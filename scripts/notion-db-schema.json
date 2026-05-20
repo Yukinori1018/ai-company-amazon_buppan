@@ -1,0 +1,55 @@
+{
+  "Name": {
+    "title": {}
+  },
+  "TicketID": {
+    "rich_text": {}
+  },
+  "Status": {
+    "select": {
+      "options": [
+        { "name": "todo",    "color": "gray"   },
+        { "name": "doing",   "color": "blue"   },
+        { "name": "waiting", "color": "yellow" },
+        { "name": "done",    "color": "green"  }
+      ]
+    }
+  },
+  "Assignee": {
+    "select": {
+      "options": [
+        { "name": "secretary",       "color": "purple" },
+        { "name": "accounting",      "color": "green"  },
+        { "name": "legal",           "color": "red"    },
+        { "name": "general_affairs", "color": "blue"   },
+        { "name": "content_creator", "color": "orange" }
+      ]
+    }
+  },
+  "Priority": {
+    "select": {
+      "options": [
+        { "name": "low",    "color": "gray" },
+        { "name": "medium", "color": "blue" },
+        { "name": "high",   "color": "red"  }
+      ]
+    }
+  },
+  "RequiresApproval": {
+    "checkbox": {}
+  },
+  "Description": {
+    "rich_text": {}
+  },
+  "CreatedAt": {
+    "date": {}
+  },
+  "UpdatedAt": {
+    "date": {}
+  },
+  "Labels": {
+    "multi_select": {
+      "options": []
+    }
+  }
+}

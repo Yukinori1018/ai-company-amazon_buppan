@@ -1,0 +1,13 @@
+.DS_Store
+
+# Claude Code: ローカル固有の設定と worktree は除外（commands/ などプロジェクト共有分はコミット）
+.claude/settings.local.json
+.claude/worktrees/
+
+# MCP の実体設定（API キー等の秘匿情報を含むため除外。.mcp.json.example はコミット）
+.mcp.json
+
+# 作業中の途中経過（agent_output）は Git 管理しない（最終納品物はリポ外）
+workspace/output/agent_output/**
+!workspace/output/agent_output/
+!workspace/output/agent_output/.gitkeep
