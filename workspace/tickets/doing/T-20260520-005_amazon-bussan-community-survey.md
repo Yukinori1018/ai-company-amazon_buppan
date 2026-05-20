@@ -2,7 +2,7 @@
 ticket_id: T-20260520-005
 title: Amazon物販の界隈調査（X / YouTube）— 基本・応用・勝ち筋
 status: doing
-assignee: secretary
+assignee: researcher
 priority: high
 created_at: 2026-05-20
 updated_at: 2026-05-20
@@ -29,3 +29,4 @@ labels: [research, learning, foundation]
 ## ログ
 
 - 2026-05-20 doing 起票（中⇒高に格上げ。軸B 着手前に必要）
+- 2026-05-20 役割再編に伴い assignee を secretary → researcher（サトル）に変更

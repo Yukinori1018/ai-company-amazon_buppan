@@ -2,7 +2,7 @@
 ticket_id: T-20260520-003
 title: Amazon物販ツール網羅調査・評価（軸A）
 status: doing
-assignee: secretary
+assignee: researcher
 priority: high
 created_at: 2026-05-20
 updated_at: 2026-05-20
@@ -45,3 +45,4 @@ labels: [strategy, tooling, research]
 
 - 2026-05-20 doing 起票（高優先・社長承認必須）
 - 2026-05-20 社長 FB「ツール詳細不足」→ 各ツール個票作成タスクを追加
+- 2026-05-20 役割再編に伴い assignee を secretary → researcher（サトル）に変更。事実シートはサトルが、導入判断（戦略部分）はプランナー（タケシ）に引き継ぐ
