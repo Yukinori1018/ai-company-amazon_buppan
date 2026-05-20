@@ -19,7 +19,7 @@
 1. Notion で新規ページを作成（任意のワークスペース内）
 2. 本文の入力欄に `/database` と入力
 3. 候補から **Database - Full page** を選択
-4. ページタイトルを `{{ 事業名 }} Tickets` 等に設定
+4. ページタイトルを `Amazon物販事業 Tickets` 等に設定
 
 ## Step 2: プロパティを整える
 
@@ -41,7 +41,7 @@
 
 1. ブラウザで [https://www.notion.so/my-integrations](https://www.notion.so/my-integrations) を開く
 2. **+ New integration** をクリック
-3. 名前を `{{ 事業名 }} MCP` 等に設定、ワークスペースを選択、Type は **Internal**
+3. 名前を `Amazon物販事業 MCP` 等に設定、ワークスペースを選択、Type は **Internal**
 4. **Submit** で作成
 5. 表示された **Internal Integration Secret**（`secret_...` で始まる文字列）をコピー
    - **このトークンは一度しか表示されない**ので、安全な場所に控える

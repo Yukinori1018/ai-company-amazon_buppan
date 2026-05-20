@@ -1,4 +1,4 @@
-# {{ 事業名 }} — AI 会社全体ルール
+# Amazon物販事業 — AI 会社全体ルール
 
 ## 0. このファイルについて
 
@@ -28,11 +28,11 @@
 
 ## 1. 会社のミッション
 
-- **事業:** {{ 事業名 }}
-- **ミッション:** {{ ミッション }}
-- **最重要KPI:** {{ 最重要KPI }}
-- **主力商品/サービス:** {{ 主力商品/サービス }}
-- **想定顧客:** {{ 想定顧客 }}
+- **事業:** Amazon物販事業
+- **ミッション:** Amazon 上で利益と販売確度の高い SKU を 100 積み上げ、月商800万円・利益率20%を達成する
+- **最重要KPI:** 月商800万円、利益率20%以上、SKU数100
+- **主力商品/サービス:** 未定（後日決定）
+- **想定顧客:** 未定（後日決定）
 
 > 子会社化時にこのセクションを埋めてください。プレースホルダーの全体一覧は §7 を参照。
 
@@ -59,7 +59,7 @@
 
 1. **窓口の一元化** — 社長への返答は秘書のみ。他エージェントは秘書経由で報告する。
 2. **チケット駆動** — すべての作業は [workspace/tickets/](workspace/tickets/) でのチケット起票から始まる。チケットなしの作業はしない。
-3. **成果物の二段管理** — 途中経過は `workspace/output/agent_output/`（リポ内、worktree 単位）、社長確認用の最終物は `~/Documents/AI Company Outputs/{{ 事業名 }}/` に配置（リポ外、全 worktree から共有、Finder で直接アクセス可）。
+3. **成果物の二段管理** — 途中経過は `workspace/output/agent_output/`（リポ内、worktree 単位）、社長確認用の最終物は `~/Documents/AI Company Outputs/Amazon物販事業/` に配置（リポ外、全 worktree から共有、Finder で直接アクセス可）。
 4. **メモリへの記録義務** — 失敗・気づき・社長のこだわり・判断理由は、自分の `memory/` に必ず残す。次回以降の品質向上の源泉となる。
 5. **不明点は止まって聞く** — 判断に迷ったら勝手に決めない。チケットを `waiting/` に出して社長に確認する。
 6. **プレースホルダーは保持** — 親テンプレ作業中は `{{ }}` を埋めない。子会社化時に初めて埋める。
@@ -110,7 +110,7 @@
 
 **複数領域にまたがる場合:**
 - 秘書が依頼を分解し、それぞれの担当に並行発注する
-- 各担当の成果物を秘書が統合して `~/Documents/AI Company Outputs/{{ 事業名 }}/<ticket_id>/` に納品
+- 各担当の成果物を秘書が統合して `~/Documents/AI Company Outputs/Amazon物販事業/<ticket_id>/` に納品
 
 ---
 
@@ -134,7 +134,7 @@ todo → doing → waiting → done
 ### 成果物の保管ルール
 
 - `workspace/output/agent_output/<ticket_id>/` — 作業中の途中経過。リポ内（worktree 単位、`.gitignore` 対象）。監査用。社長は通常見ない。
-- `~/Documents/AI Company Outputs/{{ 事業名 }}/<ticket_id>/` — **社長が確認する最終納品物のみ**。リポ外。Finder でブックマークしておくと毎回のアクセスが楽。
+- `~/Documents/AI Company Outputs/Amazon物販事業/<ticket_id>/` — **社長が確認する最終納品物のみ**。リポ外。Finder でブックマークしておくと毎回のアクセスが楽。
 
 > 最終納品物をリポ外に置く理由：worktree のサイクル（生成 → 作業 → マージ → 削除）に左右されず、全 worktree／全セッションから同じ場所で参照できるため。Finder で隠しフォルダを辿る必要もない。
 
@@ -154,11 +154,11 @@ todo → doing → waiting → done
 
 | プレースホルダー | 説明 | 記入場所 |
 |---------------|------|---------|
-| `{{ 事業名 }}` | 例：Amazon物販事業 | CLAUDE.md §1, タイトル、README, docs/ 各所 |
-| `{{ ミッション }}` | その事業の存在意義 | CLAUDE.md §1 |
-| `{{ 最重要KPI }}` | 例：月商◯◯円、SKU数 | CLAUDE.md §1 |
-| `{{ 主力商品/サービス }}` | 何を扱う事業か | CLAUDE.md §1 |
-| `{{ 想定顧客 }}` | 誰のための事業か | CLAUDE.md §1 |
+| `Amazon物販事業` | 例：Amazon物販事業 | CLAUDE.md §1, タイトル、README, docs/ 各所 |
+| `国内未進出のニッチ良品を発掘・販売し、月商800万を達成する` | その事業の存在意義 | CLAUDE.md §1 |
+| `月商800万円、利益率20%以上、SKU数100` | 例：月商◯◯円、SKU数 | CLAUDE.md §1 |
+| `未定（後日決定）` | 何を扱う事業か | CLAUDE.md §1 |
+| `未定（後日決定）` | 誰のための事業か | CLAUDE.md §1 |
 | `{{ NOTION_API_KEY }}` | Notion Integration の secret token | `.mcp.json`（`.mcp.json.example` からコピー） |
 | `{{ NOTION_DATABASE_ID }}` | カンバン用 Notion DB の ID | `.mcp.json` |
 

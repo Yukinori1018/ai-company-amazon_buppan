@@ -18,7 +18,7 @@ workspace/
 └── SUBAGENT_PROTOCOL.md         # サブエージェント共通の受け取り/引き渡し手順
 
 # 最終納品物はリポ外に格納（worktree 間で共有、Finder で直接アクセス可）
-~/Documents/AI Company Outputs/{{ 事業名 }}/
+~/Documents/AI Company Outputs/Amazon物販事業/
 ├── <ticket_id_1>/
 ├── <ticket_id_2>/
 └── ...
@@ -36,10 +36,10 @@ workspace/
 | パス | 用途 | 社長が見るか |
 |------|------|------------|
 | `workspace/output/agent_output/<ticket_id>/`（リポ内） | サブエージェントの作業中ファイル | 通常見ない（問題発生時の監査用） |
-| `~/Documents/AI Company Outputs/{{ 事業名 }}/<ticket_id>/`（リポ外） | 社長確認用の最終納品物 | **常に見る** |
+| `~/Documents/AI Company Outputs/Amazon物販事業/<ticket_id>/`（リポ外） | 社長確認用の最終納品物 | **常に見る** |
 
 `workspace/output/agent_output/` は `.gitignore` 対象（テンプレ複製時はクリーン）。
-最終納品物はリポ外なので worktree のサイクルに左右されず、Finder で `~/Documents/AI Company Outputs/{{ 事業名 }}/` をブックマークしておけば一発アクセス可。
+最終納品物はリポ外なので worktree のサイクルに左右されず、Finder で `~/Documents/AI Company Outputs/Amazon物販事業/` をブックマークしておけば一発アクセス可。
 
 ## サブエージェントの作業ルール
 

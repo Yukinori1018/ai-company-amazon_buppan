@@ -58,7 +58,7 @@ todo → doing → waiting → done
 | todo → doing | 担当エージェント起動、`status` 更新、`updated_at` 更新、Notion 同期 |
 | doing → waiting | 社長への質問内容を本文に記載、Notion 同期、`requires_approval: true` の場合は理由を明記 |
 | waiting → doing | 社長回答をログに記録、Notion 同期 |
-| doing → done | 成果物リンクを本文に追記、`~/Documents/AI Company Outputs/{{ 事業名 }}/<ticket_id>/` への配置確認、Notion 同期 |
+| doing → done | 成果物リンクを本文に追記、`~/Documents/AI Company Outputs/Amazon物販事業/<ticket_id>/` への配置確認、Notion 同期 |
 
 ファイルは物理的に `workspace/tickets/<status>/` に **mv** する（コピーではない）。
 

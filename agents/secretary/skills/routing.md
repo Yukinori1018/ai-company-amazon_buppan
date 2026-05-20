@@ -23,7 +23,7 @@
 
 1. 該当担当宛のチケットを起票（`assignee` を設定）
 2. `todo → doing` で起動
-3. 進捗を監視、完了したら `~/Documents/AI Company Outputs/{{ 事業名 }}/<ticket_id>/` を確認して社長に報告
+3. 進捗を監視、完了したら `~/Documents/AI Company Outputs/Amazon物販事業/<ticket_id>/` を確認して社長に報告
 
 ## 複数担当ケース（横断案件）
 
@@ -46,4 +46,4 @@
 2. 担当エージェントの `agent.md` と関連スキルを参照
 3. 担当エージェントに作業を委譲（Claude Code のサブエージェント機能を使う想定。詳細運用は Phase 5 で確定）
 4. 成果物は担当が `workspace/output/agent_output/<ticket_id>/` に保存（リポ内・worktree 単位）
-5. 秘書が品質確認した上で `~/Documents/AI Company Outputs/{{ 事業名 }}/<ticket_id>/` に移し、社長報告（リポ外・全 worktree から見える場所）
+5. 秘書が品質確認した上で `~/Documents/AI Company Outputs/Amazon物販事業/<ticket_id>/` に移し、社長報告（リポ外・全 worktree から見える場所）

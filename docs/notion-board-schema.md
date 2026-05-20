@@ -56,7 +56,7 @@
 
 1. Notion でワークスペース内に新規ページを作成
 2. `/database` で「Database - Full page」を挿入
-3. データベース名を `{{ 事業名 }} Tickets` 等に設定
+3. データベース名を `Amazon物販事業 Tickets` 等に設定
 4. 上記「必須プロパティ」を1つずつ追加（型と選択肢を正確に揃える）
 5. 新規ビューで「Board」を選択 → グループ化を `Status` に設定
 6. Notion インテグレーション（Internal Integration Token）を発行し、このデータベースに「接続」

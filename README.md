@@ -54,11 +54,11 @@ grep -rn "{{ " . \
 
 セットアップ時に埋めるもの（CLAUDE.md §7.1）：
 
-- `{{ 事業名 }}` — 例：Amazon物販事業
-- `{{ ミッション }}` — その事業の存在意義
-- `{{ 最重要KPI }}` — 例：月商800万円
-- `{{ 主力商品/サービス }}` — 何を扱うか
-- `{{ 想定顧客 }}` — 誰のため
+- `Amazon物販事業` — 例：Amazon物販事業
+- `国内未進出のニッチ良品を発掘・販売し、月商800万を達成する` — その事業の存在意義
+- `月商800万円、利益率20%以上、SKU数100` — 例：月商800万円
+- `未定（後日決定）` — 何を扱うか
+- `未定（後日決定）` — 誰のため
 - `{{ NOTION_API_KEY }}` / `{{ NOTION_DATABASE_ID }}` — Step 3 で取得
 
 > grep の結果に `{{ チケットタイトル }}` も出ますが、これは **runtime プレースホルダー**（チケット起票のたびに埋める）なのでセットアップ時の対応は不要です。詳細は CLAUDE.md §7.2。
@@ -81,7 +81,7 @@ Gmail・Slack・GitHub などの道具を秘書/サブエージェントに持�
 リポ外に最終納品物用フォルダを作っておきます（Finder でブックマーク推奨）：
 
 ```bash
-mkdir -p ~/Documents/"AI Company Outputs"/{{ 事業名 }}
+mkdir -p ~/Documents/"AI Company Outputs"/Amazon物販事業
 ```
 
 ### Step 6: 初回起動と動作確認
@@ -91,7 +91,7 @@ Claude Code でこのリポジトリを開いて：
 1. セッション開始時に `CLAUDE.md` が読み込まれることを確認（秘書「カズヨ」が起動）
 2. 秘書に「テスト用チケットを1件起票して Notion にも反映して」と依頼
 3. `workspace/tickets/todo/` にファイルが作られ、Notion カードも作られることを確認
-4. 何か納品物のあるタスクを試して、`~/Documents/AI Company Outputs/{{ 事業名 }}/` に最終物が置かれることを確認
+4. 何か納品物のあるタスクを試して、`~/Documents/AI Company Outputs/Amazon物販事業/` に最終物が置かれることを確認
 
 ここまで動けば運用開始可能です。
 
@@ -112,7 +112,7 @@ Claude Code でこのリポジトリを開いて：
 
 ### 3. 確認するのは最終納品物だけ
 
-**`~/Documents/AI Company Outputs/{{ 事業名 }}/`** に置かれたものを見ます。Finder でこのフォルダをブックマークしておくのがおすすめ。途中経過（リポ内の `workspace/output/agent_output/`）は問題発生時の監査用。
+**`~/Documents/AI Company Outputs/Amazon物販事業/`** に置かれたものを見ます。Finder でこのフォルダをブックマークしておくのがおすすめ。途中経過（リポ内の `workspace/output/agent_output/`）は問題発生時の監査用。
 
 ### 4. 承認が必要な依頼は `waiting/` に来る
 
@@ -140,7 +140,7 @@ Claude Code でこのリポジトリを開いて：
 ├── workspace/
 │   ├── tickets/{todo,doing,waiting,done}/   # カンバン（Notion同期）
 │   └── output/agent_output/                 # 作業中の途中経過のみ（gitignore）
-                                              # 最終納品物は ~/Documents/AI Company Outputs/{{ 事業名 }}/
+                                              # 最終納品物は ~/Documents/AI Company Outputs/Amazon物販事業/
 │   ├── README.md                            # workspace 運用ハブ
 │   └── SUBAGENT_PROTOCOL.md                 # サブ共通プロトコル
 └── docs/

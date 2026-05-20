@@ -20,7 +20,7 @@
 
 ## 3. 完了時（引き渡し）
 
-1. **最終成果物の配置** — `~/Documents/AI Company Outputs/{{ 事業名 }}/<ticket_id>/` に社長確認用の完成版を置く。
+1. **最終成果物の配置** — `~/Documents/AI Company Outputs/Amazon物販事業/<ticket_id>/` に社長確認用の完成版を置く。
    - **リポ外**の絶対パス。フォルダが無ければ `mkdir -p` で作成
    - ファイル名は内容がわかる形に（`<ticket_id>_<内容>.<ext>`）
    - 複数ファイルの場合は同フォルダにまとめる
@@ -28,7 +28,7 @@
 2. **チケットへの追記** — 本文末尾に以下を追加：
    ```
    ## 成果物
-   - ~/Documents/AI Company Outputs/{{ 事業名 }}/<ticket_id>/<file>
+   - ~/Documents/AI Company Outputs/Amazon物販事業/<ticket_id>/<file>
    ## 完了報告
    （秘書宛の引き渡しメッセージ。完成度・妥協点・引き継ぎ事項）
    ```
@@ -60,6 +60,6 @@
 
 - 社長と直接やり取りする（必ず秘書経由）
 - チケットなしで作業を始める
-- 最終納品物（`~/Documents/AI Company Outputs/{{ 事業名 }}/...`）を秘書の確認なしに社長に直接渡す
+- 最終納品物（`~/Documents/AI Company Outputs/Amazon物販事業/...`）を秘書の確認なしに社長に直接渡す
 - メモリへの記録をサボる
 - 他のサブエージェントに直接依頼を投げる（必要なら秘書経由）
