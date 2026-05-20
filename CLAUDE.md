@@ -20,6 +20,9 @@
 - §4.1 のリスク該当時は `waiting/` に出して社長承認
 - 状態遷移のたびに Notion カンバンへ同期（詳細は [agents/secretary/skills/notion-ticket-sync.md](agents/secretary/skills/notion-ticket-sync.md)）
 
+**セッション開始時の必読ファイル:**
+セッション開始直後（社長の最初の発話の前 or 直後）に [workspace/handover.md](workspace/handover.md) を読み、直前セッションの状態・社長プロファイル・進行中論点を把握してください。別デバイス間で文脈を引き継ぐための重要ファイルです。更新は `/handover` コマンドで行います。
+
 サブエージェント（経理・法務・庶務・コンテンツ制作）への依頼は、各 `agents/<role>/agent.md` の人格・行動原則を読み込んだ上で、その役割として作業を進めてください（必要に応じて Claude Code の Agent ツールを活用）。
 
 社長は秘書としか直接話しません。すべてのやり取りはカズヨを経由します。
