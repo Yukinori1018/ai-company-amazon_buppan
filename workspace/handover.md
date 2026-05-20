@@ -87,13 +87,27 @@
 | `polished-draft.md` | コンテンツ制作ヒデアキ | 磨き上げ版（用語ミニ辞典＋4ツール構造統一） |
 | `integrated-summary.md` | **秘書統合版** | 3軸の合意点・分岐点・社長判断 Q1〜Q4 |
 
-**社長判断待ち（Q1〜Q4）**:
-- Q1 基本シナリオ B 採用 → Yes 想定
-- Q2 SellerSprite vs Helium 10 vs 入れない → **未決**
-- Q3 Keepa Pro 切替を「週3件 or 判断保留3回」発火に → Yes 想定
-- Q4 店舗仕入れの予定 → 未決
+**2026-05-20 追加4観点（利益確度・回転率・仕入れ容易性・AI連携）受領 → 2エージェント並行で再評価**:
 
-PC 復帰時の推奨アクション: 上記5ファイルを `~/Documents/AI Company Outputs/Amazon物販事業/T-20260520-003/` にコピー。HTML 併出は Q1〜Q4 判定後で OK
+| 追加ファイル | 担当 | 結論 |
+|---|---|---|
+| `accounting-review-v2.md` | 経理ハジメ | **B'（Helium 10 差替え版）**。初年度約 84,000円。コスパ指数 H10 が SS の1.72倍 |
+| `general-affairs-review.md` | 庶務マリエ | AI連携順 FBA計算機≧Keepa>H10>アマサーチ>SellerSprite。5ツール統合整理スキーム提案 |
+| `integrated-summary-v2.md` | **秘書統合v2** | 5評価で Helium 10 推奨が一致、Q1〜Q6 整理 |
+
+**5評価の完全合意点**:
+- Step1=FBA計算機+Keepa無料、Step2=Keepa Pro、Step3=Helium 10（SellerSprite ではない）
+- A案（即フル）は否定
+
+**社長判断待ち（Q1〜Q6、更新版）**:
+- Q1 基本シナリオ B → Yes 想定
+- Q2 改 カテゴリ攻略期は **Helium 10** → 5評価とも推奨／例外は Q5
+- Q3 Keepa Pro 切替発火条件 → Yes 想定
+- Q4 店舗仕入れ予定 → 未決
+- Q5 新 **中国輸入を主軸にするか** → Yes なら SellerSprite 必須／No なら H10 単独
+- Q6 新 5ツール統合整理スキーム採用 → 採用推奨
+
+PC 復帰時の推奨アクション: `workspace/output/agent_output/T-20260520-003/` 配下の全ファイル（7点）を `~/Documents/AI Company Outputs/Amazon物販事業/T-20260520-003/` にコピー。HTML 併出は Q1〜Q6 判定後で OK
 
 ### T-005（界隈調査）
 

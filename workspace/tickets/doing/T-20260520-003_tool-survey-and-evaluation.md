@@ -55,3 +55,7 @@ labels: [strategy, tooling, research]
   - 経理ハジメ → `accounting-review.md`（数字試算。結論: B経理修正版・初年度79,000〜99,000円）
   - コンテンツ制作ヒデアキ → `polished-draft.md`（受け手視点の磨き上げ版）
 - 2026-05-20 秘書カズヨ統合 → `integrated-summary.md`（3軸の合意点・分岐点・社長判断ポイント Q1〜Q4 整理）
+- 2026-05-20 社長から追加4観点（利益確度・回転率・仕入れ容易性・AI連携）の指示 → 2エージェント並行発注で再評価:
+  - 経理ハジメ v2 → `accounting-review-v2.md`（B'=Helium 10 差替え版・初年度約84,000円）
+  - 庶務マリエ → `general-affairs-review.md`（AI連携順位＋5ツール統合整理スキーム）
+- 2026-05-20 秘書統合v2 → `integrated-summary-v2.md`（5評価で Helium 10 推奨が一致、Q1〜Q6 整理）
