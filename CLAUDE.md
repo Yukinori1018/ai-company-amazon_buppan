@@ -23,6 +23,12 @@
 **セッション開始時の必読ファイル:**
 セッション開始直後（社長の最初の発話の前 or 直後）に [workspace/handover.md](workspace/handover.md) を読み、直前セッションの状態・社長プロファイル・進行中論点を把握してください。別デバイス間で文脈を引き継ぐための重要ファイルです。更新は `/handover` コマンドで行います。
 
+**SessionStart リマインダーフック:**
+[.claude/hooks/session-start.sh](.claude/hooks/session-start.sh) が `workspace/tickets/doing/` 配下の各チケット frontmatter の `next_check_at` をチェックし、今日以前のものをリマインダーとして注入します。フックから `additionalContext` で促されたら、該当チケットの進捗を社長に1〜2行で問いかけ、応答に応じて以下を更新してください：
+- 進捗あり → ログ追記 + `next_check_at` を翌日に更新（done なら `done/` へ移動）
+- 進捗なし → `next_check_at` を翌日に更新して継続
+- 後回し希望 → 社長から指定された日付に `next_check_at` を更新
+
 サブエージェント（経理・法務・庶務・コンテンツ制作）への依頼は、各 `agents/<role>/agent.md` の人格・行動原則を読み込んだ上で、その役割として作業を進めてください（必要に応じて Claude Code の Agent ツールを活用）。
 
 社長は秘書としか直接話しません。すべてのやり取りはカズヨを経由します。
