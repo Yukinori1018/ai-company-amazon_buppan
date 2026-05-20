@@ -73,12 +73,27 @@
 
 社長から「ツールの詳細が不足」のフィードバックあり。Keepa / SellerSprite / アマサーチ / FBA計算機 など、**各ツールの個票（用途・できること・料金・代替・スクショ）作成**を追加タスクとして T-003 に組み込み済。
 
-**2026-05-20 cloud セッションで個票作成完了**:
-- 成果物: `workspace/output/agent_output/T-20260520-003/tool-profiles.md`（gitignore 対象だが cloud セッション保全のため force-add でコミット）
-- 各ツール1枚（用途・できること・料金・代替・画面構成・採用タイミング・注意点）＋ 横並び比較表 ＋ A/B/C＋推奨
-- 秘書推奨: **B（段階導入）**。Step1 = FBA計算機（無料）＋Keepa無料、Step2 = 体験仕入れ後に Keepa Pro / アマサーチ、Step3 = SellerSprite（法務確認後）
-- 社長次の判断: A/B/C のどれか、SellerSprite 法務発注 Y/N、店舗仕入れ前倒しの有無
-- 次セッションで PC 復帰時の推奨アクション: `~/Documents/AI Company Outputs/Amazon物販事業/T-20260520-003/` に同ファイルをコピーして Finder からアクセス可能にする。HTML 併出は社長判断後で OK
+**2026-05-20 cloud セッション**:
+
+初稿は秘書カズヨ単独で作成 → 社長から **§5 ルーティング違反** の指摘あり（リサーチ・法務評価・財務試算・磨き上げを全部秘書が抱え込んでいた）。
+
+ルール通り **3エージェント並行発注で再実施**（成果物すべて `workspace/output/agent_output/T-20260520-003/` 配下）:
+
+| ファイル | 担当 | 結論 |
+|---|---|---|
+| `tool-profiles.md` | 初稿（秘書暫定版） | — |
+| `legal-review.md` | 法務ハルオ | **条件付き可**。防御策A〜E必須＋段階導入Step3厳守。純法務票は **Helium 10 乗り換え推奨** |
+| `accounting-review.md` | 経理ハジメ | **B経理修正版**。初年度79,000〜99,000円。Pro 切替7月以降／SellerSprite は粗利10万円×2ヶ月後 |
+| `polished-draft.md` | コンテンツ制作ヒデアキ | 磨き上げ版（用語ミニ辞典＋4ツール構造統一） |
+| `integrated-summary.md` | **秘書統合版** | 3軸の合意点・分岐点・社長判断 Q1〜Q4 |
+
+**社長判断待ち（Q1〜Q4）**:
+- Q1 基本シナリオ B 採用 → Yes 想定
+- Q2 SellerSprite vs Helium 10 vs 入れない → **未決**
+- Q3 Keepa Pro 切替を「週3件 or 判断保留3回」発火に → Yes 想定
+- Q4 店舗仕入れの予定 → 未決
+
+PC 復帰時の推奨アクション: 上記5ファイルを `~/Documents/AI Company Outputs/Amazon物販事業/T-20260520-003/` にコピー。HTML 併出は Q1〜Q4 判定後で OK
 
 ### T-005（界隈調査）
 

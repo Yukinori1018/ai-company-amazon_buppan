@@ -49,5 +49,9 @@ labels: [strategy, tooling, research]
 
 - 2026-05-20 doing 起票（高優先・社長承認必須）
 - 2026-05-20 社長 FB「ツール詳細不足」→ 各ツール個票作成タスクを追加
-- 2026-05-20 cloud セッションで個票作成完了（`workspace/output/agent_output/T-20260520-003/tool-profiles.md`、cloud 由来のため force-add でコミット）。社長 A/B/C 判断待ち
-- 2026-05-20 更新日付: 2026-05-20
+- 2026-05-20 cloud セッションで個票初稿作成（秘書カズヨ単独 → §5 ルーティング違反のため社長指摘）
+- 2026-05-20 §5 ルーティングに沿って **3エージェント並行発注で再実施**:
+  - 法務ハルオ → `legal-review.md`（SellerSprite リスク評価。結論: 条件付き可／純法務票は Helium 10 推奨）
+  - 経理ハジメ → `accounting-review.md`（数字試算。結論: B経理修正版・初年度79,000〜99,000円）
+  - コンテンツ制作ヒデアキ → `polished-draft.md`（受け手視点の磨き上げ版）
+- 2026-05-20 秘書カズヨ統合 → `integrated-summary.md`（3軸の合意点・分岐点・社長判断ポイント Q1〜Q4 整理）
