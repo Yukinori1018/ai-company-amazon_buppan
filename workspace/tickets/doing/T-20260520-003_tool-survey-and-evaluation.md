@@ -50,3 +50,28 @@ labels: [strategy, tooling, research]
 - 2026-05-20 社長 FB「ツール詳細不足」→ 各ツール個票作成タスクを追加
 - 2026-05-20 役割再編に伴い assignee を secretary → researcher（サトル）に変更。事実シートはサトルが、導入判断（戦略部分）はプランナー（タケシ）に引き継ぐ
 - 2026-05-20 社長から A案承認＋以後は秘書判断で進行の指示。サトルが個票作成に着手
+- 2026-05-20 サトル：4ツールの個票初稿を `workspace/output/deliverables/T-20260520-003/` に納品（Keepa / SellerSprite / アマサーチ / FBA計算機）
+
+## 成果物
+
+- `workspace/output/deliverables/T-20260520-003/README.md` — 個票インデックス
+- `workspace/output/deliverables/T-20260520-003/01_keepa.md`
+- `workspace/output/deliverables/T-20260520-003/02_sellersprite.md`
+- `workspace/output/deliverables/T-20260520-003/03_amasearch.md`
+- `workspace/output/deliverables/T-20260520-003/04_fba-calculator.md`
+
+## 次の手
+
+1. 社長レビュー（粒度・項目過不足）
+2. タケシ（プランナー）にバトンパス → 導入タイミング戦略（即導入 vs 軸B後 vs 不要）の A/B/C＋推奨を起案
+3. マサル（シミュレーター）が仮想 PDCA → 撤退条件・KPI を磨き込み
+4. 収束後、社長へ最終提案（実 Do = 契約申し込みは社長アクション）
+
+## 仮想 PDCA（マサル用メモ）
+
+タケシが戦略案を出したら、マサルが以下シナリオで仮想実行：
+- **シナリオA：即 Keepa Premium 導入（月¥3,000）** — 軸B未着手のため使いこなせず3ヶ月空回りリスク
+- **シナリオB：軸B 1周後に Keepa Premium 導入** — 文脈を持ったまま導入できデータの読みが早い
+- **シナリオC：当面アマサーチ無料版＋ FBA計算機のみ** — 初期コストゼロ、ただし市場分析の解像度が低い
+
+撤退条件のヒント：「導入後3ヶ月で売上に貢献するSKU発見ゼロなら撤退」など。
