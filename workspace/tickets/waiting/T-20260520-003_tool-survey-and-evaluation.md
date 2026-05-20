@@ -1,13 +1,14 @@
 ---
 ticket_id: T-20260520-003
 title: Amazon物販ツール網羅調査・評価（軸A）
-status: doing
+status: waiting
 assignee: researcher
 priority: high
 created_at: 2026-05-20
 updated_at: 2026-05-20
 requires_approval: true
 labels: [strategy, tooling, research]
+parent_ticket: ""
 ---
 
 ## 要件
@@ -51,6 +52,7 @@ labels: [strategy, tooling, research]
 - 2026-05-20 役割再編に伴い assignee を secretary → researcher（サトル）に変更。事実シートはサトルが、導入判断（戦略部分）はプランナー（タケシ）に引き継ぐ
 - 2026-05-20 社長から A案承認＋以後は秘書判断で進行の指示。サトルが個票作成に着手
 - 2026-05-20 サトル：4ツールの個票初稿を `workspace/output/deliverables/T-20260520-003/` に納品（Keepa / SellerSprite / アマサーチ / FBA計算機）
+- 2026-05-20 doing → waiting に移動。社長レビュー待ち（個票4本の粒度・項目過不足を確認いただきたい）
 
 ## 成果物
 

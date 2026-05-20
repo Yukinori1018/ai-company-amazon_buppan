@@ -1,13 +1,14 @@
 ---
 ticket_id: T-20260520-005
 title: Amazon物販の界隈調査（X / YouTube）— 基本・応用・勝ち筋
-status: doing
+status: waiting
 assignee: researcher
 priority: high
 created_at: 2026-05-20
 updated_at: 2026-05-20
 requires_approval: false
 labels: [research, learning, foundation]
+parent_ticket: ""
 ---
 
 ## 要件
@@ -24,9 +25,10 @@ labels: [research, learning, foundation]
 
 ## 現在地
 
-調査着手。WebSearch を中心に一次情報を集め、まとめる。
+レポート納品済、社長レビュー待ち。レポートは `workspace/output/agent_output/T-20260520-005/report.md`（クラウドでは gitignore のため未push）。PC 復帰時に `workspace/output/deliverables/T-20260520-005/` へ移して全環境から見られるようにする。
 
 ## ログ
 
 - 2026-05-20 doing 起票（中⇒高に格上げ。軸B 着手前に必要）
 - 2026-05-20 役割再編に伴い assignee を secretary → researcher（サトル）に変更
+- 2026-05-20 doing → waiting に移動。レポート完了、社長レビュー待ち
