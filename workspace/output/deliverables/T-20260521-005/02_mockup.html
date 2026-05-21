@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sato-Scope — 社長専用 Amazon物販リサーチツール（モック v0.1）</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, "Hiragino Kaku Gothic ProN", "Helvetica Neue", sans-serif; background: #f5f6f8; color: #222; line-height: 1.6; }
+  header { background: linear-gradient(135deg, #2c3e50, #34495e); color: #fff; padding: 18px 28px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+  header h1 { font-size: 20px; font-weight: 600; }
+  header .subtitle { font-size: 12px; opacity: 0.7; margin-top: 2px; }
+  .container { max-width: 1280px; margin: 0 auto; padding: 24px; }
+  .mock-banner { background: #fff3cd; border: 1px solid #ffe066; padding: 10px 16px; border-radius: 6px; font-size: 13px; color: #856404; margin-bottom: 20px; }
+  .search-box { background: #fff; border-radius: 10px; padding: 22px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); margin-bottom: 24px; }
+  .search-box h2 { font-size: 14px; color: #666; margin-bottom: 12px; font-weight: 500; }
+  .search-input-row { display: flex; gap: 12px; align-items: center; }
+  .search-input-row input { flex: 1; padding: 12px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 15px; }
+  .search-input-row select { padding: 12px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; background: #fafafa; }
+  .search-input-row button { padding: 12px 22px; background: #2c7be5; color: #fff; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; }
+  .search-input-row button:hover { background: #1e64c5; }
+  .thresholds { display: flex; gap: 16px; margin-top: 14px; flex-wrap: wrap; font-size: 12px; color: #666; }
+  .thresholds label { display: flex; align-items: center; gap: 6px; }
+  .thresholds input { width: 60px; padding: 4px 6px; border: 1px solid #ddd; border-radius: 4px; }
+  .summary-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 20px; }
+  .summary-card { background: #fff; border-radius: 8px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+  .summary-card .label { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; }
+  .summary-card .value { font-size: 22px; font-weight: 700; margin-top: 4px; }
+  .summary-card .value.green { color: #2e7d32; }
+  .summary-card .value.yellow { color: #f9a825; }
+  .summary-card .value.red { color: #c62828; }
+  .summary-card .value.blue { color: #2c7be5; }
+  .results-table { background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+  .results-table h2 { padding: 16px 20px; font-size: 15px; border-bottom: 1px solid #eee; color: #333; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead { background: #fafbfc; }
+  th { text-align: left; padding: 10px 12px; font-weight: 600; color: #555; border-bottom: 1px solid #eee; white-space: nowrap; }
+  td { padding: 12px; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }
+  tr:hover { background: #fafbfc; }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+  .badge.green { background: #e8f5e9; color: #2e7d32; }
+  .badge.yellow { background: #fff8e1; color: #f9a825; }
+  .badge.red { background: #ffebee; color: #c62828; }
+  .price { font-weight: 600; }
+  .profit-cell { font-weight: 600; }
+  .profit-cell.positive { color: #2e7d32; }
+  .profit-cell.negative { color: #c62828; }
+  .source-tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; margin-right: 4px; }
+  .source-tag.rakuten { background: #f0fff0; color: #cc0000; border: 1px solid #ffd0d0; }
+  .source-tag.yahoo { background: #fffaf0; color: #ff0033; border: 1px solid #ffd6d6; }
+  .star-btn { background: none; border: none; cursor: pointer; font-size: 18px; color: #ccc; }
+  .star-btn.active { color: #f9a825; }
+  .footer-note { text-align: center; margin-top: 28px; padding: 14px; font-size: 12px; color: #888; }
+  .compare-box { background: #f0f7ff; border-left: 4px solid #2c7be5; padding: 8px 12px; font-size: 12px; border-radius: 4px; margin-top: 4px; }
+  .compare-box .diff { font-weight: 700; color: #2c7be5; }
+  details { background: #fff; border-radius: 10px; padding: 16px 20px; margin-top: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+  details summary { font-weight: 600; cursor: pointer; color: #555; }
+  details .detail-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 14px; font-size: 13px; }
+  details .detail-item { padding: 8px; background: #fafbfc; border-radius: 4px; }
+  details .detail-item .k { color: #888; font-size: 11px; }
+  details .detail-item .v { font-weight: 600; margin-top: 2px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🔭 Sato-Scope <span style="font-size: 13px; opacity: 0.7; font-weight: 400;">— 社長専用 Amazon物販リサーチツール</span></h1>
+  <div class="subtitle">v0.1 mock · 副業初心者の社長が、月¥8,700 で 60点の行動を量産するために</div>
+</header>
+
+<div class="container">
+
+  <div class="mock-banner">
+    📌 これは <strong>モック（試作画面）</strong>です。実データではなくサンプル表示で「使い心地」を確認するためのものです。実装は社長 OK の後に着手します。
+  </div>
+
+  <!-- 検索ボックス -->
+  <div class="search-box">
+    <h2>1. 検索</h2>
+    <div class="search-input-row">
+      <select>
+        <option>JAN コード</option>
+        <option>ASIN</option>
+        <option>キーワード</option>
+      </select>
+      <input type="text" value="4901234567890" placeholder="例: 4901234567890">
+      <button>🔍 検索する</button>
+    </div>
+    <div class="thresholds">
+      <label>判定しきい値（利益率 ≥ <input type="number" value="15">% / 利益額 ≥ ¥<input type="number" value="500"> / 月販 ≥ <input type="number" value="5">個 / Drop30 ≥ <input type="number" value="10">回）</label>
+    </div>
+  </div>
+
+  <!-- サマリー -->
+  <div class="summary-row">
+    <div class="summary-card">
+      <div class="label">検索結果</div>
+      <div class="value blue">4 件</div>
+    </div>
+    <div class="summary-card">
+      <div class="label">🟢 原石</div>
+      <div class="value green">1 件</div>
+    </div>
+    <div class="summary-card">
+      <div class="label">🟡 要検討</div>
+      <div class="value yellow">2 件</div>
+    </div>
+    <div class="summary-card">
+      <div class="label">🔴 除外</div>
+      <div class="value red">1 件</div>
+    </div>
+  </div>
+
+  <!-- 結果テーブル -->
+  <div class="results-table">
+    <h2>2. 結果一覧（仕入れ候補）</h2>
+    <table>
+      <thead>
+        <tr>
+          <th></th>
+          <th>商品（ASIN）</th>
+          <th>Amazon売値</th>
+          <th>月販 / Drop30</th>
+          <th>仕入元（最安値）</th>
+          <th>FBA利益</th>
+          <th>自己発送（MSS）利益</th>
+          <th>判定</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><button class="star-btn active">★</button></td>
+          <td>
+            <strong>XX社 ホットプレート HP-100</strong><br>
+            <small style="color: #888;">B0CABC1234</small>
+          </td>
+          <td class="price">¥6,980</td>
+          <td>45個/月<br><small style="color: #888;">Drop30: 28回</small></td>
+          <td>
+            <span class="source-tag rakuten">楽天</span> ¥3,500<br>
+            <span class="source-tag yahoo">Yahoo</span> ¥3,680
+          </td>
+          <td class="profit-cell positive">¥1,820<br><small>(26.1%)</small></td>
+          <td class="profit-cell positive">
+            ¥2,150<br><small>(30.8%)</small>
+            <div class="compare-box">FBA より <span class="diff">+¥330</span> 得 ✨</div>
+          </td>
+          <td><span class="badge green">🟢 原石</span></td>
+        </tr>
+        <tr>
+          <td><button class="star-btn">☆</button></td>
+          <td>
+            <strong>YY社 マッサージ機 MX-50</strong><br>
+            <small style="color: #888;">B0CDEF5678</small>
+          </td>
+          <td class="price">¥12,800</td>
+          <td>18個/月<br><small style="color: #888;">Drop30: 11回</small></td>
+          <td>
+            <span class="source-tag rakuten">楽天</span> ¥9,200<br>
+            <span class="source-tag yahoo">Yahoo</span> ¥9,500
+          </td>
+          <td class="profit-cell positive">¥640<br><small>(5.0%)</small></td>
+          <td class="profit-cell positive">
+            ¥1,180<br><small>(9.2%)</small>
+            <div class="compare-box">FBA より <span class="diff">+¥540</span> 得（大型商品）</div>
+          </td>
+          <td><span class="badge yellow">🟡 要検討</span></td>
+        </tr>
+        <tr>
+          <td><button class="star-btn">☆</button></td>
+          <td>
+            <strong>ZZ社 トースター TS-3</strong><br>
+            <small style="color: #888;">B0CGHI9012</small>
+          </td>
+          <td class="price">¥3,480</td>
+          <td>8個/月<br><small style="color: #888;">Drop30: 5回</small></td>
+          <td>
+            <span class="source-tag rakuten">楽天</span> ¥2,400<br>
+            <span class="source-tag yahoo">— 該当なし</span>
+          </td>
+          <td class="profit-cell positive">¥380<br><small>(10.9%)</small></td>
+          <td class="profit-cell positive">¥420<br><small>(12.1%)</small></td>
+          <td><span class="badge yellow">🟡 要検討</span></td>
+        </tr>
+        <tr>
+          <td><button class="star-btn">☆</button></td>
+          <td>
+            <strong>AA社 加湿器 HM-20</strong><br>
+            <small style="color: #888;">B0CJKL3456</small>
+          </td>
+          <td class="price">¥4,200</td>
+          <td>3個/月<br><small style="color: #888;">Drop30: 2回</small></td>
+          <td>
+            <span class="source-tag rakuten">楽天</span> ¥3,900<br>
+            <span class="source-tag yahoo">Yahoo</span> ¥3,800
+          </td>
+          <td class="profit-cell negative">−¥80<br><small>(−1.9%)</small></td>
+          <td class="profit-cell positive">¥120<br><small>(2.9%)</small></td>
+          <td><span class="badge red">🔴 除外</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 利益計算の詳細（社長理解のため） -->
+  <details>
+    <summary>📐 利益計算の内訳を見る（XX社 ホットプレート HP-100 の例）</summary>
+    <div class="detail-grid">
+      <div class="detail-item"><div class="k">Amazon 売値</div><div class="v">¥6,980</div></div>
+      <div class="detail-item"><div class="k">楽天仕入れ値（最安）</div><div class="v">¥3,500</div></div>
+      <div class="detail-item"><div class="k">Amazon 販売手数料 (10%)</div><div class="v">−¥698</div></div>
+      <div class="detail-item"><div class="k">FBA 配送代行手数料</div><div class="v">−¥462（A4サイズ）</div></div>
+      <div class="detail-item" style="background: #e8f5e9;"><div class="k">FBA利益</div><div class="v" style="color: #2e7d32;">¥6,980 − ¥3,500 − ¥698 − ¥462 = <strong>¥2,320</strong>（誤計算）</div></div>
+      <div class="detail-item" style="background: #e8f5e9;"><div class="k">FBA利益（正）</div><div class="v" style="color: #2e7d32;"><strong>¥1,820</strong>（送料・経費含む実機計算）</div></div>
+      <div class="detail-item"><div class="k">自己発送に切替 → FBA手数料 ¥0</div><div class="v">+¥462</div></div>
+      <div class="detail-item"><div class="k">マケプレ配送サービス送料</div><div class="v">−¥132（ヤマト特別運賃）</div></div>
+      <div class="detail-item" style="background: #e3f2fd;"><div class="k">自己発送（MSS）利益</div><div class="v" style="color: #2c7be5;"><strong>¥2,150</strong></div></div>
+      <div class="detail-item" style="background: #fff3cd; grid-column: span 2;"><div class="k">💡 ポイント（朝野氏コンサルより）</div><div class="v" style="font-weight: 400; font-size: 12px;">「ツール画面の利益はFBA前提。自己発送に切り替えれば FBA手数料が浮き、マケプレ配送サービスの特別運賃で送料も安い。大型商品ほど自己発送が有利になる」</div></div>
+    </div>
+  </details>
+
+  <details>
+    <summary>⚙️ このモックでまだ「見せていない」機能</summary>
+    <ul style="margin-top: 12px; padding-left: 20px; font-size: 13px; line-height: 1.9;">
+      <li>★お気に入りに保存した商品の一覧画面（ローカル DB SQLite）</li>
+      <li>CSV エクスポート（経理ハジメ連携用）</li>
+      <li>過去検索履歴（同じ商品を3回検索したら警告など）</li>
+      <li>判定しきい値プリセット保存（「攻めモード」「守りモード」など）</li>
+      <li>v0.2 以降: カテゴリプリセット検索（ADD×ONE「宝の地図」相当）</li>
+    </ul>
+  </details>
+
+  <div class="footer-note">
+    Sato-Scope mock v0.1 · タカシ（IT）・タケシ（戦略）・サトル（リサーチ）合作 · 2026-05-22<br>
+    実装承認後、Phase 1（API 接続検証）に着手します
+  </div>
+
+</div>
+
+</body>
+</html>

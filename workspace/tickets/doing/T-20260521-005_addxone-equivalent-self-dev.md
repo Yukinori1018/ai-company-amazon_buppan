@@ -1,11 +1,12 @@
 ---
 ticket_id: T-20260521-005
 title: ADD×ONE PROJECT 同等の社長専用 物販リサーチツール 自社開発検討
-status: todo
-assignee: secretary
+status: doing
+assignee: it_engineer
 priority: high
 created_at: 2026-05-21
-updated_at: 2026-05-21
+updated_at: 2026-05-22
+next_check_at: 2026-05-23
 requires_approval: true
 labels: [dev, research, mvp, tooling]
 related_tickets: [T-20260520-006]
@@ -62,8 +63,18 @@ ADD×ONE はスクレイピング方式と推定だが、本案は **Yahoo!公�
 
 ## 現在地
 
-社長 A/B/C 判断待ち。起票のみ完了（チケット駆動の鉄則に従い、判断前から状態を明示）。
+**Phase 0 完了**（2026-05-22）。サトル・タケシ・タカシ3者合作で以下を納品、社長レビュー待ち。
+
+- `workspace/output/deliverables/T-20260521-005/01_tool-overview.md` — ツール概要・MVP仕様
+- `workspace/output/deliverables/T-20260521-005/02_mockup.html` — HTML モック
+- `workspace/output/deliverables/T-20260521-005/03_research-and-strategy.md` — リサーチ＆戦略ログ
+- `workspace/output/deliverables/T-20260521-005/README.md`
+
+A/B/C 判断後に Phase 1（API 接続検証）着手。Phase 1 時点で Keepa API €49/月課金の §4.1 承認を改めて取得。
 
 ## ログ
 
-- 2026-05-21 起票。社長依頼受領 → A/B/C 提案中。秘書推奨 A
+- 2026-05-21 起票。社長依頼受領 → A/B/C 提案
+- 2026-05-21 社長 A 承認（IT エージェント「タカシ」新規雇用で進行）
+- 2026-05-22 タカシ正式登用（`agents/it_engineer/agent.md` 作成、CLAUDE.md §2/§5 追記）
+- 2026-05-22 Phase 0 納品。3者合作で概要・モック・戦略ログを deliverables 配置
