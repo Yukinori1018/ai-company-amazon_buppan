@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>Amazon物販 仕入れ〜販売 完全プレイブック（FBA・小口・予算10万円） — T-20260520-008</title>
+<style>
+  @page { size: A4; margin: 18mm 14mm; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body {
+    font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", "Noto Sans JP", sans-serif;
+    color: #1f2328;
+    line-height: 1.75;
+    max-width: 940px;
+    margin: 0 auto;
+    padding: 32px 28px 80px;
+    background: #fafbfc;
+    font-size: 14.5px;
+  }
+  h1 {
+    font-size: 1.95em;
+    border-bottom: 3px solid #0969da;
+    padding-bottom: 0.4em;
+    margin-top: 1.2em;
+    color: #0a1929;
+    letter-spacing: 0.02em;
+  }
+  h2 {
+    font-size: 1.45em;
+    border-bottom: 2px solid #d0d7de;
+    padding-bottom: 0.3em;
+    margin-top: 2.4em;
+    color: #0a1929;
+  }
+  h3 {
+    font-size: 1.15em;
+    margin-top: 1.8em;
+    color: #1f2328;
+  }
+  h4 {
+    font-size: 1.02em;
+    margin-top: 1.4em;
+    color: #1f2328;
+  }
+  p { margin: 0.7em 0; }
+  blockquote {
+    border-left: 4px solid #d0d7de;
+    background: #f6f8fa;
+    margin: 1em 0;
+    padding: 0.8em 1.2em;
+    color: #57606a;
+    border-radius: 0 4px 4px 0;
+  }
+  blockquote strong { color: #1f2328; }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1.2em 0;
+    font-size: 0.92em;
+    page-break-inside: avoid;
+  }
+  th, td {
+    border: 1px solid #d0d7de;
+    padding: 7px 11px;
+    text-align: left;
+    vertical-align: top;
+  }
+  th {
+    background: #f1f4f8;
+    font-weight: 700;
+    color: #0a1929;
+  }
+  tr:nth-child(even) td { background: #fafbfc; }
+  code {
+    background: #eef2f6;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", "Consolas", monospace;
+    font-size: 0.88em;
+    color: #82071e;
+  }
+  pre {
+    background: #0d1117;
+    color: #e6edf3;
+    padding: 16px 20px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 0.85em;
+    line-height: 1.55;
+    page-break-inside: avoid;
+  }
+  pre code { background: transparent; color: inherit; padding: 0; }
+  ul, ol { padding-left: 1.8em; }
+  li { margin: 0.3em 0; }
+  hr {
+    border: none;
+    border-top: 1px dashed #d0d7de;
+    margin: 2.6em 0;
+  }
+  a { color: #0969da; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .toc {
+    background: #f1f4f8;
+    border: 1px solid #d0d7de;
+    border-radius: 8px;
+    padding: 18px 26px;
+    margin: 1.8em 0 2.4em;
+  }
+  .toc h2 {
+    border: none;
+    margin-top: 0;
+    font-size: 1.1em;
+  }
+  .toc ol { margin: 0.4em 0; padding-left: 1.6em; }
+  .toc a { color: #0a1929; }
+  .badge {
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 11px;
+    font-size: 0.78em;
+    font-weight: 700;
+    vertical-align: middle;
+  }
+  .badge-ng { background: #ffebe9; color: #82071e; border: 1px solid #ffcecb; }
+  .badge-warn { background: #fff8c5; color: #7d4e00; border: 1px solid #f0d96b; }
+  .badge-ok { background: #dafbe1; color: #1a7f37; border: 1px solid #aceebb; }
+  .callout {
+    border-left: 5px solid #d29922;
+    background: #fff8c5;
+    padding: 12px 18px;
+    margin: 1.2em 0;
+    border-radius: 0 6px 6px 0;
+  }
+  .callout-danger {
+    border-left-color: #cf222e;
+    background: #ffebe9;
+  }
+  .callout-info {
+    border-left-color: #0969da;
+    background: #ddf4ff;
+  }
+  .callout strong { color: #0a1929; }
+  .frontmatter {
+    background: #f6f8fa;
+    border: 1px solid #d0d7de;
+    border-radius: 8px;
+    padding: 14px 20px;
+    font-size: 0.92em;
+    color: #57606a;
+    margin: 1.2em 0 2em;
+  }
+  .frontmatter strong { color: #1f2328; }
+  .signature {
+    margin-top: 3em;
+    padding-top: 1em;
+    border-top: 2px solid #0969da;
+    color: #57606a;
+    font-style: italic;
+  }
+  @media print {
+    body { background: #fff; max-width: 100%; padding: 0; font-size: 11pt; }
+    h2 { page-break-before: auto; page-break-after: avoid; }
+    h3 { page-break-after: avoid; }
+    table, pre, blockquote, .callout { page-break-inside: avoid; }
+    a { color: #000; text-decoration: none; }
+    .toc { page-break-after: always; }
+  }
+</style>
+</head>
+<body>
+
+<h1>Amazon物販 仕入れ〜販売 完全プレイブック</h1>
+<p style="font-size:1.05em; color:#57606a; margin-top:-0.4em;">FBA利用・小口プラン・予算10万円 — 副業初心者の社長が Day 1 から動き出すための操作マニュアル</p>
+
+<div class="frontmatter">
+<strong>T-20260520-008 統合成果物</strong> ／ 制作: コンテンツ制作 ヒデアキ（2026-05-21）<br>
+入力: 経理ハジメ（収支シミュレーション）／庶務マリエ（仕入れ先30件）／法務ハルオ（規制マトリクス）<br>
+読み方: 上から順に読めば、Day 1 から Day 75 まで、迷わず実行できる設計にしました<br>
+用語の補足: 用語集 <a href="../T-20260520-007/glossary.md">T-20260520-007/glossary.md</a> を別タブで開いておくと作業が止まりません
+</div>
+
+<h2>このプレイブックの読み方（最初に2分だけ）</h2>
+<p>社長、本書は「資料」ではなく「<strong>操作マニュアル</strong>」です。家電の取扱説明書と同じ思想で書きました。</p>
+<ul>
+<li><strong>時系列で並んでいます</strong>: Day 1 → Day 7 → Day 30 → Day 75 と、上から実行すれば終わります</li>
+<li><strong>「やってはいけない」を §1 に置きました</strong>: 利益を取りに行く前に、退場リスクを潰してください</li>
+<li><strong>3エージェントの判定理由を残しています</strong>: 経理／庶務／法務それぞれの判断根拠を消していません。社長が判断を覆す時に、誰の意見を否定しているのか分かるようにするためです</li>
+<li><strong>数字は経理ハジメの中央シナリオを採用</strong>: 楽観・悲観の幅は §4 と §6 に残しました</li>
+<li><strong>判断を仰ぐ箇所には「【社長判断】」マーク</strong>: 該当箇所では作業を止めて、秘書カズヨ経由で承認を取ってください</li>
+</ul>
+
+<div class="toc">
+<h2>目次</h2>
+<ol>
+<li><a href="#sec1">【最重要】着手前に必ず読む — やってはいけない Top 5</a></li>
+<li><a href="#sec2">全体像 — 仕入れから入金までのフロー一枚絵</a></li>
+<li><a href="#sec3">整合性チェック — 経理推奨3商品の法務再判定（重大変更あり）</a></li>
+<li><a href="#sec4">推奨商品3点（修正後）と1サイクル収支</a></li>
+<li><a href="#sec5">時系列ロードマップ — Day 1 から Day 75 まで</a></li>
+<li><a href="#sec6">キャッシュフロー可視化 — 現金がいつ動くか</a></li>
+<li><a href="#sec7">仕入れ先カタログ（庶務マリエ版・厳選3棚に絞り込み）</a></li>
+<li><a href="#sec8">損益分岐とリスク早見表</a></li>
+<li><a href="#sec9">躓きポイント先回り集</a></li>
+<li><a href="#sec10">ヒデアキの作業ノート</a></li>
+<li><a href="#sec11">秘書（カズヨ）への申し送り</a></li>
+</ol>
+</div>
+
+<h2 id="sec1">1. 【最重要】着手前に必ず読む — やってはいけない Top 5</h2>
+
+<div class="callout callout-danger">
+<strong>法務ハルオが断じた「踏み抜くと取り返しがつかない」5領域です。</strong>利益が出るかどうか以前に、<strong>事業継続の可否</strong>がかかっています。最初の1サイクルでは絶対に手を出さないでください。
+</div>
+
+<table>
+<thead>
+<tr><th>順位</th><th>触ってはいけない商品</th><th>踏んだ時の最悪事態</th></tr>
+</thead>
+<tbody>
+<tr><td><span class="badge badge-ng">第1位</span></td><td><strong>ブランド品（並行輸入を含む）</strong> — ロレックス、ヴィトン、ナイキの一部、Apple並行品など</td><td>商標権侵害申立て1件で <strong>アカウント永久停止</strong>＋刑事告訴＋民事賠償。真贋証明が事実上不可能</td></tr>
+<tr><td><span class="badge badge-ng">第2位</span></td><td><strong>中古化粧品・サプリ・医薬品</strong></td><td>薬機法違反で <strong>3年以下の懲役または300万円以下の罰金</strong>＋アカウント停止</td></tr>
+<tr><td><span class="badge badge-ng">第3位</span></td><td><strong>PSEマークなしの電気製品</strong>（中国輸入の充電器・モバイルバッテリー・LED照明など）</td><td>電気用品安全法違反で <strong>1年以下の懲役または100万円以下の罰金</strong>＋火災事故時の製造物責任（PL法）</td></tr>
+<tr><td><span class="badge badge-ng">第4位</span></td><td><strong>技適マークなしの無線機器</strong>（海外Bluetoothスピーカー、Wi-Fi機器、トランシーバー）</td><td>電波法違反で <strong>1年以下の拘禁刑または100万円以下の罰金</strong></td></tr>
+<tr><td><span class="badge badge-ng">第5位</span></td><td><strong>食品全般（特に輸入食品）</strong></td><td>食品衛生法第27条の事前届出、HACCP衛生管理、表示基準対応が必要。<strong>副業初心者には全て無理</strong>。食中毒発生時は刑事責任</td></tr>
+</tbody>
+</table>
+
+<h3>なぜこの順番なのか（ヒデアキの整理）</h3>
+<p>法務ハルオの所見をそのまま引用します。「<strong>初心者の最初の1周は『何を扱うか』より『何を扱わないか』を厳格に決めることが最も重要</strong>」。利益10%を取りに行く前に、<strong>退場確率を1%でも下げる</strong>のが合理です。</p>
+
+<blockquote>
+<strong>【社長判断不要・即実行ルール】</strong>: 上記5領域は1サイクル目では一切扱わない。秘書カズヨが商品候補を提案する際も、この5領域に該当しないことを必ず確認すること。
+</blockquote>
+
+<h2 id="sec2">2. 全体像 — 仕入れから入金までのフロー一枚絵</h2>
+
+<pre><code>┌─────────────────────────────────────────────────────────────────┐
+│                  Amazon物販 1サイクル 全体像                       │
+│            （FBA・小口プラン・所要 約75日）                         │
+└─────────────────────────────────────────────────────────────────┘
+
+  [Day 1-3]            [Day 4-7]            [Day 8-14]          [Day 15-22]
+  ┌──────────┐        ┌──────────┐        ┌──────────┐        ┌──────────┐
+  │ 開業届   │        │ 商品候補 │        │ 仕入れ先 │        │ 仕入れ   │
+  │ ＋古物商 │  →    │ Keepa等で│  →    │ 選定＆発注│  →    │ 着荷＆検品│
+  │ 申請     │        │ リサーチ │        │          │        │          │
+  └──────────┘        └──────────┘        └──────────┘        └──────────┘
+                                                                    ↓
+  [Day 75-]            [Day 30-75]          [Day 23-30]         [Day 22-23]
+  ┌──────────┐        ┌──────────┐        ┌──────────┐        ┌──────────┐
+  │ 売上入金 │        │ 販売開始 │        │ FBA納品  │        │ ラベル貼り│
+  │（14日毎）│  ←    │ ＋価格   │  ←    │ プラン作成│  ←    │ ＋梱包   │
+  │ ＋次回   │        │ モニタ   │        │ ＋発送   │        │          │
+  └──────────┘        └──────────┘        └──────────┘        └──────────┘
+
+  関与プレイヤー（一枚絵で把握してください）:
+  ・あなた（社長）            ─ 意思決定・仕入れ承認・キャッシュフロー管理
+  ・秘書（カズヨ）            ─ 進捗管理・承認窓口・サブエージェント統括
+  ・仕入れ先（NETSEA等）      ─ 商品供給
+  ・Amazon FBA倉庫            ─ 在庫保管・梱包・配送・カスタマーサポート
+  ・購入者                    ─ Amazon経由で代金支払
+  ・Amazon → 出品者口座       ─ 14日サイクルで売上を振込</code></pre>
+
+<h3>このフローで覚えておくべき3つの原則</h3>
+<ol>
+<li><strong>現金は仕入れ時点で消える（在庫に変わる）</strong>: Day 8〜14 で約 6.5 万円が出ていきます。「<strong>消えたのではなく在庫に変わっただけ</strong>」と捉えてください（経理ハジメ）</li>
+<li><strong>販売開始から初回入金まで約14日のラグ</strong>: Day 30 に売れても、入金は Day 44 頃。<strong>売れていても手元には入らない期間</strong>があります</li>
+<li><strong>1サイクル完了は約75日</strong>: 「Day 1 に動き始めて Day 75 に投資回収」がベースライン。これを <strong>2.5ヶ月</strong> と覚えてください</li>
+</ol>
+
+<h2 id="sec3">3. 整合性チェック — 経理推奨3商品の法務再判定（重大変更あり）</h2>
+<p>私（ヒデアキ）が3エージェントの成果を突合した結果、<strong>経理推奨の3商品のうち2点に法務上の懸念</strong>を発見しました。この §3 は、3者の差分を社長に正直にお見せするセクションです。</p>
+
+<h3>3-1. 経理推奨3商品 × 法務マトリクスの突合</h3>
+<table>
+<thead>
+<tr><th>#</th><th>経理推奨商品</th><th>経理判定</th><th>法務マトリクス該当</th><th>総合判定（ヒデアキ）</th></tr>
+</thead>
+<tbody>
+<tr><td>①</td><td><strong>シャンプー詰替パウチ</strong>（H&amp;B 消耗品）</td><td>規制軽い・10%手数料</td><td><strong>「化粧品（ヘアケア）」非推奨</strong>。Amazon出品許可申請必須・全成分日本語表示義務</td><td><span class="badge badge-warn">要差替え or 出品許可取得後</span></td></tr>
+<tr><td>②</td><td><strong>猫用おやつ ちゅーる類似品</strong>（ペット消耗品）</td><td>規制低〜中・8%手数料</td><td>「ペット用品（処方食・サプリ）」慎重。<strong>一般おやつは原則可だがペットフード安全法の表示義務あり</strong></td><td><span class="badge badge-warn">条件付き可</span></td></tr>
+<tr><td>③</td><td><strong>ステンレスタンブラー 真空断熱</strong>（H&amp;K 小物）</td><td>規制軽い・15%手数料</td><td>食品衛生法上の「器具・容器包装」に該当。<strong>国内メーカー正規品なら届出済みで問題なし</strong>、輸入ノーブランド品は食品衛生法第27条の輸入届出が必要</td><td><span class="badge badge-ok">国内メーカー品なら安全</span></td></tr>
+</tbody>
+</table>
+
+<h3>3-2. 商品①シャンプーの差し戻し判断（最重要）</h3>
+<p>法務ハルオの規制マトリクス A-1 に明記されています:</p>
+<blockquote>
+<strong>「化粧品（スキンケア・ヘアケア・メイク）」</strong>: Amazon出品許可申請必須。製造販売届出済品目に限定。全成分の日本語表示が必須。輸入は製造販売業許可が必要。<strong>初心者推奨度: 非推奨</strong>
+</blockquote>
+<p>シャンプー（医薬部外品含む）は明確に<strong>ヘアケア＝化粧品扱い</strong>です。経理ハジメは「日用品扱いのシャンプー」と表現していますが、<strong>Amazon の出品制限カテゴリ上は化粧品</strong>として扱われます。</p>
+
+<p><strong>ヒデアキの提案</strong>: 商品①を以下のいずれかに差し替えます。</p>
+<table>
+<thead>
+<tr><th>差替え候補</th><th>理由</th><th>1サイクル想定利益（経理推定流用）</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>A. 国内メーカー製 文房具・収納雑貨</strong>（A4ファイル・収納ボックス等）</td><td>法務ハルオの推奨ホワイトリスト「(1) 国内メーカー直販／正規問屋経由の新品日用品」に直撃。出品制限なし・PSE/技適/薬機法すべて非該当</td><td>約 +9,000円〜+12,000円（H&amp;B枠を継承）</td></tr>
+<tr><td><strong>B. 清掃用品</strong>（マイクロファイバークロス、メラミンスポンジ等）</td><td>同上。ドラッグストア・量販店仕入れで規制リスクほぼゼロ</td><td>約 +8,000円〜+11,000円</td></tr>
+<tr><td><strong>C. シャンプー詰替パウチ継続（出品許可取得後）</strong></td><td>経理試算を継続したい場合。出品許可申請には正規卸請求書3通＋約1〜4週間の審査が必要</td><td>約 +11,160円（経理中央値）</td></tr>
+</tbody>
+</table>
+
+<div class="callout">
+<strong>【社長判断】</strong>: A・B・C のどれを選びますか? 秘書カズヨ経由で返答をお願いします。<strong>ヒデアキ推奨は A（文房具・収納雑貨）</strong>。理由は「規制リスク最小×回転15〜25日×粗利10〜15%」が経理①の枠と整合し、かつ法務ホワイトリストに直撃するため、最初の1サイクルとして最適だからです。
+</div>
+
+<h3>3-3. 商品②猫用おやつの条件付き可判断</h3>
+<p>法務マトリクスでは「ペット用品（処方食・サプリ）」のみ非推奨で、<strong>一般のおやつは原則可</strong>です。ただし以下の3条件を満たす必要があります。</p>
+<ul>
+<li>✓ ペットフード安全法に基づく<strong>表示義務</strong>（原材料名・賞味期限・原産国・事業者名）が既にメーカー側で完了している商品を選ぶ</li>
+<li>✓ <strong>国内メーカー製（カルカン、いなば、ペティオ等）</strong>を仕入れる</li>
+<li>✓ 輸入品は避ける（事前届出が必要）</li>
+</ul>
+<p><strong>ヒデアキの判定</strong>: 経理ハジメの「猫用おやつ ちゅーる類似品」は、<strong>国内メーカー（いなば等）の正規流通品であれば継続可</strong>です。経理試算（中央 +13,500円）をそのまま使えます。</p>
+
+<h3>3-4. 商品③ステンレスタンブラーの条件付き可判断</h3>
+<p>食品衛生法上「器具・容器包装」に該当します。ただし以下を満たせば問題ありません。</p>
+<ul>
+<li>✓ <strong>国内メーカー製の正規流通品</strong>（サーモス、象印、タイガー、ノーブランドでも国内大手卸経由）を選ぶ</li>
+<li>✓ <strong>中国/海外からの直輸入品は避ける</strong>（輸入時に食品衛生法第27条の事前届出が必要）</li>
+<li>✓ ノーブランド品の場合は、NETSEA・スーパーデリバリーで「日本仕入れ」明記の商品を選ぶ</li>
+</ul>
+<p><strong>ヒデアキの判定</strong>: 経理ハジメの「ステンレスタンブラー 真空断熱」は、<strong>国内卸経由の正規流通品であれば継続可</strong>です。経理試算（中央 +19,800円）をそのまま使えます。</p>
+
+<h2 id="sec4">4. 推奨商品3点（修正後）と1サイクル収支</h2>
+<p>§3 の整合性チェックを踏まえた、ヒデアキ推奨の3点です。社長が §3-2 で A 案（文房具・収納雑貨）を選んだ前提で記載します。</p>
+
+<h3>4-1. 推奨3商品サマリー</h3>
+<table>
+<thead>
+<tr><th>#</th><th>商品</th><th>仕入れ先候補</th><th>仕入総額</th><th>中央想定利益</th><th>回転</th><th>粗利率</th><th>法務判定</th></tr>
+</thead>
+<tbody>
+<tr><td>①</td><td><strong>国内メーカー製 収納ボックス／ファイル</strong>（H&amp;B 枠の差替え）</td><td>NETSEA（A-1）／ヨドバシ（A-3）／楽天（A-4）</td><td>24,000円</td><td>約 +9,000〜+12,000円</td><td>25日</td><td>15〜18%</td><td><span class="badge badge-ok">ホワイトリスト直撃</span></td></tr>
+<tr><td>②</td><td><strong>国内メーカー製 猫用おやつ</strong>（カルカン・いなば等）</td><td>NETSEA（A-1）／ヨドバシ（A-3）／ドンキ（A-5）</td><td>11,000円</td><td>+13,500円</td><td>18日</td><td>16.9%</td><td><span class="badge badge-ok">国内正規品なら可</span></td></tr>
+<tr><td>③</td><td><strong>国内卸経由 ステンレスタンブラー</strong>（サーモス類または国内卸の真空断熱品）</td><td>NETSEA（A-1）／ヨドバシ（A-3）／楽天（A-4）</td><td>21,000円</td><td>+19,800円</td><td>35日</td><td>24.8%</td><td><span class="badge badge-ok">国内品なら可</span></td></tr>
+<tr><td colspan="2"><strong>合計</strong></td><td>3棚から仕入れ</td><td><strong>56,000円</strong></td><td><strong>+42,300〜+45,300円</strong></td><td>—</td><td>約 13.5%</td><td>—</td></tr>
+</tbody>
+</table>
+<p><strong>数字の出典</strong>: 経理ハジメ <code>accounting-simulation.md</code> §B 中央シナリオ。商品①は差替えによる調整値（H&amp;B枠の数字を雑貨枠相当に補正）。</p>
+
+<h3>4-2. 仕入れ予算の使い方（10万円の内訳）</h3>
+<pre><code>予算 10万円の配分マップ（ヒデアキ推奨）
+├─ 仕入れ本体: 56,000円（商品①②③合計）
+├─ 国内送料合計: 4,700円
+├─ FBA入庫送料: 4,800円
+├─ 梱包資材（OPP袋・テープ等）: 1,500円
+├─ 古物商許可申請手数料: 19,000円【法務ハルオ推奨】
+└─ 予備バッファ: 14,000円（不測の事態用）
+   合計: 100,000円</code></pre>
+<p>古物商許可は経理ハジメの収支試算には含まれていませんが、<strong>法務ハルオの最重要推奨</strong>として開業届と同時申請を推奨します。理由は §5 Day 1-3 に記載。</p>
+
+<h2 id="sec5">5. 時系列ロードマップ — Day 1 から Day 75 まで</h2>
+<p>ここからが「<strong>何日目に何をするか</strong>」の本編です。社長は上から順に実行してください。</p>
+
+<h3>Day 1-3 — 開業準備＆古物商許可申請</h3>
+<table>
+<thead><tr><th>やること</th><th>担当</th><th>詳細</th></tr></thead>
+<tbody>
+<tr><td>✅ 開業届を税務署に提出</td><td>社長</td><td>既に準備中（T-004）</td></tr>
+<tr><td>✅ <strong>古物商許可を警察署に申請</strong>【法務最重要】</td><td>社長</td><td>19,000円・標準処理40日。<strong>今日申請すれば Day 43 前後で許可下りる</strong></td></tr>
+<tr><td>✅ Amazon セラーアカウント開設（小口プラン）</td><td>社長</td><td>既に進行中（T-004）</td></tr>
+<tr><td>✅ セゾンカードデジタル登録</td><td>社長</td><td>既に完了（T-004）</td></tr>
+<tr><td>✅ 仕入れ管理用フォルダ作成</td><td>社長</td><td><code>~/Documents/AI Company Outputs/Amazon物販事業/purchase-log/</code></td></tr>
+<tr><td>✅ 仕入れ記録 CSV テンプレート保存</td><td>秘書</td><td><code>purchase-log-template.csv</code> をクラウドストレージへ</td></tr>
+</tbody>
+</table>
+<div class="callout callout-info">
+<strong>なぜ Day 1 に古物商許可を申請するか（ヒデアキの理由）</strong>:
+<ul>
+<li>中古に手を出したくなった時、許可なしでは違法。<strong>40日かかるので、最初に出しておけば軸の選択肢が広がる</strong></li>
+<li>19,000円は経費計上可能（経理ハジメ）</li>
+<li>開業届と同時申請が税務署/警察署への信用形成にも効く（法務ハルオ）</li>
+</ul>
+</div>
+
+<h3>Day 4-7 — 商品候補のリサーチ</h3>
+<table>
+<thead><tr><th>やること</th><th>担当</th><th>詳細</th></tr></thead>
+<tbody>
+<tr><td>商品①②③の <strong>JAN/ASIN を Keepa で再検証</strong></td><td>社長</td><td>T-003 軸A で導入予定の Keepa 無料版で月販履歴を確認</td></tr>
+<tr><td>FBA計算機で <strong>利幅を実測再計算</strong></td><td>社長</td><td>Amazon公式 FBA料金シミュレーターを使う</td></tr>
+<tr><td>仕入れ先 NETSEA・ヨドバシ・楽天で <strong>在庫＆価格チェック</strong></td><td>社長</td><td>§7 の3棚に絞る</td></tr>
+<tr><td><strong>【社長判断】</strong>: 商品①の最終確定（A/B/C どれにするか）</td><td>社長 → 秘書</td><td>§3-2 参照。ヒデアキ推奨は A（文房具・収納雑貨）</td></tr>
+</tbody>
+</table>
+<p><strong>躓きポイント</strong>: 経理ハジメの数字はあくまで「推定」です。<strong>Keepa の月販履歴と FBA計算機の実測値</strong>で必ず上書きしてください。経理ハジメ自身が <code>accounting-simulation.md</code> 末尾で「実数値は1サイクル目の実績で必ず置き換えること」と明記しています。</p>
+
+<h3>Day 8-14 — 仕入れ発注＆支払い</h3>
+<table>
+<thead><tr><th>やること</th><th>担当</th><th>詳細</th></tr></thead>
+<tbody>
+<tr><td>商品① 仕入れ先で発注（24,000円分）</td><td>社長</td><td>NETSEA or ヨドバシ。<strong>セゾンデジタルで決済</strong></td></tr>
+<tr><td>商品② 仕入れ先で発注（11,000円分）</td><td>社長</td><td>国内メーカー製の猫用おやつ</td></tr>
+<tr><td>商品③ 仕入れ先で発注（21,000円分）</td><td>社長</td><td>国内卸経由のステンレスタンブラー</td></tr>
+<tr><td>仕入れ記録 CSV に <strong>3件すべて記録</strong></td><td>社長</td><td><code>purchase-log-template.csv</code> のフォーマット通り</td></tr>
+<tr><td>領収書 PDF を <code>receipts/</code> フォルダに保存</td><td>社長</td><td>経理ハジメの整理ルール</td></tr>
+</tbody>
+</table>
+<blockquote>
+<strong>この段階で起きること（経理ハジメの言葉）</strong>: 「<strong>現金が10万円から3万円に減りますが、これは消えたのではなく在庫に変わっただけ</strong>です」<br>
+社長、初回は本当に焦ります。でもこれは正常です。
+</blockquote>
+
+<h3>Day 15-22 — 着荷＆検品＆梱包＆ラベル貼付</h3>
+<table>
+<thead><tr><th>やること</th><th>担当</th><th>詳細</th></tr></thead>
+<tbody>
+<tr><td>仕入れ商品の <strong>着荷確認</strong></td><td>社長</td><td>自宅で受け取り。検品（数量・破損）</td></tr>
+<tr><td>検品結果を CSV に記録</td><td>社長</td><td><code>到着実績日</code> カラムを埋める</td></tr>
+<tr><td><strong>OPP袋に1個ずつ梱包</strong></td><td>社長</td><td>100均で OPP袋・テープ・段ボールを準備</td></tr>
+<tr><td><strong>FNSKU ラベル貼付</strong>（FBA識別ラベル）</td><td>社長</td><td>Amazon セラーセントラルで FNSKU 発行 → 印刷 → 貼付</td></tr>
+<tr><td><strong>【最重要】商品本体の JAN バーコードを覆い隠す</strong></td><td>社長</td><td>これを忘れると FBA倉庫で混在事故が起きる</td></tr>
+</tbody>
+</table>
+<div class="callout">
+<strong>躓きポイントの最頻出（庶務マリエ＆ヒデアキ）</strong>:
+<ul>
+<li>FNSKU ラベル印刷には<strong>A4ラベルシート</strong>（コクヨなど）が必要。100均では揃わない場合あり。事前に Amazon or 文房具店で調達</li>
+<li>ラベル貼付で<strong>元のJANバーコードが見えていると倉庫で誤識別</strong>される。必ず上から覆い隠す</li>
+</ul>
+</div>
+
+<h3>Day 22-30 — FBA納品プラン作成＆発送</h3>
+<table>
+<thead><tr><th>やること</th><th>担当</th><th>詳細</th></tr></thead>
+<tbody>
+<tr><td>Amazon セラーセントラルで <strong>FBA納品プラン作成</strong></td><td>社長</td><td>商品の数量・サイズ・重量を入力</td></tr>
+<tr><td>Amazon から <strong>倉庫指定</strong>を受ける</td><td>社長</td><td>関東なら小田原、東日本なら市川、関西なら堺など</td></tr>
+<tr><td><strong>段ボールに梱包</strong>して倉庫宛に発送</td><td>社長</td><td>ヤマト or 佐川。費用約4,800円（経理推定）</td></tr>
+<tr><td>配送伝票番号を CSV に記録</td><td>社長</td><td>トラブル時の追跡用</td></tr>
+</tbody>
+</table>
+<p><strong>躓きポイント</strong>: 倉庫指定は1箇所とは限りません。<strong>3商品が異なる倉庫に振り分けられる</strong>こともあります。その場合は発送が複数件になり、送料が増えます。</p>
+
+<h3>Day 30-35 — FBA倉庫受領＆出品開始</h3>
+<table>
+<thead><tr><th>やること</th><th>担当</th><th>詳細</th></tr></thead>
+<tbody>
+<tr><td>FBA倉庫で受領（発送から2〜4日）</td><td>Amazon</td><td>自動で在庫反映</td></tr>
+<tr><td>セラーセントラルで <strong>出品ステータス確認</strong></td><td>社長</td><td>「販売可能」になれば自動で商品ページに表示</td></tr>
+<tr><td><strong>販売価格を設定</strong></td><td>社長</td><td>経理ハジメの中央シナリオ価格を初期値に</td></tr>
+<tr><td>商品ページの <strong>写真・説明文を最終チェック</strong></td><td>社長</td><td>相乗り出品なら不要。新規ページなら整える</td></tr>
+</tbody>
+</table>
+
+<h3>Day 35-75 — 販売モニタリング</h3>
+<table>
+<thead><tr><th>やること</th><th>担当</th><th>詳細</th></tr></thead>
+<tbody>
+<tr><td>毎日 <strong>アカウントヘルススコア</strong>を確認</td><td>社長</td><td>法務ハルオ最重要警告: 72時間以内対応のパフォーマンス通知を放置しない</td></tr>
+<tr><td>毎日 <strong>販売数量</strong>を確認</td><td>社長</td><td>Keepa で競合の価格変動も追う</td></tr>
+<tr><td>商品②（おやつ）が <strong>Day 53 頃に完売想定</strong></td><td>—</td><td>18日回転（経理中央）</td></tr>
+<tr><td>商品①（文房具）が <strong>Day 60 頃に完売想定</strong></td><td>—</td><td>25日回転（H&amp;B枠の代替推定）</td></tr>
+<tr><td>商品③（タンブラー）が <strong>Day 70 頃に完売想定</strong></td><td>—</td><td>35日回転（経理中央）</td></tr>
+<tr><td><strong>【判断ライン】</strong>: 60日経過時点で売れない商品は値下げ判断</td><td>社長</td><td>法務ハルオ警告: 365日超で長期保管手数料</td></tr>
+</tbody>
+</table>
+
+<h3>Day 44-75 — Amazon からの売上入金</h3>
+<table>
+<thead><tr><th>入金日（推定）</th><th>金額（中央）</th><th>累計手元現金（中央）</th></tr></thead>
+<tbody>
+<tr><td>Day 44（初回入金）</td><td>+35,000円</td><td>+75,000円</td></tr>
+<tr><td>Day 58（2回目）</td><td>+35,000円</td><td>+110,000円</td></tr>
+<tr><td>Day 72（3回目）</td><td>+25,000円</td><td>+135,000円</td></tr>
+<tr><td>Day 75（最終分）</td><td>+9,460円</td><td><strong>+144,460円</strong></td></tr>
+</tbody>
+</table>
+<p><strong>数字の出典</strong>: 経理ハジメ <code>accounting-simulation.md</code> §C キャッシュフロー時系列、W5〜W11 を Day 換算。</p>
+
+<h2 id="sec6">6. キャッシュフロー可視化 — 現金がいつ動くか</h2>
+<p>経理ハジメの試算を、「<strong>現金が今いくらあるか</strong>」が時系列で見える棒グラフ表現に変換しました。</p>
+
+<h3>6-1. 中央シナリオの手元現金推移（テキスト棒グラフ）</h3>
+<pre><code>円 →   0          50,000        100,000       150,000
+       ├─────────────┼─────────────┼─────────────┤
+Day  0 ████████████████████ 100,000 [スタート]
+Day  8 ██████████████████   約88,000 [カード決済前]
+Day 14 ███████              33,000  [仕入れ＋送料支払い完了・最低点]
+Day 22 ███████              33,000  [FBA入庫送料も払って横ばい]
+Day 30 ███████              33,000  [販売開始・売上未入金]
+Day 44 ███████████████      75,000  [初回 Amazon 入金 ★]
+Day 58 █████████████████████ 110,000 [2回目入金]
+Day 72 ███████████████████████ 135,000 [3回目入金]
+Day 75 ████████████████████████ 144,460 [最終入金・+44,460円利益]</code></pre>
+
+<h3>6-2. このグラフを見るときの3つの読み方</h3>
+<ol>
+<li><strong>Day 14 が最低点</strong>: 手元現金が <strong>約3.3万円</strong>まで減る。社長は「あれ、本当にこんなに減るの?」と感じる場面ですが、<strong>約6.7万円は在庫として存在している</strong>ので焦らないでください</li>
+<li><strong>Day 30〜44 は "売れてるのに現金が増えない期間"</strong>: Amazon の14日サイクル入金のため。<strong>この期間で資金繰りに困らないよう、予備バッファ14,000円を残してある</strong>のがヒデアキ案の設計です</li>
+<li><strong>Day 44 を過ぎたら一気に増える</strong>: ここから2週間ごとに入金。<strong>「動き始めたら早い」</strong>のが Amazon FBA の特徴です</li>
+</ol>
+
+<h3>6-3. 3シナリオ比較（最終手元現金）</h3>
+<table>
+<thead><tr><th>シナリオ</th><th>Day 75 時点 手元現金</th><th>累積利益</th><th>利益率（売上比）</th></tr></thead>
+<tbody>
+<tr><td>楽観</td><td>約 +162,000円</td><td>+62,000円</td><td>約 20%</td></tr>
+<tr><td><strong>中央（基準）</strong></td><td><strong>約 +144,460円</strong></td><td><strong>+44,460円</strong></td><td><strong>約 13.5%</strong></td></tr>
+<tr><td>悲観</td><td>約 +76,800円</td><td><strong>-23,200円</strong></td><td>-27%（赤字）</td></tr>
+</tbody>
+</table>
+<p><strong>数字の出典</strong>: 経理ハジメ §C・§D。<strong>悲観シナリオでも10万円の予算枠内に収まる</strong>よう設計済み（最悪損失 -23,200円、予算9.7万円のうち23.9%が消失）。</p>
+
+<h2 id="sec7">7. 仕入れ先カタログ（庶務マリエ版・厳選3棚に絞り込み）</h2>
+<p>庶務マリエが網羅した30件のうち、<strong>社長の今のフェーズ（小口・予算10万円・在宅完結）に最適化した3棚</strong>だけを抜粋します。残り27件は次サイクル以降の選択肢として、<code>suppliers-list.md</code> を参照してください。</p>
+
+<h3>7-1. 今サイクルで開ける3棚</h3>
+<table>
+<thead><tr><th>カテゴリ</th><th>推奨仕入れ先</th><th>URL</th><th>この棚で買うべき商品</th><th>ときめき度</th></tr></thead>
+<tbody>
+<tr><td><strong>A-1 国内卸</strong></td><td><strong>NETSEA（ネッシー）</strong></td><td><a href="https://www.netsea.jp/">netsea.jp</a></td><td>商品①（文房具・収納雑貨）／商品③（ステンレスタンブラー）</td><td>9/10</td></tr>
+<tr><td><strong>A-3 量販店ネット</strong></td><td><strong>ヨドバシ・ドット・コム</strong></td><td><a href="https://www.yodobashi.com/">yodobashi.com</a></td><td>商品②（猫用おやつ・国内メーカー製）</td><td>9/10</td></tr>
+<tr><td><strong>A-4 大型ECモール</strong></td><td><strong>楽天市場</strong></td><td><a href="https://www.rakuten.co.jp/">rakuten.co.jp</a></td><td>商品①〜③の <strong>価格比較用＋SPU還元時の差替え調達</strong></td><td>9/10</td></tr>
+</tbody>
+</table>
+
+<h3>7-2. なぜこの3棚なのか（庶務マリエの所見を引用）</h3>
+<ul>
+<li><strong>NETSEA</strong>: 国内最大200万点。<strong>会員登録無料</strong>で翌日から仕入れ画面に入れる。クーポンとゲリラセールで利益率が一気に乗る</li>
+<li><strong>ヨドバシ</strong>: <strong>10%ポイント還元＋全品送料無料</strong>が魔法のように効く。ペット用品の正規流通品が揃う</li>
+<li><strong>楽天</strong>: <strong>SPU最大16倍</strong>。スーパーセール時は実質40%超還元の日も。ただし最初は <strong>SPU 5倍まで</strong>で始めるのが効率的</li>
+</ul>
+
+<h3>7-3. 今サイクルでは閉めておく棚</h3>
+<p>庶務マリエの言葉を借りれば「ありがとう、お役御免」ではなく「<strong>今は閉めて、感謝の一礼をして待つ</strong>」棚です。</p>
+<ul>
+<li>中古市場（A-6 ブックオフ・メルカリ等）: 古物商許可取得後（Day 43以降）に解禁</li>
+<li>海外輸入（A-7 1688・Alibaba・タオバオ・eBay）: 法務ハルオの事前レビュー必須。<strong>初心者の最初の3周は閉店</strong></li>
+<li>メーカー直販（A-2）: 実績ができてから打診開始（軸B 2周目以降）</li>
+<li>CF後続・在庫処分（A-8）: 独自路線を出したくなった頃に解禁</li>
+</ul>
+
+<h3>7-4. 仕入れ記録の運用ルール（庶務マリエ版）</h3>
+<ul>
+<li>仕入れフォルダ: <code>~/Documents/AI Company Outputs/Amazon物販事業/purchase-log/</code></li>
+<li>ファイル名: <code>YYYYMM_purchase-log.csv</code>（月別1ファイル）</li>
+<li>領収書: <code>YYYYMMDD_仕入れ先名_金額.pdf</code> で同フォルダ内 <code>receipts/</code> に格納</li>
+<li><strong>月次レビュー</strong>: 月末に「ときめいた仕入れ先 Top3 / ときめかなかった仕入れ先 / 新規開拓したい棚1つ」を判定</li>
+</ul>
+
+<h2 id="sec8">8. 損益分岐とリスク早見表</h2>
+<p>経理ハジメの試算 §D をベースに、「<strong>いくら売れたら黒字か</strong>」を一目で見られるようにしました。</p>
+
+<h3>8-1. 商品別 黒字ライン</h3>
+<table>
+<thead><tr><th>商品</th><th>仕入総額</th><th>損益分岐販売数</th><th>仕入数量</th><th>黒字必要消化率</th><th>余裕度</th></tr></thead>
+<tbody>
+<tr><td>商品① 文房具・収納雑貨（差替後）</td><td>24,000円</td><td>23個程度</td><td>30個</td><td><strong>77%</strong></td><td>やや厳しい</td></tr>
+<tr><td>商品② 猫用おやつ</td><td>13,500円</td><td>14個</td><td>20個</td><td><strong>70%</strong></td><td>中程度</td></tr>
+<tr><td>商品③ ステンレスタンブラー</td><td>25,000円</td><td>10個</td><td>15個</td><td><strong>67%</strong></td><td>余裕あり ★</td></tr>
+</tbody>
+</table>
+<p><strong>数字の出典</strong>: 経理ハジメ <code>accounting-simulation.md</code> §D-2。商品①は差替え後も H&amp;B枠と同等の薄利前提として継承。</p>
+
+<h3>8-2. 想定外コストのリスク早見表</h3>
+<table>
+<thead><tr><th>リスク</th><th>発生確率</th><th>1サイクル想定影響額</th><th>対策</th></tr></thead>
+<tbody>
+<tr><td>返品（カスタマーリターン）</td><td>65個中3-5%</td><td>-3,000円〜-5,000円</td><td>価格設定に組み込み済み</td></tr>
+<tr><td>FBA倉庫破損（補償外）</td><td>1-2個</td><td>-1,500円〜-3,000円</td><td>検品強化・頑丈梱包で50%削減</td></tr>
+<tr><td>長期保管延長料</td><td>商品③のみ15%</td><td>-2,400円</td><td>60日経過時点で値下げ判断</td></tr>
+<tr><td>価格高騰検知・出品停止</td><td>5%</td><td>-3,000円（機会損失）</td><td>軸A の Keepa Pro 導入後に対策</td></tr>
+<tr><td>アカウント健全性低下</td><td>初期10%</td><td>金額小だが<strong>最重大</strong></td><td>評価1つき直後にメッセージで対応</td></tr>
+</tbody>
+</table>
+<p><strong>リスク調整後の実利益</strong>: 中央シナリオ +44,460円 から期待値損失 約 -6,500円 を控除し、<strong>実利益 +37,960円／1サイクル</strong>。</p>
+
+<h2 id="sec9">9. 躓きポイント先回り集</h2>
+<p>3エージェントの所見と、ヒデアキが受け手目線で読み返したときに「ここで詰まる」と確信した点を集約しました。</p>
+
+<h3>9-1. 法務側で詰まる箇所</h3>
+<table>
+<thead><tr><th>#</th><th>躓きポイント</th><th>先回り策</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>古物商許可を後回しにする</td><td><strong>Day 1 に開業届と同時申請。19,000円・40日。</strong>法務ハルオ最強推奨</td></tr>
+<tr><td>2</td><td>シャンプー/化粧品系に手を出す</td><td>出品許可申請が必要。§3-2 で <strong>A 文房具に差替え推奨</strong></td></tr>
+<tr><td>3</td><td>中国製ノーブランド充電器・LED に手を出す</td><td><strong>PSE未取得は刑事罰</strong>。最初の3周は閉店</td></tr>
+<tr><td>4</td><td>メルカリで仕入れて Amazon に再販</td><td>メルカリ規約上グレー＋古物商必須。<strong>初心者は触らない</strong></td></tr>
+<tr><td>5</td><td>特商法表記に氏名・住所を出すのを忘れる</td><td>番地まで公開義務。<strong>バーチャルオフィス契約</strong>が現実解（経理ハジメ案件）</td></tr>
+</tbody>
+</table>
+
+<h3>9-2. 経理側で詰まる箇所</h3>
+<table>
+<thead><tr><th>#</th><th>躓きポイント</th><th>先回り策</th></tr></thead>
+<tbody>
+<tr><td>6</td><td>仕入れ後の現金減少にパニックになる</td><td><strong>「消えたのではなく在庫に変わっただけ」</strong>。Day 14 が最低点と覚える</td></tr>
+<tr><td>7</td><td>Amazon の入金サイクル（14日）を知らずに資金繰り計画を立てる</td><td>予備バッファ14,000円を残す設計を採用済み</td></tr>
+<tr><td>8</td><td>経理試算の数字を「絶対値」と誤解する</td><td><strong>すべて推定</strong>。Day 4-7 で Keepa＋FBA計算機で必ず再計算</td></tr>
+<tr><td>9</td><td>長期保管手数料（2026年4月改定）を見落とす</td><td><strong>60日経過＝値下げ判断ライン</strong>。365日放置で月20円/個追加</td></tr>
+</tbody>
+</table>
+
+<h3>9-3. 仕入れ／オペレーション側で詰まる箇所</h3>
+<table>
+<thead><tr><th>#</th><th>躓きポイント</th><th>先回り策</th></tr></thead>
+<tbody>
+<tr><td>10</td><td>FNSKU ラベル印刷用のA4ラベルシートが手元にない</td><td><strong>Day 14 までに調達</strong>。Amazon or 文房具店</td></tr>
+<tr><td>11</td><td>元のJANバーコードを覆い隠さずに発送</td><td><strong>FBA倉庫で混在事故</strong>になる。商品本体のバーコード上から FNSKU で覆う</td></tr>
+<tr><td>12</td><td>3商品が異なるFBA倉庫に振り分けられて送料が増える</td><td>プラン作成時に <strong>「1倉庫納品」</strong>オプションを試す。だめなら諦めて発送</td></tr>
+<tr><td>13</td><td>仕入れ記録 CSV を月末まで放置</td><td><strong>発注の都度即記録</strong>。後でまとめてやろうとすると必ず抜ける</td></tr>
+<tr><td>14</td><td>アカウントヘルス通知を見落とす</td><td><strong>毎日セラーセントラルを開く習慣</strong>。72時間以内対応が原則</td></tr>
+</tbody>
+</table>
+
+<h2 id="sec10">10. ヒデアキの作業ノート</h2>
+<p>統合方針として「<strong>経理は数字、庶務は仕入れ先、法務は規制</strong>という3軸を、社長が時系列で読める1本の物語に編み直す」ことに徹しました。3者の独立成果は完成度が高く、私の役目は「<strong>整合性チェック → 差分の明示 → 時系列への展開</strong>」の3点に絞りました。</p>
+
+<p>最大の発見は<strong>経理推奨商品①「シャンプー詰替パウチ」が法務ホワイトリスト的に NG</strong>だったことです。経理ハジメは「日用品扱いのシャンプー」と表現していましたが、Amazon の出品制限カテゴリ上は <strong>ヘアケア＝化粧品</strong>として扱われます。3者の独立作業では発見できなかった齟齬で、統合役の私がここを潰しました。商品②（猫用おやつ）と商品③（ステンレスタンブラー）も法務観点で条件付き可と再判定し、<strong>「国内メーカー製・国内卸経由」という条件</strong>を §3 で明示しました。</p>
+
+<p>妥協ポイントは2つあります。第一に、商品①の差替え候補（文房具・収納雑貨）について<strong>経理ハジメによる正式な収支試算を取り直していない</strong>ことです。H&amp;B枠の数字を雑貨枠相当に補正する形で暫定運用しています。社長判断で A 案が確定したら、経理ハジメに<strong>差替え商品の正式な数字を再依頼</strong>することを推奨します。第二に、HTML 版の <strong>PDF印刷時の改ページ最適化</strong>は時間制約で初稿のままです。社長が紙印刷で使う場合、章ごとの改ページがズレる可能性があります。</p>
+
+<p>受け手視点で3周読み返しました。専門用語の補足は用語集 T-007 への参照に留め、本文の肥大化を避けました。冒頭の「やってはいけない Top 5」を §1 に置いた判断は、<strong>利益を取りに行く前に退場リスクを潰す</strong>という法務ハルオの所見を、社長の最初の判断材料として最も効果的に渡すためです。次稿で改善したい点は、<strong>実際に Day 1 を動き始めた後の「Day 1 振り返り → Day 2 微調整」のフィードバックループ設計</strong>です。マニュアルは渡して終わりではなく、回しながら磨くもの。これは社長が1サイクル完了後に T-009 として発注いただくのが筋だと考えます。</p>
+
+<h2 id="sec11">11. 秘書（カズヨ）への申し送り</h2>
+
+<h3>11-1. CLAUDE.md §4.1 該当事項（社長承認必須）</h3>
+<p>以下は本プレイブックに記載しただけでは進められません。<strong>実行前に必ず社長承認</strong>を取ってください。</p>
+<table>
+<thead><tr><th>該当項目</th><th>区分</th><th>説明</th></tr></thead>
+<tbody>
+<tr><td>商品仕入れの実行（56,000円）</td><td><strong>金銭が動く</strong></td><td>カード決済が発生。10万円予算枠は T-004 で承認済だが、<strong>実際の発注ボタンを押すタイミングで再承認</strong>を推奨</td></tr>
+<tr><td>古物商許可申請（19,000円）</td><td><strong>金銭が動く</strong></td><td>法務ハルオ推奨だが、社長判断で取得タイミングを確定する必要あり</td></tr>
+<tr><td>Amazon セラーセントラルでの出品操作</td><td><strong>外部発信</strong></td><td>商品ページの作成・価格設定は事実上の販売開始。社長立会いを推奨</td></tr>
+<tr><td>特商法表記の住所登録（自宅 or バーチャルオフィス）</td><td><strong>金銭が動く＋外部発信</strong></td><td>バーチャルオフィス契約は新規サブスク。経理ハジメに費用比較を依頼してから判断</td></tr>
+</tbody>
+</table>
+
+<h3>11-2. 社長判断を仰ぐべき項目（A/B/C＋推奨形式）</h3>
+
+<h4>判断1: 商品①の最終確定（§3-2 参照）</h4>
+<table>
+<thead><tr><th>選択肢</th><th>内容</th><th>推奨度</th></tr></thead>
+<tbody>
+<tr><td>A</td><td>国内メーカー製 文房具・収納雑貨に差替え</td><td><strong>★ ヒデアキ推奨</strong></td></tr>
+<tr><td>B</td><td>清掃用品に差替え</td><td>次点</td></tr>
+<tr><td>C</td><td>シャンプー詰替パウチ継続（出品許可取得後・約1-4週間遅延）</td><td>経理ハジメの試算を活かしたい場合</td></tr>
+</tbody>
+</table>
+
+<h4>判断2: 古物商許可の申請タイミング</h4>
+<table>
+<thead><tr><th>選択肢</th><th>内容</th><th>推奨度</th></tr></thead>
+<tbody>
+<tr><td>A</td><td>Day 1 に開業届と同時申請</td><td><strong>★ 法務・経理・ヒデアキ全員推奨</strong></td></tr>
+<tr><td>B</td><td>軸B 1周完了後（Day 75 以降）に申請</td><td>中古に手を出す具体的予定がない場合</td></tr>
+<tr><td>C</td><td>当面取得しない</td><td>中古・メルカリ・ヤフオク仕入れを完全に閉ざす場合</td></tr>
+</tbody>
+</table>
+
+<h4>判断3: 特商法表記の住所</h4>
+<table>
+<thead><tr><th>選択肢</th><th>内容</th><th>推奨度</th></tr></thead>
+<tbody>
+<tr><td>A</td><td>自宅住所を公開</td><td>コスト最小だがプライバシーリスク</td></tr>
+<tr><td>B</td><td>バーチャルオフィス契約（月額3,000〜10,000円程度）</td><td><strong>★ 経理ハジメに費用比較を発注後に判断推奨</strong></td></tr>
+<tr><td>C</td><td>公開しない（事業継続不可）</td><td>NG（特商法違反）</td></tr>
+</tbody>
+</table>
+
+<h3>11-3. 次タスクの発注候補（参考）</h3>
+<ul>
+<li><strong>経理ハジメへ</strong>: 商品①が A 案（文房具・収納雑貨）に確定したら、正式な収支試算の再発注</li>
+<li><strong>法務ハルオへ</strong>: バーチャルオフィス契約の規約確認（特商法表記の住所として登録可能か）</li>
+<li><strong>庶務マリエへ</strong>: バーチャルオフィス3社比較（月額・所在地・転送頻度）</li>
+<li><strong>コンテンツ制作ヒデアキへ</strong>: 1サイクル完了時の振り返りフォーマット作成（次稿改善ループ用）</li>
+</ul>
+
+<h3>11-4. 成果物の最終配置</h3>
+<ul>
+<li>本プレイブック（Markdown）: <code>workspace/output/agent_output/T-20260520-008/playbook-final.md</code></li>
+<li>本プレイブック（HTML）: <code>workspace/output/agent_output/T-20260520-008/playbook-final.html</code></li>
+<li>社長配布版: 秘書カズヨが <code>~/Documents/AI Company Outputs/Amazon物販事業/T-20260520-008/</code> にコピー</li>
+<li>参考: 経理シミュレーション本体（<code>accounting-simulation.md</code>）、仕入れ先カタログ（<code>suppliers-list.md</code>）、法務マトリクス（<code>legal-fba-compliance.md</code>）、CSV3点（<code>simulation-numbers.csv</code> ／ <code>suppliers-list.csv</code> ／ <code>restricted-categories.csv</code> ／ <code>purchase-log-template.csv</code>）</li>
+</ul>
+
+<div class="signature">
+以上、コンテンツ制作 ヒデアキより。社長が Day 1 から迷わず動き出せる一本になっていれば本望です。気になる箇所があれば、秘書カズヨ経由で何度でも改稿します。完成度が足りないと感じたら、必ず差し戻してください。
+</div>
+
+</body>
+</html>
