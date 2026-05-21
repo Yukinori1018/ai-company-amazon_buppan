@@ -1,100 +1,205 @@
 # 引き継ぎノート
 
-> このファイルは、別デバイス・別セッションで Claude Code を起動した際に、直前のセッションの文脈を即座に引き継ぐためのものです。
-> セッション開始時、秘書カズヨ（または任意のエージェント）はまずここを読みます。
-> 更新方法: `/handover` スラッシュコマンドで自動更新（または手動編集）。
+> 別デバイス・別セッションで Claude Code を起動した際に、直前のセッションの文脈を即座に引き継ぐためのファイル。
+> セッション開始時、秘書カズヨ（または任意のエージェント）はまずここを読む。
+> 更新方法: `/handover` スラッシュコマンド or 手動編集。
+> **次セッション開始の最も簡単な方法: `/resume` と入力するだけ**。秘書カズヨが本ファイル＋関連を自動読み込みします。
 
 ---
 
 ## 最終更新
 
-- **日時**: 2026-05-21（Cloud セッションで PC 側ブランチ `claude/organize-agent-roles-0YTXI` をマージ完了）
+- **日時**: 2026-05-22 夜
 - **更新者**: 秘書カズヨ（Cloud セッション）
-- **次の想定読み手**: PC セッション or 次回モバイル
+- **次の想定読み手**: PC セッション or 別 Cloud セッション
+- **作業ブランチ**: `claude/complete-remaining-tasks-0eCzs`（main には未マージ・後述）
 
 ---
 
-## 直前セッションの締めくくり（2026-05-21 cloud・統合マージ）
+## ⚠️ 次セッション冒頭の必須アクション
 
-PC 側で 2026-05-20 に整備された組織再編（サトル・タケシ・マサル新設、§4.3 緩和、deliverables/ ルール、Notion 同期ルール）を、cloud worktree に取り込んだ。同時に cloud 側で並行進行していた成果物・チケットを保全し、番号衝突を回避するため **T-20260521-001〜007 へリネーム**。
+### 1. 作業ブランチに乗る
 
-### cloud 側で別途進めていた作業（保全分）
+```bash
+cd ~/Claude\ Code/ai-company-amazon_buppan   # PC の場合
+# Cloud の場合は worktree が自動配置される
 
-| 新ID | タイトル | Status | 状況 |
-|---|---|---|---|
-| T-20260521-001 | Amazon物販・副業 用語集（150語10カテゴリ） | doing | ヒデアキ納品済、社長レビュー待ち。`workspace/output/agent_output/T-20260520-007/glossary.{csv,md}` |
-| T-20260521-002 | 初心者向け仕入れ〜販売シミュレーション資料（FBA前提） | doing | 経理ハジメ・庶務マリエ・法務ハルオ・ヒデアキ4者連携、playbook-final.md/html 納品済、社長レビュー待ち。`workspace/output/agent_output/T-20260520-008/` |
-| T-20260521-003 | Ama-Jack（Amazak）コミュニティ評価＋社長判断完了 | doing | 法務/経理/庶務3者評価完了。社長判断「無料入会・金銭発生時退会」確定。`workspace/output/agent_output/T-20260520-006/`。30日/60日再点検チケット連動 |
-| T-20260521-004 | 【社長タスク】Amazak URL/カズさん YouTube URL 共有 | done | 社長提供画像5枚＋YouTube スクショで完了 |
-| T-20260521-005 | ADD×ONE 同等の社長専用 物販リサーチツール 自社開発検討 | todo | **社長 A 承認済（IT エージェント「タカシ」新規雇用で構築進行）**。次セッションで agents/it_engineer/agent.md 起票＋ MVP 設計から |
-| T-20260521-006 | 【再点検】Amazak 入会 30日後 | todo | next_check_at=2026-06-20。法務防御策F |
-| T-20260521-007 | 【再点検】Amazak 入会 60日後 | todo | next_check_at=2026-07-20。継続/退会判断 |
+git fetch origin
+git checkout claude/complete-remaining-tasks-0eCzs
+git pull --ff-only origin claude/complete-remaining-tasks-0eCzs
+```
 
-### cloud 側で発見した重要情報（次セッションで活用）
+**注意**: `main` ブランチには Sato-Scope の成果物・関連チケットが未統合です。**社長判断で `main` へのマージ可否**を確認してください（後述）。
 
-- **カズくん正体**: 物販ONE @kazu-keio（慶應卒・年商10億円・SNS総25万人だが YouTube 5,970人で乖離大）
-- **150万円コース勧誘実態**: カズくん＋みかみさんの2人体制で数千人規模に勧誘中
-- **ADD×ONE PROJECT**: カズくん運営の独自ツール。Keepa API＋Yahoo!ショッピング等のスクレイピング。150万円コース付属推定
-- **Amazak（社長表記）= Ama-Jack（広告ロゴ）**: 株式会社JACKALL（代表 惣本達也・広島）運営の0円コミュニティ。物販ONE とは別組織
-- **社長の Ama-Jack（Amazak）入会判断**: 「無料・勧誘断る・金銭発生時退会」確定
+### 2. 社長判断待ち事項を確認
 
-### 私の手順違反（反省・記録）
-
-1. Notion 同期を一度も実施せず PC 側との乖離を見過ごした
-2. 番号衝突に気付かず T-007〜T-012 を別タスクで起票
-3. 日付の誤用（5/21 起票なのに T-20260520-* を流用）
-4. T-005 ルーティング違反（秘書が一人で抱え込み）→ 社長指摘で修正
-
-### マージ後の重要事項
-
-- `workspace/output/deliverables/T-20260520-003/` にサトル納品の Keepa/SellerSprite/アマサーチ/FBA計算機 個票が存在（PC 側成果物）
-- agents/researcher/agent.md（サトル）、agents/planner/agent.md（タケシ）、agents/simulator/agent.md（マサル）が利用可能に
-- §4.3「迷ったら止まる」→「軽く動いてから聞く」に緩和、夜間自走モード解禁
+| 件 | 社長判断 |
+|---|---|
+| **A: main へのマージ可否** | 現状ブランチで継続するか、main にマージして本流化するか |
+| **B: Sato-Scope Phase 2 着手** | Keepa API €49/月 課金承認（§4.1） |
+| **C: モック確認結果** | v0.2 モック動作確認後のフィードバック |
+| **D: ローカル起動確認** | code/ でローカル動作確認したか |
 
 ---
 
-## PC 側 2026-05-20 セッション締めくくり（取り込み済）
+## 直前セッション（2026-05-22）の締めくくり
 
-社長指摘「Notion の ToDo 粒度が大きすぎて進捗が見えない／依頼が反映されてない」を解消。
+**社長専用 Amazon 物販リサーチツール「Sato-Scope」を Phase 0 → v0.2 再設計 → Phase 1 まで完成させた**。サトル（リサーチ）／タケシ（戦略）／タカシ（IT・新設）の3者合作。
 
-1. **粒度ルールを明文化**：`_template.md` に「1チケット=1〜2セッション、大きいものは親子分割、`parent_ticket` フィールド」を追記
-2. **本日分の作業を遡及チケット化**：T-007（リサーチャー＋プランナー新設）／T-008（シミュレーター新設）／T-009（自律運用ルール拡張）／T-010（deliverables 配置ルール）／T-011（本対応）
-3. **Notion DB 整備**：Assignee 選択肢に researcher／planner／simulator を追加、ParentTicket 列を新設
-4. **未登録カード作成**：T-005〜T-011 を Notion に新規作成、T-003／T-004 を最新化
-5. **カード本文に「結果要約」を追加**：11カード全てに `## 結果要約` セクションを末尾に追記（done＝何を成し遂げたか／waiting＝何を待っているか／doing＝現在地と次の手／todo＝ブロッカー）
-6. **同期ルール明文化**：`agents/secretary/skills/notion-ticket-sync.md` に「カード本文に結果要約を書くルール」を追加
+### 重要な方向転換（社長レビューを経て）
 
-**コミット**：`af7be92`（粒度対応）／`da1feb6`（同期ルール）
+初版（Phase 0）は **Product Lookup 型**（JAN/ASIN 入力で1商品調査）で作っていたが、社長指摘で **Discovery 型**（「探す」ボタン一発で利益候補一覧）に**完全再設計**（v0.2）。
+
+### 差別化軸の確定（D1〜D9）
+
+| 軸 | 採用 / 不採用 | 詳細 |
+|---|---|---|
+| D1 仕入れ元の量 | △ 並行調査のみ | 楽天+Yahoo!固定、量拡張は社長判断後 |
+| D2 マイナー公式 API | ◯ 並行調査 | 法律範囲内 |
+| D3 ポイント込み実質価格 | ✅ 実装済 | トグル ON/OFF 可 |
+| D4 真の利益計算（FBA/自己発送/MSS） | ✅ 実装済 | **差別化の核** |
+| D5 独自おすすめスコア | ✅ 実装済 | 0〜100 スコア・デフォルトソート |
+| D6 AI 解説 | ❌ 不要 | 代わりに楽天/Yahoo!/Amazon URL リンク |
+| D7 中古せどり | ⏸ ペンディング | v0.x で再検討 |
+| D8 コンプラ警告 | ✅ 実装済 | 11ブランド警告マスタ |
+| D9 クロスチャネル裁定 | ❌ 不要 | |
+
+### Amazon の扱い（社長指摘で整理）
+- **販売データ参照元として**: ✅ Keepa 経由で売値・月販・Drop30 取得
+- **仕入れ元として**: ❌ 副業初心者には不向きで除外
+
+### Phase 1 で完成したもの（コードベース）
+
+`workspace/output/deliverables/T-20260521-005/code/` 配下：
+
+```
+code/
+├── README.md                       # セットアップ手順
+├── requirements.txt / .env.example
+├── app/
+│   ├── main.py                     # FastAPI /search /health
+│   ├── calc/
+│   │   ├── profit.py               # FBA/自己発送/MSS 真の利益計算
+│   │   └── score.py                # おすすめスコア + 🟢🟡🔴 判定
+│   ├── compliance/brand_warnings.py # Sony/Apple/Nike 等11ブランド警告
+│   ├── adapters/{keepa,rakuten,yahoo}.py # 各 API アダプタ（モック実装）
+│   └── static/index.html           # モック HTML v0.2 統合済み
+└── tests/test_profit.py            # ユニットテスト
+```
+
+**動作確認済み**: `/search` が 7 件抽出、Sony 警告発火、全商品で MSS > FBA を実証。
+
+### モックの確認方法
+
+```bash
+# 方法1: HTML だけ直接開く
+open workspace/output/deliverables/T-20260521-005/02_mockup.html
+
+# 方法2: FastAPI で起動（推奨）
+cd workspace/output/deliverables/T-20260521-005/code
+python3 -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload
+# → http://localhost:8000/ でモック画面、/search で JSON、/health で稼働確認
+```
 
 ---
 
-## 組織再編メモ（2026-05-20）
+## チケット状況（2026-05-22 最新）
 
-リサーチが秘書に集中していた問題と、社長の Do がボトルネックになる構造を解消するため、計3名を新設。
-
-| 新ポジ | モデル | 仮名 | 役割 |
-|---|---|---|---|
-| リサーチャー | 安宅和人風 | **サトル** | 商品/市場/競合/ツール/業界の事実収集と構造化 |
-| プランナー | 森岡毅風 | **タケシ** | 調査結果をもとに戦略立案（A/B/C＋推奨） |
-| シミュレーター | 羽生善治風 | **マサル** | 戦略案の仮想実行（3シナリオ＋プレモーテム）。社長の実 Do を最後の1回に絞るゲートキーパー |
-
-意思決定パイプライン: `社長 → カズヨ → サトル（事実） → タケシ（戦略Plan） → マサル（仮想Do） → カズヨ（仮想Check） → タケシ（仮想Act）→ 収束まで反復 → 社長（実 Do）`
-
-### 自律運用ルールの変更（重要）
-
-- **§4.3「迷ったら止まる」→「軽く動いてから聞く」に更新**: §4.1 該当の疑いがなければ、マサルで仮想 PDCA を1〜2周回してから A/B/C＋推奨で `waiting/` に出す。丸投げ質問を社長に投げない
-- **夜間自走モード**: 社長就寝中は調査深掘り・仮想 PDCA 反復・ドラフト推敲・メモリ整理を秘書司令で進める。`/loop` や `agents/secretary/skills/routines.md` を活用
-- **§4.1（外部発信・課金・契約・不可逆削除・第三者連絡・機密外部送信）は変わらず社長承認必須**
+| ID | タイトル | Status | 担当 | 備考 |
+|---|---|---|---|---|
+| **T-20260520-003** | ツール網羅調査（軸A） | waiting | researcher | 個票4本納品済、社長レビュー待ち |
+| T-20260520-004 | 体験仕入れ・販売サイクル（軸B） | doing | secretary | 社長アカウント開設 |
+| **T-20260520-005** | Amazon物販界隈調査 | waiting | researcher | レポートファイル所在不明・要再生成 |
+| T-20260520-006 | カズくん開発ツール調査 | todo | researcher | 社長追加情報待ち |
+| T-20260520-012 | 仕入れ先網羅調査（軸B 先行） | todo | researcher | サトル発注待ち |
+| **T-20260521-001** | 用語集（150語×10カテゴリ） | doing | content_creator | 納品済、社長レビュー待ち |
+| **T-20260521-002** | 仕入れ販売シミュレーション | doing | content_creator | 納品済、社長レビュー待ち |
+| **T-20260521-003** | Ama-Jack 評価＋判断 | doing | secretary | 判断完了「無料・勧誘断る・金銭発生時退会」 |
+| **T-20260521-005** | Sato-Scope 自社開発 | **doing** | it_engineer | **Phase 1 完了・Phase 2 §4.1 承認待ち** |
+| T-20260521-006 | Amazak 30日後再点検 | todo | secretary | next_check_at=2026-06-20 |
+| T-20260521-007 | Amazak 60日後再点検 | todo | secretary | next_check_at=2026-07-20 |
+| T-20260522-001 | B2B卸API網羅調査 | todo | researcher | Sato-Scope 拡張源（社長 A1 承認） |
+| T-20260522-002 | プレスリリースAPI調査 | todo | researcher | 同上 |
+| T-20260522-003 | アフィリエイトASP ToS確認 | todo | legal | 同上 |
+| T-20260522-004 | Sato-Scope ROI 試算 | todo | accounting | Phase 2 着手前 |
+| T-20260522-005 | 公式API ToS 最終確認 | todo | legal | Phase 2 着手前 |
 
 ---
 
-## 社長について（毎セッション参照）
+## 進行中の論点（次セッションで判断/着手すべき）
+
+### 🔴 最優先: Sato-Scope Phase 2 着手の §4.1 承認
+
+| 項目 | 内容 |
+|---|---|
+| Keepa API Power-User Plan **€49/月**（カード決済） | 必須・約¥8,200/月 |
+| 楽天市場 ApplicationID 登録 | 無料・社長アカウント連動 |
+| Yahoo!ショッピング ClientID 登録 | 無料・社長アカウント連動 |
+
+社長が「Go」と言ったタイミングで Phase 2 着手。
+**ROI 試算（T-20260522-004）／ToS 最終確認（T-20260522-005）の結果を待ってから判断**でも可。
+
+### 🟡 main へのマージ可否
+
+現在の作業はすべて `claude/complete-remaining-tasks-0eCzs` ブランチ上。main には未統合。
+**社長判断**: 
+- A: main にマージして本流化
+- B: 現ブランチで継続（次セッションも同ブランチで作業）
+- C: PR 作成して社長が GitHub 上でレビュー後マージ
+
+推奨は **A**（本流化したい場合）または **B**（しばらく実験段階扱い）。
+
+### 🟢 4件の納品物レビュー
+
+社長レビュー待ち：
+- T-20260520-003 ツール網羅調査
+- T-20260521-001 用語集
+- T-20260521-002 仕入れ販売シミュレーション
+- Sato-Scope v0.2 モックの社長 PC 動作確認
+
+---
+
+## 重要 URL（次セッションで参照）
+
+### Sato-Scope（T-20260521-005）
+
+- **Notion カード**: https://www.notion.so/367b0a4044fa8185b4f0d19af0b0440b
+- **GitHub (ブランチ表示)**: https://github.com/Yukinori1018/ai-company-amazon_buppan/tree/claude/complete-remaining-tasks-0eCzs/workspace/output/deliverables/T-20260521-005
+- **モック v0.2 (htmlpreview)**: https://htmlpreview.github.io/?https://github.com/Yukinori1018/ai-company-amazon_buppan/blob/claude/complete-remaining-tasks-0eCzs/workspace/output/deliverables/T-20260521-005/02_mockup.html
+- **code/ ディレクトリ**: https://github.com/Yukinori1018/ai-company-amazon_buppan/tree/claude/complete-remaining-tasks-0eCzs/workspace/output/deliverables/T-20260521-005/code
+
+### 他チケットの Notion カード
+
+- T-20260520-003 ツール調査: https://www.notion.so/366b0a4044fa81459b7ac9c36846b567
+- T-20260521-001 用語集: https://www.notion.so/367b0a4044fa81259c2fc036df537583
+- T-20260521-002 仕入れ販売シミュ: https://www.notion.so/367b0a4044fa81869f40dab2cdba76f7
+- T-20260521-003 Ama-Jack 評価: https://www.notion.so/367b0a4044fa816ba547c1fd15b5d029
+- T-20260522-001 B2B卸API調査: https://www.notion.so/367b0a4044fa8193b010c3f6c7b21e27
+- T-20260522-002 PR-API 調査: https://www.notion.so/367b0a4044fa8131b4d3c0f83f31aef1
+- T-20260522-003 アフィリエイトASP ToS: https://www.notion.so/367b0a4044fa818c8440ea02827e78ad
+- T-20260522-004 ROI 試算: https://www.notion.so/367b0a4044fa819dbe93e840cc7f8344
+- T-20260522-005 API ToS 最終確認: https://www.notion.so/367b0a4044fa81ce9f8edf1899ae40a8
+
+---
+
+## 社長プロファイル（毎セッション参照）
 
 - **副業初心者**。座学より体験を優先。専門用語（SKU / FBA / カートボックス 等）が出る時は短く補足する。
-- **分量のある資料はテキスト + HTML 形式で併出力**。最終納品物は `~/Documents/AI Company Outputs/Amazon物販事業/<ticket_id>/`（PC）または `workspace/output/deliverables/<ticket_id>/`（Cloud→Git で PC に届ける）。
+- **分量のある資料はテキスト + HTML 形式で併出力**。
 - 秘書とだけ対話。サブエージェントへの依頼は秘書経由。
 - 結論ファースト、A/B/C＋推奨 形式の意思決定支援を好む。
-- Notion カンバンで進捗を見る習慣あり。**カード本文に結果要約があると一目で把握できる**ことを評価。
+- Notion カンバンで進捗を見る習慣あり。**カード本文に結果要約・アウトプット欄があると一目で把握できる**ことを評価。
+
+---
+
+## 直近の重要ナレッジ（memory/）
+
+- `knowledge_dennou_sedori_system.md` — 電脳せどり「システム型物販」（朝野氏10選）
+- `knowledge_buppan_consulting_session_1.md` — 48歳本業志望者へのプロコンサル（FBA/自己発送/MSS の真実、無在庫対応テクニック）
+
+→ 物販ナレッジ１ Part3「FBA vs 自己発送 真の利益計算」が Sato-Scope の差別化の核 (D4) として実装済み。
 
 ---
 
@@ -102,131 +207,48 @@ PC 側で 2026-05-20 に整備された組織再編（サトル・タケシ・�
 
 - **事業名**: Amazon物販事業
 - **ミッション** (CLAUDE.md §1): 「Amazon 上で利益と販売確度の高い SKU を 100 積み上げ、月商800万円・利益率20%を達成する」
-- **戦略方向性**: 体験先行（軸B）で学びを蓄積してから主力カテゴリを確定する方針
-- **進行軸**: 2軸並行
+- **戦略方向性**: 体験先行（軸B）で学びを蓄積してから主力カテゴリを確定
+- **進行軸**: 3軸並行
   - **軸A**: 既存ツール網羅調査（T-003）— 個票4本納品済、社長レビュー待ち
-  - **軸B**: 体験仕入れ・販売サイクル1周（T-004、予算上限 10万円承認済み）— アカウント開設社長手作業中
+  - **軸B**: 体験仕入れ・販売サイクル1周（T-004、予算上限 10万円承認済）— 社長アカウント開設中
+  - **軸C**: 社長専用ツール自社開発（T-005 Sato-Scope）— Phase 1 完了
 
 ---
 
-## チケット状況
+## 環境メモ
 
-| ID | タイトル | Status | 担当 | 備考 |
-|---|---|---|---|---|
-| T-20260520-001 | Notion 連携動作テスト | done | secretary | クローズ済 |
-| T-20260520-002 | 主力商品カテゴリと想定顧客像を確定 | done | secretary | 体験先行方針で「未定」据え置きの決定 |
-| T-20260520-003 | Amazon物販ツール網羅調査・評価（軸A） | **waiting** | researcher | 個票4本納品済、社長レビュー待ち |
-| T-20260520-004 | 体験仕入れ・販売サイクル1周（軸B） | doing | secretary | アカウント開設社長手作業中 |
-| T-20260520-005 | Amazon物販界隈調査（X/YouTube） | **waiting** | researcher | レポート納品済、社長レビュー待ち |
-| T-20260520-006 | カズさん開発ツール調査 + 自社開発検討 | todo | researcher | 社長から追加情報待ち |
-| T-20260520-007 | リサーチャー＋プランナー新設 | done | secretary | 完了（遡及起票） |
-| T-20260520-008 | シミュレーター新設＋仮想 PDCA 設計 | done | secretary | 完了（遡及起票） |
-| T-20260520-009 | 自律運用ルール拡張＋ルーティン定義 | done | secretary | 完了（遡及起票） |
-| T-20260520-010 | deliverables/ 配置ルール追加 | done | secretary | 完了（遡及起票） |
-| T-20260520-011 | Notion 粒度問題対応＋同期ルール更新 | done | secretary | 完了（本セッション） |
-| T-20260520-012 | 仕入れ先・仕入れ方法の網羅調査（軸B 先行） | **todo** | researcher | 次セッション冒頭でサトルに発注 |
-| T-20260521-001 | Amazon物販・副業 用語集（初心者向け 150語） | doing | content_creator | ヒデアキ納品済、社長レビュー待ち |
-| T-20260521-002 | 仕入れ〜販売シミュレーション資料（FBA前提） | doing | content_creator | 4者連携で playbook-final.md/html 納品済 |
-| T-20260521-003 | Ama-Jack（Amazak）コミュニティ評価＋判断 | doing | secretary | 社長判断完了「無料入会・金銭発生時退会」 |
-| T-20260521-004 | 【社長タスク】Amazak/カズ YouTube URL 共有 | done | secretary | 社長提供で完了 |
-| T-20260521-005 | ADD×ONE 同等の社長専用ツール 自社開発検討 | todo | secretary | **A 承認済、IT エージェント雇用 → MVP 設計から次セッション** |
-| T-20260521-006 | 【再点検】Amazak 入会 30日後 | todo | secretary | next_check_at=2026-06-20 |
-| T-20260521-007 | 【再点検】Amazak 入会 60日後 | todo | secretary | next_check_at=2026-07-20 |
-
-各チケットの本文は `workspace/tickets/<status>/T-*.md` を参照。Notion カードを開けば結果要約も読める。
-
----
-
-## 次セッションの想定タスク（社長メモ・確定）
-
-> 前回の handover に音声入力の誤認識があり訂正済。**Amazon 出品アカウント開設は社長手作業中（今日中に完了見込み）。完了を待たず先行で動く**。
-
-社長の次セッションのゴール：**Amazon で販売する10万円分の商品を決める**。
-
-そのための先行調査チケットを起票済：
-
-- **T-20260520-012：仕入れ先・仕入れ方法の網羅調査（軸B 先行調査）** — 担当：サトル（リサーチャー）、parent=T-004
-  - 電脳せどり／店舗せどり／メルカリ仕入れ／ヤフオク／卸サイト（NETSEA・スーパーデリバリー等）／中国輸入（アリババ・タオバオ）／韓国輸入／OEM 等を網羅
-  - 副業初心者・予算10万円で現実的な 3〜5 案に絞り込み
-  - 各方法の主要仕入れ先・実務情報（価格相場・送料・支払い・最小ロット）・規制リスク注意点を整理
-  - テキスト + HTML でレポート納品 → 社長レビュー → タケシで「10万円商品選定戦略」→ マサルで仮想 PDCA → 社長最終決定 → T-004 Step 3〜4 へ
-
-**次セッション冒頭の動き方**：
-1. アカウント開設の進捗を **軽く** 確認（書類準備状況、完了報告）→ T-004 はそのままで OK
-2. **T-012 をサトルに発注して並走させる**（社長承認不要、§4.1 該当なし）
-3. サトル納品まで社長は他作業可。納品後にレビュー → タケシ・マサル → 商品選定へ
-
----
-
-## 進行中の論点（社長の返答待ち）
-
-### T-003（軸A・ツール網羅調査）— waiting
-
-- 個票4本（Keepa／SellerSprite／アマサーチ／FBA計算機）が `workspace/output/deliverables/T-20260520-003/` に納品済
-- 社長判断待ち：
-  1. 個票の粒度・項目過不足の確認
-  2. 導入タイミング（即／軸B 1周後／無料版継続）
-- レビュー後の流れ：タケシ（プランナー）→ マサル（シミュレーター）の仮想 PDCA で磨いてから最終提案
-
-### T-004（軸B・体験仕入れ）— doing
-
-- 承認済み：予算 10万円／出品プラン=小口／事業形態=個人／決済=セゾンカードデジタル
-- 現在地：Step 1（アカウント開設）社長手作業中。書類準備で時間要
-- 秘書は日次でリマインド継続（`next_check_at` ベース）
-
-### T-005（界隈調査）— waiting
-
-- レポート: `workspace/output/agent_output/T-20260520-005/report.md`（Cloud では gitignore のため未push。PC 復帰時に `workspace/output/deliverables/T-20260520-005/` に移して全環境から見られるようにする予定）
-- 社長レビュー待ち
-
-### T-006（カズさん開発ツール）— todo
-
-- 社長からの追加情報待ち（YouTube チャンネル URL／アプリ名／機能／料金 等）
-- 受領後：実態調査 → 軸A T-003 と接続 → 自社開発 MVP 見積もり → A/B/C＋推奨
-
----
-
-## 環境メモ（モバイルで再現するなら）
-
-- **Notion カンバン DB ID**: `366b0a4044fa81788359d44b4f807458`（URL: https://www.notion.so/366b0a4044fa81788359d44b4f807458）
+- **Notion カンバン DB ID**: `366b0a4044fa81788359d44b4f807458`
 - **親ページ**: 「クロードコード ToDo進捗」（id `365b0a4044fa8000addbc5404f51685b`）
-- **Notion DB 構成**：Assignee 選択肢に researcher／planner／simulator／secretary／accounting／legal／general_affairs／content_creator、Status は todo/doing/waiting/done、ParentTicket 列あり
-- **カード本文に結果要約を必ず書く**（運用ルール、`agents/secretary/skills/notion-ticket-sync.md` 参照）
-- **`.mcp.json`**: gitignore 対象（push されない）。モバイルで Notion 同期したい場合は `.mcp.json.example` をコピーし、`NOTION_API_KEY` と `NOTION_DATABASE_ID`（上記）を埋める。`NOTION_API_KEY` は PC の `~/.config/ai-company-template/config.env` にある（モバイルへは別途安全に共有）
-- **成果物の配置**：
-  - Cloud セッション：`workspace/output/deliverables/<ticket_id>/`（Git 経由で PC に届く）
-  - PC ローカル：`~/Documents/AI Company Outputs/Amazon物販事業/<ticket_id>/`（リポ外、Finder ブックマーク推奨）
+- **Notion DB 構成**: Assignee に `it_engineer` を**追加すべきか要確認**（現状 T-20260521-005 は secretary でカード作成済）
+- **`.mcp.json`**: gitignore 対象
+- **成果物の配置**:
+  - Cloud セッション: `workspace/output/deliverables/<ticket_id>/`（Git 経由で PC に届く）
+  - PC ローカル: `~/Documents/AI Company Outputs/Amazon物販事業/<ticket_id>/`（リポ外）
 
 ---
 
-## モバイル／次セッション起動時の推奨初動
+## 次セッション起動時の推奨初動
 
-**最も簡単: 社長は `/resume` とだけ入力**してください。秘書カズヨが以下を自動で実行します:
-
-1. このファイル（`workspace/handover.md`）＋ `CLAUDE.md` ＋ doing/waiting チケット一括読み込み
-2. `git log` ＋ `git status` ＋ ブランチ確認、Notion 同期状態の照合
-3. SessionStart リマインダー（`next_check_at` 到達）を抽出
-4. **優先継続事項 Top 3** を A/B/C＋推奨形式で提示
-5. 社長に「どこから再開しますか?」を提示
-
-引数なしで5分以内、`quick` 引数なら30秒、`full` 引数なら成果物の一覧と要約も載せます。詳細は `.claude/commands/resume.md` を参照。
+**最も簡単: 社長は `/resume` とだけ入力**してください。秘書カズヨが本ファイル＋ doing/waiting/todo チケット＋ Notion 状態を自動で読み込み、優先継続事項 Top 3 を提示します。
 
 ### 手動で読む場合の優先順位
 
-`/resume` を使わない時は、以下の順序で読んでください:
+1. 本ファイル（`workspace/handover.md`）の「⚠️ 次セッション冒頭の必須アクション」と「進行中の論点」
+2. `workspace/tickets/doing/T-20260521-005_*.md`（Sato-Scope Phase 1 完了状態）
+3. `workspace/output/deliverables/T-20260521-005/README.md`（v0.2 改訂サマリ）
+4. `workspace/output/deliverables/T-20260521-005/code/README.md`（Phase 1 セットアップ手順）
 
-1. このファイル（`workspace/handover.md`）の「直前セッションの締めくくり」と「チケット状況」の表
-2. `workspace/tickets/doing/T-20260520-004_*.md`（軸B アカウント開設・社長手作業中）
-3. `workspace/tickets/todo/T-20260520-012_*.md`（仕入れ先網羅調査・サトルに発注待ち）
-4. `workspace/tickets/todo/T-20260521-005_*.md`（ADD×ONE 同等開発・A 承認済、IT エージェント雇用から）
+### このセッションで起きた要点（時系列）
 
-### このセッションで起きた要点
+1. /resume で前回引き継ぎ確認 → Notion カードに「アウトプット欄＋URL」を追加（既存4件＋新規3件）
+2. 物販ナレッジ１（朝野コンサル動画分析 .docx）を `memory/` に記録 → FBA/自己発送/MSS の真実が Sato-Scope の核に
+3. T-20260521-005 Sato-Scope Phase 0 着手 → モック初版（Product Lookup 型）納品
+4. 社長レビューで方向性指摘 → Discovery 型に**完全再設計**（v0.2）
+5. D1〜D9 議論で質的差別化軸を確定。Amazon は販売参照のみで仕入れ元から除外
+6. スクレイピング以外の合法的拡張手段を発掘（B2B卸API・プレスリリースAPI・アフィリエイトASP・公式RSS）
+7. 社長 A1 承認 → 並行調査3チケット起票（T-20260522-001/002/003）
+8. 社長 A 承認 → Phase 1 着手。FastAPI バックエンド一式実装、テスト全通過、`/search` で7件抽出確認
+9. Phase 2 着手前の並行発注2件起票（T-20260522-004 ROI / 005 ToS）
+10. handover.md フル更新（本ファイル）
 
-- PC 側ブランチ `claude/organize-agent-roles-0YTXI` を取り込み、サトル・タケシ・マサル＋運用ルール拡張を統合
-- cloud 側で並行進行していた7成果物を T-20260521-001〜007 にリネームして保全
-- 社長判断: Amazak（旧表記 Ama-Jack）に **無料入会・金銭発生時退会** で確定。30日/60日後の再点検チケット起票済
-- 社長承認 **A**: ADD×ONE 同等の社長専用ツールを IT エージェント「タカシ」新規雇用で構築 → **次セッションで実装着手**
-- 未実施タスク（次セッション必須）:
-  1. `agents/it_engineer/agent.md` 起票＋ CLAUDE.md §2/§5 追記
-  2. Notion DB と本リポジトリの同期（T-20260521-* 系を Notion に新規登録）
-  3. T-006（PC 側カズさん調査）と T-20260521-003（Ama-Jack 評価）の関係整理
+すべての作業は `claude/complete-remaining-tasks-0eCzs` ブランチ上、commit `262a9da` まで push 済み。
