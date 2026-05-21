@@ -9,36 +9,34 @@
 
 ## 最終更新
 
-- **日時**: 2026-05-22 夜
+- **日時**: 2026-05-22 夜（PR #2 main マージ後の追記）
 - **更新者**: 秘書カズヨ（Cloud セッション）
-- **次の想定読み手**: PC セッション or 別 Cloud セッション
-- **作業ブランチ**: `claude/complete-remaining-tasks-0eCzs`（main には未マージ・後述）
+- **次の想定読み手**: 携帯デバイス × GitHub 経由の新セッション
+- **作業ブランチ**: `main`（PR #2 マージ済 = commit `311dec4`）
 
 ---
 
 ## ⚠️ 次セッション冒頭の必須アクション
 
-### 1. 作業ブランチに乗る
+### 1. main から新ブランチを切る
 
 ```bash
-cd ~/Claude\ Code/ai-company-amazon_buppan   # PC の場合
-# Cloud の場合は worktree が自動配置される
-
 git fetch origin
-git checkout claude/complete-remaining-tasks-0eCzs
-git pull --ff-only origin claude/complete-remaining-tasks-0eCzs
+git checkout main
+git pull --ff-only origin main
+git checkout -b claude/<次のタスク名>
 ```
 
-**注意**: `main` ブランチには Sato-Scope の成果物・関連チケットが未統合です。**社長判断で `main` へのマージ可否**を確認してください（後述）。
+PR #2 で旧ブランチ `claude/complete-remaining-tasks-0eCzs` の全成果物は main に統合済み。**旧ブランチは履歴保持目的で残置**（社長判断で削除可）。
 
 ### 2. 社長判断待ち事項を確認
 
 | 件 | 社長判断 |
 |---|---|
-| **A: main へのマージ可否** | 現状ブランチで継続するか、main にマージして本流化するか |
-| **B: Sato-Scope Phase 2 着手** | Keepa API €49/月 課金承認（§4.1） |
+| ~~A: main マージ~~ | ✅ 完了（PR #2 マージ済、2026-05-22 夜） |
+| **B: Sato-Scope Phase 2 着手** | Keepa API €49/月 課金承認（§4.1）— 先に T-004 ROI / T-005 ToS の結果を待つのが推奨 |
 | **C: モック確認結果** | v0.2 モック動作確認後のフィードバック |
-| **D: ローカル起動確認** | code/ でローカル動作確認したか |
+| **D: 4件の納品物レビュー** | T-003 ツール調査 / T-001 用語集 / T-002 シミュレーション / Sato-Scope モック |
 
 ---
 
