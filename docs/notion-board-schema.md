@@ -14,7 +14,7 @@
 |------------------|------|------|-------------------|------|
 | Name | Title | ✓ | `title` | カードのタイトル |
 | TicketID | Text | ✓ | `ticket_id` | 一意。同期キー |
-| Status | Status | ✓ | `status` | カンバンの列分け |
+| Status | Select | ✓ | `status` | カンバンの列分け |
 | Assignee | Select | ✓ | `assignee` | 担当エージェント |
 | Priority | Select | ✓ | `priority` | 優先度 |
 | RequiresApproval | Checkbox | ✓ | `requires_approval` | 社長承認必須フラグ |
@@ -22,6 +22,7 @@
 | CreatedAt | Date | ✓ | `created_at` | 起票日 |
 | UpdatedAt | Date | ✓ | `updated_at` | 最終更新日 |
 | Labels | Multi-select | — | `labels` | 任意のラベル |
+| ParentTicket | Text | — | `parent_ticket` | 親チケットの TicketID（空欄=独立チケット） |
 
 ## 3. 選択肢の値
 
@@ -39,6 +40,9 @@
 | 値 | 対応エージェント |
 |----|---------------|
 | secretary | 秘書（カズヨ） |
+| researcher | リサーチャー（サトル） |
+| planner | プランナー（タケシ） |
+| simulator | シミュレーター（マサル） |
 | accounting | 経理（ハジメ） |
 | legal | 法務（ハルオ） |
 | general_affairs | 庶務（マリエ） |

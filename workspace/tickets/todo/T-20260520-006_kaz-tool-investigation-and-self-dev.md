@@ -2,7 +2,7 @@
 ticket_id: T-20260520-006
 title: カズさん（YouTuber）開発 Amazon物販ツールの調査 + 自社開発検討
 status: todo
-assignee: secretary
+assignee: researcher
 priority: medium
 created_at: 2026-05-20
 updated_at: 2026-05-20
@@ -33,3 +33,4 @@ labels: [research, tooling, dev, idea]
 ## ログ
 
 - 2026-05-20 todo 起票。社長からの追加情報待ち
+- 2026-05-20 役割再編に伴い assignee を secretary → researcher（サトル）に変更。自社開発 vs 既存 vs ハイブリッドの戦略判断はプランナー（タケシ）にバトンパス予定
