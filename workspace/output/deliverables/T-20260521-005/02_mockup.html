@@ -237,5 +237,48 @@
 
 </div>
 
+<!--
+  このモックは純粋な HTML + CSS で構成されており、外部スクリプト・外部画像・外部フォントを一切読み込みません。
+  下記は「触れる感」を出すための最小限の Vanilla JS（〜30行）です。エラー時もモック表示は崩れません。
+-->
+<script>
+(function() {
+  "use strict";
+  try {
+    // ★ お気に入りボタンのトグル
+    document.querySelectorAll('.star-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var active = btn.classList.toggle('active');
+        btn.textContent = active ? '★' : '☆';
+      });
+    });
+
+    // 🔍 検索ボタンのデモ動作（実装は Phase 1 以降）
+    var searchBtn = document.querySelector('.search-input-row button');
+    if (searchBtn) {
+      searchBtn.addEventListener('click', function() {
+        alert('これはモックです。実際の検索は Phase 1（API 接続検証）完了後に動作します。\n\n社長の A 承認後、Keepa API・Yahoo!ショッピング API・楽天 API を接続します。');
+      });
+    }
+
+    // しきい値変更で「再判定中…」風の小さな視覚フィードバック
+    document.querySelectorAll('.thresholds input').forEach(function(inp) {
+      inp.addEventListener('change', function() {
+        var card = document.querySelectorAll('.summary-card .value')[0];
+        if (!card) return;
+        var orig = card.textContent;
+        card.textContent = '判定中…';
+        setTimeout(function() { card.textContent = orig; }, 600);
+      });
+    });
+
+    console.log('[Sato-Scope mock] v0.1 ready — pure HTML/CSS + 30 lines of vanilla JS, no external deps.');
+  } catch (e) {
+    // モックは UI 確認用なので、JS エラーが起きても画面は壊さない
+    console.warn('[Sato-Scope mock] script error (display unaffected):', e);
+  }
+})();
+</script>
+
 </body>
 </html>
