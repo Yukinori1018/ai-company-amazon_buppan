@@ -82,3 +82,14 @@ A/B/C 判断後に Phase 1（API 接続検証）着手。Phase 1 時点で Keepa
 - 2026-05-22 D1〜D9 議論を経て差別化軸を質的方向（D3/D4/D5/D6/D8）に確定。Amazon は販売参照のみで仕入れ元から除外
 - 2026-05-22 **モック v0.2 を Discovery 型に書き換え**。8件サンプル・ソート/フィルター/ポイント込み価格トグル/★お気に入りが実動
 - 2026-05-22 並行調査 3 チケット起票（T-20260522-001 B2B卸API/002 PR-API/003 アフィリエイトASP-ToS）。A1 承認に基づき走らせるが実装は社長判断待ち
+- 2026-05-22 社長 A 承認 → **Phase 1 着手**。タカシがコードベース構築：
+  - `code/app/calc/profit.py`（FBA/自己発送/MSS 真の利益計算）+ ユニットテスト全通過
+  - `code/app/calc/score.py`（おすすめスコア + 🟢🟡🔴 判定）
+  - `code/app/compliance/brand_warnings.py`（Sony/Apple/Nike 等の警告マスタ）
+  - `code/app/adapters/{keepa,rakuten,yahoo}.py`（モック実装、Phase 2 で実 API 接続）
+  - `code/app/main.py`（FastAPI /search /health エンドポイント）
+  - 動作確認: `/search` が 7 件抽出、スコア降順、Sony 警告も発火
+- 2026-05-22 Phase 2 着手前の並行発注 2 チケット起票:
+  - T-20260522-004 Sato-Scope ROI 試算（ハジメ）
+  - T-20260522-005 公式 API ToS 最終確認（ハルオ）
+- 2026-05-22 Phase 2 着手の §4.1 承認待ち（Keepa €49/月 + 楽天/Yahoo! ApplicationID 登録）
