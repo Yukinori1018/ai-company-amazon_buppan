@@ -1,5 +1,5 @@
 ---
-ticket_id: T-20260520-006
+ticket_id: T-20260521-003
 title: Ama-Jack（カズさん開発）アプリ + 無料コミュニティ 評価
 status: doing
 assignee: secretary

@@ -11,12 +11,13 @@
 ticket_id: T-20260518-001
 title: {{ チケットタイトル }}
 status: todo            # todo | doing | waiting | done
-assignee: secretary      # secretary | accounting | legal | general_affairs | content_creator
+assignee: secretary      # secretary | researcher | planner | simulator | accounting | legal | general_affairs | content_creator
 priority: medium         # low | medium | high
 created_at: 2026-05-18
 updated_at: 2026-05-18
 requires_approval: false # true なら waiting/ 経由必須
 labels: []
+parent_ticket: ""        # 親チケットがあればその ticket_id を記載。なければ空文字列
 ---
 
 ## 要件
@@ -66,11 +67,23 @@ todo → doing → waiting → done
 
 以下のいずれかが発生したら必ず起票します。
 
-- 社長から新規依頼を受信
+- 社長から新規依頼を受信 — **依頼受領 → ただちにチケット起票 → 作業着手** の順を厳守。「ついでに進める」「軽い依頼だから後で起票」は禁止
 - 既存タスクの中から派生タスクが発生
 - 自発的なメンテナンス（メモリ整理、定期レビュー等）
 
 「小さすぎるから起票しない」は禁止。**例外なく起票**します（後追いで進捗が見えなくなるため）。
+
+## チケット粒度ルール
+
+**1チケット = 1〜2セッション（数時間〜半日）で完了する規模** を目標。
+
+- 大きい依頼（1週間以上かかるもの）は **親子分割** する：
+  - **親チケット**：全体ゴールを記述、`labels: [parent]` を付ける
+  - **子チケット**：1〜2セッションで完了する単位、frontmatter の `parent_ticket` に親 ID を記載
+  - 子は独立して todo→doing→done で動かす（Notion 上でカードが動いて進捗が見える）
+  - 親は子がすべて done になった時点で done に
+- 例：「Amazon物販ツール網羅調査」（親）の下に「Keepa 個票作成」「SellerSprite 個票作成」…（子）を並列に立てる
+- **「Notion で進んでない感」が出るのは粒度が大きすぎるサイン**。3日以上 doing のままなら子分割を検討
 
 ## チケット内に記録する4要素
 

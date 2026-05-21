@@ -1,5 +1,5 @@
 ---
-ticket_id: T-20260520-010
+ticket_id: T-20260521-005
 title: ADD×ONE PROJECT 同等の社長専用 物販リサーチツール 自社開発検討
 status: todo
 assignee: secretary

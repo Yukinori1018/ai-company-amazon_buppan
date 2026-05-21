@@ -1,5 +1,5 @@
 ---
-ticket_id: T-20260520-008
+ticket_id: T-20260521-002
 title: 初心者向け「仕入れ〜販売」シミュレーション資料作成（FBA 前提）
 status: doing
 assignee: secretary

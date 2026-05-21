@@ -1,5 +1,5 @@
 ---
-ticket_id: T-20260520-011
+ticket_id: T-20260521-006
 title: 【再点検】Amazak（アマジャック）入会から30日経過時点の状況確認
 status: todo
 assignee: secretary

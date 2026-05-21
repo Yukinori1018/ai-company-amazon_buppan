@@ -1,5 +1,5 @@
 ---
-ticket_id: T-20260520-009
+ticket_id: T-20260521-004
 title: 【社長タスク】Ama-Jack 公式 URL / カズさん YouTube URL を秘書へ共有
 status: doing
 assignee: owner

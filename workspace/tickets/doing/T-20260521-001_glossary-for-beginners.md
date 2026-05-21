@@ -1,5 +1,5 @@
 ---
-ticket_id: T-20260520-007
+ticket_id: T-20260521-001
 title: Amazon物販・副業 用語集（初心者向け）作成
 status: doing
 assignee: content_creator
