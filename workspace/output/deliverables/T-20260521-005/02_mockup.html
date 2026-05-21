@@ -3,279 +3,458 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sato-Scope — 社長専用 Amazon物販リサーチツール（モック v0.1）</title>
+<title>Sato-Scope v0.2 — 社長専用 物販リサーチツール（Discovery 型モック）</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, "Hiragino Kaku Gothic ProN", "Helvetica Neue", sans-serif; background: #f5f6f8; color: #222; line-height: 1.6; }
-  header { background: linear-gradient(135deg, #2c3e50, #34495e); color: #fff; padding: 18px 28px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-  header h1 { font-size: 20px; font-weight: 600; }
-  header .subtitle { font-size: 12px; opacity: 0.7; margin-top: 2px; }
-  .container { max-width: 1280px; margin: 0 auto; padding: 24px; }
-  .mock-banner { background: #fff3cd; border: 1px solid #ffe066; padding: 10px 16px; border-radius: 6px; font-size: 13px; color: #856404; margin-bottom: 20px; }
-  .search-box { background: #fff; border-radius: 10px; padding: 22px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); margin-bottom: 24px; }
-  .search-box h2 { font-size: 14px; color: #666; margin-bottom: 12px; font-weight: 500; }
-  .search-input-row { display: flex; gap: 12px; align-items: center; }
-  .search-input-row input { flex: 1; padding: 12px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 15px; }
-  .search-input-row select { padding: 12px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; background: #fafafa; }
-  .search-input-row button { padding: 12px 22px; background: #2c7be5; color: #fff; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; }
-  .search-input-row button:hover { background: #1e64c5; }
-  .thresholds { display: flex; gap: 16px; margin-top: 14px; flex-wrap: wrap; font-size: 12px; color: #666; }
-  .thresholds label { display: flex; align-items: center; gap: 6px; }
-  .thresholds input { width: 60px; padding: 4px 6px; border: 1px solid #ddd; border-radius: 4px; }
-  .summary-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 20px; }
-  .summary-card { background: #fff; border-radius: 8px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-  .summary-card .label { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; }
+  body { font-family: -apple-system, "Hiragino Kaku Gothic ProN", "Helvetica Neue", sans-serif; background: #f5f6f8; color: #222; line-height: 1.55; font-size: 14px; }
+  header { background: linear-gradient(135deg, #2c3e50, #34495e); color: #fff; padding: 16px 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+  header h1 { font-size: 19px; font-weight: 600; }
+  header .subtitle { font-size: 11px; opacity: 0.75; margin-top: 2px; }
+  .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+  .mock-banner { background: #fff3cd; border: 1px solid #ffe066; padding: 10px 14px; border-radius: 6px; font-size: 12px; color: #856404; margin-bottom: 18px; }
+
+  /* 検索ボックス */
+  .search-zone { background: #fff; border-radius: 10px; padding: 20px 22px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); margin-bottom: 18px; }
+  .search-zone-main { display: flex; gap: 14px; align-items: center; }
+  .btn-search { padding: 14px 36px; background: #2c7be5; color: #fff; border: none; border-radius: 6px; font-size: 16px; font-weight: 700; cursor: pointer; box-shadow: 0 2px 8px rgba(44,123,229,0.3); }
+  .btn-search:hover { background: #1e64c5; }
+  .btn-search:disabled { background: #aaa; cursor: not-allowed; }
+  .toggle-options { color: #2c7be5; cursor: pointer; font-size: 13px; padding: 8px 12px; border: 1px solid #2c7be5; border-radius: 6px; background: #fff; }
+  .last-scan { margin-left: auto; font-size: 12px; color: #888; }
+
+  .search-options { margin-top: 16px; padding: 14px; background: #fafbfc; border-radius: 6px; display: none; }
+  .search-options.open { display: block; }
+  .opt-row { display: flex; gap: 18px; flex-wrap: wrap; margin-bottom: 10px; align-items: center; font-size: 13px; }
+  .opt-row label { color: #555; display: flex; align-items: center; gap: 6px; }
+  .opt-row input[type="number"] { width: 80px; padding: 5px 8px; border: 1px solid #ddd; border-radius: 4px; }
+  .opt-row select { padding: 5px 10px; border: 1px solid #ddd; border-radius: 4px; background: #fff; }
+  .opt-row input[type="checkbox"] { transform: scale(1.1); }
+
+  /* サマリー */
+  .summary-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 16px; }
+  .summary-card { background: #fff; border-radius: 8px; padding: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+  .summary-card .label { font-size: 10px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; }
   .summary-card .value { font-size: 22px; font-weight: 700; margin-top: 4px; }
-  .summary-card .value.green { color: #2e7d32; }
-  .summary-card .value.yellow { color: #f9a825; }
-  .summary-card .value.red { color: #c62828; }
-  .summary-card .value.blue { color: #2c7be5; }
-  .results-table { background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
-  .results-table h2 { padding: 16px 20px; font-size: 15px; border-bottom: 1px solid #eee; color: #333; }
-  table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  thead { background: #fafbfc; }
-  th { text-align: left; padding: 10px 12px; font-weight: 600; color: #555; border-bottom: 1px solid #eee; white-space: nowrap; }
-  td { padding: 12px; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }
+  .green { color: #2e7d32; } .yellow { color: #f9a825; } .red { color: #c62828; } .blue { color: #2c7be5; }
+
+  /* ツールバー */
+  .toolbar { background: #fff; padding: 12px 16px; border-radius: 10px 10px 0 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); display: flex; gap: 12px; align-items: center; flex-wrap: wrap; border-bottom: 1px solid #eee; }
+  .toolbar label { font-size: 12px; color: #555; display: flex; align-items: center; gap: 6px; }
+  .toolbar select { padding: 5px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; background: #fff; }
+  .toolbar .divider { color: #ccc; }
+
+  /* 結果カード */
+  .results { background: #fff; border-radius: 0 0 10px 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  thead { background: #fafbfc; position: sticky; top: 0; }
+  th { text-align: left; padding: 10px 8px; font-weight: 600; color: #555; border-bottom: 1px solid #eee; font-size: 11px; text-transform: uppercase; letter-spacing: 0.3px; white-space: nowrap; }
+  td { padding: 10px 8px; border-bottom: 1px solid #f0f0f0; vertical-align: top; }
   tr:hover { background: #fafbfc; }
-  .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+
+  .prod-cell { min-width: 200px; }
+  .prod-img { width: 44px; height: 44px; background: #e8eaed; border-radius: 4px; display: inline-block; vertical-align: middle; margin-right: 8px; text-align: center; line-height: 44px; font-size: 18px; color: #999; }
+  .prod-name { display: inline-block; vertical-align: middle; max-width: 150px; }
+  .prod-name strong { font-size: 12px; }
+  .prod-name small { color: #888; font-size: 10px; }
+
+  .source-tag { display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: 600; margin-right: 3px; }
+  .source-tag.rakuten { background: #ffeaea; color: #cc0000; }
+  .source-tag.yahoo { background: #fff5e5; color: #ff6600; }
+  .source-tag.amazon { background: #fff3e0; color: #c75000; }
+
+  .price-line { font-size: 12px; margin: 1px 0; }
+  .price-link { color: #2c7be5; text-decoration: none; font-size: 11px; margin-left: 4px; }
+  .price-link:hover { text-decoration: underline; }
+  .price-actual { color: #2c7be5; font-weight: 600; font-size: 11px; }
+  .price-actual-tag { background: #e3f2fd; padding: 1px 4px; border-radius: 3px; font-size: 10px; margin-left: 4px; color: #2c7be5; }
+
+  .profit-cell { font-weight: 600; font-size: 13px; white-space: nowrap; }
+  .profit-cell .rate { font-weight: 400; font-size: 10px; color: #666; }
+  .profit-cell.positive { color: #2e7d32; }
+  .profit-cell.negative { color: #c62828; }
+  .profit-cell .mss-bonus { display: block; font-size: 10px; color: #2c7be5; font-weight: 600; margin-top: 1px; }
+
+  .score-cell { text-align: center; }
+  .score-bar { background: #eee; height: 5px; border-radius: 3px; overflow: hidden; margin-top: 3px; }
+  .score-bar > span { display: block; height: 100%; background: linear-gradient(90deg, #f9a825, #2e7d32); }
+  .score-num { font-weight: 700; font-size: 13px; }
+
+  .badge { display: inline-block; padding: 3px 8px; border-radius: 10px; font-size: 10px; font-weight: 700; }
   .badge.green { background: #e8f5e9; color: #2e7d32; }
   .badge.yellow { background: #fff8e1; color: #f9a825; }
   .badge.red { background: #ffebee; color: #c62828; }
-  .price { font-weight: 600; }
-  .profit-cell { font-weight: 600; }
-  .profit-cell.positive { color: #2e7d32; }
-  .profit-cell.negative { color: #c62828; }
-  .source-tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; margin-right: 4px; }
-  .source-tag.rakuten { background: #f0fff0; color: #cc0000; border: 1px solid #ffd0d0; }
-  .source-tag.yahoo { background: #fffaf0; color: #ff0033; border: 1px solid #ffd6d6; }
-  .star-btn { background: none; border: none; cursor: pointer; font-size: 18px; color: #ccc; }
+
+  .warn-flag { background: #ffebee; color: #c62828; padding: 2px 6px; border-radius: 3px; font-size: 10px; font-weight: 600; display: inline-block; margin-top: 3px; }
+
+  .star-btn { background: none; border: none; cursor: pointer; font-size: 17px; color: #ddd; }
   .star-btn.active { color: #f9a825; }
-  .footer-note { text-align: center; margin-top: 28px; padding: 14px; font-size: 12px; color: #888; }
-  .compare-box { background: #f0f7ff; border-left: 4px solid #2c7be5; padding: 8px 12px; font-size: 12px; border-radius: 4px; margin-top: 4px; }
-  .compare-box .diff { font-weight: 700; color: #2c7be5; }
-  details { background: #fff; border-radius: 10px; padding: 16px 20px; margin-top: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-  details summary { font-weight: 600; cursor: pointer; color: #555; }
-  details .detail-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 14px; font-size: 13px; }
-  details .detail-item { padding: 8px; background: #fafbfc; border-radius: 4px; }
-  details .detail-item .k { color: #888; font-size: 11px; }
-  details .detail-item .v { font-weight: 600; margin-top: 2px; }
+
+  /* ローディング */
+  .loading { text-align: center; padding: 40px; color: #666; }
+  .spinner { display: inline-block; width: 32px; height: 32px; border: 3px solid #eee; border-top-color: #2c7be5; border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 14px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .footer-note { text-align: center; margin-top: 22px; padding: 12px; font-size: 11px; color: #888; }
+
+  .info-box { background: #f0f7ff; border-left: 4px solid #2c7be5; padding: 10px 14px; font-size: 12px; border-radius: 4px; margin-bottom: 14px; color: #333; }
 </style>
 </head>
 <body>
 
 <header>
-  <h1>🔭 Sato-Scope <span style="font-size: 13px; opacity: 0.7; font-weight: 400;">— 社長専用 Amazon物販リサーチツール</span></h1>
-  <div class="subtitle">v0.1 mock · 副業初心者の社長が、月¥8,700 で 60点の行動を量産するために</div>
+  <h1>🔭 Sato-Scope <span style="font-size: 12px; opacity: 0.7; font-weight: 400;">— 社長専用 物販リサーチツール v0.2 mock</span></h1>
+  <div class="subtitle">Discovery 型 · 楽天 + Yahoo!ショッピング横断スキャン · Amazon 販売データ参照（Keepa）</div>
 </header>
 
 <div class="container">
 
   <div class="mock-banner">
-    📌 これは <strong>モック（試作画面）</strong>です。実データではなくサンプル表示で「使い心地」を確認するためのものです。実装は社長 OK の後に着手します。
+    📌 これは <strong>モック v0.2</strong>（試作画面）です。サンプルデータ表示で「使い心地」を確認するもので、実データではありません。
+  </div>
+
+  <div class="info-box">
+    💡 <strong>今回の方針確定（2026-05-22）</strong>：商品未指定で「探す」ボタン一発 → 楽天・Yahoo!ショッピングを横断スキャンして利益が見込める商品を一覧化。Amazon は Keepa 経由で販売データ参照のみ（仕入れ元としては使わない）。差別化軸: ポイント込み実質価格／真の利益計算（FBA・自己発送・MSS）／コンプラ警告／独自おすすめスコア。
   </div>
 
   <!-- 検索ボックス -->
-  <div class="search-box">
-    <h2>1. 検索</h2>
-    <div class="search-input-row">
-      <select>
-        <option>JAN コード</option>
-        <option>ASIN</option>
-        <option>キーワード</option>
-      </select>
-      <input type="text" value="4901234567890" placeholder="例: 4901234567890">
-      <button>🔍 検索する</button>
+  <div class="search-zone">
+    <div class="search-zone-main">
+      <button class="btn-search" id="searchBtn">🔍 利益商品を探す</button>
+      <button class="toggle-options" id="toggleOpts">⚙️ 条件を絞る ▾</button>
+      <div class="last-scan">前回スキャン: <strong>2026-05-22 09:14</strong> · スキャン対象: 楽天 + Yahoo!</div>
     </div>
-    <div class="thresholds">
-      <label>判定しきい値（利益率 ≥ <input type="number" value="15">% / 利益額 ≥ ¥<input type="number" value="500"> / 月販 ≥ <input type="number" value="5">個 / Drop30 ≥ <input type="number" value="10">回）</label>
+
+    <div class="search-options" id="searchOptions">
+      <div class="opt-row">
+        <label>仕入れ予算上限: ¥<input type="number" value="10000"></label>
+        <label>利益率しきい値: ≥ <input type="number" value="5">%</label>
+        <label>利益額しきい値: ≥ ¥<input type="number" value="300"></label>
+        <label>月販しきい値: ≥ <input type="number" value="5">個</label>
+      </div>
+      <div class="opt-row">
+        <label>仕入れ元: <input type="checkbox" checked>楽天 <input type="checkbox" checked>Yahoo!</label>
+        <label>カテゴリ: <select><option>すべて</option><option>家電・カメラ</option><option>キッチン・日用品</option><option>ホビー・おもちゃ</option><option>美容・コスメ</option><option>食品・飲料</option></select></label>
+        <label>除外ブランド: <input type="text" placeholder="例: Panasonic,Sony" style="width: 200px; padding: 5px 8px; border: 1px solid #ddd; border-radius: 4px;"></label>
+      </div>
     </div>
   </div>
 
-  <!-- サマリー -->
-  <div class="summary-row">
-    <div class="summary-card">
-      <div class="label">検索結果</div>
-      <div class="value blue">4 件</div>
-    </div>
-    <div class="summary-card">
-      <div class="label">🟢 原石</div>
-      <div class="value green">1 件</div>
-    </div>
-    <div class="summary-card">
-      <div class="label">🟡 要検討</div>
-      <div class="value yellow">2 件</div>
-    </div>
-    <div class="summary-card">
-      <div class="label">🔴 除外</div>
-      <div class="value red">1 件</div>
-    </div>
+  <!-- ローディング演出領域 -->
+  <div class="loading" id="loadingArea" style="display:none;">
+    <div class="spinner"></div>
+    <div><strong>楽天・Yahoo!ショッピングをスキャン中…</strong></div>
+    <div style="font-size: 12px; color: #888; margin-top: 4px;">Keepa で Amazon 側データを照合しています</div>
   </div>
 
-  <!-- 結果テーブル -->
-  <div class="results-table">
-    <h2>2. 結果一覧（仕入れ候補）</h2>
-    <table>
-      <thead>
-        <tr>
-          <th></th>
-          <th>商品（ASIN）</th>
-          <th>Amazon売値</th>
-          <th>月販 / Drop30</th>
-          <th>仕入元（最安値）</th>
-          <th>FBA利益</th>
-          <th>自己発送（MSS）利益</th>
-          <th>判定</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><button class="star-btn active">★</button></td>
-          <td>
-            <strong>XX社 ホットプレート HP-100</strong><br>
-            <small style="color: #888;">B0CABC1234</small>
-          </td>
-          <td class="price">¥6,980</td>
-          <td>45個/月<br><small style="color: #888;">Drop30: 28回</small></td>
-          <td>
-            <span class="source-tag rakuten">楽天</span> ¥3,500<br>
-            <span class="source-tag yahoo">Yahoo</span> ¥3,680
-          </td>
-          <td class="profit-cell positive">¥1,820<br><small>(26.1%)</small></td>
-          <td class="profit-cell positive">
-            ¥2,150<br><small>(30.8%)</small>
-            <div class="compare-box">FBA より <span class="diff">+¥330</span> 得 ✨</div>
-          </td>
-          <td><span class="badge green">🟢 原石</span></td>
-        </tr>
-        <tr>
-          <td><button class="star-btn">☆</button></td>
-          <td>
-            <strong>YY社 マッサージ機 MX-50</strong><br>
-            <small style="color: #888;">B0CDEF5678</small>
-          </td>
-          <td class="price">¥12,800</td>
-          <td>18個/月<br><small style="color: #888;">Drop30: 11回</small></td>
-          <td>
-            <span class="source-tag rakuten">楽天</span> ¥9,200<br>
-            <span class="source-tag yahoo">Yahoo</span> ¥9,500
-          </td>
-          <td class="profit-cell positive">¥640<br><small>(5.0%)</small></td>
-          <td class="profit-cell positive">
-            ¥1,180<br><small>(9.2%)</small>
-            <div class="compare-box">FBA より <span class="diff">+¥540</span> 得（大型商品）</div>
-          </td>
-          <td><span class="badge yellow">🟡 要検討</span></td>
-        </tr>
-        <tr>
-          <td><button class="star-btn">☆</button></td>
-          <td>
-            <strong>ZZ社 トースター TS-3</strong><br>
-            <small style="color: #888;">B0CGHI9012</small>
-          </td>
-          <td class="price">¥3,480</td>
-          <td>8個/月<br><small style="color: #888;">Drop30: 5回</small></td>
-          <td>
-            <span class="source-tag rakuten">楽天</span> ¥2,400<br>
-            <span class="source-tag yahoo">— 該当なし</span>
-          </td>
-          <td class="profit-cell positive">¥380<br><small>(10.9%)</small></td>
-          <td class="profit-cell positive">¥420<br><small>(12.1%)</small></td>
-          <td><span class="badge yellow">🟡 要検討</span></td>
-        </tr>
-        <tr>
-          <td><button class="star-btn">☆</button></td>
-          <td>
-            <strong>AA社 加湿器 HM-20</strong><br>
-            <small style="color: #888;">B0CJKL3456</small>
-          </td>
-          <td class="price">¥4,200</td>
-          <td>3個/月<br><small style="color: #888;">Drop30: 2回</small></td>
-          <td>
-            <span class="source-tag rakuten">楽天</span> ¥3,900<br>
-            <span class="source-tag yahoo">Yahoo</span> ¥3,800
-          </td>
-          <td class="profit-cell negative">−¥80<br><small>(−1.9%)</small></td>
-          <td class="profit-cell positive">¥120<br><small>(2.9%)</small></td>
-          <td><span class="badge red">🔴 除外</span></td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+  <!-- 結果領域（ここに JS が描画） -->
+  <div id="resultsArea">
 
-  <!-- 利益計算の詳細（社長理解のため） -->
-  <details>
-    <summary>📐 利益計算の内訳を見る（XX社 ホットプレート HP-100 の例）</summary>
-    <div class="detail-grid">
-      <div class="detail-item"><div class="k">Amazon 売値</div><div class="v">¥6,980</div></div>
-      <div class="detail-item"><div class="k">楽天仕入れ値（最安）</div><div class="v">¥3,500</div></div>
-      <div class="detail-item"><div class="k">Amazon 販売手数料 (10%)</div><div class="v">−¥698</div></div>
-      <div class="detail-item"><div class="k">FBA 配送代行手数料</div><div class="v">−¥462（A4サイズ）</div></div>
-      <div class="detail-item" style="background: #e8f5e9;"><div class="k">FBA利益</div><div class="v" style="color: #2e7d32;">¥6,980 − ¥3,500 − ¥698 − ¥462 = <strong>¥2,320</strong>（誤計算）</div></div>
-      <div class="detail-item" style="background: #e8f5e9;"><div class="k">FBA利益（正）</div><div class="v" style="color: #2e7d32;"><strong>¥1,820</strong>（送料・経費含む実機計算）</div></div>
-      <div class="detail-item"><div class="k">自己発送に切替 → FBA手数料 ¥0</div><div class="v">+¥462</div></div>
-      <div class="detail-item"><div class="k">マケプレ配送サービス送料</div><div class="v">−¥132（ヤマト特別運賃）</div></div>
-      <div class="detail-item" style="background: #e3f2fd;"><div class="k">自己発送（MSS）利益</div><div class="v" style="color: #2c7be5;"><strong>¥2,150</strong></div></div>
-      <div class="detail-item" style="background: #fff3cd; grid-column: span 2;"><div class="k">💡 ポイント（朝野氏コンサルより）</div><div class="v" style="font-weight: 400; font-size: 12px;">「ツール画面の利益はFBA前提。自己発送に切り替えれば FBA手数料が浮き、マケプレ配送サービスの特別運賃で送料も安い。大型商品ほど自己発送が有利になる」</div></div>
+    <!-- サマリー -->
+    <div class="summary-row">
+      <div class="summary-card"><div class="label">候補数</div><div class="value blue" id="sumCount">8 件</div></div>
+      <div class="summary-card"><div class="label">🟢 原石</div><div class="value green" id="sumGreen">3 件</div></div>
+      <div class="summary-card"><div class="label">🟡 要検討</div><div class="value yellow" id="sumYellow">3 件</div></div>
+      <div class="summary-card"><div class="label">🔴 除外</div><div class="value red" id="sumRed">2 件</div></div>
+      <div class="summary-card"><div class="label">⚠️ コンプラ警告</div><div class="value" style="color:#c62828;" id="sumWarn">1 件</div></div>
     </div>
-  </details>
 
-  <details>
-    <summary>⚙️ このモックでまだ「見せていない」機能</summary>
-    <ul style="margin-top: 12px; padding-left: 20px; font-size: 13px; line-height: 1.9;">
-      <li>★お気に入りに保存した商品の一覧画面（ローカル DB SQLite）</li>
-      <li>CSV エクスポート（経理ハジメ連携用）</li>
-      <li>過去検索履歴（同じ商品を3回検索したら警告など）</li>
-      <li>判定しきい値プリセット保存（「攻めモード」「守りモード」など）</li>
-      <li>v0.2 以降: カテゴリプリセット検索（ADD×ONE「宝の地図」相当）</li>
-    </ul>
-  </details>
+    <!-- ツールバー（ソート＆フィルター） -->
+    <div class="toolbar">
+      <label>並び替え:
+        <select id="sortBy">
+          <option value="score">⭐ おすすめスコア順</option>
+          <option value="profit">💰 利益額順（高い順）</option>
+          <option value="rate">📈 利益率順（高い順）</option>
+          <option value="sales">📦 月販順（多い順）</option>
+        </select>
+      </label>
+      <span class="divider">|</span>
+      <label><input type="checkbox" id="usePoint" checked> ポイント込み実質価格を使う</label>
+      <span class="divider">|</span>
+      <label>判定:
+        <select id="filterJudge">
+          <option value="all">すべて</option>
+          <option value="green">🟢 原石のみ</option>
+          <option value="yg">🟢🟡 原石+要検討</option>
+        </select>
+      </label>
+      <span class="divider">|</span>
+      <label>仕入れ元:
+        <select id="filterSrc">
+          <option value="all">すべて</option>
+          <option value="rakuten">楽天のみ</option>
+          <option value="yahoo">Yahoo!のみ</option>
+        </select>
+      </label>
+    </div>
+
+    <!-- テーブル -->
+    <div class="results">
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th class="prod-cell">商品</th>
+            <th>仕入元 / 価格 / URL</th>
+            <th>実質価格<br><small style="font-weight:400;text-transform:none;font-size:9px;">(ポイント込)</small></th>
+            <th>Amazon 売値 / URL</th>
+            <th>月販<br>Drop30</th>
+            <th>FBA 利益</th>
+            <th>自己発送(MSS)</th>
+            <th>スコア</th>
+            <th>判定</th>
+          </tr>
+        </thead>
+        <tbody id="rowsBody">
+          <!-- JS が描画 -->
+        </tbody>
+      </table>
+    </div>
+
+  </div>
 
   <div class="footer-note">
-    Sato-Scope mock v0.1 · タカシ（IT）・タケシ（戦略）・サトル（リサーチ）合作 · 2026-05-22<br>
-    実装承認後、Phase 1（API 接続検証）に着手します
+    Sato-Scope v0.2 mock · タカシ（IT）／タケシ（戦略）／サトル（リサーチ）合作 · 2026-05-22<br>
+    v0.1 実装着手承認後、Keepa API・楽天 API・Yahoo!ショッピング API の接続検証から開始
   </div>
 
 </div>
 
-<!--
-  このモックは純粋な HTML + CSS で構成されており、外部スクリプト・外部画像・外部フォントを一切読み込みません。
-  下記は「触れる感」を出すための最小限の Vanilla JS（〜30行）です。エラー時もモック表示は崩れません。
--->
 <script>
 (function() {
   "use strict";
   try {
-    // ★ お気に入りボタンのトグル
-    document.querySelectorAll('.star-btn').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        var active = btn.classList.toggle('active');
-        btn.textContent = active ? '★' : '☆';
-      });
-    });
+    // サンプル商品データ（8件）
+    const products = [
+      {
+        id: 1, img: "🍳", name: "山田電機 ホットプレート HP-100", asin: "B0CABC1234",
+        src: "rakuten", srcPrice: 3500, srcUrl: "https://item.rakuten.co.jp/example/hp-100/",
+        pointRate: 10, // 楽天SPU 10倍想定
+        amzPrice: 6980, amzUrl: "https://www.amazon.co.jp/dp/B0CABC1234",
+        sales: 45, drop30: 28,
+        fbaProfit: 1820, fbaRate: 26.1,
+        mssProfit: 2150, mssRate: 30.8,
+        score: 92, judge: "green", warn: null,
+      },
+      {
+        id: 2, img: "💆", name: "ABC社 マッサージガン MG-Pro", asin: "B0CDEF5678",
+        src: "yahoo", srcPrice: 9200, srcUrl: "https://store.shopping.yahoo.co.jp/example/mg-pro.html",
+        pointRate: 8, // PayPay 8%還元
+        amzPrice: 12800, amzUrl: "https://www.amazon.co.jp/dp/B0CDEF5678",
+        sales: 18, drop30: 11,
+        fbaProfit: 640, fbaRate: 5.0,
+        mssProfit: 1180, mssRate: 9.2,
+        score: 68, judge: "yellow", warn: null,
+      },
+      {
+        id: 3, img: "🎧", name: "Sony WH-1000XM5 ヘッドホン", asin: "B0CGHI9012",
+        src: "rakuten", srcPrice: 32800, srcUrl: "https://item.rakuten.co.jp/example/sony-headphone/",
+        pointRate: 10,
+        amzPrice: 41800, amzUrl: "https://www.amazon.co.jp/dp/B0CGHI9012",
+        sales: 24, drop30: 18,
+        fbaProfit: 2400, fbaRate: 7.3,
+        mssProfit: 2890, mssRate: 8.8,
+        score: 78, judge: "green", warn: "🚨 Sony 販売チャネル制限あり（出品許可申請が必要）",
+      },
+      {
+        id: 4, img: "💧", name: "AA社 ハイブリッド加湿器 HM-20", asin: "B0CJKL3456",
+        src: "yahoo", srcPrice: 3800, srcUrl: "https://store.shopping.yahoo.co.jp/example/hm-20.html",
+        pointRate: 5,
+        amzPrice: 4200, amzUrl: "https://www.amazon.co.jp/dp/B0CJKL3456",
+        sales: 3, drop30: 2,
+        fbaProfit: -80, fbaRate: -1.9,
+        mssProfit: 120, mssRate: 2.9,
+        score: 22, judge: "red", warn: null,
+      },
+      {
+        id: 5, img: "💄", name: "ZZ コスメ シートマスク 30枚入", asin: "B0CMNO7890",
+        src: "yahoo", srcPrice: 1500, srcUrl: "https://store.shopping.yahoo.co.jp/example/mask-30.html",
+        pointRate: 12,
+        amzPrice: 2800, amzUrl: "https://www.amazon.co.jp/dp/B0CMNO7890",
+        sales: 80, drop30: 45,
+        fbaProfit: 320, fbaRate: 11.4,
+        mssProfit: 520, mssRate: 18.6,
+        score: 89, judge: "green", warn: null,
+      },
+      {
+        id: 6, img: "🍞", name: "AAA社 ポップアップトースター TS-3", asin: "B0CPQR1234",
+        src: "rakuten", srcPrice: 2400, srcUrl: "https://item.rakuten.co.jp/example/ts-3/",
+        pointRate: 7,
+        amzPrice: 3480, amzUrl: "https://www.amazon.co.jp/dp/B0CPQR1234",
+        sales: 8, drop30: 5,
+        fbaProfit: 380, fbaRate: 10.9,
+        mssProfit: 420, mssRate: 12.1,
+        score: 55, judge: "yellow", warn: null,
+      },
+      {
+        id: 7, img: "💪", name: "BBB プロテイン 1kg バニラ", asin: "B0CSTU5678",
+        src: "yahoo", srcPrice: 4200, srcUrl: "https://store.shopping.yahoo.co.jp/example/protein-1kg.html",
+        pointRate: 10,
+        amzPrice: 6800, amzUrl: "https://www.amazon.co.jp/dp/B0CSTU5678",
+        sales: 55, drop30: 32,
+        fbaProfit: 980, fbaRate: 14.4,
+        mssProfit: 1240, mssRate: 18.2,
+        score: 84, judge: "green", warn: null,
+      },
+      {
+        id: 8, img: "🖱", name: "CCC ワイヤレスマウス WM-1", asin: "B0CVWX9012",
+        src: "rakuten", srcPrice: 1200, srcUrl: "https://item.rakuten.co.jp/example/wm-1/",
+        pointRate: 8,
+        amzPrice: 1890, amzUrl: "https://www.amazon.co.jp/dp/B0CVWX9012",
+        sales: 15, drop30: 9,
+        fbaProfit: 120, fbaRate: 6.3,
+        mssProfit: 250, mssRate: 13.2,
+        score: 48, judge: "yellow", warn: null,
+      },
+    ];
 
-    // 🔍 検索ボタンのデモ動作（実装は Phase 1 以降）
-    var searchBtn = document.querySelector('.search-input-row button');
-    if (searchBtn) {
-      searchBtn.addEventListener('click', function() {
-        alert('これはモックです。実際の検索は Phase 1（API 接続検証）完了後に動作します。\n\n社長の A 承認後、Keepa API・Yahoo!ショッピング API・楽天 API を接続します。');
+    // 状態
+    const state = { stars: new Set([1]), sortBy: "score", usePoint: true, filterJudge: "all", filterSrc: "all" };
+
+    function fmt(n) {
+      if (n === null || n === undefined) return "—";
+      const sign = n < 0 ? "−" : "";
+      return sign + "¥" + Math.abs(n).toLocaleString();
+    }
+
+    function actualPrice(p) {
+      if (!state.usePoint) return p.srcPrice;
+      return Math.round(p.srcPrice * (1 - p.pointRate / 100));
+    }
+
+    function srcLabel(s) {
+      return s === "rakuten" ? "楽天" : (s === "yahoo" ? "Yahoo!" : s);
+    }
+
+    function judgeBadge(j) {
+      if (j === "green") return '<span class="badge green">🟢 原石</span>';
+      if (j === "yellow") return '<span class="badge yellow">🟡 要検討</span>';
+      return '<span class="badge red">🔴 除外</span>';
+    }
+
+    function rowHtml(p) {
+      const isStar = state.stars.has(p.id);
+      const actPrice = actualPrice(p);
+      const pointTag = state.usePoint && p.pointRate > 0
+        ? `<span class="price-actual-tag">${p.pointRate}%還元</span>` : "";
+      return `
+        <tr>
+          <td><button class="star-btn ${isStar ? 'active' : ''}" data-id="${p.id}">${isStar ? '★' : '☆'}</button></td>
+          <td class="prod-cell">
+            <span class="prod-img">${p.img}</span>
+            <span class="prod-name"><strong>${p.name}</strong><br><small>${p.asin}</small></span>
+          </td>
+          <td>
+            <div class="price-line"><span class="source-tag ${p.src}">${srcLabel(p.src)}</span><strong>${fmt(p.srcPrice)}</strong>
+              <a href="${p.srcUrl}" target="_blank" class="price-link">→ 見る</a>
+            </div>
+          </td>
+          <td>
+            <span class="price-actual">${fmt(actPrice)}</span>${pointTag}
+            ${state.usePoint ? `<div style="font-size:10px;color:#888;">−${fmt(p.srcPrice - actPrice)} 還元</div>` : ''}
+          </td>
+          <td>
+            <div class="price-line"><span class="source-tag amazon">Amazon</span><strong>${fmt(p.amzPrice)}</strong>
+              <a href="${p.amzUrl}" target="_blank" class="price-link">→ 見る</a>
+            </div>
+          </td>
+          <td><strong>${p.sales}個/月</strong><br><small style="color:#888;">Drop30: ${p.drop30}</small></td>
+          <td class="profit-cell ${p.fbaProfit >= 0 ? 'positive' : 'negative'}">
+            ${fmt(p.fbaProfit)}<br><span class="rate">${p.fbaRate}%</span>
+          </td>
+          <td class="profit-cell ${p.mssProfit >= 0 ? 'positive' : 'negative'}">
+            ${fmt(p.mssProfit)}<br><span class="rate">${p.mssRate}%</span>
+            ${p.mssProfit > p.fbaProfit ? `<span class="mss-bonus">+${fmt(p.mssProfit - p.fbaProfit)} 得 ✨</span>` : ''}
+          </td>
+          <td class="score-cell">
+            <div class="score-num">${p.score}</div>
+            <div class="score-bar"><span style="width:${p.score}%;"></span></div>
+          </td>
+          <td>
+            ${judgeBadge(p.judge)}
+            ${p.warn ? `<div class="warn-flag">${p.warn}</div>` : ''}
+          </td>
+        </tr>
+      `;
+    }
+
+    function sortFn(a, b) {
+      switch (state.sortBy) {
+        case "profit": return b.mssProfit - a.mssProfit;
+        case "rate": return b.mssRate - a.mssRate;
+        case "sales": return b.sales - a.sales;
+        default: return b.score - a.score;
+      }
+    }
+
+    function filterFn(p) {
+      if (state.filterJudge === "green" && p.judge !== "green") return false;
+      if (state.filterJudge === "yg" && p.judge === "red") return false;
+      if (state.filterSrc !== "all" && p.src !== state.filterSrc) return false;
+      return true;
+    }
+
+    function render() {
+      const filtered = products.filter(filterFn).sort(sortFn);
+      document.getElementById('rowsBody').innerHTML = filtered.map(rowHtml).join("");
+
+      // サマリー更新
+      const g = products.filter(p => p.judge === "green").length;
+      const y = products.filter(p => p.judge === "yellow").length;
+      const r = products.filter(p => p.judge === "red").length;
+      const w = products.filter(p => p.warn).length;
+      document.getElementById('sumCount').textContent = filtered.length + " 件";
+      document.getElementById('sumGreen').textContent = g + " 件";
+      document.getElementById('sumYellow').textContent = y + " 件";
+      document.getElementById('sumRed').textContent = r + " 件";
+      document.getElementById('sumWarn').textContent = w + " 件";
+
+      // ★ボタン再バインド
+      document.querySelectorAll('.star-btn').forEach(btn => {
+        btn.addEventListener('click', e => {
+          const id = parseInt(btn.dataset.id, 10);
+          if (state.stars.has(id)) state.stars.delete(id);
+          else state.stars.add(id);
+          render();
+        });
       });
     }
 
-    // しきい値変更で「再判定中…」風の小さな視覚フィードバック
-    document.querySelectorAll('.thresholds input').forEach(function(inp) {
-      inp.addEventListener('change', function() {
-        var card = document.querySelectorAll('.summary-card .value')[0];
-        if (!card) return;
-        var orig = card.textContent;
-        card.textContent = '判定中…';
-        setTimeout(function() { card.textContent = orig; }, 600);
-      });
+    // 初期描画
+    render();
+
+    // イベント
+    document.getElementById('sortBy').addEventListener('change', e => { state.sortBy = e.target.value; render(); });
+    document.getElementById('usePoint').addEventListener('change', e => { state.usePoint = e.target.checked; render(); });
+    document.getElementById('filterJudge').addEventListener('change', e => { state.filterJudge = e.target.value; render(); });
+    document.getElementById('filterSrc').addEventListener('change', e => { state.filterSrc = e.target.value; render(); });
+
+    document.getElementById('toggleOpts').addEventListener('click', () => {
+      document.getElementById('searchOptions').classList.toggle('open');
     });
 
-    console.log('[Sato-Scope mock] v0.1 ready — pure HTML/CSS + 30 lines of vanilla JS, no external deps.');
+    document.getElementById('searchBtn').addEventListener('click', e => {
+      const btn = e.target;
+      btn.disabled = true;
+      btn.textContent = "スキャン中…";
+      document.getElementById('loadingArea').style.display = 'block';
+      document.getElementById('resultsArea').style.display = 'none';
+      setTimeout(() => {
+        document.getElementById('loadingArea').style.display = 'none';
+        document.getElementById('resultsArea').style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = "🔍 利益商品を探す";
+        // 「最新スキャン時刻」を擬似的に更新
+        const now = new Date();
+        const ts = now.getFullYear() + "-" + String(now.getMonth()+1).padStart(2,'0') + "-" + String(now.getDate()).padStart(2,'0')
+                 + " " + String(now.getHours()).padStart(2,'0') + ":" + String(now.getMinutes()).padStart(2,'0');
+        document.querySelector('.last-scan').innerHTML = '前回スキャン: <strong>' + ts + '</strong> · スキャン対象: 楽天 + Yahoo!';
+      }, 1200);
+    });
+
+    console.log('[Sato-Scope v0.2 mock] ready — Discovery 型・8件サンプル・ソート/フィルター/ポイント込み実質価格対応');
   } catch (e) {
-    // モックは UI 確認用なので、JS エラーが起きても画面は壊さない
-    console.warn('[Sato-Scope mock] script error (display unaffected):', e);
+    console.warn('[Sato-Scope v0.2 mock] script error (display unaffected):', e);
   }
 })();
 </script>
