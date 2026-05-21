@@ -46,7 +46,7 @@
 | T-20260520-006 | Ama-Jack（カズさん）アプリ + 無料コミュニティ評価 | doing | 3者完了（法務CAUTION/経理NO-GO/庶務お役御免）、秘書推奨B（アプリのみDL）、社長判断待ち |
 | T-20260520-007 | Amazon物販・副業 用語集（初心者向け） | doing | ヒデアキ納品済（150語10カテゴリ、CSV+MD）、社長レビュー待ち |
 | T-20260520-008 | 初心者向け仕入れ〜販売シミュレーション資料（FBA前提） | doing | 4エージェント連携完了。playbook-final.md/html 納品、社長レビュー待ち |
-| T-20260520-009 | 【社長タスク】Ama-Jack 公式 URL/カズさん YouTube URL 共有 | doing | 庶務マリエが URL/運営会社自前特定 → スコープ縮小（広告スクショ提供のみ任意） |
+| T-20260520-009 | 【社長タスク】Ama-Jack URL/カズさん YouTube URL 共有 | **done** | 社長提供画像5枚＋口頭で完了（カズ＋みかみ／150万円／ADD×ONE PROJECT） |
 
 各チケットの本文は `workspace/tickets/<status>/T-*.md` を参照。
 
@@ -130,7 +130,14 @@ PC 復帰時の推奨アクション: `workspace/output/agent_output/T-20260520-
 
 **秘書統合・推奨**: **B（Ama-Jack アプリのみ DL、コミュニティ＋公式 LINE 登録はスキップ）**。社長判断待ち。
 
-副次成果: 庶務マリエが Ama-Jack 公式 URL・運営会社を自前特定。T-009 はスコープ縮小。
+副次成果: 庶務マリエが Ama-Jack 公式 URL・運営会社を自前特定。T-009 は社長提供情報で done。
+
+**社長提供の追加情報（2026-05-21 夕方）**: `workspace/output/agent_output/T-20260520-006/owner-supplementary-info.md` に整理。要点:
+- カズくん＋みかみさんの2人体制
+- 高額サービスは約 **150万円**（法務想定の80万円より大）、数千人規模で勧誘中
+- 独自ツール **ADD×ONE PROJECT** が存在: RPG 風 UI、Keepa API 連携、Yahoo!ショッピング等のスクレイピング、150万円コース付属の可能性高
+- ADD×ONE PROJECT は Yahoo/Amazon ToS 抵触リスクあり → SellerSprite 同等の R-1（アカウント停止）リスク
+- 新情報は3者判定（CAUTION/NO-GO/お役御免）を **全て強化方向に補強** → 秘書推奨 B 維持
 
 ### T-008（仕入れ〜販売シミュレーション・FBA前提）
 
