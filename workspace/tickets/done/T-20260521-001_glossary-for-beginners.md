@@ -1,11 +1,11 @@
 ---
 ticket_id: T-20260521-001
 title: Amazon物販・副業 用語集（初心者向け）作成
-status: doing
+status: done
 assignee: content_creator
 priority: high
 created_at: 2026-05-20
-updated_at: 2026-05-20
+updated_at: 2026-05-22
 requires_approval: false
 labels: [glossary, content, foundation, learning]
 ---
@@ -22,7 +22,8 @@ labels: [glossary, content, foundation, learning]
 - [x] 関連語・略語・読み方を付与
 - [x] CSV 形式で出力（Excel／Google Sheets 直接読込可、UTF-8 BOM 付き）
 - [x] 確認用 Markdown 版も併出
-- [ ] 社長納品 → カズヨが整理して提示
+- [x] 社長納品 → カズヨが整理して提示
+- [x] 社長レビュー OK（2026-05-22）
 
 ## 現在地
 
@@ -34,3 +35,4 @@ labels: [glossary, content, foundation, learning]
 
 - 2026-05-20 todo 起票 → 即 doing（ヒデアキへ発注、承認不要 §4.2）
 - 2026-05-20 ヒデアキ納品（150語10カテゴリ・CSV+MD）→ 社長レビュー待ち
+- 2026-05-22 社長レビュー OK → doing → done
