@@ -93,3 +93,4 @@ A/B/C 判断後に Phase 1（API 接続検証）着手。Phase 1 時点で Keepa
   - T-20260522-004 Sato-Scope ROI 試算（ハジメ）
   - T-20260522-005 公式 API ToS 最終確認（ハルオ）
 - 2026-05-22 Phase 2 着手の §4.1 承認待ち（Keepa €49/月 + 楽天/Yahoo! ApplicationID 登録）
+- 2026-05-22 **社長レビューでモック OK、Phase 2 即 GO 承認取得**。Keepa Power-User Plan €49/月 課金 §4.1 承認確定。次は社長手作業で Keepa 申込＋楽天 ApplicationID＋Yahoo! ClientID 取得（カズヨが手順書を提示）
