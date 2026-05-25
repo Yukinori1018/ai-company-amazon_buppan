@@ -6,7 +6,7 @@ assignee: it_engineer
 priority: high
 created_at: 2026-05-21
 updated_at: 2026-05-22
-next_check_at: 2026-05-23
+next_check_at: 2026-05-26
 requires_approval: true
 labels: [dev, research, mvp, tooling]
 related_tickets: [T-20260520-006]
@@ -94,3 +94,6 @@ A/B/C 判断後に Phase 1（API 接続検証）着手。Phase 1 時点で Keepa
   - T-20260522-005 公式 API ToS 最終確認（ハルオ）
 - 2026-05-22 Phase 2 着手の §4.1 承認待ち（Keepa €49/月 + 楽天/Yahoo! ApplicationID 登録）
 - 2026-05-22 **社長レビューでモック OK、Phase 2 即 GO 承認取得**。Keepa Power-User Plan €49/月 課金 §4.1 承認確定。次は社長手作業で Keepa 申込＋楽天 ApplicationID＋Yahoo! ClientID 取得（カズヨが手順書を提示）
+- 2026-05-25 ハジメ ROI 試算完了（案A 自社開発が回収最有利・1.0ヶ月）。サトル/ハジメ共通論点「軸B 0周問題」浮上
+- 2026-05-25 **社長指摘で重要訂正: Sato-Scope と ERESA は代替でなく補完（別レイヤー）**。Sato-Scope は仕入れ発見を担う唯一の自社資産で置換不可。「ERESA で代替＝不要」論を取り下げ。memory に記録（`agents/secretary/memory/knowledge_satoscope-vs-eresa-different-layers.md`）
+- 2026-05-25 **社長方針確定（選択肢1）: Phase 2 継続 GO ＋ 軸B 1周を最優先 ＋ ERESA は保留**。API キー取得は社長手作業待ち。next_check_at を 2026-05-26 に更新

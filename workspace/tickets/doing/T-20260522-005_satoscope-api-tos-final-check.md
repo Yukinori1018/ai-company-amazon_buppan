@@ -1,11 +1,11 @@
 ---
 ticket_id: T-20260522-005
 title: Sato-Scope 公式 API 利用規約 最終確認（Keepa／楽天／Yahoo!）
-status: todo
+status: doing
 assignee: legal
 priority: medium
 created_at: 2026-05-22
-updated_at: 2026-05-22
+updated_at: 2026-05-25
 requires_approval: false
 labels: [legal, sato-scope, tos-review]
 related_tickets: [T-20260521-005]
@@ -55,3 +55,4 @@ todo。ハルオ発注待ち。
 ## ログ
 
 - 2026-05-22 起票（Phase 2 §4.1 承認前の最終確認）
+- 2026-05-25 社長「承認不要なものは全て進めて」＋Phase 2 継続方針 → todo → doing。ハルオ発注（§4.2）

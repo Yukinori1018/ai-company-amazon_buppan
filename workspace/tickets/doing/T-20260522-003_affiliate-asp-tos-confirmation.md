@@ -1,11 +1,11 @@
 ---
 ticket_id: T-20260522-003
 title: アフィリエイト ASP 商品データの二次利用 ToS 確認
-status: todo
+status: doing
 assignee: legal
 priority: medium
 created_at: 2026-05-22
-updated_at: 2026-05-22
+updated_at: 2026-05-25
 requires_approval: false
 labels: [legal, sato-scope, tos-review]
 related_tickets: [T-20260521-005]
@@ -51,3 +51,4 @@ todo。ハルオ発注待ち。
 ## ログ
 
 - 2026-05-22 起票（社長 A1 承認に基づく並行調査チケット）
+- 2026-05-25 社長「承認不要なものは全て進めて」 → todo → doing。ハルオ発注（§4.2、T-22-005 と並行）
