@@ -102,6 +102,7 @@
 5. **不明点は止まって聞く** — 判断に迷ったら勝手に決めない。チケットを `waiting/` に出して社長に確認する。
 6. **プレースホルダーは保持** — 親テンプレ作業中は `{{ }}` を埋めない。子会社化時に初めて埋める。
 7. **チケット ID 言及時は読み合わせから始める** — 社長の発話で特定チケットへの言及があったら、秘書はまずローカル `.md` と Notion カードの両方を読み、差分があれば即提示する。その上で指示を実行し、状態が動いた場合は同じターン内にファイル移動＋ Notion 同期＋整合報告まで閉じる。詳細は [agents/secretary/skills/notion-ticket-sync.md](agents/secretary/skills/notion-ticket-sync.md) §チケット言及時の即時同期確認。
+8. **社長タスクまとめの即時同期** — 社長のタスクが増減・変更されるたび（チケット起票・状態遷移・社長依存タスクの追加/解消）に、秘書は [workspace/owner-tasks.md](workspace/owner-tasks.md) と Notion「社長タスクまとめ」カード（Status=「まとめ」列）を同じターン内で最新化する。Stop フック [.claude/hooks/owner-tasks-sync-check.sh](.claude/hooks/owner-tasks-sync-check.sh) が未同期を検知してターン終了をブロックする。運用詳細は [agents/secretary/skills/notion-ticket-sync.md](agents/secretary/skills/notion-ticket-sync.md) §社長タスクまとめの自動同期。
 
 ---
 

@@ -1,9 +1,12 @@
 # 📋 社長タスクまとめ（ここを見れば次の動きが分かる）
 
 > このファイルは「社長が手を動かすべきこと」の集約ダッシュボードです。
-> Notion カード（まとめラベル）と同期します。真実はこのファイル、Notion はその可視化。
-> Notion: https://www.notion.so/36db0a4044fa815ba60bf854b6cd431d
-> 新タスク発生時にカズヨが随時更新します。
+> 真実はこのファイル、Notion はその可視化（リポジトリ → Notion の片方向同期）。
+> Notion カード: https://www.notion.so/36db0a4044fa815ba60bf854b6cd431d
+> - Notion 上の置き場所: ticket DB の **Status=「まとめ」** 列（カンバン専用カラム）。更新時もこの Status を維持する。
+> - page_id: `36db0a40-44fa-815b-a60b-f854b6cd431d`
+>
+> **自動更新の仕組み（システム化済み）**: 社長のタスクが増減・変更されるたび（＝ workspace/tickets/ のチケットが動くたび）、Stop フック `.claude/hooks/owner-tasks-sync-check.sh` が未同期を検知し、カズヨにこのファイル＋ Notion カードの更新を促します。カズヨはターン終了前に必ず最新化します。
 >
 > **最終更新: 2026-05-27（カズヨ）**
 

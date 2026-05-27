@@ -99,6 +99,26 @@ MCP 設定（API トークン、Database ID）も子会社側で `.mcp.json` に
 - 親子分割した場合：親カード＋子カードがそれぞれ Notion に出現し、子が動くたびに Notion で進捗が可視化される
 - 3日以上 `doing` のままのチケットは子分割を検討するか、`waiting/` に動かすべきでないか再確認
 
+## 社長タスクまとめの自動同期
+
+社長が「次の動き」を1枚で把握するためのダッシュボード。**社長のタスクが増減・変更されるたびに必ず最新化する**（CLAUDE.md §3-8）。
+
+**実体（2層）:**
+- 真実: [../../../workspace/owner-tasks.md](../../../workspace/owner-tasks.md)（リポジトリ）
+- 可視化: Notion「📋 社長タスクまとめ」カード（page_id `36db0a40-44fa-815b-a60b-f854b6cd431d`、ticket DB の **Status=「まとめ」** 列に常駐）
+
+**更新トリガー（いずれかが起きたら同じターン内で同期）:**
+- 新規チケット起票（社長アクションが発生するもの）
+- チケットの状態遷移（todo↔doing↔waiting↔done）
+- 社長依存タスクの追加・解消・内容変更（承認待ち・情報提供待ち・レビュー待ち・本人手作業）
+
+**同期手順:**
+1. `workspace/tickets/{todo,doing,waiting,done}/` を走査し、社長アクションが必要なものを抽出
+2. `workspace/owner-tasks.md` を更新（🔴 今すぐ着手 / 🟡 情報・判断待ち / 🟢 レビュー待ち / ℹ️ 自動進行 の区分、「最終更新」日付も）
+3. Notion カードを `notion-update-page` で同期。**Status=「まとめ」を維持**（`doing` 等に戻さない）。`UpdatedAt` も更新
+
+**強制の仕組み:** Stop フック [../../../.claude/hooks/owner-tasks-sync-check.sh](../../../.claude/hooks/owner-tasks-sync-check.sh) が「owner-tasks.md より新しいチケットがある＝未同期」を検知してターン終了をブロックする。owner-tasks.md を更新すれば最新になり自動解除（ループしない）。社長アクションに影響しない変更なら最終更新日のみ更新で可。
+
 ## エラー時のフォールバック
 
 MCP 呼び出しが失敗した場合：
