@@ -5,8 +5,8 @@ status: doing
 assignee: it_engineer
 priority: high
 created_at: 2026-05-21
-updated_at: 2026-05-22
-next_check_at: 2026-05-26
+updated_at: 2026-05-27
+next_check_at: 2026-05-28
 requires_approval: true
 labels: [dev, research, mvp, tooling]
 related_tickets: [T-20260520-006]
@@ -97,3 +97,4 @@ A/B/C 判断後に Phase 1（API 接続検証）着手。Phase 1 時点で Keepa
 - 2026-05-25 ハジメ ROI 試算完了（案A 自社開発が回収最有利・1.0ヶ月）。サトル/ハジメ共通論点「軸B 0周問題」浮上
 - 2026-05-25 **社長指摘で重要訂正: Sato-Scope と ERESA は代替でなく補完（別レイヤー）**。Sato-Scope は仕入れ発見を担う唯一の自社資産で置換不可。「ERESA で代替＝不要」論を取り下げ。memory に記録（`agents/secretary/memory/knowledge_satoscope-vs-eresa-different-layers.md`）
 - 2026-05-25 **社長方針確定（選択肢1）: Phase 2 継続 GO ＋ 軸B 1周を最優先 ＋ ERESA は保留**。API キー取得は社長手作業待ち。next_check_at を 2026-05-26 に更新
+- 2026-05-27 社長手作業（API キー取得）のボトルネック解消のため、カズヨが取得手順書を先回り作成・納品（`04_api-key-setup-guide.md`）。Keepa(€49/月・承認済)/楽天/Yahoo! の3キー取得〜`.env`設定〜`/health`でlive確認までを初心者向けに記載。社長のキー取得待ち継続、next_check_at を 2026-05-28 に更新

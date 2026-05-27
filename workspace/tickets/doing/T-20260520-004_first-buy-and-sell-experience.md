@@ -5,10 +5,10 @@ status: doing
 assignee: secretary
 priority: high
 created_at: 2026-05-20
-updated_at: 2026-05-20
+updated_at: 2026-05-27
 requires_approval: true
 labels: [experience, learning, foundation]
-next_check_at: 2026-05-26
+next_check_at: 2026-05-28
 ---
 
 ## 要件
@@ -45,4 +45,5 @@ Step 1（アカウント開設）社長手作業中。本人確認書類（顔�
 - 2026-05-21 リマインダー（朝・夕）社長返答なし。Ama-Jack 評価（T-006）に注力中のため `next_check_at` を 2026-05-22 に持ち越し
 - 2026-05-22 社長から「翌日に持ち越し」指示。`next_check_at` を 2026-05-23 に更新して継続リマインド
 - 2026-05-25 社長方針で軸B 1周が**最優先**に格上げ（Sato-Scope と並行）。アカウント開設は引き続き社長待ち。`next_check_at` を 2026-05-26 に更新
+- 2026-05-27 アカウント開設（社長手作業）は進捗報告待ち。先回り準備として、仕入れ手法比較・初心者10万円ショートリスト・仕入れ先一覧（T-20260520-012 納品物）が利用可能=Step2/3の材料は揃っている旨を確認。アカウント開設報告があり次第 Step2 へ即移行できる体制。`next_check_at` を 2026-05-28 に更新
 
