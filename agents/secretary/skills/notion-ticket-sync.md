@@ -112,10 +112,14 @@ MCP 設定（API トークン、Database ID）も子会社側で `.mcp.json` に
 - チケットの状態遷移（todo↔doing↔waiting↔done）
 - 社長依存タスクの追加・解消・内容変更（承認待ち・情報提供待ち・レビュー待ち・本人手作業）
 
+**担当: マリエ（庶務）。** 情報整頓は庶務の本分のため、まとめの維持はマリエが担当する。カズヨは司令塔として更新が必要なタイミングを検知してマリエに発注し、成果を品質確認して社長へ報告する（routing.md §着手前の可視化）。軽微・即時の反映はスピード判断でカズヨ代行も可だが、原則はマリエ名義の成果物。
+
 **同期手順:**
-1. `workspace/tickets/{todo,doing,waiting,done}/` を走査し、社長アクションが必要なものを抽出
-2. `workspace/owner-tasks.md` を更新（🔴 今すぐ着手 / 🟡 情報・判断待ち / 🟢 レビュー待ち / ℹ️ 自動進行 の区分、「最終更新」日付も）
-3. Notion カードを `notion-update-page` で同期。**Status=「まとめ」を維持**（`doing` 等に戻さない）。`UpdatedAt` も更新
+1. （カズヨ）更新トリガーを検知 → 「この作業はマリエ（庶務）です」と宣言してマリエに発注
+2. （マリエ）`workspace/tickets/{todo,doing,waiting,done}/` を走査し、社長アクションが必要なものを抽出
+3. （マリエ）`workspace/owner-tasks.md` を更新（🔴 今すぐ着手 / 🟡 情報・判断待ち / 🟢 レビュー待ち / ℹ️ 自動進行 の区分、「最終更新」日付も）
+4. （マリエ）Notion カードを `notion-update-page` で同期。**Status=「まとめ」を維持**（`doing` 等に戻さない）。`UpdatedAt` も更新
+5. （カズヨ）整合を確認し、社長へ報告
 
 **強制の仕組み:** Stop フック [../../../.claude/hooks/owner-tasks-sync-check.sh](../../../.claude/hooks/owner-tasks-sync-check.sh) が「owner-tasks.md より新しいチケットがある＝未同期」を検知してターン終了をブロックする。owner-tasks.md を更新すれば最新になり自動解除（ループしない）。社長アクションに影響しない変更なら最終更新日のみ更新で可。
 
