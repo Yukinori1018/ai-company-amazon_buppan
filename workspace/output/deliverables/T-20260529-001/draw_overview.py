@@ -17,6 +17,8 @@ COL = {
     "gate":  "#ffd9d9",
     "rel":   "#fff0c2",
     "dead":  "#e6e6e6",
+    "after": "#ecdcf7",
+    "health":"#ffe0cc",
 }
 EDGE = {
     "start": "#3a8c3a",
@@ -24,10 +26,12 @@ EDGE = {
     "gate":  "#cc3333",
     "rel":   "#d6a400",
     "dead":  "#888888",
+    "after": "#8e44ad",
+    "health":"#e67e22",
 }
 
-fig, ax = plt.subplots(figsize=(9.2, 16.5))
-ax.set_xlim(0, 12)
+fig, ax = plt.subplots(figsize=(11.0, 16.5))
+ax.set_xlim(0, 14.6)
 ax.set_ylim(0, 21)
 ax.axis("off")
 
@@ -81,6 +85,14 @@ box("G3", 6.0, 1.2, "★11. 振り返り\nもう一度仕入れる？", "gate", 
 box("REL", 10.0, 15.2, "2b. 出品制限の解除\n（必要時のみ・別フロー）\n0円→1点→10点", "rel", w=3.4, h=1.3, fs=11)
 box("X1", 2.0, 15.2, "別販路で売る\nor 諦める", "dead", w=2.6, h=1.0, fs=11)
 
+# --- independent parallel flow: after-sales / customer care ---
+box("AF", 11.9, 5.6,
+    "★12. アフターフォロー\n（独立・並走フロー）\n\n・購入者メッセージ対応(24h以内)\n・返品/返金・返送品の検品\n・注文評価/レビューの確認と対応\n・A-to-Z保証/真贋・知財クレーム",
+    "after", w=4.4, h=3.0, fs=10.5)
+box("AH", 11.9, 2.6,
+    "アカウントヘルス\n(注文不良率ODR等)を健全に保つ\n→悪化でアカウント停止リスク",
+    "health", w=4.4, h=1.4, fs=10.5)
+
 # --- main arrows ---
 arrow("start", "P0")
 arrow("P0", "P1")
@@ -133,10 +145,29 @@ ax.add_patch(FancyArrowPatch((g2x-g2w/2, g2y), (lane_x, g2y),
 ax.text(g2x-g2w/2-0.5, g2y+0.3, "NoGo", ha="center", fontsize=10,
         fontproperties=fp, color="#b00")
 
+# --- after-sales arrows ---
+p9x, p9y, p9w, p9h = boxes["P9"]
+afx, afy, afw, afh = boxes["AF"]
+ahx, ahy, ahw, ahh = boxes["AH"]
+# 販売〜配送のイベント -> アフターフォロー
+ax.add_patch(FancyArrowPatch((p9x+p9w/2, p9y), (afx-afw/2, afy+0.6),
+             arrowstyle="-|>", mutation_scale=16, linewidth=1.7, color="#8e44ad"))
+ax.text((p9x+p9w/2+afx-afw/2)/2, afy+1.05, "販売後イベント\n（返品・問合せ・評価）",
+        ha="center", va="center", fontsize=9.5, fontproperties=fp, color="#8e44ad")
+# アフターフォロー -> アカウントヘルス
+ax.add_patch(FancyArrowPatch((afx, afy-afh/2), (ahx, ahy+ahh/2),
+             arrowstyle="-|>", mutation_scale=16, linewidth=1.7, color="#8e44ad"))
+# アカウントヘルス -> 振り返り（指標を反映）
+ax.add_patch(FancyArrowPatch((ahx-ahw/2, ahy), (g3x+g3w/2, g3y),
+             arrowstyle="-|>", mutation_scale=15, linewidth=1.5, color="#e67e22",
+             connectionstyle="arc3,rad=0.15"))
+ax.text((ahx-ahw/2+g3x+g3w/2)/2, g3y-0.55, "指標・学びを反映",
+        ha="center", va="center", fontsize=9.5, fontproperties=fp, color="#e67e22")
+
 # title
-ax.text(6.0, 20.85, "Amazon物販 業務フロー ① 大きな流れ（全体像）",
+ax.text(7.0, 20.85, "Amazon物販 業務フロー ① 大きな流れ（全体像）",
         ha="center", va="center", fontsize=16, fontproperties=fp, weight="bold")
-ax.text(11.6, 0.2, "T-20260529-001 / 秘書カズヨ / 2026-05-29",
+ax.text(14.4, 0.2, "T-20260529-001 / 秘書カズヨ / 2026-05-29",
         ha="right", fontsize=8, fontproperties=fp, color="#999")
 
 plt.tight_layout()
