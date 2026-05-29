@@ -24,7 +24,7 @@
 セッション開始直後（社長の最初の発話の前 or 直後）に [workspace/handover.md](workspace/handover.md) を読み、直前セッションの状態・社長プロファイル・進行中論点を把握してください。別デバイス間で文脈を引き継ぐための重要ファイルです。更新は `/handover` コマンドで行います。
 
 **SessionStart リマインダーフック:**
-[.claude/hooks/session-start.sh](.claude/hooks/session-start.sh) が `workspace/tickets/doing/` 配下の各チケット frontmatter の `next_check_at` をチェックし、今日以前のものをリマインダーとして注入します。フックから `additionalContext` で促されたら、該当チケットの進捗を社長に1〜2行で問いかけ、応答に応じて以下を更新してください：
+[.claude/hooks/session-start.sh](.claude/hooks/session-start.sh) はセッション開始時に自動実行され、(1) **まず `/sync-notion` の実行を促し**（Notion 整合を毎セッション自動で取る。社長の入力は不要）、(2) `workspace/tickets/doing/` と `waiting/` 配下の各チケット frontmatter の `next_check_at` をチェックし、今日以前のものをリマインダーとして注入します。フックから `additionalContext` で促されたら、該当チケットの進捗を社長に1〜2行で問いかけ、応答に応じて以下を更新してください：
 - 進捗あり → ログ追記 + `next_check_at` を翌日に更新（done なら `done/` へ移動）
 - 進捗なし → `next_check_at` を翌日に更新して継続
 - 後回し希望 → 社長から指定された日付に `next_check_at` を更新

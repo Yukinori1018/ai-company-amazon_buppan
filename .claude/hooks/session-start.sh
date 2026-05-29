@@ -14,12 +14,15 @@
 set -euo pipefail
 
 REPO="${CLAUDE_PROJECT_DIR:-$(pwd)}"
-TICKETS_DIR="$REPO/workspace/tickets/doing"
+# next_check_at は doing/（作業中）と waiting/（社長タスク一覧）の両方を走査する。
+# 社長アクション待ちのチケットは waiting/ に置かれるため、日次リマインドの主対象。
+TICKETS_DIRS="$REPO/workspace/tickets/doing $REPO/workspace/tickets/waiting"
 TODAY="$(date +%Y-%m-%d)"
 
 REMINDERS=""
 
-if [ -d "$TICKETS_DIR" ]; then
+for TICKETS_DIR in $TICKETS_DIRS; do
+  [ -d "$TICKETS_DIR" ] || continue
   for f in "$TICKETS_DIR"/*.md; do
     [ -e "$f" ] || continue
 
@@ -58,13 +61,25 @@ if [ -d "$TICKETS_DIR" ]; then
       REMINDERS="${REMINDERS}- ${ticket_id}: ${title}（next_check_at=${next_check}、今日=${TODAY}）\n  ファイル: ${f#$REPO/}\n"
     fi
   done
-fi
+done
+
+# --- メッセージ組み立て ---
+# 朝ルーティンとして、まず Notion リコンサイルを必ず促す（カズヨが /sync-notion を実行）。
+# その後、next_check_at リマインダーがあれば続けて注入する。
+
+SYNC_MSG="【秘書カズヨ宛・SessionStart：朝ルーティン①（最優先）】
+セッション開始です。まず \`/sync-notion\` を実行し、workspace/tickets/ と Notion カンバンの整合を取ってください（リポジトリ→Notion の片方向・非破壊）。
+- ブランチ分岐や前セッションの同期漏れ由来のドリフトはここで自己修復します。
+- 差分が無ければそのまま即終了して構いません。社長の入力は不要（社長に /sync-notion を打たせない）。
+- 責務は庶務マリエ。手順は agents/general_affairs/skills/notion-ticket-sync.md。"
 
 if [ -n "$REMINDERS" ]; then
   # シェル変数の \n を実際の改行に展開
   REMINDERS_EXPANDED="$(printf '%b' "$REMINDERS")"
 
-  MESSAGE="【秘書カズヨ宛・SessionStart リマインダー】
+  REMINDER_MSG="
+
+【SessionStart リマインダー②：next_check_at 到来】
 以下のチケットが next_check_at に達しています。社長に進捗確認を切り出してください（簡潔に1〜2行で問いかけ、報告があればチケットと workspace/handover.md を更新）。
 
 ${REMINDERS_EXPANDED}
@@ -72,19 +87,23 @@ ${REMINDERS_EXPANDED}
 - 進捗があった → ログ追記＋ next_check_at を翌日に更新 or done なら done/ へ移動
 - 進捗なし → next_check_at を翌日に更新して継続リマインド
 - 社長から後回し希望 → next_check_at を希望日に更新"
+else
+  REMINDER_MSG=""
+fi
 
-  # JSON エスケープ（python が無い環境を考慮し、jq があれば使う）
-  if command -v jq >/dev/null 2>&1; then
-    jq -n --arg msg "$MESSAGE" '{
-      hookSpecificOutput: {
-        hookEventName: "SessionStart",
-        additionalContext: $msg
-      }
-    }'
-  else
-    # jq が無ければ stdout に普通に出力（Claude は stdout も読む）
-    printf '%s\n' "$MESSAGE"
-  fi
+MESSAGE="${SYNC_MSG}${REMINDER_MSG}"
+
+# JSON エスケープ（python が無い環境を考慮し、jq があれば使う）
+if command -v jq >/dev/null 2>&1; then
+  jq -n --arg msg "$MESSAGE" '{
+    hookSpecificOutput: {
+      hookEventName: "SessionStart",
+      additionalContext: $msg
+    }
+  }'
+else
+  # jq が無ければ stdout に普通に出力（Claude は stdout も読む）
+  printf '%s\n' "$MESSAGE"
 fi
 
 exit 0
