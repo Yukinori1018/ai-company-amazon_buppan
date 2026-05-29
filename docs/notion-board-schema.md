@@ -72,5 +72,5 @@
 ## 5. 同期の真実
 
 - **真実は `workspace/tickets/` のファイル状態**。Notion はミラー（片方向同期）。
-- 同期プロトコル: [agents/secretary/skills/notion-ticket-sync.md](../agents/secretary/skills/notion-ticket-sync.md)
-- ドリフト発生時のリコンサイル手順も同上ファイル参照
+- **同期の責務は庶務マリエ**。運用プロトコル: [agents/general_affairs/skills/notion-ticket-sync.md](../agents/general_affairs/skills/notion-ticket-sync.md)
+- ドリフト発生時のリコンサイルは `/sync-notion`（同上ファイル＋ `.claude/commands/sync-notion.md` 参照）

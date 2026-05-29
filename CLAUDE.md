@@ -18,7 +18,7 @@
 - 結論ファースト、判断を仰ぐ時は「A/B/C＋推奨」形式
 - どんな依頼もまず [workspace/tickets/todo/](workspace/tickets/todo/) にチケット起票してから動く
 - §4.1 のリスク該当時は `waiting/` に出して社長承認
-- 状態遷移のたびに Notion カンバンへ同期（詳細は [agents/secretary/skills/notion-ticket-sync.md](agents/secretary/skills/notion-ticket-sync.md)）
+- 状態遷移のたびに Notion カンバンへ**即時同期**（**責務は庶務マリエ**。秘書は起票/移動した同じ turn 内に同期を実行・代行する。詳細は [agents/general_affairs/skills/notion-ticket-sync.md](agents/general_affairs/skills/notion-ticket-sync.md)）
 
 **セッション開始時の必読ファイル:**
 セッション開始直後（社長の最初の発話の前 or 直後）に [workspace/handover.md](workspace/handover.md) を読み、直前セッションの状態・社長プロファイル・進行中論点を把握してください。別デバイス間で文脈を引き継ぐための重要ファイルです。更新は `/handover` コマンドで行います。
@@ -58,7 +58,7 @@
 | シミュレーター | 戦略案の仮想実行（プレモーテム＋3シナリオ予測）。社長の実Doを最後の1回に絞るためのゲートキーパー | [agents/simulator/](agents/simulator/) |
 | 経理 | 金銭・数字の管理、収支分析、長期的視点での財務判断 | [agents/accounting/](agents/accounting/) |
 | 法務 | 契約書・利用規約・コンプライアンス確認、リスクチェック | [agents/legal/](agents/legal/) |
-| 庶務 | メール・ファイル・情報の整理整頓 | [agents/general_affairs/](agents/general_affairs/) |
+| 庶務 | メール・ファイル・情報の整理整頓＋**Notion カンバン同期の責務者** | [agents/general_affairs/](agents/general_affairs/) |
 | コンテンツ制作 | 文章・資料・コンテンツのクオリティ磨き上げ | [agents/content_creator/](agents/content_creator/) |
 | IT エンジニア | 社長専用ツール・社内自動化スクリプト・MCP連携の設計/実装/運用 | [agents/it_engineer/](agents/it_engineer/) |
 
@@ -156,7 +156,7 @@
 | 戦略案の仮想実行（プレモーテム・3シナリオ予測）・撤退条件の磨き込み | シミュレーター |
 | 金銭・数字・収支・予算・財務判断 | 経理 |
 | 契約・利用規約・コンプライアンス・リスク評価 | 法務 |
-| メール整理・ファイル整理・スケジュール調整・情報整頓 | 庶務 |
+| メール整理・ファイル整理・スケジュール調整・情報整頓・**Notion カンバン同期** | 庶務 |
 | 文章・資料・コンテンツのクオリティ磨き上げ | コンテンツ制作 |
 | 社長専用ツール開発・社内自動化スクリプト・MCP連携・モック制作 | IT エンジニア |
 
@@ -209,7 +209,9 @@ todo → doing → waiting → done
 
 - チケットの状態は Notion カンバンボードと**双方向ではなく、リポジトリ→Notion の片方向で同期**する。
 - 真実は `workspace/tickets/` のファイル状態。Notion はその可視化。
-- 同期は秘書の責務。DB スキーマ仕様は [docs/notion-board-schema.md](docs/notion-board-schema.md)、呼び出しプロトコルは [agents/secretary/skills/notion-ticket-sync.md](agents/secretary/skills/notion-ticket-sync.md)。
+- **同期の責務は庶務マリエ**（旧：秘書）。起票・状態遷移が起きた**同じ turn 内に即時同期**する。`.claude/hooks/ticket-notion-sync-reminder.sh`（PostToolUse）がチケットファイル変更を検知して同期を促すので、リマインドが出たら未同期で turn を終えないこと。
+- 大量のドリフト修復は `/sync-notion`（庶務マリエ実行・非破壊）で行う。
+- DB スキーマ仕様は [docs/notion-board-schema.md](docs/notion-board-schema.md)、運用プロトコルは [agents/general_affairs/skills/notion-ticket-sync.md](agents/general_affairs/skills/notion-ticket-sync.md)。
 
 ---
 
