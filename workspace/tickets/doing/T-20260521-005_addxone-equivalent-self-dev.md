@@ -6,7 +6,7 @@ assignee: it_engineer
 priority: high
 created_at: 2026-05-21
 updated_at: 2026-05-22
-next_check_at: 2026-05-23
+next_check_at: 2026-05-30
 requires_approval: true
 labels: [dev, research, mvp, tooling]
 related_tickets: [T-20260520-006]
