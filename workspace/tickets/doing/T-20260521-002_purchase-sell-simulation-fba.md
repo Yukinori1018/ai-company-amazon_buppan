@@ -37,3 +37,4 @@ labels: [research, simulation, foundation, learning]
 - 2026-05-21 Phase 1 完了（経理・庶務・法務）
 - 2026-05-21 Phase 2 ヒデアキ統合完了（playbook-final.md/html）。社長レビュー待ち
 - 2026-05-21 重要差分: 商品①シャンプー → 法務NG → 文房具/収納雑貨へ差替え推奨
+- 2026-05-30 夜間自走ターン: ヒデアキが補遺 A「Scenario C 完全自己発送ルート」を追補。商品②のみ自己発送切り出しの混合運用（A+）が最有力という結論。`deliverables/T-20260521-002/addendum-scenario-c-self-fulfillment.md` 配置。次回ターンで Scenario B（FBA+MSS）を追補予定
