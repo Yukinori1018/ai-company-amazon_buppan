@@ -192,8 +192,15 @@ todo → doing → waiting → done
 ```
 
 - **todo:** 未着手。秘書が起票したばかり、または着手待ち。
-- **doing:** 作業中。担当エージェントが実行中。
-- **waiting:** 社長確認待ち（§4.1 該当時、または迷った時）。
+- **doing:** 作業中。担当エージェントが実行中（社長のアクションを待っていない）。
+- **waiting:** **社長の番（社長タスク一覧）**。社長の判断・承認・レビュー・情報提供・手作業のいずれかを待っている状態は**すべて waiting に置く**。社長は「waiting 列を見れば自分が何をすべきか分かる」。該当する例：
+  - §4.1 該当の承認待ち（`requires_approval: true`）
+  - 納品物の社長レビュー待ち
+  - 社長への情報提供・URL 共有などの依頼待ち
+  - 社長自身の手作業待ち（例：アカウント開設、API キー取得）
+  - 判断に迷い社長に確認したい時
+  > どの状態に入れるか迷ったら「社長が次に手を動かす必要があるか？」で判定。Yes なら waiting、No なら doing/todo。
+  > （旧「📋 社長タスクまとめ」カードは廃止。waiting 列がその役割を担う。）
 - **done:** 完了。社長が確認済み、または自動進行で完了。
 
 詳細運用は [workspace/README.md](workspace/README.md)、起票・状態遷移の手順は [agents/secretary/skills/ticket-management.md](agents/secretary/skills/ticket-management.md)、サブエージェントの作業ルールは [workspace/SUBAGENT_PROTOCOL.md](workspace/SUBAGENT_PROTOCOL.md)。

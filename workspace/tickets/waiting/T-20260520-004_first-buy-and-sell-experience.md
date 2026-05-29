@@ -1,11 +1,11 @@
 ---
 ticket_id: T-20260520-004
 title: 体験仕入れ・販売サイクル1周（軸B）
-status: doing
+status: waiting
 assignee: secretary
 priority: high
 created_at: 2026-05-20
-updated_at: 2026-05-20
+updated_at: 2026-05-29
 requires_approval: true
 labels: [experience, learning, foundation]
 next_check_at: 2026-05-30
@@ -44,4 +44,9 @@ Step 1（アカウント開設）社長手作業中。本人確認書類（顔�
 - 2026-05-20 アカウント開設は社長手作業で進行中。書類準備で時間要 → 日次リマインド体制へ
 - 2026-05-21 リマインダー（朝・夕）社長返答なし。Ama-Jack 評価（T-006）に注力中のため `next_check_at` を 2026-05-22 に持ち越し
 - 2026-05-29 進捗なし（社長確認）。`next_check_at` を 2026-05-30 に更新し継続リマインド
+- 2026-05-29 waiting へ移動（新基準＝社長タスク一覧化）。社長の手作業（アカウント開設）待ち
+
+## 社長判断待ち
+
+**Amazon 出品アカウントの開設**をお願いします。本人確認書類（顔写真付き＋180日以内の住所確認書類）を準備 → 出品登録で規約同意・本人確認。これが軸B（体験仕入れ1周）の起点で、開かないと仕入れ→出品→入金が始められません。
 

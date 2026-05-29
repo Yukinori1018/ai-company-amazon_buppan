@@ -1,11 +1,11 @@
 ---
 ticket_id: T-20260520-006
 title: カズさん（YouTuber）開発 Amazon物販ツールの調査 + 自社開発検討
-status: todo
+status: waiting
 assignee: researcher
 priority: medium
 created_at: 2026-05-20
-updated_at: 2026-05-20
+updated_at: 2026-05-29
 requires_approval: false
 labels: [research, tooling, dev, idea]
 ---
@@ -30,7 +30,12 @@ labels: [research, tooling, dev, idea]
 
 社長から追加情報を待機中。情報受領前に進められる前提整理（カズ系発信者の候補リスト）は秘書側で並行可能だが、空振りリスクが高いので情報待ち優先。
 
+## 社長判断待ち
+
+**カズさんの YouTube チャンネル URL / ツール名を秘書へ共有してください。** これが届けばサトルが調査着手できます（情報がないと空振りリスクが高い）。
+
 ## ログ
 
 - 2026-05-20 todo 起票。社長からの追加情報待ち
 - 2026-05-20 役割再編に伴い assignee を secretary → researcher（サトル）に変更。自社開発 vs 既存 vs ハイブリッドの戦略判断はプランナー（タケシ）にバトンパス予定
+- 2026-05-29 waiting へ移動（新基準＝社長タスク一覧化）。社長の情報提供待ち

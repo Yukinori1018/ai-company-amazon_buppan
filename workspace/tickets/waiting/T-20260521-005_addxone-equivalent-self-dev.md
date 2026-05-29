@@ -1,11 +1,11 @@
 ---
 ticket_id: T-20260521-005
 title: ADD×ONE PROJECT 同等の社長専用 物販リサーチツール 自社開発検討
-status: doing
+status: waiting
 assignee: it_engineer
 priority: high
 created_at: 2026-05-21
-updated_at: 2026-05-22
+updated_at: 2026-05-29
 next_check_at: 2026-05-30
 requires_approval: true
 labels: [dev, research, mvp, tooling]
@@ -93,3 +93,8 @@ A/B/C 判断後に Phase 1（API 接続検証）着手。Phase 1 時点で Keepa
   - T-20260522-004 Sato-Scope ROI 試算（ハジメ）
   - T-20260522-005 公式 API ToS 最終確認（ハルオ）
 - 2026-05-22 Phase 2 着手の §4.1 承認待ち（Keepa €49/月 + 楽天/Yahoo! ApplicationID 登録）
+- 2026-05-29 waiting へ移動（新基準＝社長タスク一覧化）。社長の API キー取得＋Phase 2 課金判断待ち
+
+## 社長判断待ち
+
+**API キーの取得と Phase 2 の課金判断をお願いします（§4.1 該当）。** ① Keepa（€49/月・要課金承認）② 楽天 ApplicationID（無料）③ Yahoo! Client ID（無料）。手順は `04_api-key-setup-guide.md`。1つでも入れば実データで動き始めます。
