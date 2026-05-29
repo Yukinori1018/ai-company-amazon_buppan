@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>比較表 v2 — Amazon物販ツール8選（AI 連携前提・JP セラー視点）</title>
+<style>
+  :root {
+    --bg: #fafafa;
+    --fg: #1f2937;
+    --muted: #6b7280;
+    --accent: #2563eb;
+    --accent-soft: #dbeafe;
+    --border: #e5e7eb;
+    --table-head: #f3f4f6;
+    --table-stripe: #fbfbfd;
+    --good: #059669;
+    --bad: #dc2626;
+    --warn: #d97706;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
+    line-height: 1.7;
+    color: var(--fg);
+    background: var(--bg);
+    margin: 0;
+    padding: 0;
+  }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 32px 24px 80px; }
+  h1 {
+    font-size: 26px;
+    margin: 0 0 8px;
+    padding-bottom: 12px;
+    border-bottom: 3px solid var(--accent);
+    color: #111827;
+  }
+  h2 {
+    font-size: 20px;
+    margin: 40px 0 12px;
+    padding-left: 12px;
+    border-left: 5px solid var(--accent);
+    color: #111827;
+  }
+  h3 { font-size: 16px; margin: 24px 0 8px; color: #111827; }
+  blockquote {
+    margin: 16px 0;
+    padding: 12px 16px;
+    background: var(--accent-soft);
+    border-left: 4px solid var(--accent);
+    border-radius: 4px;
+    color: #1e3a8a;
+    font-size: 14px;
+  }
+  blockquote p { margin: 4px 0; }
+  p { margin: 8px 0; font-size: 14.5px; }
+  strong { color: #111827; }
+  hr {
+    margin: 36px 0;
+    border: 0;
+    border-top: 1px dashed var(--border);
+  }
+  .table-scroll {
+    overflow-x: auto;
+    margin: 12px 0 16px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: #fff;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+  thead th {
+    background: var(--table-head);
+    color: #111827;
+    font-weight: 600;
+    text-align: left;
+    padding: 10px 12px;
+    border-bottom: 2px solid var(--border);
+    position: sticky;
+    top: 0;
+  }
+  tbody td {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  tbody tr:nth-child(even) { background: var(--table-stripe); }
+  tbody tr:hover { background: #eef2ff; }
+  td.center, th.center { text-align: center; }
+  ul { margin: 8px 0 8px 24px; padding: 0; }
+  li { margin: 4px 0; font-size: 14.5px; }
+  ol { margin: 8px 0 8px 24px; padding: 0; }
+  ol li { margin: 8px 0; }
+  .tag {
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-left: 4px;
+  }
+  .tag-good { background: #d1fae5; color: var(--good); }
+  .tag-bad  { background: #fee2e2; color: var(--bad);  }
+  .tag-warn { background: #fef3c7; color: var(--warn); }
+  .meta {
+    color: var(--muted);
+    font-size: 12px;
+    margin-top: 4px;
+  }
+  .footer-note {
+    margin-top: 48px;
+    padding: 16px 20px;
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+    border-radius: 6px;
+    font-size: 13.5px;
+    color: #7c2d12;
+  }
+  code {
+    background: #f3f4f6;
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 13px;
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>比較表 v2 — Amazon物販ツール8選（AI 連携前提・JP セラー視点）</h1>
+
+<blockquote>
+<p>個票4本（v1: Keepa / SellerSprite / アマサーチ / FBA計算機）＋追加4本（v2: DELTA tracer / Helium 10 / Jungle Scout / セラースケット）の <strong>全8ツール</strong> を、社長判断のための1枚に凝縮した比較表。AI 連携前提の v2 観点（Sato-Scope への組み込みやすさ）を最重要評価軸に据えています。</p>
+<p>料金・機能は <strong>2026年5月時点の公式記載情報</strong> ベース。為替は <strong>1ドル=¥155 / €1=¥165</strong> 換算。導入時は必ず公式サイトで再確認してください。</p>
+</blockquote>
+
+<h2>0. 1枚で見る早見表</h2>
+<div class="table-scroll">
+<table>
+<thead><tr>
+<th class="center">#</th><th>ツール</th><th>開発元</th><th class="center">国内JP対応</th><th>月額（最安実用プラン・概算）</th><th class="center">API 公開</th><th class="center">AI 内蔵</th><th>Sato-Scope への取り込み</th><th>役割（カズヨ判定）</th>
+</tr></thead>
+<tbody>
+<tr><td class="center">01</td><td><strong>Keepa</strong></td><td>🇩🇪 ドイツ</td><td class="center">◯（多言語）</td><td>€19 / ¥3,000（Premium）</td><td class="center">◎ Tokens 課金</td><td class="center">△（外部 LLM 連携前提）</td><td><strong>◎ 中核データ源筆頭</strong></td><td>Sato-Scope の <strong>価格・在庫履歴の基盤</strong></td></tr>
+<tr><td class="center">02</td><td><strong>SellerSprite</strong></td><td>🇨🇳 中国</td><td class="center">◯</td><td>$39 / ¥6,000（Standard）</td><td class="center">◯（要問合）</td><td class="center">◯（独自 KW 分析）</td><td>△（規約グレー要法務）</td><td><strong>KW × ASIN 逆引き専用枠</strong></td></tr>
+<tr><td class="center">03</td><td><strong>アマサーチ</strong></td><td>🇯🇵 日本</td><td class="center">◎</td><td>¥0〜¥980（無料/Std）</td><td class="center">×</td><td class="center">×</td><td>×</td><td><strong>軸B 初日のスマホ即時判断</strong></td></tr>
+<tr><td class="center">04</td><td><strong>FBA計算機</strong></td><td>🇯🇵 Amazon公式</td><td class="center">◎</td><td>¥0（無料）</td><td class="center">×</td><td class="center">×</td><td>×</td><td><strong>手数料計算の正解基準</strong></td></tr>
+<tr><td class="center">05</td><td><strong>DELTA tracer</strong></td><td>🇯🇵 日本</td><td class="center">◎</td><td>¥2,200</td><td class="center">×</td><td class="center">×</td><td>×</td><td><strong>Keepa の JP 日本語版・初心者代替</strong></td></tr>
+<tr><td class="center">06</td><td><strong>Helium 10</strong></td><td>🇺🇸 米国</td><td class="center">◯（部分）</td><td>$79 / ¥12,245（Platinum 年払）</td><td class="center">◎ Platinum〜</td><td class="center">◎ AI Listing / Adtomic</td><td><strong>◎ 攻めの中核候補（US 展開時）</strong></td><td>—</td></tr>
+<tr><td class="center">07</td><td><strong>Jungle Scout</strong></td><td>🇺🇸 米国</td><td class="center">◯（部分）</td><td>$49 / ¥7,595（Suite 年払）</td><td class="center">△ Pro 階段（$84/月〜）</td><td class="center">◯ AI Assist</td><td>◯（API は Pro 階段が重い）</td><td><strong>OEM/輸入志向時の Supplier DB</strong></td></tr>
+<tr><td class="center">08</td><td><strong>セラースケット</strong></td><td>🇯🇵 日本</td><td class="center">◎</td><td>¥2,980（Std）</td><td class="center">×</td><td class="center">×</td><td>×</td><td><strong>守りの中核候補（月商50万円超で検討）</strong></td></tr>
+</tbody>
+</table>
+</div>
+
+<hr>
+
+<h2>1. 機能カバレッジ比較</h2>
+<div class="table-scroll">
+<table>
+<thead><tr>
+<th>機能カテゴリ</th><th class="center">Keepa</th><th class="center">SellerSprite</th><th class="center">アマサーチ</th><th class="center">FBA計算機</th><th class="center">DELTA tracer</th><th class="center">Helium 10</th><th class="center">Jungle Scout</th><th class="center">セラースケット</th>
+</tr></thead>
+<tbody>
+<tr><td>価格・ランキング履歴</td><td class="center">◎</td><td class="center">◯</td><td class="center">△（簡易）</td><td class="center">×</td><td class="center">◎</td><td class="center">◯</td><td class="center">◯</td><td class="center">△</td></tr>
+<tr><td>販売数推定</td><td class="center">◎</td><td class="center">◯</td><td class="center">△</td><td class="center">×</td><td class="center">◯</td><td class="center">◎</td><td class="center">◎</td><td class="center">×</td></tr>
+<tr><td>キーワードリサーチ</td><td class="center">△</td><td class="center">◎</td><td class="center">×</td><td class="center">×</td><td class="center">×</td><td class="center">◎</td><td class="center">◎</td><td class="center">×</td></tr>
+<tr><td>競合 ASIN 逆引き KW</td><td class="center">×</td><td class="center">◎</td><td class="center">×</td><td class="center">×</td><td class="center">×</td><td class="center">◎ Cerebro</td><td class="center">◎ KW Scout</td><td class="center">×</td></tr>
+<tr><td>商品リサーチ（網羅検索）</td><td class="center">◎ Product Finder</td><td class="center">◯</td><td class="center">×</td><td class="center">×</td><td class="center">×</td><td class="center">◎ Black Box</td><td class="center">◎ Product DB</td><td class="center">△</td></tr>
+<tr><td>出品最適化（Listing AI）</td><td class="center">×</td><td class="center">△</td><td class="center">×</td><td class="center">×</td><td class="center">×</td><td class="center">◎ AI Listing</td><td class="center">◎ AI Assist</td><td class="center">×</td></tr>
+<tr><td>PPC 広告自動化</td><td class="center">×</td><td class="center">△（分析のみ）</td><td class="center">×</td><td class="center">×</td><td class="center">×</td><td class="center">◎ Adtomic</td><td class="center">×</td><td class="center">×</td></tr>
+<tr><td>利益計算（FBA/FBM）</td><td class="center">△</td><td class="center">△</td><td class="center">◎</td><td class="center">◎（公式正解）</td><td class="center">△</td><td class="center">◎ Profits</td><td class="center">◎ Sales Analytics</td><td class="center">◯（運営機能）</td></tr>
+<tr><td>価格自動改定</td><td class="center">×</td><td class="center">×</td><td class="center">×</td><td class="center">×</td><td class="center">×</td><td class="center">×</td><td class="center">×</td><td class="center">◯（+¥500）</td></tr>
+<tr><td>在庫管理／納品プラン</td><td class="center">×</td><td class="center">×</td><td class="center">×</td><td class="center">×</td><td class="center">△</td><td class="center">◎</td><td class="center">◎</td><td class="center">◎</td></tr>
+<tr><td><strong>アカウント停止対応</strong></td><td class="center">×</td><td class="center">×</td><td class="center">×</td><td class="center">×</td><td class="center">×</td><td class="center">×</td><td class="center">×</td><td class="center"><strong>◎ 独自</strong></td></tr>
+<tr><td><strong>取締り履歴 DB</strong></td><td class="center">×</td><td class="center">×</td><td class="center">×</td><td class="center">×</td><td class="center">×</td><td class="center">×</td><td class="center">×</td><td class="center"><strong>◎ 独自</strong></td></tr>
+<tr><td><strong>Supplier 逆引き</strong></td><td class="center">×</td><td class="center">×</td><td class="center">×</td><td class="center">×</td><td class="center">×</td><td class="center">×</td><td class="center"><strong>◎ 独自</strong></td><td class="center">×</td></tr>
+<tr><td>拡張機能（Chrome）</td><td class="center">◎</td><td class="center">◯</td><td class="center">◎</td><td class="center">×</td><td class="center">◯</td><td class="center">◎ Xray</td><td class="center">◎ Extension</td><td class="center">×</td></tr>
+<tr><td>アラート通知</td><td class="center">◎（多チャネル）</td><td class="center">△</td><td class="center">×</td><td class="center">×</td><td class="center">△</td><td class="center">◎</td><td class="center">◯</td><td class="center">△</td></tr>
+<tr><td>CSV エクスポート</td><td class="center">◎（API＋画面）</td><td class="center">◯</td><td class="center">△</td><td class="center">△</td><td class="center">△（プラン依存）</td><td class="center">◎</td><td class="center">◎</td><td class="center">△（記載薄）</td></tr>
+</tbody>
+</table>
+</div>
+
+<hr>
+
+<h2>2. 料金 × プラン（最安実用プラン基準）</h2>
+<div class="table-scroll">
+<table>
+<thead><tr>
+<th>ツール</th><th>無料/トライアル</th><th>標準プラン（個人セラー想定）</th><th>上位プラン</th><th>年契約割引</th><th>為替リスク</th>
+</tr></thead>
+<tbody>
+<tr><td>Keepa</td><td>拡張機能のみ無料（履歴グラフ）</td><td><strong>Premium €19/月（≒¥3,000）</strong></td><td>API Tokens 都度購入</td><td>年払い ≒月¥2,500</td><td>◯ EUR 建て</td></tr>
+<tr><td>SellerSprite</td><td>7日無料</td><td><strong>Standard $39〜49/月（≒¥6,000〜7,500）</strong></td><td>Advanced $79〜99 / Premium $159〜199</td><td>キャンペーン頻発</td><td>◯ USD/CNY 建て</td></tr>
+<tr><td>アマサーチ</td><td>完全無料あり</td><td><strong>Std ¥980〜1,980</strong></td><td>Pro ¥3,000〜5,000</td><td>公式未明示</td><td>× JPY 固定</td></tr>
+<tr><td>FBA計算機</td><td>完全無料（恒久）</td><td>—</td><td>—</td><td>—</td><td>×</td></tr>
+<tr><td>DELTA tracer</td><td>2週間無料</td><td><strong>¥2,200</strong></td><td>法人プラン要問合</td><td>公式未明示</td><td>× JPY 固定</td></tr>
+<tr><td>Helium 10</td><td>Free（Xray 制限付き）</td><td><strong>Platinum 年払 $79/月（≒¥12,245）</strong></td><td>Diamond $209 / Elite $399</td><td>あり（年払で約20%引）</td><td>◯ USD 建て・値上げ実績</td></tr>
+<tr><td>Jungle Scout</td><td>7日返金保証</td><td><strong>Suite 年払 $49/月（≒¥7,595）</strong></td><td>Pro $84 / Cobalt 別</td><td>あり（年払で約30%引）</td><td>◯ USD 建て</td></tr>
+<tr><td>セラースケット</td><td>20日無料</td><td><strong>Std ¥2,980</strong>（本体¥2,480＋価格改定¥500）</td><td>Premium ¥5,480</td><td>年額プラン記載なし</td><td>× JPY 固定</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>合計シナリオ別月額試算（推奨構成案）</h3>
+<ul>
+<li><strong>シナリオ α（最安・JP 入門）</strong>: FBA計算機 + アマサーチ無料 + Keepa 拡張無料 = <strong>¥0/月</strong></li>
+<li><strong>シナリオ β（軸B 即併走 / 推奨）</strong>: FBA計算機 + アマサーチ Std + DELTA tracer + Keepa Premium = <strong>¥980 + ¥2,200 + ¥3,000 = ¥6,180/月</strong></li>
+<li><strong>シナリオ γ（AI 連携中核フル装備）</strong>: Keepa Premium + Keepa API Tokens + SellerSprite Std = <strong>¥3,000 + ¥3,000〜10,000 + ¥6,000 = ¥12,000〜19,000/月</strong></li>
+<li><strong>シナリオ δ（守り併設・月商50万円超想定）</strong>: シナリオ β + セラースケット Std = <strong>¥9,160/月</strong></li>
+<li><strong>シナリオ ε（攻め海外展開・US併売）</strong>: シナリオ γ + Helium 10 Platinum = <strong>¥24,000〜31,000/月</strong></li>
+</ul>
+
+<hr>
+
+<h2>3. 国内 Amazon（amazon.co.jp）対応の精度</h2>
+<div class="table-scroll">
+<table>
+<thead><tr>
+<th>ツール</th><th class="center">UI 日本語</th><th class="center">JP データ精度</th><th class="center">JP セラー指標の作り込み</th><th class="center">海外展開</th>
+</tr></thead>
+<tbody>
+<tr><td>Keepa</td><td class="center">◯（部分）</td><td class="center">◎（グローバル標準）</td><td class="center">△（言語以外は共通）</td><td class="center">◎ 全世界</td></tr>
+<tr><td>SellerSprite</td><td class="center">◯</td><td class="center">◯（実用レベル）</td><td class="center">△</td><td class="center">◎ US/CN 強い</td></tr>
+<tr><td>アマサーチ</td><td class="center">◎</td><td class="center">◎（JP特化）</td><td class="center">◎</td><td class="center">× US 弱い</td></tr>
+<tr><td>FBA計算機</td><td class="center">◎</td><td class="center">◎（公式正解）</td><td class="center">◎</td><td class="center">◯ 国別ツール存在</td></tr>
+<tr><td>DELTA tracer</td><td class="center">◎</td><td class="center">◎（JP完全特化）</td><td class="center">◎（中古/新品せどり判定）</td><td class="center">× JP 専用</td></tr>
+<tr><td>Helium 10</td><td class="center">◯（メニュー）</td><td class="center">△（US 中心の係数）</td><td class="center">× US 最適化前提</td><td class="center">◎ 全世界</td></tr>
+<tr><td>Jungle Scout</td><td class="center">◯（部分）</td><td class="center">△（US 中心の係数）</td><td class="center">×</td><td class="center">◎ 全世界</td></tr>
+<tr><td>セラースケット</td><td class="center">◎</td><td class="center">◎（取締り履歴は独自）</td><td class="center">◎（真贋・知財警告）</td><td class="center">× JP 専用</td></tr>
+</tbody>
+</table>
+</div>
+
+<p><strong>JP セラー視点での順位</strong>: アマサーチ ≒ FBA計算機 ≒ DELTA tracer ≒ セラースケット &gt; Keepa &gt; SellerSprite &gt; Helium 10 ≒ Jungle Scout</p>
+
+<hr>
+
+<h2>4. 学習コスト（実運用に乗せるまで）</h2>
+<div class="table-scroll">
+<table>
+<thead><tr><th>ツール</th><th>基本操作</th><th>中核機能の活用</th><th>全機能フル活用</th></tr></thead>
+<tbody>
+<tr><td>Keepa</td><td>1〜2時間</td><td>3〜5時間</td><td>1週間〜</td></tr>
+<tr><td>SellerSprite</td><td>3〜5時間</td><td>1〜2週間</td><td>1ヶ月〜</td></tr>
+<tr><td>アマサーチ</td><td>30分〜1時間</td><td>3〜5時間</td><td>1日〜</td></tr>
+<tr><td>FBA計算機</td><td>15分</td><td>30分</td><td>1時間</td></tr>
+<tr><td>DELTA tracer</td><td>30分〜1時間</td><td>2〜3時間</td><td>1日〜</td></tr>
+<tr><td>Helium 10</td><td>1〜2時間（Xray）</td><td>1日〜（Black Box）</td><td>1〜3ヶ月</td></tr>
+<tr><td>Jungle Scout</td><td>1〜2時間</td><td>1日〜</td><td>1〜2ヶ月</td></tr>
+<tr><td>セラースケット</td><td>30分〜1時間</td><td>1〜2日</td><td>実停止時まで未知</td></tr>
+</tbody>
+</table>
+</div>
+
+<p><strong>学習摩擦が低い順</strong>: FBA計算機 &gt; アマサーチ ≒ DELTA tracer &gt; Keepa &gt; Jungle Scout &gt; Helium 10 &gt; セラースケット（保険型） &gt; SellerSprite</p>
+
+<hr>
+
+<h2>5. 出力可搬性（撤退時にデータを持ち出せるか）</h2>
+<div class="table-scroll">
+<table>
+<thead><tr><th>ツール</th><th class="center">API</th><th class="center">CSV</th><th class="center">持ち出し可否</th><th>ロックイン強度</th></tr></thead>
+<tbody>
+<tr><td>Keepa</td><td class="center">◎ Tokens 課金</td><td class="center">◎</td><td class="center">◎</td><td>低（標準化済）</td></tr>
+<tr><td>SellerSprite</td><td class="center">◯ 要問合</td><td class="center">◯</td><td class="center">◯</td><td>中（独自指標多い）</td></tr>
+<tr><td>アマサーチ</td><td class="center">×</td><td class="center">△（範囲限定）</td><td class="center">△</td><td>低（薄い依存）</td></tr>
+<tr><td>FBA計算機</td><td class="center">×</td><td class="center">△</td><td class="center">◎（数式が公開）</td><td>ゼロ（公式仕様）</td></tr>
+<tr><td>DELTA tracer</td><td class="center">×</td><td class="center">△（プラン依存）</td><td class="center">△</td><td>中（JP 特化指標）</td></tr>
+<tr><td>Helium 10</td><td class="center">◎ Platinum〜</td><td class="center">◎</td><td class="center">◎</td><td>中（指標は独自命名）</td></tr>
+<tr><td>Jungle Scout</td><td class="center">△ Pro〜</td><td class="center">◎</td><td class="center">◯</td><td>中</td></tr>
+<tr><td>セラースケット</td><td class="center">×</td><td class="center">公式未明示</td><td class="center">×</td><td><strong>高（取締り履歴は独占資産）</strong></td></tr>
+</tbody>
+</table>
+</div>
+
+<p><strong>Sato-Scope 連携の現実解</strong>: Keepa API を一次データ源、SellerSprite を KW 専用 API、Helium 10 は US 展開時のみ追加、他は人手 UI 利用。<strong>セラースケットの取締り履歴データは API がないため Sato-Scope に取り込めず、人手で運用画面を確認する設計が必要</strong>。</p>
+
+<hr>
+
+<h2>6. AI 連携性 <span class="tag tag-warn">★ v2 で最重要に追加</span></h2>
+<div class="table-scroll">
+<table>
+<thead><tr><th>ツール</th><th class="center">公式 API</th><th>AI 内蔵機能</th><th>Sato-Scope への組み込みやすさ</th><th class="center">AI 連携前提での評価</th></tr></thead>
+<tbody>
+<tr><td>Keepa</td><td class="center">◎ Tokens 課金</td><td>△（LLM は外部接続）</td><td><strong>◎ 一次データ源として筆頭</strong></td><td class="center">★★★★★</td></tr>
+<tr><td>SellerSprite</td><td class="center">◯（要問合）</td><td>◯ 独自 KW 分析 AI</td><td>◯（規約グレー要法務）</td><td class="center">★★★☆☆</td></tr>
+<tr><td>アマサーチ</td><td class="center">×</td><td>×</td><td>×</td><td class="center">★☆☆☆☆</td></tr>
+<tr><td>FBA計算機</td><td class="center">×</td><td>×</td><td>△（手数料率は人手反映可）</td><td class="center">★★☆☆☆</td></tr>
+<tr><td>DELTA tracer</td><td class="center">×</td><td>×</td><td>×</td><td class="center">★☆☆☆☆</td></tr>
+<tr><td>Helium 10</td><td class="center">◎ Platinum〜</td><td>◎ AI Listing / Adtomic AI / Demand Analyzer</td><td><strong>◎ AI ネイティブの筆頭</strong></td><td class="center">★★★★★</td></tr>
+<tr><td>Jungle Scout</td><td class="center">△ Pro 階段</td><td>◯ AI Assist / Inventory ML / Opportunity ML</td><td>◯（Pro 階段が重い）</td><td class="center">★★★★☆</td></tr>
+<tr><td>セラースケット</td><td class="center">×</td><td>×</td><td>×（独自資産だが連携手段なし）</td><td class="center">★☆☆☆☆</td></tr>
+</tbody>
+</table>
+</div>
+
+<p><strong>Sato-Scope 中核データ源の筆頭</strong>: <strong>Keepa</strong>（必須）、<strong>Helium 10</strong>（US 展開時）、<strong>SellerSprite</strong>（KW 強化時）。Jungle Scout は <strong>Pro 階段を踏める収益規模に達した時の選択肢</strong>。それ以外（アマサーチ/FBA計算機/DELTA tracer/セラースケット）は人手 UI 専用ツールとして位置付け。</p>
+
+<hr>
+
+<h2>7. 役割マップ（攻め / 守り / 体験 の3軸で再整理）</h2>
+<div class="table-scroll">
+<table>
+<thead><tr><th>軸</th><th>該当ツール</th><th>推奨タイミング</th></tr></thead>
+<tbody>
+<tr><td><strong>体験（軸B 初動・¥0〜¥6千/月）</strong></td><td>アマサーチ + FBA計算機 + Keepa 拡張無料 (+ DELTA tracer)</td><td>T-20260520-004 着手と同時</td></tr>
+<tr><td><strong>攻めの中核（リサーチ深掘り・¥6千〜¥30千/月）</strong></td><td>Keepa Premium + Keepa API + SellerSprite</td><td>軸B 1周完了 / 月商10万円超</td></tr>
+<tr><td><strong>攻めの中核 +US 展開</strong></td><td>+ Helium 10 Platinum</td><td>US 併売を決めた時点</td></tr>
+<tr><td><strong>攻めの中核 +OEM/輸入</strong></td><td>+ Jungle Scout Pro</td><td>Supplier 探索を本格化する時点</td></tr>
+<tr><td><strong>守りの中核（リスク予防）</strong></td><td>セラースケット Std / Premium</td><td>月商50万円超 / 真贋警告履歴あり</td></tr>
+<tr><td><strong>公式リファレンス（恒久・¥0）</strong></td><td>FBA計算機</td><td>全期間（手数料の最終確認）</td></tr>
+</tbody>
+</table>
+</div>
+
+<hr>
+
+<h2>8. タケシへのハンドオフ（軸B 即併走候補 Top 3）</h2>
+
+<blockquote>夜間指示書 §完了判定の「軸B 即併走候補 Top 3」をここで確定。詳細サマリは別途 <code>handover-summary.md</code> に1段落で出力する。</blockquote>
+
+<ol>
+<li><strong>アマサーチ（無料 or Std ¥980〜1,980/月）</strong> — 副業初心者の社長にとって学習摩擦が最小（30分でマスター可能）、JP特化、スマホ動作も軽快。<strong>軸B 初日に必ず入れる1本目</strong>。</li>
+<li><strong>FBA計算機（¥0）</strong> — Amazon 公式の手数料正解。仕入価格 → 売価 → 手数料 → 粗利の流れを実機で通すための土台。<strong>契約不要なので即日導入</strong>。</li>
+<li><strong>DELTA tracer（¥2,200/月 + 2週間無料体験）</strong> — Keepa の日本語版相当。初心者の Keepa 学習コスト（英語UI・指標の読み解き）を回避しつつ、価格・ランキング履歴の感覚を養える。<strong>軸B Day 7〜Day 14 の "履歴を読む" 段階で投入</strong>。</li>
+</ol>
+
+<h3>当面見送り（Top 3 から外した理由）</h3>
+<ul>
+<li><strong>Keepa Premium</strong>: AI 連携前提では筆頭だが、軸B 初動には英語 UI・販売数推定の学習コストが重い。<strong>軸B 1周完了後</strong> に Sato-Scope の中核データ源として投入する。</li>
+<li><strong>SellerSprite / Helium 10 / Jungle Scout</strong>: 月額¥6,000〜¥12,000 級、学習コスト1〜3ヶ月。軸B 初動には過剰投資。<strong>月商10万円ライン到達後の Phase 2</strong> で再評価。</li>
+<li><strong>セラースケット</strong>: "守りの保険" であり、初動の月¥2,980 は重い。<strong>月商50万円ラインを超えてから自動的に検討</strong>。</li>
+</ul>
+
+<hr>
+
+<h2>9. 撤退条件のテンプレ（マサルの仮想 PDCA 用）</h2>
+
+<p>各ツールを導入した際の <strong>撤退条件</strong> をあらかじめ明文化することで、サブスク放置による損失を防ぐ。</p>
+
+<div class="table-scroll">
+<table>
+<thead><tr><th>ツール</th><th>撤退条件（共通テンプレ）</th></tr></thead>
+<tbody>
+<tr><td>Keepa Premium</td><td>導入3ヶ月で API 連携 or 履歴グラフ参照を Sato-Scope または社長の意思決定に反映できなければ Free 拡張に戻す</td></tr>
+<tr><td>SellerSprite</td><td>導入3ヶ月で「KW逆引きで仕入対象 SKU を3件以上発掘」できなければ解約</td></tr>
+<tr><td>アマサーチ Std</td><td>軸B 体験中の利益計算に乗らなければ無料版にダウングレード</td></tr>
+<tr><td>DELTA tracer</td><td>2週間無料体験中に「Keepa より読みやすい」感覚が得られなければ契約しない</td></tr>
+<tr><td>Helium 10</td><td>導入3ヶ月で Adtomic か Cerebro のどちらかでも実運用に乗らなければ即解約</td></tr>
+<tr><td>Jungle Scout</td><td>導入3ヶ月で Opportunity Finder か Supplier DB のどちらかでも実運用に乗らなければ即解約</td></tr>
+<tr><td>セラースケット</td><td>導入6ヶ月で取締り履歴チェック / アカウント停止サポートのどちらかが実用に乗らなければ解約</td></tr>
+</tbody>
+</table>
+</div>
+
+<hr>
+
+<h2>10. v1 からの主な更新点</h2>
+<ul>
+<li><strong>AI 連携性</strong> を最重要評価軸に追加（§6）→ Keepa / Helium 10 が中核候補として明確化</li>
+<li><strong>追加4ツール</strong>（DELTA tracer / Helium 10 / Jungle Scout / セラースケット）を全評価軸に組み込み</li>
+<li><strong>シナリオ別月額試算</strong>を5パターン提示（§2）→ 社長判断の解像度向上</li>
+<li><strong>役割マップ（攻め/守り/体験/公式リファレンス）</strong> を新設（§7）→ ツール選定の判断軸を整理</li>
+<li><strong>撤退条件テンプレ</strong> を全ツールに明示（§9）→ マサルの仮想 PDCA で再利用可</li>
+</ul>
+
+<div class="footer-note">
+<strong>次のアクション</strong>：本表とハンドオフサマリ（<code>handover-summary.md</code>）をベースに、朝レビューで社長確認 → タケシ（プランナー）に「導入タイミング戦略 A/B/C＋推奨」を発注 → マサル（シミュレーター）で仮想 PDCA → §4.1 該当（有料プラン契約）を <code>waiting/</code> に置いて社長承認へ。
+</div>
+
+<p class="meta">生成: 2026-05-30 夜間自走（7周目） — 秘書カズヨ / リサーチャー サトル<br>
+出力先: <code>workspace/output/deliverables/T-20260520-003/comparison-v2.html</code></p>
+
+</div>
+</body>
+</html>
