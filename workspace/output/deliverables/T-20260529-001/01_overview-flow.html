@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Amazon物販 業務フロー ① 大きな流れ</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+  body { font-family: -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic", Meiryo, sans-serif;
+         line-height: 1.8; color: #222; max-width: 960px; margin: 0 auto; padding: 24px; background:#fafafa; }
+  h1 { font-size: 1.5rem; border-bottom: 3px solid #ff9900; padding-bottom: 8px; }
+  h2 { font-size: 1.2rem; margin-top: 2em; border-left: 6px solid #ff9900; padding-left: 10px; }
+  .note { background:#fff8e6; border:1px solid #ffd47a; border-radius:8px; padding:12px 16px; }
+  table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
+  th, td { border: 1px solid #ddd; padding: 6px 8px; text-align: left; }
+  th { background:#fff1d6; }
+  .mermaid { background:#fff; border:1px solid #eee; border-radius:8px; padding:16px; text-align:center; overflow-x:auto; }
+  .legend { font-size:0.85rem; color:#666; }
+  footer { margin-top:3em; font-size:0.8rem; color:#888; border-top:1px solid #ddd; padding-top:12px; }
+</style>
+</head>
+<body>
+<h1>Amazon物販 業務フロー ── ① 大きな流れ（全体像）</h1>
+<p class="legend">T-20260529-001 / Phase 1 ｜ 担当: 秘書カズヨ ｜ 2026-05-29 ｜ 対象: Amazon物販に限定（FBA・小口・個人事業を主に想定）</p>
+
+<div class="note">
+<b>全体像を一言で：</b> Amazon物販は「探す → 売れるか確かめる → 仕入れる → 売る → お金にする → 振り返る」のループです。
+社長が最も迷っている <b>「仕入れ」</b> は、実は <b>「仕入れる前にやる確認作業（特に出品制限チェック）」</b> がカギ。下図の赤いゲート◇がそれです。
+</div>
+
+<h2>大きな流れ（メインのループ）</h2>
+<div class="mermaid">
+flowchart TD
+    S([事業スタート]) --> P0
+    P0["&lt;b&gt;0. 事業準備&lt;/b&gt;&lt;br/&gt;出品アカウント開設・環境整備&lt;br/&gt;（本人確認／カード／ツール）"]
+    P1["&lt;b&gt;1. リサーチ&lt;/b&gt;&lt;br/&gt;売れそうな商品・仕入れ候補を探す"]
+    G1{"&lt;b&gt;2. 出品できる商品か？&lt;/b&gt;&lt;br/&gt;出品制限・カテゴリ制限を確認"}
+    P3["&lt;b&gt;3. 利益計算&lt;/b&gt;&lt;br/&gt;真の利益・利益率20%以上か判定"]
+    G2{"&lt;b&gt;4. 仕入れ判断&lt;/b&gt;&lt;br/&gt;Go か NoGo か"}
+    REL["&lt;b&gt;2b. 出品制限の解除&lt;/b&gt;&lt;br/&gt;（必要な場合のみ・別フロー）"]
+    P5["&lt;b&gt;5. 仕入れ実行&lt;/b&gt;&lt;br/&gt;発注・入金・領収書PDF取得"]
+    P7["&lt;b&gt;6. 出品・カタログ登録&lt;/b&gt;&lt;br/&gt;価格・コンディション設定"]
+    P8["&lt;b&gt;7. 納品&lt;/b&gt;&lt;br/&gt;FBA倉庫へ納品 or 自己発送準備"]
+    P9["&lt;b&gt;8. 販売&lt;/b&gt;&lt;br/&gt;カート獲得・価格調整"]
+    P10["&lt;b&gt;9. 受注〜配送&lt;/b&gt;&lt;br/&gt;FBA=自動 / 自己発送=梱包発送"]
+    P11["&lt;b&gt;10. 入金・会計&lt;/b&gt;&lt;br/&gt;売上回収・利益確定・記帳"]
+    P12{"&lt;b&gt;11. 振り返り&lt;/b&gt;&lt;br/&gt;もう一度仕入れる？"}
+    P0 --> P1 --> G1
+    G1 -->|"この商品を出品する（制限なし）"| P3
+    G1 -->|"出品を申請（要解除）"| REL
+    G1 -->|"出品情報のコピー（出品不可）"| X1["別販路で売る or 諦める"]
+    REL --> P3
+    X1 -.-> P1
+    P3 --> G2
+    G2 -->|"NoGo"| P1
+    G2 -->|"Go"| P5
+    P5 --> P7 --> P8 --> P9 --> P10 --> P11 --> P12
+    P12 -->|"売れた・再現したい"| P1
+    P12 -->|"撤退・別商品へ"| P1
+    classDef gate fill:#ffe1e1,stroke:#d33,stroke-width:2px;
+    classDef rel fill:#fff3cd,stroke:#e0a800,stroke-width:2px;
+    class G1,G2,P12 gate;
+    class REL rel;
+</div>
+
+<h2>各段階のひとことガイド</h2>
+<table>
+<tr><th>#</th><th>段階</th><th>ゴール</th><th>Phase 2 で分解する準備・登録先・ToDoの例</th></tr>
+<tr><td>0</td><td>事業準備</td><td>売れる状態を作る</td><td>出品アカウント開設（本人確認）・小口/大口選択・カード登録・ツール導入・古物商許可（中古時）</td></tr>
+<tr><td>1</td><td>リサーチ</td><td>利益候補を見つける</td><td>Keepa等の使い方・需要と競合の見方・仕入れ先巡回</td></tr>
+<tr><td>2 ◇</td><td>出品可否チェック</td><td>仕入れ前に売れる商品か確定</td><td>ASIN確認手順・3分岐判定・トラップ2点（ノーブランド/新品不可）</td></tr>
+<tr><td>2b</td><td>出品制限の解除</td><td>制限商品を売れる状態に</td><td>3段階解除（0円→1点→10点）・領収書条件・申請の工夫・落とし穴3つ</td></tr>
+<tr><td>3</td><td>利益計算</td><td>利益率20%を満たすか</td><td>FBA手数料・送料・原価・ポイント込み・真の利益（FBA/自己発送/MSS）</td></tr>
+<tr><td>4 ◇</td><td>仕入れ判断</td><td>Go/NoGo を決める</td><td>損益分岐・在庫リスク・資金繰り・撤退ライン</td></tr>
+<tr><td>5</td><td>仕入れ実行</td><td>商品と領収書を入手</td><td>仕入れ先別発注手順・領収書PDF・仕入れ記録CSV・<b>仕入れ先リスト</b></td></tr>
+<tr><td>6</td><td>出品・カタログ登録</td><td>商品を載せる</td><td>相乗り/新規登録・価格・コンディション・画像</td></tr>
+<tr><td>7</td><td>納品</td><td>在庫を置く</td><td>FBA納品プラン・ラベル・搬入 / 自己発送在庫管理</td></tr>
+<tr><td>8</td><td>販売</td><td>実際に売る</td><td>カート獲得・価格自動改定・在庫切れ防止</td></tr>
+<tr><td>9</td><td>受注〜配送</td><td>お客様へ届ける</td><td>FBA自動・自己発送は梱包/発送/追跡</td></tr>
+<tr><td>10</td><td>入金・会計</td><td>利益を確定</td><td>売上金サイクル・手数料控除・記帳・確定申告準備</td></tr>
+<tr><td>11 ◇</td><td>振り返り</td><td>次の一手</td><td>KPI・再仕入れ判断・SKU積み上げ</td></tr>
+</table>
+
+<h2>このあとの進め方</h2>
+<ol>
+<li>この全体像でイメージは合っていますか？（段階の粒度・順番・抜け漏れ）</li>
+<li>OKなら Phase 2（各段階の ToDo 細分化）へ。<b>仕入れ周り（段階2・2b・5）から先に細かくする</b>提案ですが、頭（事業準備）から順でも対応します。</li>
+</ol>
+
+<footer>Amazon物販事業 ／ AI会社 ／ 秘書カズヨ作成。図は Mermaid.js でブラウザ描画しています。</footer>
+<script>mermaid.initialize({ startOnLoad: true, theme: 'base', flowchart: { useMaxWidth: true } });</script>
+</body>
+</html>
+</content>
