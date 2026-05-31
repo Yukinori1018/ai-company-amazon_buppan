@@ -47,4 +47,5 @@ next_check_at: 2026-05-30
 - 2026-05-29 起票。社長依頼受領。規制解除マニュアルを reference 保存。Phase 1（全体フロー）に着手
 - 2026-05-29 全体フロー初版を Mermaid(md/html) で作成 → 社長環境で描画されず。matplotlib+IPAGothic で確実表示の PNG に作り替え（`01_overview-flow.png`）
 - 2026-05-29 社長指摘で改訂: クレーム対応・評価確認を独立並走フロー「12. アフターフォロー」＋「アカウントヘルス」として追加（PNG/md 反映）。Phase 2 着手待ち（仕入れ周りから細分化が有力）
+- 2026-05-31 社長選択で「仕入れ周りから」着手。②仕入れ判断フロー(`02_sourcing-flow.png`)・③出品制限の3段階解除フロー(`03_restriction-release-flow.png`)・ToDoチェックリスト(`02_sourcing-todo.md`)を作成。描画共通ライブラリ `flow_lib.py` 化。仕入れ先スプレッドシートは既存 `T-20260521-002/suppliers-list.csv`（30社）を参照する形に統合（重複作成回避）
 </content>
