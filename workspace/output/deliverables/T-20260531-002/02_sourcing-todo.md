@@ -1,6 +1,6 @@
 # ② 仕入れ周り ToDo チェックリスト（出品可否→解除→発注）
 
-> 対象チケット: T-20260529-001 ／ 作成: 秘書カズヨ ／ 2026-05-29
+> 対象チケット: T-20260531-002 ／ 作成: 秘書カズヨ ／ 2026-05-29
 > 対の図解: `02_sourcing-flow.png`（判断フロー）, `03_restriction-release-flow.png`（解除フロー）
 > 出典: `99_reference_listing-restriction-release-manual.md`
 > 仕入れ先の一覧（連絡先・ジャンル・難易度）: `../T-20260521-002/suppliers-list.csv`（30社）

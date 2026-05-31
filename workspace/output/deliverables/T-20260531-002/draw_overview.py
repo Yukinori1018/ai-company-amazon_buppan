@@ -167,10 +167,10 @@ ax.text((ahx-ahw/2+g3x+g3w/2)/2, g3y-0.55, "指標・学びを反映",
 # title
 ax.text(7.0, 20.85, "Amazon物販 業務フロー ① 大きな流れ（全体像）",
         ha="center", va="center", fontsize=16, fontproperties=fp, weight="bold")
-ax.text(14.4, 0.2, "T-20260529-001 / 秘書カズヨ / 2026-05-29",
+ax.text(14.4, 0.2, "T-20260531-002 / 秘書カズヨ / 2026-05-29",
         ha="right", fontsize=8, fontproperties=fp, color="#999")
 
 plt.tight_layout()
-out = "workspace/output/deliverables/T-20260529-001/01_overview-flow.png"
+out = "workspace/output/deliverables/T-20260531-002/01_overview-flow.png"
 plt.savefig(out, dpi=140, bbox_inches="tight", facecolor="white")
 print("saved", out)
