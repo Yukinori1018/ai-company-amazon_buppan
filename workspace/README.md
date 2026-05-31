@@ -10,7 +10,7 @@ workspace/
 │   ├── _template.md             # チケット雛形（_ 始まりはスキャン対象外）
 │   ├── todo/                    # 未着手
 │   ├── doing/                   # 作業中
-│   ├── waiting/                 # 社長確認待ち
+│   ├── waiting/                 # 社長の番（判断/承認/レビュー/情報提供/手作業待ち）＝社長タスク一覧
 │   └── done/                    # 完了
 ├── output/                      # 作業中の中間ファイルのみ（.gitignore 対象）
 │   └── agent_output/            # 作業中の途中経過。監査用

@@ -1,11 +1,11 @@
 ---
 ticket_id: T-20260521-002
 title: 初心者向け「仕入れ〜販売」シミュレーション資料作成（FBA 前提）
-status: doing
+status: waiting
 assignee: secretary
 priority: high
 created_at: 2026-05-20
-updated_at: 2026-05-21
+updated_at: 2026-05-29
 requires_approval: false
 labels: [research, simulation, foundation, learning]
 ---
@@ -37,3 +37,8 @@ labels: [research, simulation, foundation, learning]
 - 2026-05-21 Phase 1 完了（経理・庶務・法務）
 - 2026-05-21 Phase 2 ヒデアキ統合完了（playbook-final.md/html）。社長レビュー待ち
 - 2026-05-21 重要差分: 商品①シャンプー → 法務NG → 文房具/収納雑貨へ差替え推奨
+- 2026-05-29 waiting へ移動（新基準＝社長タスク一覧化）。playbook 納品済、社長レビュー待ち
+
+## 社長判断待ち
+
+**納品済みのシミュレーション資料（playbook-final）に目を通し、一言フィードバックをください。** 問題なければ done にします。
