@@ -21,7 +21,7 @@
    - マスターCSV＝`workspace/output/deliverables/T-20260601-001/deliverables-catalog.csv`（リポ内の真実。Markdown版併置）。Drive file id=`1xXfKbgbbiRUns-U40sgWNUWzwvu1s2aS3Gr1Ouy5MQY`。
    - 既存 Drive コネクタが認証済みで **OAuthクリックすら不要**だった。マリエが棚卸し→CSV化、タカシが Drive MCP `create_file`（text/csv→Sheets自動変換）で生成。
    - 運用ルール恒久化: CLAUDE.md §6「成果物カタログ」＋庶務スキル `agents/general_affairs/skills/deliverables-catalog.md`（成果物のたびマリエが追記）。
-   - **follow-up（未了）**: Drive コネクタは create のみ＝セル追記APIなし。**書き込み可能な Sheets 連携（URL固定で増分反映）をタカシが別途整備**。それまでは CSV を真実にCSV追記→必要時に再生成。クラウド回はCSV追記まで、ローカル回頭でシートに追いつかせる。
+   - **書き込み連携 〔T-20260601-003 / done〕**: Apps Script Web App 連携を整備し疎通済（2026-06-01・HTTP200/56行）。**カタログ更新は `python3 scripts/catalog/sync_catalog_to_sheet.py` 一発**で同一URLのシートを全置換ミラー更新（冪等）。手順=`scripts/catalog/README.md`、接続情報=`scripts/catalog/.catalog_sync.env`（gitignore・ローカルのみ）。クラウド回は環境変数 `WEBAPP_URL`/`SHARED_TOKEN` を渡せば実行可、無ければCSV追記までに留め次のローカル回で同期。
 
 2. **業務フロー図 ①全体像の社長確認（確認ゲート①） 〔T-20260531-002 / doing〕**
    - 社長はまだ「大まかな全体像」を一読しただけ。②③④⑤は作成済みだが**社長レビュー未**。
