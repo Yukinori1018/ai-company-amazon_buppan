@@ -1,13 +1,15 @@
 ---
+ticket_id: T-20260531-001
 title: ローカル⇄GitHub⇄Notion 同期の破綻復旧と再発防止ワークフロー確立
-id: T-20260531-001
 status: doing
 assignee: secretary
+priority: high
 created_at: 2026-05-31
-next_check_at: 2026-06-01
+updated_at: 2026-06-01
+requires_approval: false
+next_check_at: 2026-06-02
 labels: [infra, git, notion, governance, incident]
 parent: null
-priority: high
 ---
 
 # T-20260531-001 ローカル⇄GitHub⇄Notion 同期の破綻復旧と再発防止
