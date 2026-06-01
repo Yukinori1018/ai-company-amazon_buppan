@@ -11,3 +11,6 @@
 workspace/output/agent_output/**
 !workspace/output/agent_output/
 !workspace/output/agent_output/.gitkeep
+
+# 成果物カタログ同期の実設定（Web App URL・共有トークンを含むため除外。.example はコミット）
+scripts/catalog/.catalog_sync.env
