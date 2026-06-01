@@ -2,7 +2,7 @@
 
 > Googleスプレッドシート（社長閲覧用）: https://docs.google.com/spreadsheets/d/1xXfKbgbbiRUns-U40sgWNUWzwvu1s2aS3Gr1Ouy5MQY/edit  
 > マスターCSV: `deliverables-catalog.csv`（リポ内の真実）  
-> 全55件 / 自動更新責務=庶務マリエ（`agents/general_affairs/skills/deliverables-catalog.md`）
+> 全56件 / 自動更新: `python3 scripts/catalog/sync_catalog_to_sheet.py`（庶務マリエ責務）
 
 
 ## T-20260520-003 — Amazon物販ツール網羅調査・評価（軸A）
@@ -104,3 +104,9 @@
 | 事業準備ToDoチェックリスト | 5点セット準備・出品プラン選択など初期登録のToDoチェックリスト | レポート | content_creator | md | [GitHub](https://github.com/Yukinori1018/ai-company-amazon_buppan/blob/claude/nighttime-work-checkin-iTWEa/workspace/output/deliverables/T-20260531-002/05_setup-todo.md) |
 | 出品制限解除マニュアル（参考） | 出品制限の基礎知識・確認方法・解除手順をまとめた参考マニュアル | レポート | content_creator | md | [GitHub](https://github.com/Yukinori1018/ai-company-amazon_buppan/blob/claude/nighttime-work-checkin-iTWEa/workspace/output/deliverables/T-20260531-002/99_reference_listing-restriction-release-manual.md) |
 | フロー作図スクリプト一式 | 各フロー図PNGを生成するPython作図スクリプト（draw_*.py/flow_lib.py）一式 | コード | it_engineer | py | [GitHub](https://github.com/Yukinori1018/ai-company-amazon_buppan/blob/claude/nighttime-work-checkin-iTWEa/workspace/output/deliverables/T-20260531-002) |
+
+## T-20260601-004 — スプレッドシート連携テスト（新規成果物追加→同期反映の実証）
+
+| 成果物タイトル | 内容（要約） | 種別 | 担当 | 形式 | リンク |
+|---|---|---|---|---|---|
+| Google スプレッドシート連携方法まとめ | 成果物カタログとGoogleスプレッドシートの連携(Apps Script Web App)の仕組み・構成・セキュリティ・運用・トラブルシュートを1枚にまとめた資料。本ドキュメント追加が連携テストの題材 | レポート | it_engineer | md/html | [GitHub](https://github.com/Yukinori1018/ai-company-amazon_buppan/blob/claude/nighttime-work-checkin-iTWEa/workspace/output/deliverables/T-20260601-004/sheets-integration-summary.md) |
