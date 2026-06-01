@@ -16,11 +16,12 @@
 
 ### 🆕🔴 2026-06-01 セッションの最重要引き継ぎ（ローカルで最初にやること）
 
-1. **成果物カタログ（Googleスプレッドシート）作成 〔T-20260601-001 / waiting〕** ← **社長がこのためにローカルへ移動**
-   - クラウドでは Google Sheets に繋げない（OAuth・ネット制約）ため local-only。社長判断で「ローカルでGoogleスプレッドシート」を選択。
-   - 段取り: **タカシ（IT）が Sheets 連携（MCP or gspread）をセットアップ**（社長は OAuth クリックのみ）→ **マリエ（庶務）がカタログ構築＋既存成果物を流し込み**＋以後の自動更新運用。
-   - 要件・列設計・既存成果物の棚卸し・担当分担は **チケット本文に整備済み**（`workspace/tickets/waiting/T-20260601-001_deliverables-catalog-spreadsheet.md`）。まずこれを読む。
-   - 運用ルール: **成果物が出るたびにこの表を更新**（マリエ定常責務化＋検知フックをタカシが検討）。
+1. ~~**成果物カタログ（Googleスプレッドシート）作成 〔T-20260601-001〕**~~ → ✅ **done（2026-06-01 ローカルで完了）**
+   - **Googleスプレッドシート**「成果物カタログ_Amazon物販事業」: https://docs.google.com/spreadsheets/d/1xXfKbgbbiRUns-U40sgWNUWzwvu1s2aS3Gr1Ouy5MQY/edit （社長アカウント所有・My Drive直下・12列55行/9チケット）
+   - マスターCSV＝`workspace/output/deliverables/T-20260601-001/deliverables-catalog.csv`（リポ内の真実。Markdown版併置）。Drive file id=`1xXfKbgbbiRUns-U40sgWNUWzwvu1s2aS3Gr1Ouy5MQY`。
+   - 既存 Drive コネクタが認証済みで **OAuthクリックすら不要**だった。マリエが棚卸し→CSV化、タカシが Drive MCP `create_file`（text/csv→Sheets自動変換）で生成。
+   - 運用ルール恒久化: CLAUDE.md §6「成果物カタログ」＋庶務スキル `agents/general_affairs/skills/deliverables-catalog.md`（成果物のたびマリエが追記）。
+   - **follow-up（未了）**: Drive コネクタは create のみ＝セル追記APIなし。**書き込み可能な Sheets 連携（URL固定で増分反映）をタカシが別途整備**。それまでは CSV を真実にCSV追記→必要時に再生成。クラウド回はCSV追記まで、ローカル回頭でシートに追いつかせる。
 
 2. **業務フロー図 ①全体像の社長確認（確認ゲート①） 〔T-20260531-002 / doing〕**
    - 社長はまだ「大まかな全体像」を一読しただけ。②③④⑤は作成済みだが**社長レビュー未**。
