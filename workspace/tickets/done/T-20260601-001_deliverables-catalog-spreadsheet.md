@@ -1,11 +1,12 @@
 ---
 ticket_id: T-20260601-001
 title: 成果物カタログ（Googleスプレッドシート）作成＋成果物のたび自動更新する運用の確立
-status: waiting
+status: done
 assignee: general_affairs
 priority: high
 created_at: 2026-06-01
 updated_at: 2026-06-01
+completed_at: 2026-06-01
 requires_approval: false
 labels: [catalog, index, spreadsheet, google-sheets, ops, local-only]
 related_tickets: [T-20260531-002, T-20260520-010]
@@ -82,6 +83,21 @@ environment: local-only
 3. タカシが提示する Sheets 連携の **OAuth 認証クリック**（数十秒）だけ対応
 → 以降はマリエが構築・社長と列の最終確認 → 自動更新運用へ
 
+## 成果物（2026-06-01 ローカルセッションで実施・完了）
+
+- **Googleスプレッドシート**: 「成果物カタログ_Amazon物販事業」
+  - URL: https://docs.google.com/spreadsheets/d/1xXfKbgbbiRUns-U40sgWNUWzwvu1s2aS3Gr1Ouy5MQY/edit
+  - Drive file id: `1xXfKbgbbiRUns-U40sgWNUWzwvu1s2aS3Gr1Ouy5MQY` / 所有: 社長アカウント / My Drive 直下
+  - 12列 × 55行（ヘッダー除く）/ 9チケット分の主要成果物を網羅
+- **マスターCSV（リポ内の真実）**: `workspace/output/deliverables/T-20260601-001/deliverables-catalog.csv`
+- **運用ルール化**: CLAUDE.md §6「成果物カタログ」節を新設 ＋ 庶務スキル `agents/general_affairs/skills/deliverables-catalog.md` を新設（成果物のたびマリエが追記する定常責務）。
+
+## follow-up（未了・別途）
+
+- **書き込み可能な Sheets 連携の整備（タカシ/IT）**: 現状の Google Drive コネクタは create のみでセル追記APIが無く、増分を既存シートへ in-place 反映できない。当面はマスターCSVを真実にCSV追記→必要時に再生成/手動貼付で運用。append/update 対応の Sheets 連携を整えれば URL を変えず増分反映できる。
+- **`deliverables/` 新規ファイル検知フック（任意）**: カタログ更新を促す PostToolUse 類似フックをタカシが検討。
+
 ## ログ
 
 - 2026-06-01 起票。社長依頼を受領。クラウドでは Google Sheets 不可のため local-only と判定、社長が「ローカルでGoogleスプレッドシート」を選択。ローカル再開用に要件・列設計・棚卸し・分担を整備して waiting（社長のローカル再依頼＋OAuth待ち）
+- 2026-06-01 ローカルセッションで実施。**社長は Drive コネクタで認証済み → OAuthクリックすら不要**だった。マリエが deliverables を棚卸ししマスターCSV（55行）を生成 → タカシが Drive MCP `create_file`（text/csv→Sheets自動変換）で社長Driveにスプレッドシート生成 → メタデータで変換・所有者を検証。運用ルールを CLAUDE.md＋庶務スキルに恒久化。**done**（follow-up は上記2点）。
