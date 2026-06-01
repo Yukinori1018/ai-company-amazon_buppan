@@ -230,6 +230,7 @@ todo → doing → waiting → done
 - **ルール: 新しい成果物が `deliverables/` に出るたび、マリエが①マスターCSVへ行を追記 → ②スプレッドシートへ同期**する。これを定常責務とする（個別チケット完了の締め作業に含める）。
 - **反映手段（稼働中）**: Apps Script Web App 連携（T-20260601-003 / 2026-06-01 疎通済）。マスターCSVを更新したら **`python3 scripts/catalog/sync_catalog_to_sheet.py`** を実行 → 同一URLのシートを全置換ミラー更新（冪等）。設定・手順は [scripts/catalog/README.md](scripts/catalog/README.md)。接続情報は `scripts/catalog/.catalog_sync.env`（gitignore対象）。
 - **環境**: 上記同期は **HTTPS POST のみで動くためクラウド/夜間自走からも実行可能**（認証情報はローカルに置かない設計）。ただし `.catalog_sync.env` はローカルのみに存在するため、クラウド回は環境変数 `WEBAPP_URL`/`SHARED_TOKEN` を渡すか、CSV追記までに留めて次のローカル回で同期する。
+- **社長の入口**: [`/amazon_buppan_catalog`](.claude/commands/amazon_buppan_catalog.md) を打つと、カズヨが最新CSVをシートへ同期してからブラウザでカタログを開く（このプロジェクトの作業開始時の定番動線）。`nosync` / `synconly` 引数あり。
 
 ### Notion カンバンとの同期（原則）
 
