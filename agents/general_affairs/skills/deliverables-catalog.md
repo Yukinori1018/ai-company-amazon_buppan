@@ -37,15 +37,17 @@
 3. **Googleスプレッドシートへ反映**（ローカル環境のみ）。
 4. チケット完了の締め作業にこの①〜③を含める。
 
-## 4. スプレッドシートへの反映手段（現状と制約）
+## 4. スプレッドシートへの反映手段（稼働中・T-20260601-003）
 
-- 接続は **Google Drive コネクタ（MCP）**。社長は認証済みで追加OAuth不要。
-- 新規生成は `create_file`（contentMimeType=`text/csv`、textContent=CSV全文、変換オプション無指定 → `application/vnd.google-apps.spreadsheet` に自動変換）。
-- **制約**: この Drive コネクタは**セル単位の追記・更新APIを持たない**（create / read / copy / metadata のみ）。
-  - そのため増分追記を既存シートへ in-place で反映できない。
-  - **暫定運用**: マスターCSV を真実として追記 → ローカルで社長に増分を提示 →（行数が増えた節目で）CSV から再生成 or 社長が手動でシートに貼り付け。
-  - **follow-up（タカシ/IT）**: append/update 可能な Google Sheets 連携を整備し、URL を変えずに増分反映できるようにする。整備後はこの節を更新。
-- **クラウドセッションでは Google に繋げない**。クラウドで成果物が出た回は **CSV 追記まで**を行い、次のローカルセッション冒頭でシートへ追いつかせる。
+- **Apps Script Web App 連携**（2026-06-01 疎通済）。マスターCSVを更新したら次を実行するだけ:
+  ```bash
+  python3 scripts/catalog/sync_catalog_to_sheet.py            # 同一URLのシートを全置換ミラー更新
+  python3 scripts/catalog/sync_catalog_to_sheet.py --dry-run  # 送信せず行数・先頭行プレビュー
+  ```
+- 仕組み: CSV を Web App へ POST → シートを全クリア→全行書き込み（**全置換ミラー・冪等**。差分計算不要・行重複なし）。**URLは固定**。
+- 設定・手順書: [scripts/catalog/README.md](../../../scripts/catalog/README.md)。接続情報（URL・トークン）は `scripts/catalog/.catalog_sync.env`（**gitignore対象**・ローカルのみ）。
+- **クラウド/夜間自走から実行する場合**: 認証はトークンのみで HTTPS POST するだけなので可能。ただし `.catalog_sync.env` はローカル限定のため、クラウド回は環境変数 `WEBAPP_URL` / `SHARED_TOKEN` を渡すか、CSV追記までに留めて次のローカル回で `sync_catalog_to_sheet.py` を流す。
+- 初回生成（参考）: Google Drive コネクタ `create_file`（text/csv → スプレッドシート自動変換）で作成した。以後の更新は上記 Apps Script 連携を使う。
 
 ## 5. 検知の補助（任意・IT follow-up）
 

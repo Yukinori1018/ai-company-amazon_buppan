@@ -1,11 +1,12 @@
 ---
 ticket_id: T-20260601-003
 title: 書き込み可能な Google Sheets 連携の整備（カタログをURL固定で増分反映）
-status: doing
+status: done
 assignee: it_engineer
 priority: high
 created_at: 2026-06-01
 updated_at: 2026-06-01
+completed_at: 2026-06-01
 requires_approval: false
 labels: [google-sheets, integration, catalog, ops, it]
 related_tickets: [T-20260601-001]
@@ -46,3 +47,6 @@ T-20260601-001 で成果物カタログのGoogleスプレッドシートを作�
 ## ログ
 
 - 2026-06-01 起票。社長が B 採択。レジストリに Sheets 書込コネクタ無しを確認、ローカル実装方針。タカシに設計＋実装を発注。
+- 2026-06-01 タカシが Apps Script Web App 案（A）で実装（`scripts/catalog/` 一式・社長設定10手順README・dry-run確認）。
+- 2026-06-01 社長が一度きり設定を実施。初回は未審査アプリ警告（Advanced→移動→許可で通過）、次にアクセス権「全員」未設定で HTTP 401 → デプロイ設定を「全員」に修正し再デプロイ。`.catalog_sync.env`（gitignore）に URL・トークン設定。
+- 2026-06-01 **実通信テスト成功（HTTP 200・56行×12列を全置換ミラー書き込み）**。URL固定の書き込み連携が稼働。CLAUDE.md §6＋庶務スキルを「稼働中」に更新。**done**。

@@ -227,9 +227,9 @@ todo → doing → waiting → done
 - **真実**＝`workspace/output/deliverables/` 配下の成果物ファイル。**カタログ＝その片方向ミラー**（チケットID × 成果物タイトル × 内容要約 × アウトプットURL の一覧）。
 - **マスターCSV**: [workspace/output/deliverables/T-20260601-001/deliverables-catalog.csv](workspace/output/deliverables/T-20260601-001/deliverables-catalog.csv)（リポ内の真実。Git管理）。
 - **Googleスプレッドシート**（社長閲覧用・ローカル環境のみ生成可）: タイトル「成果物カタログ_Amazon物販事業」/ Drive file id `1xXfKbgbbiRUns-U40sgWNUWzwvu1s2aS3Gr1Ouy5MQY`。社長アカウント所有・My Drive 直下。
-- **ルール: 新しい成果物が `deliverables/` に出るたび、マリエが①マスターCSVへ行を追記 → ②同じ列設計でスプレッドシートへ反映**する。これを定常責務とする（個別チケット完了の締め作業に含める）。
-- **環境制約**: スプレッドシート反映は **ローカル（社長Mac）セッションのみ**（クラウドは Google へ繋げない）。クラウドで成果物が出た回はマスターCSVへの追記までを行い、次のローカルセッション冒頭でスプレッドシートへ追いつかせる。
-- **反映手段**: 現状の Google Drive コネクタは新規作成のみで**セル単位の追記更新APIを持たない**。当面はマスターCSVを真実として運用し、スプレッドシートの増分反映を確実にする書き込み可能な Sheets 連携の整備をタカシ（IT）の follow-up とする（[T-20260601-001](workspace/tickets/) ログ参照）。それまでの暫定は「CSVへ追記 → ローカルで社長に増分を提示し、必要時に再生成 or 手動追記」。
+- **ルール: 新しい成果物が `deliverables/` に出るたび、マリエが①マスターCSVへ行を追記 → ②スプレッドシートへ同期**する。これを定常責務とする（個別チケット完了の締め作業に含める）。
+- **反映手段（稼働中）**: Apps Script Web App 連携（T-20260601-003 / 2026-06-01 疎通済）。マスターCSVを更新したら **`python3 scripts/catalog/sync_catalog_to_sheet.py`** を実行 → 同一URLのシートを全置換ミラー更新（冪等）。設定・手順は [scripts/catalog/README.md](scripts/catalog/README.md)。接続情報は `scripts/catalog/.catalog_sync.env`（gitignore対象）。
+- **環境**: 上記同期は **HTTPS POST のみで動くためクラウド/夜間自走からも実行可能**（認証情報はローカルに置かない設計）。ただし `.catalog_sync.env` はローカルのみに存在するため、クラウド回は環境変数 `WEBAPP_URL`/`SHARED_TOKEN` を渡すか、CSV追記までに留めて次のローカル回で同期する。
 
 ### Notion カンバンとの同期（原則）
 
