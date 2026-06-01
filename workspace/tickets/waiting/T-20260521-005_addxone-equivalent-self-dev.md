@@ -5,8 +5,8 @@ status: waiting
 assignee: it_engineer
 priority: high
 created_at: 2026-05-21
-updated_at: 2026-05-29
-next_check_at: 2026-05-30
+updated_at: 2026-06-01
+next_check_at: 2026-06-02
 requires_approval: true
 labels: [dev, research, mvp, tooling]
 related_tickets: [T-20260520-006]
@@ -93,8 +93,15 @@ A/B/C 判断後に Phase 1（API 接続検証）着手。Phase 1 時点で Keepa
   - T-20260522-004 Sato-Scope ROI 試算（ハジメ）
   - T-20260522-005 公式 API ToS 最終確認（ハルオ）
 - 2026-05-22 Phase 2 着手の §4.1 承認待ち（Keepa €49/月 + 楽天/Yahoo! ApplicationID 登録）
-- 2026-05-29 waiting へ移動（新基準＝社長タスク一覧化）。社長の API キー取得＋Phase 2 課金判断待ち
+- 2026-05-22 **社長レビューでモック OK、Phase 2 即 GO 承認取得**。Keepa Power-User Plan €49/月 課金 §4.1 承認確定。次は社長手作業で Keepa 申込＋楽天 ApplicationID＋Yahoo! ClientID 取得（カズヨが手順書を提示）
+- 2026-05-25 ハジメ ROI 試算完了（案A 自社開発が回収最有利・1.0ヶ月）。サトル/ハジメ共通論点「軸B 0周問題」浮上
+- 2026-05-25 **社長指摘で重要訂正: Sato-Scope と ERESA は代替でなく補完（別レイヤー）**。Sato-Scope は仕入れ発見を担う唯一の自社資産で置換不可。「ERESA で代替＝不要」論を取り下げ。memory に記録（`agents/secretary/memory/knowledge_satoscope-vs-eresa-different-layers.md`）
+- 2026-05-25 **社長方針確定（選択肢1）: Phase 2 継続 GO ＋ 軸B 1周を最優先 ＋ ERESA は保留**。API キー取得は社長手作業待ち。next_check_at を 2026-05-26 に更新
+- 2026-05-27 社長手作業（API キー取得）のボトルネック解消のため、カズヨが取得手順書を先回り作成・納品（`04_api-key-setup-guide.md`）。Keepa(€49/月・承認済)/楽天/Yahoo! の3キー取得〜`.env`設定〜`/health`でlive確認までを初心者向けに記載。社長のキー取得待ち継続、next_check_at を 2026-05-28 に更新
+- 2026-05-27 **B案ハイブリッド方針転換**: Phase 2 自社開発を中止し ERESA PRO 主軸へ（T-20260527-001/002 起票）。Sato-Scope は独自2軸のみ Lite 縮退
+- 2026-05-29 waiting へ移動（新基準＝社長タスク一覧化）
+- 2026-06-01 ブランチ統合（resume-vDg2L）でログ統合。next_check_at を 2026-06-02 に更新
 
 ## 社長判断待ち
 
-**API キーの取得と Phase 2 の課金判断をお願いします（§4.1 該当）。** ① Keepa（€49/月・要課金承認）② 楽天 ApplicationID（無料）③ Yahoo! Client ID（無料）。手順は `04_api-key-setup-guide.md`。1つでも入れば実データで動き始めます。
+**Phase 2 の方針は B案（ERESA PRO 主軸）へ転換済み。** 関連の社長タスクは T-20260527-001（ERESA PRO 7日試用→契約・§4.1）に集約。本チケットは Lite 縮退分の整理待ち。

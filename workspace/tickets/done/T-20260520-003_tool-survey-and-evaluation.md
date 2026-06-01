@@ -1,13 +1,13 @@
 ---
 ticket_id: T-20260520-003
 title: Amazon物販ツール網羅調査・評価（軸A）
-status: waiting
+status: done
 assignee: researcher
 priority: high
 created_at: 2026-05-20
-updated_at: 2026-05-20
+updated_at: 2026-05-25
 requires_approval: true
-labels: [strategy, tooling, research]
+labels: [strategy, tooling, research, ai-integration]
 parent_ticket: ""
 ---
 
@@ -53,6 +53,17 @@ parent_ticket: ""
 - 2026-05-20 社長から A案承認＋以後は秘書判断で進行の指示。サトルが個票作成に着手
 - 2026-05-20 サトル：4ツールの個票初稿を `workspace/output/deliverables/T-20260520-003/` に納品（Keepa / SellerSprite / アマサーチ / FBA計算機）
 - 2026-05-20 doing → waiting に移動。社長レビュー待ち（個票4本の粒度・項目過不足を確認いただきたい）
+- 2026-05-22 社長レビュー：**AI連携を前提に再見直し依頼**。カズヨ推奨A（Sato-Scope を中核、外部ツールは"データ源"に格下げ）で確定。waiting → doing に戻し、サトルへ再発注。
+  - 再調査スコープ:
+    1. AI 内蔵ツールの網羅追加（Helium 10 AI、Jungle Scout AI、新興日本系 AI 物販ツール、Brand Analytics AI 機能、ChatGPT/Claude 連携サービス 等）
+    2. 既存4本の AI 連携可否（API 経由で Sato-Scope に取り込めるか）
+    3. 「人間が触る AI ツール」vs「Sato-Scope に組み込む AI 機能」の比較
+    4. 各ツールの「AI で代替できる作業」「AI で増幅できる作業」の整理
+  - 納期: 1〜2日。納品先 `workspace/output/deliverables/T-20260520-003/`（既存4本は v1 として保存、新規 v2 として AI 連携観点を追加）
+- 2026-05-25 サトル v2 納品（AI 内蔵13本＋既存4本＝計17本）。社長レビュー＋方針確定（選択肢1）で軸A 調査は役割完了 → doing → done。
+  - 確定方針: Sato-Scope を仕入れ発見の中核（唯一の自社資産）に据える。外部 AI ツール（ERESA 等）は別レイヤーの補完で今は保留。
+  - 重要訂正: ERESA と Sato-Scope は代替でなく補完（`05_issues-for-decision.md` に訂正ボックス追記済）。
+  - 残課題は法務 ToS 確認（T-22-005/003）に引き継ぎ。
 
 ## 成果物
 

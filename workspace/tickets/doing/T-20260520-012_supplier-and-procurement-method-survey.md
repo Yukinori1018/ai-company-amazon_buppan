@@ -1,11 +1,11 @@
 ---
 ticket_id: T-20260520-012
 title: 仕入れ先・仕入れ方法の網羅調査（軸B 先行調査）
-status: todo
+status: doing
 assignee: researcher
 priority: high
 created_at: 2026-05-20
-updated_at: 2026-05-20
+updated_at: 2026-05-25
 requires_approval: false
 labels: [research, procurement, axis-b]
 parent_ticket: T-20260520-004
@@ -41,3 +41,4 @@ todo 起票。次セッション冒頭でサトル（リサーチャー）に発
 ## ログ
 
 - 2026-05-20 todo 起票（社長依頼受領後、ただちに起票＝CLAUDE.md §3 鉄則 #2 遵守）
+- 2026-05-25 社長「承認不要なものは全て進めて」＋軸B 最優先方針 → todo → doing。サトル発注（§4.2）

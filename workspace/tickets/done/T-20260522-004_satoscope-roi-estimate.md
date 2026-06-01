@@ -1,11 +1,11 @@
 ---
 ticket_id: T-20260522-004
 title: Sato-Scope 開発・運用コスト ROI 試算
-status: todo
+status: done
 assignee: accounting
 priority: medium
 created_at: 2026-05-22
-updated_at: 2026-05-22
+updated_at: 2026-05-25
 requires_approval: false
 labels: [accounting, sato-scope, roi]
 related_tickets: [T-20260521-005]
@@ -43,8 +43,10 @@ parent_ticket: T-20260521-005
 
 ## 現在地
 
-todo。ハジメ発注待ち。次セッションで発注。
+doing。社長 GO（2026-05-25）。ハジメ発注済。サトル v2 調査で判明した代替 SaaS（ERESA AI ¥5,980/月）との比較を試算に含めること。
 
 ## ログ
 
 - 2026-05-22 起票（Phase 1 着手と並行、Phase 2 着手前の意思決定材料として）
+- 2026-05-25 社長 GO → todo → doing。ハジメ発注。比較対象に ERESA AI（¥5,980/月、AI 統合済）を追加
+- 2026-05-25 ハジメ納品 → doing → done。中央シナリオで案A（自社開発・Keepa のみ・SP-API 無料）が回収最有利（開発費回収1.0ヶ月、1年ROI +118%）。撤退ライン=月商4.1万割れで赤字／半年で月商5万下回り継続なら撤退。論点=軸B 0周のため販売実行力が支配変数、ERESA 無料試用が入口リスク最小。成果物: `workspace/output/deliverables/T-20260522-004/`

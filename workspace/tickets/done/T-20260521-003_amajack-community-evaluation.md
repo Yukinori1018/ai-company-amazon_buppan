@@ -1,11 +1,11 @@
 ---
 ticket_id: T-20260521-003
 title: Ama-Jack（カズさん開発）アプリ + 無料コミュニティ 評価
-status: doing
+status: done
 assignee: secretary
 priority: high
 created_at: 2026-05-20
-updated_at: 2026-05-21
+updated_at: 2026-05-25
 requires_approval: true
 labels: [research, tooling, evaluation, urgent]
 deadline: 2026-05-23
@@ -60,3 +60,4 @@ deadline: 2026-05-23
 - 2026-05-21 社長提供の追加情報（カズ＋みかみ／150万円／ADD×ONE PROJECT／Yahoo スクレイピング）→ `owner-supplementary-info.md` に整理。3者判定は強化方向、秘書推奨 B 維持
 - 2026-05-21 社長提供 YouTube 情報: カズくん = 物販ONE @kazu-keio（慶應卒・年商10億円）→ Amazak（株式会社JACKALL）とは **別組織** の可能性高
 - 2026-05-21 **社長最終判断: アマジャック（Amazak）に一度無料入会する**。金銭発生時点で即退会の方針。秘書側は防御策の徹底＋30日/60日後の再点検チケット起票で対応 → 本チケットは社長判断完了で **モニタリング相** へ移行
+- 2026-05-25 社長判断完了済・再点検チケット（T-20260521-006 30日後／T-20260521-007 60日後）起票済のため、本チケットは doing → done。以後の監視は再点検チケットで継続。
