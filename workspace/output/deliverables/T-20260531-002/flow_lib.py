@@ -6,7 +6,18 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import FancyBboxPatch, FancyArrowPatch
 from matplotlib import font_manager as fm
 
-FONT = "/usr/share/fonts/opentype/ipafont-gothic/ipag.ttf"
+import os as _os
+
+# OS 横断でゴシック系日本語フォントを自動選択（macOS=ヒラギノ W3 / Linux=IPAGothic）
+_FONT_CANDIDATES = [
+    "/System/Library/Fonts/ヒラギノ角ゴシック W3.ttc",          # macOS（最優先・上品）
+    _os.path.expanduser("~/Library/Fonts/GenShinGothic-Heavy.ttf"),  # macOS 代替
+    "/usr/share/fonts/opentype/ipafont-gothic/ipag.ttf",        # Linux（IPAGothic）
+    "/Library/Fonts/Arial Unicode.ttf",                          # 最終フォールバック
+]
+FONT = next((c for c in _FONT_CANDIDATES if _os.path.exists(c)), None)
+if FONT is None:
+    raise FileNotFoundError("日本語フォントが見つかりません: " + ", ".join(_FONT_CANDIDATES))
 FP = fm.FontProperties(fname=FONT)
 fm.fontManager.addfont(FONT)
 plt.rcParams["font.family"] = FP.get_name()

@@ -5,8 +5,18 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.patches import FancyBboxPatch, FancyArrowPatch
 from matplotlib import font_manager as fm
+import os as _os
 
-FONT = "/usr/share/fonts/opentype/ipafont-gothic/ipag.ttf"
+# OS 横断で日本語フォントを自動選択（macOS=ヒラギノ W3 / Linux=IPAGothic）
+_FONT_CANDIDATES = [
+    "/System/Library/Fonts/ヒラギノ角ゴシック W3.ttc",
+    _os.path.expanduser("~/Library/Fonts/GenShinGothic-Heavy.ttf"),
+    "/usr/share/fonts/opentype/ipafont-gothic/ipag.ttf",
+    "/Library/Fonts/Arial Unicode.ttf",
+]
+FONT = next((c for c in _FONT_CANDIDATES if _os.path.exists(c)), None)
+if FONT is None:
+    raise FileNotFoundError("日本語フォントが見つかりません")
 fp = fm.FontProperties(fname=FONT)
 plt.rcParams["font.family"] = fp.get_name()
 fm.fontManager.addfont(FONT)
@@ -171,6 +181,6 @@ ax.text(14.4, 0.2, "T-20260531-002 / 秘書カズヨ / 2026-05-29",
         ha="right", fontsize=8, fontproperties=fp, color="#999")
 
 plt.tight_layout()
-out = "workspace/output/deliverables/T-20260531-002/01_overview-flow.png"
+out = _os.path.join(_os.path.dirname(__file__), "01_overview-flow.png")
 plt.savefig(out, dpi=140, bbox_inches="tight", facecolor="white")
 print("saved", out)
