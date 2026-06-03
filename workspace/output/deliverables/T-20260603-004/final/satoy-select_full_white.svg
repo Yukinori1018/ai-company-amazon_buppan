@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 260" width="640" height="260" font-family="'Helvetica Neue',Arial,sans-serif">
+  <rect width="640" height="260" fill="#ffffff"/>
+  <g transform="translate(130,130)">
+    <circle r="88" fill="none" stroke="#1B2A4A" stroke-width="5"/>
+    <circle r="76" fill="none" stroke="#C9A24B" stroke-width="2"/>
+    <path d="M-34 4 L-10 30 L40 -32" fill="none" stroke="#C9A24B" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="0" y="62" text-anchor="middle" font-size="13" letter-spacing="5" fill="#1B2A4A" font-weight="600">SELECT</text>
+  </g>
+  <g transform="translate(250,0)">
+    <text x="0" y="120" font-size="68" font-weight="700" fill="#1B2A4A" letter-spacing="-1">Satoy</text>
+    <text x="4" y="158" font-size="24" font-weight="500" fill="#C9A24B" letter-spacing="12">SELECT</text>
+    <line x1="6" y1="178" x2="300" y2="178" stroke="#1B2A4A" stroke-width="2"/>
+    <text x="6" y="200" font-size="13" fill="#6B7280" letter-spacing="2">CURATED FINDS</text>
+  </g>
+</svg>
