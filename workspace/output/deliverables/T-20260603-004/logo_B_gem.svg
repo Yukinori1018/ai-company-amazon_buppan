@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 260" width="640" height="260" font-family="'Helvetica Neue',Arial,sans-serif">
+  <rect width="640" height="260" fill="#ffffff"/>
+  <!-- Discovered gem = ニッチ良品の発掘 -->
+  <g transform="translate(120,90)">
+    <polygon points="0,-46 40,-16 24,46 -24,46 -40,-16" fill="#0E7C7B"/>
+    <polygon points="0,-46 40,-16 0,-16" fill="#13A89F"/>
+    <polygon points="0,-46 -40,-16 0,-16" fill="#0B5E5D"/>
+    <polygon points="-40,-16 0,-16 -24,46" fill="#0E7C7B"/>
+    <polygon points="40,-16 0,-16 24,46" fill="#10918E"/>
+    <polygon points="-24,46 24,46 0,-16" fill="#13A89F"/>
+    <!-- sparkle -->
+    <path d="M52 -54 l4 12 12 4 -12 4 -4 12 -4 -12 -12 -4 12 -4 z" fill="#E0B43A"/>
+  </g>
+  <g transform="translate(220,0)">
+    <text x="0" y="118" font-size="66" font-weight="800" fill="#13283A" letter-spacing="-2">Satoy</text>
+    <text x="4" y="156" font-size="22" font-weight="500" fill="#0E7C7B" letter-spacing="14">SELECT</text>
+    <text x="6" y="190" font-size="13" fill="#6B7280" letter-spacing="2">NICHE GOODS, WELL CHOSEN</text>
+  </g>
+</svg>

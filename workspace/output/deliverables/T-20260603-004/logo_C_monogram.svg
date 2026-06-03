@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 260" width="640" height="260" font-family="'Helvetica Neue',Arial,sans-serif">
+  <rect width="640" height="260" fill="#ffffff"/>
+  <!-- Monogram S in rounded square badge -->
+  <g transform="translate(50,50)">
+    <rect x="0" y="0" width="160" height="160" rx="36" fill="#1F1F1F"/>
+    <text x="80" y="118" text-anchor="middle" font-size="120" font-weight="800" fill="#ffffff" font-style="italic">S</text>
+    <!-- gold underline accent -->
+    <rect x="44" y="128" width="72" height="6" rx="3" fill="#C9A24B"/>
+  </g>
+  <g transform="translate(250,0)">
+    <text x="0" y="122" font-size="62" font-weight="700" fill="#1F1F1F" letter-spacing="-1">Satoy</text>
+    <text x="4" y="160" font-size="23" font-weight="400" fill="#1F1F1F" letter-spacing="13">SELECT</text>
+    <rect x="6" y="176" width="40" height="4" fill="#C9A24B"/>
+  </g>
+</svg>
