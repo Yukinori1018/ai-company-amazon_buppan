@@ -14,3 +14,8 @@ workspace/output/agent_output/**
 
 # 成果物カタログ同期の実設定（Web App URL・共有トークンを含むため除外。.example はコミット）
 scripts/catalog/.catalog_sync.env
+
+# APIキー等の秘密情報（全 .env を除外。.env.example はコミット）
+.env
+**/.env
+!**/.env.example
