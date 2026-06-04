@@ -1,11 +1,12 @@
 ---
 ticket_id: T-20260603-005
 title: 初回フル外注の実務設計（FBA納品代行業者調査＋卸→代行→FBA フロー＋損益織り込み）
-status: waiting
+status: done
 assignee: researcher
 priority: high
 created_at: 2026-06-03
 updated_at: 2026-06-03
+completed_at: 2026-06-03
 requires_approval: false
 parent_ticket: T-20260520-004
 labels: [outsourcing, fba, prep-center, research, axis-b]
@@ -42,3 +43,5 @@ next_check_at: 2026-06-04
 ## 社長判断待ち
 
 初回フル外注の実務設計を確認のうえ、**「少量でも割高を許容してフル外注を貫く」か「フル外注を活かすため初回からある程度の数量で小さく本番にする(大口切替も視野)」か**を判断。詳細フロー＝`deliverables/T-20260603-005/full-outsourcing-design.html`。
+
+- 2026-06-03 **社長判断：案②（小さく本番で数量確保）を採用**。本チケットは判断材料として役目完了 → **done**。実行は親 T-20260520-004 で継続（ERESA試用・NETSEA登録・代行業者相見積り・最初の商品選定）。
