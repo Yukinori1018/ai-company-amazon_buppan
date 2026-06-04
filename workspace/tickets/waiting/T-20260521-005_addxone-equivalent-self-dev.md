@@ -106,7 +106,7 @@ A/B/C 判断後に Phase 1（API 接続検証）着手。Phase 1 時点で Keepa
     `code/calc/profit.py`（UI分離の純ロジック）/`code/calc/fees.py`（料率・FBA定数表＝要・経理検証マーク付）/`code/calc/test_profit.py`（pytest 9件オールパス）/`code/adapters/keepa.py`（第2層スタブ）/`app.py`（Streamlit単品＋複数判定UI）/README/requirements.txt。deliverables/T-20260521-005/code/ に確定保存。
     動作確認例: 卸1,000円→Amazon2,980円(ホーム&キッチン/標準1/送料200)=純利益849円・利益率28.5%・判定「原石」🟢。
   - 第1層はNETSEA卸×ERESA手動参照と即補完可能（社長が数字を入れれば仕入可否を判定）。月額0円。
-  - 経理ハジメに料率/FBA手数料の検証を並行発注（§4.2 自律）。
+  - 経理ハジメに料率/FBA手数料の検証を並行発注（§4.2 自律）→ **符号反転しうる誤りを発見**（toys/sports料率15%→10%・最低手数料30円欠落・FBA 2025/4改定値未反映）。レポート=`05_fee-verification-by-accounting.md`。タカシが確定分を即修正（fees.py）→ **pytest 17件パス・判定符号は不変**（FBA値下げ分だけ利益改善: 卸1,000→Amazon2,980の純利益 849→965円）。health/apparel/food料率・large_1区分は **要・社長Seller Central確認**マークで残置。
   - **第2層=Amazon自動取得（AIが自動で儲かる商品を探す）はKeepa €49/月が必要 → §4.1。** 2026-05-22に一度承認→05-27にERESA主軸へ転換した経緯あり。今回の「自動探索」依頼で再判断が必要。A/B/Cで社長に提示。
 
 ## 社長判断待ち（2026-06-04 更新）
