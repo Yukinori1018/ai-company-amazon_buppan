@@ -6,9 +6,10 @@
 設計方針（タカシ）:
 - 計算もデータ取得も discovery / calc / adapters に任せ、このファイルは「表示」だけ。
 - 02_mockup.html の質感（紺ヘッダ・サマリーカード・利益で色分けの表）を踏襲。
-- サンプルデータで動いている間は画面上部に黄色バナーで「サンプル」と明示する
-  （本物の利益数字と誤認させないため＝データの正直さ）。
-- キー（YAHOO_APP_ID / KEEPA_API_KEY）が入ると自動で本番接続に切り替わる旨も表示。
+- キー（YAHOO_APP_ID / KEEPA_API_KEY）の有無でデータソースを自動判定する。
+  キーが無いときだけ「サンプル」バナー/列を出し、本番（Keepa/Yahoo実データ）接続時は
+  サンプル系の文言を一切出さない（＝データの正直さ・本番中の矛盾表現を排除）。
+- 本番でも残る正当な注意（FBAサイズ推定・月販推定・相場変動）は本番時も表示する。
 """
 
 import os
@@ -111,7 +112,8 @@ with st.sidebar:
 
     query = ""
     if mode.startswith("(い)"):
-        query = st.text_input("仕入れキーワード（空欄=サンプル全件）", "")
+        _q_help = "" if keepa_live else "（空欄=サンプル全件）"
+        query = st.text_input(f"仕入れキーワード{_q_help}", "")
     assumed = 0.5
     if mode.startswith("(あ)"):
         assumed = st.slider("想定原価率（仕入元未特定時の仮置き）", 0.2, 0.9, 0.5, 0.05)
@@ -222,6 +224,10 @@ if not rows:
     else:
         st.info("条件に合う候補がありませんでした。プリセットを『広く拾う』にすると増えます。")
 else:
+    def _amazon_url(asin: str) -> str:
+        # ASIN がある行だけ Amazon 商品ページへのリンクを張る（空なら "-"）。
+        return f"https://www.amazon.co.jp/dp/{asin}" if asin else "-"
+
     df = pd.DataFrame(
         [
             {
@@ -239,11 +245,16 @@ else:
                 "突合": r.match_status,
                 "カテゴリ": r.category_label,
                 "仕入元": r.supplier_url,
+                "Amazon": _amazon_url(r.asin),
+                # 「サンプル」列は本番（Keepa実データ）時は出さない。下で keepa_live により列ごと落とす。
                 "サンプル": "★" if r.is_sample else "",
             }
             for r in rows
         ]
     )
+    # 本番（Keepa実データ）接続時は「サンプル」列ごと表示しない（矛盾表現の排除）。
+    if keepa_live and "サンプル" in df.columns:
+        df = df.drop(columns=["サンプル"])
 
     # 並べ替え UI（既定は純利益降順 = パイプラインの出力順）
     sort_col = st.selectbox(
@@ -262,9 +273,11 @@ else:
         height=480,
         column_config={
             "仕入元": st.column_config.LinkColumn("仕入元", display_text="開く"),
+            "Amazon": st.column_config.LinkColumn("Amazon", display_text="Amazonで開く"),
         },
     )
     st.caption(
         "判定『原石』=利益率15%以上かつ純利益500円以上 / 突合『Amazon起点(仕入元未特定)』"
         "の仕入値は想定原価率での仮置きです。"
+        "各行は仕入元(Yahoo)と販売先(Amazon)の両リンクから現物を確認できます。"
     )
