@@ -135,7 +135,7 @@ class YahooShoppingClient:
 
         params = {
             "appid": self.app_id,
-            "results": min(results, 50),  # 1回の上限は50件（公式）
+            "results": min(results, 20),  # Yahoo V3 itemSearch の1回上限は20件（公式）
         }
         if query:
             params["query"] = query
