@@ -5,8 +5,8 @@ status: waiting
 assignee: it_engineer
 priority: high
 created_at: 2026-05-21
-updated_at: 2026-06-01
-next_check_at: 2026-06-02
+updated_at: 2026-06-04
+next_check_at: 2026-06-05
 requires_approval: true
 labels: [dev, research, mvp, tooling]
 related_tickets: [T-20260520-006]
@@ -101,7 +101,19 @@ A/B/C 判断後に Phase 1（API 接続検証）着手。Phase 1 時点で Keepa
 - 2026-05-27 **B案ハイブリッド方針転換**: Phase 2 自社開発を中止し ERESA PRO 主軸へ（T-20260527-001/002 起票）。Sato-Scope は独自2軸のみ Lite 縮退
 - 2026-05-29 waiting へ移動（新基準＝社長タスク一覧化）
 - 2026-06-01 ブランチ統合（resume-vDg2L）でログ統合。next_check_at を 2026-06-02 に更新
+- 2026-06-04 **社長依頼で再起動**: 「Amazonで利益が出る商品をAIで調べるツール/システムを開発してほしい」。同日 NETSEA で10社以上の卸取引承認を取得（軸B実弾化）。ツールを2層に再整理し doing へ。
+  - **第1層=利益判定エンジン（無料・承認不要）をタカシが新規実装＝本日完成**:
+    `code/calc/profit.py`（UI分離の純ロジック）/`code/calc/fees.py`（料率・FBA定数表＝要・経理検証マーク付）/`code/calc/test_profit.py`（pytest 9件オールパス）/`code/adapters/keepa.py`（第2層スタブ）/`app.py`（Streamlit単品＋複数判定UI）/README/requirements.txt。deliverables/T-20260521-005/code/ に確定保存。
+    動作確認例: 卸1,000円→Amazon2,980円(ホーム&キッチン/標準1/送料200)=純利益849円・利益率28.5%・判定「原石」🟢。
+  - 第1層はNETSEA卸×ERESA手動参照と即補完可能（社長が数字を入れれば仕入可否を判定）。月額0円。
+  - 経理ハジメに料率/FBA手数料の検証を並行発注（§4.2 自律）。
+  - **第2層=Amazon自動取得（AIが自動で儲かる商品を探す）はKeepa €49/月が必要 → §4.1。** 2026-05-22に一度承認→05-27にERESA主軸へ転換した経緯あり。今回の「自動探索」依頼で再判断が必要。A/B/Cで社長に提示。
 
-## 社長判断待ち
+## 社長判断待ち（2026-06-04 更新）
 
-**Phase 2 の方針は B案（ERESA PRO 主軸）へ転換済み。** 関連の社長タスクは T-20260527-001（ERESA PRO 7日試用→契約・§4.1）に集約。本チケットは Lite 縮退分の整理待ち。
+**① 第1層ツールのレビュー**: `deliverables/T-20260521-005/code/` の利益判定エンジン。社長PCで `pip install -r requirements.txt && streamlit run app.py` で起動。NETSEA承認卸の商品で試せます。
+**② 第2層「自動探索」の方向性 A/B/C**:
+- **A（推奨・低コスト先行）**: 当面は第1層（手動入力）×ERESA PROで運用。自動化は保留。月額=ERESAのみ。
+- **B（自動化フル）**: Keepa API €49/月を再承認し第2層を実装。「ASIN/JAN入力→Amazon売値・月販・価格推移を自動取得→一括判定」を実現。月額≒ERESA+Keepa。
+- **C**: ERESA契約を見送り、Keepa自社開発に一本化（独自資産化）。
+> 推奨A: まず手動運用で「利益が出る型」を体感→必要なら自動化Bへ。実弾(NETSEA)が今日揃ったので、まず1商品を判定して感触を得るのが最速。

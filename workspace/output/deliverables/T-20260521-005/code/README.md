@@ -1,89 +1,145 @@
-# Sato-Scope Phase 1 コードベース
+# Sato-Scope Lite — Amazon物販 利益判定エンジン（第1層 MVP）
 
-社長専用 Amazon 物販リサーチツール v0.2 の実装。Phase 1 では **API 接続前にできる最大限**（計算ロジック・FastAPI スケルトン・モックアダプタ・テスト）を構築しています。
+社長専用のローカルツールです。卸価格と Amazon 売値などを入力すると、純利益・利益率・
+ROI・損益分岐売値・判定（**原石 / あやしい / はずれ**）を即座に色付き表示します。
 
-## ディレクトリ構成
+NETSEA 等で承認済みの卸から仕入れた商品が「Amazonで売って利益が出るか」を、
+手入力ベースで素早く判定するのが目的です。
+
+---
+
+## セットアップ
+
+```bash
+# 1. このディレクトリ（code/）へ移動
+cd code
+
+# 2. 依存ライブラリをインストール（仮想環境推奨）
+python3 -m venv .venv && source .venv/bin/activate   # 任意
+pip install -r requirements.txt
+
+# 3. Web UI を起動
+streamlit run app.py
+```
+
+ブラウザが自動で開きます（既定 http://localhost:8501）。
+
+### テストの実行
+
+```bash
+cd code
+python -m pytest          # ユニットテスト（現在 9 件）
+python -m calc.profit     # 計算ロジックのサンプル出力（CLI）
+```
+
+---
+
+## 構成
 
 ```
 code/
-├── app/
-│   ├── __init__.py
-│   ├── main.py                  # FastAPI アプリ（/search, /health）
-│   ├── calc/
-│   │   ├── profit.py            # FBA / 自己発送 / MSS 真の利益計算（差別化の核）
-│   │   └── score.py             # おすすめスコア + 🟢🟡🔴 判定
-│   ├── adapters/
-│   │   ├── keepa.py             # Keepa API アダプタ（モック付き）
-│   │   ├── rakuten.py           # 楽天市場 API アダプタ（モック付き）
-│   │   └── yahoo.py             # Yahoo!ショッピング API アダプタ（モック付き）
-│   ├── compliance/
-│   │   └── brand_warnings.py    # コンプラ警告マスタ（Sony/Apple/Nike 等）
-│   └── static/
-│       └── index.html           # モック HTML（v0.2）
-├── tests/
-│   └── test_profit.py           # 利益計算ユニットテスト
+├── app.py                  # Streamlit Web UI（画面だけ。計算はしない）
 ├── requirements.txt
-├── .env.example
-└── README.md
+├── README.md               # このファイル
+├── calc/                   # ★第1層：利益計算の純ロジック（UI非依存・テスト可能）
+│   ├── profit.py           #   利益計算エンジン本体
+│   ├── fees.py             #   Amazon料率・FBA手数料の定数表（要・経理検証）
+│   └── test_profit.py      #   ユニットテスト（pytest）
+└── adapters/               # ★第2層：外部APIラッパー（差し替え可能）
+    └── keepa.py            #   Keepa連携スタブ（実装はTODO。課金承認後に埋める）
 ```
 
-## セットアップ（社長 PC で動かす手順）
+### 設計の考え方
 
-### 1. 必要なもの
-- Python 3.10 以降（PC に入っているはず。`python3 --version` で確認）
-- 1コマンドで動くので難しくありません
+- **計算ロジックは UI から完全分離**（`calc/profit.py`）。Streamlit を使わなくても、
+  CLI からも将来の第2層からも同じ計算が呼べます。
+- **数値は1ファイルに集約**（`calc/fees.py`）。料率改定時はここだけ直せば済みます。
+- **外部APIはラッパー越し**（`adapters/keepa.py`）。Keepa にロックインされない設計。
 
-### 2. 仮想環境作成 + 依存インストール
-```bash
-cd ~/Claude\ Code/ai-company-amazon_buppan/workspace/output/deliverables/T-20260521-005/code
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
+---
+
+## 計算ロジック（データは正直であれ）
+
+```
+純利益 = Amazon売値 − (Amazon販売手数料 + FBA手数料 + 卸仕入価格(税込) + 仕入送料 + その他経費)
+利益率 = 純利益 / Amazon売値
+ROI    = 純利益 / 仕入総原価（仕入税込 + 仕入送料 + その他経費）
 ```
 
-### 3. 環境変数設定（モックモードならスキップ可）
-```bash
-cp .env.example .env
-# .env を編集。API キー未設定の場合は自動的にモックモードで動きます
-```
+- **Amazon販売手数料** = 税込売値 × カテゴリ別料率（カテゴリにより最低手数料あり）
+- **FBA配送代行手数料** = サイズ区分別の固定額（自己発送なら0円）
+- **損益分岐売値** = この売値で売れば純利益が0になる価格
 
-### 4. サーバ起動
-```bash
-uvicorn app.main:app --reload
-```
+### 判定フラグ（閾値は UI のスライダーで調整可）
 
-→ ブラウザで http://localhost:8000/ を開くとモック画面が表示されます。
-→ http://localhost:8000/search でバックエンドの JSON が見られます。
-→ http://localhost:8000/health で稼働状況を確認できます。
+| 判定 | 条件 |
+|------|------|
+| 🟢 原石 | 利益率 **15%以上** かつ 純利益 **500円以上** |
+| 🟡 あやしい | 黒字だが上記の閾値に届かない |
+| 🔴 はずれ | 赤字（純利益0以下） |
 
-### 5. テスト実行
-```bash
-pytest -v
-```
+### 消費税の扱い
 
-## Phase 1 で実装済みのもの
+- 卸価格は **税込原価** として計算（税抜入力時は10%換算）。
+- Amazon 販売手数料は **税込売値** ベース（Amazonの算定方式に合わせる）。
+- 仕入消費税の仕入税額控除（インボイス）は**未実装**。課税/免税事業者で実質利益が
+  変わる点は経理ハジメの領域です。
 
-- ✅ FBA / 自己発送 / MSS の3パターン真の利益計算（差別化の核）
-- ✅ 利益額・利益率・月販・Drop30 を組み合わせた独自おすすめスコア
-- ✅ 🟢🟡🔴 判定ロジック
-- ✅ コンプラ警告マスタ（Sony・Panasonic・Apple・Nike 等）
-- ✅ 楽天・Yahoo! の最安値選択ロジック
-- ✅ ポイント込み実質価格計算
-- ✅ FastAPI による `/search` `/health` エンドポイント
-- ✅ モックアダプタ（8件サンプル）で**全機能が動く**
-- ✅ ユニットテスト
+---
 
-## Phase 2 で実装予定（社長 GO 後）
+## 月額ランニングコスト
 
-- ⏳ Keepa API 実接続（**€49/月 課金 §4.1 承認後**）
-- ⏳ 楽天市場 API 実接続（無料・社長 ApplicationID 登録）
-- ⏳ Yahoo!ショッピング API 実接続（無料・社長 ApplicationID 登録）
-- ⏳ SQLite で ★お気に入りの永続化
-- ⏳ Keepa Product Finder の高度クエリ（カテゴリ・売れ筋）
+| 項目 | コスト |
+|------|--------|
+| **第1層（この MVP）** | **0円**（外部API一切なし・ローカル実行） |
+| 第2層（Keepa連携・将来） | 約 €49/月（≒9,000円）※社長承認 §4.1 が必要 |
 
-## §4.1 承認が必要な事項
+---
 
-1. **Keepa API 月額 €49** の有料契約（カード決済）
-2. 楽天/Yahoo! の ApplicationID 登録（無料だが社長個人アカウント連動）
+## ⚠️ 料率・送料の検証について（重要）
 
-Phase 2 着手前に改めて承認を取り直します。
+`calc/fees.py` の料率・FBA手数料は **2026年時点の Amazon.co.jp 公開料率の代表値**です。
+**経理ハジメの検証前**の暫定値であり、Amazon の改定で変わる可能性があります。
+ファイル内の「⚠️ 経理ハジメ検証ポイント」コメントを参照し、本番判断の前に
+Seller Central の最新料金表と必ず突き合わせてください。
+
+主な検証対象:
+- カテゴリ別料率（特に段階料率になりうる「ホーム&キッチン」「食品」等）
+- カテゴリ別の最低手数料の有無・金額
+- FBAサイズ区分別の固定額（改定の影響を最も受けやすい）
+- 軽減税率（食品8%）対象の扱い
+
+---
+
+## このMVPで作らないもの（スコープ外）
+
+YAGNI（今いらないものは作らない）の方針で、以下は意図的に未実装です。
+
+- **Keepa等の有料API実呼び出し** — 課金は §4.1 承認待ち。今はスタブのみ。
+- **NETSEAからの自動データ取得** — スクレイピングは ToS 違反のため禁止。
+  仕入データは手入力（将来は公式手段があれば検討）。
+- **認証・デプロイ・DB** — 社長1人専用・ローカル実行で十分。
+- **在庫保管手数料・長期保管手数料・返品処理手数料の自動計上** — 必要なら
+  「その他経費」欄に手入力。
+
+---
+
+## 第2層（Keepa連携）の拡張ポイント
+
+Keepa 課金（§4.1）の承認が下りたら、以下の手順で第2層を有効化します。
+
+1. `requirements.txt` の `keepa>=1.3` のコメントを外して `pip install`。
+2. 環境変数に APIキーを設定（**コードに書かない**）:
+   ```bash
+   export KEEPA_API_KEY="（取得したキー）"
+   ```
+3. `adapters/keepa.py` の `KeepaClient.fetch_product()` の TODO を実装
+   （Keepaレスポンス → `KeepaProduct` への正規化、category/size のマッピング）。
+4. `app.py` の入力欄に「ASINを入れたら Amazon 売値・カテゴリ・サイズを自動取得」
+   ボタンを追加。`product_to_profit_input()` で `ProfitInput` に橋渡し済み。
+
+第1層の `calc/` は一切変更不要です（外部APIを知らない設計のため）。
+
+---
+
+*開発: IT エンジニア タカシ ／ チケット T-20260521-005*
