@@ -148,6 +148,44 @@ PRESETS: dict[str, DiscoveryPreset] = {
 DEFAULT_PRESET_KEY = "hunting_beginner"
 
 
+# =============================================================================
+# (あ) Amazon起点：Keepa Best Sellers で売れ筋を引くカテゴリ（co.jp ルートカテゴリID）
+# =============================================================================
+# Keepa の co.jp ルートカテゴリID（domain=5）。bestsellers の category 引数に渡す。
+# ※ これらは Amazon公開ブラウズノードではなく **Keepa /category で実取得した有効ID**
+#    （2026-06-05 タカシが実 API で検証。Amazonブラウズノードとは一致しない値がある）。
+# 初心者が扱いやすい安全カテゴリ（無在庫/FBA向き・規制が比較的緩い）を厳選。
+@dataclass
+class AmazonCategory:
+    """Amazon起点探索の対象カテゴリ1件。"""
+
+    key: str
+    label: str
+    category_id: int
+
+
+AMAZON_CATEGORIES: dict[str, AmazonCategory] = {
+    "home_kitchen": AmazonCategory("home_kitchen", "ホーム＆キッチン", 3828871),
+    "office": AmazonCategory("office", "文房具・オフィス用品", 86731051),
+    "pet": AmazonCategory("pet", "ペット用品", 2127212051),
+    "toys": AmazonCategory("toys", "おもちゃ", 13299531),
+    "sports": AmazonCategory("sports", "スポーツ＆アウトドア", 14304371),
+}
+
+# (あ) 既定カテゴリ（初心者向けに最も無難なホーム＆キッチン）。
+DEFAULT_AMAZON_CATEGORY_KEY = "home_kitchen"
+
+
+def amazon_category_choices() -> list[tuple[str, str]]:
+    """UI のカテゴリ選択用 (key, label) リスト。"""
+    return [(c.key, c.label) for c in AMAZON_CATEGORIES.values()]
+
+
+def get_amazon_category(key: str) -> AmazonCategory:
+    """キーから Amazon カテゴリを返す。未知なら既定（ホーム＆キッチン）。"""
+    return AMAZON_CATEGORIES.get(key, AMAZON_CATEGORIES[DEFAULT_AMAZON_CATEGORY_KEY])
+
+
 def get_preset(key: str) -> DiscoveryPreset:
     """キーからプリセットを返す。未知なら既定（堅実）にフォールバック。"""
     return PRESETS.get(key, PRESETS[DEFAULT_PRESET_KEY])

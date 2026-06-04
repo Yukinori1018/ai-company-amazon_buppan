@@ -20,7 +20,13 @@ import streamlit as st
 from adapters.amazon_data import KeepaBackend, SampleBackend, get_backend
 from adapters.yahoo_shopping import YahooShoppingClient
 from discovery import pipeline
-from discovery.presets import PRESETS, get_preset, preset_choices
+from discovery.presets import (
+    PRESETS,
+    amazon_category_choices,
+    get_amazon_category,
+    get_preset,
+    preset_choices,
+)
 
 st.set_page_config(page_title="Sato-Scope Discovery", layout="wide")
 
@@ -114,9 +120,30 @@ with st.sidebar:
     if mode.startswith("(い)"):
         _q_help = "" if keepa_live else "（空欄=サンプル全件）"
         query = st.text_input(f"仕入れキーワード{_q_help}", "")
+
+    # (あ) Amazon起点：キーワード不要。カテゴリの売れ筋から原石を探す。
+    amazon_cat_key = "home_kitchen"
+    use_assumed = False
     assumed = 0.5
     if mode.startswith("(あ)"):
-        assumed = st.slider("想定原価率（仕入元未特定時の仮置き）", 0.2, 0.9, 0.5, 0.05)
+        amazon_cat_key = st.selectbox(
+            "探索カテゴリ（売れ筋を自動収集）",
+            options=[k for k, _ in amazon_category_choices()],
+            format_func=lambda k: get_amazon_category(k).label,
+        )
+        if keepa_live:
+            st.info(
+                "🔎 キーワード不要。選んだカテゴリの **Amazon売れ筋ランキング** から最大10商品を"
+                "自動収集し、Yahooで仕入元を当てて利益化します。"
+                "1回の探索で **Keepaトークンを約20〜30消費**します（詳細10件＋売れ筋取得）。"
+            )
+        use_assumed = st.checkbox(
+            "仕入元が見つからない商品も『想定原価率』で仮計算する（学習用・正直でない）",
+            value=False,
+            help="OFF（推奨）: 仕入元が無い商品は利益をでっち上げず『候補保留』にします。",
+        )
+        if use_assumed:
+            assumed = st.slider("想定原価率（仮置き）", 0.2, 0.9, 0.5, 0.05)
 
     run = st.button("リサーチ実行", type="primary")
 
@@ -133,10 +160,14 @@ def _build_rows():
         # 確認できるよう、生の Yahoo 候補も併せて保持する（正直なフォールバック）。
         raw = yahoo.search(query, results=30)
         return rows, raw
+    cat = get_amazon_category(amazon_cat_key)
     rows = pipeline.discover_from_amazon(
         preset_key=preset_key, amazon_backend=amazon,
-        assumed_cost_rate=assumed, yahoo_client=yahoo,
+        assumed_cost_rate=assumed, use_assumed_cost=use_assumed,
+        yahoo_client=yahoo, category_id=cat.category_id, max_asins=10,
     )
+    # 探索後の残トークンを表示用に session_state へ（Keepaバックエンドのみ）。
+    st.session_state["ss_tokens_left"] = getattr(amazon, "last_tokens_left", None)
     return rows, []
 
 
@@ -156,13 +187,21 @@ raw_yahoo = st.session_state.get("ss_raw_yahoo", [])
 # ----- サマリーカード -------------------------------------------------------
 if rows:
     gem = sum(1 for r in rows if r.verdict == "原石")
+    needs_check = sum(1 for r in rows if not r.qty_reliable)
     avg_margin = sum(r.margin_rate for r in rows) / len(rows)
     top = rows[0]
-    c1, c2, c3, c4 = st.columns(4)
+    c1, c2, c3, c4, c5 = st.columns(5)
     c1.metric("候補件数", f"{len(rows)} 件")
-    c2.metric("原石（推奨）", f"{gem} 件")
-    c3.metric("平均利益率", f"{avg_margin*100:.1f} %")
-    c4.metric("トップ純利益", f"{int(top.net_profit):,} 円")
+    c2.metric("原石🟢(数量一致)", f"{gem} 件")
+    c3.metric("⚠️数量要確認", f"{needs_check} 件")
+    c4.metric("平均利益率", f"{avg_margin*100:.1f} %")
+    c5.metric("トップ純利益", f"{int(top.net_profit):,} 円")
+
+# (あ)Amazon起点でKeepaを実消費したら、残トークンを正直に表示する。
+if mode.startswith("(あ)") and keepa_live:
+    _tok = st.session_state.get("ss_tokens_left")
+    if _tok is not None:
+        st.caption(f"🪙 Keepa残トークン: 約 {_tok} （この探索で詳細最大10件＋売れ筋取得を消費）")
 
 # ----- 生Yahoo候補（仕入れ元=本物。Amazon未突合でも実在を見せる）-------------
 if raw_yahoo and mode.startswith("(い)"):
@@ -228,10 +267,16 @@ else:
         # ASIN がある行だけ Amazon 商品ページへのリンクを張る（空なら "-"）。
         return f"https://www.amazon.co.jp/dp/{asin}" if asin else "-"
 
+    def _qty_label(q):
+        return "?" if q is None else q
+
     df = pd.DataFrame(
         [
             {
-                "商品名": r.name,
+                "仕入元商品名": r.name,
+                "Amazon商品名": r.amazon_name or "（取得不可）",
+                "数量フラグ": r.qty_flag or "—",
+                "数量(Yahoo/Amazon)": f"{_qty_label(r.supplier_qty)} / {_qty_label(r.amazon_qty)}",
                 "仕入値(円)": r.supplier_price,
                 "Amazon売値(円)": int(r.amazon_price),
                 "純利益(円)": int(r.net_profit),
@@ -264,7 +309,14 @@ else:
     df = df.sort_values(sort_col, ascending=ascending, na_position="last")
 
     def _hl(row):
-        color = "#e8f5e9" if row["純利益(円)"] > 0 else "#ffebee"
+        # 数量フラグが警告（⚠️）の行は黄色で「要・個数目視」を強調（偽の原石の温床）。
+        flag = str(row.get("数量フラグ", ""))
+        if flag.startswith("⚠️"):
+            color = "#fff8e1"  # 黄: 数量要確認/補正 → 原石にしない
+        elif row["純利益(円)"] > 0:
+            color = "#e8f5e9"  # 緑: 黒字かつ数量一致
+        else:
+            color = "#ffebee"  # 赤: 赤字
         return [f"background-color:{color}"] * len(row)
 
     st.dataframe(
@@ -277,7 +329,10 @@ else:
         },
     )
     st.caption(
-        "判定『原石』=利益率15%以上かつ純利益500円以上 / 突合『Amazon起点(仕入元未特定)』"
-        "の仕入値は想定原価率での仮置きです。"
-        "各行は仕入元(Yahoo)と販売先(Amazon)の両リンクから現物を確認できます。"
+        "🟢 判定『原石』=**数量が一致して信頼できる**行のうち利益率15%以上かつ純利益500円以上。 "
+        "🟡『数量フラグ』に⚠️が付く行は **仕入元の個数と販売先(Amazon)の個数が違う／不明** な行です。"
+        "『1個入りを仕入れて20個入りとして売る』ような誤突合を防ぐため、これらは原石にせず"
+        "『要確認』に降格しています（"
+        "数量補正の仕入値は1個あたり単価×Amazon個数での**推定**＝人間の目視照合が前提）。 "
+        "必ず『仕入元商品名』と『Amazon商品名』の個数を見比べ、両リンクから現物を確認してください。"
     )

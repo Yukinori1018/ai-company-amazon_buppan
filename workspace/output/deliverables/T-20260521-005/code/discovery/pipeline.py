@@ -21,6 +21,7 @@ from adapters.amazon_data import AmazonDataBackend, AmazonProduct, get_backend
 from adapters.yahoo_shopping import YahooItem, YahooShoppingClient
 from calc import profit
 from discovery.presets import DiscoveryPreset, get_preset
+from discovery.quantity import parse_quantity
 
 logger = logging.getLogger("discovery")
 
@@ -29,7 +30,7 @@ logger = logging.getLogger("discovery")
 class DiscoveryRow:
     """ランキング1行。UI のテーブル列とほぼ1対1。"""
 
-    name: str                    # 商品名（仕入元 or Amazon の名前）
+    name: str                    # 仕入元(Yahoo)側の商品名
     asin: str
     supplier_price: Optional[int]    # 仕入値（円・税込）。Amazon起点で仕入元未特定なら None
     amazon_price: float              # Amazon売値（円・税込）
@@ -40,8 +41,14 @@ class DiscoveryRow:
     sales_rank: Optional[int]
     offer_count: Optional[int]
     oos_rate_90d: Optional[float]
-    verdict: str                     # 原石/あやしい/はずれ
+    verdict: str                     # 原石/要確認/あやしい/はずれ
     match_status: str                # 突合状態（後述の定数）
+    amazon_name: str = ""            # Amazon(Keepa)側の商品名。Yahoo名と別保持（個数照合用）
+    supplier_qty: Optional[int] = None   # 仕入元側の推定入数（None=不明）
+    amazon_qty: Optional[int] = None     # Amazon側の推定入数（None=不明）
+    qty_flag: str = ""               # 数量フラグ（一致/補正/要確認の可視化ラベル）
+    qty_reliable: bool = False       # 入数が両側一致して信頼できるか（原石付与の前提）
+    supplier_price_raw: Optional[int] = None  # 数量補正前の生の仕入値（監査用）
     supplier_url: str = ""           # 仕入元リンク
     category_label: str = ""
     is_sample: bool = False          # サンプル由来か
@@ -54,6 +61,14 @@ MATCH_NO_JAN = "JAN無し(突合不可)"
 MATCH_NO_AMAZON = "Amazonに該当無し"
 MATCH_NO_PRICE = "Amazon価格取得不可"
 AMAZON_ONLY = "Amazon起点(仕入元未特定)"
+
+# 数量フラグの定数（UI とテストで共有）
+QTY_MATCH = "数量一致"                  # 両側判明し一致 → 信頼できる
+QTY_ADJUSTED = "⚠️数量補正"            # 両側判明し不一致 → per-unitで補正（推定・要確認）
+QTY_UNKNOWN = "⚠️数量要確認"           # 片側/両側が入数不明 → 1対1はリスク・要目視
+
+# 数量降格後の判定ラベル（profit.VERDICT_* とは別。数量起因の降格を明示）。
+VERDICT_NEEDS_CHECK = "要確認"
 
 
 # =============================================================================
@@ -116,12 +131,69 @@ def discover_from_supplier(
     return rows
 
 
+def _resolve_quantities(
+    supplier_price: int, supplier_name: str, amazon_name: str
+) -> dict:
+    """仕入元名・Amazon名の入数を推定し、安全な突合方針を決める（honesty-first）。
+
+    返り値 dict:
+      supplier_qty / amazon_qty : 推定入数（None=不明）
+      adjusted_price            : 入数を揃えた実質仕入値（補正不要ならそのまま）
+      qty_flag                  : QTY_MATCH / QTY_ADJUSTED / QTY_UNKNOWN
+      qty_reliable              : 入数一致で利益が信頼できるか（原石付与の前提）
+      extra_notes               : 行に積む補足ノート（推定である旨を明示）
+
+    方針（社長が踏んだ「20個入り vs 1個」バグの恒久対策）:
+      - 両方判明 & qy==qa → そのまま（信頼できる）。
+      - 両方判明 & qy!=qa → 仕入値を per-unit で Amazon 入数に揃えて再計算し、
+        「⚠️数量補正」を立て、原石にしない（推定なので要確認に降格）。
+      - 片方/両方が不明 → 1対1はリスク。「⚠️数量要確認」で原石にしない。
+    """
+    qy = parse_quantity(supplier_name)
+    qa = parse_quantity(amazon_name)
+
+    if qy is not None and qa is not None and qy == qa:
+        return {
+            "supplier_qty": qy, "amazon_qty": qa,
+            "adjusted_price": supplier_price,
+            "qty_flag": QTY_MATCH, "qty_reliable": True, "extra_notes": [],
+        }
+
+    if qy is not None and qa is not None and qy != qa:
+        # per-unit で Amazon 入数に揃える: 1個あたり仕入単価 × Amazon入数。
+        unit = supplier_price / qy
+        adjusted = round(unit * qa)
+        note = (
+            f"⚠️数量補正(推定): 仕入は{qy}個入り{supplier_price:,}円→"
+            f"1個{unit:,.0f}円×Amazon{qa}個={adjusted:,}円で再計算。"
+            f"人間確認前提（原石にはしない）"
+        )
+        return {
+            "supplier_qty": qy, "amazon_qty": qa,
+            "adjusted_price": adjusted,
+            "qty_flag": QTY_ADJUSTED, "qty_reliable": False, "extra_notes": [note],
+        }
+
+    # 片方/両方が不明
+    note = (
+        f"⚠️数量未確定・要目視: 仕入元={'?' if qy is None else qy}個 / "
+        f"Amazon={'?' if qa is None else qa}個。"
+        f"1対1比較はリスク（多包装ASINに単品が一致する誤突合の恐れ）"
+    )
+    return {
+        "supplier_qty": qy, "amazon_qty": qa,
+        "adjusted_price": supplier_price,
+        "qty_flag": QTY_UNKNOWN, "qty_reliable": False, "extra_notes": [note],
+    }
+
+
 def _build_row(
     item: YahooItem, ap: AmazonProduct, preset: DiscoveryPreset
 ) -> Optional[DiscoveryRow]:
     """突合済みの (Yahoo候補, Amazon商品) から利益計算して DiscoveryRow を作る。
 
     Amazon価格欠損・プリセット条件外は None を返し理由をログに残す。
+    入数（Yahoo個数 vs Amazon個数）を照合し、不一致/不明なら原石に昇格させない。
     """
     if ap.current_price is None:
         logger.info("除外[Amazon価格無し]: %s (ASIN=%s)", item.name, ap.asin)
@@ -132,22 +204,34 @@ def _build_row(
         logger.info("除外[Amazon条件外]: %s (ASIN=%s)", item.name, ap.asin)
         return None
 
+    # ── 入数照合（個数ミスマッチによる偽・原石を潰す） ──
+    qres = _resolve_quantities(item.price, item.name, ap.title)
+
     result = profit.calculate(
         profit.ProfitInput(
-            wholesale_price=item.price,          # Yahoo価格は税込として扱う
+            wholesale_price=qres["adjusted_price"],  # 数量補正後の実質仕入値（税込扱い）
             amazon_price=ap.current_price,
             category_key=ap.category_key,
             size_key=ap.size_key,
         )
     )
 
-    # Keepa 由来の推定ノート（月販推定・FBAサイズ推定）を結果に正直に引き継ぐ。
-    notes = list(result.notes) + list(getattr(ap, "estimate_notes", []) or [])
+    # 数量が信頼できない行は原石/あやしいに昇格させず「要確認」へ降格（honesty-first）。
+    verdict = result.verdict
+    if not qres["qty_reliable"] and verdict != profit.VERDICT_MISS:
+        verdict = VERDICT_NEEDS_CHECK
+
+    # Keepa 由来の推定ノート（月販推定・FBAサイズ推定）＋数量ノートを正直に引き継ぐ。
+    notes = (
+        list(result.notes)
+        + list(getattr(ap, "estimate_notes", []) or [])
+        + qres["extra_notes"]
+    )
 
     return DiscoveryRow(
         name=item.name,
         asin=ap.asin,
-        supplier_price=item.price,
+        supplier_price=qres["adjusted_price"],
         amazon_price=ap.current_price,
         net_profit=result.net_profit,
         margin_rate=result.margin_rate,
@@ -156,8 +240,14 @@ def _build_row(
         sales_rank=ap.sales_rank,
         offer_count=ap.offer_count,
         oos_rate_90d=ap.oos_rate_90d,
-        verdict=result.verdict,
+        verdict=verdict,
         match_status=MATCH_OK,
+        amazon_name=ap.title,
+        supplier_qty=qres["supplier_qty"],
+        amazon_qty=qres["amazon_qty"],
+        qty_flag=qres["qty_flag"],
+        qty_reliable=qres["qty_reliable"],
+        supplier_price_raw=item.price,
         supplier_url=item.url,
         category_label=result.category_label,
         is_sample=item.is_sample or ap.is_sample,
@@ -173,21 +263,32 @@ def discover_from_amazon(
     preset_key: str = "hunting_beginner",
     amazon_backend: Optional[AmazonDataBackend] = None,
     assumed_cost_rate: float = 0.5,
+    use_assumed_cost: bool = False,
     yahoo_client: Optional[YahooShoppingClient] = None,
     max_items: int = 50,
+    category_id: Optional[int] = None,
+    max_asins: int = 10,
 ) -> list[DiscoveryRow]:
-    """Amazon側を条件フィルタ→利益計算→ランキング。
+    """Amazon側を条件フィルタ→利益計算→ランキング（キーワード不要の売れ筋探索）。
 
     仕入れ値は本来「仕入元を探して初めて」確定する。Amazon起点モードでは
-    まず Yahoo に JAN で当てて実仕入値を試み、見つからなければ
-    `assumed_cost_rate`（Amazon売値に対する想定原価率）で仮置きする。
-    仮置きの場合 match_status=AMAZON_ONLY とし、UI/READMEで「想定値」と明示する。
+    まず Yahoo に JAN で当てて実仕入値を試み、見つかればそれで利益計算する。
+    見つからない場合の方針:
+      - use_assumed_cost=False（本番・既定）: 仮の利益をでっち上げず「候補保留」にする。
+      - use_assumed_cost=True（学習/デモ）  : assumed_cost_rate で仮置き（要確認に降格）。
+
+    category_id を渡すと Keepa Best Sellers から売れ筋 ASIN を集める（list_products 経由）。
+    トークン節約のため詳細取得 ASIN は max_asins 件にハードキャップ。
     """
     preset = get_preset(preset_key)
     amazon = amazon_backend or get_backend()
     yahoo = yahoo_client or YahooShoppingClient()
 
-    products = amazon.list_products()
+    list_kwargs = {}
+    if category_id is not None:
+        list_kwargs["category_id"] = category_id
+    list_kwargs["limit"] = max_asins
+    products = amazon.list_products(**list_kwargs)
     rows: list[DiscoveryRow] = []
 
     for ap in products:
@@ -198,60 +299,150 @@ def discover_from_amazon(
             logger.info("除外[Amazon条件外]: %s (rank=%s)", ap.title, ap.sales_rank)
             continue
 
-        # 仕入元を JAN で当てに行く（実仕入値が取れればそれを使う）。
-        supplier_price: Optional[int] = None
-        supplier_url = ""
-        match_status = AMAZON_ONLY
-        if ap.jan:
-            for it in yahoo.search(jan_code=ap.jan, results=5):
-                if it.jan == ap.jan:
-                    supplier_price = it.price
-                    supplier_url = it.url
-                    match_status = MATCH_OK
-                    break
+        row = _build_amazon_row(ap, yahoo, assumed_cost_rate, use_assumed_cost)
+        if row is not None:
+            rows.append(row)
 
-        if supplier_price is None:
-            supplier_price = round(ap.current_price * assumed_cost_rate)
+    rows = _apply_profit_filters(rows, preset)
+    rows.sort(key=lambda r: r.net_profit, reverse=True)
+    return rows
 
+
+def _build_amazon_row(
+    ap: AmazonProduct,
+    yahoo: YahooShoppingClient,
+    assumed_cost_rate: float,
+    use_assumed: bool,
+) -> Optional[DiscoveryRow]:
+    """(あ)Amazon起点の1商品から DiscoveryRow を作る。
+
+    仕入元を JAN で当てに行き、実仕入値が取れたら個数照合のうえ利益計算する。
+    仕入元が取れない場合:
+      - use_assumed=True  : 想定原価率で仮置き（学習/デモ用。要確認に降格）
+      - use_assumed=False : 仕入値をでっち上げず None で保留（本番の正直モード）
+    """
+    supplier_name = ""
+    supplier_price: Optional[int] = None
+    supplier_url = ""
+    match_status = AMAZON_ONLY
+    if ap.jan:
+        for it in yahoo.search(jan_code=ap.jan, results=5):
+            if it.jan == ap.jan:
+                supplier_price = it.price
+                supplier_name = it.name
+                supplier_url = it.url
+                match_status = MATCH_OK
+                break
+
+    # 実仕入値が取れた → 個数照合つきで利益計算（(い)と同じ honesty ロジック）。
+    if supplier_price is not None:
+        qres = _resolve_quantities(supplier_price, supplier_name, ap.title)
         result = profit.calculate(
             profit.ProfitInput(
-                wholesale_price=supplier_price,
+                wholesale_price=qres["adjusted_price"],
                 amazon_price=ap.current_price,
                 category_key=ap.category_key,
                 size_key=ap.size_key,
             )
         )
-
-        rows.append(
-            DiscoveryRow(
-                name=ap.title,
-                asin=ap.asin,
-                supplier_price=supplier_price,
-                amazon_price=ap.current_price,
-                net_profit=result.net_profit,
-                margin_rate=result.margin_rate,
-                roi=result.roi,
-                monthly_sales=ap.monthly_sales,
-                sales_rank=ap.sales_rank,
-                offer_count=ap.offer_count,
-                oos_rate_90d=ap.oos_rate_90d,
-                verdict=result.verdict,
-                match_status=match_status,
-                supplier_url=supplier_url,
-                category_label=result.category_label,
-                is_sample=ap.is_sample,
-                notes=result.notes
-                + (
-                    []
-                    if match_status == MATCH_OK
-                    else [f"仕入値は想定原価率{assumed_cost_rate*100:.0f}%での仮置き"]
-                ),
-            )
+        verdict = result.verdict
+        if not qres["qty_reliable"] and verdict != profit.VERDICT_MISS:
+            verdict = VERDICT_NEEDS_CHECK
+        notes = (
+            list(result.notes)
+            + list(getattr(ap, "estimate_notes", []) or [])
+            + qres["extra_notes"]
+        )
+        return DiscoveryRow(
+            name=supplier_name or ap.title,
+            asin=ap.asin,
+            supplier_price=qres["adjusted_price"],
+            amazon_price=ap.current_price,
+            net_profit=result.net_profit,
+            margin_rate=result.margin_rate,
+            roi=result.roi,
+            monthly_sales=ap.monthly_sales,
+            sales_rank=ap.sales_rank,
+            offer_count=ap.offer_count,
+            oos_rate_90d=ap.oos_rate_90d,
+            verdict=verdict,
+            match_status=match_status,
+            amazon_name=ap.title,
+            supplier_qty=qres["supplier_qty"],
+            amazon_qty=qres["amazon_qty"],
+            qty_flag=qres["qty_flag"],
+            qty_reliable=qres["qty_reliable"],
+            supplier_price_raw=supplier_price,
+            supplier_url=supplier_url,
+            category_label=result.category_label,
+            is_sample=ap.is_sample,
+            notes=notes,
         )
 
-    rows = _apply_profit_filters(rows, preset)
-    rows.sort(key=lambda r: r.net_profit, reverse=True)
-    return rows
+    # 仕入元が見つからない。本番の正直モードでは仮の利益を出さず保留（行は出すが利益なし）。
+    if not use_assumed:
+        return DiscoveryRow(
+            name=ap.title,
+            asin=ap.asin,
+            supplier_price=None,
+            amazon_price=ap.current_price,
+            net_profit=0.0,
+            margin_rate=0.0,
+            roi=0.0,
+            monthly_sales=ap.monthly_sales,
+            sales_rank=ap.sales_rank,
+            offer_count=ap.offer_count,
+            oos_rate_90d=ap.oos_rate_90d,
+            verdict=VERDICT_NEEDS_CHECK,
+            match_status=AMAZON_ONLY,
+            amazon_name=ap.title,
+            qty_flag=QTY_UNKNOWN,
+            qty_reliable=False,
+            supplier_url="",
+            category_label="",
+            is_sample=ap.is_sample,
+            notes=list(getattr(ap, "estimate_notes", []) or [])
+            + ["仕入元未発見：実仕入値が無いため利益は算出していません（候補保留・要リサーチ）"],
+        )
+
+    # 学習/デモ用フォールバック: 想定原価率で仮置き（要確認に降格・明示ノート）。
+    supplier_price = round(ap.current_price * assumed_cost_rate)
+    result = profit.calculate(
+        profit.ProfitInput(
+            wholesale_price=supplier_price,
+            amazon_price=ap.current_price,
+            category_key=ap.category_key,
+            size_key=ap.size_key,
+        )
+    )
+    verdict = (
+        VERDICT_NEEDS_CHECK
+        if result.verdict != profit.VERDICT_MISS
+        else result.verdict
+    )
+    return DiscoveryRow(
+        name=ap.title,
+        asin=ap.asin,
+        supplier_price=supplier_price,
+        amazon_price=ap.current_price,
+        net_profit=result.net_profit,
+        margin_rate=result.margin_rate,
+        roi=result.roi,
+        monthly_sales=ap.monthly_sales,
+        sales_rank=ap.sales_rank,
+        offer_count=ap.offer_count,
+        oos_rate_90d=ap.oos_rate_90d,
+        verdict=verdict,
+        match_status=AMAZON_ONLY,
+        amazon_name=ap.title,
+        qty_flag=QTY_UNKNOWN,
+        qty_reliable=False,
+        supplier_url="",
+        category_label=result.category_label,
+        is_sample=ap.is_sample,
+        notes=list(result.notes)
+        + [f"仕入値は想定原価率{assumed_cost_rate*100:.0f}%での仮置き（実仕入値ではない・要確認）"],
+    )
 
 
 # =============================================================================
@@ -274,13 +465,24 @@ def _passes_amazon_filters(ap: AmazonProduct, preset: DiscoveryPreset) -> bool:
 def _apply_profit_filters(
     rows: list[DiscoveryRow], preset: DiscoveryPreset
 ) -> list[DiscoveryRow]:
-    """利益計算後の閾値（利益率/純利益）でフィルタ。"""
-    return [
-        r
-        for r in rows
-        if r.margin_rate >= preset.min_margin_rate
-        and r.net_profit >= preset.min_net_profit
-    ]
+    """利益計算後の閾値（利益率/純利益）でフィルタ。
+
+    ただし数量が信頼できない行（補正/要確認）は **黙って捨てない**。閾値を満たさなくても
+    「⚠️数量要確認」として残し、社長が目視照合できるようにする（honesty-first）。
+    黒字（純利益>0）であることだけは最低条件として課す（赤字は表示価値が薄い）。
+    """
+    out = []
+    for r in rows:
+        passes_threshold = (
+            r.margin_rate >= preset.min_margin_rate
+            and r.net_profit >= preset.min_net_profit
+        )
+        if passes_threshold:
+            out.append(r)
+        elif not r.qty_reliable and r.net_profit > 0:
+            # 数量補正/不明の黒字行は、閾値未達でも「要確認」として残す。
+            out.append(r)
+    return out
 
 
 # =============================================================================

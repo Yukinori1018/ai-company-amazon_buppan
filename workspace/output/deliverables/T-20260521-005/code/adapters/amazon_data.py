@@ -459,33 +459,93 @@ class KeepaBackend:
         return out
 
     # ------------------------------------------------------------------
-    # Amazon 起点（Product Finder）—— 今回スコープ外。明示的に未実装。
+    # Amazon 起点（Best Sellers）= キーワード不要の売れ筋自動収集
     # ------------------------------------------------------------------
-    def list_products(self, **filters) -> list[AmazonProduct]:
-        """Amazon起点ディスカバリー（Product Finder）。本タスクのスコープ外。
+    BESTSELLERS_ENDPOINT = "https://api.keepa.com/bestsellers"
+    MAX_ASINS_PER_LIST = 10  # 詳細取得する ASIN のハードキャップ（トークン節約の要）
 
-        (あ)モードは別途 Product Finder API（/query?selection=...）の実装が必要。
-        今回は (い)仕入れ元起点を本番化することに集中するため未実装。
-        ※app 側は (あ) では Keepa を使わずサンプル/Yahoo 仮置きにフォールバックする。
+    def list_products(self, **filters) -> list[AmazonProduct]:
+        """Keepa Best Sellers でカテゴリの売れ筋 ASIN を取り、先頭N件だけ詳細取得する。
+
+        引数（filters）:
+          category_id : Amazon.co.jp ブラウズノードID（presets.AMAZON_CATEGORIES から）。
+                        未指定なら呼び出し側で既定カテゴリを渡す前提。
+          limit       : 詳細取得する ASIN の上限（既定/上限とも MAX_ASINS_PER_LIST=10）。
+
+        トークン節約:
+          1) bestsellers で ASIN リスト取得（=軽い。1リクエスト）。
+          2) 先頭 limit 件だけ product で詳細取得（1バッチ・stats/offers 込み）。
+          → 1回の探索で詳細取得は最大10 ASIN にハードキャップ。
         """
-        raise NotImplementedError(
-            "Keepa Product Finder（Amazon起点(あ)）は本タスクのスコープ外です。"
-            "(い)仕入れ元起点は resolve_by_jan/resolve_many で本番稼働します。"
-        )
+        self._require_key()
+        category_id = filters.get("category_id")
+        limit = min(int(filters.get("limit", self.MAX_ASINS_PER_LIST)),
+                    self.MAX_ASINS_PER_LIST)
+        if category_id is None:
+            logger.info("list_products: category_id 未指定のため空を返す")
+            return []
+
+        asins = self._fetch_bestseller_asins(category_id)
+        if not asins:
+            logger.info("Best Sellers: ASINを取得できませんでした（category=%s）", category_id)
+            return []
+        asins = asins[:limit]
+        logger.info("Best Sellers: 売れ筋ASIN %d件の詳細を取得（category=%s）",
+                    len(asins), category_id)
+
+        payload = self._request(asin=",".join(asins))
+        self.last_tokens_left = payload.get("tokensLeft")
+        self.last_tokens_consumed = payload.get("tokensConsumed")
+        logger.info("Keepa: 詳細%d件 消費tokens=%s 残tokens=%s",
+                    len(asins), self.last_tokens_consumed, self.last_tokens_left)
+
+        out: list[AmazonProduct] = []
+        for prod in payload.get("products") or []:
+            ap = _product_to_amazon(prod)
+            if ap is None:
+                continue
+            # Amazon起点は JAN を eanList から拾っておく（仕入元突合のヒントに）。
+            eans = [str(c) for c in (prod.get("eanList") or [])]
+            if eans:
+                ap.jan = eans[0]
+            out.append(ap)
+        return out
+
+    def _fetch_bestseller_asins(self, category_id) -> list:
+        """bestsellers エンドポイントでカテゴリの売れ筋 ASIN リストを取得する。"""
+        import requests  # 遅延 import
+
+        params = {
+            "key": self.api_key,
+            "domain": self.KEEPA_DOMAIN_JP,
+            "category": str(category_id),
+        }
+        resp = requests.get(self.BESTSELLERS_ENDPOINT, params=params,
+                            timeout=self.timeout)
+        resp.raise_for_status()
+        payload = resp.json()
+        self.last_tokens_left = payload.get("tokensLeft")
+        # bestsellers のレスポンス形は { "bestSellersList": {"asinList": [...]} }。
+        bsl = payload.get("bestSellersList") or {}
+        asins = bsl.get("asinList") or payload.get("asinList") or []
+        return [str(a) for a in asins if a]
 
     # ------------------------------------------------------------------
     # HTTP（生 requests・遅延 import）
     # ------------------------------------------------------------------
-    def _request(self, *, code: str) -> dict:
+    def _request(self, *, code: Optional[str] = None, asin: Optional[str] = None) -> dict:
         import requests  # 遅延 import（サンプル経路では不要）
 
         params = {
             "key": self.api_key,
             "domain": self.KEEPA_DOMAIN_JP,
-            "code": code,
             "stats": 90,    # 90日統計（OOS率・平均など）を含める
             "offers": 20,   # 出品オファーを最大20件（Buy Box/出品者数の精度向上）
         }
+        if code is not None:
+            params["code"] = code   # JAN 突合（(い)経路）
+        if asin is not None:
+            params["asin"] = asin   # ASIN 直接取得（(あ)Best Sellers 経路）
         resp = requests.get(self.ENDPOINT, params=params, timeout=self.timeout)
         resp.raise_for_status()
         return resp.json()

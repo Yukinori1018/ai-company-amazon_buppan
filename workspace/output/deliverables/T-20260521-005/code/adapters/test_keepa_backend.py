@@ -157,6 +157,41 @@ def test_resolve_many_caps_jan_count(monkeypatch):
     assert len(captured["code"].split(",")) == KeepaBackend.MAX_JANS_PER_CALL
 
 
+def test_list_products_bestsellers_flow(monkeypatch):
+    """(あ)Amazon起点: bestsellers→ASIN→詳細 の流れと ASIN上限が効くことを検証（実APIは叩かない）。"""
+    backend = KeepaBackend(api_key="dummy")
+
+    def fake_bestsellers(self, category_id):
+        # カテゴリから売れ筋 ASIN を15件返す（上限10で切られるはず）
+        return [f"B{ i:09d}" for i in range(15)]
+
+    captured = {}
+
+    def fake_request(self, *, code=None, asin=None):
+        captured["asin"] = asin
+        return {
+            "tokensLeft": 900,
+            "tokensConsumed": 10,
+            "products": [MOCK_PRODUCT, MOCK_NO_BUYBOX],
+        }
+
+    monkeypatch.setattr(KeepaBackend, "_fetch_bestseller_asins", fake_bestsellers)
+    monkeypatch.setattr(KeepaBackend, "_request", fake_request)
+
+    products = backend.list_products(category_id=3828871, limit=10)
+    # 詳細取得は最大10 ASIN（ハードキャップ）
+    assert len(captured["asin"].split(",")) == 10
+    # 返ってきた商品が AmazonProduct に正規化される
+    assert all(p.asin for p in products)
+    assert products[0].current_price == 9500
+    assert backend.last_tokens_left == 900
+
+
+def test_list_products_without_category_returns_empty():
+    backend = KeepaBackend(api_key="dummy")
+    assert backend.list_products() == []
+
+
 def test_resolve_by_jan_not_live_raises():
     backend = KeepaBackend(api_key=None)
     backend.api_key = None
