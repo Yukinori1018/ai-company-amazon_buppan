@@ -27,6 +27,33 @@ from pathlib import Path
 from typing import Optional
 
 
+def _load_dotenv_if_present() -> None:
+    """同階層〜2つ上までの .env を探して os.environ に流し込む（軽量自前ローダ）。
+
+    python-dotenv に依存しないのは YAGNI（KEY=VALUE しか無いため）。
+    既に環境変数があればそちらを優先（上書きしない）。シークレットは Git 対象外の .env のみ。
+    """
+    here = Path(__file__).resolve()
+    for base in [here.parent, here.parent.parent, here.parent.parent.parent]:
+        env_path = base / ".env"
+        if not env_path.exists():
+            continue
+        try:
+            for line in env_path.read_text(encoding="utf-8").splitlines():
+                line = line.strip()
+                if not line or line.startswith("#") or "=" not in line:
+                    continue
+                key, val = line.split("=", 1)
+                key, val = key.strip(), val.strip().strip('"').strip("'")
+                os.environ.setdefault(key, val)
+        except OSError:
+            pass
+        break
+
+
+_load_dotenv_if_present()
+
+
 # 公式エンドポイント（実呼び出し時に使用）
 YAHOO_ITEMSEARCH_ENDPOINT = (
     "https://shopping.yahooapis.jp/ShoppingWebService/V3/itemSearch"
@@ -147,19 +174,53 @@ class YahooShoppingClient:
     # ---------------------------------------------------------------------
     @staticmethod
     def _normalize(hits: list, *, is_sample: bool) -> list[YahooItem]:
+        """生 hits（本番 v3 / サンプル両対応）→ YahooItem。
+
+        本番 v3 ItemSearch のレスポンスは入れ子（seller/image/point が dict）。
+        サンプルJSONはフラット（store/image_url/pointRate）。両方を吸収する。
+        本番で実測したフィールド構造（2026-06-04 タカシ）に合わせてある。
+        """
         out: list[YahooItem] = []
         for h in hits:
-            # 本番レスポンスとサンプルJSONで同じキー名を使う設計にしてある。
-            jan = h.get("janCode") or h.get("jan") or None
+            jan = (h.get("janCode") or h.get("jan") or "").strip() or None
+
+            # 出店ストア名: 本番は seller.name（dict）、サンプルは store（str）
+            store = ""
+            seller = h.get("seller")
+            if isinstance(seller, dict):
+                store = seller.get("name", "")
+            else:
+                store = h.get("store") or (seller or "")
+
+            # 画像URL: 本番は image.medium（dict）、サンプルは image_url/image（str）
+            image_url = ""
+            image = h.get("image")
+            if isinstance(image, dict):
+                image_url = image.get("medium") or image.get("small") or ""
+            else:
+                image_url = h.get("image_url") or (image or "")
+
+            # ポイント還元率: 本番 v3 は point(dict) で「率(%)」を直接返さず付与額のみ。
+            # 率に換算（付与額/価格*100）。サンプルは pointRate(%) を直接持つ。
+            point_rate = 0.0
+            point = h.get("point")
+            price = int(h.get("price", 0) or 0)
+            if isinstance(point, dict) and price > 0:
+                # 通常付与 + ボーナス付与を実質還元として概算（LYP限定は変動するため除外＝保守的）
+                amount = (point.get("amount", 0) or 0) + (point.get("bonusAmount", 0) or 0)
+                point_rate = round(amount / price * 100, 1)
+            elif point is None:
+                point_rate = float(h.get("pointRate", h.get("point_rate", 0)) or 0)
+
             out.append(
                 YahooItem(
                     name=h.get("name", ""),
-                    price=int(h.get("price", 0) or 0),
+                    price=price,
                     url=h.get("url", ""),
-                    jan=jan or None,
-                    store=h.get("store", h.get("seller", "")),
-                    point_rate=float(h.get("pointRate", h.get("point_rate", 0)) or 0),
-                    image_url=h.get("image_url", h.get("image", "")),
+                    jan=jan,
+                    store=store,
+                    point_rate=point_rate,
+                    image_url=image_url,
                     is_sample=is_sample,
                 )
             )

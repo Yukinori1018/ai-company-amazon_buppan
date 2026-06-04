@@ -4,19 +4,30 @@
 - 閾値はコードではなく「設定」。社長やサトル監修で頻繁に変わるのでコードから分離する。
 - profit.py の判定閾値（利益率15%/純利益500円）とは別物。ここは「リサーチの絞り込み」条件。
 
-⚠️ 要・サトル監修:
-  下の数値は一般的な電脳せどり指南で語られる代表値（朝野拓也系ナレッジ・一般論）から
-  タカシが置いた暫定値です。サトルのリサーチ結果（06_research-methods-to-encode.md）が
-  出たら、その実数で上書きしてください。現時点では実データ検証されていません。
+閾値の出典（2026-06-04 サトル監修反映）:
+  値はサトルのリサーチ成果 06_research-methods-to-encode.md に基づき、実プレイヤー基準
+  （ERESA公式・ECセラーラボ・tremas-lab・社内朝野ナレッジ）で更新済み。
+  サトルが「出典が割れる」と注記した値は保守的側を採り、下に before→after をコメント。
+
+⚠️ Drop主軸への設計上の注記（サトル §A-2, §5）:
+  リサーチの結論は「ランキング絶対順位より Drop30/90（販売回数の近似）で売れ行きを見る方が
+  正確」。Drop は Keepa からしか取れず本プロトは Keepa 未契約のため、現状は max_sales_rank /
+  min_monthly_sales を売れ行きの代理指標として残している。Keepa 契約後に Drop フィールドを
+  AmazonProduct に足し、ここを drop30/drop90 主軸へ移行する（TODO・タカシ）。
 
 各閾値の意味:
 - max_sales_rank   : このランキングより上（数値が小さい）= よく売れている、を残す
-- min_monthly_sales: 推定月販がこれ以上を残す（売れない死に筋を除外）
+                     （※サトル: 順位は補助指標。本命は Drop。Keepa後に置換予定）
+- min_monthly_sales: 推定月販がこれ以上を残す（Drop30 の代理。死に筋を除外）
 - max_offer_count  : 出品者数がこれ以下を残す（多すぎる相乗りは価格競争で利益消失）
-- min_oos_rate_90d : 在庫切れ率がこれ以上を残す（在庫切れ＝チャンス、という考え方）
+                     サトル基準: 安全圏 3〜10人（少なすぎ1〜2人は真贋/知財リスクで別途警告）
+- min_oos_rate_90d : 在庫切れ率がこれ以上を残す（在庫切れ＝出せば売れるチャンス）
+                     サトル基準: 公式30〜40% / 社内20% で割れ → 保守的に下限20%採用。
                      0.0 にすると在庫切れ条件を無視する。
 - min_margin_rate  : 利益率がこれ以上の結果だけ最終的に残す（profit計算後に適用）
+                     サトル基準: 初心者5% / 標準15% / 安全圏20%
 - min_net_profit   : 純利益（円）がこれ以上の結果だけ残す
+                     サトル基準: 初心者500円 / 標準1,000円（朝野「利益500円まで緩めて分母拡大」）
 """
 
 from dataclasses import dataclass
@@ -37,56 +48,92 @@ class DiscoveryPreset:
     min_net_profit: float = 0.0      # 円
 
 
-# ⚠️ 要・サトル監修の暫定プリセット群
+# サトル基準（06_research-methods-to-encode.md §2「宝の地図」型プリセット）反映済み。
+# (い)『価格差ハンティングマップ』を既定。社長は副業初心者 → 初心者緩め値を採用。
 PRESETS: dict[str, DiscoveryPreset] = {
-    "beginner_safe": DiscoveryPreset(
-        key="beginner_safe",
-        label="初心者・堅実（推奨）",
+    # ── (い) 仕入れ元起点：サトル §2「価格差ハンティングマップ」初心者値 ──
+    "hunting_beginner": DiscoveryPreset(
+        key="hunting_beginner",
+        label="(い)価格差ハンティング・初心者（推奨）",
         description=(
-            "売れていて・相乗りが少なく・利益率も確保。失敗しにくい王道設定。"
-            "⚠️サトル監修前の暫定値"
+            "楽天/Yahoo!の実質価格とAmazon売値の差を突く電脳せどり。"
+            "朝野式の初心者緩和（利益率5%/利益500円/月3個）で分母を広げる。"
+            "サトル監修済（06_research §2 (い)初心者値）"
         ),
-        max_sales_rank=10000,
-        min_monthly_sales=100,
-        max_offer_count=5,
+        # before(beginner_safe): rank10000/月販100/出品5/OOS0/率15%/額500
+        max_sales_rank=50000,    # 順位は補助。Drop未取得のため緩め（→Keepa後Drop主軸へ）
+        min_monthly_sales=3,     # サトル: 初心者は月3個(Drop30≥3)まで緩める
+        max_offer_count=12,      # サトル: 初心者は出品者3〜12人
+        min_oos_rate_90d=0.0,    # 在庫切れは(い)では必須条件にしない
+        min_margin_rate=0.05,    # サトル: 初心者5%
+        min_net_profit=500,      # サトル: 初心者500円
+    ),
+    # ── (い) 標準値（慣れてきたら）──
+    "hunting_standard": DiscoveryPreset(
+        key="hunting_standard",
+        label="(い)価格差ハンティング・標準",
+        description=(
+            "利益率15%・利益1,000円・月販10個の標準ライン。安全圏寄り。"
+            "サトル監修済（06_research §2 (い)標準値）"
+        ),
+        max_sales_rank=30000,
+        min_monthly_sales=10,    # Drop30≥10
+        max_offer_count=8,       # 標準は3〜8人
         min_oos_rate_90d=0.0,
-        min_margin_rate=0.15,
+        min_margin_rate=0.15,    # サトル: 標準15%
+        min_net_profit=1000,     # サトル: 標準1,000円
+    ),
+    # ── (あ) Amazon起点：サトル §2「Amazon棚卸しマップ」初心者値 ──
+    "stocktake_beginner": DiscoveryPreset(
+        key="stocktake_beginner",
+        label="(あ)Amazon棚卸し・初心者",
+        description=(
+            "Amazonで売れてて・競合薄くて・本体不在の棚を掘る。仕入元は後で探す。"
+            "サトル監修済（06_research §2 (あ)初心者値）"
+        ),
+        max_sales_rank=50000,
+        min_monthly_sales=3,     # Drop30≥3
+        max_offer_count=12,      # サトル: 初心者3〜12人
+        min_oos_rate_90d=0.0,    # 任意（不在優先）。在庫切れ妙味は oos_premium で強める
+        min_margin_rate=0.05,
         min_net_profit=500,
     ),
-    "oos_chance": DiscoveryPreset(
-        key="oos_chance",
-        label="在庫切れ狙い（チャンス型）",
+    # ── 在庫切れ妙味（プレミア寄り）：サトル §A1 あ1/あ2/あ8 ──
+    "oos_premium": DiscoveryPreset(
+        key="oos_premium",
+        label="(あ)在庫切れ妙味（プレミア寄り）",
         description=(
-            "在庫切れが多い=出品すれば売れやすい商品を狙う。出品者数も絞る。"
-            "⚠️サトル監修前の暫定値"
+            "90日在庫切れ率が高い=出せば売れる商品を狙う。出品者も絞る。"
+            "サトル監修済（公式30〜40%/社内20%が割れ→保守的に20%採用）"
         ),
-        max_sales_rank=20000,
-        min_monthly_sales=50,
-        max_offer_count=3,
-        min_oos_rate_90d=0.20,
+        # before(oos_chance): rank20000/月販50/出品3/OOS20%/率12%/額400
+        max_sales_rank=30000,
+        min_monthly_sales=3,
+        max_offer_count=8,       # サトル: 3〜8人
+        min_oos_rate_90d=0.20,   # 公式40%/社内20%割れ → 保守的に下限20%
         min_margin_rate=0.12,
-        min_net_profit=400,
+        min_net_profit=500,      # 400→500（朝野基準に統一）
     ),
+    # ── 高利益率（中上級・「お宝プレミアマップ」寄り）：サトル §2(う) あ3 ──
     "high_margin": DiscoveryPreset(
         key="high_margin",
-        label="高利益率重視（少数精鋭）",
+        label="高利益率重視（中上級・少数精鋭）",
         description=(
-            "回転は問わず1個あたりの利益率を最優先。単価高め商品向け。"
-            "⚠️サトル監修前の暫定値"
+            "回転より1個あたり利益率を最優先。廃番/限定の急騰品想定（利益率30〜50%）。"
+            "サトル監修済（06_research §2(う) お宝プレミアマップ）。在庫リスク高に注意。"
         ),
         max_sales_rank=30000,
         min_monthly_sales=0,
         max_offer_count=8,
         min_oos_rate_90d=0.0,
-        min_margin_rate=0.25,
-        min_net_profit=800,
+        min_margin_rate=0.30,    # 25%→30%（サトル: プレミア帯は30〜50%）
+        min_net_profit=1000,     # 800→1000
     ),
     "wide_net": DiscoveryPreset(
         key="wide_net",
         label="広く拾う（学習用・ゆるめ）",
         description=(
-            "閾値をほぼ無効化し、利益が出る候補を黒字なら全部出す。relationship学習用。"
-            "⚠️サトル監修前の暫定値"
+            "閾値をほぼ無効化し、黒字なら全部出す。突合率や相場感の学習用。"
         ),
         max_sales_rank=999999,
         min_monthly_sales=0,
@@ -97,7 +144,8 @@ PRESETS: dict[str, DiscoveryPreset] = {
     ),
 }
 
-DEFAULT_PRESET_KEY = "beginner_safe"
+# 既定は (い) 価格差ハンティング初心者（社長=副業初心者・電脳せどりが主軸）
+DEFAULT_PRESET_KEY = "hunting_beginner"
 
 
 def get_preset(key: str) -> DiscoveryPreset:

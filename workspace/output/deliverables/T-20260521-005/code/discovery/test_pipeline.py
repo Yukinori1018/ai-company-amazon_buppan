@@ -66,11 +66,11 @@ def test_preset_thresholds_actually_filter():
         "", preset_key="wide_net", amazon_backend=amazon, yahoo_client=yahoo
     )
     strict = pipeline.discover_from_supplier(
-        "", preset_key="beginner_safe", amazon_backend=amazon, yahoo_client=yahoo
+        "", preset_key="hunting_beginner", amazon_backend=amazon, yahoo_client=yahoo
     )
     assert len(strict) <= len(wide)
     # 堅実プリセットの結果は全て利益率15%以上・純利益500円以上
-    p = get_preset("beginner_safe")
+    p = get_preset("hunting_beginner")
     for r in strict:
         assert r.margin_rate >= p.min_margin_rate
         assert r.net_profit >= p.min_net_profit

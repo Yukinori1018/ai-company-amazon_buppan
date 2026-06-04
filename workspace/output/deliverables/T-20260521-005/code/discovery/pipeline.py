@@ -62,7 +62,7 @@ AMAZON_ONLY = "Amazon起点(仕入元未特定)"
 def discover_from_supplier(
     query: str = "",
     *,
-    preset_key: str = "beginner_safe",
+    preset_key: str = "hunting_beginner",
     amazon_backend: Optional[AmazonDataBackend] = None,
     yahoo_client: Optional[YahooShoppingClient] = None,
     max_items: int = 50,
@@ -148,7 +148,7 @@ def _match_and_calc(
 # =============================================================================
 def discover_from_amazon(
     *,
-    preset_key: str = "beginner_safe",
+    preset_key: str = "hunting_beginner",
     amazon_backend: Optional[AmazonDataBackend] = None,
     assumed_cost_rate: float = 0.5,
     yahoo_client: Optional[YahooShoppingClient] = None,
@@ -270,10 +270,10 @@ if __name__ == "__main__":
     az = SampleBackend()
     yh = YahooShoppingClient(force_sample=True)
     print("=" * 70)
-    print("(い) 仕入れ元起点ディスカバリー  preset=beginner_safe  ※サンプルデータ")
+    print("(い) 仕入れ元起点ディスカバリー  preset=hunting_beginner  ※サンプルデータ")
     print("=" * 70)
     for i, r in enumerate(
-        discover_from_supplier("", preset_key="beginner_safe",
+        discover_from_supplier("", preset_key="hunting_beginner",
                                amazon_backend=az, yahoo_client=yh), 1
     ):
         print(
