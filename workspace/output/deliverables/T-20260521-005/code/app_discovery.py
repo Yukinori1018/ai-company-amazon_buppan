@@ -54,17 +54,28 @@ st.markdown(
 yahoo_live = bool(os.environ.get("YAHOO_APP_ID"))
 keepa_live = bool(os.environ.get("KEEPA_API_KEY"))
 
-if yahoo_live and not keepa_live:
+if yahoo_live and keepa_live:
+    # 仕入れ元(Yahoo)=本物 / Amazon(Keepa)=本物 の両方本番。最終形。
+    st.markdown(
+        '<div class="ss-live">'
+        '<b>データソース状態（正直版）</b>：仕入れ元 Yahoo!ショッピング = <b>本番（実データ）</b> ／ '
+        'Amazon売値・月販・ランキング・出品者数・在庫切れ率 = <b>本番（Keepa実データ）</b><br>'
+        '✅ <b>(い)仕入れ元起点</b>は本物のYahoo候補 × 本物のAmazonデータで'
+        '<b>実利益ランキング</b>を出します。表示の純利益は「確定利益」に近い実勢ベースです。<br>'
+        '⚠ ただし次の<b>推定誤差は残ります</b>：(1) FBA手数料はパッケージ寸法/重量からの'
+        '<b>サイズ区分推定</b>（実区分とズレる場合あり）、(2) 月販は Keepa の実測値があれば実測、'
+        '無い商品は<b>ランキングからの粗い推定</b>、(3) 相場は<b>変動</b>します（出品時に再確認を）。'
+        '</div>',
+        unsafe_allow_html=True,
+    )
+elif yahoo_live and not keepa_live:
     # 仕入れ元(Yahoo)=本物 / Amazon(Keepa)=サンプル の混在状態を正直に明示。
     st.markdown(
         '<div class="ss-live">'
         '<b>データソース状態（正直版）</b>：仕入れ元 Yahoo!ショッピング = <b>本番（実データ）</b> ／ '
-        'Amazon売値・月販・ランキング = <b>サンプル（Keepa未契約）</b><br>'
+        'Amazon売値・月販・ランキング = <b>サンプル（KEEPA_API_KEY未設定）</b><br>'
         '⚠ いま表示される<b>純利益・利益率はAmazon側がダミー</b>のため「確定利益」ではありません。'
-        'Keepa契約までは仕入れ元の実在候補確認用です。<br>'
-        '⚠ <b>(い)仕入れ元起点</b>は本物JANをサンプルAmazonに突合するため'
-        '<b>通常0件</b>になります（架空JANと一致しないのが正常）。実候補の一覧は'
-        '次のKeepa契約で初めて利益付きランキングになります。'
+        'KEEPA_API_KEY を設定すると Amazon 側も本番（実データ）に切り替わります。'
         '</div>',
         unsafe_allow_html=True,
     )
@@ -156,11 +167,17 @@ if raw_yahoo and mode.startswith("(い)"):
     with_jan = sum(1 for it in raw_yahoo if it.jan)
     live_note = "本番（実データ）" if not raw_yahoo[0].is_sample else "サンプル"
     st.subheader(f"仕入れ元の実在候補（Yahoo!ショッピング・{live_note}）")
+    keepa_on = bool(os.environ.get("KEEPA_API_KEY"))
+    match_note = (
+        "JANが付いている商品だけが Amazon（Keepa）と突合され、下の利益ランキングに乗ります。"
+        "※トークン節約のため JAN付きの先頭10件のみ Amazon に問い合わせます。"
+        if keepa_on
+        else "JANが付いている商品だけが将来 Amazon と突合できます。"
+        "※この表は仕入れ元の実在確認用。Amazon売値・利益はKEEPA_API_KEY設定後に付きます。"
+    )
     st.caption(
         f"取得 {len(raw_yahoo)} 件 / うち JAN付き {with_jan} 件"
-        f"（{round(with_jan/len(raw_yahoo)*100)}%）。"
-        "JANが付いている商品だけが将来 Amazon と突合できます。"
-        "※この表は仕入れ元の実在確認用。Amazon売値・利益はKeepa契約後に付きます。"
+        f"（{round(with_jan/len(raw_yahoo)*100)}%）。" + match_note
     )
     raw_df = pd.DataFrame(
         [
@@ -188,11 +205,20 @@ if raw_yahoo and mode.startswith("(い)"):
 # ----- 結果テーブル（Amazon突合済み・利益ランキング）-----------------------
 if not rows:
     if raw_yahoo:
-        st.info(
-            "Amazonと突合できた利益ランキングは0件です。"
-            "Amazon側がサンプルのため実在JANと一致しないのが原因で、これは正常な挙動です。"
-            "Keepa契約後に、上の実在候補へAmazon売値・月販が付いて利益ランキングになります。"
-        )
+        if os.environ.get("KEEPA_API_KEY"):
+            st.info(
+                "Amazonと突合できた利益ランキングは0件でした。"
+                "考えられる理由：(1) JAN付き候補がAmazonに存在しない、"
+                "(2) プリセットの絞り込み（ランキング/出品者数/利益率など）で全件除外、"
+                "(3) この仕入値ではAmazon売値との差が小さく黒字化しない。"
+                "プリセットを『広く拾う（学習用）』にすると、黒字なら全件表示されます。"
+            )
+        else:
+            st.info(
+                "Amazonと突合できた利益ランキングは0件です。"
+                "Amazon側がサンプルのため実在JANと一致しないのが原因で、これは正常な挙動です。"
+                "KEEPA_API_KEY設定後に、上の実在候補へAmazon売値・月販が付いて利益ランキングになります。"
+            )
     else:
         st.info("条件に合う候補がありませんでした。プリセットを『広く拾う』にすると増えます。")
 else:

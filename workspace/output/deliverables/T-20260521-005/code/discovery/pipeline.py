@@ -59,6 +59,11 @@ AMAZON_ONLY = "Amazon起点(仕入元未特定)"
 # =============================================================================
 # (い) 仕入れ元起点 = 電脳せどり
 # =============================================================================
+# JAN突合で Amazon（Keepa）に問い合わせる JAN の上限。
+# KeepaBackend.MAX_JANS_PER_CALL と揃える（トークン節約。残トークンが少ないため重要）。
+MAX_JAN_LOOKUPS = 10
+
+
 def discover_from_supplier(
     query: str = "",
     *,
@@ -66,9 +71,12 @@ def discover_from_supplier(
     amazon_backend: Optional[AmazonDataBackend] = None,
     yahoo_client: Optional[YahooShoppingClient] = None,
     max_items: int = 50,
+    max_jan_lookups: int = MAX_JAN_LOOKUPS,
 ) -> list[DiscoveryRow]:
     """Yahoo!ショッピングで仕入れ候補を探し、Amazon と突合して利益ランキングを返す。
 
+    トークン節約のため、Yahoo 結果のうち **JAN付きの先頭 max_jan_lookups 件のみ**を
+    1リクエストにまとめて Amazon（Keepa）へ突合する（resolve_many）。
     突合できなかった候補は結果に含めず、理由を logger に残す（正直に除外）。
     """
     preset = get_preset(preset_key)
@@ -76,12 +84,31 @@ def discover_from_supplier(
     yahoo = yahoo_client or YahooShoppingClient()
 
     items = yahoo.search(query, results=max_items)
-    rows: list[DiscoveryRow] = []
 
-    for item in items:
-        row = _match_and_calc(item, amazon, preset)
+    # JAN付きの先頭 N 件だけ Amazon に問い合わせる（トークン上限のハードキャップ）。
+    jan_items = [it for it in items if it.jan]
+    no_jan = len(items) - len(jan_items)
+    if no_jan:
+        logger.info("JAN無しで突合不可: %d件（Yahoo出店者がJAN未登録）", no_jan)
+    target_items = jan_items[:max_jan_lookups]
+    if len(jan_items) > max_jan_lookups:
+        logger.info(
+            "トークン節約: JAN付き%d件中 先頭%d件のみAmazon突合",
+            len(jan_items), max_jan_lookups,
+        )
+
+    # 1リクエストでまとめて突合（Keepaならカンマ区切り1コールでトークン節約）。
+    jan_to_product = amazon.resolve_many([it.jan for it in target_items])
+
+    rows: list[DiscoveryRow] = []
+    for item in target_items:
+        ap = jan_to_product.get(item.jan)
+        if ap is None:
+            logger.info("除外[Amazon該当無し]: %s (JAN=%s)", item.name, item.jan)
+            continue
+        row = _build_row(item, ap, preset)
         if row is None:
-            continue  # 除外理由は _match_and_calc 内でログ済み
+            continue  # 除外理由は _build_row 内でログ済み
         rows.append(row)
 
     rows = _apply_profit_filters(rows, preset)
@@ -89,26 +116,18 @@ def discover_from_supplier(
     return rows
 
 
-def _match_and_calc(
-    item: YahooItem, amazon: AmazonDataBackend, preset: DiscoveryPreset
+def _build_row(
+    item: YahooItem, ap: AmazonProduct, preset: DiscoveryPreset
 ) -> Optional[DiscoveryRow]:
-    """1つの仕入れ候補を Amazon と突合し、利益計算して DiscoveryRow にする。
+    """突合済みの (Yahoo候補, Amazon商品) から利益計算して DiscoveryRow を作る。
 
-    突合できなければ None を返し、理由をログに残す。
+    Amazon価格欠損・プリセット条件外は None を返し理由をログに残す。
     """
-    if not item.jan:
-        logger.info("除外[JAN無し]: %s", item.name)
-        return None
-
-    ap: Optional[AmazonProduct] = amazon.resolve_by_jan(item.jan)
-    if ap is None:
-        logger.info("除外[Amazon該当無し]: %s (JAN=%s)", item.name, item.jan)
-        return None
     if ap.current_price is None:
         logger.info("除外[Amazon価格無し]: %s (ASIN=%s)", item.name, ap.asin)
         return None
 
-    # Amazon起点フィルタ（ランキング/出品者数/在庫切れ率）はここでも軽く効かせる。
+    # Amazon側メタ（ランキング/出品者数/在庫切れ率）でプリセット条件を軽く効かせる。
     if not _passes_amazon_filters(ap, preset):
         logger.info("除外[Amazon条件外]: %s (ASIN=%s)", item.name, ap.asin)
         return None
@@ -121,6 +140,9 @@ def _match_and_calc(
             size_key=ap.size_key,
         )
     )
+
+    # Keepa 由来の推定ノート（月販推定・FBAサイズ推定）を結果に正直に引き継ぐ。
+    notes = list(result.notes) + list(getattr(ap, "estimate_notes", []) or [])
 
     return DiscoveryRow(
         name=item.name,
@@ -139,7 +161,7 @@ def _match_and_calc(
         supplier_url=item.url,
         category_label=result.category_label,
         is_sample=item.is_sample or ap.is_sample,
-        notes=result.notes,
+        notes=notes,
     )
 
 
