@@ -1,0 +1,122 @@
+[
+  {
+    "asin": "B0SAMPLE001",
+    "title": "ワイヤレスイヤホン Bluetooth5.3 防水 (Amazon掲載)",
+    "current_price": 3980,
+    "sales_rank": 1200,
+    "monthly_sales": 320,
+    "offer_count": 4,
+    "oos_rate_90d": 0.05,
+    "category_key": "electronics",
+    "size_key": "small",
+    "jan": "4900000000017"
+  },
+  {
+    "asin": "B0SAMPLE002",
+    "title": "ステンレス水筒 500ml 真空断熱 (Amazon掲載)",
+    "current_price": 2480,
+    "sales_rank": 800,
+    "monthly_sales": 540,
+    "offer_count": 3,
+    "oos_rate_90d": 0.02,
+    "category_key": "home_kitchen",
+    "size_key": "standard_1",
+    "jan": "4900000000024"
+  },
+  {
+    "asin": "B0SAMPLE003",
+    "title": "ヨガマット 10mm 厚手 滑り止め (Amazon掲載)",
+    "current_price": 2780,
+    "sales_rank": 3500,
+    "monthly_sales": 180,
+    "offer_count": 6,
+    "oos_rate_90d": 0.10,
+    "category_key": "sports",
+    "size_key": "large_1",
+    "jan": "4900000000031"
+  },
+  {
+    "asin": "B0SAMPLE004",
+    "title": "メンズ 折りたたみ 長財布 本革 (Amazon掲載)",
+    "current_price": 4200,
+    "sales_rank": 9000,
+    "monthly_sales": 70,
+    "offer_count": 2,
+    "oos_rate_90d": 0.15,
+    "category_key": "apparel",
+    "size_key": "small",
+    "jan": "4900000000048"
+  },
+  {
+    "asin": "B0SAMPLE005",
+    "title": "ホエイプロテイン 1kg チョコ風味 (Amazon掲載)",
+    "current_price": 3680,
+    "sales_rank": 600,
+    "monthly_sales": 900,
+    "offer_count": 8,
+    "oos_rate_90d": 0.03,
+    "category_key": "health",
+    "size_key": "standard_2",
+    "jan": "4900000000055"
+  },
+  {
+    "asin": "B0SAMPLE006",
+    "title": "LED デスクライト 調光調色 USB給電 (Amazon掲載)",
+    "current_price": 2180,
+    "sales_rank": 5200,
+    "monthly_sales": 130,
+    "offer_count": 5,
+    "oos_rate_90d": 0.08,
+    "category_key": "home_kitchen",
+    "size_key": "standard_1",
+    "jan": "4900000000062"
+  },
+  {
+    "asin": "B0SAMPLE007",
+    "title": "シリコン製 調理スプーン 5本セット (Amazon掲載)",
+    "current_price": 1380,
+    "sales_rank": 14000,
+    "monthly_sales": 45,
+    "offer_count": 9,
+    "oos_rate_90d": 0.20,
+    "category_key": "home_kitchen",
+    "size_key": "small",
+    "jan": "4900000000079"
+  },
+  {
+    "asin": "B0SAMPLE008",
+    "title": "知育玩具 木製パズル 数字 形合わせ (Amazon掲載)",
+    "current_price": 2980,
+    "sales_rank": 2200,
+    "monthly_sales": 260,
+    "offer_count": 3,
+    "oos_rate_90d": 0.06,
+    "category_key": "toys",
+    "size_key": "standard_1",
+    "jan": "4900000000086"
+  },
+  {
+    "asin": "B0SAMPLE009",
+    "title": "アロマディフューザー 超音波 300ml (Amazon掲載・在庫薄)",
+    "current_price": 3480,
+    "sales_rank": 4100,
+    "monthly_sales": 150,
+    "offer_count": 2,
+    "oos_rate_90d": 0.35,
+    "category_key": "home_kitchen",
+    "size_key": "standard_1",
+    "jan": "4900000000093"
+  },
+  {
+    "asin": "B0SAMPLE010",
+    "title": "Amazon専売おまけ商品（仕入元なし・Amazon起点専用）",
+    "current_price": 5980,
+    "sales_rank": 950,
+    "monthly_sales": 410,
+    "offer_count": 2,
+    "oos_rate_90d": 0.28,
+    "category_key": "beauty",
+    "size_key": "small",
+    "jan": "4900000999999"
+  }
+]
