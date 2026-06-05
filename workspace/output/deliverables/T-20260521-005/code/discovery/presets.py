@@ -30,7 +30,7 @@
                      サトル基準: 初心者500円 / 標準1,000円（朝野「利益500円まで緩めて分母拡大」）
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 
 @dataclass
@@ -184,6 +184,133 @@ def amazon_category_choices() -> list[tuple[str, str]]:
 def get_amazon_category(key: str) -> AmazonCategory:
     """キーから Amazon カテゴリを返す。未知なら既定（ホーム＆キッチン）。"""
     return AMAZON_CATEGORIES.get(key, AMAZON_CATEGORIES[DEFAULT_AMAZON_CATEGORY_KEY])
+
+
+# =============================================================================
+# (あ) 原石オートサーチ：Keepa Product Finder 用 selection（条件抽出）
+# =============================================================================
+# 「そこそこ売れてる × 競合が少ない × 中位ランク」のニッチ原石を数千商品から自動抽出する。
+# Best Sellers（売れ筋トップ＝競争激・赤字）とは逆向きに、中位ランク帯を狙うのが肝。
+#
+# Keepa Product Finder の selection フィールド（query エンドポイント仕様）:
+#   current_SALES_gte / _lte      : 販売ランキングの範囲（小さい=売れる）。中位帯で挟む。
+#   current_COUNT_NEW_gte / _lte  : 新品出品者数の範囲（相乗り＝競合数）。少なめに絞る。
+#   current_NEW_gte / _lte        : 新品価格の範囲（円）。仕入れ可能な価格帯に限定。
+#   categories_include            : 対象カテゴリ（co.jp ノードID）の配列。
+#   perPage / page                : ページング。sort: [[field, "asc"|"desc"]]。
+# ※ Product Finder は ASIN しか返さない（詳細は別途 product で取得＝find_products内で実施）。
+
+
+@dataclass
+class FinderPreset:
+    """原石オートサーチ1セット。Keepa Product Finder の selection に変換できる条件。"""
+
+    key: str
+    label: str
+    description: str
+    sales_rank_gte: int          # ランク下限（これ以上=トップ過ぎを除外）
+    sales_rank_lte: int          # ランク上限（これ以下=売れなさ過ぎを除外）
+    count_new_gte: int           # 出品者数の下限（少なすぎ=真贋/知財リスクの別問題）
+    count_new_lte: int           # 出品者数の上限（多すぎ=価格競争）
+    price_gte: int               # 価格下限（円）
+    price_lte: int               # 価格上限（円）
+    per_page: int = 50           # Finder取得件数（>=50）。詳細取得は別途15件にキャップ。
+    # 抽出順。実走検証(2026-06-05)で SALES asc はランク密集帯（Amazonが安い人気品）に偏り
+    # 原石が出にくいと判明。COUNT_NEW asc（競合が最も薄い順）で値付けの緩い原石を上に拾う。
+    sort: list = field(default_factory=lambda: [["current_COUNT_NEW", "asc"]])
+    # 利益計算後に効く閾値（既存 DiscoveryPreset と同じ役割。原石判定に使う）。
+    min_margin_rate: float = 0.05
+    min_net_profit: float = 500
+
+    def to_selection(self, category_ids: list[int]) -> dict:
+        """Keepa Product Finder の selection(JSON) を組み立てる。"""
+        return {
+            "current_SALES_gte": self.sales_rank_gte,
+            "current_SALES_lte": self.sales_rank_lte,
+            "current_COUNT_NEW_gte": self.count_new_gte,
+            "current_COUNT_NEW_lte": self.count_new_lte,
+            "current_NEW_gte": self.price_gte,
+            "current_NEW_lte": self.price_lte,
+            "categories_include": [int(c) for c in category_ids],
+            "perPage": self.per_page,
+            "page": 0,
+            "sort": self.sort,
+        }
+
+    def as_discovery_preset(self) -> "DiscoveryPreset":
+        """利益フィルタ用に既存 DiscoveryPreset へ写像する（パイプライン互換）。
+
+        Finder 側で既にランク/出品者数/価格を絞り込んでいるので、ここでは
+        利益閾値（率/額）だけを効かせ、メタ条件は緩く（誤除外を避ける）。
+        """
+        return DiscoveryPreset(
+            key=self.key,
+            label=self.label,
+            description=self.description,
+            max_sales_rank=self.sales_rank_lte,
+            min_monthly_sales=0,
+            max_offer_count=self.count_new_lte,
+            min_oos_rate_90d=0.0,
+            min_margin_rate=self.min_margin_rate,
+            min_net_profit=self.min_net_profit,
+        )
+
+
+FINDER_PRESETS: dict[str, FinderPreset] = {
+    # ── 原石オートサーチ・初心者（サトル基準：中位ランク×競合薄×手頃価格）──
+    "finder_genseki_beginner": FinderPreset(
+        key="finder_genseki_beginner",
+        label="(あ)原石オートサーチ・初心者（推奨）",
+        description=(
+            "キーワード不要。中位ランク（概ね1,000〜80,000位）× 出品者2〜10人 × "
+            "1,000〜10,000円 の『そこそこ売れて競合が薄い』ニッチ原石を数千商品から自動抽出。"
+            "Best Sellers（売れ筋トップ＝赤字）の逆を狙う。サトル基準・初心者緩和。"
+        ),
+        sales_rank_gte=3000,      # 〜3,000位は人気品でAmazonが安い傾向→原石薄。少し下から拾う
+        sales_rank_lte=80000,     # 80,000位より下は売れ行き不安で除外
+        count_new_gte=2,          # 出品1人=真贋/知財リスクの別問題なので2以上
+        count_new_lte=10,         # 10人超は価格競争で利益消失
+        price_gte=1000,
+        price_lte=10000,
+        per_page=50,
+        # 初心者既定は SALES asc。実走検証(2026-06-05)で「JAN付き＝Yahooで仕入元を実際に
+        # 当てられる」ブランド品が多く、利益が実数で出る（保留だらけになりにくい）ため。
+        # 競合の薄いニッチ無名品狙い（=Yahoo未掲載が増える）は『標準』の COUNT_NEW asc で。
+        sort=[["current_SALES", "asc"]],
+        min_margin_rate=0.05,     # 初心者5%
+        min_net_profit=500,       # 初心者500円
+    ),
+    # ── 原石オートサーチ・標準（競合さらに絞り/利益厚め）──
+    "finder_genseki_standard": FinderPreset(
+        key="finder_genseki_standard",
+        label="(あ)原石オートサーチ・標準",
+        description=(
+            "中位ランク × 出品者2〜6人 × 1,500〜12,000円。競合をさらに絞り利益率15%/1,000円を要求。"
+            "慣れてきたら。サトル基準・標準値。"
+        ),
+        sales_rank_gte=1000,
+        sales_rank_lte=60000,
+        count_new_gte=2,
+        count_new_lte=6,
+        price_gte=1500,
+        price_lte=12000,
+        per_page=50,
+        min_margin_rate=0.15,
+        min_net_profit=1000,
+    ),
+}
+
+DEFAULT_FINDER_PRESET_KEY = "finder_genseki_beginner"
+
+
+def get_finder_preset(key: str) -> FinderPreset:
+    """キーから Finder プリセットを返す。未知なら既定（初心者）。"""
+    return FINDER_PRESETS.get(key, FINDER_PRESETS[DEFAULT_FINDER_PRESET_KEY])
+
+
+def finder_preset_choices() -> list[tuple[str, str]]:
+    """UI のセレクト用 (key, label) リスト。"""
+    return [(p.key, p.label) for p in FINDER_PRESETS.values()]
 
 
 def get_preset(key: str) -> DiscoveryPreset:

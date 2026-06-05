@@ -23,7 +23,9 @@ from discovery import pipeline
 from discovery.presets import (
     PRESETS,
     amazon_category_choices,
+    finder_preset_choices,
     get_amazon_category,
+    get_finder_preset,
     get_preset,
     preset_choices,
 )
@@ -51,7 +53,7 @@ st.markdown(
     """
     <div class="ss-header">
       <h1>Sato-Scope Discovery — 利益が出る商品の自動リサーチ（プロト）</h1>
-      <div class="sub">仕入れ元起点(電脳せどり) / Amazon起点 の2モード · 利益計算は経理検証済みエンジン</div>
+      <div class="sub">原石オートサーチ(Keepa Product Finder・キーワード不要) / 仕入れ元起点(電脳せどり) · 利益計算は経理検証済みエンジン</div>
     </div>
     """,
     unsafe_allow_html=True,
@@ -106,36 +108,61 @@ with st.sidebar:
     st.header("検索条件")
     mode = st.radio(
         "モード",
-        ["(い) 仕入れ元起点（電脳せどり）", "(あ) Amazon起点ディスカバリー"],
+        [
+            "(あ) 原石オートサーチ（キーワード不要）",
+            "(い) 仕入れ元起点（電脳せどり）",
+            "(あ旧) Amazon起点（売れ筋トップ）",
+        ],
     )
-    preset_key = st.selectbox(
-        "プリセット（絞り込み条件）",
-        options=[k for k, _ in preset_choices()],
-        format_func=lambda k: get_preset(k).label,
-    )
-    st.caption("⚠ プリセット閾値はサトル監修前の暫定値です。")
-    st.caption(get_preset(preset_key).description)
+
+    # 原石オートサーチは専用の Finder プリセットを使う。他モードは従来プリセット。
+    is_finder = mode.startswith("(あ) 原石")
+    if is_finder:
+        finder_preset_key = st.selectbox(
+            "原石プリセット（抽出条件）",
+            options=[k for k, _ in finder_preset_choices()],
+            format_func=lambda k: get_finder_preset(k).label,
+        )
+        st.caption(get_finder_preset(finder_preset_key).description)
+        preset_key = "hunting_beginner"  # 未使用だが下流の参照安全のため既定を入れる
+    else:
+        finder_preset_key = "finder_genseki_beginner"
+        preset_key = st.selectbox(
+            "プリセット（絞り込み条件）",
+            options=[k for k, _ in preset_choices()],
+            format_func=lambda k: get_preset(k).label,
+        )
+        st.caption("⚠ プリセット閾値はサトル監修前の暫定値です。")
+        st.caption(get_preset(preset_key).description)
+
+    is_legacy_amazon = mode.startswith("(あ旧)")
 
     query = ""
     if mode.startswith("(い)"):
         _q_help = "" if keepa_live else "（空欄=サンプル全件）"
         query = st.text_input(f"仕入れキーワード{_q_help}", "")
 
-    # (あ) Amazon起点：キーワード不要。カテゴリの売れ筋から原石を探す。
+    # カテゴリ選択は (あ)原石オートサーチ／(あ旧)売れ筋トップ の両方で使う。
     amazon_cat_key = "home_kitchen"
     use_assumed = False
     assumed = 0.5
-    if mode.startswith("(あ)"):
+    if is_finder or is_legacy_amazon:
         amazon_cat_key = st.selectbox(
-            "探索カテゴリ（売れ筋を自動収集）",
+            "探索カテゴリ",
             options=[k for k, _ in amazon_category_choices()],
             format_func=lambda k: get_amazon_category(k).label,
         )
-        if keepa_live:
+        if is_finder and keepa_live:
             st.info(
-                "🔎 キーワード不要。選んだカテゴリの **Amazon売れ筋ランキング** から最大10商品を"
-                "自動収集し、Yahooで仕入元を当てて利益化します。"
-                "1回の探索で **Keepaトークンを約20〜30消費**します（詳細10件＋売れ筋取得）。"
+                "🔎 **キーワード不要**。選んだカテゴリの中位ランク帯から "
+                "『そこそこ売れて競合が薄い』ニッチ原石を **Keepa Product Finder で条件抽出**し、"
+                "Yahooで仕入元を当てて利益化します。"
+                "1回の探索で **Keepaトークンを約20〜30消費**します（Finder抽出＋詳細最大15件）。"
+            )
+        elif is_legacy_amazon and keepa_live:
+            st.info(
+                "（旧モード）選んだカテゴリの **売れ筋ランキング上位** から最大15商品を取得します。"
+                "売れ筋トップは競争が激しく赤字になりやすいため、原石狙いは『原石オートサーチ』を推奨。"
             )
         use_assumed = st.checkbox(
             "仕入元が見つからない商品も『想定原価率』で仮計算する（学習用・正直でない）",
@@ -160,14 +187,27 @@ def _build_rows():
         # 確認できるよう、生の Yahoo 候補も併せて保持する（正直なフォールバック）。
         raw = yahoo.search(query, results=30)
         return rows, raw
+
     cat = get_amazon_category(amazon_cat_key)
-    rows = pipeline.discover_from_amazon(
-        preset_key=preset_key, amazon_backend=amazon,
-        assumed_cost_rate=assumed, use_assumed_cost=use_assumed,
-        yahoo_client=yahoo, category_id=cat.category_id, max_asins=10,
-    )
-    # 探索後の残トークンを表示用に session_state へ（Keepaバックエンドのみ）。
+    if is_finder:
+        # (あ) 原石オートサーチ：Keepa Product Finder で条件抽出 → Yahoo突合。
+        rows = pipeline.discover_by_finder(
+            finder_preset_key=finder_preset_key,
+            category_ids=[cat.category_id],
+            amazon_backend=amazon, yahoo_client=yahoo,
+            use_assumed_cost=use_assumed, assumed_cost_rate=assumed,
+            max_asins=15,
+        )
+    else:
+        # (あ旧) 売れ筋トップ。
+        rows = pipeline.discover_from_amazon(
+            preset_key=preset_key, amazon_backend=amazon,
+            assumed_cost_rate=assumed, use_assumed_cost=use_assumed,
+            yahoo_client=yahoo, category_id=cat.category_id, max_asins=15,
+        )
+    # 探索後の消費/残トークンを表示用に session_state へ（Keepaバックエンドのみ）。
     st.session_state["ss_tokens_left"] = getattr(amazon, "last_tokens_left", None)
+    st.session_state["ss_tokens_consumed"] = getattr(amazon, "last_tokens_consumed", None)
     return rows, []
 
 
@@ -197,11 +237,14 @@ if rows:
     c4.metric("平均利益率", f"{avg_margin*100:.1f} %")
     c5.metric("トップ純利益", f"{int(top.net_profit):,} 円")
 
-# (あ)Amazon起点でKeepaを実消費したら、残トークンを正直に表示する。
-if mode.startswith("(あ)") and keepa_live:
+# (あ)系モードでKeepaを実消費したら、消費/残トークンを正直に表示する。
+if (is_finder or is_legacy_amazon) and keepa_live:
     _tok = st.session_state.get("ss_tokens_left")
+    _con = st.session_state.get("ss_tokens_consumed")
     if _tok is not None:
-        st.caption(f"🪙 Keepa残トークン: 約 {_tok} （この探索で詳細最大10件＋売れ筋取得を消費）")
+        _src = "Finder抽出＋詳細最大15件" if is_finder else "売れ筋取得＋詳細最大15件"
+        _con_txt = f"消費 約{_con} / " if _con is not None else ""
+        st.caption(f"🪙 Keepaトークン: {_con_txt}残 約 {_tok} （この探索で{_src}）")
 
 # ----- 生Yahoo候補（仕入れ元=本物。Amazon未突合でも実在を見せる）-------------
 if raw_yahoo and mode.startswith("(い)"):
@@ -260,6 +303,13 @@ if not rows:
                 "Amazon側がサンプルのため実在JANと一致しないのが原因で、これは正常な挙動です。"
                 "KEEPA_API_KEY設定後に、上の実在候補へAmazon売値・月販が付いて利益ランキングになります。"
             )
+    elif is_finder:
+        st.info(
+            "条件に合う原石が今回は見つかりませんでした（正直な結果）。"
+            "考えられる理由：(1) Product Finder の条件（中位ランク×出品者2〜10人×価格帯）に"
+            "合うASINがこのカテゴリで少ない、(2) 抽出ASINがYahooで仕入元に当たらない、"
+            "(3) 当たっても黒字化しない。対策：別カテゴリに変える／『標準』→『初心者』に緩める。"
+        )
     else:
         st.info("条件に合う候補がありませんでした。プリセットを『広く拾う』にすると増えます。")
 else:

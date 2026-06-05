@@ -20,7 +20,7 @@ from typing import Optional
 from adapters.amazon_data import AmazonDataBackend, AmazonProduct, get_backend
 from adapters.yahoo_shopping import YahooItem, YahooShoppingClient
 from calc import profit
-from discovery.presets import DiscoveryPreset, get_preset
+from discovery.presets import DiscoveryPreset, get_finder_preset, get_preset
 from discovery.quantity import parse_quantity
 
 logger = logging.getLogger("discovery")
@@ -308,6 +308,62 @@ def discover_from_amazon(
     return rows
 
 
+# =============================================================================
+# (あ) 原石オートサーチ = Keepa Product Finder（キーワード不要・条件抽出）
+# =============================================================================
+def discover_by_finder(
+    *,
+    finder_preset_key: str = "finder_genseki_beginner",
+    category_ids: Optional[list[int]] = None,
+    amazon_backend: Optional[AmazonDataBackend] = None,
+    yahoo_client: Optional[YahooShoppingClient] = None,
+    use_assumed_cost: bool = False,
+    assumed_cost_rate: float = 0.5,
+    max_asins: int = 15,
+) -> list[DiscoveryRow]:
+    """Keepa Product Finder で原石ASIN群を抽出→Yahoo突合→利益ランキング（キーワード不要）。
+
+    Best Sellers（売れ筋トップ＝赤字）ではなく、Finder の条件抽出で
+    「中位ランク × 競合薄 × 手頃価格」のニッチ原石を数千商品から自動で絞り込む。
+    抽出した各ASINを JAN で Yahoo に当てて実仕入値を取り、個数安全判定を通して利益化する。
+
+    トークン節約: Finder 1コール＋詳細最大 max_asins(≤15) 件の product 1バッチのみ。
+    仕入元未発見/赤字は **でっち上げず正直に保留/除外**（_build_amazon_row と同じ honesty）。
+    """
+    fpreset = get_finder_preset(finder_preset_key)
+    amazon = amazon_backend or get_backend()
+    yahoo = yahoo_client or YahooShoppingClient()
+
+    # find_products を持つバックエンド（Keepa）でのみ Finder 探索。サンプル等は list_products へ。
+    if hasattr(amazon, "find_products"):
+        selection = fpreset.to_selection(category_ids or [])
+        logger.info("Product Finder selection=%s（詳細上限%d件）", selection, max_asins)
+        products = amazon.find_products(selection, limit=max_asins)
+    else:
+        logger.info("find_products 非対応バックエンド→list_productsにフォールバック")
+        products = amazon.list_products(limit=max_asins)
+
+    # 利益フィルタは Finder プリセットを DiscoveryPreset に写像して再利用。
+    preset = fpreset.as_discovery_preset()
+
+    rows: list[DiscoveryRow] = []
+    for ap in products:
+        if ap.current_price is None:
+            logger.info("除外[Amazon価格無し]: %s", ap.title)
+            continue
+        # Finder 側で既にランク/出品者数/価格を絞っているが、念のため軽く再確認。
+        if not _passes_amazon_filters(ap, preset):
+            logger.info("除外[Amazon条件外]: %s (rank=%s)", ap.title, ap.sales_rank)
+            continue
+        row = _build_amazon_row(ap, yahoo, assumed_cost_rate, use_assumed_cost)
+        if row is not None:
+            rows.append(row)
+
+    rows = _apply_profit_filters(rows, preset)
+    rows.sort(key=lambda r: r.net_profit, reverse=True)
+    return rows
+
+
 def _build_amazon_row(
     ap: AmazonProduct,
     yahoo: YahooShoppingClient,
@@ -481,6 +537,10 @@ def _apply_profit_filters(
             out.append(r)
         elif not r.qty_reliable and r.net_profit > 0:
             # 数量補正/不明の黒字行は、閾値未達でも「要確認」として残す。
+            out.append(r)
+        elif r.supplier_price is None and r.match_status == AMAZON_ONLY:
+            # 仕入元未発見の「候補保留」行（利益0）は黙って捨てず残す（honesty-first）。
+            # Amazon起点/Finderで原石候補として社長がリサーチできるようにする。
             out.append(r)
     return out
 

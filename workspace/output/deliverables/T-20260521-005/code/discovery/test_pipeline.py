@@ -171,6 +171,99 @@ def test_quantity_unknown_is_downgraded():
     assert any("数量未確定" in n for n in row.notes)
 
 
+class _FakeFinderBackend:
+    """find_products を持つ偽 Keepa バックエンド（実APIを叩かずに Finder 経路を検証）。"""
+
+    is_live = True
+    is_sample = False
+
+    def __init__(self, products):
+        self._products = products
+        self.last_selection = None
+        self.last_tokens_left = 530
+        self.last_tokens_consumed = 24
+
+    def find_products(self, selection, *, limit=None):
+        self.last_selection = selection
+        return list(self._products)[: (limit or len(self._products))]
+
+
+def _amazon_product(asin, title, price, jan=None, rank=20000, offers=4):
+    from adapters.amazon_data import AmazonProduct
+
+    return AmazonProduct(
+        asin=asin, title=title, current_price=price, sales_rank=rank,
+        monthly_sales=30, offer_count=offers, category_key="home_kitchen",
+        size_key="standard_1", jan=jan,
+    )
+
+
+def test_discover_by_finder_builds_selection_and_ranks(monkeypatch):
+    """Finder経路: selection が組まれ、Yahoo突合→利益降順ランキングになる。"""
+    from discovery.presets import get_finder_preset
+
+    products = [
+        _amazon_product("B1", "原石A 1個", 3980, jan="4900000000017"),
+        _amazon_product("B2", "原石B 1個", 2980, jan="4900000000024"),
+    ]
+    backend = _FakeFinderBackend(products)
+    yahoo = YahooShoppingClient(force_sample=True)
+
+    rows = pipeline.discover_by_finder(
+        finder_preset_key="finder_genseki_beginner",
+        category_ids=[3828871],
+        amazon_backend=backend, yahoo_client=yahoo,
+        use_assumed_cost=True, assumed_cost_rate=0.4,  # サンプルYahoo未一致でも行が出るように
+    )
+    # selection が Finder プリセットから組み立てられている
+    sel = backend.last_selection
+    fp = get_finder_preset("finder_genseki_beginner")
+    assert sel["current_SALES_gte"] == fp.sales_rank_gte
+    assert sel["current_SALES_lte"] == fp.sales_rank_lte
+    assert sel["current_COUNT_NEW_lte"] == fp.count_new_lte
+    assert sel["categories_include"] == [3828871]
+    assert sel["sort"] == fp.sort  # 抽出順はプリセット定義（既定: 競合薄い順 COUNT_NEW asc）
+    # 利益降順
+    profits = [r.net_profit for r in rows]
+    assert profits == sorted(profits, reverse=True)
+
+
+def test_discover_by_finder_honest_when_no_supplier(monkeypatch):
+    """仕入元が当たらず use_assumed_cost=False なら利益をでっち上げず保留にする。"""
+    products = [_amazon_product("BX", "原石X 1個", 5000, jan="0000000000000")]
+    backend = _FakeFinderBackend(products)
+    yahoo = YahooShoppingClient(force_sample=True)
+
+    rows = pipeline.discover_by_finder(
+        finder_preset_key="finder_genseki_beginner",
+        category_ids=[3828871],
+        amazon_backend=backend, yahoo_client=yahoo,
+        use_assumed_cost=False,
+    )
+    # 仕入元未発見の行は利益0・要確認・保留ノート付き（でっち上げ無し）
+    assert rows and rows[0].supplier_price is None
+    assert rows[0].net_profit == 0.0
+    assert rows[0].verdict == pipeline.VERDICT_NEEDS_CHECK
+    assert any("仕入元未発見" in n for n in rows[0].notes)
+
+
+def test_finder_preset_to_selection_shape():
+    """FinderPreset.to_selection が Keepa が期待するフィールド名の dict を返す。"""
+    from discovery.presets import get_finder_preset
+
+    fp = get_finder_preset("finder_genseki_beginner")
+    sel = fp.to_selection([3828871, 86731051])
+    for field_name in (
+        "current_SALES_gte", "current_SALES_lte",
+        "current_COUNT_NEW_gte", "current_COUNT_NEW_lte",
+        "current_NEW_gte", "current_NEW_lte",
+        "categories_include", "perPage", "page", "sort",
+    ):
+        assert field_name in sel
+    assert sel["categories_include"] == [3828871, 86731051]
+    assert sel["perPage"] >= 50  # Keepa の最小 perPage 要件
+
+
 def test_jan_search_filters_to_single_product():
     """JAN直指定の検索が該当1件に絞れる（Amazon起点の実仕入値当てに使う経路）。"""
     yahoo = YahooShoppingClient(force_sample=True)

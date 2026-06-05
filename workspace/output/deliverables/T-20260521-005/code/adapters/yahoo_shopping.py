@@ -146,8 +146,18 @@ class YahooShoppingClient:
         if price_to is not None:
             params["price_to"] = price_to
 
-        resp = requests.get(YAHOO_ITEMSEARCH_ENDPOINT, params=params, timeout=15)
-        resp.raise_for_status()
+        # 短時間に多数のJAN検索を連投すると Yahoo が 429 を返すため、軽くペーシングし、
+        # 429 を一度だけバックオフ再試行する（原石オートサーチは最大15回連続で叩くため）。
+        import time
+
+        for attempt in range(2):
+            resp = requests.get(YAHOO_ITEMSEARCH_ENDPOINT, params=params, timeout=15)
+            if resp.status_code == 429 and attempt == 0:
+                time.sleep(1.0)  # レート制限 → 1秒待って一度だけ再試行
+                continue
+            resp.raise_for_status()
+            break
+        time.sleep(0.15)  # 次の呼び出しまでの最小間隔（429 予防）
         payload = resp.json()
         return self._normalize(payload.get("hits", []), is_sample=False)
 

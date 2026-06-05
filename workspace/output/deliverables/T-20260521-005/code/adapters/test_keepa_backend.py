@@ -187,6 +187,77 @@ def test_list_products_bestsellers_flow(monkeypatch):
     assert backend.last_tokens_left == 900
 
 
+def test_find_products_finder_flow(monkeypatch):
+    """(あ)原石オートサーチ: Finder query→ASIN→詳細 の流れと ASIN上限15を検証（実APIは叩かない）。"""
+    backend = KeepaBackend(api_key="dummy")
+
+    captured = {}
+
+    def fake_finder(self, selection):
+        captured["selection"] = selection
+        # Finder が条件合致 ASIN を20件返す（上限15で切られるはず）
+        return [f"B{i:09d}" for i in range(20)]
+
+    def fake_request(self, *, code=None, asin=None):
+        captured["asin"] = asin
+        return {
+            "tokensLeft": 540,
+            "tokensConsumed": 25,
+            "products": [MOCK_PRODUCT, MOCK_NO_BUYBOX],
+        }
+
+    monkeypatch.setattr(KeepaBackend, "_fetch_finder_asins", fake_finder)
+    monkeypatch.setattr(KeepaBackend, "_request", fake_request)
+
+    selection = {
+        "current_SALES_gte": 1000, "current_SALES_lte": 80000,
+        "current_COUNT_NEW_gte": 2, "current_COUNT_NEW_lte": 10,
+        "categories_include": [3828871], "perPage": 50, "page": 0,
+    }
+    products = backend.find_products(selection, limit=15)
+    # 詳細取得は最大15 ASIN（ハードキャップ）
+    assert len(captured["asin"].split(",")) == 15
+    # selection がそのまま Finder に渡る
+    assert captured["selection"]["current_SALES_lte"] == 80000
+    assert all(p.asin for p in products)
+    assert products[0].current_price == 9500
+    assert backend.last_tokens_left == 540
+    assert backend.last_tokens_consumed == 25
+
+
+def test_find_products_empty_when_no_asins(monkeypatch):
+    """Finder が0件なら詳細取得せず空リスト（でっち上げ無し）。"""
+    backend = KeepaBackend(api_key="dummy")
+    monkeypatch.setattr(KeepaBackend, "_fetch_finder_asins", lambda self, sel: [])
+    called = {"request": False}
+
+    def fake_request(self, *, code=None, asin=None):
+        called["request"] = True
+        return {"products": []}
+
+    monkeypatch.setattr(KeepaBackend, "_request", fake_request)
+    assert backend.find_products({"perPage": 50}) == []
+    assert called["request"] is False  # ASIN0件なら詳細コールしない＝トークン浪費しない
+
+
+def test_find_products_caps_at_max_asins_per_list(monkeypatch):
+    """limit 未指定でも MAX_ASINS_PER_LIST(15) を超えないこと。"""
+    backend = KeepaBackend(api_key="dummy")
+    monkeypatch.setattr(
+        KeepaBackend, "_fetch_finder_asins",
+        lambda self, sel: [f"B{i:09d}" for i in range(50)],
+    )
+    captured = {}
+
+    def fake_request(self, *, code=None, asin=None):
+        captured["asin"] = asin
+        return {"tokensLeft": 1, "products": []}
+
+    monkeypatch.setattr(KeepaBackend, "_request", fake_request)
+    backend.find_products({"perPage": 50})  # limit 未指定
+    assert len(captured["asin"].split(",")) == KeepaBackend.MAX_ASINS_PER_LIST
+
+
 def test_list_products_without_category_returns_empty():
     backend = KeepaBackend(api_key="dummy")
     assert backend.list_products() == []

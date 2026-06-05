@@ -462,7 +462,7 @@ class KeepaBackend:
     # Amazon 起点（Best Sellers）= キーワード不要の売れ筋自動収集
     # ------------------------------------------------------------------
     BESTSELLERS_ENDPOINT = "https://api.keepa.com/bestsellers"
-    MAX_ASINS_PER_LIST = 10  # 詳細取得する ASIN のハードキャップ（トークン節約の要）
+    MAX_ASINS_PER_LIST = 15  # 詳細取得する ASIN のハードキャップ（社長制約：最大15件）
 
     def list_products(self, **filters) -> list[AmazonProduct]:
         """Keepa Best Sellers でカテゴリの売れ筋 ASIN を取り、先頭N件だけ詳細取得する。
@@ -510,6 +510,87 @@ class KeepaBackend:
                 ap.jan = eans[0]
             out.append(ap)
         return out
+
+    # ------------------------------------------------------------------
+    # Product Finder（条件抽出）= キーワード不要の「原石オートサーチ」(あ)
+    # ------------------------------------------------------------------
+    QUERY_ENDPOINT = "https://api.keepa.com/query"
+
+    def find_products(self, selection: dict, *, limit: Optional[int] = None) -> list[AmazonProduct]:
+        """Keepa Product Finder で条件に合う ASIN 群を引き、先頭N件だけ詳細取得する。
+
+        引数:
+          selection : Keepa Product Finder の selection(JSON)。
+                      例: {"current_SALES_gte":1000, "current_SALES_lte":80000,
+                           "current_COUNT_NEW_gte":2, "current_COUNT_NEW_lte":10,
+                           "current_NEW_gte":1000, "current_NEW_lte":10000,
+                           "categories_include":[3828871], "perPage":50, "page":0,
+                           "sort":[["current_SALES","asc"]]}
+          limit     : 詳細取得する ASIN の上限（既定/上限とも MAX_ASINS_PER_LIST=15）。
+
+        トークン節約（社長制約：実走2〜3回・詳細最大15件）:
+          1) query で条件に合う ASIN リストを取得（=Finderコール。10token+ASIN数/100）。
+          2) 先頭 limit 件だけ product で詳細取得（1バッチ・stats/offers 込み）。
+          → 1探索で詳細取得は最大 MAX_ASINS_PER_LIST=15 ASIN にハードキャップ。
+
+        返り値: AmazonProduct のリスト（詳細取得＋正規化済み）。
+        Product Finder は ASIN しか返さないため、詳細は product で別途取得する（Keepa仕様）。
+        """
+        self._require_key()
+        cap = self.MAX_ASINS_PER_LIST
+        limit = min(int(limit), cap) if limit is not None else cap
+
+        asins = self._fetch_finder_asins(selection)
+        if not asins:
+            logger.info("Product Finder: 条件に合うASINが0件でした（条件を緩める/別カテゴリ）")
+            return []
+        asins = asins[:limit]
+        logger.info("Product Finder: 条件合致ASIN %d件の詳細を取得（先頭%d件）",
+                    len(asins), limit)
+
+        payload = self._request(asin=",".join(asins))
+        self.last_tokens_left = payload.get("tokensLeft")
+        self.last_tokens_consumed = payload.get("tokensConsumed")
+        logger.info("Keepa: 詳細%d件 消費tokens=%s 残tokens=%s",
+                    len(asins), self.last_tokens_consumed, self.last_tokens_left)
+
+        out: list[AmazonProduct] = []
+        for prod in payload.get("products") or []:
+            ap = _product_to_amazon(prod)
+            if ap is None:
+                continue
+            eans = [str(c) for c in (prod.get("eanList") or [])]
+            if eans:
+                ap.jan = eans[0]  # 仕入元突合のヒント
+            out.append(ap)
+        return out
+
+    def _fetch_finder_asins(self, selection: dict) -> list:
+        """query エンドポイントで Product Finder を叩き、ASIN リストを取得する。
+
+        Keepa 仕様: GET https://api.keepa.com/query?key=..&domain=5&selection=<JSON>。
+        レスポンスは {"asinList": [...], "tokensLeft": ..., "totalResults": ...}。
+        """
+        import json as _json  # 遅延 import
+        import requests        # 遅延 import
+
+        params = {
+            "key": self.api_key,
+            "domain": self.KEEPA_DOMAIN_JP,
+            "selection": _json.dumps(selection, separators=(",", ":")),
+        }
+        resp = requests.get(self.QUERY_ENDPOINT, params=params, timeout=self.timeout)
+        resp.raise_for_status()
+        payload = resp.json()
+        self.last_tokens_left = payload.get("tokensLeft")
+        self.last_tokens_consumed = payload.get("tokensConsumed")
+        total = payload.get("totalResults")
+        asins = payload.get("asinList") or []
+        logger.info(
+            "Product Finder: 該当%s件中 ASIN %d件取得 消費tokens=%s 残tokens=%s",
+            total, len(asins), self.last_tokens_consumed, self.last_tokens_left,
+        )
+        return [str(a) for a in asins if a]
 
     def _fetch_bestseller_asins(self, category_id) -> list:
         """bestsellers エンドポイントでカテゴリの売れ筋 ASIN リストを取得する。"""
