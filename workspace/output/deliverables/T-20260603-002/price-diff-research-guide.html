@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>価格差リサーチ実践ガイド — ERESA PRO で「仕入れる/見送る」を判断する</title>
+<style>
+  :root { --ink:#1a2233; --sub:#5a6273; --line:#e2e6ee; --bg:#f7f9fc; --accent:#1f6feb; --green:#1a7f37; --amber:#9a6700; --red:#cf222e; --card:#fff; }
+  * { box-sizing:border-box; }
+  body { font-family:-apple-system,"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif; color:var(--ink); background:var(--bg); line-height:1.75; margin:0; padding:0 16px; }
+  .wrap { max-width:880px; margin:0 auto; padding:32px 0 80px; }
+  h1 { font-size:1.62rem; line-height:1.4; border-bottom:3px solid var(--accent); padding-bottom:12px; margin-bottom:8px; }
+  h2 { font-size:1.28rem; margin-top:2.4em; padding:8px 0 8px 12px; border-left:5px solid var(--accent); background:linear-gradient(90deg,#eaf2ff,transparent); }
+  h3 { font-size:1.06rem; margin-top:1.6em; color:#26324a; }
+  .meta { background:#eef2f8; border:1px solid var(--line); border-radius:10px; padding:14px 18px; font-size:.82rem; color:var(--sub); margin:18px 0 28px; }
+  .meta div { margin:2px 0; }
+  .goal { background:#fff8e6; border:1px solid #f3e3b3; border-left:6px solid #e3b341; border-radius:10px; padding:16px 20px; margin:22px 0; }
+  .note { background:#eef7ff; border-left:5px solid var(--accent); padding:12px 18px; border-radius:0 8px 8px 0; margin:18px 0; }
+  table { border-collapse:collapse; width:100%; margin:18px 0; background:var(--card); border-radius:10px; overflow:hidden; box-shadow:0 1px 3px rgba(20,30,60,.06); font-size:.9rem; }
+  th,td { border:1px solid var(--line); padding:9px 12px; text-align:left; vertical-align:top; }
+  th { background:#2b3650; color:#fff; font-weight:600; }
+  tr:nth-child(even) td { background:#fafbfd; }
+  code,pre { font-family:"SF Mono",Consolas,Menlo,monospace; }
+  pre { background:#0f1626; color:#e6edf3; padding:16px 18px; border-radius:10px; overflow-x:auto; font-size:.85rem; line-height:1.6; }
+  code { background:#eef2f8; padding:1px 6px; border-radius:4px; font-size:.86em; }
+  .g{color:var(--green);font-weight:600;} .a{color:var(--amber);font-weight:600;} .r{color:var(--red);font-weight:600;}
+  blockquote { margin:16px 0; padding:10px 18px; border-left:4px solid #c7ccd6; background:#f1f3f7; color:var(--sub); border-radius:0 8px 8px 0; font-size:.92rem; }
+  .src { font-size:.78rem; color:var(--sub); border-top:1px solid var(--line); margin-top:40px; padding-top:18px; }
+  strong { color:#10172a; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>価格差リサーチ実践ガイド<br>— ERESA PRO で「仕入れる/見送る」を自分で判断する</h1>
+
+<div class="meta">
+  <div>作成: サトル（リサーチャー） / 2026-06-03 / 依頼: カズヨ（秘書）経由 社長</div>
+  <div>対象: T-20260603-002（価格差リサーチ実践ガイド）</div>
+  <div>前提: 副業初心者 / 予算上限10万円 / 小口プラン / 個人 / 店舗名 Satoy Select</div>
+  <div>仕入れ手法: B（国内卸=NETSEA等の新品小ロット）→ C（電脳せどり=ヨドバシ等のポイント還元）の順・両対応</div>
+  <div>主軸ツール: ERESA PRO（7日無料試用→月¥4,980、Keepa内包）。補助で無料Keepa拡張・アマサーチ等</div>
+  <div>規制低カテゴリ（日用品雑貨・文具）中心。家電(PSE)/サプリ/ブランド品は避ける</div>
+  <div>ツールUI詳細など未確認の点は【要確認】試用開始後に画面で確認、と明示</div>
+</div>
+
+<div class="goal">
+<strong>ゴール:</strong> 社長がERESAを開いて、このガイド通りに手を動かせば「価格差があって、かつ売れる商品」を自分で見分けて<strong>『仕入れる/見送る』を判断できるようになる</strong>こと。<br><br>
+初心者が最初にやりがちな失敗は「Amazonで高く売れてる！仕入値より安い！だから仕入れる」。これは<strong>半分しか見ていません</strong>。価格差があっても売れなければ<strong>在庫の山</strong>になり、現金が在庫に化けたまま戻りません。だから最初から次の<strong>4つの目</strong>を同時に見ます。
+</div>
+
+<table>
+<tr><th>見る目</th><th>何を確認するか</th><th>見ないと起きる事故</th></tr>
+<tr><td>① 利益（額/率）</td><td>仕入総コスト vs 販売価格。手数料を全部引いて残るか</td><td>手数料を忘れて「儲かるはず」が赤字</td></tr>
+<tr><td>② 回転（売れ行き）</td><td>月に何個売れているか／ランキングが動いているか</td><td>価格差はあるが売れず、在庫の山</td></tr>
+<tr><td>③ 競合（出品者数）</td><td>同じ商品を何人が売っているか／Amazon本体・メーカーがいるか</td><td>値下げ合戦に巻き込まれ利益消滅</td></tr>
+<tr><td>④ 価格推移の安定</td><td>過去の価格が乱高下していないか</td><td>仕入れた直後に相場が暴落</td></tr>
+</table>
+
+<blockquote>ひとことで: 「安く買えて高く売れる」だけでは不十分。<strong>「安く買えて・高く売れて・ちゃんと売れて・競合が荒れていない」の4つが揃って初めて『仕入れる』。</strong></blockquote>
+
+<h2>1. そもそも「価格差リサーチ」とは</h2>
+<p>仕入れ先での値段（仕入値）とAmazonの販売価格の差（＝粗利の元）を確認し、<strong>そこから手数料を引いても利益が残るか、かつその商品がちゃんと売れるか</strong>を見極める作業です。腹落ちさせるべきは2点。</p>
+<ul>
+<li><strong>価格差 ≠ 利益。</strong>「Amazon2,000円・仕入値1,000円・差1,000円！」でも、販売手数料・FBA手数料・送料を引くと利益は数百円、悪くすると赤字（§4で実例）。</li>
+<li><strong>利益が出ても、売れなければ意味がない。</strong>利益率30%でも月1個なら現金が3ヶ月戻らない。<strong>「回転」は利益率と同じくらい重要</strong>。</li>
+</ul>
+<p>本質は<strong>「価格差・利益・回転・競合・安定」をツールで一度に見て、賭けて良い商品か判断する作業</strong>。闇雲な仕入れを避けたいという希望にそのまま答える型です。</p>
+
+<h2>2. 使うツールと役割</h2>
+<h3>2.1 ERESA PRO（主軸）— 1画面で4つの目が揃う</h3>
+<p>ERESAはAmazon SPN（公認）リサーチ・分析ツール。ASIN/JAN/商品名で検索すると以下が見られます（出典: knowledge_eresa_research_report.md）。</p>
+<table>
+<tr><th>4つの目</th><th>ERESAで見える機能</th></tr>
+<tr><td>① 利益</td><td><strong>損益分岐点の自動計算</strong>（販売手数料・FBA手数料を見込み「いくらで仕入れれば黒字か」を出す）</td></tr>
+<tr><td>② 回転</td><td><strong>ランキング推移グラフ・ランキング降下回数</strong>（降下＝1個売れたサイン）、<strong>売上個数予測</strong>（PRO限定）</td></tr>
+<tr><td>③ 競合</td><td><strong>コンディション別最安値・出品者数</strong>、<strong>Amazon本体の有無・カート取得率</strong>（PRO限定）</td></tr>
+<tr><td>④ 安定</td><td><strong>Keepaの価格推移グラフ（30/90/180/365日）</strong>を内包</td></tr>
+</table>
+<p><strong>「Keepa内包」の意味:</strong> 価格推移を本格的に見るには通常Keepaを月約€19（約3,000円）で契約します。ERESA PROは<strong>そのKeepaグラフをERESA内で見られる</strong>ので別契約が不要。これが主軸にする最大の理由です。</p>
+<table>
+<tr><th>プラン</th><th>料金（税込）</th><th>用途</th></tr>
+<tr><td>無料版</td><td>¥0</td><td>ASIN/JAN検索・Keepaミニグラフ・出品者数・損益分岐計算まで使える</td></tr>
+<tr><td><strong>7日間無料お試し</strong></td><td>¥0</td><td><strong>PRO全機能。まずここで練習する</strong></td></tr>
+<tr><td>PRO 月払い</td><td>¥4,980/月</td><td>本格運用。詳細検索・売上個数予測・セラーリサーチが解放</td></tr>
+</table>
+<div class="note"><strong>推奨の入り方:</strong> いきなり課金せず、<strong>7日無料お試しでPRO全機能を触り、狙う日用品・文具カテゴリで利益商品を見つけられるか検証</strong>してから本契約を判断（出典: ERESAレポート結論）。Step2は学習主目的なので無料期間だけでも十分練習できます。</div>
+
+<h3>2.2 補助ツール（無料・必要なら）</h3>
+<table>
+<tr><th>ツール</th><th>役割</th><th>位置づけ</th></tr>
+<tr><td>Keepa（拡張・無料版）</td><td>Amazon商品ページに価格推移グラフを重ねて表示</td><td>ERESA内包で必須ではない。PCで商品ページを見ながら確認する補助</td></tr>
+<tr><td>アマサーチ（無料アプリ）</td><td>スマホでバーコードを読むと利益計算・ランキングを即表示</td><td>現物を素早く判定したい時に便利。Cの実質価格メモにも</td></tr>
+<tr><td>Amazonアプリ</td><td>バーコード検索で既存ページと相場を確認</td><td>最初の相場感をつかむ入口</td></tr>
+</table>
+<blockquote>初心者の方針: <strong>まずERESA1本に集中</strong>。複数ツールを同時に覚えると混乱します。慣れたら足す、で十分。</blockquote>
+
+<h2>3. 仕入れ可否チェックリスト（初心者の練習用・目安つき）</h2>
+<p>下記は<strong>「まずこの基準で練習する」初心者向けの一般的な目安</strong>です。断定ではなく、慣れたら自分のカテゴリに合わせて調整する出発点。<strong>1つでも<span class="r">🟥</span>に当たれば原則『見送る』</strong>。</p>
+<table>
+<tr><th>#</th><th>チェック項目</th><th>練習用の目安</th><th>どこで見る</th><th>判定</th></tr>
+<tr><td>1</td><td>利益額</td><td>1個あたり利益 ≥ <strong>300〜500円</strong></td><td>§4計算 / ERESA損益計算</td><td>下回る→<span class="r">🟥</span></td></tr>
+<tr><td>2</td><td>利益率</td><td>≥ <strong>15%</strong>（学習段階は10%超でも可、本番20%目標）</td><td>同上</td><td>下回る→<span class="a">🟨</span></td></tr>
+<tr><td>3</td><td>回転（ランキング）</td><td>カテゴリ上位5〜10%以内（目安 概ね3万位以内）【要確認: カテゴリで母数差・降下頻度も併用】</td><td>ERESAランキング推移・降下回数</td><td>外→<span class="a">🟨</span>〜<span class="r">🟥</span></td></tr>
+<tr><td>4</td><td>売れ行きの実数</td><td>Keepaグラフのランキング線が月に何度もギザギザ降下。月10個以上が目安</td><td>ERESA内Keepa / 売上個数予測(PRO)</td><td>動かない→<span class="r">🟥</span></td></tr>
+<tr><td>5</td><td>競合（出品者数）</td><td>新品出品者 <strong>2〜8人</strong>。1人独占も10人超も避ける</td><td>ERESA出品者数</td><td>外→<span class="a">🟨</span></td></tr>
+<tr><td>6</td><td>Amazon本体・メーカー</td><td>出品者に <strong>Amazon本体・メーカー公式がいない</strong></td><td>ERESA出品者欄 / カート取得率(PRO)</td><td>いる→<span class="r">🟥</span></td></tr>
+<tr><td>7</td><td>価格推移の安定</td><td>過去90〜180日が乱高下していない（直近急落なし）</td><td>ERESA内Keepa価格グラフ</td><td>乱高下→<span class="r">🟥</span></td></tr>
+<tr><td>8</td><td>規制カテゴリでない</td><td>日用品雑貨・文具中心。家電/サプリ/化粧品/ブランド/食品/酒は避ける</td><td>§8地雷集</td><td>該当→<span class="r">🟥</span></td></tr>
+<tr><td>9</td><td>真贋・出所</td><td>Bは請求書が出る正規卸か。Cは領収書を保管できるか</td><td>仕入れ先の条件</td><td>不明→<span class="a">🟨</span></td></tr>
+</table>
+<blockquote><strong>カート取得率（PRO限定）:</strong> 「カートに入れる」を誰がどれだけ獲得しているか。特定セラーが80%以上独占の商品は避ける。<br><strong>ランキング降下回数:</strong> 1個売れるとランキングが一時的に上位へ動く。回数が多い＝よく売れている。</blockquote>
+
+<h2>4. 損益計算の型（手数料を全部引く）</h2>
+<h3>4.1 基本の式</h3>
+<pre>1個あたり利益 = 販売価格
+              −（仕入値 + 仕入送料/個）
+              − 販売手数料（販売価格 × カテゴリ料率）
+              − FBA配送代行料（FBAを使う場合のみ・1個あたり定額）
+              − FBA入庫送料/個・在庫保管料/個（FBAの場合・少額）
+
+利益率 = 1個あたり利益 ÷ 販売価格</pre>
+<ul>
+<li><strong>自己発送の場合:</strong> FBA配送代行料・保管料は不要。代わりに<strong>自分が送る配送料・梱包資材費</strong>がかかる。</li>
+<li><strong>販売手数料率（2026/5・出典: accounting-simulation）:</strong> ペット8% / ヘルス&ビューティー10% / ホーム&キッチン15% / 文具・ホビー等は概ね8〜15%。【要確認: ERESA損益計算か公式FBAシミュレーターで都度確認】</li>
+<li><strong>FBA配送代行料の目安:</strong> 小型288円 / 標準20=413円 / 標準40=455円 / 大型520〜603円。</li>
+</ul>
+<h3>4.2 具体例で1件計算（ホーム&キッチン小物・FBA）</h3>
+<table>
+<tr><th>項目</th><th>値</th></tr>
+<tr><td>販売価格（Amazon）</td><td>2,780円</td></tr>
+<tr><td>仕入値</td><td>1,400円</td></tr>
+<tr><td>仕入送料（1個按分）</td><td>約130円</td></tr>
+<tr><td>販売手数料（15%）</td><td>417円</td></tr>
+<tr><td>FBA配送代行料（標準40）</td><td>455円</td></tr>
+<tr><td>在庫保管料（1ヶ月）</td><td>16円</td></tr>
+<tr><td><strong>1個あたり利益</strong></td><td>2,780 −1,400 −130 −417 −455 −16 = <strong>約362円</strong></td></tr>
+<tr><td><strong>利益率</strong></td><td>362 ÷ 2,780 = <strong>約13.0%</strong></td></tr>
+</table>
+<p>→ 「利益額 ≥300円 <span class="g">◯</span>」「利益率 ≥15% <span class="a">△</span>（学習段階なら可）」。<strong>回転（35日でやや遅い）と競合次第で判断</strong>、という読み方。「価格差だけでは決められない」の実例です。</p>
+<h3>4.3 ERESAの損益計算機能の使い方（型）</h3>
+<ol>
+<li>ERESAで対象商品をASIN/JANで検索。</li>
+<li><strong>損益分岐点計算欄に想定仕入値を入力</strong>すると手数料込みで利益・利益率が自動算出（無料版可）。</li>
+<li>その数字を<strong>§4.1の手計算と突き合わせ</strong>、ズレを確認（最初の数件は手計算も並走）。</li>
+<li>【要確認: 入力欄の位置・FBA/自己発送の切替・送料の扱いは試用開始後に画面で確認】</li>
+</ol>
+<div class="note">初心者のコツ: <strong>最初の5件は手計算とツールの両方で出し、答えが合うことを確認</strong>。これで「ツールの数字を信じてよい」と腹落ちし、以降は高速化できます。</div>
+
+<h2>5. B（国内卸）でのリサーチ手順</h2>
+<p><strong>起点 = 卸サイトの仕入値</strong>。卸で「この値段で買える」を見つけ、ERESAで「Amazonで売れて利益が出るか」を逆算。</p>
+<ol>
+<li>NETSEA等に無料会員登録し、規制低カテゴリ（生活日用品・雑貨・文具・収納）を眺める。</li>
+<li>商品の<strong>仕入値・最小ロット・JAN</strong>をメモ。</li>
+<li><strong>ERESAでJAN/商品名検索</strong> → 販売価格・ランキング・出品者数を確認。JANが無ければ型番検索。同一商品が特定できなければ判断保留。</li>
+<li><strong>§3チェックリストを上から判定</strong> → §4で1個利益を計算。</li>
+<li><strong>ロット全部を消化できるか</strong>を回転から逆算（例: ロット20個で月10個なら2ヶ月在庫）。学習段階は<strong>最小ロットが小さい品</strong>優先。</li>
+<li>すべて◯なら『仕入れる候補』、1つでも<span class="r">🟥</span>なら『見送る』。</li>
+<li>仕入れたら<strong>請求書を必ず保管</strong>（真贋調査対策）。</li>
+</ol>
+<blockquote>Bの利点: 新品・正規ルートで請求書が出て出所が明確、事故りにくい（出典: step2-procurement-decision §2 B案）。本番デビューに向く。</blockquote>
+
+<h2>6. C（電脳せどり）でのリサーチ手順</h2>
+<p><strong>起点 = 量販店ネットの「ポイント還元込み実質価格」</strong>。表示価格ではなく<strong>ポイント分を引いた実質仕入値</strong>で損益を見るのが肝。</p>
+<ol>
+<li>ヨドバシ・ビック・楽天等で規制低カテゴリの商品を見る。</li>
+<li><strong>実質仕入値 = 表示価格 −（表示価格 × ポイント還元率）</strong>。例: 2,000円・13%還元 → 実質1,740円。<strong>【注意】ポイントは現金ではなく次回使える点。出金は満額2,000円</strong>。</li>
+<li><strong>ERESAでJAN/型番検索</strong> → §3＋§4。<strong>実質仕入値を仕入値として入力</strong>。</li>
+<li><strong>規制チェックを特に厳重に</strong>: 量販店ネットは家電(PSE)・無線(技適)・玩具に触れやすい。日用品・文具に絞る。</li>
+<li><strong>新品出品の可否に注意</strong>: メーカー同等保証が無いと新品出品で問題になる場合あり。<strong>領収書を必ず保管</strong>。</li>
+<li>すべて◯なら『仕入れる候補』、1つでも<span class="r">🟥</span>なら『見送る』。</li>
+</ol>
+<blockquote>Cの注意: 学びは深いが難度が高い。<strong>Bで型を体得してからCへ</strong>進むのが安全（出典: step2-procurement-decision 推奨）。</blockquote>
+
+<h2>7. 練習メニュー（手を動かして慣れる順番）</h2>
+<p>7日無料お試しの初日から、<strong>「判断する練習」</strong>を積みます。利益を出すのが目的ではなく、<strong>判断の型を体に入れる</strong>のが目的。</p>
+<h3>ステップA: まず10商品を判定（1〜2日目）</h3>
+<ol>
+<li>B/Cから気になる商品を10個ピックアップ。</li>
+<li>各商品をERESAで検索し<strong>§3チェックリストで仕入れる/見送るを判定</strong>。</li>
+<li><strong>理由を1行ずつメモ</strong>（例:「見送り＝利益率8%・出品者12人」「候補＝利益率18%・月20個・出品者4人」）。</li>
+<li>10個中何個残るか見る。<strong>初心者は1〜2個残れば上出来</strong>。ほとんど見送りが正常で、それがリサーチの価値。</li>
+</ol>
+<h3>ステップB: 候補を1〜2商品に絞る（3〜4日目）</h3>
+<ol start="5">
+<li>残った候補を<strong>§4で精緻に損益計算</strong>し回転も見比べる。</li>
+<li>最も自信が持てる1〜2商品に絞る。「薄利だが速回転」か「低回転だが高利益率」かを意識。</li>
+</ol>
+<h3>ステップC: 判断を記録して振り返る（継続）</h3>
+<ol start="7">
+<li>判定理由を残し、<strong>売れたら予測と実績のズレ（回転日数・実利益）を記録</strong>。</li>
+<li>このズレが次回のリサーチ精度を上げる最大の教材。</li>
+</ol>
+<blockquote>習熟の目安: 1日目=ツールに触れる → 2〜3日目=10個判定が30分で回せる → 1週間後=チェックリスト無しでも4つの目で見られる。</blockquote>
+
+<h2>8. 地雷集（初心者がはまりやすい罠）</h2>
+<table>
+<tr><th>地雷</th><th>どういう罠か</th><th>回避法</th></tr>
+<tr><td>高利益に見えて売れない</td><td>利益率40%でも月1個。現金が在庫に化けて戻らない</td><td>利益率と<strong>同時に回転</strong>を見る。「売れてから喜ぶ」</td></tr>
+<tr><td>価格競争に巻き込まれる</td><td>出品者10人超／1セラーがカート独占。値下げ合戦で利益消滅</td><td>出品者2〜8人・カート分散のみ（§3 #5#6）</td></tr>
+<tr><td>Amazon本体・メーカー出品</td><td>本体/公式が同じ商品を出している。価格でも在庫でも勝てない</td><td>いたら見送り（§3 #6）</td></tr>
+<tr><td>規制品</td><td>家電/無線/サプリ/化粧品/食品/酒/ブランド/中古は許可・届出要 or 出品不可</td><td>「非推奨」は触らない。日用品雑貨・文具に限定</td></tr>
+<tr><td>ニセの価格差</td><td>「セット品vs単品」「並行輸入vs正規」「型落ちvs現行」を見間違え別物比較</td><td>JAN/ASINで<strong>同一商品</strong>を必ず確認。中身・容量・型番一致</td></tr>
+<tr><td>手数料忘れ</td><td>価格差だけ見て手数料を引き忘れ、黒字のつもりが赤字</td><td>§4で<strong>手数料を全部引いた利益</strong>で判断</td></tr>
+<tr><td>過去の高値で喜ぶ</td><td>Keepaの一時高騰時を「相場」と勘違い</td><td>直近90〜180日の安定価格帯で利益が出るか（§3 #7）</td></tr>
+<tr><td>ポイントを現金と錯覚（C）</td><td>実質価格で計算したが出金は満額。資金繰りが苦しくなる</td><td>実質価格で損益判断しつつ<strong>現金は満額出る</strong>と別で意識</td></tr>
+</table>
+<h3>触ってはいけないカテゴリ（出典: restricted-categories.csv）</h3>
+<p><span class="r">🟥 非推奨（許可・届出・出品不可）:</span> 化粧品・医薬部外品・医薬品・医療機器・サプリ/健康食品・食品/飲料・酒類・タバコ・ブランド時計/ジュエリー・<strong>家電/電気製品(PSE)</strong>・<strong>無線機器(技適)</strong>・銃刀類・危険物(スプレー/リチウム電池単体)・ブランド品・農薬・コンタクト/度入りメガネ。</p>
+<p><span class="a">🟨 慎重（条件付き）:</span> 玩具・新品DVD/CD・中古品全般（古物商）・繊維製品(品質表示義務)・自動車/バイク用品。</p>
+<p><span class="g">🟩 推奨（規制最小）:</span> <strong>国内メーカー直販・正規問屋経由の日用品（文房具・清掃用品・収納用品等）</strong>、中古本（＋古物商）。<strong>まずはここだけで練習する。</strong></p>
+
+<h2>付録: 1枚チェックシート（印刷・手元用）</h2>
+<pre>商品名/JAN: ____________________   仕入れ先: B(卸) / C(電脳)
+仕入値: ____円  (+送料/個 ____円)   ※C:ポイント還元後実質 ____円
+Amazon販売価格: ____円   カテゴリ料率: ____%
+
+[ ] ① 利益額 ≥300〜500円？    1個利益 = ____円
+[ ] ② 利益率 ≥15%？           利益率 = ____%
+[ ] ③ ランキング上位5〜10%(目安3万位以内)？  順位 ____
+[ ] ④ 月10個以上売れていそう？(グラフのギザギザ降下)
+[ ] ⑤ 出品者2〜8人？           出品者 ____人
+[ ] ⑥ Amazon本体・メーカーが不在？
+[ ] ⑦ 価格推移が安定(乱高下なし)？
+[ ] ⑧ 規制低カテゴリ(日用品/文具)？
+[ ] ⑨ 請求書/領収書を保管できる？
+
+→ 全部◯なら【仕入れる候補】 / 1つでも🟥なら【見送る】
+判定: 仕入れる / 見送る    理由メモ: ________________</pre>
+
+<div class="src">
+<strong>出典まとめ:</strong><br>
+・ERESA機能・料金・10大稼ぎテク: memory/knowledge_eresa_research_report.md（社長提供Google Drive調査レポートの要約）<br>
+・仕入れ手法B/C定義・規制低カテゴリ・損益式: workspace/output/deliverables/T-20260603-001/step2-procurement-decision.md<br>
+・手数料率・FBA配送代行料・代表商品損益: workspace/output/deliverables/T-20260521-002/accounting-simulation.md<br>
+・規制カテゴリ一覧: workspace/output/deliverables/T-20260521-002/restricted-categories.csv<br>
+・数値目安（利益率・ランキング・出品者数）は一般的な初心者向け目安であり断定ではありません。ツールUI詳細は【要確認】として明示し、試用開始後に画面で確定してください。
+</div>
+
+</div>
+</body>
+</html>

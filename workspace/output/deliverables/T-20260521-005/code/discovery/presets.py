@@ -31,6 +31,7 @@
 """
 
 from dataclasses import dataclass, field
+from typing import Optional
 
 
 @dataclass
@@ -54,24 +55,28 @@ PRESETS: dict[str, DiscoveryPreset] = {
     # ── (い) 仕入れ元起点：サトル §2「価格差ハンティングマップ」初心者値 ──
     "hunting_beginner": DiscoveryPreset(
         key="hunting_beginner",
-        label="(い)価格差ハンティング・初心者（推奨）",
+        label="価格差ハンティング・初心者（推奨）",
         description=(
             "楽天/Yahoo!の実質価格とAmazon売値の差を突く電脳せどり。"
             "朝野式の初心者緩和（利益率5%/利益500円/月3個）で分母を広げる。"
             "サトル監修済（06_research §2 (い)初心者値）"
         ),
         # before(beginner_safe): rank10000/月販100/出品5/OOS0/率15%/額500
-        max_sales_rank=50000,    # 順位は補助。Drop未取得のため緩め（→Keepa後Drop主軸へ）
-        min_monthly_sales=3,     # サトル: 初心者は月3個(Drop30≥3)まで緩める
-        max_offer_count=12,      # サトル: 初心者は出品者3〜12人
+        # 2026-06-05 社長フィードバック「原石が出てこない」→ 初心者既定をさらに緩和。
+        # ランク/出品者は緩め、原石バッジの利益基準も率8%/300円へ下げて分母を最大化する
+        # （閾値割れ行も“要確認”で全件表示する設計に変えたので、ここは原石付与の足切りのみ）。
+        max_sales_rank=200000,   # 初心者は回転より「黒字×少量仕入れ」優先。順位は補助指標
+                                 # （Drop未取得のため緩め。実売れ行きはランク列で目視）→Keepa後Drop主軸へ
+        min_monthly_sales=0,     # 初心者は売れ行き足切りを外す（死に筋はランク表示で目視）
+        max_offer_count=15,      # 初心者は出品者の上限を緩める（相乗りは別途警告で見せる）
         min_oos_rate_90d=0.0,    # 在庫切れは(い)では必須条件にしない
-        min_margin_rate=0.05,    # サトル: 初心者5%
-        min_net_profit=500,      # サトル: 初心者500円
+        min_margin_rate=0.08,    # 初心者: 利益率8%以上で原石バッジ（朝野式の緩和帯）
+        min_net_profit=300,      # 初心者: 純利益300円以上で原石バッジ（分母拡大）
     ),
     # ── (い) 標準値（慣れてきたら）──
     "hunting_standard": DiscoveryPreset(
         key="hunting_standard",
-        label="(い)価格差ハンティング・標準",
+        label="価格差ハンティング・標準",
         description=(
             "利益率15%・利益1,000円・月販10個の標準ライン。安全圏寄り。"
             "サトル監修済（06_research §2 (い)標準値）"
@@ -86,7 +91,7 @@ PRESETS: dict[str, DiscoveryPreset] = {
     # ── (あ) Amazon起点：サトル §2「Amazon棚卸しマップ」初心者値 ──
     "stocktake_beginner": DiscoveryPreset(
         key="stocktake_beginner",
-        label="(あ)Amazon棚卸し・初心者",
+        label="Amazon棚卸し・初心者",
         description=(
             "Amazonで売れてて・競合薄くて・本体不在の棚を掘る。仕入元は後で探す。"
             "サトル監修済（06_research §2 (あ)初心者値）"
@@ -101,7 +106,7 @@ PRESETS: dict[str, DiscoveryPreset] = {
     # ── 在庫切れ妙味（プレミア寄り）：サトル §A1 あ1/あ2/あ8 ──
     "oos_premium": DiscoveryPreset(
         key="oos_premium",
-        label="(あ)在庫切れ妙味（プレミア寄り）",
+        label="在庫切れ妙味（プレミア寄り）",
         description=(
             "90日在庫切れ率が高い=出せば売れる商品を狙う。出品者も絞る。"
             "サトル監修済（公式30〜40%/社内20%が割れ→保守的に20%採用）"
@@ -149,12 +154,18 @@ DEFAULT_PRESET_KEY = "hunting_beginner"
 
 
 # =============================================================================
-# (あ) Amazon起点：Keepa Best Sellers で売れ筋を引くカテゴリ（co.jp ルートカテゴリID）
+# (あ) Amazon起点：Keepa Best Sellers / Product Finder のカテゴリ（co.jp ルートカテゴリID）
 # =============================================================================
-# Keepa の co.jp ルートカテゴリID（domain=5）。bestsellers の category 引数に渡す。
-# ※ これらは Amazon公開ブラウズノードではなく **Keepa /category で実取得した有効ID**
-#    （2026-06-05 タカシが実 API で検証。Amazonブラウズノードとは一致しない値がある）。
-# 初心者が扱いやすい安全カテゴリ（無在庫/FBA向き・規制が比較的緩い）を厳選。
+# Keepa の co.jp ルートカテゴリID（domain=5）。bestsellers の `category` 引数および
+# Product Finder の `categories_include` に渡す。
+#
+# ★全ID出典（2026-06-05 タカシが Keepa /category API で実取得・検証）:
+#    GET https://api.keepa.com/category?key=...&domain=5&category=0&parents=0
+#    → co.jp の全31ルートカテゴリの (id, name) を取得し、その中から
+#      「初心者がFBA/無在庫で扱いやすい物販向き・規制が比較的緩い」物理商品カテゴリを厳選。
+#    除外: 本/洋書/DVD/Music/Kindle/ゲーム(DL)/アプリ/Prime Video/Alexa等のメディア・
+#          デジタル系、ファッション(衣料は返品/サイズ難)、ファイナンス等の非物販。
+# ※ これらは Amazon公開ブラウズノードと一致しない値がある（Keepa独自ID）。でっち上げ無し。
 @dataclass
 class AmazonCategory:
     """Amazon起点探索の対象カテゴリ1件。"""
@@ -164,12 +175,28 @@ class AmazonCategory:
     category_id: int
 
 
+# 各 category_id は上記 Keepa /category API レスポンス（2026-06-05 実取得）に存在する有効ID。
+# コメントの「実取得済」= /category の31件リストに当該IDが含まれることを確認済みの意。
+# さらに代表3カテゴリ（home_kitchen / drugstore / diy_tools）は Finder 実走でASIN抽出を確認。
 AMAZON_CATEGORIES: dict[str, AmazonCategory] = {
-    "home_kitchen": AmazonCategory("home_kitchen", "ホーム＆キッチン", 3828871),
-    "office": AmazonCategory("office", "文房具・オフィス用品", 86731051),
-    "pet": AmazonCategory("pet", "ペット用品", 2127212051),
-    "toys": AmazonCategory("toys", "おもちゃ", 13299531),
-    "sports": AmazonCategory("sports", "スポーツ＆アウトドア", 14304371),
+    # ── 既存5カテゴリ（IDは /category 実取得リストと一致を再確認）──
+    "home_kitchen": AmazonCategory("home_kitchen", "ホーム＆キッチン", 3828871),       # 実取得済・Finder実走確認
+    "office": AmazonCategory("office", "文房具・オフィス用品", 86731051),               # 実取得済
+    "pet": AmazonCategory("pet", "ペット用品", 2127212051),                            # 実取得済
+    "toys": AmazonCategory("toys", "おもちゃ", 13299531),                              # 実取得済
+    "sports": AmazonCategory("sports", "スポーツ＆アウトドア", 14304371),               # 実取得済
+    # ── 今回増設（すべて /category 実取得の有効ID）──
+    "drugstore": AmazonCategory("drugstore", "ドラッグストア（ヘルス&ケア）", 160384011),  # 実取得済・Finder実走確認
+    "beauty": AmazonCategory("beauty", "ビューティー（コスメ）", 52374051),             # 実取得済
+    "food": AmazonCategory("food", "食品・飲料・お酒", 57239051),                      # 実取得済
+    "appliances": AmazonCategory("appliances", "家電＆カメラ", 3210981),               # 実取得済
+    "pc": AmazonCategory("pc", "パソコン・周辺機器", 2127209051),                      # 実取得済
+    "diy_tools": AmazonCategory("diy_tools", "DIY・工具・ガーデン", 2016929051),        # 実取得済・Finder実走確認
+    "baby": AmazonCategory("baby", "ベビー＆マタニティ", 344845011),                   # 実取得済
+    "car": AmazonCategory("car", "車＆バイク", 2017304051),                            # 実取得済
+    "hobby": AmazonCategory("hobby", "ホビー", 2277721051),                            # 実取得済
+    "instruments": AmazonCategory("instruments", "楽器・音響機器", 2123629051),        # 実取得済
+    "industrial": AmazonCategory("industrial", "産業・研究開発用品", 3445393051),       # 実取得済
 }
 
 # (あ) 既定カテゴリ（初心者向けに最も無難なホーム＆キッチン）。
@@ -221,10 +248,14 @@ class FinderPreset:
     # 利益計算後に効く閾値（既存 DiscoveryPreset と同じ役割。原石判定に使う）。
     min_margin_rate: float = 0.05
     min_net_profit: float = 500
+    # Amazon本体在庫=アウトオブストック（公式が在庫切れ）を必須条件にするか（PoiPoi基準）。
+    # True にすると selection に current_AMAZON_gte=-1（＝Amazon本体に在庫なし）を加える。
+    # Keepa の current_AMAZON は「-1=在庫なし」を意味するので、gte=-1 かつ lte=-1 で在庫切れに限定する。
+    require_amazon_oos: bool = False
 
     def to_selection(self, category_ids: list[int]) -> dict:
         """Keepa Product Finder の selection(JSON) を組み立てる。"""
-        return {
+        sel = {
             "current_SALES_gte": self.sales_rank_gte,
             "current_SALES_lte": self.sales_rank_lte,
             "current_COUNT_NEW_gte": self.count_new_gte,
@@ -236,6 +267,12 @@ class FinderPreset:
             "page": 0,
             "sort": self.sort,
         }
+        if self.require_amazon_oos:
+            # Keepa: current_AMAZON は Amazon本体価格。-1=在庫なし（アウトオブストック）。
+            # gte=-1 & lte=-1 で「Amazon本体が在庫切れ」の商品だけに限定する（PoiPoi Phase1基準）。
+            sel["current_AMAZON_gte"] = -1
+            sel["current_AMAZON_lte"] = -1
+        return sel
 
     def as_discovery_preset(self) -> "DiscoveryPreset":
         """利益フィルタ用に既存 DiscoveryPreset へ写像する（パイプライン互換）。
@@ -260,7 +297,7 @@ FINDER_PRESETS: dict[str, FinderPreset] = {
     # ── 原石オートサーチ・初心者（サトル基準：中位ランク×競合薄×手頃価格）──
     "finder_genseki_beginner": FinderPreset(
         key="finder_genseki_beginner",
-        label="(あ)原石オートサーチ・初心者（推奨）",
+        label="原石オートサーチ・初心者（推奨）",
         description=(
             "キーワード不要。中位ランク（概ね1,000〜80,000位）× 出品者2〜10人 × "
             "1,000〜10,000円 の『そこそこ売れて競合が薄い』ニッチ原石を数千商品から自動抽出。"
@@ -277,13 +314,13 @@ FINDER_PRESETS: dict[str, FinderPreset] = {
         # 当てられる」ブランド品が多く、利益が実数で出る（保留だらけになりにくい）ため。
         # 競合の薄いニッチ無名品狙い（=Yahoo未掲載が増える）は『標準』の COUNT_NEW asc で。
         sort=[["current_SALES", "asc"]],
-        min_margin_rate=0.05,     # 初心者5%
-        min_net_profit=500,       # 初心者500円
+        min_margin_rate=0.08,     # 初心者8%（2026-06-05 社長フィードバックで緩和）
+        min_net_profit=300,       # 初心者300円（原石バッジの分母拡大）
     ),
     # ── 原石オートサーチ・標準（競合さらに絞り/利益厚め）──
     "finder_genseki_standard": FinderPreset(
         key="finder_genseki_standard",
-        label="(あ)原石オートサーチ・標準",
+        label="原石オートサーチ・標準",
         description=(
             "中位ランク × 出品者2〜6人 × 1,500〜12,000円。競合をさらに絞り利益率15%/1,000円を要求。"
             "慣れてきたら。サトル基準・標準値。"
@@ -298,6 +335,31 @@ FINDER_PRESETS: dict[str, FinderPreset] = {
         min_margin_rate=0.15,
         min_net_profit=1000,
     ),
+    # ── PoiPoi標準（資料『PoiPoiポケット活用の自動化せどり戦略』Phase1基準を忠実に写像）──
+    # 動画資料の抽出条件をそのまま再現:
+    #   新品出品者数 ≥ 2 / 販売価格 ≥ 3,000円(低単価排除) /
+    #   Amazon本体在庫=アウトオブストック(公式が在庫切れ) / ランク 50,000〜150,000位。
+    # 出品者上限は資料に明記が無いため、価格競争で利益消失する帯（>15人）だけ除外する緩めの上限を置く。
+    "finder_poipoi_standard": FinderPreset(
+        key="finder_poipoi_standard",
+        label="PoiPoi標準（資料の自動化せどり基準）",
+        description=(
+            "PoiPoiポケットの自動化せどり戦略（社長提供動画）の Phase1 抽出条件を忠実に再現。"
+            "出品者数2人以上 × 販売価格3,000円以上 × Amazon本体が在庫切れ × "
+            "ランキング50,000〜150,000位。Amazon公式が在庫を切らした『出せば売れる中位帯』を狙う。"
+        ),
+        sales_rank_gte=50000,     # 50,000位より上（人気すぎ）は除外
+        sales_rank_lte=150000,    # 150,000位より下（売れなさすぎ）は除外
+        count_new_gte=2,          # 出品者2人以上（資料 Offer Count ≥ 2）
+        count_new_lte=15,         # 資料に上限記載なし。価格競争帯(>15)のみ除外する緩い上限
+        price_gte=3000,           # 販売価格3,000円以上（低単価排除）
+        price_lte=100000,         # 上限は実質無し（資料に上限なし。ダイニチ加湿器7万円台も対象）
+        per_page=50,
+        sort=[["current_SALES", "asc"]],
+        min_margin_rate=0.08,     # Phase3(利益率8〜30%)の下限に合わせる
+        min_net_profit=3000,      # 資料 Phase3: 利益額 ≥ 3,000円
+        require_amazon_oos=True,   # Amazon本体在庫=アウトオブストック（資料の核心条件）
+    ),
 }
 
 DEFAULT_FINDER_PRESET_KEY = "finder_genseki_beginner"
@@ -311,6 +373,31 @@ def get_finder_preset(key: str) -> FinderPreset:
 def finder_preset_choices() -> list[tuple[str, str]]:
     """UI のセレクト用 (key, label) リスト。"""
     return [(p.key, p.label) for p in FINDER_PRESETS.values()]
+
+
+def gem_criteria_text(margin_rate: float, net_profit: float) -> str:
+    """『原石』判定の基準を実値から1文に組み立てる（表示と実装の食い違い防止）。
+
+    なぜ関数化（タカシ）:
+    - 以前は app 側に「利益率15%以上かつ純利益500円以上」とハードコードされ、
+      preset を 8%/300円 へ緩和した後も文言が古いまま残って社長を混乱させた。
+    - 基準は必ず preset の実値（min_margin_rate / min_net_profit）から生成し、
+      二度と表示と実装がズレないようにする。
+    """
+    return f"利益率{round(margin_rate * 100):g}%以上かつ純利益{int(net_profit):,}円以上"
+
+
+def active_gem_criteria_text(*, finder_key: Optional[str] = None,
+                             preset_key: Optional[str] = None) -> str:
+    """いま選択中のモード/プリセットの原石基準文を返す（app の説明文に使う）。
+
+    finder_key が渡されれば Finder プリセット、なければ通常 preset の実値を使う。
+    """
+    if finder_key is not None:
+        fp = get_finder_preset(finder_key)
+        return gem_criteria_text(fp.min_margin_rate, fp.min_net_profit)
+    p = get_preset(preset_key or DEFAULT_PRESET_KEY)
+    return gem_criteria_text(p.min_margin_rate, p.min_net_profit)
 
 
 def get_preset(key: str) -> DiscoveryPreset:

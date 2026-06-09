@@ -27,6 +27,19 @@ from typing import Optional, Protocol
 
 logger = logging.getLogger("adapters.amazon_data")
 
+
+class KeepaRateLimitError(RuntimeError):
+    """Keepa のトークン上限（HTTP 429）にリトライ尽きても到達した時に投げる明確な例外。
+
+    呼び出し側（resolve_many / app_discovery）がこれを捕捉して「混雑＝待てば直る」と
+    UI 上で判別できるようにするための専用型。RuntimeError を継承するので、
+    既存の `except RuntimeError` 経路でも握れる（ただし UI では型で分岐して親切表示する）。
+    """
+
+    def __init__(self, message: str, *, retry_after: Optional[int] = None):
+        super().__init__(message)
+        self.retry_after = retry_after  # 推奨待機秒（分かれば。UI 表示に使う）
+
 # .env を読み込む（KEEPA_API_KEY をここでも確実に拾えるように）。
 # yahoo_shopping に同じ軽量ローダがあるが、get_backend() が単独で呼ばれても
 # Keepa が選ばれるよう、import 時に一度流し込む（既存の環境変数は上書きしない）。
@@ -53,6 +66,9 @@ class AmazonProduct:
     size_key: str = "standard_1"          # fees.py のサイズキー
     jan: Optional[str] = None             # 紐づくJAN（突合監査用）
     is_sample: bool = False               # サンプル由来か（UI/READMEで明示）
+    # 過去の売値推移（古い→新しい順の円の系列）。最悪相場シミュレーション/折れ線表示に使う。
+    # Keepa stats から取れた時のみ入る。取れない/サンプル簡易時は None または擬似系列。
+    price_history: Optional[list] = None  # 例: [74000, 72000, ..., 61800]（円）
 
 
 class AmazonDataBackend(Protocol):
@@ -98,10 +114,16 @@ class SampleBackend:
         with open(_SAMPLE_PATH, encoding="utf-8") as f:
             rows = json.load(f)
         for r in rows:
+            cur = r.get("current_price")
+            # サンプルでも最悪相場シミュレーションを試せるよう、現在価格から擬似の過去相場を合成。
+            # 過去最安=現在の82%・90日平均=92%・現在 の3点（古い→新しい）。実データではない目安。
+            hist = r.get("price_history")
+            if hist is None and isinstance(cur, (int, float)) and cur > 0:
+                hist = [round(cur * 0.82), round(cur * 0.92), cur]
             p = AmazonProduct(
                 asin=r["asin"],
                 title=r.get("title", ""),
-                current_price=r.get("current_price"),
+                current_price=cur,
                 sales_rank=r.get("sales_rank"),
                 monthly_sales=r.get("monthly_sales"),
                 offer_count=r.get("offer_count"),
@@ -110,6 +132,7 @@ class SampleBackend:
                 size_key=r.get("size_key", "standard_1"),
                 jan=r.get("jan"),
                 is_sample=True,
+                price_history=hist,
             )
             self._all.append(p)
             if p.jan:
@@ -238,6 +261,49 @@ def _pick_oos_rate_90d(stats: dict) -> Optional[float]:
     return v
 
 
+def _price_at_index(arr, i) -> Optional[float]:
+    """stats の固定インデックス配列から1価格を取り出す（-1/欠落は None）。"""
+    if not isinstance(arr, list) or len(arr) <= i:
+        return None
+    return _keepa_price_yen(arr[i])
+
+
+def _extract_price_history(stats: dict) -> Optional[list]:
+    """Keepa stats から「過去相場の代表点」系列を軽量に組み立てる（円・古い→新しい順）。
+
+    フル csv（history=1）は重くトークンを食うため要求しない。代わりに stats=90 で既に
+    返る代表統計（min/avg90/avg30/current の Buy Box→New フォールバック）から、
+    『最悪のケース＝過去相場の最安水準』を含む数点の系列を作る。
+    最悪相場シミュレーション（過去最安まで下落しても黒字か）に必要十分な粒度。
+
+    返り値: [過去最安, 90日平均, 30日平均, 現在] のうち取れた点（円, 重複/欠落除去）。
+    1点も取れなければ None（UI 側でプレースホルダ＋手動入力に切り替える）。
+    """
+    if not isinstance(stats, dict):
+        return None
+    # Buy Box(18) を主、無ければ New(1) を使う（_pick_amazon_price と同じ優先順）。
+    idx = (KEEPA_IDX_BUY_BOX, KEEPA_IDX_NEW)
+
+    def from_block(block):
+        if not isinstance(block, list):
+            return None
+        for i in idx:
+            v = _price_at_index(block, i)
+            if v is not None:
+                return v
+        return None
+
+    points = []
+    lo = from_block(stats.get("min90") or stats.get("min"))
+    avg90 = from_block(stats.get("avg90"))
+    avg30 = from_block(stats.get("avg30"))
+    cur = _pick_amazon_price(stats)
+    for v in (lo, avg90, avg30, cur):
+        if v is not None and (not points or points[-1] != v):
+            points.append(v)
+    return points or None
+
+
 def _estimate_monthly_sales(product: dict, sales_rank: Optional[int]) -> tuple:
     """月販個数を返す。Keepa の monthlySold があればそれ（実測）、無ければランク粗推定。
 
@@ -336,6 +402,7 @@ def _product_to_amazon(product: dict) -> Optional[AmazonProduct]:
     monthly, is_estimate, ms_note = _estimate_monthly_sales(product, sales_rank)
     category_key = _map_category_key(product)
     size_key, size_note = _map_size_key(product)
+    price_history = _extract_price_history(stats)
 
     p = AmazonProduct(
         asin=asin,
@@ -349,6 +416,7 @@ def _product_to_amazon(product: dict) -> Optional[AmazonProduct]:
         size_key=size_key,
         jan=None,  # 突合キーは呼び出し側（resolve_by_jan の引数）で補完
         is_sample=False,
+        price_history=price_history,
     )
     # 監査用メタは AmazonProduct に専用フィールドが無いため、推定フラグは
     # 呼び出し側ログ＋下流ノートで扱う。ここでは属性として一時付与しておく。
@@ -365,7 +433,7 @@ class KeepaBackend:
 
     Keepa Product API を生 HTTPS で叩く（公式 python クライアントには依存しない＝YAGNI）。
     エンドポイント: GET https://api.keepa.com/product
-      ?key=...&domain=5&code=<JAN>[,JAN...]&stats=90&offers=20
+      ?key=...&domain=5&code=<JAN>[,JAN...]&stats=90&offers=1（offersは最小限＝節約）
     - code に JAN を渡すと Keepa が JAN→ASIN を解決して商品を返す。
     - 複数 JAN はカンマ区切りで1リクエストにまとめられる（トークン節約）。
     - レスポンスは gzip。requests が自動解凍する。価格は **円そのまま**（-1=無し）。
@@ -378,6 +446,21 @@ class KeepaBackend:
     KEEPA_DOMAIN_JP = 5  # co.jp
     ENDPOINT = "https://api.keepa.com/product"
     MAX_JANS_PER_CALL = 10  # 1検索で Keepa に問い合わせる JAN の上限（トークン節約・調整可）
+
+    # offers パラメータ: 出品オファーの生配列の取得数。Keepa は offers の値だけ
+    # トークンを多く消費する（offers=20 は1商品あたり高コスト）。本パイプラインが
+    # 実際に使うのは stats.buyBoxPrice / stats.current[COUNT_NEW] / OOS% であり、
+    # これらは stats=90 だけで埋まり、offers の生配列は一切パースしていない。
+    #
+    # ⚠ Keepa 仕様（実測 2026-06-05 タカシ）: offers は「0 も 1 も invalidParameter で拒否」
+    #   され、要求するなら **最低20**。中途半端な値（1等）を渡すと products が空で返り、
+    #   (あ)Amazon起点が「0件」になる主因だった。stats だけで必要値は揃うため、
+    #   offers パラメータは **付けない**（None＝省略）のが最小トークンかつ正解。
+    OFFERS_PER_PRODUCT = None  # None=offersを送らない（最小トークン）。送るなら20以上必須。
+
+    # 429（トークン上限）時の指数バックオフ設定。残トークン枯渇時の自動回復用。
+    RETRY_BACKOFFS_SEC = (5, 10, 20)  # リトライ毎の待機秒（最大3回再試行）
+    MAX_RETRY_WAIT_SEC = 90           # refillIn 等から算出する待機の上限（無限待機防止）
 
     def __init__(self, api_key: Optional[str] = None, *, timeout: int = 60):
         self.api_key = api_key or os.environ.get("KEEPA_API_KEY")
@@ -426,24 +509,20 @@ class KeepaBackend:
         )
 
         products = payload.get("products") or []
-        # JAN→商品 の対応を eanList/upcList で取る。無ければ入力順でのフォールバック対応。
+        # JAN→商品 の対応は eanList/upcList の「実際の一致」のみで取る。
+        # ⚠ 旧実装は eanList で取れなかった商品を入力順×返却順で zip 割り当てしていたが、
+        #   これは別JAN商品を無理やり別JANへ紐付ける重大バグの温床だった（社長報告 2026-06-06）。
+        #   位置フォールバックは撤去。問い合わせJANを eanList/upcList に実際に含む商品だけを
+        #   確定マッチとし、含まれない商品は「該当なし」で正直に除外する。
         out: dict = {}
         by_jan: dict = {}
-        unmatched_products = []
         for prod in products:
             jan_codes = (prod.get("eanList") or []) + (prod.get("upcList") or [])
             jan_codes = [str(c) for c in jan_codes]
             matched = next((j for j in uniq if j in jan_codes), None)
             if matched:
-                by_jan[matched] = prod
-            else:
-                unmatched_products.append(prod)
-
-        # eanList で取れなかった分は、入力順 × 返却順のフォールバックで割り当てる
-        # （Keepa は概ね code の順序で返すため）。それでも紐付かない JAN は「該当なし」。
-        leftover_jans = [j for j in uniq if j not in by_jan]
-        for j, prod in zip(leftover_jans, unmatched_products):
-            by_jan[j] = prod
+                # 同一JANに複数商品が返る場合は先勝ち（最初の確定マッチを採用）
+                by_jan.setdefault(matched, prod)
 
         for jan in uniq:
             prod = by_jan.get(jan)
@@ -615,21 +694,89 @@ class KeepaBackend:
     # HTTP（生 requests・遅延 import）
     # ------------------------------------------------------------------
     def _request(self, *, code: Optional[str] = None, asin: Optional[str] = None) -> dict:
+        """Keepa product を1回叩く。429（トークン上限）は指数バックオフで自動リトライ。
+
+        トークンが枯渇していると Keepa は HTTP 429 を返す。ここで握りつぶさず、
+        (1) レスポンスの refillIn（次のトークン補充までのミリ秒）が分かればそれを優先、
+        (2) 分からなければ RETRY_BACKOFFS_SEC の指数バックオフ、で最大3回まで待って再試行する。
+        それでも回復しなければ KeepaRateLimitError を投げ、呼び出し側が「混雑」を判別できるようにする。
+        """
+        import time
+
         import requests  # 遅延 import（サンプル経路では不要）
 
         params = {
             "key": self.api_key,
             "domain": self.KEEPA_DOMAIN_JP,
             "stats": 90,    # 90日統計（OOS率・平均など）を含める
-            "offers": 20,   # 出品オファーを最大20件（Buy Box/出品者数の精度向上）
         }
+        # offers は None なら送らない（Keepa は 0/1 を invalidParameter で拒否し products が
+        # 空になる。20以上でないと無効）。stats=90 だけで必要値（buyBox/COUNT_NEW/OOS）は揃う。
+        if self.OFFERS_PER_PRODUCT:
+            params["offers"] = self.OFFERS_PER_PRODUCT
         if code is not None:
             params["code"] = code   # JAN 突合（(い)経路）
         if asin is not None:
             params["asin"] = asin   # ASIN 直接取得（(あ)Best Sellers 経路）
-        resp = requests.get(self.ENDPOINT, params=params, timeout=self.timeout)
-        resp.raise_for_status()
-        return resp.json()
+
+        last_retry_after: Optional[int] = None
+        # 初回 + 最大 len(RETRY_BACKOFFS_SEC) 回の再試行。
+        for attempt in range(len(self.RETRY_BACKOFFS_SEC) + 1):
+            resp = requests.get(self.ENDPOINT, params=params, timeout=self.timeout)
+            if resp.status_code != 429:
+                resp.raise_for_status()
+                return resp.json()
+
+            # --- 429: トークン上限。待機秒を算出して再試行する ---
+            wait = self._retry_after_seconds(resp, attempt)
+            last_retry_after = wait
+            if attempt >= len(self.RETRY_BACKOFFS_SEC):
+                break  # リトライ尽きた → ループ後に明確な例外を投げる
+            logger.warning(
+                "Keepa 429（トークン上限）。%d秒待って再試行します（%d/%d回目）",
+                wait, attempt + 1, len(self.RETRY_BACKOFFS_SEC),
+            )
+            time.sleep(wait)
+
+        raise KeepaRateLimitError(
+            "Keepa のトークン上限に達しました（リトライ後も解消せず）。"
+            "30〜60秒ほど待って再実行してください。1回の取得件数を減らすと安定します。",
+            retry_after=last_retry_after,
+        )
+
+    def _retry_after_seconds(self, resp, attempt: int) -> int:
+        """429 レスポンスから次の再試行までの待機秒を決める。
+
+        優先順位: (1) JSON 本文の refillIn(ms)→秒換算、(2) Retry-After ヘッダ、
+        (3) RETRY_BACKOFFS_SEC の指数バックオフ。いずれも MAX_RETRY_WAIT_SEC で頭打ち。
+        Keepa は 429 でもトークン補充情報（refillIn）を本文に返すことがあるためそれを尊重する。
+        """
+        fallback = self.RETRY_BACKOFFS_SEC[min(attempt, len(self.RETRY_BACKOFFS_SEC) - 1)]
+        wait: Optional[float] = None
+
+        # (1) Keepa JSON 本文の refillIn（ミリ秒）。
+        try:
+            body = resp.json()
+            refill_ms = body.get("refillIn")
+            if isinstance(refill_ms, (int, float)) and refill_ms > 0:
+                wait = refill_ms / 1000.0 + 1.0  # 補充直後を狙って +1s 余裕
+        except Exception:  # noqa: BLE001  本文が JSON でない/壊れている場合は無視
+            pass
+
+        # (2) 標準の Retry-After ヘッダ（秒）。
+        if wait is None:
+            ra = resp.headers.get("Retry-After")
+            if ra:
+                try:
+                    wait = float(ra)
+                except (TypeError, ValueError):
+                    wait = None
+
+        # (3) 指数バックオフへフォールバック。
+        if wait is None:
+            wait = fallback
+
+        return int(max(1, min(wait, self.MAX_RETRY_WAIT_SEC)))
 
     def _require_key(self):
         if not self.is_live:

@@ -19,3 +19,6 @@ scripts/catalog/.catalog_sync.env
 .env
 **/.env
 !**/.env.example
+
+# 社長からの一時ファイル受け渡し（読み込み・整理用、コミット対象外）
+_inbox_社長共有/

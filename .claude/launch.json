@@ -1,0 +1,14 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "sato-scope",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": [
+        "-lc",
+        "cd 'workspace/output/deliverables/T-20260521-005/code' && exec python3 -m streamlit run app_discovery.py --server.headless true --server.port 8534 --browser.gatherUsageStats false"
+      ],
+      "port": 8534
+    }
+  ]
+}

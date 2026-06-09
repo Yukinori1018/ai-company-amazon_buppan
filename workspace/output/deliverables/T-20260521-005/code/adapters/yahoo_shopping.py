@@ -79,6 +79,7 @@ class YahooItem:
     point_rate: float = 0.0        # PayPayポイント還元率（%）。実質原価の参考用
     image_url: str = ""            # 商品画像URL（UI表示用）
     is_sample: bool = False        # サンプル由来かどうか（UI/READMEで明示するため）
+    source: str = "Yahoo"          # 仕入元名（複数仕入れ先のマージ時にどこ由来か保持）
 
 
 class YahooShoppingClient:
@@ -124,19 +125,54 @@ class YahooShoppingClient:
     # ---------------------------------------------------------------------
     # 本番: 実 API 呼び出し（キーを入れればここが動く）
     # ---------------------------------------------------------------------
+    # Yahoo V3 itemSearch の1回上限は20件（公式）。これ以上は start オフセットで
+    # ページングして集める（mode(い)の JAN突合母数を広げる肝）。無限ページ防止に上限を置く。
+    PAGE_SIZE = 20
+    MAX_PAGES = 3  # 最大 20×3=60件まで（トークン不要の無料API。429予防で控えめ）
+
     def _search_live(
         self, query, *, results, price_from, price_to, jan_code
     ) -> list[YahooItem]:
         """実 API を叩いて YahooItem に正規化する。
 
+        results が20を超える場合は start オフセットでページングし、複数ページを連結する。
+        JAN直指定検索（jan_code）は1件取れれば十分なので1ページのみ。
         requests に依存。キーが入った瞬間にこの経路に切り替わる（コメント明示）。
         """
+        # JAN直指定は1ページで足りる（最安1件採用の入力）。キーワード検索だけページング。
+        if jan_code:
+            pages = 1
+            want = min(results, self.PAGE_SIZE)
+        else:
+            want = max(1, results)
+            pages = min(self.MAX_PAGES, (want + self.PAGE_SIZE - 1) // self.PAGE_SIZE)
+
+        out: list[YahooItem] = []
+        for page in range(pages):
+            start = page * self.PAGE_SIZE + 1  # Yahoo V3 は start が1始まり
+            hits = self._fetch_page(
+                query=query, jan_code=jan_code,
+                price_from=price_from, price_to=price_to,
+                results=min(self.PAGE_SIZE, want - len(out)), start=start,
+            )
+            out.extend(self._normalize(hits, is_sample=False))
+            if len(hits) < self.PAGE_SIZE or len(out) >= want:
+                break  # これ以上ページが無い／必要数に達した
+        return out[:want]
+
+    def _fetch_page(
+        self, *, query, jan_code, price_from, price_to, results, start
+    ) -> list:
+        """itemSearch を1ページ分（最大20件）叩いて生 hits を返す。429は1回だけ再試行。"""
         import requests  # 遅延 import（サンプル経路では不要にする）
+        import time
 
         params = {
             "appid": self.app_id,
-            "results": min(results, 20),  # Yahoo V3 itemSearch の1回上限は20件（公式）
+            "results": min(results, self.PAGE_SIZE),
         }
+        if start > 1:
+            params["start"] = start
         if query:
             params["query"] = query
         if jan_code:
@@ -146,10 +182,8 @@ class YahooShoppingClient:
         if price_to is not None:
             params["price_to"] = price_to
 
-        # 短時間に多数のJAN検索を連投すると Yahoo が 429 を返すため、軽くペーシングし、
+        # 短時間に多数の検索を連投すると Yahoo が 429 を返すため、軽くペーシングし、
         # 429 を一度だけバックオフ再試行する（原石オートサーチは最大15回連続で叩くため）。
-        import time
-
         for attempt in range(2):
             resp = requests.get(YAHOO_ITEMSEARCH_ENDPOINT, params=params, timeout=15)
             if resp.status_code == 429 and attempt == 0:
@@ -158,8 +192,7 @@ class YahooShoppingClient:
             resp.raise_for_status()
             break
         time.sleep(0.15)  # 次の呼び出しまでの最小間隔（429 予防）
-        payload = resp.json()
-        return self._normalize(payload.get("hits", []), is_sample=False)
+        return resp.json().get("hits", [])
 
     # ---------------------------------------------------------------------
     # フォールバック: サンプルJSON

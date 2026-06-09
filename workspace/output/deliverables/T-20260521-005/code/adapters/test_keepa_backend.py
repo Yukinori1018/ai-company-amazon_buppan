@@ -6,9 +6,12 @@
 取得した「水筒」商品レスポンスの構造をそのまま縮約したもの。価格は円そのまま、-1=データ無し。
 """
 
+import pytest
+
 from adapters import amazon_data
 from adapters.amazon_data import (
     KeepaBackend,
+    KeepaRateLimitError,
     _map_category_key,
     _map_size_key,
     _pick_amazon_price,
@@ -142,6 +145,46 @@ def test_resolve_many_matches_by_eanlist(monkeypatch):
     assert backend.last_tokens_left == 1000
 
 
+def test_resolve_many_no_positional_fallback(monkeypatch):
+    """位置フォールバック撤去の回帰（社長報告 2026-06-06）。
+
+    旧実装は eanList に問い合わせJANを含まない商品を、入力順×返却順の zip で別JANへ
+    無理やり割り当てていた（別商品の誤突合の温床）。撤去後は eanList/upcList に
+    実際に一致した商品だけが確定マッチとなり、一致しない問い合わせJANは欠落する。
+    """
+    backend = KeepaBackend(api_key="dummy")
+
+    def fake_request(self, *, code):
+        # 問い合わせは2件。返る商品は MOCK_PRODUCT(JAN=...072) のみ。
+        # 旧バグなら 2件目の "4580502099086" が MOCK_PRODUCT に位置割り当てされてしまう。
+        return {"tokensLeft": 100, "tokensConsumed": 5, "products": [MOCK_PRODUCT]}
+
+    monkeypatch.setattr(KeepaBackend, "_request", fake_request)
+    result = backend.resolve_many(["4580502099086", "4562344377072"])
+    # eanList に実在する 072 だけが確定マッチ。先頭の 086 は割り当てられない（欠落）。
+    assert set(result.keys()) == {"4562344377072"}
+    assert "4580502099086" not in result
+    # jan の上書きも確定マッチに限定される（誤JANで上書きされない）。
+    assert result["4562344377072"].jan == "4562344377072"
+
+
+def test_resolve_many_jan_overwrite_only_on_confirmed_match(monkeypatch):
+    """ap.jan の上書きは eanList 一致した確定マッチJANに限ることを保証する。"""
+    backend = KeepaBackend(api_key="dummy")
+
+    def fake_request(self, *, code):
+        return {"tokensLeft": 100, "tokensConsumed": 5,
+                "products": [MOCK_PRODUCT, MOCK_NO_BUYBOX]}
+
+    monkeypatch.setattr(KeepaBackend, "_request", fake_request)
+    result = backend.resolve_many(["4562344377072", "4582532193901"])
+    assert result["4562344377072"].jan == "4562344377072"
+    assert result["4582532193901"].jan == "4582532193901"
+    # 各商品が自分の eanList のJANに正しく紐づく（取り違えなし）。
+    assert result["4562344377072"].asin == "B08VR99HJR"
+    assert result["4582532193901"].asin == "B0BBQ3ZFCL"
+
+
 def test_resolve_many_caps_jan_count(monkeypatch):
     """MAX_JANS_PER_CALL を超える JAN は切り詰められること（トークン節約）。"""
     backend = KeepaBackend(api_key="dummy")
@@ -261,6 +304,129 @@ def test_find_products_caps_at_max_asins_per_list(monkeypatch):
 def test_list_products_without_category_returns_empty():
     backend = KeepaBackend(api_key="dummy")
     assert backend.list_products() == []
+
+
+# ---------------------------------------------------------------------------
+# 429（トークン上限）バックオフのテスト。requests と time.sleep をモックし、
+# 実 API もスリープも発生させずにリトライ挙動だけを検証する。
+# ---------------------------------------------------------------------------
+class _FakeResp:
+    """requests.Response の最小モック（status_code / json / headers / raise_for_status）。"""
+
+    def __init__(self, status_code=200, json_body=None, headers=None):
+        self.status_code = status_code
+        self._json = json_body if json_body is not None else {}
+        self.headers = headers or {}
+
+    def json(self):
+        return self._json
+
+    def raise_for_status(self):
+        if self.status_code >= 400:
+            raise AssertionError(f"raise_for_status should not fire for {self.status_code}")
+
+
+def _patch_request_env(monkeypatch, responses, *, no_sleep=True):
+    """amazon_data 内の `import requests` / `time.sleep` を差し替えるヘルパ。
+
+    responses は _FakeResp のリスト（呼ばれるたび先頭から順に返す）。
+    """
+    import sys
+    import types
+
+    calls = {"n": 0, "slept": [], "params": []}
+
+    def fake_get(url, params=None, timeout=None):
+        i = min(calls["n"], len(responses) - 1)
+        calls["n"] += 1
+        calls["params"].append(params or {})
+        return responses[i]
+
+    fake_requests = types.SimpleNamespace(get=fake_get)
+    monkeypatch.setitem(sys.modules, "requests", fake_requests)
+
+    if no_sleep:
+        import time as _time
+        monkeypatch.setattr(_time, "sleep", lambda s: calls["slept"].append(s))
+
+    return calls
+
+
+def test_request_retries_on_429_then_succeeds(monkeypatch):
+    """429 を2回返した後に200で成功 → 例外を投げずに payload を返し、待機している。"""
+    backend = KeepaBackend(api_key="dummy")
+    responses = [
+        _FakeResp(429, {"refillIn": 3000}),   # refillIn=3s → 4秒待つ想定
+        _FakeResp(429, {}),                    # 本文無し → 指数バックオフ(10s)
+        _FakeResp(200, {"tokensLeft": 50, "products": [MOCK_PRODUCT]}),
+    ]
+    calls = _patch_request_env(monkeypatch, responses)
+
+    payload = backend._request(code="4562344377072")
+    assert payload["tokensLeft"] == 50
+    assert calls["n"] == 3            # 3回叩いた（429×2 + 成功）
+    assert len(calls["slept"]) == 2   # 2回待機した
+    assert calls["slept"][0] == 4     # refillIn 3000ms → +1s = 4s
+
+
+def test_request_raises_rate_limit_error_after_retries_exhausted(monkeypatch):
+    """429 が回復しない → リトライ尽きて KeepaRateLimitError を投げる（握りつぶさない）。"""
+    backend = KeepaBackend(api_key="dummy")
+    responses = [_FakeResp(429, {}, headers={"Retry-After": "7"})]  # 常に429
+    calls = _patch_request_env(monkeypatch, responses)
+
+    with pytest.raises(KeepaRateLimitError) as ei:
+        backend._request(code="4562344377072")
+    # 初回 + 3リトライ = 4回叩く / 待機は3回
+    assert calls["n"] == len(KeepaBackend.RETRY_BACKOFFS_SEC) + 1
+    assert len(calls["slept"]) == len(KeepaBackend.RETRY_BACKOFFS_SEC)
+    assert ei.value.retry_after == 7  # Retry-After ヘッダを拾えている
+
+
+def test_resolve_many_propagates_rate_limit_error(monkeypatch):
+    """429 枯渇時、resolve_many は KeepaRateLimitError を呼び出し側へ伝播する（UI が混雑判別可能）。"""
+    backend = KeepaBackend(api_key="dummy")
+    responses = [_FakeResp(429, {})]
+    _patch_request_env(monkeypatch, responses)
+    with pytest.raises(KeepaRateLimitError):
+        backend.resolve_many(["4562344377072"])
+
+
+def test_offers_param_omitted_by_default(monkeypatch):
+    """トークン節約 & Keepa仕様: offers は既定で **送らない**（0/1は invalidParameter で
+    products が空になるバグの恒久対策）。必要値は stats=90 だけで揃う。"""
+    # 既定は None（=送らない）。社長が踏んだ「(あ)が0件」の主因を回帰固定。
+    assert KeepaBackend.OFFERS_PER_PRODUCT is None
+    backend = KeepaBackend(api_key="dummy")
+    calls = _patch_request_env(
+        monkeypatch, [_FakeResp(200, {"tokensLeft": 50, "products": [MOCK_PRODUCT]})]
+    )
+    backend._request(asin="B0TEST")
+    sent = calls["params"][0]
+    assert "offers" not in sent, "offers は既定で送らない（0/1は無効）"
+    assert sent["stats"] == 90  # stats は必須（buyBox/COUNT_NEW/OOS の供給源）
+
+
+def test_offers_param_forwarded_when_set(monkeypatch):
+    """明示的に20以上を設定した場合は offers が送られる（将来の拡張余地を担保）。"""
+    backend = KeepaBackend(api_key="dummy")
+    monkeypatch.setattr(backend, "OFFERS_PER_PRODUCT", 20)
+    calls = _patch_request_env(
+        monkeypatch, [_FakeResp(200, {"tokensLeft": 50, "products": [MOCK_PRODUCT]})]
+    )
+    backend._request(asin="B0TEST")
+    assert calls["params"][0].get("offers") == 20
+
+
+def test_retry_after_prefers_refill_in(monkeypatch):
+    """_retry_after_seconds は refillIn(ms) を Retry-After より優先し、上限で頭打ちする。"""
+    backend = KeepaBackend(api_key="dummy")
+    # refillIn=2000ms → 3秒
+    resp = _FakeResp(429, {"refillIn": 2000}, headers={"Retry-After": "99"})
+    assert backend._retry_after_seconds(resp, 0) == 3
+    # refillIn が巨大 → MAX_RETRY_WAIT_SEC で頭打ち
+    big = _FakeResp(429, {"refillIn": 999999999})
+    assert backend._retry_after_seconds(big, 0) == KeepaBackend.MAX_RETRY_WAIT_SEC
 
 
 def test_resolve_by_jan_not_live_raises():
