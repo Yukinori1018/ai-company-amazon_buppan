@@ -169,8 +169,8 @@ from discovery import keepa_query_url  # noqa: E402  (URL貼り付けパーサ)
 MODE_FINDER = "カテゴリから自動で探す（キーワード不要・おすすめ）"
 MODE_KEYWORD = "キーワードで探す"
 MODE_NETSEA = "卸から自動で探す（NETSEA・キーワード不要）"
-MODE_LEGACY = "Amazon売れ筋から探す（上級者向け）"
-MODE_KEEPA_URL = "Keepaで作った検索条件を貼り付ける（上級者向け）"
+MODE_LEGACY = "Amazon売れ筋から探す"
+MODE_KEEPA_URL = "Keepaで作った検索条件を貼り付ける"
 
 st.markdown("## ① 抽出条件（Phase 1：対象を絞る）")
 st.caption(
@@ -271,7 +271,7 @@ with col_left:
             format_func=lambda k: get_finder_preset(k).label,
             help="抽出条件は貼り付けたURLを使い、利益率/利益額の原石判定だけこのプリセットの値を使います。",
         )
-        with st.expander("▼ 上級者：Keepaで作った検索条件URL/JSONを貼り付け", expanded=True):
+        with st.expander("▼ Keepaで作った検索条件URL/JSONを貼り付ける（任意）", expanded=True):
             st.caption(
                 "Keepaの Product Finder で条件を作り『SHOW API QUERY』を押すと出るURL、"
                 "または selection の JSON をそのまま貼り付けてください。"
@@ -600,7 +600,7 @@ if not rows:
             "条件に合う原石が今回は見つかりませんでした（正直な結果）。"
             "考えられる理由：(1) Product Finder の条件（中位ランク×出品者2〜10人×価格帯）に"
             "合うASINがこのカテゴリで少ない、(2) 抽出ASINがYahooで仕入元に当たらない、"
-            "(3) 仕入元が見つかっても黒字にならない。対策：別カテゴリに変える、または「標準」から「初心者」に緩めてください。"
+            "(3) 仕入元が見つかっても黒字にならない。対策：別カテゴリに変える、または条件プリセットをより緩いものに変えてください。"
         )
     else:
         st.info("条件に合う候補がありませんでした。プリセットを「広く拾う」にすると候補が増えます。")

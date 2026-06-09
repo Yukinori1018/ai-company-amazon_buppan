@@ -55,11 +55,11 @@ PRESETS: dict[str, DiscoveryPreset] = {
     # ── (い) 仕入れ元起点：サトル §2「価格差ハンティングマップ」初心者値 ──
     "hunting_beginner": DiscoveryPreset(
         key="hunting_beginner",
-        label="価格差ハンティング・初心者（推奨）",
+        label="価格差ハンティング（推奨）",
         description=(
             "楽天/Yahoo!の実質価格とAmazon売値の差を突く電脳せどり。"
-            "朝野式の初心者緩和（利益率5%/利益500円/月3個）で分母を広げる。"
-            "サトル監修済（06_research §2 (い)初心者値）"
+            "緩めの基準（利益率8%/利益300円/売れ行き足切りなし）で候補を広く拾う。"
+            "サトル監修済（06_research §2 (い)）"
         ),
         # before(beginner_safe): rank10000/月販100/出品5/OOS0/率15%/額500
         # 2026-06-05 社長フィードバック「原石が出てこない」→ 初心者既定をさらに緩和。
@@ -76,9 +76,9 @@ PRESETS: dict[str, DiscoveryPreset] = {
     # ── (い) 標準値（慣れてきたら）──
     "hunting_standard": DiscoveryPreset(
         key="hunting_standard",
-        label="価格差ハンティング・標準",
+        label="価格差ハンティング・しっかり絞る",
         description=(
-            "利益率15%・利益1,000円・月販10個の標準ライン。安全圏寄り。"
+            "利益率15%・利益1,000円・月販10個でしっかり絞る。安全圏寄り。"
             "サトル監修済（06_research §2 (い)標準値）"
         ),
         max_sales_rank=30000,
@@ -91,10 +91,10 @@ PRESETS: dict[str, DiscoveryPreset] = {
     # ── (あ) Amazon起点：サトル §2「Amazon棚卸しマップ」初心者値 ──
     "stocktake_beginner": DiscoveryPreset(
         key="stocktake_beginner",
-        label="Amazon棚卸し・初心者",
+        label="Amazon棚卸し（標準）",
         description=(
             "Amazonで売れてて・競合薄くて・本体不在の棚を掘る。仕入元は後で探す。"
-            "サトル監修済（06_research §2 (あ)初心者値）"
+            "サトル監修済（06_research §2 (あ)）"
         ),
         max_sales_rank=50000,
         min_monthly_sales=3,     # Drop30≥3
@@ -122,7 +122,7 @@ PRESETS: dict[str, DiscoveryPreset] = {
     # ── 高利益率（中上級・「お宝プレミアマップ」寄り）：サトル §2(う) あ3 ──
     "high_margin": DiscoveryPreset(
         key="high_margin",
-        label="高利益率重視（中上級・少数精鋭）",
+        label="高利益率重視（少数精鋭）",
         description=(
             "回転より1個あたり利益率を最優先。廃番/限定の急騰品想定（利益率30〜50%）。"
             "サトル監修済（06_research §2(う) お宝プレミアマップ）。在庫リスク高に注意。"
@@ -297,11 +297,11 @@ FINDER_PRESETS: dict[str, FinderPreset] = {
     # ── 原石オートサーチ・初心者（サトル基準：中位ランク×競合薄×手頃価格）──
     "finder_genseki_beginner": FinderPreset(
         key="finder_genseki_beginner",
-        label="原石オートサーチ・初心者（推奨）",
+        label="原石オートサーチ（推奨）",
         description=(
             "キーワード不要。中位ランク（概ね1,000〜80,000位）× 出品者2〜10人 × "
             "1,000〜10,000円 の『そこそこ売れて競合が薄い』ニッチ原石を数千商品から自動抽出。"
-            "Best Sellers（売れ筋トップ＝赤字）の逆を狙う。サトル基準・初心者緩和。"
+            "Best Sellers（売れ筋トップ＝赤字）の逆を狙う。サトル基準・緩めの基準で広く拾う。"
         ),
         sales_rank_gte=3000,      # 〜3,000位は人気品でAmazonが安い傾向→原石薄。少し下から拾う
         sales_rank_lte=80000,     # 80,000位より下は売れ行き不安で除外
@@ -320,10 +320,10 @@ FINDER_PRESETS: dict[str, FinderPreset] = {
     # ── 原石オートサーチ・標準（競合さらに絞り/利益厚め）──
     "finder_genseki_standard": FinderPreset(
         key="finder_genseki_standard",
-        label="原石オートサーチ・標準",
+        label="原石オートサーチ・しっかり絞る",
         description=(
             "中位ランク × 出品者2〜6人 × 1,500〜12,000円。競合をさらに絞り利益率15%/1,000円を要求。"
-            "慣れてきたら。サトル基準・標準値。"
+            "サトル基準・しっかり絞る値。"
         ),
         sales_rank_gte=1000,
         sales_rank_lte=60000,
