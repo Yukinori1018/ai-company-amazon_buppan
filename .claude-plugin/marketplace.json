@@ -1,0 +1,18 @@
+{
+  "name": "ai-company",
+  "owner": {
+    "name": "Amazon物販事業 AI Company",
+    "email": "satoyukinori1018@gmail.com"
+  },
+  "description": "Amazon物販事業 AI会社の社内ツールを束ねた Claude Code プラグイン・マーケットプレイス。子会社リポジトリは本 marketplace から会社の道具一式を install できる。",
+  "plugins": [
+    {
+      "name": "ai-company-toolkit",
+      "source": "./plugins/ai-company-toolkit",
+      "description": "秘書カズヨ運用を補助する社内ツール一式（チケット起票コマンド・KPIチェックスキル・起動バナーフック・依頼ルーティング用エージェント）",
+      "version": "0.1.0",
+      "category": "productivity",
+      "keywords": ["amazon", "buppan", "secretary", "ticket", "kpi"]
+    }
+  ]
+}

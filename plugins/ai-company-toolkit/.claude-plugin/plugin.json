@@ -1,0 +1,15 @@
+{
+  "name": "ai-company-toolkit",
+  "displayName": "AI Company Toolkit",
+  "version": "0.1.0",
+  "description": "Amazon物販事業 AI会社の社内運用ツール（チケット起票コマンド・KPIチェックスキル・起動バナーフック・依頼ルーティング用エージェント）",
+  "author": {
+    "name": "秘書カズヨ（AI Company）",
+    "email": "satoyukinori1018@gmail.com"
+  },
+  "homepage": "https://github.com/Yukinori1018/ai-company-amazon_buppan",
+  "repository": "https://github.com/Yukinori1018/ai-company-amazon_buppan",
+  "license": "MIT",
+  "keywords": ["amazon", "buppan", "ticket", "kpi", "secretary", "ai-company"],
+  "hooks": "./hooks/hooks.json"
+}
