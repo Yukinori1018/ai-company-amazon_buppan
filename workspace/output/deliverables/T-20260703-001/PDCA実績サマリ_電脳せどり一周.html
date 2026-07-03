@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>電脳せどり PDCA 実績サマリ</title>
+<style>
+  @page { size: A4; margin: 10mm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif; color:#1a1a1a; font-size:9.4px; line-height:1.42; background:#fff; }
+  .sheet { width:190mm; min-height:277mm; margin:0 auto; padding:2mm 0; }
+  h1 { font-size:15px; color:#0b3d5c; border-bottom:2.5px solid #0b3d5c; padding-bottom:3px; margin-bottom:4px; }
+  .meta { font-size:8.6px; color:#444; margin-bottom:5px; line-height:1.5; }
+  .meta b { color:#0b3d5c; }
+  .concl { background:#fef6e0; border:1px solid #e0b84a; border-left:5px solid #e0b84a; padding:6px 9px; margin-bottom:7px; font-size:9.8px; }
+  .concl b { color:#a9741a; }
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+  .box { border:1px solid #ccc; border-radius:4px; padding:6px 8px; }
+  .box h2 { font-size:11px; padding:2px 7px; border-radius:3px; color:#fff; display:inline-block; margin-bottom:4px; }
+  .p h2{background:#2e7d32;} .d h2{background:#1565c0;} .c h2{background:#c62828;} .a h2{background:#6a1b9a;}
+  .box .sub { font-size:8.4px; color:#555; margin-bottom:4px; }
+  table { width:100%; border-collapse:collapse; font-size:8.4px; margin:2px 0; }
+  th,td { border:1px solid #d5d5d5; padding:2px 4px; text-align:center; }
+  th { background:#f0f3f6; font-weight:600; }
+  td.l,th.l { text-align:left; }
+  .hl { color:#c0392b; font-weight:700; }
+  .go { color:#2e7d32; font-weight:700; }
+  .arrow { font-size:8.8px; margin-top:3px; padding:3px 5px; background:#f4f7fa; border-radius:3px; }
+  ol { margin-left:15px; font-size:8.6px; } ol li { margin-bottom:2.5px; }
+  .foot { margin-top:6px; display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+  .fbox { border:1px dashed #999; border-radius:4px; padding:5px 8px; font-size:8.5px; }
+  .fbox h3 { font-size:9.5px; color:#0b3d5c; margin-bottom:3px; }
+  .fbox ul { margin-left:14px; } .fbox li { margin-bottom:2px; }
+  .kata { grid-column:1 / -1; background:#eef4ef; border:1px solid #b7d3ba; }
+</style>
+</head>
+<body>
+<div class="sheet">
+  <h1>電脳せどり PDCA 一周・実績サマリ</h1>
+  <div class="meta">
+    <b>実施日</b> 2026-07-03 ／ <b>担当</b> カズヨ(司令塔)＋サトル(調査)・タケシ(Plan/Act)・マサル(仮想Do)<br>
+    <b>対象商品</b> エポック社 シルバニアファミリー「赤い屋根の大きなお家」ハ-48（おもちゃ・大型FBA）<br>
+    <b>Doの扱い</b> 実購入はせず「実物を仕入れ→FBAで売る体」で仮想実行（金銭が動く実決済は社長承認事項のため未実行）。数値は社内の利益計算エンジン＋実相場に接地。
+  </div>
+
+  <div class="concl">
+    <b>結論：</b>初回テスト5個は基準シナリオで<b>＋3,096円の黒字</b>。ただし<b>利益率11.6%で全社目標20%に未達</b>。
+    原因は利益率の低さより<b>「値下げ耐性の薄さ」</b>。リピートは条件付き可 —— 仕入値を下げるか需要期に絞れば勝てる商品。
+  </div>
+
+  <div class="grid">
+    <!-- PLAN -->
+    <div class="box p">
+      <h2>P ｜ Plan（仕入れ判定）</h2>
+      <div class="sub">実相場で3候補を収集→利益計算エンジンで実額判定（手数料・FBA料込）</div>
+      <table>
+        <tr><th class="l">候補</th><th>仕入→売価</th><th>純利/個</th><th>利益率</th><th>判定</th></tr>
+        <tr><td class="l"><b>A シルバニア(本命)</b></td><td>5,300→9,500</td><td class="hl">1,742円</td><td class="hl">18.3%</td><td class="go">原石=GO</td></tr>
+        <tr><td class="l">B 象印ケトル</td><td>7,400→9,300</td><td>212円</td><td>2.3%</td><td>見送り</td></tr>
+        <tr><td class="l">C デオナチュレ3個</td><td>2,100→3,070</td><td>133円</td><td>4.3%</td><td>見送り</td></tr>
+      </table>
+      <div class="arrow">→ <b>判断：候補Aを初回テスト5個仕入れ</b>（投下資金 約27,400円）。B/Cは薄利で今回見送り。</div>
+    </div>
+
+    <!-- DO -->
+    <div class="box d">
+      <h2>D ｜ Do（仮想・30日FBA販売）</h2>
+      <div class="sub">5個を30日販売。マサルが3シナリオ予測（確率加重期待値 約＋3,150円）</div>
+      <table>
+        <tr><th class="l"></th><th>悲観30%</th><th>基準50%</th><th>楽観20%</th></tr>
+        <tr><td class="l">売れた数/30日</td><td>2個</td><td class="hl">3個</td><td>5個</td></tr>
+        <tr><td class="l">期末在庫</td><td>3個</td><td class="hl">2個</td><td>0個</td></tr>
+        <tr><td class="l">実現平均売価</td><td>8,300</td><td class="hl">8,900</td><td>9,400</td></tr>
+        <tr><td class="l">確定現金損益</td><td>±0</td><td class="hl">＋3,096</td><td>＋8,035</td></tr>
+      </table>
+      <div class="arrow">→ 相乗り値下げでカート9,500→8,900に下振れ＋7月平常需要で回転3/5、が最も現実的な着地（＝基準を採用）。</div>
+    </div>
+
+    <!-- CHECK -->
+    <div class="box c">
+      <h2>C ｜ Check（計画 対 実績）</h2>
+      <div class="sub">基準シナリオをエンジンで検算。全社KPI「利益率20%」と照合</div>
+      <table>
+        <tr><th class="l">指標</th><th>計画(5個@9,500)</th><th>実績(3個@8,900)</th></tr>
+        <tr><td class="l">1個純利益</td><td>1,742円</td><td class="hl">1,032円</td></tr>
+        <tr><td class="l">利益率</td><td>18.3%</td><td class="hl">11.6% ✗未達</td></tr>
+        <tr><td class="l">確定利益</td><td>8,710円</td><td class="hl">＋3,096円</td></tr>
+        <tr><td class="l">ROI(投下資本)</td><td>30.4%</td><td class="hl">11.3%</td></tr>
+      </table>
+      <div class="arrow">差異主因＝①実売価下振れ ▲600円/個（相乗り）②回転不足 5→3個（季節）③想定外コスト＋200円/個。<b>在庫2個=11,460円が未回収拘束</b>。</div>
+    </div>
+
+    <!-- ACT -->
+    <div class="box a">
+      <h2>A ｜ Act（次に効く改善）</h2>
+      <div class="sub">タケシ：この一周から抽出した恒久ルール</div>
+      <ol>
+        <li><b>仕入基準に「値下げ耐性」を追加</b>。利益率18.3%でも分岐点まで約2,000円しかなく相乗り1回で利益消失。今後は<b>実売想定を1割引いて判定</b>し、それでも黒字の物だけ買う。</li>
+        <li><b>季節性を回転に織り込む</b>。7月の玩具は鈍い→テストは平常期、本番仕込みは需要期(11〜12月)。</li>
+        <li><b>テスト5個は正解</b>。軽傷で学べる。次も「まず5個で再現性確認」を標準化。</li>
+        <li><b>リピートは条件付き可</b>。①仕入値4,800円以下で分岐点を下げる ②カート取得率と実売価を記録、のどちらか達成で増量。未達なら同条件リピート非推奨。</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="foot">
+    <div class="fbox">
+      <h3>撤退・損切りライン（今回設定）</h3>
+      <ul>
+        <li>カート価格が <b>7,800円</b>を継続割れ → 値下げ追随を停止（分岐点まで余裕350円）</li>
+        <li><b>14日で0個→黄信号 / 21日で1個以下→赤信号</b></li>
+        <li>30日で2個以上残り → FBAで寝かせず別チャネル(メルカリ等)で現金化</li>
+      </ul>
+    </div>
+    <div class="fbox">
+      <h3>プレモーテム（失敗要因TOP3）</h3>
+      <ul>
+        <li>カート喪失→値下げ連鎖で分岐点割れ（「売れてるのに損」状態）</li>
+        <li>大型玩具の返品・箱毀損で再出品原価が焦げる</li>
+        <li>回転せずキャッシュ拘束＋長期保管手数料の入口</li>
+      </ul>
+    </div>
+    <div class="fbox kata">
+      <h3>この一周で確立した“型”（次回そのまま流用可）</h3>
+      実相場リサーチ(サトル) → <b>利益計算エンジンで判定(原石/あやしい/はずれ)</b> → 仮想Do3シナリオ(マサル) → エンジンで計画対実績を検算(カズヨ) → 基準見直し(タケシ)。
+      全数値が社内エンジン＋実相場に接地。次回は<b>候補と仕入値を差し替えるだけ</b>で同じ精度で回せる。
+    </div>
+  </div>
+</div>
+</body>
+</html>
