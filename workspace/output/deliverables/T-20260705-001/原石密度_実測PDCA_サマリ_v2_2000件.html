@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>原石密度の実測PDCA v2（2,000件）</title>
+<style>
+  @page { size: A4; margin: 9mm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif; color:#1a1a1a; font-size:9.1px; line-height:1.38; }
+  .sheet { width:192mm; margin:0 auto; }
+  h1 { font-size:14px; color:#0b3d5c; border-bottom:2.5px solid #0b3d5c; padding-bottom:2px; margin-bottom:3px; }
+  .meta { font-size:8.3px; color:#444; margin-bottom:4px; line-height:1.42; }
+  .meta b { color:#0b3d5c; }
+  .concl { background:#e8f2e8; border:1px solid #4a9c4a; border-left:5px solid #4a9c4a; padding:5px 8px; margin-bottom:6px; font-size:9.4px; }
+  .concl b { color:#2e7d32; }
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:5px; }
+  .box { border:1px solid #ccc; border-radius:4px; padding:5px 7px; }
+  .box h2 { font-size:10.5px; padding:1px 6px; border-radius:3px; color:#fff; display:inline-block; margin-bottom:3px; }
+  .p h2{background:#2e7d32;} .d h2{background:#1565c0;} .c h2{background:#c62828;} .a h2{background:#6a1b9a;}
+  .box .sub { font-size:8px; color:#555; margin-bottom:3px; }
+  table { width:100%; border-collapse:collapse; font-size:8.1px; margin:2px 0; }
+  th,td { border:1px solid #d5d5d5; padding:1.5px 4px; text-align:center; }
+  th { background:#f0f3f6; font-weight:600; }
+  td.l,th.l { text-align:left; }
+  .hl { color:#c0392b; font-weight:700; } .gd{color:#2e7d32;font-weight:700;}
+  .arrow { font-size:8.2px; margin-top:2px; padding:2px 5px; background:#f4f7fa; border-radius:3px; }
+  ol { margin-left:14px; font-size:8.3px; } ol li { margin-bottom:2px; }
+  ul.tight { margin-left:13px; font-size:8.1px; } ul.tight li{ margin-bottom:1.5px; }
+  .foot { margin-top:5px; display:grid; grid-template-columns:1fr 1fr; gap:5px; }
+  .fbox { border:1px dashed #999; border-radius:4px; padding:4px 7px; font-size:8.1px; }
+  .fbox h3 { font-size:9.2px; color:#0b3d5c; margin-bottom:2px; }
+  .fix { grid-column:1/-1; background:#fff8e1; border:1px solid #e0b84a; }
+  .fix b{color:#a9741a;}
+</style>
+</head>
+<body>
+<div class="sheet">
+  <h1>電脳せどりは事業になるか — 原石密度の実測PDCA【v2・2,000件・訂正版】</h1>
+  <div class="meta">
+    <b>実施</b> 2026-07-05〜06 ／ <b>担当</b> カズヨ＋サトル ／ <b>問い</b> 稼げる商品（仕入値とAmazon価格の差）は本当に存在するか＝月50万は現実的か<br>
+    <b>前回からの修正</b> ①235→<b>2,000件</b> ②サンプリングを素人的なYahoo無選別→<b>プロの逆順</b>(Amazon条件で先に絞る) ③前回「全件BuyBox無し」は<b>私の測定ミス</b>(buyboxパラメータ未指定)→訂正
+  </div>
+
+  <div class="concl">
+    <b>結論（訂正）：稼げる商品は「ほとんど無い」わけではなかった。ただし濃くもない。</b>正しい手法で測ると、誤突合を除いた<b>クリーンな流動性原石は突合の5.3%＝2,000件から47件</b>。約7割は相乗り可能、純利益 中央¥1,620・仕入資本 中央¥4,167。<b>AIで正しく絞れば事業の芽はあるが、無選別・ワンクリックでは罠だらけ。</b>
+  </div>
+
+  <div class="grid">
+    <div class="box p">
+      <h2>P ｜ Plan（サンプリングを逆順に再設計）</h2>
+      <div class="sub">サトルがナレッジ精査。前回の誤り=仕入れ先を無選別に舐めた</div>
+      <ul class="tight">
+        <li><b>Amazon側でPoiPoi標準条件を先に絞る</b>：ランク5万〜15万・出品者2人以上・3,000円以上・<b>Amazon本体在庫切れ</b></li>
+        <li>各ASINの<b>JANで仕入れ先(Yahoo+楽天)を逆引き最安</b></li>
+        <li>基準は朝野式に緩和：利益率8%・利益額300円（分母最大化）</li>
+      </ul>
+    </div>
+
+    <div class="box d">
+      <h2>D ｜ Do（Product Finderで2,000件・自走3時間）</h2>
+      <table>
+        <tr><td class="l">Amazon側 条件合致(抽出)</td><td><b>1,999</b></td></tr>
+        <tr><td class="l">JANあり</td><td>1,543</td></tr>
+        <tr><td class="l">仕入先が付いた(突合)</td><td><b>890 (44.5%)</b></td></tr>
+        <tr><td class="l">原石188 / 持続177 / 流動性(生)</td><td><b>131</b></td></tr>
+      </table>
+    </div>
+
+    <div class="box c">
+      <h2>C ｜ Check（生値は盛られる→誤突合を剥がす）</h2>
+      <table>
+        <tr><th class="l">段階</th><th>件数</th><th>対突合%</th></tr>
+        <tr><td class="l">流動性ある原石（生）</td><td>131</td><td>14.7%</td></tr>
+        <tr><td class="l">−入数不一致/別モデル誤突合</td><td>−84</td><td></td></tr>
+        <tr><td class="l"><b>クリーン流動性原石(真値)</b></td><td class="gd"><b>47</b></td><td class="gd"><b>5.3%</b></td></tr>
+      </table>
+      <div class="arrow">生14.7%の正体＝消火器<b>1本</b>(¥3,620)が「19本セット¥78,750」に誤突合等。クリーン47件は差の比率 中央<b>1.73倍</b>・純利益 中央¥1,620・資本 中央¥4,167・ブランド制限28%。</div>
+    </div>
+
+    <div class="box a">
+      <h2>A ｜ Act（2,000件が確定させた方針）</h2>
+      <ol>
+        <li><b>ツールに"罠フィルタ"を必ず組む</b>（生値は真値の約3倍）。必須＝①入数照合 ②名寄せ信頼度 ③Buy Box実在確認 ④ブランド/薬機警告。無いAIリサーチは害。</li>
+        <li><b>勝ち筋カテゴリに寄せる</b>：おもちゃ・ホビー・家電・ホーム&キッチン（ドラッグ/ベビーは低効率）。</li>
+        <li><b>「探す」より「絞る」がAIの主戦場</b>。2,000→47は人手では回せない。</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="foot">
+    <div class="fbox">
+      <h3>月50万の再逆算（訂正・概算）</h3>
+      <ul class="tight">
+        <li>相乗り可能なクリーン原石 ≈34件／2,000件スキャン</li>
+        <li>純利益 中央¥1,620・実売15個/月なら 1SKU≈¥24,000/月</li>
+        <li>→ 月50万 ≈ <b>常時21SKU</b>。継続再スキャン＋在庫資本＋出品許可クリアが条件</li>
+        <li><b>判定：正しい手法＋AIスケール＋罠フィルタなら射程内。無選別・低努力では非現実的。</b></li>
+      </ul>
+    </div>
+    <div class="fbox">
+      <h3>カテゴリ別 クリーン原石（勝ち筋）</h3>
+      <ul class="tight">
+        <li>おもちゃ10・家電9・ホビー8・ホーム&キッチン6・スポーツ6</li>
+        <li>DIY4・ペット3・ベビー1（ドラッグは突合率低=薬機/JAN無）</li>
+        <li>突合率が高い順：スポーツ76%・toys/diy 62%・office 60%</li>
+      </ul>
+    </div>
+    <div class="fbox fix">
+      <h3>前回結論の訂正（誠実開示）</h3>
+      前回A4の「全件Buy Box無し→投資可能≈0%」は、<b>Keepaのbuyboxパラメータを付けず未取得値を"無し"と誤読した私の測定ミス</b>でした。実際はBuy Boxは存在し、クリーン47件はほぼ全て実売Buy Box価格でも基準を維持。よって「開かれた相乗り市場では非現実的」は維持しつつ、<b>「Amazon条件抽出＋逆引き＋罠除去」なら事業の芽はある</b>へ更新します。
+    </div>
+  </div>
+  <div style="font-size:7.5px;color:#888;margin-top:3px;">データ=新規スプレッドシート『原石密度_リサーチデータ_2000件.xlsx』(全1,999行＋クリーン原石47件＋カテゴリ別＋サマリ)。確度の限界：月販はrank由来の粗推定／仕入は逆引き最安1件(別バリエ残存リスク)／ブランド制限は名寄せ推定。真の投資可否は各SKUで最終確認。</div>
+</div>
+</body>
+</html>
