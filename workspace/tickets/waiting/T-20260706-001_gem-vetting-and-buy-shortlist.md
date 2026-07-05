@@ -37,6 +37,7 @@ related_tickets: [T-20260705-001, T-20260521-005]
 
 ## 納品物
 - buy_shortlist.csv / vetting_filter.py / スプレッドシート「買い候補ショートリスト」タブ
+- **新規Googleスプレッドシート**（社長依頼でExcel→Googleシート化）: https://docs.google.com/spreadsheets/d/1gTVgZdHX6SotrZcpKdms05X5-YKmAHZ1QD98gz74sA8/edit （My Drive直下・社長所有・候補17＋除外30の全47行）
 
 ## 次（社長承認事項＝§4.1金銭）
 本チケットはショートリスト提示で停止。**実購入は社長承認が必須**。候補から1〜数SKUを選び、各Amazon実ページ×仕入先ページで同一商品を最終目視確認→小さく本番（Bフル外注ラインに接続）。
