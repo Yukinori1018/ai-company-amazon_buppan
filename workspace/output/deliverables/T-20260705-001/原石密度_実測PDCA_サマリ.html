@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>原石密度の実測PDCA</title>
+<style>
+  @page { size: A4; margin: 9mm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif; color:#1a1a1a; font-size:9.2px; line-height:1.4; background:#fff; }
+  .sheet { width:192mm; margin:0 auto; padding:1mm 0; }
+  h1 { font-size:14.5px; color:#0b3d5c; border-bottom:2.5px solid #0b3d5c; padding-bottom:2px; margin-bottom:3px; }
+  .meta { font-size:8.4px; color:#444; margin-bottom:4px; line-height:1.45; }
+  .meta b { color:#0b3d5c; }
+  .concl { background:#fdecea; border:1px solid #d9534f; border-left:5px solid #d9534f; padding:5px 8px; margin-bottom:6px; font-size:9.6px; }
+  .concl b { color:#b52b27; }
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:5px; }
+  .box { border:1px solid #ccc; border-radius:4px; padding:5px 7px; }
+  .box h2 { font-size:10.5px; padding:1px 6px; border-radius:3px; color:#fff; display:inline-block; margin-bottom:3px; }
+  .p h2{background:#2e7d32;} .d h2{background:#1565c0;} .c h2{background:#c62828;} .a h2{background:#6a1b9a;}
+  .box .sub { font-size:8.2px; color:#555; margin-bottom:3px; }
+  table { width:100%; border-collapse:collapse; font-size:8.2px; margin:2px 0; }
+  th,td { border:1px solid #d5d5d5; padding:1.5px 4px; text-align:center; }
+  th { background:#f0f3f6; font-weight:600; }
+  td.l,th.l { text-align:left; }
+  .hl { color:#c0392b; font-weight:700; }
+  .zero { color:#b52b27; font-weight:700; }
+  .arrow { font-size:8.4px; margin-top:2px; padding:2px 5px; background:#f4f7fa; border-radius:3px; }
+  ol { margin-left:14px; font-size:8.4px; } ol li { margin-bottom:2px; }
+  ul.tight { margin-left:13px; font-size:8.2px; } ul.tight li{ margin-bottom:1.5px; }
+  .foot { margin-top:5px; display:grid; grid-template-columns:1.1fr 1fr; gap:5px; }
+  .fbox { border:1px dashed #999; border-radius:4px; padding:4px 7px; font-size:8.2px; }
+  .fbox h3 { font-size:9.2px; color:#0b3d5c; margin-bottom:2px; }
+  .mech { grid-column:1 / -1; background:#fff8e1; border:1px solid #e0b84a; }
+  .mech b{ color:#a9741a; }
+</style>
+</head>
+<body>
+<div class="sheet">
+  <h1>電脳せどりは事業になるか — 原石密度の実測PDCA</h1>
+  <div class="meta">
+    <b>実施日</b> 2026-07-05 ／ <b>担当</b> カズヨ ／ <b>問い</b> 「仕入れ値とAmazon価格の差で稼げる商品(原石)」は本当に存在するか＝月50万は現実的か<br>
+    <b>方法</b> 実接続で母集団をスキャン：Yahoo/NETSEA(仕入れ側)×Keepa(Amazon側:価格・相乗り出品者数・月販)×実働利益エンジン。①黒字の差 ②持続(相乗り少・回転) の歩留まり率を実測。
+  </div>
+
+  <div class="concl">
+    <b>結論：社長の疑問は実データで裏付けられました。</b>ただし理由が肝 —— 「稼げる商品」が無いのではなく、<b>差が残っている商品は"Buy Boxが無い＝実際には売れていない"</b>。健全に売れて差もある商品は市場が即刈り取り差が消える。<b>"大きい差をAIで探す"は罠を掘り当てるだけ</b>だった。
+  </div>
+
+  <div class="grid">
+    <div class="box p">
+      <h2>P ｜ Plan（密度を測る設計）</h2>
+      <ul class="tight">
+        <li>母集団①<b>開かれた市場</b>：Yahoo!を20カテゴリのKWで舐める（相乗り電脳せどりの典型）</li>
+        <li>母集団②<b>卸起点</b>：NETSEA承認サプライヤーを棚卸し（構造的な差の本命）</li>
+        <li>JAN→Keepa突合→利益エンジンで判定。原石=率15%&利500円、持続=相乗り≤5&月販≥10</li>
+        <li>歩留まり率から<b>月50万に要るSKU数・スキャン量を逆算</b></li>
+      </ul>
+    </div>
+
+    <div class="box d">
+      <h2>D ｜ Do（実際にスキャンした）</h2>
+      <div class="sub">Keepaトークン 1,198→613（約585消費）</div>
+      <table>
+        <tr><th class="l">経路</th><th>母集団</th><th>JAN取得</th><th>Amazon突合N</th></tr>
+        <tr><td class="l">① Yahoo(開かれた市場)</td><td>20KW*</td><td>275</td><td><b>235</b></td></tr>
+        <tr><td class="l">② NETSEA(卸/30社)</td><td>1,200商品</td><td>327<br>(網羅27%)</td><td><b>269</b></td></tr>
+      </table>
+      <div class="arrow">*Yahooは10KWで429(レート制限)。卸はJAN網羅率が27%＝そもそも機械突合できる卸商品が3割弱。</div>
+    </div>
+
+    <div class="box c">
+      <h2>C ｜ Check（生の歩留まり→検証で総崩れ）</h2>
+      <table>
+        <tr><th class="l">指標</th><th>①Yahoo</th><th>②NETSEA卸</th></tr>
+        <tr><td class="l">黒字の差(net&gt;0)</td><td>5.5%</td><td>24.2%</td></tr>
+        <tr><td class="l">Tier1 原石</td><td>3.4%</td><td>16.0%</td></tr>
+        <tr><td class="l"><b>Tier2 持続原石(生)</b></td><td><b>2.1%</b></td><td><b>9.3%</b></td></tr>
+        <tr><td class="l">検証後(実質の検討可能)</td><td class="zero">≈0%</td><td class="hl">7.8%*</td></tr>
+      </table>
+      <div class="arrow">*NETSEA7.8%も、信頼できそうな9件を最終検証したら<b>全件Buy Box無し</b>＋薬機法/カテゴリ許可の壁。Yahoo原石8件は言い値/ブランド制限/誤突合で全滅。</div>
+    </div>
+
+    <div class="box a">
+      <h2>A ｜ Act（確定した方針転換）</h2>
+      <ol>
+        <li><b>AIの役割を変える：「大きい差を探す」→「差の"流動性"を検証する」。</b>Buy Box有無・出品構成(カート奪取可否)・実売・gating・薬機法を<b>トラップフィルタ</b>化。流動性未検証の差はノイズ。</li>
+        <li><b>開かれた相乗り電脳せどりは主戦場から外す</b>（密度≈0を実証）。<b>卸×Amazon突合に集中</b>。</li>
+        <li>原石が実在するのは<b>障壁で守られた場所</b>：①出品制限解除 ②メーカー独占/卸の構造差 ③独自セット。既存ナレッジ(メーカー仕入れ/NETSEA)と直結。</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="foot">
+    <div class="fbox">
+      <h3>月50万の逆算（概算）</h3>
+      <ul class="tight">
+        <li>卸の検討可能原石＝平均純利益 約¥1,500/個・月販は控えめ</li>
+        <li>Buy Box無し→実売は推定を大きく下回る。仮に実売10個/月＝1SKU約¥15,000/月</li>
+        <li>→ 月50万には<b>常時33SKU級</b>が必要。開かれた市場(密度≈0)では<b>非現実的</b></li>
+        <li>卸でも「薄利ニッチの大量grind＋Buy Box奪取＋薬機法クリア」を越えないと届かない</li>
+      </ul>
+    </div>
+    <div class="fbox">
+      <h3>次のPlan（順に）</h3>
+      <ul class="tight">
+        <li>①卸フル2周目：流動性フィルタ付きで<b>真の卸原石密度</b>を数える</li>
+        <li>②薄利前提でSKU数と回転を再逆算（grind型が成立するか）</li>
+        <li>③障壁プレイの実地検証（出品制限解除・メーカー独占仕入れ）</li>
+      </ul>
+    </div>
+    <div class="fbox mech">
+      <h3>市場メカニズム（この実測で掴んだ核心）</h3>
+      <b>差が残る＝Buy Boxが無い＝売れていない。</b> Amazonは効率市場で、"本当に売れて差もある商品"は競合が即座に刈り取り差が消える。スキャンに"差"として残るのは、Buy Box無し・幻の月販(売れ数0)・ブランド制限・誤突合といった<b>流動性の無い残りカス</b>。だから「稼げる大きな差を探す」ほど罠に当たる。原石は"探す"のではなく、障壁を作って"守る"もの。
+    </div>
+  </div>
+  <div style="font-size:7.6px;color:#888;margin-top:3px;">確度の限界：サンプルはYahoo235/NETSEA269（Yahooは429で縮小）。月販はrank由来推定でBuy Box無し銘柄は過大。Buy Box奪取可否(FBM/FBA別出品構成)は次の計測項目。真の密度確定には卸フル2周目が要る。</div>
+</div>
+</body>
+</html>

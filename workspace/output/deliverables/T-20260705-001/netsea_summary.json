@@ -1,0 +1,11 @@
+{
+  "supplier_sampled": 30,
+  "total_items": 1200,
+  "jan_unique": 327,
+  "jan_coverage_pct": 27.3,
+  "matched_N": 269,
+  "positive_gap": 65,
+  "tier1": 43,
+  "tier2": 25,
+  "tokens_left": 582
+}
