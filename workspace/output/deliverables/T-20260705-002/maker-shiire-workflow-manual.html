@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>メーカー仕入れ式 物販 業務フロー｜社長用マニュアル</title>
+<style>
+  :root{
+    --ink:#1a2230; --sub:#556; --line:#d8dee9; --bg:#f6f8fb;
+    --accent:#1f6feb; --accent2:#0e9f6e; --warn:#b45309; --warnbg:#fff7ed;
+    --s1:#1f6feb; --s2:#7c3aed; --s3:#0e9f6e; --s4:#d97706;
+    --card:#fff; --grow:#eef6ff;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif;
+    line-height:1.75;font-size:15px;}
+  .wrap{max-width:1040px;margin:0 auto;padding:32px 24px 72px;}
+  header.doc{border-bottom:3px solid var(--ink);padding-bottom:16px;margin-bottom:8px;}
+  header.doc .kicker{font-size:12px;letter-spacing:.14em;color:var(--accent);font-weight:700;}
+  header.doc h1{font-size:26px;margin:6px 0 4px;letter-spacing:.01em;}
+  header.doc .lead{color:var(--sub);font-size:14px;margin:0;}
+  .meta{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:12px;color:var(--sub);margin-top:12px;}
+  .meta b{color:var(--ink);}
+
+  .callout{background:#fff;border:1px solid var(--line);border-left:4px solid var(--accent);
+    border-radius:8px;padding:14px 18px;margin:22px 0;font-size:14px;}
+  .callout b{color:var(--accent);}
+
+  h2.section{font-size:18px;margin:38px 0 14px;padding-bottom:6px;border-bottom:2px solid var(--line);}
+  h2.section span{color:var(--accent);font-weight:800;}
+
+  /* ---- diagram ---- */
+  .board{background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:22px 20px;box-shadow:0 2px 10px rgba(30,50,90,.05);overflow-x:auto;}
+  .board .lbl{font-size:12px;font-weight:700;color:var(--sub);letter-spacing:.08em;margin:0 0 12px;}
+  .flow{display:flex;align-items:stretch;gap:10px;min-width:820px;}
+  .step{flex:1;background:#fff;border:2px solid var(--line);border-radius:12px;padding:14px 12px;
+    position:relative;display:flex;flex-direction:column;}
+  .step .no{position:absolute;top:-13px;left:14px;width:26px;height:26px;border-radius:50%;
+    color:#fff;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;}
+  .step h3{font-size:15px;margin:6px 0 6px;}
+  .step p{font-size:12.5px;color:var(--sub);margin:0;line-height:1.6;}
+  .step.s1{border-color:var(--s1);} .step.s1 .no{background:var(--s1);}
+  .step.s2{border-color:var(--s2);} .step.s2 .no{background:var(--s2);}
+  .step.s3{border-color:var(--s3);} .step.s3 .no{background:var(--s3);}
+  .step.s4{border-color:var(--s4);} .step.s4 .no{background:var(--s4);}
+  .arrow{align-self:center;color:#9aa7bd;font-size:22px;font-weight:900;flex:0 0 auto;}
+
+  .loopnote{display:flex;align-items:center;gap:10px;margin:12px 2px 0;
+    font-size:12.5px;color:var(--accent2);font-weight:700;}
+  .loopnote .curve{font-size:18px;}
+
+  .growband{margin-top:18px;background:var(--grow);border:1px dashed var(--accent);
+    border-radius:12px;padding:14px 16px;}
+  .growband .lbl{color:var(--accent);}
+  .grow{display:flex;gap:10px;min-width:640px;}
+  .gcard{flex:1;background:#fff;border:1px solid #cfe0fb;border-radius:10px;padding:11px 12px;position:relative;}
+  .gcard .no{position:absolute;top:-12px;left:12px;width:24px;height:24px;border-radius:50%;
+    background:var(--accent);color:#fff;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;}
+  .gcard h4{margin:6px 0 4px;font-size:14px;}
+  .gcard p{margin:0;font-size:12px;color:var(--sub);}
+
+  /* ---- annotations ---- */
+  .ann{margin-top:14px;}
+  .anngrp{background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:6px 20px 14px;margin:16px 0;}
+  .anngrp > h3{font-size:16px;margin:16px 0 8px;display:flex;align-items:center;gap:10px;}
+  .chip{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:24px;
+    padding:0 8px;border-radius:6px;color:#fff;font-weight:800;font-size:13px;}
+  .chip.s1{background:var(--s1);} .chip.s2{background:var(--s2);}
+  .chip.s3{background:var(--s3);} .chip.s4{background:var(--s4);}
+  .chip.g{background:var(--accent);}
+  .anngrp > h3 small{font-weight:500;color:var(--sub);font-size:12.5px;}
+  ol.notes{list-style:none;counter-reset:none;margin:6px 0 0;padding:0;}
+  ol.notes li{position:relative;padding:7px 0 7px 44px;border-top:1px dashed #e6ebf2;font-size:14px;}
+  ol.notes li:first-child{border-top:none;}
+  ol.notes li .n{position:absolute;left:0;top:7px;min-width:32px;height:22px;padding:0 6px;
+    background:#eef2f8;color:var(--ink);border-radius:5px;font-weight:800;font-size:12.5px;
+    display:inline-flex;align-items:center;justify-content:center;}
+  ol.notes li b{color:var(--ink);}
+  ol.notes li .tag{display:inline-block;font-size:11px;font-weight:700;color:#fff;background:var(--accent2);
+    border-radius:4px;padding:1px 6px;margin-left:2px;vertical-align:1px;}
+  ol.notes li .tag.num{background:var(--warn);}
+  ol.notes li .tag.tool{background:#334155;}
+
+  .kpibox{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0 2px;}
+  .kpi{flex:1 1 150px;background:#f4f8ff;border:1px solid #d6e4ff;border-radius:8px;padding:8px 12px;}
+  .kpi .v{font-size:18px;font-weight:800;color:var(--accent);}
+  .kpi .k{font-size:11.5px;color:var(--sub);}
+
+  .warnbox{background:var(--warnbg);border:1px solid #fed7aa;border-left:4px solid var(--warn);
+    border-radius:8px;padding:12px 16px;margin:14px 0;font-size:13.5px;}
+  .warnbox b{color:var(--warn);}
+
+  footer.doc{margin-top:40px;border-top:1px solid var(--line);padding-top:14px;font-size:12px;color:var(--sub);}
+  .next{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 20px;margin-top:24px;}
+  .next h3{margin:0 0 8px;font-size:15px;}
+  .next ol{margin:0;padding-left:20px;}
+  .next li{margin:5px 0;font-size:14px;}
+
+  @media print{
+    body{background:#fff;font-size:12px;}
+    .wrap{max-width:none;padding:0;}
+    .board,.anngrp,.next{box-shadow:none;break-inside:avoid;}
+    .flow,.grow{min-width:0;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="doc">
+    <div class="kicker">社長用 業務マニュアル ／ 別ルート（メーカー・店舗直接仕入れ）</div>
+    <h1>メーカー仕入れ式 物販 業務フロー</h1>
+    <p class="lead">実店舗・メーカーへ直接（電話／メール）連絡して安く仕入れ、Amazonで売る。EC STARs流の手法を当社用に整理。</p>
+    <div class="meta">
+      <span><b>ticket</b> T-20260705-002</span>
+      <span><b>制作</b> コンテンツ制作ヒデアキ（監修：秘書カズヨ）</span>
+      <span><b>出典</b> EC STARs Lab.（中西恒太）マニュアル＋2026-06-10セミナー実記録</span>
+      <span><b>更新</b> 2026-07-05</span>
+    </div>
+  </header>
+
+  <div class="callout">
+    <b>このマニュアルの使い方。</b> 上段の「1枚フロー図」で全体の流れを大まかにつかみ、下段の<b>番号付き注釈（通し番号1〜）</b>で各ステップの実務を確認します。番号は今後カズヨと詳細を詰める際の共通の目印です（例：「注釈7のKeepa条件を決めたい」）。電脳せどり検証は<b>別ルートとして並行継続</b>し、本ルートはそれとは独立に立ち上げます。
+  </div>
+
+  <!-- ============ DIAGRAM ============ -->
+  <h2 class="section"><span>■</span> 全体フロー（1枚俯瞰）</h2>
+  <div class="board">
+    <p class="lbl">A. 基本サイクル ── 毎回まわす4ステップ</p>
+    <div class="flow">
+      <div class="step s1"><span class="no">1</span><h3>リサーチ</h3>
+        <p>Keepaで「卸してくれそうな売れ筋」を抽出し、メーカーをリスト化</p></div>
+      <div class="arrow">→</div>
+      <div class="step s2"><span class="no">2</span><h3>問い合わせ</h3>
+        <p>メーカーへメール／FAX／電話で取引打診 → 見積を回収</p></div>
+      <div class="arrow">→</div>
+      <div class="step s3"><span class="no">3</span><h3>仕入れ判断</h3>
+        <p>経費35%概算で利益を判定 → 通れば「小ロット」で初回発注</p></div>
+      <div class="arrow">→</div>
+      <div class="step s4"><span class="no">4</span><h3>管理・販売</h3>
+        <p>FBA納品 → 販売 → 2週で入金 → 売れた分をリピート発注</p></div>
+    </div>
+    <div class="loopnote"><span class="curve">↩︎</span> 売れ続ける商品は STEP4→STEP3 を<b>メール1本でリピート</b>（＝ストック型。取引メーカーが増えるほど利益が階段状に積み上がる）</div>
+
+    <div class="growband">
+      <p class="lbl">B. 成長施策 ── 月利が安定してきたら着手（任意・順不同でない）</p>
+      <div class="grow">
+        <div class="gcard"><span class="no">5</span><h4>外注化</h4><p>リサーチ・梱包納品を外注し、社長はPC上の判断に専念</p></div>
+        <div class="gcard"><span class="no">6</span><h4>融資</h4><p>売上実績を作ってから公庫等で資金調達、仕入れを増やす</p></div>
+        <div class="gcard"><span class="no">7</span><h4>限定化・独占</h4><p>メーカーと信頼を築き、値崩れしない“自分だけの商品”へ</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ ANNOTATIONS ============ -->
+  <h2 class="section"><span>■</span> 注釈（各ステップの実務・通し番号）</h2>
+  <div class="ann">
+
+    <!-- STEP1 -->
+    <div class="anngrp">
+      <h3><span class="chip s1">1</span> リサーチ <small>狙いの商品とメーカーを見つける</small></h3>
+      <ol class="notes">
+        <li><span class="n">1</span><b>狙いは中小メーカー。</b>大手は代理店制度があり個人には卸さない。中小は人手不足で「作るプロだが売るのは苦手」なので、Amazon販売の代行提案に需要がある。</li>
+        <li><span class="n">2</span><b>リサーチ基準はたった3つ。</b>①Amazon本体が出品していない ②売れ筋ランキング5万位以内（1〜50,000位） ③FBAライバルセラーが2人以上。</li>
+        <li><span class="n">3</span><b>「セラー2人以上」が肝。</b>セラーが1人だけの商品はOEM・メーカー直販で卸してもらえない。複数いる＝“卸す意思のあるメーカー”という証拠。ライバル上限は気にしない。</li>
+        <li><span class="n">4</span><b>使うツールはKeepaのみ</b><span class="tag tool">ツール</span>（月額約5,000円／29ユーロ）。「製品ファインダー」で上記3条件を機械的に絞り込む。<span class="tag num">数値</span></li>
+        <li><span class="n">5</span><b>絞り込み手順：</b>(a) ランク1〜50,000を指定 →(b)「Amazon在庫なし」を追加 →(c) FBAセラー数2以上 →(d) 酒類など免許が要るカテゴリを除外 →(e) ヒット商品の<b>メーカー名を控えてリスト化</b>。</li>
+        <li><span class="n">6</span><b>売れやすさの3要素で最終確認：</b>①回転数（需要）②出品者数（供給）③カート獲得（選択）。特に「自分がカートを取れるか」を意識。</li>
+        <li><span class="n">7</span><b>想定月販の概算式</b><span class="tag num">数値</span>：平均月販 ÷（現出品者数＋1）＝ 参入後の自分の想定月販。仕入れ個数の目安にもなる。</li>
+        <li><span class="n">8</span><b>本ルートの最初の詰めどころ。</b>Keepaの具体条件・NGカテゴリ・1日あたり何件リスト化するかは、この後カズヨと決める（→末尾「次に詰める論点1」）。</li>
+      </ol>
+    </div>
+
+    <!-- STEP2 -->
+    <div class="anngrp">
+      <h3><span class="chip s2">2</span> 問い合わせ <small>メーカーに直接コンタクトし取引を打診</small></h3>
+      <ol class="notes">
+        <li><span class="n">9</span><b>連絡手段は複数併用。</b>メール中心＋FAX＋電話。中小メーカーはFAX・電話が有効なことも多い。肩書きは不要（個人でも堂々と）。</li>
+        <li><span class="n">10</span><b>初回メールは4構成の型。</b>①書き出し（挨拶）②要件（取引したい旨）③会社案内（会社概要URLで安心感）④終わりの一言。テンプレ臭を消してオリジナル化する。</li>
+        <li><span class="n">11</span><b>信頼の作り込みが返信率を左右。</b>会社概要ページに<b>顔写真＋事業への思い</b>を載せる。社長メモ「ホームページを作った方がいい」。<span class="tag">要検討</span></li>
+        <li><span class="n">12</span><b>返信率KPI</b><span class="tag num">数値</span>：合格ラインは<b>30%以上</b>。HP整備で返信率46%→66.5%に上がった事例あり。数を送る（例：メール月530件＋FAX390件）。</li>
+        <li><span class="n">13</span><b>断られても財産。</b>断られたら理由を聞く。担当者が代われば再チャンスもある。関係構築はAI・営業代行では代替しにくい参入障壁＝当社の守り。</li>
+        <li><span class="n">14</span><b>ゴールは「見積の回収」。</b>卸値・最低ロット・支払条件（前払い／掛け払い）を引き出す。ここまで来て初めてSTEP3の判定に進める。</li>
+        <li><span class="n">15</span><b>本ルートの詰めどころ。</b>初回メール／FAXの当社版テンプレ、HPの要否と最小構成は、この後カズヨと決める（→末尾「次に詰める論点2」）。</li>
+      </ol>
+    </div>
+
+    <!-- STEP3 -->
+    <div class="anngrp">
+      <h3><span class="chip s3">3</span> 仕入れ判断 <small>利益が出るか計算し、小さく発注する</small></h3>
+      <ol class="notes">
+        <li><span class="n">16</span><b>利益の概算ルール</b><span class="tag num">数値</span>：<b>経費割合35%</b>（Amazon販売手数料＋FBA送料＋納品送料の合算目安）。例：売価1,980円→手残り利益 約110円。</li>
+        <li><span class="n">17</span><b>まず小さく始める（鉄則）。</b>初回は最小ロット（目安5個程度）。ロットが大きい・見積が高額な案件は危険。<b>売れてからリピートで回収</b>する。</li>
+        <li><span class="n">18</span><b>販売はFBA前提。</b>Amazon倉庫へ送れば梱包・発送・カスタマー対応はAmazonが代行。社長は物理作業をせずPC上で完結（当社の基本方針と整合）。</li>
+        <li><span class="n">19</span><b>入金サイクル</b><span class="tag num">数値</span>：Amazonは約2週間サイクルで入金（都度払い可）。この回転を前提に資金繰りを組む。</li>
+        <li><span class="n">20</span><b>必要在庫資金の目安</b><span class="tag num">数値</span>：在庫は月販の<b>1.2〜1.5倍</b>を持つ。月利10万→在庫50〜75万／月利50万→250〜375万／月利100万→500〜750万。当面は自己資金の範囲で。</li>
+        <li><span class="n">21</span><b>正規書類を必ずもらう。</b>メーカー発行の請求書・取引書類はAmazonの真贋調査への防御になる（せどりにない安全性）。</li>
+        <li><span class="n">22</span><b>本ルートの詰めどころ。</b>当社版の利益計算シート（35%概算＋実額）、小ロット基準、在庫資金の初期上限は、この後カズヨと決める（→末尾「次に詰める論点3」）。</li>
+      </ol>
+    </div>
+
+    <!-- STEP4 -->
+    <div class="anngrp">
+      <h3><span class="chip s4">4</span> 管理・販売 <small>売って、入金を回し、リピートで積み上げる</small></h3>
+      <ol class="notes">
+        <li><span class="n">23</span><b>在庫表で一元管理。</b>FBA納品日／SKU／ASIN／原価／売価／利益率／最適在庫予測を1シートで管理（EC STARsの在庫表構成を当社用に転用）。</li>
+        <li><span class="n">24</span><b>売れ行きの監視。</b>Keepaや定点観測で在庫の減り方を追い、欠品させない・過剰在庫にしないラインを見極める。</li>
+        <li><span class="n">25</span><b>リピート発注はメール1本。</b>取引が決まった商品は再リサーチ不要。発注作業は月2回程度で回る。ここがストック型の強み。</li>
+        <li><span class="n">26</span><b>リピート量の目安</b><span class="tag num">数値</span>：現金前払いなら1.5ヶ月分、掛け払いなら2〜3ヶ月分を目安に。売れ行きに応じて調整。</li>
+        <li><span class="n">27</span><b>1商品の到達イメージ</b><span class="tag num">数値</span>：実例＝ご当地ラーメン詰め合わせ1商品で月96セット・月利約14.2万円・利益率26%。これを複数メーカーに積み上げる。</li>
+      </ol>
+    </div>
+
+    <!-- GROWTH -->
+    <div class="anngrp">
+      <h3><span class="chip g">5-7</span> 成長施策 <small>月利が安定してから着手（土台が回ってから）</small></h3>
+      <ol class="notes">
+        <li><span class="n">28</span><b>⑤外注化：</b>リサーチと梱包納品を外注し、社長はPC上の判断業務に専念。梱包外注は<b>WAM NET</b><span class="tag tool">ツール</span>（就労支援施設、1商品5〜10円）が定番。手順＝検索→訪問説明→1ヶ月テスト。副業者の稼働は1日1〜2時間が目安。</li>
+        <li><span class="n">29</span><b>⑥融資：</b><span class="tag num">数値</span><b>売上100万円の実績を作ってから</b>公庫または信金＋保証協会へ。実績ゼロだと50〜100万止まり、実績ありなら売上の2〜3倍。融資活用で目標到達が18ヶ月→9ヶ月に短縮した試算。</li>
+        <li><span class="n">30</span><b>⑦限定化・独占：</b>メーカーの困り事（値崩れ・無断販売者・仕組みが分からない）を解決する立場になり、“自分だけが売れる商品”にする。順序は<b>仲良くなる→提言→限定化→独占</b>。「初対面で結婚を申し込むな」。</li>
+      </ol>
+      <div class="warnbox"><b>方針メモ：</b>EC STARs Lab.は信用できる会社と社長評価。ただし<b>コンサル契約はしない</b>（2026-06-12決定）。手法のみ採用し、物販事業はカズヨ体制で進める。セミナー終盤のコンサル誘致は今後も無視してよい。</div>
+    </div>
+
+  </div>
+
+  <!-- KPI strip -->
+  <h2 class="section"><span>■</span> 覚えておく主要数値</h2>
+  <div class="kpibox">
+    <div class="kpi"><div class="v">5万位以内</div><div class="k">狙う売れ筋ランク</div></div>
+    <div class="kpi"><div class="v">2人以上</div><div class="k">FBAセラー数（卸す意思の証拠）</div></div>
+    <div class="kpi"><div class="v">35%</div><div class="k">経費概算（利益判定）</div></div>
+    <div class="kpi"><div class="v">30%+</div><div class="k">問い合わせ返信率の合格ライン</div></div>
+    <div class="kpi"><div class="v">1.2〜1.5倍</div><div class="k">必要在庫（対 月販）</div></div>
+    <div class="kpi"><div class="v">約2週間</div><div class="k">Amazon入金サイクル</div></div>
+  </div>
+
+  <!-- NEXT -->
+  <div class="next">
+    <h3>▶ この後カズヨと詰める論点（本マニュアルの続き）</h3>
+    <ol>
+      <li><b>論点1・リサーチ（注釈4〜8）：</b>Keepa製品ファインダーの具体条件、除外NGカテゴリ、1日あたりのリスト化件数と運用。</li>
+      <li><b>論点2・問い合わせ（注釈10〜15）：</b>初回メール／FAXの当社版テンプレ、会社概要ページ（HP）の要否と最小構成、送付数の運用。</li>
+      <li><b>論点3・仕入れ判断（注釈16〜22）：</b>当社版の利益計算シート（35%概算＋実額）、小ロット基準、初期の在庫資金上限。</li>
+    </ol>
+  </div>
+
+  <footer class="doc">
+    T-20260705-002 ／ メーカー仕入れ式 物販 業務フロー 社長用マニュアル ／ 出典：EC STARs Lab.（中西恒太）パーフェクトマニュアル サンプル版＋2026-06-10セミナー実記録。<br>
+    ※本ルートは電脳せどり検証（T-20260703-001 / T-20260705-001）とは独立の並行事業。数値は出典セミナー時点の目安であり、当社実測で更新していく。
+  </footer>
+
+</div>
+</body>
+</html>
