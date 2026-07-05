@@ -69,6 +69,16 @@ class AmazonProduct:
     # 過去の売値推移（古い→新しい順の円の系列）。最悪相場シミュレーション/折れ線表示に使う。
     # Keepa stats から取れた時のみ入る。取れない/サンプル簡易時は None または擬似系列。
     price_history: Optional[list] = None  # 例: [74000, 72000, ..., 61800]（円）
+    # メーカー仕入れ（T-20260705-002）用。Keepa raw product の brand/manufacturer を保持する。
+    # せどり用フロー（JAN突合→利益計算）では未使用でも支障ない任意メタ。追加トークンは消費しない
+    # （brand/manufacturer は stats=90 の1バッチ応答に既に含まれる）。
+    brand: Optional[str] = None           # ブランド名（Keepa raw の brand）
+    manufacturer: Optional[str] = None    # 製造元（Keepa raw の manufacturer）
+
+    @property
+    def maker(self) -> str:
+        """メーカー名の当たり。brand > manufacturer の優先（サトル _brand_of と同順）。両方無ければ ""。"""
+        return (self.brand or self.manufacturer or "").strip()
 
 
 class AmazonDataBackend(Protocol):
@@ -133,6 +143,8 @@ class SampleBackend:
                 jan=r.get("jan"),
                 is_sample=True,
                 price_history=hist,
+                brand=r.get("brand"),
+                manufacturer=r.get("manufacturer"),
             )
             self._all.append(p)
             if p.jan:
@@ -417,6 +429,9 @@ def _product_to_amazon(product: dict) -> Optional[AmazonProduct]:
         jan=None,  # 突合キーは呼び出し側（resolve_by_jan の引数）で補完
         is_sample=False,
         price_history=price_history,
+        # メーカー仕入れ用（追加トークン0。空文字は None に正規化して maker プロパティを素直にする）。
+        brand=(product.get("brand") or "").strip() or None,
+        manufacturer=(product.get("manufacturer") or "").strip() or None,
     )
     # 監査用メタは AmazonProduct に専用フィールドが無いため、推定フラグは
     # 呼び出し側ログ＋下流ノートで扱う。ここでは属性として一時付与しておく。

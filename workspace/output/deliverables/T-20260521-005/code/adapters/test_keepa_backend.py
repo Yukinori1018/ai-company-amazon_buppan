@@ -437,3 +437,44 @@ def test_resolve_by_jan_not_live_raises():
         assert False, "キー無しは例外を投げるべき"
     except RuntimeError:
         pass
+
+
+# ---------------------------------------------------------------------------
+# メーカー仕入れ用 brand/manufacturer マッピング（T-20260706-001）。
+# Keepa raw の brand/manufacturer を AmazonProduct に恒久搭載し、メーカー抽出を
+# 再クエリなしで discover 出力から取れるようにした回帰テスト。
+# ---------------------------------------------------------------------------
+def test_product_to_amazon_maps_brand_and_manufacturer():
+    prod = dict(MOCK_PRODUCT, brand="サーモス", manufacturer="THERMOS株式会社")
+    ap = _product_to_amazon(prod)
+    assert ap is not None
+    assert ap.brand == "サーモス"
+    assert ap.manufacturer == "THERMOS株式会社"
+    # maker プロパティは brand を優先
+    assert ap.maker == "サーモス"
+
+
+def test_maker_falls_back_to_manufacturer_when_no_brand():
+    prod = dict(MOCK_PRODUCT, manufacturer="THERMOS株式会社")
+    prod.pop("brand", None)
+    ap = _product_to_amazon(prod)
+    assert ap is not None
+    assert ap.brand is None
+    assert ap.maker == "THERMOS株式会社"  # brand 無し → manufacturer にフォールバック
+
+
+def test_maker_empty_when_both_absent():
+    # 既存の MOCK_PRODUCT は brand/manufacturer を持たない（せどり用フローは未使用でも動く）。
+    ap = _product_to_amazon(MOCK_PRODUCT)
+    assert ap is not None
+    assert ap.brand is None and ap.manufacturer is None
+    assert ap.maker == ""  # 両方無ければ空文字（下流で "—" 表示）
+
+
+def test_blank_brand_normalized_to_none():
+    # 空白のみの brand は None に正規化して maker を素直にする。
+    prod = dict(MOCK_PRODUCT, brand="   ", manufacturer="花王")
+    ap = _product_to_amazon(prod)
+    assert ap is not None
+    assert ap.brand is None
+    assert ap.maker == "花王"

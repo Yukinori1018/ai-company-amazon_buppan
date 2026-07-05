@@ -69,6 +69,7 @@ class DiscoveryRow:
     verdict: str                     # 原石/要確認/あやしい/はずれ
     match_status: str                # 突合状態（後述の定数）
     amazon_name: str = ""            # Amazon(Keepa)側の商品名。Yahoo名と別保持（個数照合用）
+    maker: str = ""                  # メーカー/ブランド名（Keepa raw の brand>manufacturer）。メーカー仕入れ抽出用
     supplier_qty: Optional[int] = None   # 仕入元側の推定入数（None=不明）
     amazon_qty: Optional[int] = None     # Amazon側の推定入数（None=不明）
     qty_flag: str = ""               # 数量フラグ（一致/補正/要確認の可視化ラベル）
@@ -305,6 +306,7 @@ def _suspect_row(
         verdict=VERDICT_NEEDS_CHECK,
         match_status=MATCH_SUSPECT_MISMATCH,
         amazon_name=ap.title,
+        maker=ap.maker,
         qty_flag="",
         qty_reliable=False,
         match_confidence=name_match.CONFIDENCE_LOW,
@@ -413,6 +415,7 @@ def _build_row(
         verdict=verdict,
         match_status=MATCH_OK if amazon_meta_ok else AMAZON_FILTER_FAIL,
         amazon_name=ap.title,
+        maker=ap.maker,
         supplier_qty=qres["supplier_qty"],
         amazon_qty=qres["amazon_qty"],
         qty_flag=qres["qty_flag"],
@@ -813,6 +816,7 @@ def _build_amazon_row(
             verdict=verdict,
             match_status=match_status,
             amazon_name=ap.title,
+            maker=ap.maker,
             supplier_qty=qres["supplier_qty"],
             amazon_qty=qres["amazon_qty"],
             qty_flag=qres["qty_flag"],
@@ -847,6 +851,7 @@ def _build_amazon_row(
             verdict=VERDICT_NEEDS_CHECK,
             match_status=AMAZON_ONLY,
             amazon_name=ap.title,
+            maker=ap.maker,
             qty_flag=QTY_UNKNOWN,
             qty_reliable=False,
             supplier_url="",
@@ -886,6 +891,7 @@ def _build_amazon_row(
         verdict=verdict,
         match_status=AMAZON_ONLY,
         amazon_name=ap.title,
+        maker=ap.maker,
         qty_flag=QTY_UNKNOWN,
         qty_reliable=False,
         supplier_url="",

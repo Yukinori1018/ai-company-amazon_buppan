@@ -338,13 +338,13 @@ class _FakeFinderBackend:
         return list(self._products)[: (limit or len(self._products))]
 
 
-def _amazon_product(asin, title, price, jan=None, rank=20000, offers=4):
+def _amazon_product(asin, title, price, jan=None, rank=20000, offers=4, brand=None):
     from adapters.amazon_data import AmazonProduct
 
     return AmazonProduct(
         asin=asin, title=title, current_price=price, sales_rank=rank,
         monthly_sales=30, offer_count=offers, category_key="home_kitchen",
-        size_key="standard_1", jan=jan,
+        size_key="standard_1", jan=jan, brand=brand,
     )
 
 
@@ -376,6 +376,28 @@ def test_discover_by_finder_builds_selection_and_ranks(monkeypatch):
     # 利益降順
     profits = [r.net_profit for r in rows]
     assert profits == sorted(profits, reverse=True)
+
+
+def test_discover_by_finder_carries_maker(monkeypatch):
+    """メーカー仕入れ用（T-20260706-001）: Finder 出力 DiscoveryRow に maker が乗る。
+
+    仕入元未特定でも（use_assumed_cost=False の正直保留行でも）メーカー名は保持され、
+    メーカー抽出を Keepa 再クエリなしで discover 出力から取れることを保証する。
+    """
+    products = [
+        _amazon_product("BM", "原石M 1個", 4980, jan="0000000000000", brand="サーモス"),
+    ]
+    backend = _FakeFinderBackend(products)
+    yahoo = YahooShoppingClient(force_sample=True)
+
+    rows = pipeline.discover_by_finder(
+        finder_preset_key="finder_genseki_beginner",
+        category_ids=[3828871],
+        amazon_backend=backend, yahoo_client=yahoo,
+        use_assumed_cost=False,  # 仕入元未特定→正直保留。それでも maker は乗る
+    )
+    assert rows, "行が出るはず（捨てない設計）"
+    assert all(r.maker == "サーモス" for r in rows)
 
 
 def test_discover_by_finder_honest_when_no_supplier(monkeypatch):

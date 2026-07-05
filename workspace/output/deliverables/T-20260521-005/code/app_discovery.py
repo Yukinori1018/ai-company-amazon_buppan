@@ -697,6 +697,7 @@ else:
                     "仕入先": r.supplier_source or "—",
                     "仕入元商品名": r.name,
                     "Amazon商品名": r.amazon_name or "（取得不可）",
+                    "メーカー": r.maker or "—",
                     "突合信頼度": r.match_confidence or "—",
                     "数量フラグ": r.qty_flag or "—",
                     "数量(仕入元/Amazon)": f"{_qty_label(r.supplier_qty)} / {_qty_label(r.amazon_qty)}",
@@ -856,6 +857,7 @@ else:
             [
                 {
                     "Amazon商品名": r.amazon_name or r.name,
+                    "メーカー": r.maker or "—",
                     "Amazon売値(円)": int(r.amazon_price),
                     "月販推定": r.monthly_sales,
                     "ランキング": r.sales_rank,
@@ -894,6 +896,7 @@ else:
                     "仕入先": r.supplier_source or "—",
                     "仕入元商品名": r.name,
                     "Amazon商品名": r.amazon_name or "（取得不可）",
+                    "メーカー": r.maker or "—",
                     "仕入値(円)": r.supplier_price,
                     "Amazon売値(円)": int(r.amazon_price) if r.amazon_price else None,
                     "仕入元": r.supplier_url,
