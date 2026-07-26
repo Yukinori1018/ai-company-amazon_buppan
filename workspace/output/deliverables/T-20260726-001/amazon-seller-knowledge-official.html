@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Amazonセラー運用ナレッジ集（公式一次情報）</title>
+<style>
+  :root{ --bg:#fff; --fg:#1a1a1a; --muted:#666; --line:#e4e4e7; --accent:#ff9900; --accent2:#146eb4; --card:#faf9f7; --warn:#b3541e; --warnbg:#fff5ec; --good:#1a7f4b; --goodbg:#eefaf2; }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif;color:var(--fg);background:var(--bg);line-height:1.75;font-size:15px}
+  .wrap{max-width:920px;margin:0 auto;padding:32px 20px 80px}
+  header.top{border-bottom:3px solid var(--accent);padding-bottom:16px;margin-bottom:8px}
+  header.top h1{font-size:26px;margin:0 0 6px}
+  header.top .meta{color:var(--muted);font-size:13px}
+  .lead{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 18px;margin:20px 0;font-size:14px}
+  nav.toc{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px 20px;margin:22px 0}
+  nav.toc h2{font-size:15px;margin:0 0 10px;color:var(--accent2)}
+  nav.toc ol{margin:0;padding-left:22px;columns:2;column-gap:28px}
+  nav.toc a{color:var(--fg);text-decoration:none}
+  nav.toc a:hover{color:var(--accent2);text-decoration:underline}
+  section{margin:34px 0;scroll-margin-top:16px}
+  h2.sec{font-size:20px;border-left:5px solid var(--accent);padding-left:12px;margin:0 0 14px}
+  h3{font-size:16px;color:var(--accent2);margin:20px 0 6px}
+  table{border-collapse:collapse;width:100%;margin:12px 0;font-size:13.5px}
+  th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+  th{background:#f4f4f5}
+  ul{margin:8px 0;padding-left:22px}
+  li{margin:3px 0}
+  .warn{background:var(--warnbg);border:1px solid #f0c9a8;border-left:4px solid var(--warn);border-radius:8px;padding:12px 16px;margin:14px 0}
+  .warn b{color:var(--warn)}
+  .good{background:var(--goodbg);border:1px solid #b7e3c8;border-left:4px solid var(--good);border-radius:8px;padding:12px 16px;margin:14px 0}
+  .good b{color:var(--good)}
+  code{background:#f0eee9;padding:1px 5px;border-radius:4px;font-size:13px}
+  .tag{display:inline-block;background:var(--accent2);color:#fff;font-size:11px;border-radius:4px;padding:1px 7px;margin-left:6px;vertical-align:middle}
+  footer{margin-top:50px;border-top:1px solid var(--line);padding-top:16px;color:var(--muted);font-size:12px}
+  .src{color:var(--muted);font-size:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+  <h1>Amazonセラー運用ナレッジ集 <span class="tag">公式一次情報</span></h1>
+  <div class="meta">出典：Amazon公式（sell.amazon.co.jp / Seller University）を直接巡回・実画面確認 ｜ 収集日：2026-07-26 ｜ 事業：Amazon物販事業（ストア：Satoy Select・日本マーケットプレイス） ｜ 作成：秘書カズヨ</div>
+</header>
+
+<div class="lead">
+本資料は、ブログ等の二次情報ではなく <b>Amazon公式ページの本文・実画面・出品大学動画</b> を直接確認して整理した運用ナレッジです。料率・特典額・仕様は2026年時点の公開値であり、実発注前にセラーセントラルの公式値で都度確認する前提で使ってください。
+</div>
+
+<nav class="toc">
+  <h2>目次</h2>
+  <ol>
+    <li><a href="#s1">出品プランと手数料</a></li>
+    <li><a href="#s2">登録・本人確認(KYC)・税務情報</a></li>
+    <li><a href="#s3">商品登録・カタログ</a></li>
+    <li><a href="#s4">FBA・在庫管理・新商品特典</a></li>
+    <li><a href="#s5">ブランド登録・保護</a></li>
+    <li><a href="#s6">広告・レビュー・プロモーション</a></li>
+    <li><a href="#s7">健全性・ログイン対処・サポート</a></li>
+    <li><a href="#s8">プログラム一覧・海外販売</a></li>
+    <li><a href="#s9">学習リソース</a></li>
+  </ol>
+</nav>
+
+<section id="s1">
+  <h2 class="sec">1. 出品プランと手数料</h2>
+  <table>
+    <tr><th>項目</th><th>内容</th></tr>
+    <tr><td>大口出品</td><td>月額 <b>4,900円（税抜）</b> ＋ 販売手数料。FBA・広告・タイムセール・一括在庫・新商品カタログ追加が使えるのは大口のみ</td></tr>
+    <tr><td>小口出品</td><td>1点あたり <b>100円（税抜）</b> ＋ 販売手数料。月額なし</td></tr>
+    <tr><td>切替効果</td><td>小口→大口へ切り替えた出品者の <b>79.6%が売上増</b>（2022/8 Amazon調べ）。復帰基準の目安＝月49個以上販売なら大口が有利</td></tr>
+    <tr><td>入金</td><td>売上金の入金サイクルは概ね2週間</td></tr>
+  </table>
+  <h3>手数料の三層構造</h3>
+  <ul>
+    <li><b>販売手数料</b>：カテゴリー別（多くは8〜15%）。書籍/DVD等はやや高め、一部カテゴリは最低額あり</li>
+    <li><b>FBA配送代行手数料</b>：サイズ・重量別（商品1点ごと）</li>
+    <li><b>FBA在庫保管手数料</b>：体積(㎥)×月額単価。10〜12月は繁忙期単価が上昇。365日超は長期保管手数料が別途</li>
+  </ul>
+  <p class="src">出典：/pricing ・ /learn/marketplace</p>
+</section>
+
+<section id="s2">
+  <h2 class="sec">2. 登録・本人確認(KYC)・税務情報</h2>
+  <div class="warn">
+    <b>社長の過去のアカウント停止（本人確認の不一致）に直結する最重要セクション。</b> 提出物の規格ミスや登録情報との不一致が、停止・入金停止の主因になります。
+  </div>
+  <h3>登録に必要なもの</h3>
+  <ul>
+    <li>顔写真付き身分証明書（パスポート or 運転免許証）／過去180日以内の取引明細書／有効なクレジットカード（<b>Master・Amex・VISAのみ。JCB・ダイナーズ不可</b>）／売上受取用の銀行口座／税務情報／電話番号</li>
+    <li>販売用Eメールは <b>購入用アカウント・Amazon Pay・Amazon Businessと別のもの</b>（同一だとログイン不能の原因）</li>
+    <li>法人は追加で 法人番号(13桁)・登記簿謄本・会社住所証明・担当者の法人帰属書類</li>
+  </ul>
+  <h3>本人確認書類の規格（不備＝差戻し）</h3>
+  <ul>
+    <li>身分証は <b>有効期限内・顔写真入り・氏名がセラーセントラル登録情報と完全一致</b></li>
+    <li><b>マイナンバーカード／マイナ免許証は審査に使えない</b></li>
+    <li>パスポートは顔写真ページ＋<b>署名欄も</b>含める／運転免許証は<b>両面</b></li>
+    <li><b>スクリーンショットは審査対象外</b>。スマホ撮影 or 原本スキャンのみ。<b>カラー必須（白黒不可）</b></li>
+    <li>形式：png / tiff / tif / jpg / jpeg / pdf。ファイル名に絵文字・特殊記号（$ &amp; #）不可</li>
+    <li>各証明書類は原則発行日から180日以内。銀行はキャッシュカード写真・ATM明細・振込明細はNG</li>
+    <li>審査は3営業日が目安</li>
+  </ul>
+  <h3>税務情報（納税情報）の登録 <span class="tag">必須</span></h3>
+  <ul>
+    <li>登録場所：セラーセントラル「設定」→「出品用アカウント情報」→「納税情報」</li>
+    <li>入力内容：発送元住所／日本で消費税申告義務があれば消費税番号／居住地・市民権情報／氏名・定住所（国・住所・都道府県・郵便番号）</li>
+    <li><b>適切な書類がないと売上金の受け取りに支障</b>。スペルミス・番号誤りでフォーム検証が失敗する</li>
+    <li>VAT/GST売上税は「居住地域 × 商品カテゴリのAmazon物品税コード（例 A_BAG_GEN）」で決定</li>
+    <li>ビジネス成長に合わせて常に最新に保つ（実入力は機微情報のため社長ご本人が実施）</li>
+  </ul>
+  <div class="warn">
+    <b>インボイス（適格請求書）：</b>ダッシュボードに「適格請求書発行事業者登録番号を入力してください」の推奨が表示中。制度は2023/10/1施行、B2B(Amazonビジネス)ではAmazonが代理で請求書発行。セラーセントラル「消費税の設定」から登録。<b>登録要否は経理・法務に諮って判断（未対応タスク）。</b>
+  </div>
+  <p class="src">出典：/sell/identity-verification ・ /learn/sellercentral ・ 出品大学「はじめての税務情報登録」・ /grow/programs/amazon-business</p>
+</section>
+
+<section id="s3">
+  <h2 class="sec">3. 商品登録・カタログ</h2>
+  <ul>
+    <li><b>相乗り出品は最短10分</b>：カタログ→商品登録→商品名/ASIN/製品コードで検索→コンディション選択→在庫数/価格/配送方法を入力。要許可カテゴリは書類提出</li>
+    <li><b>新規出品</b>：製品コード（GTIN/UPC/EAN/JAN）or GTIN免除申請 → 「空白のフォーム/商品画像/Web URL」→ 商品名でカテゴリ自動候補 → 送信</li>
+    <li><b>SKU</b>：出品者が決定（半角英数・ハイフン・アンダーバー）。セット商品は単品と別SKU。ASINは自動生成・全出品者で共有</li>
+    <li><b>商品画像</b>：メイン1枚＋サブ最大8枚＝<b>最大9枚</b>。500×500px以上（推奨1,000×1,000）・白背景・商品が80%以上。タイトル最大50文字</li>
+    <li><b>一括登録</b>：カタログ→アップロードによる一括商品登録→テンプレDL→データ定義シート参考に記入（相乗りと新規でテンプレ別）</li>
+    <li><b>バリエーション（親子関係）</b>：色/サイズを1ページで比較でき、レビューが集約されて検索順位向上に寄与</li>
+    <li>カートボックス（購入の約8割）＝要件を満たす出品者が最優位表示。プライムアイコンはFBA必須</li>
+  </ul>
+  <p class="src">出典：/learn/listing ・ /learn/beginners-guide</p>
+</section>
+
+<section id="s4">
+  <h2 class="sec">4. FBA・在庫管理・新商品特典</h2>
+  <h3>FBA基本</h3>
+  <ul>
+    <li>納品：セットアップ→FBA在庫指定→梱包/経路指定要件に従い準備→納品プラン＋配送ラベル→FC発送。商品ごとに <b>FNSKUラベル</b>（既存JANを完全に隠す）</li>
+    <li><b>FBA手数料は6種</b>：①在庫保管 ②長期保管(365日超) ③配送代行 ④納品不備受領作業 ⑤返送/所有権放棄 ⑥購入者返品</li>
+    <li><b>IPI（在庫パフォーマンス指標）</b>：低いと保管超過手数料・納品制限。構成＝FBA販売率/在庫ありの割合/余剰在庫/無効出品在庫</li>
+    <li>危険物(HAZMAT)：登録時に危険物クラス選択・SDSアップロード・UN番号。通常FBA不可→危険物納品プログラム</li>
+  </ul>
+  <div class="good">
+    <b>FBA新商品特典（New Selection）＝新規SKU積み上げのコスト圧縮に直結：</b> 対象は初FBA商品（小型/標準は最初100点・大型50点）。<b>在庫保管料120日無料／返送・所有権放棄180日無料／売上平均5%リベート（120日間）</b>。Vine登録手数料25%割引。2022/1以降の初出品者は自動登録。
+  </div>
+  <h3>在庫管理の基礎</h3>
+  <ul>
+    <li>用語：棚卸し／在庫回転率／リードタイム／安全在庫／発注点</li>
+    <li><b>在庫回転率＝総出庫数 ÷ 平均在庫数</b>（平均在庫数＝(期首+期末)÷2）。高いほど効率的</li>
+    <li>ABC分析：A=収益性高いベストセラー / B=中程度 / C=低回転</li>
+    <li>キャッシュフロー重視（2024年の廃業企業の16.2%が黒字倒産）。FBAはセール前は受領が遅れる→<b>2週間前納品を推奨</b></li>
+    <li>MCF＝FBA在庫で外部チャネルも配送代行（ただし<b>カスタマーサービスは出品者責任</b>）</li>
+  </ul>
+  <p class="src">出典：/fulfill/fulfillment-by-amazon（+ New Selection / MCF / AGL）・ /learn/inventory-management</p>
+</section>
+
+<section id="s5">
+  <h2 class="sec">5. ブランド登録・保護</h2>
+  <ul>
+    <li>登録には <b>登録済み or 申請中の有効な文字/図形商標が必須</b>（商標なしは IP Accelerator で承認済み法律事務所を紹介）</li>
+    <li>要件：ブランド名が商標記録と一致／商品・パッケージに商標表示した画像／公的登録番号／出品カテゴリー。<b>審査約1〜2週間・登録は無料</b>（商標取得は別費用）</li>
+    <li class="warn" style="list-style:none;margin-left:-22px"><b>サインインは出品用アカウントと同一メール/パスワード</b>（別アカウントだとブランドが紐づかない）＝社長の2アカウント問題に注意。ブランド名は大文字小文字も完全一致</li>
+    <li>構築4ツール：商品紹介(A+)コンテンツ（A/Bテスト可・審査7営業日・承認後24hで表示）／スポンサーブランド広告／ストア（テンプレ3種・独自URL・最大3階層）／Amazon Vine</li>
+    <li>保護2ツール：<b>Transparency</b>（ユニット単位シリアル化・購入者がコードで真贋確認）／<b>Project Zero</b>（AIで偽造検出・毎日80億件超モニタ・自動削除）</li>
+    <li>効果：動画のある商品で購入可能性3.6倍／プレミアムA+で売上最大20%↑／世界20万超のブランドが登録済み</li>
+  </ul>
+  <p class="src">出典：/brand-registry ・ /learn/brand-register ・ /grow/brands</p>
+</section>
+
+<section id="s6">
+  <h2 class="sec">6. 広告・レビュー・プロモーション</h2>
+  <h3>広告</h3>
+  <ul>
+    <li>4タイプ：スポンサープロダクト（初心者向け・SPのみブランド登録不要）／スポンサーブランド／スポンサーディスプレイ／スポンサーTV</li>
+    <li>開始前4確認：①大口 ②おすすめ出品(カート)獲得 ③広告資格要件 ④ブランド登録(SP以外必須)</li>
+    <li>運用6ステップ：キャンペーンマネージャー→支払い設定→目標設定→作成→約2週間後にレポート確認→最適化。公式指標＝ROAS/CTR/インプレ/CVR。ACOSは利益率以下が目安</li>
+  </ul>
+  <h3>レビュー・Amazon Vine</h3>
+  <ul>
+    <li>増やす3法：①Amazon Vine（有料）②レビューリクエスト機能（注文＞注文管理＞注文の詳細＞「レビューをリクエスト」）③購入者へメッセージ</li>
+    <li class="warn" style="list-style:none;margin-left:-22px"><b>禁止行為（違反＝即アカウント毀損）</b>：家族・従業員の投稿／ギフト券等を報酬に渡す／意図的な高評価誘導</li>
+    <li>Vine参加条件：大口出品／対象FBA商品／Brand Registry承認のブランド代表者（＝商標必須）</li>
+  </ul>
+  <h3>タイムセール・クーポン</h3>
+  <ul>
+    <li>ビッグセール（ブラックフライデー/プライムデー）や先行セールに合わせると効果大</li>
+    <li>クーポン：緑バッジで露出↑・<b>購入されない限り費用ゼロ</b>（費用対効果高）。セール1週間前〜後に併用</li>
+    <li>在庫：FBAはセール前受領が遅れる→2週間前納品＋在庫補充通知</li>
+  </ul>
+  <p class="src">出典：/grow/advertising ・ /learn/customer-reviews ・ /learn/timesale</p>
+</section>
+
+<section id="s7">
+  <h2 class="sec">7. アカウント健全性・ログイン対処・サポート</h2>
+  <div class="good"><b>現状：</b>ダッシュボード上のアカウント健全性は「健全」（2026-07-26 確認・ストア Satoy Select）。</div>
+  <h3>アカウント健全性（停止予防）</h3>
+  <ul>
+    <li>AHR（アカウント健全性評価）／ODR（注文不良率）は1%未満を維持</li>
+    <li>停止3類型：パフォーマンス（ODR等）／ポリシー違反／KYC（本人確認）。停止時はPOA（改善計画書）で復活申請</li>
+  </ul>
+  <h3>ログイン後にやるべき4つ</h3>
+  <ol>
+    <li>2段階認証の設定（不正アクセス保護）</li>
+    <li>割賦販売法に伴う情報提供（クレカ決済加盟店審査。未提供だと商品登録等が使えない）</li>
+    <li>ブランド登録（商標を持つ場合）</li>
+    <li>商品登録</li>
+  </ol>
+  <div class="warn">
+    <b>ログインできない時の公式対処（社長のログイン地獄に直結）：</b>
+    ①メールが購入用/Amazon Pay/Amazon Businessと被っていないか確認し<b>別メールで試す</b> ②ブラウザのキャッシュクリア/別ブラウザ ③それでも不可ならヘルプ。入口は必ず sellercentral.amazon.co.jp から。
+  </div>
+  <h3>サポート窓口</h3>
+  <ul>
+    <li>テクニカルサポート：右上ヘルプから。<b>電話（コールバック＝通話料無料）・チャットは9〜21時</b>、Eメールは通常24時間以内返信</li>
+    <li>セラーフォーラム（出品者コミュニティ）／LINE公式 <code>@sellonamazonjp</code>（振込エラー等の重要通知）</li>
+  </ul>
+  <p class="src">出典：/learn/sellercentral ・ ダッシュボード実画面 ・ 既存ナレッジ（停止予防）</p>
+</section>
+
+<section id="s8">
+  <h2 class="sec">8. プログラム一覧・海外販売</h2>
+  <table>
+    <tr><th>プログラム</th><th>要点</th></tr>
+    <tr><td>新規出品者特典</td><td>対象ブランド売上の最初750万円に10%＋次の1.4億円に5%＝最大787.5万円還元。広告クレジット・Vine・FBA配送料15,000円割引 等（額はページ/時期で差異あり・要確認）</td></tr>
+    <tr><td>Amazonビジネス(B2B)</td><td>法人顧客100万社+。法人価格/数量割引/請求書払い。インボイス対応（登録番号入力・Amazon代理発行）</td></tr>
+    <tr><td>定期おトク便</td><td>割引価格での定期配送。CVR向上（ブランド登録で最大1.8倍の記載）</td></tr>
+    <tr><td>海外販売(Global Selling)</td><td>北米(統一)/欧州28か国/豪印/中東 等。統合月額は「各国合計 or 39.99USD相当の低い方」。<span class="src">※本事業は日本店専業のため当面参考</span></td></tr>
+    <tr><td>AGL(越境物流)</td><td>中国/ベトナム発・工場〜FC直送。開通60日以内予約で海上運賃8%OFF</td></tr>
+    <tr><td>JAPAN STORE</td><td>JETRO×Amazon。米1,200社/英400社定員・2027年3月末まで</td></tr>
+    <tr><td>有料コンサル(SAS)</td><td>月16万円＋前月売上0.3%(税別)・上限月100万・最低6ヶ月。当面不要</td></tr>
+    <tr><td>その他</td><td>Merch by Amazon／Amazon整備済み品／Amazon Easy Ship／配送ラベル購入／Amazon Pay</td></tr>
+  </table>
+  <h3>ドロップシッピング（無在庫）</h3>
+  <p>Amazonのドロップシッピングポリシー（G201808410）を満たせば<b>条件付きで許可</b>。原則＝記録上の販売者として自社を表示・第三者の梱包明細/伝票を除去・返品対応責任を負う。違反で出品権失効リスク。<span class="src">（規約原文はログイン後ページ。既存の無在庫グレー知識と併読）</span></p>
+  <p class="src">出典：/grow/programs ・ /grow/global-selling ・ /grow/promotions/japan-store</p>
+</section>
+
+<section id="s9">
+  <h2 class="sec">9. 学習リソース</h2>
+  <ul>
+    <li><b>Amazon出品大学</b>：60以上のトピック・動画/DL資料/ウェビナー・無料。動線＝セラーセントラル「知識と情報」／YouTube「Amazonで売る」</li>
+    <li><b>出品パートナーアプリストア</b>：2,500以上のツール（商品調査・自動価格設定・在庫・会計・税務）＝ツール戦略で活用</li>
+    <li>Amazon出品アプリ（無料・スマホで出品/注文/商品写真撮影）</li>
+    <li>出品ブログに実務記事：「自社配送とFBAの物流コスト比較」「EC物流コスト削減戦略」など（損益比較で参照）</li>
+    <li>ウェビナー：月1〜2回・ライブ(Q&amp;A)＋YouTube録画。セラーセントラルから参加登録</li>
+    <li>公式ポリシーID：プログラムポリシー総覧=G521／制限事項=G200301050／コミュニティガイドライン=G1801</li>
+  </ul>
+  <p class="src">出典：/learn/seller-university ・ /learn/resources ・ /blog</p>
+</section>
+
+<footer>
+  本資料は Amazon 公式情報を秘書カズヨが整理した社内ナレッジです。数値・特典・料率は2026-07-26時点の公開値。実運用前にセラーセントラルの最新値をご確認ください。原本の詳細メモは社内メモリ（knowledge_seller_official_operations 他）に保全。
+</footer>
+</div>
+</body>
+</html>
