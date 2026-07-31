@@ -11,3 +11,8 @@
 workspace/output/agent_output/**
 !workspace/output/agent_output/
 !workspace/output/agent_output/.gitkeep
+
+# Python 生成物（バイトコードキャッシュ・仮想環境）
+__pycache__/
+*.pyc
+.venv/
