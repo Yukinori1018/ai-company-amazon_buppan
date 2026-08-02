@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Amazon 納税情報セットアップ確認シート（免税事業者・日本セラー向け）</title>
+<style>
+  :root{
+    --bg:#f7f8fa; --card:#ffffff; --ink:#1a1d21; --muted:#5b636c;
+    --line:#e2e6ea; --accent:#146eb4; --accent-soft:#e8f1f9;
+    --ok:#1f8a4c; --ok-soft:#e6f4ec; --warn:#b26a00; --warn-soft:#fbf0dd;
+    --pause:#6b7280; --pause-soft:#eef0f2; --danger:#b3261e;
+    --code:#eef1f4;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#14171a; --card:#1e2226; --ink:#e8eaed; --muted:#9aa3ac;
+      --line:#2c3238; --accent:#4ea3e0; --accent-soft:#182a38;
+      --ok:#4cc47f; --ok-soft:#12271a; --warn:#e0a03a; --warn-soft:#2c2311;
+      --pause:#9aa3ac; --pause-soft:#23282d; --danger:#e57373;
+      --code:#23282d;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#14171a; --card:#1e2226; --ink:#e8eaed; --muted:#9aa3ac;
+    --line:#2c3238; --accent:#4ea3e0; --accent-soft:#182a38;
+    --ok:#4cc47f; --ok-soft:#12271a; --warn:#e0a03a; --warn-soft:#2c2311;
+    --pause:#9aa3ac; --pause-soft:#23282d; --danger:#e57373; --code:#23282d;
+  }
+  :root[data-theme="light"]{
+    --bg:#f7f8fa; --card:#ffffff; --ink:#1a1d21; --muted:#5b636c;
+    --line:#e2e6ea; --accent:#146eb4; --accent-soft:#e8f1f9;
+    --ok:#1f8a4c; --ok-soft:#e6f4ec; --warn:#b26a00; --warn-soft:#fbf0dd;
+    --pause:#6b7280; --pause-soft:#eef0f2; --danger:#b3261e; --code:#eef1f4;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;
+    line-height:1.75;font-size:15.5px;}
+  .wrap{max-width:920px;margin:0 auto;padding:28px 20px 80px;}
+  header.top{border-left:5px solid var(--accent);padding:4px 0 4px 16px;margin-bottom:8px;}
+  h1{font-size:23px;margin:0 0 6px;line-height:1.4;}
+  .meta{color:var(--muted);font-size:13px;margin:2px 0;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:20px 22px;margin:18px 0;box-shadow:0 1px 2px rgba(0,0,0,.04);}
+  h2{font-size:18px;margin:6px 0 12px;padding-bottom:8px;border-bottom:2px solid var(--accent-soft);}
+  h3{font-size:15.5px;margin:18px 0 6px;color:var(--accent);}
+  p{margin:8px 0;}
+  ul,ol{margin:8px 0;padding-left:22px;}
+  li{margin:5px 0;}
+  code{background:var(--code);padding:2px 6px;border-radius:5px;font-size:13px;
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;}
+  .callout{border-radius:10px;padding:14px 16px;margin:14px 0;font-size:14.5px;}
+  .callout.warn{background:var(--warn-soft);border:1px solid var(--warn);}
+  .callout.info{background:var(--accent-soft);border:1px solid var(--accent);}
+  .callout.disc{background:var(--pause-soft);border:1px solid var(--line);color:var(--muted);font-size:13px;}
+  .concl{counter-reset:c;list-style:none;padding-left:0;}
+  .concl li{position:relative;padding:10px 12px 10px 48px;background:var(--accent-soft);
+    border-radius:10px;margin:8px 0;font-weight:600;}
+  .concl li::before{counter-increment:c;content:counter(c);position:absolute;left:12px;top:10px;
+    width:26px;height:26px;background:var(--accent);color:#fff;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;font-size:14px;}
+  .tablewrap{overflow-x:auto;margin:12px 0;}
+  table{border-collapse:collapse;width:100%;font-size:14px;min-width:520px;}
+  th,td{border:1px solid var(--line);padding:9px 11px;text-align:left;vertical-align:top;}
+  th{background:var(--accent-soft);font-weight:700;}
+  tr:nth-child(even) td{background:rgba(128,128,128,.04);}
+  .pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap;}
+  .pill.ok{background:var(--ok-soft);color:var(--ok);}
+  .pill.chk{background:var(--warn-soft);color:var(--warn);}
+  .checklist{list-style:none;padding-left:0;}
+  .checklist li{position:relative;padding:8px 10px 8px 34px;border-bottom:1px dashed var(--line);}
+  .checklist li::before{content:"☐";position:absolute;left:8px;top:7px;font-size:17px;color:var(--muted);}
+  .grid{display:grid;grid-template-columns:1fr;gap:14px;}
+  @media(min-width:720px){.grid{grid-template-columns:1fr 1fr;}}
+  .box{border-radius:10px;padding:14px 16px;border:1px solid var(--line);}
+  .box.do{background:var(--ok-soft);}
+  .box.pause{background:var(--pause-soft);}
+  .box.future{background:var(--accent-soft);}
+  .box h4{margin:0 0 8px;font-size:15px;}
+  .box.do h4{color:var(--ok);}
+  .box.pause h4{color:var(--pause);}
+  .box.future h4{color:var(--accent);}
+  .fact{font-weight:700;color:var(--ok);}
+  .src{font-size:13px;}
+  .src a{color:var(--accent);word-break:break-all;}
+  .rec{background:var(--ok-soft);border:1px solid var(--ok);border-radius:10px;padding:14px 16px;margin:12px 0;}
+  .rec strong{color:var(--ok);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <h1>Amazon 納税情報セットアップ確認シート</h1>
+  <div class="meta">対象: Satoy Select（個人・副業・<b>免税事業者／インボイス未登録</b>・日本店のみ）</div>
+  <div class="meta">作成: 経理ハジメ ／ 統合: 秘書カズヨ ／ チケット T-20260726-002 ／ 2026-07-26 時点</div>
+</header>
+
+<div class="callout warn">
+  <b>重要な前提:</b> 私（ハジメ）もカズヨも<b>税理士資格を持ちません</b>。本シートは一般的情報と一般的推奨に留めます。個別の税額計算・断定的な税務判断は行いません。<b>最終判断・登録前の確認は必ず税理士へ。</b> フォームへの実入力・送信は機微情報のため<b>社長ご本人が実施</b>してください（代行しません）。
+</div>
+
+<div class="card">
+  <h2>0. 結論（3行）</h2>
+  <ol class="concl">
+    <li>免税事業者なので「VAT/GST登録番号」ページ（<code>/tax/jpregistrations</code>）は<b>空欄のままでOK</b>。罰則も不利益もなし（そもそも番号を持っていないので入れられません）。</li>
+    <li>別物として、基本の「納税情報」（設定 → 出品用アカウント情報 → 納税情報）は<b>登録済み・最新であることが必須</b>。売上金受取の前提なのでここだけは確認。</li>
+    <li>任意インボイス登録は<b>現段階では非推奨（B2C・小規模）</b>。<b>売上1,000万円ラインが見えてきたら初めて検討</b>でOK。</li>
+  </ol>
+</div>
+
+<div class="card">
+  <h2>1. 「VAT/GST登録番号」ページの正体と免税事業者の扱い</h2>
+  <h3>このページは何か</h3>
+  <p>日本セラーがここに入れる番号 = <b>適格請求書発行事業者の登録番号（インボイス番号／"T" + 13桁）</b>。Amazon が社長に請求する<b>手数料（販売手数料・FBA配送代行料など）にかかる消費税</b>について、Amazon が社長宛に適格請求書を発行するか判定するために使います。</p>
+
+  <h3>「空欄でOK」の根拠 <span class="fact">（事実）</span></h3>
+  <ul>
+    <li>登録番号は<b>課税事業者しか取得できない</b>。免税事業者は課税事業者になって登録しない限り番号を持てません。</li>
+    <li>基準期間の課税売上1,000万円以下などの免税事業者は<b>インボイス登録は任意</b> → <b>このページへの入力も任意で、未入力に罰則なし</b>。</li>
+    <li>社長は T+13桁を保有していないため、<b>入れようがない = 空欄が正しい状態</b>。</li>
+  </ul>
+
+  <h3>Amazon 手数料の消費税と「控除可否」（要注意）</h3>
+  <div class="callout info">
+    Amazon の販売手数料・FBA手数料は<b>消費税の課税対象</b>。ただし<b>仕入税額控除ができるのは課税事業者だけ</b>です。<b>免税事業者はそもそも消費税を申告・納税しないため、手数料の消費税を控除する場面がありません。</b>
+    <br>→ <b>番号の有無で控除可否が変わるのは「課税事業者になった後」の話。</b> 今の社長（免税）には、番号を入れても控除メリットは発生しません。
+    <br><b>結論:</b> 免税のうちはこのページは空欄で実質的な不利益ゼロ。番号が効くのは「課税事業者化＋インボイス登録」の後です。
+  </div>
+</div>
+
+<div class="card">
+  <h2>2. 任意インボイス登録の是非（免税事業者が Amazon B2C で売る場合）</h2>
+  <div class="callout info">
+    <b>大前提:</b> 一般消費者は仕入税額控除をしないので<b>適格請求書を必要としません</b>。インボイスが要るのは「買った側が事業者で控除に使いたい」ケース。<b>B2C 中心なら買い手からインボイスを求められる場面がほぼない</b> = 登録の主目的が薄い。
+  </div>
+
+  <div class="tablewrap">
+  <table>
+    <tr><th>メリット</th><th>デメリット</th></tr>
+    <tr>
+      <td>
+        ・法人／事業者の顧客にインボイスを出せる（B2B で選ばれやすい）<br>
+        ・課税事業者になり、手数料・仕入の消費税を<b>仕入税額控除</b>できる<br>
+        ・将来 B2B・卸に広げるなら早めに慣れられる
+      </td>
+      <td>
+        ・免税 → 課税事業者化で<b>売上の消費税納税義務が発生</b><br>
+        ・申告・記帳の事務負担が増える<br>
+        ・<b>B2C 中心では顧客がインボイス不要なのでメリットが活きない</b>
+      </td>
+    </tr>
+  </table>
+  </div>
+
+  <h3>負担軽減措置（登録した場合・2026年時点の最新）</h3>
+  <ul>
+    <li><b>2割特例</b>（納税額を売上税額の2割に圧縮）: <b>個人事業者は令和8年分（2026年分）が最後</b>。令和8年度税制改正で<b>個人に限り令和9・10年（2027・2028年）は「3割特例」に移行して2年延長</b>（法人は延長なし）。<span class="fact">（事実／適用可否は税理士確認）</span></li>
+    <li><b>免税事業者からの仕入れに係る経過措置</b>（＝社長"から買う事業者側"の控除割合。社長自身の納税ではない）: <b>2026/9/30まで80%控除 → 2026/10/1以降50%控除</b>に縮小。<b>顧客が一般消費者なら社長には実務上ほぼ無関係。</b></li>
+  </ul>
+
+  <div class="rec">
+    <strong>現段階の推奨: 今は任意登録しない（免税のまま）。</strong>
+    <ul>
+      <li>根拠1: 販売相手がほぼ一般消費者 → インボイスを求められない → 登録の主目的が立たない。</li>
+      <li>根拠2: 登録すると売上の消費税納税義務が発生 → 小規模・副業初期の手取り／キャッシュフローを直接圧迫。</li>
+      <li>根拠3: 免税のうちは手数料消費税の控除メリットも発生しない（第1章）。</li>
+    </ul>
+    <b>再検討トリガー:</b> (a) B2B・法人顧客が増えインボイスを求められ始めたとき／(b) 課税売上が1,000万円ラインに近づいたとき（課税化が避けられなくなるので登録デメリットが消える）。<br>
+    <span style="color:var(--muted)">※一般的推奨です。登録の最終判断は税理士に確認を。</span>
+  </div>
+</div>
+
+<div class="card">
+  <h2>3. Seller Central「その他の納税関連設定」チェック</h2>
+  <p>「VAT/GST登録番号」ページとは<b>別物</b>。免税事業者でも必須なのは<b>基本の納税情報</b>です。</p>
+  <div class="tablewrap">
+  <table>
+    <tr><th>項目</th><th>場所（目安）</th><th>免税事業者の対応</th><th>状態</th></tr>
+    <tr><td><b>基本の納税情報（必須）</b></td><td>設定 → 出品用アカウント情報 → 納税情報</td><td><b>入力必須・最新に</b>。売上金受取の前提。発送元住所・居住地/氏名・定住所など。本人確認書類と完全一致で（ズレは検証失敗）</td><td><span class="pill chk">要現物確認</span></td></tr>
+    <tr><td>VAT/GST登録番号</td><td><code>/tax/jpregistrations</code></td><td><b>空欄でOK</b>（番号なし・任意・罰則なし）</td><td><span class="pill ok">空欄で正</span></td></tr>
+    <tr><td>消費税番号の欄（納税情報内）</td><td>上記「納税情報」内</td><td>消費税の申告義務がある場合のみ。<b>免税は該当せず空欄</b></td><td><span class="pill ok">空欄で正</span></td></tr>
+    <tr><td>割賦販売法の遵守確認</td><td>支払い・納税設定まわり</td><td>出品プロセス上の確認項目。内容確認のうえ社長判断で対応</td><td><span class="pill chk">要現物確認</span></td></tr>
+    <tr><td>消費税の徴収／表示設定</td><td>価格設定まわり</td><td>日本国内 B2C は原則<b>税込価格で表示</b>（米国型の売上税徴収設定は国内取引で通常不要）。専用トグルの有無は画面で確認</td><td><span class="pill chk">要現物確認</span></td></tr>
+    <tr><td>源泉徴収・その他税務情報の欄</td><td>納税情報／各種設定</td><td>物品販売では源泉徴収は通常発生しない。該当欄の有無は画面で確認</td><td><span class="pill chk">要現物確認（存在不確実）</span></td></tr>
+  </table>
+  </div>
+  <p style="color:var(--muted);font-size:13px;">「要現物確認」= 画面の文言や欄の有無がアカウント・時期で変わりうるため、社長がログインして実物を見て確認する項目。推測で断定しません。</p>
+</div>
+
+<div class="card">
+  <h2>4. 免税事業者としての実務注意</h2>
+  <h3>記帳</h3>
+  <p>免税でも、<b>所得税の確定申告のために売上・仕入・経費の記帳と証憑（領収書・請求書）の保存は必要</b>。自分の帳簿は必ずつける。</p>
+  <h3>確定申告（事業所得 / 雑所得）</h3>
+  <ul>
+    <li>副業の所得区分は<b>事業所得</b>か<b>雑所得</b>かで扱いが変わる（事業所得は青色申告特別控除などのメリット）。</li>
+    <li>目安: 継続性・独立性・規模＋帳簿あり → 事業所得寄り／小規模・単発・帳簿なし → 雑所得寄り（令和4年通達で「売上300万円以下かつ帳簿保存なしは原則雑所得」の整理）。<b>どちらで申告するかは税理士相談を推奨。</b></li>
+    <li>給与所得者の副業は<b>副業所得が年20万円超で確定申告が必要</b>が一般的目安（住民税は別途申告要の場合あり）。</li>
+  </ul>
+  <h3>消費税「課税事業者化」のタイミング（=インボイス登録を検討する合図）</h3>
+  <ul>
+    <li>原則: <b>基準期間（2年前）の課税売上高が1,000万円超</b>でその課税期間から課税事業者（個人ならある年の売上1,000万円超 → 翌々年から課税）。</li>
+    <li>特定期間（前年上半期）の課税売上＋給与がいずれも1,000万円超なら翌年から課税の場合も。</li>
+    <li><b>実務の合図:</b> 課税売上が1,000万円ラインに近づいたら、①税理士に課税化時期・2割/3割特例・簡易課税を相談 → ②<b>どのみち課税になるならそのタイミングでインボイス登録を前向きに検討</b>（登録デメリット＝納税義務が"どうせ発生"に変わり、登録の相対デメリットが消えるため）。</li>
+    <li style="color:var(--muted)">※年数・要件は一般的整理。適用は税理士確認を推奨。</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h2>5. 「今やること／今はやらなくていいこと」チェックリスト</h2>
+  <div class="grid">
+    <div class="box do">
+      <h4>✅ 今やること（PC 上で完結）</h4>
+      <ul class="checklist">
+        <li><b>設定 → 出品用アカウント情報 → 納税情報</b>を開き、入力済み・最新か確認（未入力なら本人が入力。売上金受取の前提）</li>
+        <li>氏名・住所が<b>本人確認書類と完全一致</b>か目視チェック（ズレ＝入金トラブルの元）</li>
+        <li><b>VAT/GST登録番号ページは空欄のまま</b>と確認して閉じる（何も入れない）</li>
+        <li>日々の<b>売上・仕入・経費の記帳と領収書保存</b>を習慣化</li>
+      </ul>
+    </div>
+    <div class="box pause">
+      <h4>⏸ 今はやらなくていいこと</h4>
+      <ul class="checklist">
+        <li>インボイス（適格請求書発行事業者）の<b>任意登録</b> → 今はしない（B2C・小規模）</li>
+        <li>消費税の申告・納税の準備 → 免税のうちは不要</li>
+        <li>手数料の消費税を控除する作業 → 免税では発生しないので不要</li>
+      </ul>
+    </div>
+  </div>
+  <div class="box future" style="margin-top:14px;">
+    <h4>🔭 将来のトリガー（どちらか来たら税理士に相談）</h4>
+    <ul class="checklist">
+      <li><b>課税売上が1,000万円ラインに近づいた</b> → 課税化時期＋インボイス登録＋2割/3割特例・簡易課税を相談</li>
+      <li><b>法人・事業者の顧客からインボイスを求められ始めた</b> → B2B 比率と登録メリットを再評価</li>
+    </ul>
+  </div>
+</div>
+
+<div class="card">
+  <h2>6. 参照（2026-07-26 時点）</h2>
+  <ul class="src">
+    <li>国税庁「2割特例の概要」 <a href="https://www.nta.go.jp/publication/pamph/shohi/kaisei/202304/01.htm">nta.go.jp/.../202304/01.htm</a></li>
+    <li>令和8年度税制改正（2割特例見直し・3割特例）辻・本郷税理士法人 <a href="https://www.ht-tax.or.jp/topics/invoive-reiwa8kaisei/">ht-tax.or.jp/topics/invoive-reiwa8kaisei</a></li>
+    <li>令和8年度改正・経過措置の変更 クレド税理士事務所 <a href="https://credo-tax.jp/column/1770/">credo-tax.jp/column/1770</a></li>
+    <li>インボイス経過措置（80%→50%→…）freee <a href="https://www.freee.co.jp/kb/kb-invoice/invoice_transitional_measures/">freee.co.jp/.../invoice_transitional_measures</a></li>
+    <li>Amazon 出品者のインボイス対応 サイバーレコード <a href="https://www.cyber-records.co.jp/amazon-invoice/">cyber-records.co.jp/amazon-invoice</a></li>
+    <li>Amazon.co.jp インボイス制度 案内 <a href="https://www.amazon.co.jp/-/en/b?ie=UTF8&node=18254925051">amazon.co.jp インボイス案内</a></li>
+    <li>社内ナレッジ: knowledge_seller_official_operations（Seller Central 納税情報の登録手順・公式一次情報）</li>
+  </ul>
+</div>
+
+<div class="callout disc">
+  免責: 本シートは一般的情報の提供であり、税務・法務の個別助言ではありません。作成者（経理ハジメ・秘書カズヨ）は税理士資格を有しません。実際の登録・申告・判断の前に、必ず税理士等の有資格者にご確認ください。
+</div>
+
+</div>
+</body>
+</html>
