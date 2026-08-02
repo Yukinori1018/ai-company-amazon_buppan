@@ -1,100 +1,21 @@
-# スキル：Notion チケット同期
+# スキル：Notion チケット同期（秘書の関与）
 
-秘書が Notion カンバンボードと `workspace/tickets/` を同期する際のプロトコルです。
+> **2026-05-29 変更:** Notion 同期の**責務は庶務マリエに移管**しました。
+> 運用本体（接続先・プロパティ書式・MCP レシピ・リコンサイル手順）は
+> [agents/general_affairs/skills/notion-ticket-sync.md](../../general_affairs/skills/notion-ticket-sync.md) を参照してください。
 
-## 同期方針
+## 秘書カズヨがやること
 
-- **真実は `workspace/tickets/` のファイル状態**。Notion はその可視化（ミラー）。
-- **片方向同期**：リポジトリ → Notion。Notion 側で直接カードを動かしても、リポジトリには反映されない（次回リコンサイル時に Notion 側が上書きされる）。
-- 同期は **秘書の責務**。MCP 経由で Notion API を直接呼び出す。
+社長窓口として、チケットを起票・移動した**その turn 内で**、上記マリエのスキルに従い Notion を即時同期します（軽量な単発同期は秘書が直接 MCP を叩いてよい＝マリエの作業を代行）。
 
-## Notion 側の前提
+| イベント | 即時アクション |
+|---------|--------------|
+| 新規起票（todo 作成） | カード新規作成（`notion-create-pages`） |
+| 状態遷移（todo→doing→waiting→done） | Status・UpdatedAt 更新（`notion-update-page`） |
+| done 化 | Status=done＋本文「結果要約」更新 |
 
-子会社化時、子会社オーナーが Notion に以下を用意します（詳細は Phase 6 で `docs/notion-setup-guide.md` に整備）。
+- `.claude/hooks/ticket-notion-sync-reminder.sh`（PostToolUse 強制フック）がチケットファイル変更を検知して同期を促します。**リマインドが出たら未同期で turn を終えない。**
+- 大量同期・ドリフト修復は `/sync-notion` でマリエに一括依頼します。
+- 真実は `workspace/tickets/` のファイル。Notion は片方向ミラー（リポジトリ → Notion）。
 
-- Notion データベース 1 つ（カンバンビュー）
-- 必須プロパティ：
-
-| Notion プロパティ | 型 | チケット frontmatter |
-|------------------|-----|-------------------|
-| Name | Title | `title` |
-| TicketID | Text（一意） | `ticket_id` |
-| Status | Status（todo / doing / waiting / done） | `status` |
-| Assignee | Select | `assignee` |
-| Priority | Select | `priority` |
-| RequiresApproval | Checkbox | `requires_approval` |
-| Description | Text | 本文の「要件」セクション |
-| CreatedAt | Date | `created_at` |
-| UpdatedAt | Date | `updated_at` |
-
-MCP 設定（API トークン、Database ID）も子会社側で `.mcp.json` に注入。親テンプレートにはスタブのみ置きます（Phase 5 で配置）。
-
-## 呼び出しタイミング
-
-**社長から「Notion を見ても進捗が見えない」と言われないよう、以下を厳守：**
-
-| イベント | Notion 側のアクション | 即時性 |
-|---------|---------------------|---|
-| **チケット新規起票**（`todo/` に作成） | カード新規作成、TicketID で一意性確保 | ★ 起票と同じターン内に同期 |
-| **状態遷移**（todo → doing 等） | Status プロパティ更新、UpdatedAt 更新 | ★ 状態を動かした同じターン内 |
-| **チケット内容更新**（タイトル・担当・優先度等） | 該当プロパティ更新 | 同じセッション内 |
-| `done` に移動 | Status を done、UpdatedAt 更新 | ★ 完了と同じターン内 |
-| 親子関係の付与 | ParentTicket フィールド更新 | 起票時 |
-| チケット削除（基本しない） | カード削除 | 都度 |
-
-## ページ本文に「結果要約」を書く
-
-カンバン表示（カード）には Status・Assignee・Priority 等のプロパティしか出ない。**カード本文（ページを開いた時に見える本文）には、社長が一目で内容を把握できる「結果要約」を必ず置く。**
-
-- 配置：ページ本文の末尾に `## 結果要約` 見出しで追記
-- 内容：
-  - **done**：何を成し遂げたか／関連コミット
-  - **waiting**：何を納品済か／何を待っているか／レビュー観点
-  - **doing**：承認済み前提／現在地／次の手
-  - **todo**：ブロッカー／情報受領後の流れ
-- 粒度：3〜10行程度。長文は要件セクションに譲る
-- 更新タイミング：状態遷移と同じターン内に書き換える（古い要約を残さない）
-- MCP 呼び出し：`notion-update-page` の `insert_content`（末尾追記）または `update_content`（既存差し替え）
-
-## チケット粒度と Notion 上の見え方
-
-**「Notion で進捗が見えない」問題の根本原因：チケット粒度が大きすぎる**
-
-- 1チケットが1〜2週間規模だと、何日も `doing` から動かず「進んでない」と見える
-- 対策：[ticket-management.md](ticket-management.md) の「チケット粒度ルール」に従い、1〜2セッションで完了する単位に分割
-- 親子分割した場合：親カード＋子カードがそれぞれ Notion に出現し、子が動くたびに Notion で進捗が可視化される
-- 3日以上 `doing` のままのチケットは子分割を検討するか、`waiting/` に動かすべきでないか再確認
-
-## エラー時のフォールバック
-
-MCP 呼び出しが失敗した場合：
-
-1. 失敗内容を [../memory/](../memory/) の `notion-sync-errors.md` に追記（タイムスタンプ・チケットID・エラー内容）
-2. **チケット自体の処理は止めない**（リポジトリ側を真実として進める）
-3. その日のうちに社長に「Notion 同期 N 件失敗、リコンサイル要」と報告
-4. 次の機会にリコンサイル実行
-
-## リコンサイル（手動同期）
-
-`workspace/tickets/` 全体を走査して Notion 側を上書き更新する操作。
-
-**実行タイミング:**
-- 同期エラーが蓄積した時
-- 社長から「Notion とズレてる気がする」と指摘された時
-- 月次の定期メンテナンス
-
-**手順:**
-1. `workspace/tickets/{todo,doing,waiting,done}/` 配下の全 `.md` を走査
-2. 各チケットの frontmatter を読み取り
-3. TicketID で Notion 側カードを検索
-4. あれば更新、なければ作成
-5. Notion 側に存在するが リポジトリにない TicketID は、社長確認の上でアーカイブ
-6. 結果サマリ（更新N件・作成M件・要確認K件）を社長に報告
-
-## メモリへの記録対象
-
-- 同期失敗パターン（どのフィールドで何が起きやすいか）
-- Notion 側の手動変更が頻発する箇所（同期方針見直しの材料）
-- リコンサイル時の差分傾向
-
-→ [../memory/](../memory/) に蓄積。
+詳細・実値・落とし穴はすべてマリエのスキルに集約してあります。

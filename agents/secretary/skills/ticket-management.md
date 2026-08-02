@@ -57,11 +57,25 @@ todo → doing → waiting → done
 |------|--------------|
 | → todo | チケット作成、frontmatter 記入、Notion 同期（新規カード作成） |
 | todo → doing | 担当エージェント起動、`status` 更新、`updated_at` 更新、Notion 同期 |
-| doing → waiting | 社長への質問内容を本文に記載、Notion 同期、`requires_approval: true` の場合は理由を明記 |
-| waiting → doing | 社長回答をログに記録、Notion 同期 |
+| todo/doing → waiting | 本文に **「## 社長判断待ち」** で待っている内容（何をしてほしいか）を明記、Notion 同期、§4.1 該当なら `requires_approval: true` と理由を記載 |
+| waiting → doing | 社長回答・アクションをログに記録、Notion 同期 |
 | doing → done | 成果物リンクを本文に追記、`~/Documents/AI Company Outputs/Amazon物販事業/<ticket_id>/` への配置確認、Notion 同期 |
 
 ファイルは物理的に `workspace/tickets/<status>/` に **mv** する（コピーではない）。
+
+### waiting の判断基準（重要・2026-05-29 改訂）
+
+**`waiting` 列 = 社長タスク一覧。** 社長が次に手を動かす必要がある状態は、todo/doing を問わず**すべて waiting に置く**。社長は waiting 列だけ見れば自分の番が分かる（旧「📋 社長タスクまとめ」カードは廃止し、この列が役割を引き継いだ）。
+
+waiting に入れる基準：
+- §4.1 該当の承認待ち（`requires_approval: true`）
+- 納品物の社長レビュー待ち
+- 社長への情報提供・URL 共有などの依頼待ち
+- 社長自身の手作業待ち（アカウント開設・API キー取得など）
+- 判断に迷い社長に確認したい時
+
+判定の合言葉：**「社長が次に動く必要があるか？」→ Yes なら waiting**。
+社長のアクションが済んだら waiting → doing（または done）へ戻す。`requires_approval` は §4.1 専用フラグで、waiting の条件とは独立（情報提供待ち等は `requires_approval: false` でも waiting に入る）。
 
 ## 起票タイミング
 

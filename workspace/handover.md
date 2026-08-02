@@ -9,10 +9,37 @@
 
 ## 最終更新
 
-- **日時**: 2026-05-22 夜（PR #2 main マージ後の追記）
+- **日時**: 2026-06-01（同期復旧＋業務フロー図＋成果物カタログ依頼セッション）
 - **更新者**: 秘書カズヨ（Cloud セッション）
-- **次の想定読み手**: 携帯デバイス × GitHub 経由の新セッション
-- **作業ブランチ**: `main`（PR #2 マージ済 = commit `311dec4`）
+- **次の想定読み手**: **ローカル（社長Mac）の新セッション**
+- **作業ブランチ**: `claude/nighttime-work-checkin-iTWEa`（push 済、未マージ）
+
+### 🆕🔴 2026-06-01 セッションの最重要引き継ぎ（ローカルで最初にやること）
+
+1. ~~**成果物カタログ（Googleスプレッドシート）作成 〔T-20260601-001〕**~~ → ✅ **done（2026-06-01 ローカルで完了）**
+   - **Googleスプレッドシート**「成果物カタログ_Amazon物販事業」: https://docs.google.com/spreadsheets/d/1xXfKbgbbiRUns-U40sgWNUWzwvu1s2aS3Gr1Ouy5MQY/edit （社長アカウント所有・My Drive直下・12列55行/9チケット）
+   - マスターCSV＝`workspace/output/deliverables/T-20260601-001/deliverables-catalog.csv`（リポ内の真実。Markdown版併置）。Drive file id=`1xXfKbgbbiRUns-U40sgWNUWzwvu1s2aS3Gr1Ouy5MQY`。
+   - 既存 Drive コネクタが認証済みで **OAuthクリックすら不要**だった。マリエが棚卸し→CSV化、タカシが Drive MCP `create_file`（text/csv→Sheets自動変換）で生成。
+   - 運用ルール恒久化: CLAUDE.md §6「成果物カタログ」＋庶務スキル `agents/general_affairs/skills/deliverables-catalog.md`（成果物のたびマリエが追記）。
+   - **書き込み連携 〔T-20260601-003 / done〕**: Apps Script Web App 連携を整備し疎通済（2026-06-01・HTTP200/56行）。**カタログ更新は `python3 scripts/catalog/sync_catalog_to_sheet.py` 一発**で同一URLのシートを全置換ミラー更新（冪等）。手順=`scripts/catalog/README.md`、接続情報=`scripts/catalog/.catalog_sync.env`（gitignore・ローカルのみ）。クラウド回は環境変数 `WEBAPP_URL`/`SHARED_TOKEN` を渡せば実行可、無ければCSV追記までに留め次のローカル回で同期。
+
+2. **業務フロー図 ①全体像の社長確認（確認ゲート①） 〔T-20260531-002 / doing〕**
+   - 社長はまだ「大まかな全体像」を一読しただけ。②③④⑤は作成済みだが**社長レビュー未**。
+   - 当初設計どおり「①全体像を確定 → その後に⑤②③④を1枚ずつレビュー」。残2本（⑩入金・会計／⑫アフターフォロー）は未着手。
+   - 成果物: `workspace/output/deliverables/T-20260531-002/`（01〜05 の png＋todo.md）。
+
+### ⚠️ handover の以下「2026-05-22〜29」記述は古い（参考情報）
+
+- 下記の「次セッション冒頭の必須アクション」「チケット状況(2026-05-22)」「重要URL(旧ブランチ)」等は**旧ブランチ前提で陳腐化**。最新のチケット状態は `workspace/tickets/` と Notion カンバンが正。`/resume` か `/sync-notion` 不要（前セッションで全件突合済・ドリフトゼロ）。
+- 直近の大きな変更: **同期破綻の復旧（幽霊チケT-027-001/002をリポジトリへ復元）／ERESA PRO 主軸へB案転換（Sato-Scope Phase2中止・Lite縮退）／業務フロー図作成**。
+
+### 🆕 2026-05-29 の成果（T-20260529-001 / done）
+
+- **Notion 同期の責務を秘書 → 庶務マリエに移管**。起票・移動を **PostToolUse 強制フック**（`.claude/hooks/ticket-notion-sync-reminder.sh`）が検知し、未同期で turn を終えないよう促す。実機発火確認済み。
+- マリエ運用スキル `agents/general_affairs/skills/notion-ticket-sync.md` 新設（DB ID・MCP レシピ・日付/チェックボックス書式の落とし穴を集約）。
+- **`/sync-notion`**（非破壊リコンサイル）新設、朝夕ルーティンに組込。
+- 根本原因②=**ブランチ分岐**で Notion とリポジトリがズレる件 → 社長が **A 採択**（現状維持＋朝夕リコンサイルで自己修復、Notion 専用カード T-20260527-001/002 等は温存）。
+- ⚠️ 制約：ホスト型 MCP のためシェルからの完全自動同期は不可。強制フックが最善手。
 
 ---
 

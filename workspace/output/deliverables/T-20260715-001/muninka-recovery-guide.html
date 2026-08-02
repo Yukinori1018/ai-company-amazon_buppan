@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Amazon「無認可」ログインエラー 復旧ガイド／電話スクリプト</title>
+<style>
+  body{font-family:-apple-system,"Hiragino Sans","Yu Gothic",sans-serif;line-height:1.7;color:#1a1a1a;max-width:820px;margin:0 auto;padding:28px 22px;background:#fafafa;}
+  h1{font-size:1.5rem;border-bottom:3px solid #146eb4;padding-bottom:8px;}
+  h2{font-size:1.2rem;margin-top:1.8em;background:#146eb4;color:#fff;padding:7px 12px;border-radius:5px;}
+  h3{font-size:1.05rem;margin-top:1.4em;color:#146eb4;}
+  .danger{background:#fdecea;border-left:5px solid #d93025;padding:12px 16px;border-radius:5px;margin:14px 0;}
+  .success{background:#e6f4ea;border-left:5px solid #1e8e3e;padding:12px 16px;border-radius:5px;margin:14px 0;}
+  .script{background:#fff;border:1px solid #d0d0d0;border-radius:6px;padding:14px 16px;margin:12px 0;font-size:0.98rem;}
+  .quote{background:#fff8e1;border-left:5px solid #f9a825;padding:12px 16px;border-radius:5px;margin:12px 0;}
+  table{border-collapse:collapse;width:100%;margin:12px 0;background:#fff;font-size:0.92rem;}
+  th,td{border:1px solid #ccc;padding:7px 10px;text-align:left;}
+  th{background:#eef3f7;}
+  code{background:#eef1f4;padding:2px 6px;border-radius:4px;font-size:0.9em;word-break:break-all;}
+  ol li,ul li{margin:6px 0;}
+  .note{font-size:0.85rem;color:#555;margin-top:2em;border-top:1px solid #ddd;padding-top:10px;}
+  .step-num{display:inline-block;background:#146eb4;color:#fff;width:24px;height:24px;border-radius:50%;text-align:center;line-height:24px;font-weight:bold;margin-right:6px;}
+</style>
+</head>
+<body>
+
+<h1>Amazon「無認可」ログインエラー 復旧ガイド</h1>
+<p style="color:#555;">出品用アカウント：<strong>Satoy Select</strong>／ログイン：<code>satoyukinori1018@gmail.com</code>／作成：2026-07-26（秘書カズヨ・公式フォーラム調査に基づく）</p>
+
+<h2>何が起きているのか（結論）</h2>
+<p>ログイン（メール・パスワード・二段階認証）は<strong>成功しているのに</strong>、その直後に「<strong>無認可／このEメールアドレスはどのアカウントにも関連付けられていません</strong>」と出て、出品管理画面に入れない状態です。</p>
+<p>Amazon公式フォーラムの複数事例（2026年7月の事例を含む）から、これは<strong>「1つのメールアドレスに紐づく "購入用アカウント" と "出品用アカウント" のデータ競合（SSO競合）」で起こる、Amazon側の既知バグ</strong>である可能性が非常に高いと判明しました。一般カスタマーサポートの権限では直せず、<strong>データベースの紐付け修復が必要</strong>なタイプです。</p>
+
+<div class="danger">
+<h3 style="margin-top:0;color:#d93025;">⛔ 絶対にやってはいけないこと</h3>
+<ul>
+<li><strong>「登録」ボタンを押さない</strong>（新規アカウント作成）。2026年7月の被害者は、CSに「同じアドレスで購入者アカウントを作れ」と言われ、その通りにした瞬間にSSO競合で<strong>完全ロックアウト</strong>されました。</li>
+<li><strong>メールアドレスをこれ以上変更しない</strong>（競合を悪化させる恐れ）。</li>
+<li><strong>同じことを何度もログインし直さない</strong>（連続失敗で一時ロックの恐れ）。</li>
+</ul>
+</div>
+
+<div class="success">
+<h3 style="margin-top:0;color:#1e8e3e;">✅ 実際に「直った」方法（公式フォーラムの成功例）</h3>
+<p>PCでもログイン不能になった出品者が、<strong>「買い物用（購買）Amazon のテクニカルサポート」</strong>に相談 →<br>
+「<strong>1つのメールアドレスに2つのアカウントが作成されています</strong>」と判明 →<br>
+<strong>使っていない方のアカウントを削除してもらい → パスワードのリセットリクエストを実施 → 即解決</strong>。</p>
+</div>
+
+<h2>① 最優先アクション：買い物用Amazonのサポートに電話／チャット</h2>
+<p>普通の <strong>amazon.co.jp</strong>（買い物で使う方）→ 画面下部「<strong>カスタマーサービス</strong>」→「<strong>チャットで問い合わせ</strong>」または「<strong>電話（コールバック）</strong>」。<br>※ここはセラーセントラルの"外"なので、今のブロックの影響を受けません。</p>
+
+<h3>そのまま読める電話スクリプト</h3>
+<div class="script">
+「出品用アカウント（ストア名 <strong>Satoy Select</strong>）にログインすると、認証は通るのに直後に『<strong>無認可・このEメールアドレスはどのアカウントにも関連付けられていません</strong>』と表示されて、管理画面に入れません。<br><br>
+同じメールアドレス <strong>satoyukinori1018@gmail.com</strong> で、<strong>購入用アカウントと出品用アカウントが二重に作成されていないか、SSOのデータ競合が起きていないか</strong>を調べてください。<br><br>
+もし競合・重複アカウントがあれば整理し、<strong>パスワードのリセットリクエスト</strong>を送ってください。別ブラウザ・スマホ・シークレットモードでも同じ症状で、通知用メールの確認も済ませましたが変わりません。<br><br>
+エラー画面の参照番号は次のとおりです。」
+</div>
+
+<h3>担当者に伝える参照番号</h3>
+<table>
+<tr><th>項目</th><th>値</th></tr>
+<tr><td>NCID / ZCID</td><td><code>A1XUKPMRY27SCQ</code></td></tr>
+<tr><td>PAID</td><td><code>A1R784V1OV0W16</code></td></tr>
+<tr><td>MCID</td><td><code>A1QBYCHTVOMJJM</code></td></tr>
+<tr><td>MKID（日本マーケットプレイス）</td><td><code>A1VC38T7YXB528</code></td></tr>
+<tr><td>別画面の参照番号</td><td>CID <code>A29YIFB21WPEBC</code> / RID <code>1A4ED5BXQJBGT0S0SB0F</code></td></tr>
+<tr><td>ログインメール</td><td><code>satoyukinori1018@gmail.com</code>（二段階認証あり）</td></tr>
+<tr><td>通知用メール（変更・確認済）</td><td><code>satoyselect@gmail.com</code></td></tr>
+</table>
+
+<h2>② 並行：セラーフォーラムでモデレーターにエスカレーション依頼</h2>
+<p>一般CSで直らない場合の定石。フォーラムには<strong>Amazon社員のモデレーター</strong>がいて、シニアエンジニア／アカウントスペシャリストへ連携してくれます。<br>
+投稿先：<code>https://sellercentral.amazon.co.jp/seller-forums/</code></p>
+<div class="script">
+<strong>【件名】</strong>「無認可：このEメールアドレスはどのアカウントにも関連付けられていません」でログイン不能。エスカレーションのお願い<br><br>
+<strong>【本文】</strong>認証（メール・パスワード・二段階認証）は成功しますが、直後に「無認可・このEメールアドレスはどのアカウントにも関連付けられていません」と表示され、出品用アカウント（Satoy Select）に入れません。別ブラウザ・スマホ・シークレットでも同じ、通知用メールの確認も完了済みです。<strong>購入用アカウントとのSSOデータ競合（既知の無認可バグ）</strong>と思われ、一般サポートの権限では修復できないと理解しています。恐れ入りますが、<strong>シニアエンジニアまたはアカウントスペシャリストへ、アカウントのログイン権限（データベースの紐付け）復旧をエスカレーション</strong>いただけないでしょうか。参照番号：NCID <code>A1XUKPMRY27SCQ</code> / PAID <code>A1R784V1OV0W16</code> / MCID <code>A1QBYCHTVOMJJM</code>。
+</div>
+
+<h2>（参考）Amazon公式CSが案内する基本3ステップ</h2>
+<ol>
+<li><span class="step-num">1</span><strong>購入用・海外を含む全Amazonアカウントからログアウト</strong> → <code>https://services.amazon.co.jp/</code> の「セラーセントラルにログイン」から入り直す。</li>
+<li><span class="step-num">2</span>だめなら<strong>パスワードのリセット</strong>（ログイン画面「パスワードを忘れた場合」→ 認証コード → 新パスワード）。<br><span style="font-size:0.85rem;color:#777;">※認証は既に通っているので単独では直らない可能性大。ただし①の重複アカウント整理とセットで有効。</span></li>
+<li><span class="step-num">3</span>海外アカウントがあれば、海外のセラーセントラルへログイン → 上部の店舗名プルダウン → 「日本」に切替。</li>
+</ol>
+<p>ログイン不能時のテクニカルサポート案内ページ：<code>https://sellercentral.amazon.co.jp/cu/help/contact-us</code><br>
+<span style="font-size:0.85rem;color:#777;">※「ログインしてヘルプセンターから」と案内する作りのため、本件のように"認証は通るが無認可"だと堂々巡りしやすい。上記①のルート（買い物用サポート）を優先。</span></p>
+
+<div class="note">
+出典：Amazonセラーセントラル公式フォーラムの複数ディスカッション（「このEメールアドレスはどのアカウントにも関連付けられていません」「無認可 ●●はマーチャント」「【深刻なバグ・モデレーター様助けてください】CSの誤案内に従った結果…（2026年7月）」ほか）／Google検索のAIによる概要。<br>
+本ガイドは秘書カズヨが公式情報を確認して作成。実際の連絡・操作は社長ご本人が行ってください（メール・パスワード等の入力は代行しません）。
+</div>
+
+</body>
+</html>

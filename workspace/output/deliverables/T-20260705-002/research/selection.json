@@ -1,0 +1,14 @@
+{
+  "_comment": "Keepa Product Finder selection for maker-shiire (EC STARs流) candidate extraction. T-20260705-002. domain=5(co.jp). See README.md for field meanings and token cost. Regulated categories are excluded via categories_exclude (drugstore/beauty/food root nodes) AND a post-fetch keyword blocklist (README §除外).",
+  "current_SALES_gte": 1,
+  "current_SALES_lte": 50000,
+  "current_COUNT_NEW_gte": 2,
+  "current_AMAZON_gte": -1,
+  "current_AMAZON_lte": -1,
+  "current_NEW_gte": 1000,
+  "categories_exclude": [160384011, 52374051, 57239051],
+  "productType": [0],
+  "perPage": 50,
+  "page": 0,
+  "sort": [["current_COUNT_NEW", "asc"]]
+}

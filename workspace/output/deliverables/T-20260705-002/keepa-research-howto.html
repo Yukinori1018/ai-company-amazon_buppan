@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Keepaで「狙う商品→メーカー」を探す手順書｜社長用</title>
+<style>
+  :root{
+    --ink:#1a2230; --sub:#556; --line:#d8dee9; --bg:#f6f8fb;
+    --accent:#1f6feb; --accent2:#0e9f6e; --warn:#b45309; --warnbg:#fff7ed;
+    --s1:#1f6feb; --s2:#7c3aed; --s3:#0e9f6e; --s4:#d97706;
+    --card:#fff; --grow:#eef6ff;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif;
+    line-height:1.75;font-size:15px;}
+  .wrap{max-width:1040px;margin:0 auto;padding:32px 24px 72px;}
+  header.doc{border-bottom:3px solid var(--ink);padding-bottom:16px;margin-bottom:8px;}
+  header.doc .kicker{font-size:12px;letter-spacing:.14em;color:var(--accent);font-weight:700;}
+  header.doc h1{font-size:26px;margin:6px 0 4px;letter-spacing:.01em;}
+  header.doc .lead{color:var(--sub);font-size:14px;margin:0;}
+  .meta{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:12px;color:var(--sub);margin-top:12px;}
+  .meta b{color:var(--ink);}
+
+  .callout{background:#fff;border:1px solid var(--line);border-left:4px solid var(--accent);
+    border-radius:8px;padding:14px 18px;margin:22px 0;font-size:14px;}
+  .callout b{color:var(--accent);}
+
+  h2.section{font-size:18px;margin:38px 0 14px;padding-bottom:6px;border-bottom:2px solid var(--line);}
+  h2.section span{color:var(--accent);font-weight:800;}
+
+  /* ---- mini flow (where this fits) ---- */
+  .board{background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:20px;box-shadow:0 2px 10px rgba(30,50,90,.05);overflow-x:auto;margin:6px 0 4px;}
+  .board .lbl{font-size:12px;font-weight:700;color:var(--sub);letter-spacing:.08em;margin:0 0 12px;}
+  .flow{display:flex;align-items:stretch;gap:10px;min-width:640px;}
+  .fstep{flex:1;background:#fff;border:2px solid var(--line);border-radius:12px;padding:12px 12px;
+    position:relative;display:flex;flex-direction:column;opacity:.5;}
+  .fstep.on{opacity:1;box-shadow:0 3px 12px rgba(31,111,235,.14);}
+  .fstep .no{position:absolute;top:-13px;left:14px;width:26px;height:26px;border-radius:50%;
+    color:#fff;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;}
+  .fstep h3{font-size:14px;margin:6px 0 4px;}
+  .fstep p{font-size:12px;color:var(--sub);margin:0;line-height:1.55;}
+  .fstep.s1{border-color:var(--s1);} .fstep.s1 .no{background:var(--s1);}
+  .fstep.s2{border-color:var(--s2);} .fstep.s2 .no{background:var(--s2);}
+  .fstep.s3{border-color:var(--s3);} .fstep.s3 .no{background:var(--s3);}
+  .fstep.s4{border-color:var(--s4);} .fstep.s4 .no{background:var(--s4);}
+  .arrow{align-self:center;color:#9aa7bd;font-size:22px;font-weight:900;flex:0 0 auto;}
+
+  /* ---- step blocks ---- */
+  .step{background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:4px 22px 18px;margin:18px 0;}
+  .step > h3{font-size:16px;margin:18px 0 4px;display:flex;align-items:center;gap:12px;}
+  .stepno{display:inline-flex;align-items:center;justify-content:center;
+    min-width:34px;height:34px;border-radius:9px;background:var(--s1);color:#fff;
+    font-weight:800;font-size:17px;flex:0 0 auto;}
+  .step .goal{font-size:12.5px;color:var(--sub);margin:2px 0 12px 46px;}
+
+  .do,.why{margin:8px 0;padding:10px 14px 10px 44px;border-radius:8px;font-size:14px;position:relative;}
+  .do{background:#f4f8ff;border:1px solid #dbe8ff;}
+  .why{background:#f2fbf6;border:1px solid #cdeede;}
+  .do .k,.why .k{position:absolute;left:12px;top:10px;font-size:11px;font-weight:800;
+    letter-spacing:.04em;}
+  .do .k{color:var(--accent);}
+  .why .k{color:var(--accent2);}
+  .do b{color:var(--ink);}
+  .do ul,.why ul{margin:6px 0 0;padding-left:18px;}
+  .do li{margin:3px 0;}
+  code.ui{background:#eef2f8;border:1px solid #dde3ec;border-radius:5px;padding:1px 7px;
+    font-size:12.5px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#243;white-space:nowrap;}
+  .en{color:var(--sub);font-size:12px;}
+
+  .trap{background:var(--warnbg);border:1px solid #fed7aa;border-left:4px solid var(--warn);
+    border-radius:8px;padding:9px 14px 9px 44px;margin:8px 0;font-size:13.5px;position:relative;}
+  .trap .k{position:absolute;left:12px;top:9px;font-size:11px;font-weight:800;color:var(--warn);}
+  .trap b{color:var(--warn);}
+
+  .filtertable{width:100%;border-collapse:collapse;margin:8px 0 2px;font-size:13px;}
+  .filtertable th,.filtertable td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top;}
+  .filtertable th{background:#eef2f8;font-size:12px;color:var(--sub);}
+  .filtertable td b{color:var(--ink);}
+  .filtertable .num{color:var(--accent);font-weight:800;white-space:nowrap;}
+
+  .formula{background:#fff;border:1px dashed var(--accent);border-radius:10px;
+    padding:14px 16px;margin:12px 0;text-align:center;}
+  .formula .eq{font-size:16px;font-weight:800;color:var(--ink);}
+  .formula .eq b{color:var(--accent);}
+  .formula .ex{font-size:12.5px;color:var(--sub);margin-top:8px;}
+
+  .warnbox{background:var(--warnbg);border:1px solid #fed7aa;border-left:4px solid var(--warn);
+    border-radius:8px;padding:12px 16px;margin:14px 0;font-size:13.5px;}
+  .warnbox b{color:var(--warn);}
+
+  .ledger{width:100%;border-collapse:collapse;margin:10px 0;font-size:12.5px;overflow:hidden;}
+  .ledger th,.ledger td{border:1px solid var(--line);padding:7px 9px;text-align:left;}
+  .ledger th{background:#243;color:#fff;font-size:11.5px;font-weight:700;white-space:nowrap;}
+  .ledger td{color:var(--sub);}
+  .ledger tr:nth-child(even) td{background:#f7f9fc;}
+  .ledger .col{color:var(--ink);font-weight:700;}
+
+  footer.doc{margin-top:40px;border-top:1px solid var(--line);padding-top:14px;font-size:12px;color:var(--sub);}
+  .next{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 20px;margin-top:24px;}
+  .next h3{margin:0 0 8px;font-size:15px;}
+  .next ol{margin:0;padding-left:20px;}
+  .next li{margin:5px 0;font-size:14px;}
+
+  @media print{
+    body{background:#fff;font-size:12px;}
+    .wrap{max-width:none;padding:0;}
+    .board,.step,.next{box-shadow:none;break-inside:avoid;}
+    .flow{min-width:0;}
+    .step{break-inside:avoid;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="doc">
+    <div class="kicker">社長用 実地ガイド ／ メーカー仕入れ STEP①「リサーチ」を自分の手で</div>
+    <h1>Keepaで「狙う商品 → そのメーカー」を探す手順書</h1>
+    <p class="lead">Keepaの製品ファインダーで売れ筋を3条件で絞り、ヒットした商品のメーカーを辿って「メーカー台帳」に記録するまで。画面を触りながら体験するためのガイドです。</p>
+    <div class="meta">
+      <span><b>ticket</b> T-20260705-002</span>
+      <span><b>制作</b> コンテンツ制作ヒデアキ（監修：秘書カズヨ）</span>
+      <span><b>対象</b> メーカー仕入れ 基本4ステップの「①リサーチ」</span>
+      <span><b>前提</b> Keepa契約済（€49/月・Product Finder込み・追加費用なし）</span>
+      <span><b>更新</b> 2026-07-05</span>
+    </div>
+  </header>
+
+  <div class="callout">
+    <b>この手順書の位置づけ。</b> メーカー仕入れの基本4ステップ（①リサーチ→②問い合わせ→③仕入れ判断→④管理）のうち、<b>①リサーチ</b>を社長ご自身が手を動かして体験するための実地ガイドです。全体像は本体マニュアル「メーカー仕入れ式 物販 業務フロー」を参照してください。ここでの目的は<b>「狙える売れ筋商品を見つけ、その裏にいるメーカーを連絡先まで特定する」</b>こと。1件でも台帳に書ければ体験としては十分です。
+  </div>
+
+  <!-- where this fits -->
+  <div class="board">
+    <p class="lbl">この手順書がカバーする範囲（4ステップの最初の1つ）</p>
+    <div class="flow">
+      <div class="fstep s1 on"><span class="no">1</span><h3>リサーチ</h3><p>Keepaで売れ筋を絞り、メーカーを台帳化 ← <b>今回ここ</b></p></div>
+      <div class="arrow">→</div>
+      <div class="fstep s2"><span class="no">2</span><h3>問い合わせ</h3><p>メーカーへメール等で取引打診</p></div>
+      <div class="arrow">→</div>
+      <div class="fstep s3"><span class="no">3</span><h3>仕入れ判断</h3><p>利益を計算して小ロット発注</p></div>
+      <div class="arrow">→</div>
+      <div class="fstep s4"><span class="no">4</span><h3>管理・販売</h3><p>FBA納品・リピート発注</p></div>
+    </div>
+  </div>
+
+  <!-- ============ PREP ============ -->
+  <h2 class="section"><span>■</span> はじめる前に（準備と用語）</h2>
+
+  <div class="step">
+    <h3><span class="stepno" style="background:#64748b">0</span> 準備：Keepaにログインして製品ファインダーを開く</h3>
+    <div class="goal">目的：これから使う画面まで到達する。ここが出れば準備完了です。</div>
+
+    <div class="do"><span class="k">画面でやること</span>
+      <ul>
+        <li><b>keepa.com</b> をブラウザで開き、契約済みのアカウントでログインします。</li>
+        <li>上部メニューから <code class="ui">製品ファインダー</code><span class="en">（英語UI＝<code class="ui">Product Finder</code>）</span>を開きます。たくさんのフィルタ（絞り込み条件）が縦に並んだ画面が出ればOKです。</li>
+        <li>画面の言語は、右上の設定から日本語/英語を切り替えられます。この手順書は<b>日本語UIの表記を主</b>に、英語UIの語も併記します。</li>
+      </ul>
+    </div>
+    <div class="why"><span class="k">なぜ</span> 製品ファインダーは「条件に合うAmazon商品を機械的に一覧化する」道具です。1件ずつ目で探す必要がなくなるので、リサーチの入口はここに固定します。</div>
+    <div class="trap"><span class="k">つまずき</span> Keepaのフィルタ項目名は改訂されることがあります。本書で項目名が不確かな箇所は<b>「〜相当の項目」</b>と書いています。画面で完全一致が見つからないときは、意味が同じ項目を選んでください（下の対応表も参照）。</div>
+  </div>
+
+  <!-- ============ STEP 1 ============ -->
+  <h2 class="section"><span>■</span> 手順：3条件で売れ筋を絞る</h2>
+
+  <div class="step">
+    <h3><span class="stepno">1</span> 「Amazon本体が売っていない」商品に絞る</h3>
+    <div class="goal">狙う3条件のうち①。Amazonが自分で在庫を持って売っている商品は避けます。</div>
+
+    <div class="do"><span class="k">画面でやること</span>
+      <ul>
+        <li>フィルタの中から <b>Amazonの在庫状況</b>にあたる項目を探します。Keepaの画面で <code class="ui">Amazon out of stock</code>（Amazon在庫切れ）相当の項目です。<span class="en">日本語UIでは「Amazon 在庫切れ」などと表示されることがあります。</span></li>
+        <li>これを<b>「Amazon本体が現在出品していない（＝在庫なし）」</b>状態に設定します。</li>
+      </ul>
+    </div>
+    <div class="why"><span class="k">なぜ</span> Amazon本体が売っている商品は、価格でまず勝てません。「Amazonがいない棚」を狙うことで、私たち（第三者セラー）が利益を取れる余地が生まれます。</div>
+    <div class="trap"><span class="k">つまずき</span> 「Amazon在庫」系の項目は<b>「在庫あり/なし」「◯日以上在庫切れ」</b>など複数の指定方法があります。まずはシンプルに「現在Amazon在庫なし」で始めれば十分です。</div>
+  </div>
+
+  <div class="step">
+    <h3><span class="stepno">2</span> 「売れ筋ランキング 1〜50,000位」に絞る</h3>
+    <div class="goal">狙う3条件のうち②。売れているが、激戦すぎない“ちょうどいい”帯を狙います。</div>
+
+    <div class="do"><span class="k">画面でやること</span>
+      <ul>
+        <li><b>売れ筋ランキング</b>にあたる項目を探します。Keepaの画面で <code class="ui">Sales Rank</code>（セールスランク）相当の項目です。<span class="en">日本語UIでは「売れ筋ランキング」等。</span></li>
+        <li>範囲を <b>最小 1 〜 最大 50,000</b> に設定します（1〜5万位以内）。</li>
+      </ul>
+    </div>
+    <div class="why"><span class="k">なぜ</span> ランキングの数字が小さいほどよく売れています。1万位でも十分売れ筋。5万位を上限にするのは、それより下だと売れ行きが読みにくく、在庫が寝るリスクが上がるためです。「売れているが上位すぎない」帯が、中小メーカー商品の宝庫です。</div>
+    <div class="trap"><span class="k">つまずき</span> ランキングは<b>カテゴリごとの順位</b>です。全カテゴリを対象にすると、カテゴリ違いの1位同士が混ざります。今回はカテゴリを絞らないので、この点は後の目視確認でカバーします（本書では深追いしません）。</div>
+  </div>
+
+  <div class="step">
+    <h3><span class="stepno">3</span> 「FBA出品者が2人以上」に絞る</h3>
+    <div class="goal">狙う3条件のうち③。ここが今回いちばん大事な条件です。</div>
+
+    <div class="do"><span class="k">画面でやること</span>
+      <ul>
+        <li><b>FBAの出品者数</b>にあたる項目を探します。Keepaの画面で <code class="ui">Offer Count: New, FBA</code>（新品FBAの出品者数）相当の項目です。<span class="en">「FBA出品者数」などと表示されることがあります。</span></li>
+        <li>範囲を <b>最小 2</b> に設定します（2以上）。上限は空欄でOK。</li>
+      </ul>
+    </div>
+    <div class="why"><span class="k">なぜ</span> FBA出品者が<b>2人以上いる</b>＝「そのメーカーは第三者に卸す意思がある」証拠です。出品者が1人だけの商品は、メーカー直販やOEM（そのブランド専用生産）で、私たちには卸してもらえません。ライバルの多さは今回は気にしません。まず“卸してくれるメーカー”を見つけるのが目的です。</div>
+    <div class="trap"><span class="k">つまずき</span> Keepaには「FBAの数」と「新品全体の数」など似た項目が複数あります。必ず<b>FBAの出品者数</b>の項目を選んでください（自己発送だけの出品者を数えても卸の意思の証拠になりません）。項目名が判別できないときは、カズヨに画面を共有してください。</div>
+  </div>
+
+  <div class="step">
+    <h3><span class="stepno">4</span> 価格と“避けるカテゴリ”で仕上げる</h3>
+    <div class="goal">利益を取りやすくし、初期のリスクカテゴリを外します。</div>
+
+    <div class="do"><span class="k">画面でやること</span>
+      <ul>
+        <li><b>価格</b>にあたる項目（<code class="ui">Buy Box</code> または <code class="ui">New</code> の価格相当）で、<b>最小 1,000円</b>を目安に設定します。</li>
+        <li>カテゴリは<b>絞りません（全カテゴリ）</b>。ただし下の「初期は避けるカテゴリ」に当たる商品が出てきたら、台帳に載せずスキップします。</li>
+      </ul>
+    </div>
+    <div class="why"><span class="k">なぜ</span> 価格が安すぎる商品は、1個売れても利益がほぼ残りません（経費が35%前後かかるため）。1,000円以上を目安にすると、初回から手残りが計算しやすくなります。</div>
+    <div class="warnbox"><b>初期は避けるカテゴリ（法令リスク）：</b> 化粧品／サプリメント／医薬品・医薬部外品／家電（PSEマークが要るもの）／酒類／食品。これらは許認可・表示・PSE等の規制があり、初心者が最初に触ると事故のもとです。<b>慣れるまでは外して</b>、雑貨・日用品・文具・ペット用品など規制の緩いカテゴリから始めます。（判断に迷う商品はスキップし、カズヨに確認してください。）</div>
+  </div>
+
+  <div class="step">
+    <h3><span class="stepno">5</span> 絞り込みを実行して一覧を出す</h3>
+    <div class="goal">3条件＋価格をかけた結果を表示させます。</div>
+    <div class="do"><span class="k">画面でやること</span>
+      <ul>
+        <li>設定したフィルタで <code class="ui">検索</code><span class="en">（<code class="ui">Find Products</code> / <code class="ui">Search</code> 相当）</span>を押します。</li>
+        <li>条件に合う商品の一覧（表）が出ます。ASIN・商品名・ランク・出品者数などが列で並びます。</li>
+        <li>ヒット件数が<b>多すぎる</b>ときはランク上限を3万位に、<b>少なすぎる</b>ときは5万位のまま価格下限を下げる等で微調整します。</li>
+      </ul>
+    </div>
+    <div class="why"><span class="k">なぜ</span> ここで出た一覧が「卸してくれそうな売れ筋の候補群」です。次のステップで、この中から実際に狙う商品を選び、メーカーを辿ります。</div>
+  </div>
+
+  <!-- filter recap table -->
+  <h2 class="section"><span>■</span> フィルタ対応表（日本語UI / 英語UI と設定値）</h2>
+  <div class="board" style="padding:16px 16px 6px;">
+    <table class="filtertable">
+      <thead>
+        <tr><th>狙い</th><th>日本語UIの目安</th><th>英語UI（相当）</th><th>設定値</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><b>①Amazon本体が不在</b></td><td>Amazon 在庫切れ 相当</td><td>Amazon out of stock 相当</td><td class="num">現在 在庫なし</td></tr>
+        <tr><td><b>②ちょうどいい売れ筋</b></td><td>売れ筋ランキング 相当</td><td>Sales Rank 相当</td><td class="num">1 〜 50,000</td></tr>
+        <tr><td><b>③卸す意思の証拠</b></td><td>FBA出品者数 相当</td><td>Offer Count: New, FBA 相当</td><td class="num">2 以上</td></tr>
+        <tr><td><b>薄利を避ける</b></td><td>価格 相当</td><td>Buy Box / New price 相当</td><td class="num">1,000円 以上</td></tr>
+        <tr><td><b>リスク回避</b></td><td>カテゴリ（絞らない）</td><td>Category（all）</td><td>化粧品/サプリ/医薬/家電PSE/酒/食品は目視で除外</td></tr>
+      </tbody>
+    </table>
+    <p style="font-size:11.5px;color:var(--sub);margin:8px 2px 4px;">※ 項目名は「相当」＝Keepaの改訂で表記が変わりうるため、意味が同じ項目を選ぶ前提で書いています。完全一致が見つからないときはカズヨへ画面共有を。</p>
+  </div>
+
+  <!-- ============ 想定月販 ============ -->
+  <h2 class="section"><span>■</span> ヒット商品の「自分の想定月販」を読む</h2>
+  <div class="step">
+    <h3><span class="stepno" style="background:var(--accent2)">6</span> 想定月販を概算する</h3>
+    <div class="goal">「この商品を私が扱ったら、月にいくつ売れそうか」の当たりをつけます。</div>
+    <div class="formula">
+      <div class="eq">自分の想定月販　＝　<b>平均月販</b>　÷　（<b>現在の出品者数</b>　＋　1）</div>
+      <div class="ex">例：平均月販90個・現在の出品者数が2人 → 90 ÷（2＋1）＝ <b>月30個</b>があなたの想定取り分。<br>「＋1」は“あなたが参入して出品者が1人増える”ぶんです。カート（Buy Box）を出品者で分け合う考え方の簡易版。</div>
+    </div>
+    <div class="why"><span class="k">なぜ</span> 全部の売上を独り占めできるわけではありません。出品者で分け合うので、この式で「控えめな取り分」を先に見積もると、初回の仕入れ個数を無理なく決められます（＝在庫が寝るのを防ぐ）。</div>
+    <div class="trap"><span class="k">つまずき</span> 平均月販はKeepaのグラフや推定販売数から読みます。数字が読めないときは無理に確定せず、台帳の「推定月販」は空欄でも構いません。まずは商品とメーカーを1件特定することを優先します。</div>
+  </div>
+
+  <!-- ============ メーカー特定 ============ -->
+  <h2 class="section"><span>■</span> 商品からメーカーの連絡先まで辿る</h2>
+
+  <div class="step">
+    <h3><span class="stepno" style="background:var(--s2)">7</span> ブランド名を取得する</h3>
+    <div class="goal">狙う商品を1つ決め、その商品の「ブランド名／メーカー名」を控えます。</div>
+    <div class="do"><span class="k">画面でやること</span>
+      <ul>
+        <li>一覧から気になる商品を1つ開き、<b>ブランド名（Brand）</b>または<b>メーカー名（Manufacturer）</b>を確認します。KeepaやAmazonの商品ページに表示されています。</li>
+        <li>ブランド名をコピーして控えます。ASIN（商品の固有番号）も一緒に控えます。</li>
+      </ul>
+    </div>
+    <div class="why"><span class="k">なぜ</span> 私たちが取引したい相手は「商品」ではなく「その商品を作っている会社（メーカー）」です。ブランド名が、会社を探す入口になります。</div>
+  </div>
+
+  <div class="step">
+    <h3><span class="stepno" style="background:var(--s2)">8</span> 公式サイト → 会社概要 → 問い合わせ先を辿る</h3>
+    <div class="goal">メーカーの「連絡できる窓口」（メール／電話／FAX）まで到達します。</div>
+    <div class="do"><span class="k">画面でやること</span>
+      <ul>
+        <li>検索エンジンで <b>「ブランド名」</b> や <b>「ブランド名 + 会社概要」</b> を検索し、<b>公式サイト</b>を開きます。</li>
+        <li>公式サイト内の <code class="ui">会社概要</code> / <code class="ui">企業情報</code> / <code class="ui">お問い合わせ</code> を開き、<b>問い合わせメール・電話番号・FAX番号</b>を探します。</li>
+        <li>見つけた連絡先を、次の「メーカー台帳」に記録します。</li>
+      </ul>
+    </div>
+    <div class="why"><span class="k">なぜ</span> ここまで辿れれば、STEP②「問い合わせ」（取引打診メール）にそのまま渡せます。台帳に連絡先が1件たまるごとに、次の一手が撃てる状態になります。</div>
+    <div class="trap"><span class="k">つまずき</span> 公式サイトが見つからない／連絡先が載っていないメーカーもあります。深追いせず<b>次の候補商品へ</b>。連絡先が取れた案件だけを台帳に残せば十分です。</div>
+  </div>
+
+  <!-- ============ 台帳 ============ -->
+  <h2 class="section"><span>■</span> 記録先：メーカー台帳テンプレ</h2>
+  <p style="font-size:14px;margin:0 0 6px;">辿れたメーカーは、以下の列で1行ずつ記録します。この台帳がSTEP②「問い合わせ」の発射台になります。表計算（スプレッドシート）でそのまま使える列構成です。</p>
+  <div style="overflow-x:auto;">
+    <table class="ledger">
+      <thead>
+        <tr>
+          <th>メーカー名</th><th>種商品</th><th>ASIN</th><th>カテゴリ</th><th>ランク</th>
+          <th>FBA出品者数</th><th>推定月販</th><th>価格</th><th>公式HP</th><th>問い合わせ手段</th><th>判定</th><th>備考</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="col">（記入例）〇〇製作所</td><td>ご当地〇〇セット</td><td>B0XXXXXXXX</td><td>食品※初期は回避</td><td>18,400</td>
+          <td>3</td><td>30/月</td><td>1,980円</td><td>example.co.jp</td><td>メール/電話</td><td>候補</td><td>会社概要に思い記載あり／返信率期待</td>
+        </tr>
+        <tr>
+          <td class="col"> </td><td> </td><td> </td><td> </td><td> </td><td> </td><td> </td><td> </td><td> </td><td> </td><td> </td><td> </td>
+        </tr>
+        <tr>
+          <td class="col"> </td><td> </td><td> </td><td> </td><td> </td><td> </td><td> </td><td> </td><td> </td><td> </td><td> </td><td> </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:12px;color:var(--sub);margin:6px 2px;">列の意味：<b>種商品</b>＝そのメーカーで見つけた代表商品／<b>判定</b>＝候補・保留・見送り（初期回避カテゴリは「見送り」）／<b>備考</b>＝返信率を左右しそうな気づき（会社概要の作り込み等）。空欄があっても構いません。まずは「メーカー名＋問い合わせ手段」が埋まれば1件成立です。</p>
+
+  <!-- NEXT -->
+  <div class="next">
+    <h3>▶ 今回の体験ゴールと、この後カズヨと詰めること</h3>
+    <ol>
+      <li><b>今日の合格ライン：</b>Keepaで一覧を出し、<b>連絡先まで辿れたメーカーを1〜3件、台帳に記録</b>できたらOK。件数より「一連の流れを一度通す」ことが目的です。</li>
+      <li><b>詰める論点A（本体マニュアル論点1）：</b>Keepaフィルタの確定項目名（実画面での正式名称）と、1日あたりのリスト化件数の運用。</li>
+      <li><b>詰める論点B：</b>台帳をスプレッドシート化して、STEP②の取引打診メールへ自動で渡す動線。</li>
+    </ol>
+  </div>
+
+  <footer class="doc">
+    T-20260705-002 ／ Keepaで「狙う商品→メーカー」を探す手順書（メーカー仕入れ STEP①リサーチ 実地ガイド） ／ 本体マニュアル：maker-shiire-workflow-manual.html。<br>
+    ※ Keepaのフィルタ項目名は改訂されうるため「〜相当」と表記。実画面で意味が同じ項目を選ぶ前提です。数値（ランク5万位以内・FBA2以上・価格1,000円以上・経費35%）は出典セミナー時点の目安であり、当社実測で更新していきます。抽出3基準の出典＝EC STARs Lab.（中西恒太）。
+  </footer>
+
+</div>
+</body>
+</html>

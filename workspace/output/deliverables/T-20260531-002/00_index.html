@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Amazon物販 業務フロー図 完全版（全体像＋6詳細フロー）</title>
+<style>
+  :root { --amz:#ff9900; --ink:#222; --sub:#666; }
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic", Meiryo, sans-serif;
+         line-height: 1.8; color: var(--ink); margin: 0; background:#f4f5f7; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 28px 22px 80px; }
+  header.hero { background: linear-gradient(135deg,#232f3e 0%,#37475a 100%); color:#fff; padding:34px 22px; }
+  header.hero .inner { max-width:1080px; margin:0 auto; }
+  header.hero h1 { margin:0 0 6px; font-size:1.7rem; letter-spacing:.02em; }
+  header.hero .amz { color:var(--amz); }
+  header.hero p { margin:4px 0 0; color:#cdd5df; font-size:.92rem; }
+  h2 { font-size:1.3rem; margin:0 0 4px; border-left:7px solid var(--amz); padding-left:12px; }
+  .goal { color:var(--sub); font-size:.95rem; margin:2px 0 14px 19px; }
+  .card { background:#fff; border:1px solid #e3e6ea; border-radius:12px; padding:22px 24px;
+          margin:0 0 30px; box-shadow:0 1px 3px rgba(0,0,0,.05); }
+  .card img { width:100%; height:auto; border:1px solid #eee; border-radius:8px; background:#fff; display:block; margin:10px 0 6px; }
+  .figcap { font-size:.82rem; color:#999; text-align:center; margin-bottom:14px; }
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  @media(max-width:760px){ .grid{ grid-template-columns:1fr; } }
+  .box { border-radius:8px; padding:12px 16px; font-size:.9rem; }
+  .pts { background:#f0f7ff; border:1px solid #cfe3fb; }
+  .warn { background:#fff3f3; border:1px solid #f4c4c4; }
+  .pts b, .warn b { display:block; margin-bottom:4px; }
+  ul { margin:6px 0; padding-left:1.25em; }
+  li { margin:3px 0; }
+  .legend { display:flex; flex-wrap:wrap; gap:8px 14px; font-size:.84rem; color:#555; margin:6px 0 0; }
+  .chip { display:inline-flex; align-items:center; gap:6px; }
+  .sw { width:15px; height:15px; border-radius:4px; display:inline-block; border:1.5px solid; }
+  table { border-collapse:collapse; width:100%; font-size:.86rem; margin-top:6px; }
+  th,td { border:1px solid #e0e0e0; padding:6px 9px; text-align:left; }
+  th { background:#fff1d6; }
+  .ok { color:#1a8a1a; font-weight:600; } .pend { color:#c47b00; font-weight:600; }
+  nav.toc { background:#fff; border:1px solid #e3e6ea; border-radius:12px; padding:16px 22px; margin:0 0 28px; }
+  nav.toc a { color:#1565c0; text-decoration:none; }
+  nav.toc a:hover { text-decoration:underline; }
+  nav.toc ol { columns:2; } @media(max-width:760px){ nav.toc ol{ columns:1; } }
+  .reviewbox { background:#fffbe6; border:1px solid #ffe08a; border-radius:10px; padding:14px 18px; }
+  footer { color:#888; font-size:.8rem; border-top:1px solid #ddd; padding-top:14px; margin-top:10px; }
+  a.dl { color:#1565c0; font-size:.85rem; }
+</style>
+</head>
+<body>
+<header class="hero"><div class="inner">
+  <h1><span class="amz">Amazon物販</span> 業務フロー図 ── 完全版</h1>
+  <p>全体像（地図）＋ 6つの詳細フロー（事業準備・仕入れ・制限解除・出品納品・入金会計・アフターフォロー）</p>
+  <p>T-20260531-002 ｜ 担当: 秘書カズヨ ｜ 更新: 2026-06-03 ｜ 対象: Amazon物販に限定（FBA・個人事業・副業初心者を想定）</p>
+</div></header>
+
+<div class="wrap">
+
+<div class="card">
+  <h2 style="border:none;padding-left:0">この資料の使い方</h2>
+  <p>Amazon物販の業務を「①まず全体像をつかむ → ②各段階をToDoレベルまで分解」の2段で図解しました。
+  社長が最も迷われている <b>「仕入れ」</b> 周り（②③）を最も厚く描いています。各図はクリックで拡大できます。
+  詳細な手順チェックリストは各セクションの <b>ToDoファイル（.md）</b> に対応しています。</p>
+  <div class="legend">
+    <span class="chip"><span class="sw" style="background:#cfeccf;border-color:#3a8c3a"></span>開始/完了</span>
+    <span class="chip"><span class="sw" style="background:#dcefff;border-color:#2a7fb5"></span>作業ステップ</span>
+    <span class="chip"><span class="sw" style="background:#ffd9d9;border-color:#cc3333"></span>判断・確認ゲート◇</span>
+    <span class="chip"><span class="sw" style="background:#fff0c2;border-color:#d6a400"></span>条件分岐/解除</span>
+    <span class="chip"><span class="sw" style="background:#d9f2ec;border-color:#16a085"></span>補足メモ</span>
+    <span class="chip"><span class="sw" style="background:#ffe0cc;border-color:#e67e22"></span>注意・要警戒</span>
+    <span class="chip"><span class="sw" style="background:#ecdcf7;border-color:#8e44ad"></span>アフターフォロー（並走）</span>
+  </div>
+</div>
+
+<nav class="toc">
+  <b>目次</b>
+  <ol>
+    <li><a href="#f1">① 大きな流れ（全体像）</a></li>
+    <li><a href="#f5">⑤ 事業準備・初期登録（段階0）</a></li>
+    <li><a href="#f2">② 仕入れ周り（出品可否→解除→発注）</a></li>
+    <li><a href="#f3">③ 出品制限の3段階解除</a></li>
+    <li><a href="#f4">④ 出品〜FBA納品</a></li>
+    <li><a href="#f10">⑩ 入金・会計</a></li>
+    <li><a href="#f12">⑫ アフターフォロー（並走）</a></li>
+  </ol>
+</nav>
+
+<div class="card reviewbox">
+  <b>📋 作成・レビュー状況（2026-06-03 時点）</b>
+  <table>
+    <tr><th>図 / フロー</th><th>作成</th><th>社長レビュー</th></tr>
+    <tr><td>① 大きな流れ（全体像）</td><td class="ok">✅</td><td class="pend">🔄 一読のみ（確認ゲート未通過）</td></tr>
+    <tr><td>⑤ 事業準備・初期登録</td><td class="ok">✅</td><td class="pend">⬜ 未</td></tr>
+    <tr><td>② 仕入れ周り</td><td class="ok">✅</td><td class="pend">⬜ 未</td></tr>
+    <tr><td>③ 出品制限の3段階解除</td><td class="ok">✅</td><td class="pend">⬜ 未</td></tr>
+    <tr><td>④ 出品〜FBA納品</td><td class="ok">✅</td><td class="pend">⬜ 未</td></tr>
+    <tr><td>⑩ 入金・会計 <b>(今回追加)</b></td><td class="ok">✅</td><td class="pend">⬜ 未</td></tr>
+    <tr><td>⑫ アフターフォロー <b>(今回追加)</b></td><td class="ok">✅</td><td class="pend">⬜ 未</td></tr>
+  </table>
+  <p style="margin:10px 0 0;font-size:.9rem">これで <b>全段階の図解が出そろいました</b>（フロー図は完成）。まずは <b>①全体像の確認ゲート</b>を正式に通していただき、そのうえで気になる段階から詳細レビューに進むのが効率的です。</p>
+</div>
+
+<!-- ① 全体像 -->
+<div class="card" id="f1">
+  <h2>① 大きな流れ（全体像）</h2>
+  <p class="goal">ゴール: 事業の全体地図をつかむ ──「探す → 売れるか確かめる → 仕入れる → 売る → お金にする → 振り返る」のループ</p>
+  <img src="01_overview-flow.png" alt="全体フロー図">
+  <p class="figcap">01_overview-flow.png</p>
+  <div class="grid">
+    <div class="box pts"><b>要点</b><ul>
+      <li>本流は0〜11の一本道＋「⑫アフターフォロー」が販売後ずっと<b>並走</b>。</li>
+      <li>赤い<b>ゲート◇</b>（出品可否・仕入れ判断・振り返り）を飛ばすと損失に直結。</li>
+      <li>社長が迷う「仕入れ」は、実は<b>仕入れる前の確認作業（出品制限チェック）</b>がカギ。</li>
+    </ul></div>
+    <div class="box warn"><b>このループを1周回すのが当面のゴール</b><ul>
+      <li>軸B（T-004 体験仕入れ）＝この1周を体感すること。</li>
+      <li>⑫が悪化すると<b>アカウント停止＝事業停止</b>。だから独立フローとして常時監視。</li>
+    </ul></div>
+  </div>
+</div>
+
+<!-- ⑤ 事業準備 -->
+<div class="card" id="f5">
+  <h2>⑤ 事業準備・初期登録（全体像の段階0）</h2>
+  <p class="goal">ゴール: 「売れる状態」を作る ── アカウント開設からリサーチ環境まで</p>
+  <img src="05_setup-flow.png" alt="事業準備フロー図">
+  <p class="figcap">05_setup-flow.png ／ ToDo: 05_setup-todo.md</p>
+  <div class="grid">
+    <div class="box pts"><b>要点</b><ul>
+      <li><b>5点セット</b>（本人確認書類・決済カード・受取口座・事業用メール・携帯番号）を先に準備。</li>
+      <li>出品プランは<b>小口（月0円＋1点100円）で開始</b>、月50個超で大口へ。</li>
+      <li>並走で<b>青色申告（開業2ヶ月以内）／古物商（中古を扱うなら）</b>の届出。</li>
+    </ul></div>
+    <div class="box warn"><b>⚠️ 本人確認(KYC)の落とし穴 ← 社長は今ここ(T-004)</b><ul>
+      <li>書類の住所と入力住所の<b>不一致</b>で差戻し → 完全一致に。</li>
+      <li>暗い/反射した撮影 → 鮮明に撮り直し。</li>
+      <li>氏名のヘボン式・漢字ゆれに注意。</li>
+    </ul></div>
+  </div>
+</div>
+
+<!-- ② 仕入れ -->
+<div class="card" id="f2">
+  <h2>② 仕入れ周り（出品可否チェック → 解除 → 発注）<span style="font-size:.8rem;color:var(--amz)">★社長の最重要関心</span></h2>
+  <p class="goal">ゴール: 仕入れる前に「売れる商品か」を確定し、ムダ仕入れを防ぐ</p>
+  <img src="02_sourcing-flow.png" alt="仕入れ判断フロー図">
+  <p class="figcap">02_sourcing-flow.png ／ ToDo: 02_sourcing-todo.md ／ 仕入れ先30社: ../T-20260521-002/suppliers-list.csv</p>
+  <div class="grid">
+    <div class="box pts"><b>要点（STEP1の3分岐が肝）</b><ul>
+      <li>「この商品を出品する」→ 制限なし → トラップ確認へ。</li>
+      <li>「出品を申請」→ 制限あり → ③解除フローへ。</li>
+      <li>「出品情報のコピー」→ 出品不可 → 候補から外す。</li>
+      <li>トラップ2点: <b>ノーブランド品エラー / 新品が選べるか</b>。</li>
+    </ul></div>
+    <div class="box warn"><b>⚠️ 領収書の必須4条件（解除に効く）</b><ul>
+      <li>①180日以内 ②氏名・住所が一致 ③仕入先の名前・住所記載 ④10点以上購入。</li>
+      <li><b>Amazonからの仕入れ領収書は絶対NG</b>。</li>
+    </ul></div>
+  </div>
+</div>
+
+<!-- ③ 制限解除 -->
+<div class="card" id="f3">
+  <h2>③ 出品制限の3段階解除</h2>
+  <p class="goal">ゴール: 制限商品を「売れる状態」にする ── コストの安い順に試す</p>
+  <img src="03_restriction-release-flow.png" alt="出品制限解除フロー図">
+  <p class="figcap">03_restriction-release-flow.png ／ 出典: 99_reference_listing-restriction-release-manual.md</p>
+  <div class="grid">
+    <div class="box pts"><b>3段階（上から順に・通ったら終了）</b><ul>
+      <li><b>第1段階: 0円解除</b> … 無関係な領収書（水・日用品）で申請。マイナーメーカーは通りやすい。</li>
+      <li><b>第2段階: 1点購入</b> … 最安1点の領収書で申請（数円〜数百円）。</li>
+      <li><b>第3段階: 10点で王道申請</b> … 計10点の領収書。高額品はペイ可否で判断。</li>
+    </ul></div>
+    <div class="box warn"><b>⚠️ 解除したのに出品できない3つの落とし穴</b><ul>
+      <li>①表記違い（カタカナ↔英）②メーカー名の勘違い（例: PlayStation→SIE）③カテゴリー二重ブロック。</li>
+      <li>トランスペアレンシー（青いT）が出たら電脳せどりではスルーが合理的。</li>
+    </ul></div>
+  </div>
+</div>
+
+<!-- ④ 出品〜FBA -->
+<div class="card" id="f4">
+  <h2>④ 出品〜FBA納品</h2>
+  <p class="goal">ゴール: 仕入れた在庫をFBA倉庫に届けて販売可能にする</p>
+  <img src="04_listing-fba-flow.png" alt="出品〜FBA納品フロー図">
+  <p class="figcap">04_listing-fba-flow.png ／ ToDo: 04_listing-fba-todo.md</p>
+  <div class="grid">
+    <div class="box pts"><b>要点</b><ul>
+      <li>既存ASINに<b>相乗り</b>（コンディション＝新品）→ 価格・在庫設定。</li>
+      <li>FBA選択 → 納品プラン作成 → <b>FNSKUラベル</b>貼付 → 配送 → 倉庫受領。</li>
+      <li>倉庫分割は<b>送料分岐点≒2,000円/箱</b>で統合可否を判断。</li>
+    </ul></div>
+    <div class="box warn"><b>⚠️ 事故が多いトップ3</b><ul>
+      <li><b>ラベル設定ミス</b>（メーカーバーコード設定 or JAN露出）→ 在庫混在の重大事故。</li>
+      <li><b>危険物見落とし</b>（化粧品・電池）→ 受領拒否・返送料。</li>
+      <li><b>倉庫分割の放置</b> → 想定外の送料増。</li>
+    </ul></div>
+  </div>
+</div>
+
+<!-- ⑩ 入金・会計 -->
+<div class="card" id="f10">
+  <h2>⑩ 入金・会計 <span style="font-size:.8rem;color:var(--amz)">(今回追加)</span></h2>
+  <p class="goal">ゴール: 売上を回収し「真の利益」を確定 → 記帳 → 確定申告へ</p>
+  <img src="10_accounting-flow.png" alt="入金・会計フロー図">
+  <p class="figcap">10_accounting-flow.png ／ ToDo: 10_accounting-todo.md</p>
+  <div class="grid">
+    <div class="box pts"><b>要点</b><ul>
+      <li>売上は手数料控除後に<b>14日サイクル</b>で確定 → 登録口座へ自動振込。</li>
+      <li>「真の利益」＝<b>販売手数料(8〜15%)＋FBA手数料＋保管料を引いた後</b>。利益率20%はここで判定。</li>
+      <li>記帳は<b>会計ソフト＋Amazon連携で自動取込</b>すると確定申告が軽くなる。</li>
+    </ul></div>
+    <div class="box warn"><b>⚠️ お金まわりの注意</b><ul>
+      <li><b>リザーブ（売上金保留）</b>＝新規は7〜14日保留。入金は遅れる前提で資金繰り。</li>
+      <li>年末<b>在庫は経費にならず</b>翌期へ繰越（棚卸し）。</li>
+      <li>売上1,000万円超で課税事業者化 → 経理ハジメ/法務ハルオに確認。</li>
+    </ul></div>
+  </div>
+</div>
+
+<!-- ⑫ アフターフォロー -->
+<div class="card" id="f12">
+  <h2>⑫ アフターフォロー（販売後ずっと並走） <span style="font-size:.8rem;color:var(--amz)">(今回追加)</span></h2>
+  <p class="goal">ゴール: 顧客満足とアカウント健全性を保ち、事業継続そのものを守る</p>
+  <img src="12_afterfollow-flow.png" alt="アフターフォローフロー図">
+  <p class="figcap">12_afterfollow-flow.png ／ ToDo: 12_afterfollow-todo.md</p>
+  <div class="grid">
+    <div class="box pts"><b>4つのイベントへの対応</b><ul>
+      <li>①購入者メッセージ → <b>24h以内に返信</b>。</li>
+      <li>②返品・返金 → FBAは自動 / 返送品を検品し再販可否判定。</li>
+      <li>③評価・レビュー → <b>評価(セラー)は削除依頼可・レビュー(商品)は原則不可</b>。</li>
+      <li>④A-to-Z/真贋クレーム → 即時対応・証憑提出。</li>
+    </ul></div>
+    <div class="box warn"><b>⚠️ アカウントヘルスが生命線</b><ul>
+      <li><b>注文不良率 ODR &lt; 1%</b> を死守。週1で健全性ページ確認。</li>
+      <li><b>真贋クレームは即停止リスク</b> → 正規仕入れの請求書を即提出（②仕入れと直結）。</li>
+      <li>悪化時は改善計画(POA)提出。困ったら法務ハルオへ。</li>
+    </ul></div>
+  </div>
+</div>
+
+<div class="card">
+  <h2 style="border:none;padding-left:0">仕入れ先リスト（スプレッドシート）</h2>
+  <p>仕入れの深掘りから派生した<b>仕入れ先カタログ30社</b>（連絡先・取扱ジャンル・初心者向き度・支払方法）は既存資産を流用しています。<br>
+  <a class="dl" href="../T-20260521-002/suppliers-list.csv">→ ../T-20260521-002/suppliers-list.csv</a>（②仕入れフローのSTEP4で参照）</p>
+</div>
+
+<div class="card reviewbox">
+  <b>🙋 社長にお願いしたいこと</b>
+  <ol style="margin:8px 0 0">
+    <li><b>①全体像でイメージは合っていますか？</b>（段階の粒度・順番・抜け漏れの感覚）— ここを確定ゲートとして通したいです。</li>
+    <li>OKであれば、気になる段階の<b>詳細フロー＋ToDo</b>を順にご確認ください（仕入れ周り②③を最初におすすめします）。</li>
+    <li>不足・違和感のある箇所があれば、その図名（例: ④）でお知らせいただければ即修正します。</li>
+  </ol>
+</div>
+
+<footer>
+  Amazon物販事業 ／ AI会社 ／ 秘書カズヨ作成。図は matplotlib（ヒラギノ角ゴシック）で描画した PNG です。<br>
+  成果物フォルダ: workspace/output/deliverables/T-20260531-002/ ｜ 図の再生成: <code>python3 draw_*.py</code>
+</footer>
+
+</div>
+</body>
+</html>

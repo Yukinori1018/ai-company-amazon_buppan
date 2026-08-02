@@ -1,0 +1,153 @@
+[
+  {
+    "supplier_id": 1000,
+    "product_id": "NS-BOTTLE-500",
+    "product_url": "https://www.netsea.jp/shop/1000/@bottle500",
+    "product_name": "ステンレス水筒 500ml 真空断熱 保温保冷 マイボトル【卸】",
+    "shop_name": "キッチン雑貨卸 SynaBiz",
+    "jan_code": "4900000000024",
+    "category_id": "20000",
+    "reference_price_type": "M",
+    "ship_fee_type": "N",
+    "ship_fee": 0,
+    "image_url_1": "https://img01.netsea.jp/sample/bottle500_0.jpg",
+    "set": [
+      {
+        "direct_item_id": "1000-1",
+        "jan_code": "4900000000024",
+        "reference_price": 1800,
+        "price": 760,
+        "set_num": 1,
+        "set_price": 836,
+        "set_price_without_tax": 760,
+        "sold_out_flag": "N"
+      }
+    ]
+  },
+  {
+    "supplier_id": 1000,
+    "product_id": "NS-EARBUDS-X1",
+    "product_url": "https://www.netsea.jp/shop/1000/@earbudsx1",
+    "product_name": "ワイヤレスイヤホン Bluetooth5.3 防水 ノイズキャンセリング【卸】",
+    "shop_name": "ガジェット卸ストア",
+    "jan_code": "4900000000017",
+    "category_id": "21000",
+    "reference_price_type": "O",
+    "ship_fee_type": "N",
+    "ship_fee": 0,
+    "image_url_1": "https://img01.netsea.jp/sample/earbudsx1_0.jpg",
+    "set": [
+      {
+        "direct_item_id": "1000-2",
+        "jan_code": "4900000000017",
+        "reference_price": 3200,
+        "price": 1280,
+        "set_num": 1,
+        "set_price": 1408,
+        "set_price_without_tax": 1280,
+        "sold_out_flag": "N"
+      }
+    ]
+  },
+  {
+    "supplier_id": 1001,
+    "product_id": "NS-DIFFUSER-300",
+    "product_url": "https://www.netsea.jp/shop/1001/@diffuser300",
+    "product_name": "アロマディフューザー 超音波 300ml 木目調 LEDライト付【卸】",
+    "shop_name": "リラックス雑貨卸",
+    "jan_code": "4900000000093",
+    "category_id": "20000",
+    "reference_price_type": "M",
+    "ship_fee_type": "Y",
+    "ship_fee": 500,
+    "image_url_1": "https://img01.netsea.jp/sample/diffuser300_0.jpg",
+    "set": [
+      {
+        "direct_item_id": "1001-1",
+        "jan_code": "4900000000093",
+        "reference_price": 2400,
+        "price": 980,
+        "set_num": 1,
+        "set_price": 1078,
+        "set_price_without_tax": 980,
+        "sold_out_flag": "N"
+      }
+    ]
+  },
+  {
+    "supplier_id": 1001,
+    "product_id": "NS-SPOON-5SET",
+    "product_url": "https://www.netsea.jp/shop/1001/@spoon5set",
+    "product_name": "シリコン製 調理スプーン 5本セット 耐熱 食洗機対応【卸】",
+    "shop_name": "キッチン雑貨卸 SynaBiz",
+    "jan_code": "4900000000079",
+    "category_id": "20000",
+    "reference_price_type": "M",
+    "ship_fee_type": "N",
+    "ship_fee": 0,
+    "image_url_1": "https://img01.netsea.jp/sample/spoon5set_0.jpg",
+    "set": [
+      {
+        "direct_item_id": "1001-2",
+        "jan_code": "4900000000079",
+        "reference_price": 1480,
+        "price": 540,
+        "set_num": 1,
+        "set_price": 594,
+        "set_price_without_tax": 540,
+        "sold_out_flag": "N"
+      }
+    ]
+  },
+  {
+    "supplier_id": 1002,
+    "product_id": "NS-PROTEIN-1KG",
+    "product_url": "https://www.netsea.jp/shop/1002/@protein1kg",
+    "product_name": "ホエイプロテイン 1kg チョコ風味 国内製造【卸・軽減税率】",
+    "shop_name": "サプリ卸センター",
+    "jan_code": "4900000000055",
+    "category_id": "22000",
+    "reference_price_type": "M",
+    "ship_fee_type": "N",
+    "ship_fee": 0,
+    "image_url_1": "https://img01.netsea.jp/sample/protein1kg_0.jpg",
+    "set": [
+      {
+        "direct_item_id": "1002-1",
+        "jan_code": "4900000000055",
+        "reference_price": 3980,
+        "price": 1850,
+        "set_num": 1,
+        "set_price": 1998,
+        "set_price_without_tax": 1850,
+        "consumption_tax_class": 1,
+        "sold_out_flag": "N"
+      }
+    ]
+  },
+  {
+    "supplier_id": 1003,
+    "product_id": "NS-DESKLIGHT",
+    "product_url": "https://www.netsea.jp/shop/1003/@desklight",
+    "product_name": "LED デスクライト 調光調色 USB給電【卸】",
+    "shop_name": "家電卸倉庫",
+    "jan_code": "4900000000110",
+    "category_id": "21000",
+    "reference_price_type": "O",
+    "ship_fee_type": "N",
+    "ship_fee": 0,
+    "image_url_1": "https://img01.netsea.jp/sample/desklight_0.jpg",
+    "set": [
+      {
+        "direct_item_id": "1003-1",
+        "jan_code": "4900000000110",
+        "reference_price": 2980,
+        "price": 990,
+        "set_num": 1,
+        "set_price": 1089,
+        "set_price_without_tax": 990,
+        "sold_out_flag": "N"
+      }
+    ]
+  }
+]

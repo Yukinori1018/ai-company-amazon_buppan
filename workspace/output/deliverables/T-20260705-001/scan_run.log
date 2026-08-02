@@ -1,0 +1,48 @@
+/Users/yukinori/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+=== 母集団収集(Yahoo) ===
+[yahoo] '水筒 ステンレス': 50 hits, cumulative JAN=36
+[yahoo] 'タンブラー 保温': 50 hits, cumulative JAN=53
+[yahoo] 'キッチン 収納 ラック': 50 hits, cumulative JAN=70
+[yahoo] '調理器具 セット': 50 hits, cumulative JAN=99
+[yahoo] '美容 スチーマー': 50 hits, cumulative JAN=118
+[yahoo] 'ヘアアイロン': 50 hits, cumulative JAN=143
+[yahoo] '電動歯ブラシ 替えブラシ': 50 hits, cumulative JAN=165
+[yahoo] '制汗剤 デオドラント': 50 hits, cumulative JAN=202
+[yahoo] 'おもちゃ ブロック': 50 hits, cumulative JAN=241
+[yahoo] 'ボードゲーム': 50 hits, cumulative JAN=275
+[warn] Yahoo '文房具 ペン セット': 429 Client Error: Too Many Requests for url: https://shopping.yahooapis.jp/ShoppingWebService/V3/itemSearch?appid=dmVyPTIwMjUwNyZpZD1ENExJM3VNMnVUJmhhc2g9WXpneE5HRTJNV1ExWVdZME16ZzBZZw&results=20&query=%E6%96%87%E6%88%BF%E5%85%B7+%E3%83%9A%E3%83%B3+%E3%82%BB%E3%83%83%E3%83%88
+[warn] Yahoo '手帳 2026': 429 Client Error: Too Many Requests for url: https://shopping.yahooapis.jp/ShoppingWebService/V3/itemSearch?appid=dmVyPTIwMjUwNyZpZD1ENExJM3VNMnVUJmhhc2g9WXpneE5HRTJNV1ExWVdZME16ZzBZZw&results=20&query=%E6%89%8B%E5%B8%B3+2026
+[warn] Yahoo 'ペット 用品 猫': 429 Client Error: Too Many Requests for url: https://shopping.yahooapis.jp/ShoppingWebService/V3/itemSearch?appid=dmVyPTIwMjUwNyZpZD1ENExJM3VNMnVUJmhhc2g9WXpneE5HRTJNV1ExWVdZME16ZzBZZw&results=20&query=%E3%83%9A%E3%83%83%E3%83%88+%E7%94%A8%E5%93%81+%E7%8C%AB
+[warn] Yahoo '犬 おやつ': 429 Client Error: Too Many Requests for url: https://shopping.yahooapis.jp/ShoppingWebService/V3/itemSearch?appid=dmVyPTIwMjUwNyZpZD1ENExJM3VNMnVUJmhhc2g9WXpneE5HRTJNV1ExWVdZME16ZzBZZw&results=20&query=%E7%8A%AC+%E3%81%8A%E3%82%84%E3%81%A4
+[warn] Yahoo 'スポーツ ヨガマット': 429 Client Error: Too Many Requests for url: https://shopping.yahooapis.jp/ShoppingWebService/V3/itemSearch?appid=dmVyPTIwMjUwNyZpZD1ENExJM3VNMnVUJmhhc2g9WXpneE5HRTJNV1ExWVdZME16ZzBZZw&results=20&query=%E3%82%B9%E3%83%9D%E3%83%BC%E3%83%84+%E3%83%A8%E3%82%AC%E3%83%9E%E3%83%83%E3%83%88
+[warn] Yahoo 'アウトドア ランタン': 429 Client Error: Too Many Requests for url: https://shopping.yahooapis.jp/ShoppingWebService/V3/itemSearch?appid=dmVyPTIwMjUwNyZpZD1ENExJM3VNMnVUJmhhc2g9WXpneE5HRTJNV1ExWVdZME16ZzBZZw&results=20&query=%E3%82%A2%E3%82%A6%E3%83%88%E3%83%89%E3%82%A2+%E3%83%A9%E3%83%B3%E3%82%BF%E3%83%B3
+[warn] Yahoo 'モバイルバッテリー': 429 Client Error: Too Many Requests for url: https://shopping.yahooapis.jp/ShoppingWebService/V3/itemSearch?appid=dmVyPTIwMjUwNyZpZD1ENExJM3VNMnVUJmhhc2g9WXpneE5HRTJNV1ExWVdZME16ZzBZZw&results=20&query=%E3%83%A2%E3%83%90%E3%82%A4%E3%83%AB%E3%83%90%E3%83%83%E3%83%86%E3%83%AA%E3%83%BC
+[warn] Yahoo 'LED ライト 卓上': 429 Client Error: Too Many Requests for url: https://shopping.yahooapis.jp/ShoppingWebService/V3/itemSearch?appid=dmVyPTIwMjUwNyZpZD1ENExJM3VNMnVUJmhhc2g9WXpneE5HRTJNV1ExWVdZME16ZzBZZw&results=20&query=LED+%E3%83%A9%E3%82%A4%E3%83%88+%E5%8D%93%E4%B8%8A
+[warn] Yahoo '掃除 グッズ': 429 Client Error: Too Many Requests for url: https://shopping.yahooapis.jp/ShoppingWebService/V3/itemSearch?appid=dmVyPTIwMjUwNyZpZD1ENExJM3VNMnVUJmhhc2g9WXpneE5HRTJNV1ExWVdZME16ZzBZZw&results=20&query=%E6%8E%83%E9%99%A4+%E3%82%B0%E3%83%83%E3%82%BA
+[warn] Yahoo '収納 ボックス 折りたたみ': 429 Client Error: Too Many Requests for url: https://shopping.yahooapis.jp/ShoppingWebService/V3/itemSearch?appid=dmVyPTIwMjUwNyZpZD1ENExJM3VNMnVUJmhhc2g9WXpneE5HRTJNV1ExWVdZME16ZzBZZw&results=20&query=%E5%8F%8E%E7%B4%8D+%E3%83%9C%E3%83%83%E3%82%AF%E3%82%B9+%E6%8A%98%E3%82%8A%E3%81%9F%E3%81%9F%E3%81%BF
+母集団(ユニークJAN)=275 / Keepa解決対象=275
+
+============================================================
+原石密度の実測サマリ
+============================================================
+母集団ユニークJAN(Yahoo)   : 275
+Keepa解決対象JAN           : 275
+Amazon突合成功(=分析対象N)  : 235
+Keepa残トークン            : 972
+------------------------------------------------------------
+差が黒字(手数料引後 net>0) : 13 (5.5%)
+Tier1 原石(率15%&利500)    : 8 (3.4%)
+Tier2 持続原石(+相乗り少回転): 5 (2.1%)
+Tier3 堅い原石(+値下げ耐性) : 5 (2.1%)
+------------------------------------------------------------
+持続原石の平均純利益/個     : 6,779円
+
+[Tier2以上の実物 上位10]
+   15792円 率47.7% 相乗り 1 月販 34 | 絹女 ヘアアイロン W ストレートアイロン -worldwide model- 
+   10963円 率68.4% 相乗り 1 月販162 | 精製水 5l 純水 化粧用 スチーマー cpap 高純度精製水 5L × 1箱 
+    4406円 率17.1% 相乗り 1 月販298 | 絹女 ストレートアイロン LM-225 正規品 ヘアアイロン KINUJO LM
+    1510円 率37.9% 相乗り 1 月販 27 | 《セット販売》　マンダム ギャツビー アイスボディペーパー フローズンペアー (
+    1224円 率15.4% 相乗り 1 月販1000 | プルーストクリーム 2.0 30g 約20日分 ヨミテ デオドラントクリーム ク
+
+CSV: /Users/yukinori/Claude Code/ai-company-amazon_buppan/workspace/output/deliverables/T-20260705-001/density_scan_results.csv

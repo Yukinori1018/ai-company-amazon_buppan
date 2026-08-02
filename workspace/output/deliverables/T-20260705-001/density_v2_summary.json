@@ -1,0 +1,69 @@
+{
+  "method": "Amazon-first (Keepa Product Finder PoiPoi標準) → JAN逆引き(Yahoo+楽天)",
+  "finder_filter": "rank50000-150000/offers2-15/price3000+/AmazonOOS",
+  "criteria": "原石=率≥8%&利益≥300円 / 持続=+相乗り2-10&月販≥3 / 流動性=+BuyBox実在",
+  "asin_found": 1999,
+  "detailed": 1999,
+  "has_jan": 1543,
+  "supplier_matched": 890,
+  "gem_tier1": 188,
+  "durable_tier2": 177,
+  "liquid_tier3": 131,
+  "match_rate_pct": 44.5,
+  "gem_rate_of_matched_pct": 21.1,
+  "durable_rate_of_matched_pct": 19.9,
+  "liquid_rate_of_matched_pct": 14.7,
+  "by_category": {
+    "home_kitchen": {
+      "detail": 299,
+      "matched": 142,
+      "gem": 15
+    },
+    "drugstore": {
+      "detail": 250,
+      "matched": 26,
+      "gem": 10
+    },
+    "diy_tools": {
+      "detail": 250,
+      "matched": 155,
+      "gem": 23
+    },
+    "pet": {
+      "detail": 200,
+      "matched": 98,
+      "gem": 36
+    },
+    "toys": {
+      "detail": 200,
+      "matched": 124,
+      "gem": 43
+    },
+    "hobby": {
+      "detail": 200,
+      "matched": 80,
+      "gem": 26
+    },
+    "sports": {
+      "detail": 150,
+      "matched": 114,
+      "gem": 10
+    },
+    "office": {
+      "detail": 150,
+      "matched": 90,
+      "gem": 9
+    },
+    "baby": {
+      "detail": 150,
+      "matched": 10,
+      "gem": 2
+    },
+    "appliances": {
+      "detail": 150,
+      "matched": 51,
+      "gem": 14
+    }
+  },
+  "tokens_left": 610
+}

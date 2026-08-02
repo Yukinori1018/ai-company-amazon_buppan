@@ -1,6 +1,12 @@
-fastapi>=0.110
-uvicorn[standard]>=0.27
-httpx>=0.27
-pydantic>=2.6
-python-dotenv>=1.0
-pytest>=8.0
+# Sato-Scope Lite — 第1層（利益判定エンジン）依存ライブラリ
+# 第1層は外部APIに一切依存しません。UIとテストのためだけのライブラリです。
+
+streamlit>=1.30      # Web UI（社長専用ローカル画面）
+pandas>=2.0          # まとめ判定タブの表編集・表示
+pytest>=8.0          # ユニットテスト
+
+requests>=2.28       # Yahoo!ショッピング & Keepa Product API 本番接続（キー設定時に使用）
+
+# ── Keepa は公式 python クライアントに依存せず requests で直接叩く（YAGNI）──
+# Keepa Product API: GET https://api.keepa.com/product?key=...&domain=5&code=<JAN>
+# 追加パッケージ不要。KEEPA_API_KEY を .env に置くと Amazon 側が本番（実データ）になる。

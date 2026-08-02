@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>登録・手続きチェックリスト — Satoy Select</title>
+<style>
+  :root {
+    --done: #2e7d32; --now: #c62828; --opt: #f9a825; --c: #2e7d32; --future: #5e6c84;
+    --bg: #f7f8fa; --card: #fff; --line: #e3e6ea; --ink: #222; --sub: #5e6c84;
+  }
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic", Meiryo, sans-serif;
+    background: var(--bg); color: var(--ink); line-height: 1.7; margin: 0; padding: 0 16px 80px; }
+  .wrap { max-width: 960px; margin: 0 auto; }
+  h1 { font-size: 1.5rem; margin: 28px 0 6px; }
+  .meta { color: var(--sub); font-size: .82rem; background: #eef1f5; border-radius: 8px; padding: 12px 16px; margin-bottom: 24px; }
+  .meta strong { color: var(--now); }
+  h2 { font-size: 1.18rem; margin: 36px 0 12px; padding: 8px 14px; border-radius: 8px; color: #fff; }
+  h2.s-done { background: var(--done); }
+  h2.s-now { background: var(--now); }
+  h2.s-opt { background: var(--opt); color: #4a3a00; }
+  h2.s-c { background: var(--c); }
+  h2.s-future { background: var(--future); }
+  .summary { background: var(--card); border: 2px solid var(--now); border-radius: 12px; padding: 18px 22px; margin-bottom: 8px; }
+  .summary h3 { margin: 0 0 10px; font-size: 1.1rem; }
+  .summary ul { margin: 6px 0; padding-left: 20px; }
+  .summary .one { background: #fff4f4; border-left: 4px solid var(--now); padding: 10px 14px; border-radius: 6px; margin-top: 12px; }
+  table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 10px; overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,.06); font-size: .86rem; margin-bottom: 8px; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { background: #eef1f5; color: var(--sub); font-weight: 600; white-space: nowrap; }
+  td.name { font-weight: 700; min-width: 130px; }
+  tr:last-child td { border-bottom: none; }
+  .badge { display: inline-block; padding: 1px 7px; border-radius: 5px; font-size: .76rem; font-weight: 700; white-space: nowrap; }
+  .b-done { background: #e6f4ea; color: var(--done); }
+  .b-mi { background: #f1f3f5; color: var(--sub); }
+  .b-check { background: #fff8e1; color: #b8860b; }
+  .b-app { background: #ffebee; color: var(--now); }
+  .note { color: var(--sub); font-size: .82rem; }
+  .tip { background: #fffbe9; border-left: 4px solid var(--opt); border-radius: 6px; padding: 12px 16px; margin: 10px 0 26px; font-size: .86rem; }
+  .tip strong { color: #b8860b; }
+  .route { background: #1b1f24; color: #e6e9ec; border-radius: 12px; padding: 20px 24px; font-family: "SF Mono", Menlo, monospace; font-size: .84rem; white-space: pre-wrap; line-height: 1.6; margin: 14px 0; }
+  .glossary { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 16px 20px; font-size: .82rem; color: var(--sub); margin-top: 24px; }
+  a { color: #1565c0; }
+  .warn { color: var(--now); font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>登録・手続き チェックリスト</h1>
+<p class="meta">
+  「私が登録しないといけないのはどこか」一覧 ／ 店舗名 <strong>Satoy Select</strong><br>
+  作成: ヒデアキ（コンテンツ制作） 2026-06-03 ／ 依頼: カズヨ経由 社長<br>
+  前提: 副業初心者・個人事業・小口プラン・予算10万円・決済=セゾン ／ 仕入れ手法 B(国内卸)→C(電脳せどり) ／ 主軸ツール ERESA PRO<br>
+  <strong>現状: Amazonセラーのみ登録済（本人確認・有効化まで完了）</strong>
+</p>
+
+<div class="summary">
+  <h3>結論</h3>
+  <ul>
+    <li><span class="warn">今すぐ要る登録 … 2件（＋ERESA無料試用）</span> — 受取口座の確認 / NETSEA登録 / ERESA 7日無料試用</li>
+    <li>任意・余力があれば … 2件（スーパーデリバリー / orosy）</li>
+    <li>C案に進むとき … 量販店アカウント数件（すべて無料）</li>
+    <li>将来の届出（並走OK）… 2件（開業届＋青色申告 / 古物商）</li>
+  </ul>
+  <div class="one">
+    今あなたが新たに手を動かすのは実質 <strong>「受取口座の確認 → NETSEA登録 → ERESA試用開始」の3つだけ</strong>。<br>
+    お金が動く（=承認が要る）のは <strong>ERESA本契約・スーパーデリバリー・orosy有料・古物商</strong> のみ。無料登録・試用は承認不要で進めます。
+  </div>
+</div>
+<p class="note">凡例: <span class="badge b-done">🟢 済</span> 完了 ／ <span class="badge b-mi">⬜ 未</span> これから ／ <span class="badge b-check">🔶 要確認</span> Amazon登録時に設定済みかも ／ <span class="badge b-app">⚠️ 要承認</span> 金銭が動く新規契約（社内ルール§4.1）</p>
+
+<h2 class="s-done">1. ✅ 完了済み（現状の棚卸し）</h2>
+<table>
+<tr><th>#</th><th>名称</th><th>何のためか</th><th>必須/任意</th><th>料金</th><th>承認</th><th>現状</th><th>入口・補足</th></tr>
+<tr><td>1-1</td><td class="name">Amazon出品アカウント（セラーセントラル）</td><td>Amazonで商品を売る販売者アカウント</td><td>必須</td><td>小口=月0円＋成約100円/点</td><td>—</td><td><span class="badge b-done">🟢 済</span></td><td><a href="https://sell.amazon.co.jp/">sell.amazon.co.jp</a> ／ 本人確認(KYC)通過済</td></tr>
+<tr><td>1-2</td><td class="name">決済用クレジットカード（セゾン）</td><td>手数料・仕入れの支払い</td><td>必須</td><td>保有済</td><td>—</td><td><span class="badge b-done">🟢 済</span></td><td>各仕入れサイトでも同カードを使い回せる</td></tr>
+<tr><td>1-3</td><td class="name">出品プラン＝小口</td><td>月額固定費を抑えて始める</td><td>必須</td><td>月0円＋成約100円/点</td><td>—</td><td><span class="badge b-done">🟢 済</span></td><td>月50個超で大口（月4,900円）切替検討（49個が分岐）</td></tr>
+<tr><td>1-4</td><td class="name">本人確認書類（KYC）</td><td>アカウント有効化の審査</td><td>必須</td><td>無料</td><td>—</td><td><span class="badge b-done">🟢 済</span></td><td>身分証＋住所確認書類で通過済</td></tr>
+</table>
+
+<h2 class="s-now">2. 🔴 今やる（B案＝国内卸で仕入れるための必須・準必須）</h2>
+<table>
+<tr><th>#</th><th>名称</th><th>何のためか</th><th>必須/任意</th><th>料金</th><th>承認</th><th>現状</th><th>入口・補足（つまずき注意）</th></tr>
+<tr><td>2-1</td><td class="name">売上の受取用 銀行口座</td><td>Amazon売上金の振込先。無いと入金されない</td><td>必須</td><td>無料</td><td>—</td><td><span class="badge b-check">🔶 要確認</span></td><td>セラーセントラルの出金設定で登録済みか確認。未登録なら個人口座でOK。<span class="warn">ネット銀行（住信SBI/楽天）だと確定申告がラク</span>。名義＝登録氏名を一致</td></tr>
+<tr><td>2-2</td><td class="name">事業用メールアドレス</td><td>注文・在庫・入金の通知受信</td><td>準必須</td><td>無料</td><td>—</td><td><span class="badge b-check">🔶 要確認</span></td><td>Amazon登録が私用兼用なら別途用意してもよい（Gmail等で十分）</td></tr>
+<tr><td>2-3</td><td class="name">携帯電話番号（SMS認証）</td><td>各サイトの本人確認・2段階認証</td><td>必須</td><td>無料</td><td>—</td><td><span class="badge b-done">🟢 済</span></td><td>新規取得不要。同じ番号を各サイトで使う</td></tr>
+<tr><td>2-4</td><td class="name">NETSEA（ネッシー）会員登録</td><td>B案の主力仕入れ先。新品を小ロット卸価格で</td><td>必須（B案の起点）</td><td><b>無料</b></td><td>—</td><td><span class="badge b-mi">⬜ 未</span></td><td><a href="https://www.netsea.jp/">netsea.jp</a> ／ 買い手として無料登録。一部メーカーは取引審査あり。日用品・文具・収納を眺める</td></tr>
+<tr><td>2-5</td><td class="name">ERESA PRO 7日無料試用</td><td>「利益が出て売れる商品」を見分ける主軸ツール。Keepa内包</td><td>準必須</td><td>試用<b>無料</b>（後 月¥4,980）</td><td><span class="badge b-app">⚠️ 本契約は要承認</span></td><td><span class="badge b-mi">⬜ 未</span></td><td><a href="https://eresa.jp/">eresa.jp</a> ／ 試用開始は無料・承認不要。<span class="warn">7日経過で自動課金に移行する設計が一般的</span>。本契約前にカズヨ経由で承認</td></tr>
+</table>
+<div class="tip"><strong>つまずき防止トップ3:</strong> ① 受取口座の未設定に気づかず出品 → 先に2-1を確認。② ERESA試用の自動課金 → 開始日をメモし7日以内に判断。③ NETSEAで規制カテゴリに手を出す → 日用品・文具・収納に限定。</div>
+
+<h2 class="s-opt">3. 🟡 B案の任意・余力があれば</h2>
+<table>
+<tr><th>#</th><th>名称</th><th>何のためか</th><th>必須/任意</th><th>料金</th><th>承認</th><th>現状</th><th>入口・補足</th></tr>
+<tr><td>3-1</td><td class="name">スーパーデリバリー</td><td>大手卸サイト。品揃えが広い</td><td>任意</td><td class="warn">有料 月¥約2,000(税抜)</td><td><span class="badge b-app">⚠️ 要承認</span></td><td><span class="badge b-mi">⬜ 未</span></td><td><a href="https://www.superdelivery.com/">superdelivery.com</a> ／ 月額＋入会審査あり。NETSEAで物足りなくなってから</td></tr>
+<tr><td>3-2</td><td class="name">orosy（オロシー）</td><td>後払い対応など個人事業者向け卸</td><td>任意</td><td>無料プランあり</td><td>（有料時のみ要承認）</td><td><span class="badge b-mi">⬜ 未</span></td><td><a href="https://orosy.com/">orosy.com</a> ／ 無料枠で試せる</td></tr>
+</table>
+
+<h2 class="s-c">4. 🟢 C案（電脳せどり）に進むとき</h2>
+<p class="note">B案で型を覚えてから。量販店の購入アカウント＋ポイント会員を作るだけで、すべて無料。</p>
+<table>
+<tr><th>#</th><th>名称</th><th>何のためか</th><th>必須/任意</th><th>料金</th><th>承認</th><th>現状</th><th>入口・補足</th></tr>
+<tr><td>4-1</td><td class="name">ヨドバシ.com アカウント</td><td>ポイント還元込み実質価格で新品仕入れ（主力）</td><td>C案で必須</td><td>無料</td><td>—</td><td><span class="badge b-mi">⬜ 未</span></td><td><a href="https://www.yodobashi.com/">yodobashi.com</a> ／ ポイントは現金でなく次回値引き。実質仕入値で損益を見る</td></tr>
+<tr><td>4-2</td><td class="name">ビックカメラ.com アカウント</td><td>ヨドバシの代替・比較</td><td>C案で任意</td><td>無料</td><td>—</td><td><span class="badge b-mi">⬜ 未</span></td><td><a href="https://www.biccamera.com/">biccamera.com</a></td></tr>
+<tr><td>4-3</td><td class="name">楽天市場 アカウント（楽天会員）</td><td>SPU・お買い物マラソンで高還元</td><td>C案で任意</td><td>無料</td><td>—</td><td><span class="badge b-mi">⬜ 未</span></td><td><a href="https://www.rakuten.co.jp/">rakuten.co.jp</a> ／ 還元設計が複雑。慣れてから</td></tr>
+<tr><td>4-4</td><td class="name">（家電等に踏み込む場合）法務確認</td><td>PSE・技適など規制カテゴリのリスク確認</td><td>条件付き必須</td><td>無料（社内）</td><td>—</td><td><span class="badge b-mi">⬜ 未</span></td><td>カズヨ経由で法務ハルオへ。<span class="warn">日用品・文具に絞れば不要</span></td></tr>
+</table>
+
+<h2 class="s-future">5. 🗂 任意・将来の届出（メインと並走OK）</h2>
+<table>
+<tr><th>#</th><th>名称</th><th>何のためか</th><th>必須/任意</th><th>料金</th><th>承認</th><th>現状</th><th>入口・補足（期限注意）</th></tr>
+<tr><td>5-1</td><td class="name">開業届</td><td>個人事業の開始を税務署へ届出。青色申告の前提</td><td>任意（青色なら必須）</td><td>無料</td><td>—</td><td><span class="badge b-mi">⬜ 未</span></td><td>管轄税務署/e-Tax ／ <span class="warn">開業から1ヶ月以内が目安</span></td></tr>
+<tr><td>5-2</td><td class="name">青色申告承認申請書</td><td>最大65万円控除・赤字繰越などの節税</td><td>任意（節税したいなら推奨）</td><td>無料</td><td>—</td><td><span class="badge b-mi">⬜ 未</span></td><td>開業届とセット。<span class="warn">開業から2ヶ月以内が期限。遅れると初年度は白色</span></td></tr>
+<tr><td>5-3</td><td class="name">古物商許可</td><td>中古品を仕入れて売る場合に必須の警察署許可</td><td>条件付き必須</td><td class="warn">有料 約¥19,000</td><td><span class="badge b-app">⚠️ 要承認</span></td><td><span class="badge b-mi">⬜ 未</span></td><td>管轄警察署 ／ 取得まで約40日。<span class="warn">新品仕入れ販売のみなら原則不要</span>。B/C(新品)中心の現方針では当面不要</td></tr>
+</table>
+
+<h2 class="s-now" style="background:#37474f;">最短ルート（①→②→③で仕入れ開始）</h2>
+<div class="route">【①受取口座の確認】 セラーセントラルで売上の振込先口座が登録済みか確認
+        │  （未登録なら個人口座を登録。ネット銀行が確定申告ラク）
+        ▼
+【②NETSEA に無料登録】 買い手として登録 → 日用品・文具・収納を眺める
+        │  （ここまで承認不要・お金ゼロ）
+        ▼
+【③ERESA PRO 7日無料試用を開始】 NETSEAで気になった商品を ERESA で検索し
+        │  「利益が出て・売れる」か判定する練習（試用は無料）
+        ▼
+   ＝ここまでで「仕入れ→出品→販売→入金」を回す準備が完了＝
+        │
+        ▼
+（試用後に本契約したくなったら）ERESA PRO 月¥4,980 を ⚠️カズヨ経由で承認 → 契約</div>
+<p class="note">①②③はすべて無料・承認不要で今日着手できます。お金が動く（=承認が要る）のは ERESA本契約・スーパーデリバリー・orosy有料・古物商。進める段でカズヨが A/B/C＋推奨でお伺いします。</p>
+
+<div class="glossary">
+<strong>用語ミニ補足（初心者向け）</strong><br>
+・<b>セラーセントラル</b> … Amazon出品者の管理画面。出品・在庫・出金設定を行う場所。<br>
+・<b>KYC</b> … 本人確認。アカウント有効化の審査。社長は通過済み。<br>
+・<b>小口/大口プラン</b> … 小口=月0円＋成約100円/点、大口=月4,900円。<br>
+・<b>卸サイト（NETSEA等）</b> … 小売店向けに新品を卸価格で売る仕入れ先。請求書が出るので出所が明確。<br>
+・<b>ERESA / Keepa</b> … 価格・売れ行き・競合を見るリサーチツール。ERESA PROはKeepaを内包。<br><br>
+出典: 05_setup-todo.md（5点セット・届出） / step2-procurement-decision.md（仕入れ手法B/C） / price-diff-research-guide.md（ERESA料金・機能）
+</div>
+
+</div>
+</body>
+</html>

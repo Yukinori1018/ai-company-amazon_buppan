@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Step2 仕入れ手法の決定 — 意思決定資料（体験仕入れ1周 / 軸B）</title>
+<style>
+  :root { --ink:#1a1a1a; --sub:#555; --line:#e0e0e0; --accent:#2563eb; --accent2:#0f766e;
+          --green:#16a34a; --amber:#d97706; --red:#dc2626; --bg:#fafafa; --card:#fff; }
+  * { box-sizing:border-box; }
+  body { font-family:-apple-system,"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;
+         color:var(--ink); line-height:1.75; margin:0; background:var(--bg); }
+  .wrap { max-width:920px; margin:0 auto; padding:32px 22px 80px; }
+  header.doc { border-bottom:3px solid var(--accent); padding-bottom:16px; margin-bottom:8px; }
+  h1 { font-size:1.55rem; margin:0 0 6px; }
+  .meta { color:var(--sub); font-size:.82rem; line-height:1.6; }
+  .pre { background:#f1f5f9; border-left:4px solid var(--accent); padding:12px 16px; border-radius:4px;
+         font-size:.85rem; color:#334155; margin:14px 0 26px; }
+  h2 { font-size:1.25rem; margin:42px 0 12px; padding-left:12px; border-left:6px solid var(--accent); }
+  h3 { font-size:1.05rem; margin:26px 0 8px; color:var(--accent2); }
+  p, li { font-size:.95rem; }
+  .lead { background:linear-gradient(180deg,#eff6ff,#fff); border:1px solid #bfdbfe; border-radius:10px;
+          padding:20px 22px; margin:16px 0; }
+  .lead .punch { font-size:1.15rem; font-weight:700; color:var(--accent); margin:0 0 10px; }
+  table { width:100%; border-collapse:collapse; margin:14px 0; font-size:.88rem; background:var(--card); }
+  th, td { border:1px solid var(--line); padding:8px 10px; text-align:left; vertical-align:top; }
+  th { background:#f3f4f6; font-weight:600; }
+  caption { caption-side:top; text-align:left; font-weight:600; color:var(--accent2); margin-bottom:6px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:6px 18px 14px; margin:16px 0;
+          box-shadow:0 1px 3px rgba(0,0,0,.04); }
+  .rec { border:2px solid var(--accent); background:#eff6ff; }
+  .green{color:var(--green);font-weight:600}.amber{color:var(--amber);font-weight:600}.red{color:var(--red);font-weight:600}
+  .badge { display:inline-block; font-size:.72rem; padding:2px 9px; border-radius:999px; font-weight:600; margin-left:6px; }
+  .b-rec{background:var(--accent);color:#fff}.b-a{background:#dcfce7;color:#166534}
+  .b-b{background:#dbeafe;color:#1e40af}.b-c{background:#fef3c7;color:#92400e}
+  ol.steps { counter-reset:step; list-style:none; padding-left:0; }
+  ol.steps > li { position:relative; padding:6px 0 6px 44px; margin-bottom:6px; border-bottom:1px dashed var(--line); }
+  ol.steps > li::before { counter-increment:step; content:counter(step); position:absolute; left:0; top:6px;
+        width:30px; height:30px; background:var(--accent); color:#fff; border-radius:50%; text-align:center; line-height:30px; font-weight:700; }
+  .phase { background:#0f766e; color:#fff; display:inline-block; padding:3px 12px; border-radius:6px; font-size:.85rem; font-weight:600; margin:18px 0 4px; }
+  .ok::before { content:"✅ "; }
+  .warn-list li { margin-bottom:4px; }
+  .note { font-size:.82rem; color:var(--sub); background:#f8fafc; border-left:3px solid #cbd5e1; padding:8px 14px; margin:10px 0; border-radius:4px; }
+  .kpi td:first-child { font-weight:600; }
+  footer { margin-top:50px; padding-top:14px; border-top:1px solid var(--line); font-size:.8rem; color:var(--sub); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="doc">
+  <h1>Step2 仕入れ手法の決定 — 意思決定資料</h1>
+  <div class="meta">
+    体験仕入れ・販売サイクル1周（軸B / T-20260520-004 Step2）<br>
+    起案: タケシ（プランナー） / 2026-06-03 / 依頼: カズヨ（秘書）経由 社長<br>
+    事実の出典: T-20260520-012 の 01〜04（リサーチャー サトル）。憶測は「要確認」と明示。
+  </div>
+</header>
+
+<div class="pre">
+  <strong>前提（厳守）:</strong> 副業初心者 / 予算上限10万円 / 出品プラン=小口 / 個人 /
+  決済=セゾン / 店舗名=Satoy Select / Amazonアカウント有効化済（2026-06-02）
+</div>
+
+<h2>1. 結論サマリ</h2>
+<div class="lead">
+  <p class="punch">勝ち筋はここです — 「不要品販売(A)で1周完走 → 国内卸サイト(B)で本番2周目」の2段構成。</p>
+  <p>理由は1つ。このStep2のゴールは「利益」ではなく <strong>「事故ゼロで、出品→販売→入金の全工程を、自分の手で1周し切る」体験</strong> だからです（T-004「学習が主目的、利益は副次」）。最初の1周は<strong>規制リスクが構造的にゼロに近い不要品販売(A)</strong>で仕組みを完走させ、その直後に<strong>国内卸サイト(B)で「仕入れて売る」本番</strong>へ進むのが、期待値・学習効率・事故率のすべてで最良です。</p>
+  <ul>
+    <li><strong>最初の一歩（今日〜数日）:</strong> 自宅の不用品から状態の良い <strong>書籍・ゲーム・未使用ガジェット等を3〜5点</strong>選び、Amazonの商品ページに「相乗り出品」。<strong>原資ゼロ・古物商不要・10万円は1円も使わない。</strong></li>
+    <li><strong>10万円の出番は2周目(B)から。</strong> 1周目で仕組みを完走してから、初めてお金を賭けます。</li>
+    <li><strong>やらないこと:</strong> 1周目から「儲かる商品探し（電脳せどりC）」に飛びつかない。リサーチ・損益計算・規制判断を初心者に<em>同時に</em>背負わせると完走前に止まる。<strong>学ぶ順番を分解する</strong>のが今回の戦略の核心。</li>
+  </ul>
+  <p style="margin-bottom:0"><strong>ひとことで:</strong> 「お金を賭ける前に、仕組みを1周させる」。これが副業初心者の事故率を最も下げる順番です。</p>
+</div>
+
+<h2>2. 仕入れ手法 A/B/C ＋推奨</h2>
+<p>リサーチで12方法→3案に絞り込み済（02）。体験1周の目線で評価します。</p>
+
+<div class="card">
+  <h3>A案: 不要品販売（自宅の私物を売る）<span class="badge b-a">現実度 ★★★</span></h3>
+  <table>
+    <tr><th>何を / どこで</th><td>自宅の不用品（書籍・ゲーム・CD/DVD・未使用ガジェット等）／ 仕入れ先なし＝Amazon既存ページに相乗り出品</td></tr>
+    <tr><th>初期費用 / 難易度</th><td>0円（10万円は使わない）／ ★☆☆ 最も易しい</td></tr>
+    <tr><th>学べること</th><td>出品登録→価格設定→梱包発送→入金 の<strong>全工程を最小リスクで1周</strong></td></tr>
+    <tr><th>想定リスク</th><td><span class="green">🟩 構造的に最小</span>。自己所有物の処分は古物営業に当たらず<strong>古物商不要</strong>、真贋・商標問題なし</td></tr>
+    <tr><th>体験1周への向き</th><td><strong>最適</strong>。「仕組みを事故なく1周する」目的に最も忠実</td></tr>
+  </table>
+</div>
+
+<div class="card">
+  <h3>B案: 国内卸サイト（NETSEA等で小ロット新品仕入れ）<span class="badge b-b">現実度 ★★★</span></h3>
+  <table>
+    <tr><th>何を / どこで</th><td>卸の新品を小ロット仕入れ（日用品雑貨・文具・収納等）／ NETSEA（登録無料）・スーパーデリバリー（買い手 月¥約2,000税抜＋審査）・orosy 等</td></tr>
+    <tr><th>初期費用 / 難易度</th><td>NETSEAは0円・仕入原資は10万円から／ ★★☆</td></tr>
+    <tr><th>学べること</th><td><strong>「仕入れて売る」本来のフロー</strong>・損益計算（仕入値＋送料＋FBA手数料）・最小ロット運用</td></tr>
+    <tr><th>想定リスク</th><td><span class="green">🟩</span>〜<span class="amber">🟨</span> 国内卸の新品は<strong>請求書が出る＝真贋調査に強い</strong>。出所明確で事故りにくい</td></tr>
+    <tr><th>体験1周への向き</th><td><strong>本番体験に最適</strong>。フリマ仕入れがNGの今、新品を正規ルートで小ロット仕入れできる現実的な在宅手段</td></tr>
+  </table>
+</div>
+
+<div class="card">
+  <h3>C案: 電脳せどり（量販店ネットのポイント還元）<span class="badge b-c">現実度 ★★☆</span></h3>
+  <table>
+    <tr><th>何を / どこで</th><td>ヨドバシ等で還元込み実質10〜16%引きの新品／ ヨドバシ・ビック・楽天 等</td></tr>
+    <tr><th>初期費用 / 難易度</th><td>0〜・Keepa等ツール月¥約3千推奨／ ★★★ 最も高い</td></tr>
+    <tr><th>学べること</th><td>相場リサーチ・ポイント設計・送料込み損益計算（<strong>せどり基礎力は最も付く</strong>）</td></tr>
+    <tr><th>想定リスク</th><td><span class="amber">🟨</span> 量販店新品は「メーカー同等保証」が無いと<strong>Amazon新品出品不可</strong>・領収書保管必須。家電(PSE)等の規制に触れやすい</td></tr>
+    <tr><th>体験1周への向き</th><td>△ 学びは深いが、リサーチ＋規制判断＋損益を同時に課すため<strong>初回完走の難度が高い</strong></td></tr>
+  </table>
+</div>
+
+<div class="card rec">
+  <h3 style="color:var(--accent)">★ 推奨: A → B の2段構成（C は3周目以降の選択肢）</h3>
+  <ol>
+    <li><strong>目的適合度が最も高い</strong> — ゴールは「完走体験」。A案は規制リスクがゼロに近く、お金を賭けずに全工程を1周でき、完走確率が最大。</li>
+    <li><strong>学習が階段状に積み上がる</strong> — 1周目(A)で仕組みを覚えた状態で2周目(B)の損益に進めば、新たに学ぶ変数が毎回1つに絞れる。<strong>初心者の認知負荷を最小化＝挫折率を下げる最も効く打ち手</strong>。</li>
+    <li><strong>予算を守りながら本番も体験</strong> — A案は0円、B案も小ロットで10万円枠内。儲けを焦らず学びを最大化しつつ、Bでお金を賭ける緊張感も得られる。</li>
+  </ol>
+  <p style="margin-bottom:0"><strong>捨てるもの:</strong> 初回からのC案。リサーチ力・規制判断・損益計算を同時要求するため、完走より先に「リサーチ沼」で止まるリスクが高い。C案の基礎力は価値が高いので<strong>A→B完走後の3周目で取りに行く</strong>（永久除外ではなく順番を後ろに）。</p>
+</div>
+<div class="note">店舗せどり（次点）は外出・地域差が前提。在宅完結のB/Cを優先。社長が外出仕入れも体験したい場合のみ昇格を検討（要確認＝社長の生活情報）。</div>
+
+<h2>3. 最初に狙う商品ジャンル / 具体例</h2>
+<p>「規制リスク低 × 低単価 × 良し悪しを判断しやすい」で選定（restricted-categories 推奨と整合）。</p>
+
+<table>
+  <caption>A案（不要品販売）— 自宅にあるものから</caption>
+  <tr><th>ジャンル</th><th>商品イメージ</th><th>なぜ初心者向きか</th></tr>
+  <tr><td>本・雑誌</td><td>読み終えた書籍・専門書・コミック</td><td>既存ページが必ずあり相乗り容易。相場が一目で分かり低単価で失敗ダメージ小</td></tr>
+  <tr><td>ゲーム・ソフト</td><td>遊び終えたソフト/周辺機器</td><td>型番で同定しやすく状態ランク基準が明確</td></tr>
+  <tr><td>CD/DVD/Blu-ray</td><td>視聴済みメディア</td><td>バーコードで一発検索でき出品が速い</td></tr>
+  <tr><td>未使用ガジェット小物</td><td>もらい物の充電器・ケーブル（未開封）</td><td>状態判断が容易・送料が安く損益が読みやすい</td></tr>
+</table>
+<div class="note">A案のコツ: まず「状態が良く・型番がはっきりし・Amazonに既存ページがある」ものを選ぶ。相乗り出品を最速で体験する近道。</div>
+
+<table>
+  <caption>B案（国内卸）— 規制低カテゴリに限定</caption>
+  <tr><th>ジャンル</th><th>商品イメージ</th><th>なぜ初心者向きか</th></tr>
+  <tr><td>生活日用品・雑貨</td><td>キッチン小物・収納・掃除用品</td><td>請求書で出所明確・規制<span class="green">🟩</span>・生活必需で需要安定。B案×日用品は相性最良</td></tr>
+  <tr><td>文具・事務用品</td><td>ノート・ペン・デスク周り</td><td>季節変動が小さく回転が読みやすい・低単価で賭け金が小さい</td></tr>
+  <tr><td>ペット用品（消耗品系）</td><td>トイレシート・食器等</td><td>リピート需要・規制低。<span class="red">※ペットフード/サプリは食品扱いで避ける</span></td></tr>
+</table>
+
+<h3 class="red" style="color:var(--red)">避けるべきジャンル（初回は触らない）</h3>
+<ul class="warn-list">
+  <li><span class="red">🟥</span> 健康食品・サプリ・化粧品・美容機器（薬機法・社長方針で除外）</li>
+  <li><span class="red">🟥</span> 家電・電気製品（PSE）/ 無線機器（技適）— C案で触れやすく特に注意</li>
+  <li><span class="red">🟥</span> ブランド品・キャラクター商品（商標・真贋調査リスク）</li>
+  <li><span class="red">🟥</span> フリマ・個人仕入れ品の新品出品（メルカリ2025/10規約＋Amazon規約でNG）</li>
+  <li><span class="red">🟥</span> 海外輸入品（中国・韓国。知財/PSE/薬機/関税。初手スコープ外）</li>
+</ul>
+
+<h2>4. 初手の具体アクション（今日〜数日）</h2>
+
+<div class="phase">Phase 0: 1周目=A案（今日〜3日）— お金を使わず完走する</div>
+<ol class="steps">
+  <li><strong>不用品の棚卸し（30分）:</strong> 「状態が良く・型番が明確・Amazonに既存ページがありそう」な品を3〜5点集める。</li>
+  <li><strong>相場チェック（各5分）:</strong> Amazonアプリで商品名/バーコード検索→既存ページの価格確認。「この値段なら手放してOK」を即決できる品を優先。</li>
+  <li><strong>最初の1〜2点を出品（小口）:</strong> 既存ページの「出品する（コンディション選択で相乗り）」から。<strong>最初は自己発送を推奨</strong>（FBAは工程増。2周目で体験すればよい／要確認: 初回からFBA体験希望なら変更可）。価格は相場の中央〜やや安め（売れる確度＝完走優先）。</li>
+  <li><strong>売れたら:</strong> 梱包→発送→評価→<strong>入金確認</strong>まで見届けて1周完走。学びをメモ（Step7振り返り素材）。</li>
+</ol>
+
+<div class="phase">Phase 1: 2周目=B案（A案完走後、数日〜2週間）— 10万円の出番</div>
+<ol class="steps">
+  <li><strong>NETSEAに無料会員登録</strong>（買い手として）。日用品雑貨カテゴリを眺める。</li>
+  <li><strong>本命を1〜2 SKU選ぶ:</strong> Amazonで同等品の販売価格を確認し、<strong>仕入値＋送料＋手数料 &lt; 販売価格</strong> の品を選ぶ。経理ハジメの損益シミュ（T-20260521-002）と突合で精度↑。</li>
+  <li><strong>小ロット仕入れ→出品→販売→入金</strong>で本番1周。請求書は必ず保管（真贋調査対策）。</li>
+</ol>
+
+<div class="card">
+  <h3>10万円の配分設計</h3>
+  <ul>
+    <li><strong>推奨: 本命1〜2 SKUに3〜5万円、残りは予備。</strong> 1万円×多数SKUの分散は「リサーチ工数×初心者」で破綻しやすい。最初は集中で1サイクルの損益を綺麗に観測する方が学びが濃い。</li>
+    <li>低単価品（数百〜千円台）を選べば5万円でも複数個×複数SKUの練習が可能。</li>
+    <li>※精緻な損益（FBA手数料・回転率込み）は経理ハジメに別途依頼可（要すり合わせ）。</li>
+  </ul>
+</div>
+
+<h2>5. 撤退 / 見直し条件 と「成功の定義」</h2>
+<p>体験1周なので、撤退条件は「損失額」ではなく<strong>「学べたか」</strong>で定義します。</p>
+
+<div class="card rec">
+  <h3 style="color:var(--accent)">成功の定義（達成できたら1周は成功）</h3>
+  <ul style="list-style:none;padding-left:0">
+    <li class="ok"><strong>A案:</strong> 出品→販売→入金まで自分の手で1周し、各工程を体感した。</li>
+    <li class="ok"><strong>B案:</strong> 「仕入値＋送料＋手数料 vs 販売価格」の損益を自分で計算し、仕入れ→販売→入金を1周した。</li>
+    <li class="ok">規制・コンディション・真贋（請求書保管）の実務注意点を体で理解した。</li>
+  </ul>
+  <p style="margin-bottom:0">利益が出れば理想だが、<strong>赤字でも上記が達成できれば「学習＝成功」</strong>（T-004の目的に忠実）。</p>
+</div>
+
+<table class="kpi">
+  <caption>見直し / 撤退条件（KPI×期限）</caption>
+  <tr><th>条件</th><th>判定</th><th>アクション</th></tr>
+  <tr><td>A案で2週間経っても1点も出品できない</td><td>行動が止まっている</td><td>つまずき箇所を特定しカズヨが手順支援。商品を更に易しい品（本1冊）に下げる</td></tr>
+  <tr><td>A案で出品したが3週間売れない</td><td>価格設定の問題</td><td>相場の最安付近まで値下げ（完走優先・利益度外視で「売れる→入金」を体験）</td></tr>
+  <tr><td>B案で良い仕入れ候補が10日探しても無い</td><td>リサーチ難度が高い</td><td>SKUを最低単価・高回転の日用品に限定。または1周目Aで満足なら振り返りへ</td></tr>
+  <tr><td>B案で損益が合う商品が無い</td><td>卸の利益が薄い市場</td><td>「薄利の現実を学んだ」と記録し、C案または次フェーズへ論点を送る</td></tr>
+</table>
+
+<div class="card">
+  <h3>KPI 3階層</h3>
+  <ul>
+    <li><strong>北極星:</strong> 出品→販売→入金を1周完走し、学びを言語化できた。</li>
+    <li><strong>先行指標:</strong> A案で初出品完了 / B案で初仕入れ完了。</li>
+    <li><strong>行動指標:</strong> 不用品の棚卸し点数・相場チェック数・NETSEAで損益が合う候補の発見数。</li>
+  </ul>
+</div>
+
+<div class="note">
+  <strong>法務エスカレーションの線引き:</strong> A案・B案（日用品雑貨中心）なら法務エスカレ不要レベル。C案で家電(PSE)・玩具・ブランド品に踏み込む場合のみ法務ハルオへ事前レビュー起票。今回の推奨（A→B日用品）はこのラインを踏まないので、まず法務発注不要で進められます。
+</div>
+
+<h2>付録: 社長への確認事項（任意・進行を止めない範囲）</h2>
+<p>以下は未取得情報だが、推奨（A→B）は回答を待たずに着手可能。回答があれば精度が上がる程度。</p>
+<ol>
+  <li>週にどれくらいリサーチ時間を取れそうか / 外出仕入れ（店舗せどり）も体験したいか。→ B/Cの比重・店舗せどり昇格に影響。</li>
+  <li>1周目からFBA（Amazon倉庫発送）も体験したいか。→ YesならA案を最初からFBAで。</li>
+  <li>不用品で「売りたくない」除外品があるか。</li>
+</ol>
+<p><strong>いずれも回答がなくてもA案の着手は今日から可能です</strong>（自己発送・3〜5点ピックアップから）。</p>
+
+<footer>
+  タケシ（プランナー）/ T-20260603-001 / 2026-06-03<br>
+  事実出典: T-20260520-012（01〜04, サトル）。一次出典は各リサーチ資料末尾の出典セクション参照。
+</footer>
+
+</div>
+</body>
+</html>

@@ -11,3 +11,18 @@
 workspace/output/agent_output/**
 !workspace/output/agent_output/
 !workspace/output/agent_output/.gitkeep
+
+# 成果物カタログ同期の実設定（Web App URL・共有トークンを含むため除外。.example はコミット）
+scripts/catalog/.catalog_sync.env
+
+# APIキー等の秘密情報（全 .env を除外。.env.example はコミット）
+.env
+**/.env
+!**/.env.example
+
+# 社長からの一時ファイル受け渡し（読み込み・整理用、コミット対象外）
+_inbox_社長共有/
+
+# 第三者動画(物販総合研究所)由来の参考メディアはローカル保持のみ（索引READMEのみ追跡）
+docs/reference/poipoi-pocket/screenshots/
+docs/reference/poipoi-pocket/*.docx

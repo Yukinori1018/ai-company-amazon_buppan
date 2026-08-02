@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 260" width="640" height="260" font-family="'Helvetica Neue',Arial,sans-serif">
+  <rect width="640" height="260" fill="#ffffff"/>
+  <!-- Price/quality tag = セレクトショップの値札モチーフ -->
+  <g transform="translate(70,70)">
+    <path d="M0 24 L70 0 L150 0 A14 14 0 0 1 164 14 L164 106 A14 14 0 0 1 150 120 L70 120 L0 96 Z" fill="#C24B3A"/>
+    <circle cx="42" cy="60" r="11" fill="#ffffff"/>
+    <!-- check inside tag -->
+    <path d="M86 60 L104 80 L138 38" fill="none" stroke="#ffffff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g transform="translate(270,0)">
+    <text x="0" y="118" font-size="64" font-weight="700" fill="#2A2A2A" letter-spacing="-1">Satoy</text>
+    <text x="4" y="156" font-size="22" font-weight="500" fill="#C24B3A" letter-spacing="13">SELECT</text>
+    <text x="6" y="188" font-size="13" fill="#6B7280" letter-spacing="2">PICKED FOR YOU</text>
+  </g>
+</svg>

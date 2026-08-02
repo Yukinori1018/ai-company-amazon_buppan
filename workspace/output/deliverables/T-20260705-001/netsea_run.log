@@ -1,0 +1,26 @@
+/Users/yukinori/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+承認サプライヤー総数: 100
+取得商品総数: 1200 / JAN付きユニーク: 327 (JAN網羅率≈27.3%)
+
+=== NETSEA卸起点 密度サマリ ===
+JAN網羅率(卸)          : 27.3% (327/1200)
+Amazon突合成功 N       : 269
+Keepa残トークン        : 582
+黒字差(net>0)          : 65 (24.2%)
+Tier1原石              : 43 (16.0%)
+Tier2持続原石          : 25 (9.3%)
+
+[黒字だった卸商品]
+  net 47086 率 78.5% 相乗  2 月販   0 buy2800 amz60000.0 | ●日本製スライサー SV-3178
+  net 20147 率 72.3% 相乗  1 月販   0 buy2000 amz27864.0 | ●電動シュレッダー USBケーブル付　SV-5349
+  net  7057 率 64.9% 相乗  1 月販   0 buy1608 amz10878.0 | 梅肉エキス粒
+  net  6935 率 64.5% 相乗  1 月販   0 buy1250 amz10758.0 | 【1日あたり20個まで、在庫0の場合当日分終了】ナットウキナーゼ
+  net  6735 率 39.9% 相乗  1 月販   0 buy6400 amz16900.0 | TEIカラー クマケシ1&2
+  net  6514 率 28.0% 相乗  2 月販   0 buy11325 amz23300.0 | 吸湿速乾キルトバランスマットレス　12cm厚／6cm厚
+  net  6103 率 71.0% 相乗  2 月販   0 buy730 amz8600.0 | MOSTチュアブル　ビタミンC
+  net  5268 率 77.7% 相乗  2 月販  36 buy0 amz6780.0 | ★アウトレット★ 玉葱エキス粒徳用
+  net  4829 率 49.8% 相乗  3 月販  26 buy2788 amz9700.0 | 水溶性アガリクス
+  net  3385 率 50.8% 相乗  2 月販  17 buy1620 amz6668.0 | ●ココスクリア 3個セット
+  net  3242 率 46.9% 相乗  2 月販   0 buy1640 amz6918.0 | ●日本製　抗菌エラストマーまな板
+  net  3144 率 67.2% 相乗  2 月販  20 buy0 amz4680.0 | 欠品中　●ベランダ手すり用 鳩対策具 ハトッパー

@@ -1,0 +1,81 @@
+<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>成果物カタログ × Google スプレッドシート連携方法まとめ</title>
+<style>
+body{font-family:-apple-system,"Hiragino Kaku Gothic ProN",sans-serif;line-height:1.7;max-width:900px;margin:2rem auto;padding:0 1rem;color:#222}
+h1{border-bottom:3px solid #2a7;padding-bottom:.3rem}
+h2{border-bottom:1px solid #ccc;padding-bottom:.2rem;margin-top:2rem}
+table{border-collapse:collapse;width:100%;margin:1rem 0}
+th,td{border:1px solid #ccc;padding:.5rem .7rem;text-align:left;vertical-align:top}
+th{background:#f0f7f4}
+code{background:#f4f4f4;padding:.1rem .3rem;border-radius:3px;font-size:.9em}
+pre{background:#1e2a24;color:#d8f0e6;padding:1rem;border-radius:6px;overflow-x:auto}
+pre code{background:none;color:inherit}
+blockquote{border-left:4px solid #2a7;margin:1rem 0;padding:.3rem 1rem;background:#f7faf9;color:#555}
+hr{border:none;border-top:1px solid #ddd;margin:1.5rem 0}
+</style></head><body>
+<h1>成果物カタログ × Google スプレッドシート連携方法まとめ</h1>
+<blockquote>作成: 2026-06-01 / 担当: タカシ（IT）＋マリエ（庶務）/ 関連: T-20260601-001・003・004</blockquote>
+<blockquote>このドキュメント自体が「連携テスト（T-20260601-004）」の題材であり、本文がシートに反映されれば連携成功の証明になります。</blockquote>
+<hr>
+<h2>1. ひとことで言うと</h2>
+<p><strong>リポジトリ内のマスターCSVを「真実」とし、ワンコマンドで Google スプレッドシート（URL固定）へ全置換ミラーする</strong>仕組み。</p>
+<p>成果物が増えるたびに秘書が同期コマンドを1回流すだけで、社長のシートが最新になります。</p>
+<pre><code>
+deliverables/ の成果物
+      │  マリエが棚卸し・要約
+      ▼
+deliverables-catalog.csv（リポ内＝真実）
+      │  python3 scripts/catalog/sync_catalog_to_sheet.py
+      ▼  （HTTPS POST：CSV全文）
+Apps Script Web App（シートに紐づくスクリプト）
+      │  シートを全クリア→全行書き込み（冪等）
+      ▼
+Google スプレッドシート「成果物カタログ_Amazon物販事業」（URL固定）
+</code></pre>
+<hr>
+<h2>2. なぜこの方式（Apps Script Web App）か</h2>
+<p>3案を比較し、<strong>社長の手間が最小・認証情報をPCに残さない・URLが変わらない・将来クラウドからも叩ける</strong>点で採用。</p>
+<table>
+<tr><th>案</th><th>初期設定の重さ</th><th>認証情報の保管</th><th>クラウド可</th><th>採否</th></tr>
+<tr><td><strong>A. Apps Script Web App</strong></td><td>軽（シート内設定のみ）</td><td>置かない（トークンのみ）</td><td>◯</td><td>✅ 採用</td></tr>
+<tr><td>B. gspread + OAuthクライアント</td><td>重（GCPプロジェクト＋client.json）</td><td>client.json をローカル保管</td><td>×</td><td>不採用</td></tr>
+<tr><td>C. サービスアカウント＋共有</td><td>中（SAキー作成＋共有）</td><td>SA鍵JSONをローカル保管</td><td>×</td><td>不採用</td></tr>
+</table>
+<hr>
+<h2>3. 構成ファイル</h2>
+<table>
+<tr><th>ファイル</th><th>役割</th></tr>
+<tr><td><code>scripts/catalog/catalog_sync.gs</code></td><td>シート側に貼る Apps Script。POSTを受けシートを全置換</td></tr>
+<tr><td><code>scripts/catalog/sync_catalog_to_sheet.py</code></td><td>ローカルからCSVを読みPOSTするヘルパー（標準ライブラリのみ・<code>--dry-run</code>対応）</td></tr>
+<tr><td><code>scripts/catalog/.catalog_sync.env</code></td><td>接続情報（URL・トークン）。<strong>gitignore対象＝Gitに載らない</strong></td></tr>
+<tr><td><code>scripts/catalog/.catalog_sync.env.example</code></td><td>設定見本</td></tr>
+<tr><td><code>scripts/catalog/README.md</code></td><td>社長の一度きり初期設定（全10手順）</td></tr>
+<tr><td><code>workspace/output/deliverables/T-20260601-001/deliverables-catalog.csv</code></td><td>マスターCSV（真実）</td></tr>
+</table>
+<hr>
+<h2>4. セキュリティ設計</h2>
+<ul><li><strong>共有トークン方式</strong>: Web Appのアクセス権は「全員」だが、書き込みには合言葉 <code>SHARED_TOKEN</code> が必須。URLを知られても書き込めない。</li><li>トークンはコードに直書きせず、<strong>Apps Scriptの Script Property</strong> と <strong>ローカルの <code>.env</code></strong>（gitignore）に分離保管。</li><li>POSTするのは社長自身のシートに対してのみ。第三者サービスへは一切送らない。</li></ul>
+<hr>
+<h2>5. 運用（成果物が増えたとき）</h2>
+<p>1. マリエがマスターCSVに行を追記（タイトル・内容要約・GitHubリンク等）。</p>
+<p>2. 同期: <code>python3 scripts/catalog/sync_catalog_to_sheet.py</code></p>
+<p>   - 事前確認したい時: <code>python3 scripts/catalog/sync_catalog_to_sheet.py --dry-run</code></p>
+<p>3. シートが最新化（全置換なので重複なし・冪等）。</p>
+<blockquote>クラウド/夜間自走から流す場合は環境変数 <code>WEBAPP_URL</code> / <code>SHARED_TOKEN</code> を渡せば可。無ければCSV追記までに留め、次のローカル回で同期。</blockquote>
+<hr>
+<h2>6. つまずきポイント（実際に踏んだもの）</h2>
+<table>
+<tr><th>症状</th><th>原因</th><th>対処</th></tr>
+<tr><td>「Google hasn&#x27;t verified this app」警告</td><td>未審査の個人スクリプト全般に出る定型表示</td><td>Advanced → プロジェクトに移動 → 許可（自作・自分のシートなので安全）</td></tr>
+<tr><td>HTTP 401（ログインHTMLが返る）</td><td>デプロイのアクセス権が「全員」でない</td><td>デプロイ管理→編集→アクセス「全員」→再デプロイ</td></tr>
+<tr><td>新デプロイでURLが変わる</td><td>「新しいデプロイ」は別URLを発行</td><td>コード修正時は「デプロイ管理→編集→新バージョン」でURL固定</td></tr>
+<tr><td><code>unauthorized</code></td><td><code>.env</code> と Script Property のトークン不一致</td><td>両者を同じ値に揃える</td></tr>
+</table>
+<hr>
+<h2>7. テスト結果（T-20260601-004）</h2>
+<ul><li>2026-06-01 初回疎通: <strong>HTTP 200 / 56行×12列</strong>（T-20260601-003）。</li><li>本ドキュメントを成果物として追加し、カタログ行を増やした状態で再同期 → 反映を確認（このテストの合格判定）。</li></ul>
+<hr>
+<h2>8. 今後の拡張余地（YAGNIで現状見送り）</h2>
+<ul><li>成果物追加を検知して自動同期するフック（<code>deliverables/</code> 監視）。</li><li>夜間自走ルーティンへの組み込み（環境変数経由）。</li><li>列の自動フォーマット（種別ごとの色分け等）— Apps Script側で拡張可能。</li></ul>
+</body></html>
