@@ -1,0 +1,97 @@
+{
+  "ticket": "T-20260803-001",
+  "method": "Amazon起点(Keepa Product Finder 16cat) → JAN逆引き(Yahoo+楽天) → 利益判定",
+  "finder_filter": "rank3000-80000/offers2-10/price1000-10000",
+  "criteria": "原石=率≥8%&利益≥300円 / 持続=+相乗り2-10&月販≥3",
+  "asin_found": 4446,
+  "list_rows": 4446,
+  "has_jan": 3472,
+  "supplier_matched": 2752,
+  "gem_tier1": 83,
+  "durable_tier2": 82,
+  "match_rate_pct": 61.9,
+  "by_category": {
+    "home_kitchen": {
+      "rows": 450,
+      "matched": 344,
+      "gem": 2
+    },
+    "drugstore": {
+      "rows": 400,
+      "matched": 142,
+      "gem": 7
+    },
+    "beauty": {
+      "rows": 349,
+      "matched": 264,
+      "gem": 12
+    },
+    "food": {
+      "rows": 300,
+      "matched": 227,
+      "gem": 28
+    },
+    "diy_tools": {
+      "rows": 350,
+      "matched": 302,
+      "gem": 1
+    },
+    "pet": {
+      "rows": 299,
+      "matched": 177,
+      "gem": 6
+    },
+    "toys": {
+      "rows": 300,
+      "matched": 267,
+      "gem": 7
+    },
+    "hobby": {
+      "rows": 300,
+      "matched": 191,
+      "gem": 3
+    },
+    "sports": {
+      "rows": 249,
+      "matched": 94,
+      "gem": 2
+    },
+    "office": {
+      "rows": 250,
+      "matched": 201,
+      "gem": 6
+    },
+    "baby": {
+      "rows": 250,
+      "matched": 123,
+      "gem": 0
+    },
+    "appliances": {
+      "rows": 249,
+      "matched": 74,
+      "gem": 0
+    },
+    "pc": {
+      "rows": 200,
+      "matched": 103,
+      "gem": 7
+    },
+    "car": {
+      "rows": 200,
+      "matched": 80,
+      "gem": 0
+    },
+    "instruments": {
+      "rows": 150,
+      "matched": 116,
+      "gem": 2
+    },
+    "industrial": {
+      "rows": 150,
+      "matched": 47,
+      "gem": 0
+    }
+  },
+  "tokens_left": 272,
+  "finished_at": "2026-08-03 21:37:51"
+}
