@@ -19,6 +19,19 @@ npm run prisma:generate
 npm run prisma:migrate        # SQLite に初期スキーマを作成
 ```
 
+## 認証を先に単独テスト（推奨）
+
+全体を動かす前に、**SP-API 認証（LWA トークン取得＋疎通）だけ**を最小構成で検証できます。
+SP-API は認証が最も詰まりやすいので、ここが通ってから起動へ進むのが安全です。
+
+```bash
+npm run auth:test
+# Step1: refresh_token→access_token 取得 / Step2: marketplaceParticipations で疎通・権限確認
+```
+
+> 補足: 現行 SP-API は 2023 以降 **AWS SigV4 署名・STS/IAM ロールが不要**になっており、
+> 認証は LWA アクセストークンのみです（旧来の STS トークン取得の複雑さはありません）。
+
 ## 起動
 
 ```bash

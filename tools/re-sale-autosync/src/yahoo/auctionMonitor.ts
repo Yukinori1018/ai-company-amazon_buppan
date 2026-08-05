@@ -35,10 +35,19 @@ export interface AuctionSnapshot {
 
 let lastRequestAt = 0;
 
-/** ポライトネス: 前回リクエストから最低 interval を空ける。 */
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+/**
+ * ポライトネス: 前回リクエストから最低 interval を空ける。
+ * さらに ±40% のランダムジッタを乗せ、一定間隔の機械的アクセスパターンを崩して
+ * IP ブロックを受けにくくする。
+ */
 async function throttle(): Promise<void> {
-  const wait = config.YAHOO_REQUEST_INTERVAL_MS - (Date.now() - lastRequestAt);
-  if (wait > 0) await new Promise((r) => setTimeout(r, wait));
+  const base = config.YAHOO_REQUEST_INTERVAL_MS;
+  const jitter = Math.floor((Math.random() - 0.5) * base * 0.8); // ±40%
+  const target = Math.max(0, base + jitter);
+  const wait = target - (Date.now() - lastRequestAt);
+  if (wait > 0) await sleep(wait);
   lastRequestAt = Date.now();
 }
 
@@ -97,8 +106,12 @@ export function parseAuctionHtml(auctionId: string, html: string): AuctionSnapsh
   return { yahooAuctionId: auctionId, status, currentPrice, endTime };
 }
 
-/** Cheerio（軽量 HTTP 取得）でのスナップショット取得。 */
-async function fetchWithCheerio(auctionId: string): Promise<AuctionSnapshot> {
+/**
+ * Cheerio（軽量 HTTP 取得）でのスナップショット取得。
+ * 429（レート制限）/503（一時的拒否）は指数バックオフ + Retry-After 尊重で最大 2 回再試行。
+ * それでもダメなら UNKNOWN を返し、Amazon 在庫は触らない（誤停止防止）。
+ */
+async function fetchWithCheerio(auctionId: string, attempt = 0): Promise<AuctionSnapshot> {
   await throttle();
   const url = buildUrl(auctionId);
   try {
@@ -108,12 +121,30 @@ async function fetchWithCheerio(auctionId: string): Promise<AuctionSnapshot> {
         'Accept-Language': 'ja,en;q=0.8',
       },
       timeout: 20_000,
-      // 404 も例外にせず自前で判定する
-      validateStatus: (s) => s < 500,
+      // 404/429/503 も例外にせず自前で判定・制御する
+      validateStatus: () => true,
     });
+
     if (res.status === 404) {
       return { yahooAuctionId: auctionId, status: 'NOT_FOUND', currentPrice: null, endTime: null };
     }
+
+    // レート制限・一時的拒否はバックオフ再試行
+    if ((res.status === 429 || res.status === 503) && attempt < 2) {
+      const retryAfter = Number(res.headers?.['retry-after']);
+      const backoff = Number.isFinite(retryAfter)
+        ? retryAfter * 1000
+        : (2 ** attempt) * config.YAHOO_REQUEST_INTERVAL_MS;
+      logger.warn({ auctionId, status: res.status, backoff }, 'yahoo throttled; backing off');
+      await sleep(backoff);
+      return fetchWithCheerio(auctionId, attempt + 1);
+    }
+
+    if (res.status >= 400) {
+      logger.warn({ auctionId, status: res.status }, 'yahoo fetch non-OK; UNKNOWN');
+      return { yahooAuctionId: auctionId, status: 'UNKNOWN', currentPrice: null, endTime: null };
+    }
+
     return parseAuctionHtml(auctionId, res.data);
   } catch (err) {
     logger.warn({ auctionId, err: (err as Error).message }, 'yahoo fetch(cheerio) failed');
