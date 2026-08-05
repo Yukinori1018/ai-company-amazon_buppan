@@ -17,28 +17,45 @@ const commonParams = {
   marketplaceIds: config.SPAPI_MARKETPLACE_ID,
 };
 
+export type FulfillmentType = 'FBA' | 'FBM';
+
 export interface PutListingInput {
   sku: string;
   productType: string; // 例: PET_SUPPLIES。getDefinitionsProductType で ASIN から取得推奨。
   condition: string; // new_new / used_like_new / used_very_good / used_good / used_acceptable
   price: number; // 円
-  quantity: number; // 初期在庫（無在庫なので通常 1）
-  fulfillmentLatencyDays?: number; // ハンドリングタイム（無在庫は長めに設定して仕入れ猶予を確保）
-  merchantShippingGroup?: string;
+  fulfillmentType?: FulfillmentType; // 既定 FBA（即時仕入れ→検品→ラベル→FBA 納品モデル）
+  quantity?: number; // FBM 時の初期在庫。FBA は倉庫実数管理のため無視。
+  fulfillmentLatencyDays?: number; // FBM のハンドリングタイム
 }
 
 /**
- * 新規出品（FBM）。出品者出荷なので fulfillment_availability に自社在庫を記述。
+ * 新規出品。
+ *  - FBA（既定）: fulfillment_channel_code = AMAZON_JP。在庫は Amazon 倉庫の実数で管理されるため
+ *    quantity は指定しない（納品＝Inbound Shipment で反映される）。
+ *  - FBM: fulfillment_channel_code = DEFAULT。自社在庫 quantity とハンドリングタイムを記述。
  * ※ attributes のキーはマーケットプレイス×productType で異なるため、実運用では
  *   getDefinitionsProductType のスキーマに合わせて動的に組み立てること。
+ * ※ FBA 用マーケットプレイス別チャネルコード（日本=AMAZON_JP）は要確認。
  */
 export async function putListing(input: PutListingInput): Promise<{ status: string; submissionId?: string }> {
+  const fulfillmentType = input.fulfillmentType ?? 'FBA';
+  const fulfillmentAvailability =
+    fulfillmentType === 'FBA'
+      ? [{ fulfillment_channel_code: 'AMAZON_JP' }] // FBA: 在庫は倉庫実数管理
+      : [
+          {
+            fulfillment_channel_code: 'DEFAULT', // FBM（出品者出荷）
+            quantity: input.quantity ?? 1,
+            lead_time_to_ship_max_days: input.fulfillmentLatencyDays ?? 5,
+          },
+        ];
+
   const body = {
     productType: input.productType,
     requirements: 'LISTING',
     attributes: {
       condition_type: [{ value: input.condition }],
-      merchant_suggested_asin: undefined, // ASIN 相乗り時は existing offer に紐づくので通常不要
       purchasable_offer: [
         {
           currency: 'JPY',
@@ -46,13 +63,7 @@ export async function putListing(input: PutListingInput): Promise<{ status: stri
           marketplace_id: config.SPAPI_MARKETPLACE_ID,
         },
       ],
-      fulfillment_availability: [
-        {
-          fulfillment_channel_code: 'DEFAULT', // FBM（出品者出荷）
-          quantity: input.quantity,
-          lead_time_to_ship_max_days: input.fulfillmentLatencyDays ?? 5,
-        },
-      ],
+      fulfillment_availability: fulfillmentAvailability,
     },
   };
 
