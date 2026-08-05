@@ -1,0 +1,83 @@
+// Re-Sale AutoSync — Prisma スキーマ
+// 既定は SQLite。PostgreSQL/MySQL へは provider と DATABASE_URL の差し替えで移行可能。
+// （enum を使いたい場合は provider を postgresql/mysql にして String → enum 化）
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+/// Amazon 側の出品（SKU 単位）。1 SKU = 1 監視対象オークションに紐づく。
+model Product {
+  id            String   @id @default(cuid())
+  asin          String
+  sku           String   @unique
+  title         String?
+  productType   String? // SP-API の productType（例: PET_SUPPLIES）。出品 PUT に必須。
+  // 価格計算の内訳（監査用に保存）
+  costPrice     Int // 想定落札価格（円）
+  shippingCost  Int      @default(0) // 仕入れ送料（円）
+  targetMargin  Float    @default(0.2) // 目標利益率（0.20 = 20%）
+  sellPrice     Int // 自動計算された Amazon 販売価格（円）
+  // 現在の Amazon 在庫状態（このツールが管理する希望値）
+  quantity      Int      @default(1) // 1=出品中 / 0=停止
+  listingState  String   @default("PENDING") // PENDING | ACTIVE | INACTIVE | ERROR
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  auction       Auction?
+  syncLogs      SyncLog[]
+
+  @@index([asin])
+  @@index([listingState])
+}
+
+/// 監視対象のヤフオク! オークション。Product と 1:1。
+model Auction {
+  id             String   @id @default(cuid())
+  yahooAuctionId String   @unique // 例: x1234567890
+  url            String
+  // 直近スクレイピングで得た状態
+  status         String   @default("UNKNOWN") // ACTIVE | ENDED | CANCELLED | NOT_FOUND | UNKNOWN
+  currentPrice   Int? // 現在価格 / 落札価格（円）
+  endTime        DateTime? // オークション終了予定時刻
+  lastCheckedAt  DateTime?
+  checkFailCount Int      @default(0) // 連続取得失敗回数（一時的失敗で誤停止しないため）
+  active         Boolean  @default(true) // 監視を続けるか（落札確定後などに false へ）
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  productId      String   @unique
+  product        Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@index([active])
+}
+
+/// 同期処理の監査ログ（いつ・何を根拠に・Amazon をどう変えたか）。
+model SyncLog {
+  id             String   @id @default(cuid())
+  productId      String
+  product        Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  auctionStatus  String // 判定時のヤフオク状態
+  action         String // NO_CHANGE | SET_OUT_OF_STOCK | SET_IN_STOCK | ERROR
+  fromQuantity   Int?
+  toQuantity     Int?
+  spapiStatus    String? // SP-API レスポンス（ACCEPTED 等）や feed 状態
+  message        String?
+  createdAt      DateTime @default(now())
+
+  @@index([productId])
+  @@index([createdAt])
+}
+
+/// グローバル設定（既定利益率・手数料率など）。UI から編集可能にする想定。
+model Setting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}
