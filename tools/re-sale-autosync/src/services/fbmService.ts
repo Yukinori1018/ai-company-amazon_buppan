@@ -5,8 +5,9 @@ import { config } from '../config.js';
 import { logger } from '../logger.js';
 
 /**
- * FBM（無在庫）出品：ヤフオク落札前に Amazon へ出品し、監視対象オークションを紐付ける。
- * 以後 monitorJob が Auction を巡回し、終了/取消で在庫0、再出品で在庫1へ同期する。
+ * 無在庫(FBM)出品：ヤフオク落札前に Amazon へ出品し、監視対象オークションを紐付ける。
+ * 以後 monitorJob が Auction を巡回し、仕入れ不能（終了/取消/価格超過）で在庫0、
+ * 再度仕入れ可能になれば在庫1へ同期する。
  */
 export interface CreateFbmInput {
   asin: string;
@@ -15,7 +16,7 @@ export interface CreateFbmInput {
   productType: string;
   purchasePrice: number; // 想定落札価格
   procurementShipping?: number;
-  prepCost?: number; // 自社発送費など
+  otherCost?: number; // 自社発送費・梱包等
   targetMargin?: number;
   referralRate?: number;
   yahooAuctionId: string; // 監視対象
@@ -26,8 +27,7 @@ export async function createFbmListing(input: CreateFbmInput) {
   const price = calcSellPrice({
     assumedWinningBid: input.purchasePrice,
     procurementShipping: input.procurementShipping ?? 0,
-    prepCost: input.prepCost ?? 0,
-    fbaFee: 0,
+    otherCost: input.otherCost ?? 0,
     targetMargin: input.targetMargin ?? 0.2,
     referralRate: input.referralRate,
   });
@@ -47,15 +47,12 @@ export async function createFbmListing(input: CreateFbmInput) {
       sku: input.sku,
       title: input.title,
       productType: input.productType,
-      fulfillmentType: 'FBM',
       purchasePrice: input.purchasePrice,
       procurementShipping: input.procurementShipping ?? 0,
-      prepCost: input.prepCost ?? 0,
-      fbaFee: 0,
+      otherCost: input.otherCost ?? 0,
       targetMargin: input.targetMargin ?? 0.2,
       sellPrice: price.sellPrice,
-      sourceUrl: `${config.YAHOO_BASE_URL}${input.yahooAuctionId}`,
-      sourceRef: input.yahooAuctionId,
+      maxSourcePrice: price.maxSourcePrice,
       quantity: 1,
       listingState: listing.status === 'DRY_RUN' ? 'DRAFT' : 'ACTIVE',
       auction: {
@@ -70,6 +67,9 @@ export async function createFbmListing(input: CreateFbmInput) {
     include: { auction: true },
   });
 
-  logger.info({ sku: product.sku, auctionId: input.yahooAuctionId }, 'FBM listed & monitoring');
+  logger.info(
+    { sku: product.sku, auctionId: input.yahooAuctionId, maxSourcePrice: price.maxSourcePrice },
+    'FBM listed & monitoring',
+  );
   return { product, listing, price };
 }

@@ -24,9 +24,9 @@ export interface PutListingInput {
   productType: string; // 例: PET_SUPPLIES。getDefinitionsProductType で ASIN から取得推奨。
   condition: string; // new_new / used_like_new / used_very_good / used_good / used_acceptable
   price: number; // 円
-  fulfillmentType?: FulfillmentType; // 既定 FBA（即時仕入れ→検品→ラベル→FBA 納品モデル）
-  quantity?: number; // FBM 時の初期在庫。FBA は倉庫実数管理のため無視。
-  fulfillmentLatencyDays?: number; // FBM のハンドリングタイム
+  fulfillmentType?: FulfillmentType; // 既定 FBM（無在庫）。本ツールは FBM 専用。
+  quantity?: number; // FBM の初期在庫（通常 1）。
+  fulfillmentLatencyDays?: number; // FBM のハンドリングタイム（仕入れ猶予を確保）
 }
 
 /**
@@ -39,7 +39,7 @@ export interface PutListingInput {
  * ※ FBA 用マーケットプレイス別チャネルコード（日本=AMAZON_JP）は要確認。
  */
 export async function putListing(input: PutListingInput): Promise<{ status: string; submissionId?: string }> {
-  const fulfillmentType = input.fulfillmentType ?? 'FBA';
+  const fulfillmentType = input.fulfillmentType ?? 'FBM';
   const fulfillmentAvailability =
     fulfillmentType === 'FBA'
       ? [{ fulfillment_channel_code: 'AMAZON_JP' }] // FBA: 在庫は倉庫実数管理

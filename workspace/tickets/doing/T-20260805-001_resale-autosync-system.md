@@ -59,3 +59,10 @@ next_check_at: 2026-08-06
   - fbmService新設(FBM出品＋Auction紐付け)、syncService復活(ヤフオク状態→Amazon在庫同期)、monitorJobはFBM同期ループへ。
   - UIをFBM監視一覧＋FBAボードの2パネル＋方式切替に。API: /api/fbm/list, /api/monitor/run 追加。
   - DESIGN/README全面更新。FBMパスのポリシー抵触リスクは明記のうえ社長判断で進行。
+- 2026-08-05: 社長方針最終確定。**FBAはアプリ化しない**（Keepa＋Claude検索→社長選定→メーカー仕入れ→FBA
+  の手動運用。※メーカー仕入れ系チケット T-20260705-002/T-20260612-002 の領域）。**アプリはFBM(無在庫)一本**。
+  - FBAアプリコード撤去（pipelineService削除、FBAボード/エンドポイント/pipelineStage/PipelineLog削除）。
+  - スキーマをFBM専用に。核心=「Amazonで売れたのに仕入れられない」リスク低減を強化：
+    損益分岐仕入れ価格 `maxSourcePrice` を導入し、現在価格>maxSourcePrice でも在庫0（利益で仕入れ不能）。
+    終了/取消/消滅は即在庫0。UNKNOWNは触らない。判定理由をSyncLog.reasonに記録。
+  - UIをFBM単一(リサーチ&出品＋監視一覧に状態/現在価格/損益分岐/在庫を表示)に。DESIGN/README全面刷新。

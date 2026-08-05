@@ -7,13 +7,6 @@ import { prisma } from './db.js';
 import { getCatalogItem, searchCatalogItems } from './amazon/catalog.js';
 import { calcSellPrice } from './services/pricing.js';
 import { getAuctionSnapshot } from './yahoo/auctionMonitor.js';
-import {
-  PIPELINE_STAGES,
-  PipelineStage,
-  createSourcedProduct,
-  advanceStage,
-  listToFba,
-} from './services/pipelineService.js';
 import { createFbmListing } from './services/fbmService.js';
 import { runMonitorCycle } from './jobs/monitorJob.js';
 
@@ -25,25 +18,14 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// --- 画面: FBM 監視一覧 ＋ FBA パイプラインボード ---
+// --- 画面: 無在庫(FBM)監視ダッシュボード ---
 app.get('/', async (_req, res) => {
-  const [fbm, fba] = await Promise.all([
-    prisma.product.findMany({
-      where: { fulfillmentType: 'FBM' },
-      include: { auction: true },
-      orderBy: { updatedAt: 'desc' },
-      take: 200,
-    }),
-    prisma.product.findMany({
-      where: { fulfillmentType: 'FBA' },
-      orderBy: { updatedAt: 'desc' },
-      take: 300,
-    }),
-  ]);
-  const board: Record<string, typeof fba> = {};
-  for (const stage of PIPELINE_STAGES) board[stage] = [];
-  for (const p of fba) (board[p.pipelineStage ?? 'SOURCED'] ??= []).push(p);
-  res.render('index', { fbm, board, stages: PIPELINE_STAGES });
+  const products = await prisma.product.findMany({
+    include: { auction: true },
+    orderBy: { updatedAt: 'desc' },
+    take: 300,
+  });
+  res.render('index', { products });
 });
 
 // --- API: Amazon 商品情報の検索（ASIN or キーワード） ---
@@ -63,7 +45,7 @@ app.get('/api/amazon/search', async (req, res) => {
   }
 });
 
-// --- API: ヤフオク! の状態/相場取得（FBM 監視・FBA リサーチ共用） ---
+// --- API: ヤフオク! の状態/相場取得（リサーチ・監視の目視確認用） ---
 app.get('/api/source/yahoo/:auctionId', async (req, res) => {
   try {
     res.json(await getAuctionSnapshot(req.params.auctionId));
@@ -72,16 +54,15 @@ app.get('/api/source/yahoo/:auctionId', async (req, res) => {
   }
 });
 
-// --- API: 価格プレビュー（FBM/FBA 共通・手数料込み試算） ---
+// --- API: 価格プレビュー（販売価格＋損益分岐仕入れ価格の試算） ---
 app.post('/api/price/preview', (req, res) => {
   try {
-    const { purchasePrice, procurementShipping, prepCost, fbaFee, targetMargin } = req.body;
+    const { purchasePrice, procurementShipping, otherCost, targetMargin } = req.body;
     res.json(
       calcSellPrice({
         assumedWinningBid: Number(purchasePrice),
         procurementShipping: Number(procurementShipping ?? 0),
-        prepCost: Number(prepCost ?? 0),
-        fbaFee: Number(fbaFee ?? 0),
+        otherCost: Number(otherCost ?? 0),
         targetMargin: Number(targetMargin ?? 0.2),
       }),
     );
@@ -90,10 +71,8 @@ app.post('/api/price/preview', (req, res) => {
   }
 });
 
-// ============================ FBM（無在庫） ============================
-
-// --- API: FBM 出品＋監視紐付け ---
-app.post('/api/fbm/list', async (req, res) => {
+// --- API: 無在庫出品＋監視紐付け ---
+app.post('/api/list', async (req, res) => {
   try {
     const b = req.body;
     if (!b.asin || !b.sku || !b.productType || !b.yahooAuctionId || b.purchasePrice == null) {
@@ -108,7 +87,7 @@ app.post('/api/fbm/list', async (req, res) => {
       productType: b.productType,
       purchasePrice: Number(b.purchasePrice),
       procurementShipping: Number(b.procurementShipping ?? 0),
-      prepCost: Number(b.prepCost ?? 0),
+      otherCost: Number(b.otherCost ?? 0),
       targetMargin: Number(b.targetMargin ?? 0.2),
       yahooAuctionId: String(b.yahooAuctionId),
     });
@@ -118,62 +97,15 @@ app.post('/api/fbm/list', async (req, res) => {
   }
 });
 
-// --- API: FBM 監視を今すぐ 1 サイクル実行 ---
+// --- API: 監視を今すぐ 1 サイクル実行（デバッグ/運用用） ---
 app.post('/api/monitor/run', async (_req, res) => {
   await runMonitorCycle();
   res.json({ ok: true });
 });
 
-// ============================ FBA（有在庫） ============================
-
-// --- API: 仕入れ登録（SOURCED として起票） ---
-app.post('/api/products', async (req, res) => {
-  try {
-    const b = req.body;
-    if (!b.asin || !b.sku || b.purchasePrice == null) {
-      return res.status(400).json({ error: 'asin, sku, purchasePrice は必須です' });
-    }
-    res.json(
-      await createSourcedProduct({
-        asin: b.asin,
-        sku: b.sku,
-        title: b.title,
-        productType: b.productType,
-        purchasePrice: Number(b.purchasePrice),
-        procurementShipping: Number(b.procurementShipping ?? 0),
-        prepCost: Number(b.prepCost ?? 0),
-        fbaFee: Number(b.fbaFee ?? 0),
-        targetMargin: Number(b.targetMargin ?? 0.2),
-        sourceUrl: b.sourceUrl,
-        sourceRef: b.sourceRef,
-      }),
-    );
-  } catch (err) {
-    res.status(500).json({ error: (err as Error).message });
-  }
-});
-
-// --- API: 段階を1つ進める ---
-app.post('/api/products/:id/advance', async (req, res) => {
-  try {
-    res.json(await advanceStage(req.params.id, String(req.body.toStage) as PipelineStage, req.body.note));
-  } catch (err) {
-    res.status(400).json({ error: (err as Error).message });
-  }
-});
-
-// --- API: FBA 出品（INBOUND → LISTED） ---
-app.post('/api/products/:id/list', async (req, res) => {
-  try {
-    res.json(await listToFba(req.params.id));
-  } catch (err) {
-    res.status(500).json({ error: (err as Error).message });
-  }
-});
-
 app.listen(config.PORT, () => {
   logger.info(
     { port: config.PORT, dryRun: config.DRY_RUN },
-    `Re-Sale AutoSync (FBM+FBA) on http://localhost:${config.PORT}`,
+    `Re-Sale AutoSync (FBM) on http://localhost:${config.PORT}`,
   );
 });

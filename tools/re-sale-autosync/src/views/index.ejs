@@ -3,75 +3,70 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Re-Sale AutoSync — FBM監視 ＋ FBAパイプライン</title>
+  <title>Re-Sale AutoSync — 無在庫(FBM)監視</title>
   <style>
     body { font-family: system-ui, sans-serif; margin: 20px; color: #222; }
-    h1 { font-size: 20px; } h2 { font-size: 15px; }
+    h1 { font-size: 20px; } h2 { font-size: 15px; margin-top: 0; }
     .panel { border: 1px solid #ddd; border-radius: 8px; padding: 14px; margin-bottom: 20px; }
     .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end; }
     label { font-size: 11px; color: #555; display: block; }
-    input, select { padding: 5px; width: 130px; box-sizing: border-box; }
+    input { padding: 5px; width: 130px; box-sizing: border-box; }
     button { padding: 6px 12px; cursor: pointer; }
     table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
     th, td { border-bottom: 1px solid #eee; padding: 5px 6px; text-align: left; }
     .badge { padding: 2px 7px; border-radius: 999px; font-size: 11px; }
-    .ACTIVE, .LISTED { background: #e6f4ea; color: #137333; }
-    .INACTIVE, .ENDED, .CANCELLED, .NOT_FOUND { background: #fce8e6; color: #c5221f; }
-    .DRAFT, .PENDING, .UNKNOWN { background: #fef7e0; color: #b06000; }
-    .board { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; align-items: start; }
-    .col { background: #f6f7f9; border-radius: 8px; padding: 8px; min-height: 90px; }
-    .col h3 { font-size: 11px; margin: 4px 0 8px; text-align: center; color: #444; }
-    .card { background: #fff; border: 1px solid #e2e2e2; border-radius: 6px; padding: 7px; margin-bottom: 7px; font-size: 11px; }
-    .card button { font-size: 10px; padding: 3px 6px; margin-top: 5px; }
+    .ACTIVE { background: #e6f4ea; color: #137333; }
+    .INACTIVE, .ENDED, .CANCELLED, .NOT_FOUND, .ERROR { background: #fce8e6; color: #c5221f; }
+    .DRAFT, .UNKNOWN { background: #fef7e0; color: #b06000; }
     .out { background: #f5f5f5; padding: 8px; font-family: monospace; white-space: pre-wrap; margin-top: 10px; font-size: 12px; }
-    .fba-only { display: none; }
-    .muted { color: #777; }
+    .muted { color: #777; } .note { font-size: 12px; color: #666; }
+    .over { color: #c5221f; font-weight: bold; }
   </style>
 </head>
 <body>
-  <h1>Re-Sale AutoSync</h1>
+  <h1>Re-Sale AutoSync — 無在庫(FBM)監視</h1>
+  <p class="note">目的：仕入れ元(ヤフオク)が仕入れ不能になった瞬間に Amazon 在庫を 0 にし、「売れたのに買えない」注文を防ぐ。</p>
 
-  <!-- 共通フォーム: FBM/FBA を切替 -->
+  <!-- リサーチ＆出品 -->
   <div class="panel">
-    <h2 style="margin-top:0;">リサーチ＆登録</h2>
+    <h2>リサーチ＆出品</h2>
     <div class="row">
-      <div><label>方式</label>
-        <select id="mode" onchange="onModeChange()">
-          <option value="FBM">FBM（無在庫・ヤフオク監視）</option>
-          <option value="FBA">FBA（即時仕入れ→検品→ラベル→納品）</option>
-        </select>
-      </div>
       <div><label>ASIN</label><input id="asin" placeholder="B0XXXXXXXX" /></div>
       <div><label>SKU</label><input id="sku" placeholder="YFO-0001" /></div>
       <div><label>productType</label><input id="productType" placeholder="PET_SUPPLIES" /></div>
-      <div id="wrap-yahoo"><label>ヤフオクID（FBM必須）</label><input id="yahooAuctionId" placeholder="x123..." /></div>
-      <div><label>想定/落札価格</label><input id="purchasePrice" type="number" value="3000" /></div>
+      <div><label>ヤフオクID</label><input id="yahooAuctionId" placeholder="x123..." /></div>
+      <div><label>想定落札価格</label><input id="purchasePrice" type="number" value="3000" /></div>
       <div><label>仕入送料</label><input id="procurementShipping" type="number" value="800" /></div>
-      <div><label id="prepLabel">自社発送費/外注費</label><input id="prepCost" type="number" value="200" /></div>
-      <div class="fba-only"><label>FBA配送手数料</label><input id="fbaFee" type="number" value="500" /></div>
+      <div><label>自社発送費</label><input id="otherCost" type="number" value="350" /></div>
       <div><label>目標利益率</label><input id="targetMargin" type="number" step="0.01" value="0.20" /></div>
     </div>
     <div style="margin-top:10px;">
-      <button onclick="preview()">利益プレビュー</button>
-      <button onclick="submitMain()" id="submitBtn">FBM出品＋監視開始</button>
+      <button onclick="preview()">価格プレビュー</button>
+      <button onclick="submitList()">出品＋監視開始</button>
     </div>
     <div id="out" class="out"></div>
   </div>
 
-  <!-- FBM 監視一覧 -->
+  <!-- 監視一覧 -->
   <div class="panel">
-    <h2 style="margin-top:0;">FBM 無在庫監視（<%= fbm.length %>件）
+    <h2>監視中（<%= products.length %>件）
       <button onclick="runMonitor()" style="float:right;">今すぐ監視を1周</button>
     </h2>
     <table>
-      <thead><tr><th>SKU</th><th>ASIN</th><th>ヤフオクID</th><th>ヤフオク状態</th><th>在庫</th><th>出品状態</th><th>価格</th></tr></thead>
+      <thead>
+        <tr><th>SKU</th><th>ASIN</th><th>ヤフオクID</th><th>状態</th><th>現在価格</th><th>損益分岐</th><th>在庫</th><th>出品状態</th><th>販売価格</th></tr>
+      </thead>
       <tbody>
-        <% fbm.forEach(function (p) { %>
+        <% products.forEach(function (p) {
+             const a = p.auction; const price = a && a.currentPrice != null ? a.currentPrice : null;
+             const over = price != null && price > p.maxSourcePrice; %>
           <tr>
             <td><%= p.sku %></td>
             <td><%= p.asin %></td>
-            <td><%= p.auction ? p.auction.yahooAuctionId : '-' %></td>
-            <td><span class="badge <%= p.auction ? p.auction.status : 'UNKNOWN' %>"><%= p.auction ? p.auction.status : '-' %></span></td>
+            <td><%= a ? a.yahooAuctionId : '-' %></td>
+            <td><span class="badge <%= a ? a.status : 'UNKNOWN' %>"><%= a ? a.status : '-' %></span></td>
+            <td class="<%= over ? 'over' : '' %>"><%= price != null ? '¥' + price.toLocaleString() : '-' %></td>
+            <td class="muted">¥<%= p.maxSourcePrice.toLocaleString() %></td>
             <td><%= p.quantity %></td>
             <td><span class="badge <%= p.listingState %>"><%= p.listingState %></span></td>
             <td>¥<%= p.sellPrice.toLocaleString() %></td>
@@ -79,78 +74,32 @@
         <% }); %>
       </tbody>
     </table>
-  </div>
-
-  <!-- FBA パイプラインボード -->
-  <div class="panel">
-    <h2 style="margin-top:0;">FBA 仕入れパイプライン</h2>
-    <div class="board">
-      <% const labels = { SOURCED:'仕入済', INSPECTED:'検品済', RELABELED:'ラベル貼替済', INBOUND:'FBA納品済', LISTED:'出品中', SOLD_OUT:'在庫切れ' }; %>
-      <% const nextOf = { SOURCED:'INSPECTED', INSPECTED:'RELABELED', RELABELED:'INBOUND', INBOUND:'LISTED', LISTED:'SOLD_OUT' }; %>
-      <% stages.forEach(function (stage) { %>
-        <div class="col">
-          <h3><%= labels[stage] %>（<%= board[stage].length %>）</h3>
-          <% board[stage].forEach(function (p) { %>
-            <div class="card">
-              <b><%= p.sku %></b><br /><span class="muted"><%= p.asin %></span><br />¥<%= p.sellPrice.toLocaleString() %>
-              <% if (stage === 'INBOUND') { %>
-                <br /><button onclick="listFba('<%= p.id %>')">FBA出品</button>
-              <% } else if (nextOf[stage]) { %>
-                <br /><button onclick="advance('<%= p.id %>','<%= nextOf[stage] %>')">→ <%= labels[nextOf[stage]] %></button>
-              <% } %>
-            </div>
-          <% }); %>
-        </div>
-      <% }); %>
-    </div>
+    <p class="note">「現在価格 &gt; 損益分岐」になると利益で仕入れ不能と判定し、次サイクルで在庫を0にします。</p>
   </div>
 
   <script>
     const $ = (id) => document.getElementById(id);
     const show = (o) => ($('out').textContent = JSON.stringify(o, null, 2));
     const num = (id) => +$(id).value;
-
-    function onModeChange() {
-      const fba = $('mode').value === 'FBA';
-      document.querySelectorAll('.fba-only').forEach((e) => (e.style.display = fba ? 'block' : 'none'));
-      $('wrap-yahoo').style.display = fba ? 'none' : 'block';
-      $('prepLabel').textContent = fba ? '外注プレップ費' : '自社発送費';
-      $('submitBtn').textContent = fba ? '仕入れ登録（SOURCED）' : 'FBM出品＋監視開始';
-    }
-
-    function commonBody() {
+    function body() {
       return {
         asin: $('asin').value, sku: $('sku').value, productType: $('productType').value,
-        purchasePrice: num('purchasePrice'), procurementShipping: num('procurementShipping'),
-        prepCost: num('prepCost'), fbaFee: num('fbaFee'), targetMargin: num('targetMargin'),
+        yahooAuctionId: $('yahooAuctionId').value, purchasePrice: num('purchasePrice'),
+        procurementShipping: num('procurementShipping'), otherCost: num('otherCost'),
+        targetMargin: num('targetMargin'),
       };
     }
     async function post(url, data) {
       const r = await fetch(url, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(data || {}) });
       return { ok: r.ok, json: await r.json() };
     }
-    async function preview() { show((await post('/api/price/preview', commonBody())).json); }
-
-    async function submitMain() {
-      let r;
-      if ($('mode').value === 'FBA') {
-        r = await post('/api/products', commonBody());
-      } else {
-        r = await post('/api/fbm/list', { ...commonBody(), yahooAuctionId: $('yahooAuctionId').value });
-      }
+    async function preview() { show((await post('/api/price/preview', body())).json); }
+    async function submitList() {
+      const r = await post('/api/list', body());
       show(r.json);
       if (r.ok) setTimeout(() => location.reload(), 1000);
     }
     async function runMonitor() { await post('/api/monitor/run', {}); location.reload(); }
-    async function advance(id, toStage) {
-      const r = await post('/api/products/' + id + '/advance', { toStage });
-      if (r.ok) location.reload(); else show(r.json);
-    }
-    async function listFba(id) {
-      const r = await post('/api/products/' + id + '/list', {});
-      show(r.json); if (r.ok) setTimeout(() => location.reload(), 900);
-    }
-    onModeChange();
   </script>
 </body>
 </html>

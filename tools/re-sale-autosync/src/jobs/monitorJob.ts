@@ -6,16 +6,15 @@ import { config } from '../config.js';
 import { logger } from '../logger.js';
 
 /**
- * 定期実行ワーカー（既定 20 分おき）。
+ * 定期実行ワーカー（既定 20 分おき）— 無在庫(FBM)の仕入れ可能性の監視。
  *
- * 主目的は FBM（無在庫）の在庫同期：
- *   active な Auction（= FBM 商品）を巡回し、ヤフオク状態に応じて Amazon 在庫を 0/1 に同期。
+ *   active な Auction を巡回し、仕入れ元の状態/価格に応じて Amazon 在庫を 0/1 に同期。
+ *   目的は「Amazonで売れたのに仕入れられない」注文を出さないこと（アカウント健全性の保護）。
  *   - p-limit で同時実行数を絞る（ヤフオク/Amazon 双方の負荷・レート制御）
  *   - Promise.allSettled で 1 件の失敗が全体を止めないようにする
  *   - running フラグで多重起動を防止
  *
- * FBA（有在庫）商品は Auction を持たないため、この同期の対象にならない。
- * （FBA 在庫残数チェック・価格追随は Phase 2 で本ワーカーに追加予定。）
+ * 監視間隔を詰めるほど「売れたのに買えない」窓は小さくなる（MONITOR_CRON で調整）。
  */
 
 const limit = pLimit(config.MONITOR_CONCURRENCY);
@@ -41,8 +40,6 @@ export async function runMonitorCycle(): Promise<void> {
       { total: targets.length, failed, ms: Date.now() - startedAt },
       'FBM monitor cycle done',
     );
-    // TODO(Phase2): FBA 在庫残数チェック（FBA Inventory API）→ 再仕入れアラート。
-    // TODO(Phase2): Amazon 価格追随（Product Pricing API）→ 利益割れ通知/リプライス。
   } catch (err) {
     logger.error({ err: (err as Error).message }, 'monitor cycle fatal');
   } finally {

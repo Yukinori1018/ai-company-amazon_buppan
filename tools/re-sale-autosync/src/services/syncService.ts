@@ -4,25 +4,43 @@ import { setInStock, setOutOfStock } from '../amazon/listings.js';
 import { logger } from '../logger.js';
 
 /**
- * FBM（無在庫）専用：ヤフオク状態 → Amazon 在庫の同期。
- *   ACTIVE                         → 在庫 1（出品中）
- *   ENDED / CANCELLED / NOT_FOUND  → 在庫 0（停止）
- *   UNKNOWN                        → 変更しない（誤停止防止。連続失敗が閾値超で人手確認）
+ * 無在庫(FBM)の在庫同期 = 「仕入れ可能性(procurability)」の監視。
  *
- * FBA 商品は Auction を持たないため、この同期の対象にならない。
+ * 本ツールの核心目的:「Amazonで売れたのに仕入れられない」注文を発生させないこと。
+ *   → 仕入れ元(オークション)が仕入れ不能になった瞬間に Amazon 在庫を 0 にする。
+ *
+ * 判定（希望在庫）:
+ *   ENDED / CANCELLED / NOT_FOUND        → 0（仕入れ元が消滅。この一点物はもう買えない）
+ *   ACTIVE かつ 現在価格 > maxSourcePrice → 0（価格が損益分岐超過＝利益で仕入れ不能）
+ *   ACTIVE かつ 価格が範囲内               → 1（仕入れ可能）
+ *   UNKNOWN                              → 変更しない（誤停止/誤出品の双方を防ぐ）
  */
 const UNKNOWN_FAIL_THRESHOLD = 3;
 
-function desiredQuantity(status: AuctionStatus): number | null {
+interface Decision {
+  quantity: number | null; // null = 触らない
+  reason: string;
+}
+
+function decide(
+  status: AuctionStatus,
+  currentPrice: number | null,
+  maxSourcePrice: number,
+): Decision {
   switch (status) {
-    case 'ACTIVE':
-      return 1;
     case 'ENDED':
+      return { quantity: 0, reason: 'AUCTION_ENDED' };
     case 'CANCELLED':
+      return { quantity: 0, reason: 'AUCTION_CANCELLED' };
     case 'NOT_FOUND':
-      return 0;
+      return { quantity: 0, reason: 'AUCTION_NOT_FOUND' };
+    case 'ACTIVE':
+      if (currentPrice != null && currentPrice > maxSourcePrice) {
+        return { quantity: 0, reason: `PRICE_OVER_MAX(${currentPrice}>${maxSourcePrice})` };
+      }
+      return { quantity: 1, reason: 'PROCURABLE' };
     default:
-      return null; // UNKNOWN = 触らない
+      return { quantity: null, reason: 'UNKNOWN_SKIP' };
   }
 }
 
@@ -32,12 +50,10 @@ export async function syncOne(productId: string): Promise<void> {
     where: { id: productId },
     include: { auction: true },
   });
-  if (!product || !product.auction) return;
-  if (product.fulfillmentType !== 'FBM') return; // FBA は同期対象外
-  if (!product.auction.active) return;
+  if (!product || !product.auction || !product.auction.active) return;
 
   const snap = await getAuctionSnapshot(product.auction.yahooAuctionId);
-  const desired = desiredQuantity(snap.status);
+  const { quantity: desired, reason } = decide(snap.status, snap.currentPrice, product.maxSourcePrice);
 
   await prisma.auction.update({
     where: { id: product.auction.id },
@@ -57,12 +73,12 @@ export async function syncOne(productId: string): Promise<void> {
         'UNKNOWN が連続。手動確認が必要',
       );
     }
-    await log(productId, snap.status, 'NO_CHANGE', product.quantity, product.quantity, 'UNKNOWN: skip');
+    await log(productId, snap.status, reason, 'NO_CHANGE', product.quantity, product.quantity);
     return;
   }
 
   if (desired === product.quantity) {
-    await log(productId, snap.status, 'NO_CHANGE', product.quantity, desired);
+    await log(productId, snap.status, reason, 'NO_CHANGE', product.quantity, desired);
     return;
   }
 
@@ -72,24 +88,26 @@ export async function syncOne(productId: string): Promise<void> {
       where: { id: productId },
       data: { quantity: desired, listingState: desired === 0 ? 'INACTIVE' : 'ACTIVE' },
     });
-    if (snap.status === 'ENDED' || snap.status === 'CANCELLED') {
+    // 終了/取消でその一点物が消えたら監視終了（価格超過は復帰し得るので監視継続）
+    if (snap.status === 'ENDED' || snap.status === 'CANCELLED' || snap.status === 'NOT_FOUND') {
       await prisma.auction.update({ where: { id: product.auction.id }, data: { active: false } });
     }
     await log(
       productId,
       snap.status,
+      reason,
       desired === 0 ? 'SET_OUT_OF_STOCK' : 'SET_IN_STOCK',
       product.quantity,
       desired,
       res.status,
     );
     logger.info(
-      { sku: product.sku, from: product.quantity, to: desired, status: snap.status },
+      { sku: product.sku, from: product.quantity, to: desired, status: snap.status, reason },
       'FBM synced',
     );
   } catch (err) {
     await prisma.product.update({ where: { id: productId }, data: { listingState: 'ERROR' } });
-    await log(productId, snap.status, 'ERROR', product.quantity, desired, undefined, (err as Error).message);
+    await log(productId, snap.status, reason, 'ERROR', product.quantity, desired, undefined, (err as Error).message);
     throw err;
   }
 }
@@ -97,6 +115,7 @@ export async function syncOne(productId: string): Promise<void> {
 async function log(
   productId: string,
   auctionStatus: string,
+  reason: string,
   action: string,
   fromQuantity?: number,
   toQuantity?: number,
@@ -104,6 +123,6 @@ async function log(
   message?: string,
 ): Promise<void> {
   await prisma.syncLog.create({
-    data: { productId, auctionStatus, action, fromQuantity, toQuantity, spapiStatus, message },
+    data: { productId, auctionStatus, reason, action, fromQuantity, toQuantity, spapiStatus, message },
   });
 }
