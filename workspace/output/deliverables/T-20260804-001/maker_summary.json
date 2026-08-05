@@ -1,0 +1,13 @@
+{
+  "ticket": "T-20260804-001",
+  "method": "Keepa Finder(本体不在×競合2+×ランク5万-15万・13カテゴリ) → brand/manufacturer直読み → 想定仕入価格逆算 → メーカー名寄せ",
+  "criteria": "①Amazon本体不在 ②FBAライバル≥2 ③ランク50000-150000 / 想定仕入価格=純利益率25%の税込上限(手数料+FBA+納品送料+外注100円計上)",
+  "asin_found": 5200,
+  "product_rows": 7840,
+  "criteria_ok_rows": 7764,
+  "unique_makers": 3282,
+  "makers_criteria_ok": 3252,
+  "chusho_makers": 3181,
+  "tokens_left": 156,
+  "finished_at": "2026-08-05 11:07:49"
+}

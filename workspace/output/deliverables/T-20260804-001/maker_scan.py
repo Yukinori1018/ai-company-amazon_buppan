@@ -165,24 +165,42 @@ def main():
         f"目標ASIN計={len(CATS)*TARGET_PER_CAT} 目標利益率{TARGET_MARGIN*100:.0f}%")
 
     # Phase1: Finder
+    ASIN_MAP = OUT / "asin_map.json"
     cat_map = {}
     fee_map = {}
-    for ckey, (cid, feecat) in CATS.items():
-        got = finder_asins(kb, cid, TARGET_PER_CAT)
-        for a in got:
-            cat_map.setdefault(a, ckey)
-            fee_map.setdefault(a, feecat)
-        log(f"[Finder] {ckey}: {len(got)}件 (累計{len(cat_map)}) tokensLeft={kb.last_tokens_left}")
+    if ASIN_MAP.exists():
+        m = json.loads(ASIN_MAP.read_text(encoding="utf-8"))
+        for a, pair in m.items():
+            cat_map[a] = pair[0]; fee_map[a] = pair[1]
+        log(f"[resume] asin_map読込 {len(cat_map)}件（Finderスキップ）")
+    else:
+        for ckey, (cid, feecat) in CATS.items():
+            got = finder_asins(kb, cid, TARGET_PER_CAT)
+            for a in got:
+                cat_map.setdefault(a, ckey)
+                fee_map.setdefault(a, feecat)
+            log(f"[Finder] {ckey}: {len(got)}件 (累計{len(cat_map)}) tokensLeft={kb.last_tokens_left}")
+        ASIN_MAP.write_text(json.dumps({a: [cat_map[a], fee_map[a]] for a in cat_map},
+                                       ensure_ascii=False), encoding="utf-8")
     asins = list(cat_map.keys())
     log(f"=== Phase1完了: 本体不在×競合2+×ランク帯 ASIN {len(asins)}件 ===")
 
-    # Phase2: 詳細取得 → メーカー抽出 → 想定仕入価格
+    # 既存CSVから再開（電源断対策）: 処理済み行を読み込み、済みASINはスキップ
     rows = []
     seen = set()
+    if PROD_CSV.exists():
+        with open(PROD_CSV, encoding="utf-8") as f:
+            for r in csv.DictReader(f):
+                rows.append(r); seen.add(r["asin"])
+        log(f"[resume] 既存 {len(rows)}行を読込・処理済ASINをスキップ")
+
+    # Phase2: 詳細取得 → メーカー抽出 → 想定仕入価格
+    todo = [a for a in asins if a not in seen]
+    log(f"=== Phase2: 残り {len(todo)}件を処理（済{len(seen)}） ===")
     i = 0
-    while i < len(asins):
+    while i < len(todo):
         wait_tokens(kb)
-        chunk = asins[i:i + DETAIL_CHUNK]
+        chunk = todo[i:i + DETAIL_CHUNK]
         i += DETAIL_CHUNK
         try:
             pay = kb._request(asin=",".join(chunk))
@@ -226,12 +244,21 @@ def main():
                 "note": ("要連絡先確認" if scale == "中小候補" else "大手/海外の可能性→代理店窓口"),
                 "amazon_url": f"https://www.amazon.co.jp/dp/{ap.asin}",
             })
-        log(f"  詳細 {min(i,len(asins))}/{len(asins)} メーカー付与行={len(rows)} tokensLeft={pay.get('tokensLeft')}")
+        log(f"  詳細 {min(i,len(todo))}/{len(todo)} メーカー付与行={len(rows)} tokensLeft={pay.get('tokensLeft')}")
         write_prod(rows)
         time.sleep(0.2)
     write_prod(rows)
 
-    # Phase3: メーカー名寄せ台帳
+    # Phase3: メーカー名寄せ台帳（loaded行=文字列/新規行=native の両対応で係数化）
+    def _i(v):
+        try:
+            return int(float(v))
+        except (TypeError, ValueError):
+            return 0
+
+    def _tf(v):
+        return v is True or str(v).strip().lower() in ("true", "1", "yes")
+
     led = {}
     for r in rows:
         key = r["manufacturer"] or r["brand"]
@@ -242,14 +269,14 @@ def main():
                                  "scale_flag": r["scale_flag"]})
         d["brands"].add(r["brand"])
         d["n_products"] += 1
-        if r["criteria_ok"]:
+        if _tf(r["criteria_ok"]):
             d["n_criteria_ok"] += 1
-        ms = r["monthly_sales"] or 0
+        ms = _i(r["monthly_sales"])
         d["sum_monthly"] += ms
         d["categories"].add(r["category"])
         if ms > d["top_ms"]:
             d["top_ms"] = ms; d["top_asin"] = r["asin"]
-        p = r["amazon_price"] or 0
+        p = _i(r["amazon_price"])
         if p:
             d["price_min"] = p if d["price_min"] is None else min(d["price_min"], p)
             d["price_max"] = p if d["price_max"] is None else max(d["price_max"], p)
@@ -274,7 +301,7 @@ def main():
         "method": "Keepa Finder(本体不在×競合2+×ランク5万-15万・13カテゴリ) → brand/manufacturer直読み → 想定仕入価格逆算 → メーカー名寄せ",
         "criteria": f"①Amazon本体不在 ②FBAライバル≥2 ③ランク{RANK_LO}-{RANK_HI} / 想定仕入価格=純利益率{TARGET_MARGIN*100:.0f}%の税込上限(手数料+FBA+納品送料+外注{OTHER_COSTS}円計上)",
         "asin_found": len(asins), "product_rows": len(rows),
-        "criteria_ok_rows": sum(1 for r in rows if r["criteria_ok"]),
+        "criteria_ok_rows": sum(1 for r in rows if _tf(r["criteria_ok"])),
         "unique_makers": len(ledger),
         "makers_criteria_ok": sum(1 for d in ledger if d["n_criteria_ok"] > 0),
         "chusho_makers": sum(1 for d in ledger if d["scale_flag"] == "中小候補"),
