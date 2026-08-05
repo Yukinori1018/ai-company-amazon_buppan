@@ -1,6 +1,10 @@
-// Re-Sale AutoSync — Prisma スキーマ
+// Re-Sale AutoSync — Prisma スキーマ（FBA 有在庫モデル）
+//
+// 採用モデル: 即時仕入れ(ヤフオク落札)→ 検品 → ラベル貼替(外注) → FBA 納品 → 出品中
+// 無在庫(FBM)前提の「ヤフオク在庫→Amazon在庫0/1 リアルタイム同期」は廃止。
+// 実物を保有するため、1 SKU = 1 商品を「仕入れ〜FBA納品〜出品」のパイプラインで管理する。
+//
 // 既定は SQLite。PostgreSQL/MySQL へは provider と DATABASE_URL の差し替えで移行可能。
-// （enum を使いたい場合は provider を postgresql/mysql にして String → enum 化）
 
 generator client {
   provider = "prisma-client-js"
@@ -11,71 +15,59 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-/// Amazon 側の出品（SKU 単位）。1 SKU = 1 監視対象オークションに紐づく。
+/// 仕入れた 1 商品（SKU 単位）。仕入れ〜FBA納品〜出品の状態を pipelineStage で追う。
 model Product {
-  id            String   @id @default(cuid())
-  asin          String
-  sku           String   @unique
-  title         String?
-  productType   String? // SP-API の productType（例: PET_SUPPLIES）。出品 PUT に必須。
-  // 価格計算の内訳（監査用に保存）
-  costPrice     Int // 想定落札価格（円）
-  shippingCost  Int      @default(0) // 仕入れ送料（円）
-  targetMargin  Float    @default(0.2) // 目標利益率（0.20 = 20%）
-  sellPrice     Int // 自動計算された Amazon 販売価格（円）
-  // 現在の Amazon 在庫状態（このツールが管理する希望値）
-  quantity      Int      @default(1) // 1=出品中 / 0=停止
-  listingState  String   @default("PENDING") // PENDING | ACTIVE | INACTIVE | ERROR
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id                  String    @id @default(cuid())
+  asin                String
+  sku                 String    @unique
+  title               String?
+  productType         String? // SP-API の productType（出品 PUT に必須）
 
-  auction       Auction?
-  syncLogs      SyncLog[]
+  // --- 原価内訳（利益計算・監査用） ---
+  purchasePrice       Int // 落札価格（円）
+  procurementShipping Int       @default(0) // 仕入れ送料（円）
+  prepCost            Int       @default(0) // 検品・ラベル貼替(外注)＋FBA入庫送料（円）
+  fbaFee              Int       @default(0) // FBA 配送代行手数料（円/個）
+  targetMargin        Float     @default(0.2) // 目標利益率
+  sellPrice           Int // 自動計算した Amazon 販売価格（円）
 
+  // --- 仕入れ元（一度きり。監視はしない） ---
+  sourceUrl           String? // 仕入れ元 URL（ヤフオク等）
+  sourceRef           String? // ヤフオクのオークションID 等
+  purchasedAt         DateTime?
+
+  // --- FBA パイプライン ---
+  // SOURCED(仕入済) → INSPECTED(検品済) → RELABELED(ラベル貼替済) → INBOUND(FBA納品済)
+  //   → LISTED(出品中) → SOLD_OUT(在庫切れ)
+  pipelineStage       String    @default("SOURCED")
+  listingState        String    @default("DRAFT") // DRAFT | LISTED | INACTIVE | ERROR
+  fnsku               String? // FBA ラベル(FNSKU)。ラベル貼替の実体。
+
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  logs                PipelineLog[]
+
+  @@index([pipelineStage])
   @@index([asin])
   @@index([listingState])
 }
 
-/// 監視対象のヤフオク! オークション。Product と 1:1。
-model Auction {
-  id             String   @id @default(cuid())
-  yahooAuctionId String   @unique // 例: x1234567890
-  url            String
-  // 直近スクレイピングで得た状態
-  status         String   @default("UNKNOWN") // ACTIVE | ENDED | CANCELLED | NOT_FOUND | UNKNOWN
-  currentPrice   Int? // 現在価格 / 落札価格（円）
-  endTime        DateTime? // オークション終了予定時刻
-  lastCheckedAt  DateTime?
-  checkFailCount Int      @default(0) // 連続取得失敗回数（一時的失敗で誤停止しないため）
-  active         Boolean  @default(true) // 監視を続けるか（落札確定後などに false へ）
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-
-  productId      String   @unique
-  product        Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-
-  @@index([status])
-  @@index([active])
-}
-
-/// 同期処理の監査ログ（いつ・何を根拠に・Amazon をどう変えたか）。
-model SyncLog {
-  id             String   @id @default(cuid())
-  productId      String
-  product        Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  auctionStatus  String // 判定時のヤフオク状態
-  action         String // NO_CHANGE | SET_OUT_OF_STOCK | SET_IN_STOCK | ERROR
-  fromQuantity   Int?
-  toQuantity     Int?
-  spapiStatus    String? // SP-API レスポンス（ACCEPTED 等）や feed 状態
-  message        String?
-  createdAt      DateTime @default(now())
+/// パイプラインの状態遷移ログ（いつ・どの段階へ・誰/何の操作で動いたか）。
+model PipelineLog {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  fromStage String?
+  toStage   String
+  note      String?
+  createdAt DateTime @default(now())
 
   @@index([productId])
   @@index([createdAt])
 }
 
-/// グローバル設定（既定利益率・手数料率など）。UI から編集可能にする想定。
+/// グローバル設定（既定利益率・手数料率・外注単価など）。UI から編集可能にする想定。
 model Setting {
   key       String   @id
   value     String

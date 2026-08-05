@@ -3,105 +3,105 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Re-Sale AutoSync — 監視ダッシュボード</title>
+  <title>Re-Sale AutoSync — FBA仕入れパイプライン</title>
   <style>
-    body { font-family: system-ui, sans-serif; margin: 24px; color: #222; }
+    body { font-family: system-ui, sans-serif; margin: 20px; color: #222; }
     h1 { font-size: 20px; }
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-    .card { border: 1px solid #ddd; border-radius: 8px; padding: 16px; }
-    label { display: block; font-size: 12px; color: #555; margin-top: 8px; }
-    input, select { width: 100%; padding: 6px; box-sizing: border-box; }
-    button { margin-top: 12px; padding: 8px 14px; cursor: pointer; }
-    table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 13px; }
-    th, td { border-bottom: 1px solid #eee; padding: 6px 8px; text-align: left; }
-    .badge { padding: 2px 8px; border-radius: 999px; font-size: 12px; }
-    .ACTIVE { background: #e6f4ea; color: #137333; }
-    .INACTIVE, .ENDED, .CANCELLED, .NOT_FOUND { background: #fce8e6; color: #c5221f; }
-    .PENDING, .UNKNOWN { background: #fef7e0; color: #b06000; }
-    .out { background: #f5f5f5; padding: 8px; font-family: monospace; white-space: pre-wrap; }
+    .research { border: 1px solid #ddd; border-radius: 8px; padding: 14px; margin-bottom: 20px; }
+    .research .row { display: flex; flex-wrap: wrap; gap: 8px; }
+    .research label { font-size: 11px; color: #555; display: block; }
+    .research input { padding: 5px; width: 130px; }
+    button { padding: 6px 12px; cursor: pointer; }
+    .board { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; align-items: start; }
+    .col { background: #f6f7f9; border-radius: 8px; padding: 8px; min-height: 120px; }
+    .col h3 { font-size: 12px; margin: 4px 0 8px; text-align: center; color: #444; }
+    .card { background: #fff; border: 1px solid #e2e2e2; border-radius: 6px; padding: 8px; margin-bottom: 8px; font-size: 12px; }
+    .card b { font-size: 12px; }
+    .muted { color: #777; }
+    .card button { font-size: 11px; padding: 3px 8px; margin-top: 6px; }
+    .out { background: #f5f5f5; padding: 8px; font-family: monospace; white-space: pre-wrap; margin-top: 10px; font-size: 12px; }
+    .stagelabels { font-size: 11px; color: #888; }
   </style>
 </head>
 <body>
-  <h1>Re-Sale AutoSync — 監視ダッシュボード</h1>
+  <h1>Re-Sale AutoSync — FBA仕入れパイプライン</h1>
+  <p class="stagelabels">即時仕入れ → 検品 → ラベル貼替(外注) → FBA納品 → 出品中 の流れを管理（有在庫／無在庫同期は廃止）</p>
 
-  <div class="grid">
-    <!-- リサーチ＆出品 -->
-    <div class="card">
-      <h2 style="font-size:16px;">リサーチ＆出品</h2>
-      <label>ASIN</label>
-      <input id="asin" placeholder="B0XXXXXXXX" />
-      <label>ヤフオク! オークションID</label>
-      <input id="yahooId" placeholder="x1234567890" />
-      <label>productType（SP-API）</label>
-      <input id="productType" placeholder="例: PET_SUPPLIES" />
-      <label>SKU（自社管理コード）</label>
-      <input id="sku" placeholder="YAHOO-x1234567890" />
-      <label>想定落札価格（円）</label>
-      <input id="bid" type="number" value="3000" />
-      <label>仕入れ送料（円）</label>
-      <input id="ship" type="number" value="800" />
-      <label>目標利益率</label>
-      <input id="margin" type="number" step="0.01" value="0.20" />
-      <button onclick="preview()">価格プレビュー</button>
-      <button onclick="submitList()">出品する</button>
-      <div id="out" class="out"></div>
+  <!-- リサーチ＆仕入れ登録 -->
+  <div class="research">
+    <h2 style="font-size:15px;margin-top:0;">リサーチ＆仕入れ登録</h2>
+    <div class="row">
+      <div><label>ASIN</label><input id="asin" placeholder="B0XXXXXXXX" /></div>
+      <div><label>SKU</label><input id="sku" placeholder="YFO-0001" /></div>
+      <div><label>productType</label><input id="productType" placeholder="PET_SUPPLIES" /></div>
+      <div><label>落札価格</label><input id="purchasePrice" type="number" value="3000" /></div>
+      <div><label>仕入送料</label><input id="procurementShipping" type="number" value="800" /></div>
+      <div><label>外注プレップ費</label><input id="prepCost" type="number" value="200" /></div>
+      <div><label>FBA配送手数料</label><input id="fbaFee" type="number" value="500" /></div>
+      <div><label>目標利益率</label><input id="targetMargin" type="number" step="0.01" value="0.20" /></div>
+      <div><label>仕入元URL</label><input id="sourceUrl" placeholder="https://..." /></div>
     </div>
+    <div style="margin-top:10px;">
+      <button onclick="preview()">利益プレビュー</button>
+      <button onclick="createProduct()">仕入れ登録（SOURCED）</button>
+    </div>
+    <div id="out" class="out"></div>
+  </div>
 
-    <!-- 監視中一覧 -->
-    <div class="card">
-      <h2 style="font-size:16px;">監視中（<%= products.length %>件）</h2>
-      <table>
-        <thead>
-          <tr><th>SKU</th><th>ASIN</th><th>ヤフオクID</th><th>状態</th><th>在庫</th><th>価格</th></tr>
-        </thead>
-        <tbody>
-          <% products.forEach(function (p) { %>
-            <tr>
-              <td><%= p.sku %></td>
-              <td><%= p.asin %></td>
-              <td><%= p.auction ? p.auction.yahooAuctionId : '-' %></td>
-              <td><span class="badge <%= p.auction ? p.auction.status : 'UNKNOWN' %>"><%= p.auction ? p.auction.status : '-' %></span></td>
-              <td><span class="badge <%= p.listingState %>"><%= p.quantity %></span></td>
-              <td>¥<%= p.sellPrice.toLocaleString() %></td>
-            </tr>
-          <% }); %>
-        </tbody>
-      </table>
-      <button onclick="runMonitor()">今すぐ監視を1周実行</button>
-    </div>
+  <!-- パイプラインボード -->
+  <div class="board">
+    <% const labels = { SOURCED:'仕入済', INSPECTED:'検品済', RELABELED:'ラベル貼替済', INBOUND:'FBA納品済', LISTED:'出品中', SOLD_OUT:'在庫切れ' }; %>
+    <% const nextOf = { SOURCED:'INSPECTED', INSPECTED:'RELABELED', RELABELED:'INBOUND', INBOUND:'LISTED', LISTED:'SOLD_OUT' }; %>
+    <% stages.forEach(function (stage) { %>
+      <div class="col">
+        <h3><%= labels[stage] %>（<%= board[stage].length %>）</h3>
+        <% board[stage].forEach(function (p) { %>
+          <div class="card">
+            <b><%= p.sku %></b><br />
+            <span class="muted"><%= p.asin %></span><br />
+            <span>¥<%= p.sellPrice.toLocaleString() %></span>
+            <% if (stage === 'INBOUND') { %>
+              <br /><button onclick="listFba('<%= p.id %>')">FBA出品</button>
+            <% } else if (nextOf[stage]) { %>
+              <br /><button onclick="advance('<%= p.id %>','<%= nextOf[stage] %>')">→ <%= labels[nextOf[stage]] %></button>
+            <% } %>
+          </div>
+        <% }); %>
+      </div>
+    <% }); %>
   </div>
 
   <script>
     const $ = (id) => document.getElementById(id);
     const show = (o) => ($('out').textContent = JSON.stringify(o, null, 2));
+    const num = (id) => +$(id).value;
 
-    async function preview() {
-      const r = await fetch('/api/price/preview', {
-        method: 'POST', headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({
-          assumedWinningBid: +$('bid').value, procurementShipping: +$('ship').value,
-          targetMargin: +$('margin').value,
-        }),
-      });
-      show(await r.json());
+    function body() {
+      return {
+        asin: $('asin').value, sku: $('sku').value, productType: $('productType').value,
+        purchasePrice: num('purchasePrice'), procurementShipping: num('procurementShipping'),
+        prepCost: num('prepCost'), fbaFee: num('fbaFee'), targetMargin: num('targetMargin'),
+        sourceUrl: $('sourceUrl').value,
+      };
     }
-
-    async function submitList() {
-      const r = await fetch('/api/list', {
-        method: 'POST', headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({
-          asin: $('asin').value, sku: $('sku').value, productType: $('productType').value,
-          yahooAuctionId: $('yahooId').value, assumedWinningBid: +$('bid').value,
-          procurementShipping: +$('ship').value, targetMargin: +$('margin').value,
-        }),
-      });
-      show(await r.json());
-      if (r.ok) setTimeout(() => location.reload(), 1200);
+    async function post(url, data) {
+      const r = await fetch(url, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(data || {}) });
+      return { ok: r.ok, json: await r.json() };
     }
-
-    async function runMonitor() {
-      await fetch('/api/monitor/run', { method: 'POST' });
-      location.reload();
+    async function preview() { show((await post('/api/price/preview', body())).json); }
+    async function createProduct() {
+      const r = await post('/api/products', body());
+      show(r.json);
+      if (r.ok) setTimeout(() => location.reload(), 900);
+    }
+    async function advance(id, toStage) {
+      const r = await post('/api/products/' + id + '/advance', { toStage });
+      if (r.ok) location.reload(); else show(r.json);
+    }
+    async function listFba(id) {
+      const r = await post('/api/products/' + id + '/list', {});
+      show(r.json);
+      if (r.ok) setTimeout(() => location.reload(), 900);
     }
   </script>
 </body>

@@ -49,3 +49,8 @@ next_check_at: 2026-08-06
   - 対応: putListingをFBA既定(AMAZON_JP)に、pricingをFBA手数料モデルに更新。DESIGN冒頭を確定モデルに改訂。
   - 次: ツールの重心を「仕入れ判断＋仕入れ〜FBA納品パイプライン管理＋FBA在庫/価格監視」へ寄せる方向で
     スコープ再設計を社長にA/B/C提示（waiting相当）。
+- 2026-08-05: 社長「無在庫ではFBAはしない方がいい」＝A方向で確定。ツールをFBAパイプラインへ再設計。
+  - スキーマをProduct(pipelineStage)/PipelineLogへ刷新（Auction/SyncLog廃止）。
+  - pipelineService新設（SOURCED→INSPECTED→RELABELED→INBOUND→LISTED→SOLD_OUT の段階遷移＋FBA出品）。
+  - 無在庫用syncService削除、monitorJobはFBA在庫/価格監視のPhase2スタブへ。
+  - UIをかんばんボードへ、API刷新（/api/products, /advance, /list）。DESIGN/README全面更新。
