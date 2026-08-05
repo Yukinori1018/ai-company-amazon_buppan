@@ -66,3 +66,12 @@ next_check_at: 2026-08-06
     損益分岐仕入れ価格 `maxSourcePrice` を導入し、現在価格>maxSourcePrice でも在庫0（利益で仕入れ不能）。
     終了/取消/消滅は即在庫0。UNKNOWNは触らない。判定理由をSyncLog.reasonに記録。
   - UIをFBM単一(リサーチ&出品＋監視一覧に状態/現在価格/損益分岐/在庫を表示)に。DESIGN/README全面刷新。
+- 2026-08-05: 社長が要件を精緻化＋実装形態を決定。核心=「Amazonで売れたのに仕入れられない」をアプリ/拡張で防ぐ。
+  必要機能: ①ヤフオクで先に売れたらAmazon在庫0 ②Amazon注文が入ったらヤフオク購入を確定。
+  社長決定(AskUserQuestion): アーキ=**Chrome拡張のみ** / 自動購入=**半自動(1クリック確認)**。
+  → まず「どう改善し・どんな結論か」を提示し、承認後に制作。以下を実装しpush:
+  - 新規 `tools/re-sale-autosync-extension/`（Manifest V3・拡張のみ・常駐サーバー無し）。
+    background(監視alarm+注文受信+タスク統括)、lib(pricing/decide/store)、content(yahoo半自動購入/seller注文読取+在庫変更)、popup、options。
+  - 安全弁: DRY_RUN既定ON、上限価格ガード(maxSourcePrice)、1日購入上限、二重購入防止、購入失敗アラート。
+  - サーバーアプリ版(tools/re-sale-autosync)は参照実装として残置（SP-API書込の確実化に将来再利用）。
+  - 制約明記: 監視はChrome起動中のみ/セラーセントラル・ヤフオクのDOMセレクタは実画面で要調整。

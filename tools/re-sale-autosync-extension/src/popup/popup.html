@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <h1>Re-Sale AutoSync <span id="dryBadge" class="badge">DRY_RUN</span></h1>
+  <p class="note">無在庫: ヤフオクが先に売れたら在庫0 / Amazon注文が入ったら1クリック購入。</p>
+
+  <details open>
+    <summary>出品を監視に登録</summary>
+    <div class="form">
+      <label>ASIN<input id="asin" placeholder="B0..." /></label>
+      <label>SKU<input id="sku" placeholder="YFO-0001" /></label>
+      <label>ヤフオク商品URL<input id="url" placeholder="https://page.auctions.yahoo.co.jp/jp/auction/x..." /></label>
+      <div class="grid">
+        <label>想定落札<input id="purchasePrice" type="number" value="3000" /></label>
+        <label>仕入送料<input id="procurementShipping" type="number" value="800" /></label>
+        <label>その他費<input id="otherCost" type="number" value="350" /></label>
+        <label>利益率<input id="targetMargin" type="number" step="0.01" value="0.20" /></label>
+      </div>
+      <div id="calc" class="calc"></div>
+      <div class="btns">
+        <button id="previewBtn">価格計算</button>
+        <button id="addBtn" class="primary">監視に登録</button>
+      </div>
+    </div>
+  </details>
+
+  <div class="row"><button id="runBtn">今すぐ監視を1周</button><a id="optLink" href="#">設定</a></div>
+
+  <h2>購入待ち（Amazon注文）</h2>
+  <div id="tasks" class="list"></div>
+
+  <h2>監視中</h2>
+  <div id="watches" class="list"></div>
+
+  <script src="../lib/pricing.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
