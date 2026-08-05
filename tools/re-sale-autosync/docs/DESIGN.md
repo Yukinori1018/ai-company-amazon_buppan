@@ -5,29 +5,29 @@
 
 ---
 
-## 採用モデル（確定）と設計インプリケーション
+## 採用モデル（確定）: FBM 無在庫 ＋ FBA 有在庫 のハイブリッド
 
-**確定した運用モデル（ポリシー適合）**：
+社長方針により、**2 つの運用を 1 ツールで並行**する。商品ごとに `fulfillmentType`（FBM/FBA）で分岐。
 
-> **即時仕入れ（ヤフオク落札）→ 検品 → ラベル貼替（外注先）→ FBA 納品 → Amazon が自社出品者名義で発送。**
+| 方式 | フロー | 在庫の考え方 | このツールの役割 |
+|---|---|---|---|
+| **FBM（無在庫）** | ヤフオク落札**前**に Amazon 出品 → オークション監視 → 終了/取消で在庫0、再出品で在庫1 | 自社が quantity を 0/1 で制御 | **ヤフオク状態→Amazon在庫の自動同期**（cron） |
+| **FBA（有在庫）** | 即時仕入れ→検品→ラベル貼替(外注)→FBA納品→出品 | Amazon 倉庫の実数管理 | **仕入れ〜納品パイプライン管理**＋出品 |
 
-これは実物を自社で保有・Amazon 倉庫へ納品する正規の FBA であり、**ドロップシッピングポリシーには
-抵触しない**（他の小売業者に顧客へ直接発送させる形態ではないため）。
+### ⚠️ 法務注意（FBM パスに残るリスク・社長判断で進行）
 
-### この確定により変わった設計方針（重要）
+- **FBM（ヤフオク→Amazon 無在庫）は Amazon のドロップシッピングポリシーに抵触するリスクが残る**
+  （他の小売業者から仕入れ、実物保有前に出品・販売する形態）。アカウント指標悪化・停止のリスクを
+  内包する点は変わらない。**在庫0化の即時性**（落札/終了検知→即停止）でキャンセルを防ぐことが最重要。
+- **FBA（即時仕入れ→自社検品→自社名義でFBA納品）はポリシー非抵触**。
+- ヤフオク!スクレイピングは Yahoo! の規約・robots・負荷に配慮（§6）。監視は連携済み ID のみ。
 
-- **「ヤフオク在庫と同期して Amazon 在庫を 0/1 に自動切替」する当初のコア機能は、FBA では前提が消える。**
-  無在庫（FBM）は「先に出品 → 仕入元が消えたら急いで在庫 0」が必須だったが、**FBA は出品前に実物を
-  保有**しており、在庫は Amazon 倉庫の実数で管理され売り切れ判定も Amazon が行う。
-  → ヤフオクのオークション終了を監視して在庫 0 にする必要が原理的になくなる。
-- **ツールの価値の重心は「在庫同期」→「仕入れ判断 ＋ 仕入れ〜FBA 納品パイプライン管理 ＋ FBA 在庫/価格の監視」へ移る。**
-- 本コードの `putListing` は **FBA を既定**（`fulfillment_channel_code = AMAZON_JP`、在庫は倉庫実数管理）に更新済み。
-  `pricing.ts` は **FBA 手数料（referral ＋ FBA 配送代行 ＋ 外注プレップ費）**で利益を逆算するよう更新済み。
-- 旧「ヤフオク監視 → 在庫 PATCH」ロジック（`auctionMonitor.ts` / `syncService.ts` / `monitorJob.ts`）は
-  **FBM を併用する場合の任意機能**として温存。FBA 主軸では未使用でよい（README/§5 参照）。
+### コード上の分岐
 
-> ヤフオク!スクレイピングを使う場合（リサーチ用の相場取得 or FBM 併用時）は、Yahoo! の利用規約・
-> robots.txt・アクセス負荷に配慮する（§6）。監視は自分が連携した ID のみに限定し全件クロールしない。
+- `putListing({ fulfillmentType })`：FBM=`DEFAULT`＋quantity、FBA=`AMAZON_JP`（倉庫管理）。
+- FBM 経路：`fbmService.createFbmListing`（出品＋Auction紐付け）→ `monitorJob`＋`syncService.syncOne`（在庫同期）。
+- FBA 経路：`pipelineService`（SOURCED→…→LISTED の段階遷移＋出品）。Auction は持たず監視対象外。
+- `pricing.calcSellPrice`：FBM/FBA 共通。FBA は fbaFee を、FBM は自社発送費を prepCost に入れる。
 
 ---
 
@@ -38,35 +38,36 @@
 ```
         ┌─────────────────────────────────────────────────────────┐
         │                     ブラウザ（社長/運用者）                 │
-        │  パイプラインボードUI: リサーチ→仕入れ登録→段階移動→FBA出品    │
+        │  FBM監視一覧 ＋ FBAパイプラインボード（方式を切替えて登録）     │
         └───────────────┬─────────────────────────────────────────┘
                         │ HTTP(JSON)
         ┌───────────────▼─────────────────────────────────────────┐
         │                Web/API サーバ (Express + TypeScript)       │
-        │  /api/amazon/search  /api/price/preview  /api/products     │
-        │  /api/products/:id/advance   /api/products/:id/list        │
+        │  FBM: /api/fbm/list  /api/monitor/run                      │
+        │  FBA: /api/products  /:id/advance  /:id/list               │
+        │  共通: /api/amazon/search /api/source/yahoo /api/price/preview│
         └───┬───────────────┬───────────────────┬──────────────────┘
             │               │                   │
    ┌────────▼───────┐ ┌─────▼─────────┐ ┌───────▼──────────┐
-   │ Amazon SP-API   │ │ Pipeline       │ │ Pricing サービス   │
-   │ (LWA 認証)       │ │ サービス        │ │ (FBA手数料込み逆算) │
-   │ catalog/listings│ │ (段階遷移/出品)  │ └──────────────────┘
-   │ (FBA出品 PUT)   │ └─────┬─────────┘
-   └────────┬───────┘       │
-            │        ┌──────▼───────────────────────────────────┐
+   │ Amazon SP-API   │ │ FBM: fbmService│ │ Yahoo auctionMonitor│
+   │ (LWA 認証)       │ │ FBA: pipeline  │ │ (Cheerio/Puppeteer) │
+   │ catalog/listings│ │ Service        │ └───────┬──────────┘
+   │ (FBM/FBA 出品)  │ └─────┬─────────┘         │
+   └────────┬───────┘       │                    │
+            │        ┌──────▼────────────────────▼─────────────┐
             └───────►│        DB (Prisma / SQLite→PG/MySQL)       │
-                     │  Product(pipelineStage) / PipelineLog / Setting│
+                     │ Product / Auction(FBM) / SyncLog / PipelineLog│
                      └──────▲───────────────────────────────────┘
-                            │ 任意 / Phase2（20分おき）
+                            │ 20分おき（FBM 同期）
         ┌───────────────────┴──────────────────────────────────┐
-        │      Cron Worker (node-cron / 将来 BullMQ)  ※任意       │
-        │  FBA在庫残数チェック→再仕入れアラート / 価格追随（Phase2）  │
+        │      Cron Worker (node-cron / 将来 BullMQ)              │
+        │ FBM: active Auction 巡回→状態判定→Amazon在庫PATCH        │
+        │ FBA(Phase2): 在庫残数/価格の監視アラート                  │
         └────────────────────────────────────────────────────────┘
 ```
 
 - **Web/API とワーカーはプロセス分離**（`npm run dev` と `npm run worker`）。
-- **DB がシステムの真実（source of truth）**。仕入れた各商品の状態（pipelineStage）を DB で管理し、
-  UI/ API からの手動操作で段階を前進させる。FBA 在庫の実数管理は Amazon 側が担う。
+- **DB がシステムの真実**。FBM は「ヤフオク実態 ⇄ Amazon在庫」を cron で冪等同期、FBA は段階遷移を手動管理。
 
 ### ディレクトリ構造
 
@@ -81,42 +82,44 @@ tools/re-sale-autosync/
 └── src/
     ├── config.ts                # 環境変数の Zod 検証
     ├── logger.ts / db.ts        # pino ロガー / Prisma シングルトン
-    ├── server.ts                # Express: API + パイプラインボード
-    ├── views/index.ejs          # かんばん UI（仕入済→…→出品中）
+    ├── server.ts                # Express: FBM監視一覧 ＋ FBAボード ＋ API
+    ├── views/index.ejs          # UI（方式切替＋FBM表＋FBAかんばん）
     ├── scripts/testAuth.ts      # SP-API 認証スモークテスト（npm run auth:test）
     ├── amazon/
     │   ├── spapiClient.ts        # LWA トークン管理 + 共通HTTP(429リトライ)
     │   ├── catalog.ts            # Catalog Items API（ASIN/キーワード検索）
-    │   └── listings.ts           # Listings Items API（FBA/FBM 出品 PUT・任意PATCH）
+    │   └── listings.ts           # Listings Items API（FBM/FBA 出品 PUT・在庫 PATCH）
     ├── yahoo/
-    │   └── auctionMonitor.ts     # 仕入れ元相場の参照/FBM併用時の任意機能
+    │   └── auctionMonitor.ts     # ヤフオク生存確認（Cheerio/Puppeteer・多数決判定）
     ├── services/
-    │   ├── pricing.ts            # FBA手数料込みで販売価格を逆算
-    │   └── pipelineService.ts    # 段階遷移(SOURCED→…→LISTED)＋FBA出品
+    │   ├── pricing.ts            # 手数料込みで販売価格を逆算（FBM/FBA共通）
+    │   ├── fbmService.ts         # FBM出品＋Auction紐付け
+    │   ├── syncService.ts        # FBM: ヤフオク状態→Amazon在庫 同期（核）
+    │   └── pipelineService.ts    # FBA: 段階遷移(SOURCED→…→LISTED)＋出品
     └── jobs/
-        └── monitorJob.ts         # 任意/Phase2: FBA在庫・価格監視のスタブ
+        └── monitorJob.ts         # node-cron: FBM同期サイクル（+FBA Phase2）
 ```
 
 ---
 
 ## 2. データベーススキーマ
 
-`prisma/schema.prisma` を参照。**FBA 有在庫モデル**のため、監視対象テーブルではなく
-「仕入れ〜FBA納品〜出品」を追うパイプライン中心の構成。
+`prisma/schema.prisma` を参照。FBM/FBA 両対応。
 
 | テーブル | 役割 | 主なカラム |
 |---|---|---|
-| **Product** | 仕入れた 1 商品（SKU 単位） | `asin`, `sku(unique)`, `productType`, `purchasePrice`, `procurementShipping`, `prepCost`, `fbaFee`, `targetMargin`, `sellPrice`, `pipelineStage`, `listingState`, `fnsku`, `sourceUrl/sourceRef/purchasedAt` |
-| **PipelineLog** | 状態遷移の監査ログ | `fromStage`, `toStage`, `note` |
+| **Product** | 出品する 1 商品（SKU 単位・FBM/FBA共通） | `asin`, `sku(unique)`, `productType`, `fulfillmentType`, 原価内訳(`purchasePrice`/`procurementShipping`/`prepCost`/`fbaFee`), `sellPrice`, FBM用(`quantity`/`listingState`), FBA用(`pipelineStage`/`fnsku`) |
+| **Auction** | 監視対象ヤフオク（**FBM のみ**・Product と 1:1） | `yahooAuctionId(unique)`, `status`, `currentPrice`, `endTime`, `checkFailCount`, `active` |
+| **SyncLog** | FBM 在庫同期の監査ログ | `auctionStatus`, `action`, `from/toQuantity`, `spapiStatus` |
+| **PipelineLog** | FBA 段階遷移の監査ログ | `fromStage`, `toStage`, `note` |
 | **Setting** | 既定利益率・手数料率・外注単価等 | `key`, `value` |
 
 設計判断：
 
-- **`pipelineStage`** で `SOURCED → INSPECTED → RELABELED → INBOUND → LISTED → SOLD_OUT` を管理。
-  実物を保有するため、無在庫時代の「監視対象オークション」テーブル（Auction）は廃止。仕入れ元は
-  一度きりの参照情報として Product に内包（`sourceUrl` / `sourceRef` / `purchasedAt`）。
-- **原価内訳を Product に保存**（落札・仕入送料・外注プレップ費・FBA手数料）し、利益計算と監査を両立。
-- **`PipelineLog`** に全遷移を残し、外注先への受け渡しや納品漏れを後から追える。
+- **`fulfillmentType` で分岐**。FBM は `quantity`/`listingState`＋`Auction` を使い、FBA は `pipelineStage`
+  （`SOURCED → INSPECTED → RELABELED → INBOUND → LISTED → SOLD_OUT`）を使う。
+- **`Auction` は FBM 商品のみ**が 1:1 で持つ（`checkFailCount` で UNKNOWN 連続時の誤停止を防ぐ）。FBA は持たない。
+- **原価内訳を Product に保存**し利益計算と監査を両立。ログは FBM=`SyncLog` / FBA=`PipelineLog` に分離。
 - **SQLite で開始**し、`provider` と `DATABASE_URL` の差し替えだけで PostgreSQL/MySQL に移行可能。
 
 ---
@@ -159,9 +162,7 @@ PUT /listings/2021-08-01/items/{sellerId}/{sku}?marketplaceIds=A1VC38T7YXB528
 
 ## 4. ヤフオク! 監視ロジックの実装方針
 
-実装：`src/yahoo/auctionMonitor.ts`。**位置づけ変更**：FBA 有在庫では在庫の自動同期は不要のため、
-本モジュールは「**リサーチ時の仕入れ元相場の参照**」（`GET /api/source/yahoo/:id`）と、FBM を
-併用する場合の任意機能に用途を限定。cron の自動同期からは切り離した。
+実装：`src/yahoo/auctionMonitor.ts`。**FBM 無在庫の在庫同期の要**。FBA ではリサーチ時の相場参照に使う。
 
 - Yahoo! オークション公式 API は提供終了のため、**商品ページ取得で状態判定**する。
 - 取得は 2 モード：`cheerio`（軽量 HTTP、既定）／`puppeteer`（JS レンダリング必須ページ用）。
@@ -180,16 +181,17 @@ PUT /listings/2021-08-01/items/{sellerId}/{sku}?marketplaceIds=A1VC38T7YXB528
 
 ## 5. 定期実行タスク（Cron）の実装
 
-実装：`src/jobs/monitorJob.ts`。**FBA 有在庫のため、在庫の自動同期ループは廃止**（実物を保有し
-在庫は倉庫実数管理のため不要）。パイプラインの状態遷移は UI/ API からの手動操作
-（`pipelineService.advanceStage`）で進める。
+実装：`src/jobs/monitorJob.ts`、FBM 同期の核は `src/services/syncService.ts`。
 
-cron ワーカーは **Phase 2 の任意機能**として残置し、以下を担う想定（現状は LISTED/INBOUND 件数を
-集計する安全なスタブ）：
-
-- `node-cron` で既定 **20 分おき**（`MONITOR_CRON`）。
-- **FBA 在庫残数チェック**（FBA Inventory API）→ 在庫僅少で**再仕入れアラート**。
-- **価格追随**（Product Pricing API）→ 想定利益を割る価格で**通知/リプライス**。
+- `node-cron` で既定 **20 分おき**（`MONITOR_CRON`）。`active` な Auction（=FBM商品）を全件取得し、
+  **`p-limit` で同時実行数を絞って**巡回。**多重起動防止**フラグ＋**`Promise.allSettled`**で頑健化。
+- FBM 同期ロジック（`syncOne`）：
+  1. ヤフオク状態を取得 → Auction に観測結果を保存
+  2. 状態→希望在庫（ACTIVE→1 / ENDED・CANCELLED・NOT_FOUND→0 / UNKNOWN→触らない）
+  3. **希望値と現在値が一致すれば何もしない（冪等）**
+  4. 差分があれば Amazon を PATCH → Product 更新 → **SyncLog に必ず記録**
+  5. 落札/終了で `Auction.active=false`
+- FBA 商品は Auction を持たないため対象外。**FBA の在庫残数チェック・価格追随は Phase 2** で本ワーカーに追加予定。
 - 将来は **BullMQ** に移行し、リトライ・遅延・並列度をキューで制御するとスケールしやすい。
 
 ---
@@ -201,7 +203,9 @@ cron ワーカーは **Phase 2 の任意機能**として残置し、以下を�
 - **SP-API はトークンバケット方式のレート制限**。各オペレーションに rate/burst があり、
   超過で 429。`x-amzn-RateLimit-Limit` ヘッダを読み、**429/5xx は指数バックオフ + Retry-After**
   で再試行（本実装済み）。大量更新は **PATCH ではなく Feeds API** に寄せる。
-- すべての外部呼び出しに **タイムアウト**を設定。失敗は `PipelineLog`/pino に構造化ログで残す。
+- **FBM で UNKNOWN 時は在庫を触らない**設計（`checkFailCount` 閾値）。ヤフオクの一時的失敗で在庫を
+  落とすと機会損失＋アカウント指標悪化につながる。連続 UNKNOWN が閾値超で人手確認へ。
+- すべての外部呼び出しに **タイムアウト**を設定。失敗は `SyncLog`/`PipelineLog`/pino に構造化ログで残す。
 - **秘密情報は `.env`（gitignore 済み）**。`.env.example` のみコミット。
 
 ### SP-API 認証の先行検証（最も詰まりやすい箇所）
@@ -220,19 +224,16 @@ cron ワーカーは **Phase 2 の任意機能**として残置し、以下を�
   `p-limit`（同時実行数）で全体の頻度も抑制。**429/503 は指数バックオフ + Retry-After** で再試行。
 - 構造変化に備え **多数決判定 + UNKNOWN フォールバック**。壊れたら止めるのではなく人手確認へ。
 
-### Amazon ドロップシッピングポリシー違反の回避（最重要）
+### Amazon ドロップシッピングポリシー（FBM パスの最重要注意）
 
-> 冒頭の「重大注意」の再掲。技術的緩和策だけでは合法・適正にならない点に留意。
+> 冒頭の法務注意の再掲。**FBM（無在庫）パスにはポリシー抵触リスクが残る**（技術的緩和では消えない）。
 
-- **推奨は「即時仕入れ→自社発送（有在庫寄り）」**。ヤフオク落札品を自社で検品・保管し、
-  **自社名義・自社梱包で発送**する。他小売業者に直接発送させない。これで
-  ドロップシッピングポリシーの主要禁止事項を外せる。本ツールの在庫同期は有在庫でも有効。
-- **ハンドリングタイムを長めに**設定し、仕入れ（落札→入手）の猶予を確保。到着遅延・
-  キャンセル率の悪化を防ぐ。
-- **在庫 0 化は即時性が命**：オークション終了/落札を検知したら**最優先で Amazon を停止**し、
-  「買えない注文」を発生させない（キャンセル率・顧客体験の毀損＝アカウント健全性の悪化を防ぐ）。
-- **価格・出荷の整合**：想定落札価格が上振れした場合に赤字出品にならないよう、`targetMargin`
-  に加え**下限価格ガード**を将来追加（現状は `calcSellPrice` で試算のみ）。
-- **本番投入は社長の Go/NoGo（実 Do）を必須**とする。`DRY_RUN=true` を既定にし、
-  検証が済むまで Amazon への書き込みを行わない。
+- **FBA パス**は「即時仕入れ→自社検品→自社名義でFBA納品」＝**ポリシー非抵触**。可能な限りこちらへ寄せる。
+- **FBM パスを運用する場合の緩和策**（リスクを下げるだけで消しはしない）：
+  - **在庫 0 化の即時性が命**：オークション終了/落札を検知したら**最優先で Amazon を停止**し、
+    「買えない注文（→キャンセル）」を出さない。キャンセル率悪化はアカウント健全性を直接毀損する。
+  - **ハンドリングタイムを長めに**設定し、落札→入手の猶予を確保。
+  - **UNKNOWN では止めも動かしもしない**（誤停止＝機会損失、誤出品＝在庫なし販売）。
+  - **下限価格ガード**を将来追加し、落札価格の上振れ時の赤字出品を防ぐ（現状 `calcSellPrice` は試算のみ）。
+- **本番投入は社長の Go/NoGo（実 Do）を必須**とし、`DRY_RUN=true` を既定にして検証が済むまで書き込まない。
 ```

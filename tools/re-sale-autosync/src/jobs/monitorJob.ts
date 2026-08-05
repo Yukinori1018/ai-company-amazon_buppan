@@ -1,33 +1,57 @@
 import cron from 'node-cron';
+import pLimit from 'p-limit';
 import { prisma } from '../db.js';
+import { syncOne } from '../services/syncService.js';
 import { config } from '../config.js';
 import { logger } from '../logger.js';
 
 /**
- * 定期実行ワーカー（FBA 有在庫モデル・任意 / Phase 2）。
+ * 定期実行ワーカー（既定 20 分おき）。
  *
- * FBA では在庫は Amazon 倉庫の実数で管理されるため、無在庫時代の
- * 「ヤフオク在庫→Amazon在庫0/1 リアルタイム同期」は不要（廃止済み）。
+ * 主目的は FBM（無在庫）の在庫同期：
+ *   active な Auction（= FBM 商品）を巡回し、ヤフオク状態に応じて Amazon 在庫を 0/1 に同期。
+ *   - p-limit で同時実行数を絞る（ヤフオク/Amazon 双方の負荷・レート制御）
+ *   - Promise.allSettled で 1 件の失敗が全体を止めないようにする
+ *   - running フラグで多重起動を防止
  *
- * 代わりにこのワーカーが担う想定の Phase 2 タスク（未実装のプレースホルダ）:
- *   - LISTED 商品の FBA 在庫残数チェック（FBA Inventory API）→ 在庫僅少で再仕入れアラート
- *   - Amazon 価格追随（Product Pricing API）→ 想定利益を割る価格になったら通知
- *
- * 現状は LISTED 商品を集計してログするだけの安全なスタブ。
+ * FBA（有在庫）商品は Auction を持たないため、この同期の対象にならない。
+ * （FBA 在庫残数チェック・価格追随は Phase 2 で本ワーカーに追加予定。）
  */
+
+const limit = pLimit(config.MONITOR_CONCURRENCY);
+let running = false;
+
 export async function runMonitorCycle(): Promise<void> {
-  const listed = await prisma.product.count({ where: { pipelineStage: 'LISTED' } });
-  const inbound = await prisma.product.count({ where: { pipelineStage: 'INBOUND' } });
-  logger.info(
-    { listed, inbound },
-    'monitor cycle (Phase2 stub): FBA在庫/価格監視は未実装。LISTED/INBOUND件数のみ集計。',
-  );
-  // TODO(Phase2): FBA Inventory API で在庫残数を取得し、閾値割れをアラート。
-  // TODO(Phase2): Product Pricing API で現在価格を取得し、利益割れをアラート。
+  if (running) {
+    logger.warn('前回サイクル実行中のためスキップ');
+    return;
+  }
+  running = true;
+  const startedAt = Date.now();
+  try {
+    const targets = await prisma.auction.findMany({
+      where: { active: true },
+      select: { productId: true },
+    });
+    logger.info({ count: targets.length }, 'FBM monitor cycle start');
+
+    const results = await Promise.allSettled(targets.map((t) => limit(() => syncOne(t.productId))));
+    const failed = results.filter((r) => r.status === 'rejected').length;
+    logger.info(
+      { total: targets.length, failed, ms: Date.now() - startedAt },
+      'FBM monitor cycle done',
+    );
+    // TODO(Phase2): FBA 在庫残数チェック（FBA Inventory API）→ 再仕入れアラート。
+    // TODO(Phase2): Amazon 価格追随（Product Pricing API）→ 利益割れ通知/リプライス。
+  } catch (err) {
+    logger.error({ err: (err as Error).message }, 'monitor cycle fatal');
+  } finally {
+    running = false;
+  }
 }
 
 export function startScheduler(): void {
-  logger.info({ cron: config.MONITOR_CRON }, 'scheduler starting (FBA phase2 stub)');
+  logger.info({ cron: config.MONITOR_CRON, dryRun: config.DRY_RUN }, 'scheduler starting');
   cron.schedule(config.MONITOR_CRON, () => {
     void runMonitorCycle();
   });

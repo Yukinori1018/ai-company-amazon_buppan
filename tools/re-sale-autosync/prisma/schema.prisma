@@ -1,8 +1,8 @@
-// Re-Sale AutoSync — Prisma スキーマ（FBA 有在庫モデル）
+// Re-Sale AutoSync — Prisma スキーマ（FBM 無在庫 ＋ FBA 有在庫 ハイブリッド）
 //
-// 採用モデル: 即時仕入れ(ヤフオク落札)→ 検品 → ラベル貼替(外注) → FBA 納品 → 出品中
-// 無在庫(FBM)前提の「ヤフオク在庫→Amazon在庫0/1 リアルタイム同期」は廃止。
-// 実物を保有するため、1 SKU = 1 商品を「仕入れ〜FBA納品〜出品」のパイプラインで管理する。
+// 2 つの運用を 1 ツールで扱う。商品ごとに fulfillmentType で分岐する。
+//   FBM(無在庫): ヤフオク落札前に出品 → オークション監視 → 終了/取消で在庫0、再出品で在庫1
+//   FBA(有在庫): 即時仕入れ → 検品 → ラベル貼替(外注) → FBA納品 → 出品（pipelineStage で管理）
 //
 // 既定は SQLite。PostgreSQL/MySQL へは provider と DATABASE_URL の差し替えで移行可能。
 
@@ -15,45 +15,89 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-/// 仕入れた 1 商品（SKU 単位）。仕入れ〜FBA納品〜出品の状態を pipelineStage で追う。
+/// 出品する 1 商品（SKU 単位）。FBM/FBA 両対応。
 model Product {
   id                  String    @id @default(cuid())
   asin                String
   sku                 String    @unique
   title               String?
   productType         String? // SP-API の productType（出品 PUT に必須）
+  fulfillmentType     String    @default("FBM") // FBM | FBA
 
   // --- 原価内訳（利益計算・監査用） ---
-  purchasePrice       Int // 落札価格（円）
+  purchasePrice       Int // FBM=想定落札価格 / FBA=落札価格（円）
   procurementShipping Int       @default(0) // 仕入れ送料（円）
-  prepCost            Int       @default(0) // 検品・ラベル貼替(外注)＋FBA入庫送料（円）
-  fbaFee              Int       @default(0) // FBA 配送代行手数料（円/個）
-  targetMargin        Float     @default(0.2) // 目標利益率
+  prepCost            Int       @default(0) // FBA=検品/ラベル貼替(外注)+入庫送料 / FBM=自社発送費など（円）
+  fbaFee              Int       @default(0) // FBA 配送代行手数料（円/個）。FBM は 0。
+  targetMargin        Float     @default(0.2)
   sellPrice           Int // 自動計算した Amazon 販売価格（円）
 
-  // --- 仕入れ元（一度きり。監視はしない） ---
-  sourceUrl           String? // 仕入れ元 URL（ヤフオク等）
+  // --- 仕入れ元 ---
+  sourceUrl           String?
   sourceRef           String? // ヤフオクのオークションID 等
-  purchasedAt         DateTime?
+  purchasedAt         DateTime? // FBA の実仕入れ日時
 
-  // --- FBA パイプライン ---
-  // SOURCED(仕入済) → INSPECTED(検品済) → RELABELED(ラベル貼替済) → INBOUND(FBA納品済)
-  //   → LISTED(出品中) → SOLD_OUT(在庫切れ)
-  pipelineStage       String    @default("SOURCED")
-  listingState        String    @default("DRAFT") // DRAFT | LISTED | INACTIVE | ERROR
-  fnsku               String? // FBA ラベル(FNSKU)。ラベル貼替の実体。
+  // --- FBM 用の状態（在庫の希望値） ---
+  quantity            Int       @default(1) // 1=出品中 / 0=停止
+  listingState        String    @default("DRAFT") // DRAFT | ACTIVE | LISTED | INACTIVE | ERROR
+
+  // --- FBA 用の状態 ---
+  // SOURCED → INSPECTED → RELABELED → INBOUND → LISTED → SOLD_OUT
+  pipelineStage       String? // FBA のみ使用
+  fnsku               String? // FBA ラベル(FNSKU)
 
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @updatedAt
 
-  logs                PipelineLog[]
+  auction             Auction? // FBM 監視対象（FBA は null）
+  syncLogs            SyncLog[] // FBM 在庫同期ログ
+  pipelineLogs        PipelineLog[] // FBA 段階遷移ログ
 
+  @@index([fulfillmentType])
   @@index([pipelineStage])
   @@index([asin])
   @@index([listingState])
 }
 
-/// パイプラインの状態遷移ログ（いつ・どの段階へ・誰/何の操作で動いたか）。
+/// 監視対象のヤフオク! オークション（FBM のみ）。Product と 1:1。
+model Auction {
+  id             String    @id @default(cuid())
+  yahooAuctionId String    @unique
+  url            String
+  status         String    @default("UNKNOWN") // ACTIVE | ENDED | CANCELLED | NOT_FOUND | UNKNOWN
+  currentPrice   Int?
+  endTime        DateTime?
+  lastCheckedAt  DateTime?
+  checkFailCount Int       @default(0) // 連続取得失敗回数（一時的失敗で誤停止しないため）
+  active         Boolean   @default(true) // 監視を続けるか
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  productId      String    @unique
+  product        Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@index([active])
+}
+
+/// FBM 在庫同期の監査ログ（いつ・何を根拠に・Amazon をどう変えたか）。
+model SyncLog {
+  id            String   @id @default(cuid())
+  productId     String
+  product       Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  auctionStatus String
+  action        String // NO_CHANGE | SET_OUT_OF_STOCK | SET_IN_STOCK | ERROR
+  fromQuantity  Int?
+  toQuantity    Int?
+  spapiStatus   String?
+  message       String?
+  createdAt     DateTime @default(now())
+
+  @@index([productId])
+  @@index([createdAt])
+}
+
+/// FBA パイプラインの状態遷移ログ。
 model PipelineLog {
   id        String   @id @default(cuid())
   productId String
@@ -67,7 +111,7 @@ model PipelineLog {
   @@index([createdAt])
 }
 
-/// グローバル設定（既定利益率・手数料率・外注単価など）。UI から編集可能にする想定。
+/// グローバル設定（既定利益率・手数料率・外注単価など）。
 model Setting {
   key       String   @id
   value     String

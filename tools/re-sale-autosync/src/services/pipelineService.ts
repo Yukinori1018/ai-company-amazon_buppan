@@ -52,6 +52,7 @@ export async function createSourcedProduct(input: CreateProductInput) {
       sku: input.sku,
       title: input.title,
       productType: input.productType,
+      fulfillmentType: 'FBA',
       purchasePrice: input.purchasePrice,
       procurementShipping: input.procurementShipping ?? 0,
       prepCost: input.prepCost ?? 0,
