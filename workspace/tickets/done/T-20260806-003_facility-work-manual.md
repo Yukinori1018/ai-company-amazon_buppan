@@ -1,7 +1,7 @@
 ---
 ticket_id: T-20260806-003
 title: 就労支援施設向け 作業業務マニュアル（Amazon FBA梱包・ラベル貼り／編集可能テンプレ）
-status: waiting
+status: done
 assignee: content_creator
 priority: high
 created_at: 2026-08-06
@@ -9,7 +9,7 @@ updated_at: 2026-08-09
 requires_approval: false
 parent_ticket: T-20260806-001
 labels: [outsourcing, shurou-shien, manual, fba, content, editable]
-next_check_at: 2026-08-12
+closed_reason: 社長判断で就労支援施設への外注検討を一旦クローズ（2026-08-09・T-20260809-001）。成果物は社内理解用の参考資料として温存。
 ---
 
 ## 背景
@@ -66,6 +66,6 @@ next_check_at: 2026-08-12
 - URL: https://docs.google.com/document/d/1xnhzsLCqcDryR_UG1TnG2FT19axjxnFRrqp2ynMP15I/edit
 - 2026-08-09 カズヨが md をベースに Drive 化。社長が【要記入】34箇所を埋め、施設へ共有。改訂は md（真実）を直す→HTML/Doc に反映の一方向運用。
 
-## waiting の理由（社長の番）
+## クローズ（2026-08-09）
 
-社長レビュー＋【要記入】34箇所の記入待ち（資材の支給方法・数量/納期・受け渡し・連絡先・商品別の個別指示など、実運用に合わせて社長が確定）。写真は実商品が1つ決まったら差し込み枠6箇所に撮影・挿入。
+社長判断により**就労支援施設への外注検討を一旦クローズ**（T-20260809-001）。本マニュアルの社長レビュー・【要記入】記入は不要となったため done へ。成果物（md/html/Google Doc）は削除せず、将来の再開時や社内理解用の参考資料として温存する。
