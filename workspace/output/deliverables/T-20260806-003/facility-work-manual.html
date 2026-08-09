@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>商品の梱包・ラベル貼り 作業マニュアル</title>
+<style>
+  :root {
+    --ink: #1a1a1a;
+    --sub: #555;
+    --line: #d0d0d0;
+    --accent: #2563a8;
+    --accent-soft: #eaf1f9;
+    --ok-bg: #eaf6ec;
+    --ok-line: #4a9d5b;
+    --ng-bg: #fbecec;
+    --ng-line: #c0453f;
+    --fill-bg: #fff8e6;
+    --fill-line: #d9a41a;
+    --note-bg: #f4f6f8;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body {
+    font-family: "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
+    color: var(--ink);
+    line-height: 1.85;
+    font-size: 11pt;
+    margin: 0;
+    background: #f0f0f0;
+  }
+  .page {
+    max-width: 800px;
+    margin: 0 auto;
+    background: #fff;
+    padding: 28px 40px 48px;
+  }
+  h1 {
+    font-size: 21pt;
+    line-height: 1.4;
+    margin: 0 0 4px;
+    border-bottom: 4px solid var(--accent);
+    padding-bottom: 10px;
+  }
+  h2 {
+    font-size: 15pt;
+    margin: 34px 0 12px;
+    padding: 7px 12px;
+    background: var(--accent);
+    color: #fff;
+    border-radius: 4px;
+  }
+  h3 {
+    font-size: 12.5pt;
+    margin: 22px 0 8px;
+    padding-left: 10px;
+    border-left: 5px solid var(--accent);
+    color: var(--accent);
+  }
+  p { margin: 8px 0; }
+  ul, ol { margin: 8px 0; padding-left: 1.5em; }
+  li { margin: 4px 0; }
+  strong { color: #111; }
+  .rt { font-size: 0.8em; color: var(--sub); }
+
+  /* version / header meta */
+  .meta {
+    background: var(--accent-soft);
+    border: 1px solid #c3d6ea;
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin: 14px 0 8px;
+    font-size: 10.5pt;
+  }
+  .meta .top { font-weight: bold; color: var(--accent); margin-bottom: 6px; }
+  .meta table { border: none; margin: 0; width: auto; }
+  .meta td { border: none; padding: 2px 14px 2px 0; }
+
+  .lead {
+    background: var(--note-bg);
+    border-radius: 6px;
+    padding: 14px 18px;
+    margin: 16px 0;
+  }
+
+  /* tables */
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 12px 0;
+    font-size: 10.5pt;
+  }
+  th, td {
+    border: 1px solid var(--line);
+    padding: 7px 10px;
+    text-align: left;
+    vertical-align: top;
+  }
+  th { background: #eef1f4; font-weight: bold; }
+
+  /* OK / NG comparison */
+  table.okng th:first-child { background: var(--ok-bg); color: #1e5b2c; border-bottom: 2px solid var(--ok-line); }
+  table.okng th:last-child { background: var(--ng-bg); color: #8a2b26; border-bottom: 2px solid var(--ng-line); }
+  table.okng td:first-child { background: #f6fbf7; }
+  table.okng td:last-child { background: #fdf6f6; }
+
+  /* placeholder */
+  .fill {
+    background: var(--fill-bg);
+    border: 1px dashed var(--fill-line);
+    border-radius: 3px;
+    padding: 0 6px;
+    font-weight: bold;
+    color: #8a6400;
+    white-space: nowrap;
+  }
+
+  /* photo frame */
+  .photo {
+    border: 2px dashed #b0b0b0;
+    border-radius: 6px;
+    background: repeating-linear-gradient(45deg, #fafafa, #fafafa 10px, #f2f2f2 10px, #f2f2f2 20px);
+    color: #888;
+    text-align: center;
+    padding: 22px 12px;
+    margin: 12px 0;
+    font-size: 10.5pt;
+  }
+  .photo::before { content: "📷 "; }
+
+  /* callouts */
+  .note {
+    background: var(--note-bg);
+    border-left: 4px solid var(--accent);
+    padding: 10px 16px;
+    margin: 12px 0;
+    border-radius: 0 4px 4px 0;
+    font-size: 10.5pt;
+  }
+  .star {
+    background: #fff4e0;
+    border: 2px solid var(--fill-line);
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin: 14px 0;
+  }
+  .star .tag { display:inline-block; background: var(--fill-line); color:#fff; font-weight:bold; padding:1px 10px; border-radius:12px; font-size:10pt; margin-bottom:6px; }
+
+  /* flow diagram */
+  .flow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 16px 0;
+    align-items: stretch;
+  }
+  .flow .step {
+    flex: 1 1 120px;
+    background: var(--accent-soft);
+    border: 1px solid #c3d6ea;
+    border-radius: 6px;
+    padding: 10px 8px;
+    text-align: center;
+    font-size: 10pt;
+    position: relative;
+  }
+  .flow .step .n { display:block; font-weight:bold; color: var(--accent); font-size: 11pt; }
+  .flow .step .t { display:block; font-weight:bold; margin: 3px 0; }
+  .flow .step .d { display:block; color: var(--sub); font-size: 9.5pt; }
+
+  .rev td { height: 30px; }
+
+  hr { border: none; border-top: 1px solid var(--line); margin: 26px 0; }
+
+  .footer-note {
+    background: var(--accent-soft);
+    border-radius: 6px;
+    padding: 14px 18px;
+    margin-top: 28px;
+    font-size: 10.5pt;
+  }
+
+  /* print */
+  @media print {
+    body { background: #fff; font-size: 10.5pt; }
+    .page { max-width: none; margin: 0; padding: 0 8mm; }
+    h2 { break-after: avoid; }
+    h3 { break-after: avoid; }
+    table, .photo, .star, .flow { break-inside: avoid; }
+    @page { size: A4; margin: 14mm 12mm; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <h1>商品の梱包（こんぽう）・ラベル貼り 作業マニュアル</h1>
+
+  <div class="meta">
+    <div class="top">このマニュアルは随時（ずいじ）更新します。最新版は社長にご確認ください。</div>
+    <table>
+      <tr><td><strong>版数（ばんすう）</strong></td><td>第1版</td></tr>
+      <tr><td><strong>作成日</strong></td><td>2026年8月9日</td></tr>
+      <tr><td><strong>作成</strong></td><td><span class="fill">【要記入：社長氏名／屋号】</span>（Amazon店舗名：Satoy Select）</td></tr>
+      <tr><td><strong>お渡し先</strong></td><td><span class="fill">【要記入：施設名】</span> ご担当者さま</td></tr>
+    </table>
+  </div>
+
+  <div class="lead">
+    <p>いつもありがとうございます。<br>
+    このマニュアルは、<strong>商品（しょうひん）を袋（ふくろ）に入れて、シールを貼（は）って、きれいに仕上（しあ）げる作業</strong>の手順書です。</p>
+    <p>作業はむずかしくありません。<strong>「袋に入れる」「シールを貼る」「箱にまとめる」</strong> の3つが中心です。
+    このマニュアルの通りに進めていただければ大丈夫です。分からないところは、遠慮（えんりょ）なく連絡先（§9）にご質問ください。</p>
+  </div>
+
+  <h2>1. はじめに（この作業は何か・何のためか）</h2>
+
+  <h3>この作業は何をするもの？</h3>
+  <p>わたしたちは、<strong>インターネットの通販サイト「Amazon（アマゾン）」で商品を売っています。</strong></p>
+  <p>Amazonでは、商品を売る前に、一度「Amazonの大きな倉庫（そうこ）」へ商品を送ります。
+  その倉庫に商品が届くと、<strong>注文が入ったときにAmazonが自動でお客さまへ発送（はっそう）してくれます。</strong>
+  （この仕組みを「FBA＝Amazonの倉庫にまとめて送る仕組み」と呼びます。むずかしい言葉なので、覚えなくて大丈夫です。）</p>
+  <p>その「Amazonの倉庫へ送る前」に、商品を<strong>きれいに袋に入れて、決められたシールを貼る準備</strong>が必要です。
+  <strong>この準備の作業を、みなさまにお願いしたい</strong>というのが、今回のお願いです。</p>
+
+  <h3>なぜていねいさが大事なの？</h3>
+  <ul>
+    <li>Amazonの倉庫では、商品のシール（バーコード）を<strong>機械で読み取って</strong>管理します。</li>
+    <li>シールがまっすぐ貼れていなかったり、汚（よご）れていたりすると、<strong>機械が読めず、商品が受け取ってもらえない</strong>ことがあります。</li>
+    <li>だから、<strong>「シールをきれいに貼ること」「商品を大切にあつかうこと」</strong> がとても大事です。</li>
+  </ul>
+  <div class="note">ひとことで：<strong>「商品を袋に入れて、シールをきれいに貼って、箱にまとめる」</strong>。これがみなさまのお仕事です。</div>
+
+  <h2>2. 全体の流れ</h2>
+  <p>作業は、次の順番（じゅんばん）で進みます。左から右へ、1つずつ進めてください。</p>
+  <div class="flow">
+    <div class="step"><span class="n">①</span><span class="t">受取</span><span class="d">商品を受け取る</span></div>
+    <div class="step"><span class="n">②</span><span class="t">検品</span><span class="d">数を数える／傷を見る</span></div>
+    <div class="step"><span class="n">③</span><span class="t">梱包</span><span class="d">袋に入れて包む</span></div>
+    <div class="step"><span class="n">④</span><span class="t">ラベル貼り</span><span class="d">シールを貼る</span></div>
+    <div class="step"><span class="n">⑤</span><span class="t">保管</span><span class="d">種類ごとにまとめる</span></div>
+    <div class="step"><span class="n">⑥</span><span class="t">引き渡し</span><span class="d">社長へお渡し</span></div>
+  </div>
+  <ul>
+    <li><strong>① 受取:</strong> 届いた商品を受け取ります。</li>
+    <li><strong>② 検品:</strong> 数を数え、傷（きず）や汚れがないか見ます。</li>
+    <li><strong>③ 梱包:</strong> 商品を袋に入れ、必要なら緩衝材（かんしょうざい＝プチプチ）で包みます。</li>
+    <li><strong>④ ラベル貼り:</strong> 決められたシール（バーコード）を貼ります。</li>
+    <li><strong>⑤ 保管:</strong> 作業が終わった商品を、種類ごとに分けて箱にまとめます。</li>
+    <li><strong>⑥ 引き渡し:</strong> まとまったら、社長へお渡しします。</li>
+  </ul>
+
+  <h2>3. 用意するもの・資材（ざいりょう）</h2>
+  <p>作業に使う道具（どうぐ）と材料です。<strong>「だれが用意するか」</strong> は、施設さまと社長で相談して決めます。下の表の <span class="fill">【要記入】</span> をうめてください。</p>
+  <table>
+    <tr><th>用意するもの</th><th>何に使う？</th><th>だれが用意する？</th></tr>
+    <tr><td>OPP袋（＝とうめいな袋）</td><td>商品を入れる袋</td><td><span class="fill">【要記入：社長が支給／施設で用意】</span></td></tr>
+    <tr><td>緩衝材（＝プチプチ）</td><td>こわれやすい商品を包む</td><td><span class="fill">【要記入：社長が支給／施設で用意】</span></td></tr>
+    <tr><td>ラベルシール（バーコードのシール）</td><td>商品に貼る</td><td><span class="fill">【要記入：社長が印刷して支給】</span></td></tr>
+    <tr><td>セロハンテープ／OPPテープ</td><td>袋や箱をとめる</td><td><span class="fill">【要記入】</span></td></tr>
+    <tr><td>はさみ・カッター</td><td>袋やテープを切る</td><td><span class="fill">【要記入】</span></td></tr>
+    <tr><td>定規（じょうぎ）／ヘラ</td><td>シールをまっすぐ貼る</td><td><span class="fill">【要記入】</span></td></tr>
+    <tr><td>ダンボール箱</td><td>商品をまとめる</td><td><span class="fill">【要記入】</span></td></tr>
+    <tr><td>作業記録表（§8）</td><td>作業した数を書く</td><td>社長が用意</td></tr>
+    <tr><td>ウェットティッシュ・ふきん</td><td>手や机（つくえ）をきれいに</td><td><span class="fill">【要記入】</span></td></tr>
+  </table>
+  <div class="note"><strong>【要記入】</strong>その他、この商品にとくべつ必要な道具があれば書いてください：<br>［　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　］</div>
+
+  <h2>4. 各作業の手順（てじゅん）</h2>
+  <p>写真を入れる場所は、点線（てんせん）のわくで示しています。あとで社長が写真をはめこみます。</p>
+
+  <h3>② 検品（けんぴん）— 数を数える・傷を見る</h3>
+  <div class="photo">写真：検品のようす（商品を数えている場面）</div>
+  <ol>
+    <li>届いた箱を開けます。</li>
+    <li><strong>商品の数を数えます。</strong> 指示書（しじしょ）に書いてある数と合っているか確かめます。</li>
+    <li>数が合わないときは、<strong>作業を止めて、社長に連絡（§9）してください。</strong></li>
+    <li>商品を1つずつ見て、次のものがないか確かめます。
+      <ul><li>傷（きず）・われ・へこみ</li><li>汚れ・シール跡（あと）</li><li>ふたが開いている・中身がもれている</li></ul>
+    </li>
+    <li>傷や汚れのある商品は、<strong>べつの場所によけておきます。</strong> そのまま袋に入れないでください。</li>
+    <li>よけた商品の数を、記録表（§8）に書いておきます。</li>
+  </ol>
+  <div class="note">ポイント：<strong>「数が合っているか」「きれいな商品か」</strong> の2つを見ます。</div>
+
+  <h3>③ 梱包（こんぽう）— 袋に入れて包む</h3>
+  <div class="photo">写真：袋に入れる手順</div>
+  <div class="photo">写真：緩衝材で包む手順</div>
+  <ol>
+    <li>手をきれいにします。机（つくえ）の上もふいておきます。</li>
+    <li>商品を <strong>OPP袋（とうめいな袋）</strong> に入れます。</li>
+    <li>こわれやすい商品は、先に <strong>緩衝材（プチプチ）</strong> で包んでから袋に入れます。
+      <ul><li>どの商品を包むかは → <span class="fill">【要記入：緩衝材で包む商品はどれか】</span></li></ul>
+    </li>
+    <li>袋の口（くち）を <strong>テープでとめます。</strong> 空気（くうき）が入りすぎないように、軽くおさえます。</li>
+    <li>袋がやぶれていないか、口がしっかり閉じているか確かめます。</li>
+  </ol>
+  <div class="note">ポイント：<strong>商品が袋の中で動かないように</strong>、ちょうどよい大きさの袋を使います。袋の口が開いていると、Amazonで受け取ってもらえません。</div>
+
+  <h3>④ ラベル貼り（らべるはり）— シールを貼る　★いちばん大事★</h3>
+  <div class="photo">写真：ラベルを貼る位置</div>
+  <div class="photo">写真：貼る前と貼ったあとの見本</div>
+  <p><strong>「ラベル」とは、商品につける四角いバーコードのシールです。</strong>
+  Amazonの倉庫で、このシールを機械で読み取って商品を管理します。だから、とても大事な作業です。</p>
+  <p><strong>手順：</strong></p>
+  <ol>
+    <li>貼るシールが、その商品用（よう）の正しいシールか確かめます。</li>
+    <li>シールを <strong>まっすぐ</strong>、<strong>シワにならないように</strong> 貼ります。
+      <ul><li>ゆっくり、はしから貼っていくとキレイに貼れます。</li><li>定規やヘラで上から軽くこすると、シワになりません。</li></ul>
+    </li>
+  </ol>
+  <div class="star">
+    <span class="tag">★ いちばん大事なルール ★</span>
+    <p style="margin:4px 0 8px"><strong>商品にもともと付いている別のバーコードは、あたらしいシールで「かくして」ください。</strong></p>
+    <ul style="margin:0">
+      <li>商品の箱には、もともとバーコードが付いていることがあります。</li>
+      <li>そのままだと、機械がどちらを読めばいいか分からなくなります。</li>
+      <li>だから、<strong>もとのバーコードの上に、あたらしいシールをかぶせて隠（かく）します。</strong></li>
+    </ul>
+  </div>
+  <ol start="4">
+    <li><strong>バーコードは「1つだけ」見える状態</strong>にします。（くわしい理由は §6）</li>
+    <li>貼る場所（位置・向き）は → <span class="fill">【要記入：貼る位置・向き。例「箱の右下・横向き」】</span></li>
+  </ol>
+  <div class="note">ポイント：<br>・シールは <strong>まっすぐ・シワなし・1枚だけ</strong>。<br>・<strong>もとのバーコードは必ずかくす。</strong><br>・まよったら、貼る前に §9 に連絡してください。</div>
+
+  <h3>⑤ 保管（ほかん）— 種類ごとに分けてまとめる</h3>
+  <div class="photo">写真：種類ごとに分けた状態</div>
+  <ol>
+    <li>作業がおわった商品を、<strong>種類（しゅるい）ごとに分けます。</strong> 別の商品とまぜないでください。</li>
+    <li>同じ商品を、決められた数ずつダンボール箱にまとめます。
+      <ul><li>1箱に入れる数は → <span class="fill">【要記入：1箱あたりの数】</span></li></ul>
+    </li>
+    <li>箱に、中身が分かるようにメモを貼ります（商品名・数）。</li>
+    <li>作業前の商品と、作業後の商品は、<strong>置き場所を分けます。</strong>（まざると数え間違いのもとになります）</li>
+    <li>商品がぬれたり、日に当たったり、汚れたりしない場所に置きます。</li>
+  </ol>
+  <div class="note">ポイント：<strong>「作業前」と「作業後」をはっきり分ける</strong>と、まちがいがへります。</div>
+
+  <h3>⑥ 引き渡し（ひきわたし）— 社長へお渡しする</h3>
+  <ol>
+    <li>まとまった箱を、決められた方法で社長へお渡しします。
+      <ul>
+        <li>受け渡しの方法は → <span class="fill">【要記入：社長が取りに来る／宅配便で送る など】</span></li>
+        <li>受け渡しの曜日・時間は → <span class="fill">【要記入：例「毎週金曜の午前」】</span></li>
+      </ul>
+    </li>
+    <li>その回に作業した数を、記録表（§8）に書いて、いっしょにお渡しします。</li>
+    <li>傷などでよけた商品があれば、それも分けてお渡しします。</li>
+  </ol>
+
+  <h2>5. 品質基準（ひんしつきじゅん）— よい例とダメな例</h2>
+  <p>作業の「合格ライン」です。<strong>左（○ OK）が正しい状態、右（× NG）はやり直しが必要な状態</strong>です。</p>
+
+  <h3>袋・梱包について</h3>
+  <table class="okng">
+    <tr><th>○ OK（これでよい）</th><th>× NG（やり直し）</th></tr>
+    <tr><td>商品が袋にきちんと入っている</td><td>商品が袋からはみ出している</td></tr>
+    <tr><td>袋の口がテープで閉じている</td><td>袋の口が開いている</td></tr>
+    <tr><td>こわれ物が緩衝材で包まれている</td><td>こわれ物がむき出しのまま</td></tr>
+    <tr><td>袋がきれい</td><td>袋がやぶれている・汚れている</td></tr>
+  </table>
+
+  <h3>ラベル（シール）について</h3>
+  <table class="okng">
+    <tr><th>○ OK（これでよい）</th><th>× NG（やり直し）</th></tr>
+    <tr><td>シールがまっすぐ貼れている</td><td>シールがななめ・曲がっている</td></tr>
+    <tr><td>シールにシワがない</td><td>シールにシワ・気泡（きほう）がある</td></tr>
+    <tr><td>シールが1枚だけ貼ってある</td><td>シールが二重（にじゅう）に貼ってある</td></tr>
+    <tr><td>もとのバーコードがかくれている</td><td>もとのバーコードが見えている</td></tr>
+    <tr><td>シールがはがれていない</td><td>シールのはしがめくれている</td></tr>
+  </table>
+  <div class="note"><strong>NG（ダメな例）を見つけたら、やり直してください。</strong> 判断にまよったら §9 に連絡してください。</div>
+
+  <h2>6. FBAの大事なお約束（バーコードは「1つだけ」）</h2>
+  <p><strong>FBAとは：Amazonの倉庫にまとめて商品を送る仕組みのことです。</strong></p>
+  <h3>なぜバーコードを1つだけにするの？</h3>
+  <ul>
+    <li>Amazonの倉庫では、<strong>機械がバーコードを読み取って</strong>、商品を1つずつ管理しています。</li>
+    <li>もし商品に <strong>バーコードが2つ以上見えている</strong> と、機械がどちらを読めばいいか分からず、<strong>まちがった商品として登録</strong>されてしまいます。</li>
+    <li>そうなると、<strong>お客さまに違う商品が届いたり、商品が迷子（まいご）になったり</strong>します。</li>
+    <li>だから、<strong>「新しいシール1つだけが見える」「もとのバーコードはかくす」</strong> が絶対のルールです。</li>
+  </ul>
+  <div class="note">かんたんに言うと：<strong>「見えるバーコードは、いつも1つだけ」</strong>。これだけ覚えてください。</div>
+
+  <h3>商品ごとのとくべつな注意（社長がうめます）</h3>
+  <p>商品によっては、とくべつな決まりがあります。下は社長が商品ごとに指示します。</p>
+  <table>
+    <tr><th>商品のタイプ</th><th>あつかい方（社長が記入）</th></tr>
+    <tr><td>こわれやすい商品（ガラス・とうき など）</td><td><span class="fill">【要記入：包み方の指示】</span></td></tr>
+    <tr><td>危険物（きけんぶつ）あつかいの商品（スプレー・電池 など）</td><td><span class="fill">【要記入：あつかい方。※通常この作業では取りあつかいません】</span></td></tr>
+    <tr><td>セット商品（何個かをまとめて1つとして売るもの）</td><td><span class="fill">【要記入：まとめ方・シールの貼り方】</span></td></tr>
+    <tr><td>その他の注意</td><td><span class="fill">【要記入】</span></td></tr>
+  </table>
+
+  <h2>7. 数量（すうりょう）・納期（のうき）・受け渡し</h2>
+  <p>作業の量やスケジュールです。社長と施設さまで相談して決め、<span class="fill">【要記入】</span> をうめます。</p>
+  <table>
+    <tr><th>項目</th><th>内容</th></tr>
+    <tr><td>1ヶ月あたりの数量の目安</td><td><span class="fill">【要記入：例「100〜300個くらい」】</span></td></tr>
+    <tr><td>1回あたりの数量</td><td><span class="fill">【要記入：例「1週間で〇個」】</span></td></tr>
+    <tr><td>作業の締め（しめ）・仕上げる日</td><td><span class="fill">【要記入：例「毎週木曜までに仕上げる」】</span></td></tr>
+    <tr><td>受け渡しの曜日・時間</td><td><span class="fill">【要記入：例「毎週金曜の午前」】</span></td></tr>
+    <tr><td>受け渡しの場所・方法</td><td><span class="fill">【要記入：例「施設で社長が受け取る」】</span></td></tr>
+    <tr><td>商品が届く方法</td><td><span class="fill">【要記入：例「宅配便で施設に届く」】</span></td></tr>
+  </table>
+  <div class="note">まずは <strong>約1ヶ月のお試し</strong> から始めます。その間に、量やスピードを見ながら、無理のないペースを一緒に決めていきます。</div>
+
+  <h2>8. 作業記録表（さぎょうきろくひょう）</h2>
+  <p>作業をした日ごとに、下の表に書いてください。<strong>この表が、社長への大事な報告になります。</strong></p>
+  <table class="rev">
+    <tr><th>日付</th><th>商品名</th><th>作業した数</th><th>不良（ふりょう）の数</th><th>担当した人</th><th>気づいたこと</th></tr>
+    <tr><td>&nbsp;/&nbsp;</td><td></td><td>個</td><td>個</td><td></td><td></td></tr>
+    <tr><td>&nbsp;/&nbsp;</td><td></td><td>個</td><td>個</td><td></td><td></td></tr>
+    <tr><td>&nbsp;/&nbsp;</td><td></td><td>個</td><td>個</td><td></td><td></td></tr>
+    <tr><td>&nbsp;/&nbsp;</td><td></td><td>個</td><td>個</td><td></td><td></td></tr>
+    <tr><td>&nbsp;/&nbsp;</td><td></td><td>個</td><td>個</td><td></td><td></td></tr>
+    <tr><td>&nbsp;/&nbsp;</td><td></td><td>個</td><td>個</td><td></td><td></td></tr>
+    <tr><td>&nbsp;/&nbsp;</td><td></td><td>個</td><td>個</td><td></td><td></td></tr>
+    <tr><td>&nbsp;/&nbsp;</td><td></td><td>個</td><td>個</td><td></td><td></td></tr>
+  </table>
+  <ul>
+    <li><strong>不良の数</strong> ＝ 傷や汚れでよけた商品の数、やり直した数。</li>
+    <li><strong>気づいたこと</strong> ＝ 「この商品はシールが貼りにくい」など、何でも書いてください。次の改善（かいぜん）に役立ちます。</li>
+  </ul>
+
+  <h2>9. 困（こま）った時・連絡先（れんらくさき）</h2>
+  <p><strong>まよったら、自分だけで決めずに、下記に連絡してください。</strong> それがいちばん安全です。</p>
+  <p>こんな時は連絡を：</p>
+  <ul>
+    <li>数が合わない</li>
+    <li>傷・汚れ・こわれた商品が多い</li>
+    <li>シールの貼り方がわからない</li>
+    <li>商品が足りない・資材が足りない</li>
+    <li>そのほか、こまったこと・不安なこと</li>
+  </ul>
+  <table>
+    <tr><th>連絡先</th><th>内容</th></tr>
+    <tr><td>担当者（社長）氏名</td><td><span class="fill">【要記入】</span></td></tr>
+    <tr><td>電話番号</td><td><span class="fill">【要記入】</span></td></tr>
+    <tr><td>メールアドレス</td><td><span class="fill">【要記入】</span></td></tr>
+    <tr><td>連絡できる時間帯</td><td><span class="fill">【要記入：例「平日9時〜18時」】</span></td></tr>
+    <tr><td>急ぎのときの連絡方法</td><td><span class="fill">【要記入：例「電話」】</span></td></tr>
+  </table>
+  <div class="note">「こんなこと聞いていいのかな」と思うことでも、遠慮なく連絡してください。<strong>質問は大かんげいです。</strong></div>
+
+  <h2>10. 改訂（かいてい）履歴</h2>
+  <p>このマニュアルを直したら、下の表に1行ずつ書き足してください。</p>
+  <table class="rev">
+    <tr><th>版</th><th>日付</th><th>変更した点</th><th>だれが</th></tr>
+    <tr><td>第1版</td><td>2026-08-09</td><td>新規作成</td><td><span class="fill">【要記入：社長】</span></td></tr>
+    <tr><td></td><td></td><td></td><td></td></tr>
+    <tr><td></td><td></td><td></td><td></td></tr>
+    <tr><td></td><td></td><td></td><td></td></tr>
+  </table>
+
+  <div class="footer-note">
+    このマニュアルは、みなさまが作業しやすいように、これからも一緒（いっしょ）に良くしていきます。<br>
+    「ここが分かりにくい」「こうしたら早い」などのご意見は、ぜひ教えてください。
+  </div>
+
+</div>
+</body>
+</html>
