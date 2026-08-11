@@ -1,0 +1,138 @@
+<meta charset="utf-8">
+<title>Keepa拡張の使い方ガイド｜Amazon物販事業</title>
+<style>
+  :root{
+    --bg:#ffffff; --fg:#1a1a1a; --muted:#5b6470; --line:#e3e7ec;
+    --accent:#0b63c4; --accent-soft:#eaf2fc; --pink:#e5399b; --purple:#6a5acd;
+    --green:#2e9e5b; --black:#333; --card:#f7f9fb; --warn:#b26a00; --warnbg:#fff6e5;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#12151a; --fg:#e8ecf1; --muted:#9aa4b0; --line:#2a303a;
+      --accent:#5fa8ff; --accent-soft:#1a2532; --card:#1a1e25; --warnbg:#2a2313; --warn:#e0a94a; }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);font-family:-apple-system,"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;line-height:1.75;font-size:15.5px}
+  .wrap{max-width:860px;margin:0 auto;padding:32px 22px 80px}
+  h1{font-size:26px;line-height:1.35;margin:0 0 6px;letter-spacing:.01em}
+  .sub{color:var(--muted);font-size:13.5px;margin:0 0 28px}
+  h2{font-size:19px;margin:38px 0 10px;padding-top:14px;border-top:2px solid var(--line);display:flex;align-items:center;gap:10px}
+  h2 .n{flex:0 0 auto;width:28px;height:28px;border-radius:8px;background:var(--accent);color:#fff;font-size:14px;display:inline-flex;align-items:center;justify-content:center;font-weight:700}
+  h3{font-size:15.5px;margin:22px 0 6px}
+  p{margin:8px 0}
+  ul{margin:8px 0;padding-left:22px}
+  li{margin:5px 0}
+  .lead{background:var(--accent-soft);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:0 0 10px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:12px 0}
+  .tag{display:inline-block;font-size:12px;font-weight:700;padding:2px 9px;border-radius:999px;background:var(--accent);color:#fff;vertical-align:middle}
+  .muted{color:var(--muted)}
+  .term{font-size:13.5px;color:var(--muted);border-left:3px solid var(--line);padding:2px 0 2px 12px;margin:6px 0}
+  .warn{background:var(--warnbg);border:1px solid var(--warn);border-radius:12px;padding:14px 16px;margin:14px 0;color:var(--fg)}
+  .warn b{color:var(--warn)}
+  table{border-collapse:collapse;width:100%;margin:12px 0;font-size:13.5px;display:block;overflow-x:auto}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:var(--card);white-space:nowrap}
+  .legend{display:inline-block;width:22px;height:0;border-top:3px solid;vertical-align:middle;margin-right:6px}
+  .dot{display:inline-block;width:11px;height:11px;border-radius:50%;vertical-align:middle;margin-right:6px}
+  .kbd{font-family:ui-monospace,Menlo,monospace;background:var(--card);border:1px solid var(--line);border-radius:6px;padding:1px 7px;font-size:12.5px}
+  .quick{display:grid;grid-template-columns:1fr;gap:10px;margin:14px 0}
+  .quick .card{margin:0}
+  .step{counter-reset:s;list-style:none;padding-left:0}
+  .step li{position:relative;padding-left:34px;margin:10px 0}
+  .step li::before{counter-increment:s;content:counter(s);position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .foot{margin-top:40px;padding-top:16px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px}
+</style>
+<div class="wrap">
+
+<h1>Keepa（Chrome拡張）の使い方ガイド</h1>
+<p class="sub">社長共有のスクショ（AirPods Pro 第3世代・整備済み品ページ）に沿った実画面ベースの解説 ／ 2026-08-11 ／ 秘書カズヨ・制作ヒデアキ</p>
+
+<div class="lead">
+<b>Keepaとは：</b>Amazonの商品ページに「価格と売れ行きの履歴グラフ」を差し込んでくれる無料のChrome拡張です。<b>「今の値段は高いのか安いのか」「この商品は本当に売れているのか」</b>を、感覚ではなく<b>過去データ</b>で判断するための道具です。仕入れ判断の土台になります。
+</div>
+
+<div class="warn">
+<b>まず大前提</b> ── Keepaの画面は、Amazon商品ページの中に「Keepa Box」という小さな枠として<b>埋め込まれて</b>表示されます。単独アプリではありません。商品ページを開くたびに、価格の上あたりに自動で出てきます。上部に <b>価格履歴 / 商品のトラッキング / Data / バリエーション / 設定</b> の5つのタブがあり、これを切り替えて使います。
+</div>
+
+<h2><span class="n">1</span>価格履歴タブ（いちばん使う画面）</h2>
+<p>Keepa Boxを開いた時に最初に出るメイン画面。折れ線グラフで<b>価格の推移</b>が読めます。縦軸が価格（例：¥30,000〜¥40,000）、横軸が日付です。</p>
+
+<h3>線の色の見分け方</h3>
+<table>
+<tr><th>色</th><th>意味</th><th>物販での読み方</th></tr>
+<tr><td><span class="dot" style="background:var(--pink)"></span>ピンク＝<b>Buy Box</b></td><td>今カートに入る価格（送料込み・最有力オファー）</td><td><b>実際に売れている価格帯。最重要。</b>仕入れ後にいくらで売れるかの基準</td></tr>
+<tr><td><span class="dot" style="background:var(--purple)"></span>紫＝<b>新品</b></td><td>新品オファーの最安値</td><td>新品相場の下限</td></tr>
+<tr><td><span class="legend" style="border-color:#7aa"></span>新しい第三者FBA</td><td>Amazon倉庫発送のセラー価格</td><td>FBA競合の価格</td></tr>
+<tr><td><span class="legend" style="border-color:#7aa;border-style:dashed"></span>新品 第三者FBM</td><td>セラー自己発送の価格</td><td>自己発送競合の価格</td></tr>
+<tr><td><span class="dot" style="background:var(--black)"></span>黒＝<b>中古</b></td><td>中古・整備済みの価格</td><td>中古/整備済みを扱う時の相場</td></tr>
+<tr><td><span class="muted">リファビッシュ</span></td><td>メーカー整備済み品</td><td>今回のAirPods Proはこれ</td></tr>
+</table>
+<p class="term">💡 グラフの右側にこの<b>凡例（色の一覧）</b>が出ています。凡例の項目を<b>クリックすると、その線の表示/非表示を切り替え</b>できます。見たい線だけ残すと読みやすくなります。</p>
+
+<h3>操作のコツ（実画面の注記どおり）</h3>
+<ul>
+<li><b>期間切替：</b>右下の <span class="kbd">1日 / 1週間 / 1ヶ月 / 全期間</span> で表示範囲を変える。相場感は「全期間」、直近の動きは「1ヶ月」。</li>
+<li><b>ズーム：</b>グラフ上で見たい範囲を<b>ドラッグ選択</b>すると拡大。<b>ダブルクリックで元に戻る</b>。</li>
+<li><b>クローズアップビュー：</b>ONにすると、価格が動いている範囲に縦軸を寄せて、小さな変動を見やすくする。</li>
+<li><b>統計：</b>クリックで最安値・最高値・平均価格などの数値サマリーが出る。</li>
+<li><b>「◯人のユーザがこの商品をトラッキングしています」：</b>ウォッチしている人数。多いほど注目商品の目安。</li>
+</ul>
+
+<div class="card">
+<b>物販での読みどころ（ここが本番）</b>
+<ul>
+<li><b>価格の底と天井：</b>ピンク（Buy Box）の帯を見て「いくらまで下がる／上がるか」を把握。<b>底値で仕入れ、高値で売る</b>の判断材料。</li>
+<li><b>値動きの激しさ：</b>ギザギザが激しい＝値崩れリスク。平坦＝安定して利益計算しやすい。</li>
+<li><b>売れ行き（後述の売れ筋ランキング線）：</b>ランキングが<b>ガクッと下がる回数＝売れた回数</b>の目安。線が頻繁に落ちている＝よく売れている。</li>
+</ul>
+</div>
+
+<h2><span class="n">2</span>商品のトラッキングタブ（値下がりアラート）</h2>
+<p>「この価格まで下がったら教えて」を設定する画面。<b>登録不要・無料</b>で、メール／ウェブプッシュ／Telegram／RSSで通知が届きます。</p>
+<ol class="step">
+<li><b>目標価格を入れる：</b>Buy Box / Amazon / 新品 / 中古 それぞれに「◯円<b>以下</b>になったら通知」を設定できる（スクショでは Buy Box=¥30,381 以下）。</li>
+<li><b>トラッキング対象（期間）を選ぶ：</b>2週〜10年。通常は<b>1年</b>でOK。</li>
+<li><b><span class="tag">トラッキング開始</span> ボタンを押す</b>と監視スタート。</li>
+</ol>
+<p class="term">💡 モードは <b>ベーシック / アドバンスド / プロ</b> の3段階。最初は<b>ベーシック</b>で十分。仕入れ候補を「安くなったら買う」リストとして貯めるのに便利です。</p>
+
+<h2><span class="n">3</span>Dataタブ（セラー競合の実態を見る）</h2>
+<p>上部にサブタブ <b>製品詳細 / オファー / Buy Box統計情報 / Buy Box 中古統計情報</b>。中でも重要なのが <b>Buy Box統計情報</b> です。</p>
+<div class="card">
+<b>Buy Box統計情報＝「カートを誰がどれだけ取っているか」の表</b>
+<p>スクショの例：<b>Buy Box対象オファー数 → 新品FBA:22 / 新品FBM:6 / 中古FBA:3</b>（＝それだけ競合セラーがいる）</p>
+<table>
+<tr><th>%獲得</th><th>平均価格</th><th>販売者</th><th>FBA</th><th>評価</th></tr>
+<tr><td><b>57%</b></td><td>¥35,554</td><td>Beo Store 秋葉原店</td><td>✔</td><td>-1%</td></tr>
+<tr><td>23%</td><td>¥37,792</td><td>メディアマーケット 横浜本店</td><td></td><td>92%</td></tr>
+<tr><td>6%</td><td>¥40,549</td><td>ピクセルポート</td><td></td><td>60%</td></tr>
+</table>
+<p class="muted" style="font-size:13px;margin-top:8px"><b>%獲得＝そのセラーがカートを取っている割合。</b>1社が過半を握っている商品は、後から入っても価格競争になりやすい＝旨みが薄い、という判断に使えます。FBA列・評価列で競合の強さも読めます。</p>
+</div>
+
+<h2><span class="n">4</span>バリエーションタブ（色・サイズ違いを横並び比較）</h2>
+<p>同じ商品の色・容量などのバリエーションを、<b>Buy Box / 新品 / 中古 の現在価格と履歴グラフ</b>で一覧比較できます。右端の <b>「先月の購入」</b>（例：200+）は<b>直近の販売数の目安</b>で、需要の強さを測るのに使えます。「どのバリエが一番売れて、値持ちが良いか」を選ぶのに便利です。</p>
+
+<h2><span class="n">5</span>設定タブ（最初に整えると快適）</h2>
+<p>Keepa Boxの見た目や既定値を調整。副業初心者としては<b>下の3つだけ</b>触れば十分です。</p>
+<ul>
+<li><b>デフォルト期間：</b>初期表示を <span class="kbd">3か月</span> などにしておくと毎回ちょうど良い範囲で開く。</li>
+<li><b>デフォルトの目標価格：</b>トラッキング時の初期値（例 5%）。よく使う値下げ幅にしておくと設定が速い。</li>
+<li><b>単位系：</b>日本なら <b>メートル法（cm, g）</b>。言語も日本語（🇯🇵）に。</li>
+</ul>
+<p class="term">その他「極端な価格を無視」「クローズアップビューON」「Keepa Boxの高さ200px」などは既定のままで問題ありません。</p>
+
+<h2><span class="n">✓</span>これだけ覚えれば回る：3ステップ</h2>
+<div class="quick">
+<div class="card"><b>① 価格履歴タブ</b><br>ピンク線（Buy Box）で「今は高い？安い？」を判断。全期間で相場、1ヶ月で直近を見る。</div>
+<div class="card"><b>② 売れ行き確認</b><br>売れ筋ランキング線のギザギザ（下落回数）＋バリエーションタブの「先月の購入」で、本当に売れているか確認。</div>
+<div class="card"><b>③ 競合チェック</b><br>Data→Buy Box統計情報で、セラー数とカート獲得率を見て「入っても勝てるか」を判断。</div>
+</div>
+
+<div class="warn">
+<b>注意：</b>Keepaは<b>過去の事実</b>を見せてくれる道具で、未来を保証はしません。仕入れ判断は必ず「仕入れ値＋送料＋Amazon手数料＋外注費」を差し引いた<b>手元利益</b>と合わせて計算してください（当社は損益を外注費込みで計算する方針）。
+</div>
+
+<p class="foot">出典：社長共有スクリーンショット5枚（FireShot Capture 021〜025 / AirPods Pro 第3世代 整備済み品ページ, amazon.co.jp）。本ガイドは実画面の表記に忠実に作成。チケット T-20260811-001。</p>
+
+</div>
