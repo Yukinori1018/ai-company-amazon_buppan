@@ -1,7 +1,7 @@
 ---
 ticket_id: T-20260812-001
 title: AMZScout PRO AI 使い方ナレッジ蓄積＋採否一次判断
-status: waiting
+status: done
 assignee: researcher
 priority: medium
 created_at: 2026-08-12
@@ -30,7 +30,7 @@ related_tickets: [T-20260520-003, T-20260527-001, T-20260803-001]
 - [x] 既契約 Keepa／既調査 ERESA との重複・差分整理（feedback_research_existing_before_build）
 - [x] 本事業戦略（②メーカー仕入れ最優先／①せどり停止／③OEM）との整合を評価
 - [x] 採否一次判断を A/B/C＋推奨で社長へ（→ waiting）
-- [ ] 社長判断（本チケットの締め）
+- [x] 社長判断（本チケットの締め）＝**A案で確定**（2026-08-12）
 
 ## 注意（§4.1）
 
@@ -41,5 +41,6 @@ related_tickets: [T-20260520-003, T-20260527-001, T-20260803-001]
 
 - 2026-08-12 todo 起票 →（同turn）doing：リサーチャー・サトルで読解・ナレッジ化。秘書カズヨが採否判断を統合。
 - 2026-08-12 スクショ13枚読解完了→機能マップ化。memory `knowledge_amzscout_pro_ai` 保存＋MEMORY.md索引追加。納品（HTML+md）＝`deliverables/T-20260812-001/`＋社長閲覧用フォルダ。カタログCSV追記済（シート同期はWebApp404で次回リトライ）。owner-tasks反映。→ waiting（社長のA/B/C判断待ち・推奨A）。
+- 2026-08-12 社長判断＝**A案で確定**（今は契約せず、③簡易OEM〔T-20260809-001〕を具体検討する局面で無料トライアル16回だけ「サプライヤー逆引き＋AIリスティング」を検証。費用ゼロ・§4.1非該当）。→ done。将来の無料トライアル検証は③OEMの実行フェーズに紐づけて起動する。
 </content>
 </invoke>
