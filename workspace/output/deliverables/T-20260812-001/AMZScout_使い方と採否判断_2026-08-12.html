@@ -1,0 +1,83 @@
+<title>AMZScout PRO AI 使い方ナレッジ＋採否判断</title>
+<style>
+  :root{--bg:#fff;--fg:#1a1a1a;--muted:#5c6470;--line:#e3e6ea;--accent:#d6820a;--accent2:#0a7d55;--card:#f7f8fa;--warn:#b64a00;--danger:#c0392b}
+  @media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#161a1f;--fg:#e8eaed;--muted:#9aa3ad;--line:#2c333b;--accent:#f0a030;--accent2:#3ec98a;--card:#1e242b;--warn:#f0a030;--danger:#ff6b5b}}
+  *{box-sizing:border-box}
+  body{background:var(--bg);color:var(--fg);font-family:-apple-system,"Hiragino Kaku Gothic ProN",Meiryo,sans-serif;line-height:1.75;margin:0;padding:2.2rem 1.2rem;max-width:920px;margin-inline:auto}
+  h1{font-size:1.55rem;line-height:1.4;margin:0 0 .3rem;border-bottom:3px solid var(--accent);padding-bottom:.5rem}
+  h2{font-size:1.2rem;margin:2.2rem 0 .8rem;color:var(--accent)}
+  h3{font-size:1.02rem;margin:1.4rem 0 .5rem}
+  .sub{color:var(--muted);font-size:.9rem;margin-bottom:1.6rem}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:1rem 1.2rem;margin:1rem 0}
+  .verdict{border-left:5px solid var(--accent2)}
+  .verdict.hold{border-left-color:var(--warn)}
+  table{border-collapse:collapse;width:100%;font-size:.9rem;margin:.6rem 0;overflow-x:auto;display:block}
+  @media(min-width:640px){table{display:table}}
+  th,td{border:1px solid var(--line);padding:.5rem .6rem;text-align:left;vertical-align:top}
+  th{background:var(--card);font-weight:700}
+  .tag{display:inline-block;font-size:.72rem;padding:.1rem .5rem;border-radius:999px;border:1px solid var(--line);margin-right:.3rem}
+  .ok{color:var(--accent2)}.warn{color:var(--warn)}.no{color:var(--danger)}
+  ul{padding-left:1.3rem}li{margin:.25rem 0}
+  .abc{border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:1rem 0}
+  .abc>div{padding:.9rem 1.1rem;border-bottom:1px solid var(--line)}
+  .abc>div:last-child{border-bottom:none}
+  .abc .rec{background:color-mix(in srgb,var(--accent2) 12%,transparent)}
+  .lbl{font-weight:700;margin-right:.4rem}
+  small{color:var(--muted)}
+</style>
+
+<h1>AMZScout PRO AI｜使い方ナレッジ＋「使えるか」の一次判断</h1>
+<div class="sub">秘書カズヨ（リサーチャー・サトル読解）／2026-08-12／T-20260812-001<br>出典：社長共有スクショ13枚（AMZScout PRO AI Chrome拡張のオンボーディング＋実データ画面）</div>
+
+<div class="card verdict hold">
+  <strong>⏸ 結論：いま契約は見送り推奨。</strong> 無料トライアル（16回の利用回数制）の範囲で、<b>③簡易OEM/PL のときだけ</b>「サプライヤー画像逆引き」「AIリスティング設計」を試す — に留めるのが最も費用対効果が高いです。理由は下段「採否判断」に3点。
+</div>
+
+<h2>1. これは何のツールか</h2>
+<ul>
+  <li><b>Amazonの検索結果ページに"重ねて"表示する商品リサーチ拡張</b>（オーバーレイ型）。キーワードで検索すると、ページ上の全商品に販売数・収益・利益データが一気に付与される「探す（Discovery）型」。</li>
+  <li>系統は <b>Jungle Scout / Helium10 と同カテゴリの海外製ツール</b>。本来の主用途は <b>PL（自社ブランドOEM）と再販（せどり/転売）の"売れる商品探し"</b>。</li>
+  <li>料金は有料サブスク。無料お試しは<b>「16回」の利用回数制</b>（日数でなく回数。スクショで16→15に減っていた）。<small>※正確な月額は今回のスクショには写っておらず未確認。</small></li>
+  <li><span class="tag warn">要注意</span>スクショは全て <b>amazon.com（米国市場・USD建て）</b>。当社の舞台は amazon.co.jp。日本切替は可能ですが、画面は米国設定でした。</li>
+</ul>
+
+<h2>2. 使い方（オンボーディング6ステップ＝基本の型）</h2>
+<table>
+<tr><th>手順</th><th>やること</th></tr>
+<tr><td>①売上データ発見</td><td>BSR（ランキング）・親ASIN推定収益・推定販売数・ページ売上シェアの読み方を把握</td></tr>
+<tr><td>②製品情報AI分析</td><td>FBA手数料・LQS（リスティング品質0〜100）・出品日で「新しい/整った商品か」を判定</td></tr>
+<tr><td>③AIアシスタント</td><td>各商品を<b>SWOT（強み/弱み/機会/脅威）で自動診断</b>＋改善案（CVR・売上・収益への推定インパクト%）</td></tr>
+<tr><td>④サプライヤー</td><td><b>商品画像から米国・中国等の仕入先/OEM先を逆引き</b>。取引通貨・購入価格・最低ロットで絞り込み</td></tr>
+<tr><td>⑤研究のヒント</td><td>上位商品の頻出キーワードを抽出しSEO/PPCへ転用（AIリスティングKW密度）</td></tr>
+<tr><td>⑥完了</td><td>「利益高・競争少・販売安定」のニッチを絞り込む一連の流れが完成</td></tr>
+</table>
+
+<h3>主なデータ列・機能</h3>
+<ul>
+  <li><b>テーブル列：</b>PL製品スコア／再販向け製品スコア／BSR／推定収益・販売数／FBA手数料／利益の可能性／LQS／出品日／ブランド・カテゴリー</li>
+  <li><b>行ごとの道具：</b>利益計算機／商品履歴（Sales・Rank・Price推移＋CSV出力）／AI製品分析／アリババで検索／ASINコピー</li>
+  <li><b>列セット：</b>スターター（初心者）／ブランド（PL・利益率重視）／再販業者（価格・売上監視）を用途で切替</li>
+  <li><b>AI群：</b>AIチャットボット／アイニッチ分析／AIローンチプランナー／AIリスティングKW密度</li>
+</ul>
+
+<h2>3. 採否判断（「使えるか」への回答）</h2>
+<div class="card">
+<p>「機能は充実。ただし当社にとって"今"の優先度は低い」というのが率直な評価です。根拠3点：</p>
+<ol>
+  <li><b class="warn">既契約Keepa＋既調査ERESAと機能がほぼ重複。</b>推定販売数・BSR・価格履歴・損益分岐は Keepa／ERESA でも取得済み。二重課金は当社ルール「自作/新規契約の前に既存・無料・既契約を先に使う」に反します。</li>
+  <li><b class="warn">当社の最優先は②メーカー仕入れ（既存品の卸仕入れ＝ストック型）。</b>AMZScoutの本領は<b>PL/OEMと再販の商品ハンティング</b>で、主目的がズレます。①電脳せどりは現在停止中。</li>
+  <li><b class="warn">画面が米国市場・USD建て。</b>日本市場のデータ精度・母数は、国内6万件導入・SPN公認の Keepa／ERESA に分があります。</li>
+</ol>
+<p><b class="ok">唯一の明確な使いどころ＝③簡易OEM/PL。</b>「サプライヤー画像逆引き」と「AI×リスティング設計」は Keepa／ERESA に無い差別化で、ここだけは無料トライアル16回で価値検証する意味があります。</p>
+</div>
+
+<h2>4. ご判断ください（A/B/C＋推奨）</h2>
+<div class="abc">
+  <div class="rec"><span class="lbl ok">A（推奨）</span>今は<b>契約せず</b>、③OEMを具体検討する局面で<b>無料トライアル16回だけ</b>「サプライヤー逆引き＋AIリスティング」を試す。費用ゼロ・当社ルール順守。</div>
+  <div><span class="lbl">B</span>月額を確認のうえ<b>1ヶ月だけ課金して本格検証</b>（PL/OEMの商品選定に本気で使う前提）。<small>→ 課金は§4.1「金銭が動く」＝社長承認が必要。</small></div>
+  <div><span class="lbl">C</span><b>採用しない</b>と決め、リサーチは Keepa＋ERESA に一本化。ツール調査はここで打ち切り。</div>
+</div>
+<p><small>推奨理由：Aなら費用ゼロで「③OEMに効くか」だけをピンポイント検証でき、既契約ツールとの重複コストを避けられます。BはPL/OEMを主軸に据える意思が固まってからで十分。</small></p>
+
+<hr style="border:none;border-top:1px solid var(--line);margin:2rem 0">
+<p><small>蓄積先：社内メモリ <code>knowledge_amzscout_pro_ai</code>（機能マップ全項目を保存済み）。関連：<code>knowledge_eresa_research_report</code>／<code>project_strategy_multitrack_2026-08</code>／<code>knowledge_kokunai_niche_oem</code>。</small></p>
