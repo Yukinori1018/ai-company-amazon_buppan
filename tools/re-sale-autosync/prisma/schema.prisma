@@ -1,0 +1,97 @@
+// Re-Sale AutoSync — Prisma スキーマ（無在庫 / FBM 専用）
+//
+// 目的: ヤフオク! を仕入れ元にした Amazon 無在庫(FBM)出品で、
+//       「Amazonで売れたのに仕入れられない」= キャンセル = アカウント健全性低下/停止
+//       のリスクをアプリで極力下げる。
+//   → 仕入れ元(オークション)の「仕入れ可能性(procurability)」を監視し、
+//     仕入れ不能になった瞬間に Amazon 在庫を 0 にして「買えない注文」を防ぐ。
+//
+// ※ 有在庫(FBA)はアプリ対象外（Keepa＋Claude検索→社長選定→メーカー仕入れ→FBA、の手動運用）。
+//
+// 既定は SQLite。PostgreSQL/MySQL へは provider と DATABASE_URL の差し替えで移行可能。
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+/// Amazon 無在庫(FBM)出品（SKU 単位）。監視対象オークションと 1:1。
+model Product {
+  id                  String   @id @default(cuid())
+  asin                String
+  sku                 String   @unique
+  title               String?
+  productType         String? // SP-API の productType（出品 PUT に必須）
+
+  // --- 価格・原価（利益計算・監査用） ---
+  purchasePrice       Int // 想定落札価格（円）
+  procurementShipping Int      @default(0) // 仕入れ送料（円）
+  otherCost           Int      @default(0) // 自社発送費・梱包等（円）
+  targetMargin        Float    @default(0.2) // 目標利益率
+  sellPrice           Int // 自動計算した Amazon 販売価格（円）
+  // 仕入れ可能性ガード: 落札価格がこの額を超えたら「利益で仕入れ不能」と見なし在庫0にする
+  maxSourcePrice      Int // 損益分岐となる仕入れ元価格（円）
+
+  // --- 在庫の希望値（このツールが管理） ---
+  quantity            Int      @default(1) // 1=出品中 / 0=停止
+  listingState        String   @default("DRAFT") // DRAFT | ACTIVE | INACTIVE | ERROR
+
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  auction             Auction?
+  syncLogs            SyncLog[]
+
+  @@index([asin])
+  @@index([listingState])
+}
+
+/// 監視対象のヤフオク! オークション（仕入れ元）。Product と 1:1。
+model Auction {
+  id             String    @id @default(cuid())
+  yahooAuctionId String    @unique
+  url            String
+  status         String    @default("UNKNOWN") // ACTIVE | ENDED | CANCELLED | NOT_FOUND | UNKNOWN
+  currentPrice   Int? // 現在価格 / 落札価格（円）
+  endTime        DateTime?
+  lastCheckedAt  DateTime?
+  checkFailCount Int       @default(0) // 連続取得失敗回数（UNKNOWN で誤停止しないため）
+  active         Boolean   @default(true) // 監視を続けるか
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  productId      String    @unique
+  product        Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@index([active])
+}
+
+/// 在庫同期の監査ログ（いつ・何を根拠に・Amazon をどう変えたか）。
+model SyncLog {
+  id            String   @id @default(cuid())
+  productId     String
+  product       Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  auctionStatus String
+  reason        String? // 判定理由（例: PRICE_OVER_MAX, AUCTION_ENDED）
+  action        String // NO_CHANGE | SET_OUT_OF_STOCK | SET_IN_STOCK | ERROR
+  fromQuantity  Int?
+  toQuantity    Int?
+  spapiStatus   String?
+  message       String?
+  createdAt     DateTime @default(now())
+
+  @@index([productId])
+  @@index([createdAt])
+}
+
+/// グローバル設定（既定利益率・手数料率など）。
+model Setting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}
