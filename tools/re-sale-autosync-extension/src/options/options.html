@@ -25,6 +25,15 @@
   <label>Amazon販売手数料率<input id="referralRate" type="number" step="0.01" /></label>
   <label>在庫管理ページURL<input id="sellerCentralInventoryUrl" type="text" style="width:100%" /></label>
 
+  <h1 style="font-size:15px;margin-top:26px;">DOMセレクタ（上級・実画面調整用）</h1>
+  <div class="desc">セラーセントラル/ヤフオクの画面変更に合わせ、コードを触らず調整できます。空欄で既定に戻ります。</div>
+  <label>注文行セレクタ<input id="sel_amazonOrderRow" type="text" style="width:100%" /></label>
+  <label>SKU セレクタ<input id="sel_amazonSku" type="text" style="width:100%" /></label>
+  <label>在庫行セレクタ<input id="sel_amazonInventoryRow" type="text" style="width:100%" /></label>
+  <label>数量入力セレクタ<input id="sel_amazonQtyInput" type="text" style="width:100%" /></label>
+  <label>保存ボタンセレクタ<input id="sel_amazonSaveBtn" type="text" style="width:100%" /></label>
+  <label>ヤフオク購入ボタン文言（カンマ区切り）<input id="sel_yahooBuyLabels" type="text" style="width:100%" /></label>
+
   <div><button id="save">保存</button><span id="saved"></span></div>
   <script src="options.js"></script>
 </body>

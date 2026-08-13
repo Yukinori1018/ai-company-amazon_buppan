@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Re-Sale AutoSync（無在庫 ヤフオク⇄Amazon 同期）",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "無在庫物販の『Amazonで売れたのに仕入れられない』を防ぐ。ヤフオクが先に売れたらAmazon在庫0、Amazon注文が入ったらヤフオク購入を1クリック確認で確定。",
   "permissions": ["storage", "alarms", "notifications", "tabs", "scripting"],
   "host_permissions": [

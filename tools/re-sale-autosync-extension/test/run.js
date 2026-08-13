@@ -94,6 +94,16 @@ function fx(name) { return fs.readFileSync(path.join(__dirname, 'fixtures', name
   ok(await RSAS.Store.canSpend(1000, today) === true, 'store: 残枠内はtrue(19000+1000=20000)');
   // 日跨ぎでリセット
   ok(await RSAS.Store.canSpend(5000, '2026-08-13') === true, 'store: 翌日は枠リセットでtrue');
+  // remainingBudget
+  await RSAS.Store.saveSettings({ dailySpendCapJPY: 10000, spentTodayJPY: 3000, spentDate: today });
+  ok(await RSAS.Store.remainingBudget(today) === 7000, 'store: remainingBudget=残枠');
+
+  // ---- C1: selectors 深いマージ ----
+  await RSAS.Store.saveSettings({ selectors: { amazonSku: '.custom-sku' } }); // 一部だけ上書き
+  var st = await RSAS.Store.getSettings();
+  eq(st.selectors.amazonSku, '.custom-sku', 'selectors: 上書きが反映');
+  ok(!!st.selectors.amazonOrderRow, 'selectors: 未指定キーは既定を保持(深いマージ)');
+  ok(Array.isArray(st.selectors.yahooBuyLabels) && st.selectors.yahooBuyLabels.length > 0, 'selectors: 既定ラベル配列を保持');
 
   // ---- 結果表示 ----
   console.log(`\n  PASS ${pass} / FAIL ${fail}`);

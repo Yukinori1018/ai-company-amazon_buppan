@@ -21,10 +21,12 @@
     return m ? Number(m[1].replace(/[^0-9]/g, '')) : null;
   }
 
+  // C1: 購入ボタンのラベルは settings.selectors.yahooBuyLabels で外部化（実ページに合わせ調整可）
+  var buyLabels = ['購入手続きへ', '今すぐ落札', '即決で落札', '購入する', 'カートに入れる'];
+
   // Yahoo の購入導線をクリック（best-effort）。成功/失敗を boolean で返す。
   function clickBuy() {
-    // TODO: 実ページに合わせて調整。「今すぐ落札」「購入手続きへ」「カートに入れる」等を探す。
-    var labels = ['購入手続きへ', '今すぐ落札', '即決で落札', '購入する', 'カートに入れる'];
+    var labels = buyLabels;
     var buttons = Array.prototype.slice.call(document.querySelectorAll('a,button,input[type=submit]'));
     for (var i = 0; i < buttons.length; i++) {
       var t = (buttons[i].innerText || buttons[i].value || '').trim();
@@ -108,6 +110,9 @@
     if (!itemId) return;
     chrome.runtime.sendMessage({ type: 'GET_STATE' }, function (state) {
       if (!state || !state.tasks) return;
+      if (state.settings && state.settings.selectors && Array.isArray(state.settings.selectors.yahooBuyLabels) && state.settings.selectors.yahooBuyLabels.length) {
+        buyLabels = state.settings.selectors.yahooBuyLabels; // C1: 設定のラベルで上書き
+      }
       var task = state.tasks.find(function (t) {
         return t.state === 'PENDING' && t.sourceUrl && t.sourceUrl.indexOf(itemId) >= 0;
       });

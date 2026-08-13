@@ -4,6 +4,17 @@
 (function (root) {
   root.RSAS = root.RSAS || {};
 
+  // C1: DOMセレクタを設定として外部化。実画面に合わせた調整をコード改修なしで行える。
+  //     content script は settings.selectors を読み、未設定はこの既定にフォールバック。
+  var DEFAULT_SELECTORS = {
+    amazonOrderRow: '[data-test-id="order-card"], .order-card, tr.order-row',
+    amazonSku: '[data-test-id="sku"], .sku',
+    amazonInventoryRow: '[data-test-id="inventory-row"], tr',
+    amazonQtyInput: 'input[name*="quantity"], input[type="number"]',
+    amazonSaveBtn: 'button[type="submit"], .save-button',
+    yahooBuyLabels: ['購入手続きへ', '今すぐ落札', '即決で落札', '購入する', 'カートに入れる']
+  };
+
   var DEFAULT_SETTINGS = {
     dryRun: true,                 // true の間は実購入・実在庫変更を行わずログのみ
     referralRate: 0.15,
@@ -11,7 +22,8 @@
     dailySpendCapJPY: 20000,      // 1日の自動購入上限（半自動でも上限で保護）
     spentTodayJPY: 0,
     spentDate: '',                // YYYY-MM-DD
-    sellerCentralInventoryUrl: 'https://sellercentral.amazon.co.jp/inventory'
+    sellerCentralInventoryUrl: 'https://sellercentral.amazon.co.jp/inventory',
+    selectors: DEFAULT_SELECTORS
   };
 
   function get(keys) {
@@ -24,7 +36,9 @@
   var Store = {
     async getSettings() {
       var r = await get('settings');
-      return Object.assign({}, DEFAULT_SETTINGS, r.settings || {});
+      var merged = Object.assign({}, DEFAULT_SETTINGS, r.settings || {});
+      merged.selectors = Object.assign({}, DEFAULT_SELECTORS, (r.settings && r.settings.selectors) || {}); // selectorsは深くマージ
+      return merged;
     },
     async saveSettings(patch) {
       var s = await Store.getSettings();
