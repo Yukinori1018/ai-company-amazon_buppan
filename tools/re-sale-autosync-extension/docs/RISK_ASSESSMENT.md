@@ -22,7 +22,7 @@
 |---|---|---|---|---|---|
 | B1 | 🟠 | `parseYahooHtml` はコメントで「多数決」と称すが**実装は優先if-else**。'カートに入れる'/'購入手続きへ' が終了ページの"おすすめ"にも出現し**誤ACTIVE**の恐れ | 売切れを在庫0化できず「売れたのに買えない」注文が発生 | シグナルをスコア加点式へ。ACTIVEは正シグナル必須＆終了シグナルで打消し。UNKNOWNフォールバック維持 | ✅ v0.2 |
 | B2 | 🟡 | `decide` は ACTIVE かつ price=null で quantity=1（procurable）。価格不明でも在庫維持 | 在庫は残るが購入は手動再チェックのため実害限定 | 理由を `PROCURABLE_PRICE_UNKNOWN` に分離し可観測化 | ✅ v0.2 |
-| B3 | 🟡 | `fetchYahooSnapshot` は `credentials:'omit'`。ログイン/地域ゲートで別HTML→UNKNOWN頻発の可能性 | 監視精度低下（誤って触らないので安全側） | UNKNOWN連続(`checkFailCount`)閾値で通知（手動確認を促す）。将来 content 経由の実DOM取得を検討 | ⏳ 次期 |
+| B3 | 🟡 | `fetchYahooSnapshot` は `credentials:'omit'`。ログイン/地域ゲートで別HTML→UNKNOWN頻発の可能性 | 監視精度低下（誤って触らないので安全側） | UNKNOWN連続(`checkFailCount`)閾値で通知（手動確認を促す）。将来 content 経由の実DOM取得を検討 | ✅ v0.5で通知実装（実HTML最終確認のみ社長待ち） |
 | B4 | 🟡 | 価格抽出が JSON-LD "price" 優先。フリマ/オークションで意味が異なる（即決 vs 現在）場合あり | 上限判定の基準ずれ | フィクスチャで実HTML検証しパターン拡充 | ⏳ 次期(要実HTML) |
 
 ## C. セラーセントラル連携（DOM自動化）
