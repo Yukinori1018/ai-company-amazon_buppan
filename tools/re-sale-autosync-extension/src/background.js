@@ -16,8 +16,10 @@ function todayStr() {
   return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
 }
 
+var _notifySeq = 0;
 function notify(id, title, message) {
-  chrome.notifications.create(id, {
+  // D3: 同種通知の上書き（見落とし）を避けるため連番で一意化
+  chrome.notifications.create(id + '-' + (Date.now()) + '-' + (++_notifySeq), {
     type: 'basic', iconUrl: chrome.runtime.getURL('icons/icon128.png'),
     title: title, message: message, priority: 2
   });

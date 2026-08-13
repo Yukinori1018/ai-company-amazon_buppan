@@ -53,3 +53,19 @@ $('save').onclick = function () {
     });
   });
 };
+
+// D2: ログをJSONでエクスポート
+$('exportLogs').onclick = function () {
+  chrome.storage.local.get(['logs', 'watches', 'tasks'], function (r) {
+    var dump = { exportedAt: new Date().toISOString(), logs: r.logs || [], watches: r.watches || [], tasks: r.tasks || [] };
+    var blob = new Blob([JSON.stringify(dump, null, 2)], { type: 'application/json' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'rsas-logs-' + Date.now() + '.json';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+    $('exported').textContent = '書き出しました（' + (r.logs ? r.logs.length : 0) + '件）';
+    setTimeout(function () { $('exported').textContent = ''; }, 2000);
+  });
+};
