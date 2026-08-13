@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>国内ニッチ簡易OEM SKU積み上げ戦略ドラフト｜Amazon物販事業</title>
+<style>
+:root{color-scheme:light dark}
+body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif;line-height:1.75;max-width:900px;margin:0 auto;padding:32px 20px;color:#1a1a1a;background:#fff}
+@media(prefers-color-scheme:dark){body{color:#e6e6e6;background:#1a1a1a}code{background:#333}blockquote{background:#222;border-color:#555}th{background:#2a2a2a}tr:nth-child(even) td{background:#242424}table,th,td{border-color:#444}}
+h1{font-size:1.7em;border-bottom:3px solid #2a6f9e;padding-bottom:.3em;line-height:1.4}
+h2{font-size:1.35em;border-bottom:1px solid #ccc;padding-bottom:.25em;margin-top:1.8em;color:#1f5b82}
+h3{font-size:1.12em;margin-top:1.4em}
+h4{font-size:1em;color:#444}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:.9em;display:block;overflow-x:auto}
+th,td{border:1px solid #ccc;padding:7px 10px;text-align:left;vertical-align:top}
+th{background:#eef4f8}
+tr:nth-child(even) td{background:#f7f9fb}
+code{background:#eef1f3;padding:1px 5px;border-radius:4px;font-size:.88em}
+pre{background:#0f2233;color:#d6e6f2;padding:14px 16px;border-radius:8px;overflow-x:auto;line-height:1.5}
+pre code{background:none;color:inherit;padding:0}
+blockquote{border-left:4px solid #2a6f9e;background:#f2f7fa;margin:1em 0;padding:.6em 1em;border-radius:0 6px 6px 0}
+strong{color:#c0392b}
+@media(prefers-color-scheme:dark){strong{color:#ff8a75}h2{color:#7db8dc}}
+hr{border:none;border-top:1px solid #ddd;margin:2em 0}
+li{margin:.25em 0}
+</style></head><body>
+<h1>国内ニッチ簡易OEM SKU積み上げ戦略ドラフト</h1>
+<blockquote>起案: プランナー・タケシ / チケット: T-20260809-001 / 2026-08-09<br>インプット: <code>docs/reference/kokunai-niche-oem/README.md</code>（船原徹雄・平井氏 動画分析）、<code>knowledge_kokunai_niche_oem</code>、<code>knowledge_maker_shiire_ecstars</code>、<code>knowledge_overnight_3000_scan</code>、<code>knowledge_maker_extraction_keepa</code>、<code>project_profit_first_exit</code>、<code>owner_pc_complete_outsourcing</code>、CLAUDE.md §1<br>ステータス: 社内ドラフト（戦略立案まで）。実仕入れ・メーカー実連絡・スクール/コンサル契約は §4.1 該当＝社長承認が別途必要。本ドラフトは一切の外部発信・第三者連絡・決済を含まない。</blockquote>
+<hr>
+<h2>0. 勝ち筋（結論を最初に置く）</h2>
+<p><strong>勝ち筋はここです。簡易OEMを「せどりで作った現金を&quot;減らない資産&quot;に変える、SKU100本の背骨（ストック軸）」として据える。ただし主軸化ではなく、まず1〜2本で&quot;仕組みが回るか&quot;を実証してから段階拡大する（B案）。</strong></p>
+<p>理由を3行で：</p>
+<ol>
+<li>CLAUDE.md §1 の北極星は「月商800万・利益率20%・<strong>SKU100</strong>」。SKU100は&quot;積み上がる資産&quot;を数える指標であり、都度売り切って消えるせどりでは埋まらない。<strong>簡易OEMは1SKU=1つの持続資産</strong>で、この指標に直接効く。</li>
+<li>簡易OEMは、EC STARsのメーカー仕入れ（ストック型）と同系統でありながら、<strong>「中身そのまま・ラベルだけ自社ブランド」×超少ロット6本〜</strong>で参入障壁と初期資金が最小。副業初心者の社長が「小さく本番」で学ぶのに最適。</li>
+<li>物理作業ゼロ（メーカー→FBA直送）で社長のPC完結方針（<code>owner_pc_complete_outsourcing</code>）と完全整合。社長の実Doは「発掘の判断・電話の型どおりの実行・ラベル承認」だけに絞れる。</li>
+</ol>
+<p><strong>やらないこと（捨てるものを先に決める）:</strong> 初期に<strong>完全オリジナルOEM（配合・容器変更）はやらない</strong>。ロットが300〜1,000本に跳ね上がり（<code>knowledge_kokunai_niche_oem</code>）、初心者の資金と学習速度を殺す。あくまで「ラベルのみの簡易OEM」に限定する。</p>
+<hr>
+<h2>1. 三手法の比較表（棚卸し）</h2>
+<p>本事業がいま持つ／検討中の3つの仕入れ手法を、同じ物差しで並べます。</p>
+<table><thead><tr><th>評価軸</th><th>① せどり（現金製造機）</th><th>② EC STARsメーカー仕入れ（ストック型）</th><th>③ 簡易OEM（本件）</th></tr></thead><tbody>
+<tr><td><strong>本質</strong></td><td>安く仕入れて価格差で売る。相乗り出品</td><td>メーカーと直取引しリピート発注。既存ASINに相乗り→交渉で限定化</td><td>中身そのまま・<strong>ラベルだけ自社ブランド化</strong>して<strong>新規ASINを自分で作る</strong></td></tr>
+<tr><td><strong>参入障壁</strong></td><td>低（誰でも即開始）</td><td>中（メーカー開拓・交渉が要る）</td><td><strong>中〜やや低</strong>（少ロット6本〜で交渉ハードルが最も低い）</td></tr>
+<tr><td><strong>初期資金</strong></td><td>小〜中（仕入れ都度・回収早い）</td><td>中（在庫は月販の1.2〜1.5倍を要保有）</td><td><strong>小</strong>（6本〜。1SKU数千〜数万円で試せる）</td></tr>
+<tr><td><strong>回転／ストック性</strong></td><td>高回転・<strong>ストックしない</strong>（売れたら終わり、探し続ける労働）</td><td>低回転でも<strong>ストックする</strong>（リピートで積み上がる）</td><td><strong>ストックする</strong>（新規ASINが自社資産。相乗りされにくい）</td></tr>
+<tr><td><strong>利益率目安</strong></td><td>8〜15%（相乗り値崩れで変動大）</td><td>経費率35%前提で概ね10〜15%</td><td><strong>20〜28%</strong>（品質重視で相場より高く値付け可・独占ASIN）</td></tr>
+<tr><td><strong>値崩れ耐性</strong></td><td>弱い（相乗り多数・価格競争）</td><td>中（限定化・独占まで育てれば強い）</td><td><strong>強い</strong>（自社ブランドASIN＝相乗りされにくい／実質独占）</td></tr>
+<tr><td><strong>再現性</strong></td><td>高（型化容易・ただし労働集約）</td><td>中（メーカーとの関係構築に依存）</td><td><strong>中</strong>（発掘＋交渉の型がある。拒否率は要織り込み）</td></tr>
+<tr><td><strong>社長PC完結度</strong></td><td>中（検品・納品は外注要）</td><td>高（発注メール中心。物理は外注/FBA）</td><td><strong>最高</strong>（メーカー→FBA直送で在庫レス。社長はPCで判断のみ）</td></tr>
+<tr><td><strong>SKU100への効き</strong></td><td>弱（積み上がらない）</td><td>強</td><td><strong>最強</strong>（1SKU=持続資産、値崩れ耐性で長生き）</td></tr>
+<tr><td><strong>本事業での役割</strong></td><td>現金製造機（<code>project_profit_first_exit</code>）</td><td>ストック軸の本命候補</td><td><strong>ストック軸の&quot;入口&quot;（最小資金で学べる版）</strong></td></tr>
+</tbody></table>
+<p><strong>読み解き:</strong> ①は「現金を作る」フェーズ、②③は「その現金を減らない資産に変える」フェーズ。②と③は同系統だが、③のほうが<strong>初期資金・ロットが小さく、初心者が最初の成功体験を得やすい</strong>。よって<strong>ストック軸の入口は③（簡易OEM）から入り、育ったら②の限定化・独占ノウハウを接ぐ</strong>のが最短。</p>
+<hr>
+<h2>2. 簡易OEMのポジション定義（SKU100のうち何本・どのフェーズで）</h2>
+<h3>2.1 全体の配分仮説（SKU100の設計図）</h3>
+<p>SKU100は「役割の違う3層」で埋める前提を置きます（数字は仮説・後述の実績で更新）。</p>
+<table><thead><tr><th>層</th><th>手法</th><th>目標SKU数</th><th>役割</th></tr></thead><tbody>
+<tr><td>回転層</td><td>せどり</td><td>40〜50</td><td>現金創出。入れ替わり前提（&quot;在庫としてのSKU&quot;は数えるが流動的）</td></tr>
+<tr><td><strong>ストック層（入口）</strong></td><td><strong>簡易OEM</strong></td><td><strong>25〜35</strong></td><td><strong>本件。減らない資産。値崩れ耐性で長生き</strong></td></tr>
+<tr><td>ストック層（発展）</td><td>メーカー仕入れ（限定化・独占）</td><td>20〜30</td><td>簡易OEMで関係のできたメーカーを限定化・独占へ格上げ</td></tr>
+</tbody></table>
+<blockquote>補足：せどりSKUは回転で入れ替わるため「常時40〜50が棚にある」状態を指す。簡易OEM/メーカー仕入れは累積で積み上がる。<strong>月商800万の&quot;下支え&quot;は後者2層</strong>という設計。</blockquote>
+<h3>2.2 簡易OEM枠のフェーズ別積み上げ（根拠つき）</h3>
+<table><thead><tr><th>フェーズ</th><th>期間</th><th>簡易OEM 累積SKU</th><th>根拠・狙い</th></tr></thead><tbody>
+<tr><td>Phase 0（実証）</td><td>0〜3ヶ月</td><td><strong>1〜2本</strong></td><td>「発掘→交渉→ラベル→FBA直送→初売上」の<strong>ループが実際に回るかを1本で証明</strong>。初心者の学習優先（<code>owner_side_business_beginner</code>）。ここで型の穴を潰す</td></tr>
+<tr><td>Phase 1（型化）</td><td>3〜6ヶ月</td><td>累計 <strong>8〜10本</strong></td><td>Phase 0の型を横展開。月2〜3本ペースで発掘・交渉。並行で外注（ラベル制作・FBA納品代行）を仕組み化</td></tr>
+<tr><td>Phase 2（拡大）</td><td>6〜12ヶ月</td><td>累計 <strong>25〜30本</strong></td><td>交渉の当たり筋（応じやすいメーカー像）が見えた前提で月4〜5本。育った関係は②の限定化・独占へ格上げ</td></tr>
+</tbody></table>
+<p><strong>なぜ0-3ヶ月は1〜2本に絞るか:</strong> 簡易OEMは1SKUのリードタイムが長い（メーカー交渉→ラベル法務チェック→初回ロット到着→FBA反映で概ね4〜8週）。初心者がいきなり10本並走すると、どの工程が詰まったか学べない。<strong>まず1本を最後まで通し、ボトルネックを言語化してから複製する</strong>（森岡流：勝ち筋を1つ確立してから増やす）。</p>
+<p><strong>拒否率の織り込み:</strong> 動画の生電話3件中、即OKは1件（33%）。メーカー拒否・不在・条件不一致を見込み、<strong>1本成立させるのに5〜8件アタックが必要</strong>と仮置き。Phase 1で月8〜10本狙うなら、月40〜60件の発掘・アタックが要る（発掘は後述の半自動スキャンで賄う）。</p>
+<hr>
+<h2>3. リサーチ基準の当社仕様化（既存スキャン基盤への接続）</h2>
+<h3>3.1 平井式の基準を&quot;当社の言葉&quot;に翻訳</h3>
+<p><strong>狙う5条件（発掘フィルタ）:</strong></p>
+<ol>
+<li>程よくニッチ（形/切り口が少し違う。例：小分けスティック醤油）</li>
+<li>金額が少し高めでもOK（安売り競合を避け品質で勝つ＝利益率を確保する原資）</li>
+<li>ちょっと健康的（無添加・オーガニック・国産）</li>
+<li>ちょっと便利（保存/携帯/使いやすさ）</li>
+<li>国産が差別化になる（中国輸入セラーに対する堀）</li>
+</ol>
+<p><strong>セラースプライト4基準（需要ゲート）:</strong></p>
+<table><thead><tr><th>基準</th><th>閾値</th><th>意味（初心者向け補足）</th></tr></thead><tbody>
+<tr><td>月間検索ボリューム</td><td>3,000〜30,000</td><td>「その言葉が月に何回検索されるか」。有名すぎず埋もれすぎず</td></tr>
+<tr><td>転換率 CVR</td><td>3%以上</td><td>「見た人のうち何%が買うか」。買う気の強さ</td></tr>
+<tr><td>PPC入札額</td><td>100円以下</td><td>「広告1クリックの相場」。高い＝強敵ぞろい</td></tr>
+<tr><td>検索トレンド</td><td>過去3年 横ばい〜右上がり</td><td>需要が枯れていない</td></tr>
+</tbody></table>
+<h3>3.2 【重要な設計判断】既存の夜間スキャン基盤は&quot;そのまま&quot;は使えない — 用途別に2系統へ分ける</h3>
+<p>既存の夜間3000件スキャン（<code>shiire_scan_v3.py</code> / <code>finder_genseki_beginner</code>、<code>knowledge_overnight_3000_scan</code>）は<strong>せどり用に最適化</strong>されており、簡易OEMにはそのままでは向きません。理由を正直に置きます：</p>
+<ol>
+<li><strong>カテゴリが逆。</strong> 既存スキャンは規制回避のため<strong>食品(57239051)・ビューティー・ドラッグを&quot;除外&quot;</strong>している（<code>knowledge_maker_extraction_keepa</code>）。簡易OEMが狙う「国産ニッチ食品・消耗品」は、まさにその除外カテゴリ。→ <strong>食品/日用品を&quot;含める&quot;別プリセットが必要。</strong></li>
+<li><strong>Keepaでは測れない指標がある。</strong> CVR と PPC入札額は Sellersprite/広告データ側の指標で、<strong>Keepa Product Finder では取得できない</strong>。→ Keepaで測れるのは「検索ボリューム(近似)・ランク・出品者数・価格・トレンド」まで。<strong>CVR・PPCは人手（またはSellersprite）で最終確認</strong>する二段構えが現実解。</li>
+<li><strong>狙う数量が違う。</strong> せどりは数千件から価格差を拾う。簡易OEMは<strong>月数十件の&quot;交渉候補&quot;を出せれば十分</strong>。大量スキャンより「質の高い候補を薄く」出す設計でよい。</li>
+</ol>
+<h3>3.3 半自動化の具体案：<code>finder_niche_oem</code> プリセットを1本追加する</h3>
+<p>既存コード（<code>workspace/output/agent_output/T-20260521-005/code/discovery/presets.py</code> の <code>FinderPreset</code>）は<strong>プリセットを1つ足すだけで新条件のスキャンが回る</strong>設計です。せどり資産を壊さず、簡易OEM専用の「発掘レーン」を増設します。</p>
+<p><strong>Keepaで機械的に一次スクリーニング（夜間・無人）→ 人が最終ゲート</strong>の二段。</p>
+<p><strong>第1段：夜間Keepaスキャン（機械）— 新プリセット案 <code>finder_niche_oem</code></strong></p>
+<ul>
+<li><code>categories_include</code>: 食品・飲料、日用品/消耗品、健康食品などの co.jp ノードを<strong>含める</strong>（既存の食品&quot;除外&quot;を外したレーン）</li>
+<li><code>sales_rank_gte / lte</code>: 3,000〜80,000 相当（&quot;程よく売れる&quot;帯。せどり初心者プリセットと同帯でよい）</li>
+<li><code>count_new_gte / lte</code>: 相乗りが薄い帯（2〜10）。ただし簡易OEMは<strong>新規ASINを自分で作る</strong>ので、既存ASINの出品者数は「参考需要」として見る用途</li>
+<li><code>price_gte / lte</code>: 1,000〜10,000（&quot;少し高め&quot;を許容し利益率確保）</li>
+<li>トレンド：Keepaのランク推移(90日/1年)で「横ばい〜右上がり」を近似フィルタ（右肩下がりを除外）</li>
+<li>出力：候補ASIN＋brand/manufacturer（＝<strong>メーカー名と裏取り</strong>。<code>knowledge_maker_extraction_keepa</code> の&quot;brand/manufacturer直読み&quot;実装を流用）＋ランク/出品者/価格を1行1候補でCSV化</li>
+</ul>
+<blockquote>これで「国産ニッチ食品/消耗品で、そこそこ売れて競合が薄い商品」と、その<strong>製造元メーカー名</strong>が夜間に自動で数十〜数百件並ぶ。動画の「棚を1列ずつ見て裏面の製造元を控える」を<strong>在宅・無人で代替</strong>できるのが肝。</blockquote>
+<p><strong>第2段：人の最終ゲート（社長 or 外注、PC上のみ）</strong></p>
+<ol>
+<li>スキャンCSVの上位候補について、Sellersprite で <strong>CVR3%以上・PPC100円以下</strong> を確認（Keepaで測れない2指標をここで潰す）</li>
+<li>「狙う5条件」への当てはまり（ニッチ度・健康性・国産）を目視で○×</li>
+<li>通過したものだけ「交渉候補リスト」へ（メーカー名・電話番号・商品名・想定売価・想定ロット）</li>
+</ol>
+<p><strong>半自動化の到達点:</strong> 「棚のリサーチ」と「製造元の割り出し」を機械化し、<strong>人は&quot;買う気(CVR/PPC)の確認と交渉判断&quot;に集中</strong>する。社長の実Doは「候補リストにGoを出す」＋「電話の型どおりの実行」だけに縮む。</p>
+<blockquote>実装は IT エンジニア（タカシ）案件。本ドラフトでは「プリセット1本追加＋food含めるレーン＋2段ゲート」という設計方針まで。着手は別チケットで発注。</blockquote>
+<hr>
+<h2>4. オペレーション設計（社長PC完結＋外注/FBA前提の1本フロー）</h2>
+<p>発掘から売上計上までを、社長が物に触れない前提で1本の業務フローに落とします。</p>
+<pre><code>[1] 発掘（機械＋PC）
+    夜間 finder_niche_oem スキャン → 候補CSV（メーカー名つき）
+        ↓  ※社長Do最小＝Goを出すだけ
+[2] 需要ゲート（PC）
+    Sellersprite で CVR≥3%・PPC≤100円・トレンド確認 → 交渉候補リスト
+        ↓
+[3] メーカー交渉（社長Do＝電話。型に沿うだけ）★§4.1第三者連絡＝要承認
+    型: ①挨拶＋商品称賛 → ②「中身そのまま・ラベルのみ自社オリジナルの簡易OEMで取引したい」
+        → ③初回ロット/条件確認（6本〜/最低何箱から可か）
+    屋号（例「Satoy Select」＝既存ストア名）を名乗る。OEM受付を明記していないメーカーほど少ロット柔軟
+        ↓  成立
+[4] ラベル制作（外注＋PC）
+    デザインは外注（コンテンツ制作ヒデアキ or 外部デザイナー）
+    → 表示内容（原材料/アレルゲン/製造者/内容量/賞味期限表記）を法務ハルオ＆メーカーでダブルチェック ★食品表示法/景表法
+        ↓
+[5] 初回発注＆FBA直送（PC）★§4.1金銭＝要承認
+    メーカーにラベル送付 → メーカーが商品へ貼付 → メーカーから直接 Amazon FBA倉庫へ直送（在庫レス）
+    ※メーカーがFBA納品要件（外装/ラベル/危険物SDS等）を満たせない場合のみFBA納品代行業者を1枚挟む
+        ↓
+[6] 出品・販売（PC＋FBA）
+    新規ASIN作成・カタログ/画像作り込み（ヒデアキ）→ FBAが保管・発送・CS代行
+    → 初動はSP広告（PPC）で回転づけ、ACOS≦利益率で運用
+        ↓
+[7] リピート＆格上げ（PC）
+    売れたら追加発注（現金前払いで小さく）。関係が育ったメーカーは②の限定化・独占へ交渉を進める</code></pre>
+<p><strong>社長が実際に手を動かすのは [1]のGo・[3]の電話・[5]の発注承認・[7]の追加判断のみ。</strong> 残りは機械／外注／FBA。動画の「メーカー→FBA直送で在庫を持たない」仕組みを、当社の外注前提にそのまま接続できます。</p>
+<p><strong>§4.1 で社長承認が要る関所（実行フェーズで必ず waiting に出す）:</strong> [3]メーカーへの実連絡（第三者連絡）、[5]初回発注の決済（金銭）、（もし検討するなら）スクール/コンサル契約。<strong>本ドラフト段階では一切実行しません。</strong></p>
+<hr>
+<h2>5. 経済性の試算（1SKUの想定PL）</h2>
+<h3>5.1 単品PL（1個あたり・仮の代表SKU：国産ニッチ健康食品）</h3>
+<p>前提を明示します（願望でなく仮置き。実交渉・実手数料で要更新）：</p>
+<ul>
+<li>想定売価：<strong>1,780円</strong>（&quot;少し高め&quot;に置ける前提。品質・国産・独占ASIN）</li>
+<li>仕入原価（卸）：<strong>650円</strong>（小ロット6本〜は掛け率が悪い＝原価率高め。相場小売の6〜7掛けを仮定）</li>
+<li>Amazon販売手数料：売価の<strong>10%</strong>＝178円（食品カテゴリ想定。実カテゴリで8〜15%）</li>
+<li>FBA配送代行手数料：<strong>350円</strong>（小型標準サイズ想定）</li>
+<li>FBA保管料：<strong>約10円/個</strong>（軽微）</li>
+<li>ラベル制作・貼付按分：<strong>40円/個</strong>（デザインは初期一括、貼付はメーカー）</li>
+<li>メーカー→FBA 納品送料按分：<strong>60円/個</strong></li>
+<li>SP広告（PPC）按分：<strong>100円/個</strong>（立ち上げ期。軌道に乗れば逓減）</li>
+</ul>
+<table><thead><tr><th>項目</th><th>金額</th></tr></thead><tbody>
+<tr><td>売価</td><td>1,780</td></tr>
+<tr><td>仕入原価</td><td>-650</td></tr>
+<tr><td>販売手数料(10%)</td><td>-178</td></tr>
+<tr><td>FBA配送代行</td><td>-350</td></tr>
+<tr><td>保管料</td><td>-10</td></tr>
+<tr><td>ラベル按分</td><td>-40</td></tr>
+<tr><td>納品送料按分</td><td>-60</td></tr>
+<tr><td>広告按分</td><td>-100</td></tr>
+<tr><td><strong>純利益/個</strong></td><td><strong>392</strong></td></tr>
+<tr><td><strong>利益率</strong></td><td><strong>約22%</strong></td></tr>
+</tbody></table>
+<blockquote>広告が逓減する軌道後は純利益480〜500円/個（約27%）まで伸びる余地。逆に売価を相場並み（例1,280円）に置くと利益率は一桁に沈む。<strong>&quot;少し高め&quot;に値付けできる商品を選ぶことが利益率20%死守の生命線</strong>（＝狙う5条件②③⑤の意味）。</blockquote>
+<h3>5.2 月販シナリオ（1SKU・悲観/中庸/楽観）</h3>
+<p>Sellersprite 4基準を通した&quot;程よくニッチ&quot;の月販を、確率つきで置きます。</p>
+<table><thead><tr><th>シナリオ</th><th>確率</th><th>月販(個)</th><th>月商/SKU</th><th>月利/SKU</th></tr></thead><tbody>
+<tr><td>悲観</td><td>25%</td><td>15</td><td>26,700円</td><td>約4,500円（広告重く率低下）</td></tr>
+<tr><td>中庸</td><td>50%</td><td>40</td><td>71,200円</td><td>約16,000円</td></tr>
+<tr><td>楽観</td><td>25%</td><td>100</td><td>178,000円</td><td>約50,000円（広告逓減で率改善）</td></tr>
+<tr><td><strong>期待値</strong></td><td>—</td><td><strong>約48</strong></td><td><strong>約85,000円</strong></td><td><strong>約22,000円</strong></td></tr>
+</tbody></table>
+<blockquote>中庸の月商71,200円/SKU は、<strong>月商800万÷SKU100＝平均8万円/SKU</strong> とほぼ一致。簡易OEM 1SKUは&quot;平均的なSKU1本分&quot;の稼ぎを持続的に生む計算で、SKU100設計と内的整合が取れています。</blockquote>
+<h3>5.3 月商800万・利益率20%への寄与（概算）</h3>
+<ul>
+<li>簡易OEM枠を <strong>中庸ケースで25SKU</strong> 積んだ場合：月商 71,200 × 25 ≈ <strong>178万円/月（800万の約22%）</strong>、月利 約40万円。</li>
+<li><strong>30SKU</strong>なら 月商 約214万円（<strong>約27%</strong>）、月利 約48万円。</li>
+<li>利益率は単品22%前提でそのまま<strong>枠全体で約20〜22%</strong>を確保でき、KPIの利益率20%と整合。</li>
+<li>残りの月商は せどり回転層（現金）＋ メーカー仕入れ発展層 で埋める前提。<strong>簡易OEMは&quot;800万の1/4を担う持続下支え&quot;</strong>という位置づけが妥当。</li>
+</ul>
+<hr>
+<h2>6. 撤退条件・リスク</h2>
+<h3>6.1 撤退条件（サンクコスト回避のため最初に約束）</h3>
+<table><thead><tr><th>#</th><th>撤退トリガー</th><th>判定時点</th></tr></thead><tbody>
+<tr><td>A</td><td><strong>Phase 0で1SKUが成立しない</strong>（交渉8件アタックしても簡易OEM受諾ゼロ／またはラベル法務が通らない）</td><td>3ヶ月時点</td></tr>
+<tr><td>B</td><td>成立した1SKUが<strong>3ヶ月連続で月利マイナス or 率5%未満</strong>（広告費で赤字）</td><td>SKU毎・出品後3ヶ月</td></tr>
+<tr><td>C</td><td>Phase 1で<strong>8〜10本目標に対し成立率が想定の半分未満</strong>（＝発掘/交渉の型が再現しない）</td><td>6ヶ月時点</td></tr>
+<tr><td>D</td><td>食品表示・景表法で<strong>行政指摘やアカウント警告</strong>が出た</td><td>随時（即時見直し）</td></tr>
+</tbody></table>
+<blockquote>A・Cは「手法そのものの撤退」、Bは「そのSKUだけの撤退（損切り）」。<strong>枠全体をやめる前に、まずSKU単位で損切りできる設計</strong>にしておく。</blockquote>
+<h3>6.2 リスク一覧と打ち手</h3>
+<table><thead><tr><th>リスク</th><th>内容</th><th>打ち手</th></tr></thead><tbody>
+<tr><td><strong>食品表示法/景表法</strong></td><td>ラベルに原材料・アレルゲン・製造者・内容量・賞味期限・栄養表示等の義務。誇大表現(「効く」等)は景表法違反</td><td>ラベル案は<strong>メーカー確認＋法務ハルオの二重チェック</strong>を必須工程化。健康強調表現は使わない</td></tr>
+<tr><td><strong>少ロットゆえの原価率</strong></td><td>6本〜は掛け率が悪く原価率が高い→利益率を圧迫</td><td>&quot;少し高め&quot;に値付けできる商品だけ選ぶ（狙う5条件）。売れたらロットを増やし掛け率改善</td></tr>
+<tr><td><strong>メーカー拒否率</strong></td><td>動画実測で即OKは1/3。断られる/不在が多い</td><td>1本成立に5〜8件アタック前提で候補を厚めに（半自動スキャンで供給）。断られたら理由を聞く</td></tr>
+<tr><td><strong>相乗り/値崩れ</strong></td><td>簡易OEMは新規ASIN＝相乗りされにくいが、模倣・並行品リスクはゼロではない</td><td>自社ブランドラベルで商標的な差別化。将来はブランド登録・限定化(②のノウハウ)で堀を深める</td></tr>
+<tr><td><strong>KYC/アカウント健全性</strong></td><td>食品出品は要件（賞味期限管理・温度帯）が厳しく、違反は停止リスク。社長は過去KYC停止経験あり</td><td>要冷蔵は除外（常温/冷凍のみ）。賞味期限60日ルール・混合在庫回避（<code>knowledge_fba_shipment_playbook</code>）を厳守。新規カテゴリの出品許可を事前確認</td></tr>
+<tr><td><strong>在庫リスク（ストック型ゆえ）</strong></td><td>売れ残りは現金化しにくい（せどりと違い自分で作ったASIN）</td><td>初回は最小ロット。追加は&quot;売れてから現金前払いで小さく&quot;（②の鉄則を流用）</td></tr>
+<tr><td><strong>リードタイムの長さ</strong></td><td>交渉→ラベル→初回ロット→FBA反映で4〜8週。回収が遅い</td><td>せどり(現金製造機)で運転資金を回しながら、簡易OEMは並行で仕込む。<strong>現金軸と資産軸の両輪</strong></td></tr>
+</tbody></table>
+<hr>
+<h2>7. 30/60/90日ロードマップ（最初の1SKU成立までの最短経路）</h2>
+<p>社長の実Doを最小化し、機械／サブエージェント／外注に寄せた最短経路です。</p>
+<h3>Day 0–30（発掘レーンを作り、交渉候補を10本並べる）</h3>
+<ul>
+<li>IT（タカシ）：<code>finder_niche_oem</code> プリセット追加（食品/日用品を含めるレーン＋brand/manufacturer出力）。<strong>夜間スキャンで候補50〜100件のCSV生成</strong>（別チケット化）</li>
+<li>リサーチ（サトル）：候補上位を Sellersprite で CVR/PPC/トレンド確認 → <strong>交渉候補リスト10本</strong>（メーカー名・電話・想定売価・想定ロット）に絞る</li>
+<li>法務（ハルオ）：食品ラベル表示の<strong>チェックリスト</strong>（義務表示項目・NG表現）を先に整備</li>
+<li><strong>社長Do：交渉候補リストにGo/NoGo（PC上・数分）</strong></li>
+<li>ゲート：候補10本が揃うこと</li>
+</ul>
+<h3>Day 31–60（交渉→1SKU成立）</h3>
+<ul>
+<li><strong>社長Do：型に沿ってメーカー電話 5〜8件（§4.1第三者連絡＝事前に waiting 承認）</strong>。1件でも「簡易OEM 6本〜OK」を獲得</li>
+<li>コンテンツ（ヒデアキ）：成立メーカーの商品ラベルデザイン制作</li>
+<li>法務＋メーカー：ラベル表示ダブルチェック → 修正確定</li>
+<li>ゲート：<strong>簡易OEMの取引条件が1件確定＋ラベル法務OK</strong></li>
+</ul>
+<h3>Day 61–90（初回発注→出品→初売上）</h3>
+<ul>
+<li><strong>社長Do：初回発注の決済承認（§4.1金銭＝waiting）</strong>。メーカーが商品へ貼付→<strong>FBA直送</strong>（必要ならFBA納品代行を1枚挟む）</li>
+<li>コンテンツ（ヒデアキ）：新規ASIN作成・カタログ/画像作り込み</li>
+<li>運用：SP広告で回転づけ（ACOS≦利益率）</li>
+<li>ゲート：<strong>1SKUがFBAで販売開始＝初売上計上</strong>。ここまでの各工程の詰まりを言語化（Phase1の複製テンプレ化）</li>
+</ul>
+<blockquote>90日で「1本を最後まで通す」ことが目的。速さより<strong>再現可能な型を1つ確立</strong>することを優先（森岡流：まず1つ勝ち筋を作ってから増やす）。</blockquote>
+<hr>
+<h2>8. 社長への提示案（A/B/C＋推奨）</h2>
+<table><thead><tr><th>案</th><th>内容</th><th>想定リターン（期待値）</th><th>想定リスク</th><th>撤退条件</th></tr></thead><tbody>
+<tr><td><strong>A：フル採用（主軸化）</strong></td><td>簡易OEMをストック軸の中心に据え、12ヶ月で50〜60SKU</td><td>月商 約350〜430万円（枠単独）</td><td>初心者がいきなり多本並走→どの工程が詰まったか学べず崩れる。リードタイム長く現金が薄い</td><td>6ヶ月で20本未満なら縮小</td></tr>
+<tr><td><strong>B：副軸で試験導入→ストック軸に育てる（推奨）</strong></td><td>0-3ヶ月で1〜2本実証→型化→12ヶ月で25〜30SKU。せどり(現金)と両輪</td><td>月商 約178〜214万円（800万の約22〜27%）・月利 約40〜48万円</td><td>中程度。拒否率・法務・リードタイムは織り込み済</td><td>§6.1のA/B/C/Dトリガー</td></tr>
+<tr><td><strong>C：見送り</strong></td><td>簡易OEMは採らず、せどり＋従来メーカー仕入れのみ</td><td>現状路線の範囲。SKU100の&quot;資産化&quot;は②に全依存</td><td>SKU100が積み上がらず800万の下支えが弱いまま。学習機会損失</td><td>—</td></tr>
+</tbody></table>
+<h3>推奨：<strong>B案（副軸で試験導入 → ストック軸へ育成）</strong></h3>
+<p><strong>根拠:</strong></p>
+<ol>
+<li><strong>KPI整合</strong> — 簡易OEMはSKO100の&quot;減らない下支え&quot;を最小資金で作れる唯一の入口。B案の25〜30SKUで月商の約1/4を持続的に担い、利益率20%とも整合（§5.3）。</li>
+<li><strong>初心者最適</strong> — 0-3ヶ月を1〜2本に絞ることで、社長は「小さく本番」で学べる（<code>owner_side_business_beginner</code>）。Aは学習を飛ばして崩れるリスク、Cは学習機会を捨てる。</li>
+<li><strong>既存資産の再解釈で勝つ</strong> — 夜間スキャン基盤・メーカー抽出実装・FBA外注ノウハウ・既存ストア名「Satoy Select」と、<strong>新規投資ほぼゼロで接続</strong>できる（森岡流：手持ちリソースの組み替えで勝つ）。</li>
+<li><strong>リスク限定</strong> — SKU単位の損切り設計（§6.1-B）と、せどり現金軸との両輪で、資産軸のリードタイムの長さを現金で埋められる。</li>
+</ol>
+<h3>最初の一手（社長の実Do＝1つだけ）</h3>
+<p><strong>「<code>finder_niche_oem</code> スキャン（IT・別チケット）を回して、交渉候補リスト10本を作る」ことを承認していただく。</strong> ここまでは§4.1に触れず（外部連絡・決済なし）、社長の手はほぼ動きません。10本が出た時点で「どのメーカーに電話するか」の判断（次の関所＝§4.1第三者連絡）に進みます。</p>
+<hr>
+<h2>付記（本ドラフトの前提と限界）</h2>
+<ul>
+<li>数字はすべて<strong>仮置き</strong>。実カテゴリの販売手数料・FBAサイズ区分・実卸価格・実月販で更新が必要（経理ハジメ・リサーチャーサトルへ発注推奨）。</li>
+<li>実行フェーズの §4.1 関所（メーカー実連絡・初回決済・スクール/コンサル契約）は<strong>すべて社長承認を取ってから</strong>。本ドラフトは立案のみ。</li>
+<li>次アクション候補：①<code>finder_niche_oem</code> 実装チケット（IT）②食品ラベル表示チェックリスト（法務）③シミュレーター・マサルによる3シナリオ×プレモーテムの仮想検証（本ドラフトのB案を叩く）。</li>
+</ul>
+<hr><p style="font-size:.85em;color:#888">起案: プランナー・タケシ / T-20260809-001 / 2026-08-09 ｜ 本ドラフトは立案のみ。§4.1該当（メーカー実連絡・初回決済・スクール契約）は社長承認が別途必要。</p>
+</body></html>

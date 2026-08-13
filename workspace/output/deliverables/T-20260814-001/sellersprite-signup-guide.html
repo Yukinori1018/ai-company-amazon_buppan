@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>セラースプライト申込ガイド｜T-20260814-001</title>
+<style>
+  :root{--bg:#f7f8fa;--card:#fff;--ink:#1a1f2b;--sub:#5a6473;--line:#e3e7ee;--brand:#2b6cb0;--good:#1b8a5a;--warn:#b7791f;--bad:#c53030;--hl:#eef5fc;}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;line-height:1.7;font-size:15px}
+  .wrap{max-width:920px;margin:0 auto;padding:24px 18px 80px}
+  h1{font-size:24px;margin:0 0 4px}
+  h2{font-size:19px;margin:34px 0 10px;padding-bottom:6px;border-bottom:2px solid var(--brand);color:var(--brand)}
+  h3{font-size:16px;margin:20px 0 8px}
+  .meta{color:var(--sub);font-size:13px;margin-bottom:16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:14px 0;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+  .concl{background:var(--hl);border:1px solid #cfe0f2;border-radius:12px;padding:16px 18px}
+  .concl li{margin:6px 0}
+  table{width:100%;border-collapse:collapse;margin:10px 0;font-size:14px;overflow-x:auto;display:block}
+  @media(min-width:640px){table{display:table}}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:#eef1f6;font-weight:600}
+  .rec{background:#eafaf1}
+  .tag{display:inline-block;font-size:12px;padding:2px 8px;border-radius:999px;font-weight:600}
+  .t-good{background:#e3f5ec;color:var(--good)}
+  .t-warn{background:#fbf1dc;color:var(--warn)}
+  .t-bad{background:#fbe4e4;color:var(--bad)}
+  .note{border-left:4px solid var(--warn);background:#fffdf5;padding:10px 14px;border-radius:0 8px 8px 0;margin:10px 0}
+  .danger{border-left:4px solid var(--bad);background:#fff6f6;padding:10px 14px;border-radius:0 8px 8px 0;margin:10px 0}
+  code{background:#eef1f6;padding:1px 6px;border-radius:5px;font-size:13px}
+  ol.steps{padding-left:20px}
+  ol.steps>li{margin:10px 0}
+  .chk{color:var(--sub);font-size:13px;display:block;margin-top:2px}
+  a{color:var(--brand)}
+  .small{font-size:13px;color:var(--sub)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>セラースプライト（SellerSprite）申込ガイド</h1>
+<div class="meta">リサーチャー・サトル｜確認日 2026-08-14｜T-20260814-001｜用途の中心＝②メーカー仕入れ・③国内ニッチ簡易OEM（「ニッチOEM 4基準」の測定）</div>
+
+<div class="danger"><b>⚠️ このガイドは「手順の説明」です。</b> 実際のアカウント登録・プラン選択・決済は<b>社長ご自身</b>がPC上で行ってください。当社Claudeは登録・決済を代行しません。</div>
+
+<h2>0. 結論ファースト（30秒）</h2>
+<div class="concl">
+<ul>
+<li><b>推奨＝B：</b>無料版/トライアルで感触確認 → <b>スタンダード月額 ¥13,998/月</b>を1か月だけ契約して実戦検証 → 続けると決めたら年額（16%OFF）に切替。</li>
+<li>当社用途に必要な機能（キーワードリサーチ・競合逆引き・市場調査・推定売上・推定PPC・CVR）は<b>スタンダードで全て使える</b>。アドバンス/VIPは当面不要（トラッカー枠と子アカウントが増えるだけ）。</li>
+<li>ニッチOEM 4基準は全て<b>キーワードリサーチ＋市場調査（トレンドグラフ）</b>で測れる（§4）。</li>
+<li>既契約Keepa（PRO）とは<b>役割が違い相互補完</b>。乗り換えではなく併用（§7）。</li>
+<li><b>社長が次にやること：</b>§6の手順で（1）無料登録→（2）3日トライアル/無料版で1〜2品テスト→（3）スタンダード月額を契約。<b>決済前に金額と通貨（円/ドル）を必ず確認。</b></li>
+</ul>
+</div>
+
+<h2>用語ミニ辞典（副業初心者向け）</h2>
+<div class="card">
+<table>
+<tr><th>用語</th><th>かんたん説明</th></tr>
+<tr><td>検索ボリューム（月間検索数）</td><td>そのキーワードがAmazonで月に何回検索されるか。需要の大きさの目安。</td></tr>
+<tr><td>CVR（転換率）</td><td>検索した人のうち実際に買う割合。3%＝100人見て3人購入。</td></tr>
+<tr><td>PPC（推定入札額）</td><td>スポンサー広告1クリックの入札単価の目安。低いほど広告費が安い。</td></tr>
+<tr><td>Reverse ASIN（競合逆引き）</td><td>ライバル商品の番号を入れ、その商品が「どのKWで・何個売れているか」を逆算表示。</td></tr>
+<tr><td>トラッカー（監視枠）</td><td>商品・KW・ストアを継続ウォッチする登録上限。</td></tr>
+<tr><td>Chrome拡張</td><td>Amazon検索結果の画面上に売上推定などを重ねて表示するブラウザ機能。</td></tr>
+</table>
+</div>
+
+<h2>1. 料金プラン一覧 <span class="small">（出典：公式 sellersprite.com／確認日 2026-08-14）</span></h2>
+<h3>日本円（公式JPページ）</h3>
+<div class="card">
+<table>
+<tr><th>プラン</th><th>月額</th><th>年額</th><th>商品/KW/ストア トラッカー</th><th>位置づけ</th></tr>
+<tr><td>無料</td><td>¥0</td><td>¥0</td><td>0 / 0 / 0（エクスポート不可）</td><td>お試し・初心者</td></tr>
+<tr class="rec"><td><b>スタンダード</b></td><td><b>¥13,998/月</b></td><td>¥139,998/年（16%OFF・通常¥168,004）</td><td>100 / 500 / 50</td><td>個人セラーに十分 ★推奨</td></tr>
+<tr><td>アドバンス</td><td>（年額表示）</td><td>¥269,831/年（16%OFF・通常¥323,810）</td><td>300 / 1,000 / 100</td><td>拡大期・チーム（子6）</td></tr>
+<tr><td>VIP</td><td>（年額表示）</td><td>¥339,998/年（16%OFF・通常¥408,013）</td><td>500 / 2,000 / 200</td><td>大規模（子10）</td></tr>
+</table>
+<div class="small">有料共通：エクスポート50件/日/アカウント、AI機能100回/日/機能。年額は月額比16%OFF（公式表記）。</div>
+</div>
+
+<h3>米ドル（公式ENページ・参考）</h3>
+<div class="card">
+<table>
+<tr><th>プラン</th><th>月額</th><th>年額(16%off)</th></tr>
+<tr><td>Basic</td><td>$39</td><td>$390</td></tr>
+<tr><td>Standard</td><td>$79</td><td>$790</td></tr>
+<tr><td>Advanced</td><td>$129</td><td>$1,290</td></tr>
+<tr><td>VIP</td><td>$189</td><td>$1,890</td></tr>
+</table>
+<div class="note"><b>要確認：</b>JP月額ページにはUSの「Basic($39)」相当が見当たらず、日本側はスタンダード月額から始まる構成に見える。US/JPで提供構成・表示が異なる可能性 → <b>申込画面で実際の選択肢と金額を確認</b>。</div>
+</div>
+
+<h3>割引クーポン <span class="tag t-warn">要確認</span></h3>
+<div class="card">
+<ul>
+<li>第三者（アフィリエイト）記事が複数の割引コードを掲示：例「30%OFF」「34%OFF」系（コード例 VNI524／IQX623 等、いずれも第三者掲示）。</li>
+<li>公式の恒常割引とは限らず、有効期限・対象・併用可否が不明。<b>申込時にコード欄で実際に金額が下がるかをその場で確認</b>。適用されなければコードなしで進めてOK。</li>
+</ul>
+<div class="small">当社の扱い：「割引がある可能性あり／金額は要現地確認」。憶測で確定額は書きません。</div>
+</div>
+
+<h2>2. 無料版・無料トライアル</h2>
+<div class="card">
+<ul>
+<li><b>無料版（恒久）</b>：¥0。基本データの一部とChrome拡張の一部表示は使えるが、<b>閲覧/DL回数に大きな制限・エクスポート不可・トラッカー0</b>。「触ってみる」用途。</li>
+<li><b>無料トライアル</b>：公式ENに <code>FREE 3-Day trial of Monthly Plan</code>（月額の3日間無料）。<span class="tag t-warn">要確認</span> 日本語アフィ記事は「7日間」と記載あり。<b>日数は申込画面の実表示が正</b>。トライアルはクレカ登録を伴い、期間内に解約しないと課金。</li>
+</ul>
+<table>
+<tr><th>項目</th><th>無料版</th><th>有料（スタンダード〜）</th></tr>
+<tr><td>キーワードリサーチ</td><td><span class="tag t-warn">△制限</span></td><td><span class="tag t-good">○実質無制限</span></td></tr>
+<tr><td>商品リサーチ（推定売上）</td><td><span class="tag t-warn">△制限</span></td><td><span class="tag t-good">○</span></td></tr>
+<tr><td>競合逆引き（Reverse ASIN）</td><td><span class="tag t-bad">✕〜△</span></td><td><span class="tag t-good">○</span></td></tr>
+<tr><td>市場調査・トレンド</td><td><span class="tag t-warn">△</span></td><td><span class="tag t-good">○</span></td></tr>
+<tr><td>エクスポート</td><td><span class="tag t-bad">✕</span></td><td><span class="tag t-good">○(50件/日)</span></td></tr>
+<tr><td>トラッカー</td><td><span class="tag t-bad">✕(0枠)</span></td><td><span class="tag t-good">○(100〜)</span></td></tr>
+</table>
+</div>
+
+<h2>3. 主要機能 対応表</h2>
+<div class="card">
+<table>
+<tr><th>機能</th><th>対応</th><th>当社での使いどころ</th></tr>
+<tr><td>キーワードリサーチ</td><td><span class="tag t-good">○</span></td><td>検索ボリューム・CVR・推定PPCを取得（4基準の主軸）</td></tr>
+<tr><td>商品リサーチ</td><td><span class="tag t-good">○</span></td><td>推定月間売上・売上個数でカテゴリの旨味を判定</td></tr>
+<tr><td>競合逆引き（Reverse ASIN）</td><td><span class="tag t-good">○</span></td><td>ライバルOEM品の流入KW・販売数を逆算し差別化点探索</td></tr>
+<tr><td>推定月間売上</td><td><span class="tag t-good">○</span></td><td>②メーカー仕入れの需要確認</td></tr>
+<tr><td>推定PPC・広告可視化</td><td><span class="tag t-good">○</span></td><td>KW単位の推定入札額（「PPC100円以下」判定）</td></tr>
+<tr><td>レビュー分析</td><td><span class="tag t-good">○</span> <span class="tag t-warn">上限要確認</span></td><td>不満点抽出→OEM改良ポイント</td></tr>
+<tr><td>日本語UI・日本市場対応</td><td><span class="tag t-good">○</span></td><td>UI日本語、Amazon.co.jp対応、Chrome拡張で検索結果に重畳</td></tr>
+</table>
+</div>
+
+<h2>4. 「ニッチOEM 4基準」をどの機能で測るか</h2>
+<div class="card">
+<table>
+<tr><th>基準</th><th>使う機能</th><th>見る場所（操作の当たり）</th></tr>
+<tr><td>① 検索ボリューム 3,000〜30,000</td><td>キーワードリサーチ／マイニング</td><td>結果表の「月間検索数」列でソート・フィルタ</td></tr>
+<tr><td>② CVR ≧ 3%</td><td>キーワードリサーチ</td><td>「転換率(CVR)」列で3%以上を抽出</td></tr>
+<tr><td>③ 推定PPC ≦ 100円</td><td>キーワードリサーチ</td><td>「PPC入札額(推定)」列で100円以下に絞る</td></tr>
+<tr><td>④ トレンド 横〜右肩上がり</td><td>キーワードトレンド／市場調査</td><td>数年分のトレンドグラフの傾き（右肩下がりは除外）</td></tr>
+</table>
+<p class="small"><b>当たりの操作フロー：</b>候補カテゴリ/シードKWを入力 → キーワードリサーチで①③②をフィルタ → 有望KWを市場調査/トレンドで④確認 → 競合逆引きで上位ライバルのKW・販売数を裏取り → Chrome拡張でAmazon実画面の推定売上を確認。</p>
+<div class="note">②CVR列・③PPC列の<b>正確な列名は画面バージョンで変わり得る</b>ため、初回に列ヘッダを確認してください（要確認）。</div>
+</div>
+
+<h2>5. 推奨プラン A / B / C（＋推奨）</h2>
+<div class="card">
+<table>
+<tr><th>案</th><th>内容</th><th>メリット</th><th>デメリット</th><th>コスト目安</th></tr>
+<tr><td>A</td><td>無料版＋3日トライアルのみで様子見</td><td>出費ゼロ</td><td>制限が重く4基準検証が中途半端</td><td>¥0</td></tr>
+<tr class="rec"><td><b>B（推奨）</b></td><td>無料/トライアル→<b>スタンダード月額¥13,998</b>を1か月→継続なら年額(16%OFF)へ</td><td>実務機能フル・単月で撤退可・低リスク</td><td>続けるなら年額より割高</td><td>¥13,998/月</td></tr>
+<tr><td>C</td><td>最初からスタンダード年額¥139,998</td><td>16%OFF（実質≈¥11,667/月）</td><td>初月で不要と判明しても年縛り</td><td>年額¥139,998</td></tr>
+</table>
+<p><b>推奨＝B。</b>まだ自社KPIでSellerSpriteの実戦価値を検証していないため、月額で1か月回し、ニッチOEM 4基準のスクリーニングが機能するか（＝候補SKUが出るか）を確かめてから年額へ。アドバンス/VIPは当面不要。</p>
+</div>
+
+<h2>6. 申込ステップ手順書（社長がPC上で完結）</h2>
+<div class="card">
+<ol class="steps">
+<li><b>公式サイトを開く</b>：<code>https://www.sellersprite.com/jp</code> にアクセス。</li>
+<li><b>無料アカウント登録</b>：「登録／無料で始める」からメール＋パスワードで登録→確認メールを認証。<span class="chk">確認：事業用メールで作るか個人メールか決める（共有予定なら事業用推奨）。</span></li>
+<li><b>無料/トライアルで試す</b>：キーワードリサーチに候補KWを1つ入れ、§4の列（検索数・CVR・PPC）が見えるか確認。Chrome拡張を入れAmazon.co.jpで重畳表示を確認。</li>
+<li><b>プラン選択</b>：「料金／アップグレード」→<b>スタンダード</b>。<span class="chk">確認：「月額」タブを選ぶ／表示が円か米ドルか／金額（¥13,998/月目安）。</span></li>
+<li><b>クーポン欄</b>：割引コードがあれば入力し<b>金額が実際に下がるか</b>確認。下がらなければ空欄で進む。</li>
+<li><b>支払い</b>：クレジットカード等を入力し確定。<b>社長ご自身が入力・確定</b>（当社は代行しません）。<span class="chk">確認：請求サイクル／次回請求日／自動更新。トライアル経由なら終了日と解約期限をカレンダー登録。</span></li>
+<li><b>領収書/請求書</b>：アカウント設定の請求履歴を確認し、経理連携用に控えを保存。</li>
+</ol>
+<div class="danger"><b>注意：</b>トライアルは自動で有料移行が多い。<b>続けない場合の解約期限</b>を先に把握。通貨表示（円/ドル）で実質価格が変わるため為替も確認。</div>
+</div>
+
+<h2>7. 既契約ツールとの重複チェック</h2>
+<div class="card">
+<table>
+<tr><th>観点</th><th>Keepa（PRO・契約中）</th><th>SellerSprite</th><th>ERESA（未契約）</th></tr>
+<tr><td>強み</td><td>価格・順位の長期履歴、価格トラッキング、Product Finder</td><td>KW検索数・CVR・推定PPC・競合逆引き・推定売上</td><td>Keepa連携の相場確認（無料寄り）</td></tr>
+<tr><td>4基準への寄与</td><td>④トレンドの裏取り</td><td>①②③④の主軸を直接取得</td><td>限定的</td></tr>
+<tr><td>重複</td><td>推定売上・順位で一部</td><td>Keepaと一部</td><td>SellerSpriteのKWデータには及ばず</td></tr>
+</table>
+<p><b>結論（事実）：</b>SellerSpriteとKeepaは<b>役割が異なり相互補完</b>。Keepa＝価格・順位の履歴と監視、SellerSprite＝キーワード需要・CVR・PPC・競合逆引き。重複は推定売上程度で、<b>乗り換えではなく併用が合理的</b>。ERESAはKeepa＋SellerSpriteがあれば追加契約の必要性は低い（最終判断はプランナー領分）。</p>
+</div>
+
+<h2>出典（すべて確認日 2026-08-14）</h2>
+<div class="card small">
+<ul>
+<li>公式 料金（日本語）：<a href="https://www.sellersprite.com/jp/price">sellersprite.com/jp/price</a></li>
+<li>公式 料金（英語）：<a href="https://www.sellersprite.com/en/price">sellersprite.com/en/price</a></li>
+<li>公式 キーワードリサーチ：<a href="https://sellersprite.jp/v2/keyword-research">sellersprite.jp/v2/keyword-research</a></li>
+<li>公式 キーワードマイニング：<a href="https://www.sellersprite.com/jp/v2/keyword-miner/page">sellersprite.com/jp/v2/keyword-miner</a></li>
+<li>EC STARs Lab.（機能・クーポン）：<a href="https://ecstarslab.com/blog/sellersprite/">ecstarslab.com/blog/sellersprite</a></li>
+<li>はちのす制作（料金・クーポン）：<a href="https://hachinosu-seisaku.co.jp/column/marketing/sellersprite-ryoukin/">hachinosu-seisaku.co.jp</a></li>
+<li>FORCE-R（無料/有料比較）：<a href="https://force-r.co.jp/column/column-24574/">force-r.co.jp</a></li>
+</ul>
+<p>価格・トライアル日数・クーポンは変動し得ます。<b>申込画面の実表示を最終の正</b>としてください。「要確認」と記した箇所は憶測で埋めていません。</p>
+</div>
+
+</div>
+</body>
+</html>
