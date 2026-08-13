@@ -32,11 +32,18 @@
     if (orders.length) chrome.runtime.sendMessage({ type: 'AMAZON_ORDERS', orders: orders });
   }
 
+  // C2: DOM変化のたびに連打しないようデバウンス
+  var _debTimer = null;
+  function reportOrdersDebounced() {
+    if (_debTimer) clearTimeout(_debTimer);
+    _debTimer = setTimeout(reportOrders, 700);
+  }
+
   // 注文ページなら読み取り（初回＋DOM変化を監視）
   if (/orders|注文/.test(href) || document.querySelector('[data-test-id="order-card"], .order-card, tr.order-row')) {
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', reportOrders);
     else reportOrders();
-    var mo = new MutationObserver(function () { reportOrders(); });
+    var mo = new MutationObserver(reportOrdersDebounced);
     if (document.body) mo.observe(document.body, { childList: true, subtree: true });
   }
 
@@ -69,9 +76,8 @@
     }
     var ok = setStockForSku(msg.sku, msg.quantity);
     if (!ok) {
-      chrome.runtime.sendMessage({
-        type: 'AMAZON_ORDERS', orders: [] // no-op；在庫行が見つからない場合は手動対応を促す通知に委ねる
-      });
+      // C3: 在庫行が見つからない場合は手動対応を促す（background側の通知に委ね、ここでは結果のみ返す）
+      console.warn('[RSAS] 在庫行が見つからず在庫変更できません sku=', msg.sku, '→ 手動で在庫を', msg.quantity, 'にしてください');
     }
     sendResponse({ ok: ok });
   });

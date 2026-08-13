@@ -81,9 +81,13 @@
     // 1日の購入上限管理
     async canSpend(amount, todayStr) {
       var s = await Store.getSettings();
-      if (s.spentDate !== todayStr) { s.spentToday = 0; }
+      var spent = s.spentDate === todayStr ? s.spentTodayJPY : 0; // 日跨ぎは0にリセット
+      return spent + Number(amount || 0) <= s.dailySpendCapJPY;
+    },
+    async remainingBudget(todayStr) {
+      var s = await Store.getSettings();
       var spent = s.spentDate === todayStr ? s.spentTodayJPY : 0;
-      return spent + amount <= s.dailySpendCapJPY;
+      return Math.max(0, s.dailySpendCapJPY - spent);
     },
     async addSpend(amount, todayStr) {
       var s = await Store.getSettings();

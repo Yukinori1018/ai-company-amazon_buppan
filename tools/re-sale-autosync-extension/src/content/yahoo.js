@@ -75,14 +75,25 @@
           setTimeout(function () { box.remove(); }, 1200);
           return;
         }
-        var ok = clickBuy();
-        if (ok) {
-          msg.textContent = '購入導線をクリックしました。決済完了を確認してください。';
-          report(task.id, true, nowPrice, null);
-        } else {
-          msg.textContent = '購入ボタンが見つかりませんでした（手動購入してください）。';
-          report(task.id, false, nowPrice, 'BUY_BUTTON_NOT_FOUND');
-        }
+        // A1: 実購入は必ず background の事前承認を通す（日次上限・上限価格・タスク状態を検査）
+        buyBtn.disabled = true;
+        chrome.runtime.sendMessage({ type: 'CAN_PURCHASE', taskId: task.id, price: nowPrice }, function (auth) {
+          if (!auth || !auth.allowed) {
+            buyBtn.disabled = false;
+            msg.textContent = '購入不可: ' + ((auth && auth.reason) || 'NOT_AUTHORIZED') + '（中止しました）';
+            report(task.id, false, nowPrice, (auth && auth.reason) || 'NOT_AUTHORIZED');
+            return;
+          }
+          var ok = clickBuy();
+          if (ok) {
+            msg.textContent = '購入導線をクリックしました。決済完了を確認してください。（残枠¥' + (auth.remaining || 0).toLocaleString() + '）';
+            report(task.id, true, nowPrice, null);
+          } else {
+            buyBtn.disabled = false;
+            msg.textContent = '購入ボタンが見つかりませんでした（手動購入してください）。';
+            report(task.id, false, nowPrice, 'BUY_BUTTON_NOT_FOUND');
+          }
+        });
       });
     };
   }

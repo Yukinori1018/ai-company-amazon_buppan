@@ -1,6 +1,8 @@
 /* popup: 監視登録・状態表示・購入待ちの操作 */
 var $ = function (id) { return document.getElementById(id); };
 function send(msg) { return new Promise(function (r) { chrome.runtime.sendMessage(msg, r); }); }
+// D1: 未定義/非数値でも例外を出さない通貨表示
+function yen(v) { return (typeof v === 'number' && isFinite(v)) ? '¥' + v.toLocaleString() : '—'; }
 function itemIdFromUrl(url) {
   var m = url.match(/auction\/([a-zA-Z0-9]+)/) || url.match(/item\/([a-zA-Z0-9]+)/);
   return m ? m[1] : null;
@@ -56,7 +58,7 @@ async function render() {
   var tasks = (s.tasks || []).filter(function (t) { return t.state === 'PENDING'; });
   $('tasks').innerHTML = tasks.length ? tasks.map(function (t) {
     return '<div class="item"><b>' + t.sku + '</b> <span class="pill PENDING">購入待ち</span><br>' +
-      'Amazon注文 ' + t.amazonOrderId + ' / 上限 ¥' + t.maxSourcePrice.toLocaleString() + '<br>' +
+      'Amazon注文 ' + t.amazonOrderId + ' / 上限 ' + yen(t.maxSourcePrice) + '<br>' +
       '<a href="' + t.sourceUrl + '" target="_blank">ヤフオクを開いて購入</a></div>';
   }).join('') : '<div class="note">なし</div>';
 
@@ -64,9 +66,9 @@ async function render() {
   $('watches').innerHTML = ws.length ? ws.map(function (w) {
     var over = w.currentPrice != null && w.currentPrice > w.maxSourcePrice;
     return '<div class="item"><b>' + w.sku + '</b> <span class="pill ' + (w.status || 'UNKNOWN') + '">' + (w.status || '-') + '</span> ' +
-      '在庫' + w.quantity + '<br>' + w.asin + '<br>' +
-      '現在 <span class="' + (over ? 'over' : '') + '">' + (w.currentPrice != null ? '¥' + w.currentPrice.toLocaleString() : '-') + '</span>' +
-      ' / 上限 ¥' + w.maxSourcePrice.toLocaleString() + (w.active ? '' : ' <span class="pill INACTIVE">監視終了</span>') + '</div>';
+      '在庫' + (w.quantity != null ? w.quantity : '-') + '<br>' + (w.asin || '') + '<br>' +
+      '現在 <span class="' + (over ? 'over' : '') + '">' + (w.currentPrice != null ? yen(w.currentPrice) : '-') + '</span>' +
+      ' / 上限 ' + yen(w.maxSourcePrice) + (w.active ? '' : ' <span class="pill INACTIVE">監視終了</span>') + '</div>';
   }).join('') : '<div class="note">未登録</div>';
 }
 

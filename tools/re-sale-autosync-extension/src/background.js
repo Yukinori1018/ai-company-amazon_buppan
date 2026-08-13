@@ -29,7 +29,10 @@ chrome.runtime.onInstalled.addListener(async function () {
   await Store.saveSettings(s); // デフォルトを確定
   await rescheduleAlarm();
 });
-chrome.runtime.onStartup.addListener(rescheduleAlarm);
+chrome.runtime.onStartup.addListener(async function () {
+  await rescheduleAlarm();
+  runMonitorCycle().catch(function (e) { console.warn('startup monitor failed', e); }); // 起動時に即1周（監視の空白を減らす）
+});
 
 async function rescheduleAlarm() {
   var s = await Store.getSettings();
@@ -133,6 +136,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     switch (msg.type) {
       case 'RUN_MONITOR': await runMonitorCycle(); sendResponse({ ok: true }); break;
       case 'AMAZON_ORDERS': await onAmazonOrders(msg.orders || []); sendResponse({ ok: true }); break;
+      case 'CAN_PURCHASE': sendResponse(await authorizePurchase(msg)); break;
       case 'PURCHASE_RESULT': await onPurchaseResult(msg); sendResponse({ ok: true }); break;
       case 'RESCHEDULE': await rescheduleAlarm(); sendResponse({ ok: true }); break;
       case 'GET_STATE': {
@@ -148,13 +152,35 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
   return true; // async
 });
 
+/**
+ * 購入の事前承認ゲート（A1: 実購入直前に content から必ず呼ぶ）。
+ * 検査: ①対象タスクが PENDING ②単価が損益分岐(maxSourcePrice)以内 ③日次購入上限に収まる。
+ * returns { allowed, reason, remaining }
+ */
+async function authorizePurchase(msg) {
+  var price = Number(msg.price || 0);
+  var tasks = await Store.getTasks();
+  var task = tasks.find(function (t) { return t.id === msg.taskId; });
+  if (!task) return { allowed: false, reason: 'TASK_NOT_FOUND' };
+  if (task.state !== 'PENDING') return { allowed: false, reason: 'TASK_NOT_PENDING(' + task.state + ')' };
+  if (task.maxSourcePrice != null && price > task.maxSourcePrice) {
+    return { allowed: false, reason: 'PRICE_OVER_MAX(' + price + '>' + task.maxSourcePrice + ')' };
+  }
+  var remaining = await Store.remainingBudget(todayStr());
+  if (!(await Store.canSpend(price, todayStr()))) {
+    return { allowed: false, reason: 'DAILY_CAP_EXCEEDED(残枠¥' + remaining + ')', remaining: remaining };
+  }
+  return { allowed: true, reason: 'OK', remaining: remaining };
+}
+
 // 購入結果（yahoo.js の購入確定 or 失敗）
 async function onPurchaseResult(msg) {
   var task = (await Store.getTasks()).find(function (t) { return t.id === msg.taskId; });
   if (!task) return;
   if (msg.success) {
-    await Store.updateTask(task.id, { state: 'BOUGHT', boughtPrice: msg.price, boughtAt: new Date().toISOString() });
-    await Store.addSpend(msg.price || 0, todayStr());
+    var settings = await Store.getSettings();
+    await Store.updateTask(task.id, { state: 'BOUGHT', boughtPrice: msg.price, boughtAt: new Date().toISOString(), dryRun: !!settings.dryRun });
+    if (!settings.dryRun) await Store.addSpend(msg.price || 0, todayStr()); // A2: DRY_RUNでは日次枠を消費しない
     // 買えたのでこの一点物は消える → 該当 SKU の在庫は0へ
     var w = (await Store.getWatches()).find(function (x) { return x.id === task.watchId; });
     if (w) await requestAmazonStockChange(w, 0, 'PURCHASED_ON_YAHOO');
