@@ -23,6 +23,7 @@
     spentTodayJPY: 0,
     spentDate: '',                // YYYY-MM-DD
     sellerCentralInventoryUrl: 'https://sellercentral.amazon.co.jp/inventory',
+    unknownStreakAlert: 3,        // 取得不能(UNKNOWN)がこの回数連続したら手動確認を促す
     selectors: DEFAULT_SELECTORS
   };
 

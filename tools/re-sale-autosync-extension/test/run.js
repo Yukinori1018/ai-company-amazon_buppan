@@ -81,6 +81,12 @@ function fx(name) { return fs.readFileSync(path.join(__dirname, 'fixtures', name
   eq(f.currentPrice, 3500, 'parse: フリマ販売価格抽出');
   eq(RSAS.parseYahooHtml('').status, 'UNKNOWN', 'parse: 空→UNKNOWN');
   eq(RSAS.parseYahooHtml('<html><body>意味不明</body></html>').status, 'UNKNOWN', 'parse: シグナル無→UNKNOWN');
+  var j = RSAS.parseYahooHtml(fx('active_jsonld_only.html'));
+  eq(j.status, 'ACTIVE', 'parse: JSON-LDのみでもACTIVE');
+  eq(j.currentPrice, 12000, 'parse: JSON-LD priceを抽出');
+  var et = RSAS.parseYahooHtml(fx('active_with_endtime.html'));
+  eq(et.status, 'ACTIVE', 'parse: 「終了日時」表示の開催中を誤ENDEDしない');
+  eq(et.currentPrice, 2800, 'parse: 税込表記の現在価格を抽出');
 })();
 
 // ========== store: 日次購入上限 canSpend/addSpend ==========

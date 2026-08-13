@@ -63,12 +63,23 @@ async function syncOne(watch) {
   var snap = await fetchYahooSnapshot(watch.source.url);
   var d = self.RSAS.decide(snap.status, snap.currentPrice, watch.maxSourcePrice);
 
+  var newFailCount = snap.status === 'UNKNOWN' ? (watch.checkFailCount || 0) + 1 : 0;
   await Store.updateWatch(watch.id, {
     status: snap.status,
     currentPrice: snap.currentPrice,
     lastCheckedAt: new Date().toISOString(),
-    checkFailCount: snap.status === 'UNKNOWN' ? (watch.checkFailCount || 0) + 1 : 0
+    checkFailCount: newFailCount
   });
+
+  // B3: UNKNOWN が連続したら手動確認を促す（閾値を跨いだ瞬間だけ通知＝毎周の連投を防ぐ）
+  if (snap.status === 'UNKNOWN') {
+    var s = await Store.getSettings();
+    var threshold = s.unknownStreakAlert || 3;
+    if (newFailCount === threshold) {
+      notify('unknown-' + watch.sku, '仕入れ元の取得に連続失敗', watch.sku + '：ヤフオクの状態を' + threshold + '回連続で取得できません。手動で在庫可否をご確認ください。');
+      await Store.log({ kind: 'MONITOR', sku: watch.sku, action: 'UNKNOWN_STREAK', count: newFailCount });
+    }
+  }
 
   if (d.quantity === null) return;            // UNKNOWN: 触らない
   if (d.quantity === watch.quantity) return;  // 冪等
