@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>利益計算ツール実践ガイド｜FBA料金シミュレーター × Keepa</title>
+<style>
+  :root{
+    --bg:#ffffff; --fg:#1a1a1a; --muted:#5b6470; --line:#e3e7ec;
+    --accent:#0b63c4; --accent-soft:#eaf2fc; --amz:#ff9900; --amzd:#146eb4;
+    --ok:#137333; --warn:#b06000; --warnbg:#fff6e5; --ng:#b3261e;
+    --card:#f7f9fb; --num:#0f1b25;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#12151a; --fg:#e8ecf1; --muted:#9aa4b0; --line:#2a303a;
+      --accent:#5fa8ff; --accent-soft:#1a2532; --card:#1a1e25; --warnbg:#2a2313; --warn:#e0a94a; }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);font-family:-apple-system,"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;line-height:1.75;font-size:15.5px}
+  .wrap{max-width:880px;margin:0 auto;padding:32px 22px 80px}
+  h1{font-size:25px;line-height:1.35;margin:0 0 6px}
+  .sub{color:var(--muted);font-size:13.5px;margin:0 0 24px}
+  h2{font-size:20px;margin:40px 0 12px;padding-top:16px;border-top:2px solid var(--line);display:flex;align-items:center;gap:10px}
+  h2 .n{flex:0 0 auto;width:30px;height:30px;border-radius:8px;background:var(--accent);color:#fff;font-size:15px;display:inline-flex;align-items:center;justify-content:center;font-weight:700}
+  h3{font-size:16px;margin:22px 0 6px}
+  p{margin:8px 0}
+  ul,ol{margin:8px 0;padding-left:22px} li{margin:6px 0}
+  .lead{background:var(--accent-soft);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:0 0 12px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:12px 0}
+  .warn{background:var(--warnbg);border:1px solid var(--warn);border-radius:12px;padding:14px 16px;margin:14px 0}
+  .warn b{color:var(--warn)}
+  .ok{color:var(--ok);font-weight:700}.ng{color:var(--ng);font-weight:700}.warnt{color:var(--warn);font-weight:700}
+  table{border-collapse:collapse;width:100%;margin:12px 0;font-size:13.5px}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:var(--card)}
+  .num{text-align:right;font-variant-numeric:tabular-nums}
+  .kbd{font-family:ui-monospace,Menlo,monospace;background:var(--card);border:1px solid var(--line);border-radius:6px;padding:1px 7px;font-size:12.5px}
+  .url{font-family:ui-monospace,Menlo,monospace;font-size:12.5px;word-break:break-all;background:var(--num);color:#e8f0f6;padding:8px 10px;border-radius:8px;display:block;margin:6px 0}
+  .step{counter-reset:s;list-style:none;padding-left:0}
+  .step>li{position:relative;padding-left:38px;margin:14px 0}
+  .step>li::before{counter-increment:s;content:counter(s);position:absolute;left:0;top:0;width:26px;height:26px;border-radius:50%;background:var(--amzd);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .term{font-size:13.5px;color:var(--muted);border-left:3px solid var(--line);padding:2px 0 2px 12px;margin:6px 0}
+  .flow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:14px 0;font-weight:700}
+  .flow .b{background:var(--accent-soft);border:1px solid var(--accent);border-radius:10px;padding:8px 12px}
+  .flow .a{color:var(--accent);font-size:20px}
+  .foot{margin-top:40px;padding-top:16px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px}
+  .pill{display:inline-block;font-size:11px;font-weight:700;padding:2px 9px;border-radius:999px;color:#fff}
+  .pill.free{background:var(--ok)} .pill.have{background:var(--amzd)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>利益計算ツール実践ガイド<br>FBA料金シミュレーター × Keepa</h1>
+<p class="sub">商品選定の「ざっくり利益計算」を、この2本で完結させる ／ 制作ヒデアキ・事実確認サトル・秘書カズヨ ／ T-20260816-002 ／ 2026-08-16</p>
+
+<div class="lead">
+<b>結論：この2本は競合ではなく、役割分担でセットで使います。</b>
+<div class="flow">
+<span class="b">① Keepa<br><span style="font-weight:400;font-size:12px">相場と売れ行きを掴む</span></span>
+<span class="a">→</span>
+<span class="b">② FBA料金シミュレーター<br><span style="font-weight:400;font-size:12px">手数料を引いた利益を確定</span></span>
+<span class="a">→</span>
+<span class="b">仕入れ判断</span>
+</div>
+Keepaで「いくらで売れるか・本当に売れているか」を調べ、その数字をシミュレーターに入れて「手元にいくら残るか」を出す。<b>この一直線が"ざっくり利益計算"の完成形</b>です。
+</div>
+
+<div class="card">
+<b>選定の妥当性（社長の判断は正しい）</b>
+<table>
+<thead><tr><th>ツール</th><th>役割</th><th>料金</th><th>判定</th></tr></thead>
+<tbody>
+<tr><td><b>FBA料金シミュレーター</b></td><td>利益計算の"公式・正解"。手数料が最新で正確</td><td><span class="pill free">無料</span></td><td class="ok">◎ 必須</td></tr>
+<tr><td><b>Keepa</b></td><td>相場・売れ行き・競合。売価の妥当性を裏取り</td><td><span class="pill free">無料</span> <span class="pill have">既導入</span></td><td class="ok">◎ 必須</td></tr>
+<tr><td>ERESA / tool4seller / Amacode</td><td>上記の機能を"まとめて速く"。あれば便利</td><td>無料〜</td><td class="warnt">△ 後回しでOK</td></tr>
+<tr><td>プライスター</td><td>出品〜価格改定〜売上管理の自動化（計算専用ではない）</td><td>月5,280円</td><td>— SKUが増えてから</td></tr>
+</tbody>
+</table>
+<p class="term">まず無料2本で「計算する習慣」を作るのが正解。速度が欲しくなったら無料のtool4seller等を足す、で十分間に合います。</p>
+</div>
+
+<!-- ========== FBA SIMULATOR ========== -->
+<h2><span class="n">A</span>FBA料金シミュレーターの使い方（超詳細）</h2>
+
+<h3>0. まずアクセス（ログイン不要）</h3>
+<span class="url">https://sellercentral.amazon.co.jp/hz/fba/profitabilitycalculator/index?lang=ja_JP</span>
+<div class="warn">
+<b>ここ重要：ログインしなくても使えます。</b> 開くとサインインを促されますが、<b>「ゲストとして続ける（Continue as guest）」</b>を選べば、アカウントなしで計算できます。出品者でなくても使える公式ツールです。<br>
+※「セラーセントラルにサインイン」を選ぶと自分のアカウント固有の割引等も反映されますが、<b>ざっくり計算はゲストで十分</b>です。
+</div>
+
+<h3>1. 商品を検索して特定する</h3>
+<ol class="step">
+<li><b>検索欄に入力：</b>調べたい商品の <span class="kbd">ASIN</span> / <span class="kbd">JANコード</span> / <span class="kbd">商品名</span> のどれかを入れて検索。<br>
+<span class="term">ASINが一番確実。Keepaや商品ページのURL（<span class="kbd">/dp/</span>の後ろの英数字10桁）からコピーできます。</span></li>
+<li><b>候補から「選択」：</b>類似商品が並ぶので、<b>実物と同じ商品</b>の「選択」ボタンをクリック。商品名・画像・サイズが一致するか必ず確認。</li>
+<li>選ぶと、その商品の<b>サイズ・重量・カテゴリが自動で読み込まれ</b>、手数料が自動計算されます。</li>
+</ol>
+
+<h3>2. 数字を入力する（左＝自己発送 / 右＝FBA を同時比較）</h3>
+<p>画面は左右2列。<b>左＝出品者出荷（自分で発送）</b>、<b>右＝FBA（Amazon倉庫から発送）</b>を並べて比較できます。それぞれに入れる項目：</p>
+<table>
+<thead><tr><th>入力欄</th><th>何を入れる</th><th>初心者のコツ</th></tr></thead>
+<tbody>
+<tr><td><b>商品代金（売却価格）</b></td><td>Amazonでいくらで売るか＝<b>Keepaで見たBuy Box価格</b></td><td>強気の高値でなく「実際に売れている価格」を入れる</td></tr>
+<tr><td><b>配送費用</b>（自己発送側）</td><td>自分で送るときの送料</td><td>FBAだけ見るなら空欄でも可</td></tr>
+<tr><td><b>Amazonへの納品費用</b>（FBA側）</td><td>倉庫へ送る送料（1個あたり按分）</td><td>まずは0〜数十円のざっくりでOK</td></tr>
+<tr><td><b>商品原価</b></td><td><b>仕入れ値＋関連費用</b>（送料・梱包・外注費）</td><td>ここが利益を決める。分かる範囲で正直に</td></tr>
+</tbody>
+</table>
+<div class="term">💡 「商品代金」と「商品原価」の2つだけ入れれば、ざっくり利益はもう出ます。まずはこの2つから。</div>
+
+<h3>3. 出力を読む（ここが利益計算の答え）</h3>
+<p>入力すると下（またはグラフ）に自動集計されます。読む順番：</p>
+<table>
+<thead><tr><th>出力項目</th><th>意味</th></tr></thead>
+<tbody>
+<tr><td>売上（商品代金）</td><td>売価</td></tr>
+<tr><td>Amazon手数料</td><td><b>販売手数料＋FBA配送代行手数料</b>など（自動で最新額）</td></tr>
+<tr><td>商品原価</td><td>入れた仕入れ値</td></tr>
+<tr><td><b class="ok">純利益</b></td><td><b>手元に残るお金</b>＝売上−手数料−原価。これがプラスかを見る</td></tr>
+<tr><td><b>利益率（粗利率）</b></td><td>純利益÷売上。当社目標は<b>20〜30%以上</b></td></tr>
+</tbody>
+</table>
+<div class="card">
+<b>左右比較の使い方：</b> 純利益が大きい方が有利。<b>小型・高回転はFBA（右）が有利</b>なことが多く、<b>大型・低回転は自己発送（左）</b>が勝つことも。当社は原則FBA（カート取得に有利）ですが、大型品は両方見て判断します。
+</div>
+
+<h3>4. 使う上での最重要注意</h3>
+<div class="warn">
+<b>サイズ・重量が正しいかを必ず確認。</b> シミュレーターは商品ページ登録のサイズを使うため、<b>登録が誤っていると手数料も誤る</b>＝利益計算がズレます。数値が怪しい時は<b>「商品の定義」タブで実寸・実重量を手入力</b>して計算し直してください。<br>
+また保管料が売れ残り期間で増える点はこのツールでは軽めに出ます。<b>長く寝る可能性がある商品は、別途の保管料リスク資料（T-20260816-001）と合わせて</b>判断を。
+</div>
+
+<!-- ========== KEEPA ========== -->
+<h2><span class="n">B</span>Keepaの使い方（利益計算のための"3つだけ"）</h2>
+<p>Keepaの全機能は別ガイド〔<b>T-20260811-001 Keepa拡張の使い方ガイド</b>〕に詳しく載せています。ここでは<b>利益計算に直結する3点だけ</b>を復習します。Keepaは商品ページに埋め込まれる無料拡張で、<b>価格と売れ行きの"過去"を見る</b >道具です（＝利益は出さない。売価と売れ行きの根拠を出す）。</p>
+<ol class="step">
+<li><b>売価を決める（ピンク線＝Buy Box）：</b>価格履歴タブのピンク線が「実際に売れている価格帯」。<b>この値をシミュレーターの"商品代金"に入れる</b>。全期間で相場、直近1ヶ月で今の水準を確認。強気の最高値でなく<b>普段の水準</b>を採用。</li>
+<li><b>本当に売れているか（売れ筋ランキング線）：</b>ランキング線が<b>ガクッと下がる回数＝売れた回数</b>の目安。頻繁に落ちていれば回転が期待できる＝売れ残りリスク小。平坦で動かない＝売れていない＝要注意。</li>
+<li><b>入っても勝てるか（Data → Buy Box統計情報）：</b>セラー数とカート獲得率。1社が過半を握る商品は価格競争になりやすく旨みが薄い。競合が分散していて相場が安定＝入りやすい。</li>
+</ol>
+<div class="term">💡 Keepaは「いくらで売れるか（＝売価）」「売れるか（＝回転）」を教えてくれる。その売価をシミュレーターに渡すのが連携の肝です。</div>
+
+<!-- ========== WORKED EXAMPLE ========== -->
+<h2><span class="n">C</span>通し実例：この順でやれば5分で判断できる</h2>
+<p>「気になる商品」を1つ見つけてから、仕入れGO/見送りを出すまでの一連の流れ。</p>
+<ol class="step">
+<li><b>Amazonで商品ページを開く</b>（候補商品）。URLの <span class="kbd">/dp/XXXXXXXXXX</span> がASIN。</li>
+<li><b>Keepaで相場と売れ行きを確認：</b>ピンク線＝Buy Box が例えば <b>¥1,980</b> で安定、ランキング線が月に何度も下落（＝売れている）、競合カートも分散。→ 「売価¥1,980・回転OK」と判断。</li>
+<li><b>仕入れ先で仕入れ値を確認：</b>卸/他ECで同じ商品が例えば <b>¥800</b>。</li>
+<li><b>FBA料金シミュレーターを開く</b>（ゲスト）→ ASINで検索→選択。</li>
+<li><b>入力：</b>商品代金＝<b>1,980</b>、商品原価＝<b>800</b>（＋分かれば納品費用）。</li>
+<li><b>出力を読む：</b>Amazon手数料が自動で出て、<b>純利益・利益率</b>が確定。例では純利益 <b class="ok">約530円 / 利益率 約27%</b> と出れば、当社基準（20〜30%↑）クリアで<b class="ok">GO候補</b>。</li>
+<li><b>最終チェック：</b>大きい商品なら保管料リスク（T-20260816-001）、サイズ登録の正しさ、実物一致（Amazonページ×仕入先）を確認して仕入れ判断。<b>実購入は§4.1＝カズヨ経由で承認</b>。</li>
+</ol>
+
+<div class="card">
+<b>ざっくり早見の暗算（ツールを開く前のふるい）</b><br>
+売価の<b>ざっくり3〜4割が手数料</b>（販売手数料＋FBA配送）。なので<br>
+<b>手取りの目安 ＝ 売価 −（売価×35%）− 仕入れ値</b>。<br>
+例：1,980 −(693)− 800 ＝ <b>約487円</b>。ツールの正確値（約530円）に近い数字が暗算で出せます。<b>この暗算で"明らかに赤字"を弾き、残りをシミュレーターで確定</b>すると速いです。
+</div>
+
+<h2><span class="n">✓</span>まとめ：毎回この3行だけ</h2>
+<div class="card">
+<ol style="margin:4px 0">
+<li><b>Keepa</b>でピンク線（売価）と売れ行き（ランキング下落）を見る</li>
+<li><b>FBA料金シミュレーター</b>（ゲスト）に 売価＋仕入れ値 を入れて純利益・利益率を出す</li>
+<li>利益率<b>20〜30%以上</b>＆回転OKなら仕入れ候補 → カズヨへ一報（実購入は承認制）</li>
+</ol>
+</div>
+
+<div class="foot">
+出典: Amazon FBA料金シミュレーター公式（sellercentral.amazon.co.jp・ゲスト利用可を確認）、株式会社そばに / EC STARs Lab. 使い方解説、既存Keepaガイド T-20260811-001。手数料の実額はシミュレーター/セラーセントラルが正。数値例は概算。<br>
+関連資料: FBA料金 完全リファレンス＋早見表＋商品シミュレーション（T-20260816-001）、FBA保管料リスク・シミュレーション（同）。
+</div>
+
+</div>
+</body>
+</html>
