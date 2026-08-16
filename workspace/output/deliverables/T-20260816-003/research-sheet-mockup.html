@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>リサーチ損益シート 見本｜Amazon物販</title>
+<style>
+  :root{
+    --bg:#fff;--fg:#1a1a1a;--muted:#5b6470;--line:#d7dde3;
+    --auto:#e8f1fb;--autoh:#146eb4;--input:#fff7e0;--inputh:#b06000;--res:#e7f6ec;--resh:#137333;
+    --star:#fff3cd;--ok:#137333;--warn:#b06000;--ng:#b3261e;--card:#f7f9fb;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{--bg:#12151a;--fg:#e8ecf1;--muted:#9aa4b0;--line:#2a303a;
+      --auto:#12233a;--input:#2a2413;--res:#12291b;--star:#33290a;--card:#1a1e25;}
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);font-family:-apple-system,"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;line-height:1.7;font-size:15px}
+  .wrap{max-width:1120px;margin:0 auto;padding:28px 18px 70px}
+  h1{font-size:22px;margin:0 0 4px}
+  .sub{color:var(--muted);font-size:13px;margin:0 0 18px}
+  .legend{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0}
+  .lg{font-size:12.5px;padding:4px 12px;border-radius:20px;font-weight:700}
+  .lg.a{background:var(--auto);color:var(--autoh)} .lg.i{background:var(--input);color:var(--inputh)} .lg.r{background:var(--res);color:var(--resh)}
+  .scroll{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+  table{border-collapse:collapse;min-width:1060px;width:100%;font-size:12.5px}
+  th,td{border:1px solid var(--line);padding:6px 8px;text-align:right;white-space:nowrap}
+  th{position:sticky;top:0;font-weight:600}
+  td.l,th.l{text-align:left}
+  .ga{background:var(--auto)} .gi{background:var(--input)} .gr{background:var(--res)}
+  .star{background:var(--star);font-weight:700}
+  thead .grp{text-align:center;font-size:12px;font-weight:800}
+  .ok{color:var(--ok);font-weight:700}.warn{color:var(--warn);font-weight:700}.ng{color:var(--ng);font-weight:700}
+  .badge{padding:1px 8px;border-radius:10px;color:#fff;font-size:11px;font-weight:700}
+  .badge.ok{background:var(--ok)}.badge.warn{background:var(--warn)}.badge.ng{background:var(--ng)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin:16px 0;font-size:14px}
+  ul{margin:6px 0;padding-left:20px}
+  .key{background:var(--star);border:1px solid #e5c96a;border-radius:10px;padding:12px 14px;margin:14px 0;font-size:14px}
+  b.hl{background:var(--star);padding:0 4px;border-radius:3px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>リサーチ損益シート 見本（1商品＝1行で数字評価）</h1>
+<p class="sub">Keepaで拾ったおすすめ商品を、社長が数字で GO/見送り を判断できる形に ／ T-20260816-003 ／ 見本・数値は仮</p>
+
+<div class="legend">
+<span class="lg a">■ 自動（Keepa＋手数料計算）</span>
+<span class="lg i">■ 社長が入れる変数（幅で評価）</span>
+<span class="lg r">■ 自動（結果）</span>
+</div>
+
+<div class="scroll">
+<table>
+<thead>
+<tr class="grp">
+<th class="l ga" colspan="6">自動：Keepa＋相場</th>
+<th class="ga" colspan="5">自動：Amazon手数料</th>
+<th class="gi" colspan="3">社長入力：変数</th>
+<th class="gr" colspan="6">自動：結果</th>
+</tr>
+<tr>
+<th class="l ga">商品名</th><th class="ga">カテゴリ</th><th class="ga">想定売価<br>(BuyBox)</th><th class="ga">売価レンジ</th><th class="ga">推定<br>月販</th><th class="ga">サイズ</th>
+<th class="ga">販売<br>手数料</th><th class="ga">成約料<br>(小口)</th><th class="ga">FBA<br>配送</th><th class="ga">保管<br>/月</th><th class="ga">手数料<br>合計</th>
+<th class="gi">仕入れ値</th><th class="gi">外注費<br>/個</th><th class="gi">送料<br>納品</th>
+<th class="gr">純利益</th><th class="gr">利益率<br>ROS</th><th class="gr">ROI</th><th class="star">★損益分岐<br>仕入れ値</th><th class="gr">判定</th><th class="gr">回転<br>目安</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="l ga">ステンレスボトル</td><td class="ga">ホーム</td><td class="ga">2,780</td><td class="ga">2,480–2,980</td><td class="ga">40</td><td class="ga">標準</td>
+<td class="ga">289</td><td class="ga">100</td><td class="ga">318</td><td class="ga">7</td><td class="ga">714</td>
+<td class="gi">1,300</td><td class="gi">50</td><td class="gi">100</td>
+<td class="gr ok">616</td><td class="gr">22.2%</td><td class="gr">47%</td><td class="star">1,916</td><td class="gr"><span class="badge ok">GO</span></td><td class="gr">〜30日</td>
+</tr>
+<tr>
+<td class="l ga">化粧水</td><td class="ga">ビューティ</td><td class="ga">1,980</td><td class="ga">1,780–2,180</td><td class="ga">60</td><td class="ga">標準</td>
+<td class="ga">206</td><td class="ga">100</td><td class="ga">318</td><td class="ga">3</td><td class="ga">627</td>
+<td class="gi">800</td><td class="gi">30</td><td class="gi">80</td>
+<td class="gr ok">443</td><td class="gr">22.4%</td><td class="gr">55%</td><td class="star">1,243</td><td class="gr"><span class="badge ok">GO</span></td><td class="gr">〜25日</td>
+</tr>
+<tr>
+<td class="l ga">スマホケース</td><td class="ga">家電アクセ</td><td class="ga">980</td><td class="ga">880–1,180</td><td class="ga">120</td><td class="ga">小型</td>
+<td class="ga">102</td><td class="ga">100</td><td class="ga">222</td><td class="ga">1</td><td class="ga">425</td>
+<td class="gi">250</td><td class="gi">20</td><td class="gi">40</td>
+<td class="gr ok">245</td><td class="gr">25.0%</td><td class="gr">98%</td><td class="star">495</td><td class="gr"><span class="badge ok">GO</span></td><td class="gr">〜15日</td>
+</tr>
+<tr>
+<td class="l ga">卓上加湿器</td><td class="ga">家電</td><td class="ga">3,480</td><td class="ga">2,980–3,680</td><td class="ga">15</td><td class="ga">大型</td>
+<td class="ga">292</td><td class="ga">100</td><td class="ga">472</td><td class="ga">210</td><td class="ga">1,074</td>
+<td class="gi">2,000</td><td class="gi">70</td><td class="gi">150</td>
+<td class="gr warn">186</td><td class="gr warn">5.3%</td><td class="gr">9%</td><td class="star">2,186</td><td class="gr"><span class="badge warn">境界</span></td><td class="gr">要注意</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<div class="key">
+★<b>損益分岐仕入れ値</b>＝これ<b>以下</b>で仕入れられれば黒字、という一発判定ライン。<br>
+例：ボトルは <b class="hl">¥1,916以下</b>で仕入れれば黒字。利益率20%を確保したいなら¥1,360以下が目安。<br>
+→ 社長は「実際の仕入れ値がこのラインより下か？」を見るだけで GO/見送りを数字で判断できます。
+</div>
+
+<div class="card">
+<b>この見本のポイント（3つだけ）</b>
+<ul>
+<li><b>社長が触るのは黄色の3列だけ</b>（仕入れ値・外注費・送料）。手数料は青列で全自動、結果は緑列で自動計算。</li>
+<li><b>“幅”で評価</b>：売価レンジ＋損益分岐仕入れ値で「いくらで売れて・いくらまでで仕入れれば勝つか」の幅が一目。仕入れ値も安値/高値の2本入れれば損益が振れ幅で見えます。</li>
+<li><b>大型の罠が見える</b>：卓上加湿器は売価が高くても保管料¥210＋大型配送で利益が痩せ「境界」。<b>小型・高回転が有利</b>が数字で出ます。※低単価は成約料¥100(小口)が重い＝数が出たら大口切替の判断材料にも。</li>
+</ul>
+</div>
+
+<div class="card">
+<b>結論（こう進めます）</b>
+<ul>
+<li>本番のKeepaリサーチ納品を、この<b>損益シート形式のGoogleスプレッドシート</b>に統一。おすすめ商品を1行ずつ、上記列で自動計算して並べます。</li>
+<li>この見本の列でよければ、<b>実データ十数件で最初の1枚</b>を作成してお渡しします（社長は黄色3列をいじって数字評価）。</li>
+<li>列の <b>追加・削除・並び替え</b>の希望があれば、それだけ教えてください（例：「利益額の下限」「ブランド制限フラグ」「Amazon本体の有無」等も足せます）。</li>
+</ul>
+</div>
+
+<p class="sub">※数値は仕組みを示すための仮値。実運用では手数料をFBA料金シミュレーター準拠で自動算出し、売価・月販はKeepa実データを反映します。</p>
+</div>
+</body>
+</html>
