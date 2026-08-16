@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FBA料金 完全リファレンス＋早見表＋商品シミュレーション</title>
+<style>
+  :root{
+    --bg:#ffffff; --fg:#1a1a1a; --muted:#666; --line:#e2e2e2;
+    --accent:#146eb4; --accent2:#ff9900; --ok:#137333; --warn:#b06000; --ng:#b3261e;
+    --th:#f4f7fa; --zebra:#fafafa; --box:#f6f8fa;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);
+    font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif;
+    line-height:1.7;font-size:15px}
+  .wrap{max-width:960px;margin:0 auto;padding:32px 20px 80px}
+  h1{font-size:24px;border-bottom:3px solid var(--accent2);padding-bottom:10px;margin:0 0 6px}
+  h2{font-size:19px;margin:38px 0 10px;padding-left:10px;border-left:5px solid var(--accent)}
+  h3{font-size:16px;margin:22px 0 6px;color:var(--accent)}
+  .meta{color:var(--muted);font-size:13px;margin-bottom:8px}
+  table{border-collapse:collapse;width:100%;margin:12px 0;font-size:13.5px}
+  th,td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
+  th{background:var(--th);font-weight:600}
+  tbody tr:nth-child(even){background:var(--zebra)}
+  .num{text-align:right;font-variant-numeric:tabular-nums}
+  .box{background:var(--box);border:1px solid var(--line);border-radius:8px;padding:14px 16px;margin:14px 0}
+  .ok{color:var(--ok);font-weight:700}
+  .warn{color:var(--warn);font-weight:700}
+  .ng{color:var(--ng);font-weight:700}
+  .tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:10px;color:#fff;margin-left:6px}
+  .tag.ok{background:var(--ok)} .tag.warn{background:var(--warn)} .tag.ng{background:var(--ng)}
+  .cannot{background:#fff6f5;border:1px solid #f3c9c4;border-radius:8px;padding:14px 16px;margin:14px 0}
+  .cannot h3{color:var(--ng);margin-top:0}
+  ul{margin:6px 0 6px 0;padding-left:22px}
+  .small{font-size:12.5px;color:var(--muted)}
+  .foot{border-top:1px dashed var(--line);color:var(--muted);
+    font-size:12px;margin-top:8px;padding-top:6px}
+  .simcard{border:1px solid var(--line);border-radius:10px;padding:0;overflow:hidden;margin:16px 0}
+  .simhead{background:var(--accent);color:#fff;padding:10px 14px;font-weight:700;font-size:15px}
+  .simbody{padding:12px 14px}
+  .verdict{font-weight:700}
+  code{background:#eef2f5;padding:1px 5px;border-radius:4px;font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>FBA料金 完全リファレンス ＋ 早見表 ＋ 商品シミュレーション</h1>
+<div class="meta">作成: 秘書カズヨ / 事実収集: サトル・損益: ハジメ / チケット T-20260816-001 / 2026-08-16<br>
+出典: Amazon公式 sell.amazon.co.jp（2026/4改定反映）＋公式解説の二次クロスチェック2件。<span class="warn">料率は改定されるため実発注前にFBA料金シミュレーターで都度確認</span>。</div>
+
+<div class="box">
+<b>この資料の位置づけ（結論）</b><br>
+FBAの料金は「① 販売手数料 ＋ ② FBA配送代行手数料 ＋ ③ 在庫保管手数料」の三層が主。ここに滞留・返品・貼付などの追加費が乗る。<b>費目・計算式・代表単価は本資料でほぼ網羅</b>。ただし<b>「あなたのアカウントの1円単位の実額」はログイン必須のFBA料金シミュレーターでしか出せない</b>（＝下記「できなかったこと」）。仕入れ判断は本表で概算 → 有力候補はシミュレーターで確定、の二段構え。
+</div>
+
+<h2>0. FBA料金でできたこと / できなかったこと（網羅性の明示）</h2>
+<h3>✅ できたこと（公式改定後の値を取得）</h3>
+<ul>
+<li>出品プラン料金（大口/小口）</li>
+<li>カテゴリ別 販売手数料率（主要カテゴリ網羅）</li>
+<li>FBA配送代行手数料：サイズ区分別・1,000円以下/超の二段（小型〜標準の主要区分）</li>
+<li>在庫保管手数料：通常期/繁忙期の単価と計算式（通常カテゴリ・服/シューズ別）</li>
+<li>長期在庫保管手数料の下限（2026/4/15〜）／追加費目（冷凍+375円・ラベル貼付・返送/廃棄・納品不備・返金処理・低在庫レベル）</li>
+</ul>
+<div class="cannot">
+<h3>⚠️ できなかったこと（明確化）</h3>
+<ul>
+<li><b>FBA料金シミュレーターの「実額」</b>：セラーセントラルへのログインが必要（アカウント固有・機密）。カズヨは代行不可 → <b>社長ご本人がASINを入れて取得</b>、または承認のうえ実施。</li>
+<li><b>全サイズ×全重量の完全マトリクス（特に大型・特大型の細区分）</b>：本文がログインゲートの公式ヘルプ（G200336920）内。本資料は<b>小型〜標準の主要区分＋特大型の上限</b>まで。大型帯の中間刻みは要ログイン確認。</li>
+<li><b>アカウント固有の割引の実額</b>：新規出品者特典（FBA配送料15,000円割引等）・パートナーキャリア割引は、適用後の実額がアカウント依存。</li>
+<li><b>販売手数料の最低額（30円）・メディア成約料（約140円）</b>：二次情報では流通しているが、公式pricing画面では未確認フラグ。実額はシミュレーターが正。</li>
+</ul>
+</div>
+
+<h2>1. 早見表</h2>
+
+<h3>1-1. 出品プラン</h3>
+<table>
+<thead><tr><th>プラン</th><th>月額</th><th>1点ごと</th><th>主な制約</th></tr></thead>
+<tbody>
+<tr><td>大口（プロ）</td><td class="num">4,900円/月(税抜)</td><td class="num">—</td><td>カート/広告/一括出品/制限カテゴリ 全部使える（本格運用は実質一択）</td></tr>
+<tr><td>小口（個人）</td><td class="num">0円</td><td class="num">100円(税抜)</td><td class="ng">カート獲得不可・広告不可・一括出品不可</td></tr>
+</tbody>
+</table>
+<div class="small">損益分岐＝月 約49〜50点。本事業方針＝「初期小口 → 月49個で大口」。</div>
+
+<h3>1-2. ① 販売手数料（カテゴリ別・税抜率／別途消費税）</h3>
+<table>
+<thead><tr><th>カテゴリ</th><th>料率</th></tr></thead>
+<tbody>
+<tr><td>本 / CD / DVD / ゲーム（メディア）</td><td>15.4% 固定（＋メディア成約料 ≈140円/点）</td></tr>
+<tr><td>ホーム&キッチン / 文房具 / DIY工具 / 家具 / 腕時計 / その他</td><td>750円以下 5% ／ 超 <b>15.4%</b></td></tr>
+<tr><td>家電アクセサリ / 楽器 / スポーツ / おもちゃ&ホビー / ホーム&キッチン家電</td><td>750円以下 5% ／ 超 <b>10.4%</b></td></tr>
+<tr><td>エレクトロニクス / PC周辺 / 家電本体</td><td>750円以下 5% ／ 超 <b>8.4%</b></td></tr>
+<tr><td>ビューティ / ヘルス&パーソナルケア / 食品&飲料</td><td>5% ／ 8.4%(〜1,500円) ／ <b>10.4%(1,500円超)</b></td></tr>
+<tr><td>服&ファッション小物</td><td>5% ／ 8.4%(〜2,500) ／ 12.4%(2,500〜3,000) ／ 3,000超部分 8.4%</td></tr>
+<tr><td>シューズ / バッグ</td><td>5% ／ 12.4% ／ 7,500超部分 6.4%</td></tr>
+<tr><td>Amazonデバイス用アクセサリー</td><td class="ng">45.4%（要注意）</td></tr>
+</tbody>
+</table>
+<div class="small">課税ベース＝商品価格＋配送料＋ギフト包装料＋税の合計。最低手数料 ≈30円/点（二次情報・要確認）。</div>
+
+<h3>1-3. ② FBA配送代行手数料（1点あたり・税込・2026/4改定後）</h3>
+<table>
+<thead><tr><th>サイズ区分</th><th>目安寸法/重量</th><th class="num">1,000円以下</th><th class="num">1,000円超</th></tr></thead>
+<tbody>
+<tr><td>小型</td><td>25×18×2cm・250g以下</td><td class="num">222円</td><td class="num">288円</td></tr>
+<tr><td>標準1</td><td>35×30×3.3cm・1kg以下</td><td class="num">252円</td><td class="num">318円</td></tr>
+<tr><td>標準2a</td><td>三辺20cm・2kg以下</td><td class="num">344円</td><td class="num">410円</td></tr>
+<tr><td>標準2b</td><td>三辺30cm・2kg以下</td><td class="num">358円</td><td class="num">415円</td></tr>
+<tr><td>標準3</td><td>三辺80cm・5kg以下</td><td class="num">427円</td><td class="num">472円</td></tr>
+<tr><td>（参考）特大型</td><td>三辺260cm・50kg以下</td><td class="num">5,559円</td><td class="num">5,625円</td></tr>
+</tbody>
+</table>
+<div class="small">大型帯（標準3と特大型の間）の中間刻みは要ログイン確認（＝できなかったこと）。</div>
+
+<h3>1-4. ③ 在庫保管手数料（税込・月額）</h3>
+<table>
+<thead><tr><th>カテゴリ</th><th class="num">通常期 1-9月</th><th class="num">繁忙期 10-12月</th><th>計算式</th></tr></thead>
+<tbody>
+<tr><td>通常カテゴリ（小型/標準）</td><td class="num">5.676円</td><td class="num">10.087円</td><td rowspan="2">単価 ×(商品cm³÷1,000)×(保管日数÷当月日数)</td></tr>
+<tr><td>服 / シューズ / バッグ</td><td class="num">3.10円</td><td class="num">5.50円</td></tr>
+</tbody>
+</table>
+<div class="small">繁忙期は約1.8倍。<b>長期在庫保管手数料</b>＝365日超で追加、2026/4/15〜<b>最低20円/点/月</b>の下限。</div>
+
+<h3>1-5. その他の費目</h3>
+<table>
+<thead><tr><th>費目</th><th>金額 / 内容</th></tr></thead>
+<tbody>
+<tr><td>ラベル貼付サービス（代行）</td><td>小型/標準 22円 ／ 大型 51円（1点・税込）</td></tr>
+<tr><td>冷凍食品の追加手数料</td><td>+375円/点（税込）</td></tr>
+<tr><td>返送/所有権の放棄手数料</td><td>1点ごと（サイズ依存）</td></tr>
+<tr><td>納品不備受領作業手数料</td><td>1点ごと（＝正しい梱包/ラベルで回避可）</td></tr>
+<tr><td>返金処理手数料</td><td>500円 か 販売手数料の10% の低い方</td></tr>
+<tr><td>低在庫レベル手数料</td><td>在庫を薄く持ちすぎるとペナルティ的に課金</td></tr>
+</tbody>
+</table>
+
+<h2>2. 商品シミュレーション（販売価格 → 内訳 → 利益）</h2>
+<div class="box small">
+<b>共通の前提・判断基準：</b>
+利益 = 売価 −(仕入れ値 ＋ 販売手数料 ＋ FBA配送代行 ＋ 保管料 ＋ ラベル)。
+<b>ROS（利益率）</b>=利益÷売価、目標20〜30%以上。<b>ROI</b>=利益÷仕入れ値、目標35%以上。
+販売手数料は税抜率で計算（別途消費税は<b>課税事業者なら仕入税額控除で実質戻る</b>前提／免税事業者は戻らない点に注意）。
+<span class="warn">仕入れ値は「想定値」。実測に置き換えて初めて確定します（推定と実測の分離）。</span>
+</div>
+
+<!-- A -->
+<div class="simcard">
+<div class="simhead">例A：化粧水（ビューティ・標準2b）売価 1,980円 <span class="tag ok">合格</span></div>
+<div class="simbody">
+<table>
+<tbody>
+<tr><td>売価</td><td class="num">+1,980円</td><td class="small">想定販売価格</td></tr>
+<tr><td>仕入れ値（想定）</td><td class="num ng">−800円</td><td class="small">実測要</td></tr>
+<tr><td>① 販売手数料</td><td class="num ng">−206円</td><td class="small">ビューティ1,500円超 10.4%</td></tr>
+<tr><td>② FBA配送代行</td><td class="num ng">−415円</td><td class="small">標準2b・1,000円超</td></tr>
+<tr><td>③ 保管料</td><td class="num ng">−3円</td><td class="small">約400cm³・1ヶ月</td></tr>
+<tr><td>ラベル貼付</td><td class="num ng">−22円</td><td class="small">代行の場合</td></tr>
+<tr><td><b>利益</b></td><td class="num ok"><b>534円</b></td><td class="small"></td></tr>
+</tbody>
+</table>
+<div class="verdict"><span class="ok">ROS 27.0% ／ ROI 66.8%</span> → 両基準クリア。仕入れられるなら<b>GO</b>。</div>
+</div></div>
+
+<!-- B -->
+<div class="simcard">
+<div class="simhead">例B：ステンレスボトル（ホーム&キッチン・標準3）売価 2,780円 <span class="tag warn">境界</span></div>
+<div class="simbody">
+<table>
+<tbody>
+<tr><td>売価</td><td class="num">+2,780円</td><td class="small"></td></tr>
+<tr><td>仕入れ値（想定）</td><td class="num ng">−1,300円</td><td class="small">実測要</td></tr>
+<tr><td>① 販売手数料</td><td class="num ng">−428円</td><td class="small">ホーム&キッチン 15.4%</td></tr>
+<tr><td>② FBA配送代行</td><td class="num ng">−472円</td><td class="small">標準3・嵩張る</td></tr>
+<tr><td>③ 保管料</td><td class="num ng">−9円</td><td class="small">約1,500cm³・1ヶ月</td></tr>
+<tr><td>ラベル貼付</td><td class="num ng">−22円</td><td class="small"></td></tr>
+<tr><td><b>利益</b></td><td class="num warn"><b>549円</b></td><td class="small"></td></tr>
+</tbody>
+</table>
+<div class="verdict"><span class="warn">ROS 19.7%（20%わずかに未達）／ ROI 42.2%（合格）</span> → 判断が割れる境界例。<b>仕入れ値をあと100円下げれば ROS 23%で合格圏</b>。手数料率15.4%＋嵩張る＝配送代行が重い典型。</div>
+</div></div>
+
+<!-- C -->
+<div class="simcard">
+<div class="simhead">例C：スマホケース（家電アクセサリ・小型）売価 980円 <span class="tag ok">優秀</span></div>
+<div class="simbody">
+<table>
+<tbody>
+<tr><td>売価</td><td class="num">+980円</td><td class="small">1,000円以下＝配送代行の安い方</td></tr>
+<tr><td>仕入れ値（想定）</td><td class="num ng">−250円</td><td class="small">実測要</td></tr>
+<tr><td>① 販売手数料</td><td class="num ng">−102円</td><td class="small">家電アクセサリ750円超 10.4%</td></tr>
+<tr><td>② FBA配送代行</td><td class="num ng">−222円</td><td class="small">小型・1,000円以下</td></tr>
+<tr><td>③ 保管料</td><td class="num ng">−1円</td><td class="small">約50cm³・1ヶ月</td></tr>
+<tr><td>ラベル貼付</td><td class="num ng">−22円</td><td class="small">メーカーバーコード有なら0円</td></tr>
+<tr><td><b>利益</b></td><td class="num ok"><b>383円</b></td><td class="small"></td></tr>
+</tbody>
+</table>
+<div class="verdict"><span class="ok">ROS 39.1% ／ ROI 153%</span> → 小型・低単価・高回転の理想形。少額資金で回転を稼ぐ王道SKU。</div>
+</div></div>
+
+<div class="box">
+<b>3例から読める原則：</b>
+<ul>
+<li><b>サイズが小さいほど有利</b>（配送代行が軽い）。例Cが圧倒的に効率的なのはこれ。</li>
+<li><b>手数料率の高いカテゴリ（15.4%）＋嵩張る商品</b>は、売価が高くても利益が痩せる（例B）。</li>
+<li><b>1,000円の壁</b>：売価1,000円以下は配送代行が一段安い。低単価×小型は相性が良い。</li>
+<li>境界例（例B）は<b>仕入れ値の数十〜百円が合否を分ける</b> ＝ だから「仕入れ値が安いか」の見極めが決定的。</li>
+</ul>
+</div>
+
+<div class="foot">
+※本資料の単価は2026/4改定の公式値と公式解説クロスチェックに基づく概算。アカウント実額はFBA料金シミュレーターが正。改定追随のため定期リフレッシュを推奨。<br>
+出典: Amazon出品サービス（sell.amazon.co.jp/pricing）、LINK株式会社「Amazon手数料ガイド（元Amazon出身者監修）」、GoalTech「FBA手数料2026」。
+</div>
+
+</div>
+</body>
+</html>
