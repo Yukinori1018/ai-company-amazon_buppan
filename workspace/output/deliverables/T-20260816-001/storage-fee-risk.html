@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FBA保管料リスク・シミュレーション（売れ残り期間別）</title>
+<style>
+  :root{
+    --bg:#ffffff; --fg:#1a1a1a; --muted:#666; --line:#e2e2e2;
+    --accent:#146eb4; --accent2:#ff9900; --ok:#137333; --warn:#b06000; --ng:#b3261e;
+    --th:#f4f7fa; --zebra:#fafafa; --box:#f6f8fa; --cliff:#fff1f0;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);
+    font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif;
+    line-height:1.7;font-size:15px}
+  .wrap{max-width:960px;margin:0 auto;padding:32px 20px 80px}
+  h1{font-size:23px;border-bottom:3px solid var(--accent2);padding-bottom:10px;margin:0 0 6px}
+  h2{font-size:19px;margin:36px 0 10px;padding-left:10px;border-left:5px solid var(--accent)}
+  h3{font-size:16px;margin:20px 0 6px;color:var(--accent)}
+  .meta{color:var(--muted);font-size:13px;margin-bottom:8px}
+  table{border-collapse:collapse;width:100%;margin:12px 0;font-size:13.5px}
+  th,td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
+  th{background:var(--th);font-weight:600}
+  tbody tr:nth-child(even){background:var(--zebra)}
+  .num{text-align:right;font-variant-numeric:tabular-nums}
+  .box{background:var(--box);border:1px solid var(--line);border-radius:8px;padding:14px 16px;margin:14px 0}
+  .cliff{background:var(--cliff);border:1px solid #f3c9c4;border-radius:8px;padding:14px 16px;margin:14px 0}
+  .ok{color:var(--ok);font-weight:700}.warn{color:var(--warn);font-weight:700}.ng{color:var(--ng);font-weight:700}
+  .formula{background:#0f1b25;color:#e8f0f6;border-radius:8px;padding:14px 16px;font-size:14px;overflow-x:auto}
+  .formula b{color:var(--accent2)}
+  ul{margin:6px 0;padding-left:22px}
+  .small{font-size:12.5px;color:var(--muted)}
+  .foot{border-top:1px dashed var(--line);color:var(--muted);font-size:12px;margin-top:12px;padding-top:6px}
+  code{background:#eef2f5;padding:1px 5px;border-radius:4px;font-size:13px}
+  .pill{display:inline-block;font-size:11px;padding:2px 8px;border-radius:10px;color:#fff}
+  .pill.k{background:var(--ok)}.pill.q{background:var(--warn)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>FBA保管料リスク・シミュレーション（何ヶ月も売れなかったら）</h1>
+<div class="meta">秘書カズヨ / 事実収集サトル・損益ハジメ / T-20260816-001 追補 / 2026-08-16<br>
+凡例: <span class="pill k">確定</span>=公式または全ソース一致 / <span class="pill q">要確認</span>=二次情報で数値が食い違い＝実額はシミュレーター・公式が正</div>
+
+<div class="box">
+<b>結論を3行で：</b>
+<ol style="margin:6px 0">
+<li><b>保管料リスクは「体積」でまるで別物</b>。小型は1年寝ても数十円の誤差、<b>大型は保管料だけで利益が消える</b>。</li>
+<li><b>365日の崖</b>：1年を超えると長期在庫保管手数料が上乗せ＋<b>最低20円/点/月</b>の下限。</li>
+<li>本当の損は保管料より<b>「資本の塩漬け（回転が止まる）」＋「相場下落での投げ売り」＋「廃棄手数料」</b>。撤退ラインを先に決めておく。</li>
+</ol>
+</div>
+
+<h2>1. 在庫保管手数料の計算式（詳細）</h2>
+<div class="formula">
+月額保管料 ＝ <b>単価</b> × ( <b>商品体積cm³</b> ÷ 1,000 ) × ( <b>その月の保管日数</b> ÷ その月の日数 )
+</div>
+<h3>単価（1,000cm³・1ヶ月あたり・税込） <span class="pill k">確定</span></h3>
+<table>
+<thead><tr><th>カテゴリ</th><th class="num">通常期 1〜9月</th><th class="num">繁忙期 10〜12月</th></tr></thead>
+<tbody>
+<tr><td>通常カテゴリ（小型/標準）</td><td class="num">5.676円</td><td class="num">10.087円（約1.8倍）</td></tr>
+<tr><td>服 / シューズ / バッグ</td><td class="num">3.10円</td><td class="num">5.50円</td></tr>
+</tbody>
+</table>
+<div class="small">※体積は「梱包後」の外寸で決まる。日割りなので月の途中で売れれば保管日数分だけ。判定・請求は<b>毎月15日</b>時点の在庫がベース。</div>
+
+<h3>ワンステップ計算例（化粧水・約400cm³・通常期を丸1ヶ月）</h3>
+<div class="box small">
+5.676 ×（400 ÷ 1,000）×（30 ÷ 30）＝ 5.676 × 0.4 × 1 ＝ <b>約2.3円/月</b>。<br>
+→ 小型品の1ヶ月の保管料は「コーヒー1杯どころか一桁円」。ここが誤解ポイントで、<b>小型では保管料そのものは怖くない</b>。
+</div>
+
+<h2>2. 月次シミュレーション：3サイズ×12ヶ月（＝1年間売れ残り）</h2>
+<div class="small">前提：1月に納品→12月まで丸1年在庫。1〜9月＝通常期(9ヶ月)、10〜12月＝繁忙期(3ヶ月)。通常カテゴリ単価で計算。<span class="pill k">確定</span></div>
+<table>
+<thead><tr>
+<th>サイズ例</th><th>体積</th><th class="num">通常期 月額</th><th class="num">繁忙期 月額</th><th class="num">1年間の保管料 累計</th></tr></thead>
+<tbody>
+<tr><td>小型（化粧水・スマホケース級）</td><td>400cm³</td><td class="num">約2.3円</td><td class="num">約4.0円</td><td class="num ok">約33円</td></tr>
+<tr><td>標準（ステンレスボトル級）</td><td>1,500cm³</td><td class="num">約8.5円</td><td class="num">約15.1円</td><td class="num warn">約122円</td></tr>
+<tr><td>大型（40×30×30cm・家電/家庭用品級）</td><td>36,000cm³</td><td class="num">約204円</td><td class="num">約363円</td><td class="num ng">約2,928円</td></tr>
+</tbody>
+</table>
+<div class="cliff">
+<b>ここが決定的：</b> 大型品は<b>1年で約2,900円</b>の保管料。前の資料の例B（ボトル）の<b>利益549円</b>と比べると、<b>大型品が売れ残ると保管料だけで利益が何倍も吹き飛ぶ</b>。逆に小型品（33円）は誤差。<br>
+<b>→ 「売れ残りリスク」を最も左右するのは、利益率でもカテゴリでもなく〈商品の大きさ〉。</b>
+</div>
+
+<h2>3. 365日の崖（長期在庫保管手数料）</h2>
+<ul>
+<li><b>毎月15日</b>にAmazonが全在庫の保管日数をチェック。<span class="pill k">確定</span></li>
+<li><b>271日目から段階的に</b>長期在庫の追加料金が乗り始め、<b>365日超で最も重くなる</b>。<span class="pill k">確定</span></li>
+<li><b>2026/4/15新設：1点あたり最低20円/月の下限</b>。体積で計算した額と20円を比べ、<b>高い方が請求</b>される（メディアは10円）。<span class="pill k">確定</span></li>
+<li>段階別の正確な料率（1,000cm³あたり）は<b>二次情報で食い違う</b>（例：366日以降を17.8円とする記事と34.2円とする記事）。<span class="pill q">要確認</span>＝実額はセラーセントラルの在庫画面が正。</li>
+</ul>
+<h3>2年目（365日超）の月額イメージ</h3>
+<table>
+<thead><tr><th>サイズ</th><th class="num">体積計算（長期料率・要確認）</th><th class="num">最低20円/点との比較</th><th class="num">実質 月額（目安）</th></tr></thead>
+<tbody>
+<tr><td>小型 400cm³</td><td class="num">約7円</td><td class="num">20円が上回る</td><td class="num">約20円/月</td></tr>
+<tr><td>標準 1,500cm³</td><td class="num">約27円</td><td class="num">体積側が上回る</td><td class="num">約27円/月</td></tr>
+<tr><td>大型 36,000cm³</td><td class="num ng">約640円</td><td class="num">体積側が圧倒</td><td class="num ng">約640円/月</td></tr>
+</tbody>
+</table>
+<div class="small">※長期料率は「要確認」なので目安。小型は下限20円が効き、大型は体積で青天井に膨らむ、という<b>構造だけは確実</b>。</div>
+
+<h2>4. 保管料より怖い「本当の売れ残りコスト」</h2>
+<div class="box">
+保管料はあくまで氷山の一角。実際に効くのは次の3つ：
+<table style="margin-top:8px">
+<thead><tr><th>隠れコスト</th><th>中身</th><th>効き方</th></tr></thead>
+<tbody>
+<tr><td><b>①資本の塩漬け（最重要）</b></td><td>仕入れ代金が在庫に固定され、次の商品を仕入れられない</td><td>物販は<b>回転で稼ぐ</b>。ROI35%の¥800を年6回転できるはずが1年寝ると、逃した利益は保管料の何十倍。<b>黒字倒産の主因</b></td></tr>
+<tr><td><b>②相場下落</b></td><td>ライバル増・型落ちでBSR悪化→値下げ合戦</td><td>結局<b>損切り値下げ</b>。売価が下がると販売手数料以外は固定費なので利益率が急落</td></tr>
+<tr><td><b>③返送/廃棄手数料</b></td><td>諦めて引き上げる時にも1点ごとに費用</td><td>売れ残りは<b>出口でも課金</b>。塩漬け→廃棄の二重損</td></tr>
+</tbody>
+</table>
+</div>
+<div class="formula">
+真の保有コスト ＝ 保管料累計 ＋ <b>(仕入れ値 × 目標ROI × 逃した回転回数)</b> ＋ 値下げ額 ＋ 返送/廃棄手数料
+</div>
+
+<h2>5. 売れ残り対策カレンダー（撤退ラインを先に決める）</h2>
+<table>
+<thead><tr><th>経過</th><th>状態</th><th>アクション</th></tr></thead>
+<tbody>
+<tr><td>〜60日</td><td>様子見</td><td>通常販売。動きを観察</td></tr>
+<tr><td>90日</td><td class="warn">要注意</td><td>売れ行きゼロなら価格を見直し（小幅値下げ・カート価格に追従）</td></tr>
+<tr><td>180日</td><td class="warn">黄信号</td><td>本格値下げ・セット販売・クーポン。回転を作る</td></tr>
+<tr><td>271日</td><td class="ng">長期加算スタート</td><td><b>ここまでに捌く</b>のが目標。ダメなら投げ売りか返送/廃棄を判断</td></tr>
+<tr><td>365日</td><td class="ng">崖</td><td>長期手数料が最大＋最低20円/点。原則ここを跨がせない</td></tr>
+</tbody>
+</table>
+
+<div class="box">
+<b>仕入れ判断への還元（結論）：</b>
+<ul>
+<li><b>小型・低単価・高回転</b>を選ぶ＝売れ残っても保管ダメージが小さく、資本も小さいので塩漬け被害も限定的。<b>初心者はまずここ</b>。</li>
+<li><b>大型・高単価</b>は利益額が大きい反面、<b>売れ残った時の保管料と資本塩漬けが桁違い</b>。回転の確信（Keepaでランキングが定期的に下落＝売れている）が取れた物だけ。</li>
+<li>仕入れ前に<b>「何日で売り切るか」の想定回転日数</b>を決め、それを超えたら値下げ、271日で撤退、と<b>ルール化</b>しておく。</li>
+</ul>
+</div>
+
+<div class="foot">
+確定値の出典: Amazon公式 sell.amazon.co.jp（通常保管料・毎月15日判定・最低20円/点は2026/4/15〜）。要確認項目（長期料率の段階別）は二次情報で相違があり、実額はセラーセントラル「在庫」→保管手数料/長期在庫レポートで各自確認。<br>
+参考: サイバーレコード「長期保管手数料の値上げと対策(2026/4)」、そばに「FBA長期在庫保管手数料」、LINK「Amazon手数料ガイド」。数値は概算モデルであり実額はアカウント依存。
+</div>
+
+</div>
+</body>
+</html>
