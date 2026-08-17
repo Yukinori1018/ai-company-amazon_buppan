@@ -1,7 +1,7 @@
 ---
 id: T-20260817-003
 title: Amazon出品制限（ゲート）のルール明確化＋ナレッジ化＋仕入れフローへの組み込み
-status: waiting
+status: done
 owner: researcher
 requires_approval: false
 created_at: 2026-08-17
@@ -84,3 +84,9 @@ related:
 - メモリ `knowledge_listing_restrictions_ungating` を訂正（MEMORY.md索引も更新）
 - 本納品物を v1.1 に更新（冒頭に訂正表を明示）
 - 方針書 T-20260817-002 の段3-A を修正
+
+## 社長裁可（2026-08-17）→ done
+- **制限ありは加点扱いで確定**
+- **「初回1SKUは制限なしから選ぶ」縛りは撤廃**（商品の幅を狭めるため）→ 発注前ワンクリック解除テスト＋請求書記載の事前確約を必須化
+- 撤退条件は T-20260817-002 側で判断基準へ変更
+→ ナレッジ `knowledge_listing_restrictions_ungating` に確定内容を反映済み。**done**。
