@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Amazon 出品制限（ゲート）完全ガイド</title>
+<style>
+  :root{
+    --bg:#ffffff; --fg:#1a1a1a; --muted:#5b6470; --line:#e3e7ec;
+    --accent:#0b63c4; --accent-soft:#eaf2fc; --amzd:#146eb4;
+    --ok:#137333; --okbg:#eaf6ec; --warn:#b06000; --warnbg:#fff6e5; --ng:#b3261e; --ngbg:#fdecea;
+    --card:#f7f9fb; --num:#0f1b25; --hl:#fff3bf;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#12151a; --fg:#e8ecf1; --muted:#9aa4b0; --line:#2a303a;
+      --accent:#5fa8ff; --accent-soft:#1a2532; --card:#1a1e25; --warnbg:#2a2313; --warn:#e0a94a;
+      --okbg:#14251a; --ok:#6fce8a; --ngbg:#2a1614; --ng:#ff8a80; --hl:#3a3418; }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);font-family:-apple-system,"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;line-height:1.75;font-size:15.5px}
+  .wrap{max-width:900px;margin:0 auto;padding:32px 22px 80px}
+  h1{font-size:25px;line-height:1.35;margin:0 0 6px}
+  .sub{color:var(--muted);font-size:13.5px;margin:0 0 24px}
+  h2{font-size:20px;margin:44px 0 12px;padding-top:16px;border-top:2px solid var(--line);display:flex;align-items:center;gap:10px}
+  h2 .n{flex:0 0 auto;width:30px;height:30px;border-radius:8px;background:var(--accent);color:#fff;font-size:15px;display:inline-flex;align-items:center;justify-content:center;font-weight:700}
+  h3{font-size:16.5px;margin:24px 0 6px}
+  p{margin:8px 0}
+  ul,ol{margin:8px 0;padding-left:22px} li{margin:6px 0}
+  .lead{background:var(--accent-soft);border:1px solid var(--accent);border-radius:12px;padding:16px 18px;margin:0 0 16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:12px 0}
+  .warn{background:var(--warnbg);border:1px solid var(--warn);border-radius:12px;padding:14px 16px;margin:14px 0}
+  .bad{background:var(--ngbg);border:1px solid var(--ng);border-radius:12px;padding:14px 16px;margin:14px 0}
+  .good{background:var(--okbg);border:1px solid var(--ok);border-radius:12px;padding:14px 16px;margin:14px 0}
+  .ok{color:var(--ok);font-weight:700}.ng{color:var(--ng);font-weight:700}.warnt{color:var(--warn);font-weight:700}
+  mark{background:var(--hl);color:inherit;padding:1px 3px;border-radius:3px}
+  .tw{overflow-x:auto}
+  table{border-collapse:collapse;width:100%;margin:12px 0;font-size:13.5px}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:var(--card)}
+  tr.hi td{background:var(--okbg)}
+  .num{text-align:right;font-variant-numeric:tabular-nums}
+  .formula{font-family:ui-monospace,Menlo,monospace;background:var(--num);color:#e8f0f6;padding:14px 16px;border-radius:10px;font-size:13.5px;line-height:1.9;overflow-x:auto;white-space:pre}
+  .pill{display:inline-block;font-size:11px;font-weight:700;padding:2px 9px;border-radius:999px;color:#fff;vertical-align:middle}
+  .pill.fix{background:var(--ok)} .pill.est{background:var(--warn)} .pill.own{background:var(--amzd)}
+  .foot{margin-top:44px;padding-top:16px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px}
+  .foot a{color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Amazon 出品制限（ゲート）完全ガイド<br>ルール・確認方法・解除・当社フローへの組み込み</h1>
+<p class="sub">調査サトル・整理ヒデアキ・統括カズヨ ／ T-20260817-003 ／ 2026-08-17</p>
+
+<div class="lead">
+<b>先に結論</b>
+<ol style="margin:10px 0 0">
+<li><b>社長のご記憶は「点数」が正解、「書類の種類」が違います。</b> 必要なのは <b>請求書（invoice）で10点以上・発行180日以内</b>。<b class="ng">小売店のレシート・領収書は受理されません。</b></li>
+<li><b>制限ブランドの一覧は Amazon が公式に非公開</b>と明言しています。<b>事前に機械で除外することはできず、1件ずつセラーセントラルで確認するしかありません。</b></li>
+<li><b>これはメーカー仕入れにとって有利な壁です。</b> メーカー発行の請求書はそのまま解除書類になり、せどり勢は小売レシートしか出せないので<b>構造的に解除できません</b>。→ <b>制限ありは除外理由ではなく「ライバルが少ない」という加点要素</b>。</li>
+<li><b>見落としが1つありました。</b> 本家の「初回ロットは最小5個」と、解除要件の <b>10点以上</b> が矛盾します。制限ありを狙うなら<b>初回ロット10点以上</b>が必要で、消化月数の再計算が要ります。</li>
+</ol>
+</div>
+
+<div class="warn"><b>私の反省：</b> 方針 v1.1 の段3に「出品許可が必要か確認」と1行書いただけで、要件も手順も定義していませんでした。手薄でした。本ガイドで埋めます。</div>
+
+<h2><span class="n">1</span>制限は3階層＋別枠</h2>
+<div class="tw">
+<table>
+<tr><th style="width:22%">階層</th><th>中身</th><th style="width:26%">リストは公開されているか</th></tr>
+<tr><td><b>①カテゴリー制限</b></td><td>ジュエリー・時計など。<b>2017年11月に多くが撤廃</b>（ドラッグストア／ビューティー／食品&amp;飲料／服&amp;ファッション／ペット用品／シューズ&amp;バッグ）。ただし<b>その後 再ゲート化されたものもあり、時期で変動</b></td><td>公開されるが<b>改定が多く鵜呑みにできない</b></td></tr>
+<tr class="hi"><td><b>②ブランド制限</b></td><td>Nike / adidas / Apple など。<b>実務で最も遭遇する</b></td><td><b>Amazon公式が「全ブランド名は公開していない」と明言</b>。実際に商品登録して初めて分かる</td></tr>
+<tr><td><b>③ASIN・コンディション単位</b></td><td>同じブランドでも特定ASINだけ制限／新品はOKだが中古はNG など</td><td>非公開</td></tr>
+<tr><td><b>別枠：法令規制</b></td><td>医薬品・酒類（免許）／中古品（古物商）／危険物HAZMAT（SDS・UN番号）／食品衛生法／PSE など。および出品禁止商品</td><td>法令側で公開</td></tr>
+</table>
+</div>
+<div class="bad"><b>この表からの結論：Keepa などで事前に機械的に除外することはできません。</b> 候補を絞ってから、1件ずつ実機で確認する運用が唯一正しい。</div>
+
+<h2><span class="n">2</span>確認方法（確実な順）</h2>
+<div class="tw">
+<table>
+<tr><th style="width:5%">#</th><th style="width:36%">方法</th><th style="width:20%">使う場面</th><th>判定</th></tr>
+<tr class="hi"><td class="num">1</td><td><b>セラーセントラル → カタログ → 商品登録 → ASIN/JANで検索 → コンディション選択</b></td><td><b>これが確定</b>。PCでのリサーチ時</td><td>「<b>出品許可を申請</b>」ボタン＝<b class="ng">制限あり</b>／「出品する」＝<b class="ok">制限なし</b></td></tr>
+<tr><td class="num">2</td><td><b>Amazon Seller アプリのバーコードスキャン</b></td><td>実店舗・手元の実物</td><td>同上を即表示。最速</td></tr>
+<tr><td class="num">3</td><td>Chrome拡張（ショッピングリサーチャー等）</td><td>一次スクリーニング</td><td>判定は出るが<b>確定はセラーセントラル</b>で</td></tr>
+</table>
+</div>
+<div class="card"><b>注意：</b> Keepa には出品制限の判定機能はありません。<b>Keepa は「売れているか」を見る道具、セラーセントラルは「売れるか（出せるか）」を見る道具</b>です。</div>
+
+<h2><span class="n">3</span>解除＝出品許可申請の要件【社長のご記憶の正確版】</h2>
+<div class="lead">必要なのは <b>請求書（invoice）</b> です。<b class="ng">小売店のレシート・領収書は不可。</b></div>
+<div class="tw">
+<table>
+<tr><th style="width:30%">要件</th><th>内容</th></tr>
+<tr><td>書類の種類</td><td><b>請求書</b>（メーカーまたは正規卸が発行したもの）</td></tr>
+<tr class="hi"><td>発行からの期限</td><td><b>180日以内</b></td></tr>
+<tr class="hi"><td>数量</td><td><b>合計10点以上</b>の購入が記載されていること</td></tr>
+<tr><td>記載必須 ①</td><td>出品者（自分）の氏名・住所 → <b>セラーセントラル登録情報と完全一致</b></td></tr>
+<tr><td>記載必須 ②</td><td>仕入れ先（メーカー／正規卸）の会社名・住所・電話</td></tr>
+<tr><td>記載必須 ③</td><td>商品名・型番（申請するASINと一致）</td></tr>
+<tr><td>価格</td><td><b class="ok">伏せてよい（省略可）</b></td></tr>
+</table>
+</div>
+
+<h3>受理されない書類</h3>
+<p class="bad" style="margin:8px 0">手書き ／ <b>見積書</b> ／ <b>発注書</b> ／ <b>受注書</b> ／ <b>ローラーレシート（小売レシート）</b> ／ 編集可能なファイル形式（Word・Excel等）</p>
+
+<h3>審査期間</h3>
+<div class="tw">
+<table>
+<tr><th style="width:44%">種類</th><th>期間</th></tr>
+<tr><td>ワンクリック解除（書類不要のもの）</td><td>数十分〜数時間</td></tr>
+<tr><td>書類審査</td><td><b>3〜7営業日</b>（厳しいカテゴリーで最長2週間）</td></tr>
+</table>
+</div>
+
+<h3>通らない主な原因</h3>
+<ol>
+<li>請求書のショップ名・住所が<b>アカウント登録情報と不一致</b>（最頻出）</li>
+<li>画像が判読困難（スキャン品質・見切れ）</li>
+<li><b>アカウントパフォーマンスに問題がある</b>（ODR等）</li>
+<li>購入点数が <b>10点未満</b></li>
+<li>発行から <b>180日を超過</b></li>
+</ol>
+
+<h2><span class="n">4</span>★これは当社にとって「壁」ではなく「味方」です</h2>
+<div class="tw">
+<table>
+<tr><th style="width:24%"></th><th><b>メーカー仕入れ（当社）</b></th><th>せどり・電脳せどり</th></tr>
+<tr><th>発行される書類</th><td class="ok"><b>メーカー／正規卸の請求書</b></td><td>小売店のレシートのみ</td></tr>
+<tr><th>解除できるか</th><td class="ok"><b>できる</b>（要件を自然に満たす）</td><td class="ng"><b>構造的にできない</b></td></tr>
+<tr><th>結果</th><td class="ok">制限ブランドを売れる</td><td class="ng">制限ブランドに入れない</td></tr>
+</table>
+</div>
+<div class="good"><b>つまり出品制限は「メーカー仕入れ勢だけが越えられる壁」です。</b> 越えた先はライバルが少ない土俵になります。<br><br><b>→ 運用ルール：制限ありは「除外」ではなく「加点」。</b> ただし条件が2つあります。</div>
+
+<h3>条件1：メーカーが請求書を出してくれること</h3>
+<p>個人事業主相手でも請求書を発行してくれるかは、問い合わせ時に確認します。メーカー仕入れなら通常は出ます（そもそも請求書がないと支払いができません）。</p>
+
+<h3>条件2：初回ロットを10点以上にすること ← <mark>見落としがちな衝突</mark></h3>
+<p>本家 EC STARs の教えは「<b>初回は最小5個</b>、売れてからリピート」。しかし解除要件は「<b>10点以上</b>」。</p>
+<div class="bad"><b>5個で仕入れると、解除に使える請求書が作れません。</b></div>
+<p>→ 制限ありブランドを狙う場合は <b>初回ロット10点以上</b>が前提になり、<b>消化月数の再計算が必要</b>です。</p>
+<div class="formula">消化月数 ＝ 10個 ÷ 自分の想定月販（＝ドロップ数 ÷（出品者数＋1））</div>
+<p>例：ドロップ12・出品者3人 → 自分の月販 3個 → 10個で <b>3.3ヶ月</b>。基準（3ヶ月以内）ギリギリ。<br>
+→ <b>制限ありブランドは、制限なしより高い回転を要求される</b>ということです。</p>
+
+<h2><span class="n">5</span>当社の運用ルール（4段ふるいの段3を具体化）</h2>
+<div class="formula">① セラーセントラルで ASIN/JAN 検索 → 制限の有無を判定
+        ↓
+   ┌─ 制限なし ──→ そのまま候補へ  ★初回1SKUはここから選ぶ
+   │
+   └─ 制限あり ──→ ② メーカーが請求書を出せるか（問い合わせ時に確認）
+                        ↓
+                   ┌─ 出る ──→ ★加点（競合が減る）
+                   │           ③ 初回ロットを10点以上に設定
+                   │           ④ 消化月数を10個で再計算 → 3ヶ月以内なら GO
+                   │
+                   └─ 出ない ─→ 除外</div>
+
+<h3>順序のルール（重要）</h3>
+<div class="warn"><b>最初の1SKUは「制限なし」から選びます。</b> 理由は、解除申請の審査に3〜7営業日かかり、<b>そこで止まると初回の学習サイクルが遅くなる</b>からです。制限ありに踏み込むのは<b>2SKU目以降</b>。</div>
+
+<h3>別枠の法令規制は「除外」のまま</h3>
+<p>医薬品・酒類・中古品・危険物・食品などは、<b>請求書では解けません</b>（免許・許可の話）。ここは方針 v1.1 の NG 条件のまま除外を維持します。</p>
+
+<h2><span class="n">6</span>確度タグ</h2>
+<div class="tw">
+<table>
+<tr><th>内容</th><th style="width:28%">確度</th></tr>
+<tr><td>請求書 180日以内・10点以上・出品者情報の完全一致</td><td><span class="pill fix">確定</span> 複数ソース一致・2026-08-17</td></tr>
+<tr><td>小売レシート・見積書・発注書・手書きは不可</td><td><span class="pill fix">確定</span></td></tr>
+<tr><td>価格情報は伏せてよい</td><td><span class="pill fix">確定</span>「価格情報は省略可」</td></tr>
+<tr><td>ブランド制限の全リストは非公開</td><td><span class="pill fix">確定</span> Amazon公式回答</td></tr>
+<tr><td>カテゴリー制限は2017/11に多くが撤廃</td><td><span class="pill fix">確定</span> ただし<b>再ゲート化あり＝現行対象は要実機確認</b></td></tr>
+<tr><td>審査 3〜7営業日（最長2週間）</td><td><span class="pill est">目安</span> 実務ソース</td></tr>
+<tr><td>メーカー請求書で解除が通りやすい</td><td><span class="pill est">一般則</span> 個別で結果は変わる</td></tr>
+<tr><td>初回ロット5個では解除書類を作れない</td><td><span class="pill own">論理的帰結</span> 10点要件から</td></tr>
+</table>
+</div>
+
+<h2><span class="n">7</span>次の一手</h2>
+<div class="lead">
+<b>社長にご確認いただきたいことは1点です。</b>
+<p style="margin:10px 0 0"><b>「制限ありは加点扱い／ただし初回1SKUは制限なしから選ぶ」という運用でよいか</b>を一言ください。</p>
+<p style="margin:10px 0 0">OKであれば、方針書（T-20260817-002）の段3をこの内容で確定し、候補リスト出力時に<b>「制限チェック欄」と「制限ありの場合の10個ベース消化月数」列</b>を付けます。</p>
+<p style="margin:10px 0 0">なお <b>T-20260817-002 §6 の撤退条件（1SKU 損失上限3万円）</b> の承認は、引き続きお待ちしています。</p>
+</div>
+
+<div class="foot">
+<b>出典</b><br>
+・<a href="https://jagoo.co.jp/column/amazon-sellinglimit/">Amazon出品制限とは？理由や解除方法 — ジャグー</a><br>
+・<a href="https://sobani.co.jp/columnlist/amzon_exhibition-permission">Amazon出品許可申請の完全版 — そばに</a><br>
+・<a href="https://www.cyber-records.co.jp/blog/amazon-application-for-exhibition-permission/">出品許可申請｜制限ありのカテゴリー＆解除のやり方 — サイバーレコード</a><br>
+・<a href="https://radio96.jp/amazon-category/">Amazonのカテゴリー申請が不要になった（2017/11 公式回答）</a><br>
+・<a href="https://www.cyber-records.co.jp/amazon-food-listing-restrictions/">Amazon出品の食品規制ガイド 2026 — サイバーレコード</a><br>
+・社内メモリ：knowledge_listing_restrictions_ungating（本件で新規作成）／knowledge_maker_shiire_ecstars／knowledge_seller_official_operations<br><br>
+T-20260817-003 ／ 2026-08-17 ／ Amazon物販事業（Satoy Select）
+</div>
+
+</div>
+</body>
+</html>
