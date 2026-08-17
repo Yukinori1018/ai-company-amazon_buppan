@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>メーカー仕入れ 信用構築の事前準備リスト</title>
+<style>
+  :root{
+    --bg:#ffffff; --fg:#1a1a1a; --muted:#5b6470; --line:#e3e7ec;
+    --accent:#0b63c4; --accent-soft:#eaf2fc; --amzd:#146eb4;
+    --ok:#137333; --okbg:#eaf6ec; --warn:#b06000; --warnbg:#fff6e5; --ng:#b3261e; --ngbg:#fdecea;
+    --card:#f7f9fb; --num:#0f1b25; --hl:#fff3bf;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#12151a; --fg:#e8ecf1; --muted:#9aa4b0; --line:#2a303a;
+      --accent:#5fa8ff; --accent-soft:#1a2532; --card:#1a1e25; --warnbg:#2a2313; --warn:#e0a94a;
+      --okbg:#14251a; --ok:#6fce8a; --ngbg:#2a1614; --ng:#ff8a80; --hl:#3a3418; }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);font-family:-apple-system,"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;line-height:1.75;font-size:15.5px}
+  .wrap{max-width:900px;margin:0 auto;padding:32px 22px 80px}
+  h1{font-size:25px;line-height:1.35;margin:0 0 6px}
+  .sub{color:var(--muted);font-size:13.5px;margin:0 0 24px}
+  h2{font-size:20px;margin:44px 0 12px;padding-top:16px;border-top:2px solid var(--line);display:flex;align-items:center;gap:10px}
+  h2 .n{flex:0 0 auto;width:30px;height:30px;border-radius:8px;background:var(--accent);color:#fff;font-size:15px;display:inline-flex;align-items:center;justify-content:center;font-weight:700}
+  h3{font-size:16.5px;margin:24px 0 6px}
+  h4{font-size:14.5px;margin:18px 0 4px;color:var(--accent)}
+  p{margin:8px 0}
+  ul,ol{margin:8px 0;padding-left:22px} li{margin:6px 0}
+  .lead{background:var(--accent-soft);border:1px solid var(--accent);border-radius:12px;padding:16px 18px;margin:0 0 16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:12px 0}
+  .warn{background:var(--warnbg);border:1px solid var(--warn);border-radius:12px;padding:14px 16px;margin:14px 0}
+  .bad{background:var(--ngbg);border:1px solid var(--ng);border-radius:12px;padding:14px 16px;margin:14px 0}
+  .good{background:var(--okbg);border:1px solid var(--ok);border-radius:12px;padding:14px 16px;margin:14px 0}
+  .ok{color:var(--ok);font-weight:700}.ng{color:var(--ng);font-weight:700}.warnt{color:var(--warn);font-weight:700}
+  mark{background:var(--hl);color:inherit;padding:1px 3px;border-radius:3px}
+  .tw{overflow-x:auto}
+  table{border-collapse:collapse;width:100%;margin:12px 0;font-size:13.5px}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:var(--card)}
+  tr.hi td{background:var(--okbg)}
+  .num{text-align:right;font-variant-numeric:tabular-nums}
+  .pill{display:inline-block;font-size:11px;font-weight:700;padding:2px 9px;border-radius:999px;color:#fff;vertical-align:middle}
+  .pill.fix{background:var(--ok)} .pill.est{background:var(--warn)} .pill.own{background:var(--amzd)}
+  .foot{margin-top:44px;padding-top:16px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px}
+  .foot a{color:var(--accent)}
+  .rank{font-size:22px;font-weight:800;color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>メーカー仕入れ 信用構築の事前準備リスト v1<br>屋号・ホームページ・FBA納品外注 の評価と、抜けている5項目</h1>
+<p class="sub">秘書カズヨ ／ T-20260817-006 ／ 2026-08-17</p>
+
+<div class="lead">
+<b>結論</b>
+<p style="margin:8px 0">社長の3点は<b>すべて正しい方向</b>です。ただし<b>優先度と「効き方」が違います</b>。そして 3点に入っていない「実は一番効くもの」が2つあります。</p>
+<p style="margin:8px 0"><mark><b>全部揃えても初期費用5,000円以内・月額3,000円以内。</b></mark> 1つでも欠けると足切りされうる一方、コストはほぼゼロ。<b>迷わず全部やるのが正解</b>です。</p>
+</div>
+
+<div class="tw">
+<table>
+<tr><th style="width:6%">#</th><th style="width:20%">社長の案</th><th style="width:16%">評価</th><th>実際の効き方</th><th style="width:14%">優先度</th></tr>
+<tr class="hi"><td>1</td><td><b>屋号を持つ</b></td><td><span class="ok">◎ 必須</span><br>ただし屋号"だけ"では看板だけ</td><td>本体は<b>開業届</b>。<mark>「開業届を出していない個人とは取引しない」方針のメーカーが実在</mark>＝加点ではなく<b>ゼロイチの足切り条件</b></td><td>🥇 <b>今週</b></td></tr>
+<tr class="hi"><td>2</td><td><b>ホームページを作る</b></td><td><span class="ok">◎ 費用対効果が最大</span></td><td>本家実績で<b>問い合わせ返信率 46% → 66.5%</b>（合格ライン30%）。メーカーは<b>必ず社名で検索する</b></td><td>🥈 2〜3週目</td></tr>
+<tr><td>3</td><td><b>FBA納品の外注先を決める</b></td><td><span class="warnt">○ 認識は正確</span><br>ただし<b>急ぐ必要はない</b></td><td>初回はメーカー直送か自宅経由で足りる。先に契約すると<b>月額固定費2,000〜4,000円が売上ゼロの状態で出続ける</b></td><td>🥉 初回発注が<br>見えてから</td></tr>
+</table>
+</div>
+
+<div class="good">
+<b>★ 3点に入っていない、実は一番効くもの</b>
+<ul style="margin:8px 0">
+<li><b>会社概要PDF（1〜2枚）</b> — HPは検索されて初めて見られる<b>受け身</b>の道具。PDFは<b>メールに添付して能動的に渡せ、相手の社内稟議に回る</b>。費用ゼロ・今日作れる。</li>
+<li><b>独自ドメインのメールアドレス</b> — 初回メールの送信元が <code>gmail.com</code> か <code>info@satoyselect.com</code> かで、開封率と返信率が変わる。</li>
+</ul>
+</div>
+
+
+<h2><span class="n">1</span>屋号 ── 評価 ◎、ただし「屋号だけ」は看板だけ</h2>
+
+<h3>1-1. なぜ効くのか（メーカー側の視点）</h3>
+<p>メーカーが新規の相手を見るとき、判断しているのは<b>3つだけ</b>です。</p>
+<ol>
+<li><b>実在する事業者か</b>（幽霊・転売ヤーではないか）</li>
+<li><b>代金を確実に払えるか</b></li>
+<li><b>自社ブランドを毀損しないか</b>（安売り・並行品混在・レビュー炎上）</li>
+</ol>
+<p>屋号は①の入口の記号にすぎません。ただし<b>入口を通らないと②③の話にすらならない</b>。「持っておいた方がいいのかな」という社長の直感は正しいです。</p>
+
+<h3>1-2. 押さえるべきこと</h3>
+
+<h4>(a) 開業届 ＝ これが本体。屋号は開業届の1項目</h4>
+<ul>
+<li>正式名称「<b>個人事業の開業・廃業等届出書</b>」。税務署へ提出、<b>無料・A4 1枚・15分</b></li>
+<li>屋号欄に書く → 屋号が公的に事業と紐づく</li>
+<li>原則「事業開始から1ヶ月以内」ですが、<b>遅れても罰則はありません</b></li>
+<li><b>実務上のインパクト</b>：調査したところ「<b>開業届を出していない個人とは取引をしない方針のメーカーもある</b>」と明記した解説がありました。<mark>これは信用の"加点"ではなく、ないと弾かれうる足切り条件です。</mark></li>
+</ul>
+
+<div class="warn">
+<b>⚠️ 重要な制度変更（2025年1月〜）</b>
+<p style="margin:8px 0"><b>税務署の収受日付印（受領印）の押なつが廃止されました。</b> 従来は控えに印をもらえましたが、現在は窓口で希望者に「提出日と税務署名を記載したリーフレット」が交付されるのみです。</p>
+<p style="margin:8px 0">→ <mark><b>e-Tax（オンライン）での提出を強く推奨します。</b></mark>「受信通知」が提出の証明になり、PDFで何度でも出力できます。<b>銀行の屋号口座開設時や、メーカーから書類を求められたとき</b>にこれが証明力を持ちます。</p>
+<p style="margin:8px 0">紙で提出する場合は、<b>必ずリーフレットを受け取り</b>、控えのコピーを自分で保管してください。</p>
+</div>
+
+<h4>(b) 青色申告承認申請書 ── 開業届と<u>同時に必ず</u>出す</h4>
+<ul>
+<li>最大<b>65万円</b>の特別控除、<b>赤字を3年間繰り越せる</b></li>
+<li>物販は在庫が先行するため<b>初年度が赤字になりやすい</b> → 翌年の黒字と相殺できるのが実利</li>
+<li>出し忘れるとその年は白色申告確定。<b>同時提出が鉄則</b>（期限：開業日から2ヶ月以内）</li>
+</ul>
+
+<h4>(c) 屋号名 → <b>「Satoy Select」に統一</b>を推奨</h4>
+<div class="card">
+<p style="margin:0"><b>屋号・Amazon店舗名・ドメイン・メールアドレス・銀行口座名義 を全部同じ文字列に揃える。</b></p>
+</div>
+<p>これが信用構築の最短ルートです。メーカーが検索したときに<b>全部一致する＝実在感が跳ね上がります</b>。バラバラだと「本当にこの人は誰なのか」となります。</p>
+<p><span class="warnt">⚠️ 表記の注意</span>：法人と誤認される「<b>株式会社</b>」「Co., Ltd.」は屋号に使えません（会社法違反）。「Satoy Select」単体でOKです。</p>
+
+<h4>(d) 屋号付き銀行口座</h4>
+<ul>
+<li>メーカーへの振込名義が「サトウ ユキノリ」より「<b>サトイセレクト</b>」の方が、事業体として見られます</li>
+<li>開設には<b>開業届の控え（または e-Tax 受信通知）が必要</b> → (a) が先です</li>
+<li>ネット銀行が早く、開設・維持とも無料のところが多い（GMOあおぞらネット銀行／PayPay銀行／住信SBIネット銀行／楽天銀行 等）<span class="pill est">要確認</span> 屋号付き口座の可否・必要書類は各行で条件差あり</li>
+<li>副次効果：事業用と生活用を分けるだけで<b>確定申告の手間が激減</b>します</li>
+</ul>
+
+<h4>(e) インボイス（適格請求書発行事業者）登録 → <b>現時点では「登録しない」を推奨</b></h4>
+<div class="card">
+<ul style="margin:0">
+<li><b>仕入れる側には不要です。</b> インボイスは「売る側が買う側に渡す」書類。メーカーから買うだけなら、社長が未登録でも取引に支障はほぼありません</li>
+<li>一方で<b>登録すると免税事業者でなくなり、売上の消費税を納める義務が発生</b>します。Amazon B2Cで一般消費者に売る限り買い手はインボイスを必要としない → <b>登録は純粋なコスト増</b></li>
+<li>例外：Amazonビジネス（法人向け販売）で法人客の比率が上がってきたら再検討</li>
+</ul>
+</div>
+<p>※ 既に <b>T-20260726-002</b> で「非推奨」と結論済みで、今回も同じ結論です。最終判断は税理士確認を推奨します。</p>
+
+<h4>(f) 古物商許可 → <b>新品のメーカー仕入れだけなら不要</b></h4>
+<ul>
+<li>中古品（一度でも消費者の手に渡ったもの）を売買する場合の許可。<b>メーカーから新品を仕入れるだけなら不要</b></li>
+<li>警察署へ申請・<b>19,000円</b>・1〜2ヶ月</li>
+<li>⚠️ ①電脳せどりを再開して中古を扱うなら必須。ただし<b>メーカーが古物商許可を求めることはまずない</b>ので、信用構築目的では不要です</li>
+</ul>
+
+<h4>(g) 法人化 → <b>今は不要</b></h4>
+<p>一部メーカーは「法人のみ」を取引条件にしますが、その場合は<b>その相手を後回しにするのが正解</b>です。中小メーカーは個人事業主とも普通に取引します。法人化は「利益が出てから」（目安：課税所得800万〜）。今やると設立費用・社会保険・決算費用が先行して現金が減ります。</p>
+
+<h3>1-3. 費用と時間</h3>
+<div class="tw">
+<table>
+<tr><th>項目</th><th style="width:22%">費用</th><th style="width:26%">社長の手</th></tr>
+<tr class="hi"><td>開業届＋青色申告承認申請（e-Tax）</td><td><b>0円</b></td><td>15〜30分</td></tr>
+<tr><td>屋号付き銀行口座</td><td>0円</td><td>申込10分＋審査 数日〜2週</td></tr>
+<tr><td>古物商許可（中古を扱う場合のみ）</td><td>19,000円</td><td>1〜2ヶ月</td></tr>
+</table>
+</div>
+
+
+<h2><span class="n">2</span>ホームページ ── 評価 ◎、費用対効果が最も高い</h2>
+
+<h3>2-1. 数字の裏付け</h3>
+<div class="good">
+<p style="margin:0">本家（EC STARs Lab.）の資料では、<b>HP作成により問い合わせの返信率が 46% → 66.5%</b> に上がったとされています（当社ナレッジ <code>knowledge_maker_shiire_ecstars</code>）。合格ラインが返信率30%ですから、<b>HPの有無で約1.4倍</b>。他のどの施策よりインパクトが大きい。</p>
+</div>
+<p>理由は単純で、<b>メーカーの担当者は必ず社名で検索する</b>からです。検索して何も出てこない相手に、自社商品を卸す判断はしづらい。</p>
+
+<h3>2-2. 何を載せるか（これが本質。デザインではありません）</h3>
+<p><b>「取引をご検討の企業様へ」というページを1枚作り、ここに全部書く</b>のが最も効きます。</p>
+<div class="tw">
+<table>
+<tr><th style="width:38%">載せる項目</th><th>なぜ効くか</th></tr>
+<tr><td>屋号・代表者名・<b>顔写真</b>・所在地・電話・メール・開業年</td><td>実在性。本家も「顔写真＋事業への想い」を推奨</td></tr>
+<tr><td><b>販売チャネル</b>（Amazon.co.jp／店舗名 Satoy Select／ストアURL）</td><td>メーカーの最大の関心事は「どこで売るか」</td></tr>
+<tr><td>取扱カテゴリ・想定取扱高</td><td>自社商品と合うか判断できる</td></tr>
+<tr class="hi"><td><b>販売方針</b> ← ★決定打</td><td>下記参照</td></tr>
+<tr><td>物流体制（FBA利用・検品体制・提携倉庫）</td><td>商品を雑に扱わないと伝わる</td></tr>
+<tr><td>支払条件（<b>前払い可</b>）</td><td>与信不要＝メーカーのリスクがゼロになる</td></tr>
+</table>
+</div>
+
+<div class="card">
+<b>★ 販売方針が最重要</b>
+<p style="margin:8px 0">メーカーが新規セラーに一番恐れているのは「<b>安売りされてブランドと既存取引先が崩れる</b>」こと。ここに先回りして書きます。</p>
+<ul style="margin:8px 0">
+<li>正規品として適正価格で販売し、<b>価格を崩さない</b></li>
+<li>並行輸入品・中古品と混ぜて出品しない</li>
+<li>商品ページの情報を勝手に改変しない（メーカー指定を尊重）</li>
+<li>レビュー・お問い合わせに責任を持って対応する</li>
+<li>在庫を切らさない管理をする</li>
+</ul>
+<p style="margin:8px 0">これが書いてあるHPは、<b>転売ヤーのそれと明確に違って見えます</b>。ここが差のつく場所です。</p>
+</div>
+
+<h3>2-3. 作り方（社長はPC上で完結）</h3>
+<ul>
+<li><b>ページ数は5枚で十分</b>：トップ／会社概要／事業内容／<b>取引をご検討の企業様へ</b>／お問い合わせ</li>
+<li>ツール候補：<b>ペライチ</b>（日本語・最速）／<b>STUDIO</b>（デザイン性）／<b>Googleサイト</b>（無料だがドメイン制約あり）</li>
+<li><span class="ng">⚠️ 独自ドメインは必須</span>。<code>satoyselect.com</code> など。無料サブドメイン（<code>○○.wixsite.com</code> 等）は間に合わせ感が出て<b>逆効果</b>です。年1,500円程度。</li>
+<li><span class="warnt">⚠️ 所在地の扱い（要ご判断）</span>：バーチャルオフィス（月1,000〜3,000円）という手もありますが、<b>メーカーによっては「倉庫も事務所もない」と見なされて逆効果</b>になり得ます。→ §6 でA/B/Cとしてお伺いします。</li>
+<li>特商法表記：HPで直接販売しないなら法的義務はありませんが、会社概要相当の情報は出しておくと信用が上がります</li>
+</ul>
+
+<h3>2-4. 費用</h3>
+<div class="tw">
+<table>
+<tr><th style="width:34%">項目</th><th>費用</th></tr>
+<tr><td>独自ドメイン</td><td>約1,500円/年</td></tr>
+<tr><td>ペライチ／STUDIO</td><td>無料〜月1,000円台</td></tr>
+<tr class="hi"><td>制作</td><td><b>当社（カズヨ＋ヒデアキ）が文面・構成を作成。</b>社長は顔写真と「なぜこの事業をやるか」を3〜5行いただくだけ</td></tr>
+</table>
+</div>
+
+
+<h2><span class="n">3</span>FBA納品の外注先 ── 評価 ○、認識は正確。ただし急ぐ必要はない</h2>
+
+<h3>3-1. 社長の認識について</h3>
+<div class="good">
+<p style="margin:4px 0">「仕入れ先からの送り先の住所が必要」 → <b class="ok">正しい</b></p>
+<p style="margin:4px 0">「商品によってはFBA納品を直接やってもらえるかもしれないから確認が必要」 → <b class="ok">正しい。かつ、それが最善手です</b></p>
+</div>
+<p>両方とも的確です。選択肢は3つあります。</p>
+<div class="tw">
+<table>
+<tr><th style="width:14%">型</th><th style="width:24%">流れ</th><th>費用</th><th style="width:20%">評価</th></tr>
+<tr class="hi"><td><b>A メーカー直送</b></td><td>メーカー → FBA倉庫</td><td><b>0円</b>（送料のみ）</td><td>◎ <b>最強</b>。ただし条件あり</td></tr>
+<tr><td><b>B 納品代行</b></td><td>メーカー → 代行業者 → FBA</td><td>初期3,000〜5,000円／月額2,000〜4,000円／<b>標準サイズ1点15〜30円</b>（検品＋FNSKUラベル＋OPP袋）・大型50〜100円 <span class="pill est">要見積り</span></td><td>○ 数量が増えたら</td></tr>
+<tr><td><b>C 自宅経由</b></td><td>メーカー → 自宅 → 自分でFBA納品</td><td>0円＋社長の時間</td><td>△ PC完結方針と衝突。ただし初回の品質確認には価値あり</td></tr>
+</table>
+</div>
+<p class="sub">※ Bの相場は複数の代行業者サイトのレンジ。<b>実額は相見積りで確定が必要</b>。業者ごとに費目の切り方が違うので、単価だけの比較は危険です。</p>
+
+<h3>3-2. 推奨：A を第一希望・B を保険。決めるのは初回発注が見えてから</h3>
+<div class="warn">
+<p style="margin:0"><b>理由</b>：Bを先に契約すると <mark><b>月額固定費（2,000〜4,000円）が売上ゼロの状態から出続けます</b></mark>。初回ロットは10点程度（※出品制限の請求書10点要件／T-20260817-003）なので、<b>作業単価より固定費の方が大きくなります</b>。</p>
+</div>
+
+<h4>A（メーカー直送）が成立する条件 ── メーカーに確認すべき4点</h4>
+<ol>
+<li><b>FNSKU（商品ラベル）を貼ってもらえるか</b> — PDFを送って貼付を依頼。無理なら <b>Amazonのラベル貼付サービス</b>（22円 or 51円/点・税込）で肩代わりできます（<code>knowledge_fba_label_service</code>）</li>
+<li><b>Amazonの梱包・納品要件を守れるか</b>（段ボールサイズ・重量・配送ラベルの貼付）</li>
+<li><b>納品先倉庫はAmazonが指定する</b>（こちらでは選べない）→「送り先は都度こちらから指定します」で了承いただけるか</li>
+<li>賞味期限品・危険物は追加要件あり</li>
+</ol>
+<div class="good">
+<p style="margin:0">→ <b>初回の問い合わせメールに「FBA倉庫への直送は可能でしょうか」を1行入れておく</b>のが正解です。本家の解説でも「二つ返事でOKをもらえることが多い」とされており、<b>聞かないと損</b>です。</p>
+</div>
+
+<h4>B（納品代行）を選ぶ場合 ── 相見積り3社で確認すべきスペック</h4>
+<ul>
+<li>初期費用・<b>月額固定費の有無</b>（← 固定費ゼロの業者を優先）</li>
+<li>1点あたり単価（検品／FNSKUラベル／OPP袋／セット組）</li>
+<li><b>最低ロット・最低月額の有無</b>（少量で受けてくれるか＝初期の生命線）</li>
+<li><b>仕入れ先（メーカー）からの直接入荷を受けられるか</b>、入荷連絡の速さ</li>
+<li>賞味期限品・危険物の可否／保管料と保管期間の上限</li>
+</ul>
+<p class="sub">補足：当社ナレッジにある <b>WAM NET（就労支援施設）ルートは1商品5〜10円</b>と桁違いに安いですが、①訪問して説明する必要がある（PC完結方針と衝突）②立ち上げに1ヶ月のテスト期間、という前提があります。<b>月数百点に乗ってから</b>の選択肢です。</p>
+
+<h3>3-3. 「送り先住所」の落とし穴（見落とされがち）</h3>
+<div class="warn">
+<p style="margin:0">代行業者の住所をメーカーに伝えるとき、<b>HPの会社概要に書いた住所と違う</b>と「この人はどこにいるのか」と不審に思われます。<br>→ HPの会社概要に <b>「物流拠点：○○（提携倉庫）」</b> の1行を入れておくと整合します。細かい話ですが、<b>慎重なメーカーほど見ています</b>。</p>
+</div>
+
+
+<h2><span class="n">4</span>3点以外に必要な準備 ── ここに"一番効くもの"が入っています</h2>
+<p>優先度順。★は<b>HPより先にやるべき</b>もの。</p>
+
+<h3>★ A. 会社概要PDF（1〜2枚） ── 最も費用対効果が高い</h3>
+<div class="good">
+<p style="margin:8px 0">HPは「検索されたときに出てくる」<b>受け身</b>の道具。PDFは<b>メールに添付して能動的に渡せます</b>。そしてメーカーの担当者は、これを<b>社内稟議に回します</b>。</p>
+<p style="margin:8px 0">載せる内容は §2-2 の表と同じ。<mark><b>HPより先に作れて、費用ゼロ、今日作れます。</b></mark></p>
+<p style="margin:8px 0">→ <b>これは当社（カズヨ＋ヒデアキ）で作成します。社長は顔写真と、事業への想いを3〜5行いただければ完成します。</b></p>
+</div>
+
+<h3>★ B. 独自ドメインのメールアドレス</h3>
+<p>初回メールの送信元が <code>satoyukinori1018@gmail.com</code> か <code>info@satoyselect.com</code> かで、<b>開封率・返信率が変わります</b>。フリーメールは「個人の趣味」に見えます。</p>
+<ul>
+<li>ドメイン取得（年1,500円）→ Google Workspace（月800円〜）or ムームーメール（年数百円）</li>
+<li><b>HPより先。ドメインを取れば同日から使えます。</b></li>
+</ul>
+
+<h3>★ C. 電話番号（050で可）＋ インターネットFAX</h3>
+<ul>
+<li>メーカーは電話を求めます。かつ本家は<b>電話・FAXを併用すると返信率が上がる</b>としています（月530件のメール＋390件のFAXという事例）</li>
+<li>携帯番号だけだと弱く、<b>こちらから架けたときに発信者番号が携帯だと出てもらえないことがあります</b></li>
+<li><b>050番号のIP電話（月数百円〜）で十分</b>。スマホアプリで受発信でき、名刺・HP・メール署名に載せられます <span class="pill est">要確認</span> 現行サービス名と料金は申込画面の実表示が正</li>
+<li><b>インターネットFAX（月数百円〜）</b>でPCから送受信できます。中小メーカーはFAXが現役です</li>
+</ul>
+
+<h3>D. 名刺</h3>
+<p>展示会・電話後の郵送用。ネット印刷で1,000〜2,000円。屋号・氏名・住所・電話・メール・HP・<b>Amazonストア名</b>を入れます。</p>
+
+<h3>E. Amazonストアページの"見せ方" ── 見落としがちですが効きます</h3>
+<div class="card">
+<p style="margin:8px 0">メーカーは<b>必ず Amazon の「Satoy Select」ストアページを見に来ます。</b> ここに商品が0件だと「本当に売れるのか」と思われます。出品者評価も見られます。</p>
+<p style="margin:8px 0">→ <b>初回のメーカー連絡までに、数SKUでも出品して「稼働中」に見せる</b>のが理想です。①電脳せどりはホールド中ですが、この目的だけなら数点並べる価値があります。</p>
+<p style="margin:8px 0"><span class="warnt">⚠️</span> ただしアカウント健全性を崩す仕入れは本末転倒です。既存の買い候補から安全なものを少量、が現実的です。</p>
+</div>
+
+<h3>F. 支払い体制</h3>
+<ul>
+<li><b>事業用クレジットカード</b>と屋号口座</li>
+<li><mark><b>「初回は前払い（先払い）でお支払いします」と言えることが、実績ゼロを埋める最強のカード</b></mark>です。メーカー側の与信リスクがゼロになるので、断る理由が減ります。掛け取引（後払い）は実績を作ってから。</li>
+</ul>
+
+<h3>G. 実績ゼロを埋める3点セット（交渉の型）</h3>
+<p>実績がないのは事実なので、<b>隠さず、代わりに相手のリスクを消す</b>のが正解です。</p>
+<div class="tw">
+<table>
+<tr><th style="width:44%">言うこと</th><th>消えるリスク</th></tr>
+<tr><td><b>初回は小ロットで結構です</b></td><td>相手の在庫リスク</td></tr>
+<tr><td><b>前払いでお支払いします</b></td><td>相手の与信リスク</td></tr>
+<tr><td><b>販売方針を明記</b>（価格を崩さない等）</td><td>相手のブランド毀損リスク</td></tr>
+</table>
+</div>
+<p>この3つを初回メールに書くだけで返信率が変わります。問い合わせメールのテンプレはこの型で作ります。</p>
+
+<h3>H. 求められたら即出せる書類フォルダ</h3>
+<ul>
+<li>開業届の控え（<b>e-Taxの受信通知PDF推奨</b> — §1-2(a)参照）／本人確認書類／会社概要PDF／（中古を扱う場合のみ）古物商許可証</li>
+</ul>
+<p>1フォルダにまとめておけば、聞かれた瞬間に出せます。<b>「すぐ出せる」こと自体が信用</b>です。</p>
+
+<h3>I. 展示会という近道（余力があれば）</h3>
+<p><b>東京インターナショナル・ギフト・ショー</b>（年2回・東京ビッグサイト）は中小メーカー開拓の王道です。バイヤー登録には<b>名刺と屋号が必要</b>なのでA〜Dが揃っていることが前提。メールより圧倒的に話が早い（その場で名刺交換 → 後日見積り）反面、社長の実移動が必要です。<span class="pill est">要確認</span> 2026年の会期・登録要件は公式で確認が必要。ご興味があれば別途調べます。</p>
+
+
+<h2><span class="n">5</span>推奨する順番とコスト</h2>
+<div class="tw">
+<table>
+<tr><th style="width:12%">週</th><th>やること</th><th style="width:16%">費用</th><th style="width:18%">社長の手</th></tr>
+<tr class="hi"><td><b>今週</b></td><td>①<b>開業届＋青色申告承認申請</b>（e-Tax・屋号=Satoy Select）②独自ドメイン取得 ③メールアドレス開設</td><td>約1,500円</td><td><b>30分</b></td></tr>
+<tr><td>来週</td><td>④屋号付き銀行口座 ⑤事業用カード ⑥050番号＋ネットFAX ⑦<b>会社概要PDF</b>（当社作成）</td><td>月300円〜</td><td>30分＋顔写真</td></tr>
+<tr><td>3週目</td><td>⑧HP 5ページ（当社が文面・構成）⑨名刺 ⑩Amazonストアに数SKU</td><td>年1,500円＋2,000円</td><td>確認のみ</td></tr>
+<tr><td>4週目〜</td><td>⑪メーカーへ問い合わせ開始（<b>直送可否を1行入れる</b>）→ 返答を見てから ⑫納品代行の相見積り3社</td><td>—</td><td>メール送信の承認のみ</td></tr>
+</table>
+</div>
+<div class="lead">
+<p style="margin:0"><b>初期費用の合計：おおむね5,000円以内。月額ランニング：1,500〜3,000円程度</b>（古物商・バーチャルオフィス・納品代行を除く）。<br>
+つまり、<b>信用構築にかかる費用はほぼゼロで、効くのは「揃っているか」だけ</b>です。</p>
+</div>
+
+
+<h2><span class="n">6</span>社長にご判断いただきたい点（3つ）</h2>
+
+<h3>① 屋号を「Satoy Select」で確定してよいか</h3>
+<p>（Amazon店舗名・ドメイン・銀行口座名義まで統一する前提）→ <b class="ok">推奨：Yes</b>。統一こそが信用の源泉です。</p>
+
+<h3>② HP・会社概要に載せる所在地</h3>
+<div class="tw">
+<table>
+<tr><th style="width:14%">案</th><th style="width:34%">内容</th><th>評価</th></tr>
+<tr class="hi"><td><b>A（推奨）</b></td><td>自宅住所を番地まで公開</td><td>信用が最も高い・費用ゼロ。プライバシーとのトレードオフ</td></tr>
+<tr><td>B</td><td>バーチャルオフィスを借りる（月1,000〜3,000円）</td><td>プライバシーは守れるが、「倉庫も事務所もない」と見なされるリスク</td></tr>
+<tr><td>C</td><td>市区町村まで表示し、詳細は取引時に開示</td><td>折衷。ただし「隠している」印象は残る</td></tr>
+</table>
+</div>
+
+<h3>③ 開業届の提出方法</h3>
+<div class="tw">
+<table>
+<tr><th style="width:14%">案</th><th style="width:26%">内容</th><th>評価</th></tr>
+<tr class="hi"><td><b>A（推奨）</b></td><td>e-Tax（オンライン）</td><td><b>受信通知が提出証明になる</b>。2025年1月の収受印廃止に対応済み。何度でもPDF出力可</td></tr>
+<tr><td>B</td><td>税務署窓口</td><td>対面で聞ける安心感。ただし<b>リーフレットの受け取りを忘れない</b>こと</td></tr>
+</table>
+</div>
+
+
+<h2><span class="n">7</span>ご判断いただければ、当社が次に作るもの</h2>
+<ol>
+<li><b>会社概要PDF のドラフト</b>（1〜2枚・メーカー添付用）</li>
+<li><b>HPの全ページ文面</b>（5ページ分・そのままコピペできる形）</li>
+<li><b>メーカー問い合わせメールの A/B 案</b>（FBA直送の確認・出品制限の請求書要件の事前確約・実績ゼロを埋める3点セット を織り込み済み）</li>
+</ol>
+<div class="good">
+<p style="margin:0"><b>社長が手を動かすのは、開業届の e-Tax 提出（30分）と顔写真の用意だけ</b>になります。</p>
+</div>
+<div class="warn">
+<p style="margin:0">⚠️ なお、<b>メーカーへの実連絡・有料サービスの契約・決済は §4.1（要承認）</b>です。文面が完成した段階で改めてご承認をいただきます。</p>
+</div>
+
+
+<div class="foot">
+<b>出典</b><br>
+<a href="https://arkjpn.net/column/column-7201/">【2025年1月から税務署の収受印が廃止に】e-Tax、リーフレットや納税証明による対応方法を解説 — ARK税理士法人</a><br>
+<a href="https://biz.moneyforward.com/establish/basic/11/">【2025年改正対応】開業届の証明書が必要な時どうする？ — マネーフォワード クラウド</a><br>
+<a href="https://www.post.japanpost.jp/bizpost/column/sales_promotion20/maker-purchase/">メーカー仕入れは個人でもできる！直接取引のやり方・交渉メールの例文も紹介 — 日本郵便</a><br>
+<a href="https://www.theckb.com/archive/the-complete-guide-to-starting-your-own-manufacturers-stocking/">【失敗しない】個人でメーカー仕入れを始める完全ガイド — THE CKB</a><br>
+<a href="https://www.kamiyashouten.com/column/ec%E7%89%A9%E6%B5%81/fba/">FBA納品代行の費用相場｜検品・ラベル外注の選び方 — 神谷商店</a><br>
+<a href="https://motomuralog.com/logistics-glossary/fba-prep-service/">FBA納品代行とは？料金相場・おすすめ業者・失敗しない選び方 — MOTOMURA</a><br>
+<a href="https://ecstarslab.com/blog/amazon-makerchokusou/">【超簡単】Amazon倉庫へメーカーに直送してもらう方法7STEP — EC STARs Lab.</a><br>
+当社ナレッジ：<code>knowledge_maker_shiire_ecstars</code>（返信率46%→66.5%・WAM NET 5〜10円）／<code>knowledge_fba_label_service</code>（22円・51円）／<code>knowledge_listing_restrictions_ungating</code>（請求書10点要件）<br><br>
+T-20260817-006 ／ 秘書カズヨ ／ 2026-08-17
+</div>
+
+</div>
+</body>
+</html>
