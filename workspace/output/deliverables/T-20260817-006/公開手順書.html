@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Satoy Select ホームページ 公開手順書</title>
+<style>
+  :root{
+    --bg:#ffffff; --fg:#1a1a1a; --muted:#5b6470; --line:#e3e7ec;
+    --accent:#0b63c4; --accent-soft:#eaf2fc;
+    --ok:#137333; --okbg:#eaf6ec; --warn:#b06000; --warnbg:#fff6e5; --ng:#b3261e; --ngbg:#fdecea;
+    --card:#f7f9fb; --num:#0f1b25; --hl:#fff3bf;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#12151a; --fg:#e8ecf1; --muted:#9aa4b0; --line:#2a303a;
+      --accent:#5fa8ff; --accent-soft:#1a2532; --card:#1a1e25; --warnbg:#2a2313; --warn:#e0a94a;
+      --okbg:#14251a; --ok:#6fce8a; --ngbg:#2a1614; --ng:#ff8a80; --hl:#3a3418; }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);font-family:-apple-system,"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;line-height:1.8;font-size:15.5px}
+  .wrap{max-width:880px;margin:0 auto;padding:32px 22px 80px}
+  h1{font-size:25px;line-height:1.35;margin:0 0 6px}
+  .sub{color:var(--muted);font-size:13.5px;margin:0 0 24px}
+  h2{font-size:20px;margin:44px 0 12px;padding-top:16px;border-top:2px solid var(--line);display:flex;align-items:center;gap:10px}
+  h2 .n{flex:0 0 auto;width:30px;height:30px;border-radius:8px;background:var(--accent);color:#fff;font-size:15px;display:inline-flex;align-items:center;justify-content:center;font-weight:700}
+  h3{font-size:16.5px;margin:26px 0 6px}
+  p{margin:9px 0}
+  ul,ol{margin:9px 0;padding-left:24px} li{margin:8px 0}
+  code{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:2px 6px;font-size:13.5px;font-family:ui-monospace,Menlo,monospace}
+  pre{background:var(--num);color:#e8f0f6;padding:14px 16px;border-radius:10px;font-size:13.5px;line-height:1.75;overflow-x:auto}
+  pre code{background:none;border:none;color:inherit;padding:0}
+  .lead{background:var(--accent-soft);border:1px solid var(--accent);border-radius:12px;padding:16px 18px;margin:0 0 16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:12px 0}
+  .warn{background:var(--warnbg);border:1px solid var(--warn);border-radius:12px;padding:14px 16px;margin:14px 0}
+  .bad{background:var(--ngbg);border:1px solid var(--ng);border-radius:12px;padding:14px 16px;margin:14px 0}
+  .good{background:var(--okbg);border:1px solid var(--ok);border-radius:12px;padding:14px 16px;margin:14px 0}
+  mark{background:var(--hl);color:inherit;padding:1px 3px;border-radius:3px}
+  .tw{overflow-x:auto}
+  table{border-collapse:collapse;width:100%;margin:12px 0;font-size:13.5px}
+  th,td{border:1px solid var(--line);padding:9px 11px;text-align:left;vertical-align:top}
+  th{background:var(--card)}
+  tr.hi td{background:var(--okbg)}
+  .foot{margin-top:44px;padding-top:16px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px}
+  .step-time{display:inline-block;font-size:11.5px;font-weight:700;padding:2px 10px;border-radius:999px;background:var(--accent);color:#fff;margin-left:8px;vertical-align:middle}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Satoy Select ホームページ 公開手順書<br>— 帰宅後15分で「検索に出る」状態にする</h1>
+<p class="sub">秘書カズヨ ／ T-20260817-006 ／ 2026-08-17</p>
+
+<div class="lead">
+<b>状況</b>
+<p style="margin:8px 0"><b>ホームページ本体は完成しています。</b>5ページ・スマホ対応・会社概要PDF付き。中身の確認は不要です（ご希望があれば直します）。</p>
+<p style="margin:8px 0">残っているのは <b>①社長の情報を7項目入れる ②ドメインを買う ③アップロードする</b> の3つだけです。合計15分ほど。</p>
+</div>
+
+<div class="warn">
+<b>⚠️ 先に、正直にお伝えしておくこと</b>
+<p style="margin:8px 0"><b>「翌日までに検索したら出てくる」は物理的に不可能です。</b> 新しいドメインが Google の検索結果に載るまで、通常 <b>数日〜2週間</b>かかります。Search Console から登録を申請しても即時には反映されません。これは技術の問題ではなく、Google 側の仕組みです。</p>
+<p style="margin:8px 0">ただし <b>「URL を伝えれば見てもらえる状態」は今日中に作れます。</b> メーカーへの初回メールには URL を書きますので、実務上はこれで足ります。検索順位は後から追いついてきます。</p>
+<p style="margin:8px 0">また <b>ドメイン取得とサーバー契約は §4.1（金銭・アカウント作成）</b>にあたるため、私が代行できません。社長ご本人の操作が必要です（下記②）。</p>
+</div>
+
+
+<h2><span class="n">1</span>ステップ① 情報を入れる<span class="step-time">3分</span></h2>
+
+<p>ターミナル（Mac の「ターミナル.app」）を開いて、下の1行をコピーして貼り付け、Enter を押してください。</p>
+
+<pre><code>cd ~/Documents/AI\ Company\ Outputs/Amazon物販事業/T-20260817-006/site && python3 fill.py</code></pre>
+
+<p>7つの質問が順に出るので、答えて Enter を押していくだけです。</p>
+
+<div class="tw">
+<table>
+<tr><th style="width:24%">聞かれること</th><th>答え方</th></tr>
+<tr class="hi"><td><b>独自ドメイン</b></td><td><code>satoyselect.com</code> のように入力（<code>https://</code> や <code>www.</code> は不要）。※まだ買っていなくても、これから買う予定の名前を入れてください</td></tr>
+<tr><td><b>代表者のお名前</b></td><td>そのままお名前を</td></tr>
+<tr class="hi"><td><b>所在地</b></td><td><b>郵便番号から番地まで</b>（社長のご判断＝A案）</td></tr>
+<tr><td><b>メールアドレス</b></td><td><code>info@satoyselect.com</code>（ドメイン取得後に使えます）</td></tr>
+<tr><td><b>電話番号</b></td><td>050番号で構いません。<b>まだ無ければ空のまま Enter</b> → 電話の欄が自動で消えます</td></tr>
+<tr><td><b>FAX番号</b></td><td>同上。無ければ空 Enter</td></tr>
+<tr><td><b>開業年月</b></td><td><code>2026年8月</code> のように</td></tr>
+</table>
+</div>
+
+<div class="good">
+<p style="margin:0">終わると、<code>T-20260817-006/公開用/</code> というフォルダができます。<b>この中身が、そのままアップロードするファイル一式</b>です。<br>
+同時に <b><code>Satoy-Select_会社概要.pdf</code></b>（A4・2枚）も自動で作られます。メーカーへのメールに添付する資料です。</p>
+</div>
+
+<p>入力を間違えても大丈夫です。<b>何度でもやり直せます</b>（同じコマンドをもう一度実行するだけ。元のファイルは書き換わりません）。</p>
+
+
+<h2><span class="n">2</span>ステップ② ドメインとサーバーを用意する<span class="step-time">10分・社長ご本人</span></h2>
+
+<div class="bad">
+<p style="margin:0"><b>ここは §4.1（金銭が動く・アカウント作成）です。私は代行できません。</b>社長ご本人で操作をお願いします。</p>
+</div>
+
+<h3>推奨＝A案：Xserver（ドメイン＋サーバーを1社でまとめる）</h3>
+
+<div class="tw">
+<table>
+<tr><th style="width:16%">案</th><th style="width:26%">構成</th><th>費用の目安</th><th style="width:22%">評価</th></tr>
+<tr class="hi"><td><b>A（推奨）</b></td><td>Xserver レンタルサーバー＋ドメイン</td><td>サーバー 月990円〜／ドメインは長期契約で無料になるキャンペーンあり</td><td>1社で完結。日本語サポート。設定が最も簡単</td></tr>
+<tr><td>B</td><td>お名前.com などでドメイン＋ロリポップ</td><td>ドメイン 年1,500円前後＋サーバー 月550円〜</td><td>安いが2社にまたがるぶん設定がひと手間</td></tr>
+<tr><td>C</td><td>ドメインのみ購入＋Cloudflare Pages（無料ホスティング）</td><td>ドメイン 年1,500円前後のみ</td><td><b>維持費は最安</b>だが、設定に技術的な手順が入る。ご希望なら私が手順を作ります</td></tr>
+</table>
+</div>
+
+<p><b>やること（A案の場合）</b></p>
+<ol>
+<li>Xserver のサイトで申し込み → <b>ドメイン名は <code>satoyselect.com</code> など、ステップ①で入力したものと必ず同じに</b>してください</li>
+<li>支払い（クレジットカード）</li>
+<li>管理画面で「独自SSL（https化）」を有効にする ← <b>必ず有効に。</b>「保護されていない通信」と出るサイトは信用を落とします</li>
+<li>メールアドレス <code>info@（ドメイン）</code> を作成する</li>
+</ol>
+
+<div class="warn">
+<p style="margin:0"><b>⚠️ ドメイン名を変える場合は、ステップ①をやり直してください。</b> サイト内のリンクや検索用の設定にドメイン名が埋め込まれているためです。</p>
+</div>
+
+
+<h2><span class="n">3</span>ステップ③ アップロードする<span class="step-time">2分</span></h2>
+
+<p>契約したサーバーの<b>ファイルマネージャー</b>（管理画面から開けます）を使うのが一番簡単です。</p>
+
+<ol>
+<li>管理画面 → 「ファイル管理」または「FTPファイルマネージャー」を開く</li>
+<li><code>（ドメイン名）/public_html/</code> というフォルダを開く</li>
+<li><b><code>公開用</code> フォルダの<u>中身</u>を、まるごとドラッグしてアップロード</b><br>
+　※ <code>公開用</code> フォルダごとではなく、<b>中身</b>（<code>index.html</code> や <code>assets</code> フォルダなど）を入れてください</li>
+<li>ブラウザで <code>https://（ドメイン名）/</code> を開いて、表示されることを確認</li>
+</ol>
+
+<div class="good">
+<p style="margin:0"><b>ここまでで公開完了です。</b>この時点で URL をメーカーへ伝えられます。</p>
+</div>
+
+<div class="card">
+<p style="margin:0"><b>アップロードするファイル一覧</b>（8ファイル＋assetsフォルダ）</p>
+<ul style="margin:8px 0 0">
+<li><code>index.html</code>（トップ）／<code>about.html</code>（会社概要）／<code>business.html</code>（事業内容）／<code>partners.html</code>（<b>取引をご検討の企業様へ＝本命</b>）／<code>contact.html</code>（お問い合わせ）</li>
+<li><code>profile.html</code>（会社概要資料・印刷用。検索には出ない設定済み）</li>
+<li><code>sitemap.xml</code>／<code>robots.txt</code>（検索エンジン向けの案内図）</li>
+<li><code>assets/</code>（ロゴ・デザイン一式）</li>
+<li><code>Satoy-Select_会社概要.pdf</code> ← これは<b>アップロード不要</b>。メール添付用に手元に置いてください</li>
+</ul>
+</div>
+
+
+<h2><span class="n">4</span>ステップ④ 検索に出るようにする<span class="step-time">5分＋待ち時間</span></h2>
+
+<p>公開しただけでは Google は気づきません。<b>こちらから知らせます。</b></p>
+
+<ol>
+<li><a href="https://search.google.com/search-console">Google Search Console</a> を開き、Googleアカウントでログイン</li>
+<li>「プロパティを追加」→ <b>URLプレフィックス</b>に <code>https://（ドメイン名）/</code> を入力</li>
+<li>所有権の確認 → <b>「HTMLタグ」</b>の方法を選ぶと、<code>&lt;meta name="google-site-verification" ...&gt;</code> というタグが表示されます<br>
+　→ <b>このタグを私に送ってください。</b>全ページに埋め込んでお返しします（再アップロードで確認完了）</li>
+<li>確認できたら、左メニュー「サイトマップ」→ <code>sitemap.xml</code> と入力して送信</li>
+<li>左上の検索窓に自分のURLを入れて「インデックス登録をリクエスト」</li>
+</ol>
+
+<div class="warn">
+<p style="margin:0"><b>ここから先は待ちです。</b>早ければ2〜3日、通常1〜2週間で「Satoy Select」の検索結果に出てきます。<br>
+急ぐ必要はありません。<b>メーカーへのメールに URL を書けば、その場で見てもらえます。</b>検索順位が効いてくるのは、メーカー側が後から社名を調べ直すときです。</p>
+</div>
+
+<h3>検索に出やすくするために、すでに仕込んであること</h3>
+<ul>
+<li>各ページに <b>title・description</b>（検索結果に出る見出しと説明文）を設定済み</li>
+<li>トップページに <b>構造化データ（JSON-LD）</b>を埋め込み済み — 屋号・代表者・所在地・連絡先を Google が正しく認識できます</li>
+<li><b>sitemap.xml / robots.txt</b> を同梱済み</li>
+<li>各ページに <b>canonical URL</b>（重複判定を防ぐ指定）を設定済み</li>
+<li>SNS共有時のカード表示用に <b>OGPタグ</b>を設定済み</li>
+</ul>
+
+
+<h2><span class="n">5</span>あとから足せるもの（急ぎません）</h2>
+
+<div class="tw">
+<table>
+<tr><th style="width:26%">項目</th><th>やり方</th></tr>
+<tr><td><b>顔写真</b></td><td>写真を <code>assets/portrait.jpg</code> という名前で置き、<code>about.html</code> の該当行のコメント（<code>&lt;!-- --&gt;</code>）を外すだけ。私に写真を送っていただければ、こちらで組み込みます</td></tr>
+<tr><td><b>電話番号・FAX</b></td><td>取得後にステップ①をやり直せば、自動で欄が復活します</td></tr>
+<tr><td><b>Amazonストアへのリンク</b></td><td>出品を始めてストアURLが確定したら、私に一言ください。全ページに導線を足します</td></tr>
+<tr><td><b>取扱商品の実績紹介</b></td><td>初回のメーカー取引が決まったら、事例ページを追加します（メーカー様の許可が前提）</td></tr>
+</table>
+</div>
+
+
+<h2><span class="n">6</span>まとめ</h2>
+
+<div class="tw">
+<table>
+<tr><th style="width:8%">順</th><th style="width:30%">やること</th><th style="width:14%">所要</th><th>誰が</th></tr>
+<tr class="hi"><td>①</td><td>ターミナルで <code>fill.py</code> を実行し7項目を入力</td><td>3分</td><td>社長</td></tr>
+<tr class="hi"><td>②</td><td>ドメイン＋サーバー契約（推奨＝Xserver）・SSL有効化・メール作成</td><td>10分</td><td><b>社長（§4.1）</b></td></tr>
+<tr class="hi"><td>③</td><td><code>公開用</code> の中身をアップロード</td><td>2分</td><td>社長</td></tr>
+<tr><td>④</td><td>Search Console 登録 → 確認タグを私に送る → サイトマップ送信</td><td>5分</td><td>社長＋カズヨ</td></tr>
+<tr><td>⑤</td><td>検索結果に反映されるのを待つ</td><td>数日〜2週間</td><td>—</td></tr>
+</table>
+</div>
+
+<div class="good">
+<p style="margin:0"><b>詰まったら、どの段階でも一言ください。</b>画面を見ながら一緒に進めます。<br>
+また、<b>中身の文言はすべて調整できます。</b>「ここは言い過ぎ」「この表現に変えたい」があれば遠慮なくどうぞ。</p>
+</div>
+
+<div class="foot">
+T-20260817-006 ／ 秘書カズヨ ／ 2026-08-17<br>
+関連: 信用構築の事前準備リスト <code>shiire-credibility-prep.html</code>
+</div>
+
+</div>
+</body>
+</html>
