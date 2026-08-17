@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Keepa実務ナレッジ 裏どり結果</title>
+<style>
+  :root{
+    --bg:#ffffff; --fg:#1a1a1a; --muted:#5b6470; --line:#e3e7ec;
+    --accent:#0b63c4; --accent-soft:#eaf2fc; --amzd:#146eb4;
+    --ok:#137333; --okbg:#eaf6ec; --warn:#b06000; --warnbg:#fff6e5; --ng:#b3261e; --ngbg:#fdecea;
+    --card:#f7f9fb; --num:#0f1b25; --hl:#fff3bf;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#12151a; --fg:#e8ecf1; --muted:#9aa4b0; --line:#2a303a;
+      --accent:#5fa8ff; --accent-soft:#1a2532; --card:#1a1e25; --warnbg:#2a2313; --warn:#e0a94a;
+      --okbg:#14251a; --ok:#6fce8a; --ngbg:#2a1614; --ng:#ff8a80; --hl:#3a3418; }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);font-family:-apple-system,"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;line-height:1.75;font-size:15.5px}
+  .wrap{max-width:900px;margin:0 auto;padding:32px 22px 80px}
+  h1{font-size:25px;line-height:1.35;margin:0 0 6px}
+  .sub{color:var(--muted);font-size:13.5px;margin:0 0 24px}
+  h2{font-size:20px;margin:44px 0 12px;padding-top:16px;border-top:2px solid var(--line);display:flex;align-items:center;gap:10px}
+  h2 .n{flex:0 0 auto;width:30px;height:30px;border-radius:8px;background:var(--accent);color:#fff;font-size:15px;display:inline-flex;align-items:center;justify-content:center;font-weight:700}
+  h3{font-size:16.5px;margin:24px 0 6px}
+  p{margin:8px 0}
+  ul,ol{margin:8px 0;padding-left:22px} li{margin:6px 0}
+  .lead{background:var(--accent-soft);border:1px solid var(--accent);border-radius:12px;padding:16px 18px;margin:0 0 16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:12px 0}
+  .warn{background:var(--warnbg);border:1px solid var(--warn);border-radius:12px;padding:14px 16px;margin:14px 0}
+  .bad{background:var(--ngbg);border:1px solid var(--ng);border-radius:12px;padding:14px 16px;margin:14px 0}
+  .good{background:var(--okbg);border:1px solid var(--ok);border-radius:12px;padding:14px 16px;margin:14px 0}
+  .ok{color:var(--ok);font-weight:700}.ng{color:var(--ng);font-weight:700}.warnt{color:var(--warn);font-weight:700}
+  mark{background:var(--hl);color:inherit;padding:1px 3px;border-radius:3px}
+  .tw{overflow-x:auto}
+  table{border-collapse:collapse;width:100%;margin:12px 0;font-size:13.5px}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:var(--card)}
+  tr.hi td{background:var(--okbg)}
+  .num{text-align:right;font-variant-numeric:tabular-nums}
+  .formula{font-family:ui-monospace,Menlo,monospace;background:var(--num);color:#e8f0f6;padding:14px 16px;border-radius:10px;font-size:13.5px;line-height:1.9;overflow-x:auto;white-space:pre}
+  .pill{display:inline-block;font-size:11px;font-weight:700;padding:2px 9px;border-radius:999px;color:#fff;vertical-align:middle}
+  .pill.fix{background:var(--ok)} .pill.est{background:var(--warn)} .pill.own{background:var(--amzd)} .pill.bad{background:var(--ng)}
+  .foot{margin-top:44px;padding-top:16px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px}
+  .foot a{color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Keepa実務ナレッジ（うみぞう動画）<br>裏どり結果と当社への適用</h1>
+<p class="sub">検証・統括カズヨ ／ T-20260817-004 ／ 2026-08-17 ／ 原本＝<code>docs/reference/keepa-umizou/README.md</code></p>
+
+<div class="lead">
+<b>結論を3行で</b>
+<ol style="margin:8px 0 0">
+<li><b class="ng">料金が失効していました。</b>動画の「月19€・年189€」は <b>2026年3月1日の改定で 月29€・年290€（+52%）</b> に。Keepa公式ページで実機確認済み。年 約53,500円の固定費です。</li>
+<li><b class="warnt">動画にない新事実が1つ。</b>Keepa Proに<b>データ使用量の上限（クォータ）</b>が導入され、製品ファインダーの無制限な連打はできなくなりました。</li>
+<li><b class="ok">中身そのものは信頼できます。</b>ただし当社の本線は②メーカー仕入れなので<b>全面採用はせず、3点だけ取り込む</b>のが妥当と判断しました（後述）。</li>
+</ol>
+</div>
+
+<div class="card">
+<b>提供元について</b>
+<p style="margin:8px 0 0">「うみぞうの非常識な店舗せどり攻略」は、当社が既に採用済みの <b>FBA納品ナレッジ</b>（<code>knowledge_fba_shipment_umizou</code>）と<b>同じ発信者</b>です。過去の内容は精度が高く、今回も操作手順・判断ロジックは正確でした。<mark>ズレたのは「時間が経って変わったもの（料金）」だけ</mark>です。</p>
+</div>
+
+<h2><span class="n">1</span>裏どりの総括</h2>
+
+<div class="tw">
+<table>
+<tr><th style="width:11%">判定</th><th style="width:34%">動画の記述</th><th>検証結果</th></tr>
+
+<tr><td><span class="pill bad">失効</span></td>
+<td>有料版 <b>月額19€／年払い189€</b>（約3,000円）</td>
+<td><b>現行は 月額29€／年額290€</b>。keepa.com の公式Proページを実機閲覧し「月額 29 €」の表示を確認（2026-08-17）。<b>2026年3月1日に +52% の改定</b>。1€=184.37円（2026-08-17）換算で <b>約5,350円/月・約53,500円/年</b>。<br>背景＝AmazonのSP-API有料化・制限強化のコスト転嫁。</td></tr>
+
+<tr><td><span class="pill bad">誤記</span></td>
+<td>「知的財産権（<b>地材</b>）リスク」</td>
+<td>音声の誤変換。正しくは <b>知財（ちざい）</b>。内容自体は正しいので実害なし。</td></tr>
+
+<tr><td><span class="pill est">新事実</span></td>
+<td>（記載なし）</td>
+<td><b>Keepa Pro に「データ使用量クォータ」が導入</b>されています。商品詳細のリクエストで上限が減り、<b>1時間ごとに5%回復</b>、0%になると新規データ取得が止まります。<br>・同じリクエストの1時間以内の再実行は消費しない<br>・インタラクティブなグラフは上限の対象外<br>・1日上限の目安＝Product Viewerで36,000商品/日<br>→ <b>製品ファインダーを1日中回して大量抽出、という使い方は想定されていません。</b></td></tr>
+
+<tr><td><span class="pill est">1段ズレ</span></td>
+<td>Product Finderの<b>FBA料金を589円以下</b>に絞ると小型〜標準に限定できる</td>
+<td>589円は <b>大型サイズの最小区分</b>（三辺合計60cm以下・2kg以下）の配送代行手数料。<br>正確には「<b>589円以下＝標準サイズ全域＋大型の入口まで</b>」。実用上の狙い（持ち帰れるサイズに絞る）は達成できるので<b>使ってよい</b>ですが、認識だけ補正を。<br>参考・現行FBA配送代行（税込／1,000円以下・超）＝小型222/288・標準1 252/318・標準2a 344/410・標準2b 358/415・<b>標準3 427/472</b>・大型入口 589。</td></tr>
+
+<tr><td><span class="pill own">未確認</span></td>
+<td>青＝新品最安値／<b>紫＝新品アイテム数（出品者数）</b>／黄色＝月間販売数</td>
+<td>当社が社長のKeepa実画面で確認した記録（T-20260811-001）では <b>紫＝新品</b> で、動画と食い違います。<br>Keepaは線の色を設定で変更できるため、<b class="ng">色で覚えるのは危険</b>です。<b>グラフ右の凡例ラベルで判断</b>してください。「月間販売数の黄色線」も当社では未確認（当社はバリエーションタブの「先月の購入」で確認していました）。</td></tr>
+
+<tr><td><span class="pill own">未確認</span></td>
+<td>「新品 - 下落（直近7日間）」に <b>−99〜−30</b> を入れると値上がり商品が出る</td>
+<td>マイナス＝値上がり、という符号の仕様は公式ドキュメントで裏が取れませんでした。<b>実機で1回試せば即確定</b>します。</td></tr>
+
+<tr><td><span class="pill est">経験則</span></td>
+<td>出品者30人超は仕入れNG／目標価格40%／再通知1日／期間3ヶ月 等</td>
+<td>いずれも<b>発信者の運用基準であって公式基準ではありません</b>。当社の仕入れ基準は T-20260817-002 で別途規定済みなので、そちらを優先します。</td></tr>
+
+<tr class="hi"><td><span class="pill fix">確認OK</span></td>
+<td>Pro版の機能（製品ファインダー／Buy Box統計／在庫トラッキング／バリエーションデータ／価格上昇の追跡）</td>
+<td>すべて公式Proページに記載を確認。トラッキングは<b>最大10,000商品</b>まで同時追跡可。トラッキングの3モード（ベーシック/アドバンスド/プロ）も当社実画面で確認済み。</td></tr>
+</table>
+</div>
+
+<h2><span class="n">2</span>そのまま使える中身（訂正なし）</h2>
+
+<h3>2-1. 推奨初期設定 ― 「初期設定のままだと利益商品を見逃す」は本当</h3>
+<div class="tw">
+<table>
+<tr><th style="width:26%">設定</th><th style="width:22%">推奨値</th><th>理由</th></tr>
+<tr><td>チャートの期間</td><td><b>3ヶ月</b>（初期値は1ヶ月）</td><td>1ヶ月だと売れ行きの判断材料が足りない。必要時のみ1年/全期間へ切替</td></tr>
+<tr><td>クローズアップビュー</td><td>オフ</td><td>急な値動きで軸が伸縮して読みにくくなる</td></tr>
+<tr><td>極端な価格を無視する</td><td>オフ</td><td>オンだと<b>廃盤品の高騰が「外れ値」として消える</b>＝一番おいしい波形が見えなくなる</td></tr>
+<tr><td>トラッキング対象期間</td><td>10年（最長）</td><td>短期だと監視が切れて廃盤・高騰を見逃す</td></tr>
+<tr><td>通知済アラートの再有効化</td><td><b>7日 → 1日</b></td><td>デフォルト7日では再通知が遅くチャンスを逃す</td></tr>
+<tr><td>デフォルトの表示方法</td><td>「ボタン」→ <b>Keepaボックス</b></td><td>商品ページを開いた瞬間に波形が自動展開される</td></tr>
+<tr><td>Keepaボックスの幅</td><td>ウィンドウ全体</td><td>波形が大きく見える</td></tr>
+<tr><td>販売者ページの在庫数表示</td><td>はい</td><td><b>ライバルが何個抱えているかが見える</b></td></tr>
+</table>
+</div>
+
+<h3>2-2. 仕入れ個数の決め方 ― 当社の②メーカー仕入れでも有効</h3>
+<div class="formula">自分の月間販売ペース ＝ 月間販売個数 ÷（出品者数 ＋ 1人）
+
+原則：1ヶ月以内に売り切れる個数だけ仕入れる</div>
+<p>当社の「消化月数」基準（T-20260817-002 段1）と<b>まったく同じ思想</b>です。動画側は「1ヶ月」、当社は「3ヶ月以内」と閾値が違うだけ。せどりは資金回転が命なので1ヶ月、当社はメーカー仕入れでロットがある分3ヶ月、という違いで整合します。</p>
+
+<h3>2-3. 知財クレームを見抜く5サイン <span class="pill own">当社にも直結</span></h3>
+<div class="warn">
+<ol style="margin:6px 0">
+<li>出品者に「<b>〇〇公式</b>」「株式会社〇〇（正規店）」がいる</li>
+<li>出品者グラフが<b>突然垂直に落下</b>している（＝一斉通報・削除の跡）</li>
+<li>出品者が<b>常に1人</b>（相乗りしてもすぐ排除されている）</li>
+<li>価格が一切ブレず<b>完全に水平</b>（メーカーが価格統制している）</li>
+<li>ドラッグストア・コスメ・ヘアケア・サプリメント等の<b>規約が厳しいカテゴリ</b></li>
+</ol>
+<p style="margin:8px 0 0">これは<b>出品制限（ゲート）とは別軸のリスク</b>です。ゲートは「Amazonが入口で止める」、知財クレームは「<b>権利者が後から通報して消しにくる</b>」。ゲート側は T-20260817-003 のガイドが担当します。<br>※ 当社の②メーカー仕入れは<b>メーカーから直接買う</b>ため、このリスクは構造的に低い（むしろ自分が①②の側になる）。相乗り候補を見るときの警戒サインとして使います。</p>
+</div>
+
+<h3>2-4. 危険波形4つ／お宝波形3つ</h3>
+<div class="tw">
+<table>
+<tr><th style="width:8%"></th><th style="width:26%">パターン</th><th>読み方</th></tr>
+<tr><td class="ng">危険①</td><td>超低回転</td><td>ギザギザして見えても <b>月間販売数＜出品者数</b> なら売り切るまで数ヶ月かかり値崩れする</td></tr>
+<tr><td class="ng">危険②</td><td>出品者急増</td><td>短期間で30人超に急増＝供給過多で価格暴落。※「30人」は経験則</td></tr>
+<tr><td class="ng">危険③</td><td>知財リスク</td><td>上記5サイン</td></tr>
+<tr><td class="ng">危険④</td><td>ノーブランド品カタログの罠</td><td>ブランド品なのに「ノーブランド品」でカタログ作成されており、<b>相乗り出品がエラーになる</b></td></tr>
+<tr><td class="ok">お宝①</td><td>出品者ゼロ期間</td><td>過去に売れた実績があれば、自分だけが出品者＝<b>強気の価格設定ができる</b></td></tr>
+<tr><td class="ok">お宝②</td><td>ランキング非表示</td><td>Keepa側のデータ欠落。サブカテゴリ表示や過去履歴から売れ行きを推定できる</td></tr>
+<tr><td class="ok">お宝③</td><td>季節商品</td><td>1年／全期間の波形で「毎年この時期に動く」を確認し、<b>シーズン外の底値で仕込む</b></td></tr>
+</table>
+</div>
+
+<h2><span class="n">3</span>当社への適用 ― 全面採用はしません</h2>
+
+<div class="card">
+<p style="margin:0 0 8px">この動画は<b>①電脳せどり・店舗せどり向け</b>です。当社の方針（2026-08）では <b>①はホールド、本線は②メーカー仕入れ</b>。したがって<b>全面採用はしません</b>。取り込むのは、①②どちらでも効く次の3点だけです。</p>
+<div class="tw">
+<table>
+<tr><th style="width:6%"></th><th style="width:34%">取り込むもの</th><th>組み込み先</th></tr>
+<tr class="hi"><td><b>a</b></td><td>推奨初期設定（特に期間3ヶ月／極端な価格を無視オフ／Keepaボックス自動表示）</td><td>Keepa操作ガイド（T-20260811-001）へ追記</td></tr>
+<tr class="hi"><td><b>b</b></td><td>知財クレームを見抜く5サイン</td><td>仕入れ方針 段3（目視チェック）へ追加</td></tr>
+<tr class="hi"><td><b>c</b></td><td>仕入れ数量＝月販÷(出品者+1)で「売り切れる分だけ」</td><td>既存の消化月数基準と統合（考え方の裏づけとして）</td></tr>
+</table>
+</div>
+<p style="margin:8px 0 0"><b>見送り</b>：Product Finderの「値上がり商品を拾う」レシピ（＝プレミア狙いで①寄り）、店舗巡回前提の回収ルート設計。②が軌道に乗るまで保留します。</p>
+</div>
+
+<h2><span class="n">4</span>社長にお願いしたいこと</h2>
+
+<div class="warn">
+<p style="margin:0 0 8px"><b>① Keepaの現在の請求額をご確認ください（社長しか見られません）</b><br>
+2026年2月28日までに早期更新した既存ユーザーは<b>旧価格（19€）を維持できた</b>という報告があります。社長がいつ契約されたかで、いま <b>19€ のままか 29€ か</b> が変わります。<br>
+→ Keepaにログイン →「サブスクリプション」で現在の請求額をご確認いただけますか。<b>29€ なら年 約53,500円</b>の固定費として経費計上します。</p>
+
+<p style="margin:14px 0 8px"><b>② Keepaを開いたついでに、3点だけ実機確認をお願いします</b><br>
+これで「未確認」を確定に上げられます。</p>
+<ol style="margin:6px 0">
+<li>商品ページの波形で、<b>凡例の「新品アイテム数（出品者数）」は何色</b>か</li>
+<li><b>「月間販売数」の黄色い線</b>は存在するか</li>
+<li>製品ファインダーの「新品 - 下落（直近7日間）」に <b>−99〜−30</b> を入れると、<b>値上がりした商品</b>が出てくるか</li>
+</ol>
+
+<p style="margin:14px 0 0"><b>③ 上記 (a)(b)(c) の3点を仕入れ方針（T-20260817-002）へ組み込んでよいか</b> — Go をいただければ次のセッションで反映します。</p>
+</div>
+
+<div class="foot">
+出典：keepa.com 公式Proページ（2026-08-17 実機閲覧・「月額 29 €」およびデータ使用量クォータの記載）／料金改定の時期はEC STARs Lab.ほか複数の二次情報で一致（2026-03-01・€19→€29、€189→€290）／FBA配送代行手数料は当社検証済み資料 T-20260816-001（2026年4月改定後）／線の色・トラッキングモードは当社実画面確認 T-20260811-001／為替 1€=184.37円（2026-08-17）。<br>
+原本の全文保全：<code>docs/reference/keepa-umizou/README.md</code> ／ ナレッジ：<code>memory/knowledge_keepa_operation_umizou.md</code>
+</div>
+
+</div>
+</body>
+</html>
