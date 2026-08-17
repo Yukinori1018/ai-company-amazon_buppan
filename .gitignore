@@ -26,3 +26,8 @@ _inbox_社長共有/
 # 第三者動画(物販総合研究所)由来の参考メディアはローカル保持のみ（索引READMEのみ追跡）
 docs/reference/poipoi-pocket/screenshots/
 docs/reference/poipoi-pocket/*.docx
+
+# launchd ジョブのログ（実行のたび書き換わるノイズ。ローカル保持のみ）
+workspace/.night-shift/stdout.log
+workspace/.night-shift/stderr.log
+workspace/.sync/
