@@ -137,6 +137,49 @@ cd ~/"Claude Code/<新事業リポ名>" && claude
 
 ---
 
+## GitHub 自動同期（社長の操作は不要）
+
+2026-08-17 以降、**ローカルの変更は 30 分ごとに自動で GitHub へ commit & push** されます（T-20260817-007）。
+社長が `git` を打つ必要はありません。
+
+| 項目 | 内容 |
+|------|------|
+| 実体 | [.claude/scripts/github-sync.sh](../.claude/scripts/github-sync.sh) |
+| 起動 | launchd `com.aicompany.amazon-buppan.github-sync`（30分間隔＋ログイン時） |
+| 対象 | **今いるブランチのみ**。`main` への自動マージはしない（PR は従来どおり） |
+| ログ | `workspace/.sync/github-sync.log`（Git 非追跡） |
+
+**安全装置（＝これはやりません）**
+
+- `force push` / ブランチ削除 / `reset --hard` / `rebase` は**一切しない**（CLAUDE.md §4.1）
+- ローカルと GitHub が**分岐したら push せず停止**し、ログに `STOP 分岐を検知` と残す → 人間が解決
+- 直近 5 分以内に更新されたファイルがあれば「編集中」とみなし、そのターンのコミットは見送る
+- 他セッション／夜間自走と同時に走らないようロックを取る
+
+**確認したいとき**
+
+```bash
+tail -20 "/Users/yukinori/Claude Code/ai-company-amazon_buppan/workspace/.sync/github-sync.log"
+```
+
+**今すぐ同期したいとき**
+
+```bash
+bash "/Users/yukinori/Claude Code/ai-company-amazon_buppan/.claude/scripts/github-sync.sh"
+```
+
+**一時停止 / 再開**
+
+```bash
+launchctl bootout gui/$(id -u)/com.aicompany.amazon-buppan.github-sync
+```
+
+```bash
+launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.aicompany.amazon-buppan.github-sync.plist
+```
+
+---
+
 ## トラブルシューティング早見表
 
 | 症状 | 原因 | 対処 |
@@ -146,6 +189,8 @@ cd ~/"Claude Code/<新事業リポ名>" && claude
 | Notion DB 作成で `401 unauthorized` | Integration が親ページに Connect されていない | B-1 の Notion 側確認をやり直す |
 | `gh: command not found` | gh CLI 未インストール | `brew install gh && gh auth login` |
 | `[y/N]` プロンプトで詰まる | Claude のサブシェル経由 | `/new-business` 経由なら `yes y \|` パイプ込みで自動回避済み |
+| GitHub に反映されない | 同期ログに `STOP 分岐を検知` | ローカルと GitHub が分岐。カズヨに「分岐を解消して」と伝える（自動 force push はしない設計） |
+| 同期ログに `ERROR push に失敗` | キーチェーン／トークン失効 | `gh auth status` を確認。落ちていれば `gh auth login` |
 
 ---
 
