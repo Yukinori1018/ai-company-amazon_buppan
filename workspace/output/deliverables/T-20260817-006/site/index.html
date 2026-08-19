@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Satoy Select｜国内メーカー様の良品を、埋もれさせないECパートナー</title>
-<meta name="description" content="Satoy Select（サトイセレクト）は、国内メーカー様の商品をAmazon.co.jpで販売するインターネット通信販売事業者です。適正価格を守り、ブランド価値を毀損しない販売を約束します。お取引のご相談を承っております。">
+<title>Satoy Select｜暮らしの道具を、目利きしてお届けします</title>
+<meta name="description" content="Satoy Select（サトイセレクト）は、暮らしの道具を目利きしてお届けするオンラインショップです。日用品・キッチン用品・インテリア・文具・小型家電などを、Amazon.co.jpのストアで販売しています。">
 <link rel="canonical" href="https://{{DOMAIN}}/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Satoy Select">
-<meta property="og:title" content="Satoy Select｜国内メーカー様の良品を、埋もれさせないECパートナー">
-<meta property="og:description" content="国内メーカー様の商品をAmazon.co.jpで販売するEC事業者です。適正価格を守り、ブランド価値を毀損しない販売をお約束します。">
+<meta property="og:title" content="Satoy Select｜暮らしの道具を、目利きしてお届けします">
+<meta property="og:description" content="暮らしの道具を目利きしてお届けするオンラインショップ。日用品・キッチン用品・インテリア・文具・小型家電など。">
 <meta property="og:url" content="https://{{DOMAIN}}/">
 <meta name="format-detection" content="telephone=no">
 <link rel="icon" href="assets/favicon.png" type="image/png">
@@ -17,12 +17,12 @@
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "Organization",
+  "@type": "Store",
   "name": "Satoy Select",
   "alternateName": "サトイセレクト",
   "url": "https://{{DOMAIN}}/",
   "logo": "https://{{DOMAIN}}/assets/logo-full.svg",
-  "description": "国内メーカー様の商品をAmazon.co.jpで販売するインターネット通信販売事業者。適正価格を守り、ブランド価値を毀損しない販売を行います。",
+  "description": "暮らしの道具を目利きしてお届けするオンラインショップ。日用品・キッチン用品・インテリア・文具・小型家電などを取り扱っています。",
   "founder": { "@type": "Person", "name": "{{OWNER_NAME}}" },
   "address": {
     "@type": "PostalAddress",
@@ -31,7 +31,7 @@
   },
   "contactPoint": {
     "@type": "ContactPoint",
-    "contactType": "sales",
+    "contactType": "customer support",
     "telephone": "{{TEL}}",
     "email": "{{EMAIL}}",
     "areaServed": "JP",
@@ -47,9 +47,8 @@
     <a class="brand" href="index.html"><img src="assets/logo-mark.svg" alt=""><span class="brand-text"><b>Satoy</b><em>SELECT</em></span></a>
     <nav class="nav">
       <a href="index.html" class="current">ホーム</a>
-      <a href="business.html">事業内容</a>
-      <a href="about.html">会社概要</a>
-      <a href="partners.html">取引をご検討の企業様へ</a>
+      <a href="business.html">取り扱い商品</a>
+      <a href="about.html">私たちについて</a>
       <a href="contact.html" class="cta">お問い合わせ</a>
     </nav>
   </div>
@@ -57,15 +56,15 @@
 
 <section class="hero">
   <div class="wrap">
-    <h1>良いものが、<span class="accent">埋もれない</span>場所をつくる。</h1>
+    <h1>暮らしの道具を、<span class="accent">目利き</span>してお届けします。</h1>
     <p>
-      日本には、優れた商品を作りながら「売る場所」を持てずにいるメーカー様が数多くあります。
-      Satoy Select は、そうした商品を Amazon.co.jp という国内最大の販路へ、
-      <strong style="color:#fff">価格を崩さず、ブランドを守ったまま</strong>お届けする EC 事業者です。
+      毎日使うものだからこそ、選ぶときに迷ってほしくない。
+      Satoy Select は、日用品からキッチン用品、インテリア、文具、小型家電まで、
+      <strong style="color:#fff">「これなら人にすすめられる」と思えたものだけ</strong>を並べているお店です。
     </p>
     <div class="hero-actions">
-      <a class="btn btn-gold" href="partners.html">取引をご検討の企業様へ</a>
-      <a class="btn btn-ghost" href="about.html">会社概要を見る</a>
+      <!--STORE_START--><a class="btn btn-gold" href="{{STORE_URL}}" target="_blank" rel="noopener">Amazonストアで商品を見る</a><!--STORE_END-->
+      <a class="btn btn-ghost" href="business.html">取り扱い商品を見る</a>
     </div>
   </div>
 </section>
@@ -73,38 +72,37 @@
 <section class="section">
   <div class="wrap">
     <div class="section-head">
-      <span class="eyebrow">What we do</span>
-      <h2 class="section-title">私たちがしていること</h2>
+      <span class="eyebrow">Our standard</span>
+      <h2 class="section-title">私たちが選ぶときの、3つの基準</h2>
       <p class="section-lead">
-        メーカー様から直接商品を仕入れ、Amazon.co.jp の自社ストア「Satoy Select」で販売しています。
-        商品の保管・配送は Amazon FBA（フルフィルメント by Amazon）を利用し、
-        全国のお客様へ翌日〜数日でお届けできる体制を取っています。
+        世の中にはたくさんの商品があります。そのなかから何を選んで並べるか——
+        そこがお店の仕事だと考えています。私たちは次の3つで判断しています。
       </p>
     </div>
 
     <div class="grid grid-3">
       <div class="card">
         <span class="num">1</span>
-        <h3>販路の提供</h3>
+        <h3>毎日使えるか</h3>
         <p>
-          月間数千万人が利用する Amazon.co.jp で、メーカー様の商品ページを運用します。
-          自社EC の立ち上げや広告投資を行わずに、全国の購買層へ商品を届けられます。
+          一度使って終わりではなく、暮らしのなかで繰り返し役に立つか。
+          珍しさより、使い続けられることを優先しています。
         </p>
       </div>
       <div class="card">
         <span class="num">2</span>
-        <h3>価格と品質の維持</h3>
+        <h3>作り手がはっきりしているか</h3>
         <p>
-          安売りによる相場崩れは、メーカー様にとっても私たちにとっても損失です。
-          適正価格での販売を基本方針とし、商品ページの情報もメーカー様のご意向を尊重して運用します。
+          どこの誰が作ったのか分かる商品だけを扱います。
+          国内メーカーの製品を中心に、正規のルートで仕入れています。
         </p>
       </div>
       <div class="card">
         <span class="num">3</span>
-        <h3>販売後の責任</h3>
+        <h3>価格に納得できるか</h3>
         <p>
-          お客様からのお問い合わせ、レビューへの対応、返品・交換の一次窓口はすべて当方が担います。
-          メーカー様の手を煩わせません。
+          安ければよいとは考えていません。
+          その値段を出す価値があるか、長く使えるかまで見たうえで選んでいます。
         </p>
       </div>
     </div>
@@ -114,53 +112,97 @@
 <section class="section soft">
   <div class="wrap">
     <div class="section-head">
-      <span class="eyebrow">For manufacturers</span>
-      <h2 class="section-title">メーカー様が心配されることに、先にお答えします</h2>
+      <span class="eyebrow">Categories</span>
+      <h2 class="section-title">こんなものを扱っています</h2>
+    </div>
+
+    <div class="grid grid-3">
+      <div class="card">
+        <h3>キッチン・日用品</h3>
+        <p>調理器具、保存容器、食器、掃除用品、収納グッズなど。毎日手に取るものを中心に。</p>
+      </div>
+      <div class="card">
+        <h3>インテリア・ホーム</h3>
+        <p>照明、ファブリック、小さな収納家具、季節の道具。部屋の居心地を少し良くするもの。</p>
+      </div>
+      <div class="card">
+        <h3>文具・デスクまわり</h3>
+        <p>筆記具、ノート、机上の整理用品。仕事や勉強の時間が気持ちよくなるもの。</p>
+      </div>
+      <div class="card">
+        <h3>小型家電・PC周辺</h3>
+        <p>暮らしを助ける小さな家電、パソコン周辺機器、オーディオ関連のアクセサリ。</p>
+      </div>
+      <div class="card">
+        <h3>ホビー・アウトドア</h3>
+        <p>休日の道具、トレーニング用品、外で使うもの。</p>
+      </div>
+      <div class="card">
+        <h3>これから増やしていくもの</h3>
+        <p>お客様の声を聞きながら、扱う範囲を少しずつ広げていきます。ご要望もお寄せください。</p>
+      </div>
+    </div>
+
+    <p style="margin-top:32px">
+      <a class="btn btn-navy" href="business.html">取り扱い商品を詳しく見る</a>
+    </p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Shopping with us</span>
+      <h2 class="section-title">安心してお買い物いただくために</h2>
       <p class="section-lead">
-        Amazon での販売に慎重なメーカー様が多いことは承知しています。
-        懸念されるのは、たいてい次の3つです。私たちの答えを先に記しておきます。
+        商品の販売・配送は <strong>Amazon.co.jp</strong> のストア「Satoy Select」で行っています。
+        お支払いも配送も、普段お使いの Amazon のしくみがそのまま使えます。
       </p>
     </div>
 
     <ul class="promise">
       <li>
-        <b>「安売りされて相場が崩れるのでは」</b>
+        <b>Amazon から発送されます</b>
         <span>
-          当方は価格競争を戦略としません。適正価格を維持したうえで、
-          販売数と回転で事業を成立させる設計をしています。
-          希望小売価格や下限価格のご指定があれば、それに従います。
+          商品は Amazon の倉庫に預けており、注文が入ると Amazon から発送されます。
+          Prime 対象商品は、いつもどおりお急ぎ便がお使いいただけます。
         </span>
       </li>
       <li>
-        <b>「並行輸入品や中古品と一緒に扱われるのでは」</b>
+        <b>正規品のみを取り扱っています</b>
         <span>
-          当方が扱うのは正規ルートで仕入れた新品のみです。
-          並行輸入品・中古品・非正規品と同じ商品ページで混在させることはいたしません。
+          メーカーおよび正規の卸売業者から仕入れた新品のみを販売しています。
+          中古品・並行輸入品は取り扱っていません。
         </span>
       </li>
       <li>
-        <b>「勝手に商品情報を書き換えられるのでは」</b>
+        <b>返品・交換は Amazon の規定どおり</b>
         <span>
-          商品名・画像・説明文はメーカー様の公式情報を基準とします。
-          変更が必要な場合は事前にご相談し、了承をいただいてから反映します。
+          万が一のときは Amazon の返品ポリシーに沿って対応します。
+          商品についてのご質問には、当店が責任をもってお答えします。
         </span>
       </li>
     </ul>
-
-    <p style="margin-top:32px">
-      <a class="btn btn-navy" href="partners.html">お取引の条件・流れを見る</a>
-    </p>
   </div>
 </section>
 
 <section class="cta-band">
   <div class="wrap">
-    <h2>お取引のご相談を承っております</h2>
+    <h2>気になることがあれば、お気軽に</h2>
     <p>
-      初回は小ロットからで結構です。お支払いは前払いにも対応いたします。<br>
-      まずは商品資料をお送りいただくだけでも構いません。
+      商品の使い方、サイズや仕様のご確認、ご要望など。<br>
+      「買う前に聞いておきたい」に、できるかぎりお答えします。
     </p>
     <a class="btn btn-gold" href="contact.html">お問い合わせはこちら</a>
+  </div>
+</section>
+
+<section class="section soft">
+  <div class="wrap" style="text-align:center">
+    <p style="color:var(--muted);font-size:14.5px;margin:0 0 14px">
+      商品のお取り扱いをご検討のメーカー・卸売業者の皆さまへ
+    </p>
+    <a class="btn btn-navy" href="partners.html">お取引についてのご案内</a>
   </div>
 </section>
 
@@ -174,10 +216,10 @@
       </div>
       <nav class="footer-nav">
         <a href="index.html">ホーム</a>
-        <a href="business.html">事業内容</a>
-        <a href="about.html">会社概要</a>
-        <a href="partners.html">取引をご検討の企業様へ</a>
+        <a href="business.html">取り扱い商品</a>
+        <a href="about.html">私たちについて</a>
         <a href="contact.html">お問い合わせ</a>
+        <a href="partners.html">メーカー・卸売業者の皆さまへ</a>
       </nav>
     </div>
     <div class="footer-meta">© Satoy Select. All rights reserved.</div>

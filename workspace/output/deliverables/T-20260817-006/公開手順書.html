@@ -52,8 +52,8 @@
 
 <div class="lead">
 <b>状況</b>
-<p style="margin:8px 0"><b>ホームページ本体は完成しています。</b>5ページ・スマホ対応・会社概要PDF付き。中身の確認は不要です（ご希望があれば直します）。</p>
-<p style="margin:8px 0">残っているのは <b>①社長の情報を7項目入れる ②ドメインを買う ③アップロードする</b> の3つだけです。合計15分ほど。</p>
+<p style="margin:8px 0"><b>ホームページ本体は完成しています。</b>5ページ・スマホ対応・会社概要PDF付き。<b>一般のお客様向けが4ページ</b>（ホーム／取り扱い商品／私たちについて／お問い合わせ）、<b>メーカー・卸売業者様向けが1ページ</b>という構成です。</p>
+<p style="margin:8px 0">残っているのは <b>①社長の情報を8項目入れる ②ドメインを買う ③アップロードする</b> の3つだけです。合計15分ほど。</p>
 </div>
 
 <div class="warn">
@@ -70,7 +70,7 @@
 
 <pre><code>cd ~/Documents/AI\ Company\ Outputs/Amazon物販事業/T-20260817-006/site && python3 fill.py</code></pre>
 
-<p>7つの質問が順に出るので、答えて Enter を押していくだけです。</p>
+<p>8つの質問が順に出るので、答えて Enter を押していくだけです。</p>
 
 <div class="tw">
 <table>
@@ -82,6 +82,7 @@
 <tr><td><b>電話番号</b></td><td>050番号で構いません。<b>まだ無ければ空のまま Enter</b> → 電話の欄が自動で消えます</td></tr>
 <tr><td><b>FAX番号</b></td><td>同上。無ければ空 Enter</td></tr>
 <tr><td><b>開業年月</b></td><td><code>2026年8月</code> のように</td></tr>
+<tr class="hi"><td><b>AmazonストアのURL</b></td><td>ストアページのURL。<b>まだ出品していなければ空のまま Enter</b> → 「Amazonストアで商品を見る」ボタンが自動で消えます（出品後にやり直せば復活します）</td></tr>
 </table>
 </div>
 
@@ -142,11 +143,12 @@
 <div class="card">
 <p style="margin:0"><b>アップロードするファイル一覧</b>（8ファイル＋assetsフォルダ）</p>
 <ul style="margin:8px 0 0">
-<li><code>index.html</code>（トップ）／<code>about.html</code>（会社概要）／<code>business.html</code>（事業内容）／<code>partners.html</code>（<b>取引をご検討の企業様へ＝本命</b>）／<code>contact.html</code>（お問い合わせ）</li>
+<li><b>お客様向け4ページ</b>：<code>index.html</code>（ホーム）／<code>business.html</code>（取り扱い商品）／<code>about.html</code>（私たちについて）／<code>contact.html</code>（お問い合わせ）</li>
+<li><b>事業者様向け1ページ</b>：<code>partners.html</code>（メーカー・卸売業者の皆さまへ）※各ページのフッターから辿れます</li>
 <li><code>profile.html</code>（会社概要資料・印刷用。検索には出ない設定済み）</li>
 <li><code>sitemap.xml</code>／<code>robots.txt</code>（検索エンジン向けの案内図）</li>
 <li><code>assets/</code>（ロゴ・デザイン一式）</li>
-<li><code>Satoy-Select_会社概要.pdf</code> ← これは<b>アップロード不要</b>。メール添付用に手元に置いてください</li>
+<li><code>Satoy-Select_会社概要.pdf</code> ← これは<b>アップロード不要</b>。メーカー様へのメール添付用に手元に置いてください</li>
 </ul>
 </div>
 
@@ -186,7 +188,7 @@
 <tr><th style="width:26%">項目</th><th>やり方</th></tr>
 <tr><td><b>顔写真</b></td><td>写真を <code>assets/portrait.jpg</code> という名前で置き、<code>about.html</code> の該当行のコメント（<code>&lt;!-- --&gt;</code>）を外すだけ。私に写真を送っていただければ、こちらで組み込みます</td></tr>
 <tr><td><b>電話番号・FAX</b></td><td>取得後にステップ①をやり直せば、自動で欄が復活します</td></tr>
-<tr><td><b>Amazonストアへのリンク</b></td><td>出品を始めてストアURLが確定したら、私に一言ください。全ページに導線を足します</td></tr>
+<tr><td><b>Amazonストアへのリンク</b></td><td>出品を始めてストアURLが確定したら、<code>fill.py</code> をもう一度実行して入力するだけで、全ページにボタンが出ます</td></tr>
 <tr><td><b>取扱商品の実績紹介</b></td><td>初回のメーカー取引が決まったら、事例ページを追加します（メーカー様の許可が前提）</td></tr>
 </table>
 </div>

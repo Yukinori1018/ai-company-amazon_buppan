@@ -31,6 +31,8 @@ QUESTIONS = [
     ("TEL", "電話番号（050番号で構いません／未取得なら空エンターでスキップ）", "", False),
     ("FAX", "FAX番号（未取得なら空エンターでスキップ）", "", False),
     ("OPEN_DATE", "開業年月（例: 2026年8月）", "", True),
+    ("STORE_URL", "AmazonストアのURL（未開設なら空エンターでスキップ）",
+     "https://www.amazon.co.jp/shops/...", False),
 ]
 
 
@@ -51,6 +53,11 @@ def ask(key, label, example, required):
 
 def strip_empty_blocks(html, values):
     """空欄になった項目の行・ブロックをまるごと消す"""
+    # Amazonストア未開設なら、ストアへの導線をまるごと削除
+    if not values.get("STORE_URL"):
+        html = re.sub(r"<!--STORE_START-->.*?<!--STORE_END-->", "", html, flags=re.S)
+    else:
+        html = html.replace("<!--STORE_START-->", "").replace("<!--STORE_END-->", "")
     # contact.html の .contact-row（電話 / FAX）
     for key in ("TEL", "FAX"):
         if values.get(key):
@@ -122,7 +129,7 @@ def main():
     print("=" * 62)
     print(" Satoy Select ホームページ — 情報うめこみ")
     print("=" * 62)
-    print("\n7つの質問に答えるだけで、公開できる状態のファイル一式ができます。")
+    print("\n8つの質問に答えるだけで、公開できる状態のファイル一式ができます。")
     print("あとから何度でもやり直せますので、気軽に進めてください。")
 
     values = {}

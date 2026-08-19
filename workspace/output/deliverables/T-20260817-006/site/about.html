@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>会社概要｜Satoy Select</title>
-<meta name="description" content="Satoy Select（サトイセレクト）の会社概要・代表挨拶。屋号、代表者、所在地、連絡先、事業内容、販売チャネル、物流体制を掲載しています。">
+<title>私たちについて｜Satoy Select</title>
+<meta name="description" content="Satoy Select（サトイセレクト）について。お店をはじめた理由、店主のごあいさつ、事業者情報（屋号・代表者・所在地・連絡先）を掲載しています。">
 <link rel="canonical" href="https://{{DOMAIN}}/about.html">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="Satoy Select">
-<meta property="og:title" content="会社概要｜Satoy Select">
-<meta property="og:description" content="Satoy Selectの会社概要・代表挨拶。屋号、代表者、所在地、連絡先、事業内容、販売チャネル、物流体制。">
+<meta property="og:title" content="私たちについて｜Satoy Select">
+<meta property="og:description" content="お店をはじめた理由、店主のごあいさつ、事業者情報。">
 <meta property="og:url" content="https://{{DOMAIN}}/about.html">
 <meta name="format-detection" content="telephone=no">
 <link rel="icon" href="assets/favicon.png" type="image/png">
@@ -22,9 +22,8 @@
     <a class="brand" href="index.html"><img src="assets/logo-mark.svg" alt=""><span class="brand-text"><b>Satoy</b><em>SELECT</em></span></a>
     <nav class="nav">
       <a href="index.html">ホーム</a>
-      <a href="business.html">事業内容</a>
-      <a href="about.html" class="current">会社概要</a>
-      <a href="partners.html">取引をご検討の企業様へ</a>
+      <a href="business.html">取り扱い商品</a>
+      <a href="about.html" class="current">私たちについて</a>
       <a href="contact.html" class="cta">お問い合わせ</a>
     </nav>
   </div>
@@ -32,13 +31,62 @@
 
 <div class="page-head">
   <div class="wrap">
-    <p class="crumb"><a href="index.html">ホーム</a> ／ 会社概要</p>
-    <h1>会社概要</h1>
-    <p>事業者情報と、代表からのご挨拶です。</p>
+    <p class="crumb"><a href="index.html">ホーム</a> ／ 私たちについて</p>
+    <h1>私たちについて</h1>
+    <p>どんな店で、誰がやっているのか。</p>
   </div>
 </div>
 
 <section class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Message</span>
+      <h2 class="section-title">ごあいさつ</h2>
+    </div>
+
+    <div class="greeting">
+      <div class="portrait">
+        <!-- 顔写真を入れる場合は下のコメントを外し、assets/portrait.jpg を置いてください -->
+        <!-- <img src="assets/portrait.jpg" alt="店主 {{OWNER_NAME}}"> -->
+        店主
+      </div>
+      <div>
+        <p>
+          ネットで買い物をしていて、「思っていたのと違った」と感じたことはないでしょうか。
+          写真では良さそうに見えたのに、届いてみると薄い。すぐ壊れる。
+          そういう買い物を何度かすると、だんだん買うこと自体がおっくうになってきます。
+        </p>
+        <p>
+          一方で、世の中には丁寧に作られた良い道具がたくさんあります。
+          派手な宣伝はしていないけれど、使うと違いが分かるもの。
+          そういうものが、大量の商品に埋もれて見つけてもらえないのは、もったいないことだと思っていました。
+        </p>
+        <p>
+          Satoy Select は、その間をつなぐお店です。
+          たくさんの商品のなかから「これなら人にすすめられる」と思えたものだけを選んで並べる。
+          それだけの、シンプルな店です。
+        </p>
+        <p>
+          ロゴにあるチェックマークは「目利きの印」のつもりでつけました。
+          選ぶ責任は私たちが持ちます、という意味です。
+          <strong>安いから並べる、ということはしません。</strong>
+          その値段を出す価値があるか、長く使えるか、作り手がはっきりしているか。
+          そこを見たうえで置いています。
+        </p>
+        <p>
+          まだ始まったばかりの小さな店で、品ぞろえもこれからです。
+          「こんなものを探している」というご要望があれば、ぜひ教えてください。
+          できるかぎりお応えしていきます。
+        </p>
+        <div class="sign">
+          Satoy Select 店主　<b>{{OWNER_NAME}}</b>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section soft">
   <div class="wrap">
     <div class="section-head">
       <span class="eyebrow">Company profile</span>
@@ -47,83 +95,29 @@
 
     <div class="tw">
       <table class="info">
-        <tr><th>屋号</th><td>Satoy Select（サトイセレクト）</td></tr>
+        <tr><th>店名・屋号</th><td>Satoy Select（サトイセレクト）</td></tr>
         <tr><th>代表者</th><td>{{OWNER_NAME}}</td></tr>
         <tr><th>所在地</th><td>{{ADDRESS}}</td></tr>
         <tr><th>電話番号</th><td>{{TEL}}<br><span style="color:#5b6470;font-size:13.5px">受付時間：平日 10:00〜18:00（土日祝を除く）</span></td></tr>
         <tr><th>メールアドレス</th><td>{{EMAIL}}</td></tr>
         <tr><th>開業</th><td>{{OPEN_DATE}}</td></tr>
-        <tr><th>事業内容</th><td>インターネット通信販売業<br>（国内メーカー商品の仕入れおよび Amazon.co.jp における販売）</td></tr>
-        <tr><th>販売チャネル</th><td>Amazon.co.jp ストア「Satoy Select」</td></tr>
-        <tr><th>物流体制</th><td>Amazon FBA（フルフィルメント by Amazon）を利用<br><span style="color:#5b6470;font-size:13.5px">商品の保管・梱包・配送・返品対応は Amazon の物流網で行われます</span></td></tr>
-        <tr><th>取扱カテゴリ</th><td>日用品・生活雑貨／インテリア・ホーム用品／キッチン用品／文具・事務用品／家電・PC周辺機器／ホビー・スポーツ用品 ほか</td></tr>
+        <tr><th>事業内容</th><td>インターネット通信販売業<br>（日用品・生活雑貨・インテリア・文具・小型家電などの販売）</td></tr>
+        <tr><th>販売サイト</th><td>Amazon.co.jp ストア「Satoy Select」<!--STORE_START--><br><a href="{{STORE_URL}}" target="_blank" rel="noopener">ストアページを見る</a><!--STORE_END--></td></tr>
+        <tr><th>配送</th><td>Amazon FBA（フルフィルメント by Amazon）<br><span style="color:#5b6470;font-size:13.5px">商品の保管・梱包・配送は Amazon の物流網で行われます</span></td></tr>
       </table>
     </div>
-  </div>
-</section>
 
-<section class="section soft">
-  <div class="wrap">
-    <div class="section-head">
-      <span class="eyebrow">Message</span>
-      <h2 class="section-title">代表挨拶</h2>
-    </div>
-
-    <div class="greeting">
-      <div class="portrait">
-        <!-- 顔写真を入れる場合は下のコメントを外し、assets/portrait.jpg を置いてください -->
-        <!-- <img src="assets/portrait.jpg" alt="代表 {{OWNER_NAME}}"> -->
-        代表者写真
-      </div>
-      <div>
-        <p>
-          日本には、丁寧に作られた良い商品がたくさんあります。
-          けれど、そのすべてが売れているわけではありません。
-          商品の質と、売れる量は、必ずしも一致しないからです。
-        </p>
-        <p>
-          優れた製品を作っていても、販路がない。広告に投じる予算がない。
-          EC の運用に人を割けない。——そうした理由で、
-          本来もっと多くの人に届くはずの商品が、店頭の片隅や倉庫に留まっている。
-          そのことを、もったいないと感じてきました。
-        </p>
-        <p>
-          Satoy Select は、そうした商品を Amazon.co.jp という国内最大の販路へ運ぶ役割を担います。
-          ただし、ただ売れればいいとは考えていません。
-        </p>
-        <p>
-          Amazon は、価格が崩れやすい市場です。
-          安く売れば短期的には数が出ますが、それはメーカー様が長年かけて築いた
-          価格帯とブランドを削ることでもあります。
-          販売者が目先の数字のために値を下げ、結果としてメーカー様が
-          「もう Amazon には出したくない」と考えるようになる——
-          この構図こそが、良い商品が埋もれる原因のひとつだと考えています。
-        </p>
-        <p>
-          ですから当方は、<strong>適正価格を守ることを、販売方針の最上位に置いています。</strong>
-          正規品のみを扱い、商品情報を勝手に書き換えず、
-          お客様への対応まで責任を持つ。地味ですが、それを続けることが、
-          メーカー様にとっても、お客様にとっても、いちばん良い結果につながると信じています。
-        </p>
-        <p>
-          まだ小さな事業者です。実績を誇れる立場にはありません。
-          そのぶん、初回は小ロットで、お支払いは前払いで、と
-          御社にリスクを負わせない形をご用意しました。
-          一度お試しいただき、そのうえでご判断いただければ幸いです。
-        </p>
-        <div class="sign">
-          Satoy Select 代表　<b>{{OWNER_NAME}}</b>
-        </div>
-      </div>
-    </div>
+    <p style="color:var(--muted);font-size:13.5px;margin-top:16px">
+      ※ 通信販売に関する法定の表示事項は、販売ページ（Amazon.co.jp ストア「Satoy Select」）に掲載しています。
+    </p>
   </div>
 </section>
 
 <section class="cta-band">
   <div class="wrap">
-    <h2>お取引のご相談を承っております</h2>
-    <p>初回は小ロットからで結構です。お支払いは前払いにも対応いたします。</p>
-    <a class="btn btn-gold" href="partners.html">取引をご検討の企業様へ</a>
+    <h2>ご質問・ご要望をお待ちしています</h2>
+    <p>商品のこと、お探しのもの、お気づきの点など、なんでもどうぞ。</p>
+    <a class="btn btn-gold" href="contact.html">お問い合わせはこちら</a>
   </div>
 </section>
 
@@ -137,10 +131,10 @@
       </div>
       <nav class="footer-nav">
         <a href="index.html">ホーム</a>
-        <a href="business.html">事業内容</a>
-        <a href="about.html">会社概要</a>
-        <a href="partners.html">取引をご検討の企業様へ</a>
+        <a href="business.html">取り扱い商品</a>
+        <a href="about.html">私たちについて</a>
         <a href="contact.html">お問い合わせ</a>
+        <a href="partners.html">メーカー・卸売業者の皆さまへ</a>
       </nav>
     </div>
     <div class="footer-meta">© Satoy Select. All rights reserved.</div>
