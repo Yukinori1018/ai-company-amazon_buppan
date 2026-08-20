@@ -32,8 +32,7 @@
   "contactPoint": {
     "@type": "ContactPoint",
     "contactType": "customer support",
-    "telephone": "{{TEL}}",
-    "email": "{{EMAIL}}",
+    "url": "https://{{DOMAIN}}/contact.html",
     "areaServed": "JP",
     "availableLanguage": "Japanese"
   }
@@ -62,8 +61,18 @@
       Amazon.co.jp で販売するオンラインショップです。
       <strong style="color:#fff">人にすすめられると思えたものだけ</strong>を選んで並べます。
     </p>
+    <!--PREOPEN_START-->
+    <div class="preopen">
+      <b>ただいま開店準備中です</b>
+      <p>
+        取り扱う商品を選んでいるところです。並べ始めましたらお知らせしますので、
+        よろしければ下のボタンからご登録ください。開店のご案内をお送りします。
+      </p>
+    </div>
+    <!--PREOPEN_END-->
     <div class="hero-actions">
       <!--STORE_START--><a class="btn btn-gold" href="{{STORE_URL}}" target="_blank" rel="noopener">Amazonストアで商品を見る</a><!--STORE_END-->
+      <!--PREOPEN_START--><a class="btn btn-gold" href="contact.html">開店のお知らせを受け取る</a><!--PREOPEN_END-->
       <a class="btn btn-ghost" href="business.html">取り扱い商品を見る</a>
     </div>
   </div>
@@ -104,6 +113,7 @@
     <div class="section-head">
       <span class="eyebrow">Categories</span>
       <h2 class="section-title">こんなものを扱っています</h2>
+      <!--PREOPEN_START--><p class="section-lead">下のジャンルを中心に、順次そろえていきます。</p><!--PREOPEN_END-->
     </div>
 
     <div class="grid grid-3">
@@ -202,7 +212,7 @@
       <div>
         <div class="brand foot-brand"><img src="assets/logo-mark.svg" alt=""><span class="brand-text"><b>Satoy</b><em>SELECT</em></span></div>
         <div>{{ADDRESS}}</div>
-        <div>TEL: {{TEL}}／Email: {{EMAIL}}</div>
+        <div><a href="contact.html">お問い合わせはこちら</a></div>
       </div>
       <nav class="footer-nav">
         <a href="index.html">ホーム</a>

@@ -27,12 +27,14 @@ QUESTIONS = [
     ("DOMAIN", "独自ドメイン（例: satoyselect.com）※ https:// や www. は不要", "satoyselect.com", True),
     ("OWNER_NAME", "代表者のお名前（例: 佐藤 幸則）", "", True),
     ("ADDRESS", "所在地（郵便番号から番地まで／例: 〒000-0000 東京都〇〇区〇〇1-2-3）", "", True),
-    ("EMAIL", "メールアドレス（例: info@satoyselect.com）", "", True),
+    ("EMAIL", "メールアドレス ※サイトには載りません。メーカー様へお渡しする会社概要PDFにのみ使います", "", True),
     ("TEL", "電話番号（050番号で構いません／未取得なら空エンターでスキップ）", "", False),
     ("FAX", "FAX番号（未取得なら空エンターでスキップ）", "", False),
     ("OPEN_DATE", "開業年月（例: 2026年8月）", "", True),
     ("STORE_URL", "AmazonストアのURL（未開設なら空エンターでスキップ）",
      "https://www.amazon.co.jp/shops/...", False),
+    ("FORM_URL", "GoogleフォームのURL（お問い合わせフォーム用／未作成なら空エンター）",
+     "https://docs.google.com/forms/d/e/.../viewform", False),
 ]
 
 
@@ -51,13 +53,24 @@ def ask(key, label, example, required):
         print("  ※ この項目は必須です。もう一度入力してください。")
 
 
+def show_only(html, name, keep):
+    """<!--NAME_START-->〜<!--NAME_END--> を、keep が真なら残し、偽なら中身ごと削除する"""
+    if keep:
+        return html.replace("<!--%s_START-->" % name, "").replace("<!--%s_END-->" % name, "")
+    return re.sub(r"<!--%s_START-->.*?<!--%s_END-->" % (name, name), "", html, flags=re.S)
+
+
 def strip_empty_blocks(html, values):
     """空欄になった項目の行・ブロックをまるごと消す"""
-    # Amazonストア未開設なら、ストアへの導線をまるごと削除
-    if not values.get("STORE_URL"):
-        html = re.sub(r"<!--STORE_START-->.*?<!--STORE_END-->", "", html, flags=re.S)
-    else:
-        html = html.replace("<!--STORE_START-->", "").replace("<!--STORE_END-->", "")
+    open_ = bool(values.get("STORE_URL"))          # ストアURLの有無＝開店済みかどうか
+    form_ok = bool(values.get("_FORM_READY"))      # フォームの送信先が確定しているか
+
+    html = show_only(html, "STORE", open_)         # 開店後だけ「ストアで見る」を出す
+    html = show_only(html, "PREOPEN", not open_)   # 開店前だけ「準備中」を出す
+    embed = bool(values.get("_FORM_EMBED"))        # 項目IDを読めなかったときの埋め込み表示
+    html = show_only(html, "FORM", form_ok)             # 自前デザインのフォーム
+    html = show_only(html, "FORM_EMBED", embed)         # Googleフォームをそのまま埋め込み
+    html = show_only(html, "FORM_UNSET", not (form_ok or embed))  # どちらも無ければ案内文
     # contact.html の .contact-row（電話 / FAX）
     for key in ("TEL", "FAX"):
         if values.get(key):
@@ -77,6 +90,73 @@ def strip_empty_blocks(html, values):
     if not values.get("TEL"):
         html = html.replace("TEL: {{TEL}}／Email: {{EMAIL}}", "Email: {{EMAIL}}")
     return html
+
+
+
+# ---------------------------------------------------------------
+# Googleフォームの項目ID（entry.xxxxx）を、公開URLから自動で読み取る
+# ---------------------------------------------------------------
+FORM_FIELDS = [
+    ("ENTRY_NAME",    ("お名前", "名前", "氏名")),
+    ("ENTRY_EMAIL",   ("メール",)),
+    ("ENTRY_TYPE",    ("ご用件", "用件", "種別")),
+    ("ENTRY_MESSAGE", ("内容", "本文", "ご相談")),
+    ("ENTRY_NOTIFY",  ("お知らせ", "新着", "入荷")),
+]
+
+
+def resolve_form(form_url):
+    """GoogleフォームのURL → (送信先URL, {ENTRY_*: entry.123456})
+
+    見つからない項目があれば、その旨のメッセージを添えて返す。
+    """
+    import json
+    import urllib.request
+
+    url = form_url.strip()
+    if "/viewform" not in url and "/formResponse" not in url:
+        url = url.rstrip("/") + "/viewform"
+    view = url.split("?")[0].replace("/formResponse", "/viewform")
+    action = view.replace("/viewform", "/formResponse")
+
+    try:
+        req = urllib.request.Request(view, headers={"User-Agent": "Mozilla/5.0"})
+        with urllib.request.urlopen(req, timeout=25) as r:
+            page = r.read().decode("utf-8", "replace")
+    except Exception as e:
+        return None, {}, "フォームのページを開けませんでした（%s）。URLと公開設定をご確認ください。" % e
+
+    m = re.search(r"FB_PUBLIC_LOAD_DATA_\s*=\s*(\[.*?\]);", page, re.S)
+    if not m:
+        return None, {}, "フォームの項目を読み取れませんでした。URLが「回答用のリンク」か確認してください。"
+
+    try:
+        data = json.loads(m.group(1))
+        items = data[1][1]
+    except Exception:
+        return None, {}, "フォームの項目を読み取れませんでした（形式が想定と異なります）。"
+
+    found = {}
+    for it in items:
+        try:
+            title = (it[1] or "")
+            entry_id = it[4][0][0]
+        except Exception:
+            continue
+        for key, words in FORM_FIELDS:
+            if key in found:
+                continue
+            if any(w in title for w in words):
+                found[key] = "entry.%s" % entry_id
+                break
+
+    missing = [k for k, _ in FORM_FIELDS if k not in found]
+    if missing:
+        labels = {"ENTRY_NAME": "お名前", "ENTRY_EMAIL": "メールアドレス", "ENTRY_TYPE": "ご用件",
+                  "ENTRY_MESSAGE": "お問い合わせ内容", "ENTRY_NOTIFY": "お知らせ希望"}
+        return None, {}, "フォームに次の項目が見つかりませんでした: " + "、".join(labels[k] for k in missing)
+
+    return action, found, ""
 
 
 CHROME_PATHS = [
@@ -129,7 +209,7 @@ def main():
     print("=" * 62)
     print(" Satoy Select ホームページ — 情報うめこみ")
     print("=" * 62)
-    print("\n8つの質問に答えるだけで、公開できる状態のファイル一式ができます。")
+    print("\n9つの質問に答えるだけで、公開できる状態のファイル一式ができます。")
     print("あとから何度でもやり直せますので、気軽に進めてください。")
 
     values = {}
@@ -141,7 +221,7 @@ def main():
     print(" 入力内容の確認")
     print("-" * 62)
     for key, label, _, _ in QUESTIONS:
-        print(f"  {label.split('（')[0]:<12}: {values[key] or '（なし）'}")
+        print(f"  {label.split('（')[0].split(' ※')[0]:<14}: {values[key] or '（なし）'}")
     try:
         ok = input("\nこの内容で作成しますか？ [y/n] → ").strip().lower()
     except (EOFError, KeyboardInterrupt):
@@ -150,6 +230,31 @@ def main():
     if ok not in ("y", "yes", ""):
         print("中断しました。もう一度 python3 fill.py を実行してください。")
         sys.exit(0)
+
+    # --- お問い合わせフォームの送信先を解決する ---
+    form_msg = "お問い合わせフォーム: 未設定（サイトには「準備中」と表示されます）"
+    if values.get("FORM_URL"):
+        print("\nフォームの項目を読み取っています…")
+        action, entries, err = resolve_form(values["FORM_URL"])
+        if action:
+            values["FORM_ACTION"] = action
+            values.update(entries)
+            values["_FORM_READY"] = "1"
+            form_msg = "✉️ お問い合わせフォーム: 設定できました（送信内容はフォームの回答先へ届きます）"
+        else:
+            # 項目IDを読み取れなくても、フォームごと埋め込めば必ず動く
+            view = values["FORM_URL"].split("?")[0].rstrip("/")
+            if "/viewform" not in view:
+                view += "/viewform"
+            values["FORM_EMBED_URL"] = view + "?embedded=true"
+            values["_FORM_EMBED"] = "1"
+            form_msg = ("✉️ お問い合わせフォーム: Googleフォームを埋め込む方式で設定しました。\n"
+                        "   （項目の自動読み取りには失敗: " + err + "）\n"
+                        "   見た目はGoogleフォームのままですが、送信は問題なく届きます。")
+    for key, _ in FORM_FIELDS:
+        values.setdefault(key, "")
+    values.setdefault("FORM_ACTION", "")
+    values.setdefault("FORM_EMBED_URL", "")
 
     # 出力先を作り直す
     if os.path.exists(OUT):
@@ -166,6 +271,8 @@ def main():
                 s = f.read()
             s = strip_empty_blocks(s, values)
             for key, val in values.items():
+                if key.startswith("_"):
+                    continue
                 s = s.replace("{{" + key + "}}", val)
             with open(path, "w", encoding="utf-8") as f:
                 f.write(s)
@@ -188,6 +295,7 @@ def main():
     print("=" * 62)
     print(f"\n出力先:\n  {OUT}\n")
     print(pdf_msg + "\n")
+    print(form_msg + "\n")
     if leftovers:
         print("⚠️ 未置換が残っています（カズヨに連絡してください）:")
         for l in sorted(set(leftovers)):

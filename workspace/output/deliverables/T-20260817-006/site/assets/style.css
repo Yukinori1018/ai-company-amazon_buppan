@@ -276,3 +276,74 @@ table.info th{
   .brand img{height:36px}
   .btn{padding:13px 20px;font-size:14px}
 }
+
+/* ---------- お問い合わせフォーム ---------- */
+.form-card{
+  background:#fff;border:1px solid var(--line);border-radius:10px;
+  padding:30px 28px;margin:24px 0;
+}
+.field{display:flex;flex-direction:column;gap:7px;margin:0 0 22px}
+.field:last-of-type{margin-bottom:0}
+.field label{font-weight:700;color:var(--navy);font-size:14.5px;display:flex;align-items:center;gap:8px}
+.req{
+  display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.04em;
+  background:var(--navy);color:#fff;padding:2px 7px;border-radius:3px;
+}
+.opt{
+  display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.04em;
+  background:#eef1f5;color:var(--gray);padding:2px 7px;border-radius:3px;
+}
+.field .hint{font-size:13px;color:var(--muted);line-height:1.7}
+.field input[type=text],
+.field input[type=email],
+.field select,
+.field textarea{
+  font:inherit;font-size:15.5px;color:var(--fg);background:#fff;
+  border:1px solid #c8d0da;border-radius:6px;padding:12px 13px;width:100%;
+}
+.field textarea{min-height:150px;resize:vertical;line-height:1.75}
+.field input:focus,.field select:focus,.field textarea:focus{
+  outline:none;border-color:var(--navy);box-shadow:0 0 0 3px rgba(27,42,74,.12);
+}
+.check{display:flex;align-items:flex-start;gap:11px;margin:0}
+.check input[type=checkbox]{
+  width:19px;height:19px;margin:3px 0 0;flex:0 0 auto;accent-color:var(--navy);
+}
+.check span{font-size:14.5px;line-height:1.75}
+.check span small{display:block;color:var(--muted);font-size:13px;margin-top:3px}
+.form-actions{margin:26px 0 0;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.form-actions .btn{border:0;cursor:pointer;font-family:inherit}
+.privacy{font-size:13px;color:var(--muted);line-height:1.75;margin:18px 0 0}
+
+.form-done{
+  display:none;background:var(--okbg,#eaf6ec);border:1px solid #9ccfaa;border-radius:10px;
+  padding:26px 24px;margin:24px 0;
+}
+.form-done.on{display:block}
+.form-done h3{margin:0 0 8px;color:#137333}
+.form-done p{margin:0;color:var(--muted);font-size:14.5px}
+
+.form-notice{
+  background:var(--gold-soft);border:1px solid #e6d5ab;border-radius:10px;
+  padding:20px 22px;margin:24px 0;font-size:14.5px;line-height:1.8;
+}
+.form-notice b{color:var(--navy)}
+
+/* ---------- 開店準備中の告知 ---------- */
+.preopen{
+  background:var(--gold-soft);border:1px solid #e6d5ab;border-left:4px solid var(--gold);
+  border-radius:10px;padding:20px 22px;margin:24px 0;
+}
+.preopen b{color:var(--navy);display:block;margin:0 0 6px;font-size:16px}
+.preopen p{margin:6px 0 0;color:var(--muted);font-size:14.5px;line-height:1.85}
+.hero .preopen{
+  background:rgba(201,162,75,.14);border-color:rgba(201,162,75,.45);
+  border-left-color:var(--gold);margin:0 0 26px;max-width:640px;
+}
+.hero .preopen b{color:var(--gold)}
+.hero .preopen p{color:#d6dce6}
+
+@media (max-width:640px){
+  .form-card{padding:22px 18px}
+  .field input[type=text],.field input[type=email],.field select,.field textarea{font-size:16px}
+}

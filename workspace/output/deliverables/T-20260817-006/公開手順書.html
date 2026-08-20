@@ -53,7 +53,7 @@
 <div class="lead">
 <b>状況</b>
 <p style="margin:8px 0"><b>ホームページ本体は完成しています。</b>5ページ・スマホ対応・会社概要PDF付き。<b>一般のお客様向けが4ページ</b>（ホーム／取り扱い商品／私たちについて／お問い合わせ）、<b>メーカー・卸売業者様向けが1ページ</b>という構成です。</p>
-<p style="margin:8px 0">残っているのは <b>①社長の情報を8項目入れる ②ドメインを買う ③アップロードする</b> の3つだけです。合計15分ほど。</p>
+<p style="margin:8px 0">やることは <b>①お問い合わせフォームを作る ②情報を9項目入れる ③ドメインを買う ④アップロードする</b> の4つです。合計15分ほど。</p>
 </div>
 
 <div class="warn">
@@ -64,13 +64,66 @@
 </div>
 
 
+
+<h2><span class="n">0</span>ステップ⓪ お問い合わせフォームを作る<span class="step-time">3分・初回だけ</span></h2>
+
+<div class="lead">
+<p style="margin:0"><b>なぜフォームにするか。</b> メールアドレスをサイトに書くと、迷惑メールの標的になります。
+フォームなら<b>メールアドレスを一切公開せずに</b>、お問い合わせを社長のメールで受け取れます。</p>
+</div>
+
+<p><a href="https://docs.google.com/forms/">Googleフォーム</a> を開き、空白のフォームを新規作成してください。無料です。</p>
+
+<h3>入れる質問（この5つ・順番は自由）</h3>
+<div class="tw">
+<table>
+<tr><th style="width:26%">質問のタイトル</th><th style="width:20%">形式</th><th>備考</th></tr>
+<tr class="hi"><td><b>お名前</b></td><td>記述式</td><td>必須にする</td></tr>
+<tr class="hi"><td><b>メールアドレス</b></td><td>記述式</td><td>必須にする</td></tr>
+<tr class="hi"><td><b>ご用件</b></td><td>プルダウン</td><td>選択肢：商品についての質問／探している商品の相談／届いた商品の不具合・返品について／ご意見・ご要望／メーカー・卸売業者としてのお取引の相談／その他</td></tr>
+<tr class="hi"><td><b>お問い合わせ内容</b></td><td>段落</td><td>必須にする</td></tr>
+<tr class="hi"><td><b>お知らせ希望</b></td><td>チェックボックス</td><td>選択肢を1つだけ：<code>希望する</code></td></tr>
+</table>
+</div>
+
+<div class="warn">
+<p style="margin:0"><b>⚠️ 質問のタイトルは上の言葉を必ず含めてください。</b>
+（「お名前」「メール」「ご用件」「内容」「お知らせ」）<br>
+この言葉を手がかりに、<code>fill.py</code> がサイトのフォームと自動でつなぎます。
+違う言葉にすると自動でつながらず、Googleフォームがそのまま画面に埋め込まれる形になります（動作はしますが、見た目が少し変わります）。</p>
+</div>
+
+<h3>お問い合わせを社長のメールに飛ばす設定（これが本題）</h3>
+<ol>
+<li>フォーム編集画面の上部で「<b>回答</b>」タブを開く</li>
+<li>右上の <b>⋮</b>（縦3点）をクリック</li>
+<li><b>「新しい回答についてのメール通知を受け取る」</b> にチェックを入れる</li>
+</ol>
+<div class="good">
+<p style="margin:0">これで、フォームが送信されるたびに<b>社長のGmailに通知が届きます。</b>
+回答は自動で一覧にも溜まるので、あとから見返すこともできます。</p>
+</div>
+
+<h3>URLを控える</h3>
+<ol>
+<li>右上の「<b>送信</b>」ボタンを押す</li>
+<li>リンクのアイコン（🔗）を選ぶ</li>
+<li>表示された URL をコピー ← <b>これをステップ①で貼ります</b></li>
+</ol>
+
+<div class="card">
+<p style="margin:0"><b>フォームがまだでも、先に進めます。</b> ステップ①で空のまま Enter を押せば、
+お問い合わせページは「準備中」の表示になります。フォームができたら、
+もう一度 <code>fill.py</code> を実行して貼り付ければ差し替わります。</p>
+</div>
+
 <h2><span class="n">1</span>ステップ① 情報を入れる<span class="step-time">3分</span></h2>
 
 <p>ターミナル（Mac の「ターミナル.app」）を開いて、下の1行をコピーして貼り付け、Enter を押してください。</p>
 
 <pre><code>cd ~/Documents/AI\ Company\ Outputs/Amazon物販事業/T-20260817-006/site && python3 fill.py</code></pre>
 
-<p>8つの質問が順に出るので、答えて Enter を押していくだけです。</p>
+<p>9つの質問が順に出るので、答えて Enter を押していくだけです。</p>
 
 <div class="tw">
 <table>
@@ -78,11 +131,12 @@
 <tr class="hi"><td><b>独自ドメイン</b></td><td><code>satoyselect.com</code> のように入力（<code>https://</code> や <code>www.</code> は不要）。※まだ買っていなくても、これから買う予定の名前を入れてください</td></tr>
 <tr><td><b>代表者のお名前</b></td><td>そのままお名前を</td></tr>
 <tr class="hi"><td><b>所在地</b></td><td><b>郵便番号から番地まで</b>（社長のご判断＝A案）</td></tr>
-<tr><td><b>メールアドレス</b></td><td><code>info@satoyselect.com</code>（ドメイン取得後に使えます）</td></tr>
-<tr><td><b>電話番号</b></td><td>050番号で構いません。<b>まだ無ければ空のまま Enter</b> → 電話の欄が自動で消えます</td></tr>
+<tr><td><b>メールアドレス</b></td><td><code>info@satoyselect.com</code> など。<b>サイトには一切表示されません。</b>メーカー様へお渡しする会社概要PDFにのみ使います</td></tr>
+<tr><td><b>電話番号</b></td><td><b>お持ちでなければ空のまま Enter</b> → 電話の欄がサイトから自動で消えます</td></tr>
 <tr><td><b>FAX番号</b></td><td>同上。無ければ空 Enter</td></tr>
 <tr><td><b>開業年月</b></td><td><code>2026年8月</code> のように</td></tr>
-<tr class="hi"><td><b>AmazonストアのURL</b></td><td>ストアページのURL。<b>まだ出品していなければ空のまま Enter</b> → 「Amazonストアで商品を見る」ボタンが自動で消えます（出品後にやり直せば復活します）</td></tr>
+<tr class="hi"><td><b>AmazonストアのURL</b></td><td><b>まだ出品していなければ空のまま Enter</b> → ストアへのボタンが消え、代わりに<b>「ただいま開店準備中です」</b>の案内が出ます。出品後にやり直せば自動で入れ替わります</td></tr>
+<tr class="hi"><td><b>GoogleフォームのURL</b></td><td>下の<b>ステップ⓪</b>で作ったフォームの「回答用リンク」を貼ってください。空のままだと、お問い合わせページが「準備中」の表示になります</td></tr>
 </table>
 </div>
 
@@ -199,7 +253,8 @@
 <div class="tw">
 <table>
 <tr><th style="width:8%">順</th><th style="width:30%">やること</th><th style="width:14%">所要</th><th>誰が</th></tr>
-<tr class="hi"><td>①</td><td>ターミナルで <code>fill.py</code> を実行し7項目を入力</td><td>3分</td><td>社長</td></tr>
+<tr class="hi"><td>⓪</td><td>Googleフォームを作る＋メール通知をONにする</td><td>3分</td><td>社長</td></tr>
+<tr class="hi"><td>①</td><td>ターミナルで <code>fill.py</code> を実行し9項目を入力</td><td>3分</td><td>社長</td></tr>
 <tr class="hi"><td>②</td><td>ドメイン＋サーバー契約（推奨＝Xserver）・SSL有効化・メール作成</td><td>10分</td><td><b>社長（§4.1）</b></td></tr>
 <tr class="hi"><td>③</td><td><code>公開用</code> の中身をアップロード</td><td>2分</td><td>社長</td></tr>
 <tr><td>④</td><td>Search Console 登録 → 確認タグを私に送る → サイトマップ送信</td><td>5分</td><td>社長＋カズヨ</td></tr>

@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>お問い合わせ｜Satoy Select</title>
-<meta name="description" content="Satoy Selectへのお問い合わせ。商品のサイズ・仕様のご質問、お探しの商品のご相談、ご注文後のトラブルなど。メールまたはお電話で承ります。">
+<meta name="description" content="Satoy Selectへのお問い合わせフォーム。商品のご質問、お探しの商品のご相談、不具合のご連絡、メーカー・卸売業者様からのお取引のご相談を承っています。">
 <link rel="canonical" href="https://{{DOMAIN}}/contact.html">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="Satoy Select">
 <meta property="og:title" content="お問い合わせ｜Satoy Select">
-<meta property="og:description" content="商品のご質問、お探しの商品のご相談、ご注文後のトラブルなど。メールまたはお電話で承ります。">
+<meta property="og:description" content="商品のご質問、お探しの商品のご相談、不具合のご連絡、お取引のご相談を承っています。">
 <meta property="og:url" content="https://{{DOMAIN}}/contact.html">
 <meta name="format-detection" content="telephone=no">
 <link rel="icon" href="assets/favicon.png" type="image/png">
@@ -40,40 +40,101 @@
 <section class="section">
   <div class="wrap">
     <div class="section-head">
-      <span class="eyebrow">Contact</span>
-      <h2 class="section-title">ご連絡先</h2>
+      <span class="eyebrow">Contact form</span>
+      <h2 class="section-title">お問い合わせフォーム</h2>
       <p class="section-lead">
-        メールまたはお電話でご連絡ください。原則として<strong>2営業日以内</strong>にご返信します。
+        下のフォームからお送りください。原則として<strong>2営業日以内</strong>にご返信します。
+        いただいた内容は、ご返信以外の目的には使用しません。
       </p>
     </div>
 
-    <div class="contact-block">
-      <div class="contact-row">
-        <div class="label">メール</div>
-        <div class="value">
-          <a href="mailto:{{EMAIL}}">{{EMAIL}}</a>
-          <small>24時間受付。お急ぎでなければメールが確実です。</small>
-        </div>
+    <!--FORM_START-->
+    <form class="form-card" id="contactForm"
+          action="{{FORM_ACTION}}" method="POST" target="formSink">
+
+      <div class="field">
+        <label for="f-name">お名前 <span class="req">必須</span></label>
+        <input type="text" id="f-name" name="{{ENTRY_NAME}}" required autocomplete="name">
       </div>
-      <div class="contact-row">
-        <div class="label">電話</div>
-        <div class="value">
-          {{TEL}}
-          <small>受付時間：平日 10:00〜18:00（土日祝を除く）</small>
-        </div>
+
+      <div class="field">
+        <label for="f-email">メールアドレス <span class="req">必須</span></label>
+        <input type="email" id="f-email" name="{{ENTRY_EMAIL}}" required autocomplete="email">
+        <span class="hint">こちらのアドレスへご返信します。お間違いがないかご確認ください。</span>
       </div>
-      <div class="contact-row">
-        <div class="label">FAX</div>
-        <div class="value">
-          {{FAX}}
-          <small>24時間受付。</small>
-        </div>
+
+      <div class="field">
+        <label for="f-type">ご用件 <span class="req">必須</span></label>
+        <select id="f-type" name="{{ENTRY_TYPE}}" required>
+          <option value="">選んでください</option>
+          <option>商品についての質問</option>
+          <option>探している商品の相談</option>
+          <option>届いた商品の不具合・返品について</option>
+          <option>ご意見・ご要望</option>
+          <option>メーカー・卸売業者としてのお取引の相談</option>
+          <option>その他</option>
+        </select>
       </div>
+
+      <div class="field">
+        <label for="f-message">お問い合わせ内容 <span class="req">必須</span></label>
+        <textarea id="f-message" name="{{ENTRY_MESSAGE}}" required
+                  placeholder="商品名やご状況を書いていただけると、より具体的にお答えできます。"></textarea>
+      </div>
+
+      <div class="field">
+        <label class="check">
+          <input type="checkbox" name="{{ENTRY_NOTIFY}}" value="希望する">
+          <span>新しく入荷した商品のお知らせを受け取る
+            <small>月に1回程度、取り扱いを始めた商品をご案内します。配信停止はいつでもできます。</small>
+          </span>
+        </label>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-navy">この内容で送信する</button>
+        <span class="hint" id="formStatus"></span>
+      </div>
+
+      <p class="privacy">
+        ご入力いただいた個人情報は、お問い合わせへのご返信、および（ご希望の場合のみ）
+        新着商品のご案内のために使用します。ご本人の同意なく第三者へ提供することはありません。
+      </p>
+    </form>
+
+    <div class="form-done" id="formDone">
+      <h3>送信しました</h3>
+      <p>
+        お問い合わせありがとうございます。原則として2営業日以内にご返信します。<br>
+        しばらく経っても返信が届かない場合は、迷惑メールフォルダをご確認ください。
+      </p>
     </div>
 
-    <p style="margin-top:28px">
-      <a class="btn btn-navy" href="mailto:{{EMAIL}}?subject=%E3%81%8A%E5%95%8F%E3%81%84%E5%90%88%E3%82%8F%E3%81%9B">メールで問い合わせる</a>
+    <iframe name="formSink" id="formSink" style="display:none" title="送信"></iframe>
+    <!--FORM_END-->
+
+    <!--FORM_EMBED_START-->
+    <div class="form-card" style="padding:0;overflow:hidden">
+      <iframe src="{{FORM_EMBED_URL}}" width="100%" height="1180"
+              style="border:0;display:block" title="お問い合わせフォーム">
+        フォームを読み込んでいます…
+      </iframe>
+    </div>
+    <p class="privacy">
+      ご入力いただいた個人情報は、お問い合わせへのご返信、および（ご希望の場合のみ）
+      新着商品のご案内のために使用します。ご本人の同意なく第三者へ提供することはありません。
     </p>
+    <!--FORM_EMBED_END-->
+
+    <!--FORM_UNSET_START-->
+    <div class="form-notice">
+      <p style="margin:0">
+        <b>お問い合わせフォームは準備中です。</b><br>
+        公開前に <code>fill.py</code> でフォームの送信先を設定してください（公開手順書の §1 をご覧ください）。
+        設定するとこの場所にフォームが表示されます。
+      </p>
+    </div>
+    <!--FORM_UNSET_END-->
   </div>
 </section>
 
@@ -88,21 +149,37 @@
       <li>
         <b>商品についてのご質問</b>
         <span>
-          サイズ・素材・付属品・使い方・お手入れなど。商品ページに書ききれていないことは、
-          買う前でも遠慮なくお尋ねください。
+          サイズ・素材・付属品・使い方・お手入れ方法など。
+          商品ページに書ききれていないことは、遠慮なくお尋ねください。買う前のご相談も歓迎です。
         </span>
       </li>
       <li>
         <b>お探しの商品のご相談</b>
-        <span>「こういうものを探している」というご相談も承ります。扱えるかどうかを調べてご返事します。</span>
+        <span>
+          「こういうものを探しているが見つからない」というご相談も承ります。
+          扱えるかどうかを調べて、ご返事します。
+        </span>
       </li>
       <li>
         <b>届いた商品の不具合・違い</b>
-        <span>破損や注文との相違があればご連絡ください。Amazon の返品ポリシーに沿って対応します。</span>
+        <span>
+          破損していた、注文したものと違う、といった場合はご連絡ください。
+          Amazon の返品ポリシーに沿って対応します。
+        </span>
       </li>
       <li>
         <b>ご意見・ご要望</b>
-        <span>品ぞろえやご案内へのお気づきの点をお寄せください。小さな店なので、次にそのまま反映できます。</span>
+        <span>
+          品ぞろえやご案内について、お気づきの点をお寄せください。
+          小さな店ですので、いただいたご意見はそのまま次に反映できます。
+        </span>
+      </li>
+      <li>
+        <b>メーカー・卸売業者の皆さまから</b>
+        <span>
+          お取引のご相談も、このフォームから承ります。ご用件で「メーカー・卸売業者としてのお取引の相談」をお選びください。
+          条件の詳細は<a href="partners.html">こちらのページ</a>にまとめています。
+        </span>
       </li>
     </ul>
 
@@ -125,22 +202,13 @@
   </div>
 </section>
 
-<section class="section">
-  <div class="wrap" style="text-align:center">
-    <p style="color:var(--muted);font-size:14.5px;margin:0 0 14px">
-      商品のお取り扱いをご検討のメーカー・卸売業者の皆さまは、こちらをご覧ください
-    </p>
-    <a class="btn btn-navy" href="partners.html">お取引についてのご案内</a>
-  </div>
-</section>
-
 <footer class="site-footer">
   <div class="wrap">
     <div class="footer-inner">
       <div>
         <div class="brand foot-brand"><img src="assets/logo-mark.svg" alt=""><span class="brand-text"><b>Satoy</b><em>SELECT</em></span></div>
         <div>{{ADDRESS}}</div>
-        <div>TEL: {{TEL}}／Email: {{EMAIL}}</div>
+        <div><a href="contact.html">お問い合わせはこちら</a></div>
       </div>
       <nav class="footer-nav">
         <a href="index.html">ホーム</a>
@@ -153,6 +221,31 @@
     <div class="footer-meta">© Satoy Select. All rights reserved.</div>
   </div>
 </footer>
+
+<script>
+  (function () {
+    var form = document.getElementById('contactForm');
+    if (!form) return;
+    var sink = document.getElementById('formSink');
+    var done = document.getElementById('formDone');
+    var status = document.getElementById('formStatus');
+    var submitted = false;
+
+    form.addEventListener('submit', function () {
+      submitted = true;
+      status.textContent = '送信しています…';
+    });
+
+    // Google フォームへの送信は非表示 iframe が受け取る。
+    // 読み込み完了＝送信完了とみなして、お礼メッセージに差し替える。
+    sink.addEventListener('load', function () {
+      if (!submitted) return;
+      form.style.display = 'none';
+      done.classList.add('on');
+      done.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    });
+  })();
+</script>
 
 </body>
 </html>
