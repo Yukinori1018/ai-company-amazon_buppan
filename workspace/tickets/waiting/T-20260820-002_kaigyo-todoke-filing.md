@@ -1,7 +1,7 @@
 ---
 id: T-20260820-002
 title: 開業届（＋青色申告承認申請書）の提出支援
-status: doing
+status: waiting
 owner: secretary
 requires_approval: false
 created_at: 2026-08-20
@@ -60,3 +60,4 @@ related:
 ## ログ
 
 - 2026-08-20 doing 起票・着手。国税庁/e-Tax一次情報で裏どり完了、手順書＋記入シートを `deliverables/T-20260820-002/` に納品
+- 2026-08-20 waiting へ移動＝社長の確認3点（就業状況／マイナンバーカード／開業日）と提出実行を待つ

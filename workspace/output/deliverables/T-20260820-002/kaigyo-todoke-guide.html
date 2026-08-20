@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>開業届の提出 実務ガイド（Satoy Select）</title>
+<style>
+  :root{
+    --bg:#ffffff; --fg:#1a1a1a; --muted:#5b6470; --line:#e3e7ec;
+    --accent:#0b63c4; --accent-soft:#eaf2fc; --amzd:#146eb4;
+    --ok:#137333; --okbg:#eaf6ec; --warn:#b06000; --warnbg:#fff6e5; --ng:#b3261e; --ngbg:#fdecea;
+    --card:#f7f9fb; --num:#0f1b25; --hl:#fff3bf;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#12151a; --fg:#e8ecf1; --muted:#9aa4b0; --line:#2a303a;
+      --accent:#5fa8ff; --accent-soft:#1a2532; --card:#1a1e25; --warnbg:#2a2313; --warn:#e0a94a;
+      --okbg:#14251a; --ok:#6fce8a; --ngbg:#2a1614; --ng:#ff8a80; --hl:#3a3418; }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);font-family:-apple-system,"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;line-height:1.75;font-size:15.5px}
+  .wrap{max-width:900px;margin:0 auto;padding:32px 22px 80px}
+  h1{font-size:25px;line-height:1.35;margin:0 0 6px}
+  .sub{color:var(--muted);font-size:13.5px;margin:0 0 24px}
+  h2{font-size:20px;margin:44px 0 12px;padding-top:16px;border-top:2px solid var(--line);display:flex;align-items:center;gap:10px}
+  h2 .n{flex:0 0 auto;width:30px;height:30px;border-radius:8px;background:var(--accent);color:#fff;font-size:15px;display:inline-flex;align-items:center;justify-content:center;font-weight:700}
+  h3{font-size:16.5px;margin:24px 0 6px}
+  h4{font-size:14.5px;margin:18px 0 4px;color:var(--accent)}
+  p{margin:8px 0}
+  ul,ol{margin:8px 0;padding-left:22px} li{margin:6px 0}
+  .lead{background:var(--accent-soft);border:1px solid var(--accent);border-radius:12px;padding:16px 18px;margin:0 0 16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:12px 0}
+  .warn{background:var(--warnbg);border:1px solid var(--warn);border-radius:12px;padding:14px 16px;margin:14px 0}
+  .bad{background:var(--ngbg);border:1px solid var(--ng);border-radius:12px;padding:14px 16px;margin:14px 0}
+  .good{background:var(--okbg);border:1px solid var(--ok);border-radius:12px;padding:14px 16px;margin:14px 0}
+  .ok{color:var(--ok);font-weight:700}.ng{color:var(--ng);font-weight:700}.warnt{color:var(--warn);font-weight:700}
+  mark{background:var(--hl);color:inherit;padding:1px 3px;border-radius:3px}
+  .tw{overflow-x:auto}
+  table{border-collapse:collapse;width:100%;margin:12px 0;font-size:13.5px}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:var(--card)}
+  tr.hi td{background:var(--okbg)}
+  .num{text-align:right;font-variant-numeric:tabular-nums}
+  .pill{display:inline-block;font-size:11px;font-weight:700;padding:2px 9px;border-radius:999px;color:#fff;vertical-align:middle}
+  .pill.fix{background:var(--ok)} .pill.est{background:var(--warn)} .pill.own{background:var(--amzd)}
+  .foot{margin-top:44px;padding-top:16px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px}
+  .foot a{color:var(--accent)}
+  .rank{font-size:22px;font-weight:800;color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>開業届の提出 実務ガイド<br>Satoy Select ／ 開業届＋青色申告承認申請書</h1>
+<p class="sub">秘書カズヨ ／ T-20260820-002 ／ 2026-08-20 ／ 出典はすべて国税庁・e-Tax公式（同日に実ページ確認）</p>
+
+<div class="lead">
+<b>結論（ここだけ読めば動けます）</b>
+<ol style="margin:8px 0">
+<li><b>出す書類は2枚。</b>「個人事業の開業・廃業等届出書（開業届）」と「所得税の青色申告承認申請書」を<b>同時に</b>。開業届だけ出すのは半分損です。</li>
+<li><b>急ぐ理由は開業届ではなく青色申告のほう。</b> 2026年1月1日以後の開業から<b>開業届の期限は「翌年の確定申告期限まで」に緩和</b>されました。一方<mark><b>青色申告承認申請書は従来どおり「開業日から2か月以内」</b></mark>。外すと2026年分は白色＝<b>65万円控除がゼロ</b>。</li>
+<li><b>提出は「マネーフォワード クラウド開業届」or「freee開業」（無料）＋ iPhone ＋ マイナンバーカード。</b> <span class="ng">社長のMacでは素のe-Taxから開業届を出せません</span>（国税庁の対応状況を実際に確認しました → §3）。</li>
+</ol>
+<p style="margin:8px 0"><b>社長の実作業 15〜30分・費用0円。</b></p>
+</div>
+
+<h2><span class="n">1</span>出す書類は2枚（セットで初めて意味がある）</h2>
+<div class="tw">
+<table>
+<tr><th style="width:4%">#</th><th style="width:26%">書類</th><th>何のため</th><th style="width:34%">出さないとどうなるか</th></tr>
+<tr class="hi"><td>1</td><td><b>個人事業の開業・廃業等届出書</b>（開業届）</td><td>個人事業の開始を税務署に届け出る。<b>屋号「Satoy Select」を公に名乗る根拠</b></td><td>メーカーの「開業届を出していない個人とは取引しない」方針に引っかかる（②メーカー仕入れの<b>ゼロイチの足切り</b>）。屋号付き銀行口座も作れない</td></tr>
+<tr class="hi"><td>2</td><td><b>所得税の青色申告承認申請書</b></td><td>青色申告特別控除（最大65万円）・赤字の3年繰越・家族への給与</td><td>2026年分は自動的に白色申告。<b>控除ゼロ</b>。翌年やり直し</td></tr>
+</table>
+</div>
+<p>なお <b>開業届の未提出に罰則規定はありません</b>。ただし上記の実害（信用・節税）が大きいので出します。</p>
+
+<h2><span class="n">2</span>期限 ── 今回いちばん大事なところ</h2>
+
+<h3>2-1. 開業届 ── 2026年から緩くなりました</h3>
+<div class="card">
+国税庁の届出書「書き方」原文：<br>
+「この届出書は、事業の開始、廃止等の事実があった日の属する年分の<b>所得税の確定申告期限まで</b>に納税地を所轄する税務署長に提出してください。」
+</div>
+<p>つまり <b>開業日が2026年内なら、期限は2027年3月15日</b>。世間で言われる「開業から1か月以内」は<b>2025年までの旧ルール</b>です（所得税法229条の改正）。</p>
+<div class="warn"><b>社内ナレッジの訂正事項</b>：<code>deliverables/T-20260603-003/registration-checklist</code> に「⚠️ 開業から1ヶ月以内が目安」とあります。<b>これは旧情報</b>です。本チケット完了時に修正します。</div>
+
+<h3>2-2. 青色申告承認申請書 ── こちらは緩和されていません</h3>
+<div class="card">
+国税庁 A1-8 原文：<br>
+「青色申告書による申告をしようとする年の3月15日まで（その年の<b>1月16日以後、新たに事業を開始した</b>場合には、その<b>事業開始等の日から2月以内</b>。）に提出してください。」
+</div>
+<div class="tw">
+<table>
+<tr><th style="width:34%">開業日</th><th style="width:33%">青色申告承認申請の期限</th><th>2026年分の申告</th></tr>
+<tr class="hi"><td><b>2026-08-20</b></td><td><b>2026-10-20</b></td><td><span class="ok">青色 ◎</span></td></tr>
+<tr><td>2026-09-01</td><td>2026-11-01</td><td><span class="ok">青色 ◎</span></td></tr>
+<tr><td>（仮に）2026-05-01 と過去日を書く</td><td>2026-07-01 = <b>すでに経過</b></td><td><span class="ng">白色（控除ゼロ）</span></td></tr>
+</table>
+</div>
+<div class="bad"><b>開業日を過去に遡って書くと青色を落とします。</b> 開業日は「直近の日付（提出日前後）」が正解。過去に使ったツール代（Keepa €49/月 等）は、開業日より前の支出でも<b>「開業費」として資産計上→後から経費化</b>できるので、遡る必要はありません。</div>
+
+<h2><span class="n">3</span>提出ルートの比較 ── Macの落とし穴を実際に確認しました</h2>
+<div class="bad">
+<b>先に事実を1つ。</b><br>
+国税庁が案内する開業届のe-Tax作成方法は「<b>e-Taxソフト（ダウンロード版）</b>」で、これは <b>Windows専用＝Macでは動きません</b>。そして「<b>e-Taxソフト（WEB版）</b>」の作成可能手続一覧に<b>開業届は含まれていません</b>（パソコン版・スマートフォン版の両方を実際に確認。青色申告承認申請書のほうはWEB版にあります）。<br>
+→ <mark><b>「Macで国税庁のサイトから開業届を出す」は事実上できません。</b></mark> 知らずに始めると必ず詰まります。
+</div>
+<div class="tw">
+<table>
+<tr><th style="width:34%">ルート</th><th>開業届</th><th>青色</th><th>Mac完結</th><th>費用</th><th style="width:26%">評価</th></tr>
+<tr class="hi"><td><b>A. 無料の開業届作成サービス</b>（マネーフォワード クラウド開業届／freee開業）<br>＋ iPhone ＋ マイナンバーカード</td><td>○</td><td>○</td><td>○<br>(作成Mac・送信iPhone)</td><td><b>0円</b></td><td><span class="ok">✅ 推奨</span> 2枚とも質問に答えるだけ→そのままe-Tax送信。控えPDFも残る</td></tr>
+<tr><td>B. e-Taxソフト（WEB版）で青色だけ送信＋開業届は郵送</td><td>△郵送</td><td>○</td><td>○</td><td>切手</td><td>2ルートに分かれ手間。<b>収受日付印が2025年1月に廃止</b>され受付印が押されず提出証明として弱い</td></tr>
+<tr><td>C. 2枚とも紙で持参／郵送</td><td>○</td><td>○</td><td>—</td><td>切手／交通費</td><td>同上。マイナンバー記載＋本人確認書類の提示・写し添付が必要</td></tr>
+<tr><td>D. e-Taxソフト（ダウンロード版）</td><td>○</td><td>○</td><td><span class="ng">✕ Windows専用</span></td><td>0円</td><td>社長の環境では<b>不可</b></td></tr>
+</table>
+</div>
+
+<h3>推奨 = A（理由3つ）</h3>
+<ol>
+<li><b>2枚を1回の操作でまとめて送信できる</b>（入力項目がほぼ同じなので回答を使い回してくれる）。</li>
+<li><b>e-Taxの「受信通知」が提出証明になる。</b> 2025年1月から収受日付印が廃止され、紙の控えに受付印が押されません。屋号口座の開設やメーカーからの書類要求のとき、<b>受信通知は何度でもPDFで出せる</b>のが効きます。</li>
+<li><b>無料。</b> 会計ソフトの契約は不要（65万円控除を取りに行く段階で初めて検討＝§4.1の承認案件として別途お出しします）。</li>
+</ol>
+<div class="warn">
+<b>Aルートの前提（＝ご確認したい点その1）</b>
+<ul style="margin:8px 0">
+<li><b>マイナンバーカード</b>（通知カードではなくICチップ入り）</li>
+<li><b>署名用電子証明書のパスワード</b>（英数字6〜16文字。カード受け取り時に設定したもの）</li>
+<li><b>iPhone 7 以降</b>（カードをNFCで読み取るため）</li>
+<li>無料アプリ2つ：<code>マイナポータル</code> ＋ 各サービスの電子申告アプリ</li>
+</ul>
+<p style="margin:8px 0">お持ちでない場合はAが使えません。→ <b>C（紙で郵送）に切替</b>。カード発行に1か月前後かかるため、<b>カードを待たずに紙で出す</b>のが正解です（青色の10/20期限を守るため）。</p>
+</div>
+
+<h2><span class="n">4</span>記入シート ①開業届（そのまま写せます）</h2>
+<p>サービスの質問形式でも紙でも、聞かれる中身は同じです。<b>当社の確定事項で埋めてあります。</b></p>
+<div class="tw">
+<table>
+<tr><th style="width:24%">欄</th><th style="width:32%">書く内容</th><th>Satoy Select の場合</th></tr>
+<tr><td>税務署長</td><td>納税地を所轄する税務署</td><td><b>自宅住所の管轄税務署</b>（サービス利用なら住所から自動選択）</td></tr>
+<tr><td>提出日</td><td>提出する日</td><td>提出当日</td></tr>
+<tr class="hi"><td>納税地</td><td>住所地／居所地／事業所等</td><td><b>「住所地」＝ご自宅</b>（T-20260817-006で裁可済みのA案。HPの所在地表記と一致させる）</td></tr>
+<tr><td>氏名・生年月日</td><td>本人</td><td>社長ご本人</td></tr>
+<tr><td>個人番号</td><td>マイナンバー12桁</td><td>ご本人のみ入力（<b>私は取り扱いません</b>）。e-Tax送信なら本人確認書類の添付不要</td></tr>
+<tr class="hi"><td>職業</td><td>職業の内容を具体的に（記載要領の例「洋菓子小売」）</td><td><b>「小売業」</b>（推奨。個人事業税の法定業種名と一致し後の判断がぶれない）／「インターネット物販」でも可</td></tr>
+<tr class="hi"><td>屋号</td><td>事業の名称</td><td><b>Satoy Select</b></td></tr>
+<tr><td>届出の区分</td><td>開業／廃業 等</td><td><b>「開業」</b></td></tr>
+<tr><td>所得の種類</td><td>不動産／山林／事業（農業）</td><td><b>事業（農業）所得</b>にチェック（「事業所得」の意。農業でなくてもこの欄）</td></tr>
+<tr class="hi"><td>開業・廃業等日</td><td>事業を開始した日</td><td><b>2026-08-20（本日）または直近日</b>。<span class="ng">過去に遡らないこと</span>（§2-2）</td></tr>
+<tr><td>事業所等を新増設した場合／廃業の事由</td><td>—</td><td>空欄</td></tr>
+<tr class="hi"><td>開業・廃業に伴う届出書の提出の有無</td><td>青色申告承認申請書／消費税課税事業者選択届出書</td><td>青色申告承認申請書 = <b>「有」</b> ／ 消費税課税事業者選択届出書 = <b>「無」</b>（§7）</td></tr>
+<tr class="hi"><td>事業の概要</td><td>できるだけ具体的に</td><td><b>「インターネットを利用した各種商品の小売（Amazon等のECモールでの販売）」</b></td></tr>
+<tr><td>給与等の支払の状況</td><td>従業員がいる場合のみ</td><td><b>すべて空欄</b>（従業員ゼロ・専従者ゼロ）</td></tr>
+<tr><td>源泉所得税の納期の特例の申請の有無／給与支払開始日</td><td>給与を払う場合のみ</td><td><b>「無」</b>／空欄</td></tr>
+</table>
+</div>
+
+<h2><span class="n">5</span>記入シート ②青色申告承認申請書</h2>
+<div class="tw">
+<table>
+<tr><th style="width:30%">欄</th><th style="width:28%">書く内容</th><th>Satoy Select の場合</th></tr>
+<tr><td>納税地・氏名・生年月日・職業・屋号</td><td>開業届と同じ</td><td>同上（<b>一字一句そろえる</b>）</td></tr>
+<tr class="hi"><td>「令和__年分以後の所得税の申告は、青色申告書によりたいので申請します」</td><td>適用開始年</td><td><b>令和8年分（＝2026年分）</b></td></tr>
+<tr><td>1 事業所又は所得の基因となる資産の名称及びその所在地</td><td>記載要領：「本店」「○○支店」等の名称と所在地</td><td>名称=<b>「本店」</b>、所在地=<b>ご自宅住所</b></td></tr>
+<tr><td>2 所得の種類</td><td>事業／不動産／山林</td><td><b>事業所得</b></td></tr>
+<tr><td>3 青色申告承認の取消し・取りやめの有無</td><td>有／無</td><td><b>無</b></td></tr>
+<tr><td>4 本年1月16日以後新たに業務を開始した場合、その開始した年月日</td><td>開業日</td><td><b>開業届と同じ日付</b>（例：2026-08-20）</td></tr>
+<tr><td>5 相続による事業承継の有無</td><td>有／無</td><td><b>無</b></td></tr>
+<tr class="hi"><td>6 (1) 簿記方式</td><td>複式簿記／簡易簿記／その他</td><td><b>複式簿記</b> ★65万円控除の必須条件。<span class="ng">簡易簿記にすると最大10万円</span></td></tr>
+<tr class="hi"><td>6 (2) 備付帳簿名</td><td>該当するものに○</td><td><b>総勘定元帳・仕訳帳</b>（複式簿記の必須2つ）＋ 現金出納帳・売掛帳・買掛帳・経費帳・固定資産台帳</td></tr>
+<tr><td>6 (3) その他</td><td>—</td><td>空欄</td></tr>
+</table>
+</div>
+<div class="good"><b>審査結果の通知は原則ありません。</b>「青色申告の承認を受けようとする年の12月31日までに処分の通知がなかったときは、<b>承認されたものとみなされます</b>」（国税庁 A1-8 備考※4）。通知が来なくて不安になる必要はありません。</div>
+
+<h2><span class="n">6</span>65万円控除を実際に取るための条件</h2>
+<p>申請書を出しただけでは65万円になりません。国税庁 No.2072 の要件：</p>
+<div class="tw">
+<table>
+<tr><th style="width:16%">控除額</th><th>条件</th></tr>
+<tr class="hi"><td><b>65万円</b></td><td>55万円の条件 <b>＋</b> ①確定申告書・<b>貸借対照表・損益計算書</b>を期限までに<b>e-Taxで提出</b>（イメージデータ送信は不可）、<b>または</b> ②優良な電子帳簿の要件を満たす電子保存＋所定の届出書提出</td></tr>
+<tr><td>55万円</td><td>事業所得等がある／<b>正規の簿記の原則（一般に複式簿記）で記帳</b>／申告期限内に所定の書類を提出</td></tr>
+<tr><td>10万円</td><td>上記に該当しない青色申告者</td></tr>
+</table>
+</div>
+<div class="warn">
+<b>★ 開業届を出したら、その日から領収書・請求書を捨てないでください。</b><br>
+事業所得と雑所得の線引きは「<b>帳簿書類の記帳と保存があるか</b>」で判断されます（所得税基本通達35-2関係）。保存がないと収入300万円以下のうちは雑所得に寄せられ、<b>赤字の損益通算も青色控除も使えません</b>。仕入れが先行して初年度が赤字になる物販では、ここが効きます。<br>
+複式簿記＋貸借対照表は手作業では非現実的なので、<b>初売上が立った頃に会計ソフトの契約提案を §4.1（金銭）の承認案件としてお出しします</b>。今日は不要です。
+</div>
+
+<h2><span class="n">7</span>今回「やらなくていいこと」（判断済み）</h2>
+<div class="tw">
+<table>
+<tr><th style="width:30%">項目</th><th style="width:14%">判断</th><th>根拠</th></tr>
+<tr><td><b>インボイス（適格請求書発行事業者）登録</b></td><td><span class="ng">しない</span></td><td>登録すると免税事業者でなくなり納税義務が発生。<b>仕入れる側には不要</b>。販売先がAmazonの一般消費者中心なら実害なし（T-20260726-002・T-20260817-006と同結論）</td></tr>
+<tr><td>消費税課税事業者選択届出書</td><td><span class="ng">出さない</span></td><td>開業から2年は原則免税事業者。あえて課税事業者を選ぶ理由がない</td></tr>
+<tr><td>古物商許可</td><td><span class="warnt">今は取らない</span></td><td>本線②メーカー仕入れ・③OEMは新品直仕入れで<b>法的に不要</b>。①電脳せどり・④無在庫で<b>C2C（メルカリ等）から仕入れる判断が出た時点で即申請</b>（審査40日）〔T-20260820-001〕</td></tr>
+<tr><td>青色事業専従者給与に関する届出書／源泉所得税の納期の特例</td><td><span class="ng">出さない</span></td><td>家族への給与・従業員ともにゼロのため</td></tr>
+</table>
+</div>
+<div class="warn"><b>1つだけ将来の見張り：</b> 1月1日〜6月30日（特定期間）の課税売上が<b>1,000万円を超えると翌年から消費税の課税事業者</b>になります（開業届「お知らせ」2）。月商800万円の目標到達時には確実に該当。到達が見えた段階で経理ハジメに試算させます。</div>
+
+<h2><span class="n">8</span>提出したあと、その日のうちにやること</h2>
+<ol>
+<li><b>e-Taxの「受信通知」をPDFで保存</b>（メール詳細画面から出力）。これが<b>提出した証明</b>。保管先をお知らせいただければ台帳に記録します。</li>
+<li><b>屋号付き銀行口座の開設を検討</b>（開業届の控え＝受信通知が必要）。ネット銀行（GMOあおぞら／PayPay銀行等）が屋号口座に対応。私生活の口座と分けると記帳が一気に楽になります。</li>
+<li><b>Amazonセラーセントラルの事業者情報と屋号をそろえる</b>（メーカーは必ずストアを見ます）。</li>
+<li><b>HPの「所在地・代表者」表記を開業届と一致させる</b>〔T-20260817-006〕。食い違うとメーカーの与信で引っかかります。</li>
+<li><b>記帳を初月から開始</b>（§6の理由）。当面はレシート・請求書をフォルダに貯めるだけで可。</li>
+</ol>
+
+<h2><span class="n">9</span>副業として始める場合の3つの注意点（該当する場合のみ）</h2>
+<p class="sub">社長の現在の就業状況を把握していないため、条件付きで書いています（§10で確認させてください）。</p>
+<div class="tw">
+<table>
+<tr><th style="width:24%">論点</th><th>内容</th><th style="width:34%">対策</th></tr>
+<tr><td><b>勤務先に知られる経路</b></td><td>副業の所得が住民税に上乗せされ、給与から天引き（特別徴収）される際に勤務先の経理が気づくことがある</td><td>確定申告書の住民税欄で<b>「自分で納付（普通徴収）」</b>を選ぶ。※事業所得が赤字で給与と損益通算すると住民税が下がるため、この経路では別の形で目立つ点に留意</td></tr>
+<tr><td><b>失業給付（雇用保険）</b></td><td>受給中・受給予定がある場合、開業届を出すと「就職した」扱いになり<b>基本手当が止まる</b>ことがある</td><td>受給予定があるなら<b>先にハローワークに相談</b>。「再就職手当」の対象になるケースもある</td></tr>
+<tr><td><b>配偶者の扶養／社会保険</b></td><td>扶養に入っている場合、開業＝直ちに外れるわけではないが、健保組合によっては<b>開業届の提出のみで扶養不可</b>とする規約がある</td><td>該当するなら加入している健康保険組合の規約を先に確認</td></tr>
+</table>
+</div>
+<p><b>専業（他に勤務先がない）でお進めの場合は、いずれも該当しません。</b></p>
+
+<h2><span class="n">10</span>社長にご確認したいこと（3点だけ）</h2>
+<div class="tw">
+<table>
+<tr><th style="width:4%">#</th><th style="width:22%">確認事項</th><th>選択肢</th><th style="width:30%">私の推奨</th></tr>
+<tr><td>①</td><td><b>現在の就業状況</b></td><td>A: 勤務先あり（副業として開業）／B: 専業（勤務先なし）／C: 失業給付の受給中または受給予定あり</td><td>事実をお教えください。<b>Cの場合は開業届を出す前にハローワーク相談が先</b></td></tr>
+<tr><td>②</td><td><b>マイナンバーカードの有無</b></td><td>A: 持っている（署名用パスワードもわかる）／B: 持っているがパスワード不明／C: 持っていない</td><td><b>A → §3の推奨ルート。B → 役所で再設定（即日）。C → 紙で郵送</b>（カード発行を待つと青色の期限が危うい）</td></tr>
+<tr class="hi"><td>③</td><td><b>開業日</b></td><td>A: <b>2026-08-20（本日）</b>／B: 2026-09-01／C: それ以外</td><td><b>A</b>。青色の期限が2026-10-20と最も余裕を持て、過去に遡らないため青色を落とすリスクがゼロ</td></tr>
+</table>
+</div>
+<div class="good">
+①②③をお返しいただければ、<b>その内容を反映した「提出時に見ながら入力する1枚」</b>を作ってお渡しします（所要10分）。<br>
+なお <b>提出そのものは社長ご本人の手作業</b>です。マイナンバーと本人確認を伴うため、私が代行することはできません。
+</div>
+
+<div class="foot">
+<b>出典（すべて2026-08-20に実ページ確認）</b>
+<ul>
+<li>国税庁 <a href="https://www.nta.go.jp/taxes/tetsuzuki/shinsei/annai/shinkoku/annai/04.htm">A1-5 個人事業の開業届出・廃業届出等手続</a> ／ <a href="https://www.nta.go.jp/taxes/tetsuzuki/shinsei/annai/shinkoku/pdf/h29/01_kakikata.pdf">届出書「書き方」PDF</a></li>
+<li>国税庁 <a href="https://www.nta.go.jp/taxes/tetsuzuki/shinsei/annai/shinkoku/annai/09.htm">A1-8 所得税の青色申告承認申請手続</a> ／ <a href="https://www.nta.go.jp/taxes/tetsuzuki/shinsei/annai/shinkoku/pdf/h28/10-ki.pdf">記載要領PDF</a></li>
+<li>国税庁 <a href="https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/2072.htm">No.2072 青色申告特別控除</a> ／ <a href="https://www.nta.go.jp/law/tsutatsu/kihon/shotoku/04/09.htm">所得税基本通達 法第35条《雑所得》関係</a></li>
+<li>e-Tax <a href="https://www.e-tax.nta.go.jp/e-taxsoftweb/e-taxweb_procedure.htm">作成可能手続【パソコン】</a> ／ <a href="https://www.e-tax.nta.go.jp/e-taxsoftsp/e-taxsp_procedure.htm">【スマートフォン】</a> ／ <a href="https://www.e-tax.nta.go.jp/download/e-taxSoftDownLoad.htm">e-Taxソフトのダウンロードコーナー（動作環境）</a></li>
+</ul>
+<p>秘書カズヨ ／ T-20260820-002 ／ 2026-08-20</p>
+</div>
+
+</div>
+</body>
+</html>
