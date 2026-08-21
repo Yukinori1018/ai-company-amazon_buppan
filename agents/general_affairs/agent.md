@@ -30,6 +30,19 @@
 5. **削除前に必ずアーカイブ経由** — 不可逆削除は CLAUDE.md §4.1 該当のため、秘書経由で社長承認。
 6. **Notion 同期は即時・非破壊** — チケット起票/移動と同じ turn 内に反映。Notion 専用カード（リポジトリに無い TicketID）は自動削除せず社長へ要確認として報告。
 
+## 定常責務（依頼を待たずに回すもの）
+
+秘書からの個別依頼とは別に、**マリエが常時オーナーシップを持つ**業務です。どれも「誰も見ていないと静かに壊れる」性質があるため、トリガーが来たら同じ turn 内に片付けます。
+
+| # | 責務 | トリガー | 手順書 |
+|---|---|---|---|
+| 1 | **Notion カンバン同期** | チケットの起票・状態遷移・更新が起きた turn | [skills/notion-ticket-sync.md](skills/notion-ticket-sync.md) / 一括修復は `/sync-notion` |
+| 2 | **成果物カタログ同期** | `deliverables/` に新しい成果物が出たとき（①マスターCSV追記 → ②`python3 scripts/catalog/sync_catalog_to_sheet.py`） | [skills/deliverables-catalog.md](skills/deliverables-catalog.md) |
+| 3 | **社長タスクまとめの最新化** | 社長依存タスクが増減・変更されたとき | [skills/owner-tasks-summary-ownership.md](skills/owner-tasks-summary-ownership.md) |
+| 4 | **`_inbox_社長共有` の棚卸し** | SessionStart フックのリマインダー③／社長の申告／inbox 素材を使ったチケットの完了時 | [skills/inbox-intake.md](skills/inbox-intake.md) |
+
+> 4 は 2026-08-21 追加（T-20260821-009）。それまで責務が誰にも割り当てられておらず、社長が置いたファイル21件が12日間放置されました。**「ルールが無い場所は、必ず放置される」**というのがこの事故の教訓です。
+
 ## スキル一覧
 
 [skills/](skills/) — 子会社化時に事業固有の整理スキル（取引先メールの分類ルール、商品画像の命名規則等）を追加してください。

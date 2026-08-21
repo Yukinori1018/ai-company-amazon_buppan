@@ -1,0 +1,226 @@
+<title>inbox運用崩れ 原因究明</title>
+<style>
+:root{--bg:#fbfaf8;--fg:#2c2a26;--muted:#6f6a62;--line:#e3ded5;--card:#fff;--accent:#8a6d3b}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#1a1917;--fg:#e8e4dd;--muted:#a09a90;--line:#332f2a;--card:#221f1c;--accent:#d4b483}}
+:root[data-theme=dark]{--bg:#1a1917;--fg:#e8e4dd;--muted:#a09a90;--line:#332f2a;--card:#221f1c;--accent:#d4b483}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif;line-height:1.85;font-size:15.5px}
+.wrap{max-width:960px;margin:0 auto;padding:48px 24px 96px}
+h1{font-size:1.85rem;line-height:1.4;margin:0 0 .4em;letter-spacing:-.01em}
+h2{font-size:1.3rem;margin:2.6em 0 .7em;padding-bottom:.35em;border-bottom:2px solid var(--line)}
+h3{font-size:1.08rem;margin:2em 0 .6em;color:var(--accent)}
+p{margin:.85em 0}
+hr{border:0;border-top:1px solid var(--line);margin:2.5em 0}
+code{background:rgba(138,109,59,.12);padding:.13em .42em;border-radius:4px;font-size:.87em;font-family:ui-monospace,Menlo,monospace;word-break:break-all}
+blockquote{margin:1.3em 0;padding:.9em 1.2em;background:var(--card);border-left:3px solid var(--accent);border-radius:0 6px 6px 0;color:var(--muted)}
+blockquote strong{color:var(--fg)}
+ul{padding-left:1.4em} li{margin:.4em 0}
+.tw{overflow-x:auto;margin:1.4em 0;border:1px solid var(--line);border-radius:8px;background:var(--card)}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+th,td{padding:.65em .85em;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:rgba(138,109,59,.09);font-weight:600;white-space:nowrap}
+tbody tr:last-child td{border-bottom:0}
+.hero{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:26px 30px;margin-bottom:2em}
+.tag{display:inline-block;background:var(--accent);color:var(--bg);padding:.2em .7em;border-radius:99px;font-size:.75rem;font-weight:600;letter-spacing:.04em;margin-bottom:.9em}
+</style>
+<div class="wrap"><div class="hero"><span class="tag">T-20260821-009</span><h1><code>_inbox_社長共有</code> 運用崩れ — 原因究明レポート</h1>
+<ul>
+<li>チケット: T-20260821-009</li>
+<li>作成: 庶務マリエ / 2026-08-21</li>
+<li>社長の指摘: 「共有したファイルが整理されていない。最初の方はきちんと運用されていたが、今はできていないみたい」</li>
+</ul>
+</div>
+<h2>1. 結論（真因）</h2>
+<blockquote><strong>inbox の後片付けが「チケットのタスク分解に、起票者が手書きで1行足したときだけ実行される属人的ステップ」だった。</strong> 恒久ルール・受け皿・検知のどれも存在せず、その1行を書き忘れた瞬間に運用が止まった。</blockquote>
+<p>社長の体感（「最初はできていた／今はできていない」）は<strong>完全に正確</strong>でした。 そして「最初はできていた」理由が、そのまま「今できていない」理由です。 <strong>6月に成功したのは仕組みがあったからではなく、たまたまその1行が書かれたから</strong>でした。</p>
+<p>補足として、<strong>チケットにすらならないファイル</strong>（社長が置いたが申告し忘れたもの）は検知手段が一切なく、 <strong>永久に放置される</strong>構造でした。実際、残留21件のうち <strong>2件がこの経路</strong>で、 しかもその2件が今回いちばん惜しい取りこぼし（現役の高価値資料と、未反映のナレッジ）でした（§5）。</p>
+<hr>
+<h2>2. 裏取りした事実（時系列）</h2>
+<h3>Phase 1 — 機能していた期間（2026-06-07 〜 06-10 / わずか4日間）</h3>
+<div class="tw"><table><thead><tr><th>日付</th><th>出来事</th><th>証拠</th></tr></thead><tbody>
+<tr><td>06-07</td><td><code>_inbox_社長共有/README.txt</code> 作成＝運用開始</td><td>ファイル更新日 <code>Jun 7 16:39</code></td></tr>
+<tr><td>06-09</td><td>PoiPoiポケット資料を受領</td><td><code>docs/reference/poipoi-pocket/README.md</code>「受領: 2026-06-09（社長が <code>_inbox_社長共有/</code> 経由で共有）→ <strong>2026-06-10 当フォルダへ整理</strong>」</td></tr>
+<tr><td>06-10</td><td>メーカー仕入れセミナー資料57ファイルを受領・同日処理</td><td>T-20260610-001</td></tr>
+</tbody></table></div>
+<p><strong>T-20260610-001 のタスク分解に、決定的な1行があります。</strong></p>
+<blockquote><code>- [x] 原本の整理・移動（57ファイル → ~/Documents/AI Company Outputs/...）＋ <strong>inbox クリーンアップ</strong></code></blockquote>
+<p>この1行があったから、inbox は空になりました。<strong>逆に言えば、この1行がすべてでした。</strong></p>
+<h3>Phase 2 — 空白期間（2026-06-11 〜 08-08 / 約2ヶ月）</h3>
+<p>inbox 経由の受け渡しがゼロ。この間の社長提供資料は<strong>すべてチャット貼り付けテキスト</strong>で入ってきています。</p>
+<div class="tw"><table><thead><tr><th>日付</th><th>資料</th><th>受領経路（README の記載）</th></tr></thead><tbody>
+<tr><td>08-07</td><td>国内ニッチ簡易OEM 動画</td><td>「社長提供・動画要約から<strong>カズヨが整理</strong>」</td></tr>
+<tr><td>08-17</td><td>Keepa 4つの使い方（うみぞう）</td><td>「社長提供・<strong>動画要約テキスト</strong>」</td></tr>
+<tr><td>08-20</td><td>古物商許可証</td><td>「社長提供・<strong>動画の構造化要約テキスト</strong>」</td></tr>
+</tbody></table></div>
+<p>→ <strong>主流の受け渡し経路がチャットへ移り、inbox は「たまに使う裏口」になりました。</strong> 　 使われないうちに、運用そのものが会社の記憶から消えました。</p>
+<h3>Phase 3 — 崩壊が顕在化（2026-08-09 〜 08-12）</h3>
+<div class="tw"><table><thead><tr><th>日付</th><th>ファイル</th><th>チケット</th><th>後片付けの1行</th><th>結果</th></tr></thead><tbody>
+<tr><td>08-09</td><td>比較表 xlsx 1件</td><td><strong>なし</strong></td><td>—</td><td><strong>完全な取りこぼし。12日間、誰も存在に気づいていない</strong></td></tr>
+<tr><td>08-11</td><td>FireShot 021-025（5枚）</td><td>T-20260811-001</td><td><strong>無し</strong></td><td>読解・HTML納品まで完了。<strong>ファイルだけ残置</strong></td></tr>
+<tr><td>08-12</td><td>スクショ14枚</td><td>T-20260812-001</td><td><strong>無し</strong></td><td>読解・memory化・採否判断まで完了して done。<strong>ファイルだけ残置</strong></td></tr>
+<tr><td>08-12</td><td>FireShot 026（1枚）</td><td><strong>なし</strong></td><td>—</td><td><strong>完全な取りこぼし。しかも未反映のナレッジを含む</strong>（後述）</td></tr>
+</tbody></table></div>
+<p>T-20260811-001 / T-20260812-001 のタスク分解を実際に確認しましたが、 6月の「inbox クリーンアップ」に相当する項目は<strong>どちらにも存在しません</strong>。 起票者が違えば書かれない。それだけの差でした。</p>
+<hr>
+<h2>3. 秘書の初期仮説5点の検証結果</h2>
+<p>「鵜呑みにせず実地で裏取りを」との指示に従い、5点すべてを検証しました。 結果として、<strong>5点は同格ではありません。</strong>2点が真因、3点は増幅要因です。</p>
+<div class="tw"><table><thead><tr><th>#</th><th>仮説</th><th>検証結果</th><th>判定</th></tr></thead><tbody>
+<tr><td>2</td><td>ルールが CLAUDE.md にも agents/ にも無い</td><td><code>grep -rn &quot;_inbox&quot;</code> の結果、ルールらしき記述はゼロ。ヒットするのはチケット本文と reference README の「受領経路の記録」だけ</td><td>✅ <strong>真因（中核）</strong></td></tr>
+<tr><td>3</td><td>プル型トリガー依存（社長の申告が起点）</td><td>README.txt の手順②が「チャットで一言伝える」。8月の資料が全部チャット経由に移行し、inbox に置いただけのファイル（xlsx・026）は<strong>申告されず永久放置</strong>された</td><td>✅ <strong>真因（第2の柱）</strong></td></tr>
+<tr><td>1</td><td><code>.gitignore</code> 対象で Git 差分に出ない</td><td><code>.gitignore:24</code> に <code>_inbox_社長共有/</code> を確認。既存フック3本（session-start / ticket-notion-sync-reminder / owner-tasks-sync-check）の発火条件を全部読んだところ、<strong>いずれも <code>workspace/tickets/</code> 等の追跡ファイル変更が起点</strong>で、inbox は全フックの死角</td><td>⚠️ <strong>増幅要因</strong>（原因ではなく「なぜ12日間も気づけなかったか」の答え）</td></tr>
+<tr><td>4</td><td>マリエの定常責務に未登録</td><td><code>agents/general_affairs/agent.md</code> を確認。Notion同期・カタログ同期は責務化されているが inbox は無し</td><td>⚠️ <strong>増幅要因</strong>（#2 の系。ルールが無いので責務にも登録されていない）</td></tr>
+<tr><td>5</td><td>処理済みの行き先が未定義</td><td>README.txt は「移動されることがある」のみ</td><td>⚠️ <strong>寄与要因</strong>（ただし6月は受け皿無しでも移動できたので、単独では原因にならない。「毎回どこへ置くか判断が要る＝摩擦」として効いた）</td></tr>
+</tbody></table></div>
+<p><strong>#1 を単独の原因と誤認しないことが重要です。</strong>仮に inbox が Git 追跡下にあっても、 後片付けのルールが無ければ「差分に出るが誰も片付けないファイル」になるだけでした。</p>
+<hr>
+<h2>4. 対策（3点セット。1つでも欠けると再発する）</h2>
+<p>真因が「ルール不在」＋「プル型依存」なので、<strong>明文化と自動検知の両方</strong>が要ります。</p>
+<div class="tw"><table><thead><tr><th>#</th><th>対策</th><th>実装</th><th>効く仮説</th></tr></thead><tbody>
+<tr><td>A</td><td><strong>検知の自動化</strong></td><td><code>.claude/hooks/session-start.sh</code> に「リマインダー③」を追加。inbox 直下の未処理ファイル数と最古日付を毎セッション通知。<code>_archive/</code> <code>README.txt</code> <code>.DS_Store</code> は除外</td><td>#3・#1</td></tr>
+<tr><td>B</td><td><strong>ルールの明文化</strong></td><td><code>CLAUDE.md</code> §6 に inbox 節を新設／<code>agents/general_affairs/agent.md</code> に「定常責務」表を新設し #4 として登録／手順書 <code>agents/general_affairs/skills/inbox-intake.md</code> を新設</td><td>#2・#4</td></tr>
+<tr><td>C</td><td><strong>受け皿の設置</strong></td><td><code>_inbox_社長共有/_archive/YYYY-MM/&lt;ticket_id&gt;_&lt;内容&gt;/</code> を作成。各フォルダに中身一覧の <code>README.md</code> を必須化</td><td>#5</td></tr>
+</tbody></table></div>
+<p><strong>A が要（かなめ）です。</strong>B と C だけでは「ルールを読む人がいなければ元通り」ですが、 A があれば社長が何も言わなくても毎セッション勝手に卓上に載ります。</p>
+<p>あわせて、README.txt を<strong>社長の手数が1ステップ減る</strong>方向に改訂しました。 旧: ①置く ②チャットで伝える → 新: <strong>①置くだけ</strong>（申告は任意。会社側から声をかける）。</p>
+<hr>
+<h2>5. 棚卸しで判明した副産物（実害の把握）</h2>
+<p>放置の実害は「散らかっていた」ことだけではありませんでした。</p>
+<h3>⚠️ 実害1: 高価値資料が12日間死蔵されていた（xlsx）</h3>
+<p><code>FBA納品代行業者_比較表</code>（2026-08-09・11社）は、<strong>どのチケットにも紐づかず</strong>放置されていました。 これは社長が挙げたメーカー仕入れ 信用構築3点の<strong>③「FBA納品の外注先を決めておく」に直結する一次資料</strong>です。</p>
+<p>しかも内容が、現行チケット <strong>T-20260817-006 の判断根拠を一部覆します</strong>。</p>
+<ul>
+<li>T-20260817-006 の③評価: 「急ぐ必要なし。<strong>先に契約すると月額固定費 2,000〜4,000円が売上ゼロで出続ける</strong>」</li>
+<li>本資料の事実: <strong>就労支援系（A型/B型）は月額固定費ほぼ無料</strong>、単価も 10〜50円/点（一般物流系は 40〜100円/点）</li>
+</ul>
+<p>→ 「固定費が出続けるから急がない」という論拠は、<strong>一般物流系にしか当てはまりません</strong>。 　 → <code>docs/reference/fba-prep-center/</code> へ収納（原本 xlsx ＋ テキスト版 ＋ 索引 README、いずれも Git 追跡）。</p>
+<h3>⚠️ 実害2: 未反映のナレッジが埋もれていた（FireShot 026）</h3>
+<p>026 は <strong>keepa.com「出品者概要」ページ</strong>（セラー単位の分析画面）で、08-12 に追加で置かれたものです。 T-20260811-001 の入力素材は 021〜025 の5枚のみで、026 は<strong>どのチケットにも属していません</strong>。</p>
+<p>納品済みの <code>deliverables/T-20260811-001/keepa-usage-guide.html</code> を検索したところ、 「出品者概要」「出品者検索」「セラー分析」いずれの語も<strong>ヒットせず</strong>＝機能そのものが未収録。 memory <code>knowledge_keepa_operation_umizou.md</code> にも記述なし。</p>
+<p>→ <strong>Keepa のナレッジに穴が空いたままでした。</strong> T-20260811-001 の完了確認時に、 　 反映するかスコープ外として明示的に切るかの判断が要ります（→ §6）。</p>
+<h3>記録の訂正: T-20260812-001 の「13枚」は実際は14枚</h3>
+<p>実ファイルは14枚あります。差分の1枚は <code>11.44.58</code>（別キーワード <code>Relaxation Spa Gift Pack for Men</code> での実データ画面）で、 検索語が他13枚と異なるため読解対象から漏れたと見られます。 ただし<strong>既知機能の別データ例にすぎず、採否判断（A案＝今は契約しない）の結論には影響しません。</strong>記録の正確性のための訂正のみ。</p>
+<hr>
+<h2>6. 社長判断が必要な事項</h2>
+<h3>判断①（要・社長承認）: 破棄候補の扱い</h3>
+<p>削除は CLAUDE.md §4.1（不可逆な削除）のため、マリエは実行していません。</p>
+<div class="tw"><table><thead><tr><th>ファイル</th><th>場所</th><th>破棄推奨の理由</th><th>件数</th></tr></thead><tbody>
+<tr><td><code>.DS_Store</code></td><td><code>_inbox_社長共有/</code> 直下</td><td>macOS が自動生成する表示設定ファイル。情報価値ゼロ。削除しても Finder が必要時に再生成する</td><td>1</td></tr>
+</tbody></table></div>
+<p><strong>破棄候補は上記1件のみです。</strong> 残り21件はすべてアーカイブ相当と判断しました。 「もう使わないと思う」はアーカイブの理由であって削除の理由ではない、というのがマリエの原則です。 特に AMZScout の14枚は、③簡易OEM（T-20260809-001）の実行フェーズで 「無料トライアル残回分を使って検証する」と T-20260812-001 で明記されているため、<strong>再利用の見込みがあります</strong>。</p>
+<blockquote>なお <code>.DS_Store</code> は <code>.gitignore</code> の1行目で既に除外済みのため、リポジトリを汚してはいません。 <strong>急いで消す必要はありません。</strong>「気になるので消してよい」というご判断があれば消します。</blockquote>
+<h3>判断②: FireShot 026（Keepa 出品者概要）の扱い</h3>
+<div class="tw"><table><thead><tr><th>案</th><th>内容</th><th>向くケース</th></tr></thead><tbody>
+<tr><td><strong>A（推奨）</strong></td><td>T-20260811-001 の追加素材として、Keepaマニュアルに「出品者概要」節を追記（ヒデアキ）</td><td>Keepa は本線ツール。競合セラーの逆引きは②メーカー仕入れと相性が良い</td></tr>
+<tr><td>B</td><td>別チケットを立てて「Keepa 出品者分析の活用法」を単独で調査</td><td>用途が未検証なので、まず使い道から詰めたい場合</td></tr>
+<tr><td>C</td><td>スコープ外として明示的に切り、アーカイブのまま置く</td><td>今は手を広げたくない場合</td></tr>
+</tbody></table></div>
+<p><strong>推奨は A</strong> です。理由は、T-20260811-001 が既に doing で残っており（完了確認だけが残る状態）、 <strong>新規チケットを増やさずに閉じられる</strong>こと。追記は1節分で、ヒデアキの手数も小さく済みます。</p>
+<p>判断材料として、026 から読み取れる内容は <code>_inbox_社長共有/_archive/2026-08/T-20260811-001_keepa-extension-screens/README.md</code> に整理してあります。</p>
+<blockquote>⚠️ 026 には<strong>第三者事業者の商号・住所・法人番号・電話番号・代表者名</strong>が写り込んでいます。 Keepa の公開画面ですが登記情報そのものなので、<strong>社長閲覧用 HTML や外部公開資料に貼る場合はマスクが必須</strong>です。</blockquote>
+<h3>判断③: FBA納品代行業者 比較表の活かし方</h3>
+<p><code>docs/reference/fba-prep-center/</code> に収納済みですが、<strong>次の一手は社長判断です</strong>。</p>
+<ul>
+<li>出典が Genspark AI の生成物で、<strong>各社公式サイトによる裏取りは未実施</strong></li>
+</ul>
+<p>  （memory <code>feedback_research_accuracy_blocker</code>＝推定のままが最大のボトルネック、に該当）</p>
+<ul>
+<li>業者への実際の問い合わせ・相見積り依頼は <strong>§4.1「第三者連絡」に該当</strong>＝社長承認が必要</li>
+</ul>
+<p>→ 「サトルに公式サイトベースで裏取りさせるか」「T-20260817-006 の③評価を書き換えるか」を 　 秘書経由でご判断ください。マリエは資料の収納と接続の指摘までで止めています。</p>
+<hr>
+<h2>7. Before / After</h2>
+<div class="tw"><table><thead><tr><th>指標</th><th>Before</th><th>After</th></tr></thead><tbody>
+<tr><td>inbox 直下の未処理ファイル</td><td><strong>21件</strong>（xlsx 1 / PNG 20）</td><td><strong>0件</strong></td></tr>
+<tr><td>inbox 直下の総エントリ</td><td>23（README.txt・.DS_Store 含む）</td><td>3（README.txt / <code>_archive/</code> / .DS_Store）</td></tr>
+<tr><td>最古の滞留日数</td><td><strong>12日</strong>（2026-08-09 → 08-21）</td><td>0日</td></tr>
+<tr><td>未処理を検知する仕組み</td><td><strong>なし</strong>（全フックの死角）</td><td>SessionStart フック リマインダー③</td></tr>
+<tr><td>明文化されたルール</td><td><strong>0箇所</strong></td><td>3箇所（CLAUDE.md §6 / agent.md 定常責務 / skills/inbox-intake.md）</td></tr>
+<tr><td>処理済みの受け皿</td><td><strong>未定義</strong></td><td><code>_archive/YYYY-MM/&lt;ticket_id&gt;_&lt;内容&gt;/</code>（README.md 必須）</td></tr>
+<tr><td>索引 README</td><td>0件</td><td>3件（archive 2 / reference 1）</td></tr>
+<tr><td>どのチケットにも紐づかない孤児ファイル</td><td><strong>2件</strong>（xlsx 1 / FireShot 026 1）</td><td>0件（両方とも収納＋接続先を特定）</td></tr>
+<tr><td>節約容量</td><td>—</td><td><strong>0 バイト</strong>（削除ゼロ。全件アーカイブ経由で保全）</td></tr>
+</tbody></table></div>
+<blockquote>容量は減っていません。それでよいと考えています。 今回の問題は「重い」ことではなく「行き先が決まっていない」ことでした。 21件はすべて役目を持ったファイルで、うち2件は<strong>まだ働いていない</strong>ことが分かりました。 捨てずに、働ける場所へ移すのが正しい整理だと判断しています。</blockquote>
+<hr>
+<h2>8. 変更したファイル一覧</h2>
+<div class="tw"><table><thead><tr><th>ファイル</th><th>変更</th></tr></thead><tbody>
+<tr><td><code>.claude/hooks/session-start.sh</code></td><td>リマインダー③（inbox 未処理検知）を追加。既存①②は無改変</td></tr>
+<tr><td><code>CLAUDE.md</code></td><td>§6「成果物の保管ルール」に inbox 節を新設</td></tr>
+<tr><td><code>agents/general_affairs/agent.md</code></td><td>「定常責務」表を新設。inbox 棚卸しを #4 として登録</td></tr>
+<tr><td><code>agents/general_affairs/skills/inbox-intake.md</code></td><td><strong>新規</strong>。棚卸しの手順書</td></tr>
+<tr><td><code>agents/general_affairs/memory/knowledge_inbox_operation.md</code></td><td><strong>新規</strong>。事故の記録と教訓</td></tr>
+<tr><td><code>_inbox_社長共有/README.txt</code></td><td>改訂（社長の手数を2ステップ→1ステップに）</td></tr>
+<tr><td><code>_inbox_社長共有/_archive/2026-08/**</code></td><td><strong>新規</strong>。21件を退避＋索引 README 2件</td></tr>
+<tr><td><code>docs/reference/fba-prep-center/**</code></td><td><strong>新規</strong>。xlsx 原本＋テキスト版＋索引 README</td></tr>
+</tbody></table></div><hr><h1><code>_inbox_社長共有</code> 棚卸し結果一覧（全21件）</h1>
+<ul>
+<li>チケット: T-20260821-009 / 庶務マリエ / 2026-08-21</li>
+<li>対象: 2026-08-09 〜 2026-08-12 に滞留していた未処理ファイル</li>
+<li><strong>全件、実際に中身を開いて確認済み</strong>（画像は縮小して Read、xlsx は openpyxl で全シート抽出）</li>
+</ul>
+<blockquote>秘書の起票時カウントは「22件（xlsx 1 / PNG 21）」でしたが、実測は <strong>21件（xlsx 1 / PNG 20）</strong> です。 PNG の内訳は FireShot 6枚＋スクリーンショット14枚＝20枚。1件の差は README.txt または .DS_Store を 数えたものと思われます。以降は実測値で記載します。</blockquote>
+<hr>
+<h2>振り分けサマリ</h2>
+<div class="tw"><table><thead><tr><th>振り分け先</th><th>件数</th><th>内容</th></tr></thead><tbody>
+<tr><td><code>docs/reference/fba-prep-center/</code>（今後も参照する資料）</td><td><strong>1</strong></td><td>FBA納品代行業者 比較表 xlsx</td></tr>
+<tr><td><code>_archive/2026-08/T-20260811-001_keepa-extension-screens/</code></td><td><strong>6</strong></td><td>Keepa Chrome拡張の実画面</td></tr>
+<tr><td><code>_archive/2026-08/T-20260812-001_amzscout-onboarding/</code></td><td><strong>14</strong></td><td>AMZScout PRO AI オンボーディング</td></tr>
+<tr><td><strong>破棄候補（社長承認待ち・未実行）</strong></td><td><strong>1</strong></td><td><code>.DS_Store</code>（上記21件の外数）</td></tr>
+<tr><td>合計（処理済み）</td><td><strong>21</strong></td><td></td></tr>
+</tbody></table></div>
+<hr>
+<h2>詳細</h2>
+<h3>A. <code>docs/reference/fba-prep-center/</code> へ（1件）</h3>
+<div class="tw"><table><thead><tr><th>ファイル</th><th>受領</th><th>内容</th><th>判断理由</th></tr></thead><tbody>
+<tr><td><code>FBA納品代行業者_比較表スプレッドシート-Genspark_AI_Sheets-20260809_2323.xlsx</code> → <code>20260809_FBA納品代行業者_比較表.xlsx</code></td><td>2026-08-09 23:23</td><td>4シート構成。就労支援系5社（びーぷらすFBA / おりおんFBA / 糸星 / タイシンFBA / ほっこりーな博多）＋一般物流系4社（ラクロジ / ロジスピ / ユニストック / FBA代行センター）＋総合比較＋選び方の目安</td><td><strong>どのチケットにも紐づいていなかった取りこぼし。</strong> T-20260817-006 の③「FBA納品外注先」・T-20260603-005・T-20260520-004 に直結する現役資料</td></tr>
+</tbody></table></div>
+<p>付随して作成：</p>
+<ul>
+<li><code>20260809_FBA納品代行業者_比較表.md</code> — 全4シートのテキスト版（検索・引用用。社長の「テキスト＋別形式併出力」の好みに準拠）</li>
+<li><code>README.md</code> — 索引。既存チケットとの接続、要点サマリ、裏取り未実施の警告</li>
+</ul>
+<p><strong>⚠️ この資料は T-20260817-006 の判断根拠を一部覆します</strong>（就労支援系は月額固定費ほぼ無料 → 「固定費が出続けるから急がない」は一般物流系にしか当てはまらない）。詳細は原因究明レポート §5。</p>
+<hr>
+<h3>B. <code>_archive/2026-08/T-20260811-001_keepa-extension-screens/</code> へ（6件）</h3>
+<p>紐づくチケット: <strong>T-20260811-001</strong>（Keepa(Chrome拡張)の使い方マニュアル作成・現在 doing）</p>
+<div class="tw"><table><thead><tr><th>#</th><th>受領</th><th>内容</th><th>マニュアルへの反映</th></tr></thead><tbody>
+<tr><td>FireShot 021</td><td>08-11 21:34</td><td>Amazon商品ページ全体（AirPods Pro 第3世代 整備済み品）＋ Keepa Box 埋め込み</td><td>✅ 反映済</td></tr>
+<tr><td>FireShot 022</td><td>08-11 21:35</td><td>Keepa Box「商品のトラッキング」タブ（価格アラート設定）</td><td>✅ 反映済</td></tr>
+<tr><td>FireShot 023</td><td>08-11 21:38</td><td>Keepa Box「Data」タブ → Buy Box 統計情報（セラー別カート獲得シェア。新品FBA:22 / 新品FBM:6 / 中古FBA:3）</td><td>✅ 反映済</td></tr>
+<tr><td>FireShot 024</td><td>08-11 21:39</td><td>Keepa Box「バリエーション」タブ（バリエーション別 売れ筋ランキング）</td><td>✅ 反映済</td></tr>
+<tr><td>FireShot 025</td><td>08-11 21:40</td><td>Keepa Box「設定」タブ（チャート外観・トラッキング設定・Data設定・アドオン設定）</td><td>✅ 反映済</td></tr>
+<tr><td><strong>FireShot 026</strong></td><td><strong>08-12 12:32</strong></td><td><strong>keepa.com「出品者概要」ページ</strong>（セラー基本情報・パフォーマンス・期間別評価チャート・重複の多い主なセラー・カテゴリ/ブランド別リスティング統計）</td><td>❌ <strong>未反映</strong>（→ 社長判断②）</td></tr>
+</tbody></table></div>
+<p><strong>026 だけがどのチケットにも属していません。</strong> 021-025 は 08-11 に置かれた5枚で T-20260811-001 の入力素材ですが、026 は翌日に追加で置かれたものです。納品済み HTML・memory のいずれにも「出品者概要」の記述がないことを検索で確認済み。</p>
+<p><strong>⚠️ 026 には第三者事業者の商号・住所・法人番号・電話番号・代表者名が写り込んでいます。</strong> 引用時はマスク必須。</p>
+<hr>
+<h3>C. <code>_archive/2026-08/T-20260812-001_amzscout-onboarding/</code> へ（14件）</h3>
+<p>紐づくチケット: <strong>T-20260812-001</strong>（AMZScout PRO AI 使い方ナレッジ蓄積＋採否一次判断・<strong>done</strong>） ナレッジ化先: memory <code>knowledge_amzscout_pro_ai.md</code> ／ <code>deliverables/T-20260812-001/</code></p>
+<div class="tw"><table><thead><tr><th>時刻</th><th>内容</th></tr></thead><tbody>
+<tr><td>11.39.37</td><td>オンボーディング①「発見」— 検索語 <code>picnic basket with blanket</code>、トライアル残 <strong>16</strong></td></tr>
+<tr><td>11.39.51</td><td>オンボーディング②「AI分析」— AIがニッチと商品データを自動分析／価格・相場・トレンドの即時取得</td></tr>
+<tr><td>11.40.06 / 11.40.27 / 11.40.38</td><td>オンボーディング③「置き換え」④ — 順次ステップ解説</td></tr>
+<tr><td>11.40.50</td><td>オンボーディング⑥「完了！」— 主要機能の一巡完了</td></tr>
+<tr><td>11.41.06 / 11.41.18 / 11.41.29</td><td>拡張オンボーディング — 売上データ発見／製品機能AI分析／AIアシスタンス置き換え</td></tr>
+<tr><td>11.41.39</td><td><strong>「サプライヤー」</strong> — 画像検索で米中等のサプライヤーを逆引き。貿易通関・購入価格・最低注文数量で絞り込み</td></tr>
+<tr><td>11.41.53 / 11.42.05</td><td>研究のヒントプロモーション／完了ステップ</td></tr>
+<tr><td>11.42.31</td><td>表ビュー選択（コンパクト／フレキシブル）＋列セット選択（スターター／ブランド／再販業者）</td></tr>
+<tr><td>11.44.58</td><td>別キーワード <code>Relaxation Spa Gift Pack for Men</code> での実データ（トライアル残 <strong>15</strong>）</td></tr>
+</tbody></table></div>
+<p><strong>判断理由（破棄せずアーカイブ）</strong>: T-20260812-001 は A案で確定＝「今は契約せず、③簡易OEM（T-20260809-001）の具体検討フェーズで無料トライアル残回分だけ『サプライヤー逆引き＋AIリスティング』を検証する」。<strong>この14枚はその判断の根拠資料であり、③OEM 実行時に操作手順として再利用の見込みがあります。</strong></p>
+<p><strong>記録の訂正</strong>: T-20260812-001 は入力素材を「13枚」と記録していますが実測14枚。差分は <code>11.44.58</code>（検索語が他13枚と異なるため読解対象から漏れたと推定）。既知機能の別データ例にすぎず、<strong>採否判断の結論には影響しません。</strong></p>
+<hr>
+<h3>D. 破棄候補（社長承認待ち・<strong>未実行</strong>）</h3>
+<p>削除は CLAUDE.md §4.1（不可逆な削除）に該当するため、<strong>マリエは実行していません。</strong></p>
+<div class="tw"><table><thead><tr><th>ファイル</th><th>場所</th><th>理由</th><th>緊急度</th></tr></thead><tbody>
+<tr><td><code>.DS_Store</code></td><td><code>_inbox_社長共有/</code> 直下</td><td>macOS が自動生成する Finder 表示設定。情報価値ゼロ。削除しても必要時に再生成される。<code>.gitignore</code> 1行目で既に除外済みのためリポジトリは汚していない</td><td><strong>低</strong>（急いで消す必要なし）</td></tr>
+</tbody></table></div>
+<p><strong>破棄候補は以上1件のみです。</strong></p>
+<p>「もう使わないと思う」はアーカイブの理由であって、削除の理由ではありません。 残り21件はすべて役目を持ったファイルで、うち2件（xlsx / FireShot 026）は<strong>まだ働いていない</strong>ことが今回判明しました。 捨てずに、働ける場所へ移すのが正しい整理だと判断しています。</p>
+<hr>
+<h2>取りこぼしの内訳（今回の実害）</h2>
+<div class="tw"><table><thead><tr><th>種別</th><th>件数</th><th>詳細</th></tr></thead><tbody>
+<tr><td>チケットが存在せず、誰も気づいていなかった</td><td><strong>2</strong></td><td>xlsx（高価値・現行チケットの判断を覆す）／ FireShot 026（未反映のナレッジ）</td></tr>
+<tr><td>チケットで消費済みだが後片付けされず残置</td><td><strong>19</strong></td><td>FireShot 021-025（5）／ スクショ14枚（14）</td></tr>
+<tr><td>記録との食い違い</td><td><strong>1</strong></td><td>T-20260812-001「13枚」→ 実測14枚</td></tr>
+</tbody></table></div></div>

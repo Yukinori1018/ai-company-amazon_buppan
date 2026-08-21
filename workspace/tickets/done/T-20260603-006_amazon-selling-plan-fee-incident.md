@@ -1,5 +1,5 @@
 ---
-ticket_id: T-20260603-003
+ticket_id: T-20260603-006
 title: Amazon出品プラン誤登録（大口→小口）と月額5,390円の返金交渉
 status: done
 assignee: accounting
@@ -7,6 +7,7 @@ priority: high
 created_at: 2026-06-03
 updated_at: 2026-06-03
 completed_at: 2026-06-03
+renamed_from: T-20260603-003
 requires_approval: false
 labels: [amazon, seller-central, cost, incident]
 related_tickets: [T-20260601-005]
@@ -40,3 +41,5 @@ related_tickets: [T-20260601-005]
   返金交渉の要否を社長判断待ちとして waiting に起票。
 - 2026-06-03 社長判断：**返金交渉はしない**。小口変更で来月以降の月額は停止済のため本件クローズ → done。
 - 2026-08-21 **done へ移動**（カズヨ判定）。T-20260821-007 の棚卸しでマリエが「成果物は納品済みで waiting の札が外れていないだけ」と判定、根拠を確認のうえ受け入れ。社長レビューが必要なら差し戻し可。
+- 2026-08-21 **番号衝突を解消し T-20260603-003 → T-20260603-006 へ改番**（マリエ実施・カズヨ承認）。登録チェックリスト（`waiting/T-20260603-003_registration-checklist.md`）と ID が衝突していた。`deliverables/T-20260603-003/` が登録チェックリスト側の成果物であるため、**登録チェックリストが旧IDを保持**し、本チケットを改番した。
+  過去の会話・成果物・Notion 履歴に旧ID **T-20260603-003** が残っている場合は本チケットを指す。

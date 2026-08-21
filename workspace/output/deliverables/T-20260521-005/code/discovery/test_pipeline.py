@@ -379,7 +379,7 @@ def test_discover_by_finder_builds_selection_and_ranks(monkeypatch):
 
 
 def test_discover_by_finder_carries_maker(monkeypatch):
-    """メーカー仕入れ用（T-20260706-001）: Finder 出力 DiscoveryRow に maker が乗る。
+    """メーカー仕入れ用（T-20260706-002（旧 T-20260706-001））: Finder 出力 DiscoveryRow に maker が乗る。
 
     仕入元未特定でも（use_assumed_cost=False の正直保留行でも）メーカー名は保持され、
     メーカー抽出を Keepa 再クエリなしで discover 出力から取れることを保証する。

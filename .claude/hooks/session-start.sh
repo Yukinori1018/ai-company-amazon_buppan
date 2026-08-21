@@ -100,7 +100,64 @@ else
   REMINDER_MSG=""
 fi
 
-MESSAGE="${SYNC_MSG}${REMINDER_MSG}"
+# --- リマインダー③: _inbox_社長共有 の未処理ファイル検知（2026-08-21 追加 / T-20260821-009）---
+#
+# 背景: inbox は `.gitignore` 対象のため Git 差分に出ず、既存フック（PostToolUse のチケット同期・
+#       Stop の owner-tasks チェック）はいずれもリポ内の**追跡ファイル**変更を起点に動く。
+#       結果、inbox だけが全フックの死角になり、社長が置いたファイル21件が12日間放置された。
+#       ここで「ファイルが在ること」自体を毎セッション数え、プル型トリガー（社長の申告）への依存を断つ。
+#
+# 数え方: inbox 直下のみ（`-maxdepth 1`）。`_archive/`（処理済みの受け皿）・README.txt（運用説明）・
+#         .DS_Store（macOS 自動生成）は未処理カウントから除外する。
+
+INBOX_DIR="$REPO/_inbox_社長共有"
+INBOX_MSG=""
+
+if [ -d "$INBOX_DIR" ]; then
+  # 直下の通常ファイルのみを列挙（_archive/ 等のディレクトリは -type f で自然に除外される）
+  INBOX_FILES="$(find "$INBOX_DIR" -maxdepth 1 -type f \
+    ! -name 'README.txt' \
+    ! -name '.DS_Store' \
+    ! -name '.gitkeep' \
+    -print 2>/dev/null || true)"
+
+  if [ -n "$INBOX_FILES" ]; then
+    INBOX_COUNT="$(printf '%s\n' "$INBOX_FILES" | grep -c . || true)"
+
+    # 最古ファイルの更新日を取得（BSD stat = macOS。GNU stat にもフォールバック）
+    OLDEST_DATE=""
+    while IFS= read -r f; do
+      [ -n "$f" ] || continue
+      d="$(stat -f '%Sm' -t '%Y-%m-%d' "$f" 2>/dev/null || stat -c '%y' "$f" 2>/dev/null | cut -d' ' -f1)"
+      [ -n "$d" ] || continue
+      if [ -z "$OLDEST_DATE" ] || [[ "$d" < "$OLDEST_DATE" ]]; then
+        OLDEST_DATE="$d"
+      fi
+    done <<< "$INBOX_FILES"
+
+    # 上位5件だけ名前を出す（大量投入時にコンテキストを埋めないため）
+    INBOX_SAMPLE="$(printf '%s\n' "$INBOX_FILES" | head -5 | sed "s|^$INBOX_DIR/|  - |")"
+    if [ "$INBOX_COUNT" -gt 5 ]; then
+      INBOX_SAMPLE="${INBOX_SAMPLE}
+  - …ほか $((INBOX_COUNT - 5)) 件"
+    fi
+
+    INBOX_MSG="
+
+【SessionStart リマインダー③：_inbox_社長共有 に未処理ファイル】
+未処理 ${INBOX_COUNT} 件（最古 ${OLDEST_DATE:-不明}）。社長に「棚卸ししますか？」と1行で確認してください。
+
+${INBOX_SAMPLE}
+
+処理は**庶務マリエの定常責務**です。カズヨが自分で開いて読まないこと（抱え込み＝T-20260821-001）。
+手順: agents/general_affairs/skills/inbox-intake.md
+- 社長が「お願い」→ マリエへ Agent 発注（棚卸し → 紐付け → \`_archive/YYYY-MM/\` へ退避）
+- 社長が「後で」→ 何もしない（次セッションで再度この行が出ます）
+- 削除は CLAUDE.md §4.1（不可逆な削除）。破棄候補はリスト化して社長承認を取ること"
+  fi
+fi
+
+MESSAGE="${SYNC_MSG}${REMINDER_MSG}${INBOX_MSG}"
 
 # JSON エスケープ（python が無い環境を考慮し、jq があれば使う）
 if command -v jq >/dev/null 2>&1; then

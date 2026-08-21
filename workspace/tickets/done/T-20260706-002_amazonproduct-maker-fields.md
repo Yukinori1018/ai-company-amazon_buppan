@@ -1,5 +1,5 @@
 ---
-ticket_id: T-20260706-001
+ticket_id: T-20260706-002
 title: Sato-Scope に brand/manufacturer を恒久搭載（メーカー抽出の再実行不要化）
 status: done
 assignee: it_engineer
@@ -7,6 +7,7 @@ priority: medium
 created_at: 2026-07-06
 updated_at: 2026-07-06
 completed_at: 2026-07-06
+renamed_from: T-20260706-001
 requires_approval: false
 labels: [dev, sato-scope, maker-shiire]
 parent_ticket: T-20260521-005
@@ -41,3 +42,5 @@ T-20260705-002（メーカー仕入れワークフロー）で、サトルは ra
 ## アウトプット
 
 `workspace/output/deliverables/T-20260521-005/code/` 配下を直接改修（Sato-Scope 本体）。
+- 2026-08-21 **番号衝突を解消し T-20260706-001 → T-20260706-002 へ改番**（マリエ実施・カズヨ承認）。買い候補ショートリスト（`waiting/T-20260706-001_gem-vetting-and-buy-shortlist.md`）と ID が衝突していた。Notion カードが買い候補側のものであるため、**買い候補が旧IDを保持**し、本チケットを改番した。
+  過去の会話・成果物・Notion 履歴に旧ID **T-20260706-001** が残っている場合は本チケットを指す。
