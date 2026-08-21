@@ -1,10 +1,11 @@
 ---
-id: T-20260816-003
+ticket_id: T-20260816-003
 title: リサーチ用スプレッドシートに損益シミュレーション列群を追加（社長が数字で評価できる形へ）
 status: waiting
-owner: planner
+assignee: planner
 requires_approval: false
 created_at: 2026-08-16
+updated_at: 2026-08-21
 related:
   - T-20260816-001
   - T-20260816-002
@@ -28,3 +29,8 @@ FBA費用 = 販売手数料 + 基本成約料(小口¥100) + FBA配送代行手�
 ## 進め方
 見本を数商品でHTMLモック化→社長OKなら本番リサーチのGoogleシートテンプレに組込（SA経由）。以降そのシートで納品。
 §4.1非該当・自律進行。
+
+## ログ
+
+- 2026-08-21 frontmatter修復（マリエ）: assignee=planner を補完（`id:`→`ticket_id:` / `owner:`→`assignee:` へテンプレ準拠に統一）
+- 2026-08-21 assignee 判断メモ（マリエ）: スプレッドシート列設計は it_engineer 寄りとも読めるが、設計判断（損益列の定義）が主のため既存値 planner を維持。実装フェーズで再割当を検討。

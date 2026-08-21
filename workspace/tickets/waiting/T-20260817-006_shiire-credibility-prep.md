@@ -1,10 +1,11 @@
 ---
-id: T-20260817-006
+ticket_id: T-20260817-006
 title: メーカー仕入れ 信用構築の事前準備リスト（屋号/HP/納品外注＋見落とし）
 status: waiting
-owner: secretary
+assignee: secretary
 requires_approval: false
 created_at: 2026-08-17
+updated_at: 2026-08-21
 next_check_at: 2026-08-18
 related:
   - T-20260817-002
@@ -175,3 +176,5 @@ related:
 
 ## ログ追記
 - 2026-08-20 v3。メール非公開＋フォーム化、開店準備中の自動切替、お知らせ登録導線を実装。「商品がない」問題にA/B/C＋推奨Cで回答。社長へメール済。
+- 2026-08-21 frontmatter修復（マリエ）: assignee=secretary を補完（`id:`→`ticket_id:` / `owner:`→`assignee:` へテンプレ準拠に統一）
+- 2026-08-21 assignee 判断メモ（マリエ）: 制度の事実確認=researcher／会社概要PDF・HP等の資料化=content_creator の混成で単一担当を断定できず、secretary のまま留置。カズヨの再ルーティング判断待ち。

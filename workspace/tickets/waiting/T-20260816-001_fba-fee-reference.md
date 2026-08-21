@@ -1,10 +1,11 @@
 ---
-id: T-20260816-001
+ticket_id: T-20260816-001
 title: FBA料金 完全リファレンス（費目×最新単価）＋早見表＋具体商品シミュレーション
 status: waiting
-owner: researcher
+assignee: researcher
 requires_approval: false
 created_at: 2026-08-16
+updated_at: 2026-08-21
 next_check_at: 2026-08-17
 related:
   - knowledge_seller_operations_basics
@@ -29,3 +30,7 @@ related:
 ## メモ
 - §4.1 非該当（調査・社内資料のみ）。自律進行。
 </invoke>
+
+## ログ
+
+- 2026-08-21 frontmatter修復（マリエ）: assignee=researcher を補完（`id:`→`ticket_id:` / `owner:`→`assignee:` へテンプレ準拠に統一）

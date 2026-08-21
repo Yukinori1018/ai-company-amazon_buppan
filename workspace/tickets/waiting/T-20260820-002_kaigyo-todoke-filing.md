@@ -1,8 +1,8 @@
 ---
-id: T-20260820-002
+ticket_id: T-20260820-002
 title: 開業届（＋青色申告承認申請書）の提出支援
 status: waiting
-owner: secretary
+assignee: secretary
 requires_approval: false
 created_at: 2026-08-20
 updated_at: 2026-08-20
@@ -61,3 +61,5 @@ related:
 
 - 2026-08-20 doing 起票・着手。国税庁/e-Tax一次情報で裏どり完了、手順書＋記入シートを `deliverables/T-20260820-002/` に納品
 - 2026-08-20 waiting へ移動＝社長の確認3点（就業状況／マイナンバーカード／開業日）と提出実行を待つ
+- 2026-08-21 frontmatter修復（マリエ）: assignee=secretary を補完（`id:`→`ticket_id:` / `owner:`→`assignee:` へテンプレ準拠に統一）
+- 2026-08-21 assignee 判断メモ（マリエ）: 税務手続=accounting／許認可・法令解釈=legal／手順書化=content_creator に跨り単一担当を断定できず、secretary のまま留置。カズヨの再ルーティング判断待ち。

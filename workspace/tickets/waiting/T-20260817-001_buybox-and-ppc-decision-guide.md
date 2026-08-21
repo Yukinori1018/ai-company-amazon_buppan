@@ -1,10 +1,11 @@
 ---
-id: T-20260817-001
+ticket_id: T-20260817-001
 title: カート（おすすめ出品）獲得ルールの全体像＋PPC投入要否と必要額の整理
 status: waiting
-owner: researcher
+assignee: researcher
 requires_approval: false
 created_at: 2026-08-17
+updated_at: 2026-08-21
 next_check_at: 2026-08-18
 related:
   - T-20260816-002
@@ -57,3 +58,7 @@ related:
 1. T-20260816-003 の損益シートに「許容CPC」列＋「広告成立判定」列を追加（許容CPC＝1個純利益×CVR）
 2. 「初回FBA納品の直前に大口へ切替」を固定タスク化（切替忘れ防止）
 3. 最初のSKU確定時に、その商品専用の広告初期設計（オート開始/日予算/除外語/停止条件）を1枚で提出
+
+## ログ
+
+- 2026-08-21 frontmatter修復（マリエ）: assignee=researcher を補完（`id:`→`ticket_id:` / `owner:`→`assignee:` へテンプレ準拠に統一）

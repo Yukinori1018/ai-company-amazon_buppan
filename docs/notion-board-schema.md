@@ -47,6 +47,8 @@
 | legal | 法務（ハルオ） |
 | general_affairs | 庶務（マリエ） |
 | content_creator | コンテンツ制作（ヒデアキ） |
+| it_engineer | IT エンジニア（タカシ） |
+| owner | 社長本人（残作業が社長の手作業のみのチケット） |
 
 ### Priority（固定値）
 

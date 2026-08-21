@@ -1,10 +1,11 @@
 ---
-id: T-20260816-002
+ticket_id: T-20260816-002
 title: 利益計算ツール選定（FBA料金シミュレーター＋Keepa）＋実践手順マニュアル
 status: waiting
-owner: content_creator
+assignee: content_creator
 requires_approval: false
 created_at: 2026-08-16
+updated_at: 2026-08-21
 next_check_at: 2026-08-17
 related:
   - T-20260816-001
@@ -29,3 +30,7 @@ related:
 ## 担当
 ヒデアキ（コンテンツ制作）＝手順書。サトル（リサーチャー）＝最新UI事実確認。
 §4.1非該当・自律進行。</invoke>
+
+## ログ
+
+- 2026-08-21 frontmatter修復（マリエ）: assignee=content_creator を補完（`id:`→`ticket_id:` / `owner:`→`assignee:` へテンプレ準拠に統一）

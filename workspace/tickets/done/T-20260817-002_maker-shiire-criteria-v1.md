@@ -1,10 +1,11 @@
 ---
-id: T-20260817-002
+ticket_id: T-20260817-002
 title: メーカー仕入れ 仕入れ方針v1の確定＋Keepa具体設定＋4段ふるい
 status: done
-owner: planner
+assignee: planner
 requires_approval: false
 created_at: 2026-08-17
+updated_at: 2026-08-21
 next_check_at: 2026-08-18
 related:
   - T-20260817-001
@@ -102,3 +103,7 @@ FBA配送料が定額のため単価が下がると経費率が跳ね上がる�
    - 特にドロップ数減少が決定的（値下げは「価格が理由」を解決するが「需要がない」は解決しない）
 
 → **方針確定につき done。実行フェーズは T-20260817-005 へ。**
+
+## ログ
+
+- 2026-08-21 frontmatter修復（マリエ）: assignee=planner を補完（`id:`→`ticket_id:` / `owner:`→`assignee:` へテンプレ準拠に統一）

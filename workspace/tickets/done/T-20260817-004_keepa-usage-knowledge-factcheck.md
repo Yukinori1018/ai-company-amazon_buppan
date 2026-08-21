@@ -1,10 +1,11 @@
 ---
-id: T-20260817-004
+ticket_id: T-20260817-004
 title: Keepa実務ナレッジ（うみぞう動画）の受領・裏どり・ナレッジ化
 status: done
-owner: researcher
+assignee: researcher
 requires_approval: false
 created_at: 2026-08-17
+updated_at: 2026-08-21
 related:
   - T-20260811-001
   - T-20260816-001
@@ -74,3 +75,4 @@ related:
 
 - 2026-08-17: 起票 → 原本保全 → 裏どり（keepa.com実機／当社FBA料金表 T-20260816-001 と突合）→ メモリ2件更新 → 検証レポート納品 → waiting。
 - 2026-08-17: 社長回答で確認3点すべてクローズ → 成果物 v1.1 へ改訂（クォータの誤りを訂正・スクショで3段構成を確定）→ done。
+- 2026-08-21 frontmatter修復（マリエ）: assignee=researcher を補完（`id:`→`ticket_id:` / `owner:`→`assignee:` へテンプレ準拠に統一）

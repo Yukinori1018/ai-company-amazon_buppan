@@ -1,10 +1,11 @@
 ---
-id: T-20260811-001
+ticket_id: T-20260811-001
 title: Keepa(Chrome拡張)の使い方マニュアル作成
 status: doing
-owner: content_creator
+assignee: content_creator
 requires_approval: false
 created_at: 2026-08-11
+updated_at: 2026-08-21
 next_check_at: 2026-08-12
 source: 社長依頼（_inbox_社長共有 のKeepaスクショ5枚をもとに正確な使い方を解説）
 ---
@@ -25,3 +26,4 @@ source: 社長依頼（_inbox_社長共有 のKeepaスクショ5枚をもとに�
 
 ## ログ
 - 2026-08-11 起票。スクショ5枚を全読了・拡大確認。5タブ構成を実画面から確定。HTML納品予定。
+- 2026-08-21 frontmatter修復（マリエ）: assignee=content_creator を補完（`id:`→`ticket_id:` / `owner:`→`assignee:` へテンプレ準拠に統一）

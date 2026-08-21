@@ -9,10 +9,25 @@ updated_at: YYYY-MM-DD
 requires_approval: false
 labels: []
 parent_ticket: ""
+next_check_at: YYYY-MM-DD
+related_tickets: []
 ---
+
+> ⚠️ **frontmatter のキー名は変更しないこと（機械が読む契約です）。**
+> `ticket_id` は `.claude/hooks/session-start.sh` が awk で直読みし、
+> `ticket_id` / `title` / `status` / `assignee` / `priority` / `requires_approval` /
+> `created_at` / `updated_at` / `labels` / `parent_ticket` は Notion カンバンの各列に
+> 1対1でマップされます（[docs/notion-board-schema.md](../../docs/notion-board-schema.md)）。
+> 過去に `ticket_id`→`id` / `assignee`→`owner` と勝手に別名を使った13枚が、
+> フックのID表示欠落と Notion の担当欄空白を引き起こしました（T-20260821-003 で修復）。
+> **省略は可、リネームは不可。** 表記ゆれ注意：`related_tickets`（`related` ではない）、
+> `next_check_at`（`doing/` と `waiting/` の日次リマインダーが読む）。
+> `assignee` の値は固定語彙：`secretary` / `researcher` / `planner` / `simulator` /
+> `accounting` / `legal` / `general_affairs` / `content_creator` / `it_engineer` / `owner`。
 
 > このファイルは雛形です。`_` 始まりのファイルは秘書のチケットスキャン対象外です。
 > 新規起票時はコピーして `<ticket_id>_<短いスラッグ>.md` にリネームし、`todo/` 配下に配置してください。
+> `next_check_at` はリマインダー不要なら行ごと削除して構いません。
 
 ## チケット粒度の目安
 

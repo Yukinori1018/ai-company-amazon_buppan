@@ -1,10 +1,11 @@
 ---
-id: T-20260817-003
+ticket_id: T-20260817-003
 title: Amazon出品制限（ゲート）のルール明確化＋ナレッジ化＋仕入れフローへの組み込み
 status: done
-owner: researcher
+assignee: researcher
 requires_approval: false
 created_at: 2026-08-17
+updated_at: 2026-08-21
 next_check_at: 2026-08-18
 related:
   - T-20260817-002
@@ -90,3 +91,7 @@ related:
 - **「初回1SKUは制限なしから選ぶ」縛りは撤廃**（商品の幅を狭めるため）→ 発注前ワンクリック解除テスト＋請求書記載の事前確約を必須化
 - 撤退条件は T-20260817-002 側で判断基準へ変更
 → ナレッジ `knowledge_listing_restrictions_ungating` に確定内容を反映済み。**done**。
+
+## ログ
+
+- 2026-08-21 frontmatter修復（マリエ）: assignee=researcher を補完（`id:`→`ticket_id:` / `owner:`→`assignee:` へテンプレ準拠に統一）

@@ -1,10 +1,11 @@
 ---
-id: T-20260817-005
+ticket_id: T-20260817-005
 title: メーカー仕入れ 方針v1.3の実行 — Keepa実走→4段ふるい→候補リスト/シート化
 status: doing
-owner: researcher
+assignee: researcher
 requires_approval: false
 created_at: 2026-08-17
+updated_at: 2026-08-21
 next_check_at: 2026-08-18
 related:
   - T-20260817-002
@@ -42,3 +43,7 @@ T-20260817-002 の仕入れ方針が **v1.3 で確定**（社長裁可 2026-08-1
 
 ## 社長のアクション
 当面なし。候補リスト（Googleシート）ができた段階で報告する。
+
+## ログ
+
+- 2026-08-21 frontmatter修復（マリエ）: assignee=researcher を補完（`id:`→`ticket_id:` / `owner:`→`assignee:` へテンプレ準拠に統一）

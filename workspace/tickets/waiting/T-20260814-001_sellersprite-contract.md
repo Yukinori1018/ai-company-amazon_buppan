@@ -1,10 +1,11 @@
 ---
-id: T-20260814-001
+ticket_id: T-20260814-001
 title: セラースプライト契約（申込ガイド作成→社長申込）
 status: waiting
-owner: owner
+assignee: owner
 requires_approval: true
 created_at: 2026-08-14
+updated_at: 2026-08-21
 next_check_at: 2026-08-15
 source: 社長決定（2026-08-14「セラースプライトを契約してみましょう」）
 ---
@@ -28,3 +29,5 @@ source: 社長決定（2026-08-14「セラースプライトを契約してみ�
 - 2026-08-14 起票。社長が契約決定。サトルに申込ガイド調査を発注（背景実行）。申込・決済は社長手作業のため確定後 waiting へ。
 - 2026-08-14 サトル調査完了。成果物 sellersprite-signup-guide.html/.md 納品。推奨＝**B（無料/トライアル→スタンダード月額¥13,998を1か月検証→続けるなら年額¥139,998/16%OFF）**。4基準はKWリサーチ＋トレンドで測定可能とマッピング。**waiting（社長の申込・決済待ち）へ遷移**。カタログCSV追記済み。
 - ⚠️要確認（申込画面の実表示が最終の正）: 無料トライアル日数(EN3日/JP記事7日)・クーポン有効性・JP/US月額差。
+- 2026-08-21 frontmatter修復（マリエ）: assignee=owner を補完（`id:`→`ticket_id:` / `owner:`→`assignee:` へテンプレ準拠に統一）
+- 2026-08-21 assignee 判断メモ（マリエ）: 調査/ガイド作成部分は researcher 完了済み。残作業は社長本人の申込・決済のみのため、`owner` を維持（notion-ticket-sync.md の Assignee 許容値）。
