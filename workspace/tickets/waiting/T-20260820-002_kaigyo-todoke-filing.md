@@ -63,3 +63,4 @@ related_tickets:
 - 2026-08-20 waiting へ移動＝社長の確認3点（就業状況／マイナンバーカード／開業日）と提出実行を待つ
 - 2026-08-21 frontmatter修復（マリエ）: assignee=secretary を補完（`id:`→`ticket_id:` / `owner:`→`assignee:` へテンプレ準拠に統一）
 - 2026-08-21 assignee 判断メモ（マリエ）: 税務手続=accounting／許認可・法令解釈=legal／手順書化=content_creator に跨り単一担当を断定できず、secretary のまま留置。カズヨの再ルーティング判断待ち。
+- 2026-08-21 **担当は secretary（カズヨ）で確定**。T-20260821-001 の再ルーティング検討に対し社長判断「開業届支援はカズヨのままでOK」。以後この点を蒸し返さない。

@@ -9,7 +9,7 @@ updated_at: 2026-08-05
 requires_approval: false
 labels: [it-engineer, spec, amazon-spapi, yahoo-auction, scaffold]
 related_tickets: [T-20260521-005]
-next_check_at: 2026-08-06
+next_check_at: 2026-09-16
 ---
 
 ## イシュー
@@ -75,3 +75,4 @@ next_check_at: 2026-08-06
   - 安全弁: DRY_RUN既定ON、上限価格ガード(maxSourcePrice)、1日購入上限、二重購入防止、購入失敗アラート。
   - サーバーアプリ版(tools/re-sale-autosync)は参照実装として残置（SP-API書込の確実化に将来再利用）。
   - 制約明記: 監視はChrome起動中のみ/セラーセントラル・ヤフオクのDOMセレクタは実画面で要調整。
+- 2026-08-21 棚卸し（マリエ／T-20260821-007）: next_check_at 2026-08-06 → 2026-09-16 に再設定。仕分け=A。理由: ④無在庫の探索。T-20260812-004 と同じプロジェクトなので同日に揃えて一体レビュー

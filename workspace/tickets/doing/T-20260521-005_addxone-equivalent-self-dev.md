@@ -6,7 +6,7 @@ assignee: it_engineer
 priority: high
 created_at: 2026-05-21
 updated_at: 2026-06-09
-next_check_at: 2026-06-10
+next_check_at: 2026-09-10
 requires_approval: true
 labels: [dev, research, mvp, tooling]
 related_tickets: [T-20260520-006]
@@ -130,3 +130,4 @@ A/B/C 判断後に Phase 1（API 接続検証）着手。Phase 1 時点で Keepa
 **🎉 ツール完成（(い)モード本番稼働）。社長アクション＝実際に使ってフィードバック。**
 - 起動: `cd workspace/output/agent_output/T-20260521-005/code && python3 -m streamlit run app_discovery.py` →(い)モードで「水筒」等を検索→実利益ランキング確認。
 - 次の発展候補（社長の感触次第・要相談）: (あ)Amazon起点モード実装／楽天API追加（無料）／プリセット調整／NETSEA卸の手動投入対応。
+- 2026-08-21 棚卸し（マリエ／T-20260821-007）: next_check_at 2026-06-10 → 2026-09-10 に再設定。仕分け=A。理由: Sato-Scope の親。子は生きているが、実利はKeepa API直運用で出ており優先度は下がる

@@ -6,7 +6,7 @@ assignee: planner
 priority: high
 created_at: 2026-08-09
 updated_at: 2026-08-09
-next_check_at: 2026-08-10
+next_check_at: 2026-08-23
 requires_approval: false
 labels: [strategy, niche-oem, sku, planner, maker-shiire]
 related_tickets: [T-20260804-001, T-20260803-001, T-20260705-002, T-20260612-002]
@@ -45,3 +45,4 @@ related_tickets: [T-20260804-001, T-20260803-001, T-20260705-002, T-20260612-002
 
 - 2026-08-09 todo 起票 →（同turn）doing：プランナー・タケシへ発注
 - 2026-08-09 タケシ立案完了（三手法比較/SKU配分/finder_niche_oem接続設計/PL試算/撤退条件/30-60-90日/A/B/C＋推奨B）→ waiting（社長レビュー＋最初の一手Go待ち）。Notion=waiting同期・owner-tasks反映・カタログ追記
+- 2026-08-21 棚卸し（マリエ／T-20260821-007）: next_check_at 2026-08-10 → 2026-08-23 に再設定。仕分け=B。理由: ③OEM。タケシがA/B/C＋推奨Bまで出し「最初の一手」のGo待ち＝社長判断が明確に必要

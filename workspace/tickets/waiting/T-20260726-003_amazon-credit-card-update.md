@@ -7,7 +7,7 @@ priority: medium
 created_at: 2026-07-26
 updated_at: 2026-07-26
 requires_approval: false
-next_check_at: 2026-07-27
+next_check_at: 2026-09-01
 labels: [seller-central, payment, credit-card, setup, blocked-external]
 related_tickets: [T-20260603-003, T-20260715-001]
 ---
@@ -49,3 +49,4 @@ related_tickets: [T-20260603-003, T-20260715-001]
 ## ログ
 - 2026-07-26 カズヨ: ログイン/LINE連携の解決に続き、カード変更は Amazon 側「内部エラー」で保留。忘れ防止のため本チケット起票（社長の「順番通りにしないと忘れる」懸念を記録側で吸収）。
 - 2026-07-26 カズヨ: 銀行口座ページも同エラー、2FA両方式OKでもページ側が内部エラーと判明。認証問題ではなくAmazon側ページ障害と切り分け。サポート案件へ方針転換（初期の同一タブ説・重複アカウント説はいずれも訂正）。
+- 2026-08-21 棚卸し（マリエ／T-20260821-007）: next_check_at 2026-07-27 → 2026-09-01 に再設定。仕分け=A。理由: Amazon側のページ内部エラーで停止。1ヶ月経過し復旧の可能性が高いので再試行のタイミング

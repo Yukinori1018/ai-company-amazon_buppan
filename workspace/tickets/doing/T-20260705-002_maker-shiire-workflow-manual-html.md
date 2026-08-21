@@ -6,7 +6,7 @@ assignee: content_creator
 priority: high
 created_at: 2026-07-05
 updated_at: 2026-07-05
-next_check_at: 2026-07-06
+next_check_at: 2026-08-27
 requires_approval: false
 labels: [maker-shiire, ec-stars, workflow, manual, html, deliverable]
 related_tickets: [T-20260612-002, T-20260610-001, T-20260520-012]
@@ -49,3 +49,4 @@ related_tickets: [T-20260612-002, T-20260610-001, T-20260520-012]
 - 制約: Keepa残トークン僅少（実際は約114・補充20/分。ブリーフの1,198は誤り）。1バッチ厳格実行。量産は次ローカル回。
 - 申し送り(IT): 既存 _product_to_amazon() が brand/manufacturer を捨てる→恒久化は AmazonProduct に列追加が筋。.env 実在は agent_output/T-20260521-005/code/.env。
 - 次: 法務ハルオにNGカテゴリ正式レビュー／社長がどのメーカーに問い合わせるか選定→論点2（問い合わせ）へ。
+- 2026-08-21 棚卸し（マリエ／T-20260821-007）: next_check_at 2026-07-06 → 2026-08-27 に再設定。仕分け=A。理由: ②メーカー仕入れの本線ど真ん中。3点納品済だが doing のまま滞留

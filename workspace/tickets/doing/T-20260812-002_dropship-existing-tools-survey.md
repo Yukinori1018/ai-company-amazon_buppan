@@ -9,7 +9,7 @@ updated_at: 2026-08-12
 requires_approval: false
 labels: [researcher, survey, dropship, mujaiko, chrome-extension, existing-first]
 related_tickets: [T-20260805-001, T-20260521-005]
-next_check_at: 2026-08-13
+next_check_at: 2026-09-08
 ---
 
 ## イシュー
@@ -41,3 +41,4 @@ next_check_at: 2026-08-13
 ## ログ
 
 - 2026-08-12: 起票。サトルへ発注（WebSearch中心）。無在庫の進捗サマリはカズヨが社長へ即時提示。
+- 2026-08-21 棚卸し（マリエ／T-20260821-007）: next_check_at 2026-08-13 → 2026-09-08 に再設定。仕分け=A。理由: ④無在庫の探索。自作前に既存を調べる工程（feedback_research_existing_before_build）でAutoSync開発より前に置く

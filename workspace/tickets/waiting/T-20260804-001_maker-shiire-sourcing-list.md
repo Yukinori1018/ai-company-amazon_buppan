@@ -6,7 +6,7 @@ assignee: secretary
 priority: high
 created_at: 2026-08-04
 updated_at: 2026-08-04
-next_check_at: 2026-08-05
+next_check_at: 2026-08-27
 requires_approval: false
 labels: [maker-shiire, research, keepa, spreadsheet, overnight]
 related_tickets: [T-20260705-002, T-20260803-001, T-20260612-001]
@@ -55,3 +55,4 @@ Amazon売れ筋商品の**メーカー**をナレッジ基準で選別し、連�
 2. カズヨへ「このメーカーに連絡」と一言 → 問い合わせメール文面を作成しA/B提示。
 3. **メーカーへの実送信は§4.1（第三者連絡）＝社長承認必須**。承認後に送信。
 4. 連絡先の追加取得が必要なら、次バッチ（中小61位以下）を続行可能。
+- 2026-08-21 棚卸し（マリエ／T-20260821-007）: next_check_at 2026-08-05 → 2026-08-27 に再設定。仕分け=A。理由: 本線。55社台帳は T-20260817-005 が消化月数順に再ソート中。単独レビューでなく合流後に出すのが筋

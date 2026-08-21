@@ -6,7 +6,7 @@ assignee: secretary
 priority: high
 created_at: 2026-08-03
 updated_at: 2026-08-03
-next_check_at: 2026-08-04
+next_check_at: 2026-11-01
 requires_approval: false
 labels: [shiire-sedori, research, keepa, netsea, spreadsheet, overnight]
 related_tickets: [T-20260705-001, T-20260706-001, T-20260521-005]
@@ -64,3 +64,4 @@ Amazon売れ筋商品をリサーチし、**商品＋仕入れ先のリスト**�
 1. `SS4446_原石`(83件・純利益降順) と `SS4446_全リスト` を眺める。
 2. 試しに仕入れる1〜数SKUを選ぶ → カズヨへ一言（**実購入は§4.1金銭＝承認必須**、勝手に買いません）。
 3. 選定後、Amazon実ページ×仕入先ページで同一商品を目視確認 → 小さく本番。
+- 2026-08-21 棚卸し（マリエ／T-20260821-007）: next_check_at 2026-08-04 → 2026-11-01 に再設定。仕分け=A。理由: ①電脳せどりは社長指示でホールド中。再開指示まで着手しないため、四半期レビューの位置まで送る

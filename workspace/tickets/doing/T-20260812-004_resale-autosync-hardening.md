@@ -9,7 +9,7 @@ updated_at: 2026-08-12
 requires_approval: false
 labels: [it-engineer, chrome-extension, hardening, risk-assessment, autonomous]
 related_tickets: [T-20260805-001, T-20260812-002]
-next_check_at: 2026-08-13
+next_check_at: 2026-09-16
 ---
 
 ## イシュー
@@ -38,3 +38,4 @@ next_check_at: 2026-08-13
   - v0.5.0: B3 UNKNOWN連続の手動確認通知（checkFailCount未反応の穴を解消）＋パーサ回帰fixture拡充（誤ENDED防止）。**テスト35ケース緑**。
   - **完成度**: headlessで到達可能な改善はほぼ出し切り（RISK_ASSESSMENTチェックリスト参照）。残＝実画面依存の最終確認(B3/B4)＝社長のセラーセントラル/ヤフオク実画面 or 保存HTML待ち、本番E2E(DRY_RUN解除・実購入)＝§4.1承認待ち。
   - ループはこの収束点で停止。次セッションのSessionStartフック（next_check_at）で継続をリマインド。
+- 2026-08-21 棚卸し（マリエ／T-20260821-007）: next_check_at 2026-08-13 → 2026-09-16 に再設定。仕分け=A。理由: 同上（Re-Sale AutoSync の自律改善）。T-20260805-001 とセットで見る

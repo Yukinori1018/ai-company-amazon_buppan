@@ -6,7 +6,7 @@ assignee: secretary
 priority: high
 created_at: 2026-07-06
 updated_at: 2026-07-06
-next_check_at: 2026-07-07
+next_check_at: 2026-08-24
 requires_approval: false
 labels: [dennou-sedori, vetting, shortlist, keepa]
 related_tickets: [T-20260705-001, T-20260521-005]
@@ -45,3 +45,4 @@ related_tickets: [T-20260705-001, T-20260521-005]
 ## ログ
 - 2026-07-06 起票・doing。クリーン原石47件を入口に罠フィルタ実装。
 - 2026-07-06 vetting_filter.py 実装・実行→買い候補17件抽出、スプレッドシートにタブ追加。**waiting=実購入の社長承認待ち**へ。§4.1（金銭）該当のため自動購入せず停止。
+- 2026-08-21 棚卸し（マリエ／T-20260821-007）: next_check_at 2026-07-07 → 2026-08-24 に再設定。仕分け=B。理由: 買い候補17件が§4.1（実購入）で停止。買うか見送るかの判断が要る。全方向共通の作業でホールド対象外
