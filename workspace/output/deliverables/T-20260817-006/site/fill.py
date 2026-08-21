@@ -28,7 +28,7 @@ DIST = os.path.join(os.path.dirname(HERE), "会社概要_配布用")
 TARGET_EXT = (".html", ".xml", ".txt")
 
 QUESTIONS = [
-    ("DOMAIN", "独自ドメイン（例: satoyselect.com）※ https:// や www. は不要", "satoyselect.com", True),
+    ("DOMAIN", "独自ドメイン ※ https:// や www. は不要", "satoy-select.com", True),
     ("OWNER_NAME", "代表者のお名前（例: 佐藤 幸則）", "", True),
     ("ADDRESS", "所在地", "〒146-0091 東京都大田区鵜の木2-47-20 303号", True),
     ("EMAIL", "メールアドレス ※サイトには載りません。メーカー様へお渡しする会社概要PDFにのみ使います", "", True),

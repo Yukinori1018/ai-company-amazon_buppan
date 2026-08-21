@@ -34,3 +34,11 @@ workspace/.sync/
 
 # settings.json の編集前バックアップ（ローカル保持・追跡しない）
 .claude/settings.json.bak.*
+
+# fill.py の生成物（T-20260817-006 / Satoy Select サイト）
+# 「会社概要_配布用」には代表者名・住所・メール・電話が入った profile.html と PDF が出る。
+# このリポジトリは PUBLIC かつ .claude/scripts/github-sync.sh が30分ごとに
+# `git add -A` → push するため、追跡すると個人情報がそのまま世界に公開される。
+# 「公開用」も fill.py がいつでも再生成できる成果物なので追跡しない。
+公開用/
+会社概要_配布用/
