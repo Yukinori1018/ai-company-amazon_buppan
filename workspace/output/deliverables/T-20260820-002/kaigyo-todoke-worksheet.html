@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>開業届 提出ワークシート（Satoy Select）</title>
+<style>
+  :root{
+    --bg:#ffffff; --fg:#1a1a1a; --muted:#5b6470; --line:#e3e7ec;
+    --accent:#0b63c4; --accent-soft:#eaf2fc; --amzd:#146eb4;
+    --ok:#137333; --okbg:#eaf6ec; --warn:#b06000; --warnbg:#fff6e5; --ng:#b3261e; --ngbg:#fdecea;
+    --card:#f7f9fb; --num:#0f1b25; --hl:#fff3bf;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#12151a; --fg:#e8ecf1; --muted:#9aa4b0; --line:#2a303a;
+      --accent:#5fa8ff; --accent-soft:#1a2532; --card:#1a1e25; --warnbg:#2a2313; --warn:#e0a94a;
+      --okbg:#14251a; --ok:#6fce8a; --ngbg:#2a1614; --ng:#ff8a80; --hl:#3a3418; }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);font-family:-apple-system,"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;line-height:1.75;font-size:15.5px}
+  .wrap{max-width:900px;margin:0 auto;padding:32px 22px 80px}
+  h1{font-size:25px;line-height:1.35;margin:0 0 6px}
+  .sub{color:var(--muted);font-size:13.5px;margin:0 0 24px}
+  h2{font-size:20px;margin:44px 0 12px;padding-top:16px;border-top:2px solid var(--line);display:flex;align-items:center;gap:10px}
+  h2 .n{flex:0 0 auto;width:30px;height:30px;border-radius:8px;background:var(--accent);color:#fff;font-size:15px;display:inline-flex;align-items:center;justify-content:center;font-weight:700}
+  h3{font-size:16.5px;margin:24px 0 6px}
+  h4{font-size:14.5px;margin:18px 0 4px;color:var(--accent)}
+  p{margin:8px 0}
+  ul,ol{margin:8px 0;padding-left:22px} li{margin:6px 0}
+  .lead{background:var(--accent-soft);border:1px solid var(--accent);border-radius:12px;padding:16px 18px;margin:0 0 16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:12px 0}
+  .warn{background:var(--warnbg);border:1px solid var(--warn);border-radius:12px;padding:14px 16px;margin:14px 0}
+  .bad{background:var(--ngbg);border:1px solid var(--ng);border-radius:12px;padding:14px 16px;margin:14px 0}
+  .good{background:var(--okbg);border:1px solid var(--ok);border-radius:12px;padding:14px 16px;margin:14px 0}
+  .ok{color:var(--ok);font-weight:700}.ng{color:var(--ng);font-weight:700}.warnt{color:var(--warn);font-weight:700}
+  mark{background:var(--hl);color:inherit;padding:1px 3px;border-radius:3px}
+  .tw{overflow-x:auto}
+  table{border-collapse:collapse;width:100%;margin:12px 0;font-size:13.5px}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:var(--card)}
+  tr.hi td{background:var(--okbg)}
+  .num{text-align:right;font-variant-numeric:tabular-nums}
+  .pill{display:inline-block;font-size:11px;font-weight:700;padding:2px 9px;border-radius:999px;color:#fff;vertical-align:middle}
+  .pill.fix{background:var(--ok)} .pill.est{background:var(--warn)} .pill.own{background:var(--amzd)}
+  .foot{margin-top:44px;padding-top:16px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px}
+  .foot a{color:var(--accent)}
+  .rank{font-size:22px;font-weight:800;color:var(--accent)}
+  .chk{list-style:none;padding-left:0}
+  .chk li{margin:10px 0;padding-left:30px;position:relative}
+  .chk li::before{content:"";position:absolute;left:0;top:3px;width:17px;height:17px;border:2px solid var(--accent);border-radius:4px}
+  .big{font-size:19px;font-weight:800;color:var(--accent)}
+  .val{font-weight:700;background:var(--hl);color:#1a1a1a;padding:1px 6px;border-radius:4px;display:inline-block}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>開業届 提出ワークシート<br>この1枚を見ながら入力してください</h1>
+<p class="sub">Satoy Select ／ T-20260820-002 ／ 秘書カズヨ ／ 2026-08-21 確定版<br>社長のご回答を反映：①勤務先あり（副業として開業）／②マイナンバーカードあり・署名用パスワード判明／③開業日 = 2026-08-20</p>
+
+<div class="lead">
+<b>⏰ 締切</b>
+<div class="tw"><table style="margin:8px 0">
+<tr><th style="width:34%">書類</th><th style="width:26%">締切</th><th>備考</th></tr>
+<tr><td>開業届</td><td>2027-03-15</td><td>2026年から緩和されました</td></tr>
+<tr class="hi"><td><b>青色申告承認申請書</b></td><td><span class="big">2026-10-20（火）</span></td><td>★ <b>実質の締切はこちら。</b>外すと2026年分は白色＝<b>65万円控除ゼロ</b></td></tr>
+</table></div>
+<p style="margin:8px 0"><b>所要 15〜30分・費用0円。</b> 今日やってしまうのが一番ラクです。</p>
+</div>
+
+<h2><span class="n">0</span>使うもの ／ 利用者識別番号がない場合の事前準備</h2>
+<div class="card">
+<b>手元に用意するもの</b>
+<ul style="margin:8px 0">
+<li>Mac（書類の作成）＋ <b>iPhone</b>（マイナンバーカードの読み取りと送信）</li>
+<li>マイナンバーカード</li>
+<li><b>署名用パスワード</b>（英数字6〜16桁・大文字）</li>
+<li><b>利用者証明用パスワード</b>（数字4桁）</li>
+<li><b>e-Taxの利用者識別番号（16桁）</b> → 心当たりがなければ下記で先に取得</li>
+</ul>
+</div>
+<div class="warn">
+<b>利用者識別番号（16桁）を持っていない場合だけ（5分・無料）</b>
+<ol style="margin:8px 0">
+<li>Mac の Safari で <b>e-Taxソフト（WEB版）</b> を開く →「マイナンバーカードでログイン」</li>
+<li>iPhone の <b>マイナポータル</b>アプリでカードを読み取る</li>
+<li>初回は利用者情報の登録画面が出るので、氏名・住所・所轄税務署などを入力</li>
+<li><b>発行された16桁の利用者識別番号を控える</b></li>
+</ol>
+<p style="margin:8px 0">すでに確定申告をe-Taxでしたことがあれば、その時の番号がそのまま使えます。</p>
+</div>
+
+<h2><span class="n">1</span>Macで書類を2枚作る（10分）</h2>
+<p><b>「マネーフォワード クラウド開業届」</b>（無料）を開き、質問に答えていきます。<b>開業届と青色申告承認申請書が同時に作られます</b>（片方を出し忘れる事故を防げるのが、このサービスの一番の価値です）。※ freee開業でも同じことができます。どちらでも構いません。</p>
+<div class="tw">
+<table>
+<tr><th style="width:34%">聞かれること</th><th>入力する値（そのまま写してください）</th></tr>
+<tr><td>氏名・生年月日・住所</td><td>社長ご本人のもの</td></tr>
+<tr><td>電話番号</td><td>ご自身の携帯で可</td></tr>
+<tr class="hi"><td><b>屋号</b></td><td><span class="val">Satoy Select</span></td></tr>
+<tr class="hi"><td><b>仕事の種類 / 職業</b></td><td><span class="val">小売業</span></td></tr>
+<tr class="hi"><td><b>仕事の概要 / 事業の概要</b></td><td><span class="val">インターネットを利用した各種商品の小売（Amazon等のECモールでの販売）</span></td></tr>
+<tr class="hi"><td><b>開業日</b></td><td><span class="val">2026年8月20日</span></td></tr>
+<tr><td>所得の種類</td><td><b>事業所得</b></td></tr>
+<tr><td>事業所の所在地</td><td><b>自宅（納税地と同じ）</b>を選択</td></tr>
+<tr><td>提出先の税務署</td><td>自宅住所から<b>自動で選ばれます</b>。念のため表示された税務署名を控えておいてください</td></tr>
+<tr><td>従業員（給与を支払う人）</td><td><b>いない / 0人</b></td></tr>
+<tr><td>家族への給与（専従者）</td><td><b>なし</b></td></tr>
+<tr class="hi"><td><b>青色申告を申請しますか</b></td><td><span class="val">はい（申請する）</span> ← ★絶対に「はい」</td></tr>
+<tr class="hi"><td><b>簿記の形式</b></td><td><span class="val">複式簿記</span> ← ★65万円控除の必須条件。<span class="ng">簡易簿記にすると最大10万円</span></td></tr>
+<tr><td>備付帳簿</td><td><b>総勘定元帳・仕訳帳</b>を必ず含める（＋現金出納帳・売掛帳・買掛帳・経費帳・固定資産台帳）</td></tr>
+<tr><td>消費税の課税事業者を選択しますか</td><td><b>いいえ</b></td></tr>
+<tr><td>インボイス（適格請求書発行事業者）登録</td><td><b>しない</b></td></tr>
+</table>
+</div>
+
+<h2><span class="n">2</span>iPhoneで送信する（5分）</h2>
+<p>マネーフォワードの <b>「③書類の提出」</b> 画面で <b>「スマホで電子申告（おすすめ）」</b> を選び、以下の順に進みます。</p>
+<ol>
+<li>画面のQRコードを iPhone で読み取り → <b>マネーフォワード クラウド確定申告アプリ</b>をインストール →「ログイン」をタップ</li>
+<li>事業者タイプ → <b>「個人または個人事業主」</b>を選択</li>
+<li>利用規約と個人情報の取扱いを確認 → チェック →「サービスの利用をはじめる」</li>
+<li><b>「開業届等を確認（PDF）」をタップして中身を必ず目視確認</b> ← ★ここが最後の砦です。次の§3で照合してください</li>
+<li>「開業届を提出する」をタップ</li>
+<li><b>マイナンバー（12桁）</b>と<b>利用者識別番号（16桁）</b>を入力 →「次へ進む」</li>
+<li><b>署名用パスワード</b>（英数字6〜16桁）と<b>利用者証明用パスワード</b>（数字4桁）を入力 →「読み取り開始」→ iPhoneの背面にマイナンバーカードを当てる</li>
+<li><b>「開業届データの送信が完了しました」</b>が出れば完了</li>
+</ol>
+
+<h2><span class="n">3</span>送信ボタンを押す前の最終チェック（ステップ2-4のPDFで）</h2>
+<div class="good">
+<ul class="chk">
+<li>屋号が <b>Satoy Select</b> になっている</li>
+<li>開業日が <b>2026年8月20日</b> になっている（★過去に遡っていないか）</li>
+<li>青色申告承認申請書が <b>一緒に作られている</b>（開業届1枚だけになっていないか）</li>
+<li>青色申告承認申請書の <b>簿記方式が「複式簿記」</b>（★ここが「簡易簿記」だと65万円→10万円）</li>
+<li>備付帳簿に <b>総勘定元帳・仕訳帳</b> が入っている</li>
+<li>「令和8年分以後の所得税の申告は、青色申告書によりたい」と <b>令和8年</b> になっている</li>
+<li>消費税課税事業者選択届出書が <b>付いていない</b></li>
+</ul>
+</div>
+
+<h2><span class="n">4</span>送信したあと（その日のうちに）</h2>
+<ol>
+<li><b>e-Taxの受信通知をPDFで保存</b><br>
+ウェブ版e-Taxにログイン → メインメニュー → <b>メッセージボックス</b> →「お知らせ・受信通知」<br>
+2025年1月に税務署の収受日付印が廃止されたため、<b>これが提出証明</b>になります（屋号口座の開設やメーカーからの書類要求で使います）。マネーフォワード側でも、ホーム画面の「開業届提出完了履歴」で直近5件を確認できます</li>
+<li><b>受信通知PDFの保管場所を私に一言ください</b> → 台帳に記録します</li>
+<li><b>HPの所在地・代表者表記を開業届と一致させる</b>〔T-20260817-006〕</li>
+<li><b>Amazonセラーセントラルの事業者情報と屋号をそろえる</b></li>
+<li><b>今日から領収書・請求書を捨てない</b>（記帳と保存が事業所得の実質要件。保存がないと赤字の損益通算も青色控除も使えません）</li>
+</ol>
+
+<h2><span class="n">5</span>副業として開業される社長へ</h2>
+<div class="card">
+<p style="margin:8px 0"><b>開業届の提出そのものに、勤務先への通知はありません。</b> 気をつけるのは<b>来年の確定申告のとき</b>の1点だけです。</p>
+<ul style="margin:8px 0">
+<li>確定申告書の <b>「住民税・事業税に関する事項」→「給与から差引き / 自分で納付」</b> で、<b>「自分で納付（普通徴収）」</b>を選ぶ。選ばないと副業分の住民税が勤務先の給与から天引きされ、経理が金額のズレに気づくことがあります</li>
+<li>⚠️ ただし正直に申し上げると、<b>事業所得が赤字で給与と損益通算すると住民税が下がる</b>ため、この経路では別の形で目立ちます。物販の初年度は仕入れ先行で赤字になりやすいので、そもそも<b>勤務先の就業規則で副業が認められているか</b>を先に確認しておくのが本筋です</li>
+<li>社会保険（健康保険・厚生年金）は<b>勤務先のまま変わりません</b>。開業届を出しても国民健康保険に切り替わることはありません</li>
+</ul>
+<p style="margin:8px 0">来年の申告時期になったら、私からこの点を必ずリマインドします。</p>
+</div>
+
+<h2><span class="n">6</span>つまずいたら</h2>
+<div class="tw">
+<table>
+<tr><th style="width:40%">症状</th><th>対処</th></tr>
+<tr><td>16桁の利用者識別番号がわからない</td><td>§0で新規取得。過去にe-Tax申告をしていれば同じ番号</td></tr>
+<tr><td>署名用パスワードを3回間違えてロックされた</td><td>市区町村の窓口で<b>即日再設定</b>（マイナンバーカード持参）</td></tr>
+<tr><td>iPhoneがカードを読み取らない</td><td>ケースを外し、カードの<b>中央</b>をiPhone背面上部に当てて動かさない</td></tr>
+<tr><td>「開業届は出したが青色を忘れた」と後で気づいた</td><td><b>2026-10-20 までなら青色だけ単独で出せます</b>（e-Taxソフト（WEB版）に「所得税の青色申告承認申請」があり、こちらはMacで完結します）</td></tr>
+</table>
+</div>
+
+<div class="foot">
+<p><b>提出が終わったら一言ください。</b> チケット T-20260820-002 を done に落とし、次の一手（屋号付き銀行口座 → メーカーへの問い合わせ）に進みます。</p>
+<p>制度の根拠と判断の詳細は <b>kaigyo-todoke-guide.html</b>（実務ガイド）に。手順はマネーフォワード公式サポート「開業届の電子申告 画面の使い方」で画面遷移を確認しています。</p>
+<p>秘書カズヨ ／ T-20260820-002 ／ 2026-08-21</p>
+</div>
+
+</div>
+</body>
+</html>

@@ -5,8 +5,8 @@ status: waiting
 assignee: secretary
 requires_approval: false
 created_at: 2026-08-20
-updated_at: 2026-08-20
-next_check_at: 2026-08-21
+updated_at: 2026-08-21
+next_check_at: 2026-08-22
 priority: high
 labels: [tax, setup, owner-action]
 related_tickets:
@@ -40,7 +40,7 @@ related_tickets:
 - [x] 記入内容を当社の確定事項で埋めた「そのまま写せる」記入シートを作成
 - [x] 青色申告承認申請書・65万円控除・消費税・副業論点まで含めて手順書化
 - [x] 成果物を deliverables に納品（md + HTML）
-- [ ] 社長の確認3点（就業状況／マイナンバーカード／開業日）を受けて記入シートを確定
+- [x] 社長の確認3点（就業状況／マイナンバーカード／開業日）を受けて記入シートを確定
 - [ ] 社長が提出完了 → done
 
 ## 重要な発見（裏どり結果）
@@ -64,3 +64,4 @@ related_tickets:
 - 2026-08-21 frontmatter修復（マリエ）: assignee=secretary を補完（`id:`→`ticket_id:` / `owner:`→`assignee:` へテンプレ準拠に統一）
 - 2026-08-21 assignee 判断メモ（マリエ）: 税務手続=accounting／許認可・法令解釈=legal／手順書化=content_creator に跨り単一担当を断定できず、secretary のまま留置。カズヨの再ルーティング判断待ち。
 - 2026-08-21 **担当は secretary（カズヨ）で確定**。T-20260821-001 の再ルーティング検討に対し社長判断「開業届支援はカズヨのままでOK」。以後この点を蒸し返さない。
+- 2026-08-21 社長の確認3点を回答受領（副業／カードあり／開業日8-20）→ 確定版ワークシートを納品。マネーフォワード公式サポートで画面遷移を確認。**青色の締切=2026-10-20**を明示。カタログ追記・Notion更新済
