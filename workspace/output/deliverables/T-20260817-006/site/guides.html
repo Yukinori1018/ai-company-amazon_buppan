@@ -50,7 +50,10 @@
       </p>
     </div>
 
-    <div class="guide-grid">
+    <div class="slider">
+      <button class="slider-nav prev" type="button" aria-label="前へ">‹</button>
+      <button class="slider-nav next" type="button" aria-label="次へ">›</button>
+      <div class="slider-track">
       <a class="guide-card" href="guide-cutting-board.html">
         <img class="thumb" src="assets/img/guide-cutting-board.svg" alt="4種類のまな板のイラスト">
         <span class="tag">キッチン用品</span>
@@ -63,25 +66,15 @@
           <span class="more">読む →</span>
         </div>
       </a>
-
-      <div class="guide-card soon">
-        <span class="thumb">近日公開</span>
-        <span class="tag">準備中</span>
+      <a class="guide-card" href="guide-bottle.html">
+        <img class="thumb" src="assets/img/guide-bottle.svg" alt="4種類の詰め替えボトルのイラスト">
+        <span class="tag">日用品</span>
         <div class="body">
-          <h3>詰め替えボトルの選び方</h3>
-          <p>容量・口径・ポンプの押し心地・詰め替えやすさ。似て見えて、使い勝手が大きく分かれる道具です。</p>
-          <span class="more">近日公開</span>
+          <h3>詰め替えボトルの選び方<br>中身に合う容器の見分け方</h3>
+          <p>アルコールでPETが劣化する、泡ポンプが詰まる。中身と材質の相性を先に決めれば防げます。</p>
+          <span class="more">読む →</span>
         </div>
-      </div>
-
-      <div class="guide-card soon">
-        <span class="thumb">近日公開</span>
-        <span class="tag">準備中</span>
-        <div class="body">
-          <h3>デスクライトの選び方</h3>
-          <p>明るさの単位、演色性、調光・調色。カタログの数字のどこを見れば失敗しないのかを整理します。</p>
-          <span class="more">近日公開</span>
-        </div>
+      </a>
       </div>
     </div>
 
@@ -117,5 +110,30 @@
   </div>
 </footer>
 
+
+<script>
+  document.querySelectorAll('.slider').forEach(function (sl) {
+    var track = sl.querySelector('.slider-track');
+    var prev = sl.querySelector('.slider-nav.prev');
+    var next = sl.querySelector('.slider-nav.next');
+    if (!track || !prev || !next) return;
+
+    function step() {
+      var card = track.firstElementChild;
+      return card ? card.getBoundingClientRect().width + 20 : 340;
+    }
+    function sync() {
+      var over = track.scrollWidth - track.clientWidth;
+      sl.classList.toggle('scrollable', over > 8);
+      prev.disabled = track.scrollLeft <= 2;
+      next.disabled = track.scrollLeft >= over - 2;
+    }
+    prev.addEventListener('click', function () { track.scrollBy({left: -step()}); });
+    next.addEventListener('click', function () { track.scrollBy({left: step()}); });
+    track.addEventListener('scroll', sync, {passive: true});
+    window.addEventListener('resize', sync);
+    sync();
+  });
+</script>
 </body>
 </html>

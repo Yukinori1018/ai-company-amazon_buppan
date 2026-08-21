@@ -457,3 +457,32 @@ figure.fig figcaption{
 .article > img.eyecatch{
   width:100%;display:block;border:1px solid var(--line);border-radius:12px;margin:0 0 30px;
 }
+
+/* ---------- ガイドのスライダー ---------- */
+.slider{position:relative}
+.slider-track{
+  display:flex;gap:20px;overflow-x:auto;scroll-snap-type:x mandatory;
+  scroll-behavior:smooth;padding:4px 2px 14px;
+  scrollbar-width:thin;scrollbar-color:#c3ccd6 transparent;
+}
+.slider-track::-webkit-scrollbar{height:8px}
+.slider-track::-webkit-scrollbar-thumb{background:#c3ccd6;border-radius:4px}
+.slider-track::-webkit-scrollbar-track{background:transparent}
+.slider-track > *{flex:0 0 330px;scroll-snap-align:start}
+.slider-nav{
+  position:absolute;top:38%;width:42px;height:42px;border-radius:50%;
+  background:#fff;border:1px solid var(--line);box-shadow:0 2px 10px rgba(20,30,50,.14);
+  display:none;align-items:center;justify-content:center;cursor:pointer;
+  color:var(--navy);font-size:19px;line-height:1;z-index:3;
+}
+.slider-nav:hover{background:var(--navy);color:#fff;border-color:var(--navy)}
+.slider-nav:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.slider-nav.prev{left:-14px}
+.slider-nav.next{right:-14px}
+.slider.scrollable .slider-nav{display:flex}
+.slider-nav[disabled]{opacity:.32;cursor:default}
+.slider-nav[disabled]:hover{background:#fff;color:var(--navy);border-color:var(--line)}
+@media (max-width:640px){
+  .slider-track > *{flex:0 0 84%}
+  .slider-nav{display:none !important}
+}
