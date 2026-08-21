@@ -219,9 +219,14 @@ todo → doing → waiting → done
   - 社長への情報提供・URL 共有などの依頼待ち
   - 社長自身の手作業待ち（例：アカウント開設、API キー取得）
   - 判断に迷い社長に確認したい時
-  > どの状態に入れるか迷ったら「社長が次に手を動かす必要があるか？」で判定。Yes なら waiting、No なら doing/todo。
-  > （旧「📋 社長タスクまとめ」カードは廃止。waiting 列がその役割を担う。）
-- **done:** 完了。社長が確認済み、または自動進行で完了。
+  > 迷ったら「社長が次に手を動かす必要があるか？」で判定。Yes なら waiting、No なら doing/todo。（旧「📋 社長タスクまとめ」カードは廃止し、waiting 列が役割を引き継いだ）
+
+  **レビュー待ちの期限（2026-08-21 社長承認）:** 上記のうち **「納品物の社長レビュー待ち」に限り**、`next_check_at` を過ぎても社長の反応が無ければ、**秘書が done にしてよいかを判定します**。自動では done になりません。判定するのは秘書であり、**確認が取れなければ done にしない**。手順は [agents/secretary/skills/ticket-management.md](agents/secretary/skills/ticket-management.md) §レビュー待ちの期限判定。
+
+  **期限が適用されないもの（時間の経過で可決されることはありません）:**
+  - **§4.1 該当の承認待ち**（金銭・契約・外部発信・不可逆な削除・第三者連絡）— **社長が承認するまで、何日経っても未承認です。**
+  - **社長自身の手作業待ち**（アカウント開設・API キー取得など）— 社長が手を動かすまで進みません。
+- **done:** 完了。社長が確認済み、**または秘書が上記の期限判定で done にしたもの**（判定者と根拠をチケットに残す）。
 
 詳細運用は [workspace/README.md](workspace/README.md)、起票・状態遷移の手順は [agents/secretary/skills/ticket-management.md](agents/secretary/skills/ticket-management.md)、サブエージェントの作業ルールは [workspace/SUBAGENT_PROTOCOL.md](workspace/SUBAGENT_PROTOCOL.md)。
 
