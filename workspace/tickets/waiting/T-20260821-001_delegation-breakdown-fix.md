@@ -1,7 +1,7 @@
 ---
 ticket_id: T-20260821-001
 title: 「カズヨの抱え込み」再発の原因究明と構造的改善（親）
-status: doing
+status: waiting
 assignee: secretary
 priority: high
 created_at: 2026-08-21

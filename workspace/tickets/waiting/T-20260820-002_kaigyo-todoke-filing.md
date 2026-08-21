@@ -9,7 +9,7 @@ updated_at: 2026-08-20
 next_check_at: 2026-08-21
 priority: high
 labels: [tax, setup, owner-action]
-related:
+related_tickets:
   - T-20260817-006
   - T-20260603-003
   - T-20260726-002

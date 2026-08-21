@@ -6,7 +6,7 @@ assignee: researcher
 requires_approval: false
 created_at: 2026-08-17
 updated_at: 2026-08-21
-related:
+related_tickets:
   - T-20260811-001
   - T-20260816-001
   - T-20260817-002

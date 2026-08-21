@@ -6,6 +6,7 @@ assignee: secretary
 priority: high
 created_at: 2026-05-20
 updated_at: 2026-05-29
+next_check_at: 2026-08-24
 requires_approval: false
 labels: [research, simulation, foundation, learning]
 ---
@@ -42,3 +43,4 @@ labels: [research, simulation, foundation, learning]
 ## 社長判断待ち
 
 **納品済みのシミュレーション資料（playbook-final）に目を通し、一言フィードバックをください。** 問題なければ done にします。
+- 2026-08-21 next_check_at=2026-08-24 を付与（マリエ／T-20260821-005）: 納品済・社長レビュー待ち。初回FBA納品が近づき再浮上する内容のため今週中

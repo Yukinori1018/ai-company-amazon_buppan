@@ -8,7 +8,7 @@ created_at: 2026-08-20
 updated_at: 2026-08-20
 priority: high
 labels: [knowledge, legal, compliance]
-related:
+related_tickets:
   - knowledge_kobutsusho_license
   - T-20260817-002
   - T-20260603-003

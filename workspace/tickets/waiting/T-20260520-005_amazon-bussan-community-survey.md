@@ -6,6 +6,7 @@ assignee: researcher
 priority: high
 created_at: 2026-05-20
 updated_at: 2026-05-20
+next_check_at: 2026-09-01
 requires_approval: false
 labels: [research, learning, foundation]
 parent_ticket: ""
@@ -32,3 +33,4 @@ parent_ticket: ""
 - 2026-05-20 doing 起票（中⇒高に格上げ。軸B 着手前に必要）
 - 2026-05-20 役割再編に伴い assignee を secretary → researcher（サトル）に変更
 - 2026-05-20 doing → waiting に移動。レポート完了、社長レビュー待ち
+- 2026-08-21 next_check_at=2026-09-01 を付与（マリエ／T-20260821-005）: レポート納品済・レビュー待ちで3ヶ月停止。月初にまとめて棚卸し

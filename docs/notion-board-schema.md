@@ -50,6 +50,18 @@
 | it_engineer | IT エンジニア（タカシ） |
 | owner | 社長本人（残作業が社長の手作業のみのチケット） |
 
+> ⚠️ **記法に注意：チケットの `assignee` は snake_case、`.claude/agents/` のエージェント名はハイフン。別物です。**
+> 同じ「担当」を指しますが、参照する側が違うため綴りも別系統になっています。
+>
+> | 使う場所 | 綴り | 例 |
+> |---|---|---|
+> | チケット frontmatter の `assignee` ／ Notion の Assignee 列 | **snake_case** | `general_affairs` / `content_creator` / `it_engineer` |
+> | `.claude/agents/*.md` のファイル名＝Agent ツールで指定するエージェント名 | **ハイフン** | `general-affairs` / `content-creator` / `it-engineer` |
+>
+> 相互に置き換えないこと。snake_case を Agent ツールに渡しても解決されず、
+> ハイフンを `assignee` に書くと Notion の Select 選択肢に一致せず同期が落ちます。
+> （`researcher` / `planner` / `simulator` / `accounting` / `legal` は1語なので両者同じ綴りです。）
+
 ### Priority（固定値）
 
 | 値 | 色（推奨） |

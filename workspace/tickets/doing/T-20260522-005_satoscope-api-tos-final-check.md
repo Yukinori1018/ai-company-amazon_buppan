@@ -6,6 +6,7 @@ assignee: legal
 priority: medium
 created_at: 2026-05-22
 updated_at: 2026-05-25
+next_check_at: 2026-08-25
 requires_approval: false
 labels: [legal, sato-scope, tos-review]
 related_tickets: [T-20260521-005]
@@ -56,3 +57,4 @@ todo。ハルオ発注待ち。
 
 - 2026-05-22 起票（Phase 2 §4.1 承認前の最終確認）
 - 2026-05-25 社長「承認不要なものは全て進めて」＋Phase 2 継続方針 → todo → doing。ハルオ発注（§4.2）
+- 2026-08-21 next_check_at=2026-08-25 を付与（マリエ／T-20260821-005）: ⚠️Keepa API を T-20260817-005 で実運用中なのに ToS 最終確認が未了。放置不可のため前倒し

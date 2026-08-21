@@ -9,7 +9,7 @@ updated_at: 2026-06-01
 requires_approval: false
 next_check_at: 2026-06-02
 labels: [infra, git, notion, governance, incident]
-parent: null
+parent_ticket: ""
 ---
 
 # T-20260531-001 ローカル⇄GitHub⇄Notion 同期の破綻復旧と再発防止
@@ -37,3 +37,4 @@ parent: null
 ## ログ
 - 2026-05-31 起票。調査で原因特定（ローカル/GitHub分離＋Notion二重書込）。Plan A（リポジトリ=真実）で社長合意。社長Mac操作の要否を確認中。
 </content>
+- 2026-08-21 frontmatter統一（マリエ／T-20260821-005）: `parent:`→`parent_ticket:` に統一（Notion の ParentTicket 列にマップされる正式キー。`null` はテンプレ準拠で `""` に）

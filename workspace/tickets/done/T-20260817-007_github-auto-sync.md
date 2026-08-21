@@ -10,7 +10,7 @@ completed_at: 2026-08-17
 requires_approval: false
 next_check_at: null
 labels: [infra, git, automation]
-parent: T-20260531-001
+parent_ticket: T-20260531-001
 ---
 
 # T-20260817-007 GitHub 同期の常設自動化
@@ -58,3 +58,4 @@ parent: T-20260531-001
   `com.aicompany.amazon-buppan.night-shift` が参照する `.claude/scripts/night-shift.sh` が不在で、
   少なくとも 2026-08-17 05:00 時点まで毎回起動失敗していた（＝夜間自走は動いていない）。
   復旧の要否は社長判断待ち。
+- 2026-08-21 frontmatter統一（マリエ／T-20260821-005）: `parent:`→`parent_ticket:` に統一（Notion の ParentTicket 列にマップされる正式キー。`null` はテンプレ準拠で `""` に）

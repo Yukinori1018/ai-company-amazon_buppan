@@ -6,6 +6,7 @@ assignee: it_engineer
 priority: high
 created_at: 2026-07-05
 updated_at: 2026-07-05
+next_check_at: 2026-09-03
 requires_approval: false
 labels: [infra, new-business, scaffold]
 parent_ticket: ""
@@ -34,3 +35,4 @@ parent_ticket: ""
 - 2026-07-05 2フォルダ生成→waiting（社長のフォルダ移動＋初回セットアップ待ち）
 - 2026-07-06 社長方針確認: タスク管理/成果物管理の「やり方」は踏襲、ただし**更新先Notion DB・スプレッドシートは各事業で新規**とする。雛形からAmazon固有ID（Notion Database/Data Source ID・Drive file id）を全除去しプレースホルダー化（残存0件検証）。両scaffoldのhandoverを「移動後セッション向け起動チェックリスト（新規DB/新規シート作成を明記）」に更新。
 - 2026-07-06 社長方針: 2事業を順番に立ち上げ、**第1弾＝動画投稿事業**。§1（事業内容・KPI）はフォルダ移動後の新規セッションで調査から確定する。
+- 2026-08-21 next_check_at=2026-09-03 を付与（マリエ／T-20260821-005）: Amazon物販の本線外（他事業の雛形）。IT は T-20260821-002 直後で手が塞がるため月初

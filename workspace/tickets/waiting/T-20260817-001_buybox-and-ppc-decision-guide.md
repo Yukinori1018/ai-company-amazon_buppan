@@ -7,7 +7,7 @@ requires_approval: false
 created_at: 2026-08-17
 updated_at: 2026-08-21
 next_check_at: 2026-08-18
-related:
+related_tickets:
   - T-20260816-002
   - T-20260816-001
   - T-20260809-001

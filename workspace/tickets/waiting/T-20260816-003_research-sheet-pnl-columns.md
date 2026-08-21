@@ -6,7 +6,8 @@ assignee: planner
 requires_approval: false
 created_at: 2026-08-16
 updated_at: 2026-08-21
-related:
+next_check_at: 2026-08-22
+related_tickets:
   - T-20260816-001
   - T-20260816-002
   - knowledge_seller_operations_basics
@@ -34,3 +35,4 @@ FBA費用 = 販売手数料 + 基本成約料(小口¥100) + FBA配送代行手�
 
 - 2026-08-21 frontmatter修復（マリエ）: assignee=planner を補完（`id:`→`ticket_id:` / `owner:`→`assignee:` へテンプレ準拠に統一）
 - 2026-08-21 assignee 判断メモ（マリエ）: スプレッドシート列設計は it_engineer 寄りとも読めるが、設計判断（損益列の定義）が主のため既存値 planner を維持。実装フェーズで再割当を検討。
+- 2026-08-21 next_check_at=2026-08-22 を付与（マリエ／T-20260821-005）: 本線直結。T-20260817-005 の候補シート生成と連動するため最優先で翌日

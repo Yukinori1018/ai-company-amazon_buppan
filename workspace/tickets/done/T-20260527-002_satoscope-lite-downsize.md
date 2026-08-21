@@ -9,7 +9,7 @@ updated_at: 2026-06-01
 requires_approval: false
 labels: [dev, tooling, satoscope, hybrid-strategy]
 related_tickets: [T-20260521-005, T-20260527-001]
-parent: T-20260521-005
+parent_ticket: T-20260521-005
 restored_from: notion
 ---
 
@@ -52,3 +52,4 @@ pytest 12/12 PASS、サンプル CSV で CLI 実動作確認済み（Sony 警告
 ## ログ
 - 2026-05-27 起票・即着手・done（タカシ、pytest 12/12 PASS）
 - 2026-06-01 Notion からリポジトリへ復元（同期破綻の復旧）。コード本体の取り込みは要確認として明記
+- 2026-08-21 frontmatter統一（マリエ／T-20260821-005）: `parent:`→`parent_ticket:` に統一（Notion の ParentTicket 列にマップされる正式キー。`null` はテンプレ準拠で `""` に）

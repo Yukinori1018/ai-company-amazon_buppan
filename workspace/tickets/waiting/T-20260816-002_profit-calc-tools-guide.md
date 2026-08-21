@@ -7,7 +7,7 @@ requires_approval: false
 created_at: 2026-08-16
 updated_at: 2026-08-21
 next_check_at: 2026-08-17
-related:
+related_tickets:
   - T-20260816-001
   - T-20260811-001
   - knowledge_seller_operations_basics

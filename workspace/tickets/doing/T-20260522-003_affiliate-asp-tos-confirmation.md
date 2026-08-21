@@ -6,6 +6,7 @@ assignee: legal
 priority: medium
 created_at: 2026-05-22
 updated_at: 2026-05-25
+next_check_at: 2026-09-08
 requires_approval: false
 labels: [legal, sato-scope, tos-review]
 related_tickets: [T-20260521-005]
@@ -52,3 +53,4 @@ todo。ハルオ発注待ち。
 
 - 2026-05-22 起票（社長 A1 承認に基づく並行調査チケット）
 - 2026-05-25 社長「承認不要なものは全て進めて」 → todo → doing。ハルオ発注（§4.2、T-22-005 と並行）
+- 2026-08-21 next_check_at=2026-09-08 を付与（マリエ／T-20260821-005）: Sato-Scope 系。①電脳せどりホールドに連動して優先度低下

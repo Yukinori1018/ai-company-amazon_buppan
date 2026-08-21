@@ -1,7 +1,7 @@
 ---
 ticket_id: T-20260821-003
 title: チケット frontmatter の修復（assignee 欠落13枚）＋Notion/社長タスク同期
-status: doing
+status: done
 assignee: general_affairs
 priority: high
 created_at: 2026-08-21

@@ -7,7 +7,7 @@ requires_approval: false
 created_at: 2026-08-17
 updated_at: 2026-08-21
 next_check_at: 2026-08-18
-related:
+related_tickets:
   - T-20260817-002
   - T-20260804-001
   - knowledge_listing_restrictions_ungating

@@ -1,7 +1,7 @@
 ---
 ticket_id: T-20260821-004
 title: 委譲ルールの改訂文（CLAUDE.md §5 / routing.md）
-status: doing
+status: done
 assignee: content_creator
 priority: high
 created_at: 2026-08-21

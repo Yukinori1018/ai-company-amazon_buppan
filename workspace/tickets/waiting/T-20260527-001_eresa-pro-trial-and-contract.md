@@ -9,7 +9,7 @@ updated_at: 2026-06-01
 requires_approval: true
 labels: [tooling, subscription, eresa, hybrid-strategy]
 related_tickets: [T-20260520-003, T-20260522-004, T-20260521-005]
-parent: null
+parent_ticket: ""
 next_check_at: 2026-06-02
 restored_from: notion
 ---
@@ -57,3 +57,4 @@ restored_from: notion
 ## ログ
 - 2026-05-27 起票。B案ハイブリッド戦略の社長承認を受け waiting（社長の試用申込待ち・§4.1）
 - 2026-06-01 Notion からリポジトリへ復元（同期破綻の復旧）。next_check_at を 2026-06-02 に更新
+- 2026-08-21 frontmatter統一（マリエ／T-20260821-005）: `parent:`→`parent_ticket:` に統一（Notion の ParentTicket 列にマップされる正式キー。`null` はテンプレ準拠で `""` に）

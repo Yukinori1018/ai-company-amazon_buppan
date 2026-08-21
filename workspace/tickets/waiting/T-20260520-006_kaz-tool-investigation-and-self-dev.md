@@ -6,6 +6,7 @@ assignee: researcher
 priority: medium
 created_at: 2026-05-20
 updated_at: 2026-05-29
+next_check_at: 2026-09-02
 requires_approval: false
 labels: [research, tooling, dev, idea]
 ---
@@ -39,3 +40,4 @@ labels: [research, tooling, dev, idea]
 - 2026-05-20 todo 起票。社長からの追加情報待ち
 - 2026-05-20 役割再編に伴い assignee を secretary → researcher（サトル）に変更。自社開発 vs 既存 vs ハイブリッドの戦略判断はプランナー（タケシ）にバトンパス予定
 - 2026-05-29 waiting へ移動（新基準＝社長タスク一覧化）。社長の情報提供待ち
+- 2026-08-21 next_check_at=2026-09-02 を付与（マリエ／T-20260821-005）: 社長の情報提供待ちで3ヶ月停止。ツール選定は Keepa/セラースプライトで概ね決着済み

@@ -1,7 +1,7 @@
 ---
 ticket_id: T-20260821-002
 title: サブエージェント8体を .claude/agents/ に実体登録＋委譲チェックフック
-status: doing
+status: done
 assignee: it_engineer
 priority: high
 created_at: 2026-08-21

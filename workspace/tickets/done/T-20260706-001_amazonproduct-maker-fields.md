@@ -10,7 +10,7 @@ completed_at: 2026-07-06
 requires_approval: false
 labels: [dev, sato-scope, maker-shiire]
 parent_ticket: T-20260521-005
-related: [T-20260705-002]
+related_tickets: [T-20260705-002]
 ---
 
 ## 背景
