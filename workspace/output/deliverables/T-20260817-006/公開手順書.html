@@ -242,18 +242,27 @@
 <tr><td><b>メールアドレス</b></td><td><b>サイトには出ません。</b>メーカー様へ渡す会社概要PDFにだけ使います</td></tr>
 <tr><td><b>電話番号</b></td><td><b>空エンター</b>。電話の欄がサイトから消えます</td></tr>
 <tr><td><b>FAX番号</b></td><td><b>空エンター</b></td></tr>
-<tr><td><b>開業年月</b></td><td><code>2026年8月</code> のように</td></tr>
+<tr><td><b>開業年月</b></td><td><code>2026年8月</code> のように。<b>開業届がまだなら空エンター</b>でOK（「開業」の行が消えるだけです。あとから入れ直せます）</td></tr>
 <tr><td><b>AmazonストアのURL</b></td><td>まだなら<b>空エンター</b>。ストアのボタンが消え、「まもなく公開します」の案内が出ます</td></tr>
 <tr class="hi"><td><b>GoogleフォームのURL</b></td><td>ステップ⓪でコピーしたもの</td></tr>
-<tr><td><b>Search Console の確認コード</b></td><td>ステップ④でもらいます。<b>初回は空エンター</b>でOK</td></tr>
+<tr class="hi"><td><b>Search Console の確認コード</b></td><td>ステップ④の1〜3で受け取れます。<b>先にそこだけ済ませて取ってくると、この作業が一度で終わります</b>（後回しにする場合は空エンターでOK。あとで <code>fill.py</code> を再実行して貼れば全ページに自動で入ります）</td></tr>
 </table>
 </div>
 
 <div class="good">
-<p style="margin:0">終わると <code>最新版_0821e/公開用/</code> というフォルダができます。
-<b>この中身が、そのままアップロードするファイルです。</b><br>
-同時に <code>Satoy-Select_会社概要.pdf</code>（A4・2枚）も作られます。これはアップロード不要で、
-メーカー様へのメールに添付する資料です。</p>
+<p style="margin:0"><b>終わると、フォルダが2つできます。役割がまったく違うのでご注意ください。</b></p>
+<table style="margin:10px 0 0">
+<tr><td style="white-space:nowrap"><b>✅ <code>公開用/</code></b></td><td><b>サーバーへアップロードするのは、こちらだけです。</b>ホームページ一式が入っています</td></tr>
+<tr><td style="white-space:nowrap"><b>⛔ <code>会社概要_配布用/</code></b></td><td><b>アップロードしません。</b>メーカー様へメールで手渡しする会社概要（<code>Satoy-Select_会社概要.pdf</code> A4・2枚と、その元ファイル）が入っています</td></tr>
+</table>
+</div>
+
+<div class="warn">
+<p style="margin:0"><b>⚠️ <code>会社概要_配布用/</code> は絶対にアップロードしないでください。</b>
+この中の会社概要には、<b>サイトには載せないと決めたメールアドレス</b>や電話番号が書いてあります。
+サーバーに上げると <code>https://satoyselect.com/profile.html</code> のようなURLで誰でも読めてしまい、
+メールをフォームにした意味がなくなります（PDFは Google が中身の文字まで拾います）。<br>
+アップロードするのは <b><code>公開用/</code> の中身だけ</b>。これさえ守れば大丈夫です。</p>
 </div>
 
 <p>間違えても大丈夫です。<b>同じコマンドを実行すれば、何度でもやり直せます。</b></p>
@@ -279,15 +288,15 @@ Cloudflare は自動で付きますが、反映に数分〜十数分かかるこ
 </div>
 
 <div class="card">
-<p style="margin:0"><b>アップロードするもの（11ファイル＋フォルダ）</b></p>
+<p style="margin:0"><b>アップロードするもの＝<code>公開用/</code> の中身（10ファイル＋assetsフォルダ）</b></p>
 <ul style="margin:8px 0 0">
 <li><b>お客様向け</b>：<code>index.html</code>（ホーム）／<code>guides.html</code>（選び方ガイド）／<code>guide-cutting-board.html</code>／<code>guide-bottle.html</code>／<code>business.html</code>／<code>about.html</code>／<code>contact.html</code></li>
 <li><b>事業者様向け</b>：<code>partners.html</code></li>
-<li><code>profile.html</code>（会社概要の印刷用。検索には出さない設定済み）</li>
 <li><code>sitemap.xml</code>／<code>robots.txt</code>（検索エンジン向けの案内図）</li>
 <li><code>assets/</code>（デザインとイラスト一式）</li>
-<li>⛔ <code>Satoy-Select_会社概要.pdf</code> は<b>アップロード不要</b>（手元に置いてメール添付用に）</li>
 </ul>
+<p style="margin:10px 0 0"><b>⛔ アップロードしないもの＝<code>会社概要_配布用/</code> フォルダまるごと</b><br>
+<code>Satoy-Select_会社概要.pdf</code> と <code>profile.html</code> が入っています。手元に置いて、メーカー様へのメール添付にお使いください。</p>
 </div>
 
 
@@ -305,11 +314,11 @@ Cloudflare は自動で付きますが、反映に数分〜十数分かかるこ
 </li>
 <li>所有権の確認画面で <b>「HTMLタグ」</b>を選ぶ。
   <code>&lt;meta name="google-site-verification" content="<b>ここが長い文字列</b>"&gt;</code> が表示されます</li>
-<li><mark><b>この文字列を、まるごとコピーして私に送ってください。</b></mark>
-  <p style="margin:8px 0 0">→ 私が全ページに埋め込んでお返しします。<br>
-  （ご自分でやる場合：ステップ②の <code>fill.py</code> をもう一度実行し、最後の質問に貼り付ければ自動で入ります）</p>
+<li><mark><b>この文字列をコピーし、ステップ②の <code>fill.py</code> をもう一度実行して、最後の質問に貼り付けてください。</b></mark>
+  <p style="margin:8px 0 0">全ページに自動で埋め込まれます。<code>content="..."</code> ごと貼っても、中身だけ取り出します。<br>
+  <b>私に送っていただく必要はありません。</b></p>
 </li>
-<li>埋め込んだファイルを、ステップ③と同じ手順で<b>もう一度アップロード</b></li>
+<li>できた <code>公開用/</code> を、ステップ③と同じ手順で<b>もう一度アップロード</b></li>
 <li>Search Console に戻って「確認」を押す → 所有権の確認が完了します</li>
 <li>左メニューの「<b>サイトマップ</b>」→ <code>sitemap.xml</code> と入力して送信</li>
 <li>画面いちばん上の検索窓に <code>https://satoyselect.com/</code> を入れて Enter →

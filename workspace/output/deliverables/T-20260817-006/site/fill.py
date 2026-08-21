@@ -20,6 +20,10 @@ import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(os.path.dirname(HERE), "公開用")
+# 会社概要（profile.html とそのPDF）は、メーカー様へ手渡しする配布物であって
+# 公開物ではない。公開用フォルダに混ぜるとアップロード時にそのまま公開URLになるため、
+# 生成後に必ずこちらへ退避する。
+DIST = os.path.join(os.path.dirname(HERE), "会社概要_配布用")
 
 TARGET_EXT = (".html", ".xml", ".txt")
 
@@ -30,7 +34,7 @@ QUESTIONS = [
     ("EMAIL", "メールアドレス ※サイトには載りません。メーカー様へお渡しする会社概要PDFにのみ使います", "", True),
     ("TEL", "電話番号（050番号で構いません／未取得なら空エンターでスキップ）", "", False),
     ("FAX", "FAX番号（未取得なら空エンターでスキップ）", "", False),
-    ("OPEN_DATE", "開業年月（例: 2026年8月）", "", True),
+    ("OPEN_DATE", "開業年月（例: 2026年8月）※開業届がまだなら空エンターでスキップ", "", False),
     ("STORE_URL", "AmazonストアのURL（未開設なら空エンターでスキップ）",
      "https://www.amazon.co.jp/shops/...", False),
     ("FORM_URL", "GoogleフォームのURL（お問い合わせフォーム用／未作成なら空エンター）",
@@ -102,11 +106,16 @@ def strip_empty_blocks(html, values):
             html,
             flags=re.S,
         )
-    # about.html の会社概要テーブル行
-    for key in ("TEL", "FAX"):
+    # about.html / profile.html の会社概要テーブル行
+    # OPEN_DATE も対象。開業届が未提出のうちは「開業」行ごと消す
+    # （profile.html の「開業届提出済」という記載が事実と食い違うのを防ぐ）
+    for key in ("TEL", "FAX", "OPEN_DATE"):
         if values.get(key):
             continue
         html = re.sub(r"\s*<tr><th>[^<]*</th><td>\{\{" + key + r"\}\}.*?</tr>", "", html, flags=re.S)
+    # 選び方ガイドの「最終更新：〇〇　／　カテゴリ：…」から、日付部分だけを落とす
+    if not values.get("OPEN_DATE"):
+        html = html.replace("最終更新：{{OPEN_DATE}}\u3000／\u3000", "")
     # フッターの TEL 表記
     if not values.get("TEL"):
         html = html.replace("TEL: {{TEL}}／Email: {{EMAIL}}", "Email: {{EMAIL}}")
@@ -187,10 +196,26 @@ CHROME_PATHS = [
 ]
 
 
+def stage_profile():
+    """会社概要 profile.html を「公開用」から「会社概要_配布用」へ退避する。
+
+    profile.html にはメールアドレス・電話番号など、サイトには載せない連絡先が入っている。
+    公開用フォルダに残したままアップロードすると https://<ドメイン>/profile.html で
+    誰でも読める状態になり、「メールは公開しない」という方針が崩れる。
+    そのため、置換が終わった直後に公開用の外へ移す。
+    """
+    if os.path.exists(DIST):
+        shutil.rmtree(DIST)
+    os.makedirs(DIST, exist_ok=True)
+    src = os.path.join(OUT, "profile.html")
+    if os.path.exists(src):
+        shutil.move(src, os.path.join(DIST, "profile.html"))
+
+
 def make_pdf():
     """会社概要 profile.html を PDF に変換（Chrome があれば自動、無ければ手動手順を案内）"""
-    src = os.path.join(OUT, "profile.html")
-    dst = os.path.join(OUT, "Satoy-Select_会社概要.pdf")
+    src = os.path.join(DIST, "profile.html")
+    dst = os.path.join(DIST, "Satoy-Select_会社概要.pdf")
     if not os.path.exists(src):
         return "（会社概要 profile.html が見つかりませんでした）"
 
@@ -219,11 +244,16 @@ def make_pdf():
         if os.path.exists(dst) and os.path.getsize(dst) > 1000:
             kb = os.path.getsize(dst) // 1024
             return (f"📄 会社概要PDFを作成しました: Satoy-Select_会社概要.pdf（{kb} KB）\n"
-                    "   → メーカー様へのメールに添付してお使いください。")
+                    f"   保存先: {DIST}\n"
+                    "   → メーカー様へのメールに添付してお使いください。\n"
+                    "   ⛔ このフォルダはアップロードしません。メールアドレスなど、\n"
+                    "      サイトに載せない連絡先が入っているためです。")
 
     return ("📄 会社概要PDFは自動作成できませんでした。\n"
-            "   公開用フォルダの profile.html をブラウザで開き、\n"
-            "   ⌘P →「PDFとして保存」で書き出してください（同じ体裁で出ます）。")
+            f"   {DIST} の profile.html をブラウザで開き、\n"
+            "   ⌘P →「PDFとして保存」で書き出してください（同じ体裁で出ます）。\n"
+            "   ⛔ このフォルダはアップロードしません。メールアドレスなど、\n"
+            "      サイトに載せない連絡先が入っているためです。")
 
 
 def main():
@@ -310,6 +340,8 @@ def main():
                 for m in set(re.findall(r"\{\{([A-Z_]+)\}\}", f.read())):
                     leftovers.append(f"{name}: {{{{{m}}}}}")
 
+    # 置換と点検が済んでから、会社概要を公開用の外へ退避する
+    stage_profile()
     pdf_msg = make_pdf()
 
     print("\n" + "=" * 62)
@@ -324,8 +356,12 @@ def main():
             print("   -", l)
     else:
         print("✅ 未置換の項目はありません。")
+    print("\n📂 フォルダは2つできています。役割が違うのでご注意ください。")
+    print(f"  ✅ 公開用            … サーバーへアップロードするのはこちらだけ")
+    print(f"  ⛔ 会社概要_配布用    … アップロードしない。メーカー様へ手渡しする資料")
     print("\n次の手順:")
-    print("  1. 上の「公開用」フォルダの中身を、まるごとサーバーへアップロード")
+    print("  1. 「公開用」フォルダの中身だけを、まるごとサーバーへアップロード")
+    print("     （「会社概要_配布用」は上げない。上げるとメールアドレスが公開されます）")
     print("  2. ブラウザで https://" + values["DOMAIN"] + "/ を開いて表示を確認")
     print("  3. Google Search Console にドメインを登録し、サイトマップを送信")
     print("     （詳しい手順は 公開手順書.html をご覧ください）\n")
