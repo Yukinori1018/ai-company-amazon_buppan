@@ -132,6 +132,59 @@ if tool in ("Write", "Edit", "MultiEdit", "NotebookEdit"):
                 + "許可値: " + " / ".join(sorted(ASSIGNEE_VOCAB))
             )
 
+# --- ticket_id 一意性の検証（2026-08-21 追加 / T-20260821-002 追補）------------------
+# 形式が正しくても、同じ ticket_id が2枚あれば Notion の同期キーとして破綻する。
+# 実害: 別チケットの状態を上書き／後発のカードが作成できずボードから消える
+#       （T-20260603-003 と T-20260706-001 が3ヶ月弱、誰にも気づかれず放置された）。
+#
+# ⚠️ 重複は必ず「全パスを出す」こと。片方だけ出す実装は、この事故を招いた
+#    `ls ... | head -1` と同じ見落としを再生産する。
+if checked:
+    # チケットルートは編集されたパス自身から導出する（cwd 依存を避ける）
+    troot = ""
+    for p_ in paths:
+        i = p_.find("workspace/tickets/")
+        if i >= 0:
+            cand = p_[:i] + "workspace/tickets"
+            troot = cand if os.path.isabs(cand) else os.path.join(base, cand)
+            break
+
+    if troot and os.path.isdir(troot):
+        seen = {}
+        for dirpath, _dirnames, filenames in os.walk(troot):
+            for fn in filenames:
+                if not fn.endswith(".md") or fn.startswith("_"):
+                    continue
+                fp = os.path.join(dirpath, fn)
+                try:
+                    # frontmatter は必ずファイル先頭にあるので冒頭だけ読む（90枚でも軽い）
+                    with open(fp, encoding="utf-8") as fh:
+                        head = fh.read(4096)
+                except Exception:
+                    continue
+                hm = re.match(r'^---\n(.*?)\n---\n', head, re.S)
+                if not hm:
+                    continue
+                for line in hm.group(1).split("\n"):
+                    if line.startswith("ticket_id:"):
+                        v = line.split(":", 1)[1].strip()
+                        if v:
+                            seen.setdefault(v, []).append(fp)
+                        break
+
+        dups = {k: v for k, v in seen.items() if len(v) > 1}
+        if dups:
+            touched_ids = set(re.findall(r'T-\d{8}-\d{3}', " ".join(paths)))
+            for tid_ in sorted(dups):
+                mark = "  ← 今編集したチケット" if tid_ in touched_ids else ""
+                problems.append(f"- 🔑 ticket_id `{tid_}` が {len(dups[tid_])} 枚に重複しています{mark}")
+                for fp in sorted(dups[tid_]):
+                    problems.append(f"    * {os.path.relpath(fp, troot)}")
+            problems.append(
+                "  → Notion の同期キーが衝突します（別チケットの状態を上書きする／"
+                "後発のカードが作成できずボードから消える）。どちらかを改番してください。"
+            )
+
 if problems:
     print(
         "🚨 チケット frontmatter の契約違反を検知しました（ブロックはしません。直してから turn を終えてください）。\n"
