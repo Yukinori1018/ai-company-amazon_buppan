@@ -1,0 +1,114 @@
+{
+  "ticket": "T-20260817-005",
+  "criteria_version": "v1.3（社長裁可 2026-08-17）",
+  "run_finished_at": "2026-08-21 16:39:40",
+  "elapsed_sec": 91,
+  "elapsed_hhmm": "00:01:31",
+  "keepa": {
+    "tokens_at_start": 1175,
+    "tokens_at_end": 855,
+    "tokens_consumed_estimate": 350,
+    "refill_per_min": 20
+  },
+  "finder": {
+    "A": {
+      "selection": {
+        "current_AMAZON_gte": -1,
+        "current_AMAZON_lte": -1,
+        "current_COUNT_NEW_gte": 2,
+        "current_COUNT_NEW_lte": 6,
+        "current_NEW_gte": 1500,
+        "current_NEW_lte": 8000,
+        "current_SALES_gte": 1,
+        "current_SALES_lte": 300000,
+        "current_COUNT_REVIEWS_gte": 5,
+        "current_COUNT_REVIEWS_lte": 300,
+        "variationCount_gte": 1,
+        "variationCount_lte": 3,
+        "trackingSince_lte": 7965098,
+        "isAdultProduct": false,
+        "categories_exclude": [
+          160384011,
+          52374051,
+          57239051
+        ],
+        "salesRankDrops30_gte": 10,
+        "perPage": 1000,
+        "page": 0,
+        "sort": [
+          [
+            "salesRankDrops30",
+            "desc"
+          ]
+        ]
+      },
+      "totalResults": 7937,
+      "asins_taken": 200
+    },
+    "B": {
+      "selection": {
+        "current_AMAZON_gte": -1,
+        "current_AMAZON_lte": -1,
+        "current_COUNT_NEW_gte": 2,
+        "current_COUNT_NEW_lte": 6,
+        "current_NEW_gte": 8000,
+        "current_NEW_lte": 20000,
+        "current_SALES_gte": 1,
+        "current_SALES_lte": 300000,
+        "current_COUNT_REVIEWS_gte": 5,
+        "current_COUNT_REVIEWS_lte": 300,
+        "variationCount_gte": 1,
+        "variationCount_lte": 3,
+        "trackingSince_lte": 7965098,
+        "isAdultProduct": false,
+        "categories_exclude": [
+          160384011,
+          52374051,
+          57239051
+        ],
+        "salesRankDrops30_gte": 4,
+        "perPage": 1000,
+        "page": 0,
+        "sort": [
+          [
+            "salesRankDrops30",
+            "desc"
+          ]
+        ]
+      },
+      "totalResults": 4104,
+      "asins_taken": 100
+    }
+  },
+  "assumptions": {
+    "初回ロット": 10,
+    "初回ロット_参考": 5,
+    "消化月数の上限": 3.0,
+    "粗利残存率(段2)": 0.65,
+    "外注費(サイズ別)": {
+      "small": 182,
+      "standard_1": 282,
+      "standard_2": 332,
+      "unknown": 282
+    },
+    "過去1年最安値の定義": "Keepa stats(365日) の NEW(新品最安, index=1) の最小値",
+    "FBA標準サイズ": "45x35x20cm かつ 9kg 以内。超過は大型として除外。寸法欠落は『不明』で残す"
+  },
+  "counts": {
+    "detail_fetched": 300,
+    "rows_written": 300,
+    "go": 260,
+    "top100_written": 100
+  },
+  "reject_reasons": {
+    "FBA大型サイズ": 33,
+    "最安値で黒字化不能": 7,
+    "出品者数7": 1
+  },
+  "outputs": {
+    "candidates": "/Users/yukinori/Claude Code/ai-company-amazon_buppan/workspace/output/deliverables/T-20260817-005/candidates_v13.csv",
+    "top100": "/Users/yukinori/Claude Code/ai-company-amazon_buppan/workspace/output/deliverables/T-20260817-005/candidates_v13_top100.csv",
+    "raw_dir": "/Users/yukinori/Claude Code/ai-company-amazon_buppan/workspace/output/deliverables/T-20260817-005/raw",
+    "log": "/Users/yukinori/Claude Code/ai-company-amazon_buppan/workspace/output/deliverables/T-20260817-005/scan_v13.log"
+  }
+}

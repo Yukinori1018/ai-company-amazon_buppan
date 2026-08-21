@@ -1,0 +1,70 @@
+{
+  "A": {
+    "selection": {
+      "current_AMAZON_gte": -1,
+      "current_AMAZON_lte": -1,
+      "current_COUNT_NEW_gte": 2,
+      "current_COUNT_NEW_lte": 6,
+      "current_NEW_gte": 1500,
+      "current_NEW_lte": 8000,
+      "current_SALES_gte": 1,
+      "current_SALES_lte": 300000,
+      "current_COUNT_REVIEWS_gte": 5,
+      "current_COUNT_REVIEWS_lte": 300,
+      "variationCount_gte": 1,
+      "variationCount_lte": 3,
+      "trackingSince_lte": 7965101,
+      "isAdultProduct": false,
+      "categories_exclude": [
+        160384011,
+        52374051,
+        57239051
+      ],
+      "salesRankDrops30_gte": 10,
+      "perPage": 1000,
+      "page": 0,
+      "sort": [
+        [
+          "salesRankDrops30",
+          "desc"
+        ]
+      ]
+    },
+    "totalResults": 7933,
+    "asins_taken": 2500
+  },
+  "B": {
+    "selection": {
+      "current_AMAZON_gte": -1,
+      "current_AMAZON_lte": -1,
+      "current_COUNT_NEW_gte": 2,
+      "current_COUNT_NEW_lte": 6,
+      "current_NEW_gte": 8000,
+      "current_NEW_lte": 20000,
+      "current_SALES_gte": 1,
+      "current_SALES_lte": 300000,
+      "current_COUNT_REVIEWS_gte": 5,
+      "current_COUNT_REVIEWS_lte": 300,
+      "variationCount_gte": 1,
+      "variationCount_lte": 3,
+      "trackingSince_lte": 7965101,
+      "isAdultProduct": false,
+      "categories_exclude": [
+        160384011,
+        52374051,
+        57239051
+      ],
+      "salesRankDrops30_gte": 4,
+      "perPage": 1000,
+      "page": 0,
+      "sort": [
+        [
+          "salesRankDrops30",
+          "desc"
+        ]
+      ]
+    },
+    "totalResults": 4095,
+    "asins_taken": 1500
+  }
+}
