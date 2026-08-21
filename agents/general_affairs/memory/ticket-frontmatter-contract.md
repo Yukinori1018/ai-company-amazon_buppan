@@ -136,3 +136,53 @@ CLAUDE_PROJECT_DIR="$PWD" bash -x .claude/hooks/session-start.sh 2>&1 | head -30
 
 別系統。置き換えると Notion 同期が落ちるか Agent が解決されない。
 `_template.md` と `docs/notion-board-schema.md` の両方に注記済み。
+
+---
+
+## 🚨 ticket_id の衝突（2026-08-21 発見・未解決）
+
+**同じ ID を持つ別チケットが2組ある。** 2026-06-03 から存在していた既存問題。
+
+| ID | 実体A | 実体B |
+|---|---|---|
+| `T-20260603-003` | `waiting/..._registration-checklist.md`（登録チェックリスト／content_creator）**← deliverables あり** | `done/..._amazon-selling-plan-fee-incident.md`（返金交渉／accounting） |
+| `T-20260706-001` | `waiting/..._gem-vetting-and-buy-shortlist.md`（買い候補17件／secretary）**← Notionカードあり** | `done/..._amazonproduct-maker-fields.md`（Sato-Scope brand/manufacturer／it_engineer） |
+
+### なぜ危険か
+
+`ticket_id` は **Notion 同期の一意キー**（`notion-ticket-sync.md` §3）。衝突すると：
+
+1. **どちらのチケットを指すか決まらない。** 実際に事故った——秘書の指示「T-20260603-003 を done へ」に対し、
+   私は `done/` にあった**返金交渉チケット**の属性を読み、Notion の**登録チェックリストのカード**に
+   `Status=done / Assignee=accounting` を書き込んだ。**別チケットの状態を上書きした**。
+2. **カードが1枚しか作れない。** `done/T-20260706-001_amazonproduct-maker-fields` は
+   **Notion 上に存在しない**（もう一方がキーを占有しているため）。ボードから消えている。
+
+### 私の検証も騙された（重要な反省）
+
+```bash
+f=$(ls workspace/tickets/*/${t}_*.md | head -1)   # ← これがダメ
+```
+
+`head -1` は**辞書順で `done/` を先に拾う**ため、`waiting/` にある本命が見えない。
+「所在は done」と報告したが、実際は2枚あった。
+
+**→ チケットの所在確認で `head -1` を使わない。件数を数えるか、全件を出す。**
+
+```bash
+# ID重複の検知（/sync-notion の冒頭で毎回回す）
+for f in workspace/tickets/*/*.md; do case "$(basename $f)" in _*) continue;; esac
+  grep -m1 '^ticket_id:' "$f" | cut -d' ' -f2; done | sort | uniq -d
+```
+
+### 復旧の考え方（秘書へ提案済み・未実行）
+
+**参照が少ない側を改番する。** 空き番号は `T-20260603-006` と `T-20260706-002`。
+
+- `T-20260603-003` は **deliverables フォルダが登録チェックリストのもの**なので、
+  **登録チェックリスト側が ID を保持**し、返金交渉を `T-20260603-006` へ。
+- `T-20260706-001` は **Notion カードが買い候補17件のもの**なので、
+  **買い候補側が保持**し、Sato-Scope を `T-20260706-002` へ。
+
+改番は**同期キーと相互参照を変える構造変更**なので、日付の付け替えのような可逆操作とは別扱い。
+**秘書の判定を待つ。** 前例あり（T-20260529-001 の幽霊チケット改番＝T-20260531-001 の復旧プラン）。
