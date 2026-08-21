@@ -1,16 +1,16 @@
 ---
 ticket_id: T-20260821-009
 title: _inbox_社長共有 の運用崩れ 原因究明と改善
-status: doing
+status: waiting
 assignee: general_affairs
 priority: high
 created_at: 2026-08-21
 updated_at: 2026-08-21
-requires_approval: false
+requires_approval: true
 labels: [運用改善, ファイル整理, フック]
 parent_ticket: ""
 next_check_at: 2026-08-22
-related_tickets: [T-20260821-001, T-20260821-004]
+related_tickets: [T-20260821-001, T-20260821-004, T-20260811-001, T-20260812-001, T-20260817-006]
 ---
 
 ## 要件
@@ -55,7 +55,8 @@ related_tickets: [T-20260821-001, T-20260821-004]
 - 2026-08-21 振り分け完了。`docs/reference/fba-prep-center/` へ1件、`_archive/2026-08/` へ20件。削除はゼロ。
 - 2026-08-21 SessionStart フックにリマインダー③を追加。空/未処理あり/スペース入りファイル名の3ケースで動作確認済み。既存リマインダー①②は無改変で正常動作を確認。
 - 2026-08-21 CLAUDE.md §6・agent.md 定常責務・skills/inbox-intake.md を整備。README.txt を改訂。
-- 2026-08-21 成果物を deliverables へ直納、カタログCSV追記＋シート同期（HTTP 200 / 105行）、memory 記録、git commit まで完了。
+- 2026-08-21 成果物を deliverables へ直納、カタログCSV追記＋シート同期（HTTP 200 / 105行）、memory 記録まで完了。
+- 2026-08-21 **⚠️ commit の帰属ずれ**: 本作業のファイル一式が、並行セッションのコミット **5ece40a**（ticket_id 衝突改番）に巻き込まれて取り込まれました。**ファイルは全件 HEAD に存在し欠落ゼロ**（14ファイルを `git cat-file -e` で個別確認済み）ですが、コミットメッセージが本作業を説明していません。履歴の書き換えは CLAUDE.md §4.1（破壊的 Git 操作）に該当するため**修正していません**。追跡が必要なときは 5ece40a を参照してください。
 
 ## 真因（要約。詳細は成果物 §1-3）
 
