@@ -84,7 +84,31 @@ frontmatter のドリフトとは別に、**起票時の同期そのものが漏
 - `related_tickets`（39枚）と `related`（12枚）の表記ゆれ。どちらも機械が読んでいないため実害ゼロ。一括置換は履歴を汚すので保留し、テンプレに正を明記するに留めました。
 - `docs/notion-board-schema.md` の Assignee 表に `it_engineer` / `owner` が無く、スキル側 `notion-ticket-sync.md` とズレていました（**文書間のドリフト**）。これは実害があるため追記済みです。
 
-**5. ご提案**
+**5. 🚨 検証中に見つけた重大バグ（担当外のため手を出していません）**
+
+修復後に「本当にリマインダーのID欄が埋まるか」を確かめるため `.claude/hooks/session-start.sh` を実走したところ、
+**リマインダーが1件も出ませんでした。ID欄が空だったのではなく、リマインダー機能そのものが最初から動いていません。**
+
+原因（`bash -x` で特定）:
+
+```
+TICKETS_DIRS="$REPO/workspace/tickets/doing $REPO/workspace/tickets/waiting"
+for TICKETS_DIR in $TICKETS_DIRS   # ← クォートなし＝空白で分割される
+```
+
+このリポジトリのパスは `/Users/yukinori/Claude Code/...` と**フォルダ名に空白を含みます**。
+そのため `$TICKETS_DIRS` が `/Users/yukinori/Claude` と `Code/ai-company-.../doing` に割れ、
+`[ -d ... ]` が両方 false → `continue` → **走査対象ゼロ**。`next_check_at` が何件期限切れでも無言で終わります。
+現在 doing/waiting に **期限切れ33件**がありますが、1件も通知されていません。
+
+これは私の担当（庶務）ではなく**IT エンジニア（タカシ）領域**なので、SUBAGENT_PROTOCOL §4 に従い自分では直しませんでした。
+T-20260821-002（フック整備／assignee=it_engineer）が同じ `.claude/hooks/` を触っているので、**そちらに合流させるのが最短**だと思います。
+修正自体は配列化（`TICKETS_DIRS=("$REPO/.../doing" "$REPO/.../waiting")` ＋ `for d in "${TICKETS_DIRS[@]}"`）で済みます。
+
+> **この一件が、今回のドリフトが10日間気づかれなかった理由**でもあります。
+> 「担当欄が消えた」ことと「リマインダーが死んでいた」ことが重なり、検知の網が二重に破れていました。
+
+**6. ご提案**
 キー名の警告文を書きましたが、正直これだけでは再発を止められないと思います（`owner` と `assignee` は日本語にするとどちらも「担当」で、書いた本人には違いが見えないためです）。
 T-20260821-002 で IT エンジニアが委譲チェックフックを作る際、**frontmatter キーの検証を同じフックに相乗りさせる**のが確実です。ご検討ください。
 
