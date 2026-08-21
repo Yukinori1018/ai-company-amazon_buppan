@@ -1,7 +1,7 @@
 ---
 ticket_id: T-20260821-008
 title: waiting（レビュー待ち）に期限を設ける運用ルールの追加
-status: todo
+status: waiting
 assignee: content_creator
 priority: medium
 created_at: 2026-08-21
