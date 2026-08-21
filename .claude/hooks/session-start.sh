@@ -16,12 +16,21 @@ set -euo pipefail
 REPO="${CLAUDE_PROJECT_DIR:-$(pwd)}"
 # next_check_at は doing/（作業中）と waiting/（社長タスク一覧）の両方を走査する。
 # 社長アクション待ちのチケットは waiting/ に置かれるため、日次リマインドの主対象。
-TICKETS_DIRS="$REPO/workspace/tickets/doing $REPO/workspace/tickets/waiting"
+#
+# ⚠️ 必ず配列で持つこと（2026-08-21 修正）。
+# 旧実装は空白区切りの文字列 + クォート無し for ループだった。このリポジトリのパスは
+# `/Users/yukinori/Claude Code/...` と**フォルダ名に空白を含む**ため、単語分割で
+# `/Users/yukinori/Claude` と `Code/workspace/tickets/doing` に割れ、`[ -d ]` が常に false。
+# 結果、リマインダーが一度も発火していなかった（期限切れ33件が10日間無通知）。
+TICKETS_DIRS=(
+  "$REPO/workspace/tickets/doing"
+  "$REPO/workspace/tickets/waiting"
+)
 TODAY="$(date +%Y-%m-%d)"
 
 REMINDERS=""
 
-for TICKETS_DIR in $TICKETS_DIRS; do
+for TICKETS_DIR in "${TICKETS_DIRS[@]}"; do
   [ -d "$TICKETS_DIR" ] || continue
   for f in "$TICKETS_DIR"/*.md; do
     [ -e "$f" ] || continue

@@ -55,6 +55,91 @@ if "workspace/tickets/" not in blob:
 ids = sorted(set(re.findall(r'T-\d{8}-\d{3}', blob)))
 id_str = "、".join(ids) if ids else "（ファイル名から TicketID を確認）"
 
+# --- frontmatter キー契約の検証（2026-08-21 追加 / T-20260821-002）------------------
+# `owner:` と `assignee:` は日本語だとどちらも「担当」で、書いた本人には違いが見えない。
+# 警告文をテンプレに書くだけでは再発するため、機械的にチェックする。
+# 検証は警告のみ。ブロックはしない（社長の作業を止めない）。
+ASSIGNEE_VOCAB = {
+    "secretary", "researcher", "planner", "simulator", "accounting",
+    "legal", "general_affairs", "content_creator", "it_engineer", "owner",
+}
+# ⚠️ この語彙は「チケット frontmatter の契約」であり snake_case。
+#    `.claude/agents/` のサブエージェント名（general-affairs 等・ハイフン）とは別物。混同しないこと。
+ALIAS_TRAPS = {
+    "id": "ticket_id",
+    "owner": "assignee",
+    "assigned_to": "assignee",
+    "related": "related_tickets",
+    "next_check": "next_check_at",
+    "due": "next_check_at",
+}
+
+def parse_frontmatter(text):
+    m = re.match(r'^---\n(.*?)\n---\n', text, re.S)
+    if not m:
+        return None
+    kv = {}
+    for line in m.group(1).split("\n"):
+        if not line.strip() or line.lstrip().startswith("#"):
+            continue
+        if line.startswith((" ", "\t", "-")):   # ネスト/リスト継続行は対象外
+            continue
+        k, sep, v = line.partition(":")
+        if sep:
+            kv[k.strip()] = v.strip()
+    return kv
+
+base = data.get("cwd") or os.environ.get("CLAUDE_PROJECT_DIR") or os.getcwd()
+problems = []
+checked = []
+
+if tool in ("Write", "Edit", "MultiEdit", "NotebookEdit"):
+    for p in paths:
+        if "workspace/tickets/" not in p or not p.endswith(".md"):
+            continue
+        if os.path.basename(p).startswith("_"):   # _template.md 等は対象外
+            continue
+        full = p if os.path.isabs(p) else os.path.join(base, p)
+        try:
+            with open(full, encoding="utf-8") as fh:
+                text = fh.read()
+        except Exception:
+            continue
+
+        rel = os.path.basename(full)
+        fm = parse_frontmatter(text)
+        if fm is None:
+            problems.append(f"- {rel}: frontmatter（先頭の `---` ブロック）が見つかりません")
+            continue
+        checked.append(rel)
+
+        for bad, good in ALIAS_TRAPS.items():
+            if bad in fm and good not in fm:
+                problems.append(f"- {rel}: `{bad}:` は誤り。正しいキー名は `{good}:` です（機械が読む契約）")
+
+        tid = fm.get("ticket_id", "")
+        if not tid:
+            problems.append(f"- {rel}: `ticket_id:` がありません（session-start.sh が awk で直読みします）")
+        elif not re.fullmatch(r'T-\d{8}-\d{3}', tid):
+            problems.append(f"- {rel}: `ticket_id: {tid}` の形式が不正です（T-YYYYMMDD-NNN）")
+
+        asg = fm.get("assignee", "")
+        if not asg:
+            problems.append(f"- {rel}: `assignee:` がありません（Notion の担当欄が空白になります）")
+        elif asg not in ASSIGNEE_VOCAB:
+            problems.append(
+                f"- {rel}: `assignee: {asg}` は固定語彙外です。"
+                + "許可値: " + " / ".join(sorted(ASSIGNEE_VOCAB))
+            )
+
+if problems:
+    print(
+        "🚨 チケット frontmatter の契約違反を検知しました（ブロックはしません。直してから turn を終えてください）。\n"
+        + "\n".join(problems)
+        + "\n→ キー名は機械が読む契約です。省略は可、リネームは不可。"
+          "雛形と固定語彙は workspace/tickets/_template.md の警告ブロックを参照。\n"
+    )
+
 print(
     "⚠️ チケットファイルの変更を検知しました（" + id_str + "）。\n"
     "庶務マリエの責務として、agents/general_affairs/skills/notion-ticket-sync.md に従い、"
