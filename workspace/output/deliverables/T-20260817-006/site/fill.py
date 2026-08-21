@@ -26,7 +26,7 @@ TARGET_EXT = (".html", ".xml", ".txt")
 QUESTIONS = [
     ("DOMAIN", "独自ドメイン（例: satoyselect.com）※ https:// や www. は不要", "satoyselect.com", True),
     ("OWNER_NAME", "代表者のお名前（例: 佐藤 幸則）", "", True),
-    ("ADDRESS", "所在地（郵便番号から番地まで／例: 〒000-0000 東京都〇〇区〇〇1-2-3）", "", True),
+    ("ADDRESS", "所在地", "〒146-0091 東京都大田区鵜の木2-47-20 303号", True),
     ("EMAIL", "メールアドレス ※サイトには載りません。メーカー様へお渡しする会社概要PDFにのみ使います", "", True),
     ("TEL", "電話番号（050番号で構いません／未取得なら空エンターでスキップ）", "", False),
     ("FAX", "FAX番号（未取得なら空エンターでスキップ）", "", False),
@@ -35,11 +35,19 @@ QUESTIONS = [
      "https://www.amazon.co.jp/shops/...", False),
     ("FORM_URL", "GoogleフォームのURL（お問い合わせフォーム用／未作成なら空エンター）",
      "https://docs.google.com/forms/d/e/.../viewform", False),
+    ("GSC_TOKEN", "Google Search Console の確認コード（まだなら空エンター）",
+     "content=\"...\" の中身だけ", False),
 ]
 
 
 def ask(key, label, example, required):
-    hint = f"（例: {example}）" if example else ""
+    """必須項目に既定値があれば、空エンターでそれを採用する"""
+    if required and example:
+        hint = f"\n  （このままでよければ空エンター → {example}）"
+    elif example:
+        hint = f"（例: {example}）"
+    else:
+        hint = ""
     while True:
         try:
             v = input(f"\n■ {label}{hint}\n  → ").strip()
@@ -48,6 +56,8 @@ def ask(key, label, example, required):
             sys.exit(1)
         if v:
             return v
+        if required and example:
+            return example
         if not required:
             return ""
         print("  ※ この項目は必須です。もう一度入力してください。")
@@ -71,6 +81,17 @@ def strip_empty_blocks(html, values):
     html = show_only(html, "FORM", form_ok)             # 自前デザインのフォーム
     html = show_only(html, "FORM_EMBED", embed)         # Googleフォームをそのまま埋め込み
     html = show_only(html, "FORM_UNSET", not (form_ok or embed))  # どちらも無ければ案内文
+
+    # Google Search Console の所有権確認タグ
+    token = (values.get("GSC_TOKEN") or "").strip()
+    if token:
+        # content="..." ごと貼られても中身だけ取り出す
+        m = re.search(r'content=["\']([^"\']+)["\']', token)
+        if m:
+            token = m.group(1)
+        tag = '<meta name="google-site-verification" content="%s">' % token
+        if "google-site-verification" not in html and "<link rel=\"icon\"" in html:
+            html = html.replace("<link rel=\"icon\"", tag + "\n<link rel=\"icon\"", 1)
     # contact.html の .contact-row（電話 / FAX）
     for key in ("TEL", "FAX"):
         if values.get(key):
@@ -209,7 +230,8 @@ def main():
     print("=" * 62)
     print(" Satoy Select ホームページ — 情報うめこみ")
     print("=" * 62)
-    print("\n9つの質問に答えるだけで、公開できる状態のファイル一式ができます。")
+    print("\n10個の質問に答えるだけで、公開できる状態のファイル一式ができます。")
+    print("必須の項目には既定値が入っています。そのままでよければ空エンターで進めます。")
     print("あとから何度でもやり直せますので、気軽に進めてください。")
 
     values = {}

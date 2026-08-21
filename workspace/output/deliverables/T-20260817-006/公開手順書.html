@@ -6,75 +6,166 @@
 <title>Satoy Select ホームページ 公開手順書</title>
 <style>
   :root{
-    --bg:#ffffff; --fg:#1a1a1a; --muted:#5b6470; --line:#e3e7ec;
-    --accent:#0b63c4; --accent-soft:#eaf2fc;
-    --ok:#137333; --okbg:#eaf6ec; --warn:#b06000; --warnbg:#fff6e5; --ng:#b3261e; --ngbg:#fdecea;
-    --card:#f7f9fb; --num:#0f1b25; --hl:#fff3bf;
+    --bg:#fff; --fg:#1a1f28; --muted:#5b6470; --line:#e3e7ec;
+    --accent:#0b63c4; --accent-soft:#eaf2fc; --card:#f7f9fb;
+    --ok:#137333; --okbg:#eaf6ec; --warn:#b06000; --warnbg:#fff6e5;
+    --ng:#b3261e; --ngbg:#fdecea; --num:#0f1b25; --hl:#fff3bf;
   }
   @media (prefers-color-scheme: dark){
-    :root{ --bg:#12151a; --fg:#e8ecf1; --muted:#9aa4b0; --line:#2a303a;
-      --accent:#5fa8ff; --accent-soft:#1a2532; --card:#1a1e25; --warnbg:#2a2313; --warn:#e0a94a;
-      --okbg:#14251a; --ok:#6fce8a; --ngbg:#2a1614; --ng:#ff8a80; --hl:#3a3418; }
+    :root:not([data-theme="light"]){
+      --bg:#12151a; --fg:#e8ecf1; --muted:#9aa4b0; --line:#2a303a;
+      --accent:#5fa8ff; --accent-soft:#1a2532; --card:#1a1e25;
+      --ok:#6fce8a; --okbg:#14251a; --warn:#e0a94a; --warnbg:#2a2313;
+      --ng:#ff8a80; --ngbg:#2a1614; --hl:#3a3418; }
+  }
+  :root[data-theme="dark"]{
+    --bg:#12151a; --fg:#e8ecf1; --muted:#9aa4b0; --line:#2a303a;
+    --accent:#5fa8ff; --accent-soft:#1a2532; --card:#1a1e25;
+    --ok:#6fce8a; --okbg:#14251a; --warn:#e0a94a; --warnbg:#2a2313;
+    --ng:#ff8a80; --ngbg:#2a1614; --hl:#3a3418;
   }
   *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--fg);font-family:-apple-system,"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;line-height:1.8;font-size:15.5px}
-  .wrap{max-width:880px;margin:0 auto;padding:32px 22px 80px}
-  h1{font-size:25px;line-height:1.35;margin:0 0 6px}
-  .sub{color:var(--muted);font-size:13.5px;margin:0 0 24px}
-  h2{font-size:20px;margin:44px 0 12px;padding-top:16px;border-top:2px solid var(--line);display:flex;align-items:center;gap:10px}
-  h2 .n{flex:0 0 auto;width:30px;height:30px;border-radius:8px;background:var(--accent);color:#fff;font-size:15px;display:inline-flex;align-items:center;justify-content:center;font-weight:700}
-  h3{font-size:16.5px;margin:26px 0 6px}
-  p{margin:9px 0}
-  ul,ol{margin:9px 0;padding-left:24px} li{margin:8px 0}
-  code{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:2px 6px;font-size:13.5px;font-family:ui-monospace,Menlo,monospace}
-  pre{background:var(--num);color:#e8f0f6;padding:14px 16px;border-radius:10px;font-size:13.5px;line-height:1.75;overflow-x:auto}
+  body{margin:0;background:var(--bg);color:var(--fg);line-height:1.85;font-size:15.5px;
+    font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif}
+  .wrap{max-width:880px;margin:0 auto;padding:34px 22px 90px}
+  h1{font-size:25px;line-height:1.4;margin:0 0 6px}
+  .sub{color:var(--muted);font-size:13.5px;margin:0 0 26px}
+  h2{font-size:20px;margin:52px 0 14px;padding-top:18px;border-top:2px solid var(--line);
+    display:flex;align-items:center;gap:11px;line-height:1.45}
+  h2 .n{flex:0 0 auto;width:32px;height:32px;border-radius:9px;background:var(--accent);color:#fff;
+    font-size:15px;display:inline-flex;align-items:center;justify-content:center;font-weight:700}
+  h3{font-size:17px;margin:28px 0 8px}
+  p{margin:10px 0}
+  ul,ol{margin:10px 0;padding-left:24px} li{margin:9px 0}
+  code{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:2px 6px;
+    font-size:13.5px;font-family:ui-monospace,Menlo,monospace}
+  pre{background:var(--num);color:#e8f0f6;padding:15px 17px;border-radius:10px;font-size:13px;
+    line-height:1.8;overflow-x:auto}
   pre code{background:none;border:none;color:inherit;padding:0}
-  .lead{background:var(--accent-soft);border:1px solid var(--accent);border-radius:12px;padding:16px 18px;margin:0 0 16px}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:12px 0}
-  .warn{background:var(--warnbg);border:1px solid var(--warn);border-radius:12px;padding:14px 16px;margin:14px 0}
-  .bad{background:var(--ngbg);border:1px solid var(--ng);border-radius:12px;padding:14px 16px;margin:14px 0}
-  .good{background:var(--okbg);border:1px solid var(--ok);border-radius:12px;padding:14px 16px;margin:14px 0}
-  mark{background:var(--hl);color:inherit;padding:1px 3px;border-radius:3px}
+  .lead{background:var(--accent-soft);border:1px solid var(--accent);border-radius:12px;padding:18px 20px;margin:0 0 18px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:17px 19px;margin:14px 0}
+  .warn{background:var(--warnbg);border:1px solid var(--warn);border-radius:12px;padding:15px 17px;margin:16px 0}
+  .bad{background:var(--ngbg);border:1px solid var(--ng);border-radius:12px;padding:15px 17px;margin:16px 0}
+  .good{background:var(--okbg);border:1px solid var(--ok);border-radius:12px;padding:15px 17px;margin:16px 0}
+  mark{background:var(--hl);color:inherit;padding:1px 4px;border-radius:3px}
   .tw{overflow-x:auto}
-  table{border-collapse:collapse;width:100%;margin:12px 0;font-size:13.5px}
-  th,td{border:1px solid var(--line);padding:9px 11px;text-align:left;vertical-align:top}
+  table{border-collapse:collapse;width:100%;margin:14px 0;font-size:13.5px}
+  th,td{border:1px solid var(--line);padding:10px 12px;text-align:left;vertical-align:top}
   th{background:var(--card)}
   tr.hi td{background:var(--okbg)}
-  .foot{margin-top:44px;padding-top:16px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px}
-  .step-time{display:inline-block;font-size:11.5px;font-weight:700;padding:2px 10px;border-radius:999px;background:var(--accent);color:#fff;margin-left:8px;vertical-align:middle}
+  .num-cell{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .who{display:inline-block;font-size:11.5px;font-weight:700;padding:2px 9px;border-radius:999px;color:#fff}
+  .who.me{background:var(--ok)} .who.you{background:var(--accent)} .who.pay{background:var(--ng)}
+  .time{display:inline-block;font-size:11.5px;font-weight:700;padding:2px 10px;border-radius:999px;
+    background:var(--accent);color:#fff;margin-left:8px;vertical-align:middle}
+  .foot{margin-top:52px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px}
 </style>
 </head>
 <body>
 <div class="wrap">
 
-<h1>Satoy Select ホームページ 公開手順書<br>— 帰宅後15分で「検索に出る」状態にする</h1>
-<p class="sub">秘書カズヨ ／ T-20260817-006 ／ 2026-08-17</p>
+<h1>ホームページを、Google で検索できるようにする<br>— 初心者向けの完全手順と、年間費用</h1>
+<p class="sub">秘書カズヨ ／ T-20260817-006 ／ 2026-08-21</p>
 
 <div class="lead">
-<b>状況</b>
-<p style="margin:8px 0"><b>ホームページ本体は完成しています。</b>5ページ・スマホ対応・会社概要PDF付き。<b>一般のお客様向けが4ページ</b>（ホーム／取り扱い商品／私たちについて／お問い合わせ）、<b>メーカー・卸売業者様向けが1ページ</b>という構成です。</p>
-<p style="margin:8px 0">やることは <b>①お問い合わせフォームを作る ②情報を9項目入れる ③ドメインを買う ④アップロードする</b> の4つです。合計15分ほど。</p>
+<b>先に全体像</b>
+<p style="margin:10px 0">やることは <b>5つ</b>です。社長の作業は合計 <b>30〜40分</b>。あとは待つだけです。</p>
+<ol style="margin:10px 0 0">
+<li>ドメインを買う（＝ホームページの住所）<span class="who pay">社長・支払い</span></li>
+<li>置き場所を用意する（＝サーバー）<span class="who pay">社長</span></li>
+<li>ファイルを作る<span class="who me">カズヨ</span></li>
+<li>アップロードする<span class="who you">社長</span></li>
+<li>Google に「あります」と知らせる<span class="who you">社長</span>＋<span class="who me">カズヨ</span></li>
+</ol>
 </div>
 
 <div class="warn">
-<b>⚠️ 先に、正直にお伝えしておくこと</b>
-<p style="margin:8px 0"><b>「翌日までに検索したら出てくる」は物理的に不可能です。</b> 新しいドメインが Google の検索結果に載るまで、通常 <b>数日〜2週間</b>かかります。Search Console から登録を申請しても即時には反映されません。これは技術の問題ではなく、Google 側の仕組みです。</p>
-<p style="margin:8px 0">ただし <b>「URL を伝えれば見てもらえる状態」は今日中に作れます。</b> メーカーへの初回メールには URL を書きますので、実務上はこれで足ります。検索順位は後から追いついてきます。</p>
-<p style="margin:8px 0">また <b>ドメイン取得とサーバー契約は §4.1（金銭・アカウント作成）</b>にあたるため、私が代行できません。社長ご本人の操作が必要です（下記②）。</p>
+<b>⚠️ 最初に、正直に3つ</b>
+<p style="margin:10px 0"><b>①「明日には検索に出る」ということはありません。</b>
+新しいドメインが Google の検索結果に載るまで、ふつう <b>数日〜2週間</b>かかります。
+これは Google 側の仕組みで、こちらの工夫では縮められません。</p>
+<p style="margin:10px 0"><b>② 支払いとアカウント作成は、私が代行できません。</b>
+クレジットカードの入力や、社長名義のアカウント作成は、私（AI）が行ってはいけない領域です。
+ここは社長ご本人の操作になります。</p>
+<p style="margin:10px 0"><b>③ Cowork（Claudeの作業環境）でも、そこは同じです。</b>
+ツールの制限ではなく、本人確認と支払いが必要だからです。
+ただし Cowork なら<b>画面を見ながら一緒に進める</b>ことはできます。詰まったら声をかけてください。</p>
 </div>
 
 
+<h2><span class="n">￥</span>年間いくらかかるか</h2>
 
-<h2><span class="n">0</span>ステップ⓪ お問い合わせフォームを作る<span class="step-time">3分・初回だけ</span></h2>
+<p>当社のホームページは <b>HTML だけでできた「静的サイト」</b>です。
+ブログのような仕組み（WordPress など）を使っていないので、
+<mark>高機能なレンタルサーバーは必要ありません。</mark>ここが費用を大きく左右します。</p>
 
-<div class="lead">
-<p style="margin:0"><b>なぜフォームにするか。</b> メールアドレスをサイトに書くと、迷惑メールの標的になります。
-フォームなら<b>メールアドレスを一切公開せずに</b>、お問い合わせを社長のメールで受け取れます。</p>
+<div class="tw">
+<table>
+<tr>
+  <th style="width:20%">案</th>
+  <th style="width:16%">置き場所</th>
+  <th style="width:16%">ドメイン</th>
+  <th style="width:16%" class="num-cell">年間の目安</th>
+  <th>コメント</th>
+</tr>
+<tr class="hi">
+  <td><b>A（推奨）<br>Cloudflare</b></td>
+  <td><b>0円</b><br>Cloudflare Pages</td>
+  <td>約1,500〜2,000円<br>Cloudflare Registrar</td>
+  <td class="num-cell"><b>約1,500〜2,000円</b></td>
+  <td>静的サイト専用の置き場所。<b>無料枠で十分</b>。フォルダをドラッグするだけで公開でき、表示も速い。ドメインは原価提供で更新料が上がりにくい</td>
+</tr>
+<tr>
+  <td>B<br>ロリポップ！</td>
+  <td>年約5,100円<br>ライトプラン</td>
+  <td>特典で無料</td>
+  <td class="num-cell">約5,000〜7,000円</td>
+  <td>国内の定番。管理画面が日本語で分かりやすい。メールアドレスも付いてくる</td>
+</tr>
+<tr>
+  <td>C<br>エックスサーバー</td>
+  <td>年13,200円<br>スタンダード12ヶ月</td>
+  <td>永久無料特典<br>（12ヶ月以上契約で1つ）</td>
+  <td class="num-cell">約13,200円</td>
+  <td>国内最大手で安心感がある。今後ブログを足すなら余裕がある。<b>2026年9月7日までは最大30%オフ</b>で月693円〜</td>
+</tr>
+</table>
 </div>
 
-<p><a href="https://docs.google.com/forms/">Googleフォーム</a> を開き、空白のフォームを新規作成してください。無料です。</p>
+<div class="card">
+<p style="margin:0"><b>これ以外に、かかるかもしれないもの</b></p>
+<div class="tw">
+<table style="margin-bottom:0">
+<tr><th style="width:34%">項目</th><th style="width:20%" class="num-cell">費用</th><th>要否</th></tr>
+<tr><td>お問い合わせフォーム（Googleフォーム）</td><td class="num-cell">0円</td><td>必要。無料で足ります</td></tr>
+<tr><td>独自ドメインのメール<br>（受信・転送のみ）</td><td class="num-cell">0円</td><td>Cloudflare の転送機能で <code>info@…</code> 宛を Gmail に流せます</td></tr>
+<tr><td>独自ドメインのメール<br>（送信もする）</td><td class="num-cell">月800円程度</td><td><b>当面は不要。</b>メーカーへの連絡を <code>info@…</code> から送りたくなったら検討</td></tr>
+<tr><td>SSL（https 化）</td><td class="num-cell">0円</td><td>A・B・C どの案でも無料で付きます</td></tr>
+</table>
+</div>
+</div>
 
-<h3>入れる質問（この5つ・順番は自由）</h3>
+<div class="good">
+<p style="margin:0"><b>私の推奨は A案（Cloudflare）です。</b>
+理由は3つ。①当社のサイトは静的HTMLなので、レンタルサーバーの機能が丸ごと不要
+②年1,500円台は他案の 1/3〜1/8 ③フォルダをドラッグするだけで公開でき、初心者でも詰まりにくい。
+表示が速いぶん、検索にもわずかに有利です。</p>
+<p style="margin:10px 0 0">迷ったとき、あるいは<b>日本語のサポートに電話したい</b>のであれば B案（ロリポップ）でも構いません。
+差額は年3,000〜5,000円ほどです。</p>
+</div>
+
+<p style="font-size:13.5px;color:var(--muted)">
+※ 金額はいずれも<b>目安</b>です。キャンペーンや為替で変わるので、<b>申込画面の表示が正</b>です。
+とくに Cloudflare のドメイン代はドルベースなので、円換算で前後します。
+</p>
+
+
+<h2><span class="n">0</span>お問い合わせフォームを作る<span class="time">3分</span></h2>
+
+<p><a href="https://docs.google.com/forms/">Googleフォーム</a> で空白のフォームを作ります。無料です。
+<b>メールアドレスをサイトに出さずに、お問い合わせを受け取る</b>ための仕組みです。</p>
+
+<h3>入れる質問（この5つ）</h3>
 <div class="tw">
 <table>
 <tr><th style="width:26%">質問のタイトル</th><th style="width:20%">形式</th><th>備考</th></tr>
@@ -82,194 +173,229 @@
 <tr class="hi"><td><b>メールアドレス</b></td><td>記述式</td><td>必須にする</td></tr>
 <tr class="hi"><td><b>ご用件</b></td><td>プルダウン</td><td>選択肢：商品についての質問／探している商品の相談／届いた商品の不具合・返品について／ご意見・ご要望／メーカー・卸売業者としてのお取引の相談／その他</td></tr>
 <tr class="hi"><td><b>お問い合わせ内容</b></td><td>段落</td><td>必須にする</td></tr>
-<tr class="hi"><td><b>お知らせ希望</b></td><td>チェックボックス</td><td>選択肢を1つだけ：<code>希望する</code></td></tr>
+<tr class="hi"><td><b>お知らせ希望</b></td><td>チェックボックス</td><td>選択肢は1つだけ：<code>希望する</code></td></tr>
 </table>
 </div>
 
 <div class="warn">
-<p style="margin:0"><b>⚠️ 質問のタイトルは上の言葉を必ず含めてください。</b>
-（「お名前」「メール」「ご用件」「内容」「お知らせ」）<br>
-この言葉を手がかりに、<code>fill.py</code> がサイトのフォームと自動でつなぎます。
-違う言葉にすると自動でつながらず、Googleフォームがそのまま画面に埋め込まれる形になります（動作はしますが、見た目が少し変わります）。</p>
+<p style="margin:0"><b>タイトルに、上の言葉を必ず含めてください</b>（「お名前」「メール」「ご用件」「内容」「お知らせ」）。
+この言葉を手がかりに、私のスクリプトがサイトのフォームと自動でつなぎます。
+違う言葉にすると自動でつながらず、Googleフォームがそのまま画面に埋め込まれる形になります（動きますが、見た目が変わります）。</p>
 </div>
 
-<h3>お問い合わせを社長のメールに飛ばす設定（これが本題）</h3>
+<h3>お問い合わせを、社長のメールに飛ばす</h3>
 <ol>
-<li>フォーム編集画面の上部で「<b>回答</b>」タブを開く</li>
-<li>右上の <b>⋮</b>（縦3点）をクリック</li>
-<li><b>「新しい回答についてのメール通知を受け取る」</b> にチェックを入れる</li>
+<li>フォーム編集画面の上にある「<b>回答</b>」タブを開く</li>
+<li>右上の <b>⋮</b>（縦3つの点）を押す</li>
+<li><b>「新しい回答についてのメール通知を受け取る」</b>にチェック</li>
 </ol>
-<div class="good">
-<p style="margin:0">これで、フォームが送信されるたびに<b>社長のGmailに通知が届きます。</b>
-回答は自動で一覧にも溜まるので、あとから見返すこともできます。</p>
-</div>
+<p>これで、フォームが送信されるたびに社長の Gmail に届きます。</p>
 
 <h3>URLを控える</h3>
+<p>右上の「<b>送信</b>」→ リンクのアイコン（🔗）→ 表示された URL をコピー。ステップ②で使います。</p>
+
+
+<h2><span class="n">1</span>ドメインと置き場所を用意する<span class="time">15分・社長</span></h2>
+
+<div class="bad">
+<p style="margin:0"><b>ここは支払いとアカウント作成があるため、私は代行できません。</b>社長ご本人での操作をお願いします。</p>
+</div>
+
+<h3>ドメイン名を決める</h3>
+<p>ホームページの住所です。一度決めると変えにくいので、短く覚えやすいものを。候補：</p>
+<ul>
+<li><code>satoyselect.com</code> — 店名そのまま。<b>これが第一候補</b></li>
+<li><code>satoy-select.com</code> — ハイフン入り（読みやすいが、口頭で伝えにくい）</li>
+<li><code>satoyselect.jp</code> — 日本の事業者だと分かる。ただし <code>.com</code> より少し高い</li>
+</ul>
+<p><b><code>.com</code> をおすすめします。</b>もっとも一般的で、相手が疑いません。</p>
+
+<h3>A案（Cloudflare）の手順</h3>
 <ol>
-<li>右上の「<b>送信</b>」ボタンを押す</li>
-<li>リンクのアイコン（🔗）を選ぶ</li>
-<li>表示された URL をコピー ← <b>これをステップ①で貼ります</b></li>
+<li><a href="https://dash.cloudflare.com/sign-up">Cloudflare</a> でアカウントを作る（メールアドレスとパスワードだけ）</li>
+<li>左メニューの <b>Domain Registration</b> →「Register Domains」で、決めたドメイン名を検索</li>
+<li>空いていれば購入（クレジットカード）。<b>ここで実際の年額が表示されます</b>ので、その金額をご確認ください</li>
+<li>左メニューの <b>Compute (Workers &amp; Pages)</b> → <b>Pages</b> →「アップロード」でプロジェクトを作る<br>
+　※この時点ではまだファイルがなくて構いません。ステップ③で入れます</li>
 </ol>
 
 <div class="card">
-<p style="margin:0"><b>フォームがまだでも、先に進めます。</b> ステップ①で空のまま Enter を押せば、
-お問い合わせページは「準備中」の表示になります。フォームができたら、
-もう一度 <code>fill.py</code> を実行して貼り付ければ差し替わります。</p>
+<p style="margin:0"><b>もし途中で分からなくなったら、</b>画面のスクリーンショットを撮って私に送ってください。
+どこを押せばいいか、画面に沿ってご案内します。</p>
 </div>
 
-<h2><span class="n">1</span>ステップ① 情報を入れる<span class="step-time">3分</span></h2>
 
-<p>ターミナル（Mac の「ターミナル.app」）を開いて、下の1行をコピーして貼り付け、Enter を押してください。</p>
+<h2><span class="n">2</span>情報を入れてファイルを作る<span class="time">2分</span></h2>
 
-<pre><code>cd ~/Documents/AI\ Company\ Outputs/Amazon物販事業/T-20260817-006/site && python3 fill.py</code></pre>
+<p>Mac の「ターミナル」を開いて、下の1行をコピーして貼り付け、Enter を押してください。</p>
 
-<p>9つの質問が順に出るので、答えて Enter を押していくだけです。</p>
+<pre><code>cd ~/Documents/AI\ Company\ Outputs/Amazon物販事業/T-20260817-006/最新版_0821e/site && python3 fill.py</code></pre>
+
+<p>質問が10個出ます。<b>必須の項目には、すでに答えを入れてあります。</b>そのままでよければ空エンターで進みます。</p>
 
 <div class="tw">
 <table>
-<tr><th style="width:24%">聞かれること</th><th>答え方</th></tr>
-<tr class="hi"><td><b>独自ドメイン</b></td><td><code>satoyselect.com</code> のように入力（<code>https://</code> や <code>www.</code> は不要）。※まだ買っていなくても、これから買う予定の名前を入れてください</td></tr>
+<tr><th style="width:26%">聞かれること</th><th>答え方</th></tr>
+<tr class="hi"><td><b>独自ドメイン</b></td><td>ステップ①で買ったもの（例 <code>satoyselect.com</code>）。<code>https://</code> や <code>www.</code> は不要</td></tr>
 <tr><td><b>代表者のお名前</b></td><td>そのままお名前を</td></tr>
-<tr class="hi"><td><b>所在地</b></td><td><b>郵便番号から番地まで</b>（社長のご判断＝A案）</td></tr>
-<tr><td><b>メールアドレス</b></td><td><code>info@satoyselect.com</code> など。<b>サイトには一切表示されません。</b>メーカー様へお渡しする会社概要PDFにのみ使います</td></tr>
-<tr><td><b>電話番号</b></td><td><b>お持ちでなければ空のまま Enter</b> → 電話の欄がサイトから自動で消えます</td></tr>
-<tr><td><b>FAX番号</b></td><td>同上。無ければ空 Enter</td></tr>
+<tr class="hi"><td><b>所在地</b></td><td><b>すでに入っています</b>（〒146-0091 東京都大田区鵜の木2-47-20 303号）。空エンターでOK</td></tr>
+<tr><td><b>メールアドレス</b></td><td><b>サイトには出ません。</b>メーカー様へ渡す会社概要PDFにだけ使います</td></tr>
+<tr><td><b>電話番号</b></td><td><b>空エンター</b>。電話の欄がサイトから消えます</td></tr>
+<tr><td><b>FAX番号</b></td><td><b>空エンター</b></td></tr>
 <tr><td><b>開業年月</b></td><td><code>2026年8月</code> のように</td></tr>
-<tr class="hi"><td><b>AmazonストアのURL</b></td><td><b>まだ出品していなければ空のまま Enter</b> → ストアへのボタンが消え、代わりに<b>「ただいま開店準備中です」</b>の案内が出ます。出品後にやり直せば自動で入れ替わります</td></tr>
-<tr class="hi"><td><b>GoogleフォームのURL</b></td><td>下の<b>ステップ⓪</b>で作ったフォームの「回答用リンク」を貼ってください。空のままだと、お問い合わせページが「準備中」の表示になります</td></tr>
+<tr><td><b>AmazonストアのURL</b></td><td>まだなら<b>空エンター</b>。ストアのボタンが消え、「まもなく公開します」の案内が出ます</td></tr>
+<tr class="hi"><td><b>GoogleフォームのURL</b></td><td>ステップ⓪でコピーしたもの</td></tr>
+<tr><td><b>Search Console の確認コード</b></td><td>ステップ④でもらいます。<b>初回は空エンター</b>でOK</td></tr>
 </table>
 </div>
 
 <div class="good">
-<p style="margin:0">終わると、<code>T-20260817-006/公開用/</code> というフォルダができます。<b>この中身が、そのままアップロードするファイル一式</b>です。<br>
-同時に <b><code>Satoy-Select_会社概要.pdf</code></b>（A4・2枚）も自動で作られます。メーカーへのメールに添付する資料です。</p>
+<p style="margin:0">終わると <code>最新版_0821e/公開用/</code> というフォルダができます。
+<b>この中身が、そのままアップロードするファイルです。</b><br>
+同時に <code>Satoy-Select_会社概要.pdf</code>（A4・2枚）も作られます。これはアップロード不要で、
+メーカー様へのメールに添付する資料です。</p>
 </div>
 
-<p>入力を間違えても大丈夫です。<b>何度でもやり直せます</b>（同じコマンドをもう一度実行するだけ。元のファイルは書き換わりません）。</p>
+<p>間違えても大丈夫です。<b>同じコマンドを実行すれば、何度でもやり直せます。</b></p>
 
 
-<h2><span class="n">2</span>ステップ② ドメインとサーバーを用意する<span class="step-time">10分・社長ご本人</span></h2>
+<h2><span class="n">3</span>アップロードする<span class="time">3分・社長</span></h2>
 
-<div class="bad">
-<p style="margin:0"><b>ここは §4.1（金銭が動く・アカウント作成）です。私は代行できません。</b>社長ご本人で操作をお願いします。</p>
-</div>
-
-<h3>推奨＝A案：Xserver（ドメイン＋サーバーを1社でまとめる）</h3>
-
-<div class="tw">
-<table>
-<tr><th style="width:16%">案</th><th style="width:26%">構成</th><th>費用の目安</th><th style="width:22%">評価</th></tr>
-<tr class="hi"><td><b>A（推奨）</b></td><td>Xserver レンタルサーバー＋ドメイン</td><td>サーバー 月990円〜／ドメインは長期契約で無料になるキャンペーンあり</td><td>1社で完結。日本語サポート。設定が最も簡単</td></tr>
-<tr><td>B</td><td>お名前.com などでドメイン＋ロリポップ</td><td>ドメイン 年1,500円前後＋サーバー 月550円〜</td><td>安いが2社にまたがるぶん設定がひと手間</td></tr>
-<tr><td>C</td><td>ドメインのみ購入＋Cloudflare Pages（無料ホスティング）</td><td>ドメイン 年1,500円前後のみ</td><td><b>維持費は最安</b>だが、設定に技術的な手順が入る。ご希望なら私が手順を作ります</td></tr>
-</table>
-</div>
-
-<p><b>やること（A案の場合）</b></p>
+<h3>A案（Cloudflare Pages）の場合</h3>
 <ol>
-<li>Xserver のサイトで申し込み → <b>ドメイン名は <code>satoyselect.com</code> など、ステップ①で入力したものと必ず同じに</b>してください</li>
-<li>支払い（クレジットカード）</li>
-<li>管理画面で「独自SSL（https化）」を有効にする ← <b>必ず有効に。</b>「保護されていない通信」と出るサイトは信用を落とします</li>
-<li>メールアドレス <code>info@（ドメイン）</code> を作成する</li>
+<li>Cloudflare の <b>Compute (Workers &amp; Pages)</b> → <b>Pages</b> を開く</li>
+<li>「Upload assets」（アップロード）を選ぶ</li>
+<li><b><code>公開用</code> フォルダの<u>中身</u>を、まるごとドラッグして放り込む</b><br>
+　※フォルダごとではなく、<b>中身</b>（<code>index.html</code> や <code>assets</code> フォルダなど）です</li>
+<li>「Deploy」を押す</li>
+<li>できた仮のURL（<code>◯◯.pages.dev</code>）を開いて、表示を確認</li>
+<li><b>Custom domains</b> → 買ったドメインを設定 → <code>https://satoyselect.com/</code> で開けることを確認</li>
 </ol>
 
 <div class="warn">
-<p style="margin:0"><b>⚠️ ドメイン名を変える場合は、ステップ①をやり直してください。</b> サイト内のリンクや検索用の設定にドメイン名が埋め込まれているためです。</p>
-</div>
-
-
-<h2><span class="n">3</span>ステップ③ アップロードする<span class="step-time">2分</span></h2>
-
-<p>契約したサーバーの<b>ファイルマネージャー</b>（管理画面から開けます）を使うのが一番簡単です。</p>
-
-<ol>
-<li>管理画面 → 「ファイル管理」または「FTPファイルマネージャー」を開く</li>
-<li><code>（ドメイン名）/public_html/</code> というフォルダを開く</li>
-<li><b><code>公開用</code> フォルダの<u>中身</u>を、まるごとドラッグしてアップロード</b><br>
-　※ <code>公開用</code> フォルダごとではなく、<b>中身</b>（<code>index.html</code> や <code>assets</code> フォルダなど）を入れてください</li>
-<li>ブラウザで <code>https://（ドメイン名）/</code> を開いて、表示されることを確認</li>
-</ol>
-
-<div class="good">
-<p style="margin:0"><b>ここまでで公開完了です。</b>この時点で URL をメーカーへ伝えられます。</p>
+<p style="margin:0"><b>⚠️ https（鍵マーク）になっているか必ず確認してください。</b>
+「保護されていない通信」と出るサイトは、それだけで信用を落とします。
+Cloudflare は自動で付きますが、反映に数分〜十数分かかることがあります。</p>
 </div>
 
 <div class="card">
-<p style="margin:0"><b>アップロードするファイル一覧</b>（8ファイル＋assetsフォルダ）</p>
+<p style="margin:0"><b>アップロードするもの（11ファイル＋フォルダ）</b></p>
 <ul style="margin:8px 0 0">
-<li><b>お客様向け4ページ</b>：<code>index.html</code>（ホーム）／<code>business.html</code>（取り扱い商品）／<code>about.html</code>（私たちについて）／<code>contact.html</code>（お問い合わせ）</li>
-<li><b>事業者様向け1ページ</b>：<code>partners.html</code>（メーカー・卸売業者の皆さまへ）※各ページのフッターから辿れます</li>
-<li><code>profile.html</code>（会社概要資料・印刷用。検索には出ない設定済み）</li>
+<li><b>お客様向け</b>：<code>index.html</code>（ホーム）／<code>guides.html</code>（選び方ガイド）／<code>guide-cutting-board.html</code>／<code>guide-bottle.html</code>／<code>business.html</code>／<code>about.html</code>／<code>contact.html</code></li>
+<li><b>事業者様向け</b>：<code>partners.html</code></li>
+<li><code>profile.html</code>（会社概要の印刷用。検索には出さない設定済み）</li>
 <li><code>sitemap.xml</code>／<code>robots.txt</code>（検索エンジン向けの案内図）</li>
-<li><code>assets/</code>（ロゴ・デザイン一式）</li>
-<li><code>Satoy-Select_会社概要.pdf</code> ← これは<b>アップロード不要</b>。メーカー様へのメール添付用に手元に置いてください</li>
+<li><code>assets/</code>（デザインとイラスト一式）</li>
+<li>⛔ <code>Satoy-Select_会社概要.pdf</code> は<b>アップロード不要</b>（手元に置いてメール添付用に）</li>
 </ul>
 </div>
 
 
-<h2><span class="n">4</span>ステップ④ 検索に出るようにする<span class="step-time">5分＋待ち時間</span></h2>
+<h2><span class="n">4</span>Google に「あります」と知らせる<span class="time">10分</span></h2>
 
-<p>公開しただけでは Google は気づきません。<b>こちらから知らせます。</b></p>
+<p>公開しただけでは、Google は気づきません。<b>こちらから登録します。</b>
+これが「検索できるようにする」作業の本体です。</p>
 
 <ol>
 <li><a href="https://search.google.com/search-console">Google Search Console</a> を開き、Googleアカウントでログイン</li>
-<li>「プロパティを追加」→ <b>URLプレフィックス</b>に <code>https://（ドメイン名）/</code> を入力</li>
-<li>所有権の確認 → <b>「HTMLタグ」</b>の方法を選ぶと、<code>&lt;meta name="google-site-verification" ...&gt;</code> というタグが表示されます<br>
-　→ <b>このタグを私に送ってください。</b>全ページに埋め込んでお返しします（再アップロードで確認完了）</li>
-<li>確認できたら、左メニュー「サイトマップ」→ <code>sitemap.xml</code> と入力して送信</li>
-<li>左上の検索窓に自分のURLを入れて「インデックス登録をリクエスト」</li>
+<li>「プロパティを追加」→ <b>右側の「URLプレフィックス」</b>を選び、<code>https://satoyselect.com/</code> を入力
+  <div class="card" style="margin:10px 0">
+  <p style="margin:0">※ 左側の「ドメイン」を選ぶと DNS の設定が必要になり、少し難しくなります。<b>右側を選んでください。</b></p>
+  </div>
+</li>
+<li>所有権の確認画面で <b>「HTMLタグ」</b>を選ぶ。
+  <code>&lt;meta name="google-site-verification" content="<b>ここが長い文字列</b>"&gt;</code> が表示されます</li>
+<li><mark><b>この文字列を、まるごとコピーして私に送ってください。</b></mark>
+  <p style="margin:8px 0 0">→ 私が全ページに埋め込んでお返しします。<br>
+  （ご自分でやる場合：ステップ②の <code>fill.py</code> をもう一度実行し、最後の質問に貼り付ければ自動で入ります）</p>
+</li>
+<li>埋め込んだファイルを、ステップ③と同じ手順で<b>もう一度アップロード</b></li>
+<li>Search Console に戻って「確認」を押す → 所有権の確認が完了します</li>
+<li>左メニューの「<b>サイトマップ</b>」→ <code>sitemap.xml</code> と入力して送信</li>
+<li>画面いちばん上の検索窓に <code>https://satoyselect.com/</code> を入れて Enter →
+  「<b>インデックス登録をリクエスト</b>」を押す</li>
 </ol>
 
-<div class="warn">
-<p style="margin:0"><b>ここから先は待ちです。</b>早ければ2〜3日、通常1〜2週間で「Satoy Select」の検索結果に出てきます。<br>
-急ぐ必要はありません。<b>メーカーへのメールに URL を書けば、その場で見てもらえます。</b>検索順位が効いてくるのは、メーカー側が後から社名を調べ直すときです。</p>
+<div class="good">
+<p style="margin:0"><b>ここまでで、やることは終わりです。</b>あとは Google が見に来るのを待ちます。</p>
 </div>
 
-<h3>検索に出やすくするために、すでに仕込んであること</h3>
+<h3>ついでにやると効くこと（任意・5分）</h3>
 <ul>
-<li>各ページに <b>title・description</b>（検索結果に出る見出しと説明文）を設定済み</li>
-<li>トップページに <b>構造化データ（JSON-LD）</b>を埋め込み済み — 屋号・代表者・所在地・連絡先を Google が正しく認識できます</li>
-<li><b>sitemap.xml / robots.txt</b> を同梱済み</li>
-<li>各ページに <b>canonical URL</b>（重複判定を防ぐ指定）を設定済み</li>
-<li>SNS共有時のカード表示用に <b>OGPタグ</b>を設定済み</li>
+<li><b>Bing Webmaster Tools</b> にも登録する<br>
+　→ Bing だけでなく、ChatGPT などの AI 検索にも拾われやすくなります。
+　Search Console から設定を読み込めるので、登録は数分で終わります</li>
 </ul>
 
+<div class="warn">
+<p style="margin:0"><b>⚠️ Googleビジネスプロフィール（地図に載るやつ）は、登録しないでください。</b>
+実店舗がないうえ、<b>自宅住所が Google マップ上に公開されます。</b>
+ネット通販だけの事業では、登録しても得がありません。</p>
+</div>
 
-<h2><span class="n">5</span>あとから足せるもの（急ぎません）</h2>
+
+<h2><span class="n">5</span>待つ<span class="time">数日〜2週間</span></h2>
+
+<p>登録してすぐには出ません。目安はこうです。</p>
 
 <div class="tw">
 <table>
-<tr><th style="width:26%">項目</th><th>やり方</th></tr>
-<tr><td><b>顔写真</b></td><td>写真を <code>assets/portrait.jpg</code> という名前で置き、<code>about.html</code> の該当行のコメント（<code>&lt;!-- --&gt;</code>）を外すだけ。私に写真を送っていただければ、こちらで組み込みます</td></tr>
-<tr><td><b>電話番号・FAX</b></td><td>取得後にステップ①をやり直せば、自動で欄が復活します</td></tr>
-<tr><td><b>Amazonストアへのリンク</b></td><td>出品を始めてストアURLが確定したら、<code>fill.py</code> をもう一度実行して入力するだけで、全ページにボタンが出ます</td></tr>
-<tr><td><b>取扱商品の実績紹介</b></td><td>初回のメーカー取引が決まったら、事例ページを追加します（メーカー様の許可が前提）</td></tr>
+<tr><th style="width:26%">時期</th><th>起きること</th></tr>
+<tr><td>当日〜2日</td><td>Search Console の「ページ」に、まだ何も出ないことが多い。正常です</td></tr>
+<tr><td>2〜7日</td><td><code>site:satoyselect.com</code> で検索すると、ページが出はじめます</td></tr>
+<tr><td>1〜2週間</td><td>「Satoy Select」で検索して出るようになります</td></tr>
+<tr><td>1〜3ヶ月</td><td>「まな板 選び方」のような一般的な言葉でも、少しずつ拾われはじめます</td></tr>
+</table>
+</div>
+
+<h3>確認のしかた</h3>
+<p>Google の検索窓に、こう入れてください。</p>
+<pre><code>site:satoyselect.com</code></pre>
+<p>これで<b>そのサイトの中だけ</b>を検索できます。ページが出てくれば、Google に登録されています。
+1週間経っても何も出ないときは、私に声をかけてください。原因を調べます。</p>
+
+
+<h2><span class="n">6</span>誰が何をやるか</h2>
+
+<div class="tw">
+<table>
+<tr><th style="width:38%">やること</th><th style="width:22%">担当</th><th>理由</th></tr>
+<tr><td>ドメインの購入・支払い</td><td><span class="who pay">社長</span></td><td>クレジットカード。私は行いません</td></tr>
+<tr><td>Cloudflare のアカウント作成</td><td><span class="who pay">社長</span></td><td>本人名義のアカウント作成。私は行いません</td></tr>
+<tr class="hi"><td>公開用ファイルの作成</td><td><span class="who me">カズヨ</span></td><td>作成済み。<code>fill.py</code> を回すだけの状態です</td></tr>
+<tr class="hi"><td>sitemap.xml / robots.txt</td><td><span class="who me">カズヨ</span></td><td>作成済み・同梱済み</td></tr>
+<tr class="hi"><td>検索用の設定（title・説明文・構造化データ）</td><td><span class="who me">カズヨ</span></td><td>全ページ実装済み</td></tr>
+<tr><td>アップロード</td><td><span class="who you">社長</span></td><td>管理画面へのログインが要ります</td></tr>
+<tr><td>Search Console の登録</td><td><span class="who you">社長</span></td><td>Googleアカウントでのログイン</td></tr>
+<tr class="hi"><td>確認コードの埋め込み</td><td><span class="who me">カズヨ</span></td><td>コードを送っていただければ、すぐ返します</td></tr>
+<tr class="hi"><td>公開後の点検・改善</td><td><span class="who me">カズヨ</span></td><td>表示崩れ、リンク切れ、検索状況を見ます</td></tr>
 </table>
 </div>
 
 
-<h2><span class="n">6</span>まとめ</h2>
+<h2><span class="n">7</span>すでに仕込んであること</h2>
 
-<div class="tw">
-<table>
-<tr><th style="width:8%">順</th><th style="width:30%">やること</th><th style="width:14%">所要</th><th>誰が</th></tr>
-<tr class="hi"><td>⓪</td><td>Googleフォームを作る＋メール通知をONにする</td><td>3分</td><td>社長</td></tr>
-<tr class="hi"><td>①</td><td>ターミナルで <code>fill.py</code> を実行し9項目を入力</td><td>3分</td><td>社長</td></tr>
-<tr class="hi"><td>②</td><td>ドメイン＋サーバー契約（推奨＝Xserver）・SSL有効化・メール作成</td><td>10分</td><td><b>社長（§4.1）</b></td></tr>
-<tr class="hi"><td>③</td><td><code>公開用</code> の中身をアップロード</td><td>2分</td><td>社長</td></tr>
-<tr><td>④</td><td>Search Console 登録 → 確認タグを私に送る → サイトマップ送信</td><td>5分</td><td>社長＋カズヨ</td></tr>
-<tr><td>⑤</td><td>検索結果に反映されるのを待つ</td><td>数日〜2週間</td><td>—</td></tr>
-</table>
-</div>
+<p>検索に出やすくするための下ごしらえは、全ページで終わっています。社長の作業は要りません。</p>
 
-<div class="good">
-<p style="margin:0"><b>詰まったら、どの段階でも一言ください。</b>画面を見ながら一緒に進めます。<br>
-また、<b>中身の文言はすべて調整できます。</b>「ここは言い過ぎ」「この表現に変えたい」があれば遠慮なくどうぞ。</p>
+<ul>
+<li><b>title と説明文</b> — 検索結果に出る見出しと説明。ページごとに書き分け済み</li>
+<li><b>構造化データ（JSON-LD）</b> — 店名・代表者・住所・お問い合わせ先を、Google が読める形で記述</li>
+<li><b>sitemap.xml</b> — 全8ページの案内図</li>
+<li><b>robots.txt</b> — 検索エンジンへの「見に来ていいですよ」の合図</li>
+<li><b>canonical</b> — 同じページが二重に登録されるのを防ぐ指定</li>
+<li><b>OGP</b> — LINE や X で共有したときに、タイトルと説明が出る設定</li>
+<li><b>スマホ対応</b> — Google はスマホ表示を基準に評価します。375px 幅で検証済み</li>
+</ul>
+
+<div class="card">
+<p style="margin:0"><b>いちばん効くのは、実は記事を増やすことです。</b>
+会社案内のページは誰も検索しません。「まな板 選び方」のような記事が、人を連れてきます。
+いまは2本。<b>4本、8本と増えるほど、検索から来る人が増えます。</b>ここは私が書き続けます。</p>
 </div>
 
 <div class="foot">
-T-20260817-006 ／ 秘書カズヨ ／ 2026-08-17<br>
-関連: 信用構築の事前準備リスト <code>shiire-credibility-prep.html</code>
+T-20260817-006 ／ 秘書カズヨ ／ 2026-08-21<br>
+関連：<code>画像とロゴの取り扱いルール.md</code>／<code>shiire-credibility-prep.html</code>（信用構築の準備リスト）
 </div>
 
 </div>
