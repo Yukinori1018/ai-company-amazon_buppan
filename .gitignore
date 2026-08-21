@@ -31,3 +31,6 @@ docs/reference/poipoi-pocket/*.docx
 workspace/.night-shift/stdout.log
 workspace/.night-shift/stderr.log
 workspace/.sync/
+
+# settings.json の編集前バックアップ（ローカル保持・追跡しない）
+.claude/settings.json.bak.*
