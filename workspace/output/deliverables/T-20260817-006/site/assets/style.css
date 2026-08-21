@@ -329,7 +329,7 @@ table.info th{
 }
 .form-notice b{color:var(--navy)}
 
-/* ---------- 開店準備中の告知 ---------- */
+/* ---------- 公開前のお知らせ ---------- */
 .preopen{
   background:var(--gold-soft);border:1px solid #e6d5ab;border-left:4px solid var(--gold);
   border-radius:10px;padding:20px 22px;margin:24px 0;
