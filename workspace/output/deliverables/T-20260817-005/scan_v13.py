@@ -91,6 +91,14 @@ REAL_SELLERS_MIN = 2                # ★段0の必須条件: distinct sellerId 
 REAL_SELLERS_MAX = 6                # 取り分が残る上限（COUNT_NEW ではなく実セラーで判定）
 OFFERS_PARAM = 20                   # /product?offers=N。COUNT_NEW<=6 前提なら20で十分
 OFFERS_CHUNK = 10                   # offers 付きはレスポンスが重いので小さめのバッチで
+
+# --- D1: 2026-02-23 の価格定義変更（listing price → landing price）---------
+# この時刻より **前** の NEW 記録は「出品価格」、**以降** は「着地価格（＝出品価格＋送料）」。
+# Keepa時刻(分) = unixtime/60 - KEEPA_EPOCH_MIN。2026-02-23 00:00 UTC を換算した値。
+PRICE_DEF_CHANGE_KEEPA_MIN = 7966080
+# FBM オファーが無い行は送料0＝境界前後で同値のはず、という**推論**。
+# `probe_d1_window.py` で一致率を実測し、高いことを確認できたときだけ True にする。
+USE_365_WINDOW_FOR_FBA_ONLY = False
 REVIEWS_MIN, REVIEWS_MAX = 5, 300   # 「あまり有名でない」の機械化
 VARIATION_MIN, VARIATION_MAX = 1, 3
 TRACKING_DAYS_MIN = 180             # 追跡180日以上（データが薄い商品を弾く）
@@ -149,9 +157,15 @@ FIELDS = [
     # 「出品者数」という名前が誤読の元だったので **新品オファー数** に改名した（2026-08-24）。
     # 実際に人が見るべきは「実セラー数」。
     "月間ドロップ数", "月間販売数", "新品オファー数", "実セラー数", "セラー名一覧",
-    "メーカー直販フラグ", "BuyBox価格", "過去1年最安値",
+    "メーカー直販フラグ",
+    # D2: 旧「BuyBox価格」。実体は current[1]=NEW（新品最安・送料込）だったので改名した。
+    "新品最安値(送料込)",
+    # D1: 旧「過去1年最安値」。主軸は定義が一貫した 2026-02-23 以降の窓。
+    "過去最安値(送料込・2026-02-23以降)", "参考_365日最安(価格定義混在)",
+    "価格定義混在", "採用窓", "窓差率%",
     "損益分岐仕入れ値", "損益分岐仕入れ値_精緻", "仕入れ掛け率上限%",
-    "想定月販", "消化月数", "消化月数_ロット5", "FBAサイズ区分", "外注費", "規模フラグ",
+    "想定月販", "消化月数", "消化月数_ロット5", "分母の根拠",
+    "FBAサイズ区分", "外注費", "規模フラグ",
     "段1回転", "段2値下げ耐性", "判定", "見送り理由", "出品制限チェック", "Amazonページ",
 ]
 
@@ -209,7 +223,10 @@ def build_selection(preset: str, page: int) -> dict:
     tracking_before = int(time.time() / 60) - KEEPA_EPOCH_MIN - TRACKING_DAYS_MIN * 24 * 60
     return {
         # --- 機械ふるい（v1.3）---
-        "current_AMAZON_gte": -1, "current_AMAZON_lte": -1,      # Amazon本体不在
+        "current_AMAZON_gte": -1, "current_AMAZON_lte": -1,      # 今この瞬間 Amazon 価格が無い
+        # D3: current_AMAZON=-1 は「一時在庫切れ」も通してしまう。
+        # 「Amazon のオファーがそもそも存在しない」は availabilityAmazon=-1 が正しい。
+        "availabilityAmazon": -1,
         "current_COUNT_NEW_gte": OFFERS_MIN, "current_COUNT_NEW_lte": OFFERS_MAX,
         "current_NEW_gte": price_lo, "current_NEW_lte": price_hi,
         "current_SALES_gte": 1, "current_SALES_lte": RANK_MAX,   # 足切りではなく上限開放
@@ -285,11 +302,31 @@ def _num(v):
 
 
 def _stat_min(stats: dict, idx: int):
-    """stats.min[idx] は [keepa時刻, 値] または null。値だけ取り出す。"""
-    arr = stats.get("min") or []
+    """stats.**minInInterval**[idx] は [keepa時刻, 値] または null。値だけ取り出す。
+
+    D1（2026-08-24 修正）: 以前は `stats.min` を読んでいたが、公式定義では
+    `min` は「**これまでに記録された**最安値」で `stats` パラメータの期間と無関係。
+    期間内の最安は `minInInterval`。追跡10年の商品なら10年前の底値が
+    「過去1年最安値」として入っていた。
+    """
+    arr = stats.get("minInInterval") or []
     if len(arr) > idx and isinstance(arr[idx], list) and len(arr[idx]) == 2:
         return _num(arr[idx][1])
     return None
+
+
+def _fbm_free(product: dict) -> bool:
+    """FBM（自己発送）の新品オファーが無さそうか。
+
+    判定材料は csv 35 = COUNT_NEW_FBM（2026年3月に追加された履歴）。
+    最終値が 0 なら FBM 無し。系列そのものが無い商品は **判定できない**ので False
+    （＝安全側。365日窓を使ってよい根拠にはしない）。
+    stats.offerCountFBM は offers パラメータ付きでしか入らないので当てにしない。
+    """
+    ser = _series(product, 35)
+    if not ser or len(ser) < 2:
+        return False
+    return ser[-1] == 0
 
 
 def fba_size_class(product: dict) -> tuple:
@@ -319,8 +356,81 @@ def fba_size_class(product: dict) -> tuple:
     return "standard_2", "標準2"
 
 
-def evaluate(product: dict, preset: str) -> dict:
-    """1商品を v1.3 の 段0/段1/段2 で評価して CSV 1行に落とす。"""
+# ==========================================================================
+# D1: 価格履歴から「定義が一貫した最安値」を作る（2026-08-24 追加）
+#
+# Keepa 公式（product-object / changelog）:
+#   NEW/USED/COLLECTIBLE/REFURBISHED の時系列は
+#     2026-02-23 より前の記録 = 最安の**出品価格**（listing price）
+#     2026-02-23 以降の記録   = 最安の**着地価格**（landing price = 出品価格 + 送料）
+#   つまり **同じ列の中で意味が変わっている**。
+#
+# したがって `stats.minInInterval[1]`（365日）は境界をまたぐ＝**定義混在の最小値**。
+# 損益計算の主軸には使わず、`2026-02-23 以降の窓で自前計算した最安値` を使う。
+# 混在版も捨てずに `参考_365日最安(価格定義混在)` として残し、差を `窓差率%` で見せる。
+# ==========================================================================
+def _series(product: dict, idx: int) -> list:
+    """csv[idx] の時系列 [keepa時刻, 値, keepa時刻, 値, ...]。無ければ空リスト。"""
+    c = product.get("csv") or []
+    return c[idx] if len(c) > idx and c[idx] else []
+
+
+def _min_since(series: list, since_min: int) -> tuple:
+    """since_min 以降に**記録された**データ点の最小値と件数を返す。
+
+    Keepa の -1（オファー無し）は除外する。返り値 (最小値 or None, 対象データ点数)。
+    「境界より前に記録され、境界後もその値が続いていた」ぶんは**あえて含めない**。
+    定義が変わった後に Keepa が実際に記録した値だけを使いたいため。
+    含めた場合との差は `繰越` 扱いとして呼び出し側でフラグにする。
+    """
+    best, n = None, 0
+    for i in range(0, len(series) - 1, 2):
+        t, v = series[i], series[i + 1]
+        if not isinstance(v, int) or v < 0 or t < since_min:
+            continue
+        n += 1
+        if best is None or v < best:
+            best = v
+    return best, n
+
+
+def _carry_in(series: list, since_min: int):
+    """since_min 時点で有効だった値（境界より前の最後の記録）。"""
+    val = None
+    for i in range(0, len(series) - 1, 2):
+        t, v = series[i], series[i + 1]
+        if t > since_min:
+            break
+        if isinstance(v, int) and v >= 0:
+            val = v
+    return val
+
+
+def lowest_consistent_price(product: dict) -> dict:
+    """D1 の主軸値。返り値は CSV 列にそのまま入る dict。"""
+    ser = _series(product, 1)                      # csv 1 = NEW
+    post, n_post = _min_since(ser, PRICE_DEF_CHANGE_KEEPA_MIN)
+    pre_exists = any(
+        isinstance(ser[i + 1], int) and ser[i + 1] >= 0 and ser[i] < PRICE_DEF_CHANGE_KEEPA_MIN
+        for i in range(0, len(ser) - 1, 2))
+    carried = None
+    if post is None:
+        carried = _carry_in(ser, PRICE_DEF_CHANGE_KEEPA_MIN)
+    return {
+        "post": post if post is not None else carried,
+        "post_points": n_post,
+        "carried": post is None and carried is not None,
+        # 365日窓が境界をまたいでいるか＝混在しているか
+        "mixed": bool(pre_exists and n_post > 0),
+    }
+
+
+def evaluate(product: dict, preset: str, seller: dict = None) -> dict:
+    """1商品を v1.3 の 段0/段1/段2 で評価して CSV 1行に落とす。
+
+    seller は `seller_index()` が返す実セラー情報（無ければ未検証扱い）。
+    実セラー数が分かっている行では **段0のゲートも段1の分母も実セラー数**を使う（D4）。
+    """
     stats = product.get("stats") or {}
     cur = stats.get("current") or []
     asin = product.get("asin") or ""
@@ -332,12 +442,28 @@ def evaluate(product: dict, preset: str) -> dict:
     cat_label = " > ".join(cat_names[:3])
 
     rank = _num(cur[3]) if len(cur) > 3 else None
-    offers = _num(cur[11]) if len(cur) > 11 else None
+    offers = _num(cur[11]) if len(cur) > 11 else None     # COUNT_NEW（オファー数）
     drops30 = _num(stats.get("salesRankDrops30"))
     monthly_sold = product.get("monthlySold")
     monthly_sold = int(monthly_sold) if isinstance(monthly_sold, (int, float)) and monthly_sold > 0 else ""
-    buybox = _num(stats.get("buyBoxPrice")) or (_num(cur[1]) if len(cur) > 1 else None)
-    low_365 = _stat_min(stats, 1)   # index 1 = NEW（マーケットプレイス新品最安）
+
+    # --- D2: この列は Buy Box 価格ではない ---------------------------------
+    # stats.buyBoxPrice は offers / buybox パラメータ付きでしか設定されない。
+    # Phase2 はどちらも付けないので、実際に入るのは常に current[1]（NEW＝新品最安・送料込）。
+    # 列名を偽らないよう「新品最安値(送料込)」に改めた。
+    lowest_new = _num(cur[1]) if len(cur) > 1 else None
+
+    # --- D1: 定義が一貫した最安値 -----------------------------------------
+    low_365 = _stat_min(stats, 1)                 # minInInterval[1]（365日・定義混在）
+    lp = lowest_consistent_price(product)
+    low_post = lp["post"]
+
+    # 追加2: FBM オファーが無い行は送料0＝境界前後で定義差が出ない可能性がある。
+    # ただし **実測で一致率を確認するまで採用しない**（USE_365_WINDOW_FOR_FBA_ONLY）。
+    fbm_free = _fbm_free(product)
+    use_365 = bool(USE_365_WINDOW_FOR_FBA_ONLY and fbm_free and low_365)
+    low_used = low_365 if use_365 else low_post
+
     size_key, size_label = fba_size_class(product)
     outsource = OUTSOURCE_COST.get(size_key, OUTSOURCE_COST["unknown"])
 
@@ -348,17 +474,29 @@ def evaluate(product: dict, preset: str) -> dict:
         "月間販売数": monthly_sold,
         # COUNT_NEW＝新品オファー数。**出品者数ではない**（同一セラーの FBA+FBM で2になる）。
         "新品オファー数": int(offers) if offers is not None else "",
-        "実セラー数": "",            # Phase2.5（--verify-sellers）で埋める
-        "セラー名一覧": "",
-        "メーカー直販フラグ": "",
-        "BuyBox価格": int(buybox) if buybox else "",
-        "過去1年最安値": int(low_365) if low_365 else "",
+        "実セラー数": "", "セラー名一覧": "", "メーカー直販フラグ": "",
+        "新品最安値(送料込)": int(lowest_new) if lowest_new else "",
+        "過去最安値(送料込・2026-02-23以降)": int(low_post) if low_post else "",
+        "参考_365日最安(価格定義混在)": int(low_365) if low_365 else "",
+        "価格定義混在": "はい" if lp["mixed"] else "いいえ",
+        "採用窓": ("365日(FBAのみ・実測で同値確認済)" if use_365
+               else ("繰越(境界後の記録なし)" if lp["carried"] else "2026-02-23以降")),
+        "窓差率%": (round((low_post - low_365) / low_365 * 100, 1)
+                if (low_post and low_365) else ""),
         "FBAサイズ区分": size_label, "外注費": outsource,
         "規模フラグ": ("大手/海外疑い" if BIG_BRAND_HINTS.search(f"{brand} {maker} {title}")
                   else "中小候補"),
         "出品制限チェック": "",
         "Amazonページ": f"https://www.amazon.co.jp/dp/{asin}",
     }
+
+    # ---- 実セラー数（分かっていれば使う）----
+    real = None
+    if seller:
+        real = seller["real_sellers"]
+        row["実セラー数"] = real
+        row["セラー名一覧"] = seller["names_label"]
+        row["メーカー直販フラグ"] = "メーカー直販" if seller["maker_direct"] else ""
 
     # ---- 段0: 機械ふるい（Finder の取りこぼしをここで潰す）----
     reasons = []
@@ -368,19 +506,34 @@ def evaluate(product: dict, preset: str) -> dict:
         reasons.append("FBA大型サイズ")
     if offers is None or not (OFFERS_MIN <= offers <= OFFERS_MAX):
         reasons.append(f"新品オファー数{offers}")
-    # 実セラー数は段0の必須条件だが、この時点ではまだ未取得（Phase2.5 で確定する）。
-    # ここで暫定 GO にした行だけに offers を叩く二段構えにしている（トークン節約）。
+    if real is not None:
+        if real < REAL_SELLERS_MIN:
+            reasons.append(f"実セラー数{real}（卸している証拠なし）")
+        elif real > REAL_SELLERS_MAX:
+            reasons.append(f"実セラー数{real}（相乗り過多）")
     if rank is None or rank > RANK_MAX:
         reasons.append("ランク圏外")
     if not drops30 or drops30 < PRESETS[preset][2]:
         reasons.append("ドロップ数不足")
-    if not buybox:
+    if not lowest_new:
         reasons.append("価格取得不可")
-    if _num(cur[0]) is not None:
+    # --- D3: Amazon 本体の判定 -------------------------------------------
+    # current[0] == -1 は「今この瞬間 Amazon 価格が無い」だけで「出品していない」ではない。
+    # 専用フィールド availabilityAmazon の -1 だけが「Amazon のオファーが存在しない」。
+    avail = product.get("availabilityAmazon")
+    if isinstance(avail, int):
+        if avail != -1:
+            reasons.append(f"Amazon本体あり(availabilityAmazon={avail})")
+    elif _num(cur[0]) is not None:          # フィールドが無い古い raw 用のフォールバック
         reasons.append("Amazon本体あり")
 
     # ---- 段1: 回転 ----
-    est_monthly = drops30 / (offers + 1) if (drops30 and offers is not None) else None
+    # D4: 分母は「出品者数+1」。実セラー数が分かっていればそれを使う。
+    #     未検証の行は COUNT_NEW のままだが、`分母の根拠` 列で必ず区別できるようにする。
+    denom_n = real if real is not None else offers
+    row["分母の根拠"] = ("実セラー数" if real is not None
+                   else ("COUNT_NEW(未検証)" if offers is not None else ""))
+    est_monthly = drops30 / (denom_n + 1) if (drops30 and denom_n is not None) else None
     months = (LOT_SIZE / est_monthly) if est_monthly else None
     months_alt = (LOT_SIZE_ALT / est_monthly) if est_monthly else None
     stage1 = bool(months is not None and months <= TURNOVER_MONTHS_MAX)
@@ -391,26 +544,27 @@ def evaluate(product: dict, preset: str) -> dict:
     if not stage1:
         reasons.append("回転不足(消化月数>3)")
 
-    # ---- 段2: 値下げ耐性 ----
+    # ---- 段2: 値下げ耐性（D1 の主軸値で計算する）----
     breakeven = None
     breakeven_fine = None
-    if low_365:
-        breakeven = low_365 * GROSS_KEEP_RATE - outsource
+    if low_used:
+        breakeven = low_used * GROSS_KEEP_RATE - outsource
         # 精緻版: 販売手数料(カテゴリ実料率) + FBA配送代行 + 外注費 を実額で引く
         cat_key = _map_category_key(product)
         cfg = fees.REFERRAL_FEE_TABLE.get(cat_key, fees.REFERRAL_FEE_TABLE["default"])
-        referral = max(low_365 * cfg["rate"], cfg.get("min_fee_yen", 0))
+        referral = max(low_used * cfg["rate"], cfg.get("min_fee_yen", 0))
         fba_key = size_key if size_key in fees.FBA_FEE_TABLE else "standard_1"
         fba_fee = fees.FBA_FEE_TABLE[fba_key]["fba_fee_yen"]
-        breakeven_fine = low_365 - referral - fba_fee - outsource
+        breakeven_fine = low_used - referral - fba_fee - outsource
     stage2 = bool(breakeven is not None and breakeven > 0)
     row["損益分岐仕入れ値"] = int(math.floor(breakeven)) if breakeven is not None else ""
     row["損益分岐仕入れ値_精緻"] = int(math.floor(breakeven_fine)) if breakeven_fine is not None else ""
-    row["仕入れ掛け率上限%"] = (round(breakeven / buybox * 100, 1)
-                          if (breakeven and buybox and breakeven > 0) else "")
+    # 掛け率の分母は「新品最安値(送料込)」＝いま並んでいる売値。Buy Box 価格ではない。
+    row["仕入れ掛け率上限%"] = (round(breakeven / lowest_new * 100, 1)
+                          if (breakeven and lowest_new and breakeven > 0) else "")
     row["段2値下げ耐性"] = "GO" if stage2 else "NG"
     if not stage2:
-        reasons.append("最安値で黒字化不能" if low_365 else "過去1年最安値なし")
+        reasons.append("最安値で黒字化不能" if low_used else "過去最安値なし")
 
     row["判定"] = "GO" if not reasons else "見送り"
     row["見送り理由"] = " / ".join(reasons)
@@ -559,6 +713,31 @@ def iter_offers_raw():
             yield product
 
 
+def seller_index() -> dict:
+    """raw_offers/ と seller_names.json から ASIN → 実セラー情報の辞書を作る（トークン0）。
+
+    evaluate() はこの辞書を見て、段0のゲートと段1の分母の両方に実セラー数を使う。
+    """
+    names_path = RAW_OFFERS / "seller_names.json"
+    names = json.loads(names_path.read_text(encoding="utf-8")) if names_path.exists() else {}
+    out = {}
+    for product in iter_offers_raw():
+        asin = product.get("asin")
+        if not asin:
+            continue
+        sp = seller_profile(product)
+        ids = sp["seller_ids"]
+        labels = [names.get(sid, sid) for sid in ids]
+        brand = _norm(product.get("brand") or "") or _norm(product.get("manufacturer") or "")
+        direct = bool(brand and any(
+            _norm(names.get(sid, "")) and
+            (brand in _norm(names.get(sid, "")) or _norm(names.get(sid, "")) in brand)
+            for sid in ids))
+        out[asin] = {"real_sellers": sp["real_sellers"], "seller_ids": ids,
+                     "names_label": " / ".join(labels), "maker_direct": direct}
+    return out
+
+
 def verify_sellers(from_raw: bool = False, limit: int = 0) -> dict:
     """CSV の GO 行について実セラー数を確定し、段0（実セラー数>=2）を適用する。
 
@@ -626,40 +805,21 @@ def verify_sellers(from_raw: bool = False, limit: int = 0) -> dict:
         names.update(keepa_seller_names(missing))
         names_path.write_text(json.dumps(names, ensure_ascii=False, indent=1), encoding="utf-8")
 
-    # --- 判定へ反映 ---
-    stat = {"verified": 0, "lt_min": 0, "gt_max": 0, "maker_direct": 0}
-    for r in rows:
-        p = cached.get(r["ASIN"])
-        if not p:
-            continue
-        sp = seller_profile(p)
-        stat["verified"] += 1
-        r["実セラー数"] = sp["real_sellers"]
-        r["セラー名一覧"] = " / ".join(names.get(sid, sid) for sid in sp["seller_ids"])
-        brand = _norm(r.get("ブランド", "")) or _norm(r.get("メーカー", ""))
-        seller_norms = [_norm(names.get(sid, "")) for sid in sp["seller_ids"]]
-        direct = bool(brand and any(
-            n and (brand in n or n in brand) for n in seller_norms))
-        r["メーカー直販フラグ"] = "メーカー直販" if direct else ""
-        if direct and sp["real_sellers"] == 1:
-            stat["maker_direct"] += 1
-        reasons = [x for x in (r.get("見送り理由") or "").split(" / ") if x]
-        if sp["real_sellers"] < REAL_SELLERS_MIN:
-            reasons.append(f"実セラー数{sp['real_sellers']}（卸している証拠なし）")
-            stat["lt_min"] += 1
-        elif sp["real_sellers"] > REAL_SELLERS_MAX:
-            reasons.append(f"実セラー数{sp['real_sellers']}（相乗り過多）")
-            stat["gt_max"] += 1
-        r["見送り理由"] = " / ".join(reasons)
-        r["判定"] = "GO" if not reasons else "見送り"
-
-    with open(CSV_ALL, "w", newline="", encoding="utf-8-sig") as f:
-        w = csv.DictWriter(f, fieldnames=FIELDS)
-        w.writeheader()
-        for r in rows:
-            w.writerow({k: r.get(k, "") for k in FIELDS})
+    # --- 判定は run_from_raw() に一本化する ---
+    # 実セラー数は段0のゲートであると同時に段1の分母でもある（D4）。
+    # CSV を後から書き換えると計算の入口が2か所になって必ずズレるので、
+    # **raw から全行を評価し直す**（トークン0）。
+    idx = seller_index()
+    stat = {
+        "verified": len(idx),
+        "lt_min": sum(1 for v in idx.values() if v["real_sellers"] < REAL_SELLERS_MIN),
+        "gt_max": sum(1 for v in idx.values() if v["real_sellers"] > REAL_SELLERS_MAX),
+        "maker_direct": sum(1 for v in idx.values()
+                            if v["maker_direct"] and v["real_sellers"] == 1),
+    }
     log(f"  実セラー確定={stat['verified']}件 / 実セラー<{REAL_SELLERS_MIN}で落選={stat['lt_min']}件 "
         f"/ 上限超過={stat['gt_max']}件 / メーカー直販独占={stat['maker_direct']}件")
+    run_from_raw()
     return stat
 
 
@@ -688,15 +848,19 @@ def run_from_raw() -> None:
     log("=== --from-raw: 保存済み raw JSON から再集計（トークン消費0）===")
     if CSV_ALL.exists():
         CSV_ALL.unlink()
+    idx = seller_index()
+    if idx:
+        log(f"  実セラー情報を {len(idx)} 件ぶん反映します（raw_offers/ より・トークン0）")
     rows, seen = [], set()
     for preset, product in iter_raw():
         asin = product.get("asin")
         if not asin or asin in seen:
             continue
         seen.add(asin)
-        rows.append(evaluate(product, preset))
+        rows.append(evaluate(product, preset, idx.get(asin)))
     append_rows(rows)
     n_go, n_top = write_top100()
+    write_top100(clean=True)
     log(f"再集計完了: {len(rows)}行 / GO {n_go}件 / top100 {n_top}件")
 
 
@@ -712,11 +876,8 @@ def main() -> None:
     args = ap.parse_args()
 
     if args.from_raw:
+        # run_from_raw() は raw_offers/ にある実セラー情報を自動で織り込む（トークン0）
         run_from_raw()
-        if args.verify_sellers:
-            verify_sellers(from_raw=True)
-            write_top100()
-            write_top100(clean=True)
         return
     if args.verify_sellers and CSV_ALL.exists():
         # 既存 CSV に対して実セラー検証だけを追加で走らせるモード
