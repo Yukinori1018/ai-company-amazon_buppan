@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>「想定仕入価格(上限)」の計算式と B0DWMPV656 の1個あたり損益｜経理ハジメ</title><style>
+:root{--fg:#1b1f23;--mut:#5b6570;--line:#e3e7eb;--acc:#0b5fff;--warn:#b45309;--bad:#b91c1c;--ok:#047857;}
+*{box-sizing:border-box}
+body{margin:0;background:#f6f7f9;color:var(--fg);
+ font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",Meiryo,sans-serif;
+ line-height:1.85;font-size:15.5px;-webkit-text-size-adjust:100%;}
+.wrap{max-width:1000px;margin:0 auto;padding:32px 22px 96px;background:#fff;
+ box-shadow:0 1px 3px rgba(0,0,0,.06);}
+h1{font-size:1.75rem;line-height:1.4;margin:.2em 0 .6em;padding-bottom:.4em;border-bottom:3px solid var(--acc);}
+h2{font-size:1.3rem;margin:2.2em 0 .7em;padding:.35em .6em;background:#eef3ff;border-left:5px solid var(--acc);border-radius:3px;}
+h3{font-size:1.1rem;margin:1.8em 0 .5em;padding-bottom:.25em;border-bottom:1px solid var(--line);}
+p{margin:.7em 0}
+hr{border:0;border-top:1px solid var(--line);margin:2.2em 0}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:.92em;display:block;overflow-x:auto;}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top;}
+th{background:#f0f3f7;font-weight:600;white-space:nowrap;}
+tbody tr:nth-child(even){background:#fafbfc}
+blockquote{margin:1.1em 0;padding:.8em 1em;background:#fffbeb;border-left:5px solid var(--warn);border-radius:3px;color:#463a1a;}
+code{background:#f1f3f5;padding:.12em .4em;border-radius:3px;font-size:.9em;
+ font-family:"SFMono-Regular",Menlo,Consolas,monospace;}
+pre{background:#1e2430;color:#e6edf3;padding:14px 16px;border-radius:6px;overflow-x:auto;font-size:.86em;line-height:1.6;}
+pre code{background:none;color:inherit;padding:0}
+ul,ol{margin:.7em 0;padding-left:1.6em}
+li{margin:.3em 0}
+a{color:var(--acc)}
+@media print{body{background:#fff}.wrap{box-shadow:none;max-width:none}}
+</style></head><body><div class="wrap"><h1>「想定仕入価格(上限)」の計算式と、B0DWMPV656 の1個あたり損益</h1>
+<p>作成: 経理 ハジメ / 2026-08-23 / チケット T-20260817-005<br>対象: Googleシート「メーカー仕入れ台帳」タブ <code>⭐月販実測あり(60商品)</code> 2行目（ASIN <code>B0DWMPV656</code>）</p>
+<blockquote><strong>この資料の読み方（先に1つだけ）</strong><br>各行に <strong>〔確定〕〔仮〕〔要見積り〕</strong> のタグを付けています。<br>- 〔確定〕= 公式値かコードの実装値。動きません。<br>- 〔仮〕= 私（経理）が置いた仮定。根拠は書いてありますが、実測ではありません。<br>- 〔要見積り〕= まだ誰も測っていません。<strong>この数字を根拠に発注してはいけません。</strong><br>当社の土台ルールは「仮を確定として扱わない」です。混ぜると必ず損をします。</blockquote>
+<hr>
+<h2>0. 結論（30秒で読む用）</h2>
+<ol><li><strong>「想定仕入価格(上限) 1,725円」は「赤字にならない上限」ではありません。</strong> 「<strong>純利益率25%を確保できる上限</strong>」です。赤字ラインはもっと上（同じ前提で 2,895円）。</li><li>ただしこの1,725円は <strong>在庫保管手数料をまったく含んでいません</strong>。保管を入れると 1,725円で買えても利益率は 25% → <strong>14.2%（中央シナリオ）</strong> に落ちます。</li><li><strong>1,725円 ÷ Amazon価格4,680円 = 掛け率36.9%</strong>。メーカー卸の一般的な掛け率は定価の60〜70%です。<strong>この商品はそもそも「その値段では売ってもらえない」可能性が非常に高い</strong>というのが、数字が示している最も重要な事実です。</li></ol>
+<hr>
+<h2>1. 「想定仕入価格(上限)」の計算式</h2>
+<h3>1-1. 数式</h3>
+<p>出典は <code>workspace/output/deliverables/T-20260804-001/maker_scan.py</code> の関数 <code>reverse_buy()</code>（実装そのもの）。</p>
+<pre><code>想定仕入価格(上限)
+  = Amazon価格
+  − 販売手数料（= max(Amazon価格 × カテゴリ料率, カテゴリ最低手数料)）
+  − FBA配送代行手数料（サイズ区分ごとの固定額）
+  − 納品送料（サイズ区分ごとの固定額）
+  − その他経費（一律100円）
+  − 目標純利益（= Amazon価格 × 25%）</code></pre>
+<p>コード上の該当行（原文）:</p>
+<pre><code>TARGET_MARGIN = 0.25          # 想定仕入価格＝この純利益率になる税込上限
+OTHER_COSTS   = 100           # 梱包外注(WAM NET 5-10円)+ラベル+資材+返品引当のざっくり
+INBOUND = {&quot;small&quot;: 150, &quot;standard_1&quot;: 250, &quot;standard_2&quot;: 300, &quot;large_1&quot;: 380, &quot;large_2&quot;: 480}
+
+referral   = max(amazon_price * cfg[&quot;rate&quot;], cfg.get(&quot;min_fee_yen&quot;, 0))
+fba        = fees.get_fba_fee(size).get(&quot;fba_fee_yen&quot;, 0)
+inbound    = INBOUND.get(size, 250)
+target_net = TARGET_MARGIN * amazon_price
+buy_incl   = amazon_price - referral - fba - inbound - OTHER_COSTS - target_net</code></pre>
+<h3>1-2. 使っている定数（全部）</h3>
+<p><strong>(a) Amazon販売手数料の料率</strong> — <code>calc/fees.py</code> の <code>REFERRAL_FEE_TABLE</code></p>
+<table><thead><tr><th>カテゴリキー</th><th>表示名</th><th>料率</th><th>最低手数料</th></tr></thead><tbody>
+<tr><td><code>default</code></td><td>その他</td><td>15.0%</td><td>0円</td></tr>
+<tr><td><code>home_kitchen</code></td><td>ホーム（家庭用品）&amp;キッチン</td><td><strong>15.0%</strong></td><td>0円</td></tr>
+<tr><td><code>electronics</code></td><td>家電&amp;カメラ</td><td>8.0%</td><td>30円</td></tr>
+<tr><td><code>pc</code></td><td>パソコン・周辺機器</td><td>8.0%</td><td>30円</td></tr>
+<tr><td><code>toys</code></td><td>おもちゃ&amp;ホビー</td><td>15.0%</td><td>0円</td></tr>
+<tr><td><code>sports</code></td><td>スポーツ&amp;アウトドア</td><td>15.0%</td><td>0円</td></tr>
+<tr><td><code>diy</code></td><td>DIY・工具</td><td>15.0%</td><td>0円</td></tr>
+<tr><td><code>pet</code></td><td>ペット用品</td><td>15.0%</td><td>0円</td></tr>
+<tr><td><code>office</code></td><td>文房具・オフィス用品</td><td>15.0%</td><td>0円</td></tr>
+<tr><td><code>apparel</code></td><td>服&amp;ファッション小物</td><td>15.0%</td><td>30円</td></tr>
+<tr><td><code>beauty</code> / <code>drugstore</code> / <code>health</code></td><td>各</td><td>10.0%</td><td>30円</td></tr>
+<tr><td><code>food</code></td><td>食品&amp;飲料</td><td>10.0%</td><td>0円</td></tr>
+<tr><td><code>books</code></td><td>本</td><td>15.0%</td><td>0円</td></tr>
+</tbody></table>
+<blockquote><strong>〔要修正の疑い〕</strong> <code>fees.py</code> のヘッダーには「⚠️ 要・経理ハジメ検証」と書かれています。私の手元ナレッジ（<code>knowledge_seller_operations_basics</code>／2026-07-26 に公式ページで確認）では <strong>2026年4月改定で多くのカテゴリが +0.4pt</strong> され、ホーム&amp;キッチン（750円超）は <strong>15.4%</strong>、家電 8.4%、おもちゃ 10.4% です。<strong>コードは旧料率のままです。</strong> 差額はこの商品で 19円/個（702円 → 721円）。金額としては小さいですが、100SKU × 数千個に効くので後述の残課題に入れます。</blockquote>
+<p><strong>(b) FBA配送代行手数料</strong> — <code>calc/fees.py</code> の <code>FBA_FEE_TABLE</code>（1点あたり固定額・税込相当）</p>
+<table><thead><tr><th>サイズキー</th><th>表示名</th><th>金額</th><th>寸法/重量の目安</th></tr></thead><tbody>
+<tr><td><code>small</code></td><td>小型サイズ</td><td>290円</td><td>25×18×2.0cm以内・250g以内</td></tr>
+<tr><td><code>standard_1</code></td><td>標準サイズ1</td><td>434円</td><td>45×35×20cm以内・1kg以内</td></tr>
+<tr><td><code>standard_2</code></td><td>標準サイズ2</td><td>514円</td><td>標準寸法内・2kg以内</td></tr>
+<tr><td><code>large_1</code></td><td>大型サイズ1</td><td><strong>603円</strong></td><td>60サイズ前後・5kg以内</td></tr>
+<tr><td><code>large_2</code></td><td>大型サイズ2</td><td>707円</td><td>80〜100サイズ・10kg以内</td></tr>
+<tr><td><code>self_ship</code></td><td>自己発送</td><td>0円</td><td>FBA不使用</td></tr>
+</tbody></table>
+<blockquote><strong>〔要修正の疑い〕</strong> こちらも旧値の可能性が高いです。公式ナレッジでは 2026/4改定後の標準1が <strong>318円（商品1,000円超）/ 252円（1,000円以下）</strong> と、価格帯で二段になっています。コードには価格帯の分岐がありません。<strong>発注前は必ずセラーセントラルの「FBA料金シミュレーター」に ASIN を入れて実額を取ってください。</strong>（無料・即時）</blockquote>
+<p><strong>(c) サイズ区分の判定ロジック</strong> — <code>adapters/amazon_data.py</code> の <code>_map_size_key()</code></p>
+<p>Keepa の <code>packageWeight</code>(g) と <code>packageLength/Width/Height</code>(mm) から機械判定します。</p>
+<table><thead><tr><th>条件</th><th>判定</th></tr></thead><tbody>
+<tr><td>重量も寸法も無い</td><td><code>standard_1</code>（⚠仮定）</td></tr>
+<tr><td>250g以下 かつ 最長辺25cm以下</td><td><code>small</code></td></tr>
+<tr><td>1,000g以下</td><td><code>standard_1</code></td></tr>
+<tr><td>2,000g以下</td><td><code>standard_2</code></td></tr>
+<tr><td>5,000g以下 <strong>または</strong> 三辺合計60cm以下</td><td><code>large_1</code></td></tr>
+<tr><td>それ以外</td><td><code>large_2</code></td></tr>
+</tbody></table>
+<blockquote><strong>重要:</strong> この判定は <strong>重量しか見ていません</strong>。「45×35×20cm以内なら標準」という Amazon の実際の寸法基準を反映していないため、<strong>2kg超の商品はすべて <code>large_1</code> 以上に丸められます</strong>。B0DWMPV656 が <code>large_1</code> になったのは「Keepa の梱包重量が 2,001〜5,000g だった」という意味であり、<strong>実際に大型サイズかどうかは確認できていません</strong>。</blockquote>
+<p><strong>(d) 納品送料（<code>INBOUND</code>）</strong> — 小型150 / 標準1 250 / 標準2 300 / <strong>大型1 380</strong> / 大型2 480（円/個）<br><strong>(e) その他経費（<code>OTHER_COSTS</code>）</strong> — 一律 <strong>100円/個</strong>（梱包外注＋ラベル＋資材＋返品引当のざっくり）<br><strong>(f) 目標純利益率（<code>TARGET_MARGIN</code>）</strong> — <strong>25%</strong></p>
+<h3>1-3. この数値が意味すること（初心者向け・ここだけ覚えてください）</h3>
+<blockquote><strong>「想定仕入価格(上限)」＝ この値段以下でメーカーから買えれば、目標の純利益率25%を確保できる、という交渉の上限額です。</strong><br><strong>「これを超えたら即赤字」という線ではありません。</strong> 赤字ラインはもっと上にあります（この商品なら 2,895円／同じ前提）。1,725円と2,895円の間は「黒字だが目標の25%には届かない」ゾーンです。</blockquote>
+<p>もう一つ、<strong>この式には在庫保管手数料が入っていません</strong>。売れるまで倉庫に置く費用がゼロ扱いなので、実際の利益は必ずこれより低くなります。</p>
+<hr>
+<h2>2. v1.3（<code>損益分岐仕入れ値</code> ほか）との違い — 対照表</h2>
+<p>同じシートの別タブ <code>v13_候補100件</code> には名前の似た列が3つありますが、<strong>別物です</strong>。出典は <code>workspace/output/deliverables/T-20260817-005/scan_v13.py</code>。</p>
+<table><thead><tr><th>観点</th><th>① 想定仕入価格(上限)<br>（T-20260804-001・このタブ）</th><th>② 損益分岐仕入れ値<br>（v1.3）</th><th>③ 損益分岐仕入れ値_精緻<br>（v1.3）</th><th>④ 仕入れ掛け率上限%<br>（v1.3）</th></tr></thead><tbody>
+<tr><td><strong>式</strong></td><td><code>Amazon価格 − 販売手数料 − FBA − 納品送料 − その他100 − Amazon価格×25%</code></td><td><code>過去1年最安値 × 0.65 − 外注費</code></td><td><code>過去1年最安値 − 販売手数料 − FBA − 外注費</code></td><td><code>② ÷ 現BuyBox価格 × 100</code></td></tr>
+<tr><td><strong>基準にする売価</strong></td><td><strong>現在のAmazon価格</strong>（BuyBox・取得時点のスナップショット）</td><td><strong>過去1年の新品最安値</strong>（Keepa 365日 NEW最小）</td><td>同左</td><td>分子=②（最安値ベース）／分母=現BuyBox</td></tr>
+<tr><td><strong>目標利益</strong></td><td><strong>売値の25%を先に確保</strong>して残りを上限に</td><td><strong>0円</strong>（＝損益分岐そのもの）</td><td><strong>0円</strong></td><td>—</td></tr>
+<tr><td><strong>経費の扱い</strong></td><td>カテゴリ実料率＋FBA固定額＋納品送料＋その他100円</td><td><strong>一律35%で概算</strong>（粗利残存率0.65・EC STARsセミナー値）</td><td>カテゴリ実料率＋FBA固定額＋外注費（実額）</td><td>②に準じる</td></tr>
+<tr><td><strong>外注費</strong></td><td>納品送料380円＋その他100円＝<strong>480円</strong>（大型1の場合）</td><td>small 182 / 標準1 282 / 標準2 332 円<br>（ラベル22＋梱包10＋納品送料150〜300）</td><td>同左</td><td>同左</td></tr>
+<tr><td><strong>在庫保管手数料</strong></td><td><strong>含まない</strong></td><td><strong>含まない</strong></td><td><strong>含まない</strong></td><td>—</td></tr>
+<tr><td><strong>安全度</strong></td><td><strong>中</strong>。現在価格が前提なので<strong>値下がりに弱い</strong></td><td><strong>高</strong>。1年で一番安かった値段でも黒字になる線</td><td><strong>高</strong>（②の検算用）</td><td>—</td></tr>
+<tr><td><strong>使い方</strong></td><td>「25%取れる交渉上限」</td><td><strong>メーカーへの提示上限</strong>（v1.3の正式運用）</td><td>②が乱暴すぎないかの検算</td><td><strong>40%を切ったら実務上ほぼ買えない</strong>の足切り</td></tr>
+</tbody></table>
+<p><strong>一言でいうと:</strong> ①は「儲けを先取りしてから逆算した上限」、②③は「最悪の売値でも赤字にならない上限」。<strong>発注判断には ② を使ってください</strong>（v1.3で社長裁可済みの正式ルール）。①は候補を並べるためのスクリーニング値です。</p>
+<blockquote>補足: <code>B0DWMPV656</code> は <strong>v1.3 の候補リスト（4,002行）に入っていません</strong>。v1.3 は Finder 該当 12,028件のうち 4,000件をサンプリングした走査なので「落とされた」のか「引かれなかった」のかは判別できません。ただし v1.3 は <strong>FBA大型サイズを除外</strong>（849件が該当）しており、この商品は <code>large_1</code> 判定なので、<strong>仮に走査対象に入っていても除外されていた可能性が高い</strong>です。</blockquote>
+<hr>
+<h2>3. B0DWMPV656 の1個あたり損益内訳</h2>
+<h3>3-0. この商品の素性（シートの元データ）</h3>
+<table><thead><tr><th>項目</th><th>値</th><th>タグ</th></tr></thead><tbody>
+<tr><td>ASIN</td><td>B0DWMPV656</td><td>〔確定〕</td></tr>
+<tr><td>商品名</td><td>洗濯機 小型 脱水機 手動 脱水機能付き セカンド バケツ型 ポータブル 手回し 卓上洗濯機 電気不要 靴 上履き洗い</td><td>〔確定〕</td></tr>
+<tr><td>メーカー / ブランド</td><td>seathestars / Ｓｅａ ｔｈｅ Ｓｔａｒｓ</td><td>〔確定〕</td></tr>
+<tr><td>カテゴリ</td><td>ホーム&amp;キッチン（<code>home_kitchen</code>）</td><td>〔確定〕</td></tr>
+<tr><td>Amazon価格（取得時点）</td><td>4,680円</td><td>〔確定・ただし2026-08-05時点のスナップショット〕</td></tr>
+<tr><td>ライバル出品者数</td><td>2</td><td>〔確定・同上〕</td></tr>
+<tr><td>Amazon本体</td><td>出品なし</td><td>〔確定・同上〕</td></tr>
+<tr><td>ランク</td><td>50,279位（主要カテゴリでは28,216位）</td><td>〔確定・同上〕</td></tr>
+<tr><td>月間販売数</td><td><strong>100個/月（Keepa実測 <code>monthlySold</code>＝Amazonの「100+個購入」表示）</strong></td><td>〔確定〕</td></tr>
+<tr><td>FBAサイズ区分</td><td><code>large_1</code>（大型1）</td><td><strong>〔仮〕重量2〜5kgからの機械判定。実寸未確認</strong></td></tr>
+<tr><td>商品の外寸・重量</td><td>—</td><td><strong>〔要見積り〕</strong></td></tr>
+<tr><td>過去1年の最安値</td><td>—</td><td><strong>〔要見積り〕</strong>（このタブのデータには入っていません）</td></tr>
+</tbody></table>
+<p><strong>回転の見込み（重要・良い数字です）</strong><br>想定月販 = 月間販売数 100 ÷ (ライバル2 + 自分1) = <strong>33.3個/月</strong> 〔仮：相乗り後は均等に割れるという仮定〕<br>初回ロット10個なら <strong>0.30ヶ月（約9日）で消化</strong> 〔仮〕。回転だけ見れば優秀な部類です。</p>
+<hr>
+<h3>3-1. 【A】シートの数字をそのまま再現した内訳（＝1,725円の根拠）</h3>
+<p><code>calc/profit.py</code> に同じ値を入れて再計算し、シートの 1,725円 / 純利益1,170円 / 利益率25.0% と<strong>1円まで一致</strong>することを確認しました。</p>
+<table><thead><tr><th>項目</th><th>金額</th><th>根拠</th><th>タグ</th></tr></thead><tbody>
+<tr><td>売値（Amazon価格）</td><td><strong>+4,680円</strong></td><td>シートの <code>amazon_price</code></td><td>〔確定（スナップショット）〕</td></tr>
+<tr><td>Amazon販売手数料</td><td>−702円</td><td>ホーム&amp;キッチン <strong>15.0%</strong>（<code>fees.py</code>）× 4,680円</td><td>〔仮〕料率は旧値の疑い（→15.4%なら721円）</td></tr>
+<tr><td>FBA配送代行手数料</td><td>−603円</td><td>サイズ区分 <code>large_1</code>（大型1・〜5kg）の固定額</td><td>〔仮〕実寸未確認・料金表も旧値の疑い</td></tr>
+<tr><td>FBA在庫保管手数料</td><td><strong>−0円</strong></td><td><strong>式に含まれていない</strong></td><td><strong>〔式の欠落〕</strong></td></tr>
+<tr><td>納品送料</td><td>−380円</td><td><code>INBOUND[&quot;large_1&quot;]</code></td><td>〔仮〕</td></tr>
+<tr><td>その他経費（梱包・ラベル・返品引当）</td><td>−100円</td><td><code>OTHER_COSTS</code> 一律</td><td>〔仮〕</td></tr>
+<tr><td>仕入値（税込）</td><td>−1,725円</td><td><strong>逆算の結果</strong>＝目標利益率25%になる上限</td><td>〔仮・交渉前の目標値〕</td></tr>
+<tr><td><strong>純利益</strong></td><td><strong>+1,170円</strong></td><td></td><td></td></tr>
+<tr><td><strong>利益率</strong></td><td><strong>25.0%</strong></td><td>純利益 ÷ 売値</td><td></td></tr>
+<tr><td><strong>ROI</strong></td><td><strong>53.1%</strong></td><td>純利益 ÷ 投下原価(1,725+380+100=2,205円)</td><td></td></tr>
+<tr><td>損益分岐売値</td><td>3,304円</td><td>この仕入値なら売値3,304円まで耐える</td><td>〔仮〕</td></tr>
+<tr><td><strong>損益分岐となる仕入れ値</strong></td><td><strong>2,895円</strong></td><td>純利益0になる仕入値。掛け率61.9%</td><td>〔仮〕</td></tr>
+</tbody></table>
+<blockquote>※消費税・所得税は<strong>この表に含めていません</strong>（後述 3-5）。</blockquote>
+<hr>
+<h3>3-2. 【B】経理としての精査版 — 3シナリオ（保管手数料と大型の外注費を入れ直す）</h3>
+<p>【A】には ①在庫保管手数料が丸ごと無い ②外注費100円は大型商品には低すぎる（ラベル貼付だけで51円） ③販売手数料が旧料率、という3つの穴があります。埋め直したのが下表です。<strong>仕入値は1,725円で買えたと仮定</strong>しています。</p>
+<p>共通の前提〔仮〕: 販売手数料 <strong>15.4%</strong>（2026/4改定後・ホーム&amp;キッチン750円超）／ FBAラベル貼付 <strong>大型51円・小型標準22円</strong>（公式 G200483750・税込・<strong>ここは〔確定〕</strong>）／ 在庫保管手数料 <strong>5.676円 × (商品cm³÷1000) × 月数</strong>（1〜9月・公式値・<strong>料率は〔確定〕、体積は〔要見積り〕</strong>）</p>
+<table><thead><tr><th>項目</th><th>楽観</th><th><strong>中央（推奨値）</strong></th><th>悲観</th><th>タグ</th></tr></thead><tbody>
+<tr><td>前提サイズ</td><td>標準2（30L）</td><td><strong>大型1（50L）</strong></td><td>大型1（80L）</td><td>〔要見積り〕</td></tr>
+<tr><td>前提の平均保管月数</td><td>0.5ヶ月</td><td><strong>1.0ヶ月</strong></td><td>3.0ヶ月</td><td>〔仮〕</td></tr>
+<tr><td>売値</td><td>+4,680</td><td><strong>+4,680</strong></td><td>+4,680</td><td>〔確定（スナップショット）〕</td></tr>
+<tr><td>Amazon販売手数料（15.4%）</td><td>−721</td><td><strong>−721</strong></td><td>−721</td><td>〔仮〕要シミュレーター確認</td></tr>
+<tr><td>FBA配送代行手数料</td><td>−514</td><td><strong>−603</strong></td><td>−603</td><td>〔要見積り〕</td></tr>
+<tr><td>FBA在庫保管手数料</td><td>−85</td><td><strong>−284</strong></td><td>−1,362</td><td>〔要見積り〕体積次第</td></tr>
+<tr><td>外注費：ラベル貼付</td><td>−22</td><td><strong>−51</strong></td><td>−51</td><td>〔確定〕公式手数料</td></tr>
+<tr><td>外注費：梱包</td><td>−10</td><td><strong>−30</strong></td><td>−50</td><td>〔仮〕WAM NET 5〜10円は小型基準</td></tr>
+<tr><td>外注費：納品送料</td><td>−400</td><td><strong>−600</strong></td><td>−900</td><td>〔要見積り〕大型1個口の実勢</td></tr>
+<tr><td>仕入値（税込）</td><td>−1,725</td><td><strong>−1,725</strong></td><td>−1,725</td><td>〔仮〕上限で買えた場合</td></tr>
+<tr><td><strong>純利益</strong></td><td><strong>+1,203円</strong></td><td><strong>+666円</strong></td><td><strong>−732円</strong></td><td></td></tr>
+<tr><td><strong>利益率</strong></td><td><strong>25.7%</strong></td><td><strong>14.2%</strong></td><td><strong>−15.6%</strong></td><td></td></tr>
+<tr><td><strong>ROI</strong></td><td><strong>53.7%</strong></td><td><strong>24.8%</strong></td><td><strong>−17.9%</strong></td><td></td></tr>
+<tr><td><strong>損益分岐となる仕入れ値</strong></td><td>2,928円（掛け率62.6%）</td><td><strong>2,391円（掛け率51.1%）</strong></td><td>993円（掛け率21.2%）</td><td></td></tr>
+</tbody></table>
+<p><strong>推奨値は中央シナリオ = 1個あたり純利益 666円・利益率14.2%・ROI 24.8%。</strong><br>期待値（楽観25%・中央50%・悲観25%で加重）は <strong>+451円/個</strong>。</p>
+<blockquote><strong>参考:</strong> FBA新商品特典（初めてFBAに納品する商品／大型は最初の50点まで <strong>保管料120日無料</strong>）が適用されれば、中央シナリオの保管284円が0になり、<strong>純利益950円・利益率20.3%・ROI 39.5%</strong> になります。適用可否はセラーセントラルで要確認〔要見積り〕。</blockquote>
+<hr>
+<h3>3-3. 【C】現実的な卸掛け率で買った場合（これが本題です）</h3>
+<p>1,725円は「こちらの希望上限」であって、メーカーが承諾する保証はゼロです。中央シナリオの経費前提のまま、仕入値だけ動かします。</p>
+<table><thead><tr><th>仕入掛け率（対Amazon価格4,680円）</th><th>仕入値</th><th>純利益/個</th><th>利益率</th><th>判定</th></tr></thead><tbody>
+<tr><td><strong>36.9%</strong>（＝シートの1,725円）</td><td>1,725円</td><td>+666円</td><td>14.2%</td><td>目標20%に未達</td></tr>
+<tr><td>45%</td><td>2,106円</td><td>+285円</td><td>6.1%</td><td>ほぼ利益なし</td></tr>
+<tr><td><strong>51.1%</strong></td><td><strong>2,391円</strong></td><td><strong>0円</strong></td><td><strong>0%</strong></td><td><strong>損益分岐</strong></td></tr>
+<tr><td>55%</td><td>2,574円</td><td>−183円</td><td>−3.9%</td><td>赤字</td></tr>
+<tr><td><strong>60%（メーカー卸の下限相場）</strong></td><td>2,808円</td><td><strong>−417円</strong></td><td>−8.9%</td><td><strong>赤字</strong></td></tr>
+<tr><td>70%（同・上限相場）</td><td>3,276円</td><td>−885円</td><td>−18.9%</td><td>赤字</td></tr>
+</tbody></table>
+<blockquote><strong>これが最大の論点です。</strong> メーカー仕入れの一般的な掛け率は<strong>定価の60〜70%</strong>（EC STARs／中西氏のナレッジ）。この商品で黒字を出すには <strong>51%を切る掛け率</strong>が必要で、これは初回取引の個人事業主が取れる条件ではありません。<br><strong>ただし1点だけ留保</strong>：掛け率は本来「<strong>メーカー希望小売価格</strong>」に対する率です。この商品の定価が Amazon実売の4,680円より高ければ（例：定価6,980円）、60%＝4,188円でさらに悪化します。逆に Amazon実売がメーカー定価より高い（プレミアが乗っている）ケースなら好転します。<strong>定価はメーカーに聞かないと分かりません〔要見積り〕。</strong></blockquote>
+<hr>
+<h3>3-4. 値下がりリスクの感度（中央シナリオ・仕入1,725円固定）</h3>
+<p>「4,680円」は<strong>今この瞬間のBuyBox価格のスナップショット</strong>です。ライバルが2人しかいない商品に自分が3人目として入れば、<strong>価格競争が起きるのが普通</strong>です。</p>
+<table><thead><tr><th>売値</th><th>純利益/個</th><th>利益率</th></tr></thead><tbody>
+<tr><td>4,680円（現在）</td><td>+666円</td><td>14.2%</td></tr>
+<tr><td>4,212円（−10%）</td><td>+270円</td><td>6.4%</td></tr>
+<tr><td><strong>3,744円（−20%）</strong></td><td><strong>−126円</strong></td><td><strong>−3.4%</strong></td></tr>
+<tr><td>3,276円（−30%）</td><td>−522円</td><td>−15.9%</td></tr>
+</tbody></table>
+<p><strong>赤字転落する売値は 3,892円＝現在から −16.8%。わずか17%の値下がりで飛びます。</strong> 相乗り前提の商品としては薄すぎる耐性です。</p>
+<p><strong>過去1年最安値ベースの試算〔要見積り〕:</strong> この商品の365日最安値は、シートの元データに記録されていません（T-20260804-001 のスキャンは最安値を取っていない）。<strong>仮に</strong>最安値が現在価格の80%（3,744円）だったとすると、v1.3の式では</p>
+<ul><li>損益分岐仕入れ値 = 3,744 × 0.65 − 332 = <strong>2,102円</strong></li><li>精緻版 = 3,744 − 577 − 603 − 681 = <strong>1,883円</strong></li></ul>
+<p>となり、<strong>シートの1,725円は「最安値まで落ちても一応黒字」の範囲には収まります</strong>。ただし前提の80%が仮定です。<strong>Keepaで実際の365日最安値を1分見れば確定します。</strong></p>
+<hr>
+<h3>3-5. 税金の扱い（この表では除外）</h3>
+<ul><li>上表はすべて <strong>税込金額のキャッシュベース</strong>です。<strong>消費税・所得税・住民税・事業税は含めていません。別途です。</strong></li><li>社長は現在 <strong>免税事業者・インボイス未登録</strong>（<code>agents/accounting/memory/tax_invoice_menzei_seller.md</code>）。したがって、</li><li>売上に乗った消費税を国に納める義務は今のところありません（＝4,680円は税込のまま手取り計算に使ってよい）</li><li>一方で、仕入時に払った消費税を控除することもできません（＝仕入は税込原価のまま経費）</li><li>課税売上1,000万円/年 を超えると前提が変わります</li><li><strong>所得税・住民税は年間の事業所得（＝この純利益の年間合計 − 各種経費）に対して翌年に課税されます。</strong> 上の「純利益666円」は税引前です。</li><li>私は税理士ではありません。<strong>個別の税額計算・断定的な税務判断は税理士にご確認ください。</strong></li></ul>
+<hr>
+<h3>3-6. 初回ロット10個で回した場合の資金繰り（回収を先に見る）</h3>
+<table><thead><tr><th>項目</th><th>金額</th><th>タグ</th></tr></thead><tbody>
+<tr><td>投下資金（仕入1,725＋外注681＋保管284）× 10個</td><td><strong>26,900円</strong></td><td>〔仮・中央シナリオ〕</td></tr>
+<tr><td>1SKU投入上限5万円（v1.3）に対する消化率</td><td>54%</td><td>〔確定・ルール〕</td></tr>
+<tr><td>消化期間（想定月販33.3個 → 10個）</td><td>約0.30ヶ月＝<strong>約9日</strong></td><td>〔仮〕</td></tr>
+<tr><td>Amazonの入金サイクル</td><td>約14日ごと</td><td>〔確定・一般値〕</td></tr>
+<tr><td><strong>回収完了までの目安</strong></td><td><strong>約1.0〜1.5ヶ月</strong></td><td>〔推定〕</td></tr>
+<tr><td>10個完売時の純利益（中央）</td><td><strong>+6,660円</strong></td><td>〔仮〕</td></tr>
+</tbody></table>
+<p><strong>回収は速い</strong>（1SKUあたり1〜1.5ヶ月で現金化）。ここは良い性質です。問題は利益の薄さと値下がり耐性です。</p>
+<hr>
+<h2>4. 正直な注意（実測できていないこと）</h2>
+<p>数字を飾らずに書きます。<strong>このシートの1,725円を持ってメーカーに交渉するのは、まだ早いです。</strong></p>
+<ol><li><strong>実寸・重量が未実測です。</strong> サイズ区分（<code>large_1</code>）は「Keepaの梱包重量が2〜5kg」だけから機械判定した値で、Amazonの実際の寸法基準（45×35×20cm）を見ていません。<strong>FBA配送代行手数料と在庫保管手数料は、実寸が決まるまで確定しません。</strong> → セラーセントラルの <strong>FBA料金シミュレーター</strong> にASINを入れれば無料・即時で実額が出ます。<strong>これが最優先の1手です。</strong></li><li><strong>在庫保管手数料が式に入っていません。</strong> 体積の大きい商品（バケツ型洗濯機）ではこれが致命傷になり得ます。本試算では 85〜1,362円/個 の幅が出ました。</li><li><strong>実際の卸値が分かりません。</strong> 1,725円はこちらの希望であって、メーカーの返事ではありません。掛け率51%を切れなければ赤字です（3-3）。</li><li><strong>返品率をゼロで計算しています。</strong> 手回し・可動部あり・水回りの商品は初期不良と返品が出やすい類型です。返品が出れば返金処理手数料（500円 or 販売手数料の10%の低い方）と商品の毀損が乗ります。<strong>返品率5%（うち6割が再販不可）を織り込むと、中央シナリオの純利益666円は約560円・利益率12.0%まで落ちます〔推定〕</strong>（内訳：返品1点あたり FBA配送代行603円は返金されない＋返金処理手数料72円＝min(500円, 販売手数料721円×10%)、再販不可なら仕入1,725円＋外注681円が丸損）。 ODR（注文不良率）1%超はアカウント停止リスクに直結します。</li><li><strong>「4,680円」は現在のBuyBox価格です。</strong> 過去1年最安値は未取得。−16%の下落で赤字（3-4）。</li><li><strong>販売手数料・FBA料金の定数表（<code>fees.py</code>）が旧値の疑いがあります。</strong> コードのヘッダーに「要・経理ハジメ検証」と明記されており、私の公式ナレッジ（2026-07-26確認）と食い違っています。<strong>シート上の全商品の「想定仕入価格(上限)」が systematically ずれている可能性があります。</strong></li><li><strong>月間販売数100個は「100+個購入」というAmazon表示の実測値</strong>なので信頼できますが、<strong>100個ちょうどではなく「100個以上」</strong>です。上振れの可能性があります（＝回転はもっと速いかもしれない）。</li></ol>
+<hr>
+<h2>5. 経理としての推奨（判断材料）</h2>
+<p><strong>この商品（B0DWMPV656）については、私は「見送り寄り」です。</strong>根拠は3つ。</p>
+<ol><li>中央シナリオの利益率 <strong>14.2%</strong> は、会社KPIの <strong>利益率20%以上</strong> に届きません。</li><li>損益分岐の掛け率が <strong>51.1%</strong>。メーカー卸の相場（60〜70%）では成立しません。</li><li>値下がり <strong>−17%</strong> で赤字。ライバル2人の商品に3人目で入る以上、この耐性は薄すぎます。</li></ol>
+<p><strong>ただし、これは机上の数字です。</strong>次の3手を打てば、この結論は1時間以内に「確定」か「撤回」に変わります。すべて無料・不可逆でない操作です。</p>
+<table><thead><tr><th>優先</th><th>やること</th><th>所要</th><th>効く不確実性</th></tr></thead><tbody>
+<tr><td>1</td><td><strong>FBA料金シミュレーターにASINを入れる</strong></td><td>5分</td><td>実寸・配送代行手数料・保管手数料（＝最大の穴）</td></tr>
+<tr><td>2</td><td><strong>Keepaで過去1年最安値を見る</strong></td><td>3分</td><td>値下がり耐性・v1.3の損益分岐仕入れ値</td></tr>
+<tr><td>3</td><td><strong><code>fees.py</code> の料率表を2026年公式値へ更新し、シート全体を再計算</strong></td><td>要発注</td><td>全商品の「想定仕入価格(上限)」のズレ</td></tr>
+</tbody></table>
+<blockquote><strong>メーカー（seathestars）への実連絡は CLAUDE.md §4.1 該当</strong>（第三者連絡）です。<strong>この資料は試算までで、連絡は一切していません。</strong></blockquote>
+<hr>
+<h2>付録: 再現用スクリプト</h2>
+<ul><li><code>workspace/output/agent_output/T-20260817-005/calc_B0DWMPV656.py</code> — 本資料の3シナリオ・損益分岐・値下がり感度を再計算</li><li><code>workspace/output/agent_output/T-20260817-005/calc_B0DWMPV656_sensitivity.py</code> — 掛け率感度・保管料感度</li></ul>
+<p>参照した実装:</p>
+<ul><li><code>workspace/output/deliverables/T-20260804-001/maker_scan.py</code>（<code>reverse_buy()</code>／定数 <code>TARGET_MARGIN</code> <code>OTHER_COSTS</code> <code>INBOUND</code>）</li><li><code>workspace/output/deliverables/T-20260804-001/build_maker_sheet.py</code>（列定義）</li><li><code>workspace/output/deliverables/T-20260817-005/scan_v13.py</code>（<code>evaluate()</code> 段2／定数 <code>GROSS_KEEP_RATE</code> <code>OUTSOURCE_COST</code>）</li><li><code>workspace/output/agent_output/T-20260521-005/code/calc/profit.py</code> / <code>calc/fees.py</code> / <code>adapters/amazon_data.py</code></li></ul></div></body></html>
