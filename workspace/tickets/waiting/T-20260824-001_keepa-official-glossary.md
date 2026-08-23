@@ -168,3 +168,37 @@ source: 社長依頼（2026-08-24）
    **最初から「公式フィールド定義との突合」を定期タスクとして設計に含める**。
 
 > 提起: 別セッション（T-20260817-005 側）からの申し送り。カズヨが確定。
+
+---
+
+## 法務レビュー追記（2026-08-24 ハルオ）
+
+> ⚠ 本チケットの `assignee` は `researcher` です。法務は**カズヨからの並行発注**（CLAUDE.md §5 外部サービス導入前の法務チェック）として、論点2の Keepa 公式 MCP サーバについてのみ作業しました。**チケットの状態は動かしていません**（waiting のまま）。状態遷移・別チケット化はカズヨの責務です。
+
+### 判定（論点2への回答）
+
+| 論点 | 判定 |
+|---|---|
+| Keepa 公式 MCP サーバの導入 | **条件付き GO**（条件6件） |
+| API キーの Notion 保管 | **NO**（Keepa 公式が名指しで禁止／CLAUDE.md §4.1「機密情報の外部送信」該当） |
+| 1シート制との抵触 | **抵触しない。**1シート条項は Subscriptions T&C（Pro）§4(3) の条項で、**当社に適用される API T&C には存在しない** |
+| 取得データの CSV/シート保存 | **GO。**API T&C §11(2) が明文で許諾 |
+| **当社の既存運用** | **⚠ 要是正。**Keepa 由来データ約12,000行が **PUBLIC な GitHub リポジトリ**に commit 済み |
+| **Amazon Agent Policy（2026-03-04 施行）** | **⚠ 別チケットで最優先の一次情報確認が必要**（Keepa の全論点より重い） |
+
+### 成果物（法務）
+
+- `workspace/output/deliverables/T-20260824-001/legal-review-keepa-mcp.html`（**社長閲覧用・本編**）
+- `workspace/output/deliverables/T-20260824-001/legal-review-keepa-mcp.md`
+- T&C 原文の保全：`workspace/output/agent_output/T-20260824-001/legal-sources/`（規約上の複製制限に配慮し Git 追跡外）
+
+### カズヨへの依頼（法務発）
+
+1. **【最優先・別チケット化を推奨】** Amazon Agent Policy（`https://sellercentral.amazon.co.jp/help/hub/reference/external/G47071`）・BSA 本文・amazon.co.jp 利用規約（`nodeId=508088`）を**ブラウザで取得**して法務へ回す。当方からは到達不可（ログイン必須／ボット遮断）。
+2. Keepa サブスクリプションダッシュボードで、契約が「独立 API プラン」か「Pro 付属」かを確認（適用契約が変わる）。
+3. Google スプレッドシート各種の共有設定を確認。
+4. **社長判断**：リポジトリの公開状態について A/B/C（法務推奨 C＝Private 化）。詳細は成果物 §7-2。
+
+### 法務ログ
+
+- 2026-08-24 ハルオ：Keepa の契約文書3本（サイト ToS／Subscriptions T&C 2026-08-22版／**API T&C 2026-07-28版**）を一次情報で特定・全文取得し、条項単位で当てはめ。副産物として Amazon BSA 改定（2026-03-04）を検出。memory 3本を記録。

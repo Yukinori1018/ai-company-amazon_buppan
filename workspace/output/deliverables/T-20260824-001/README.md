@@ -1,6 +1,7 @@
 # T-20260824-001 成果物インデックス — Keepa 公式用語定義集
 
 調査：サトル（リサーチャー） ／ **全内容の最終確認日 2026-08-24**
+法務レビュー：ハルオ（`legal-review-keepa-mcp.md` / `.html`）
 
 ## ファイル
 
@@ -12,6 +13,15 @@
 | `keepa-official-docs-map.md` | **公式ドキュメント所在マップ**（URL／言語／カバー範囲／機械取得可否／最終確認日）＋カズヨへのブラウザ依頼リスト | 次に Keepa を調べる人。カズヨ |
 
 | `_raw-capture-kazuyo/` | カズヨがブラウザ実機で保全した keepa.com 本体（SPA）の原文。公式FAQ全23問・サイト機能・URLマップ | 本書の日本語UI側の一次情報 |
+
+### 法務（ハルオ／2026-08-24 追加）
+
+| ファイル | 中身 | 誰がいつ読むか |
+|---|---|---|
+| **`legal-review-keepa-mcp.html`** | **法務レビュー本編（推奨・ブラウザで開く）** | 社長。MCP 導入の可否を決める前に |
+| `legal-review-keepa-mcp.md` | Keepa 公式 MCP サーバの導入可否＋**当社の既存 Keepa データ運用の点検**。判定：MCP は条件付き GO／キーの Notion 保管は NO／**公開リポジトリへの Keepa 由来データ commit は要是正**／Amazon Agent Policy（2026-03-04 施行）の一次確認が最優先 | 社長・カズヨ・タカシ |
+
+> 法務が参照した T&C 原文（Keepa API T&C 2026-07-28版／Subscriptions T&C 2026-08-22版）は、規約上の複製制限に配慮し **Git 追跡外**の `workspace/output/agent_output/T-20260824-001/legal-sources/` に保全しています。
 
 作業データ（出典HTML全30ページの保存）：`workspace/output/agent_output/T-20260824-001/sources/`
 
