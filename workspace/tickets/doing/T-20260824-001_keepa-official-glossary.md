@@ -4,6 +4,8 @@ title: Keepa公式ドキュメントの所在調査と「公式用語定義集�
 status: doing
 assignee: researcher
 requires_approval: false
+priority: high
+labels: [keepa, research, knowledge]
 created_at: 2026-08-24
 updated_at: 2026-08-24
 next_check_at: 2026-08-25
