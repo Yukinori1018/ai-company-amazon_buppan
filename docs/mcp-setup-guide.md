@@ -116,15 +116,77 @@
 | ファイルストレージ | Google Drive MCP / Dropbox MCP | 全エージェント |
 | データベース | Postgres MCP / SQLite MCP | 経理、コンテンツ制作 |
 | Webブラウジング | Puppeteer MCP / Playwright MCP | コンテンツ制作（リサーチ） |
+| Amazon 商品データ | **Keepa 公式 MCP**（下記の専用セクション参照） | IT エンジニア、リサーチャー |
 
 ---
 
-## セキュリティ
+## セキュリティ — シークレットの置き方
 
-- `.mcp.json` は **必ず `.gitignore`** に入れる（このテンプレでは既に除外済み）
+### 前提：このリポジトリは PUBLIC で、30分ごとに自動 push されます
+
+`.claude/scripts/github-sync.sh` が30分間隔で `git add -A` → commit → push します。**リポジトリ内に平文のキーを置くと、`.gitignore` の1行が消えるか、パスが変わるか、`git add -f` を打った瞬間に全世界へ公開され、Git 履歴に永久に残ります**（履歴からの除去は force push ＝ CLAUDE.md §4.1 該当で、事故後の対処コストが極めて高い）。
+
+したがって方針は「`.gitignore` を信じる」ではなく、**「キーをリポジトリの物理的な外に出し、かつ平文で存在させない」**とします。
+
+### キーを設定に持たせる3つの方法（下ほど安全）
+
+| 方法 | 書き方 | 評価 |
+|------|--------|------|
+| ① リテラル直書き | `"Authorization": "Bearer sk-xxxx"` | **リポジトリ内では禁止。** `~/.claude.json`（ユーザースコープ）ならリポ外なので許容 |
+| ② 環境変数の展開 | `"Authorization": "Bearer ${MY_API_KEY}"` | 可。`.mcp.json` と `~/.claude.json` の両方で `${VAR}` / `${VAR:-default}` が展開される（`command` / `args` / `env` / `url` / `headers` が対象）。ただしキーはシェル設定に平文で残る |
+| ③ `headersHelper` | `"headersHelper": "/path/to/auth.sh"` | **推奨。** 接続時に外部コマンドを実行し、stdout の JSON をヘッダとして使う。macOS キーチェーンと組み合わせれば**平文がどこにも存在しない** |
+
+`headersHelper` の契約：stdout に JSON オブジェクトを1個出力。エラーは stderr へ（stdout を汚すと JSON パースが壊れる）。タイムアウト10秒、キャッシュなし、セッション開始時と再接続時に実行。401/403 を受けると自動で再実行＋1回リトライ。**プロジェクト/ローカルスコープでは trust ダイアログ承認後にしか動かないため、ユーザースコープの利用を推奨します。**
+
+### スコープと保存先
+
+| スコープ | 保存先 | リポ外か |
+|---|---|---|
+| `--scope local`（既定） | `~/.claude.json` の `projects["<path>"].mcpServers` | ○ |
+| `--scope project` | リポジトリ直下の `.mcp.json` | **×（リポ内）** |
+| `--scope user` | `~/.claude.json` のルート `mcpServers` | ○ |
+
+**シークレットを含む MCP は `--scope user` を既定にしてください。**リポジトリの外に出るため、公開 push の射程から構造的に外れます。
+
+### その他
+
+- `.mcp.json` は **必ず `.gitignore`** に入れる（このテンプレでは既に除外済み。`.gitignore:8`）
 - 各種トークンは **最小権限** で発行
-- 不要になった MCP は `.mcp.json` から削除し、サービス側のトークンも revoke
+- 不要になった MCP は削除し、サービス側のトークンも revoke
 - 機密データを扱う MCP（メール本文・契約書 PDF 等）の追加時は、CLAUDE.md §4.1「機密情報の外部送信」該当ケースを再確認
+- **キーを Notion 等の第三者 SaaS に保管しないでください。** MCP のヘッダは接続時に上記①②③のいずれかでしか解決できず、「SaaS から読む」経路は存在しません。実現するには人間/AI が毎回コピペするか、別の秘密（SaaS のトークン）を平文で置く必要があり、いずれも安全性と手間の両方で劣ります。詳細は `workspace/output/deliverables/T-20260824-001/keepa-mcp-setup.md` §5。
+
+---
+
+## Keepa 公式 MCP サーバ（`https://keepa.com/mcp`）
+
+Amazon の価格履歴・Buy Box・出品者・Product Finder 等を AI から直接引ける公式ホステッドサーバです。**新規契約・追加課金はありません**（既存 Keepa API サブスクのアクセスキーで認証し、通常の API と同じトークンを消費します）。
+
+**設計・手順の全文は `workspace/output/deliverables/T-20260824-001/keepa-mcp-setup.md`（T-20260824-001 / タカシ）を参照してください。** 以下は要約です。
+
+### 導入（社長のみ。キーを触るのはステップ1の1回だけ）
+
+```bash
+# 1. キーをキーチェーンへ（-w を値なしで末尾に置くと非表示プロンプト＝シェル履歴に残らない）
+security add-generic-password -s keepa-api-key -a keepa -U -w
+
+# 2. ヘルパースクリプトを配置（キーは含まれない）
+mkdir -p ~/.claude/scripts
+cp workspace/output/deliverables/T-20260824-001/keepa-auth.sh.template ~/.claude/scripts/keepa-auth.sh
+chmod 700 ~/.claude/scripts/keepa-auth.sh
+
+# 3. ユーザースコープで登録（リポ外の ~/.claude.json に入る）
+claude mcp add-json --scope user keepa \
+  '{"type":"http","url":"https://keepa.com/mcp","headersHelper":"'"$HOME"'/.claude/scripts/keepa-auth.sh"}'
+```
+
+キーのローテーションはステップ1の再実行（`-U` が上書き）だけで済み、MCP 設定は触りません。
+
+### 運用上の注意
+
+- **トークンを消費します。** 夜間自走やループ処理から無制限に呼ばせないでください。既存の夜間スキャン（T-20260803-001 系）と食い合います。用途は「対話中の単発調査」に限定するのが安全です。
+- **大量取得は従来どおり REST API を直に叩くスクリプト側で。** Keepa 公式も「プログラムから使うなら REST API を直接使え。MCP の応答は言語モデル向けに整形してある」と明記しています。
+- **クラウド／モバイルのセッションでは使えません。** Claude Code のクラウド環境には専用のシークレットストアがまだ無く、公式が「環境変数はその環境を使う人なら誰でも読める」と警告しているためです。Keepa MCP は「Mac のローカル回で使う道具」と位置づけます。
 
 ---
 

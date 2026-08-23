@@ -1,0 +1,164 @@
+<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Keepa 公式 MCP サーバ 導入設計書 — T-20260824-001</title>
+<style>
+:root{--fg:#1b1b1b;--mut:#5c6470;--line:#d8dee6;--bg:#fff;--accent:#256a93;--warn:#fff7e6}
+*{box-sizing:border-box}
+body{font-family:-apple-system,"Hiragino Sans","Yu Gothic",Meiryo,sans-serif;line-height:1.85;
+color:var(--fg);background:#eef1f4;margin:0;padding:0 16px 80px;-webkit-text-size-adjust:100%}
+.wrap{max-width:1180px;margin:0 auto;background:var(--bg);padding:44px 52px 64px;
+box-shadow:0 1px 4px rgba(0,0,0,.09)}
+h1{font-size:1.9em;border-bottom:4px solid var(--accent);padding-bottom:.4em;margin-top:0}
+h2{font-size:1.4em;margin-top:2.4em;border-left:7px solid var(--accent);padding:.2em .6em;background:#f2f6f9}
+h3{font-size:1.15em;margin-top:1.9em;border-bottom:1px solid var(--line);padding-bottom:.25em}
+h4{font-size:1.02em;margin-top:1.5em;color:var(--accent)}
+table{border-collapse:collapse;width:100%;margin:1.1em 0;font-size:.9em;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:.5em .7em;text-align:left;vertical-align:top}
+th{background:#eaf0f5;font-weight:600;white-space:nowrap}
+tbody tr:nth-child(even){background:#fafbfc}
+code{background:#eef1f4;padding:.12em .4em;border-radius:3px;font-size:.87em;
+font-family:"SF Mono",Menlo,Consolas,monospace;word-break:break-all}
+blockquote{border-left:5px solid #f0a63a;background:var(--warn);margin:1.2em 0;padding:.9em 1.2em;color:#4a3c22}
+blockquote p{margin:.35em 0}
+hr{border:0;border-top:1px solid var(--line);margin:2.4em 0}
+a{color:var(--accent)}
+.meta{color:var(--mut);font-size:.9em;margin:.6em 0 2em}
+.toc{background:#f4f7f9;border:1px solid var(--line);padding:1em 1.6em;margin:1.6em 0}
+.toc a{text-decoration:none}
+ul,ol{padding-left:1.5em}
+@media(max-width:760px){.wrap{padding:22px 16px 40px}body{padding:0 6px 40px}th{white-space:normal}}
+
+pre.code{background:#1e2430;color:#e6edf3;padding:14px 16px;border-radius:6px;
+  overflow-x:auto;line-height:1.6;font-size:.88em;margin:14px 0;}
+pre.code code{background:none;color:inherit;padding:0;font-size:1em;white-space:pre;}
+pre.code::before{content:attr(data-lang);display:block;font-size:.72em;letter-spacing:.08em;
+  text-transform:uppercase;color:#8b98a9;margin-bottom:6px;}
+pre.code[data-lang=""]::before{content:none;}
+</style></head>
+<body><div class="wrap">
+<h1>Keepa 公式 MCP サーバ 導入設計書</h1>
+<p class="meta">T-20260824-001 ／ 設計：タカシ（IT エンジニア） ／ 対象：<code>https://keepa.com/mcp</code> ／ <strong>2026-08-24</strong><br>
+<strong>設計と手順の用意まで。導入コマンドは未実行です。</strong>実行は社長の一手（CLAUDE.md §4.4 の例外＝認証情報の入力）。<br>
+法務（ハルオ）による Keepa 利用規約チェックの結果は §9 に反映欄があります（2026-08-24 時点で未反映）。</p>
+<div class="toc"><strong>目次</strong><ol><li><a href="#1-結論">1. 結論</a></li><li><a href="#2-社長が打つコマンド-3ステップ-">2. 社長が打つコマンド（3ステップ）</a></li><li><a href="#3-前提事実-検証済みと未検証を分けます-">3. 前提事実（検証済みと未検証を分けます）</a></li><li><a href="#4-なぜこの方式か-3案の比較">4. なぜこの方式か — 3案の比較</a></li><li><a href="#5-社長ご希望の-Notion-保管について">5. 社長ご希望の Notion 保管について</a></li><li><a href="#6-複数デバイス間の同期をどう解決したか">6. 複数デバイス間の同期をどう解決したか</a></li><li><a href="#7-ヘルパースクリプトの中身">7. ヘルパースクリプトの中身</a></li><li><a href="#8-運用">8. 運用</a></li><li><a href="#9-法務確認の反映欄-2026-08-24-時点-未反映-">9. 法務確認の反映欄（2026-08-24 時点：未反映）</a></li><li><a href="#10-妥協点-分からなかったこと-正直に書きます-">10. 妥協点・分からなかったこと（正直に書きます）</a></li><li><a href="#付録-関連ファイル">付録：関連ファイル</a></li></ol></div>
+
+<p>作成：タカシ（IT エンジニア） ／ 2026-08-24 ／ チケット T-20260824-001 対象：<code>https://keepa.com/mcp</code>（Keepa 公式ホステッド MCP サーバ）</p>
+<blockquote><p><strong>この文書の状態</strong>：設計と手順の用意まで。<strong>導入コマンドは未実行</strong>です。実行は社長の一手（CLAUDE.md §4.4 の例外＝認証情報の入力）。 <strong>法務確認</strong>：ハルオによる Keepa 利用規約チェックの結果は §9 に反映欄を用意してあります（2026-08-24 時点で未反映）。</p></blockquote>
+<hr>
+<h2 id="1-結論">1. 結論</h2>
+<p><strong>推奨は「案C：macOS キーチェーン + <code>headersHelper</code>」です。</strong> APIキーを平文でどのファイルにも置かず、リポジトリにも Notion にも載せません。</p>
+<p>社長にお願いするのは <strong>キーを1回だけ貼る操作</strong>で、しかも<strong>シェル履歴にも残らない形</strong>で貼れます。</p>
+<p>社長ご希望の <strong>Notion 保管は、MCP の仕組み上そもそも成立しません</strong>（§5 で技術的な理由を説明します）。ただしご希望の狙いである<strong>複数デバイス間の同期は、iCloud キーチェーンで自動的に満たされます</strong> — Notion を経由するより素直に解決します。</p>
+<hr>
+<h2 id="2-社長が打つコマンド-3ステップ-">2. 社長が打つコマンド（3ステップ）</h2>
+<p><strong>ステップ1 — キーをキーチェーンに登録する（社長のみ）</strong></p>
+<pre class="code" data-lang="bash"><code>security add-generic-password -s keepa-api-key -a keepa -U -w</code></pre>
+<p><code>-w</code> を<strong>値なしで末尾に置く</strong>と、対話プロンプトが出てキーを非表示入力できます。 → <strong>キーがシェル履歴（<code>~/.zsh_history</code>）に残りません。</strong> macOS の <code>security</code> man ページも &quot;Put at end of command to be prompted (recommended)&quot; と明記しています。</p>
+<blockquote><p>Keepa のアクセスキーは Keepa アカウントの API ページに表示されているものです。</p></blockquote>
+<p><strong>ステップ2 — ヘルパースクリプトを置く（社長・コピペのみ）</strong></p>
+<pre class="code" data-lang="bash"><code>mkdir -p ~/.claude/scripts
+cp &quot;/Users/yukinori/Claude Code/ai-company-amazon_buppan/workspace/output/deliverables/T-20260824-001/keepa-auth.sh.template&quot; \
+   ~/.claude/scripts/keepa-auth.sh
+chmod 700 ~/.claude/scripts/keepa-auth.sh</code></pre>
+<p><strong>ステップ3 — MCP サーバを登録する（社長・コピペのみ）</strong></p>
+<pre class="code" data-lang="bash"><code>claude mcp add-json --scope user keepa \
+  &#x27;{&quot;type&quot;:&quot;http&quot;,&quot;url&quot;:&quot;https://keepa.com/mcp&quot;,&quot;headersHelper&quot;:&quot;&#x27;&quot;$HOME&quot;&#x27;/.claude/scripts/keepa-auth.sh&quot;}&#x27;</code></pre>
+<p><strong>このコマンド列のどこにも API キーの文字列は出てきません。</strong> キーが登場するのはステップ1の非表示プロンプトの中だけです。</p>
+<p>登録後に Claude Code を再起動 → <code>claude mcp list</code> に <code>keepa</code> が出れば完了です。</p>
+<hr>
+<h2 id="3-前提事実-検証済みと未検証を分けます-">3. 前提事実（検証済みと未検証を分けます）</h2>
+<h3 id="3-1-検証済み-一次情報で確認-">3.1 検証済み（一次情報で確認）</h3>
+<table><thead><tr><th>#</th><th>事実</th><th>出典</th></tr></thead><tbody><tr><td>F1</td><td><code>https://keepa.com/mcp</code> に公式ホステッド MCP サーバが実在。Streamable HTTP、<code>Authorization: Bearer YOUR_API_KEY</code> で認証</td><td>保全済み原文 <code>agent_output/T-20260824-001/sources/mcp.html</code></td></tr><tr><td>F2</td><td><strong>新規契約・追加課金なし。</strong> 既存 Keepa API サブスクのキーで認証し、ツール呼び出しは通常の API と同じトークンを消費</td><td>同上（&quot;Uses your plan&#x27;s tokens&quot;）</td></tr><tr><td>F3</td><td>Keepa 公式が「キーを埋め込んだ設定ファイル（例：<code>.mcp.json</code>）を共有リポジトリにコミットするな」と明記</td><td>同上（&quot;Important: Your API key is a secret.&quot;）</td></tr><tr><td>F4</td><td><code>${VAR}</code> 展開は <code>.mcp.json</code> だけでなく <strong><code>~/.claude.json</code> のローカル/ユーザースコープのエントリでも効く</strong></td><td>code.claude.com/docs/en/mcp.md</td></tr><tr><td>F5</td><td><code>${VAR}</code> 展開は HTTP サーバの <strong><code>headers</code> フィールドでも効く</strong></td><td>同上</td></tr><tr><td>F6</td><td><code>claude mcp add --scope user</code> は <code>~/.claude.json</code> のルートに書く＝<strong>リポジトリの外</strong></td><td>同上</td></tr><tr><td>F7</td><td><code>headersHelper</code> は接続時にシェルコマンドを実行し、<strong>stdout の JSON オブジェクト</strong>をヘッダとして使う。タイムアウト10秒、キャッシュなし、セッション開始時と再接続時に実行。401/403 で自動的に再実行＋1回リトライ</td><td>同上</td></tr><tr><td>F8</td><td><code>headersHelper</code> はプロジェクト/ローカルスコープでは trust ダイアログ承認後にしか動かないが、<strong>ユーザースコープなら制限なし</strong></td><td>同上</td></tr><tr><td>F9</td><td><strong>Claude Code のクラウド環境には専用のシークレットストアがまだ無い。</strong>公式が「環境変数はその環境を使う人なら誰でも読める」と警告</td><td>code.claude.com/docs/en/cloud-environments.md</td></tr><tr><td>F10</td><td><code>security add-generic-password ... -w</code>（値なし末尾）で非表示プロンプト。書き込み→読み戻しをダミー値で実測し往復動作を確認済み</td><td>macOS <code>man security</code> ＋ 実機検証（2026-08-24）</td></tr><tr><td>F11</td><td><strong>本リポジトリは GitHub 上で PUBLIC。</strong>かつ <code>.claude/scripts/github-sync.sh</code> が30分ごとに <code>git add -A</code> → commit → push する</td><td><code>gh repo view</code> 実測＝<code>&quot;visibility&quot;:&quot;PUBLIC&quot;</code> ／ 同スクリプト</td></tr><tr><td>F12</td><td><code>.mcp.json</code> は <code>.gitignore:8</code> で除外済み（<code>git check-ignore -v</code> で実測）。<code>.mcp.json.example</code> のみコミットされる設計</td><td>実測</td></tr><tr><td>F13</td><td>現状 Keepa MCP は未導入（<code>claude mcp list</code> が空）</td><td>実測</td></tr></tbody></table>
+<h3 id="3-2-未検証-正直に残します-">3.2 未検証（正直に残します）</h3>
+<table><thead><tr><th>#</th><th>未検証の点</th><th>影響</th></tr></thead><tbody><tr><td>U1</td><td><code>claude mcp add --header &#x27;Bearer ${KEEPA_API_KEY}&#x27;</code> が、<code>${...}</code> を<strong>追加時に展開</strong>するのか<strong>接続時まで文字列のまま保持</strong>するのかが公式に明記されていない</td><td>案A′（環境変数方式）を採る場合のみ影響。<strong>推奨案Cはこの経路を使わないので無関係</strong></td></tr><tr><td>U2</td><td><code>headersHelper</code> がタイムアウト／不正 JSON を返したときのフォールバック挙動が公式に未記載</td><td>失敗時は §8 の切り分け手順で対応</td></tr><tr><td>U3</td><td><code>.claude/settings.json</code> の <code>env</code> ブロックが <code>.mcp.json</code> の <code>${...}</code> 展開に届くかが公式に未記載</td><td>案A′のみ影響。推奨案Cは無関係</td></tr></tbody></table>
+<blockquote><p><strong>重要な訂正</strong>：チケット本文の「当社 <code>.mcp.json</code> は Git 追跡下であり」は誤りです（F12）。除外は既にできています。ただし §4 の通り、<strong>リポジトリが PUBLIC で自動 push される</strong>という別の、より重い事情があります。</p></blockquote>
+<hr>
+<h2 id="4-なぜこの方式か-3案の比較">4. なぜこの方式か — 3案の比較</h2>
+<h3 id="4-1-この会社に固有の-決定的な事情">4.1 この会社に固有の、決定的な事情</h3>
+<p><strong>本リポジトリは PUBLIC で、AI が30分ごとに <code>git add -A</code> して push します（F11）。</strong></p>
+<p>これが判断を決めました。<code>.gitignore</code> は現に機能していますが（F12）、この環境では防御が一枚しかありません。<code>.gitignore</code> の1行が消えるか、パスが変わるか、誰かが <code>git add -f</code> を打つか、キーを含む新しいファイル名が生まれた瞬間に、<strong>キーは全世界に公開され、しかも Git 履歴に永久に残ります</strong>（履歴からの除去は force push ＝ §4.1 該当で、事故後の対処コストが極めて高い）。</p>
+<p>したがって設計方針は「gitignore を信じる」ではなく、<strong>「キーをリポジトリの物理的な外に出し、かつ平文で存在させない」</strong>とします。</p>
+<h3 id="4-2-比較表">4.2 比較表</h3>
+<table><thead><tr><th></th><th><strong>案A</strong> 直書き（<code>~/.claude.json</code>）</th><th><strong>案B</strong> Notion 保管（社長ご希望）</th><th><strong>案C</strong> キーチェーン + <code>headersHelper</code>（<strong>推奨</strong>）</th></tr></thead><tbody><tr><td><strong>キーの置き場</strong></td><td><code>~/.claude.json</code> に平文</td><td>Notion のページ</td><td>macOS キーチェーン（暗号化）</td></tr><tr><td><strong>リポジトリへの露出</strong></td><td>なし（リポ外）</td><td>なし（リポ外）</td><td>なし（リポ外）</td></tr><tr><td><strong>公開 push の射程</strong></td><td>圏外</td><td>圏外</td><td>圏外</td></tr><tr><td><strong>平文でディスクに存在するか</strong></td><td><strong>する</strong></td><td>する（Notion 側＋ローカルキャッシュ）</td><td><strong>しない</strong></td></tr><tr><td><strong>第三者 SaaS への送信</strong></td><td>なし</td><td><strong>あり（Notion）</strong></td><td>なし</td></tr><tr><td><strong>AI のコンテキスト／セッションログへの混入</strong></td><td>低（ファイルを読ませなければ）</td><td><strong>高（読み込むたび毎回混入）</strong></td><td><strong>なし</strong>（Claude 本体はキーを見ない）</td></tr><tr><td><strong>シェル履歴への残留</strong></td><td>あり得る</td><td>あり得る</td><td><strong>なし</strong>（非表示プロンプト）</td></tr><tr><td><strong>導入の手間</strong></td><td>1コマンド</td><td>—</td><td>3コマンド（1回のみ）</td></tr><tr><td><strong>運用の手間</strong></td><td>ゼロ</td><td><strong>毎回コピペが必要</strong>（§5）</td><td>ゼロ</td></tr><tr><td><strong>Apple デバイス間の同期</strong></td><td>手動</td><td>手動コピペ</td><td><strong>iCloud キーチェーンで自動</strong></td></tr><tr><td><strong>クラウド／モバイル回</strong></td><td>不可</td><td>不可（§6）</td><td>不可（§6）</td></tr><tr><td><strong>キーのローテーション</strong></td><td>ファイル編集</td><td>Notion 編集＋各所貼り直し</td><td><strong>1コマンド</strong>（§8.3）</td></tr></tbody></table>
+<h3 id="4-3-案A-を推奨しない理由-案A-も悪くはありません-">4.3 案A を推奨しない理由（案A も悪くはありません）</h3>
+<p>案A（<code>claude mcp add --scope user</code> にキー直書き）は<strong>1行で終わり、リポジトリの外に出るので、それ自体は十分許容できる選択です。</strong> 実際、案C が何かの理由で動かないときのフォールバックはこれです（§8.2）。</p>
+<p>それでも案C を推す理由は、<strong>追加コストが実質ゼロだから</strong>です。セットアップが2コマンド増えるだけで、以後の運用負荷は同じ（ゼロ）。その2コマンドで「平文がどこにも無い」「シェル履歴に残らない」「ローテーションが1コマンド」が手に入ります。</p>
+<p>加えてこの会社の事情として、<strong>AI エージェントが日常的にファイルを読み、その内容がセッションログに残ります。</strong>「<code>~/.claude.json</code> を見て MCP の設定を確認して」と頼んだ瞬間にキーがログに載る、という事故が案A では起こり得ます。案C ではキーチェーンの中身は Claude の目に触れません。</p>
+<blockquote><p>YAGNI の観点でも過剰ではないと判断しました。増えるのは「1回きりの2コマンド」だけで、継続的な複雑さ（監視、ローテーション基盤、権限管理）は一切増やしていません。エンプラ的な仕組みは入れていません。</p></blockquote>
+<hr>
+<h2 id="5-社長ご希望の-Notion-保管について">5. 社長ご希望の Notion 保管について</h2>
+<p><strong>ご指摘の狙い（デバイス間で同期したい）は正しいと考えています。</strong>満たすべき要求です。ただし手段としての Notion 保管には、セキュリティ以前に<strong>技術的な障害</strong>があります。</p>
+<h3 id="5-1-そもそも-Notion-から読み込む-経路が存在しません">5.1 そもそも「Notion から読み込む」経路が存在しません</h3>
+<p>MCP の <code>Authorization</code> ヘッダは、<strong>Claude Code が接続を張るときに設定から解決します。</strong>解決できる経路は3つだけです（F4/F5/F7）。</p>
+<ol><li>設定ファイルに書かれた<strong>リテラル文字列</strong></li><li><strong>環境変数</strong> <code>${VAR}</code> の展開</li><li><strong><code>headersHelper</code></strong> が stdout に出力した JSON</li></ol>
+<p><strong>「Notion から読む」はこの3つのどれでもありません。</strong> したがって Notion に置いたキーで MCP を設定するには、次のどちらかになります。</p>
+<ul><li><strong>(a) 人間か AI が Notion を見てコピペする</strong> → 「1回貼る」が「毎回貼る」に増えるだけで、手間が純増します。</li><li><strong>(b) <code>headersHelper</code> に Notion API を叩かせる</strong> → <strong>Notion のインテグレーショントークンという別の秘密を、どこかに平文で置く必要が生じます。</strong>秘密を守るために秘密を増やす循環で、しかも接続のたびに10秒制限の中でネットワーク往復が入ります（F7）。</li></ul>
+<h3 id="5-2-セキュリティ面でも不利です">5.2 セキュリティ面でも不利です</h3>
+<ul><li><strong>キーが第三者 SaaS に渡ります。</strong> Notion 側では検索インデックス・エクスポート・共有リンク・インテグレーショントークン保有者に露出します。当社は Notion MCP を全エージェントが常用しているため、<code>notion-search</code> が偶発的にヒットする面も増えます。</li><li><strong>読み込むたびにキーが AI のコンテキストに載ります。</strong> つまり Anthropic API に送信され、ローカルのセッション記録（<code>~/.claude/projects/.../*.jsonl</code>）に平文で残ります。案C ではこれがゼロです。</li><li>Keepa 公式も「キーは秘密。埋め込んだ設定を公開・共有するな」と明記しています（F3）。</li></ul>
+<h3 id="5-3-結論">5.3 結論</h3>
+<p><strong>Notion 保管は採用しないことを推奨します。</strong> ただし繰り返しますが、<strong>ご希望の本質（デバイス間同期）は案C が満たします</strong>（§6）。ご希望を却下しているのではなく、より素直な手段に置き換える提案です。</p>
+<hr>
+<h2 id="6-複数デバイス間の同期をどう解決したか">6. 複数デバイス間の同期をどう解決したか</h2>
+<p>同期の要求を2つに分けて考えました。</p>
+<h3 id="6-1-Mac-他の-Apple-デバイス-Mac-iPad-自動で解決します">6.1 Mac ⇄ 他の Apple デバイス（Mac / iPad）→ 自動で解決します</h3>
+<p><strong>iCloud キーチェーンが有効なら、キーチェーンの項目は Apple デバイス間で自動同期されます。</strong> 別の Mac では §2 のステップ2・3（スクリプト配置と MCP 登録、どちらもキーを含まない）を実行するだけで、<strong>キーを再入力する必要がありません。</strong></p>
+<p>Notion を経由するより手数が少なく、かつ安全です。</p>
+<h3 id="6-2-クラウド-モバイルのセッション-対象外と割り切ります">6.2 クラウド／モバイルのセッション → 対象外と割り切ります</h3>
+<p><strong>これは正直にお伝えします。どの案でも安全には解決できません。</strong></p>
+<p>Claude Code のクラウド環境には専用のシークレットストアがまだ存在せず、公式が「環境変数はその環境を使う人なら誰でも読める」と警告しています（F9）。<strong>Notion に置いてもこの状況は改善しません</strong>（むしろ露出面が増えます）。</p>
+<p>したがって <strong>Keepa MCP は「Mac のローカル回で使う道具」と位置づけます。</strong> モバイルから Keepa のデータが見たい場合は、ローカル回で生成済みのスプレッドシートや成果物を参照してください。</p>
+<blockquote><p>これは当社の既存の割り切りと一致します。CLAUDE.md の成果物カタログ同期も「クラウド回は CSV 追記までに留めて、次のローカル回で同期する」という同じ形です。新しい例外を作らず、確立した前例を踏襲します。</p></blockquote>
+<hr>
+<h2 id="7-ヘルパースクリプトの中身">7. ヘルパースクリプトの中身</h2>
+<p><code>keepa-auth.sh.template</code> として同梱してあります。全文は短いので載せます。</p>
+<pre class="code" data-lang="bash"><code>#!/bin/bash
+# Keepa MCP 用の認証ヘッダを生成する。
+# キーは macOS キーチェーンにのみ存在し、このファイルには含まれない。
+set -euo pipefail
+
+KEY=&quot;$(security find-generic-password -w -s keepa-api-key 2&gt;/dev/null || true)&quot;
+
+if [ -z &quot;$KEY&quot; ]; then
+  echo &quot;keepa-auth: キーチェーンに &#x27;keepa-api-key&#x27; が見つかりません。&quot; &gt;&amp;2
+  echo &quot;  security add-generic-password -s keepa-api-key -a keepa -U -w&quot; &gt;&amp;2
+  exit 1
+fi
+
+printf &#x27;{&quot;Authorization&quot;: &quot;Bearer %s&quot;}\n&#x27; &quot;$KEY&quot;</code></pre>
+<p>設計上の注意点：</p>
+<ul><li><strong>このスクリプト自体にキーは入っていません。</strong>リポジトリに置いても無害ですが、<code>~/.claude/scripts/</code> に置く前提です（リポ外）。</li><li>出力は stdout への JSON オブジェクト1個。これが <code>headersHelper</code> の要求仕様です（F7）。</li><li>エラーメッセージは <strong>stderr</strong> に出します。stdout を汚すと JSON パースが壊れるためです。</li><li><code>chmod 700</code> にしてください（他ユーザーからの実行を防ぐ）。</li><li>接続のたびに実行されキャッシュされません（F7）。キーチェーン参照はローカル処理なので体感差はありません。</li></ul>
+<hr>
+<h2 id="8-運用">8. 運用</h2>
+<h3 id="8-1-動作確認">8.1 動作確認</h3>
+<ol><li>Claude Code を再起動</li><li><code>claude mcp list</code> → <code>keepa</code> が connected で出る</li><li>単発で軽い問い合わせを1回だけ試す（例：ASIN を1つ渡して価格履歴を聞く）</li></ol>
+<p>ヘルパー単体の確認は次でできます（<strong>キーは表示されません</strong>）。</p>
+<pre class="code" data-lang="bash"><code>~/.claude/scripts/keepa-auth.sh | python3 -c &quot;import sys,json; d=json.load(sys.stdin); print(&#x27;OK: ヘッダ生成成功, 長さ&#x27;, len(d[&#x27;Authorization&#x27;]))&quot;</code></pre>
+<h3 id="8-2-うまく動かないときの切り分けとフォールバック">8.2 うまく動かないときの切り分けとフォールバック</h3>
+<table><thead><tr><th>症状</th><th>確認すること</th></tr></thead><tbody><tr><td><code>keepa</code> が list に出ない</td><td>Claude Code を再起動したか。<code>claude mcp list</code> のエラー行を読む</td></tr><tr><td>認証エラー（401/403）</td><td>キーチェーンの値が正しいか（§8.3 で入れ直す）。Keepa API サブスクが有効か</td></tr><tr><td>ヘルパーが動かない</td><td>上の1行テストを実行。<code>chmod 700</code> が効いているか。パスが絶対パスか</td></tr><tr><td>それでも駄目</td><td><strong>案A にフォールバック</strong>：<code>claude mcp remove --scope user keepa</code> した上で、<code>claude mcp add --scope user --transport http keepa https://keepa.com/mcp --header &quot;Authorization: Bearer &lt;キー&gt;&quot;</code>。リポ外である点は変わらないので、暫定運用として許容できます</td></tr></tbody></table>
+<h3 id="8-3-キーのローテーション-Keepa-側で再発行したとき-">8.3 キーのローテーション（Keepa 側で再発行したとき）</h3>
+<pre class="code" data-lang="bash"><code>security add-generic-password -s keepa-api-key -a keepa -U -w</code></pre>
+<p><strong>これ1コマンドだけです。</strong><code>-U</code> が既存項目を上書きします。MCP の設定は触る必要がありません。Claude Code を再起動すれば次の接続から新しいキーが使われます。</p>
+<h3 id="8-4-トークン消費についての注意-運用上いちばん効きます-">8.4 トークン消費についての注意（運用上いちばん効きます）</h3>
+<p>Keepa MCP のツール呼び出しは、<strong>既存プランのトークンを消費します</strong>（F2）。新規課金は発生しませんが、<strong>AI が自分の判断で呼ぶぶんだけ減ります。</strong></p>
+<ul><li>公式仕様として、各ツールの説明にトークン単価が書かれ、応答に現在残高が載るため、AI は自分で消費を加減できます。</li><li>それでも、<strong>夜間自走やループ処理から無制限に呼ばせないでください。</strong>既存の夜間スキャン（T-20260803-001 系）と同時に走らせるとトークンを食い合います。</li><li>用途は「対話中の単発調査」に限定するのが安全です。<strong>大量取得は従来どおり REST API を直に叩くスクリプト側で行ってください。</strong> Keepa 公式も「プログラムから使うなら REST API を直接使え、MCP の応答は言語モデル向けに整形してある」と明記しています。</li></ul>
+<h3 id="8-5-やめるとき">8.5 やめるとき</h3>
+<pre class="code" data-lang="bash"><code>claude mcp remove --scope user keepa
+security delete-generic-password -s keepa-api-key</code></pre>
+<blockquote><p>2行目はキーチェーン項目の削除＝CLAUDE.md §4.1「不可逆な削除」に触れる可能性があるため、<strong>社長ご自身の判断で実行してください。</strong>エージェントは実行しません。</p></blockquote>
+<hr>
+<h2 id="9-法務確認の反映欄-2026-08-24-時点-未反映-">9. 法務確認の反映欄（2026-08-24 時点：未反映）</h2>
+<p>ハルオによる Keepa 利用規約チェックの結果を、確定後にここへ追記してください。<strong>結果によって設計を変える必要があるのは次の2点です。</strong></p>
+<table><thead><tr><th>論点</th><th>現設計での前提</th><th>法務結果が「NG」だった場合の設計変更</th></tr></thead><tbody><tr><td><strong>1シート制／キーの共有範囲</strong></td><td>キーは社長個人のマシン1台（＋同一 Apple ID のデバイス）でのみ使用。第三者への共有なし</td><td>変更不要の見込み。ただし「デバイス台数の上限」が規約にある場合は §6.1 の iCloud 同期を止め、1台に限定する</td></tr><tr><td><strong>キーの第三者 SaaS 保管</strong></td><td><strong>保管しない</strong>（案C はキーチェーンのみ）</td><td><strong>既に最も保守的な設計です。</strong>Notion 保管が規約違反と判定されても、本設計への影響はありません</td></tr><tr><td><strong>MCP 経由の利用がサブスク規約の範囲内か</strong></td><td>公式が提供するサーバであり、公式に「既存サブスクのキーで使う」と明記されている（F1/F2）ため範囲内と判断</td><td>万一制限があれば §8.5 の手順で撤去</td></tr></tbody></table>
+<p><strong>記入欄：</strong></p>
+<ul><li>確認日：　　　　／　担当：ハルオ</li><li>結論：（　□ 問題なし　／　□ 条件付き可　／　□ 不可　）</li><li>条件・留意事項：</li><li>本設計への反映：</li></ul>
+<hr>
+<h2 id="10-妥協点-分からなかったこと-正直に書きます-">10. 妥協点・分からなかったこと（正直に書きます）</h2>
+<ol><li><strong>実機での疎通確認をしていません。</strong> キーを扱わない方針のため、<code>claude mcp add</code> を実行していません。したがって「この手順で本当に Keepa に繋がる」ことは<strong>未実証</strong>です。検証済みなのは、(a) 公式が案内する手順の原文、(b) Claude Code 側の設定機構の仕様、(c) キーチェーンの読み書き往復（ダミー値で実測）の3つまでです。<strong>最初の1回は社長と一緒に見るのが確実です。</strong></li></ol>
+<ol><li><strong>U1〜U3（§3.2）は公式ドキュメントに記載がありません。</strong> ただし推奨案C はいずれの経路も使わないため、推奨案の成立には影響しません。案A′（環境変数方式）を選ぶ場合のみ、実機確認が必要になります。</li></ol>
+<ol><li><strong><code>headersHelper</code> の失敗時フォールバック挙動が未確認です（U2）。</strong> 接続失敗時は §8.2 の切り分けで対応してください。案A というフォールバック経路を用意してあるので、詰みはしません。</li></ol>
+<ol><li><strong>クラウド／モバイルからの利用は解決できていません（§6.2）。</strong> これは当社の設計不足ではなく、Claude Code 側にまだ機能が無いためです。プラットフォーム側にシークレットストアが実装されたら再検討する価値があります。</li></ol>
+<ol><li><strong><code>.mcp.json.example</code> には Keepa の項を追記しましたが、これは参考用です。</strong>推奨経路（ユーザースコープ）はリポジトリ外の <code>~/.claude.json</code> を使うため、<code>.mcp.json</code> は本来不要です。プロジェクトスコープを選びたくなったときのために形だけ示してあり、<strong>キーのリテラルは書かず <code>${KEEPA_API_KEY}</code> 参照と <code>headersHelper</code> の2形だけ</strong>を載せています。</li></ol>
+<hr>
+<h2 id="付録-関連ファイル">付録：関連ファイル</h2>
+<table><thead><tr><th>ファイル</th><th>内容</th></tr></thead><tbody><tr><td><code>keepa-auth.sh.template</code></td><td>§7 のヘルパースクリプト（そのままコピーして使えます）</td></tr><tr><td><code>../../../../.mcp.json.example</code></td><td>Keepa の項を追記済み（プレースホルダのみ）</td></tr><tr><td><code>../../../../docs/mcp-setup-guide.md</code></td><td>Keepa の節と「シークレットの置き方」の節を追記済み</td></tr><tr><td><code>../../agent_output/T-20260824-001/sources/mcp.html</code></td><td>Keepa 公式 MCP ページの保全原文</td></tr></tbody></table>
+</div></body></html>

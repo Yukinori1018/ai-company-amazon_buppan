@@ -1,0 +1,38 @@
+#!/bin/bash
+#
+# keepa-auth.sh — Keepa 公式 MCP サーバ（https://keepa.com/mcp）用の認証ヘッダ生成
+#
+# 設置先: ~/.claude/scripts/keepa-auth.sh （chmod 700）
+# 呼び出し元: ~/.claude.json の keepa エントリの "headersHelper"
+#
+# 設計意図（T-20260824-001 / タカシ）:
+#   API キーは macOS キーチェーンにのみ存在する。このファイルにも、
+#   Claude Code の設定ファイルにも、リポジトリにも平文で現れない。
+#   本リポジトリは PUBLIC かつ30分ごとに自動 push されるため、
+#   「gitignore を信じる」ではなく「キーをリポジトリの外に、かつ平文で持たない」設計にしている。
+#
+# 仕様（Claude Code の headersHelper 契約）:
+#   - stdout に「ヘッダ名: 値」の JSON オブジェクトを1個だけ出力する
+#   - エラーは必ず stderr へ（stdout を汚すと JSON パースが壊れる）
+#   - タイムアウト10秒・キャッシュなし。セッション開始時と再接続時に実行される
+#   - 401/403 を受けると Claude Code が本スクリプトを再実行して1回リトライする
+#
+# キーの登録・更新（社長のみ。-w を値なしで末尾に置くと非表示プロンプトになり、
+# シェル履歴にキーが残らない。-U は既存項目の上書き）:
+#   security add-generic-password -s keepa-api-key -a keepa -U -w
+#
+set -euo pipefail
+
+KEYCHAIN_SERVICE="keepa-api-key"
+
+# `|| true` は set -e で落とさないため。空判定は下で明示的に行う。
+KEY="$(security find-generic-password -w -s "$KEYCHAIN_SERVICE" 2>/dev/null || true)"
+
+if [ -z "$KEY" ]; then
+  echo "keepa-auth: キーチェーンに '$KEYCHAIN_SERVICE' が見つかりません。" >&2
+  echo "keepa-auth: 次のコマンドで登録してください（プロンプトが出ます）:" >&2
+  echo "  security add-generic-password -s $KEYCHAIN_SERVICE -a keepa -U -w" >&2
+  exit 1
+fi
+
+printf '{"Authorization": "Bearer %s"}\n' "$KEY"

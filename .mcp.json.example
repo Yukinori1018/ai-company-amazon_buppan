@@ -1,5 +1,10 @@
 {
-  "_comment": "Notion MCP のスタブ設定。子会社化時に .mcp.json にコピーして {{ }} を埋めてください。実体の .mcp.json は .gitignore 対象です。OPENAPI_MCP_HEADERS は @notionhq/notion-mcp-server が要求する形式（JSON 文字列）。",
+  "_comment": "MCP のスタブ設定。子会社化時に .mcp.json にコピーして {{ }} を埋めてください。実体の .mcp.json は .gitignore 対象です。OPENAPI_MCP_HEADERS は @notionhq/notion-mcp-server が要求する形式（JSON 文字列）。",
+
+  "_comment_secrets": "【重要】このリポジトリは GitHub 上で PUBLIC であり、30分ごとに `git add -A` で自動 push されます。API キーのリテラルを .mcp.json に書かないでください。gitignore の1行が消えた瞬間に全世界へ公開され、Git 履歴に永久に残ります。キーは (1) ${ENV_VAR} 参照、(2) headersHelper（外部コマンドが接続時にヘッダを生成）のいずれかで間接参照してください。",
+
+  "_comment_keepa": "Keepa 公式 MCP（https://keepa.com/mcp）。新規契約・追加課金なし＝既存 API サブスクのキーとトークンを使います。【推奨はこの .mcp.json ではなくユーザースコープです】: `claude mcp add-json --scope user keepa '{\"type\":\"http\",\"url\":\"https://keepa.com/mcp\",\"headersHelper\":\"$HOME/.claude/scripts/keepa-auth.sh\"}'` → 設定がリポジトリの外（~/.claude.json）に出ます。下記はプロジェクトスコープを選ぶ場合の形。headersHelper 版（キーが平文でどこにも残らない・推奨）を示しています。環境変数で済ませたい場合は headersHelper を消して \"headers\": { \"Authorization\": \"Bearer ${KEEPA_API_KEY}\" } に置き換えてください。設計の全文は workspace/output/deliverables/T-20260824-001/keepa-mcp-setup.md、スクリプト実体は同ディレクトリの keepa-auth.sh.template。",
+
   "mcpServers": {
     "notion": {
       "command": "npx",
@@ -8,6 +13,11 @@
         "OPENAPI_MCP_HEADERS": "{\"Authorization\": \"Bearer {{ NOTION_API_KEY }}\", \"Notion-Version\": \"2022-06-28\"}",
         "NOTION_DATABASE_ID": "{{ NOTION_DATABASE_ID }}"
       }
+    },
+    "keepa": {
+      "type": "http",
+      "url": "https://keepa.com/mcp",
+      "headersHelper": "{{ HOME }}/.claude/scripts/keepa-auth.sh"
     }
   }
 }
