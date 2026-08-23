@@ -1,14 +1,14 @@
 ---
 ticket_id: T-20260824-001
 title: Keepa公式ドキュメントの所在調査と「公式用語定義集」の作成
-status: doing
+status: waiting
 assignee: researcher
 requires_approval: false
 priority: high
 labels: [keepa, research, knowledge]
 created_at: 2026-08-24
 updated_at: 2026-08-24
-next_check_at: 2026-08-25
+next_check_at: 2026-08-27
 related_tickets:
   - T-20260811-001
   - T-20260817-004
@@ -109,3 +109,24 @@ source: 社長依頼（2026-08-24）
 - 採否・運用設計（MCP導入、鮮度チェックの運用ルール化、Finder条件の見直し）は**タケシ（プランナー）／ITエンジニアの領分**です。私は事実の整理までで止めています。
 
 確認をお願いします。
+
+- 2026-08-24 カズヨ: keepa.com 実機調査。公式FAQ23問を展開・事実抽出。`api-docs/` が独立静的サイトであることを特定しサトルへ共有。商品ページは Anti-bot check により到達不可（回避せず打ち切り）。
+- 2026-08-24 サトル: 公式APIドキュメント全30ページを取得・精読。用語定義集・差分レポートを納品。
+- 2026-08-24 **カズヨ検証**: サトルの主要4主張を公式原文HTMLで独自に再確認。全て一致。
+  - `avgBuyBoxCompetitors` = "Average number of sellers competing for the Buy Box of this seller's products (this seller included)" → 日本語UI「BUY BOX の平均売上数」は**誤訳**で確定
+  - `stats.min` = "lowest prices **ever registered**" / `minInInterval` = stats指定区間限定 → D1 確定
+  - `monthlySold` = "It is **not** an estimate"（Amazonの「過去1か月に○点購入」の実測。10+/100+の階級値。**大半のASINは値を持たない**）
+  - `scan_v13.py:335` `offers = _num(cur[11])`（=COUNT_NEW）が `:383` の想定月販の分母 → D4 確定。実セラー数はPhase2.5で取得されるが分母に還元されていない
+  - `keepa.com/mcp` 公式MCPサーバの実在と Claude Code 用1行セットアップを原文で確認（既存APIサブスクのトークンを消費／新規課金なし）
+- 2026-08-24 `doing → waiting`（社長レビュー＋判断2件待ち）。カズヨ。
+
+## 社長判断が必要な論点（2件）
+
+### 論点1: D1〜D4 の実装修正をいつ発注するか
+対象は T-20260817-005 の `scan_v13.py`。**同ファイルには別セッション由来の未コミット変更が残っている**ため、
+いま並行でタカシに修正発注すると衝突する懸念がある。A/B/C は社長への報告本文に記載。
+
+### 論点2: Keepa公式MCPサーバ（`https://keepa.com/mcp`）の導入可否
+- **新規契約・追加課金なし**（既存 API サブスクのアクセスキーとトークンを使用）。§4.1「金銭が動く」には**非該当**。
+- ただし **API キーの取り扱い**が論点。当社 `.mcp.json` は Git 追跡下であり、公式も設定ファイルへのキー直書き共有を警告している。
+- 導入するなら ITエンジニア（タカシ）が環境変数参照で設計し、法務（ハルオ）が利用規約を確認する構成。
