@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>候補リスト欠陥の原因究明と対策（T-20260817-005）</title><style>
+:root{--fg:#1b1f23;--mut:#5b6570;--line:#e3e7eb;--acc:#0b5fff;--warn:#b45309;--bad:#b91c1c;--ok:#047857;}
+*{box-sizing:border-box}
+body{margin:0;background:#f6f7f9;color:var(--fg);
+ font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",Meiryo,sans-serif;
+ line-height:1.85;font-size:15.5px;-webkit-text-size-adjust:100%;}
+.wrap{max-width:1000px;margin:0 auto;padding:32px 22px 96px;background:#fff;
+ box-shadow:0 1px 3px rgba(0,0,0,.06);}
+h1{font-size:1.75rem;line-height:1.4;margin:.2em 0 .6em;padding-bottom:.4em;border-bottom:3px solid var(--acc);}
+h2{font-size:1.3rem;margin:2.2em 0 .7em;padding:.35em .6em;background:#eef3ff;border-left:5px solid var(--acc);border-radius:3px;}
+h3{font-size:1.1rem;margin:1.8em 0 .5em;padding-bottom:.25em;border-bottom:1px solid var(--line);}
+p{margin:.7em 0}
+hr{border:0;border-top:1px solid var(--line);margin:2.2em 0}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:.92em;display:block;overflow-x:auto;}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top;}
+th{background:#f0f3f7;font-weight:600;white-space:nowrap;}
+tbody tr:nth-child(even){background:#fafbfc}
+blockquote{margin:1.1em 0;padding:.8em 1em;background:#fffbeb;border-left:5px solid var(--warn);border-radius:3px;color:#463a1a;}
+code{background:#f1f3f5;padding:.12em .4em;border-radius:3px;font-size:.9em;
+ font-family:"SFMono-Regular",Menlo,Consolas,monospace;}
+pre{background:#1e2430;color:#e6edf3;padding:14px 16px;border-radius:6px;overflow-x:auto;font-size:.86em;line-height:1.6;}
+pre code{background:none;color:inherit;padding:0}
+ul,ol{margin:.7em 0;padding-left:1.6em}
+li{margin:.3em 0}
+a{color:var(--acc)}
+@media print{body{background:#fff}.wrap{box-shadow:none;max-width:none}}
+</style></head><body><div class="wrap"><h1>候補リスト欠陥の原因究明と対策 — COUNT_NEW 問題 ＋ Keepa 公式定義との差分 D1〜D4</h1>
+<p>作成: IT エンジニア タカシ / 2026-08-24 / チケット T-20260817-005<br>きっかけ: ①社長の Keepa 実画面確認（ASIN <code>B0DWMPV656</code> は「セラー数1」なのに候補に出ている）<br>　　　　　②サトルの Keepa 公式ドキュメント突合（T-20260824-001 <code>discrepancies.md</code> の D1〜D4）</p>
+<blockquote><strong>この資料の読み方</strong><br>〔実測〕= 今回 Keepa API / 保存済み raw JSON で確認した事実。〔推定〕= 標本からの外挿。〔未確認〕= まだ測っていない。<br>数字は1つも丸めていません。100件に届かないものは届かないまま書く方針です（今回は100件に届きました）。</blockquote>
+<hr>
+<h2>0. 結論（30秒）</h2>
+<ol><li><strong>社長のご指摘は完全に正しく、原因は仮説どおりでした。</strong> Keepa の <code>COUNT_NEW</code> は</li></ol>
+<p>   <strong>新品オファーの本数</strong>であって出品者数ではありません。1社が FBA と FBM の両方に出すと<br>   セラー1社でも <code>COUNT_NEW = 2</code> になります。<code>B0DWMPV656</code> の<strong>実セラー数は 1</strong>でした〔実測〕。</p>
+<ol><li>そのセラーは <strong>ブランド所有者 seathestars 自身</strong>（自社ブランド647商品）。</li></ol>
+<p>   v1.3 が最も避けたい「メーカー直販の独占リスティング」で、<br>   「出品者2〜6」の意図（＝<strong>そのメーカーが実際に卸している証拠</strong>）と正反対のものを通していました。</p>
+<ol><li><strong>汚染は1件のノイズではありません。</strong> v1.3 top100 の <strong>35%</strong>、GO 母集団の推定 <strong>約39%</strong> が</li></ol>
+<p>   「実セラー数 &lt; 2」でした〔実測 / 推定〕。</p>
+<ol><li><strong>1件の事実訂正</strong>: <code>B0DWMPV656</code> は <strong>v1.3 の候補リストには入っていません</strong>。</li></ol>
+<p>   出所は <strong>T-20260804-001 のメーカー台帳</strong>です。同じ欠陥が2つのチケットに別々に実装されていました。</p>
+<ol><li>あわせて <strong>D1〜D4（サトルの公式突合）も同じ修正に折り込みました</strong>。結果、</li></ol>
+<p>   <strong>修正前 top100 のうち 36件が入れ替わり、残った64件も中央値15位ぶん順位が動き、1位も交代</strong>しました〔実測〕。</p>
+<ol><li><strong>前のリストはどれだけ信用できなかったか（社長が一番知りたい点）</strong>:</li></ol>
+<p>   <strong>並び順は信用できません。顔ぶれも3分の1が入れ替わります。</strong> ただし<br>   「売れている商品を拾う」という当たり自体は外していません（下記5章）。</p>
+<hr>
+<h2>1. 原因究明 — <code>B0DWMPV656</code> で何が起きていたか</h2>
+<h3>1-1. 実測データ（<code>GET /product?asin=B0DWMPV656&amp;offers=20</code>）〔実測〕</h3>
+<table><thead><tr><th>項目</th><th>値</th></tr></thead><tbody>
+<tr><td><code>stats.current[11]</code>（COUNT_NEW）</td><td><strong>2</strong></td></tr>
+<tr><td><code>stats.offerCountFBA</code> / <code>offerCountFBM</code></td><td>1 / 1（＝社長の画面「Buy Box 対象オファー数 新品FBA:1 / 新品FBM:1」と一致）</td></tr>
+<tr><td><code>stats.buyBoxSellerId</code></td><td><code>A37CWH39G3AT5D</code></td></tr>
+<tr><td><code>liveOffersOrder</code>（生存中のオファー）</td><td><code>[5, 2]</code> = <strong>2本</strong></td></tr>
+<tr><td>その2本の <code>sellerId</code></td><td><strong>どちらも <code>A37CWH39G3AT5D</code></strong></td></tr>
+<tr><td>セラー名（<code>GET /seller</code>）</td><td><strong><code>seathestars(適格請求書発行事業者)T9240001017589</code></strong></td></tr>
+<tr><td>そのセラーの自社ブランド</td><td><code>ｓｅａ　ｔｈｅ　ｓｔａｒｓ</code>（647商品・<code>productCountWithAmazonOffer</code> 0）</td></tr>
+<tr><td><strong>実セラー数（distinct sellerId）</strong></td><td><strong>1</strong></td></tr>
+</tbody></table>
+<p>生存2本の内訳は <code>index 5 = FBA / 新品</code> と <code>index 2 = FBM / 新品</code>。<br><strong>同一セラーが FBA 用と FBM 用に2本出しているだけ</strong>でした。</p>
+<h3>1-2. 他の可能性を潰す〔実測〕</h3>
+<table><thead><tr><th>疑った要因</th><th>結果</th></tr></thead><tbody>
+<tr><td>コンディション違いの混入</td><td><code>offers</code> 配列の残り4本は全て<strong>中古</strong>（<code>condition</code> 2〜4）。COUNT_NEW（新品）には元々入りません</td></tr>
+<tr><td>別セラーが中古で出している</td><td>その4本は <code>ANNLLU4HTZVX9</code> = <strong><code>Amazonアウトレット</code></strong>。中古なので新品カウントに無関係</td></tr>
+<tr><td>在庫切れオファーの残存</td><td><code>offers</code> には数か月前に消えたオファーが残る（<code>lastSeen</code> が最大305,740分＝約212日前）。だから <code>liveOffersOrder</code> で生存だけに絞る必要がある</td></tr>
+<tr><td>海外セラー</td><td>該当なし（生存新品オファーは国内1社のみ）</td></tr>
+</tbody></table>
+<h3>1-3. 機序</h3>
+<pre><code>Keepa COUNT_NEW = 新品オファーの本数
+                = Σ（各セラーが出している新品オファー）
+                ≠ 出品しているセラーの数
+
+  seathestars が FBA に1本 + FBM に1本  →  COUNT_NEW = 2  だが セラーは 1社</code></pre>
+<p><code>current_COUNT_NEW_gte=2 / _lte=6</code> を「出品者2〜6社」と読み替えたこと、<br>そして CSV の列名を <strong><code>出品者数</code></strong> としたことが誤りでした。</p>
+<hr>
+<h2>2. 汚染度の定量</h2>
+<h3>2-1. v1.3 top100（<strong>全100件を実測</strong>）〔実測〕</h3>
+<table><thead><tr><th>指標</th><th>件数</th></tr></thead><tbody>
+<tr><td>実測できた件数</td><td>100 / 100</td></tr>
+<tr><td><strong>実セラー数 &lt; 2</strong></td><td><strong>35件（35.0%）</strong></td></tr>
+<tr><td>うち 実セラー数 = 1</td><td>34件</td></tr>
+<tr><td>うち 実セラー数 = 0（生存新品オファーなし＝実質リスティング死亡）</td><td>1件</td></tr>
+<tr><td>CSV の <code>出品者数</code>(COUNT_NEW) と実セラー数が食い違う</td><td>36件（36.0%）</td></tr>
+</tbody></table>
+<p>実セラー数の分布: <code>0:1 / 1:34 / 2:59 / 3:5 / 4:1</code><br>（元 CSV の <code>出品者数</code> 分布は <code>2:94 / 3:6</code> — つまり <strong>94件が「2社」に見えていた</strong>）</p>
+<p><strong>機序の内訳</strong>（offers 取得と同時刻の COUNT_NEW を <code>csv[11]</code> の最終値から読んで判定）〔実測〕</p>
+<table><thead><tr><th>機序</th><th>件数</th></tr></thead><tbody>
+<tr><td><strong>同一セラーが FBA + FBM に二重出品</strong>（＝カズヨの仮説どおりの主犯）</td><td><strong>23件</strong></td></tr>
+<tr><td>COUNT_NEW 系列の更新ラグ（生存新品オファーは1本なのに COUNT_NEW=2 のまま）</td><td>8件</td></tr>
+<tr><td>生存新品オファー 0</td><td>1件</td></tr>
+<tr><td>スキャン後の3日間で本当に1社に減った</td><td>3件</td></tr>
+</tbody></table>
+<blockquote>2番目の8件について正直に書きます。Keepa の COUNT_NEW は <strong>独自の更新頻度を持つ時系列</strong>で、<br><code>lastUpdate</code> が2〜4分前でも COUNT_NEW の最終データ点は <strong>3,492〜124,590分前</strong>（2.4日〜86日前）でした。<br>「定義の違い」か「単なるラグ」かはこちらからは分離できません。**どちらにせよ COUNT_NEW を<br>出品者数として使えないことは変わりません。**</blockquote>
+<h3>2-2. GO 母集団の推定汚染率（<strong>サンプルです</strong>）〔推定〕</h3>
+<table><thead><tr><th>項目</th><th>値</th></tr></thead><tbody>
+<tr><td>母集団</td><td><code>candidates_v13.csv</code> の GO 2,479件から top100 を除いた <strong>2,379件</strong></td></tr>
+<tr><td><strong>標本サイズ</strong></td><td><strong>150件</strong>（シード <code>20260824</code> 固定の単純無作為抽出）</td></tr>
+<tr><td>実セラー数 &lt; 2</td><td><strong>58件 = 38.7%</strong></td></tr>
+<tr><td>95%信頼区間（正規近似）</td><td><strong>約 31% 〜 46%</strong></td></tr>
+<tr><td>COUNT_NEW と実セラー数が食い違う</td><td>81件 = 54.0%</td></tr>
+</tbody></table>
+<p>実セラー数の分布: <code>1:58 / 2:47 / 3:24 / 4:11 / 5:9 / 8:1</code></p>
+<blockquote><strong>上限側も破れています。</strong> 実セラー8社の商品が1件ありました（COUNT_NEW では6以下に見えていた）。<br>少数ですが「相乗り過多を弾く」側の条件も COUNT_NEW では担保できていません。</blockquote>
+<h3>2-3. メーカー直販独占〔実測〕</h3>
+<p>セラー名を <code>GET /seller</code> で引き、ブランド名／メーカー名とセラー名が包含関係にあるものを<br>「メーカー直販」と判定しました（表記ゆれを拾うため完全一致ではなく包含。全角→半角正規化あり）。</p>
+<p><strong>実セラー数を実測した 355件のうち、<code>実セラー数 = 1</code> かつ そのセラーがブランド所有者＝ 53件。</strong><br>これが v1.3 の意図から最も外れる類型で、<code>B0DWMPV656</code> と同じ性質のものです。</p>
+<blockquote><strong>注意（クリーン版 top100 にも残ります）</strong>: 最終 top100 の <strong>50件</strong>に <code>メーカー直販</code> フラグが付いています。<br>これは「実セラー数2以上」＝<strong>ブランド所有者＋卸された1社</strong>という状態で、<br><strong>条件（卸している証拠がある）は満たしています</strong>。ただし「メーカー自身が同じ棚で売っている」ので<br>価格競争の相手がメーカー本人になります。<strong>除外はしていません。列で見えるようにしただけです。</strong></blockquote>
+<hr>
+<h2>3. 対策① — COUNT_NEW 問題（実装済み）</h2>
+<h3>3-1. 正しい「出品者数」の求め方 — これが結論です</h3>
+<p><strong><code>GET /product?asin=...&amp;offers=20</code> を叩き、次の3段で数える。</strong></p>
+<ol><li><code>liveOffersOrder</code>（生存オファーの index 配列）で <strong>今生きているオファーだけ</strong>に絞る</li></ol>
+<p>   — <code>offers</code> 配列には数か月前に消えたオファーがそのまま残っています</p>
+<ol><li><code>condition == 1</code>（新品）だけを残す — 中古セラー（<code>Amazonアウトレット</code> 等）を混ぜない</li><li><code>sellerId</code> の <strong>distinct 数</strong>を数える</li></ol>
+<p><strong>使ってはいけない代理変数</strong></p>
+<table><thead><tr><th>フィールド</th><th>実体</th><th>使えない理由</th></tr></thead><tbody>
+<tr><td><code>current_COUNT_NEW</code> / <code>csv[11]</code></td><td>新品オファー数</td><td>同一セラーの FBA+FBM で二重計上。更新頻度も別</td></tr>
+<tr><td><code>stats.offerCountFBA + offerCountFBM</code></td><td>Keepa UI の「Buy Box 対象オファー数」</td><td>これもオファー数（社長の画面の 1+1=2 がまさにこれ）</td></tr>
+<tr><td><code>stats.buyBoxSellerId</code></td><td>カート獲得者1社</td><td>1社しか分からない</td></tr>
+</tbody></table>
+<blockquote><strong>Product Finder には distinct seller のフィルタがありません。</strong> よって<br>「Finder で COUNT_NEW 2〜6 に粗く絞る → 詳細取得 → 段1・段2 → <strong>通った行だけ offers で実セラー確定</strong>」<br>という二段構えが必要です。</blockquote>
+<h3>3-2. トークン単価（実測 2026-08-24 / domain=5）〔実測〕</h3>
+<table><thead><tr><th>リクエスト</th><th>単価</th></tr></thead><tbody>
+<tr><td><code>/product</code>（stats 付き・offers なし）</td><td><strong>1 トークン/件</strong></td></tr>
+<tr><td><code>/product?offers=20</code></td><td><strong>約5.6 トークン/件</strong></td></tr>
+<tr><td><code>/seller</code>（100 ID まで1リクエスト）</td><td><strong>1 トークン/ID</strong></td></tr>
+<tr><td><code>/token</code>（残高確認）</td><td>0</td></tr>
+</tbody></table>
+<p>offers は素の product の<strong>約6倍</strong>。GO 2,383件すべてに掛けると約13,400トークン＝<br>補充20/分で <strong>約11時間</strong>。だから「段1・段2 を通った行だけ・良い順に上から必要な分だけ」<br>掛ける設計にしました。</p>
+<hr>
+<h2>4. 対策② — D1〜D4（サトルの公式突合）を同じ修正に折り込み</h2>
+<h3>D1 ★★★「過去1年最安値」が実際は「全期間の最安値」だった — さらに落とし穴付き</h3>
+<p><strong>一次の誤り</strong>: <code>stats.min[1]</code> は公式定義で「<strong>これまでに記録された</strong>最安値」。<code>stats=365</code> と無関係でした。<br><strong>二次の落とし穴</strong>: では <code>minInInterval[1]</code>（365日）に替えればよいかというと、<strong>替えられません</strong>。<br>公式（product-object / changelog）によれば <code>NEW</code> 系列は<br><strong>2026-02-23 より前＝出品価格（listing price）／以降＝着地価格（＝出品価格＋送料）</strong>と、<br><strong>同じ列の中で意味が変わっています</strong>。今日は 2026-08-24 なので 365日窓は必ず境界をまたぎ、<br><strong>前半が送料抜き・後半が送料込みの混在データの最小値</strong>になります。</p>
+<p><strong>採用した実装</strong></p>
+<table><thead><tr><th>列</th><th>中身</th></tr></thead><tbody>
+<tr><td><strong><code>過去最安値(送料込・2026-02-23以降)</code></strong></td><td><strong>主軸</strong>。保存済み raw の <code>csv[1]</code> から、境界以降に記録されたデータ点だけで自前計算〔0トークン〕</td></tr>
+<tr><td><code>参考_365日最安(価格定義混在)</code></td><td><code>minInInterval[1]</code>。捨てずに残す</td></tr>
+<tr><td><code>価格定義混在</code></td><td>365日窓が境界の両側にデータ点を持つ行＝<code>はい</code>（<strong>4,002行中 3,866行</strong>）</td></tr>
+<tr><td><code>採用窓</code></td><td><code>2026-02-23以降</code>（3,915行）／<code>繰越(境界後の記録なし)</code>（87行）</td></tr>
+<tr><td><code>窓差率%</code></td><td>（主軸 − 365日窓）÷ 365日窓</td></tr>
+</tbody></table>
+<p><strong>損益分岐仕入れ値・損益分岐仕入れ値_精緻・仕入れ掛け率上限% は、すべて主軸の値で計算し直しました。</strong></p>
+<h4>D1 で数字がどちらにどれだけ振れたか（社長が誤解しないための数字）〔実測〕</h4>
+<p>窓を約6ヶ月に狭めたので、<strong>「1年の底値」より高い最安値</strong>になります。<br>→ <strong>損益分岐仕入れ値は「甘く（高く）」出る方向</strong>に振れます。修正前（全期間最安＝安全側に偏りすぎ）とは逆方向です。</p>
+<p><code>窓差率%</code> の分布（4,002行全件）:</p>
+<table><thead><tr><th>窓差率</th><th>件数</th><th>割合</th></tr></thead><tbody>
+<tr><td><strong>0%（同値・振れていない）</strong></td><td><strong>2,406件</strong></td><td><strong>60.1%</strong></td></tr>
+<tr><td>0〜5%</td><td>392件</td><td>9.8%</td></tr>
+<tr><td>5〜10%</td><td>372件</td><td>9.3%</td></tr>
+<tr><td>10〜25%</td><td>461件</td><td>11.5%</td></tr>
+<tr><td>25〜50%</td><td>179件</td><td>4.5%</td></tr>
+<tr><td>50%超</td><td>192件</td><td>4.8%</td></tr>
+</tbody></table>
+<blockquote><strong>6割の行は1円も動いていません。</strong> 影響が出たのは 1,596件、うち <strong>差が10%超は 832件</strong>です。<br><strong>この832件だけを人が見ればよい</strong>（＝境界より前にだけ深い底があった行）。<br>クリーン版 top100 に限れば、<strong>0%が79件・10%超は15件</strong>です。</blockquote>
+<h4>D1 追加検証: 「FBA のみの行なら365日窓を使ってよいのでは？」→ <strong>実測して不採用にしました</strong></h4>
+<p>送料が0なら境界前後で値は変わらないはず、という推論を<strong>実測で検証</strong>しました（0トークン）。</p>
+<table><thead><tr><th>群</th><th>件数</th><th>比較可能</th><th>365日窓と境界後窓が<strong>一致</strong></th></tr></thead><tbody>
+<tr><td>FBM オファー無し（<code>csv[35]</code> 最終値 = -1）</td><td>199件</td><td>198件</td><td><strong>117件（59.1%）</strong></td></tr>
+<tr><td>FBM オファーあり</td><td>3,363件</td><td>3,283件</td><td>1,919件（58.5%）</td></tr>
+<tr><td>判定不能（<code>csv[35]</code> 系列なし）</td><td>440件</td><td>434件</td><td>318件（73.3%）</td></tr>
+</tbody></table>
+<p><strong>FBM 無し群の一致率 59.1% は、FBM あり群 58.5% とほぼ同じでした。</strong><br>つまり <strong>FBM が無いことは何の保証にもなりません</strong>（不一致の主因は送料ではなく、<br>「境界より前の期間にだけ深い底があった」という窓の狭まりそのもの）。<br>→ <strong>追加2は不採用。全行を 2026-02-23 以降窓で統一しました。</strong></p>
+<h3>D2 ★★★「BuyBox価格」列は Buy Box 価格ではなかった</h3>
+<p><code>stats.buyBoxPrice</code> は <code>offers</code> / <code>buybox</code> パラメータ付きでしか設定されません。<br>Phase2 はどちらも付けていないため、**実際に入っていたのは常にフォールバックの <code>current[1]</code><br>（＝NEW＝新品最安・2026-02-23 以降は送料込みの着地価格）**でした。</p>
+<p>→ <strong>(a) 列名を <code>新品最安値(送料込)</code> に改める</strong>を採用しました（<strong>0トークン・0円</strong>）。<br><code>仕入れ掛け率上限%</code> の分母はこの列です（＝「いま並んでいる売値の何%まで出せるか」）。</p>
+<blockquote><strong>(b) 案の見積り（社長が後で選べるように残します）</strong>: <code>buybox=1</code> を付けると<br><strong>+2トークン/件</strong>。3,000件で <strong>6,000トークン</strong>、補充20/分で <strong>約5時間</strong>。<br>本当の Buy Box 価格（送料別・<code>buyBoxShipping</code> が別フィールド）が取れます。<br>現時点では<strong>採っていません</strong>。掛け率の分母として使うなら「送料別」であることを<br>計算式に反映する必要があり、修正の範囲が広がるためです。</blockquote>
+<h3>D3 ★★ Amazon 本体判定が一時在庫切れの本体を取りこぼしていた</h3>
+<p><code>current_AMAZON = -1</code> は「<strong>今この瞬間 Amazon 価格が無い</strong>」であって「Amazon が出品していない」ではありません。<br>専用フィールド <code>availabilityAmazon</code>（<strong>-1 = Amazon のオファーが存在しない</strong> / 0=在庫あり / 1=予約 / 2=不明 / 3=入荷待ち / 4=出荷遅延）を使います。</p>
+<p>→ <code>evaluate()</code> に <strong><code>availabilityAmazon != -1</code> なら「Amazon本体あり」で除外</strong>を追加〔0トークン・後段フィルタ〕。<br>　 Finder ペイロードにも <code>&quot;availabilityAmazon&quot;: -1</code> を追記（<strong>次回スキャン用</strong>。今回は再クエリしていません）。</p>
+<p><strong>効果〔実測〕: 保存済み 4,002行のうち 20件が新たに除外されました。</strong><br>社長方針「Amazon が出品している商品は除外」（2026-08-17）への取りこぼしが、実際に20件あったということです。</p>
+<h3>D4 ★★「想定月販」の分母が COUNT_NEW のままだった</h3>
+<p><code>est_monthly = drops30 / (COUNT_NEW + 1)</code> → <strong><code>drops30 / (実セラー数 + 1)</code></strong> に修正。</p>
+<ul><li>実セラー数が取得済みの行は <strong>実セラー数</strong> を使用</li><li>未取得の行は従来どおり COUNT_NEW を使用し、<strong><code>分母の根拠</code> 列</strong>（<code>実セラー数</code> / <code>COUNT_NEW(未検証)</code>）で必ず区別できるようにしました</li><li><strong>クリーン版 top100 は 100件すべてが <code>実セラー数</code> 基準</strong>です（混在していません）</li></ul>
+<blockquote>この修正が <strong>top100 の並び順そのものを変えます</strong>（top100 は消化月数の昇順のため）。次章。</blockquote>
+<hr>
+<h2>5. 修正前と修正後で、top100 はどれだけ変わったか〔実測〕</h2>
+<p><strong>ここが社長のご質問「前のリストはどれだけ信用できなかったのか」への直接の答えです。</strong></p>
+<table><thead><tr><th>比較</th><th>結果</th></tr></thead><tbody>
+<tr><td>修正前 top100 のうち <strong>最終 top100 に残った</strong></td><td><strong>64件</strong></td></tr>
+<tr><td><strong>入れ替わった</strong></td><td><strong>36件</strong></td></tr>
+<tr><td>残った64件のうち <strong>順位が20位以上動いた</strong></td><td><strong>21件</strong></td></tr>
+<tr><td>順位変動の絶対値</td><td><strong>中央値 15位 / 最大 33位</strong></td></tr>
+<tr><td><strong>1位</strong></td><td><code>B0FPB5DSB4</code>（Anker 充電器） → <strong><code>B0GK7MN552</code></strong>（Kemeskin 骨伝導イヤホン）に<strong>交代</strong></td></tr>
+</tbody></table>
+<p><strong>入れ替わった36件が落ちた理由</strong>〔実測〕</p>
+<table><thead><tr><th>理由</th><th>件数</th></tr></thead><tbody>
+<tr><td>実セラー数 1（＝実質1社の独占。卸している証拠なし）</td><td>34件</td></tr>
+<tr><td>実セラー数 0（生存新品オファーなし）</td><td>1件</td></tr>
+<tr><td>判定は GO のままだが、D4 の分母修正で順位が100位圏外へ</td><td>1件</td></tr>
+</tbody></table>
+<p><strong>読み方（正直に）</strong></p>
+<ul><li><strong>顔ぶれの入れ替わり36件は、ほぼ全部が COUNT_NEW 問題</strong>です。D1〜D4 は顔ぶれをほとんど変えていません。</li><li><strong>一方で「並び順」は D4 が大きく動かしました。</strong> 残った64件の中央値が15位ぶん動いています。</li></ul>
+<p>  <strong>「上から順に当たっていく」使い方をしていた場合、前のリストの順序は信用できません。</strong></p>
+<ul><li>ただし <strong>「売れている商品を拾う」という当たり自体は外していません</strong>。</li></ul>
+<p>  最終 top100 の消化月数レンジは <strong>0.61〜1.00ヶ月</strong>で、修正前（0.62〜0.94）とほぼ同じ水準です。<br>  <strong>拾った棚は正しく、その中の並べ方と3分の1の選別が間違っていた</strong>、というのが正確な評価です。</p>
+<hr>
+<h2>6. クリーンな候補リスト</h2>
+<p><strong><code>candidates_v13_top100_clean.csv</code> — 100件ちょうど。水増しはしていません。</strong></p>
+<table><thead><tr><th>指標</th><th>値</th></tr></thead><tbody>
+<tr><td>件数</td><td><strong>100件</strong>（GO 母集団から補充して充足）</td></tr>
+<tr><td>実セラー数</td><td><strong>2社:91件 / 3社:9件</strong>（全件が実測済み・2以上）</td></tr>
+<tr><td><code>分母の根拠</code></td><td><strong>100件すべて <code>実セラー数</code></strong>（未検証行の混入なし）</td></tr>
+<tr><td><code>採用窓</code></td><td><code>2026-02-23以降</code> 99件 / <code>繰越(境界後の記録なし)</code> 1件</td></tr>
+<tr><td>消化月数</td><td><strong>0.61 〜 1.00ヶ月</strong></td></tr>
+<tr><td>メーカー直販フラグ</td><td>50件（除外していません。列で見えるようにしただけです）</td></tr>
+<tr><td>規模フラグ</td><td>中小候補 90件 / 大手・海外疑い 10件</td></tr>
+<tr><td>窓差率%</td><td>0%（振れなし）79件 / 10%超 15件</td></tr>
+</tbody></table>
+<p><strong>充足の根拠〔実測〕</strong>: クリーン版の足切りは消化月数 <strong>1.00</strong>。<br>GO 2,383件のうち <strong>実セラー未検証で消化月数 1.00 以下の行は 0件</strong>です。<br>つまり<strong>「実は上位に来るはずだった未検証の商品」は残っていません</strong>。上位から順に検証を進め、<br>足切りを跨ぐ行が無くなるまで潰しました（実セラー検証済み 355件）。</p>
+<blockquote><strong>残る限界（正直に）</strong>: 実セラー数を実測したのは <strong>4,002行中 355件</strong>だけです。<br>それ以外の行の <code>実セラー数</code> 列は空で、<code>分母の根拠</code> は <code>COUNT_NEW(未検証)</code> のままです。<br><strong>top100 を作る目的には十分</strong>ですが、「GO 2,383件のリスト全体」を信用してはいけません。<br>全件を確定させるには約13,400トークン（<strong>約11時間</strong>）かかります。</blockquote>
+<hr>
+<h2>7. T-20260804-001（メーカー台帳）への波及〔報告のみ・未修正〕</h2>
+<p><strong>同じ欠陥があります。しかも根本原因は共有アダプタです。</strong></p>
+<pre><code>workspace/output/agent_output/T-20260521-005/code/adapters/amazon_data.py
+  def _pick_offer_count(stats):
+      &quot;&quot;&quot;新品出品オファー数（相乗り出品者数の代理）。stats.current[11]=COUNT_NEW。&quot;&quot;&quot;
+                          ^^^^^^^^^^^^^^^^^^^^^^ ここが誤り</code></pre>
+<ul><li><code>maker_scan.py</code>（T-20260804-001）の基準②は <strong>「FBAライバルセラー2人以上（current_COUNT_NEW&gt;=2）」</strong></li></ul>
+<p>  とコメントにもそのまま書かれています。<code>AmazonProduct.offer_count</code> を使う<br>  <strong>全パイプラインが同じ誤りを引き継いでいます</strong>。</p>
+<ul><li>影響範囲の目安〔実測（CSV集計）〕: <code>maker_products.csv</code> の <code>criteria_ok = True</code> 7,764行のうち、</li></ul>
+<p>  <strong><code>rival_sellers == 2</code> が 3,788行（48.8%）</strong>。これが最も汚染されやすい帯です。</p>
+<ul><li>Googleシート「メーカー仕入れ台帳」の <code>ライバル数</code> 列、および <code>⭐月販実測あり(60商品)</code> タブの</li></ul>
+<p>  同列も同じ値です（<code>B0DWMPV656</code> の <code>2</code> がまさにそれ）。</p>
+<h3>台帳側も標本で実測しました〔実測・243トークン〕</h3>
+<p><code>maker_products.csv</code> の <code>criteria_ok = True</code> 行から <strong>40件</strong>をシード固定で無作為抽出し、<br>実セラー数を実測しました（<strong>標本です。全7,764行を測ったわけではありません</strong>）。</p>
+<table><thead><tr><th>指標</th><th>結果</th></tr></thead><tbody>
+<tr><td>標本サイズ</td><td><strong>40件</strong></td></tr>
+<tr><td><strong>実セラー数 &lt; 2</strong></td><td><strong>11件（27.5%）</strong></td></tr>
+<tr><td><code>rival_sellers</code> と実セラー数が食い違う</td><td>23件（57.5%）</td></tr>
+<tr><td><strong><code>rival_sellers == 2</code> の22件に限ると、実セラー数 &lt; 2 は</strong></td><td><strong>10件（45.5%）</strong></td></tr>
+</tbody></table>
+<blockquote><strong>交絡要因を正直に書きます。</strong> 台帳のデータは <strong>2026-08-05 取得</strong>で、今回の実測は 2026-08-24。<br><strong>19日ぶんの実際の変動が混ざっています</strong>ので、27.5% のすべてが欠陥由来とは言えません。<br>ただし v1.3 側（3日差）でも 35〜39% でしたから、<strong>欠陥が主因であることは動きません</strong>。<br><strong><code>rival_sellers == 2</code> の帯では約半分が実質1社</strong>、という結論は台帳の使い方に直結します。</blockquote>
+<p><strong>修正はしていません</strong>（本チケットの指示は報告まで）。着手するなら次の順で、別チケットが妥当です。</p>
+<ul><li>A. アダプタ <code>_pick_offer_count</code> を残しつつ <code>real_seller_count</code> を新設し、呼び出し側を移す（<strong>推奨</strong>）</li></ul>
+<p>  — 既存の呼び出しを壊さず、名前で誤読を防げる</p>
+<ul><li>B. <code>_pick_offer_count</code> を廃止して全面置換 — 影響範囲が広く、offers のトークン費用が全件に乗る</li><li>C. 台帳の <code>ライバル数</code> 列に注記だけ足す — 安いが、次に見た人がまた同じ読み違いをする</li></ul>
+<hr>
+<h2>8. 範囲外だが確認した2件（D8 / D11）— <strong>修正はしていません</strong></h2>
+<h3>D8 <code>variationCount_gte=1</code> は当たりでした 〔実測・33トークン〕</h3>
+<p>Finder に同一条件で <code>variationCount</code> だけ変えて投げ、<code>totalResults</code> を比較しました。</p>
+<table><thead><tr><th>条件</th><th>totalResults</th></tr></thead><tbody>
+<tr><td><code>variationCount</code> 指定なし（ベースライン）</td><td>647,546</td></tr>
+<tr><td><strong><code>variationCount</code> 0〜0</strong></td><td><strong>97,484</strong></td></tr>
+<tr><td><code>variationCount</code> 1〜3（現行 v1.3）</td><td>93,574</td></tr>
+</tbody></table>
+<p><strong><code>variationCount = 0</code> の商品は実在し、しかも現行フィルタが拾っている 1〜3 の帯より多い（97,484 &gt; 93,574）。</strong><br>v1.3 の <code>_gte=1</code> は、この <strong>97,484件を丸ごと落としています</strong>。<br>バリエーションを持たない単品商品はメーカー仕入れの主戦場になりうるので、<strong>母集団の作られ方が変わる論点</strong>です。</p>
+<blockquote><strong>これは母集団の設計＝方針の話なので、修正は社長／タケシの判断待ちにします。</strong><br>直すなら <code>variationCount_gte</code> を <strong>0</strong> に下げるだけ（0トークン・再スキャンは必要）。</blockquote>
+<h3>D11 レビュー件数の鮮度 → <strong>「古い」以前に、こちらでは測れないことが分かりました</strong> 〔実測・0トークン〕</h3>
+<p>保存済み raw 4,002件を調べた結果:</p>
+<table><thead><tr><th>項目</th><th>結果</th></tr></thead><tbody>
+<tr><td><code>csv[17]</code>（COUNT_REVIEWS の履歴）が存在する商品</td><td><strong>0 / 4,002件（0.0%）</strong></td></tr>
+<tr><td><code>stats.current[17]</code>（現在のレビュー件数）</td><td><strong>4,002件すべてが <code>-1</code>（データ無し）</strong></td></tr>
+<tr><td><code>csv[15]</code>（EXTRA_INFO_UPDATES＝offers 鮮度の指標）が存在する商品</td><td><strong>0 / 4,002件（0.0%）</strong></td></tr>
+</tbody></table>
+<p><strong><code>offers</code> を付けないリクエストでは、レビュー件数は履歴も現在値も一切返ってきません。</strong><br>つまり Finder の <code>current_COUNT_REVIEWS 5〜300</code> は **Keepa 内部のインデックス値だけで動いており、<br>こちらの手元データからは検証も鮮度測定もできません**。鮮度を測るには全件に <code>offers</code> を掛ける<br>（約5.6トークン/件）しかなく、<strong>それ自体が5〜11時間コース</strong>です。</p>
+<blockquote>サトルの指摘「壊れているとは言っていない。<strong>鮮度を測っていない</strong>ことを指摘している」は正確でした。<br>そして今回、<strong>測る手段が手元に無い</strong>ことまで確定しました。この論点は<br>「レビュー件数を機械ふるいの1つに使い続けるか」という方針判断に上げるべきです。</blockquote>
+<hr>
+<h2>9. 消費トークン〔実測〕</h2>
+<table><thead><tr><th>用途</th><th>トークン</th></tr></thead><tbody>
+<tr><td><code>B0DWMPV656</code> の単体調査（offers + seller）</td><td>7</td></tr>
+<tr><td>単価計測用のバッチ probe（5件）</td><td>28</td></tr>
+<tr><td><strong>top100 の全100件 offers 実測</strong></td><td><strong>553</strong></td></tr>
+<tr><td><strong>GO 母集団サンプル150件 offers 実測</strong></td><td><strong>956</strong></td></tr>
+<tr><td>クリーン top100 充足のための追加 offers（105件）</td><td>610</td></tr>
+<tr><td>セラー名の解決（<code>/seller</code> 532 ID）</td><td>532</td></tr>
+<tr><td>D8 の Finder probe（3回）</td><td>33</td></tr>
+<tr><td>T-20260804-001 台帳の標本40件 offers 実測</td><td>243</td></tr>
+<tr><td>D1 追加検証・D11 測定・全行再集計（<code>--from-raw</code>）</td><td><strong>0</strong></td></tr>
+<tr><td><strong>合計</strong></td><td><strong>約 2,962</strong></td></tr>
+</tbody></table>
+<p>所要時間は約2時間。<strong>ほぼ全部が補充待ち（20トークン/分）です。</strong><br><code>/token</code> での残高確認は0トークンなので、着手前に必ず叩いています。</p>
+<hr>
+<h2>10. 成果物</h2>
+<table><thead><tr><th>ファイル</th><th>内容</th></tr></thead><tbody>
+<tr><td><code>workspace/output/deliverables/T-20260817-005/seller_count.py</code></td><td>実セラー数の正しい数え方（新規モジュール）</td></tr>
+<tr><td><code>workspace/output/deliverables/T-20260817-005/scan_v13.py</code></td><td>修正版スキャナ（COUNT_NEW対策 ＋ D1〜D4 反映済み）</td></tr>
+<tr><td><code>workspace/output/deliverables/T-20260817-005/candidates_v13_top100_clean.csv</code></td><td><strong>クリーン版 top100（100件）</strong></td></tr>
+<tr><td><code>workspace/output/deliverables/T-20260817-005/candidates_v13.csv</code></td><td>全4,002行を再評価（新列を追加）</td></tr>
+<tr><td><code>workspace/output/deliverables/T-20260817-005/seller-count-defect-report.md</code> / <code>.html</code></td><td>本資料</td></tr>
+</tbody></table>
+<p>修正前の CSV は <code>workspace/output/agent_output/T-20260817-005/</code> に退避してあります<br>（<code>*.pre-sellerfix</code> ＝ 全修正前、<code>*.countnew-only.csv</code> ＝ COUNT_NEW 修正のみ）。</p>
+<p><strong>Googleシートへの書き込みは行っていません</strong>（差し替えの可否は社長判断待ちのため）。</p>
+<h3>CSV の列で変わったもの（シート差し替え時の注意）</h3>
+<table><thead><tr><th>旧</th><th>新</th></tr></thead><tbody>
+<tr><td><code>出品者数</code></td><td><strong><code>新品オファー数</code></strong>（＋ <code>実セラー数</code> / <code>セラー名一覧</code> / <code>メーカー直販フラグ</code> を新設）</td></tr>
+<tr><td><code>BuyBox価格</code></td><td><strong><code>新品最安値(送料込)</code></strong></td></tr>
+<tr><td><code>過去1年最安値</code></td><td><strong><code>過去最安値(送料込・2026-02-23以降)</code></strong>（＋ <code>参考_365日最安(価格定義混在)</code> / <code>価格定義混在</code> / <code>採用窓</code> / <code>窓差率%</code> を新設）</td></tr>
+<tr><td>（なし）</td><td><strong><code>分母の根拠</code></strong>（想定月販の分母が実セラー数か COUNT_NEW か）</td></tr>
+</tbody></table></div></body></html>
