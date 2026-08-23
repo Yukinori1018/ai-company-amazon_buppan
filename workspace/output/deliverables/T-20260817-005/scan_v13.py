@@ -125,7 +125,7 @@ FIELDS = [
     "月間ドロップ数", "月間販売数", "出品者数", "BuyBox価格", "過去1年最安値",
     "損益分岐仕入れ値", "損益分岐仕入れ値_精緻", "仕入れ掛け率上限%",
     "想定月販", "消化月数", "消化月数_ロット5", "FBAサイズ区分", "外注費", "規模フラグ",
-    "段1回転", "段2値下げ耐性", "判定", "見送り理由", "出品制限チェック", "Amazonページリンク",
+    "段1回転", "段2値下げ耐性", "判定", "見送り理由", "出品制限チェック", "Amazonページ",
 ]
 
 
@@ -323,7 +323,7 @@ def evaluate(product: dict, preset: str) -> dict:
         "規模フラグ": ("大手/海外疑い" if BIG_BRAND_HINTS.search(f"{brand} {maker} {title}")
                   else "中小候補"),
         "出品制限チェック": "",
-        "Amazonページリンク": f"https://www.amazon.co.jp/dp/{asin}",
+        "Amazonページ": f"https://www.amazon.co.jp/dp/{asin}",
     }
 
     # ---- 段0: 機械ふるい（Finder の取りこぼしをここで潰す）----

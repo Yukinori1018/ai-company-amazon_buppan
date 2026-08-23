@@ -17,7 +17,7 @@ MAKER_CSV = OUT / "maker_ledger.csv"
 SUMMARY = OUT / "maker_summary.json"
 
 MAKER_HEAD = ["メーカー名", "ブランド", "商品数", "3基準クリア数", "月販合計",
-              "カテゴリ", "代表ASIN", "代表商品リンク", "価格帯(最小)", "価格帯(最大)",
+              "カテゴリ", "代表ASIN", "Amazonページ", "価格帯(最小)", "価格帯(最大)",
               "規模フラグ", "メーカー電話", "メーカーメール", "メーカーHP", "備考"]
 MAKER_KEYS = ["maker", "brands", "n_products", "n_criteria_ok", "sum_monthly",
               "categories", "top_asin", "_top_link", "price_min", "price_max",
@@ -26,7 +26,7 @@ MAKER_KEYS = ["maker", "brands", "n_products", "n_criteria_ok", "sum_monthly",
 PROD_HEAD = ["ASIN", "商品名", "カテゴリ", "Amazon価格", "想定仕入価格(税込上限)",
              "想定純利益", "利益率%", "メーカー名", "ブランド", "月販数", "ライバル数",
              "ランク", "サイズ", "Amazon本体", "メーカー電話", "メーカーメール",
-             "メーカーHP", "規模フラグ", "3基準OK", "備考", "Amazonリンク"]
+             "メーカーHP", "規模フラグ", "3基準OK", "備考", "Amazonページ"]
 PROD_KEYS = ["asin", "name", "category", "amazon_price", "buy_target_incl",
              "net_at_target", "margin_pct", "manufacturer", "brand", "monthly_sales",
              "rival_sellers", "sales_rank", "size", "amazon_oos", "maker_tel",

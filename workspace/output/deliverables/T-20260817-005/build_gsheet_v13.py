@@ -19,6 +19,14 @@ CRED = "/Users/yukinori/.config/claude-session-sheets/credentials.json"
 SHEET_ID = "1y1e15tdhm_o5-RfZxKIer96CWpijVPFUfIbK-W7q7X4"
 OUT = Path(__file__).resolve().parent
 CSV_PATH = OUT / "candidates_v13_top100.csv"
+
+# シート上のヘッダー名の正規化（旧列名 → 統一名）。2026-08-23 社長指示。
+# 元CSVの列名が旧世代でも、シートには必ず統一名で書き出す。
+HEADER_ALIAS = {
+    "Amazonページリンク": "Amazonページ",
+    "Amazonリンク": "Amazonページ",
+    "代表商品リンク": "Amazonページ",
+}
 URL_OUT = OUT / "sheet_url_v13.txt"
 
 PREFIX = "v13_"
@@ -96,7 +104,9 @@ def main():
         rows = list(reader)
 
     # 列構成: No + 元CSV27列 + リスク区分（カテゴリの直後に置くと見やすいので末尾ではなく前方へ）
-    header = ["No", "リスク区分"] + src_cols
+    # 2026-08-23: 社長指示「Amazonページで統一」。旧世代CSV（列名 `Amazonページリンク`）を
+    # 食わせても、シート上のヘッダーは必ず `Amazonページ` になるよう正規化する。
+    header = ["No", "リスク区分"] + [HEADER_ALIAS.get(c, c) for c in src_cols]
     data = []
     counts = {"リチウム/PSE": 0, "要確認": 0, "": 0}
     for i, r in enumerate(rows, start=1):
