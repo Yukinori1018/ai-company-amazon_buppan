@@ -29,7 +29,7 @@ TARGET_EXT = (".html", ".xml", ".txt")
 
 QUESTIONS = [
     ("DOMAIN", "独自ドメイン ※ https:// や www. は不要", "satoy-select.com", True),
-    ("OWNER_NAME", "代表者のお名前（例: 佐藤 幸則）", "", True),
+    ("OWNER_NAME", "代表者のお名前（姓と名の間に全角スペース）", "", True),
     ("ADDRESS", "所在地", "〒146-0091 東京都大田区鵜の木2-47-20 303号", True),
     ("EMAIL", "メールアドレス ※サイトには載りません。メーカー様へお渡しする会社概要PDFにのみ使います", "", True),
     ("TEL", "電話番号（050番号で構いません／未取得なら空エンターでスキップ）", "", False),
