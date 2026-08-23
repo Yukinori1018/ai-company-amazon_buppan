@@ -49,8 +49,23 @@
 <body>
 <div class="wrap">
 
-<h1>Keepa実務ナレッジ（うみぞう動画）<br>裏どり結果と当社への適用 <span style="font-size:17px">v1.1</span></h1>
-<p class="sub">検証・統括カズヨ ／ T-20260817-004 ／ 2026-08-17（v1.1 で社長回答を反映） ／ 原本＝<code>docs/reference/keepa-umizou/README.md</code></p>
+<h1>Keepa実務ナレッジ（うみぞう動画）<br>裏どり結果と当社への適用 <span style="font-size:17px">v1.2</span></h1>
+<p class="sub">検証・統括カズヨ ／ T-20260817-004 ／ 2026-08-17（v1.1 で社長回答を反映） ／ <b>2026-08-24 v1.2：サトルが公式APIドキュメントと突合し D5・D6・D7 を是正（T-20260824-001）</b> ／ 原本＝<code>docs/reference/keepa-umizou/README.md</code></p>
+
+<div class="bad">
+<b>⚠️ v1.2 訂正（2026-08-24 サトル） ── 公式一次情報との突合で3点を是正しました</b>
+<p style="margin:8px 0">T-20260824-001 で <b>Keepa 公式APIドキュメント（<code>https://keepa.com/api-docs/</code>・全30ページ）を精読</b>し、本書の記述を突き合わせました。<b>是正3件・解決1件</b>です。根拠と全体像は <code>workspace/output/deliverables/T-20260824-001/</code>（<code>keepa-glossary.md</code> §0.5 の4列対応表 ／ <code>discrepancies.md</code>）。</p>
+<div class="tw">
+<table>
+<tr><th style="width:6%">#</th><th style="width:26%">本書の記述</th><th style="width:12%">判定</th><th>正（公式定義）</th></tr>
+<tr><td><b>D5</b></td><td>「<b>↘31ドロップ/月</b>」を主軸指標として扱い、関連資料で「BSRの急落回数＝<b>推定販売件数</b>」「＝<b>売れた回数</b>」と断定</td><td><span class="ng">❌ 断定を撤回</span></td><td>公式 <code>salesRankDrops30</code>＝「直近30日間の<b>売れ筋ランキング下落の回数</b>。<b>販売を示すものとみなされる</b>（<i>considered to indicate sales</i>）」。<mark>「販売個数と等しい」とは一言も書かれていません。</mark>1回のランク更新中に複数個売れても1ドロップなので<b>構造的に過少になりうる代理指標</b>。指標として使うのは妥当だが<b>「推定販売件数」という断定形は使わない</b>（正しくは「販売の代理指標」）</td></tr>
+<tr><td><b>D6</b></td><td>関連ナレッジで <code>monthlySold</code> を「<b>月間売上予測</b>」と表記</td><td><span class="ng">❌ 誤り</span></td><td>公式：「過去1か月にこの商品が購入された回数。Amazon 検索結果の "bought past month" の値。<b>推定値ではない（It is not an estimate）</b>」。<mark>「予測」は誤りで実測値です。</mark><b>ただし但し書きが必須</b>：Amazon は <b>"10+" "100+" のような階級値でしか提供しない</b>ため <code>1000</code>＝「<b>少なくとも</b>1000回」であり、<b>大半のASINはこの値を持たない（欠測）。値はバリエーション単位</b>。「実測だから正確な数字」と読むのも同じくらい危険</td></tr>
+<tr><td><b>D7</b></td><td>「v1.3 の足切りに既に入っています（<code>current_AMAZON_gte=-1 &amp; current_AMAZON_lte=-1</code>＝本体在庫なし／<b>Amazon在庫切れ率90%以上</b>）」</td><td><span class="ng">❌ 実装に存在しない</span></td><td><code>scan_v13.py</code> の Finder ペイロードに <b><code>outOfStockPercentage90</code> 系のフィルタはありません</b>（コード全文確認）。<mark>本書が実装より強く書かれていました。</mark>さらに <code>current_AMAZON = -1</code> は「<b>今この瞬間</b> Amazon 価格が無い」の意味で「Amazon が出品していない」ではありません。専用フィールド <code>availabilityAmazon</code>（-1＝Amazonのオファーが存在しない）が公式に存在します（<code>discrepancies.md</code> D3・社長 Go 済み・タカシが修正実施）</td></tr>
+<tr class="hi"><td><b>✅</b></td><td>「新品 - 下落（直近7日間）に −99〜−30 で値上がり商品を抽出」→ 本書は「符号仕様は<b>公式ドキュメントで裏が取れず</b>。実機で1回試せば即確定」としていた</td><td><span class="ok">✅ 解決・動画が正しい</span></td><td>公式 <code>deltaPercent[1,7,30,90]_&lt;PRICE_TYPE&gt;</code>：「<b>正の値は値下がりしたものを、負の値は値上がりしたものを絞り込む</b>」。<mark>うみぞう動画の主張は公式仕様どおりで、実機テストは不要になりました。</mark>探し先（APIドキュメントの Product Finder ページ）が分かっていなかっただけです</td></tr>
+</table>
+</div>
+<p style="margin:8px 0 0"><b>併せて</b>：本書 v1.1 の「<b>APIトークンと Pro のデータ使用量クォータは別勘定</b>」という訂正は、<b class="ok">公式で正しいことを確認しました</b>（API はトークンバケットのみで制御され、公式APIドキュメントに Data Quota の記述は一切ありません）。v1.1 の判断は妥当でした。</p>
+</div>
 
 <div class="bad">
 <b>⚠️ v1.1 訂正 ── 「抽出ができなくなる」は私の誤りでした</b>
@@ -100,19 +115,19 @@
 <li><b>出品者数（新品アイテム数）</b> → <b>第3段</b>にあり、色は青紫。動画の「紫」でほぼ合っています。</li>
 <li><b>当社の旧記録「紫＝新品」も間違いではありません</b> → 第1段の「新品」も青紫系。つまり<b>「新品」と「新品アイテム数」が別パネルにあり色が似ている</b>のが混乱の正体でした。色は設定変更可なので、<b>凡例ラベル＋パネル位置で判断</b>します。</li>
 </ul>
-<p style="margin:10px 0 0">スクショの実例（縦型掃除機）は<b>当社の「サブカテゴリ順位の罠」の完璧な実例</b>でもあります ── メイン「ホーム＆キッチン <b>#187</b>」に対し、サブは「スティッククリーナー <b>#4</b>」「縦型掃除機 <b>#4</b>」。#4だけ見れば絶好調に見えます。同画面に <b>↘31ドロップ/月</b>（当社v1.3の主軸指標・基準10以上）。</p>
+<p style="margin:10px 0 0">スクショの実例（縦型掃除機）は<b>当社の「サブカテゴリ順位の罠」の完璧な実例</b>でもあります ── メイン「ホーム＆キッチン <b>#187</b>」に対し、サブは「スティッククリーナー <b>#4</b>」「縦型掃除機 <b>#4</b>」。#4だけ見れば絶好調に見えます。同画面に <b>↘31ドロップ/月</b>（当社v1.3の主軸指標・基準10以上）。<b class="ng">※ドロップ数は「販売の代理指標」であって販売個数ではありません（v1.2 訂正 D5）。</b></p>
 </div>
 
 <div class="warn">
 <b>社長のご契約（2026-08-17時点）と追加指示</b>
 <ul style="margin:8px 0 0">
 <li><b>Keepa API €49/月</b>（20トークン/分）を利用中。Pro の表示価格は €29。→ <b>€49 のみか、€29+€49=€78 の別建てかは請求明細でご確認ください</b>（€49のみなら約9,000円/月、両建てなら約14,400円/月）。</li>
-<li>「<b>Amazonが出品している商品は除外しておいた方が無難</b>」→ 仕入れ方針 v1.3 の足切りに<b>既に入っています</b>（<code>current_AMAZON_gte=-1 &amp; current_AMAZON_lte=-1</code>＝本体在庫なし／Amazon在庫切れ率90%以上）。したがって動画の利益波形②「Amazon本体あり・数十円安く出してカートを取る」パターンは<b>当社では採用しません</b>。</li>
+<li>「<b>Amazonが出品している商品は除外しておいた方が無難</b>」→ 仕入れ方針 v1.3 の足切りに<b>既に入っています</b>（<code>current_AMAZON_gte=-1 &amp; current_AMAZON_lte=-1</code>）。<b class="ng">※ここは誤りです。「Amazon在庫切れ率90%以上」の条件は実装に存在せず、<code>current_AMAZON=-1</code> も「Amazonが出品していない」ではなく「今この瞬間Amazon価格が無い」の意味です（v1.2 訂正 D7）。</b>したがって動画の利益波形②「Amazon本体あり・数十円安く出してカートを取る」パターンは<b>当社では採用しません</b>。</li>
 <li><b>(a)(b)(c) の取り込み → 社長裁可済み（Go）</b>。</li>
 </ul>
 </div>
 
-<p class="sub" style="margin-top:28px">── 以下は初版（2026-08-17）の内容。上記 v1.1 の訂正を優先してお読みください。──</p>
+<p class="sub" style="margin-top:28px">── 以下は初版（2026-08-17）の内容。上記 v1.2 / v1.1 の訂正を優先してお読みください。──</p>
 
 <div class="lead">
 <b>結論を3行で</b>
