@@ -9,17 +9,32 @@
   Phase2 詳細   : 100件バッチで product?stats=365 を取得
                   → raw JSON を必ず gzip 保存（--from-raw で **トークン0** 再フィルタ可能）
                   → 段0(機械) / 段1(回転) / 段2(値下げ耐性) を適用し 1バッチごとに CSV へ追記
+  Phase2.5 実セラー: GO 行だけに `offers` を叩いて **distinct sellerId** を実測し、
+                  `実セラー数 >= 2` を段0の必須条件として適用（2026-08-24 追加）
   Phase3 仕上げ : GO 行を「消化月数」昇順に並べ top100 CSV と summary.json を書く
 
 トークン経済（律速）:
   Finder  = 10 + ceil(件数/100) トークン（perPage=1000 なら 1000件で 20 トークン）
   product = 1 トークン/件（stats=365 の追加コストは無い＝実測確認済 2026-08-21）
+  product + offers=20 = **約5.6トークン/件**（実測 2026-08-24）。約6倍の贅沢品なので、
+  全件には掛けず「段1・段2 を通った GO 行だけ」に後段で掛ける二段構えにしている。
   残高が MIN_TOKENS を割ったら補充を待つ（落とさない・無人運転前提）
 
 使い方:
   python3 scan_v13.py                     # 通常実行（既存 CSV から再開）
   python3 scan_v13.py --target-a 3000 --target-b 2000
   python3 scan_v13.py --from-raw          # API を叩かず raw/ だけで再集計（トークン0）
+  python3 scan_v13.py --verify-sellers    # GO 行の実セラー数だけを追加取得して確定させる
+  python3 scan_v13.py --from-raw --verify-sellers  # 取得済み offers を使って0トークン再集計
+
+## 2026-08-24 の重大な修正（社長指摘）
+
+`current_COUNT_NEW`（= `stats.current[11]`）を「出品者数」として使っていたのは**誤り**。
+COUNT_NEW は **新品オファー数**であって distinct seller 数ではない。1社が FBA と FBM の
+両方に出すだけで COUNT_NEW=2 になるため、**セラー1社の独占リスティングが「相乗り2社」
+として通過していた**（top100 実測で35%が該当）。v1.3 が「出品者2〜6」を課した意図は
+「そのメーカーが実際に卸している証拠」を取ることなので、オファー数では代理にならない。
+→ `seller_count.py` で `offers` から distinct sellerId を数え、`実セラー数>=2` を必須にした。
 """
 import argparse
 import csv
@@ -48,6 +63,9 @@ for _line in open(CODE / ".env", encoding="utf-8"):
 from adapters.amazon_data import _map_category_key  # noqa: E402
 from calc import fees  # noqa: E402
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from seller_count import seller_profile  # noqa: E402  実セラー数（distinct sellerId）
+
 OUT = ROOT / "workspace/output/deliverables/T-20260817-005"
 RAW = OUT / "raw"
 OUT.mkdir(parents=True, exist_ok=True)
@@ -66,7 +84,13 @@ KEEPA_DOMAIN_JP = 5
 KEEPA_EPOCH_MIN = 21564000          # Keepa time(分) = unixtime/60 - この値
 
 RANK_MAX = 300_000                  # ランクは「足切りに使わない」＝30万位まで開放
+# COUNT_NEW（新品オファー数）の範囲。Finder の前段フィルタとしてはこれしか使えない。
+# **これは出品者数ではない**（2026-08-24 の修正参照）。実セラー数は後段 offers で確定する。
 OFFERS_MIN, OFFERS_MAX = 2, 6       # 2以上=卸している証拠 / 6以下=取り分が残る
+REAL_SELLERS_MIN = 2                # ★段0の必須条件: distinct sellerId がこれ以上
+REAL_SELLERS_MAX = 6                # 取り分が残る上限（COUNT_NEW ではなく実セラーで判定）
+OFFERS_PARAM = 20                   # /product?offers=N。COUNT_NEW<=6 前提なら20で十分
+OFFERS_CHUNK = 10                   # offers 付きはレスポンスが重いので小さめのバッチで
 REVIEWS_MIN, REVIEWS_MAX = 5, 300   # 「あまり有名でない」の機械化
 VARIATION_MIN, VARIATION_MAX = 1, 3
 TRACKING_DAYS_MIN = 180             # 追跡180日以上（データが薄い商品を弾く）
@@ -122,11 +146,17 @@ FINDER_PER_PAGE = 1000              # 実測: perPage=1000 が通る（1000件�
 
 FIELDS = [
     "preset", "ASIN", "商品名", "ブランド", "メーカー", "カテゴリ", "ランク",
-    "月間ドロップ数", "月間販売数", "出品者数", "BuyBox価格", "過去1年最安値",
+    # 「出品者数」という名前が誤読の元だったので **新品オファー数** に改名した（2026-08-24）。
+    # 実際に人が見るべきは「実セラー数」。
+    "月間ドロップ数", "月間販売数", "新品オファー数", "実セラー数", "セラー名一覧",
+    "メーカー直販フラグ", "BuyBox価格", "過去1年最安値",
     "損益分岐仕入れ値", "損益分岐仕入れ値_精緻", "仕入れ掛け率上限%",
     "想定月販", "消化月数", "消化月数_ロット5", "FBAサイズ区分", "外注費", "規模フラグ",
     "段1回転", "段2値下げ耐性", "判定", "見送り理由", "出品制限チェック", "Amazonページ",
 ]
+
+RAW_OFFERS = OUT / "raw_offers"     # offers 付きレスポンスの保存先（0トークン再集計用）
+RAW_OFFERS.mkdir(parents=True, exist_ok=True)
 
 
 # ==========================================================================
@@ -316,7 +346,11 @@ def evaluate(product: dict, preset: str) -> dict:
         "メーカー": maker, "カテゴリ": cat_label, "ランク": int(rank) if rank else "",
         "月間ドロップ数": int(drops30) if drops30 else "",
         "月間販売数": monthly_sold,
-        "出品者数": int(offers) if offers is not None else "",
+        # COUNT_NEW＝新品オファー数。**出品者数ではない**（同一セラーの FBA+FBM で2になる）。
+        "新品オファー数": int(offers) if offers is not None else "",
+        "実セラー数": "",            # Phase2.5（--verify-sellers）で埋める
+        "セラー名一覧": "",
+        "メーカー直販フラグ": "",
         "BuyBox価格": int(buybox) if buybox else "",
         "過去1年最安値": int(low_365) if low_365 else "",
         "FBAサイズ区分": size_label, "外注費": outsource,
@@ -333,7 +367,9 @@ def evaluate(product: dict, preset: str) -> dict:
     if size_label == "大型":
         reasons.append("FBA大型サイズ")
     if offers is None or not (OFFERS_MIN <= offers <= OFFERS_MAX):
-        reasons.append(f"出品者数{offers}")
+        reasons.append(f"新品オファー数{offers}")
+    # 実セラー数は段0の必須条件だが、この時点ではまだ未取得（Phase2.5 で確定する）。
+    # ここで暫定 GO にした行だけに offers を叩く二段構えにしている（トークン節約）。
     if rank is None or rank > RANK_MAX:
         reasons.append("ランク圏外")
     if not drops30 or drops30 < PRESETS[preset][2]:
@@ -401,13 +437,28 @@ def read_existing_asins() -> set:
         return {r["ASIN"] for r in csv.DictReader(f) if r.get("ASIN")}
 
 
-def write_top100() -> tuple:
-    """GO 行を消化月数の昇順で並べ、上位100件を書き出す。水増しはしない。"""
+CSV_TOP_CLEAN = OUT / "candidates_v13_top100_clean.csv"
+
+
+def write_top100(clean: bool = False) -> tuple:
+    """GO 行を消化月数の昇順で並べ、上位100件を書き出す。水増しはしない。
+
+    clean=True のときは **実セラー数が実測済みで REAL_SELLERS_MIN 以上の行だけ**を対象に
+    `candidates_v13_top100_clean.csv` を書く。未検証（実セラー数が空）の行は入れない。
+    「100件に届かないなら届かないまま出す」のがこのプロジェクトの約束。
+    """
     if not CSV_ALL.exists():
         return 0, 0
     with open(CSV_ALL, encoding="utf-8-sig") as f:
         rows = list(csv.DictReader(f))
     go = [r for r in rows if r.get("判定") == "GO"]
+    if clean:
+        def _verified(r):
+            try:
+                return int(r.get("実セラー数") or -1) >= REAL_SELLERS_MIN
+            except ValueError:
+                return False
+        go = [r for r in go if _verified(r)]
     seen, uniq = set(), []
     for r in go:                       # 念のため ASIN 重複排除
         if r["ASIN"] not in seen:
@@ -422,12 +473,194 @@ def write_top100() -> tuple:
 
     uniq.sort(key=key)
     top = uniq[:100]
-    with open(CSV_TOP, "w", newline="", encoding="utf-8-sig") as f:
+    out_path = CSV_TOP_CLEAN if clean else CSV_TOP
+    with open(out_path, "w", newline="", encoding="utf-8-sig") as f:
         w = csv.DictWriter(f, fieldnames=FIELDS)
         w.writeheader()
         for r in top:
             w.writerow({k: r.get(k, "") for k in FIELDS})
     return len(uniq), len(top)
+
+
+# ==========================================================================
+# Phase2.5: 実セラー数の確定（2026-08-24 追加）
+#
+# COUNT_NEW は新品オファー数であって出品者数ではない。v1.3 が「出品者2〜6」を課した
+# 意図は「そのメーカーが実際に卸している証拠」なので、必ず distinct sellerId で数える。
+# offers は約5.6トークン/件と高いため、段1・段2 を通った行にだけ掛ける。
+# ==========================================================================
+def keepa_products_with_offers(asins: list) -> dict:
+    """product?offers=N を1回叩く（約5.6トークン/件）。429 は待って再試行。"""
+    import requests
+    params = {"key": api_key(), "domain": KEEPA_DOMAIN_JP,
+              "offers": OFFERS_PARAM, "asin": ",".join(asins)}
+    for attempt in range(5):
+        resp = requests.get("https://api.keepa.com/product", params=params, timeout=300)
+        if resp.status_code == 429:
+            wait = min(30 * (attempt + 1), 180)
+            log(f"    429（トークン上限）→ {wait}秒待機")
+            time.sleep(wait)
+            continue
+        resp.raise_for_status()
+        return resp.json()
+    raise RuntimeError("Keepa product(offers): 429 が解消しませんでした")
+
+
+def keepa_seller_names(seller_ids: list) -> dict:
+    """sellerId → 店舗名。/seller は 1トークン/ID。100件まで1リクエスト。"""
+    import requests
+    out = {}
+    ids = [s for s in dict.fromkeys(seller_ids) if s]
+    for i in range(0, len(ids), 100):
+        batch = ids[i:i + 100]
+        wait_tokens(need=len(batch) + 20)
+        try:
+            d = requests.get("https://api.keepa.com/seller",
+                             params={"key": api_key(), "domain": KEEPA_DOMAIN_JP,
+                                     "seller": ",".join(batch)},
+                             timeout=180).json()
+        except Exception as e:
+            log(f"    seller 取得エラー: {e}")
+            continue
+        for sid, info in (d.get("sellers") or {}).items():
+            out[sid] = (info or {}).get("sellerName") or ""
+        time.sleep(0.5)
+    return out
+
+
+def _norm(text: str) -> str:
+    """ブランド名とセラー名を突き合わせるための粗い正規化。
+
+    全角英数→半角、空白・記号除去、小文字化。完全一致は狙わず「片方が片方を含む」で見る。
+    厳密一致を狙うと日本語ブランドの表記ゆれ（Ｓｅａ ｔｈｅ Ｓｔａｒｓ / seathestars）を落とす。
+    """
+    if not text:
+        return ""
+    out = []
+    for ch in text:
+        code = ord(ch)
+        if 0xFF01 <= code <= 0xFF5E:          # 全角英数記号 → 半角
+            ch = chr(code - 0xFEE0)
+        elif code == 0x3000:                   # 全角スペース
+            ch = " "
+        out.append(ch)
+    return re.sub(r"[^0-9a-z\u3040-\u30ff\u4e00-\u9fff]", "", "".join(out).lower())
+
+
+def offers_raw_path(idx: int) -> Path:
+    return RAW_OFFERS / f"offers_{idx:05d}.json.gz"
+
+
+def iter_offers_raw():
+    for path in sorted(RAW_OFFERS.glob("*.json.gz")):
+        with gzip.open(path, "rt", encoding="utf-8") as f:
+            payload = json.load(f)
+        for product in payload.get("products") or []:
+            yield product
+
+
+def verify_sellers(from_raw: bool = False, limit: int = 0) -> dict:
+    """CSV の GO 行について実セラー数を確定し、段0（実セラー数>=2）を適用する。
+
+    from_raw=True なら raw_offers/ に保存済みのぶんだけで再集計（トークン0）。
+    """
+    if not CSV_ALL.exists():
+        log("CSV が無いので実セラー検証をスキップします")
+        return {}
+    with open(CSV_ALL, encoding="utf-8-sig") as f:
+        rows = list(csv.DictReader(f))
+    # 2026-08-24 以前の CSV は列名が「出品者数」だった（＝誤読の元）。ここで吸収する。
+    for r in rows:
+        if "出品者数" in r and not r.get("新品オファー数"):
+            r["新品オファー数"] = r.pop("出品者数")
+
+    cached = {p["asin"]: p for p in iter_offers_raw() if p.get("asin")}
+
+    def _turnover(r):
+        try:
+            return float(r.get("消化月数") or 9999)
+        except ValueError:
+            return 9999.0
+
+    # 消化月数の良い順に検証する。offers は高いので「上から順に必要なぶんだけ」使う。
+    targets = sorted((r for r in rows if r.get("判定") == "GO" and r["ASIN"] not in cached),
+                     key=_turnover)
+    if limit:
+        targets = targets[:limit]
+    log(f"=== Phase2.5: 実セラー数の確定 GO={sum(1 for r in rows if r.get('判定') == 'GO')}件 "
+        f"／ 取得済み={len(cached)}件 ／ 今回取得={0 if from_raw else len(targets)}件 ===")
+
+    if not from_raw and targets:
+        idx = len(list(RAW_OFFERS.glob("*.json.gz")))
+        asins = [r["ASIN"] for r in targets]
+        for i in range(0, len(asins), OFFERS_CHUNK):
+            chunk = asins[i:i + OFFERS_CHUNK]
+            wait_tokens(need=OFFERS_CHUNK * 7 + 20)
+            try:
+                payload = keepa_products_with_offers(chunk)
+            except Exception as e:
+                log(f"    offers 取得エラー: {e}")
+                time.sleep(15)
+                continue
+            with gzip.open(offers_raw_path(idx), "wt", encoding="utf-8") as f:
+                json.dump(payload, f, ensure_ascii=False)
+            idx += 1
+            for p in payload.get("products") or []:
+                cached[p["asin"]] = p
+            log(f"  offers {i + len(chunk)}/{len(asins)} consumed={payload.get('tokensConsumed')} "
+                f"tokensLeft={payload.get('tokensLeft')}")
+            time.sleep(0.5)
+
+    # --- セラー名の解決（実セラー数=1 の行だけで十分だが、列に出すため全件引く）---
+    need_ids = []
+    for r in rows:
+        p = cached.get(r["ASIN"])
+        if p:
+            need_ids.extend(seller_profile(p)["seller_ids"])
+    # セラー名は一度引いたらローカルに貯める（1トークン/ID。二度引かない）
+    names_path = RAW_OFFERS / "seller_names.json"
+    names = json.loads(names_path.read_text(encoding="utf-8")) if names_path.exists() else {}
+    missing = [sid for sid in dict.fromkeys(need_ids) if sid not in names]
+    if missing and not from_raw:
+        log(f"  セラー名を取得: {len(missing)}件（1トークン/件・既知 {len(names)}件はスキップ）")
+        names.update(keepa_seller_names(missing))
+        names_path.write_text(json.dumps(names, ensure_ascii=False, indent=1), encoding="utf-8")
+
+    # --- 判定へ反映 ---
+    stat = {"verified": 0, "lt_min": 0, "gt_max": 0, "maker_direct": 0}
+    for r in rows:
+        p = cached.get(r["ASIN"])
+        if not p:
+            continue
+        sp = seller_profile(p)
+        stat["verified"] += 1
+        r["実セラー数"] = sp["real_sellers"]
+        r["セラー名一覧"] = " / ".join(names.get(sid, sid) for sid in sp["seller_ids"])
+        brand = _norm(r.get("ブランド", "")) or _norm(r.get("メーカー", ""))
+        seller_norms = [_norm(names.get(sid, "")) for sid in sp["seller_ids"]]
+        direct = bool(brand and any(
+            n and (brand in n or n in brand) for n in seller_norms))
+        r["メーカー直販フラグ"] = "メーカー直販" if direct else ""
+        if direct and sp["real_sellers"] == 1:
+            stat["maker_direct"] += 1
+        reasons = [x for x in (r.get("見送り理由") or "").split(" / ") if x]
+        if sp["real_sellers"] < REAL_SELLERS_MIN:
+            reasons.append(f"実セラー数{sp['real_sellers']}（卸している証拠なし）")
+            stat["lt_min"] += 1
+        elif sp["real_sellers"] > REAL_SELLERS_MAX:
+            reasons.append(f"実セラー数{sp['real_sellers']}（相乗り過多）")
+            stat["gt_max"] += 1
+        r["見送り理由"] = " / ".join(reasons)
+        r["判定"] = "GO" if not reasons else "見送り"
+
+    with open(CSV_ALL, "w", newline="", encoding="utf-8-sig") as f:
+        w = csv.DictWriter(f, fieldnames=FIELDS)
+        w.writeheader()
+        for r in rows:
+            w.writerow({k: r.get(k, "") for k in FIELDS})
+    log(f"  実セラー確定={stat['verified']}件 / 実セラー<{REAL_SELLERS_MIN}で落選={stat['lt_min']}件 "
+        f"/ 上限超過={stat['gt_max']}件 / メーカー直販独占={stat['maker_direct']}件")
+    return stat
 
 
 # ==========================================================================
@@ -472,10 +705,26 @@ def main() -> None:
     ap.add_argument("--target-a", type=int, default=3000)
     ap.add_argument("--target-b", type=int, default=2000)
     ap.add_argument("--from-raw", action="store_true")
+    ap.add_argument("--verify-sellers", action="store_true",
+                    help="GO 行の実セラー数（distinct sellerId）を offers から確定する")
+    ap.add_argument("--verify-limit", type=int, default=0,
+                    help="実セラー検証の件数上限（0=全件）")
     args = ap.parse_args()
 
     if args.from_raw:
         run_from_raw()
+        if args.verify_sellers:
+            verify_sellers(from_raw=True)
+            write_top100()
+            write_top100(clean=True)
+        return
+    if args.verify_sellers and CSV_ALL.exists():
+        # 既存 CSV に対して実セラー検証だけを追加で走らせるモード
+        verify_sellers(from_raw=False, limit=args.verify_limit)
+        n_go, n_top = write_top100()
+        n_go_c, n_top_c = write_top100(clean=True)
+        log(f"実セラー検証後: GO {n_go}件 / top100 {n_top}件 "
+            f"／ 実セラー確定済みGO {n_go_c}件 / clean top100 {n_top_c}件")
         return
 
     t0 = time.time()
@@ -535,8 +784,12 @@ def main() -> None:
                 f"GO累計={stat['go']} tokensLeft={payload.get('tokensLeft')}")
             time.sleep(0.3)
 
+    # ---- Phase2.5: 実セラー数の確定（段0の必須条件）----
+    seller_stat = verify_sellers(from_raw=False)
+
     # ---- Phase3 ----
     n_go, n_top = write_top100()
+    write_top100(clean=True)
     tokens_end = token_status().get("tokensLeft", 0)
     elapsed = time.time() - t0
     # 消費トークン = 実測の残高差 + 経過時間ぶんの補充分（補充を待ちながら走るため）
@@ -574,12 +827,15 @@ def main() -> None:
             "外注費(サイズ別)": OUTSOURCE_COST,
             "過去1年最安値の定義": "Keepa stats(365日) の NEW(新品最安, index=1) の最小値",
             "FBA標準サイズ": "45x35x20cm かつ 9kg 以内。超過は大型として除外。寸法欠落は『不明』で残す",
+            "出品者数の定義": ("distinct sellerId（生存中の新品オファーのみ）。"
+                        "COUNT_NEW は新品オファー数であり出品者数ではない（2026-08-24 修正）"),
         },
         "counts": {
             "detail_fetched": stat["fetched"],
             "rows_written": len(all_rows),
             "go": n_go,
             "top100_written": n_top,
+            "seller_verification": seller_stat,
         },
         "reject_reasons": dict(sorted(reasons.items(), key=lambda kv: -kv[1])),
         "outputs": {
