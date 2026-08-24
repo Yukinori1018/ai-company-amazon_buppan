@@ -1,0 +1,131 @@
+<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Keepa monthlySold の実データ分布 — T-20260824-003</title><style>
+:root{--fg:#1b1b1b;--mut:#5c6470;--line:#d8dee6;--bg:#fff;--accent:#256a93;--warn:#fff7e6}
+*{box-sizing:border-box}
+body{font-family:-apple-system,"Hiragino Sans","Yu Gothic",Meiryo,sans-serif;line-height:1.85;
+color:var(--fg);background:#eef1f4;margin:0;padding:0 16px 80px;-webkit-text-size-adjust:100%}
+.wrap{max-width:1180px;margin:0 auto;background:var(--bg);padding:44px 52px 64px;
+box-shadow:0 1px 4px rgba(0,0,0,.09)}
+h1{font-size:1.9em;border-bottom:4px solid var(--accent);padding-bottom:.4em;margin-top:0}
+h2{font-size:1.4em;margin-top:2.4em;border-left:7px solid var(--accent);padding:.2em .6em;background:#f2f6f9}
+h3{font-size:1.15em;margin-top:1.9em;border-bottom:1px solid var(--line);padding-bottom:.25em}
+h4{font-size:1.02em;margin-top:1.5em;color:var(--accent)}
+table{border-collapse:collapse;width:100%;margin:1.1em 0;font-size:.9em;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:.5em .7em;text-align:left;vertical-align:top}
+th{background:#eaf0f5;font-weight:600;white-space:nowrap}
+tbody tr:nth-child(even){background:#fafbfc}
+code{background:#eef1f4;padding:.12em .4em;border-radius:3px;font-size:.87em;
+font-family:"SF Mono",Menlo,Consolas,monospace;word-break:break-all}
+blockquote{border-left:5px solid #f0a63a;background:var(--warn);margin:1.2em 0;padding:.9em 1.2em;color:#4a3c22}
+blockquote p{margin:.35em 0}
+hr{border:0;border-top:1px solid var(--line);margin:2.4em 0}
+a{color:var(--accent)}
+.meta{color:var(--mut);font-size:.9em;margin:.6em 0 2em}
+.toc{background:#f4f7f9;border:1px solid var(--line);padding:1em 1.6em;margin:1.6em 0}
+.toc a{text-decoration:none}
+ul,ol{padding-left:1.5em}
+@media(max-width:760px){.wrap{padding:22px 16px 40px}body{padding:0 6px 40px}th{white-space:normal}}
+</style></head>
+<body><div class="wrap">
+<h1>Keepa <code>monthlySold</code> の実データ分布 — 「月50個以上にしか出ない」の再検証</h1>
+<ul>
+<li>チケット: T-20260824-003（親 T-20260824-001）</li>
+<li>実施: 2026-08-24 / タカシ（IT エンジニア）</li>
+<li>データ: <code>workspace/output/deliverables/T-20260817-005/raw/*.json.gz</code>（41ファイル・2026-08-21 の本走の生レスポンス）</li>
+<li><strong>Keepa API は1回も叩いていません（消費トークン 0）。</strong> 保存済み raw JSON のみで完結。</li>
+<li>再現: <code>python3 analyze_monthly_sold.py --repo-root &quot;/path/to/ai-company-amazon_buppan&quot;</code></li>
+</ul>
+<hr>
+<h2>結論（先に3行）</h2>
+<p>1. <strong>値は完全に階級値でした。</strong> 4,002 ASIN の現在値に出た値は 11 種類のみ（<code>50, 100, 200, …, 1000</code>）。連続値は1つもありません。公式定義「&quot;10+&quot; &quot;100+&quot; のような区切られた範囲でしか提供しない」と<strong>完全に一致</strong>。</p>
+<p>2. <strong>欠測は 66.5%（2,663/4,002）。</strong> 公式定義「大半のASINには値が無い」も一致。しかも当社データは*回転の速い商品だけに絞った母集団*なので、Amazon 全体ではもっと欠測が多いはずです。</p>
+<p>3. <strong>「月50個以上の商品にしか出ない」は、スナップショットとしては正しく、フィールドの性質としては誤りでした。</strong> 現在値の最小は確かに 50 ですが、<strong>同じ商品の <code>monthlySoldHistory</code> には 10 / 20 / 30 / 40 が実在します</strong>（1〜49 を履歴に持つ ASIN が 4,002 件中 <strong>1,732 件</strong>）。50 は Keepa の下限ではなく、<strong>この時期のたまたまの下限</strong>です。<code>&gt;= 50</code> を前提にしたコードを書いてはいけません。</p>
+<hr>
+<h2>1. 現在値（<code>monthlySold</code>）の分布</h2>
+<table><thead><tr><th>項目</th><th>実測</th></tr></thead><tbody>
+<tr><td>ユニーク ASIN 数</td><td><strong>4,002</strong></td></tr>
+<tr><td><code>monthlySold</code> キーなし（欠測）</td><td><strong>2,663（66.5%）</strong></td></tr>
+<tr><td>キーはあるが <code>null</code></td><td>0</td></tr>
+<tr><td>値 <code>0</code> / 負値</td><td><strong>0 件 / なし</strong> ← 欠測は「0 や -1」ではなく<strong>キーごと存在しない</strong>形で表現される</td></tr>
+<tr><td>値を持つ ASIN</td><td><strong>1,339（33.5%）</strong></td></tr>
+<tr><td><strong>最小値 / 最大値</strong></td><td><strong>50 / 1000</strong></td></tr>
+</tbody></table>
+<table><thead><tr><th><code>monthlySold</code></th><th>件数</th><th>値ありのうち</th></tr></thead><tbody>
+<tr><td><strong>50</strong></td><td><strong>779</strong></td><td><strong>58.2%</strong></td></tr>
+<tr><td>100</td><td>350</td><td>26.1%</td></tr>
+<tr><td>200</td><td>111</td><td>8.3%</td></tr>
+<tr><td>300</td><td>43</td><td>3.2%</td></tr>
+<tr><td>400</td><td>18</td><td>1.3%</td></tr>
+<tr><td>500</td><td>18</td><td>1.3%</td></tr>
+<tr><td>600</td><td>7</td><td>0.5%</td></tr>
+<tr><td>700</td><td>6</td><td>0.4%</td></tr>
+<tr><td>800</td><td>1</td><td>0.1%</td></tr>
+<tr><td>900</td><td>1</td><td>0.1%</td></tr>
+<tr><td>1000</td><td>5</td><td>0.4%</td></tr>
+</tbody></table>
+<p><strong>出現ユニーク値は 11 種類だけ</strong>：<code>[50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]</code>。</p>
+<p>値ありの <strong>58.2% が最小階級 50 に固まっている</strong>のも重要です。「monthlySold=50 の商品」は</p>
+<p>「ちょうど50個売れた」ではなく「<strong>50以上100未満のどこか</strong>」であり、実質は最下層の塊です。</p>
+<blockquote>
+<p>参考（<code>offers</code> 付きで取り直した 355 ASIN・top100 中心の偏った部分集合）では出現率 67.0%、</p>
+<p>最小値 50・ユニーク値は同じ 11 種類。<strong>母集団が回転上位に偏るほど出現率が上がる</strong>ことがわかります。</p>
+</blockquote>
+<h2>2. 「50 未満は出ない」は本当か → <strong>履歴を見ると出ています</strong></h2>
+<p><code>monthlySoldHistory</code>（履歴を持つ ASIN 2,905件）に出現した値：</p>
+<pre><code>-1, 10, 20, 30, 40, 50, 100, 200, 250, 300, 400, 500, 600, 700, 800, 900, 1000, 2000, 3000, 4000, 5000</code></pre>
+<ul>
+<li><strong><code>-1</code> は「値なし」の明示マーカー</strong>です。履歴の末尾が <code>-1</code> の 1,566 件は、現在値が<strong>例外なく全件欠測</strong>でした（末尾が正の値なのに現在値が欠測、というケースは <strong>0 件</strong>）。現在値と履歴は完全に整合しています。</li>
+<li><strong>10 / 20 / 30 / 40 が実在</strong>します。1〜49 を履歴のどこかに持つ ASIN は <strong>1,732 件</strong>。</li>
+<li>上側も <code>1000</code> で頭打ちではなく、<strong>2000 / 3000 / 4000 / 5000</strong> まであります（1000超を持つ ASIN 28件）。</li>
+<li><strong><code>250</code> という例外値が18件</strong>あり、階級は「50の倍数」で綺麗に閉じてはいません。<strong>階級表をハードコードしないこと。</strong></li>
+</ul>
+<h3>1〜49 が出ていた時期（月別）</h3>
+<table><thead><tr><th>年月</th><th>1-49</th><th>&gt;=50</th><th>-1（欠測）</th></tr></thead><tbody>
+<tr><td>2023-08〜2025-03</td><td><strong>0</strong></td><td>各月 500〜2,700</td><td>0〜259</td></tr>
+<tr><td><strong>2025-04</strong></td><td><strong>2,561</strong></td><td>3,184</td><td>100</td></tr>
+<tr><td><strong>2025-05</strong></td><td><strong>2,509</strong></td><td>3,450</td><td>608</td></tr>
+<tr><td>2025-06</td><td>5</td><td>3,000</td><td>726</td></tr>
+<tr><td>2025-07〜2026-01</td><td><strong>0</strong></td><td>各月 4,000〜6,100</td><td>151〜356</td></tr>
+<tr><td><strong>2026-02</strong></td><td><strong>4,123</strong></td><td>5,725</td><td>366</td></tr>
+<tr><td><strong>2026-03</strong></td><td><strong>1,805</strong></td><td>6,830</td><td>1,318</td></tr>
+<tr><td>2026-04</td><td>12</td><td>6,705</td><td>275</td></tr>
+<tr><td>2026-05〜2026-08</td><td><strong>0</strong></td><td>各月 5,600〜9,400</td><td>175〜311</td></tr>
+</tbody></table>
+<p>（全月の完全版はスクリプト出力を参照）</p>
+<p><strong>1〜49 は 2025-04〜05 と 2026-02〜03 に集中的に出現し、その前後では完全に消えます。</strong></p>
+<p>最後に観測されたのは <strong>2026-04-28 07:30 UTC</strong>。本走（2026-08-21）時点では下限が 50 に戻っていました。</p>
+<p>これは Amazon 側の &quot;bought past month&quot; 表示ポリシー（あるいは Keepa の収集範囲）が</p>
+<p><strong>期間によって切り替わっている</strong>ことを示します。当社データで「50未満を見たことがない」のは</p>
+<p><strong>フィールドの仕様ではなく、スキャンした時期の産物</strong>です。</p>
+<h2>3. 欠測は「売れていない」を意味するか → <strong>意味しません</strong></h2>
+<table><thead><tr><th><code>salesRankDrops30</code></th><th>ASIN数</th><th>値あり</th><th>出現率</th><th>値ありの最小値</th></tr></thead><tbody>
+<tr><td>0–10</td><td>20</td><td>1</td><td>5.0%</td><td>50</td></tr>
+<tr><td>10–20</td><td>2,561</td><td>479</td><td>18.7%</td><td>50</td></tr>
+<tr><td>20–32</td><td>1,209</td><td>680</td><td>56.2%</td><td>50</td></tr>
+<tr><td>32–50</td><td>210</td><td>177</td><td>84.3%</td><td>50</td></tr>
+<tr><td>50–100</td><td>2</td><td>2</td><td>100.0%</td><td>50</td></tr>
+</tbody></table>
+<p>回転が速いほど出現率は上がります（18.7% → 84.3%）が、<strong>32〜50ドロップ帯でも 15.7% は欠測</strong>。</p>
+<p>実例として <strong>ドロップ数 49 の <code>B0DQCC4CTB</code> は欠測</strong>、逆に <strong>ドロップ数 9 の <code>B0F1S2P3TM</code> は 50</strong> が入っています。</p>
+<p>→ <strong><code>monthlySold</code> の欠測を「月50個も売れていない」と読んではいけません。</strong> 単に Amazon が表示していないだけです。</p>
+<p>　 欠測を 0 とみなす／欠測を足切りに使う実装は誤判定を生みます。</p>
+<h2>4. 実装上の申し送り（scan_v13 系を触る人へ）</h2>
+<ul>
+<li><strong>欠測はキーの不在</strong>。<code>product.get(&quot;monthlySold&quot;)</code> は <code>None</code> を返す。<code>-1</code> や <code>0</code> での判定は不要（現在値には出ない）が、<strong><code>monthlySoldHistory</code> の中では <code>-1</code> が欠測マーカー</strong>なので履歴を扱う時だけ弾くこと。</li>
+<li><strong><code>monthlySold=50</code> は「50〜99」の意味</strong>。掛け算して売上を出すなら<strong>下限見積り</strong>として扱う。上振れ側は無限。</li>
+<li><strong><code>&gt;= 50</code> を前提にしない</strong>。10/20/30/40 は実在し、いつ戻るか読めない。</li>
+<li><strong>値は「バリエーション単位」</strong>（公式定義）。色・サイズ違いが1つに合算されるため、<strong>特定 SKU の販売数ではありません</strong>。単一 ASIN の仕入れ数量計算に直接使うと過大評価になります。</li>
+<li><code>monthlySoldHistory</code> は追加トークンなしで付いてくる。<strong>現在値が欠測でも履歴に値が残っていることがある</strong>ので、粗い当たりを付けたい時は履歴の直近非 <code>-1</code> 値を見る手があります（ただし古さの確認は必須。<code>lastSoldUpdate</code> あり）。</li>
+</ul>
+<h2>5. 公式定義との突合結果</h2>
+<table><thead><tr><th>公式定義（T-20260824-001 <code>keepa-glossary.md</code> §4 / <code>discrepancies.md</code> D6）</th><th>実データ</th><th>判定</th></tr></thead><tbody>
+<tr><td>&quot;10+&quot; &quot;100+&quot; のような<strong>区切られた範囲でしか提供しない</strong></td><td>現在値のユニーク値 11 種類のみ。連続値ゼロ</td><td><strong>一致</strong></td></tr>
+<tr><td><strong>大半のASINには値が無い</strong></td><td>欠測 66.5%（回転上位に偏った母集団ですらこの率）</td><td><strong>一致</strong></td></tr>
+<tr><td><strong>推定値ではない（It is not an estimate）</strong></td><td>値が離散階級に完全一致＝推定モデルの出力ではないことと整合</td><td><strong>矛盾なし</strong>（実データからは肯定も否定もできないが、階級構造は「Amazon 表示値の転記」と整合）</td></tr>
+<tr><td>値は<strong>バリエーション単位</strong></td><td>実データからは検証不能（別途 <code>variationCSV</code> 突合が要る）</td><td><strong>未検証</strong></td></tr>
+</tbody></table>
+<hr>
+<h2>付録：スクリプトの生出力</h2>
+<p><code>analyze_monthly_sold.py</code> の出力全文は上記各表の元データです。再実行で同じ数字が出ます（入力が固定の raw JSON のため冪等）。</p>
+</div></body></html>
