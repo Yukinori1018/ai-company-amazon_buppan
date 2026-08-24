@@ -8,3 +8,20 @@ raw_offers/
 # 作業中バックアップ（例: scan_v13.py.bak）。ローカルには残すが Git 追跡はしない。
 # ※ ファイルは削除しない。追跡対象から外すだけ（CLAUDE.md §4.1 不可逆な削除の回避）。
 *.bak
+
+# --- scan_v14（継続スキャン）-------------------------------------------------
+# Keepa の生レスポンス。--from-raw の再集計に使うのでローカルには残すが、
+# サイズが大きいので Git には入れない（過去に23MBを履歴に混入させた前科あり）。
+v14/raw/
+v14/raw_offers/
+# 取得済み ASIN の台帳（--resume 用）。数万行のテキストになるので追跡しない。
+v14/seen_asins.txt
+# 実行ログ（追記され続ける）。要点は progress.json と CSV に出る。
+v14/scan_v14.log
+v14/*.log
+# 走行時の一時状態（成果物ではない）。CSV / progress.json / HTML だけを追跡する。
+v14/*.pid
+v14/STOP
+v14/FINISHED
+v14/shard_cursors.json
+v14/*.csv.tmp
