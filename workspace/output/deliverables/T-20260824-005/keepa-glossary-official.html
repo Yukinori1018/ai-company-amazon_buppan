@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Keepa 用語集（正式版）</title>
+<style>
+:root{--ink:#1b1d21;--sub:#5b6169;--line:#dfe3e8;--bg:#fbfbfc;--warn:#b3261e;--accent:#0b5cad;--mark:#fff2a8}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font-family:"Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic",YuGothic,Meiryo,system-ui,sans-serif;
+ font-size:15px;line-height:1.75;-webkit-text-size-adjust:100%}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px 96px}
+h1{font-size:27px;letter-spacing:.02em;margin:34px 0 6px;padding-bottom:14px;border-bottom:3px solid var(--ink)}
+h2{font-size:20px;margin:52px 0 14px;padding:9px 0 9px 13px;border-left:7px solid var(--ink);background:#f0f1f3}
+h3{font-size:16.5px;margin:38px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--line);color:#25292e}
+p{margin:10px 0}
+p.grouphead{margin:30px 0 6px;font-size:15px;font-weight:700;color:#0b5cad;border-bottom:2px solid #cfd8e3;padding-bottom:4px}
+p.note{background:#f3f6fa;border-left:3px solid #9db6d0;padding:9px 13px;color:#39424c;font-size:13.5px;border-radius:0 4px 4px 0}
+blockquote{margin:14px 0;padding:12px 16px;background:#fff;border:1px solid var(--line);border-left:4px solid #8e9aa6;border-radius:0 5px 5px 0;font-size:14px;color:#33383e}
+ul,ol{margin:10px 0;padding-left:1.55em}
+li{margin:4px 0}
+hr{border:0;border-top:1px solid var(--line);margin:34px 0}
+code{background:#eef0f3;border:1px solid #e0e3e8;border-radius:3px;padding:.5px 5px;
+ font-family:"SFMono-Regular",Menlo,Consolas,monospace;font-size:12.5px;color:#0f3d70;white-space:nowrap}
+strong{font-weight:700}
+table{border-collapse:collapse;width:100%;margin:14px 0;background:#fff;font-size:13.5px;
+ box-shadow:0 1px 2px rgba(0,0,0,.05)}
+th,td{border:1px solid var(--line);padding:9px 11px;vertical-align:top;text-align:left}
+th{background:#eceff2;font-weight:700;font-size:13px;white-space:nowrap}
+tbody tr:nth-child(even){background:#fafbfc}
+tbody tr:hover{background:#f2f7fd}
+table.deftable td:nth-child(1){width:15%;font-weight:600}
+table.deftable td:nth-child(2){width:19%}
+table.deftable td:nth-child(3){width:29%}
+table.deftable td:nth-child(4){width:29%;color:#3a4048}
+table.deftable td:nth-child(5),table.deftable th:nth-child(5){width:8%;font-size:11.5px;color:var(--sub);white-space:nowrap}
+a.secref{color:var(--accent);text-decoration:none;border-bottom:1px dotted var(--accent)}
+a.secref:hover{background:#eaf2fb}
+.bar{position:sticky;top:0;z-index:50;background:rgba(251,251,252,.97);backdrop-filter:blur(6px);
+ border-bottom:1px solid var(--line);padding:9px 20px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.bar input{flex:1 1 240px;min-width:180px;padding:8px 12px;font-size:14px;border:1.5px solid #c3c9d1;border-radius:6px;background:#fff}
+.bar input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(11,92,173,.13)}
+.bar .hint{font-size:12px;color:var(--sub)}
+.bar .nav a{font-size:12.5px;color:#31383f;text-decoration:none;padding:3px 8px;border:1px solid var(--line);border-radius:99px;background:#fff;margin-right:4px;display:inline-block;margin-bottom:3px}
+.bar .nav a:hover{background:#eaf2fb;border-color:var(--accent);color:var(--accent)}
+tr.hide{display:none}
+h2.hide,h3.hide,p.hide,blockquote.hide,table.hide,hr.hide,ul.hide,ol.hide{display:none}
+mark{background:var(--mark);padding:0 1px}
+.meta{color:var(--sub);font-size:12.5px}
+@media print{.bar{display:none}body{background:#fff;font-size:11pt}tbody tr:hover{background:none}}
+@media (max-width:760px){
+ table,thead,tbody,th,td,tr{display:block}
+ thead{display:none}
+ table{box-shadow:none}
+ tbody tr{margin-bottom:12px;border:1px solid var(--line)}
+ td{border:0;border-bottom:1px dashed var(--line);width:auto!important}
+ table.deftable td:nth-child(1)::before{content:"用語：";color:var(--sub);font-weight:400}
+ table.deftable td:nth-child(2)::before{content:"API：";color:var(--sub)}
+ table.deftable td:nth-child(3)::before{content:"意味：";color:var(--sub)}
+ table.deftable td:nth-child(4)::before{content:"注意：";color:var(--sub)}
+ table.deftable td:nth-child(5)::before{content:"出典：";color:var(--sub)}
+}
+</style></head><body>
+<div class="bar">
+ <input id="q" type="search" placeholder="用語で絞り込む（例：BUY BOX／COUNT_NEW／最安値）　Escで解除" autocomplete="off">
+ <span class="hint" id="qstat"></span>
+ <span class="nav"><a href="#sec-1">注意が必要な語</a><a href="#sec-2">共通ルール</a><a href="#sec-3-1">価格</a><a href="#sec-3-2">売れ行き</a><a href="#sec-3-3">出品者数</a><a href="#sec-3-4">BuyBox</a><a href="#sec-3-5">出品者</a><a href="#sec-3-6">stats</a><a href="#sec-3-7">属性・手数料</a><a href="#sec-3-8">Finder</a><a href="#sec-3-9">トークン</a><a href="#sec-3-10">グラフ</a><a href="#sec-4">不明な語</a><a href="#sec-index-ja">索引A</a><a href="#sec-index-en">索引B</a></span>
+</div>
+<div class="wrap">
+<h1>Keepa 用語集（正式版）</h1>
+<p><strong>Keepa の画面・数値に出てくる語を、公式の定義で引くための辞書です。</strong></p>
+<ul><li><strong>出典：Keepa 公式 API ドキュメント（<code>https://keepa.com/api-docs/</code> 全30ページ）／ Keepa 公式FAQ。全件の最終確認日 2026-08-24。</strong></li><li>Keepa は仕様変更が多く、2026年だけでも 2/23・3月・4/20・7/28・8/6・8/9・8/18 に変更が入っています。<strong>最終確認日から3ヶ月を過ぎたら、出典に当たり直してください。</strong></li><li>第1版 2026-08-24（T-20260824-005）</li></ul>
+<hr>
+<h2 id="sec-howto">この用語集の使い方</h2>
+<ol><li><strong>語が決まっているなら、巻末の索引から。</strong>〔索引A〕日本語表記から引く／〔索引B〕英語・APIフィールド名から引く。HTML版は上部の検索窓に打ち込めば絞り込めます。</li><li><strong>何を疑うべきか分からないなら、<a class="secref" href="#sec-1">§1</a>「特に注意が必要な語」だけ読む。</strong>ここに挙げた10件は、取り違えると判断が逆になります。</li><li><strong>ここに載っていない語は「不明」として扱い、判断に使わないでください。</strong>公式に定義が見つからなかった語は <a class="secref" href="#sec-4">§4</a> にまとめてあります。</li></ol>
+<blockquote><strong>読み方の約束</strong><br>・「意味」列は公式原文の訳です。原文にない補足は〔 〕で囲んでいます。<br>・<strong>APIフィールド名</strong>＝Keepa が公式ドキュメントで使っている正式名称。〔API＝プログラムから Keepa のデータを直接取るための窓口。画面表示ではなく、こちらが定義の本体です〕<br>・<strong>「用語」列</strong>＝Keepa の日本語画面に出る表記。画面に対応する表記が無いものは概念名を、それも無いものは「—」を置いています。Keepa は UI の用語集を公開していないため、<strong>実画面で確認できたものと、公式定義から対応を推定したものが混在します。</strong>根拠にするのは APIフィールド名と「意味」列にしてください。</blockquote>
+<hr>
+<h2 id="sec-1">1. ⚠ 特に注意が必要な語</h2>
+<p><strong>この10件は、名前から素直に読むと意味が違います。</strong></p>
+<table class="tbl"><thead><tr><th>語</th><th>よくある読み違い</th><th>公式の定義</th><th>数字の向き・見分け方</th></tr></thead><tbody>
+<tr><td><strong>BUY BOX の平均売上数</strong><br><code>avgBuyBoxCompetitors</code></td><td>売れた個数</td><td><strong>売上ではありません。</strong>この出品者が扱う商品について、<strong>Buy Box を争っている出品者数の平均</strong>（この出品者自身を含む）。日本語UIの表記は誤訳です</td><td><strong>大きいほど競合が多い＝不利</strong></td></tr>
+<tr><td><strong>新品アイテム数</strong><br><code>COUNT_NEW</code>（csv 11）</td><td>出品者の数</td><td><strong>新品オファーの本数</strong>です。1社が FBA と FBM に1本ずつ出せば <strong>2</strong> になります</td><td>大きいほど相乗りが多い。ただし<strong>出品者数の代用にはできない</strong>（→ <a class="secref" href="#sec-3-3">§3.3</a>「出品者数（実数）」）</td></tr>
+<tr><td><code>stats.min</code> / <code>stats.max</code></td><td>指定した期間の最安値／最高値</td><td><strong>記録開始以来（全期間）</strong>の最安値／最高値。<code>stats=365</code> を指定しても期間は効きません。期間内の最安・最高は <code>stats.minInInterval</code> / <code>stats.maxInInterval</code></td><td>—</td></tr>
+<tr><td><strong>新品</strong><br><code>NEW</code>（csv 1）</td><td>出品者の新品最安値（Amazon本体は別枠）</td><td><strong>Amazon 本体もマーケットプレイスの一部として含みます。</strong>さらに <strong>2026-02-23 を境に定義が変わり</strong>、前は「出品価格」、以降は「着地価格（出品価格＋送料）」です</td><td>—</td></tr>
+<tr><td><strong>先月の購入／月間販売数</strong><br><code>monthlySold</code></td><td>予測値、または正確な販売個数</td><td>Amazon の検索結果に出る "bought past month" の値そのもの。<strong>推定値ではありません</strong>（公式明記）。ただし Amazon が "10+" "100+" のような<strong>区切られた範囲でしか提供しない</strong>ため、<code>1000</code> は「<strong>少なくとも</strong> 1000回」の意味</td><td>大きいほど売れている（ただし<strong>下限値</strong>）。<strong>大半のASINは値を持ちません</strong>（値が無い＝売れていない、ではない）</td></tr>
+<tr><td><strong>↘ N drops</strong><br><code>salesRankDrops30/90/180/365</code></td><td>売れた個数</td><td>期間内に売れ筋ランキングが<strong>下落（高い値から低い値へ変化）した回数</strong>。公式の記述は「<strong>販売を示すものとみなされる</strong>」まで</td><td>多いほど売れている傾向。<strong>個数と等しいとは公式は書いていません</strong></td></tr>
+<tr><td><strong><code>offers</code> を付けないと値が来ない語</strong>（一群）</td><td>「古い値が返る」</td><td><strong>値そのものが存在しません</strong>（<code>-1</code> または未設定）。対象は csv の 7・9・10・16・17・18・19〜27・32・33 と、<code>stats</code> の Buy Box 系・オファー数系</td><td>—</td></tr>
+<tr><td><strong>FBAリストが見つかりました</strong><br><code>hasFBA</code></td><td>FBA出品の有無</td><td>その出品者が現在FBA出品を持っているか。公式が「<strong>通常は正しいが、FBA出品があっても false になりうる</strong>」と明記</td><td><strong>「はい」は信じてよい。「いいえ」は『無い』ことの証明になりません</strong></td></tr>
+<tr><td><strong>%獲得</strong><br><code>buyBoxStats[].percentageWon</code></td><td>カートを取っている割合</td><td>その出品者が Buy Box を獲得していた<strong>時間の割合</strong>。<strong>非プライム客に対して</strong>の数値です</td><td>大きいほどその出品者がカートを押さえている</td></tr>
+<tr><td><code>availabilityAmazon</code></td><td>Amazon 本体の有無は、価格が -1 かどうかで分かる</td><td>Amazon 本体オファーの在庫状況。<strong>-1＝Amazon のオファーが存在しない</strong>／0 在庫あり／1 予約／2 不明／3 入荷待ち／4 出荷遅延</td><td><strong>Amazon 本体の不在を判定する専用フィールドはこれ。</strong>価格履歴の <code>AMAZON</code>（csv 0）が -1 なのは「その時点で Amazon の価格データが無い」という意味で、<strong>普段売っている商品が在庫切れのときも -1 になります</strong></td></tr>
+</tbody></table>
+<hr>
+<h2 id="sec-2">2. 値の共通ルール</h2>
+<p><strong>どの語にも共通してかかる約束事です。</strong>個別の定義を読む前に、ここを先に押さえてください。</p>
+<table class="tbl"><thead><tr><th>#</th><th>ルール</th><th>出典</th></tr></thead><tbody>
+<tr><td>1</td><td><strong>価格はすべて、そのマーケットプレイスの通貨の最小単位の整数。</strong>日本（co.jp）なら「円」そのもの（小数なし）、米国ならセント</td><td>product-object</td></tr>
+<tr><td>2</td><td><strong>時刻はすべて「Keepa Time 分」。</strong>Unix秒 = (keepaTime + 21564000) × 60</td><td>product-object</td></tr>
+<tr><td>3</td><td><strong><code>-1</code> は「データなし／その期間にオファーが存在しなかった」。0円ではありません。</strong><code>-2</code> は「判定できなかった」</td><td>product-object / offer-object</td></tr>
+<tr><td>4</td><td><strong>履歴（csv）は値が変わったときだけ追記されます。</strong>更新のたびに点が増えるわけではありません</td><td>product-object</td></tr>
+<tr><td>5</td><td><strong>csv 配列の長さを固定と仮定しないこと。</strong>Keepa は予告なく型を追加します（公式明記。実際 2026年に 34・35 が追加された）</td><td>product-object</td></tr>
+<tr><td>6</td><td><strong><code>productType</code> を最初に評価すること</strong>（公式が「Must always be evaluated first」と明記）。0 STANDARD 以外は、取得できるデータが限られます</td><td>product-object</td></tr>
+<tr><td>7</td><td><strong>グラフは3種類あり、1枚の画像に混ぜられません。</strong>①価格履歴 ②カテゴリ別ランキング＆月間販売数 ③オファー数と評価。それぞれ軸と値の空間が違うため</td><td>graph-image</td></tr>
+<tr><td>8</td><td><strong>画面のデータ鮮度は2段階。</strong>誰かがその商品をトラッキングしていれば<strong>1時間に1回</strong>、していなければ<strong>1日1回</strong>更新（公式FAQ）。<strong>API 経由は別ルール</strong>で、最後の更新が <code>update</code> に指定した時間（既定1時間）より古ければ、配信前に自動で更新されます</td><td>FAQ / product</td></tr>
+<tr><td>9</td><td><strong><code>offers</code> パラメータを付けない限り、一切更新されないデータ群があります</strong>（Buy Box・評価・評価件数・FBA/FBM別価格など）。→ <a class="secref" href="#sec-1">§1</a>、および各表の「注意」列</td><td>product-object</td></tr>
+</tbody></table>
+<hr>
+<h2 id="sec-3">3. 用語定義</h2>
+<h3 id="sec-3-1">3.1 価格と価格履歴（csv 履歴配列）</h3>
+<p><code>csv</code> は2次元配列です。第1次元が<strong>価格タイプの番号</strong>（下表）、第2次元が <code>[Keepa Time 分, 値, …]</code>。型名に <code>_SHIPPING</code> が付くものだけ <code>[Keepa Time 分, 価格, 送料, …]</code> の3つ組になります。</p>
+<p class="note">▸ この表の「用語」列は、Keepa 日本語画面のグラフ凡例に対応すると<strong>推定</strong>される表記です（Keepa は UI 用語集を公開していません）。根拠にするのは APIフィールド名と「意味」列にしてください。</p>
+<table class="deftable"><thead><tr><th>用語</th><th>APIフィールド名</th><th>意味</th><th>注意</th><th>出典</th></tr></thead><tbody>
+<tr><td>Amazon</td><td><code>AMAZON</code>（csv 0）</td><td>Amazon 本体が売っているオファーの価格履歴</td><td>—</td><td>product-object</td></tr>
+<tr><td>新品</td><td><code>NEW</code>（csv 1）</td><td>マーケットプレイス新品の最安価格履歴。<strong>Amazon 本体もマーケットプレイスの一部として含む</strong>（Amazon が全体の最安なら <code>NEW</code> = <code>AMAZON</code>）</td><td>⚠ <strong>2026-02-23 を境に定義が変わる</strong>（前＝最安の出品価格／以降＝最安の着地価格＝出品価格＋送料）</td><td>product-object</td></tr>
+<tr><td>中古</td><td><code>USED</code>（csv 2）</td><td>マーケットプレイス中古の最安価格履歴</td><td>⚠ 2026-02-23 の定義変更の対象</td><td>product-object</td></tr>
+<tr><td>売れ筋ランキング</td><td><code>SALES</code>（csv 3）</td><td>売れ筋ランキングの履歴</td><td>すべての商品にランクがあるわけではない。バリエーションの子ASINは通常、個別のランクを持たない</td><td>product-object</td></tr>
+<tr><td>参考価格</td><td><code>LISTPRICE</code>（csv 4）</td><td>定価（MSRP）の履歴</td><td>—</td><td>product-object</td></tr>
+<tr><td>コレクター商品</td><td><code>COLLECTIBLE</code>（csv 5）</td><td>コレクター品の価格履歴</td><td>⚠ 2026-02-23 の定義変更の対象</td><td>product-object</td></tr>
+<tr><td>再生品</td><td><code>REFURBISHED</code>（csv 6）</td><td>再生品の価格履歴</td><td>⚠ 2026-02-23 の定義変更の対象</td><td>product-object</td></tr>
+<tr><td>新品 第三者（自己発送）</td><td><code>NEW_FBM_SHIPPING</code>（csv 7）</td><td><strong>Amazon 本体を除く</strong>第三者の新品・自己発送（FBM）価格履歴。<strong>送料込み</strong></td><td>⚠ <code>offers</code> 必須</td><td>product-object</td></tr>
+<tr><td>タイムセール</td><td><code>LIGHTNING_DEAL</code>（csv 8）</td><td>タイムセール価格の履歴</td><td>進行中のセールでは、履歴の最後が「<strong>未来の日付＋価格 -1</strong>」になる。現在価格は <code>stats.current</code> から取る</td><td>product-object</td></tr>
+<tr><td>Amazon倉庫</td><td><code>WAREHOUSE</code>（csv 9）</td><td>Amazon Warehouse（Amazon の中古アウトレット）の価格履歴</td><td>⚠ <code>offers</code> 必須</td><td>product-object</td></tr>
+<tr><td>新品 第三者（FBA）</td><td><code>NEW_FBA</code>（csv 10）</td><td><strong>Amazon 本体と Warehouse を除く</strong>第三者の新品FBA最安値の履歴</td><td>⚠ <code>offers</code> 必須</td><td>product-object</td></tr>
+<tr><td>新品アイテム数</td><td><code>COUNT_NEW</code>（csv 11）</td><td>新品オファー数の履歴</td><td>⚠ <strong>出品者数ではない</strong>（→ <a class="secref" href="#sec-1">§1</a>、<a class="secref" href="#sec-3-3">§3.3</a>）</td><td>product-object</td></tr>
+<tr><td>中古アイテム数</td><td><code>COUNT_USED</code>（csv 12）</td><td>中古オファー数の履歴</td><td>—</td><td>product-object</td></tr>
+<tr><td>再生品アイテム数</td><td><code>COUNT_REFURBISHED</code>（csv 13）</td><td>再生品オファー数の履歴</td><td>—</td><td>product-object</td></tr>
+<tr><td>コレクター商品アイテム数</td><td><code>COUNT_COLLECTIBLE</code>（csv 14）</td><td>コレクター品オファー数の履歴</td><td>—</td><td>product-object</td></tr>
+<tr><td>—</td><td><code>EXTRA_INFO_UPDATES</code>（csv 15）</td><td><code>offers</code> 系データを更新した時刻の履歴。値の<strong>絶対値＝その時に取得したオファー数</strong>。値が<strong>正なら全オファーを取得できた</strong>、<strong>負なら取得しきれなかった</strong></td><td><code>offers</code> 系の値が「いつ時点の情報か」を知る手段。公式が「更新頻度が低いので、いつ更新したかを知ることが重要」と明記</td><td>product-object</td></tr>
+<tr><td>評価</td><td><code>RATING</code>（csv 16）</td><td>商品評価の履歴。<strong>0〜50の整数</strong>（45 = ★4.5）</td><td>⚠ <code>offers</code> 必須</td><td>product-object</td></tr>
+<tr><td>評価件数</td><td><code>COUNT_REVIEWS</code>（csv 17）</td><td>商品の<strong>評価件数</strong>の履歴</td><td>⚠ <code>offers</code> 必須。<strong>型名は REVIEWS だが、公式の定義文は rating count（評価件数）</strong></td><td>product-object</td></tr>
+<tr><td>Buy Box</td><td><code>BUY_BOX_SHIPPING</code>（csv 18）</td><td>新品 Buy Box 価格の履歴（<strong>送料込み</strong>）。Buy Box に適格なオファーが無い場合、または Buy Box が中古オファーの場合は <strong>-1</strong></td><td>⚠ <code>offers</code> 必須</td><td>product-object</td></tr>
+<tr><td>中古（ほぼ新品／非常に良い／良い／可）</td><td><code>USED_NEW_SHIPPING</code> / <code>USED_VERY_GOOD_SHIPPING</code> / <code>USED_GOOD_SHIPPING</code> / <code>USED_ACCEPTABLE_SHIPPING</code>（csv 19〜22）</td><td>中古サブ状態別の価格履歴（送料込み）</td><td>⚠ <code>offers</code> 必須</td><td>product-object</td></tr>
+<tr><td>コレクター商品（4状態）</td><td><code>COLLECTIBLE_*_SHIPPING</code>（csv 23〜26）</td><td>コレクター品サブ状態別の価格履歴（送料込み）</td><td>⚠ <code>offers</code> 必須</td><td>product-object</td></tr>
+<tr><td>再生品（送料込み）</td><td><code>REFURBISHED_SHIPPING</code>（csv 27）</td><td>再生品の価格履歴（送料込み）</td><td>⚠ <code>offers</code> 必須</td><td>product-object</td></tr>
+<tr><td>eBay 新品</td><td><code>EBAY_NEW_SHIPPING</code>（csv 28）</td><td>対応する eBay ロケールでの新品最安値（送料込み）</td><td>⚠ 公式が「<strong>eBay の出品は情報や商品コードの誤りが多い。価格情報の正確さを当てにするな</strong>」と明記</td><td>product-object</td></tr>
+<tr><td>eBay 中古</td><td><code>EBAY_USED_SHIPPING</code>（csv 29）</td><td>同上（中古）</td><td>⚠ 同上</td><td>product-object</td></tr>
+<tr><td>下取り</td><td><code>TRADE_IN</code>（csv 30）</td><td>下取り価格の履歴</td><td>下取りは全ロケールで提供されているわけではない</td><td>product-object</td></tr>
+<tr><td>—</td><td><code>RENT</code>（csv 31）</td><td><strong>廃止済み。値が入ることはありません。</strong>以降の番号の位置を保つためだけに残されています（2026-02-23 にレンタル関連を削除）</td><td>—</td><td>product-object / changelog</td></tr>
+<tr><td>Buy Box 中古</td><td><code>BUY_BOX_USED_SHIPPING</code>（csv 32）</td><td>中古 Buy Box 価格の履歴（送料込み・サブ状態は問わない）。適格オファーが無ければ <strong>-1</strong></td><td>⚠ <code>offers</code> 必須</td><td>product-object</td></tr>
+<tr><td>プライム会員限定</td><td><code>PRIME_EXCL</code>（csv 33）</td><td>プライム会員限定の新品最安値の履歴</td><td>⚠ <code>offers</code> 必須</td><td>product-object</td></tr>
+<tr><td>—</td><td><code>COUNT_NEW_FBA</code>（csv 34）</td><td>新品<strong>FBA</strong>オファー数の履歴（<strong>Amazon 本体のオファーを含む</strong>）</td><td>2026年に追加された新しい型（product-object は「2026年3月」、changelog は 2026-02-23 の項に記載）</td><td>product-object</td></tr>
+<tr><td>—</td><td><code>COUNT_NEW_FBM</code>（csv 35）</td><td>新品<strong>FBM</strong>オファー数の履歴</td><td>同上</td><td>product-object</td></tr>
+<tr><td>—</td><td><code>offers[].offerCSV</code></td><td>個別オファー1件の価格・送料の履歴。<code>[Keepa Time 分, 価格, 送料, …]</code></td><td>送料無料は <code>0</code>、<strong>発送不可・送料不明は <code>-1</code></strong>、価格や送料を判定できなかった場合は <code>-2</code></td><td>offer-object</td></tr>
+</tbody></table>
+<p><strong>2026-02-23 の価格定義変更（公式原文の要旨）</strong><br><code>NEW</code> / <code>USED</code> / <code>COLLECTIBLE</code> / <code>REFURBISHED</code> の時系列について、<strong>2026年2月23日より前の記録は「最安の出品価格（listing price）」</strong>、<strong>2026年2月23日以降の記録は「最安の着地価格（landing price ＝ 出品価格＋送料）」</strong>を表します。同じ列の中で意味が変わるため、この日をまたぐ期間の最安値・平均値は<strong>定義の異なる値が混ざった数字</strong>になります。（product-object / changelog）</p>
+<hr>
+<h3 id="sec-3-2">3.2 売れ行き（ランキング・販売数）</h3>
+<table class="deftable"><thead><tr><th>用語</th><th>APIフィールド名</th><th>意味</th><th>注意</th><th>出典</th></tr></thead><tbody>
+<tr><td>↘ N drops</td><td><code>salesRankDrops30</code> / <code>salesRankDrops90</code> / <code>salesRankDrops180</code> / <code>salesRankDrops365</code></td><td>直近30/90/180/365日に、売れ筋ランキングが<strong>下落（高い値から低い値への変化）した回数</strong>。公式の記述は「<strong>販売を示すものとみなされる</strong>（considered to indicate sales）」まで</td><td>⚠ <strong>公式は「販売個数と等しい」とは書いていない。</strong>更新の間隔内に複数個売れても1回と数えられうる。<code>stats</code> で指定した期間には影響されない固定窓</td><td>statistics-object</td></tr>
+<tr><td>先月の購入／月間販売数</td><td><code>monthlySold</code></td><td>過去1か月にこの商品が購入された回数。<strong>Amazon の検索結果ページに出る "bought past month" の値そのもので、推定値ではない</strong>（公式明記）</td><td>⚠ Amazon が "10+" "100+" のような<strong>区切られた範囲でしか提供しない</strong>ため正確な数字ではない。<code>1000</code> は「<strong>少なくとも</strong> 1000回」。<strong>大半のASINは値を持たない。</strong>値は<strong>バリエーション単位</strong></td><td>product-object</td></tr>
+<tr><td>—</td><td><code>monthlySoldHistory</code></td><td><code>monthlySold</code> の履歴。形式 <code>[keepaTime, monthlySold, …]</code></td><td>値が無ければ未設定</td><td>product-object</td></tr>
+<tr><td>—</td><td><code>lastSoldUpdate</code></td><td><code>monthlySold</code> を最後に更新した時刻（Keepa Time 分）</td><td><code>monthlySold</code> に値が無ければ未設定</td><td>product-object</td></tr>
+<tr><td>カテゴリ別ランキング</td><td><code>salesRanks</code></td><td>キーがカテゴリノードID、値がそのカテゴリでのランク履歴</td><td>—</td><td>product-object</td></tr>
+<tr><td>—</td><td><code>salesRankReference</code></td><td><strong>メインの</strong>売れ筋ランキングが属するカテゴリのノードID。<strong>-1＝不明／-2＝Launchpad 掲載</strong></td><td>どのカテゴリ基準のランクを見ているかを、推測ではなくフィールドとして取得できる</td><td>product-object</td></tr>
+<tr><td>—</td><td><code>salesRankReferenceHistory</code></td><td>上記の履歴。過去のランクがどのカテゴリ基準だったかを対応づけられる</td><td>—</td><td>product-object</td></tr>
+<tr><td>—</td><td><code>salesRankDisplayGroup</code></td><td>メインの売れ筋ランキングが<strong>どの分類に基づくか</strong>（例：<code>apparel_display_on_website</code>）</td><td>—</td><td>product-object</td></tr>
+<tr><td>—</td><td><code>launchpad</code></td><td>Launchpad カテゴリに掲載されているか</td><td>掲載されている場合、<code>salesRankReference</code> は取得できない</td><td>product-object</td></tr>
+</tbody></table>
+<p class="note">▸ BSR（売れ筋ランキング）そのものの性質——相対順位である／販売が無くても動く／時間とともに減衰する——は <strong>Amazon 側の仕様であり、Keepa 公式ドキュメントには記述がありません。</strong>Keepa の出典として引かないでください。</p>
+<hr>
+<h3 id="sec-3-3">3.3 出品数・出品者数</h3>
+<table class="deftable"><thead><tr><th>用語</th><th>APIフィールド名</th><th>意味</th><th>注意</th><th>出典</th></tr></thead><tbody>
+<tr><td>新品アイテム数</td><td><code>COUNT_NEW</code>（csv 11）</td><td>新品オファー数の履歴。現在値は <code>stats.current[11]</code></td><td>⚠ <strong>出品者数ではありません。</strong>公式の説明文は "count of marketplace merchants selling the product as new"（新品で売っている出品者の数）と書いていますが、<strong>フィールド名は offer count</strong> であり、実データでも<strong>同一出品者が FBA と FBM に1本ずつ出せば 2</strong> になります。出品者数が必要なら下の「出品者数（実数）」の手順を使ってください</td><td>product-object</td></tr>
+<tr><td><strong>出品者数（実数）</strong></td><td><strong>該当フィールドなし</strong></td><td><strong>Keepa に「出品者数」というフィールドは存在しません。</strong>公式が示す手順は、<code>offers</code> を取得 → <code>liveOffersOrder</code> で現存オファーに絞る → <code>condition == 1</code>（新品）→ <strong><code>sellerId</code> の重複を除いて数える</strong></td><td>⚠ オファー数（<code>COUNT_NEW</code> 等）では代用できません</td><td>product-object / offer-object</td></tr>
+<tr><td>—</td><td><code>totalOfferCount</code></td><td>この商品の、<strong>全状態を合わせた</strong>オファー総数</td><td>状態別の内訳は <code>current[11]</code>（新品）・<code>current[12]</code>（中古）で取る</td><td>statistics-object</td></tr>
+<tr><td>—</td><td><code>offerCountFBA</code> / <code>offerCountFBM</code></td><td><strong>取得できた</strong>ライブ新品 FBA / FBM オファーの数。不明なら <strong>-2</strong></td><td>⚠ <code>offers</code> 必須。「取得できた範囲での」数（<code>offers</code> で要求した件数が上限）</td><td>statistics-object</td></tr>
+<tr><td>—</td><td><code>retrievedOfferCount</code></td><td>このリクエストで取得したオファー数</td><td>⚠ <code>offers</code> 必須</td><td>statistics-object</td></tr>
+<tr><td>—</td><td><code>sellerIdsLowestFBA</code> / <code>sellerIdsLowestFBM</code></td><td><strong>最安の</strong>ライブ新品 FBA / FBM オファーの出品者ID。同価格が複数あれば複数入る</td><td>⚠ <code>offers</code> 必須</td><td>statistics-object</td></tr>
+<tr><td>販売者</td><td><code>offers[].sellerId</code></td><td>個別オファーの出品者ID</td><td><strong>実際の出品者数は、この値の重複を除いた個数</strong>で数える</td><td>offer-object</td></tr>
+<tr><td>—</td><td><code>liveOffersOrder</code></td><td><strong>いま Amazon のオファー一覧に載っている順</strong>に並んだ、<code>offers</code> 配列のインデックス列</td><td><code>offers</code> 配列には過去のオファーも混ざるため、現存オファーの判定はこれか <code>lastSeen</code> で行う（公式推奨）。⚠ <strong>同一出品者・同一状態・同一発送形態の重複オファーがあると同じインデックスが複数回入る</strong>ため、要素数を数えるとオファー数を多く見積もる</td><td>product-object</td></tr>
+<tr><td>—</td><td><code>offers[].lastSeen</code></td><td>このオファーを最後に確認した時刻（Keepa Time 分）</td><td>現存オファーだけ扱いたいならこの値で検証すること、と公式が明記</td><td>offer-object</td></tr>
+<tr><td>—</td><td><code>offersSuccessful</code></td><td><code>offers</code> 使用時に、最新のオファー情報を取得できたか</td><td>⚠ <strong>マーケットプレイスのオファーが1件も無い商品でも <code>true</code></strong>（取得成功として扱われる）。<code>offers</code> 依存フィールドを使う前に必ず確認せよ、と公式が明記</td><td>product-object</td></tr>
+<tr><td>—</td><td><code>offerDuplicates</code></td><td>同一出品者・同一状態・同一発送形態で、<strong>最安でないため <code>offers</code> 一覧から除外された</strong>重複オファーの価格・送料・コンディション説明</td><td>—</td><td>offer-object</td></tr>
+<tr><td>—</td><td><code>offers[].isFBA</code></td><td>そのオファーが FBA（Amazon 発送）か</td><td>—</td><td>offer-object</td></tr>
+<tr><td>—</td><td><code>offers[].isPrime</code></td><td>そのオファーがプライム配送で買えるか</td><td>⚠ 公式が「<strong>Keepa は SFP（出品者出荷プライム）を確実に識別できない</strong>」と明記</td><td>offer-object</td></tr>
+<tr><td>—</td><td><code>offers[].isAmazon</code></td><td>出品者が Amazon（例：Amazon.com）か</td><td>⚠ <strong>Amazon Warehouse Deals や、Amazon が別名で運用しているアカウントは Amazon とみなされません</strong></td><td>offer-object</td></tr>
+<tr><td>—</td><td><code>offers[].isShippable</code></td><td>そのオファーが現在発送可能か</td><td>発送不可の例：一時的な在庫切れ、予約商品</td><td>offer-object</td></tr>
+<tr><td>—</td><td><code>offers[].isMAP</code></td><td>MAP（最低広告価格）規制により、Amazon 上で価格が隠されているか</td><td>隠されていても、オファーオブジェクトには価格と送料が入る</td><td>offer-object</td></tr>
+<tr><td>—</td><td><code>offers[].isWarehouseDeal</code></td><td>そのオファーが Amazon Warehouse のものか</td><td>—</td><td>offer-object</td></tr>
+<tr><td>—</td><td><code>offers[].minOrderQty</code></td><td>最低注文数量</td><td>値がある場合のみ返る</td><td>offer-object</td></tr>
+<tr><td>商品の状態</td><td><code>offers[].condition</code></td><td>0 不明／<strong>1 新品</strong>／2 中古-ほぼ新品／3 中古-非常に良い／4 中古-良い／5 中古-可／6 再生品／7〜10 コレクター品の各状態／11 レンタル</td><td>⚠ <strong>開封品（Open Box）は中古として符号化されます</strong></td><td>offer-object</td></tr>
+<tr><td>—</td><td><code>offers[].conditionComment</code></td><td>商品の状態を説明する文章</td><td>—</td><td>offer-object</td></tr>
+</tbody></table>
+<hr>
+<h3 id="sec-3-4">3.4 Buy Box（カート）</h3>
+<table class="deftable"><thead><tr><th>用語</th><th>APIフィールド名</th><th>意味</th><th>注意</th><th>出典</th></tr></thead><tbody>
+<tr><td>Buy Box</td><td><code>BUY_BOX_SHIPPING</code>（csv 18）</td><td>新品 Buy Box 価格の履歴（送料込み）</td><td>⚠ <code>offers</code> 必須。→ <a class="secref" href="#sec-3-1">§3.1</a></td><td>product-object</td></tr>
+<tr><td>—</td><td><code>stats.buyBoxPrice</code></td><td>Buy Box の<strong>新品価格</strong>。無ければ -1 か -2</td><td>⚠ <strong><code>offers</code> または <code>buybox</code> を付けたときにしか設定されません。</strong><strong>送料は含まず</strong>、別フィールド <code>buyBoxShipping</code> に入ります</td><td>statistics-object</td></tr>
+<tr><td>—</td><td><code>stats.buyBoxShipping</code></td><td>Buy Box の新品<strong>送料</strong>。無ければ -1 か -2</td><td>⚠ <code>offers</code> または <code>buybox</code> 必須</td><td>statistics-object</td></tr>
+<tr><td>—</td><td><code>stats.buyBoxSellerId</code></td><td>Buy Box を取っているオファーの出品者ID。無ければ <code>"-1"</code> / <code>"-2"</code> / null</td><td>⚠ <code>offers</code> または <code>buybox</code> 必須</td><td>statistics-object</td></tr>
+<tr><td>—</td><td><code>buyBoxSellerIdHistory</code></td><td>Buy Box を保持した出品者IDの履歴。<strong><code>-1</code>＝誰も Buy Box の資格を得なかった（Buy Box 抑制）／<code>-2</code>＝出品者を特定できなかった、または在庫切れ</strong></td><td>⚠ <code>offers</code> または <code>buybox</code> 必須</td><td>product-object</td></tr>
+<tr><td>—</td><td><code>stats.buyBoxIsUnqualified</code></td><td>Buy Box を獲得した出品者がいるかどうか。<strong>質の低いオファーしか無い場合、誰も Buy Box の資格を得ません</strong></td><td>⚠ <code>offers</code> または <code>buybox</code> 必須</td><td>statistics-object</td></tr>
+<tr><td>—</td><td><code>stats.buyBoxIsFBA</code></td><td>Buy Box が FBA（Amazon 発送）か</td><td>同上</td><td>statistics-object</td></tr>
+<tr><td>—</td><td><code>stats.buyBoxIsAmazon</code></td><td>Buy Box の出品者が Amazon か</td><td>同上</td><td>statistics-object</td></tr>
+<tr><td>—</td><td><code>stats.buyBoxIsMAP</code></td><td>MAP（最低広告価格）規制により、Buy Box の新品価格が Amazon 上で非表示になっているか</td><td>同上</td><td>statistics-object</td></tr>
+<tr><td>—</td><td><code>stats.buyBoxAvailabilityMessage</code></td><td>Buy Box オファーの入手可能性。<strong><code>IN_STOCK</code>（すぐ出荷可）／<code>BACKORDER_NO_ETA</code>（取り寄せ・納期不明）／<code>BACKORDER_WITH_ETA</code>（取り寄せ・納期あり）</strong>の3値</td><td><strong>2026-04 に自然文（"In Stock" など）から定数へ変更されました</strong></td><td>statistics-object / changelog</td></tr>
+<tr><td>—</td><td><code>stats.buyBoxShippingTime</code></td><td>Buy Box オファーが出荷されるまでの推定処理時間（最小・最大の時間数）。例 <code>[24, 48]</code>＝1〜2日で出荷可</td><td>—</td><td>statistics-object</td></tr>
+<tr><td>—</td><td><code>stats.buyBoxShippingCountry</code></td><td>Buy Box 出品者の既定の発送元国。<strong>出品者が Amazon の場合は null</strong></td><td>—</td><td>statistics-object</td></tr>
+<tr><td>—</td><td><code>stats.buyBoxIsPrimeEligible</code> / <code>stats.buyBoxIsPrimeExclusive</code></td><td>Buy Box がプライム対象か／プライム会員限定か</td><td>—</td><td>statistics-object</td></tr>
+<tr><td>—</td><td><code>stats.buyBoxSavingBasis</code> / <code>stats.buyBoxSavingBasisType</code> / <code>stats.buyBoxSavingPercentage</code></td><td>Buy Box の参考価格（打ち消し線価格）／その種別（<code>LIST_PRICE</code> または <code>WAS_PRICE</code>）／表示上の割引率</td><td><strong>2026-04 以降、更新には <code>offers</code> が必要</strong></td><td>statistics-object / changelog</td></tr>
+<tr><td>—</td><td><code>stats.buyBoxUsedPrice</code> / <code>stats.buyBoxUsedShipping</code> / <code>stats.buyBoxUsedSellerId</code> / <code>stats.buyBoxUsedIsFBA</code> / <code>stats.buyBoxUsedCondition</code></td><td>中古 Buy Box の価格・送料・出品者ID・FBAか・サブ状態（2 ほぼ新品／3 非常に良い／4 良い／5 可）</td><td>—</td><td>statistics-object</td></tr>
+<tr><td>Buy Box統計</td><td><code>stats.buyBoxStats</code> / <code>stats.buyBoxUsedStats</code></td><td>指定期間の Buy Box 統計。<strong>キーが出品者ID</strong>、値がその出品者の統計オブジェクト</td><td>⚠ <code>offers</code> または <code>buybox</code> 必須</td><td>statistics-object</td></tr>
+<tr><td>%獲得</td><td><code>buyBoxStats[].percentageWon</code></td><td>その出品者が Buy Box を獲得していた<strong>時間の割合</strong>。<strong>非プライム客に対して</strong></td><td>⚠ 「非プライム客に対して」という限定が公式に明記されています</td><td>statistics-object</td></tr>
+<tr><td>平均価格</td><td><code>buyBoxStats[].avgPrice</code></td><td>その出品者の Buy Box オファーの平均価格</td><td>—</td><td>statistics-object</td></tr>
+<tr><td>—</td><td><code>buyBoxStats[].avgNewOfferCount</code></td><td><strong>その出品者が Buy Box を保持していた間の</strong>「新品」オファー数の平均</td><td>商品全体の平均ではありません</td><td>statistics-object</td></tr>
+<tr><td>—</td><td><code>buyBoxStats[].isFBA</code></td><td>そのオファーが FBA か</td><td>—</td><td>statistics-object</td></tr>
+<tr><td>—</td><td><code>buyBoxStats[].lastSeen</code></td><td>その出品者が<strong>最後に Buy Box を獲得した時刻</strong>（Keepa Time 分）</td><td>—</td><td>statistics-object</td></tr>
+<tr><td>Buy Box対象オファー数</td><td><code>buyBoxEligibleOfferCounts</code></td><td><strong>Buy Box に適格な</strong>オファー数。8要素の配列で、順に <strong>0 新品FBA／1 新品FBM／2 中古FBA／3 中古FBM／4 コレクター品FBA／5 コレクター品FBM／6 再生品FBA／7 再生品FBM</strong></td><td>⚠ ①<strong>「適格な」オファーに限られる</strong>（全オファー数ではない）②<strong>オファー数であって出品者数ではない</strong></td><td>product-object</td></tr>
+<tr><td>—</td><td><code>competitivePriceThreshold</code></td><td>他の小売業者の競合価格（Amazon の他の出品者は除く）に基づく価格。<strong>出品価格＋送料がこれを上回ると Buy Box の対象外になりうる</strong></td><td>—</td><td>product-object</td></tr>
+<tr><td>—</td><td><code>suggestedLowerPrice</code></td><td>Amazon が提示する推奨引き下げ価格（送料込み）</td><td>—</td><td>product-object</td></tr>
+<tr><td>—</td><td><code>isSNS</code></td><td>その商品の Buy Box が「定期おトク便」に対応しているか</td><td>—</td><td>product-object</td></tr>
+</tbody></table>
+<hr>
+<h3 id="sec-3-5">3.5 出品者情報（出品者概要画面 / Seller Object）</h3>
+<p><strong>keepa.com の「出品者検索」で出品者を開いたときの画面に対応します。</strong>この節の「用語」列は、<strong>実画面で確認した日本語表記</strong>です。</p>
+<table class="deftable"><thead><tr><th>用語</th><th>APIフィールド名</th><th>意味</th><th>注意</th><th>出典</th></tr></thead><tbody>
+<tr><td><strong>BUY BOX の平均売上数</strong></td><td><code>avgBuyBoxCompetitors</code></td><td><strong>この出品者が扱う商品について、Buy Box を争っている出品者数の平均</strong>（この出品者自身を含む）</td><td>⚠ <strong>売上ではありません。日本語UIの表記は誤訳です。</strong>数値が大きいほど「競合の多い棚を扱っている」という意味。<strong>目の前の1商品の混み具合ではなく、その出品者の商品群全体の平均</strong>です</td><td>seller-object</td></tr>
+<tr><td><strong>購入ボックス切り替えの所有者</strong></td><td><code>buyBoxNewOwnershipRate</code></td><td><strong>新品 Buy Box の平均獲得率（％）</strong></td><td>⚠ 「切り替え」は誤訳。意味は「獲得率」</td><td>seller-object</td></tr>
+<tr><td><strong>ボックスを購入する 中古の所有者</strong></td><td><code>buyBoxUsedOwnershipRate</code></td><td><strong>中古 Buy Box の平均獲得率（％）</strong></td><td>⚠ 同上</td><td>seller-object</td></tr>
+<tr><td><strong>え</strong>（96% などと表示）</td><td><code>positiveRating</code></td><td><strong>ポジティブ評価率（％）。ポジティブ評価とは★4または★5</strong>を指します。直近30日・90日・365日・ライフタイムの4値をこの順で格納</td><td>⚠ 「え」は Rating の誤訳。<strong>★3はポジティブに含まれません</strong>（★3が増えると下がる）</td><td>seller-object</td></tr>
+<tr><td>—</td><td><code>negativeRating</code> / <code>neutralRating</code></td><td>ネガティブ＝★1または★2／ニュートラル＝★3の比率（％）。同じく30日・90日・365日・ライフタイムの4値</td><td>—</td><td>seller-object</td></tr>
+<tr><td>評価ブロック</td><td><code>ratingCount</code></td><td><strong>評価件数。</strong>直近30日・90日・365日・ライフタイムの4値をこの順で格納</td><td>—</td><td>seller-object</td></tr>
+<tr><td>—</td><td><code>recentFeedback</code></td><td>直近の顧客フィードバック最大5件。日時・星（<strong>10＝★1 〜 50＝★5</strong>）・取り消し済みか</td><td>—</td><td>seller-object</td></tr>
+<tr><td>—</td><td><code>lastRatingUpdate</code></td><td>評価データを最後に更新した時刻（Keepa Time 分）</td><td>—</td><td>seller-object</td></tr>
+<tr><td><strong>FBAリストが見つかりました</strong></td><td><code>hasFBA</code></td><td>その出品者が現在FBA出品を持っているか</td><td>⚠ 公式が「<strong>通常は正しいが、FBA出品があっても false になりうる</strong>（Keepa が全出品を把握できていないため。特に出品数が少なく回転の遅い出品者で起きやすい）」と明記。<strong>「はい」は信じてよいが「いいえ」は『無い』ことの証明にならない</strong></td><td>seller-object</td></tr>
+<tr><td><strong>確認済みリスト</strong></td><td><code>totalStorefrontAsins</code></td><td>ストアフロントASIN数と、その指標の最終更新時刻。形式 <code>[最終更新, 件数]</code></td><td>⚠ <strong>2026年2月以降、Amazon のストアフロントを実際に取得した数ではなく、Keepa の内部データベース集計値</strong>です。<strong>実在庫数ではありません。</strong>一度もストアフロントを取得できていなければ null</td><td>seller-object / changelog</td></tr>
+<tr><td>—</td><td><code>asinList</code> / <code>asinListLastSeen</code></td><td>ストアフロントのASIN一覧（<strong>最大10万件・新しい順</strong>）と、各ASINを最後に確認できた時刻</td><td>⚠ <code>storefront</code> パラメータを使ったときのみ取得できる</td><td>seller-object</td></tr>
+<tr><td><strong>重複の多い主なセラー</strong></td><td><code>competitors</code></td><td><strong>同じ商品を扱っていることが最も多い上位5出品者</strong>と、その出品者と共有している出品の割合（％）</td><td>⚠ <strong>上位5社まで。</strong>6位以下は「いない」のではなく「返らない」</td><td>seller-object</td></tr>
+<tr><td>カテゴリー別／ブランド別リスティング統計</td><td><code>sellerCategoryStatistics</code> / <code>sellerBrandStatistics</code></td><td>その出品者の主要カテゴリ／ブランドの統計。<code>productCount</code>（点数）・<code>avg30SalesRank</code>（それらの30日平均ランク）・<code>productCountWithAmazonOffer</code>（うち Amazon のオファーがある数）</td><td>⚠ 公式が自ら「<strong>Keepa のしばしば不完全で古い出品データに基づく</strong>」と明記。％を1桁まで信用しないこと</td><td>seller-object</td></tr>
+<tr><td><strong>KEEPAによって追跡開始</strong></td><td><code>trackingSince</code></td><td><strong>Keepa がこの出品者の追跡を開始した時刻</strong></td><td>⚠ <strong>Amazon での開業日ではありません</strong></td><td>seller-object</td></tr>
+<tr><td>—</td><td><code>lastUpdate</code></td><td>出品者の基本データを最後に更新した時刻。<strong>評価・ストアフロントの更新は含みません</strong></td><td>—</td><td>seller-object</td></tr>
+<tr><td>セラーID</td><td><code>sellerId</code></td><td>出品者ID（例：<code>A2L77EE7U53NWQ</code>）</td><td>—</td><td>seller-object</td></tr>
+<tr><td>店名</td><td><code>sellerName</code></td><td>出品者の表示名</td><td>—</td><td>seller-object</td></tr>
+<tr><td>事業者名</td><td><code>businessName</code></td><td>事業者の名称</td><td>—</td><td>seller-object</td></tr>
+<tr><td>住所</td><td><code>address</code></td><td>事業所の住所。配列の1要素が1行で、<strong>最後の要素は2文字の国コード</strong></td><td>—</td><td>seller-object</td></tr>
+<tr><td>—</td><td><code>customerServicesAddress</code></td><td>カスタマーサービスの住所（形式は <code>address</code> と同じ）</td><td>—</td><td>seller-object</td></tr>
+<tr><td>—</td><td><code>tradeNumber</code></td><td><strong>商業登記番号</strong>（公式の例は <code>HRB 123 456</code>＝ドイツの登記番号）</td><td>⚠ 日本語画面の「商業番号」がこのフィールドかどうかは公式に記述がありません（→ <a class="secref" href="#sec-4">§4</a>）</td><td>seller-object</td></tr>
+<tr><td>—</td><td><code>vatID</code></td><td>VAT（付加価値税）番号</td><td>—</td><td>seller-object</td></tr>
+<tr><td>電話</td><td><code>phoneNumber</code></td><td>電話番号</td><td>—</td><td>seller-object</td></tr>
+<tr><td>代表者</td><td><code>representative</code></td><td>事業者の代表者名</td><td>—</td><td>seller-object</td></tr>
+<tr><td>—</td><td><code>businessType</code> / <code>shareCapital</code> / <code>email</code></td><td>事業形態／資本金／事業者のメールアドレス</td><td>値がある場合のみ返る</td><td>seller-object</td></tr>
+<tr><td>—</td><td><code>seller.csv</code></td><td>出品者の履歴。<strong><code>csv[0]</code> ＝評価（％。0〜100の整数）／<code>csv[1]</code> ＝評価件数の累計</strong></td><td>新規に作られた出品者アカウントには評価がまだ無いことがある</td><td>seller-object</td></tr>
+</tbody></table>
+<p class="note">▸ <strong>公式の注記：</strong>Keepa の API は、<strong>ハンドメイドカテゴリのみで販売している出品者の情報を提供しません。</strong></p>
+<hr>
+<h3 id="sec-3-6">3.6 統計値（<code>stats</code>）</h3>
+<p><code>stats</code> は、<code>stats</code> パラメータを付けたときだけ返る集計オブジェクトです。<strong>新しいデータが増えるわけではなく、<code>csv</code> の履歴から計算されたもの</strong>です（公式明記）。</p>
+<p class="note">▸ <code>current</code> / <code>avg</code> / <code>min</code> / <code>max</code> などの<strong>配列の添字は、すべて <a class="secref" href="#sec-3-1">§3.1</a> の csv 番号と同じ</strong>です（<code>[1]</code> なら新品、<code>[11]</code> なら新品オファー数）。<strong>配列の長さを固定と仮定せず、必ず番号で参照してください。</strong></p>
+<table class="deftable"><thead><tr><th>用語</th><th>APIフィールド名</th><th>意味</th><th>注意</th><th>出典</th></tr></thead><tbody>
+<tr><td>—</td><td><code>stats.current</code></td><td><strong>最後に更新された時点の</strong>価格・ランク・件数</td><td><code>-1</code> は「その期間にオファーが無かった（在庫切れなど）」</td><td>statistics-object</td></tr>
+<tr><td>—</td><td><code>stats.min</code> / <code>stats.max</code></td><td><strong>これまでに記録された中での</strong>最安値／最高値</td><td>⚠ <strong>全期間です。<code>stats=365</code> を指定しても効きません。</strong>2次元配列で、中身は <code>[記録された時刻, 値]</code> の2要素</td><td>statistics-object</td></tr>
+<tr><td>—</td><td><code>stats.minInInterval</code> / <code>stats.maxInInterval</code></td><td><code>min</code> / <code>max</code> と同じだが、<strong><code>stats</code> パラメータで指定した期間に限定</strong></td><td>期間内の最安・最高を見たいときはこちら</td><td>statistics-object</td></tr>
+<tr><td>—</td><td><code>stats.avg</code></td><td>指定期間の<strong>加重平均</strong>（weighted mean）</td><td>⚠ 単純平均ではありません。<code>-1</code> はデータ不足</td><td>statistics-object</td></tr>
+<tr><td>—</td><td><code>stats.avg30</code> / <code>stats.avg90</code> / <code>stats.avg180</code> / <code>stats.avg365</code></td><td>直近30／90／180／365日の加重平均</td><td><strong><code>stats</code> で指定した期間とは独立した固定窓</strong></td><td>statistics-object</td></tr>
+<tr><td>—</td><td><code>stats.atIntervalStart</code></td><td><strong><code>stats</code> で指定した期間の開始時点</strong>で記録されていた価格</td><td>期間中の値動きを測る基準に使える</td><td>statistics-object</td></tr>
+<tr><td>—</td><td><code>stats.outOfStockPercentage30</code> / <code>stats.outOfStockPercentage90</code> / <code>stats.outOfStockPercentage180</code> / <code>stats.outOfStockPercentage365</code></td><td>その期間の<strong>在庫切れ率</strong>。<strong>0＝一度も切れていない／100＝全期間切れていた／25＝25%の期間切れていた</strong></td><td><strong>-1＝データ不足、またはその番号が価格ではない</strong>（ランクやオファー数の番号）</td><td>statistics-object</td></tr>
+<tr><td>—</td><td><code>stats.outOfStockPercentageInInterval</code></td><td>同上を、<code>stats</code> で指定した期間で計算したもの</td><td>—</td><td>statistics-object</td></tr>
+<tr><td>—</td><td><code>stats.lightningDealInfo</code></td><td>過去・進行中・予定のタイムセールを識別する <code>[開始日, 終了日]</code>。<strong>予定のみなら終了日が -1</strong>。一度もタイムセールが無ければ null</td><td>—</td><td>statistics-object</td></tr>
+<tr><td>—</td><td><code>stats.stockAmazon</code> / <code>stats.stockBuyBox</code></td><td>Amazon 本体オファー／Buy Box オファーの在庫数</td><td>⚠ <code>stock</code> パラメータ必須（+2トークン）</td><td>statistics-object</td></tr>
+</tbody></table>
+<p><strong><code>stats</code> パラメータで指定した期間が効くフィールド</strong>：<code>stats.avg</code> ／ <code>stats.atIntervalStart</code> ／ <code>stats.minInInterval</code> ／ <code>stats.maxInInterval</code> ／ <code>stats.outOfStockPercentageInInterval</code> ／ <code>stats.buyBoxStats</code> ／ <code>stats.buyBoxUsedStats</code>。<br><strong>効かない（固定窓の）フィールド</strong>：<code>stats.avg30</code>〜<code>stats.avg365</code> ／ <code>stats.outOfStockPercentage30</code>〜<code>365</code> ／ <code>salesRankDrops30</code>〜<code>365</code> ／ <strong><code>stats.min</code> / <code>stats.max</code>（全期間）</strong>。（statistics-object）</p>
+<hr>
+<h3 id="sec-3-7">3.7 商品の属性・手数料</h3>
+<table class="deftable"><thead><tr><th>用語</th><th>APIフィールド名</th><th>意味</th><th>注意</th><th>出典</th></tr></thead><tbody>
+<tr><td>—</td><td><code>productType</code></td><td><strong>最初に評価すべきフィールド</strong>（公式明記）。<strong>0 STANDARD</strong>（すべて取得可）／<strong>1 DOWNLOADABLE</strong>・<strong>2 EBOOK</strong>（価格・評価・オファーのデータなし。更新頻度も低い）／<strong>3 INACCESSIBLE</strong>（同上。ランクとオファー数の更新頻度も低く、欠けるフィールドがある）／<strong>4 INVALID</strong>（無効・廃止ASIN 等で現在データなし。一時的なこともある）／<strong>5 VARIATION_PARENT</strong>（親ASIN）</td><td>—</td><td>product-object</td></tr>
+<tr><td>—</td><td><code>availabilityAmazon</code></td><td>Amazon 本体オファーの在庫状況。<strong>-1 Amazon のオファーが存在しない／0 在庫あり出荷可／1 予約／2 不明／3 入荷待ち／4 出荷遅延</strong></td><td>⚠ <strong>「Amazon 本体がいるか」を判定する専用フィールドはこれです。</strong>価格履歴の <code>AMAZON</code>（csv 0）が -1 なのは「その時点で価格データが無い」という意味で、<strong>在庫切れでも -1 になります</strong></td><td>product-object</td></tr>
+<tr><td>—</td><td><code>availabilityAmazonDelay</code></td><td><code>availabilityAmazon</code> が 4 のときの、遅延の幅（時間）</td><td>—</td><td>product-object</td></tr>
+<tr><td>—</td><td><code>fbaFees.pickAndPackFee</code></td><td><strong>この商品の FBA ピック＆パック手数料。</strong>寸法と重量、および<strong>現在のオファー価格と等しい販売価格を仮定して</strong>算出されます</td><td>⚠ <strong>FBA費用の全部ではなく「ピック＆パック」のみ</strong>（保管料・長期保管料は含まない）。現在オファーが無ければ最後に判明した価格、それも無ければ<strong>販売価格 100.00 を仮定した値</strong>が入ります</td><td>product-object</td></tr>
+<tr><td>—</td><td><code>referralFeePercentage</code></td><td><strong>仮定した販売価格における</strong> Amazon 販売手数料の％</td><td>⚠ 仮定価格の決め方は <code>fbaFees</code> と同じ（現在価格→最後の価格→100.00）</td><td>product-object</td></tr>
+<tr><td>—</td><td><code>variableClosingFee</code></td><td>成約時手数料（メディア系商品）</td><td>該当しなければ未設定</td><td>product-object</td></tr>
+<tr><td>—</td><td><code>returnRate</code></td><td>顧客の返品率。<strong>null＝不明または平均的／1＝返品率が低い／2＝返品率が高い</strong></td><td>—</td><td>product-object</td></tr>
+<tr><td>—</td><td><code>isHeatSensitive</code></td><td>熱に弱い商品か（例：溶けやすいもの）</td><td>—</td><td>product-object</td></tr>
+<tr><td>—</td><td><code>isAdultProduct</code></td><td>成人向けとみなされる商品か</td><td>—</td><td>product-object</td></tr>
+<tr><td>—</td><td><code>isHaul</code> / <code>isMerchOnDemand</code></td><td>Amazon Haul の商品か／Amazon Merch on Demand の商品か</td><td>Amazon Haul の商品は基本情報しか取得できない</td><td>product-object</td></tr>
+<tr><td>—</td><td><code>isEligibleForSuperSaverShipping</code></td><td>Buy Box が無料配送の対象か</td><td>—</td><td>product-object</td></tr>
+<tr><td>—</td><td><code>isEligibleForTradeIn</code></td><td>下取り対象商品か</td><td>—</td><td>product-object</td></tr>
+<tr><td>—</td><td><code>numberOfItems</code> / <code>packageQuantity</code></td><td>商品の個数／パッケージ内の個数</td><td>取得できなければ -1（<code>packageQuantity</code> は 0 か -1）</td><td>product-object</td></tr>
+<tr><td>—</td><td><code>parentAsin</code></td><td><strong>親ASIN</strong>（バリエーションがある商品の代表ASIN）。バリエーションが無ければ null</td><td>⚠ <code>monthlySold</code> など<strong>バリエーション単位の値</strong>を読むときは、いま親と子のどちらを見ているかを必ず確認してください</td><td>product-object</td></tr>
+<tr><td>—</td><td><code>parentAsinHistory</code></td><td><code>parentAsin</code> の履歴。時刻は「<strong>それまでの親ASINが有効でなくなった時点</strong>」を示す</td><td>親ASINの変更追跡は 2024-03-18 開始</td><td>product-object</td></tr>
+<tr><td>—</td><td><code>variations</code></td><td>バリエーション（子ASIN）の一覧</td><td><code>productType</code> が 5（VARIATION_PARENT）の商品で設定される</td><td>product-object</td></tr>
+<tr><td>—</td><td><code>ingredients</code></td><td>商品の原材料表示</td><td>—</td><td>product-object</td></tr>
+<tr><td>商品名</td><td><code>title</code></td><td>商品タイトル</td><td>⚠ Amazon はメディア以外の全カテゴリでタイトルを<strong>75文字（スペース含む）</strong>に制限しており、収まらない説明は <code>itemHighlights</code> に分けて掲載されます。<strong>まれにエスケープされていないHTMLが混じることがある</strong></td><td>product-object</td></tr>
+<tr><td>—</td><td><code>itemHighlights</code></td><td>タイトルに加えて表示される<strong>最大125文字</strong>の説明（素材・推奨用途など）。Amazon は検索対象として扱う</td><td>—</td><td>product-object</td></tr>
+<tr><td>—</td><td><code>urlSlug</code></td><td>商品ページURLのスラッグ</td><td>—</td><td>product-object</td></tr>
+<tr><td>—</td><td><code>audienceRating</code></td><td>対象年齢の目安（メディア商品）</td><td>—</td><td>product-object</td></tr>
+</tbody></table>
+<hr>
+<h3 id="sec-3-8">3.8 Product Finder（商品検索の絞り込み条件）</h3>
+<p class="note">▸ この表の「用語」列は、Keepa の Product Finder 画面のラベルに対応すると<strong>推定</strong>されるものを含みます。<strong>Product Finder の結果表の上にある「Show API query」を押すと、いま設定している条件の APIフィールド名がそのまま読めます</strong>（公式の Tip）。日本語ラベルと原語の対応を確定させたいときはこれが確実です。</p>
+<table class="deftable"><thead><tr><th>用語</th><th>APIフィールド名</th><th>意味</th><th>注意</th><th>出典</th></tr></thead><tbody>
+<tr><td>新品 - 下落（直近7日間）ほか</td><td><code>deltaPercent[1,7,30,90]_&lt;価格タイプ&gt;</code></td><td>現在値と、1／7／30／90日平均値との<strong>相対差</strong>（0〜100％）。<strong>正の値は「値下がりした」もの、負の値は「値上がりした」ものを絞り込みます。</strong>0 は変化なし</td><td>⚠ <strong>符号の向きに注意。</strong>「値上がりした商品を探す」なら負の値を指定します</td><td>product-finder</td></tr>
+<tr><td>—</td><td><code>delta[1,7,30,90]_&lt;価格タイプ&gt;</code></td><td>同じものの<strong>絶対差</strong>（通貨の最小単位）</td><td>符号の意味は <code>deltaPercent</code> と同じ</td><td>product-finder</td></tr>
+<tr><td>—</td><td><code>deltaLast_&lt;価格タイプ&gt;</code></td><td>現在値と<strong>直前の値</strong>との差</td><td>正＝下落／負＝上昇</td><td>product-finder</td></tr>
+<tr><td>—</td><td><code>isLowest_&lt;価格タイプ&gt;</code> / <code>isLowest90_&lt;価格タイプ&gt;</code></td><td>現在価格が<strong>史上最安か</strong>／<strong>直近90日で最安か</strong>（真偽値）</td><td>—</td><td>product-finder</td></tr>
+<tr><td>—</td><td><code>isLowestOffer</code></td><td>選んだ価格タイプが、<strong>全新品オファーの中で最安か</strong>（Amazon 本体とマーケットプレイス新品に適用）</td><td>—</td><td>product-finder</td></tr>
+<tr><td>—</td><td><code>current_&lt;価格タイプ&gt;</code> / <code>avg30_&lt;価格タイプ&gt;</code> 等</td><td><code>stats</code> の各値による絞り込み。価格タイプ名は <code>AMAZON</code> <code>NEW</code> <code>BUY_BOX_SHIPPING</code> など</td><td>—</td><td>product-finder</td></tr>
+<tr><td>—</td><td><code>availabilityAmazon</code></td><td>Amazon 本体オファーの在庫状況（値は <a class="secref" href="#sec-3-7">§3.7</a> と同じ）</td><td>⚠ Amazon 本体がいない商品を除外・抽出する条件はこれ</td><td>product-finder</td></tr>
+<tr><td>—</td><td><code>buyBoxStatsSellerCount[30,90,180,365]</code></td><td>その期間に <strong>Buy Box を獲得したことがある出品者の数</strong></td><td>⚠ 「オファーを出している出品者数」とは別物（<strong>Buy Box を一度も取れなかった出品者は数えられません</strong>）</td><td>product-finder</td></tr>
+<tr><td>—</td><td><code>buyBoxStatsAmazon[30,90,180,365]</code></td><td>その期間に <strong>Amazon 本体のオファーが Buy Box を保持していた割合（％）</strong></td><td>—</td><td>product-finder</td></tr>
+<tr><td>—</td><td><code>buyBoxStatsTopSeller[30,90,180,365]</code></td><td>最も Buy Box 獲得率が高い出品者のシェア（％。<strong>Amazon を含む</strong>）</td><td>—</td><td>product-finder</td></tr>
+<tr><td>—</td><td><code>sellerIds</code> / <code>sellerIdsLowestFBA</code> / <code>sellerIdsLowestFBM</code> / <code>buyBoxUsedSellerId</code></td><td>出品者IDによる絞り込み（出品している／FBA最安／FBM最安／中古Buy Box 適格）</td><td>—</td><td>product-finder</td></tr>
+<tr><td>—</td><td><code>minMatch</code></td><td>配列条件の <strong>K-of-N 一致</strong>。既定では配列内の項目は OR（どれか1つ該当すればよい）だが、<code>{"sellerIds": 2}</code> と書くと<strong>列挙した出品者のうち2社以上</strong>が出品している商品だけに絞れる</td><td>項目数と同じ数を指定すると AND になる</td><td>product-finder</td></tr>
+<tr><td>—</td><td><code>title</code></td><td>商品タイトルの<strong>キーワード単位</strong>の検索（最大50語・大文字小文字は区別しない）。<strong>部分一致は不可。</strong><code>"Digital Camera"</code> でフレーズ指定、<code>-digital</code> で除外</td><td>—</td><td>product-finder</td></tr>
+<tr><td>—</td><td><code>manufacturer</code> / <code>brand</code> 等</td><td>製造者名・ブランド名などの文字列配列による絞り込み</td><td>—</td><td>product-finder</td></tr>
+<tr><td>—</td><td><code>rootCategory</code> / <code>categories_include</code> / <code>categories_exclude</code></td><td>ルートカテゴリ／サブカテゴリでの絞り込み（それぞれ最大50件のカテゴリノードID）</td><td>—</td><td>product-finder</td></tr>
+<tr><td>—</td><td><code>monthlySold</code> / <code>deltaPercent90_monthlySold</code></td><td>月間販売数（→ <a class="secref" href="#sec-3-2">§3.2</a>）／その直近90日の変化率（％）</td><td>⚠ <strong>大半のASINは <code>monthlySold</code> の値を持ちません</strong></td><td>product-finder</td></tr>
+<tr><td>—</td><td><code>monthlySoldPeak</code> / <code>monthlySoldPeakDate</code> / <code>monthlySoldLastKnown</code> / <code>monthlySoldLastKnownDate</code></td><td>月間販売数の<strong>過去最高値</strong>とその時期／<strong>最後に判明した値</strong>とその時期</td><td>—</td><td>product-finder</td></tr>
+<tr><td>—</td><td><code>outOfStockPercentage90</code></td><td>直近90日の在庫切れ率。価格タイプ別の形（<code>_BB</code> / <code>_BB_USED</code> / <code>_NEW</code> / <code>_USED</code>）もある</td><td>—</td><td>product-finder</td></tr>
+<tr><td>—</td><td><code>outOfStockCountAmazon30</code> / <code>outOfStockCountAmazon90</code></td><td>直近30／90日に Amazon 本体が在庫切れになった<strong>回数</strong></td><td>—</td><td>product-finder</td></tr>
+<tr><td>—</td><td><code>trackingSince</code> / <code>lastPriceChange</code> / <code>lastOffersUpdate</code></td><td>Keepa が追跡を開始した時刻／最後に価格変動が記録された時刻／<strong>オファー関連データが最後に更新された時刻</strong></td><td><code>lastOffersUpdate</code> は「オファー系データが新しい商品だけ」を取り出すのに使える</td><td>product-finder</td></tr>
+<tr><td>—</td><td><code>hasReviews</code> / <code>returnRate</code> / <code>productType</code></td><td>レビューの有無／返品率／商品タイプによる絞り込み</td><td>—</td><td>product-finder</td></tr>
+<tr><td>—</td><td><code>hasParentASIN</code> / <code>singleVariation</code> / <code>historicalParentASIN</code></td><td>親ASINを持つか／1商品につきバリエーション1件だけ返す／親ASINから過去の子ASINを探す</td><td>—</td><td>product-finder</td></tr>
+<tr><td>—</td><td><code>variationCount</code></td><td><strong>この商品のバリエーション数</strong>による絞り込み</td><td>⚠ <strong>バリエーションの無い商品でこの値が 0 になるのか 1 になるのかは、公式に記述がありません</strong>（→ <a class="secref" href="#sec-4">§4</a>）。<code>variationCount ≧ 1</code> のような条件を置くと、意図せず全商品を落としうる</td><td>product-finder</td></tr>
+<tr><td>—</td><td><code>dealType</code></td><td>セールバッジの種類（<code>LIMITED_TIME_DEAL</code> <code>PRIME_EXCLUSIVE</code> <code>CLEARANCE_NO_RETURNS</code> など13種）</td><td>—</td><td>product-finder</td></tr>
+<tr><td>—</td><td><code>page</code> / <code>perPage</code></td><td>ページ番号／1ページの件数（既定・最小50件）</td><td>⚠ <strong><code>page=0</code> のときだけ <code>perPage</code> を最大10,000にできます。</strong>0以外のページでは <code>page × perPage</code> が10,000を超えてはいけません</td><td>product-finder</td></tr>
+</tbody></table>
+<hr>
+<h3 id="sec-3-9">3.9 リクエストとトークン</h3>
+<p><strong>トークン</strong>＝ Keepa API を使うための「回数券」です。プランごとに毎分一定数が補充され、リクエストのたびに消費されます。</p>
+<table class="deftable"><thead><tr><th>用語</th><th>APIフィールド名</th><th>意味</th><th>注意</th><th>出典</th></tr></thead><tbody>
+<tr><td>トークンバケット</td><td>—</td><td>プランは<strong>毎分 R トークンを24時間365日生成し続け</strong>、リクエストがそれを消費する仕組み。<strong>各トークンの有効期限は60分</strong>で、バケツの容量は <strong>R × 60 トークン</strong></td><td>⚠ <strong>未使用分は60分で失効します。</strong>貯められるのは1時間分だけ（＝一度に使える最大量でもある）</td><td>plans-tokens</td></tr>
+<tr><td>—</td><td><code>tokensLeft</code> / <code>refillRate</code> / <code>refillIn</code></td><td>すべてのAPIレスポンスに入る、<strong>現在のトークン残高</strong>／補充レート／次の補充までの時間</td><td>—</td><td>request-basics</td></tr>
+<tr><td>—</td><td><code>stats</code>（パラメータ）</td><td><code>stats</code> オブジェクトを付けて返す。<strong>直近x日</strong>、または<strong>期間の指定</strong>（ISO8601 の日付2つ、または Unix ミリ秒2つ）</td><td><strong>追加トークンなし。</strong>新しいデータが増えるわけではなく、<code>csv</code> から計算されます</td><td>product</td></tr>
+<tr><td>—</td><td><code>offers</code>（パラメータ）</td><td>取得する<strong>最新のマーケットプレイスオファー数</strong>（20〜100）</td><td>⚠ <strong>見つかったオファーページ1枚（最大10オファー）につき6トークン。</strong>オファーが1件も無くても、取得に成功すれば最低5トークン。<strong><code>offers</code> を使うと基本の1トークン/ASIN は適用されません</strong></td><td>product</td></tr>
+<tr><td>—</td><td><code>buybox</code>（パラメータ）</td><td>Buy Box 関連データを付けて返す</td><td><strong>+2トークン/商品</strong></td><td>product</td></tr>
+<tr><td>—</td><td><code>stock</code>（パラメータ）</td><td>在庫数を付けて返す</td><td><strong>+2トークン/商品</strong></td><td>product</td></tr>
+<tr><td>—</td><td><code>rating</code>（パラメータ）</td><td>評価・レビュー件数の履歴を付けて返す</td><td><strong>最大 +1トークン/商品</strong></td><td>product</td></tr>
+<tr><td>—</td><td><code>only-live-offers</code>（パラメータ）</td><td>現存オファーだけを返す（<code>offers</code> と併用）</td><td>追加トークンなし。<strong>現存オファーだけを要求して取得に失敗した場合、トークンは消費されません</strong></td><td>product</td></tr>
+<tr><td>—</td><td><code>update</code>（パラメータ）</td><td>「最後の更新が <strong>N 時間</strong>より古ければ強制的に更新する」の N。<strong>既定は 1 時間</strong></td><td><strong><code>update=0</code>＝常に最新を取る</strong>（前回更新が1時間以内なら +1トークン）。<strong><code>update=-1</code>＝更新しない</strong>（Keepa のDBに無い商品なら<strong>0トークン</strong>で何も返さない）</td><td>product</td></tr>
+<tr><td>—</td><td><code>history</code>（パラメータ）</td><td><code>history=0</code> で <code>csv</code>・<code>salesRanks</code> などの履歴を返さない</td><td>追加トークンなし。レスポンスを大幅に軽くできる</td><td>product</td></tr>
+<tr><td>—</td><td><code>days</code>（パラメータ）</td><td>履歴を直近N日に制限する</td><td>追加トークンなし</td><td>product</td></tr>
+<tr><td>Product Finder のトークン単価</td><td>—</td><td><strong>1リクエスト 10トークン ＋ 結果100ASINあたり1トークン</strong></td><td>—</td><td>product-finder</td></tr>
+<tr><td>Seller Finder</td><td>—</td><td>出品者データベースを条件検索して<strong>出品者IDの一覧だけ</strong>を返すエンドポイント（2026-08-09 新設）。<strong>10トークン＋返却100件あたり1トークン</strong></td><td>返るのはIDのみ。中身は Seller Information で引き直す</td><td>changelog</td></tr>
+<tr><td>Domain ID（市場）</td><td>—</td><td>対象マーケットプレイスの番号。<strong>1 com／2 co.uk／3 de／4 fr／5 co.jp／6 ca／8 it／9 es／10 in／11 com.mx／12 com.br</strong>。<strong>日本は 5</strong></td><td>⚠ Keepa 自身のドキュメント内で不統一：<code>product.html</code> <code>product-finder.html</code> <code>seller-object.html</code> は 12（com.br）まで載せていますが、<strong><code>product-object.html</code> だけ 11（com.mx）までしか載せていません</strong>（2026-08-24 時点）</td><td>product / product-finder / seller-object / product-object</td></tr>
+<tr><td>公式 MCP サーバ</td><td>—</td><td>Keepa 自身がホストする AI アシスタント向け接続口（<code>https://keepa.com/mcp</code>）。認証は既存のAPIアクセスキー、消費するのは<strong>契約中プランのトークン</strong>で、新規契約や追加課金は不要</td><td>⚠ 公式が「<strong>APIキーは秘密。キーを書いた設定ファイルを共有リポジトリにコミットしてはならない</strong>」と明記。応答は<strong>プログラム向けではなく言語モデル向けに整形</strong>されている（コードを書くなら REST API を直接使え、と公式）</td><td>mcp</td></tr>
+</tbody></table>
+<hr>
+<h3 id="sec-3-10">3.10 グラフ・トラッキング（画面まわり）</h3>
+<table class="deftable"><thead><tr><th>用語</th><th>APIフィールド名</th><th>意味</th><th>注意</th><th>出典</th></tr></thead><tbody>
+<tr><td>グラフ①「価格履歴」</td><td>—</td><td>価格の推移とルートカテゴリの売れ筋ランキングを描くグラフ</td><td>描ける csv 型：0〜10・15・18〜30・32・33</td><td>graph-image</td></tr>
+<tr><td>グラフ②「カテゴリ別ランキング＆月間販売数」</td><td>—</td><td>カテゴリ別のランクと月間販売数を描くグラフ</td><td>⚠ <strong>csv 型からは作られません</strong>（専用のパラメータで指定）</td><td>graph-image</td></tr>
+<tr><td>グラフ③「オファー数と評価」</td><td>—</td><td>オファー数・星評価・評価件数を描くグラフ</td><td>描ける csv 型：11〜14・16・17・34・35</td><td>graph-image</td></tr>
+<tr><td>再開タイマー（Rearm Timer）</td><td>—</td><td>価格アラートが一度鳴ったあと、次に鳴るまでの休止期間。<strong>既定は7日間</strong></td><td>「しない」＝到達したらそのアラートは無効化（再通知には希望価格の変更が必要）。「x日間」＝到達後 x日休止して再有効化。<strong>希望価格ごとに独立</strong>しており、1商品に複数の希望価格を設定できる</td><td>FAQ</td></tr>
+<tr><td>トラッキング</td><td>—</td><td>商品の価格を監視して通知を受ける機能</td><td>⚠ <strong>誰かがトラッキングしている商品は1時間に1回、していない商品は1日1回</strong>しか更新されません（→ <a class="secref" href="#sec-2">§2</a>-8）</td><td>FAQ</td></tr>
+</tbody></table>
+<hr>
+<h2 id="sec-4">4. 定義が確認できていない語</h2>
+<p><strong>以下は公式に定義が見つかりませんでした。推測で埋めていません。判断に使わないでください。</strong></p>
+<table class="tbl"><thead><tr><th>語</th><th>状態</th></tr></thead><tbody>
+<tr><td><strong>評価 -1%</strong>（Dataタブ Buy Box統計の評価列）</td><td>公式の <code>buyBoxStats</code> に評価の項目自体が存在しない。<strong>定義不明</strong></td></tr>
+<tr><td><strong>商業番号</strong>（出品者概要画面）</td><td>近いのは <code>tradeNumber</code>（商業登記番号）だが、<strong>日本の許可番号との対応は公式に記述なし</strong></td></tr>
+<tr><td><strong>Data Quota / Quota: 100%</strong>（keepa.com 画面右上）</td><td>公式APIドキュメントに記述なし。<strong>APIトークンとは別勘定</strong>である点だけが確定</td></tr>
+<tr><td><strong>日本語UIラベルの原語</strong>（全般）</td><td>Keepa は UI 用語集を公開していない。Product Finder は「Show API query」で確定できる（→ <a class="secref" href="#sec-3-8">§3.8</a>）</td></tr>
+<tr><td><strong>出品者概要画面が無料プランで開けるか</strong></td><td>公式の記述を発見できず</td></tr>
+<tr><td><code>variationCount</code>（バリエーション無し商品での値）</td><td><strong>0 か 1 か、公式に記述なし</strong></td></tr>
+</tbody></table>
+<hr>
+<h2 id="sec-5">5. 出典</h2>
+<p><strong>すべて 2026-08-24 に確認。</strong>表の「出典」列の略号は以下に対応します。</p>
+<table class="tbl"><thead><tr><th>略号</th><th>URL</th></tr></thead><tbody>
+<tr><td>product-object</td><td><code>https://keepa.com/api-docs/product-object.html</code></td></tr>
+<tr><td>statistics-object</td><td><code>https://keepa.com/api-docs/statistics-object.html</code></td></tr>
+<tr><td>offer-object</td><td><code>https://keepa.com/api-docs/offer-object.html</code></td></tr>
+<tr><td>seller-object</td><td><code>https://keepa.com/api-docs/seller-object.html</code></td></tr>
+<tr><td>product</td><td><code>https://keepa.com/api-docs/product.html</code></td></tr>
+<tr><td>product-finder</td><td><code>https://keepa.com/api-docs/product-finder.html</code></td></tr>
+<tr><td>plans-tokens</td><td><code>https://keepa.com/api-docs/plans-tokens.html</code></td></tr>
+<tr><td>request-basics</td><td><code>https://keepa.com/api-docs/request-basics.html</code></td></tr>
+<tr><td>graph-image</td><td><code>https://keepa.com/api-docs/graph-image.html</code></td></tr>
+<tr><td>changelog</td><td><code>https://keepa.com/api-docs/changelog.html</code></td></tr>
+<tr><td>mcp</td><td><code>https://keepa.com/api-docs/mcp.html</code></td></tr>
+<tr><td>FAQ</td><td><code>https://keepa.com/#!support</code>（日本語UI・未ログインで閲覧可）</td></tr>
+</tbody></table>
+<p class="note">▸ <strong>Keepa に、利用者向けの操作マニュアルは存在しません。</strong><code>keepa.com/help</code> <code>/faq</code> <code>/manual</code> <code>/guide</code> <code>/docs</code> <code>/tutorial</code> はいずれも 404 です。<strong>用語の定義を確定できる一次情報は、上記の API ドキュメントだけ</strong>です。</p>
+<hr>
+<h2 id="sec-index-ja">索引A｜日本語表記から引く</h2>
+<p class="grouphead"><strong>記号・英字から始まる語</strong></p>
+<table class="tbl"><thead><tr><th>見出し語</th><th>掲載</th></tr></thead><tbody>
+<tr><td>%獲得</td><td><a class="secref" href="#sec-3-4">§3.4</a></td></tr>
+<tr><td>Amazon</td><td><a class="secref" href="#sec-3-1">§3.1</a></td></tr>
+<tr><td>Amazon倉庫</td><td><a class="secref" href="#sec-3-1">§3.1</a></td></tr>
+<tr><td>Buy Box</td><td><a class="secref" href="#sec-3-1">§3.1</a> / <a class="secref" href="#sec-3-4">§3.4</a></td></tr>
+<tr><td>BUY BOX の平均売上数</td><td><a class="secref" href="#sec-3-5">§3.5</a></td></tr>
+<tr><td>Buy Box 中古</td><td><a class="secref" href="#sec-3-1">§3.1</a></td></tr>
+<tr><td>Buy Box対象オファー数</td><td><a class="secref" href="#sec-3-4">§3.4</a></td></tr>
+<tr><td>Buy Box統計</td><td><a class="secref" href="#sec-3-4">§3.4</a></td></tr>
+<tr><td>Domain ID（市場）</td><td><a class="secref" href="#sec-3-9">§3.9</a></td></tr>
+<tr><td>eBay 中古</td><td><a class="secref" href="#sec-3-1">§3.1</a></td></tr>
+<tr><td>eBay 新品</td><td><a class="secref" href="#sec-3-1">§3.1</a></td></tr>
+<tr><td>FBAリストが見つかりました</td><td><a class="secref" href="#sec-3-5">§3.5</a></td></tr>
+<tr><td>KEEPAによって追跡開始</td><td><a class="secref" href="#sec-3-5">§3.5</a></td></tr>
+<tr><td>Product Finder のトークン単価</td><td><a class="secref" href="#sec-3-9">§3.9</a></td></tr>
+<tr><td>Seller Finder</td><td><a class="secref" href="#sec-3-9">§3.9</a></td></tr>
+<tr><td>↘ N drops</td><td><a class="secref" href="#sec-3-2">§3.2</a></td></tr>
+</tbody></table>
+<p class="grouphead"><strong>五十音順</strong></p>
+<table class="tbl"><thead><tr><th>見出し語</th><th>掲載</th></tr></thead><tbody>
+<tr><td>売れ筋ランキング</td><td><a class="secref" href="#sec-3-1">§3.1</a></td></tr>
+<tr><td>え（96% などと表示）</td><td><a class="secref" href="#sec-3-5">§3.5</a></td></tr>
+<tr><td>オファー数　→「新品アイテム数」「totalOfferCount」</td><td><a class="secref" href="#sec-3-3">§3.3</a></td></tr>
+<tr><td>確認済みリスト</td><td><a class="secref" href="#sec-3-5">§3.5</a></td></tr>
+<tr><td>カテゴリ　→「カテゴリ別ランキング」「rootCategory」</td><td><a class="secref" href="#sec-3-2">§3.2</a></td></tr>
+<tr><td>カテゴリ別ランキング</td><td><a class="secref" href="#sec-3-2">§3.2</a></td></tr>
+<tr><td>カテゴリー別／ブランド別リスティング統計</td><td><a class="secref" href="#sec-3-5">§3.5</a></td></tr>
+<tr><td>カート　→「Buy Box」</td><td><a class="secref" href="#sec-3-1">§3.1</a></td></tr>
+<tr><td>グラフ①「価格履歴」</td><td><a class="secref" href="#sec-3-10">§3.10</a></td></tr>
+<tr><td>グラフ②「カテゴリ別ランキング＆月間販売数」</td><td><a class="secref" href="#sec-3-10">§3.10</a></td></tr>
+<tr><td>グラフ③「オファー数と評価」</td><td><a class="secref" href="#sec-3-10">§3.10</a></td></tr>
+<tr><td>月間販売数　→「先月の購入／月間販売数」</td><td><a class="secref" href="#sec-3-2">§3.2</a></td></tr>
+<tr><td>公式 MCP サーバ</td><td><a class="secref" href="#sec-3-9">§3.9</a></td></tr>
+<tr><td>購入ボックス切り替えの所有者</td><td><a class="secref" href="#sec-3-5">§3.5</a></td></tr>
+<tr><td>コレクター商品</td><td><a class="secref" href="#sec-3-1">§3.1</a></td></tr>
+<tr><td>コレクター商品アイテム数</td><td><a class="secref" href="#sec-3-1">§3.1</a></td></tr>
+<tr><td>コレクター商品（4状態）</td><td><a class="secref" href="#sec-3-1">§3.1</a></td></tr>
+<tr><td>再開タイマー（Rearm Timer）</td><td><a class="secref" href="#sec-3-10">§3.10</a></td></tr>
+<tr><td>再生品</td><td><a class="secref" href="#sec-3-1">§3.1</a></td></tr>
+<tr><td>再生品アイテム数</td><td><a class="secref" href="#sec-3-1">§3.1</a></td></tr>
+<tr><td>再生品（送料込み）</td><td><a class="secref" href="#sec-3-1">§3.1</a></td></tr>
+<tr><td>最安値　→「stats.min」（全期間）「stats.minInInterval」（期間内）</td><td><a class="secref" href="#sec-3-6">§3.6</a></td></tr>
+<tr><td>参考価格</td><td><a class="secref" href="#sec-3-1">§3.1</a></td></tr>
+<tr><td>在庫切れ率　→「stats.outOfStockPercentage30」</td><td><a class="secref" href="#sec-3-6">§3.6</a></td></tr>
+<tr><td>下取り</td><td><a class="secref" href="#sec-3-1">§3.1</a></td></tr>
+<tr><td>出品者数（実数）</td><td><a class="secref" href="#sec-3-3">§3.3</a></td></tr>
+<tr><td>商品の状態</td><td><a class="secref" href="#sec-3-3">§3.3</a></td></tr>
+<tr><td>商品名</td><td><a class="secref" href="#sec-3-7">§3.7</a></td></tr>
+<tr><td>新品</td><td><a class="secref" href="#sec-3-1">§3.1</a></td></tr>
+<tr><td>新品アイテム数</td><td><a class="secref" href="#sec-3-1">§3.1</a> / <a class="secref" href="#sec-3-3">§3.3</a></td></tr>
+<tr><td>新品 - 下落（直近7日間）ほか</td><td><a class="secref" href="#sec-3-8">§3.8</a></td></tr>
+<tr><td>新品 第三者（FBA）</td><td><a class="secref" href="#sec-3-1">§3.1</a></td></tr>
+<tr><td>新品 第三者（自己発送）</td><td><a class="secref" href="#sec-3-1">§3.1</a></td></tr>
+<tr><td>事業者名</td><td><a class="secref" href="#sec-3-5">§3.5</a></td></tr>
+<tr><td>住所</td><td><a class="secref" href="#sec-3-5">§3.5</a></td></tr>
+<tr><td>セラーID</td><td><a class="secref" href="#sec-3-5">§3.5</a></td></tr>
+<tr><td>先月の購入／月間販売数</td><td><a class="secref" href="#sec-3-2">§3.2</a></td></tr>
+<tr><td>タイムセール</td><td><a class="secref" href="#sec-3-1">§3.1</a></td></tr>
+<tr><td>代表者</td><td><a class="secref" href="#sec-3-5">§3.5</a></td></tr>
+<tr><td>中古</td><td><a class="secref" href="#sec-3-1">§3.1</a></td></tr>
+<tr><td>中古アイテム数</td><td><a class="secref" href="#sec-3-1">§3.1</a></td></tr>
+<tr><td>中古（ほぼ新品／非常に良い／良い／可）</td><td><a class="secref" href="#sec-3-1">§3.1</a></td></tr>
+<tr><td>重複の多い主なセラー</td><td><a class="secref" href="#sec-3-5">§3.5</a></td></tr>
+<tr><td>手数料　→「fbaFees.pickAndPackFee」「referralFeePercentage」</td><td><a class="secref" href="#sec-3-7">§3.7</a></td></tr>
+<tr><td>店名</td><td><a class="secref" href="#sec-3-5">§3.5</a></td></tr>
+<tr><td>電話</td><td><a class="secref" href="#sec-3-5">§3.5</a></td></tr>
+<tr><td>トラッキング</td><td><a class="secref" href="#sec-3-10">§3.10</a></td></tr>
+<tr><td>トークン　→「トークンバケット」</td><td><a class="secref" href="#sec-3-9">§3.9</a></td></tr>
+<tr><td>トークンバケット</td><td><a class="secref" href="#sec-3-9">§3.9</a></td></tr>
+<tr><td>ドロップ数　→「↘ N drops」</td><td><a class="secref" href="#sec-3-2">§3.2</a></td></tr>
+<tr><td>販売者</td><td><a class="secref" href="#sec-3-3">§3.3</a></td></tr>
+<tr><td>バリエーション　→「parentAsin」「variations」「variationCount」</td><td><a class="secref" href="#sec-3-7">§3.7</a></td></tr>
+<tr><td>評価</td><td><a class="secref" href="#sec-3-1">§3.1</a></td></tr>
+<tr><td>評価件数</td><td><a class="secref" href="#sec-3-1">§3.1</a></td></tr>
+<tr><td>評価ブロック</td><td><a class="secref" href="#sec-3-5">§3.5</a></td></tr>
+<tr><td>プライム会員限定</td><td><a class="secref" href="#sec-3-1">§3.1</a></td></tr>
+<tr><td>平均売上数　→「BUY BOX の平均売上数」</td><td><a class="secref" href="#sec-3-5">§3.5</a></td></tr>
+<tr><td>平均価格</td><td><a class="secref" href="#sec-3-4">§3.4</a></td></tr>
+<tr><td>ボックスを購入する 中古の所有者</td><td><a class="secref" href="#sec-3-5">§3.5</a></td></tr>
+</tbody></table>
+<hr>
+<h2 id="sec-index-en">索引B｜英語・APIフィールド名から引く</h2>
+<p class="grouphead"><strong>A</strong></p>
+<table class="tbl"><thead><tr><th>フィールド名</th><th>掲載</th></tr></thead><tbody>
+<tr><td><code>address</code></td><td><a class="secref" href="#sec-3-5">§3.5</a></td></tr>
+<tr><td><code>AMAZON</code></td><td><a class="secref" href="#sec-3-1">§3.1</a></td></tr>
+<tr><td><code>asinList</code></td><td><a class="secref" href="#sec-3-5">§3.5</a></td></tr>
+<tr><td><code>asinListLastSeen</code></td><td><a class="secref" href="#sec-3-5">§3.5</a></td></tr>
+<tr><td><code>audienceRating</code></td><td><a class="secref" href="#sec-3-7">§3.7</a></td></tr>
+<tr><td><code>availabilityAmazon</code></td><td><a class="secref" href="#sec-3-7">§3.7</a> / <a class="secref" href="#sec-3-8">§3.8</a></td></tr>
+<tr><td><code>availabilityAmazonDelay</code></td><td><a class="secref" href="#sec-3-7">§3.7</a></td></tr>
+<tr><td><code>avg30_&lt;価格タイプ&gt;</code></td><td><a class="secref" href="#sec-3-8">§3.8</a></td></tr>
+<tr><td><code>avgBuyBoxCompetitors</code></td><td><a class="secref" href="#sec-3-5">§3.5</a></td></tr>
+</tbody></table>
+<p class="grouphead"><strong>B</strong></p>
+<table class="tbl"><thead><tr><th>フィールド名</th><th>掲載</th></tr></thead><tbody>
+<tr><td><code>brand</code></td><td><a class="secref" href="#sec-3-8">§3.8</a></td></tr>
+<tr><td><code>businessName</code></td><td><a class="secref" href="#sec-3-5">§3.5</a></td></tr>
+<tr><td><code>businessType</code></td><td><a class="secref" href="#sec-3-5">§3.5</a></td></tr>
+<tr><td><code>BUY_BOX_SHIPPING</code></td><td><a class="secref" href="#sec-3-1">§3.1</a> / <a class="secref" href="#sec-3-4">§3.4</a></td></tr>
+<tr><td><code>BUY_BOX_USED_SHIPPING</code></td><td><a class="secref" href="#sec-3-1">§3.1</a></td></tr>
+<tr><td><code>buybox</code></td><td><a class="secref" href="#sec-3-9">§3.9</a></td></tr>
+<tr><td><code>buyBoxEligibleOfferCounts</code></td><td><a class="secref" href="#sec-3-4">§3.4</a></td></tr>
+<tr><td><code>buyBoxNewOwnershipRate</code></td><td><a class="secref" href="#sec-3-5">§3.5</a></td></tr>
+<tr><td><code>buyBoxSellerIdHistory</code></td><td><a class="secref" href="#sec-3-4">§3.4</a></td></tr>
+<tr><td><code>buyBoxStats[].avgNewOfferCount</code></td><td><a class="secref" href="#sec-3-4">§3.4</a></td></tr>
+<tr><td><code>buyBoxStats[].avgPrice</code></td><td><a class="secref" href="#sec-3-4">§3.4</a></td></tr>
+<tr><td><code>buyBoxStats[].isFBA</code></td><td><a class="secref" href="#sec-3-4">§3.4</a></td></tr>
+<tr><td><code>buyBoxStats[].lastSeen</code></td><td><a class="secref" href="#sec-3-4">§3.4</a></td></tr>
+<tr><td><code>buyBoxStats[].percentageWon</code></td><td><a class="secref" href="#sec-3-4">§3.4</a></td></tr>
+<tr><td><code>buyBoxStatsAmazon[30,90,180,365]</code></td><td><a class="secref" href="#sec-3-8">§3.8</a></td></tr>
+<tr><td><code>buyBoxStatsSellerCount[30,90,180,365]</code></td><td><a class="secref" href="#sec-3-8">§3.8</a></td></tr>
+<tr><td><code>buyBoxStatsTopSeller[30,90,180,365]</code></td><td><a class="secref" href="#sec-3-8">§3.8</a></td></tr>
+<tr><td><code>buyBoxUsedOwnershipRate</code></td><td><a class="secref" href="#sec-3-5">§3.5</a></td></tr>
+<tr><td><code>buyBoxUsedSellerId</code></td><td><a class="secref" href="#sec-3-8">§3.8</a></td></tr>
+</tbody></table>
+<p class="grouphead"><strong>C</strong></p>
+<table class="tbl"><thead><tr><th>フィールド名</th><th>掲載</th></tr></thead><tbody>
+<tr><td><code>categories_exclude</code></td><td><a class="secref" href="#sec-3-8">§3.8</a></td></tr>
+<tr><td><code>categories_include</code></td><td><a class="secref" href="#sec-3-8">§3.8</a></td></tr>
+<tr><td><code>COLLECTIBLE</code></td><td><a class="secref" href="#sec-3-1">§3.1</a></td></tr>
+<tr><td><code>COLLECTIBLE_*_SHIPPING</code></td><td><a class="secref" href="#sec-3-1">§3.1</a></td></tr>
+<tr><td><code>competitivePriceThreshold</code></td><td><a class="secref" href="#sec-3-4">§3.4</a></td></tr>
+<tr><td><code>competitors</code></td><td><a class="secref" href="#sec-3-5">§3.5</a></td></tr>
+<tr><td><code>COUNT_COLLECTIBLE</code></td><td><a class="secref" href="#sec-3-1">§3.1</a></td></tr>
+<tr><td><code>COUNT_NEW</code></td><td><a class="secref" href="#sec-3-1">§3.1</a> / <a class="secref" href="#sec-3-3">§3.3</a></td></tr>
+<tr><td><code>COUNT_NEW_FBA</code></td><td><a class="secref" href="#sec-3-1">§3.1</a></td></tr>
+<tr><td><code>COUNT_NEW_FBM</code></td><td><a class="secref" href="#sec-3-1">§3.1</a></td></tr>
+<tr><td><code>COUNT_REFURBISHED</code></td><td><a class="secref" href="#sec-3-1">§3.1</a></td></tr>
+<tr><td><code>COUNT_REVIEWS</code></td><td><a class="secref" href="#sec-3-1">§3.1</a></td></tr>
+<tr><td><code>COUNT_USED</code></td><td><a class="secref" href="#sec-3-1">§3.1</a></td></tr>
+<tr><td><code>current_&lt;価格タイプ&gt;</code></td><td><a class="secref" href="#sec-3-8">§3.8</a></td></tr>
+<tr><td><code>customerServicesAddress</code></td><td><a class="secref" href="#sec-3-5">§3.5</a></td></tr>
+</tbody></table>
+<p class="grouphead"><strong>D</strong></p>
+<table class="tbl"><thead><tr><th>フィールド名</th><th>掲載</th></tr></thead><tbody>
+<tr><td><code>days</code></td><td><a class="secref" href="#sec-3-9">§3.9</a></td></tr>
+<tr><td><code>dealType</code></td><td><a class="secref" href="#sec-3-8">§3.8</a></td></tr>
+<tr><td><code>delta[1,7,30,90]_&lt;価格タイプ&gt;</code></td><td><a class="secref" href="#sec-3-8">§3.8</a></td></tr>
+<tr><td><code>deltaLast_&lt;価格タイプ&gt;</code></td><td><a class="secref" href="#sec-3-8">§3.8</a></td></tr>
+<tr><td><code>deltaPercent90_monthlySold</code></td><td><a class="secref" href="#sec-3-8">§3.8</a></td></tr>
+<tr><td><code>deltaPercent[1,7,30,90]_&lt;価格タイプ&gt;</code></td><td><a class="secref" href="#sec-3-8">§3.8</a></td></tr>
+</tbody></table>
+<p class="grouphead"><strong>E</strong></p>
+<table class="tbl"><thead><tr><th>フィールド名</th><th>掲載</th></tr></thead><tbody>
+<tr><td><code>EBAY_NEW_SHIPPING</code></td><td><a class="secref" href="#sec-3-1">§3.1</a></td></tr>
+<tr><td><code>EBAY_USED_SHIPPING</code></td><td><a class="secref" href="#sec-3-1">§3.1</a></td></tr>
+<tr><td><code>email</code></td><td><a class="secref" href="#sec-3-5">§3.5</a></td></tr>
+<tr><td><code>EXTRA_INFO_UPDATES</code></td><td><a class="secref" href="#sec-3-1">§3.1</a></td></tr>
+</tbody></table>
+<p class="grouphead"><strong>F</strong></p>
+<table class="tbl"><thead><tr><th>フィールド名</th><th>掲載</th></tr></thead><tbody>
+<tr><td><code>fbaFees.pickAndPackFee</code></td><td><a class="secref" href="#sec-3-7">§3.7</a></td></tr>
+</tbody></table>
+<p class="grouphead"><strong>H</strong></p>
+<table class="tbl"><thead><tr><th>フィールド名</th><th>掲載</th></tr></thead><tbody>
+<tr><td><code>hasFBA</code></td><td><a class="secref" href="#sec-3-5">§3.5</a></td></tr>
+<tr><td><code>hasParentASIN</code></td><td><a class="secref" href="#sec-3-8">§3.8</a></td></tr>
+<tr><td><code>hasReviews</code></td><td><a class="secref" href="#sec-3-8">§3.8</a></td></tr>
+<tr><td><code>historicalParentASIN</code></td><td><a class="secref" href="#sec-3-8">§3.8</a></td></tr>
+<tr><td><code>history</code></td><td><a class="secref" href="#sec-3-9">§3.9</a></td></tr>
+</tbody></table>
+<p class="grouphead"><strong>I</strong></p>
+<table class="tbl"><thead><tr><th>フィールド名</th><th>掲載</th></tr></thead><tbody>
+<tr><td><code>ingredients</code></td><td><a class="secref" href="#sec-3-7">§3.7</a></td></tr>
+<tr><td><code>isAdultProduct</code></td><td><a class="secref" href="#sec-3-7">§3.7</a></td></tr>
+<tr><td><code>isEligibleForSuperSaverShipping</code></td><td><a class="secref" href="#sec-3-7">§3.7</a></td></tr>
+<tr><td><code>isEligibleForTradeIn</code></td><td><a class="secref" href="#sec-3-7">§3.7</a></td></tr>
+<tr><td><code>isHaul</code></td><td><a class="secref" href="#sec-3-7">§3.7</a></td></tr>
+<tr><td><code>isHeatSensitive</code></td><td><a class="secref" href="#sec-3-7">§3.7</a></td></tr>
+<tr><td><code>isLowest90_&lt;価格タイプ&gt;</code></td><td><a class="secref" href="#sec-3-8">§3.8</a></td></tr>
+<tr><td><code>isLowest_&lt;価格タイプ&gt;</code></td><td><a class="secref" href="#sec-3-8">§3.8</a></td></tr>
+<tr><td><code>isLowestOffer</code></td><td><a class="secref" href="#sec-3-8">§3.8</a></td></tr>
+<tr><td><code>isMerchOnDemand</code></td><td><a class="secref" href="#sec-3-7">§3.7</a></td></tr>
+<tr><td><code>isSNS</code></td><td><a class="secref" href="#sec-3-4">§3.4</a></td></tr>
+<tr><td><code>itemHighlights</code></td><td><a class="secref" href="#sec-3-7">§3.7</a></td></tr>
+</tbody></table>
+<p class="grouphead"><strong>L</strong></p>
+<table class="tbl"><thead><tr><th>フィールド名</th><th>掲載</th></tr></thead><tbody>
+<tr><td><code>lastOffersUpdate</code></td><td><a class="secref" href="#sec-3-8">§3.8</a></td></tr>
+<tr><td><code>lastPriceChange</code></td><td><a class="secref" href="#sec-3-8">§3.8</a></td></tr>
+<tr><td><code>lastRatingUpdate</code></td><td><a class="secref" href="#sec-3-5">§3.5</a></td></tr>
+<tr><td><code>lastSoldUpdate</code></td><td><a class="secref" href="#sec-3-2">§3.2</a></td></tr>
+<tr><td><code>lastUpdate</code></td><td><a class="secref" href="#sec-3-5">§3.5</a></td></tr>
+<tr><td><code>launchpad</code></td><td><a class="secref" href="#sec-3-2">§3.2</a></td></tr>
+<tr><td><code>LIGHTNING_DEAL</code></td><td><a class="secref" href="#sec-3-1">§3.1</a></td></tr>
+<tr><td><code>LISTPRICE</code></td><td><a class="secref" href="#sec-3-1">§3.1</a></td></tr>
+<tr><td><code>liveOffersOrder</code></td><td><a class="secref" href="#sec-3-3">§3.3</a></td></tr>
+</tbody></table>
+<p class="grouphead"><strong>M</strong></p>
+<table class="tbl"><thead><tr><th>フィールド名</th><th>掲載</th></tr></thead><tbody>
+<tr><td><code>manufacturer</code></td><td><a class="secref" href="#sec-3-8">§3.8</a></td></tr>
+<tr><td><code>minMatch</code></td><td><a class="secref" href="#sec-3-8">§3.8</a></td></tr>
+<tr><td><code>monthlySold</code></td><td><a class="secref" href="#sec-3-2">§3.2</a> / <a class="secref" href="#sec-3-8">§3.8</a></td></tr>
+<tr><td><code>monthlySoldHistory</code></td><td><a class="secref" href="#sec-3-2">§3.2</a></td></tr>
+<tr><td><code>monthlySoldLastKnown</code></td><td><a class="secref" href="#sec-3-8">§3.8</a></td></tr>
+<tr><td><code>monthlySoldLastKnownDate</code></td><td><a class="secref" href="#sec-3-8">§3.8</a></td></tr>
+<tr><td><code>monthlySoldPeak</code></td><td><a class="secref" href="#sec-3-8">§3.8</a></td></tr>
+<tr><td><code>monthlySoldPeakDate</code></td><td><a class="secref" href="#sec-3-8">§3.8</a></td></tr>
+</tbody></table>
+<p class="grouphead"><strong>N</strong></p>
+<table class="tbl"><thead><tr><th>フィールド名</th><th>掲載</th></tr></thead><tbody>
+<tr><td><code>negativeRating</code></td><td><a class="secref" href="#sec-3-5">§3.5</a></td></tr>
+<tr><td><code>neutralRating</code></td><td><a class="secref" href="#sec-3-5">§3.5</a></td></tr>
+<tr><td><code>NEW</code></td><td><a class="secref" href="#sec-3-1">§3.1</a></td></tr>
+<tr><td><code>NEW_FBA</code></td><td><a class="secref" href="#sec-3-1">§3.1</a></td></tr>
+<tr><td><code>NEW_FBM_SHIPPING</code></td><td><a class="secref" href="#sec-3-1">§3.1</a></td></tr>
+<tr><td><code>numberOfItems</code></td><td><a class="secref" href="#sec-3-7">§3.7</a></td></tr>
+</tbody></table>
+<p class="grouphead"><strong>O</strong></p>
+<table class="tbl"><thead><tr><th>フィールド名</th><th>掲載</th></tr></thead><tbody>
+<tr><td><code>offerCountFBA</code></td><td><a class="secref" href="#sec-3-3">§3.3</a></td></tr>
+<tr><td><code>offerCountFBM</code></td><td><a class="secref" href="#sec-3-3">§3.3</a></td></tr>
+<tr><td><code>offerDuplicates</code></td><td><a class="secref" href="#sec-3-3">§3.3</a></td></tr>
+<tr><td><code>offers</code></td><td><a class="secref" href="#sec-3-9">§3.9</a></td></tr>
+<tr><td><code>offers[].condition</code></td><td><a class="secref" href="#sec-3-3">§3.3</a></td></tr>
+<tr><td><code>offers[].conditionComment</code></td><td><a class="secref" href="#sec-3-3">§3.3</a></td></tr>
+<tr><td><code>offers[].isAmazon</code></td><td><a class="secref" href="#sec-3-3">§3.3</a></td></tr>
+<tr><td><code>offers[].isFBA</code></td><td><a class="secref" href="#sec-3-3">§3.3</a></td></tr>
+<tr><td><code>offers[].isMAP</code></td><td><a class="secref" href="#sec-3-3">§3.3</a></td></tr>
+<tr><td><code>offers[].isPrime</code></td><td><a class="secref" href="#sec-3-3">§3.3</a></td></tr>
+<tr><td><code>offers[].isShippable</code></td><td><a class="secref" href="#sec-3-3">§3.3</a></td></tr>
+<tr><td><code>offers[].isWarehouseDeal</code></td><td><a class="secref" href="#sec-3-3">§3.3</a></td></tr>
+<tr><td><code>offers[].lastSeen</code></td><td><a class="secref" href="#sec-3-3">§3.3</a></td></tr>
+<tr><td><code>offers[].minOrderQty</code></td><td><a class="secref" href="#sec-3-3">§3.3</a></td></tr>
+<tr><td><code>offers[].offerCSV</code></td><td><a class="secref" href="#sec-3-1">§3.1</a></td></tr>
+<tr><td><code>offers[].sellerId</code></td><td><a class="secref" href="#sec-3-3">§3.3</a></td></tr>
+<tr><td><code>offersSuccessful</code></td><td><a class="secref" href="#sec-3-3">§3.3</a></td></tr>
+<tr><td><code>only-live-offers</code></td><td><a class="secref" href="#sec-3-9">§3.9</a></td></tr>
+<tr><td><code>outOfStockCountAmazon30</code></td><td><a class="secref" href="#sec-3-8">§3.8</a></td></tr>
+<tr><td><code>outOfStockCountAmazon90</code></td><td><a class="secref" href="#sec-3-8">§3.8</a></td></tr>
+<tr><td><code>outOfStockPercentage90</code></td><td><a class="secref" href="#sec-3-8">§3.8</a></td></tr>
+</tbody></table>
+<p class="grouphead"><strong>P</strong></p>
+<table class="tbl"><thead><tr><th>フィールド名</th><th>掲載</th></tr></thead><tbody>
+<tr><td><code>packageQuantity</code></td><td><a class="secref" href="#sec-3-7">§3.7</a></td></tr>
+<tr><td><code>page</code></td><td><a class="secref" href="#sec-3-8">§3.8</a></td></tr>
+<tr><td><code>parentAsin</code></td><td><a class="secref" href="#sec-3-7">§3.7</a></td></tr>
+<tr><td><code>parentAsinHistory</code></td><td><a class="secref" href="#sec-3-7">§3.7</a></td></tr>
+<tr><td><code>perPage</code></td><td><a class="secref" href="#sec-3-8">§3.8</a></td></tr>
+<tr><td><code>phoneNumber</code></td><td><a class="secref" href="#sec-3-5">§3.5</a></td></tr>
+<tr><td><code>positiveRating</code></td><td><a class="secref" href="#sec-3-5">§3.5</a></td></tr>
+<tr><td><code>PRIME_EXCL</code></td><td><a class="secref" href="#sec-3-1">§3.1</a></td></tr>
+<tr><td><code>productType</code></td><td><a class="secref" href="#sec-3-7">§3.7</a> / <a class="secref" href="#sec-3-8">§3.8</a></td></tr>
+</tbody></table>
+<p class="grouphead"><strong>R</strong></p>
+<table class="tbl"><thead><tr><th>フィールド名</th><th>掲載</th></tr></thead><tbody>
+<tr><td><code>RATING</code></td><td><a class="secref" href="#sec-3-1">§3.1</a></td></tr>
+<tr><td><code>rating</code></td><td><a class="secref" href="#sec-3-9">§3.9</a></td></tr>
+<tr><td><code>ratingCount</code></td><td><a class="secref" href="#sec-3-5">§3.5</a></td></tr>
+<tr><td><code>recentFeedback</code></td><td><a class="secref" href="#sec-3-5">§3.5</a></td></tr>
+<tr><td><code>referralFeePercentage</code></td><td><a class="secref" href="#sec-3-7">§3.7</a></td></tr>
+<tr><td><code>refillIn</code></td><td><a class="secref" href="#sec-3-9">§3.9</a></td></tr>
+<tr><td><code>refillRate</code></td><td><a class="secref" href="#sec-3-9">§3.9</a></td></tr>
+<tr><td><code>REFURBISHED</code></td><td><a class="secref" href="#sec-3-1">§3.1</a></td></tr>
+<tr><td><code>REFURBISHED_SHIPPING</code></td><td><a class="secref" href="#sec-3-1">§3.1</a></td></tr>
+<tr><td><code>RENT</code></td><td><a class="secref" href="#sec-3-1">§3.1</a></td></tr>
+<tr><td><code>representative</code></td><td><a class="secref" href="#sec-3-5">§3.5</a></td></tr>
+<tr><td><code>retrievedOfferCount</code></td><td><a class="secref" href="#sec-3-3">§3.3</a></td></tr>
+<tr><td><code>returnRate</code></td><td><a class="secref" href="#sec-3-7">§3.7</a> / <a class="secref" href="#sec-3-8">§3.8</a></td></tr>
+<tr><td><code>rootCategory</code></td><td><a class="secref" href="#sec-3-8">§3.8</a></td></tr>
+</tbody></table>
+<p class="grouphead"><strong>S</strong></p>
+<table class="tbl"><thead><tr><th>フィールド名</th><th>掲載</th></tr></thead><tbody>
+<tr><td><code>SALES</code></td><td><a class="secref" href="#sec-3-1">§3.1</a></td></tr>
+<tr><td><code>salesRankDisplayGroup</code></td><td><a class="secref" href="#sec-3-2">§3.2</a></td></tr>
+<tr><td><code>salesRankDrops180</code></td><td><a class="secref" href="#sec-3-2">§3.2</a></td></tr>
+<tr><td><code>salesRankDrops30</code></td><td><a class="secref" href="#sec-3-2">§3.2</a></td></tr>
+<tr><td><code>salesRankDrops365</code></td><td><a class="secref" href="#sec-3-2">§3.2</a></td></tr>
+<tr><td><code>salesRankDrops90</code></td><td><a class="secref" href="#sec-3-2">§3.2</a></td></tr>
+<tr><td><code>salesRankReference</code></td><td><a class="secref" href="#sec-3-2">§3.2</a></td></tr>
+<tr><td><code>salesRankReferenceHistory</code></td><td><a class="secref" href="#sec-3-2">§3.2</a></td></tr>
+<tr><td><code>salesRanks</code></td><td><a class="secref" href="#sec-3-2">§3.2</a></td></tr>
+<tr><td><code>seller.csv</code></td><td><a class="secref" href="#sec-3-5">§3.5</a></td></tr>
+<tr><td><code>sellerBrandStatistics</code></td><td><a class="secref" href="#sec-3-5">§3.5</a></td></tr>
+<tr><td><code>sellerCategoryStatistics</code></td><td><a class="secref" href="#sec-3-5">§3.5</a></td></tr>
+<tr><td><code>sellerId</code></td><td><a class="secref" href="#sec-3-5">§3.5</a></td></tr>
+<tr><td><code>sellerIds</code></td><td><a class="secref" href="#sec-3-8">§3.8</a></td></tr>
+<tr><td><code>sellerIdsLowestFBA</code></td><td><a class="secref" href="#sec-3-3">§3.3</a> / <a class="secref" href="#sec-3-8">§3.8</a></td></tr>
+<tr><td><code>sellerIdsLowestFBM</code></td><td><a class="secref" href="#sec-3-3">§3.3</a> / <a class="secref" href="#sec-3-8">§3.8</a></td></tr>
+<tr><td><code>sellerName</code></td><td><a class="secref" href="#sec-3-5">§3.5</a></td></tr>
+<tr><td><code>shareCapital</code></td><td><a class="secref" href="#sec-3-5">§3.5</a></td></tr>
+<tr><td><code>singleVariation</code></td><td><a class="secref" href="#sec-3-8">§3.8</a></td></tr>
+<tr><td><code>stats</code></td><td><a class="secref" href="#sec-3-9">§3.9</a></td></tr>
+<tr><td><code>stats.atIntervalStart</code></td><td><a class="secref" href="#sec-3-6">§3.6</a></td></tr>
+<tr><td><code>stats.avg</code></td><td><a class="secref" href="#sec-3-6">§3.6</a></td></tr>
+<tr><td><code>stats.avg180</code></td><td><a class="secref" href="#sec-3-6">§3.6</a></td></tr>
+<tr><td><code>stats.avg30</code></td><td><a class="secref" href="#sec-3-6">§3.6</a></td></tr>
+<tr><td><code>stats.avg365</code></td><td><a class="secref" href="#sec-3-6">§3.6</a></td></tr>
+<tr><td><code>stats.avg90</code></td><td><a class="secref" href="#sec-3-6">§3.6</a></td></tr>
+<tr><td><code>stats.buyBoxAvailabilityMessage</code></td><td><a class="secref" href="#sec-3-4">§3.4</a></td></tr>
+<tr><td><code>stats.buyBoxIsAmazon</code></td><td><a class="secref" href="#sec-3-4">§3.4</a></td></tr>
+<tr><td><code>stats.buyBoxIsFBA</code></td><td><a class="secref" href="#sec-3-4">§3.4</a></td></tr>
+<tr><td><code>stats.buyBoxIsMAP</code></td><td><a class="secref" href="#sec-3-4">§3.4</a></td></tr>
+<tr><td><code>stats.buyBoxIsPrimeEligible</code></td><td><a class="secref" href="#sec-3-4">§3.4</a></td></tr>
+<tr><td><code>stats.buyBoxIsPrimeExclusive</code></td><td><a class="secref" href="#sec-3-4">§3.4</a></td></tr>
+<tr><td><code>stats.buyBoxIsUnqualified</code></td><td><a class="secref" href="#sec-3-4">§3.4</a></td></tr>
+<tr><td><code>stats.buyBoxPrice</code></td><td><a class="secref" href="#sec-3-4">§3.4</a></td></tr>
+<tr><td><code>stats.buyBoxSavingBasis</code></td><td><a class="secref" href="#sec-3-4">§3.4</a></td></tr>
+<tr><td><code>stats.buyBoxSavingBasisType</code></td><td><a class="secref" href="#sec-3-4">§3.4</a></td></tr>
+<tr><td><code>stats.buyBoxSavingPercentage</code></td><td><a class="secref" href="#sec-3-4">§3.4</a></td></tr>
+<tr><td><code>stats.buyBoxSellerId</code></td><td><a class="secref" href="#sec-3-4">§3.4</a></td></tr>
+<tr><td><code>stats.buyBoxShipping</code></td><td><a class="secref" href="#sec-3-4">§3.4</a></td></tr>
+<tr><td><code>stats.buyBoxShippingCountry</code></td><td><a class="secref" href="#sec-3-4">§3.4</a></td></tr>
+<tr><td><code>stats.buyBoxShippingTime</code></td><td><a class="secref" href="#sec-3-4">§3.4</a></td></tr>
+<tr><td><code>stats.buyBoxStats</code></td><td><a class="secref" href="#sec-3-4">§3.4</a></td></tr>
+<tr><td><code>stats.buyBoxUsedCondition</code></td><td><a class="secref" href="#sec-3-4">§3.4</a></td></tr>
+<tr><td><code>stats.buyBoxUsedIsFBA</code></td><td><a class="secref" href="#sec-3-4">§3.4</a></td></tr>
+<tr><td><code>stats.buyBoxUsedPrice</code></td><td><a class="secref" href="#sec-3-4">§3.4</a></td></tr>
+<tr><td><code>stats.buyBoxUsedSellerId</code></td><td><a class="secref" href="#sec-3-4">§3.4</a></td></tr>
+<tr><td><code>stats.buyBoxUsedShipping</code></td><td><a class="secref" href="#sec-3-4">§3.4</a></td></tr>
+<tr><td><code>stats.buyBoxUsedStats</code></td><td><a class="secref" href="#sec-3-4">§3.4</a></td></tr>
+<tr><td><code>stats.current</code></td><td><a class="secref" href="#sec-3-6">§3.6</a></td></tr>
+<tr><td><code>stats.lightningDealInfo</code></td><td><a class="secref" href="#sec-3-6">§3.6</a></td></tr>
+<tr><td><code>stats.max</code></td><td><a class="secref" href="#sec-3-6">§3.6</a></td></tr>
+<tr><td><code>stats.maxInInterval</code></td><td><a class="secref" href="#sec-3-6">§3.6</a></td></tr>
+<tr><td><code>stats.min</code></td><td><a class="secref" href="#sec-3-6">§3.6</a></td></tr>
+<tr><td><code>stats.minInInterval</code></td><td><a class="secref" href="#sec-3-6">§3.6</a></td></tr>
+<tr><td><code>stats.outOfStockPercentage180</code></td><td><a class="secref" href="#sec-3-6">§3.6</a></td></tr>
+<tr><td><code>stats.outOfStockPercentage30</code></td><td><a class="secref" href="#sec-3-6">§3.6</a></td></tr>
+<tr><td><code>stats.outOfStockPercentage365</code></td><td><a class="secref" href="#sec-3-6">§3.6</a></td></tr>
+<tr><td><code>stats.outOfStockPercentage90</code></td><td><a class="secref" href="#sec-3-6">§3.6</a></td></tr>
+<tr><td><code>stats.outOfStockPercentageInInterval</code></td><td><a class="secref" href="#sec-3-6">§3.6</a></td></tr>
+<tr><td><code>stats.stockAmazon</code></td><td><a class="secref" href="#sec-3-6">§3.6</a></td></tr>
+<tr><td><code>stats.stockBuyBox</code></td><td><a class="secref" href="#sec-3-6">§3.6</a></td></tr>
+<tr><td><code>stock</code></td><td><a class="secref" href="#sec-3-9">§3.9</a></td></tr>
+<tr><td><code>suggestedLowerPrice</code></td><td><a class="secref" href="#sec-3-4">§3.4</a></td></tr>
+</tbody></table>
+<p class="grouphead"><strong>T</strong></p>
+<table class="tbl"><thead><tr><th>フィールド名</th><th>掲載</th></tr></thead><tbody>
+<tr><td><code>title</code></td><td><a class="secref" href="#sec-3-7">§3.7</a> / <a class="secref" href="#sec-3-8">§3.8</a></td></tr>
+<tr><td><code>tokensLeft</code></td><td><a class="secref" href="#sec-3-9">§3.9</a></td></tr>
+<tr><td><code>totalOfferCount</code></td><td><a class="secref" href="#sec-3-3">§3.3</a></td></tr>
+<tr><td><code>totalStorefrontAsins</code></td><td><a class="secref" href="#sec-3-5">§3.5</a></td></tr>
+<tr><td><code>trackingSince</code></td><td><a class="secref" href="#sec-3-5">§3.5</a> / <a class="secref" href="#sec-3-8">§3.8</a></td></tr>
+<tr><td><code>TRADE_IN</code></td><td><a class="secref" href="#sec-3-1">§3.1</a></td></tr>
+<tr><td><code>tradeNumber</code></td><td><a class="secref" href="#sec-3-5">§3.5</a></td></tr>
+</tbody></table>
+<p class="grouphead"><strong>U</strong></p>
+<table class="tbl"><thead><tr><th>フィールド名</th><th>掲載</th></tr></thead><tbody>
+<tr><td><code>update</code></td><td><a class="secref" href="#sec-3-9">§3.9</a></td></tr>
+<tr><td><code>urlSlug</code></td><td><a class="secref" href="#sec-3-7">§3.7</a></td></tr>
+<tr><td><code>USED</code></td><td><a class="secref" href="#sec-3-1">§3.1</a></td></tr>
+<tr><td><code>USED_ACCEPTABLE_SHIPPING</code></td><td><a class="secref" href="#sec-3-1">§3.1</a></td></tr>
+<tr><td><code>USED_GOOD_SHIPPING</code></td><td><a class="secref" href="#sec-3-1">§3.1</a></td></tr>
+<tr><td><code>USED_NEW_SHIPPING</code></td><td><a class="secref" href="#sec-3-1">§3.1</a></td></tr>
+<tr><td><code>USED_VERY_GOOD_SHIPPING</code></td><td><a class="secref" href="#sec-3-1">§3.1</a></td></tr>
+</tbody></table>
+<p class="grouphead"><strong>V</strong></p>
+<table class="tbl"><thead><tr><th>フィールド名</th><th>掲載</th></tr></thead><tbody>
+<tr><td><code>variableClosingFee</code></td><td><a class="secref" href="#sec-3-7">§3.7</a></td></tr>
+<tr><td><code>variationCount</code></td><td><a class="secref" href="#sec-3-8">§3.8</a></td></tr>
+<tr><td><code>variations</code></td><td><a class="secref" href="#sec-3-7">§3.7</a></td></tr>
+<tr><td><code>vatID</code></td><td><a class="secref" href="#sec-3-5">§3.5</a></td></tr>
+</tbody></table>
+<p class="grouphead"><strong>W</strong></p>
+<table class="tbl"><thead><tr><th>フィールド名</th><th>掲載</th></tr></thead><tbody>
+<tr><td><code>WAREHOUSE</code></td><td><a class="secref" href="#sec-3-1">§3.1</a></td></tr>
+</tbody></table>
+<p class="grouphead"><strong>#</strong></p>
+<table class="tbl"><thead><tr><th>フィールド名</th><th>掲載</th></tr></thead><tbody>
+<tr><td><code>(該当フィールドなしの概念)</code></td><td><a class="secref" href="#sec-3-3">§3.3</a></td></tr>
+</tbody></table>
+</div>
+<script>
+(function(){
+ var box=document.getElementById('q'), stat=document.getElementById('qstat');
+ var rows=[].slice.call(document.querySelectorAll('tbody tr'));
+ var blocks=[].slice.call(document.querySelectorAll('h2,h3,p,blockquote,ul,ol,hr,table'));
+ function reset(){rows.forEach(function(r){r.classList.remove('hide')});
+  blocks.forEach(function(b){b.classList.remove('hide')});stat.textContent='';}
+ function run(){
+  var q=box.value.trim().toLowerCase();
+  if(!q){reset();return;}
+  var n=0;
+  rows.forEach(function(r){
+   var hit=r.textContent.toLowerCase().indexOf(q)>=0;
+   r.classList.toggle('hide',!hit); if(hit)n++;
+  });
+  document.querySelectorAll('table').forEach(function(t){
+   var vis=t.querySelectorAll('tbody tr:not(.hide)').length;
+   t.classList.toggle('hide',vis===0);
+  });
+  blocks.forEach(function(b){
+   if(b.tagName==='TABLE')return;
+   if(b.tagName==='H2'||b.tagName==='H3'){b.classList.remove('hide');return;}
+   b.classList.add('hide');
+  });
+  // 見出しは、その直後に見えている表がある場合だけ残す
+  document.querySelectorAll('h3').forEach(function(h){
+   var e=h.nextElementSibling,keep=false;
+   while(e&&e.tagName!=='H2'&&e.tagName!=='H3'){
+    if(e.tagName==='TABLE'&&!e.classList.contains('hide')){keep=true;break;} e=e.nextElementSibling;}
+   h.classList.toggle('hide',!keep);
+  });
+  document.querySelectorAll('h2').forEach(function(h){
+   var e=h.nextElementSibling,keep=false;
+   while(e&&e.tagName!=='H2'){
+    if(e.tagName==='TABLE'&&!e.classList.contains('hide')){keep=true;break;} e=e.nextElementSibling;}
+   h.classList.toggle('hide',!keep);
+  });
+  stat.textContent=n+' 件';
+ }
+ box.addEventListener('input',run);
+ box.addEventListener('keydown',function(e){if(e.key==='Escape'){box.value='';run();}});
+})();
+</script>
+</body></html>
