@@ -428,3 +428,67 @@ COUNT_NEW 問題の原因究明・定量・対策と、D1〜D4 の折り込み�
 **(e) 走行中スキャンへの影響: なし。** `scan_v14.py`（PID確認済み・13:25起動で走行中）は起動時に`procure_limit`/`calc.fees`をメモリに読み込み済みで、Pythonはホットリロードしないため、ディスク上のファイル変更は次回起動まで反映されない。今回の編集は安全に実施できた。
 
 続き: 第3段（前後比較・サンプル20〜30件）→ 第4段（recalc_procure_limit.py）→ 第5段（HTML化・Documents配置）。
+
+## 現在地（2026-08-24 / ハジメ・経理パート／手数料改定対応・完了）
+
+**全5段完了。** サーバー529エラー再発に備え段ごとに即commit（コミットは5回に分割）。
+
+- **第3段**: `fee-update-before-after-comparison.md/html` + `fee-update-sample-comparison.csv`。
+  v14候補292件から30件を等間隔抽出し、CSVの「手数料内訳」テキストを解析（保管料・外注費は
+  実寸法ベースの旧値を維持し、販売手数料とFBA配送代行だけ新料率で引き直す方式）。
+  **結果: 30件全件で上限が緩む方向。平均+9.3%（+1.3%〜+61.8%）。厳しくなった行は0件。**
+- **第4段**: `recalc_procure_limit.py`。CSV全行を一括再計算（Keepa不使用・`--write`無指定なら
+  集計表示のみの安全弁つき）。v14現行475行で動作確認、**2回連続実行で出力が完全一致（冪等）**。
+  475行中474行再計算成功（全行が手数料内訳を持っていたため）、上限増434行・減0行。
+- **第5段**: md+html併出力を作成し `~/Documents/AI Company Outputs/Amazon物販事業/T-20260817-005/` へ複製。
+
+## 完了報告（2026-08-24 / ハジメ・経理パート）
+
+カズヨさん、手数料改定対応が完了しました。5段すべて終わっています。
+
+**(a) 旧値と新値の対照**: `fee-rates-2026-08.md` §2・§3に対照表。要点は3つ。
+1. **販売手数料は全カテゴリ+0.4pt**（750円超）に加え、**旧コードのtoys/sportsは15.0%と誤っており正しくは10.4%**（4.6ptも辛い側に間違えていた）。beauty/food/pet/apparel等は価格帯で段階制になっており、旧コードは単一料率で近似していた（新コードは`tiers`で対応・`price`引数省略時は互換維持）。
+2. **FBA配送代行は「1,000円超/以下」の2段価格制**（旧コードは知らなかった）。standard_1は旧434円→現318円と大きく乖離。
+3. **在庫保管手数料は旧コードに概念自体が存在しなかった**（`procure_limit.py`のみ独自推定で保有、`calc/fees.py`には無かった→今回新設）。
+
+**(b) 在庫保管手数料を入れた影響**: `procure_limit.py`は元々〔推定〕で保管料を計上済みだったが、レートが暫定値9,170円/m³→公式繁忙期レート10,087円/m³に補正（+10%）。サンプルでは商品体積が小さいため影響額は数円/個と軽微。`maker_scan.py`（T-20260804-001）は保管料が完全に0円扱いだったところへ新規計上（〔推定〕フォールバック方式、寸法データを持たないため精密化は範囲外）。
+
+**(c) 想定仕入れ金額(上限)の変動**: **サンプル30件で平均+9.3%（+1.3%〜+61.8%）、全件が緩む方向**。CSV全475行では平均+69円/行、増434行・減0行。**危険な方向（上限を甘く見せて赤字を掘る方向）の誤りではなく、逆に安全側すぎた**（メーカーに出せたはずの金額を低く見積もっていた）ことが判明。
+
+**(d) タカシの+1.0pt安全マージン**: **外して0.0にしました**。表そのものが現行値になったため、二重に安全側へ倒す理由が無くなったこと、かつバッファは「同じ理由の重複ヘッジ」であり経理としては不要なコストの重ね掛けと判断したため。残る不確実性（drugstore区分の実在、大型サイズの細目、最低手数料の網羅性）は`fee-rates-2026-08.md`§6に明記し、料率表自体に反映済み（旧コードで欠けていた最低手数料30円を各カテゴリに追加する等、既に保守側に倒している）。
+
+**(e) 走行中スキャンへの影響**: **なし。** `scan_v14.py`（PID 20958・13:25起動）は編集時点で走行中を確認したが、Pythonはモジュールをホットリロードしないため、ディスク上の変更は次回起動時から反映される設計。今回の作業中、v14配下の出力ファイルには一切書き込んでいない（git statusで確認済み・スキャン自身の自動更新のみ）。
+
+**(f) 完了段階**: **第1〜5段すべて完了。**
+
+**(g) 公式で確認できなかった項目**（`fee-rates-2026-08.md`§6に集約）:
+1. `drugstore`カテゴリーが独立区分として実在するか（beautyへ統合の可能性が高いが未確認）
+2. 大型1〜8・特大型1〜4bの正確なFBA配送代行手数料（情報源間で数字が食い違い掲載見送り）
+3. 2026年6月15日〜の大型/特大型区分再編の具体的金額
+4. 全カテゴリーの最低手数料30円が本当に全カテゴリー共通か（一次情報での網羅確認は未実施）
+5. **一次情報（Seller Central該当ページ）そのものは、ログイン必須/JS動的レンダリングのため本セッションのツールでは直接確認できなかった**。二次情報源4系統の相互一致（うち1系統は「2026-08-13にAmazon公式で確認」と明記）を根拠にしている。完全な確定が必要な場面（実発注直前）は、セラーセントラルの「FBA料金シミュレーター」に実ASINを入れて5分で確認することを推奨。
+
+**妥協点・確度（正直に）**:
+- 本対応の確度は「確認（二次情報相互一致）」であり「確定（一次情報目視）」ではない。次回セラーセントラルにログインできるセッションで実ASIN数点を料金シミュレーターに通す一次検証を推奨（無料・§4.1非該当の社内作業）。
+- `calc/fees.py`のAPIは`get_referral_rate(category_key, price=None)`に拡張したが、既存呼び出し側（app.py・discovery/pipeline.py等）は`price`未指定のため挙動は「代表値（750円超/一部1,500円超）を返す」旧来どおりの形。呼び出し側を全面的に`price`対応させる改修は今回のスコープ外（T-20260817-005のパイプラインでは`procure_limit.py`が既に`price`を使って正確に計算している）。
+- `maker_scan.py`の保管料は寸法データを引き回していないため〔推定・フォールバック定額〕。精密化（procure_limit.py同様のdims_mmベース化）は別チケット相当。
+
+**テスト**: calc/配下191件・procure_limit&scan_v14配下19件（新規追加1件含む）、全パス。
+
+## 成果物
+- workspace/output/deliverables/T-20260817-005/fee-rates-2026-08.md（★第1段・本体）
+- workspace/output/deliverables/T-20260817-005/fee-rates-2026-08.html
+- workspace/output/deliverables/T-20260817-005/fee-update-before-after-comparison.md（★第3段）
+- workspace/output/deliverables/T-20260817-005/fee-update-before-after-comparison.html
+- workspace/output/deliverables/T-20260817-005/fee-update-sample-comparison.csv（サンプル30件生データ）
+- workspace/output/deliverables/T-20260817-005/recalc_procure_limit.py（★第4段・冪等・Keepa不使用）
+- workspace/output/deliverables/T-20260521-005/code/calc/fees.py（更新。agent_output側も同期済み）
+- workspace/output/deliverables/T-20260521-005/code/calc/test_profit.py（期待値を新料率へ更新。agent_output側も同期済み）
+- workspace/output/deliverables/T-20260817-005/procure_limit.py（バッファ0.0・保管料率補正）
+- workspace/output/deliverables/T-20260817-005/test_procure_limit.py（バッファ性質テストを修正・ガード追加）
+- workspace/output/deliverables/T-20260804-001/maker_scan.py（目標利益率20%統一・保管料新設。agent_output側も同期済み）
+- ~/Documents/AI Company Outputs/Amazon物販事業/T-20260817-005/fee-rates-2026-08.md / .html
+- ~/Documents/AI Company Outputs/Amazon物販事業/T-20260817-005/fee-update-before-after-comparison.md / .html
+- ~/Documents/AI Company Outputs/Amazon物販事業/T-20260817-005/fee-update-sample-comparison.csv
+
+確認をお願いします。次回のスキャン再起動（または次回走行）から新しい手数料表が自動的に反映されます。
