@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>手数料更新 前後比較 — T-20260817-005</title><style>
+:root{--fg:#1b1f23;--mut:#5b6570;--line:#e3e7eb;--acc:#0b5fff;--warn:#b45309;--bad:#b91c1c;--ok:#047857;}
+*{box-sizing:border-box}
+body{margin:0;background:#f6f7f9;color:var(--fg);
+ font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",Meiryo,sans-serif;
+ line-height:1.85;font-size:15.5px;-webkit-text-size-adjust:100%;}
+.wrap{max-width:1000px;margin:0 auto;padding:32px 22px 96px;background:#fff;
+ box-shadow:0 1px 3px rgba(0,0,0,.06);}
+h1{font-size:1.75rem;line-height:1.4;margin:.2em 0 .6em;padding-bottom:.4em;border-bottom:3px solid var(--acc);}
+h2{font-size:1.3rem;margin:2.2em 0 .7em;padding:.35em .6em;background:#eef3ff;border-left:5px solid var(--acc);border-radius:3px;}
+h3{font-size:1.1rem;margin:1.8em 0 .5em;padding-bottom:.25em;border-bottom:1px solid var(--line);}
+p{margin:.7em 0}
+hr{border:0;border-top:1px solid var(--line);margin:2.2em 0}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:.92em;display:block;overflow-x:auto;}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top;}
+th{background:#f0f3f7;font-weight:600;white-space:nowrap;}
+tbody tr:nth-child(even){background:#fafbfc}
+blockquote{margin:1.1em 0;padding:.8em 1em;background:#fffbeb;border-left:5px solid var(--warn);border-radius:3px;color:#463a1a;}
+code{background:#f1f3f5;padding:.12em .4em;border-radius:3px;font-size:.9em;
+ font-family:"SFMono-Regular",Menlo,Consolas,monospace;}
+pre{background:#1e2430;color:#e6edf3;padding:14px 16px;border-radius:6px;overflow-x:auto;font-size:.86em;line-height:1.6;}
+pre code{background:none;color:inherit;padding:0}
+ul,ol{margin:.7em 0;padding-left:1.6em}
+li{margin:.3em 0}
+a{color:var(--acc)}
+@media print{body{background:#fff}.wrap{box-shadow:none;max-width:none}}
+</style></head><body><div class="wrap"><h1>手数料更新 前後比較（第3段成果物）</h1>
+<p>作成: ハジメ（経理） / 2026-08-24 / チケット: T-20260817-005</p>
+<h2>結論（先に）</h2>
+<ul><li>サンプル30件のうち <strong>全30件で「想定仕入れ金額(上限)」が上振れ（緩む）方向に動いた</strong>。厳しくなった行は0件。</li><li><strong>平均変化率 +9.3%</strong>。最小 +1.3%、最大 +61.8%（中央値 +2.4%）。</li><li>つまり <strong>旧コードは実際より辛い（安全側すぎる）方向に間違えていた</strong>。社長への実害は</li></ul>
+<p>  「メーカーに出せたはずの提示上限を、実際より低く見積もっていた」こと。危険な方向（上限を<br>  甘く見せて赤字を掘る方向）の間違いではなかったのは不幸中の幸い。</p>
+<h2>方法（Keepaトークンは1つも使っていない）</h2>
+<p><code>v14/01_候補プール_全件.csv</code> の「手数料内訳」列には、スキャン実行時に procure_limit.compute()<br>が実際に使った内訳（基準売価・旧販売手数料額・旧FBA配送額・<strong>保管料[実寸法ベースで計算済み]</strong>・<br>外注費・雑費・目標利益）がテキストで残っている。これを正規表現でパースし、</p>
+<ul><li><strong>保管料・外注費・雑費・目標利益率は変更していないので旧値をそのまま使う</strong>（保管料は実寸法</li></ul>
+<p>  ベースで計算済みのため、CSVに寸法列が無くても正確な値を再利用できる）</p>
+<ul><li><strong>販売手数料とFBA配送代行だけを新しい料率表で引き直す</strong>（今回変更した箇所そのもの）</li></ul>
+<p>という差分計算により、Keepaへ再アクセスせずローカルだけで前後比較ができた。<br>カテゴリー判定は実際のロジック（<code>adapters.amazon_data._map_category_key</code>）をそのまま再利用。<br>スクリプト: <code>workspace/output/agent_output/T-20260817-005/compare_fee_update.py</code></p>
+<p><strong>サンプリング方法</strong>: 現時点（2026-08-24 15時台、スキャン走行中）で判定=候補の292件から、<br>先頭に偏らないよう等間隔で30件を抽出。走行中スキャンのCSVを読んだだけで、書き込みは一切していない。</p>
+<h2>サンプル30件の内訳（動いた理由の分解）</h2>
+<table><thead><tr><th>変化の主因</th><th>該当カテゴリー</th><th>効果の方向</th><th>目安の変化率</th></tr></thead><tbody>
+<tr><td>販売手数料 +0.4pt（750円超・全カテゴリ）</td><td>electronics/pc (8.0%→8.4%) / home_kitchen/diy (15.0%→15.4%)</td><td>上限をわずかに下げる方向</td><td>単独では -0.3〜-0.4pt相当</td></tr>
+<tr><td><strong>toys/sports の旧誤り是正（15.0%→10.4%）</strong></td><td>toys</td><td>上限を大きく上げる方向</td><td><strong>単独で+4.6pt相当</strong></td></tr>
+<tr><td><strong>FBA standard_1 の是正（434円→318円）</strong></td><td>standard_1サイズの商品</td><td>上限を大きく上げる方向</td><td><strong>単独で+116円</strong></td></tr>
+<tr><td>不確実性バッファの撤去（+1.0pt→0）</td><td>全件</td><td>上限を上げる方向</td><td>単独で+1.0pt相当</td></tr>
+</tbody></table>
+<p>サンプル中、<strong>+50%超の変化が出た2件</strong>（<code>B01B7QHIGO</code> すごろく＝toys、<code>B07GLJ2X4F</code> 猫用品＝pet standard_1）は、<br>「toys誤り是正」と「standard_1のFBA是正」がどちらも効いた上、**基準売価が低い商品ほど固定額(FBA)の<br>変化が比率として効きやすい**ため。小さい上限の商品ほど%表示が大きく振れる点は要注意（円建てでは<br>126円・61円で他行と大差ない）。</p>
+<h2>サンプル30件 全データ</h2>
+<p><code>fee-update-sample-comparison.csv</code>（同ディレクトリ）参照。主要な列:</p>
+<table><thead><tr><th>ASIN</th><th>商品名(先頭)</th><th>カテゴリ</th><th>サイズ</th><th>基準売価</th><th>旧限度額</th><th>新限度額</th><th>差額</th><th>変化率%</th></tr></thead><tbody>
+<tr><td>B0GFCPDT7B</td><td>ヘッドセット bluetooth</td><td>electronics/small</td><td>1,894円</td><td>769円</td><td>783円</td><td>+14円</td><td>+1.8%</td></tr>
+<tr><td>B07WS923R6</td><td>LxTek インク(エプソン)</td><td>pc/standard_1</td><td>1,762円</td><td>427円</td><td>553円</td><td>+126円</td><td>+29.5%</td></tr>
+<tr><td>B0BZKVR3K4</td><td>マリオ着ぐるみ帽子</td><td>toys/small</td><td>1,779円</td><td>546円</td><td>648円</td><td>+102円</td><td>+18.7%</td></tr>
+<tr><td>B01B7QHIGO</td><td>ナンジャモンジャ</td><td>toys/small</td><td>1,066円</td><td>107円</td><td>168円</td><td>+61円</td><td><strong>+57.0%</strong></td></tr>
+<tr><td>B07GLJ2X4F</td><td>消臭ビーズ(猫トイレ)</td><td>pet/standard_1</td><td>1,700円</td><td>204円</td><td>330円</td><td>+126円</td><td><strong>+61.8%</strong></td></tr>
+<tr><td>B0BV2PQ934</td><td>Philips ソーラーチャージャー</td><td>electronics/standard_1</td><td>3,980円</td><td>2,003円</td><td>2,143円</td><td>+140円</td><td>+7.0%</td></tr>
+</tbody></table>
+<p>（全30行は CSV を参照。上表は変化率レンジの端と代表例のみ抜粋）</p>
+<h2>実務への影響（社長への一言）</h2>
+<ul><li><strong>これまでのリストは、実際に出せる上限より平均1割弱、低い金額をメーカーに提示していた</strong></li></ul>
+<p>  ことになる（危険な方向の間違いではない＝赤字を掘る誤りではなかった）。</p>
+<ul><li><strong>旧toysカテゴリー（15.0%）で計算されていた商品は、再計算すると上限が大きく上がる</strong>。</li></ul>
+<p>  すでに交渉に入っている/入ろうとしているtoys商品があれば、再計算後の数字で出し直す価値がある。</p>
+<ul><li>逆に言えば、**旧リストで「見送り」判定になっていた商品の一部は、新しい上限では「候補」に</li></ul>
+<p>  変わる可能性がある**（Stage4の全件再計算で拾えるかを確認する）。</p>
+<h2>確度・限界</h2>
+<ul><li>サンプルは292件中30件（約10%）。母集団全体の平均変化率は「近い値になる可能性が高い」程度の</li></ul>
+<p>  確度で、<strong>全件保証ではない</strong>（Stage4で全件再計算すれば確定する）。</p>
+<ul><li>保管料・外注費は「旧計算時点の実寸法ベースの値をそのまま流用」しているため、**寸法自体が</li></ul>
+<p>  誤っていた場合はここでは検出できない**（今回のスコープ外）。</p>
+<ul><li>カテゴリー再判定は実物ロジックの再利用だが、**カテゴリー文字列のマッチング自体に元々の推定</li></ul>
+<p>  誤差がある**（<code>_map_category_key</code>のコメント通り「ベストエフォート」）。これは今回変更していない。</p></div></body></html>
