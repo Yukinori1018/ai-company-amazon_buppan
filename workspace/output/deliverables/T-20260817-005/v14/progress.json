@@ -1,0 +1,39 @@
+{
+  "ticket": "T-20260817-005",
+  "scanner": "scan_v14",
+  "updated_at": "2026-08-24 13:25:27",
+  "started_at": "2026-08-24 13:25:26",
+  "elapsed_sec": 1,
+  "elapsed_hhmm": "00:00:01",
+  "stop_reason": null,
+  "auto_stop": {
+    "max_hours": 12.0,
+    "token_starve_minutes": 60,
+    "empty_rounds_limit": 3,
+    "stop_file": "/Users/yukinori/Claude Code/ai-company-amazon_buppan/workspace/output/deliverables/T-20260817-005/v14/STOP"
+  },
+  "keepa": {
+    "tokens_consumed": 0,
+    "tokens_left": 111,
+    "refill_per_min": 20,
+    "note": "トークン上限1200・補充20/分。貯め込めないので12時間で約14,400が天井"
+  },
+  "counts": {
+    "processed": 0,
+    "rows": 0,
+    "go": 0,
+    "offers_verified": 0,
+    "rejected_seller": 0,
+    "rejected_cheap": 0
+  },
+  "makers_listed": 124,
+  "cursor": {
+    "starting": true
+  },
+  "outputs": {
+    "all": "/Users/yukinori/Claude Code/ai-company-amazon_buppan/workspace/output/deliverables/T-20260817-005/v14/01_候補プール_全件.csv",
+    "go": "/Users/yukinori/Claude Code/ai-company-amazon_buppan/workspace/output/deliverables/T-20260817-005/v14/02_候補リスト_社長用.csv",
+    "makers": "/Users/yukinori/Claude Code/ai-company-amazon_buppan/workspace/output/deliverables/T-20260817-005/v14/03_メーカー名寄せ.csv",
+    "log": "/Users/yukinori/Claude Code/ai-company-amazon_buppan/workspace/output/deliverables/T-20260817-005/v14/scan_v14.log"
+  }
+}

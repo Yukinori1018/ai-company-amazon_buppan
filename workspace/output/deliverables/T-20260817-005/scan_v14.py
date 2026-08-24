@@ -127,7 +127,13 @@ COUNT_NEW_MIN, COUNT_NEW_MAX = 2, 6  # Finder の前段フィルタ。**これ�
 REAL_SELLERS_MIN = 2                # ★唯一の必須ゲート: distinct sellerId >= 2
 OFFERS_PARAM = 20                   # Keepa は 20 未満を受け付けない（実測 2026-08-24）
 OFFERS_CHUNK = 10                   # offers 付きレスポンスは重いので小さめのバッチで
-DETAIL_CHUNK = 100                  # product エンドポイントの1リクエスト上限
+# product は1リクエスト100件まで受け付けるが、**あえて小さくしている**。
+# トークン補充が20/分なので、100件バッチ（詳細100 + offers 約90件×6.5 ≒ 685トークン）は
+# 1周に約34分かかる。その間 CSV も progress.json も1行も動かず、
+# 「無人で動いているのか死んでいるのか」が外から分からない。
+# 25件なら約8分周期で行が積まれ、途中で止めても失うのは最大25件ぶんだけで済む。
+# トークン単価は件数ベースなので、バッチを小さくしても**コストは1トークンも増えない**。
+DETAIL_CHUNK = 25
 FINDER_PER_PAGE = 1000              # 実測: perPage=1000 が通る（1000件で約20トークン）
 
 # D8（2026-08-24 社長判断）: 下限を 0 に下げた。`variationCount=0` の商品は 97,484件あり、
@@ -183,8 +189,13 @@ PRICE_DEF_CHANGE_KEEPA_MIN = 7966080
 MAX_HOURS_DEFAULT = 12.0            # ①通算の走行時間
 TOKEN_STARVE_MINUTES = 60           # ②トークンが回復しないまま何分で諦めるか
 EMPTY_ROUNDS_LIMIT = 3              # ③新規ゼロが何ラウンド続いたら止めるか
-MIN_TOKENS = 150                    # これを割ったら補充待ち
+# これを割ったら補充待ち。DETAIL_CHUNK=25 なら1バッチ45トークンで足りるので、
+# 150 を要求すると必要のない足踏みが増える。必要量ぎりぎり + 少しの余裕にする。
+MIN_TOKENS = 50
 CHECKPOINT_EVERY = 500              # ④何件ごとにチェックポイントを取るか
+# 件数だけを条件にすると、offers 待ちで遅い時間帯に progress.json が1時間以上古いままになり、
+# 「今どうなっているか」が外から分からなくなる。時間でも打つ（トークンは消費しない）。
+CHECKPOINT_EVERY_SEC = 900          #   〃 何秒ごとにも取るか（15分）
 
 # ==========================================================================
 # 出力列（★社長が使う順に並べる。13列目以降は補助）
@@ -865,6 +876,9 @@ def run(args) -> None:
 
     plan = shards()
     log(f"    探索シャード {len(plan)}本（価格帯で刻んで母集団を端から掘る）")
+    # 起動直後に1回打つ。これが無いと、最初のチェックポイントまで progress.json が
+    # **前回の走行の内容**のままで、見張りが「もう止まっています」と誤って表示する。
+    checkpoint(watch, budget, {"starting": True}, stat)
 
     # --- シャードを **ラウンドロビン**で回す理由 ------------------------------
     # 1シャードを掘り切ってから次へ行くと、12時間で処理できる 2,000件前後が
@@ -875,6 +889,7 @@ def run(args) -> None:
     queues = {s[4]: [] for s in plan}
     exhausted = set()
     since_checkpoint = 0
+    last_checkpoint_at = time.time()
     round_no = 0
 
     while not watch.should_stop():
@@ -965,11 +980,13 @@ def run(args) -> None:
                 f"消費{budget.consumed}tok 残{budget.left} 経過"
                 f"{time.strftime('%H:%M:%S', time.gmtime(watch.elapsed))}")
 
-            if since_checkpoint >= CHECKPOINT_EVERY:
+            if (since_checkpoint >= CHECKPOINT_EVERY
+                    or time.time() - last_checkpoint_at >= CHECKPOINT_EVERY_SEC):
                 checkpoint(watch, budget, {"round": round_no, "cursors": cursors,
                                            "exhausted": sorted(exhausted)}, stat)
                 save_cursors(cursors)
                 since_checkpoint = 0
+                last_checkpoint_at = time.time()
 
         # ---- 停止条件③: 1巡まるごと新規ゼロが続いたら掘り尽くしたとみなす ----
         if new_this_round == 0:
