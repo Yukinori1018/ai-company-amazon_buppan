@@ -28,14 +28,14 @@ def test_case1_black_ink_is_gem():
     """黒字・利益率15%以上・純利益500円以上 → 原石。"""
     res = calculate(ProfitInput(
         wholesale_price=1000, amazon_price=2980,
-        category_key="home_kitchen",  # 料率15%
-        size_key="standard_1",        # FBA 434円
+        category_key="home_kitchen",  # 料率15.4%（2026-08-24更新・旧15%は誤り）
+        size_key="standard_1",        # FBA 318円（2026-08-24更新・旧434円は誤り）
         inbound_shipping=200, other_costs=50,
     ))
-    # 手数料 = 2980*0.15 = 447, FBA=434, 仕入1000, 送料200, その他50
-    # 純利益 = 2980 - (447+434+1000+200+50) = 849
-    assert math.isclose(res.referral_fee, 447.0, rel_tol=1e-6)
-    assert math.isclose(res.net_profit, 849.0, rel_tol=1e-6)
+    # 手数料 = 2980*0.154 = 458.92, FBA=318, 仕入1000, 送料200, その他50
+    # 純利益 = 2980 - (458.92+318+1000+200+50) = 953.08
+    assert math.isclose(res.referral_fee, 458.92, rel_tol=1e-6)
+    assert math.isclose(res.net_profit, 953.08, rel_tol=1e-6)
     assert res.margin_rate > 0.15
     assert res.net_profit >= 500
     assert res.verdict == VERDICT_GEM
@@ -73,14 +73,14 @@ def test_case4_high_margin_gem_self_ship():
     """高利益率（自己発送でFBA手数料0）→ 原石、ROIも高い。"""
     res = calculate(ProfitInput(
         wholesale_price=800, amazon_price=4980,
-        category_key="toys",        # 料率15%
+        category_key="toys",        # 料率10.4%（2026-08-24更新・旧15%は誤り。旧コードは辛い側に間違えていた）
         size_key="self_ship",       # FBA 0円
         inbound_shipping=300, other_costs=100,
     ))
-    # 手数料=4980*0.15=747, FBA=0, 仕入800, 送料300, その他100
-    # 純利益 = 4980 - (747+0+800+300+100) = 3033
+    # 手数料=4980*0.104=517.92, FBA=0, 仕入800, 送料300, その他100
+    # 純利益 = 4980 - (517.92+0+800+300+100) = 3262.08
     assert res.fba_fee == 0
-    assert math.isclose(res.net_profit, 3033.0, rel_tol=1e-6)
+    assert math.isclose(res.net_profit, 3262.08, rel_tol=1e-6)
     assert res.margin_rate > 0.15
     assert res.roi > 1.0   # 投下原価1200に対し利益3033 → ROI>250%
     assert res.verdict == VERDICT_GEM
@@ -107,14 +107,15 @@ def test_case5b_shipping_flips_sign():
     """送料負けの符号反転を明示的に検証（黒字→赤字）。"""
     base = dict(
         wholesale_price=1000, amazon_price=2200,
-        category_key="home_kitchen", size_key="standard_1",  # FBA 434
+        category_key="home_kitchen", size_key="standard_1",  # FBA 318（2026-08-24更新）
         other_costs=0,
     )
-    # 手数料=2200*0.15=330, FBA=434, 仕入1000 → 固定控除1764
-    # 送料0 : 2200-1764 = 436 (黒字)
-    # 送料500: 2200-2264 = -64 (赤字)
+    # 手数料=2200*0.154=338.8, FBA=318, 仕入1000 → 固定控除1656.8
+    # 送料0  : 2200-1656.8 = 543.2 (黒字)
+    # 送料700: 2200-2356.8 = -156.8 (赤字)
+    # ※旧FBA434円の頃は送料500で赤字転落したが、FBAが下がったぶん700まで上げて再現
     no_ship = calculate(ProfitInput(inbound_shipping=0, **base))
-    heavy = calculate(ProfitInput(inbound_shipping=500, **base))
+    heavy = calculate(ProfitInput(inbound_shipping=700, **base))
     assert no_ship.net_profit > 0
     assert heavy.net_profit < 0
     assert heavy.verdict == VERDICT_MISS

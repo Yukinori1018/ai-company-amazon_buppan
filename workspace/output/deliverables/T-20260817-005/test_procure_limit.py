@@ -46,15 +46,26 @@ def test_returns_none_when_no_price_at_all():
 
 
 def test_fee_buffer_makes_the_limit_stricter():
-    """料率バッファは必ず上限を下げる方向にしか効かない（甘い方にはズレない）。"""
-    r_with = pl.compute(current_price=5000, floor_price=None, **BASE)
+    """料率バッファは必ず上限を下げる方向にしか効かない（甘い方にはズレない）。
+
+    2026-08-24: fees.py を現行値へ更新したため、既定の FEE_RATE_BUFFER_PT は 0.0 になった
+    （二重の安全マージンが不要になったため）。この性質テストは「バッファという仕組み自体」を
+    検証するものなので、明示的に正の値と 0 を比較する形に直す。
+    """
     saved = pl.FEE_RATE_BUFFER_PT
     try:
+        pl.FEE_RATE_BUFFER_PT = 0.010
+        r_with = pl.compute(current_price=5000, floor_price=None, **BASE)
         pl.FEE_RATE_BUFFER_PT = 0.0
         r_without = pl.compute(current_price=5000, floor_price=None, **BASE)
     finally:
         pl.FEE_RATE_BUFFER_PT = saved
     assert r_with["limit"] < r_without["limit"]
+
+
+def test_default_buffer_is_zero_after_2026_08_fee_update():
+    """既定値そのものが 0.0 であること（更新のし忘れ防止のガード）。"""
+    assert pl.FEE_RATE_BUFFER_PT == 0.0
 
 
 def test_storage_fee_scales_with_volume_and_months():

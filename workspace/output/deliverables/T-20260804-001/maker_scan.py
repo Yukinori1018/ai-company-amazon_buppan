@@ -60,7 +60,17 @@ RANK_LO, RANK_HI = 50000, 150000
 PRICE_LO, PRICE_HI = 1500, 30000
 INBOUND = {"small": 150, "standard_1": 250, "standard_2": 300, "large_1": 380, "large_2": 480}
 OTHER_COSTS = 100             # 梱包外注(WAM NET 5-10円)+ラベル+資材+返品引当のざっくり
-TARGET_MARGIN = 0.25          # 想定仕入価格＝この純利益率になる税込上限
+# 2026-08-24 ハジメ更新: 会社KPI（CLAUDE.md §1「利益率20%以上」）に合わせて 25%→20% に統一。
+# procure_limit.py（T-20260817-005・現行の主力パイプライン）と同じ値にすることで、
+# 「同じ商品なのにチケットによって想定仕入価格が違う」という混乱を防ぐ。
+TARGET_MARGIN = 0.20          # 想定仕入価格＝この純利益率になる税込上限
+# FBA在庫保管手数料〔推定・フォールバック〕。円/個。
+# 2026-08-24 ハジメ新設: 本スクリプトは寸法(dims_mm)をreverse_buy()まで引き回していないため、
+# 体積ベースの精密計算はできない。標準サイズ商品の代表的な体積(概ね1〜3L)を仮定し、
+# 繁忙期レート10.087円/1,000cm³で1ヶ月分を概算した固定額を安全側(高め)で計上する。
+# 精密化するには procure_limit.py の storage_fee_yen() 方式（dims_mm×消化月数）への統合が必要
+# （範囲外・別チケットで対応）。
+STORAGE_FEE_FALLBACK_YEN = 20  # 〔推定〕1ヶ月ぶんの概算。旧実装は在庫保管手数料が0円扱いだった
 
 # 大手/海外の可能性フラグ用（除外はせず注記）。
 BIG_HINTS = re.compile(r"(SONY|ソニー|Panasonic|パナソニック|東芝|TOSHIBA|日立|SHARP|シャープ|"
@@ -132,19 +142,20 @@ def reverse_buy(amazon_price, fee_cat, size):
     """純利益率がTARGET_MARGINになる税込仕入上限と、その時の純利益。"""
     if not amazon_price or amazon_price <= 0:
         return None, None, None
-    cfg = fees.get_referral_rate(fee_cat)
+    cfg = fees.get_referral_rate(fee_cat, price=amazon_price)
     referral = max(amazon_price * cfg["rate"], cfg.get("min_fee_yen", 0))
     fba = fees.get_fba_fee(size).get("fba_fee_yen", 0)
     inbound = INBOUND.get(size, 250)
+    storage = STORAGE_FEE_FALLBACK_YEN
     target_net = TARGET_MARGIN * amazon_price
-    buy_incl = amazon_price - referral - fba - inbound - OTHER_COSTS - target_net
+    buy_incl = amazon_price - referral - fba - inbound - storage - OTHER_COSTS - target_net
     if buy_incl <= 0:
         return 0, round(target_net), round(TARGET_MARGIN * 100, 1)
     # 検算（calc.profitで純利益率を確認）
     try:
         r = calculate(ProfitInput(wholesale_price=buy_incl, amazon_price=amazon_price,
                                    category_key=fee_cat, size_key=size,
-                                   inbound_shipping=inbound, other_costs=OTHER_COSTS,
+                                   inbound_shipping=inbound, other_costs=OTHER_COSTS + storage,
                                    wholesale_price_is_tax_included=True))
         return round(buy_incl), round(r.net_profit), round(r.margin_rate * 100, 1)
     except Exception:
