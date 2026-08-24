@@ -105,3 +105,31 @@ COUNT_NEW 対策 ＋ D1〜D4（`knowledge_keepa_field_traps.md`）を同時に�
 
 **トークンの実績**: 全体で約2,962トークン・約2時間（ほぼ全部が補充待ち20/分）。
 うち offers が2,150、セラー名が532。**0トークンで済んだのは D1追加検証・D11測定・全行再集計。**
+
+---
+
+## 2026-08-24 追記: 共有アダプタ側を直しました（T-20260817-005 ④）
+
+震源だった `adapters/amazon_data.py::_pick_offer_count` を、**呼び出し側ごと**移設。
+
+- `_pick_real_seller_count(product)` を新設
+  （`liveOffersOrder` × `condition==1` × 非Amazon の distinct `sellerId`）
+- `AmazonProduct.real_seller_count` / `seller_count_source` を追加
+- **`AmazonProduct.rival_seller_count` プロパティが唯一の入口**
+  （実セラー数があればそれ、無ければ COUNT_NEW にフォールバック＝挙動は非破壊）
+- `pipeline._passes_amazon_filters` / `DiscoveryRow` / Streamlit 表示列を移設
+- 表示列は **「出品者数」→「新品オファー数」＋「実セラー数」** に改名（列名で嘘をつかない）
+- `maker_scan.py`（T-20260804-001）も入口だけ移設。offers を付ければ自動で正しくなる
+
+`_pick_offer_count` は「オファーが何本並んでいるか」用として残してある（後方互換）。
+
+### 踏んだ罠: コピーが2つあって、**deliverables 側の方が新しかった**
+
+```
+workspace/output/agent_output/T-20260521-005/code/   ← scan_v13/v14 が import する方
+workspace/output/deliverables/T-20260521-005/code/   ← Git 追跡されている方（price_history / brand / maker が有る）
+```
+
+agent_output 側だけ直して満足しかけた。**両方に当てること。**
+テスト本数が違う（deliverables 191 / agent_output 166）ので、
+「どちらが本物か」は `git ls-files` と行数の両方で確認する。
