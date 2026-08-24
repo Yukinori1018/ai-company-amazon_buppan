@@ -478,3 +478,74 @@ def test_blank_brand_normalized_to_none():
     assert ap is not None
     assert ap.brand is None
     assert ap.maker == "花王"
+
+
+
+# =============================================================================
+# 実セラー数（distinct sellerId）— 2026-08-24 の欠陥修正ぶん
+#
+# COUNT_NEW（stats.current[11]）は **新品オファー数**であって出品者数ではない。
+# 1社が FBA と FBM の両方に出すだけで 2 になる。実例 B0DWMPV656。
+# =============================================================================
+from adapters.amazon_data import _pick_real_seller_count  # noqa: E402
+
+
+def _with_offers(offers, live_order):
+    """MOCK_PRODUCT に offers を生やした product dict を作る（テスト用の小道具）。"""
+    p = dict(MOCK_PRODUCT)
+    p["offers"] = offers
+    p["liveOffersOrder"] = live_order
+    return p
+
+
+def test_real_seller_count_is_none_without_offers():
+    """offers パラメータ無しの product は「未検証」＝None。0社と誤解させない。"""
+    assert _pick_real_seller_count(MOCK_PRODUCT) is None
+
+
+def test_real_seller_count_counts_one_seller_with_fba_and_fbm():
+    """B0DWMPV656 の再現: 同一セラーの FBA+FBM で COUNT_NEW=2 でも実セラーは1社。"""
+    p = _with_offers(
+        [
+            {"sellerId": "A37CWH39G3AT5D", "condition": 1, "isFBA": True},
+            {"sellerId": "A37CWH39G3AT5D", "condition": 1, "isFBA": False},
+        ],
+        [0, 1],
+    )
+    assert _pick_real_seller_count(p) == 1
+
+
+def test_real_seller_count_skips_dead_used_and_amazon_offers():
+    """生存(liveOffersOrder)・新品(condition==1)・非Amazon だけを数える。"""
+    p = _with_offers(
+        [
+            {"sellerId": "S1", "condition": 1},          # 生存・新品 → 数える
+            {"sellerId": "S2", "condition": 11},         # 中古 → 数えない
+            {"sellerId": "S3", "condition": 1, "isAmazon": True},  # Amazon本体 → 数えない
+            {"sellerId": "S4", "condition": 1},          # 死んだオファー（order に無い）
+        ],
+        [0, 1, 2],
+    )
+    assert _pick_real_seller_count(p) == 1
+
+
+def test_rival_seller_count_prefers_real_over_count_new():
+    """ライバル数の入口は rival_seller_count。実セラー数があればそちらが勝つ。"""
+    ap = _product_to_amazon(_with_offers(
+        [
+            {"sellerId": "A37CWH39G3AT5D", "condition": 1, "isFBA": True},
+            {"sellerId": "A37CWH39G3AT5D", "condition": 1, "isFBA": False},
+        ],
+        [0, 1],
+    ))
+    assert ap.offer_count == 2            # COUNT_NEW は 2 のまま（嘘はつかない）
+    assert ap.real_seller_count == 1      # 実際は1社
+    assert ap.rival_seller_count == 1     # 呼び出し側が読むのはこちら
+    assert ap.seller_count_source == "実セラー数"
+
+
+def test_rival_seller_count_falls_back_to_count_new_when_unverified():
+    ap = _product_to_amazon(MOCK_PRODUCT)
+    assert ap.real_seller_count is None
+    assert ap.rival_seller_count == ap.offer_count == 2
+    assert ap.seller_count_source == "COUNT_NEW(未検証)"

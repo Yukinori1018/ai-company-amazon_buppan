@@ -676,3 +676,46 @@ def test_preset_thresholds_drive_gem_verdict():
     if row_loose.net_profit > 0:  # 黒字行のときだけ原石/非原石の差が意味を持つ
         assert row_loose.verdict == "原石"
         assert row_strict.verdict != "原石"
+
+
+
+# =============================================================================
+# ライバル数フィルタは「実セラー数」を見る（2026-08-24 の欠陥修正）
+#
+# COUNT_NEW=2 でも実セラーが1社なら、それは相乗り2社ではなく **メーカーの独占**。
+# 逆に COUNT_NEW が上限を超えていても、実セラー数が上限内なら通すべき
+# （1社が FBA+FBM に二重出品しているだけのことがある）。
+# =============================================================================
+def _preset_max_rivals(n: int):
+    from discovery.presets import DiscoveryPreset
+    return DiscoveryPreset(
+        key="t", label="t", description="",
+        max_sales_rank=10**9, max_offer_count=n,
+        min_margin_rate=0.0, min_net_profit=0,
+    )
+
+
+def _ap(offer_count, real_seller_count):
+    from adapters.amazon_data import AmazonProduct
+    return AmazonProduct(
+        asin="B0TEST", title="t", current_price=1000,
+        sales_rank=100, monthly_sales=10,
+        offer_count=offer_count, real_seller_count=real_seller_count,
+        category_key="home_kitchen", size_key="standard_1",
+    )
+
+
+def test_filter_uses_real_seller_count_when_available():
+    """COUNT_NEW=8 で上限超過に見えるが、実セラーは2社なので通す。"""
+    assert pipeline._passes_amazon_filters(_ap(8, 2), _preset_max_rivals(6)) is True
+
+
+def test_filter_rejects_when_real_sellers_exceed_limit():
+    """逆に COUNT_NEW が小さくても、実セラー数が上限超過なら落とす。"""
+    assert pipeline._passes_amazon_filters(_ap(3, 9), _preset_max_rivals(6)) is False
+
+
+def test_filter_falls_back_to_count_new_when_unverified():
+    """実セラー未検証（None）の行は従来どおり COUNT_NEW で判定する（挙動を壊さない）。"""
+    assert pipeline._passes_amazon_filters(_ap(9, None), _preset_max_rivals(6)) is False
+    assert pipeline._passes_amazon_filters(_ap(3, None), _preset_max_rivals(6)) is True

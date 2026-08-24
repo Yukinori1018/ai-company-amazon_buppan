@@ -2,7 +2,11 @@
 
 ナレッジ3基準（EC STARs/中西）:
   ①Amazon本体が出品していない（Keepa current_AMAZON=-1）
-  ②FBAライバルセラー2人以上（current_COUNT_NEW>=2）
+  ②FBAライバルセラー2人以上（Finder 前段は current_COUNT_NEW>=2 で近似）
+     ⚠️ COUNT_NEW は **新品オファー数**であって出品者数ではない（2026-08-24 判明）。
+        1社が FBA と FBM の両方に出すだけで 2 になるため、`rival_sellers` 列は
+        上振れしている。確定させるには product?offers=N の distinct sellerId が要る
+        （約5.6トークン/件）。標本40件では `rival_sellers==2` の45.5%が実質1社だった。
   ③ランキング 50,000〜150,000位（社長修正）
 中小メーカー狙い・規制カテゴリ除外（医薬品/化粧品/食品）。
 
@@ -223,7 +227,11 @@ def main():
             feecat = fee_map.get(ap.asin, "default")
             size = ap.size_key or "standard_1"
             buy, net, mpct = reverse_buy(ap.current_price, feecat, size)
-            offers = ap.offer_count if ap.offer_count is not None else None
+            # ライバル数は rival_seller_count で読む（実セラー数があればそちら、
+            # 無ければ COUNT_NEW にフォールバック＝現状の挙動と同じ）。
+            # ⚠️ offers を付けずに走らせている限り、この値は「新品オファー数」であって
+            #    出品者数ではない。1社が FBA+FBM に出すだけで 2 になる（2026-08-24 判明）。
+            offers = ap.rival_seller_count
             rank = ap.sales_rank
             oos = (prod.get("availabilityAmazon", -1) == -1)
             # ランクはFinderが権威フィールド(current_SALES)で5万-15万を担保済み。

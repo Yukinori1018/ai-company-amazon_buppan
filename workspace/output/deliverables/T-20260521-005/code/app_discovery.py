@@ -708,7 +708,10 @@ else:
                     "ROI(%)": round(r.roi * 100, 1),
                     "月販推定": r.monthly_sales,
                     "ランキング": r.sales_rank,
-                    "出品者数": r.offer_count,
+                    # 列名を偽らない: COUNT_NEW は「オファー数」であって出品者数ではない。
+                    # 人が見るべきライバル数は「実セラー数」列（未検証なら空欄）。
+                    "新品オファー数": r.offer_count,
+                    "実セラー数": r.real_seller_count,
                     "在庫切れ率(%)": None if r.oos_rate_90d is None else round(r.oos_rate_90d * 100),
                     "判定": r.verdict,
                     "突合": r.match_status,
@@ -861,7 +864,10 @@ else:
                     "Amazon売値(円)": int(r.amazon_price),
                     "月販推定": r.monthly_sales,
                     "ランキング": r.sales_rank,
-                    "出品者数": r.offer_count,
+                    # 列名を偽らない: COUNT_NEW は「オファー数」であって出品者数ではない。
+                    # 人が見るべきライバル数は「実セラー数」列（未検証なら空欄）。
+                    "新品オファー数": r.offer_count,
+                    "実セラー数": r.real_seller_count,
                     "仕入元": "仕入元が見つかりませんでした",
                     "Amazon": _amazon_url(r.asin),
                 }

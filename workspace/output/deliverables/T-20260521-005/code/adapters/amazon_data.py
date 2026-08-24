@@ -60,7 +60,13 @@ class AmazonProduct:
     current_price: Optional[float]        # 現在価格（円・税込）。None=在庫なし/取得不可
     sales_rank: Optional[int] = None      # カテゴリ内ランキング
     monthly_sales: Optional[int] = None   # 推定月間販売数
-    offer_count: Optional[int] = None     # 出品者数
+    # ⚠️ offer_count は **新品オファー数**（COUNT_NEW）であって出品者数ではない。
+    #    1社が FBA と FBM の両方に出すだけで 2 になる。詳細は _pick_offer_count の docstring。
+    offer_count: Optional[int] = None     # 新品オファー数（≠出品者数）
+    # 実セラー数（distinct sellerId）。offers パラメータ付きで取得したときだけ入る。
+    # ライバル数を見たい場面では **必ず rival_seller_count 経由で読むこと**。
+    real_seller_count: Optional[int] = None
+    seller_count_source: str = ""         # "実セラー数" / "COUNT_NEW(未検証)" / ""
     oos_rate_90d: Optional[float] = None  # 90日在庫切れ率（0〜1）
     category_key: str = "default"         # fees.py のカテゴリキー
     size_key: str = "standard_1"          # fees.py のサイズキー
@@ -74,6 +80,18 @@ class AmazonProduct:
     # （brand/manufacturer は stats=90 の1バッチ応答に既に含まれる）。
     brand: Optional[str] = None           # ブランド名（Keepa raw の brand）
     manufacturer: Optional[str] = None    # 製造元（Keepa raw の manufacturer）
+
+    @property
+    def rival_seller_count(self) -> Optional[int]:
+        """「ライバル出品者は何社か」の唯一の入口。
+
+        実セラー数が分かっていればそれを、無ければ COUNT_NEW を返す（上振れ側の近似）。
+        呼び出し側が `offer_count` を直接ライバル数として読むと、
+        1社独占の商品を「相乗り2社」と誤読する（2026-08-24 の欠陥）。
+        """
+        if self.real_seller_count is not None:
+            return self.real_seller_count
+        return self.offer_count
 
     @property
     def maker(self) -> str:
@@ -137,6 +155,11 @@ class SampleBackend:
                 sales_rank=r.get("sales_rank"),
                 monthly_sales=r.get("monthly_sales"),
                 offer_count=r.get("offer_count"),
+                # サンプルデータは「オファー数」しか持たない。実セラー数は不明のまま
+                # （None）にして、rival_seller_count が COUNT_NEW にフォールバックする。
+                real_seller_count=r.get("real_seller_count"),
+                seller_count_source=("実セラー数" if r.get("real_seller_count") is not None
+                                     else "COUNT_NEW(未検証)"),
                 oos_rate_90d=r.get("oos_rate_90d"),
                 category_key=r.get("category_key", "default"),
                 size_key=r.get("size_key", "standard_1"),
@@ -239,7 +262,17 @@ def _pick_sales_rank(product: dict, stats: dict) -> Optional[int]:
 
 
 def _pick_offer_count(stats: dict) -> Optional[int]:
-    """新品出品オファー数（相乗り出品者数の代理）。stats.current[11]=COUNT_NEW。"""
+    """**新品オファー数**（stats.current[11] = COUNT_NEW）。
+
+    ⚠️ これは出品者数ではない（2026-08-24 に社長指摘で判明した欠陥の震源）。
+    1社が FBA と FBM の両方に同じ商品を出すと、セラー1社でも COUNT_NEW=2 になる。
+    実例 ASIN B0DWMPV656: COUNT_NEW=2 / offerCountFBA=1 / offerCountFBM=1 だが
+    sellerId は1つだけ（メーカー直販の独占リスティング）。
+
+    「ライバルが何社いるか」を知りたいときは `_pick_real_seller_count()` を使い、
+    読むときは `AmazonProduct.rival_seller_count` を経由すること。
+    この関数は「オファーが何本並んでいるか」を知りたい場面専用に残してある。
+    """
     if not isinstance(stats, dict):
         return None
     cur = stats.get("current") or []
@@ -248,6 +281,40 @@ def _pick_offer_count(stats: dict) -> Optional[int]:
         if isinstance(c, (int, float)) and c >= 0:
             return int(c)
     return None
+
+
+# Keepa のオファー condition コード（公式）。1 = 新品。
+KEEPA_CONDITION_NEW = 1
+
+
+def _pick_real_seller_count(product: dict) -> Optional[int]:
+    """実セラー数 = 生存中の新品オファーの distinct sellerId 数（Amazon本体は除く）。
+
+    数え方（Keepa 公式のオファー構造に沿う）:
+      1. `liveOffersOrder` で **今生きているオファー**だけに絞る
+         （`offers` 配列には過去の死んだオファーも入っている）
+      2. `condition == 1`（新品）だけを残す（中古セラーを混ぜない）
+      3. `sellerId` の distinct 数を数える（`isAmazon` は除外）
+
+    `offers` パラメータを付けずに取得した product には `liveOffersOrder` が無いので
+    **None**（＝未検証）を返す。呼び出し側は None を「0社」と読み替えないこと。
+    トークン単価: offers=20 で約5.6トークン/件（素の product の約6倍）。必要な行にだけ掛ける。
+    """
+    offers = product.get("offers")
+    order = product.get("liveOffersOrder")
+    if not isinstance(offers, list) or not isinstance(order, list) or not order:
+        return None
+    seen = set()
+    for i in order:
+        if not isinstance(i, int) or not (0 <= i < len(offers)):
+            continue
+        o = offers[i] or {}
+        if o.get("condition") != KEEPA_CONDITION_NEW or o.get("isAmazon"):
+            continue
+        sid = o.get("sellerId")
+        if sid:
+            seen.add(sid)
+    return len(seen)
 
 
 def _pick_oos_rate_90d(stats: dict) -> Optional[float]:
@@ -410,6 +477,7 @@ def _product_to_amazon(product: dict) -> Optional[AmazonProduct]:
     price = _pick_amazon_price(stats)
     sales_rank = _pick_sales_rank(product, stats)
     offer_count = _pick_offer_count(stats)
+    real_sellers = _pick_real_seller_count(product)
     oos = _pick_oos_rate_90d(stats)
     monthly, is_estimate, ms_note = _estimate_monthly_sales(product, sales_rank)
     category_key = _map_category_key(product)
@@ -423,6 +491,9 @@ def _product_to_amazon(product: dict) -> Optional[AmazonProduct]:
         sales_rank=sales_rank,
         monthly_sales=monthly,
         offer_count=offer_count,
+        real_seller_count=real_sellers,
+        seller_count_source=("実セラー数" if real_sellers is not None
+                             else ("COUNT_NEW(未検証)" if offer_count is not None else "")),
         oos_rate_90d=oos,
         category_key=category_key,
         size_key=size_key,

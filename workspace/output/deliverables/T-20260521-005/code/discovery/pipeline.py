@@ -64,10 +64,11 @@ class DiscoveryRow:
     roi: float                       # ROI（0〜1）
     monthly_sales: Optional[int]
     sales_rank: Optional[int]
-    offer_count: Optional[int]
+    offer_count: Optional[int]           # 新品オファー数（COUNT_NEW）。≠出品者数
     oos_rate_90d: Optional[float]
     verdict: str                     # 原石/要確認/あやしい/はずれ
     match_status: str                # 突合状態（後述の定数）
+    real_seller_count: Optional[int] = None  # 実セラー数（distinct sellerId）。None=未検証
     amazon_name: str = ""            # Amazon(Keepa)側の商品名。Yahoo名と別保持（個数照合用）
     maker: str = ""                  # メーカー/ブランド名（Keepa raw の brand>manufacturer）。メーカー仕入れ抽出用
     supplier_qty: Optional[int] = None   # 仕入元側の推定入数（None=不明）
@@ -302,6 +303,7 @@ def _suspect_row(
         monthly_sales=ap.monthly_sales,
         sales_rank=ap.sales_rank,
         offer_count=ap.offer_count,
+        real_seller_count=ap.real_seller_count,
         oos_rate_90d=ap.oos_rate_90d,
         verdict=VERDICT_NEEDS_CHECK,
         match_status=MATCH_SUSPECT_MISMATCH,
@@ -411,6 +413,7 @@ def _build_row(
         monthly_sales=ap.monthly_sales,
         sales_rank=ap.sales_rank,
         offer_count=ap.offer_count,
+        real_seller_count=ap.real_seller_count,
         oos_rate_90d=ap.oos_rate_90d,
         verdict=verdict,
         match_status=MATCH_OK if amazon_meta_ok else AMAZON_FILTER_FAIL,
@@ -812,6 +815,7 @@ def _build_amazon_row(
             monthly_sales=ap.monthly_sales,
             sales_rank=ap.sales_rank,
             offer_count=ap.offer_count,
+        real_seller_count=ap.real_seller_count,
             oos_rate_90d=ap.oos_rate_90d,
             verdict=verdict,
             match_status=match_status,
@@ -847,6 +851,7 @@ def _build_amazon_row(
             monthly_sales=ap.monthly_sales,
             sales_rank=ap.sales_rank,
             offer_count=ap.offer_count,
+        real_seller_count=ap.real_seller_count,
             oos_rate_90d=ap.oos_rate_90d,
             verdict=VERDICT_NEEDS_CHECK,
             match_status=AMAZON_ONLY,
@@ -887,6 +892,7 @@ def _build_amazon_row(
         monthly_sales=ap.monthly_sales,
         sales_rank=ap.sales_rank,
         offer_count=ap.offer_count,
+        real_seller_count=ap.real_seller_count,
         oos_rate_90d=ap.oos_rate_90d,
         verdict=verdict,
         match_status=AMAZON_ONLY,
@@ -911,7 +917,10 @@ def _passes_amazon_filters(ap: AmazonProduct, preset: DiscoveryPreset) -> bool:
         return False
     if ap.monthly_sales is not None and ap.monthly_sales < preset.min_monthly_sales:
         return False
-    if ap.offer_count is not None and ap.offer_count > preset.max_offer_count:
+    # ライバル数は **rival_seller_count** で読む。ap.offer_count（COUNT_NEW）を直接読むと、
+    # 1社が FBA+FBM に出しているだけの独占商品を「相乗り2社」と誤読する（2026-08-24 の欠陥）。
+    rivals = ap.rival_seller_count
+    if rivals is not None and rivals > preset.max_offer_count:
         return False
     if preset.min_oos_rate_90d > 0:
         if ap.oos_rate_90d is None or ap.oos_rate_90d < preset.min_oos_rate_90d:
