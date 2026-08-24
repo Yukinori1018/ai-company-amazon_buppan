@@ -1,7 +1,7 @@
 ---
 ticket_id: T-20260824-003
 title: Keepa monthlySold のメモリ記述を公式定義＋保存済み実データで突合・補足
-status: doing
+status: done
 assignee: it_engineer
 priority: low
 created_at: 2026-08-24
@@ -9,7 +9,6 @@ updated_at: 2026-08-24
 requires_approval: false
 labels: [keepa, memory, data-quality]
 parent_ticket: T-20260824-001
-next_check_at: 2026-08-25
 related_tickets: [T-20260824-001, T-20260817-005, T-20260803-001]
 ---
 
@@ -81,3 +80,10 @@ IT エンジニア タカシの memory `agents/it_engineer/memory/knowledge_keep
 T-20260824-001 の `keepa-glossary.md` は「`min` は**全期間**の最安値。期間内は `minInInterval`」と
 確定させています。**ここは未修正です**（スコープ外のため手を付けませんでした）。
 `scan_v13.py` の「過去1年最安値」列と損益分岐の全行に効く話なので、別チケット化を推奨します。
+- 2026-08-24 doing タカシに発注
+- 2026-08-24 done 完了。4,002 ASIN を保存済み raw JSON で集計（Keepa 0トークン）。
+  公式定義（階級値・大半欠測）は実データで裏取り成功。一方「月50個以上にしか出ない」は
+  **要修正**と判定（履歴に 10/20/30/40 が実在・1,732/4,002）。「300件中233件=78%」も
+  母集団全体では 33.5% に修正。memory に経緯を残す形で反映。commit 2ccba5e。
+  カズヨが同じ raw JSON を独立集計して数値一致を確認。
+- 2026-08-24 申し送り: `stats.min` の期間解釈の取り違え疑いを T-20260824-004 として分離起票。
