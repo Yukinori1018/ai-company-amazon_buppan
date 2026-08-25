@@ -31,6 +31,8 @@
 
 [skills/](skills/) — 子会社化時に事業固有の制作スキル（YouTube台本フォーマット、サムネ生成ルール、ブランドガイドライン等）を追加してください。
 
+**サイト制作・改修時の参照:** サイトを新規制作・改修するときは、まず [docs/reference/web-site-build/web-site-build-playbook.md](../../docs/reference/web-site-build/web-site-build-playbook.md) の工程（素材→文章→構造→装飾→動き／1フェーズ1セッション／フェーズごと commit）に沿って進める。ただし手順書のデフォルトの見た目はポップ調のポートフォリオ向けなので、Satoy Select 等の B2B 会社サイトでは配色・トーンをそのまま流用せず堅実な企業サイト向けに翻案する（案件固有の決定は各案件のメモリを優先）。
+
 ## メモリ運用
 
 [memory/](memory/) に以下を記録します。
