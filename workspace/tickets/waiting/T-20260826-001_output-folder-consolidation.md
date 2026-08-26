@@ -1,15 +1,15 @@
 ---
 ticket_id: T-20260826-001
 title: 成果物フォルダの一元化（散らばり4箇所→リポ内1箇所）
-status: doing
-assignee: general_affairs
+status: waiting
+assignee: owner
 priority: high
 created_at: 2026-08-26
 updated_at: 2026-08-26
-requires_approval: false
+requires_approval: true
 labels: [整理, 運用ルール]
 parent_ticket: ""
-next_check_at: 2026-08-27
+next_check_at: 2026-08-28
 related_tickets: [T-20260821-009, T-20260601-001]
 ---
 
@@ -92,3 +92,12 @@ related_tickets: [T-20260821-009, T-20260601-001]
 
 **積み残し（別チケット推奨）**: カタログCSVには着手前から T-20260601-001 / T-20260804-001 の2チケットが未登録です（私が触った4チケットは埋めました）。また T-20260527-002 の `sato-scope-lite/` は中身が `.pytest_cache` だけになっており、コード本体が見当たりません。
 
+
+## 社長ご判断待ち（2026-08-26 waiting へ）
+
+1. **`_archive_20260826/` 2箇所（計18MB・266ファイル）の破棄可否** — §4.1（不可逆な削除）。**時間の経過では可決されない。**
+2. **第三者著作物の公開範囲** — `docs/reference/maker-shiire/パーフェクトマニュアルサンプル_EC-STARs-Lab.pdf`（EC STARs Lab. の有料教材）が 2026-05 のコミット 1bf015a 以降 PUBLIC リポで公開中。同ディレクトリの `seminar-20260610-realtime-notes.md`（有料セミナーの内容記録）も同様。法務ハルオへレビュー発注済み。
+
+## ログ
+
+- 2026-08-26 doing → waiting（カズヨ）。マリエが一元化を完了（消失0件・移送9件・シンボリックリンク作成・CLAUDE.md 他18ファイル改訂）。社長ご判断2件のため waiting へ。カズヨ側で実在確認済み（リンク経由で49チケット参照可・移送9件すべて実在・素材置き場5.7G）。
