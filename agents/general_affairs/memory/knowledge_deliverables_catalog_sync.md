@@ -174,3 +174,49 @@ T-20260824-001＝調査記録（保全）／T-20260824-005＝正式な用語集�
 **カタログの要約は「その時点の最良」であって「確定」ではない。**
 だから要約には**確認日**を必ず入れ、備考に**「何を根拠にしたか」**を書く。
 根拠が書いてあれば、後から素材が覆っても、どの行を直せばよいかを追える。
+
+---
+
+## 2026-08-26 / T-20260826-002 — 「成果物3点」と言われたら、実ファイルを数え直す
+
+### やったこと（定常責務の実行記録）
+
+CSV 151行 → **156行**（5行追記）。`sync_catalog_to_sheet.py` で **HTTP 200 / 156行 × 13列**を書き込み。
+
+### カズヨの依頼は「3点」だったが、実際に登録したのは5行
+
+依頼文が挙げていたのは 01_master-todo.md（+.html）/ 02 / 03 の**3点**。
+`ls` で実体を確認すると **5ファイル**（README.md を含む）。CSV の既存慣行に照らすと登録単位は次のとおり:
+
+| 実ファイル | CSV 行 | 根拠 |
+|---|---|---|
+| 01_master-todo.md | 1行 | 本体 |
+| 01_master-todo.html | **別の1行** | 既存慣行。「（HTML版）」「（PDF版）」は独立行にする（例: T-20260703-001 / T-20260826-001） |
+| 02_lifecycle-checklist.md | 1行 | 作成者が違う（researcher）ので担当列も分ける |
+| 03_process-board.html | 1行 | 備考に Artifact URL |
+| README.md | 1行 | 既存 CSV に README 行が18件あり、登録するのが慣行 |
+
+**教訓: 依頼文の「N点」は指示であって在庫数ではない。** `ls deliverables/<ticket_id>/` を必ず取り、
+「登録しない」と判断したファイルがあるならその理由を報告に書く。今回は除外0件。
+
+### CSV の列数は13。スキル文書の12列は古い
+
+`deliverables-catalog.md` の列設計は12列だが、**実CSVは「暫定結果」が5列目に入った13列**。
+追記前に必ず `head -1` で実ヘッダーを見ること。スキル文書より**実ファイルが正**。
+（追記後に `set(len(r) for r in rows)` が `{13}` になることを機械検算した）
+
+### 手順のテンプレ（次回そのまま使える）
+
+```bash
+head -1 <CSV>                      # 実ヘッダーで列数を確認（スキル文書を信じない）
+tail -c 200 <CSV> | od -c          # 行末が \n で終わっているか（追記の事故防止）
+ls -la workspace/output/deliverables/<ticket_id>/   # 「N点」を鵜呑みにしない
+python3 <append script>            # csv.writer(lineterminator="\n") で追記
+python3 -c "... set(len(r)) ..."   # 全行の列数が揃っているか機械検算
+python3 scripts/catalog/sync_catalog_to_sheet.py    # HTTP 200 と行数を目視
+```
+
+- CSV は `encoding="utf-8-sig"` で**読み**、`encoding="utf-8"` で**追記**する
+  （先頭に BOM があるため。追記時に utf-8-sig で開くと BOM が二重に入る）
+- 内容（要約）にカンマを使わない。読点「、」か「/」で代替する（既存行の流儀）
+- GitHubリンクのブランチは `git branch --show-current` の実値を使う（今回 `claude/nighttime-work-checkin-iTWEa`）

@@ -2,8 +2,9 @@
 
 > 出典: 社長がリアルタイム受講したオンラインセミナー。
 > 素材 = ①社長提供の要約テキスト ②スクリーンショット28枚（10:15〜12:41、スライド画面）③社長のNotion受講メモ（副画面キャプチャから抽出）。
-> 原本画像・画面収録(6GB .mov)はリポ外 `~/Documents/AI Company Outputs/Amazon物販事業/reference/maker-shiire-seminar-20260610/` に保管。
-> 関連: [パーフェクトマニュアルサンプル_EC-STARs-Lab.pdf](パーフェクトマニュアルサンプル_EC-STARs-Lab.pdf)（同団体の申込特典PDF）
+> 原本（画面収録 5.6GB の .mov・スクリーンショット56枚・申込特典PDF）は**リポジトリに置いていません**。
+> 保管先はリポ外の `~/Documents/AI Company 素材/Amazon物販事業/maker-shiire-seminar-20260610/`（→ 同フォルダの README.md）。
+> 理由と経緯は [README.md](README.md) を参照。**PDF へのリンクは 2026-08-26 に外しました**（T-20260826-001・社長ご判断）。
 
 ---
 

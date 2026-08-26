@@ -24,15 +24,15 @@ related_tickets: [T-20260531-002, T-20260603-003, T-20260826-001]
 ## タスク分解
 
 - [x] 起票
-- [ ] マリエ: 全チケット（done/doing/waiting/todo）をライフサイクル段階へマッピング
+- [x] マリエ: 全チケット（done/doing/waiting/todo）をライフサイクル段階へマッピング
 - [x] サトル: Amazon物販の標準業務ライフサイクル（登録〜クレーム対応）を3階層で網羅
 - [x] ヒデアキ: 統合して ToDo リスト（進捗マーク付き）を deliverables へ納品
-- [ ] カズヨ: Mermaid 図を Artifact で発行
-- [ ] マリエ: 成果物カタログCSV追記＋Notion同期
+- [x] カズヨ: Mermaid 図を Artifact で発行
+- [x] マリエ: 成果物カタログCSV追記＋Notion同期＋社長タスクまとめ更新
 
 ## 現在地
 
-ヒデアキが統合を完了。マスターToDoリスト（md＋HTML）と README を deliverables へ納品済。残りは Mermaid 図の発行（カズヨ）とカタログCSV追記＋Notion同期（マリエ）。
+成果物5点（01 md/html・02・03・README）を deliverables へ納品済。マリエの定常責務3件（Notion カード作成・成果物カタログ156行へ同期・社長タスクまとめ更新）も完了。**残るは社長レビューのみ**（next_check_at 2026-08-28）。
 
 **サトルのイシュー（1行）**: 「amazon.co.jp で物販を回すとき、どの工程で何をやり落とすと事故るか」を8段階×3階層で漏れなく列挙できているか。
 
@@ -48,6 +48,7 @@ related_tickets: [T-20260531-002, T-20260603-003, T-20260826-001]
 - 2026-08-26 waiting へ（社長レビュー待ち）
 - 2026-08-26 ヒデアキ: サトルの208項目を逐語保存したまま進捗マーク（済48 / 着手中44 / 未着手116）と根拠チケットIDを付与し、マスターToDoリストを納品。中項目42すべてに「現在地」1行、社長タスクを§4.1／本人手作業／判断待ち／レビュー待ちの4群へ整理。HTML併出力。
 - 2026-08-26 サトル: メモリ11本＋公開一次情報を照合し、8大項目×40中項目×178小項目のチェックリストを納品。VTRのしきい値（従来メモリ「1,000円超」→ 正しくは「2,000円以上」）を訂正。
+- 2026-08-26 マリエ: Notion カード作成（waiting）・成果物カタログへ5行追記しシート同期（156行×13列）・owner-tasks.md 更新。**Labels は空のまま**＝frontmatter の `整理/可視化/全体像` が Notion の選択肢に無いため推測で埋めず起票者へ差し戻し。
 
 ## 成果物（サトル分）
 
@@ -70,6 +71,9 @@ related_tickets: [T-20260531-002, T-20260603-003, T-20260826-001]
 - workspace/output/deliverables/T-20260826-002/01_master-todo.md
 - workspace/output/deliverables/T-20260826-002/01_master-todo.html
 - workspace/output/deliverables/T-20260826-002/02_lifecycle-checklist.md（サトル分）
+- workspace/output/deliverables/T-20260826-002/03_process-board.html（Mermaid図3枚 / Artifact: https://claude.ai/code/artifact/094cf3f3-c334-40e6-9dc0-271149b99160）
+
+Notion カード: https://app.notion.com/p/3c8b0a4044fa81d6a93af47227aab304
 
 ## 完了報告（ヒデアキ → カズヨ）
 
