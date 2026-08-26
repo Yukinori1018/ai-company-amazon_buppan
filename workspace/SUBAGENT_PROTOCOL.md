@@ -20,25 +20,21 @@
 
 ## 3. 完了時（引き渡し）
 
-1. **最終成果物の配置** — セッション環境に応じて以下のいずれかに配置：
+1. **最終成果物の配置** — **セッション環境を問わず `workspace/output/deliverables/<ticket_id>/` の一択**（2026-08-26 / T-20260826-001 で一元化）。
 
-   **PC（ローカル）セッションの場合:**
-   - `~/Documents/AI Company Outputs/Amazon物販事業/<ticket_id>/` に社長確認用の完成版を置く
-   - **リポ外**の絶対パス。フォルダが無ければ `mkdir -p` で作成
-   - リポ外に置くことで worktree のサイクルに左右されず社長が Finder から直接アクセス可
+   - リポ内・**Git 追跡対象**。置いたら**その場で `git commit` する**（`git push` はしない＝自動同期に任せる）
+   - フォルダが無ければ `mkdir -p` で作成
+   - ファイル名は `<連番>_<内容>.<ext>`。複数ファイルの場合は同フォルダにまとめ、`README.md` でインデックス
+   - **どこかへ複製する作業はありません。** 社長の閲覧口 `~/Documents/AI Company Outputs/Amazon物販事業` は deliverables への**シンボリックリンク**なので、ここに置いた時点で社長の Finder から見えます
+   - **50MB超のバイナリ・第三者著作物**（動画・有料セミナー資料等）だけは例外で、`~/Documents/AI Company 素材/Amazon物販事業/<topic>-<YYYYMMDD>/` へ（README.md 必須）。リポに入れると GitHub の100MB上限で自動同期が止まります
 
-   **クラウド（モバイル等）セッションの場合:**
-   - `workspace/output/deliverables/<ticket_id>/` に配置（リポ内・Git追跡対象）
-   - クラウドからは PC のローカルパスに書き込めないため、Git 経由で社長 PC へ届ける
-   - PC 復帰時に社長または秘書が `~/Documents/AI Company Outputs/Amazon物販事業/<ticket_id>/` へ移し替える
-
-   共通：
-   - ファイル名は内容がわかる形に（`<連番>_<内容>.<ext>` 推奨）
-   - 複数ファイルの場合は同フォルダにまとめ、README.md でインデックス
+   > **なぜ一元化したか:** 旧ルールは「PC セッションはリポ外、クラウドはリポ内」と環境で分岐していました。その結果、同一チケットの成果物が2箇所に並存し、**内容が食い違う事故**（T-20260817-004 の2ファイル）が起きています。分岐は廃止しました。
+   >
+   > **なぜ `agent_output/` に置きっぱなしにしてはいけないか:** `agent_output/` は `.gitignore` 対象です。worktree が消えると成果物ごと消えます（実際に消失させた前例あり）。「あとでコピーする」は必ず忘れます。
 2. **チケットへの追記** — 本文末尾に以下を追加：
    ```
    ## 成果物
-   - ~/Documents/AI Company Outputs/Amazon物販事業/<ticket_id>/<file>
+   - workspace/output/deliverables/<ticket_id>/<file>
    ## 完了報告
    （秘書宛の引き渡しメッセージ。完成度・妥協点・引き継ぎ事項）
    ```
@@ -70,6 +66,6 @@
 
 - 社長と直接やり取りする（必ず秘書経由）
 - チケットなしで作業を始める
-- 最終納品物（`~/Documents/AI Company Outputs/Amazon物販事業/...`）を秘書の確認なしに社長に直接渡す
+- 最終納品物（`workspace/output/deliverables/<ticket_id>/...`）を秘書の確認なしに社長に直接渡す
 - メモリへの記録をサボる
 - 他のサブエージェントに直接依頼を投げる（必要なら秘書経由）

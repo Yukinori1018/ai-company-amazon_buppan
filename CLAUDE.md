@@ -97,7 +97,7 @@
 
 1. **窓口の一元化** — 社長への返答は秘書のみ。他エージェントは秘書経由で報告する。
 2. **チケット駆動** — すべての作業は [workspace/tickets/](workspace/tickets/) でのチケット起票から始まる。チケットなしの作業はしない。
-3. **成果物の二段管理** — 途中経過は `workspace/output/agent_output/`（リポ内、worktree 単位）、社長確認用の最終物は `~/Documents/AI Company Outputs/Amazon物販事業/` に配置（リポ外、全 worktree から共有、Finder で直接アクセス可）。
+3. **成果物は1箇所に集約** — 最終納品物は `workspace/output/deliverables/<ticket_id>/`（**唯一の正**・Git 追跡）、途中経過は `workspace/output/agent_output/<ticket_id>/`（Git 除外）、50MB超のバイナリ素材は `~/Documents/AI Company 素材/Amazon物販事業/`（リポ外）。社長の閲覧口 `~/Documents/AI Company Outputs/Amazon物販事業` は deliverables へのシンボリックリンク。詳細は §6。
 4. **メモリへの記録義務** — 失敗・気づき・社長のこだわり・判断理由は、自分の `memory/` に必ず残す。次回以降の品質向上の源泉となる。
 5. **不明点は止まって聞く** — 判断に迷ったら勝手に決めない。チケットを `waiting/` に出して社長に確認する。
 6. **プレースホルダーは保持** — 親テンプレ作業中は `{{ }}` を埋めない。子会社化時に初めて埋める。
@@ -207,7 +207,7 @@
 **複数領域にまたがる場合:**
 - 秘書が依頼を分解し、それぞれの担当に並行発注する
 - **「調べて戦略を出して」系の依頼は、リサーチャー → プランナー → シミュレーターの順で直列に流す**（事実が固まる前に戦略を立てない／磨いてない戦略を社長に上げない）
-- 各担当の成果物を秘書が統合して `~/Documents/AI Company Outputs/Amazon物販事業/<ticket_id>/` に納品し、社長へ報告する（窓口の一元化は維持）
+- 各担当の成果物を秘書が統合して `workspace/output/deliverables/<ticket_id>/` に納品し、社長へ報告する（窓口の一元化は維持）。社長は Finder のブックマーク `~/Documents/AI Company Outputs/Amazon物販事業`（＝同フォルダへのシンボリックリンク）から従来どおり閲覧できる
 
 ## 5.1. 自律運用とルーティン
 
@@ -254,12 +254,32 @@ todo → doing → waiting → done
 
 詳細運用は [workspace/README.md](workspace/README.md)、起票・状態遷移の手順は [agents/secretary/skills/ticket-management.md](agents/secretary/skills/ticket-management.md)、サブエージェントの作業ルールは [workspace/SUBAGENT_PROTOCOL.md](workspace/SUBAGENT_PROTOCOL.md)。
 
-### 成果物の保管ルール
+### 成果物の保管ルール（3層・2026-08-26 改訂）
 
-- `workspace/output/agent_output/<ticket_id>/` — 作業中の途中経過。リポ内（worktree 単位、`.gitignore` 対象）。監査用。社長は通常見ない。
-- `~/Documents/AI Company Outputs/Amazon物販事業/<ticket_id>/` — **社長が確認する最終納品物のみ**。リポ外。Finder でブックマークしておくと毎回のアクセスが楽。
+> 2026-08-26 の T-20260826-001 で**置き場を1本化**しました。旧ルールは「最終納品物は `~/Documents/AI Company Outputs/`」でしたが、実態は既にリポ内 `deliverables/` に移っており、二重管理で**同一チケットの内容が食い違う事故**（T-20260817-004 の2ファイル）が発生していました。以後は下記3層だけを使います。
 
-> 最終納品物をリポ外に置く理由：worktree のサイクル（生成 → 作業 → マージ → 削除）に左右されず、全 worktree／全セッションから同じ場所で参照できるため。Finder で隠しフォルダを辿る必要もない。
+| 層 | 場所 | 中身 | Git |
+|---|---|---|---|
+| **① 成果物の唯一の正** | `workspace/output/deliverables/<ticket_id>/` | 最終納品物 | **追跡する** |
+| ② 途中経過 | `workspace/output/agent_output/<ticket_id>/` | 中間データ・下書き・出典スクショ | 除外 |
+| ③ 大容量バイナリ素材 | `~/Documents/AI Company 素材/Amazon物販事業/<topic>-<YYYYMMDD>/` | 50MB超の動画・アーカイブ、第三者著作物の原本 | リポ外 |
+
+**運用の要点**
+
+- **成果物は ① に直納し、その場で `git commit` する。** ② は `.gitignore` 対象で、worktree が消えると成果物ごと消失します（実際に消失させた前例あり）。「あとでコピーする」は必ず忘れます。
+- **社長の閲覧口は ① へのシンボリックリンク。** `~/Documents/AI Company Outputs/Amazon物販事業` → `workspace/output/deliverables` を張ってあるので、Finder のブックマークは従来どおり使えます。**リンクの先は①そのもの**であり、コピーではありません。手でファイルを置きに行く作業はもう不要です。
+- **③ には README.md を必ず添える。** 何が入っているか・なぜリポ外なのか・どのチケット由来かを書きます。③ は Git 管理外＝バックアップされません。
+- ③ を使う判定は **1ファイル50MB超**、または**第三者著作物**（有料セミナーの録画・スライド等）。GitHub の1ファイル100MB上限を超えると push が失敗し、30分ごとの自動同期が丸ごと止まります。**サイズ判断は拡張子ではなく実サイズで行うこと** — `.mp4` や `.zip` は Web 成果物の小さな素材として正当に登場します（`.gitignore` で一律除外しているのは `.mov` `.dmg` `.iso` `.tar` `.tgz` だけ）。
+- ファイル名は `<連番>_<内容>.<ext>`。複数ファイルなら同フォルダに `README.md` でインデックスを置く。
+
+**このリポジトリは PUBLIC です。**
+
+`.claude/scripts/github-sync.sh` が **30分ごとに `git add -A` → push** します。コミットした瞬間に世界へ公開されると考えてください。したがって次の2つは `.gitignore` での除外を**継続します**（2026-08-26 社長ご判断：「現状は公開しても良い情報ばかり」だが、この2つは例外）。
+
+| 除外し続けるもの | 該当 |
+|---|---|
+| **本人特定情報**（住所・電話番号・口座番号） | `公開用/` `会社概要_配布用/` |
+| **APIキー・シークレット** | `.env` `**/.env` `.mcp.json` `scripts/catalog/.catalog_sync.env` |
 
 ### `_inbox_社長共有/` の棚卸し（マリエ定常責務）
 

@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>Amazon物販「利益 × 販売確度」ツール 比較レポート</title>
+<style>
+  :root { --navy:#1f3a68; --navy2:#2c4a7c; --bg:#fafbfd; --line:#d7dde6; --stripe:#f2f5fa; --accent:#c0392b; }
+  html,body { background:var(--bg); color:#222; }
+  body {
+    font-family: system-ui, -apple-system, "Hiragino Sans", "Yu Gothic", sans-serif;
+    max-width: 900px; margin: 0 auto; padding: 32px 24px 64px;
+    line-height: 1.75; font-size: 15.5px;
+  }
+  h1 { color: var(--navy); border-bottom: 3px solid var(--navy); padding-bottom: 10px; margin-top: 0; font-size: 26px; }
+  h2 { color: var(--navy); border-left: 6px solid var(--navy); padding: 4px 0 4px 12px; margin-top: 40px; font-size: 21px; background: linear-gradient(to right, #eef2f8, transparent); }
+  h3 { color: var(--navy2); margin-top: 28px; font-size: 17px; }
+  h4 { color: var(--navy2); margin-top: 20px; font-size: 15.5px; }
+  table { border-collapse: collapse; width: 100%; margin: 14px 0 22px; font-size: 13px; }
+  th, td { border: 1px solid var(--line); padding: 6px 8px; vertical-align: top; text-align: left; }
+  th { background: var(--navy); color: #fff; font-weight: 600; white-space: nowrap; }
+  tbody tr:nth-child(even) { background: var(--stripe); }
+  .meta { color:#666; font-size: 13px; margin-bottom: 24px; }
+  .summary { background:#fff8e7; border-left: 6px solid #e0a800; padding: 14px 18px; border-radius: 4px; }
+  .summary ol { margin: 6px 0 0 18px; padding: 0; }
+  .recommend { background:#e8f4ea; border-left: 6px solid #2e7d32; padding: 14px 18px; border-radius: 4px; margin: 16px 0; }
+  .toc { background:#fff; border:1px solid var(--line); border-radius:6px; padding: 14px 22px; margin: 18px 0 28px; }
+  .toc ol { margin: 4px 0 4px 18px; padding: 0; }
+  .toc a { color: var(--navy); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  code, .small { font-size: 12.5px; color:#555; }
+  ul { padding-left: 22px; }
+  li { margin-bottom: 4px; }
+  hr { border:none; border-top:1px dashed var(--line); margin: 28px 0; }
+  .badge { display:inline-block; background: var(--accent); color:#fff; padding: 1px 8px; border-radius: 10px; font-size: 12px; font-weight: 600; }
+  @media print {
+    body { max-width: 100%; padding: 0; font-size: 11pt; }
+    h1, h2, h3 { color: #000 !important; background: transparent !important; }
+    th { background: #ddd !important; color: #000 !important; -webkit-print-color-adjust: exact; }
+    tbody tr:nth-child(even) { background: #f3f3f3 !important; -webkit-print-color-adjust: exact; }
+    a { color: #000; text-decoration: none; }
+    .toc { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<h1>Amazon物販「利益 × 販売確度」ツール 比較レポート</h1>
+<div class="meta">
+  作成日: 2026-05-20 / 作成: 秘書「カズヨ」<br>
+  基準時点: 2026年5月20日（料金・機能は各公式サイトおよび主要レビュー記事に基づく）
+</div>
+
+<div class="summary">
+<strong>エグゼクティブサマリー（5行）</strong>
+<ol>
+  <li>Amazon.co.jp で「利益 × 販売確度」を数値ベースで自動スコアリングできる代表格は <b>セラースプライト</b>・<b>ERESA PRO</b>・<b>Keepa</b>（補助）の3つ。</li>
+  <li>国内発の総合プラットフォーム（リサーチ＋価格改定＋在庫）では <b>プライスター</b> と <b>マカド！</b> が二強、初心者の運用負荷が最も低い。</li>
+  <li>海外発（Helium 10 / Jungle Scout / DataDive / Viral Launch 等）は強力だが <b>Amazon.co.jp 対応は限定的</b>。副業初心者の最初の1本には不向き。</li>
+  <li>副業初心者の最短ルートは「Keepa（無料〜€19）＋アマサーチ（無料）＋FBA料金シミュレーター（無料）」。売上が立ったら プライスター / マカド！ を追加。</li>
+  <li>「利益×確度」のスコアリング自動化を最重視するなら <b>セラースプライト（IQX622で約9,800円〜）</b> を推奨（後述A案）。</li>
+</ol>
+</div>
+
+<nav class="toc">
+<strong>目次</strong>
+<ol>
+  <li><a href="#sec1">評価軸と凡例</a></li>
+  <li><a href="#sec2">初心者おすすめ Top3</a></li>
+  <li><a href="#sec3">中級者おすすめ Top3</a></li>
+  <li><a href="#sec4">軸A「利益×確度スコアリング自動化」最適 Top3</a></li>
+  <li><a href="#sec5">全ツール一覧表</a></li>
+  <li><a href="#sec6">カテゴリ別の整理</a></li>
+  <li><a href="#sec7">次の意思決定の提案（A/B/C＋推奨）</a></li>
+  <li><a href="#sec8">出典</a></li>
+</ol>
+</nav>
+
+<h2 id="sec1">1. 評価軸と凡例</h2>
+<ul>
+  <li>価格はすべて 税込・月額・2026-05-20 時点。USD/EUR は補助的に円換算（1 USD ≒ 155円、1 EUR ≒ 168円の概算）。</li>
+  <li>「Amazon.co.jp 対応」: ◎=ネイティブ / ○=対応はあるが一部制限 / △=限定的 / ×=非対応</li>
+  <li>「主要機能」: ◎=主力 / ○=可 / △=簡易 / ×=なし</li>
+  <li>「初心者適性」: ★1〜★5（UI、日本語、学習素材、価格の手頃さの総合）</li>
+  <li>「不明」は推測せず不明と記載。</li>
+</ul>
+
+<h2 id="sec2">2. 初心者おすすめ Top3</h2>
+<table>
+<thead><tr><th>順位</th><th>ツール</th><th>月額</th><th>理由</th></tr></thead>
+<tbody>
+<tr><td>1</td><td><b>アマサーチ</b></td><td>基本無料</td><td>スマホでバーコード読取→販売価格・手数料・想定利益・ランキングが即時表示。日本語、UI簡素</td></tr>
+<tr><td>2</td><td><b>Keepa</b></td><td>無料〜€19（≒3,200円）</td><td>価格・順位・出品者数の履歴はデファクト標準。無料でも基本グラフは見える</td></tr>
+<tr><td>3</td><td><b>FBA料金シミュレーター（公式）</b></td><td>無料</td><td>純正・無料・登録不要。利益試算の起点として必須</td></tr>
+</tbody>
+</table>
+
+<h2 id="sec3">3. 中級者おすすめ Top3</h2>
+<table>
+<thead><tr><th>順位</th><th>ツール</th><th>月額</th><th>理由</th></tr></thead>
+<tbody>
+<tr><td>1</td><td><b>プライスター</b></td><td>5,280円</td><td>出品＋価格改定＋売上管理の総合。日本語サポート厚</td></tr>
+<tr><td>2</td><td><b>マカド！</b></td><td>4,980円（2年継続3,980円）</td><td>5分間隔の高速価格改定。42機能以上</td></tr>
+<tr><td>3</td><td><b>セラースケット</b></td><td>2,480円（改定+500円）</td><td>アカウント停止予防＋知財取締対応</td></tr>
+</tbody>
+</table>
+
+<h2 id="sec4">4. 軸A「利益×確度スコアリング自動化」最適 Top3 <span class="badge">最重要</span></h2>
+<table>
+<thead><tr><th>順位</th><th>ツール</th><th>月額</th><th>主要スコア機能</th></tr></thead>
+<tbody>
+<tr><td>1</td><td><b>セラースプライト</b></td><td>約9,800円〜14,000円（IQX622 30%OFFで約9,800円〜）</td><td>商品リサーチ・市場分析・キーワード解析・利益計算機・スコア化指標。Amazon.co.jp 対応。日本語UI</td></tr>
+<tr><td>2</td><td><b>ERESA PRO / ERESA AI</b></td><td>Pro 5,980円 / Pro+ 9,800円</td><td>国内発・Amazon.co.jp ネイティブ。商品・セラー・KW分析・CSV出力・AI連携</td></tr>
+<tr><td>3</td><td><b>Keepa（API/Product Finder併用）</b></td><td>€19（≒3,200円）+API追加</td><td>直接のスコアは出ないが、Product Finder で需要×競合フィルタが可能。API で自前スコア構築可</td></tr>
+</tbody>
+</table>
+
+<h2 id="sec5">5. 全ツール一覧表</h2>
+
+<h3>5.1 海外発（グローバル）</h3>
+<table>
+<thead><tr><th>ツール</th><th>拠点</th><th>無料</th><th>最低有料(月)</th><th>主力プラン(月)</th><th>Tr</th><th>JP</th><th>リサーチ</th><th>価格履歴</th><th>競合</th><th>KW</th><th>在庫</th><th>改定</th><th>出品</th><th>FBA計算</th><th>API</th><th>日本語UI</th><th>初心者</th><th>特記</th></tr></thead>
+<tbody>
+<tr><td>Keepa</td><td>独</td><td>あり</td><td>€19 (≒3,200円)</td><td>€19</td><td>×</td><td>◎</td><td>○</td><td>◎</td><td>○</td><td>△</td><td>×</td><td>×</td><td>×</td><td>△</td><td>◎(有償)</td><td>×</td><td>★★★★</td><td>価格履歴のデファクト</td></tr>
+<tr><td>Helium 10</td><td>米</td><td>Free Plan</td><td>$99 (≒15,300円)</td><td>$99 / $279</td><td>あり</td><td>△</td><td>◎</td><td>○</td><td>◎</td><td>◎</td><td>○</td><td>×</td><td>○</td><td>◎</td><td>○</td><td>△</td><td>★★★</td><td>米中心・JP機能制限</td></tr>
+<tr><td>Jungle Scout</td><td>米</td><td>×</td><td>$49 (≒7,600円)</td><td>$79〜</td><td>7日返金</td><td>○</td><td>◎</td><td>○</td><td>○</td><td>◎</td><td>○</td><td>×</td><td>○</td><td>○</td><td>×</td><td>×</td><td>★★★</td><td>JP接続可、UI英語</td></tr>
+<tr><td>SellerSprite</td><td>中(日本語可)</td><td>終了(2025/11)</td><td>約9,800円〜</td><td>スタンダード/アドバンス/VIP</td><td>7日</td><td>◎</td><td>◎</td><td>○</td><td>◎</td><td>◎</td><td>×</td><td>×</td><td>△</td><td>○</td><td>○</td><td>◎</td><td>★★★★</td><td>日本語UI、利益計算機内蔵</td></tr>
+<tr><td>AMZScout</td><td>米</td><td>×</td><td>$44.99 (≒7,000円)</td><td>バンドル</td><td>あり</td><td>△</td><td>◎</td><td>○</td><td>○</td><td>○</td><td>×</td><td>×</td><td>×</td><td>◎(無料拡張)</td><td>×</td><td>△</td><td>★★★</td><td>Chrome拡張中心</td></tr>
+<tr><td>Viral Launch</td><td>米</td><td>×</td><td>$25 (M.I.)</td><td>$69〜$199</td><td>不明</td><td>△</td><td>◎</td><td>○</td><td>○</td><td>△(JP×)</td><td>×</td><td>×</td><td>△</td><td>×</td><td>×</td><td>×</td><td>★★</td><td>JPはMarket Intelligenceのみ</td></tr>
+<tr><td>DataDive</td><td>米</td><td>×</td><td>$39 (≒6,050円)</td><td>$149 / $490</td><td>不明</td><td>×</td><td>◎</td><td>○</td><td>○</td><td>◎</td><td>×</td><td>×</td><td>×</td><td>×</td><td>×</td><td>×</td><td>★★</td><td>KW深掘り特化・JP非対応</td></tr>
+<tr><td>ZonGuru</td><td>米</td><td>×</td><td>$39 (≒6,050円)</td><td>$39 / $49</td><td>7日</td><td>△</td><td>◎</td><td>○</td><td>○</td><td>○</td><td>○</td><td>×</td><td>○</td><td>○</td><td>×</td><td>×</td><td>★★★</td><td>AIリスティング強み</td></tr>
+<tr><td>Sellics → Perpetua</td><td>加</td><td>Benchmarker無料</td><td>要問合せ</td><td>カスタム</td><td>あり</td><td>△</td><td>×</td><td>×</td><td>△</td><td>×</td><td>×</td><td>×</td><td>×</td><td>×</td><td>○</td><td>×</td><td>★★</td><td>2022統合、広告自動化特化</td></tr>
+<tr><td>Algopix</td><td>米/イスラエル</td><td>限定無料</td><td>$27.99 (≒4,340円)</td><td>カスタム</td><td>あり</td><td>○</td><td>○</td><td>○</td><td>△</td><td>△</td><td>×</td><td>×</td><td>△</td><td>○</td><td>◎</td><td>△</td><td>★★★</td><td>eBay/Walmart横断</td></tr>
+</tbody>
+</table>
+
+<h3>5.2 国内発（Amazon.co.jp特化）</h3>
+<table>
+<thead><tr><th>ツール</th><th>無料</th><th>最低有料(月)</th><th>主力プラン(月)</th><th>Tr</th><th>リサーチ</th><th>価格履歴</th><th>競合</th><th>KW</th><th>在庫</th><th>改定</th><th>出品</th><th>FBA計算</th><th>API</th><th>日本語UI</th><th>初心者</th><th>特記</th></tr></thead>
+<tbody>
+<tr><td>ERESA / PRO / AI</td><td>無料版あり</td><td>5,980円</td><td>Pro 5,980 / Pro+ 9,800円</td><td>7日</td><td>◎</td><td>◎</td><td>◎</td><td>○</td><td>△</td><td>×</td><td>×</td><td>○</td><td>×</td><td>◎</td><td>★★★★</td><td>国内発の決定版、AI機能</td></tr>
+<tr><td>DELTA tracer</td><td>不明</td><td>2,200円</td><td>2,200円</td><td>2週間</td><td>○</td><td>◎</td><td>○</td><td>×</td><td>×</td><td>×</td><td>×</td><td>△</td><td>×</td><td>◎</td><td>★★★★</td><td>NEW TYPEは終了報、本家は稼働</td></tr>
+<tr><td>マカド！</td><td>×</td><td>4,980円</td><td>4,980円(2年継続3,980円)</td><td>30日</td><td>△</td><td>○</td><td>△</td><td>×</td><td>◎</td><td>◎</td><td>◎</td><td>○</td><td>×</td><td>◎</td><td>★★★★</td><td>価格改定の国内代表</td></tr>
+<tr><td>プライスター</td><td>×</td><td>5,280円</td><td>5,280円</td><td>1か月</td><td>△</td><td>○</td><td>△</td><td>×</td><td>◎</td><td>◎</td><td>◎</td><td>◎</td><td>×</td><td>◎</td><td>★★★★★</td><td>初心者向けUI、サポート厚</td></tr>
+<tr><td>セラースケット</td><td>×</td><td>2,480円(改定+500円)</td><td>5,480円(プレミアム)</td><td>あり</td><td>○</td><td>○</td><td>△</td><td>×</td><td>○</td><td>○(opt)</td><td>×</td><td>△</td><td>×</td><td>◎</td><td>★★★★</td><td>アカウント停止予防の定番</td></tr>
+<tr><td>アマテラス</td><td>×</td><td>不明</td><td>不明</td><td>不明</td><td>◎</td><td>○</td><td>◎</td><td>◎</td><td>△</td><td>×</td><td>△</td><td>△</td><td>×</td><td>◎</td><td>★★★</td><td>SEO/KW特化、料金要問合せ</td></tr>
+<tr><td>セドラー</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>同名サービス複数、特定困難</td></tr>
+<tr><td>セドリスト</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>公式情報を特定できず</td></tr>
+<tr><td>Amzcockpit</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>V1は2022/10/31終了</td></tr>
+<tr><td>セラーリサーチくん</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>確証情報なし</td></tr>
+<tr><td>Amacode / Pro</td><td>無料あり</td><td>Pro 5,500円</td><td>Pro 5,500円</td><td>不明</td><td>△</td><td>○</td><td>×</td><td>×</td><td>×</td><td>×</td><td>×</td><td>◎</td><td>×</td><td>◎</td><td>★★★★</td><td>スマホ仕入れの定番</td></tr>
+<tr><td>アマサーチ</td><td>無料あり</td><td>一部有料</td><td>無料</td><td>あり</td><td>○</td><td>△</td><td>×</td><td>×</td><td>×</td><td>×</td><td>×</td><td>◎</td><td>×</td><td>◎</td><td>★★★★★</td><td>初心者の最初の1本</td></tr>
+<tr><td>モノトレーサー</td><td>無料</td><td>無料</td><td>無料</td><td>—</td><td>○</td><td>◎</td><td>△</td><td>×</td><td>×</td><td>×</td><td>×</td><td>△</td><td>×</td><td>◎</td><td>★★★★</td><td>完全無料、Keepa代替</td></tr>
+<tr><td>せどりすとプレミアム</td><td>×</td><td>初月11,000円 / 翌月5,500円</td><td>5,500円</td><td>×</td><td>○</td><td>○</td><td>△</td><td>×</td><td>△</td><td>×</td><td>○</td><td>◎</td><td>×</td><td>◎</td><td>★★★</td><td>iPhone専用、店舗強い</td></tr>
+<tr><td>オークファン プレミアム</td><td>無料あり</td><td>2,200円</td><td>2,200円</td><td>初月無料</td><td>△</td><td>△</td><td>×</td><td>×</td><td>×</td><td>×</td><td>×</td><td>○</td><td>×</td><td>◎</td><td>★★★★</td><td>ヤフオク相場との突合に最強</td></tr>
+<tr><td>tool4seller</td><td>あり</td><td>$19.99 (≒3,100円)</td><td>$299.99(Premium)</td><td>14日</td><td>○</td><td>○</td><td>○</td><td>○</td><td>◎</td><td>△</td><td>○</td><td>◎</td><td>○</td><td>◎</td><td>★★★★</td><td>多店舗管理、無料FBA計算機</td></tr>
+<tr><td>FBA料金シミュレーター</td><td>無料</td><td>—</td><td>—</td><td>—</td><td>×</td><td>×</td><td>×</td><td>×</td><td>×</td><td>×</td><td>×</td><td>◎</td><td>×</td><td>◎</td><td>★★★★★</td><td>Amazon純正、登録不要</td></tr>
+</tbody>
+</table>
+
+<h2 id="sec6">6. カテゴリ別の整理</h2>
+<h3>6.1 リサーチ系（商品発掘・需要分析）</h3>
+<ul>
+<li>海外: Helium 10 / Jungle Scout / AMZScout / Viral Launch / DataDive / ZonGuru</li>
+<li>国内: SellerSprite（中国発・日本語）/ ERESA / アマテラス / Amacode / アマサーチ</li>
+</ul>
+<h3>6.2 価格追跡・履歴系</h3>
+<ul><li>Keepa（デファクト）/ DELTA tracer / モノトレーサー（無料）/ ERESA / SellerSprite</li></ul>
+<h3>6.3 価格改定・在庫管理系（運用）</h3>
+<ul><li>マカド！ / プライスター / セラースケット価格改定 / tool4seller / SellerSket価格改定</li></ul>
+<h3>6.4 総合プラットフォーム系</h3>
+<ul>
+<li>海外: Helium 10 / tool4seller</li>
+<li>国内: プライスター / マカド！ / ERESA AI</li>
+</ul>
+<h3>6.5 無料系（コストゼロから始められる）</h3>
+<ul><li>Keepa（無料版）/ モノトレーサー / FBA料金シミュレーター / アマサーチ / AMZScout無料FBA計算機 / Amacode無料版 / オークファン無料 / tool4seller Free</li></ul>
+
+<h2 id="sec7">7. 次の意思決定の提案（A/B/C＋推奨）</h2>
+
+<h3>A案: スコアリング自動化優先 <span class="badge">推奨</span></h3>
+<ul>
+<li>スタック: Keepa（€19）+ SellerSprite スタンダード（IQX622で約9,800円〜）+ アマサーチ（無料）+ FBA料金シミュレーター（無料）</li>
+<li>月額目安: <b>約 13,000〜14,000円</b></li>
+<li>強み: 「利益×確度」をほぼ自動で数値化。Amazon.co.jp ネイティブ、日本語UI、学習動画も多い</li>
+<li>弱み: 中国発SaaSのため法務確認が必要</li>
+<li>拡張: 月商が立ち始めたら プライスター 5,280円 を追加して運用自動化</li>
+</ul>
+
+<h3>B案: 国産・初心者最易 優先</h3>
+<ul>
+<li>スタック: アマサーチ（無料）+ Keepa（€19）+ ERESA PRO（5,980円）+ FBA料金シミュレーター（無料）</li>
+<li>月額目安: 約 9,200円</li>
+<li>強み: すべて日本語・国産メイン・サポート手厚い</li>
+<li>弱み: スコアリング自動化は SellerSprite に一歩劣る</li>
+</ul>
+
+<h3>C案: 無料で最大限・PoC優先</h3>
+<ul>
+<li>スタック: Keepa 無料版 + モノトレーサー + アマサーチ無料版 + FBA料金シミュレーター + AMZScout 無料拡張</li>
+<li>月額目安: <b>0円</b></li>
+<li>強み: コスト0で最初の数SKU検証</li>
+<li>弱み: スコアリング自動化なし、SKU100段階では限界</li>
+</ul>
+
+<div class="recommend">
+<strong>推奨: A案</strong>
+<ul>
+<li>理由1: 月商800万・利益率20%・SKU100 を達成するには「利益×確度の数値化を毎日大量に回す」必要があり、SellerSprite の自動化が最短ルート</li>
+<li>理由2: 国内Amazon主の前提で、日本語UI・国内対応・Amazon.co.jp ネイティブの3条件を満たす最強候補</li>
+<li>理由3: 月額1.4万円は副業の運用コストとして許容範囲。Keepa との二重化でデータ裏取り可能</li>
+</ul>
+<strong>次のアクション（社長承認待ち）</strong>
+<ol>
+<li>法務に SellerSprite（中国発SaaS）の利用規約・データ取扱の確認を依頼</li>
+<li>経理に A案 約14,000円/月 の予算稟議（30日試用後の本契約判断）</li>
+<li>庶務に 学習用Notionページ作成を依頼（各ツール初心者向け使い方を1ページに集約）</li>
+</ol>
+</div>
+
+<h2 id="sec8">8. 出典</h2>
+<ul class="small">
+<li>Keepa: <a href="https://www.saasworthy.com/product/keepa-dev/pricing">SaaSworthy</a> / <a href="https://ecstarslab.com/blog/keepa-fee/">EC STARs Lab</a></li>
+<li>Helium 10: <a href="https://www.helium10.com/pricing/">公式pricing</a></li>
+<li>Jungle Scout: <a href="https://www.junglescout.com/pricing/">公式pricing</a> / <a href="https://www.demandsage.com/jungle-scout-pricing/">DemandSage</a></li>
+<li>SellerSprite: <a href="https://www.sellersprite.com/en/price">公式pricing</a> / <a href="https://hachinosu-seisaku.co.jp/column/marketing/sellersprite-30percent-off-coupon/">はちのす制作</a></li>
+<li>AMZScout: <a href="https://amzscout.net/jp/pro/">公式</a></li>
+<li>Viral Launch: <a href="https://revenuegeeks.com/viral-launch-review/">revenuegeeks</a></li>
+<li>DataDive: <a href="https://datadive.tools/pricing/">公式pricing</a></li>
+<li>ZonGuru: <a href="https://www.zonguru.com/pricing">公式pricing</a></li>
+<li>Sellics/Perpetua: <a href="https://revenuegeeks.com/sellics-review/">revenuegeeks</a></li>
+<li>Algopix: <a href="https://www.capterra.com/p/171462/Algopix/">Capterra</a></li>
+<li>DELTA tracer: <a href="https://utilly.jp/service/delta-tracer/">utilly</a> / <a href="https://hikomhikom.com/new-type-delta-tracer/">ひこーるラボ</a></li>
+<li>ERESA: <a href="https://eresa.io/">公式</a> / <a href="https://prtimes.jp/main/html/rd/p/000000003.000118686.html">プレスリリース</a></li>
+<li>マカド: <a href="https://makad.pw/">公式</a></li>
+<li>プライスター: <a href="https://pricetar.com/lp/">公式</a> / <a href="https://ecstarslab.com/blog/pricetar-monthly-price/">EC STARs Lab</a></li>
+<li>セラースケット: <a href="https://sellersket.com/">公式</a></li>
+<li>アマテラス: <a href="https://www.amateras0.biz/">公式</a></li>
+<li>アマサーチ: <a href="https://amasearch.knz-c.com/">公式</a> / <a href="https://ec-seller-labo.co.jp/article/amasearch-how-to-use/">ECセラーラボ</a></li>
+<li>Amacode: <a href="https://crisp-trick.com/amacode-review/">レビュー</a></li>
+<li>モノトレーサー: <a href="https://www.mono-tracer.com/">公式</a></li>
+<li>せどりすとプレミアム: <a href="https://www.m-stock-series.jp/sedorist-premium-fees/">m-stock-series</a></li>
+<li>オークファン: <a href="https://aucfan.com/dyn/member/premium/">公式</a></li>
+<li>tool4seller: <a href="https://www.tool4seller.com/jp/pricing.html">公式pricing</a></li>
+<li>FBA料金シミュレーター: <a href="https://sellercentral.amazon.co.jp/hz/fba/profitabilitycalculator/index?lang=ja_JP">Amazon公式</a></li>
+</ul>
+
+<hr>
+<p class="small">以上、秘書「カズヨ」より報告いたします。ご判断（A/B/C）をお待ちしております。</p>
+
+</body>
+</html>

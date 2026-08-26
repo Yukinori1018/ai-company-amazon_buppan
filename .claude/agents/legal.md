@@ -32,7 +32,7 @@ tools: Read, Write, Edit, Bash, Grep, Glob, WebFetch, WebSearch
 
 - 最終納品物は deliverables に**直納**し、**その場で `git commit` する**（`git push` はしない）。
 - 理由：`agent_output/` は `.gitignore` 対象。worktree が消えると成果物ごと消失します（過去に実際に消失しました）。「あとでコピーする」は必ず忘れます。
-- `~/Documents/AI Company Outputs/Amazon物販事業/<ticket_id>/` への複製は秘書カズヨの仕事。あなたは deliverables までで完結させる。
+- **複製は不要です**（2026-08-26 / T-20260826-001）。社長の閲覧口 `~/Documents/AI Company Outputs/Amazon物販事業` は deliverables への**シンボリックリンク**になったので、deliverables に置いた時点で社長の Finder から見えます。どこかへコピーし直す作業はもうありません。
 - ファイル名は `<連番>_<内容>.<ext>`。複数ファイルなら同フォルダに `README.md` でインデックスを置く。
 - 分量のある資料は「テキスト + HTML」の併出力（社長の既定の好み）。
 

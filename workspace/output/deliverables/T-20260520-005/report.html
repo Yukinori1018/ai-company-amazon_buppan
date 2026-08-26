@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Amazon物販 界隈調査レポート — 基本・応用・勝ち筋</title>
+<style>
+  :root { --ink:#1a2233; --sub:#5b6680; --line:#e2e6ef; --bg:#f7f8fb; --accent:#2f6fed; --warn:#c0392b; --warnbg:#fdecea; --okbg:#eef6ee; --tip:#0b7a5b; }
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif; color: var(--ink); background: var(--bg); margin:0; line-height:1.8; }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 32px 20px 80px; }
+  header.title { background: linear-gradient(135deg,#1e3a8a,#2f6fed); color:#fff; padding: 28px 28px; border-radius: 14px; margin-bottom: 8px; }
+  header.title h1 { margin:0 0 8px; font-size: 1.5rem; }
+  header.title .meta { font-size:.82rem; opacity:.92; }
+  .lead { background:#fff; border:1px solid var(--line); border-radius:12px; padding:18px 22px; margin:20px 0; }
+  .lead ol { margin:8px 0 0; padding-left:1.2em; }
+  .lead li { margin-bottom:8px; }
+  h2 { font-size:1.18rem; margin:38px 0 12px; padding-bottom:8px; border-bottom:2px solid var(--accent); }
+  h3 { font-size:1.02rem; margin:22px 0 8px; color:var(--ink); }
+  p, li { font-size:.93rem; }
+  table { width:100%; border-collapse:collapse; background:#fff; margin:12px 0; font-size:.85rem; border:1px solid var(--line); border-radius:8px; overflow:hidden; }
+  th, td { border:1px solid var(--line); padding:8px 10px; text-align:left; vertical-align:top; }
+  th { background:#eef2fb; color:var(--ink); font-weight:600; }
+  tr:nth-child(even) td { background:#fafbfe; }
+  .term { background:#eef6ff; border-left:4px solid var(--accent); padding:8px 14px; margin:10px 0; border-radius:4px; font-size:.86rem; color:var(--sub); }
+  .warn { background:var(--warnbg); border-left:4px solid var(--warn); padding:12px 16px; border-radius:6px; margin:14px 0; font-size:.88rem; }
+  .tip { background:var(--okbg); border-left:4px solid var(--tip); padding:12px 16px; border-radius:6px; margin:14px 0; font-size:.88rem; }
+  .phase { background:#fff; border:1px solid var(--line); border-radius:10px; padding:14px 18px; margin:12px 0; }
+  .phase h3 { margin-top:0; color:var(--accent); }
+  .badge { display:inline-block; font-size:.72rem; padding:2px 8px; border-radius:10px; margin-left:6px; vertical-align:middle; }
+  .b-high { background:#e6f4ea; color:#1e7e34; }
+  .b-mid { background:#fff4e0; color:#b8860b; }
+  .b-warn { background:#fdecea; color:var(--warn); }
+  code { background:#eef0f5; padding:1px 5px; border-radius:4px; font-size:.86em; }
+  .src { font-size:.78rem; color:var(--sub); }
+  .src a { color:var(--accent); word-break:break-all; }
+  footer { margin-top:40px; font-size:.78rem; color:var(--sub); border-top:1px solid var(--line); padding-top:16px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="title">
+  <h1>Amazon物販の界隈調査レポート（X / YouTube）</h1>
+  <div>基本・応用・勝ち筋 — 副業初心者の社長向け 知識武装パック</div>
+  <div class="meta">作成: サトル（リサーチャー） / 2026-05-29 / チケット T-20260520-005 / 軸B 体験仕入れ着手前の前提整理</div>
+</header>
+
+<h2>0. このレポートのイシュー</h2>
+<p><strong>「副業初心者の社長が、Amazon物販の界隈で消耗せず勝ち筋に乗るために、最初に持つべき地図は何か」</strong></p>
+<div class="lead">
+  <strong>先に結論（3行）</strong>
+  <ol>
+    <li><strong>手法は「単純転売（せどり）→ メーカー仕入れ／OEM」へ重心が移動。</strong>2026年は規制強化で相乗り新品転売の難易度が上がり、再現性は「仕入れ先の信頼性」で決まる方向。</li>
+    <li><strong>初心者の失敗は技術不足ではなく「出品制限の確認漏れ」「資金繰り」「ツール数字の誤読」の3つに集中。</strong>事前知識でほぼ回避できる（＝本レポート最大の価値）。</li>
+    <li><strong>発信者は玉石混交。</strong>実務系（無料情報が具体的）と煽り商材系（高額スクール導線・誇大表現）を必ず区別。鵜呑み厳禁。</li>
+  </ol>
+</div>
+
+<h2>1. 物販手法の分類（用語地図）</h2>
+<div class="term">用語補足: 「せどり」= 安く仕入れ高く売る転売の総称（語源は古本の背取り）。「物販」はOEM等の自社商品販売まで含む上位概念。</div>
+<h3>1.1 仕入れチャネルによる分類</h3>
+<table>
+<tr><th>手法</th><th>何をするか</th><th>難易度</th><th>主なリスク</th><th>補足</th></tr>
+<tr><td><strong>店舗せどり</strong></td><td>実店舗で値札と相場の差を取る</td><td>中</td><td>労働集約・在庫の偶然性</td><td>相場観が早く身につく</td></tr>
+<tr><td><strong>電脳せどり</strong></td><td>ネット仕入れ→Amazon販売</td><td>中</td><td>価格改定・ポイント規約</td><td>在宅完結。既存メモリに詳細</td></tr>
+<tr><td><strong>新品せどり</strong></td><td>新品を転売</td><td>中〜高</td><td><strong>出品制限・真贋調査・垢停止</strong></td><td>2026年は規制が最も厳しい</td></tr>
+<tr><td><strong>中古せどり</strong></td><td>中古品を仕入れ販売</td><td>中</td><td><strong>古物商許可必須</strong>・状態クレーム</td><td>専門知識で利益率高・ライバル少</td></tr>
+<tr><td><strong>無在庫販売</strong></td><td>注文後に仕入れ発送</td><td>高</td><td><strong>規約グレー〜違反</strong>・欠品</td><td>初心者は非推奨</td></tr>
+<tr><td><strong>メーカー仕入れ</strong></td><td>メーカー/卸と直接継続取引</td><td>中（交渉）</td><td>初回ロット・交渉ハードル</td><td><strong>2026年の主流の勝ち筋</strong></td></tr>
+<tr><td><strong>OEM/簡易OEM</strong></td><td>自社ブランド品を製造</td><td>高</td><td>在庫・品質・PL/食品衛生法</td><td>差別化の最終形。資金と時間要</td></tr>
+<tr><td><strong>輸入/輸出</strong></td><td>海外Amazonとの価格差</td><td>高</td><td>関税・規制法・為替・納期</td><td>OEM前段の中国輸入が定番</td></tr>
+</table>
+
+<h3>1.2 「相乗り出品」vs「単独出品」</h3>
+<div class="term">用語補足: Amazonは1商品=1ページが原則。同じページに複数出品者が並ぶのが「相乗り」、自分だけのページが「単独（OEM等）」。</div>
+<ul>
+  <li><strong>相乗り</strong>: 即出品できるが価格競争に巻き込まれやすい。<span class="badge b-warn">注意</span>相乗り禁止商品に出すと<strong>アカウント停止リスク</strong>。</li>
+  <li><strong>単独</strong>: 価格競争から逃げられるが、ページ作成・広告・レビュー獲得の手間と資金が必要。</li>
+</ul>
+
+<h3>1.3 販売方式: FBA vs 自己発送</h3>
+<div class="tip">詳細は既存メモリ「48歳コンサル Part3」に整理済み（送料負けの真実・MSS）。要点: <strong>FBA</strong>=保管〜CSをAmazon代行・初心者向き。<strong>自己発送</strong>=手数料ゼロだがMSSで送料圧縮。ツールの利益表示はFBA手数料控除後が多く、そこから二重に送料を引く「赤字錯覚」に注意。</div>
+
+<h2>2. 初心者の典型的失敗（事前に潰せる）</h2>
+<table>
+<tr><th>#</th><th>失敗パターン</th><th>何が起きるか</th><th>回避策</th></tr>
+<tr><td>1</td><td><strong>出品制限の確認漏れ</strong></td><td>仕入れ後に出品不可→不良在庫。新品家電（SONY/Panasonic/Apple/Nintendo/Canon/象印 等が名指し規制）で多発</td><td>仕入れ前に必ずセラーセントラルでASIN/JANを検索し出品可否確認（鉄則）</td></tr>
+<tr><td>2</td><td><strong>真贋調査で垢停止</strong></td><td>本物の証明（請求書）を出せず売上金凍結→大赤字</td><td>領収書を残せる正規ルート仕入れを優先</td></tr>
+<tr><td>3</td><td><strong>価格差だけでリサーチ</strong></td><td>売れ行き（ランキング）を見ず、安いだけの不良在庫</td><td>Keepa/ERESAでランキング推移・販売頻度を確認</td></tr>
+<tr><td>4</td><td><strong>資金繰りの読み違い</strong></td><td>入金は2週間サイクル＋引当金で一部保留。資金が尽きる</td><td>初期資金は理想30万円。回転30〜60日以内を選ぶ</td></tr>
+<tr><td>5</td><td><strong>ツール数字の誤読</strong></td><td>FBA控除後利益から二重に送料を引き黒字商品を捨てる</td><td>FBA/自己発送の費用構造を理解</td></tr>
+<tr><td>6</td><td><strong>利益率にこだわり動けない</strong></td><td>完璧商品を探し続け経験も実績も積めず停滞</td><td>利益率5%・利益500円・月販5個まで緩め「60点の行動を量産」</td></tr>
+<tr><td>7</td><td><strong>古物商許可なしで中古販売</strong></td><td>無許可営業は古物営業法違反</td><td>警察署で取得（約19,000円・1〜2ヶ月）</td></tr>
+</table>
+
+<h2>3. 勝ち筋パターン（2024-2026の重心）</h2>
+<h3>3.1 重心シフト: 単純転売 → 信頼性ある仕入れ先 <span class="badge b-high">確度 高</span></h3>
+<p><strong>事実</strong>: 2026年版の複数ソースが「メーカー仕入れへのシフト」「規制強化対応が主要テーマ」で一致。相乗り新品せどりは「いつ止められるか分からない」構造的リスク。<br><strong>勝ち筋</strong>: 領収書を出せる正規ルートでリピート仕入れ→自分だけの定番を資産化。</p>
+<h3>3.2 仕組み化（システム型物販） <span class="badge b-mid">確度 中・特定発信者</span></h3>
+<p>既存メモリ「電脳せどりシステム化」（朝野拓也）に詳しい。<strong>ただし中〜上級の話。初心者がいきなり外注化は時期尚早。</strong></p>
+<h3>3.3 専門知識 × ニッチ <span class="badge b-mid">確度 中</span></h3>
+<p>自分の詳しい領域の中古・専門品はライバル少・利益率高。<strong>当社KPI「ニッチ良品100SKU」と方向一致 → 社長の得意領域の棚卸しが起点になり得る</strong>（プランナーへの論点）。</p>
+<h3>3.4 ツールで判断を高速化 <span class="badge b-high">確度 高</span></h3>
+<p>既存メモリ「ERESA」に詳しい。セラーリサーチ×詳細検索×カート取得率分析の3点が最ROI。軸A（T-003）と直結。</p>
+
+<h2>4. 主要発信者リスト（信頼度別）</h2>
+<div class="warn">⚠️ 前提: 「無料で具体的・再現性ある」発信は実務系、「煽り広告＋高額スクール導線」は要注意。<strong>どの発信者も有料商材への導線を持つ。情報は無料部分のみ参考にし、高額契約はCLAUDE.md §4.1（社長承認・法務確認）対象。</strong></div>
+<h3>4.1 実務系（無料情報の質が高い）</h3>
+<table>
+<tr><th>発信者 / 媒体</th><th>領域</th><th>信頼度メモ</th><th>注意点</th></tr>
+<tr><td><strong>朝野拓也（物販総合研究所）</strong></td><td>電脳せどり・国内転売</td><td>YouTube無料動画が具体的。既存メモリ2本の出典</td><td>高額コンサル導線あり</td></tr>
+<tr><td><strong>中村裕紀（EC STARs Lab.）</strong></td><td>国内/海外メーカー仕入れ</td><td>商業出版4冊・累計3万部。体系化に定評</td><td>コンサル約99万円/年。満足度95%は自社調べ</td></tr>
+<tr><td><strong>EC STARs Lab. 公式ブログ</strong></td><td>メーカー仕入れ全般</td><td>2026年版の規制・手法解説が網羅的</td><td>スクール導線</td></tr>
+<tr><td><strong>THE CKB / ECセラーラボ 等</strong></td><td>入門解説・仕入れ先</td><td>網羅的・中立寄り</td><td>代行/ツール業者のオウンドメディア（誘導バイアス）</td></tr>
+<tr><td><strong>タコス（@takosu_ped, X）</strong></td><td>電脳せどり（兼業医師）</td><td>初心者の最短ルート発信</td><td>個人。再現性は要検証</td></tr>
+</table>
+<h3>4.2 要注意系（煽り・高額商材の比重大）</h3>
+<table>
+<tr><th>対象</th><th>何が問題か</th></tr>
+<tr><td><strong>物販ONE（森谷和正/かず）</strong></td><td>YouTube広告が「うざい・怪しい」と評される。「仕入れ値の50%が利益」等の<strong>誇大表現が疑問視</strong>。99万円級講座。詐欺とは言い切れないが誇大広告に注意</td></tr>
+<tr><td><strong>「絶対稼げる」「不労所得」「再現性100%」系</strong></td><td>物販は在庫・規制・垢停止リスクが常在。"ノーリスク"を謳う発信は構造的に誇大</td></tr>
+<tr><td><strong>無在庫"楽して稼ぐ"系</strong></td><td>Amazon規約上グレー〜違反。リスクを軽視させる発信は危険</td></tr>
+</table>
+<div class="tip">サトルの中立コメント: 朝野氏・中村氏も「スクールビジネスの一角」である点は事実として記録。<strong>無料発信の質</strong>で区別したが、高額契約はすべて社長承認＋法務確認が必要。</div>
+<h3>4.3 X（旧Twitter）は「使い方」が有用</h3>
+<ul>
+  <li>個別アカウントの「決定版リスト」は流動的で確定推奨は得られず（<strong>分かりようがないこと</strong>）。</li>
+  <li>有効な使い方: <strong>Yahoo!リアルタイム検索</strong>でトレンド／<strong>TweetDeck等</strong>でキーワード監視／在庫復活・セール速報の<strong>BOT</strong>をフォロー。</li>
+  <li><span class="badge b-warn">注意</span>Xは煽り・情報商材の密度が特に高い。DMでのスクール勧誘は原則無視。</li>
+</ul>
+
+<h2>5. 学習ロードマップ（1ヶ月 → 3ヶ月 → 半年）</h2>
+<div class="warn">実 Do（仕入れ・契約・課金）は社長承認 / CLAUDE.md §4.1 対象。</div>
+<div class="phase">
+  <h3>Phase 1: 最初の1ヶ月 — 土台と1回転</h3>
+  <ul>
+    <li><strong>知識</strong>: 本レポート＋既存メモリ3本。手法地図と失敗7パターンを頭に。</li>
+    <li><strong>環境</strong>: 専用口座・Gmail、梱包材（100均でOK）、必要ならプリンタ。</li>
+    <li><strong>アカウント</strong>: 大口出品（月4,900円・税込）が無難（FBA・広告・審査安定）。※課金は §4.1。</li>
+    <li><strong>小さく1回転</strong>: 出品制限なしの低リスク商品で「売り切る経験」を優先。FBA体験。</li>
+    <li><strong>鉄則</strong>: 仕入れ前に出品可否チェックを習慣化。</li>
+  </ul>
+</div>
+<div class="phase">
+  <h3>Phase 2: 3ヶ月 — リサーチの型と回転率</h3>
+  <ul>
+    <li><strong>ツール検証</strong>: ERESA 7日無料お試しで自ジャンルの利益商品抽出を検証（軸A連動）。※有料契約は §4.1。</li>
+    <li><strong>回転率重視</strong>: 30〜60日で売り切るSKUに絞る。資金繰りを実体験で理解。</li>
+    <li><strong>得意領域</strong>: 詳しい分野でニッチ中古/専門品を当たる（中古は古物商許可）。</li>
+    <li><strong>発信の取捨選択</strong>: 実務系の無料情報のみ。煽り系はミュート。</li>
+  </ul>
+</div>
+<div class="phase">
+  <h3>Phase 3: 半年 — 資産化と差別化の選択</h3>
+  <ul>
+    <li><strong>重心移動</strong>: 単純転売の消耗を感じたらメーカー仕入れ（正規ルート・資産化）へ。</li>
+    <li><strong>仕組み化の入口</strong>: 自動リサーチ・一部外注を「必要になったら」導入（最初からはやらない）。</li>
+    <li><strong>OEM/輸入は任意</strong>: 資金・時間に余裕が出てから。</li>
+    <li><strong>KPI接続</strong>: SKU100・月商800万・利益率20%に向け勝ちSKUを定番化。</li>
+  </ul>
+</div>
+
+<h2>6. 分かっていること / いないこと / 分かりようがないこと</h2>
+<table>
+<tr><th>区分</th><th>内容</th></tr>
+<tr><td><strong>分かっていること（事実）</strong></td><td>手法分類、初心者失敗の頻出パターン、2026年の規制強化と仕入れ先重視への重心移動、FBA/自己発送の費用構造、主要発信者の存在と高額商材導線</td></tr>
+<tr><td><strong>分かっていないこと</strong></td><td>各発信者の最新実績の真偽（自社調べは割引が必要）、X個別アカウントの現時点の信頼度、社長の得意領域に適したニッチ</td></tr>
+<tr><td><strong>分かりようがないこと</strong></td><td>「絶対に稼げる商品/手法」は存在しない。相場・規制・アカウント状況で常に変動</td></tr>
+</table>
+
+<h2>7. プランナー（タケシ）への論点バトン</h2>
+<ol>
+  <li><strong>入口の手法選択</strong>: 軸B体験仕入れは電脳せどり（在宅・低資金）か店舗せどり（相場観が早い）か。社長の生活時間と相性で A/B。</li>
+  <li><strong>得意領域の棚卸し</strong>: 社長の前職・趣味からニッチ候補を引き出すワークが必要か。</li>
+  <li><strong>ツール導入タイミング</strong>: 軸A（T-003）と連動。Phase1から入れるか、Phase2の体験後か。</li>
+  <li><strong>発信者との距離</strong>: 無料情報の参照範囲をどこまで許容し、高額スクールは原則「不要」と置くか。</li>
+</ol>
+
+<footer>
+  <strong>出典（取得日 2026-05-29 / WebSearch）</strong>
+  <div class="src">
+    <a href="https://www.theckb.com/archive/the-complete-guide-to-making-money-from-amazon-sedo-purchasing/">THE CKB: せどりの始め方完全ガイド 2025</a> ・
+    <a href="https://crossma.jp/column/firstguide/">crossma: 電脳せどりとは</a> ・
+    <a href="https://ec-seller-labo.co.jp/article/computer-sedori/">ECセラーラボ: 電脳せどり完全ガイド</a> ・
+    <a href="https://sedori.co.jp/which-is-better-new-or-used/">サラせど: 新品vs中古</a> ・
+    <a href="https://biz.moneyforward.com/tax_return/basic/82124/">マネーフォワード: 儲からないのか</a> ・
+    <a href="https://oresedo.com/amazon-sale-mistake/">俺せど: 失敗談</a> ・
+    <a href="https://pricetar.com/textbook/knowhow/232">せどりの教科書: 失敗する理由</a> ・
+    <a href="https://suzaku.or.jp/suzaku-studio/archives/9585">朱雀: アカウント停止の予防策</a> ・
+    <a href="https://sedori.co.jp/list-of-amazon-regulations/">サラせど: 出品規制一覧</a> ・
+    <a href="https://link-ecconsulting.co.jp/column/amazon-category-ungating-guide/">LINK: 出品規制 2026年版</a> ・
+    <a href="https://ecstarslab.com/blog/amazon-%E3%83%A1%E3%83%BC%E3%82%AB%E3%83%BC%E4%BB%95%E5%85%A5%E3%82%8C-%E5%80%8B%E4%BA%BA-2/">EC STARs Lab: メーカー仕入れ 2026</a> ・
+    <a href="https://ec-seller-labo.co.jp/article/maker-puchase-amazon/">ECセラーラボ: メーカー仕入れ</a> ・
+    <a href="https://www.youtube.com/channel/UCy-03jSxnLigQBbgq22QfrQ">朝野拓也 YouTube</a> ・
+    <a href="https://www.buppansearch.com/buppanone-koukoku/">物販search: 物販ONE広告は怪しい？</a> ・
+    <a href="https://note.com/sedori_mama/n/n2a197ce2813c">note: 物販ONEの情報商材</a> ・
+    <a href="https://relation-blogseo.com/中村裕紀-コンサル-評判/">中村裕紀 コンサルの評判</a> ・
+    <a href="https://ecstarslab.com/">EC STARs Lab. 公式</a> ・
+    <a href="https://www.theckb.com/archive/mercari-businese-laws190819/">THE CKB: 無在庫販売は規約違反？</a> ・
+    <a href="https://tradebiz.jp/中国輸入で簡易oem化する方法/">貿易大学: 簡易OEM化</a> ・
+    <a href="https://ameblo.jp/tanashun28/entry-12952624308.html">tanashun28: 始め方ロードマップ 2026</a> ・
+    <a href="https://sedori-hacks.com/amazon-start-guide-5steps-2025/">sedori-hacks: 始め方5STEP</a> ・
+    <a href="https://sedo.li/9305.html">せどり工房: 人気Twitterアカウント</a> ・
+    <a href="https://x.com/takosu_ped">タコス @takosu_ped / X</a>
+  </div>
+  <p class="src" style="margin-top:10px;">出典の多くは代行業者・ツール会社・スクールのオウンドメディアで自社誘導バイアスを含む。一次情報（Amazon公式規約・セラーセントラル）と突き合わせて読むこと。発信者の「自社調べ実績」は割り引いて解釈する。</p>
+</footer>
+
+</div>
+</body>
+</html>
