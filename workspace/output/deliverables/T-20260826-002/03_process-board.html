@@ -1,0 +1,553 @@
+<title>Amazon物販 全工程ボード</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@500;700;900&family=Noto+Sans+JP:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+
+<style>
+:root{
+  --paper:#EFF1F4;
+  --surface:#FFFFFF;
+  --surface-2:#F7F8FA;
+  --ink:#131A22;
+  --ink-2:#3D4855;
+  --ink-3:#6C7885;
+  --rule:#D5DBE2;
+  --rule-soft:#E4E8ED;
+  --marine:#14607D;
+  --marine-soft:#E2EEF3;
+  --done:#2E7D5B;
+  --done-soft:#DCEBE1;
+  --doing:#B5761A;
+  --doing-soft:#F7E8CD;
+  --todo:#7E8894;
+  --todo-soft:#E3E7EC;
+  --alert:#A8412A;
+  --alert-soft:#F6E3DE;
+  --shadow:0 1px 2px rgba(19,26,34,.06), 0 8px 24px -16px rgba(19,26,34,.28);
+  --display:"Zen Kaku Gothic New","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;
+  --body:"Noto Sans JP","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;
+  --mono:"IBM Plex Mono","SFMono-Regular",Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0F1319;
+    --surface:#171D25;
+    --surface-2:#1D242D;
+    --ink:#E7EBF0;
+    --ink-2:#B4BEC9;
+    --ink-3:#8A95A2;
+    --rule:#2B333D;
+    --rule-soft:#232B34;
+    --marine:#5FB4D0;
+    --marine-soft:#16323D;
+    --done:#6FC496;
+    --done-soft:#17301F;
+    --doing:#E0A34D;
+    --doing-soft:#33260F;
+    --todo:#98A3B0;
+    --todo-soft:#242B34;
+    --alert:#E58C74;
+    --alert-soft:#35211B;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.9);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0F1319;
+  --surface:#171D25;
+  --surface-2:#1D242D;
+  --ink:#E7EBF0;
+  --ink-2:#B4BEC9;
+  --ink-3:#8A95A2;
+  --rule:#2B333D;
+  --rule-soft:#232B34;
+  --marine:#5FB4D0;
+  --marine-soft:#16323D;
+  --done:#6FC496;
+  --done-soft:#17301F;
+  --doing:#E0A34D;
+  --doing-soft:#33260F;
+  --todo:#98A3B0;
+  --todo-soft:#242B34;
+  --alert:#E58C74;
+  --alert-soft:#35211B;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.9);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--body);
+  font-size:15px;
+  line-height:1.75;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1040px;margin:0 auto;padding:40px 20px 80px;display:flex;flex-direction:column;gap:44px}
+
+/* ---------- header ---------- */
+.masthead{display:flex;flex-direction:column;gap:18px;padding-bottom:26px;border-bottom:2px solid var(--ink)}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--marine);display:flex;flex-wrap:wrap;gap:14px;align-items:center}
+.eyebrow .dot{width:5px;height:5px;border-radius:50%;background:currentColor;display:inline-block}
+h1{font-family:var(--display);font-weight:900;font-size:clamp(30px,5.2vw,46px);line-height:1.18;letter-spacing:.01em;margin:0;text-wrap:balance}
+.lede{margin:0;max-width:62ch;color:var(--ink-2);font-size:15.5px}
+.meta{font-family:var(--mono);font-size:12px;color:var(--ink-3);display:flex;flex-wrap:wrap;gap:6px 18px}
+
+/* ---------- totals ---------- */
+.totals{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:3px;overflow:hidden}
+.totals div{background:var(--surface);padding:16px 18px;display:flex;flex-direction:column;gap:2px}
+.totals .n{font-family:var(--mono);font-weight:600;font-size:28px;line-height:1.1;font-variant-numeric:tabular-nums}
+.totals .k{font-size:12px;color:var(--ink-3);letter-spacing:.04em}
+.n.done{color:var(--done)} .n.doing{color:var(--doing)} .n.todo{color:var(--todo)}
+
+/* ---------- sections ---------- */
+section{display:flex;flex-direction:column;gap:18px}
+h2{font-family:var(--display);font-weight:700;font-size:20px;margin:0;display:flex;align-items:baseline;gap:11px;letter-spacing:.01em}
+h2 .num{font-family:var(--mono);font-size:12px;color:var(--marine);letter-spacing:.1em;font-weight:600}
+h3{font-family:var(--display);font-weight:700;font-size:15.5px;margin:0}
+p{margin:0}
+.note{color:var(--ink-3);font-size:13px;line-height:1.7}
+ul.plain{margin:0;padding-left:1.15em;display:flex;flex-direction:column;gap:5px;color:var(--ink-2)}
+ul.plain li::marker{color:var(--marine)}
+code{font-family:var(--mono);font-size:.9em;background:var(--surface-2);border:1px solid var(--rule-soft);border-radius:3px;padding:.5px 5px;color:var(--ink-2)}
+
+/* ---------- mermaid frame ---------- */
+.figure{background:var(--surface);border:1px solid var(--rule);border-radius:4px;box-shadow:var(--shadow);overflow:hidden}
+.figure > figcaption{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:baseline;padding:12px 18px;border-bottom:1px solid var(--rule-soft);background:var(--surface-2)}
+.figure figcaption .t{font-family:var(--display);font-weight:700;font-size:13.5px}
+.figure figcaption .s{font-size:12px;color:var(--ink-3)}
+.scroller{overflow-x:auto;padding:22px 18px}
+.mermaid{min-width:640px}
+.mermaid svg{max-width:none !important;height:auto}
+
+/* ---------- legend ---------- */
+.legend{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:500;padding:4px 11px 4px 8px;border-radius:100px;border:1px solid var(--rule);background:var(--surface)}
+.chip::before{content:"";width:9px;height:9px;border-radius:2px;background:var(--todo)}
+.chip.done::before{background:var(--done)} .chip.doing::before{background:var(--doing)}
+.chip.alert::before{background:var(--alert)}
+
+/* ---------- stage cards ---------- */
+.stages{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:16px}
+.stage{background:var(--surface);border:1px solid var(--rule);border-radius:4px;box-shadow:var(--shadow);display:flex;flex-direction:column;overflow:hidden}
+.stage-head{display:flex;gap:12px;align-items:flex-start;padding:15px 16px 12px}
+.stage-no{font-family:var(--mono);font-weight:600;font-size:12px;letter-spacing:.06em;color:var(--surface);background:var(--todo);border-radius:3px;padding:2px 7px;margin-top:3px;flex:none}
+.stage.is-doing .stage-no{background:var(--doing)}
+.stage-title{display:flex;flex-direction:column;gap:2px}
+.stage-title .t{font-family:var(--display);font-weight:700;font-size:15.5px;line-height:1.4}
+.stage-title .s{font-family:var(--mono);font-size:11.5px;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.bar{display:flex;height:5px;margin:0 16px;border-radius:100px;overflow:hidden;background:var(--rule-soft)}
+.bar i{display:block;height:100%}
+.bar .d{background:var(--done)} .bar .g{background:var(--doing)} .bar .t{background:var(--todo);opacity:.42}
+.mids{list-style:none;margin:12px 0 0;padding:0 16px;display:flex;flex-direction:column}
+.mids li{display:flex;gap:10px;align-items:baseline;padding:7px 0;border-top:1px solid var(--rule-soft);font-size:13.5px}
+.mids li:first-child{border-top:0}
+.mids .id{font-family:var(--mono);font-size:11.5px;color:var(--marine);font-weight:500;flex:none;width:2.4em}
+.mids .nm{flex:1;color:var(--ink-2);line-height:1.55}
+.mids .ct{font-family:var(--mono);font-size:11px;color:var(--ink-3);font-variant-numeric:tabular-nums;flex:none;white-space:nowrap}
+.mids .ct b{font-weight:600;color:var(--done)}
+.mids .ct i{font-style:normal;font-weight:600;color:var(--doing)}
+.next{margin:14px 16px 16px;padding:10px 12px;background:var(--marine-soft);border-left:2px solid var(--marine);border-radius:0 3px 3px 0;font-size:13px;display:flex;gap:9px;align-items:baseline}
+.next .lb{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--marine);flex:none;text-transform:uppercase}
+
+/* ---------- tables ---------- */
+.tablewrap{overflow-x:auto;background:var(--surface);border:1px solid var(--rule);border-radius:4px;box-shadow:var(--shadow)}
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:13.5px}
+th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--rule-soft);vertical-align:top;line-height:1.6}
+thead th{background:var(--surface-2);font-family:var(--display);font-weight:700;font-size:12px;letter-spacing:.05em;color:var(--ink-2);white-space:nowrap;border-bottom:1px solid var(--rule)}
+tbody tr:last-child td{border-bottom:0}
+td.k{font-family:var(--mono);font-size:12px;color:var(--marine);white-space:nowrap;font-variant-numeric:tabular-nums}
+td.tk{font-family:var(--mono);font-size:11.5px;color:var(--ink-3);white-space:nowrap}
+td.st{white-space:nowrap;font-size:12px;color:var(--ink-3)}
+
+/* ---------- owner blocks ---------- */
+.owner{display:flex;flex-direction:column;gap:9px}
+.owner-head{display:flex;flex-wrap:wrap;gap:9px;align-items:center}
+.tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:3px;background:var(--todo-soft);color:var(--ink-2)}
+.tag.alert{background:var(--alert-soft);color:var(--alert)}
+.tag.marine{background:var(--marine-soft);color:var(--marine)}
+
+/* ---------- gap callout ---------- */
+.callout{background:var(--alert-soft);border:1px solid color-mix(in srgb,var(--alert) 30%,transparent);border-radius:4px;padding:16px 18px;display:flex;flex-direction:column;gap:6px}
+.callout .h{font-family:var(--display);font-weight:700;font-size:14.5px;color:var(--alert)}
+
+footer{border-top:1px solid var(--rule);padding-top:20px;color:var(--ink-3);font-size:12.5px;display:flex;flex-direction:column;gap:5px}
+footer code{font-size:11.5px}
+@media (max-width:640px){
+  .wrap{padding:28px 14px 60px;gap:34px}
+  .mids .ct{display:none}
+}
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="eyebrow"><span>T-20260826-002</span><span class="dot"></span><span>Amazon.co.jp / Satoy Select</span><span class="dot"></span><span>2026-08-26</span></div>
+    <h1>Amazon物販 全工程ボード</h1>
+    <p class="lede">開業・登録から仕入れ・出品・FBA納品・販売・クレーム対応まで、8大項目 / 42中項目 / 208小項目。当社チケット103枚を突き合わせ、どこまで実行したかを付けてあります。</p>
+    <div class="meta"><span>骨格＝サトル（標準チェックリスト）</span><span>進捗＝マリエ（チケット全数棚卸し）</span><span>統合＝ヒデアキ</span><span>作図＝カズヨ</span></div>
+  </header>
+
+  <section>
+    <h2><span class="num">A</span>現在地</h2>
+    <div class="totals">
+      <div><span class="n done">48</span><span class="k">済（実行した）</span></div>
+      <div><span class="n doing">44</span><span class="k">着手中・部分的</span></div>
+      <div><span class="n todo">116</span><span class="k">未着手</span></div>
+      <div><span class="n">103</span><span class="k">チケット総数</span></div>
+    </div>
+    <ul class="plain">
+      <li>準備と知識固めは厚い。仕入れ → 出品 → 納品 → 販売 → 顧客対応の現物ラインは<b>1周も回っていません</b>。</li>
+      <li>チケット103枚のうち64枚（62%）が「会社運営の整備」と「リサーチ・ツール」に集中。</li>
+      <li>出品・FBA納品・販売・顧客対応のチケットは合計5枚（4.9%）。完了2枚はどちらも調査と設計です。</li>
+      <li>大項目8（顧客対応・クレーム/返品）は<b>チケット0枚</b>。販売実績が無いため未発生です。</li>
+      <li>出品プランは小口のまま。小口ではカート獲得も広告出稿も構造上できません〔T-20260817-001〕。</li>
+    </ul>
+    <p class="note">大項目7・8に「済」があるのに未通過の扱いなのは、済の中身がすべて基準の確定とナレッジ化で、実オペレーションが0件のためです。</p>
+  </section>
+
+  <section>
+    <h2><span class="num">B</span>全体パイプライン</h2>
+    <div class="legend">
+      <span class="chip doing">◐ 準備が進行中</span>
+      <span class="chip">○ 現物の実行が一度も発生していない</span>
+      <span class="chip alert">⚠ 社長の一手で止まっている</span>
+    </div>
+    <figure class="figure">
+      <figcaption><span class="t">8大項目の流れと進捗</span><span class="s">数字は 済 / 着手中 / 未着手（小項目ベース）</span></figcaption>
+      <div class="scroller">
+<pre class="mermaid">
+flowchart LR
+  subgraph PREP["準備フェーズ ── 進行中"]
+    direction LR
+    S1["① 開業・法務<br/>アカウント登録<br/><br/>9 / 11 / 11"]
+    S2["② 事業戦略<br/>仕入れ手法の選定<br/><br/>9 / 7 / 4"]
+    S3["③ リサーチ<br/>ツール整備<br/><br/>17 / 10 / 2"]
+    S4["④ 仕入れ<br/>サプライヤー開拓<br/><br/>5 / 6 / 16"]
+    S1 --> S2 --> S3 --> S4
+  end
+  subgraph RUN["実行フェーズ ── 未通過"]
+    direction LR
+    S5["⑤ 出品<br/>カタログ登録<br/><br/>0 / 0 / 22"]
+    S6["⑥ FBA納品<br/>在庫オペレーション<br/><br/>0 / 2 / 26"]
+    S7["⑦ 販売・価格<br/>広告<br/><br/>5 / 3 / 15"]
+    S8["⑧ 顧客対応<br/>クレーム・返品<br/><br/>3 / 5 / 20"]
+    S5 --> S6 --> S7 --> S8
+  end
+  S4 -- "初回発注・入金<br/>ここが未通過の壁" --> S5
+  S8 -. "実績データを次のSKUへ" .-> S4
+  style PREP fill:transparent,stroke:#9AA5B1,stroke-dasharray:5 4,color:#6C7885
+  style RUN fill:transparent,stroke:#9AA5B1,stroke-dasharray:5 4,color:#6C7885
+  linkStyle 6 stroke:#A8412A,stroke-width:2px,color:#A8412A
+  classDef doing fill:#F7E8CD,stroke:#B5761A,stroke-width:1.5px,color:#3A2A0C
+  classDef todo fill:#E3E7EC,stroke:#7E8894,stroke-width:1.2px,color:#23292F
+  class S1,S2,S3,S4 doing
+  class S5,S6,S7,S8 todo
+</pre>
+      </div>
+    </figure>
+
+    <figure class="figure">
+      <figcaption><span class="t">大項目 → 中項目（準備フェーズ 1〜4）</span><span class="s">括弧内は小項目の 済 / 着手中 / 未着手</span></figcaption>
+      <div class="scroller">
+<pre class="mermaid">
+flowchart LR
+  A1["① 開業・法務<br/>アカウント登録"] --> A11["1-1 事業体・税務の届出<br/>(2 / 3 / 1)"]
+  A1 --> A12["1-2 消費税・インボイスの判断<br/>(1 / 2 / 2)"]
+  A1 --> A13["1-3 出品用アカウントの開設<br/>(1 / 1 / 1)"]
+  A1 --> A14["1-4 本人確認（KYC）書類<br/>(2 / 2 / 1)"]
+  A1 --> A15["1-5 セラーセントラル初期設定<br/>(2 / 2 / 2)"]
+  A1 --> A16["1-6 許認可・法令チェック<br/>(1 / 1 / 4)"]
+
+  A2["② 事業戦略<br/>仕入れ手法の選定"] --> A21["2-1 手法の棚卸しと優先順位<br/>(3 / 2 / 0)"]
+  A2 --> A22["2-2 目標KPIと撤退条件<br/>(2 / 2 / 1)"]
+  A2 --> A23["2-3 資金計画・資金繰り<br/>(2 / 1 / 3)"]
+  A2 --> A24["2-4 オペレーション設計<br/>(2 / 2 / 0)"]
+
+  A3["③ リサーチ<br/>ツール整備"] --> A31["3-1 ツールの導入と設定<br/>(3 / 3 / 0)"]
+  A3 --> A32["3-2 Keepaグラフの読み方<br/>(4 / 0 / 0)"]
+  A3 --> A33["3-3 需要・競合の定量判定<br/>(3 / 1 / 0)"]
+  A3 --> A34["3-4 利益計算の型<br/>(4 / 1 / 1)"]
+  A3 --> A35["3-5 出品可否の事前判定<br/>(2 / 2 / 1)"]
+  A3 --> A36["3-6 候補リストの管理<br/>(1 / 3 / 0)"]
+
+  A4["④ 仕入れ<br/>サプライヤー開拓"] --> A41["4-1 メーカー・卸の開拓<br/>(3 / 0 / 3)"]
+  A4 --> A42["4-2 取引条件の交渉と初回発注<br/>(0 / 0 / 6)"]
+  A4 --> A43["4-3 簡易OEM<br/>(0 / 4 / 2)"]
+  A4 --> A44["4-4 仕入れ書類の整備<br/>(2 / 2 / 1)"]
+  A4 --> A45["4-5 入荷・検品の手配<br/>(0 / 0 / 4)"]
+
+  A1 --> A2 --> A3 --> A4
+
+  classDef stage fill:#F7E8CD,stroke:#B5761A,stroke-width:1.5px,color:#3A2A0C
+  classDef mixed fill:#FFFFFF,stroke:#B0BAC5,stroke-width:1px,color:#23292F
+  classDef todo fill:#E3E7EC,stroke:#7E8894,stroke-width:1px,color:#23292F
+  class A1,A2,A3,A4 stage
+  class A11,A12,A13,A14,A15,A16,A21,A22,A23,A24,A31,A32,A33,A34,A35,A36,A41,A44 mixed
+  class A43 mixed
+  class A42,A45 todo
+</pre>
+      </div>
+    </figure>
+
+    <figure class="figure">
+      <figcaption><span class="t">大項目 → 中項目（実行フェーズ 5〜8）</span><span class="s">白＝一部着手 / グレー＝小項目すべて未着手</span></figcaption>
+      <div class="scroller">
+<pre class="mermaid">
+flowchart LR
+  B5["⑤ 出品<br/>カタログ登録"] --> B51["5-1 出品前の最終確認<br/>(0 / 0 / 4)"]
+  B5 --> B52["5-2 相乗り出品<br/>(0 / 0 / 4)"]
+  B5 --> B53["5-3 新規カタログ作成<br/>(0 / 0 / 4)"]
+  B5 --> B54["5-4 リスティング最適化<br/>(0 / 0 / 6)"]
+  B5 --> B55["5-5 ブランド登録・知財<br/>(0 / 0 / 4)"]
+
+  B6["⑥ FBA納品<br/>在庫オペレーション"] --> B61["6-1 納品プランの作成<br/>(0 / 0 / 6)"]
+  B6 --> B62["6-2 ラベルと梱包<br/>(0 / 1 / 5)"]
+  B6 --> B63["6-3 輸送・配送業者<br/>(0 / 0 / 6)"]
+  B6 --> B64["6-4 受領確認とトラブル処理<br/>(0 / 0 / 4)"]
+  B6 --> B65["6-5 在庫の健全性管理<br/>(0 / 1 / 5)"]
+
+  B7["⑦ 販売・価格<br/>広告"] --> B71["7-1 価格設定とカート獲得<br/>(1 / 2 / 2)"]
+  B7 --> B72["7-2 スポンサープロダクト広告<br/>(1 / 0 / 5)"]
+  B7 --> B73["7-3 レビュー獲得（適法境界）<br/>(2 / 0 / 2)"]
+  B7 --> B74["7-4 販促と新規特典<br/>(1 / 0 / 3)"]
+  B7 --> B75["7-5 売上・利益のモニタリング<br/>(0 / 1 / 3)"]
+
+  B8["⑧ 顧客対応<br/>クレーム・返品"] --> B81["8-1 問い合わせ・メッセージ対応<br/>(0 / 0 / 4)"]
+  B8 --> B82["8-2 返品・返金<br/>(0 / 0 / 5)"]
+  B8 --> B83["8-3 A-to-z保証・チャージバック<br/>(0 / 0 / 4)"]
+  B8 --> B84["8-4 アカウント健全性の監視<br/>(1 / 2 / 2)"]
+  B8 --> B85["8-5 違反・停止時の対応<br/>(2 / 2 / 1)"]
+  B8 --> B86["8-6 記帳・税務の継続<br/>(0 / 1 / 4)"]
+
+  B5 --> B6 --> B7 --> B8
+
+  classDef stage fill:#E3E7EC,stroke:#4A5560,stroke-width:1.5px,color:#23292F
+  classDef mixed fill:#FFFFFF,stroke:#B0BAC5,stroke-width:1px,color:#23292F
+  classDef todo fill:#EDEFF2,stroke:#A6AFBA,stroke-width:1px,stroke-dasharray:4 3,color:#4A5560
+  class B5,B6,B7,B8 stage
+  class B62,B65,B71,B72,B73,B74,B75,B84,B85,B86 mixed
+  class B51,B52,B53,B54,B55,B61,B63,B64,B81,B82,B83 todo
+</pre>
+      </div>
+    </figure>
+  </section>
+
+  <section>
+    <h2><span class="num">C</span>大項目ごとの内訳と次の一手</h2>
+    <div class="stages">
+
+      <article class="stage is-doing">
+        <div class="stage-head"><span class="stage-no">01</span><span class="stage-title"><span class="t">開業・法務・アカウント登録</span><span class="s">中6 ／ 小31 ・ 済9 着手11 未11</span></span></div>
+        <div class="bar"><i class="d" style="width:29%"></i><i class="g" style="width:35.5%"></i><i class="t" style="width:35.5%"></i></div>
+        <ul class="mids">
+          <li><span class="id">1-1</span><span class="nm">事業体・税務の届出</span><span class="ct"><b>2</b>/<i>3</i>/1</span></li>
+          <li><span class="id">1-2</span><span class="nm">消費税・インボイスの判断</span><span class="ct"><b>1</b>/<i>2</i>/2</span></li>
+          <li><span class="id">1-3</span><span class="nm">Amazon出品用アカウントの開設</span><span class="ct"><b>1</b>/<i>1</i>/1</span></li>
+          <li><span class="id">1-4</span><span class="nm">本人確認（KYC）書類の提出</span><span class="ct"><b>2</b>/<i>2</i>/1</span></li>
+          <li><span class="id">1-5</span><span class="nm">セラーセントラルの初期設定</span><span class="ct"><b>2</b>/<i>2</i>/2</span></li>
+          <li><span class="id">1-6</span><span class="nm">許認可・法令チェック（古物商・PSE・食品）</span><span class="ct"><b>1</b>/<i>1</i>/4</span></li>
+        </ul>
+        <p class="next"><span class="lb">Next</span><span>屋号付き銀行口座と事業用カードを開設する〔T-20260821-011〕</span></p>
+      </article>
+
+      <article class="stage is-doing">
+        <div class="stage-head"><span class="stage-no">02</span><span class="stage-title"><span class="t">事業戦略・仕入れ手法の選定</span><span class="s">中4 ／ 小20 ・ 済9 着手7 未4</span></span></div>
+        <div class="bar"><i class="d" style="width:45%"></i><i class="g" style="width:35%"></i><i class="t" style="width:20%"></i></div>
+        <ul class="mids">
+          <li><span class="id">2-1</span><span class="nm">手法の棚卸しと優先順位</span><span class="ct"><b>3</b>/<i>2</i>/0</span></li>
+          <li><span class="id">2-2</span><span class="nm">目標KPIと撤退条件</span><span class="ct"><b>2</b>/<i>2</i>/1</span></li>
+          <li><span class="id">2-3</span><span class="nm">資金計画・資金繰り</span><span class="ct"><b>2</b>/<i>1</i>/3</span></li>
+          <li><span class="id">2-4</span><span class="nm">オペレーション設計（PC完結の担保）</span><span class="ct"><b>2</b>/<i>2</i>/0</span></li>
+        </ul>
+        <p class="next"><span class="lb">Next</span><span>SKU単位の撤退条件を数値で確定する（90日 / 180日の基準）</span></p>
+      </article>
+
+      <article class="stage is-doing">
+        <div class="stage-head"><span class="stage-no">03</span><span class="stage-title"><span class="t">リサーチ・ツール整備</span><span class="s">中6 ／ 小29 ・ 済17 着手10 未2</span></span></div>
+        <div class="bar"><i class="d" style="width:58.6%"></i><i class="g" style="width:34.5%"></i><i class="t" style="width:6.9%"></i></div>
+        <ul class="mids">
+          <li><span class="id">3-1</span><span class="nm">ツールの導入と設定</span><span class="ct"><b>3</b>/<i>3</i>/0</span></li>
+          <li><span class="id">3-2</span><span class="nm">Keepaグラフの読み方（罠の回避）</span><span class="ct"><b>4</b>/<i>0</i>/0</span></li>
+          <li><span class="id">3-3</span><span class="nm">需要・競合の定量判定</span><span class="ct"><b>3</b>/<i>1</i>/0</span></li>
+          <li><span class="id">3-4</span><span class="nm">利益計算の型（推定と実測を分離）</span><span class="ct"><b>4</b>/<i>1</i>/1</span></li>
+          <li><span class="id">3-5</span><span class="nm">出品可否の事前判定</span><span class="ct"><b>2</b>/<i>2</i>/1</span></li>
+          <li><span class="id">3-6</span><span class="nm">候補リストの管理</span><span class="ct"><b>1</b>/<i>3</i>/0</span></li>
+        </ul>
+        <p class="next"><span class="lb">Next</span><span>セラースプライトの申込可否を決める〔T-20260814-001・§4.1〕</span></p>
+      </article>
+
+      <article class="stage is-doing">
+        <div class="stage-head"><span class="stage-no">04</span><span class="stage-title"><span class="t">仕入れ・サプライヤー開拓</span><span class="s">中5 ／ 小27 ・ 済5 着手6 未16</span></span></div>
+        <div class="bar"><i class="d" style="width:18.5%"></i><i class="g" style="width:22.2%"></i><i class="t" style="width:59.3%"></i></div>
+        <ul class="mids">
+          <li><span class="id">4-1</span><span class="nm">メーカー・卸の開拓（②本線）</span><span class="ct"><b>3</b>/<i>0</i>/3</span></li>
+          <li><span class="id">4-2</span><span class="nm">取引条件の交渉と初回発注</span><span class="ct"><b>0</b>/<i>0</i>/6</span></li>
+          <li><span class="id">4-3</span><span class="nm">簡易OEM（③）</span><span class="ct"><b>0</b>/<i>4</i>/2</span></li>
+          <li><span class="id">4-4</span><span class="nm">仕入れ書類の整備（真贋調査の生命線）</span><span class="ct"><b>2</b>/<i>2</i>/1</span></li>
+          <li><span class="id">4-5</span><span class="nm">入荷・検品の手配</span><span class="ct"><b>0</b>/<i>0</i>/4</span></li>
+        </ul>
+        <p class="next"><span class="lb">Next</span><span>メーカーへの初回問い合わせを送る（文面未作成・送信は §4.1）</span></p>
+      </article>
+
+      <article class="stage">
+        <div class="stage-head"><span class="stage-no">05</span><span class="stage-title"><span class="t">出品・カタログ登録</span><span class="s">中5 ／ 小22 ・ 済0 着手0 未22</span></span></div>
+        <div class="bar"><i class="t" style="width:100%"></i></div>
+        <ul class="mids">
+          <li><span class="id">5-1</span><span class="nm">出品前の最終確認（出品許可・危険物）</span><span class="ct"><b>0</b>/<i>0</i>/4</span></li>
+          <li><span class="id">5-2</span><span class="nm">相乗り出品（既存カタログ）</span><span class="ct"><b>0</b>/<i>0</i>/4</span></li>
+          <li><span class="id">5-3</span><span class="nm">新規カタログ作成（③OEM・独占品）</span><span class="ct"><b>0</b>/<i>0</i>/4</span></li>
+          <li><span class="id">5-4</span><span class="nm">リスティング最適化</span><span class="ct"><b>0</b>/<i>0</i>/6</span></li>
+          <li><span class="id">5-5</span><span class="nm">ブランド登録・知財</span><span class="ct"><b>0</b>/<i>0</i>/4</span></li>
+        </ul>
+        <p class="next"><span class="lb">Next</span><span>テスト1SKUを登録する〔T-20260823-001 の承認待ち〕</span></p>
+      </article>
+
+      <article class="stage">
+        <div class="stage-head"><span class="stage-no">06</span><span class="stage-title"><span class="t">FBA納品・在庫オペレーション</span><span class="s">中5 ／ 小28 ・ 済0 着手2 未26</span></span></div>
+        <div class="bar"><i class="g" style="width:7.1%"></i><i class="t" style="width:92.9%"></i></div>
+        <ul class="mids">
+          <li><span class="id">6-1</span><span class="nm">納品プランの作成</span><span class="ct"><b>0</b>/<i>0</i>/6</span></li>
+          <li><span class="id">6-2</span><span class="nm">ラベルと梱包（FNSKU・混合在庫回避）</span><span class="ct"><b>0</b>/<i>1</i>/5</span></li>
+          <li><span class="id">6-3</span><span class="nm">輸送・配送業者（危険物は業者限定）</span><span class="ct"><b>0</b>/<i>0</i>/6</span></li>
+          <li><span class="id">6-4</span><span class="nm">受領確認とトラブル処理</span><span class="ct"><b>0</b>/<i>0</i>/4</span></li>
+          <li><span class="id">6-5</span><span class="nm">在庫の健全性管理（IPI・長期保管）</span><span class="ct"><b>0</b>/<i>1</i>/5</span></li>
+        </ul>
+        <p class="next"><span class="lb">Next</span><span>FBA納品テストを承認する〔T-20260823-001・§4.1〕</span></p>
+      </article>
+
+      <article class="stage">
+        <div class="stage-head"><span class="stage-no">07</span><span class="stage-title"><span class="t">販売・価格・広告</span><span class="s">中5 ／ 小23 ・ 済5 着手3 未15</span></span></div>
+        <div class="bar"><i class="d" style="width:21.7%"></i><i class="g" style="width:13%"></i><i class="t" style="width:65.3%"></i></div>
+        <ul class="mids">
+          <li><span class="id">7-1</span><span class="nm">価格設定とカート獲得</span><span class="ct"><b>1</b>/<i>2</i>/2</span></li>
+          <li><span class="id">7-2</span><span class="nm">スポンサープロダクト（SP）広告</span><span class="ct"><b>1</b>/<i>0</i>/5</span></li>
+          <li><span class="id">7-3</span><span class="nm">レビュー獲得（適法境界）</span><span class="ct"><b>2</b>/<i>0</i>/2</span></li>
+          <li><span class="id">7-4</span><span class="nm">販促と新規特典</span><span class="ct"><b>1</b>/<i>0</i>/3</span></li>
+          <li><span class="id">7-5</span><span class="nm">売上・利益のモニタリング</span><span class="ct"><b>0</b>/<i>1</i>/3</span></li>
+        </ul>
+        <p class="next"><span class="lb">Next</span><span>小口→大口の切替時期を決める（推奨＝初回FBA納品の直前）</span></p>
+      </article>
+
+      <article class="stage">
+        <div class="stage-head"><span class="stage-no">08</span><span class="stage-title"><span class="t">顧客対応・クレーム/返品・アカウント維持</span><span class="s">中6 ／ 小28 ・ 済3 着手5 未20</span></span></div>
+        <div class="bar"><i class="d" style="width:10.7%"></i><i class="g" style="width:17.9%"></i><i class="t" style="width:71.4%"></i></div>
+        <ul class="mids">
+          <li><span class="id">8-1</span><span class="nm">問い合わせ・メッセージ対応（24時間以内）</span><span class="ct"><b>0</b>/<i>0</i>/4</span></li>
+          <li><span class="id">8-2</span><span class="nm">返品・返金</span><span class="ct"><b>0</b>/<i>0</i>/5</span></li>
+          <li><span class="id">8-3</span><span class="nm">A-to-z保証・チャージバック</span><span class="ct"><b>0</b>/<i>0</i>/4</span></li>
+          <li><span class="id">8-4</span><span class="nm">アカウント健全性の監視（ODR&lt;1%）</span><span class="ct"><b>1</b>/<i>2</i>/2</span></li>
+          <li><span class="id">8-5</span><span class="nm">違反・停止時の対応（POA）</span><span class="ct"><b>2</b>/<i>2</i>/1</span></li>
+          <li><span class="id">8-6</span><span class="nm">記帳・税務の継続</span><span class="ct"><b>0</b>/<i>1</i>/4</span></li>
+        </ul>
+        <p class="next"><span class="lb">Next</span><span>返品・問い合わせの対応手順を作る（チケット0枚の空白地帯）</span></p>
+      </article>
+
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="num">D</span>社長の次の一手</h2>
+
+    <div class="owner">
+      <div class="owner-head"><span class="tag alert">§4.1 承認必須</span><span class="note">時間が経っても可決されません</span></div>
+      <div class="tablewrap"><table>
+        <thead><tr><th>項番</th><th>やること</th><th>チケット</th><th>これが済むと動くもの</th></tr></thead>
+        <tbody>
+          <tr><td class="k">5-2 / 6-1</td><td>FBA納品テスト出品（1SKU）をやるか決める。やるなら実購入を承認</td><td class="tk">T-20260823-001</td><td>大項目5と6が実行に入る。現物ライン1周目の起点</td></tr>
+          <tr><td class="k">3-1</td><td>セラースプライトのプランを選び、申込・決済を実行</td><td class="tk">T-20260814-001</td><td>需要判定（3-3）とOEM候補選定（4-3）の精度が上がる</td></tr>
+          <tr><td class="k">—</td><td><code>_archive_20260826/</code> 2箇所（18MB・266ファイル）の破棄可否</td><td class="tk">T-20260826-001</td><td>成果物フォルダ一元化の最終クローズ</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+
+    <div class="owner">
+      <div class="owner-head"><span class="tag">社長本人の手作業</span><span class="note">代行できません</span></div>
+      <div class="tablewrap"><table>
+        <thead><tr><th>項番</th><th>やること</th><th>チケット</th><th>これが済むと動くもの</th></tr></thead>
+        <tbody>
+          <tr><td class="k">1-3</td><td>Amazon支払情報のクレカ変更を再試行（内部エラーで中断中）</td><td class="tk">T-20260726-003</td><td>出品プラン・広告・FBA費用の決済経路が確定</td></tr>
+          <tr><td class="k">1-1 / 1-5</td><td>屋号付き銀行口座と事業用クレジットカードを開設</td><td class="tk">T-20260821-011</td><td>屋号の統一と振込先登録が完了</td></tr>
+          <tr><td class="k">3-1</td><td>Keepa「出品者概要」が無料プランで開けるか実機で1クリック確認</td><td class="tk">T-20260811-001</td><td>Keepaマニュアルが確定し、3-2・3-3の運用に入れる</td></tr>
+          <tr><td class="k">3-1</td><td>カズさん（YouTuber）の発信者・アプリ名を共有</td><td class="tk">T-20260520-006</td><td>ツール調査の残件が閉じる</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+
+    <div class="owner">
+      <div class="owner-head"><span class="tag marine">判断・Go待ち</span></div>
+      <div class="tablewrap"><table>
+        <thead><tr><th>項番</th><th>やること</th><th>チケット</th><th>これが済むと動くもの</th></tr></thead>
+        <tbody>
+          <tr><td class="k">4-3 / 5-3</td><td>ニッチOEM戦略のB案採用と最初の一手にGo</td><td class="tk">T-20260809-001</td><td>4-3の打診と5-3の新規カタログ作成が着手可能</td></tr>
+          <tr><td class="k">4-1</td><td>トップページ デザイン案v1の方向性を判断</td><td class="tk">T-20260825-001</td><td>メーカーへ送る会社案内URLが確定し、4-1の問い合わせに進める</td></tr>
+          <tr><td class="k">4-2</td><td>買い候補17件から実仕入れに進むか判断</td><td class="tk">T-20260706-001</td><td>4-2の初回発注が動く（進むなら §4.1）</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+
+    <div class="owner">
+      <div class="owner-head"><span class="tag">レビュー待ち 12件</span><span class="note">一言いただければ閉じます</span></div>
+      <div class="tablewrap"><table>
+        <thead><tr><th>項番</th><th>チケット</th><th>待っている内容</th></tr></thead>
+        <tbody>
+          <tr><td class="k">2-1</td><td class="tk">T-20260520-005</td><td>界隈調査レポート</td></tr>
+          <tr><td class="k">2-1</td><td class="tk">T-20260521-002</td><td>仕入れ〜販売シミュレーション資料</td></tr>
+          <tr><td class="k">2-4</td><td class="tk">T-20260531-002</td><td>業務フロー図</td></tr>
+          <tr><td class="k">—</td><td class="tk">T-20260705-003</td><td>観光・動画事業の雛形フォルダ（レビューと移動）</td></tr>
+          <tr><td class="k">4-1</td><td class="tk">T-20260804-001</td><td>メーカー台帳</td></tr>
+          <tr><td class="k">3-4 / 6-5</td><td class="tk">T-20260816-001</td><td>FBA料金リファレンス</td></tr>
+          <tr><td class="k">3-4</td><td class="tk">T-20260816-002</td><td>利益計算ツール実践マニュアル</td></tr>
+          <tr><td class="k">3-4 / 7-5</td><td class="tk">T-20260816-003</td><td>損益シミュレーション列の設計</td></tr>
+          <tr><td class="k">7-1</td><td class="tk">T-20260817-001</td><td>カート/PPC判断ガイド（推奨B＝大口切替は初回FBA納品直前）</td></tr>
+          <tr><td class="k">2-4</td><td class="tk">T-20260821-010</td><td>FBA代行業者の裏取り結果</td></tr>
+          <tr><td class="k">3-1</td><td class="tk">T-20260824-001</td><td>Keepa公式用語定義集</td></tr>
+          <tr><td class="k">3-1</td><td class="tk">T-20260824-005</td><td>Keepa用語集 正式版</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="num">E</span>まだ一度も通っていない工程</h2>
+    <div class="callout">
+      <span class="h">⚠ 大項目8はチケット0枚</span>
+      <span>返品/返金、購入者メッセージ対応、低評価の削除依頼、ODR/AHRの平常監視。いずれも起票がありません。T-20260715-001（米国店の停止対応）は事後対応で、平常時の維持オペレーションではありません。</span>
+    </div>
+    <div class="tablewrap"><table>
+      <thead><tr><th>#</th><th>工程</th><th>項番</th><th>現状</th></tr></thead>
+      <tbody>
+        <tr><td class="k">①</td><td>メーカー・卸へ初回の問い合わせを送る</td><td class="k">4-1</td><td class="st">メール文面が未作成。送信は §4.1</td></tr>
+        <tr><td class="k">②</td><td>見積を取り、取引条件を交渉する</td><td class="k">4-2</td><td class="st">未発生</td></tr>
+        <tr><td class="k">③</td><td>初回ロットを発注し、入金する</td><td class="k">4-2</td><td class="st">未発生（§4.1）</td></tr>
+        <tr><td class="k">④</td><td>入荷・検品を代行業者に流す</td><td class="k">4-5</td><td class="st">未発生</td></tr>
+        <tr><td class="k">⑤</td><td>SKUを登録し、商品ページを作る</td><td class="k">5-1 / 5-2</td><td class="st">1SKUも登録なし</td></tr>
+        <tr><td class="k">⑥</td><td>FBA納品プランを作り、発送する</td><td class="k">6-1 / 6-3</td><td class="st">納品プラン作成の実績なし</td></tr>
+        <tr><td class="k">⑦</td><td>FBA倉庫の受領を確認する</td><td class="k">6-4</td><td class="st">未発生</td></tr>
+        <tr><td class="k">⑧</td><td>販売開始・価格設定・カート獲得</td><td class="k">7-1</td><td class="st">小口のためカート獲得が構造上不可</td></tr>
+        <tr><td class="k">⑨</td><td>広告を出す</td><td class="k">7-2</td><td class="st">小口のため出稿不可</td></tr>
+        <tr><td class="k">⑩</td><td>レビューを獲得する</td><td class="k">7-3</td><td class="st">未発生</td></tr>
+        <tr><td class="k">⑪</td><td>購入者対応・返品対応をする</td><td class="k">8-1 / 8-2</td><td class="st">チケット0枚</td></tr>
+        <tr><td class="k">⑫</td><td>月次で実測損益を締める</td><td class="k">7-5 / 8-6</td><td class="st">実データなし</td></tr>
+      </tbody>
+    </table></div>
+    <p class="note">①から順に通らないと②以降は発生しません。体験1周チケット T-20260520-004（2026-05-20 起票）は Step1 完了以降、記載が更新されていません。</p>
+  </section>
+
+  <section>
+    <h2><span class="num">F</span>この図の確度</h2>
+    <ul class="plain">
+      <li>小項目208件の内訳（済48 / 着手44 / 未116）は <code>awk</code> 集計。目視カウントは使っていません。</li>
+      <li><b>「済」の判定基準</b>＝その行動が現実に実行されたもの。調べた・ナレッジ化した・ルール化しただけのものは「済」にしていません（調査タスク自体を除く）。例：古物商許可はナレッジ整備済みですが未取得のため未着手。</li>
+      <li>done 61枚のうち37枚は「現在地」「完了報告」が空でした。その37枚に紐づく判定はタイトルと要件からの推定を含みます。</li>
+      <li><b>社長の確認で変わる項目が3件</b>あります。1-1 青色申告承認申請の提出（期限あり）、1-5 納税情報の登録、1-4 KYC提出書類の内訳。いずれも画面を1つ開けば確定します。</li>
+    </ul>
+  </section>
+
+  <footer>
+    <div>208小項目の全文リストは <code>workspace/output/deliverables/T-20260826-002/01_master-todo.md</code>（HTML版も同フォルダ）。</div>
+    <div>数値の出典表は <code>02_lifecycle-checklist.md</code> 末尾。進捗判定の根拠台帳は <code>agent_output/T-20260826-002/01_ticket-inventory.md</code>。</div>
+    <div>T-20260826-002 ／ 2026-08-26 ／ サトル・マリエ・ヒデアキ・カズヨ</div>
+  </footer>
+
+</div>
