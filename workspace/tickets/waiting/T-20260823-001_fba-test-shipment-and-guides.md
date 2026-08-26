@@ -1,5 +1,5 @@
 ---
-id: T-20260823-001
+ticket_id: T-20260823-001
 title: FBA納品を一度通すためのテスト出品（1SKU）＋選び方ガイドの記事追加
 status: waiting
 owner: secretary
