@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第三者著作物の公開に関する法務レビュー（T-20260826-001）</title>
+<style>
+:root{--ink:#1a2230;--sub:#5a6475;--line:#dfe4ec;--bg:#f5f7fa;--card:#fff;
+--accent:#1f4e8c;--danger:#b42318;--dangerbg:#fef3f2;--warn:#b45309;--warnbg:#fffbeb;--ok:#0e7a5f;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",Meiryo,sans-serif;
+ line-height:1.85;font-size:15.5px;}
+.wrap{max-width:1000px;margin:0 auto;padding:40px 24px 96px;}
+h1{font-size:27px;line-height:1.4;margin:0 0 6px;padding-bottom:14px;border-bottom:3px solid var(--ink);}
+h2{font-size:20px;margin:46px 0 14px;padding:10px 0 8px;border-bottom:2px solid var(--accent);color:var(--accent);}
+h3{font-size:17px;margin:30px 0 10px;padding-left:11px;border-left:4px solid var(--accent);}
+h4{font-size:15.5px;margin:22px 0 8px;color:var(--sub);}
+p{margin:12px 0;}
+ul,ol{margin:12px 0;padding-left:26px;}
+li{margin:5px 0;}
+hr{border:0;border-top:1px solid var(--line);margin:38px 0;}
+table{border-collapse:collapse;width:100%;margin:16px 0;background:var(--card);
+ font-size:14px;box-shadow:0 1px 4px rgba(30,50,90,.06);}
+th,td{border:1px solid var(--line);padding:9px 11px;text-align:left;vertical-align:top;}
+th{background:#eef2f8;font-weight:700;white-space:nowrap;}
+td:first-child{white-space:nowrap;}
+tr:nth-child(even) td{background:#fafbfd;}
+blockquote{margin:18px 0;padding:14px 18px;background:var(--warnbg);
+ border-left:4px solid var(--warn);border-radius:0 6px 6px 0;}
+blockquote p{margin:6px 0;}
+code{background:#eef1f6;padding:1.5px 5px;border-radius:4px;font-size:.9em;
+ font-family:ui-monospace,SFMono-Regular,Menlo,monospace;word-break:break-all;}
+pre{background:#1e2530;color:#e6edf3;padding:16px 18px;border-radius:8px;overflow-x:auto;font-size:13px;line-height:1.7;}
+pre code{background:none;color:inherit;padding:0;}
+strong{color:#111827;}
+.meta{color:var(--sub);font-size:13px;}
+footer{margin-top:56px;padding-top:16px;border-top:1px solid var(--line);
+ color:var(--sub);font-size:12.5px;}
+@media print{body{background:#fff}.wrap{max-width:none;padding:0}table{box-shadow:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>第三者著作物の公開に関する法務レビュー</h1>
+<ul><li>チケット: T-20260826-001（親）／レビュー: 法務ハルオ</li><li>作成日: 2026-08-26</li><li>対象: PUBLIC リポジトリ <code>https://github.com/Yukinori1018/ai-company-amazon_buppan</code> の追跡ファイル</li><li><strong>本書は社内向けの法務評価であり、弁護士の法律意見書ではありません。</strong>§7 に弁護士相談が必要な線引きを示します。</li></ul>
+<hr>
+<h2>0. 結論（先に3行）</h2>
+<ol><li><strong><code>パーフェクトマニュアルサンプル_EC-STARs-Lab.pdf</code> の公開は、著作権侵害である蓋然性が高い。</strong>引用（32条1項）の要件を1つも満たしません。<strong>グレーではなく黒に近い。即時に止めるべきです。</strong></li><li><strong><code>seminar-20260610-realtime-notes.md</code> は「黒」とは断定しませんが、§8（画面収録の解析で復元した部分）と §5・§8.6（コンサル価格表・受講者実名）は、著作権とは別に権利者からのクレーム動機が最も強い箇所です。</strong>残す理由がありません。</li><li><strong>同種の問題は他に11ファイル群あります</strong>（うち T-20260612-002 の PPTX/PDF は、有料教材を素材にした自社スライドで、PDF 単体より実害が大きい可能性があります）。<strong>推奨は「まずリポジトリを Private 化（1操作・可逆）→ 落ち着いて履歴除去」です。</strong></li></ol>
+<hr>
+<h2>1. 事実認定（当職が実機で確認した事項）</h2>
+<table><thead><tr><th>#</th><th>確認事項</th><th>結果</th><th>確認方法・日付</th></tr></thead><tbody><tr><td>1</td><td>リポジトリの公開状態</td><td><strong>PUBLIC</strong></td><td><code>gh repo view --json visibility</code> / 2026-08-26</td></tr><tr><td>2</td><td>リポジトリ作成日</td><td>2026-05-20</td><td>GitHub API <code>created_at</code> / 2026-08-26</td></tr><tr><td>3</td><td>PDF の初出コミット</td><td><strong><code>1bf015a</code>／2026-06-09 23:33 JST</strong></td><td><code>git log --follow</code> / 2026-08-26。<strong>チケット本文の「2026-05月」は誤りです（実際は 06-09、公開期間は約78日）</strong></td></tr><tr><td>4</td><td>セミナー記録の初出</td><td><code>064bb59</code>（本体）→ <code>2fffc52</code>（§8 追補）</td><td><code>git log --follow</code> / 2026-08-26</td></tr><tr><td>5</td><td><strong>両ファイルが今この瞬間、認証なしで誰でも取得できるか</strong></td><td><strong>できる。PDF は HTTP 200 / 1,690,674 バイト、記録は HTTP 200 / 18,675 バイト</strong></td><td><code>raw.githubusercontent.com</code> へ未認証 GET / 2026-08-26</td></tr><tr><td>6</td><td>PDF の正体</td><td>内部タイトル <strong>「申込配布用パーフェクトマニュアル」</strong>、全7ページ、作成 2026-06-07、制作ツール Canva、著作者表示「EC STARs Lab. 中西恒太」。全54ページ超の本編の目次＋抜粋で構成された<strong>申込者向け配布物</strong></td><td><code>mdls</code> / <code>pdftotext</code> / 2026-08-26</td></tr><tr><td>7</td><td>原本の配布形態</td><td>EC STARs Lab. 公式ブログの当該特典ページは <strong>「保護中: ご登録者様限定特典」</strong>（パスワード保護）。<strong>登録・申込という対価と引き換えに限定配布されている</strong></td><td>Web 検索 / 2026-08-26</td></tr><tr><td>8</td><td>外部ミラーの有無</td><td><strong>Software Heritage には未収録</strong>（<code>api/1/origin/search</code> が空配列）。fork 0件・star 0件・watcher 0件</td><td>Software Heritage API / GitHub API / 2026-08-26</td></tr><tr><td>9</td><td>自動公開の仕組み</td><td><code>.claude/scripts/github-sync.sh</code> が launchd <code>com.aicompany.amazon-buppan.github-sync</code> により <strong>30分間隔で <code>git add -A</code> → commit → push</strong>。force push・branch 削除はしない設計</td><td>スクリプト実読 / <code>~/Library/LaunchAgents</code> / 2026-08-26</td></tr></tbody></table>
+<p><strong>#8 は本件で最も重要な事実です。</strong>外部ミラーがまだ存在しない＝<strong>今なら履歴除去で実質的に回収できる</strong>。時間が経つほどこの窓は閉じます。</p>
+<hr>
+<h2>2. 依頼事項①：PDF とセミナー記録の著作権法上の位置づけ</h2>
+<h3>2.1 PDF（<code>パーフェクトマニュアルサンプル_EC-STARs-Lab.pdf</code>）</h3>
+<h4>(1) 著作物性 — 争う余地はない</h4>
+<p>文章・図表・レイアウトからなる編集物であり、<strong>著作権法2条1項1号</strong>の「思想又は感情を創作的に表現したもの」に当たります。<strong>10条1項1号</strong>（言語の著作物）＋図表部分は同項6号（図形の著作物）。著作者は EC STARs Lab.／中西恒太氏（法人著作なら15条1項）。</p>
+<h4>(2) 当社が行っている行為</h4>
+<table><thead><tr><th>行為</th><th>該当条文</th><th>当社の状況</th></tr></thead><tbody><tr><td>ファイルを GitHub のサーバに置いた</td><td><strong>21条（複製権）</strong></td><td>該当。commit <code>1bf015a</code> 以降</td></tr><tr><td>誰でもダウンロードできる状態に置いた</td><td><strong>23条1項（公衆送信権）</strong>、<strong>2条1項9号の5（送信可能化）</strong></td><td>該当。§1 #5 で実証済み</td></tr></tbody></table>
+<p><strong>「まだ誰もダウンロードしていない」は抗弁になりません。</strong>送信可能化は、アップロードした時点で完成する侵害です（受信者の存在を要件としない）。fork 0件という事実は損害額の議論には効きますが、侵害の成否には効きません。</p>
+<h4>(3) 私的複製（30条1項）— <strong>適用されません</strong></h4>
+<p>30条1項が許すのは「<strong>個人的に又は家庭内その他これに準ずる限られた範囲内</strong>において使用することを目的とする」複製です。</p>
+<ul><li>社長が自分の PC にダウンロードして読む段階までは、30条1項の範囲内と評価できます。</li><li>しかし<strong>世界中から取得可能な公開リポジトリに置く行為は、定義上「限られた範囲」ではありません。</strong></li><li>さらに <strong>49条1項1号</strong>により、30条1項で作成した複製物を公衆に提示した場合は「<strong>複製を行ったものとみなす</strong>」＝私的複製の免罪符が遡って消えます。</li></ul>
+<p><strong>結論：私的複製の範囲を明確に超えています。</strong></p>
+<h4>(4) 引用（32条1項）— <strong>要件を1つも満たしません</strong></h4>
+<p>32条1項は「公表された著作物は、引用して利用することができる。この場合において、その引用は、<strong>公正な慣行に合致</strong>するものであり、かつ、<strong>報道、批評、研究その他の引用の目的上正当な範囲内</strong>で行なわれるものでなければならない」と定めます。</p>
+<p>判例の判断枠組み（最判昭55.3.28 パロディ・モンタージュ写真事件が示した明瞭区別性・主従関係を出発点とし、近時は知財高判平22.10.13 美術鑑定書事件のように総合考慮する流れ）に当てはめると：</p>
+<table><thead><tr><th>要件</th><th>当社の状況</th><th>判定</th></tr></thead><tbody><tr><td>公表された著作物であること</td><td>登録者限定配布だが、不特定または特定多数への提供＝2条5項の「公衆」に当たると解される</td><td>○（唯一満たす）</td></tr><tr><td><strong>明瞭区別性</strong>（自説と引用部分が区別されている）</td><td><strong>PDF ファイルまるごと。区別すべき「自説」が存在しない</strong></td><td><strong>×</strong></td></tr><tr><td><strong>主従関係</strong>（自分の表現が主、引用が従）</td><td><strong>従しかない。主が無い</strong></td><td><strong>×</strong></td></tr><tr><td><strong>目的上正当な範囲</strong>（必要最小限）</td><td><strong>全部。抜粋ですらない</strong></td><td><strong>×</strong></td></tr><tr><td>公正な慣行</td><td>権利者が対価（登録）と引き換えに限定配布しているものを、<strong>その対価の壁を外して無償公開</strong>している</td><td><strong>×</strong></td></tr><tr><td>出所明示（48条1項1号）</td><td>ファイル名に「EC-STARs-Lab」と記載。形式的には満たすが、他要件を満たさない以上、免責にはならない</td><td>△（無意味）</td></tr></tbody></table>
+<p><strong>結論：引用ではなく、単なる再配布（複製＋送信可能化）です。</strong>当社の README にも解説にも「批評」「研究」の体裁はありません。</p>
+<h4>(5) 権利者の実害が大きい類型である</h4>
+<p>この PDF は <strong>「登録・申込という対価と引き換えに渡す集客用の配布物（リードマグネット）」</strong>です（§1 #7）。その価値は「<strong>これを手に入れるには登録しなければならない</strong>」という一点に依存します。当社の公開は、その壁を無償で外す行為であり、<strong>権利者にとって最も損害を主張しやすい形の侵害</strong>です。市場代替性が正面から認められます。</p>
+<h4>(6) 想定される請求・処分</h4>
+<table><thead><tr><th>種類</th><th>根拠</th><th>現実的な帰結</th></tr></thead><tbody><tr><td>差止請求（削除・履歴除去）</td><td>112条1項</td><td>ほぼ確実に認められる</td></tr><tr><td>損害賠償</td><td>民法709条／著作権法114条</td><td>実損の立証が争点。fork 0件・star 0件なので<strong>高額にはなりにくい</strong>が、114条3項（使用料相当額）でゼロにはならない</td></tr><tr><td>名誉回復措置</td><td>115条</td><td>可能性は低い</td></tr><tr><td><strong>GitHub への DMCA 通報</strong></td><td>17 U.S.C. §512</td><td><strong>最も現実的かつ最速。リポジトリごと無効化されうる。</strong>繰り返せばアカウント停止</td></tr><tr><td>刑事</td><td>119条1項（10年以下の拘禁刑もしくは1000万円以下の罰金または併科）／法人は124条により3億円以下</td><td><strong>123条1項により親告罪</strong>。告訴がなければ起訴されない</td></tr></tbody></table>
+<p><strong>非親告罪（123条2項）に当たるか：当たらない可能性が高いが、断定はしません。</strong>同項は「有償著作物等」を「原作のまま」複製・公衆送信し、権利者の得べき利益を不当に害する場合を非親告罪としています。本 PDF は<strong>無償配布物</strong>なので「有償著作物等」に当たらないと解するのが素直です。ただし本編（有償教材）の抜粋である以上、「有償著作物等の一部」として構成される余地は残ります。<strong>実務上の意味は薄い（民事とプラットフォーム対応で決着するため）ので、この論点で時間を使う必要はありません。</strong></p>
+<h4>(7) 著作権以外に重なるリスク</h4>
+<ul><li><strong>契約違反</strong>：この種の配布物には通常「再配布・転載禁止」の条件が付されます。<strong>当社は申込時の規約を保管していません（未確認）。</strong>あれば債務不履行（民法415条）が並立します。</li><li><strong>不法行為（民法709条）</strong>：仮に著作権侵害が成立しなくても、<strong>営業上の利益を侵害する態様の無断利用</strong>は一般不法行為となりうる（知財高判平17.10.6 読売オンライン見出し事件の枠組み）。本件はこの枠にもきれいに乗ります。</li></ul>
+<blockquote><p><strong>判定：発生確率＝中〜高／影響度＝中（リポジトリ全体の無効化を含む）／不可逆性＝高（配布済みデータは回収不能）。当社の基準では「グレーは原則 NO」以前に、黒に近い。即時停止。</strong></p></blockquote>
+<hr>
+<h3>2.2 セミナー記録（<code>seminar-20260610-realtime-notes.md</code>）</h3>
+<p>こちらは PDF と<strong>質が違います</strong>。同列に扱うと判断を誤ります。</p>
+<h4>(1) 保護対象と非保護対象を切り分ける</h4>
+<ul><li>講演は <strong>10条1項1号</strong>の言語の著作物、スライドは言語＋図形の著作物です。</li><li>一方、<strong>最判平13.6.28（江差追分事件）</strong>は、「<strong>思想、感情若しくはアイデア、事実若しくは事件など表現それ自体でない部分</strong>又は<strong>表現上の創作性がない部分</strong>において同一性を有するにすぎない場合」は翻案に当たらないとしています。</li><li>したがって、<strong>「リサーチ基準は3つ」「経費割合35%」「在庫は1.2〜1.5倍」といったノウハウ・数値そのものは著作権では保護されません。</strong>これらを自分の言葉で書いた受講メモは、原則として適法です。</li></ul>
+<h4>(2) 問題は「どこまで再現しているか」</h4>
+<p>当職が本文を通読した結果、<strong>§0〜§7 と §8 で評価が分かれます。</strong></p>
+<table><thead><tr><th>範囲</th><th>内容</th><th>評価</th></tr></thead><tbody><tr><td>§0〜§4、§6、§7</td><td>講演内容の要点・数値・所見。自社の言葉で構成され、末尾に当社所見あり</td><td><strong>概ね白</strong>。事実・アイデアの摘示にとどまる。ただし章立てが原講演の構成に忠実であり、量も多いため「白」と断定はしない</td></tr><tr><td><strong>§5（コンサル案内）・§8.6（プラン・費用表）</strong></td><td><strong>通常価格・セミナー限定特別価格・値引額・分割額の一覧、受講者の実名と月利、講師陣5名の実名、会員サイトの内容</strong></td><td><strong>著作権より先に、権利者のクレーム動機が最大の箇所。</strong>「限定特別価格」は限定であることに価値がある情報で、公開は権利者の営業を直接害する</td></tr><tr><td><strong>§8（画面収録のフレーム解析による復元）</strong></td><td>109分の録画から<strong>シーン検出122枚＋15秒間隔258枚を抽出</strong>し、スクリーンショットに無かった内容を復元。<strong>講師の完成プロンプト全文</strong>、在庫表の全列構成、KPI 実数、費用表を含む</td><td><strong>最も危うい。</strong>「聴いて記憶した要点」ではなく、<strong>録画から機械的にスライドの表現を text 化した再現</strong>であり、<strong>27条（翻案権）</strong>の射程に入る蓋然性が相対的に高い</td></tr></tbody></table>
+<p><strong>「講師の完成プロンプト全文」は、それ自体が独立した言語の著作物になりうる表現です。</strong>要点の摘示ではなく表現の複製です。ここは白と言えません。</p>
+<h4>(3) 著作権以外の論点</h4>
+<ul><li><strong>契約違反・信義則</strong>：セミナーに「録画・撮影・二次配布の禁止」のアナウンスや規約があれば、録画の作成自体が契約違反です。<strong>当社は当日の規約・アナウンスを記録していません（未確認）。</strong>オンラインセミナーでは禁止が明示されているのが通例で、<strong>「禁止されていなかった」と推定する根拠はありません。</strong></li><li><strong>プライバシー・個人情報</strong>：§5・§8.6 に受講者の氏（実名）・年齢・月利、講師陣のフルネームが列挙されています。セミナー内で開示された情報であっても、<strong>当社が全世界に再公開する必要性はゼロ</strong>です。本人からの削除要求・プライバシー侵害（民法709条）の火種になります。</li><li><strong>不法行為</strong>：価格表の公開は、著作権の成否と独立に、営業上の利益侵害として構成されうる典型です。</li></ul>
+<blockquote><p><strong>判定：§8 は発生確率＝中／影響度＝中〜大／不可逆性＝高。§5・§8.6 は法的評価より「相手が怒る確率」が高い。§0〜§7 は白寄りだが、単独で残す実益も乏しい。</strong></p></blockquote>
+<hr>
+<h2>3. 依頼事項②：追跡ファイル全体の洗い出し</h2>
+<p><code>git ls-files docs/reference</code>（12件）と <code>git ls-files workspace/output/deliverables</code>（403件）を全件確認し、第三者著作物名（EC STARs／中西／うみぞう／朝野／船原／物販総合研究所／PoiPoi／セラースプライト／Genspark）で横断検索しました。結果を<strong>危険度4段階</strong>に分類します。</p>
+<h3>Tier 1 — 第三者著作物そのものの再配布（即時対応）</h3>
+<table><thead><tr><th>ファイル</th><th>内容</th><th>判定</th></tr></thead><tbody><tr><td><code>docs/reference/maker-shiire/パーフェクトマニュアルサンプル_EC-STARs-Lab.pdf</code></td><td>第三者の配布物の完全コピー（1.6MB / 7ページ）</td><td><strong>黒に近い。§2.1</strong></td></tr></tbody></table>
+<p><strong>1件のみ。</strong><code>docs/reference</code> 配下の他のバイナリ（<code>fba-prep-center/*.xlsx</code>）は当社が生成させたものです。</p>
+<h3>Tier 2 — 第三者の有料コンテンツを素材にした派生物（要判断）</h3>
+<table><thead><tr><th>ファイル</th><th>内容</th><th>論点</th></tr></thead><tbody><tr><td><code>docs/reference/maker-shiire/seminar-20260610-realtime-notes.md</code></td><td>有料/無料不明のセミナー記録。§8 は録画のフレーム解析による復元</td><td>27条（翻案）／契約／プライバシー。<strong>§2.2</strong></td></tr><tr><td><code>workspace/output/deliverables/T-20260612-002/maker-shiire-workflow-script.md</code> / <code>.html</code></td><td><strong>冒頭に「出典: EC STARs Lab.（中西恒太）パーフェクトマニュアル サンプル版＋2026-06-10セミナー受講記録」と明記</strong>したプレゼン台本。ナレーション付きで内容を全面再構成</td><td><strong>PDF より実害が大きい可能性。</strong>単独で原教材の代替物として機能する完成品</td></tr><tr><td><code>workspace/output/deliverables/T-20260612-002/maker-shiire-workflow.pptx</code> / <code>.pdf</code></td><td>上記台本を成果物化したスライド</td><td>同上。<strong>配布可能な形式である分さらに重い</strong></td></tr><tr><td><code>workspace/output/deliverables/T-20260705-002/maker-shiire-workflow-manual.html</code></td><td>同系統の業務フロー・マニュアル（20KB）</td><td>同上</td></tr></tbody></table>
+<p><strong>Tier 2 は当社成果物としての価値が高い一方、「出典: EC STARs Lab.」と自ら明記しているため、権利者から見れば発見も主張も容易です。</strong>出典明示は誠実ですが、免責にはなりません（48条は32条の要件を満たす場合の付随義務であって、独立の許諾根拠ではありません）。</p>
+<h3>Tier 3 — 第三者の動画・文書の詳細要約（グレー／要注記）</h3>
+<table><thead><tr><th>ファイル</th><th>出典</th><th>論点</th></tr></thead><tbody><tr><td><code>docs/reference/動画分析.md</code></td><td>YouTube「AI社員に仕事を任せる方法」（まっち）</td><td>章構成・実装手順まで含む詳細要約。<strong>CLAUDE.md §8 が公開状態でこれを「設計の出典」として参照している</strong></td></tr><tr><td><code>docs/reference/keepa-umizou/README.md</code></td><td>YouTube（うみぞう）</td><td>「原本の保全」と自称。検証注記は当社の創作だが、原本部分は要約</td></tr><tr><td><code>docs/reference/kobutsusho/README.md</code></td><td>YouTube（朝野拓也／物販総合研究所）</td><td>同上</td></tr><tr><td><code>docs/reference/kokunai-niche-oem/README.md</code></td><td>YouTube（船原徹雄／平井氏）</td><td><strong>タイムラインを時刻付きで再現</strong>しており、Tier 3 の中では重い</td></tr><tr><td><code>docs/reference/web-site-build/web-site-build-playbook.md</code></td><td>「社長提供の原本」（出所不明の手順書）</td><td><strong>出所が特定できていない。</strong>社長作成なら白、第三者作成なら Tier 2 相当</td></tr><tr><td><code>workspace/output/deliverables/T-20260824-001/keepa-glossary.md</code> / <code>.html</code>（62KB）</td><td>Keepa 公式 API ドキュメント</td><td><strong>「公式定義」列は英語原文の忠実な訳</strong>と自ら明記。<strong>Keepa API T&amp;C §11(1) が modify / edit / translate / reproduce を明文で禁止</strong>（法務メモリ <code>knowledge_keepa_tos.md</code>）。<strong>著作権法27条＋契約違反の二重</strong></td></tr><tr><td><code>workspace/output/deliverables/T-20260824-005/keepa-glossary-official.md</code> / <code>.html</code>（68KB）</td><td>同上</td><td>同上。<strong>より大部で、より完成度が高い</strong></td></tr></tbody></table>
+<p><strong>Keepa の2件は、法務が2026-08-24 に自ら指摘しながら是正されていません。</strong>当職のメモリ <code>knowledge_public_repo_exposure.md</code> に「第三者ドキュメントの全訳」として記載済みです。<strong>自分の指摘を自分で放置している状態であり、これは当職の落ち度です。</strong></p>
+<h3>Tier 4 — 適法と判断してよいもの（根拠付き）</h3>
+<table><thead><tr><th>ファイル群</th><th>根拠</th></tr></thead><tbody><tr><td><code>T-20260817-006/mockup_v1/assets/img/*.jpg</code>（3枚）</td><td><strong>Unsplash License</strong>（商用利用可・許諾不要・クレジット任意）。<code>CREDITS.md</code> に Unsplash ID とライセンス URL、選定基準（第三者ロゴ排除・人物の顔なし）まで記録済み。<strong>当社で最も模範的な処理</strong>。※現在は未追跡（未 commit）だが、追跡しても問題なし</td></tr><tr><td><code>T-20260520-005</code> <code>T-20260520-012</code> <code>T-20260521-005</code> 等で第三者名に言及する各レポート</td><td><strong>事実・アイデアの摘示と当社の評価が主</strong>。江差追分事件の基準により翻案に当たらない。氏名の言及は著作権と無関係</td></tr><tr><td><code>docs/reference/fba-prep-center/*</code></td><td>各社の料金は事実であり著作物ではない。表自体は当社が Genspark で生成</td></tr><tr><td><code>T-20260824-001/_raw-capture-kazuyo/support-faq-ja.md</code></td><td><strong>「第三者著作物のため全文転記はせず、事実のみを抽出」と明記して実行済み。</strong>これが当社の目指すべき型</td></tr></tbody></table>
+<h3>3.1 副次的発見（著作権外・報告事項）</h3>
+<p><code>docs/reference/fba-prep-center/</code> の比較表は、<strong>実在の同業他社（タイシンFBA／糸星／ユニストック／FBA代行センター）について、当社自身が「相違9件」と認定した誤情報</strong>を PUBLIC で公開し続けています。当社の README に大きな警告が付いている点は評価できますが、<strong>名指しの事業者について虚偽の事実を流布する形になっており、不正競争防止法の営業誹謗（2条1項の該当号は改正で番号が動くため要確認）や信用毀損（刑法233条）の射程を意識すべきです。</strong>発生確率は低いものの、<strong>是正コストがほぼゼロ（誤りの列を削除するか、正しい値に置き換える）</strong>なので、対応は Tier 2 の処理と同時に済ませることを推奨します。</p>
+<hr>
+<h2>4. 依頼事項③：対応の選択肢（A/B/C/D ＋推奨）</h2>
+<h3>前提として押さえるべき技術的事実</h3>
+<ol><li><strong>Git 履歴は消えない。</strong><code>git rm</code> しても、<code>.gitignore</code> に足しても、<strong>過去のコミットに blob として残り、GitHub 上で URL 直打ちで取得できます。</strong>「最新版から消えた」は「公開が止まった」を意味しません。</li><li><strong>外部ミラーはまだ無い（§1 #8）。</strong>今なら履歴除去に意味があります。</li><li><strong><code>github-sync.sh</code> は force push をしない設計</strong>なので、履歴を書き換えても自動同期は追随できず、<strong>必ず人間の手当てが要ります</strong>（分岐を検知したら停止する設計＝安全側に倒れる）。</li></ol>
+<h3>A案：現状維持（依頼書の (c)）</h3>
+<table><thead><tr><th></th><th></th></tr></thead><tbody><tr><td>作業</td><td>なし</td></tr><tr><td>残存リスク</td><td><strong>Tier 1 の侵害状態が継続。</strong>DMCA 1通でリポジトリ全体が無効化されうる。30分ごとの自動同期も止まる</td></tr><tr><td>コスト</td><td>ゼロ</td></tr><tr><td><strong>判定</strong></td><td><strong>不可。</strong>「グレーは原則 NO」以前に、Tier 1 は黒に近い。<strong>採用しません</strong></td></tr></tbody></table>
+<h3>B案：<code>.gitignore</code> へ移して追跡から外す（依頼書の (a)）</h3>
+<table><thead><tr><th></th><th></th></tr></thead><tbody><tr><td>作業</td><td><code>git rm --cached</code> ＋ <code>.gitignore</code> 追記 ＋ ファイルをリポ外の素材置き場へ移動。所要15〜30分。<strong>§4.1 に当たらず、承認だけで即実行できる</strong></td></tr><tr><td>残存リスク</td><td><strong>履歴に残り、公開され続ける。</strong>コミットハッシュを知る者（GitHub のコード検索・イベント API を辿れば誰でも到達可能）は今後もダウンロードできる。<strong>根本解決にならない</strong></td></tr><tr><td>コスト</td><td>低</td></tr><tr><td><strong>判定</strong></td><td><strong>単独では不十分。</strong>ただし<strong>再発防止としては必須</strong>なので、どの案を採っても併せて実施します</td></tr></tbody></table>
+<h3>C案：履歴から完全に消す（依頼書の (b)）</h3>
+<table><thead><tr><th></th><th></th></tr></thead><tbody><tr><td>作業</td><td><code>git filter-repo</code>（または BFG）で対象パスを全履歴から除去 → <strong>force push</strong> → GitHub サポートへキャッシュ purge 依頼 → 全 worktree の再クローン</td></tr><tr><td><strong>承認</strong></td><td><strong>CLAUDE.md §4.1「不可逆な削除／破壊的 Git 操作」に該当。社長承認必須。当職は実行しません</strong></td></tr><tr><td>残存リスク</td><td>①<strong>全コミットハッシュが変わる</strong>ため、成果物カタログ CSV の blob URL・チケット本文のコミット参照・<code>docs/</code> 内のリンクが一斉に切れる（当社は blob URL をカタログに使用中）。②他 worktree・他デバイスのクローンとの整合を人間が取り直す必要がある。③GitHub 側のキャッシュ・PR・Gist に残る可能性（本件は PR 0件なので影響小）。④<strong>既にダウンロードされた分は回収不能</strong></td></tr><tr><td>コスト</td><td><strong>中〜高。</strong>半日〜1日。復旧手順を誤ると当社の全成果物履歴を壊す。<strong>実行者は IT エンジニア（ケンジ）とし、事前に <code>git bundle</code> で完全バックアップを取ること</strong></td></tr><tr><td><strong>判定</strong></td><td><strong>有効。ただし「まず出血を止める」手段としては遅く、危険</strong></td></tr></tbody></table>
+<h3>D案：リポジトリを Private 化（当職からの追加提案）</h3>
+<table><thead><tr><th></th><th></th></tr></thead><tbody><tr><td>作業</td><td>GitHub の設定を1回変更するだけ。<strong>5分。履歴・Issue・カタログの blob URL・ローカルの全 worktree に一切影響しない</strong>（所有者である社長は従来どおり閲覧可）</td></tr><tr><td>効果</td><td><strong>HEAD も全履歴も、Tier 1〜3 のすべてが即座に外から見えなくなる</strong>。DMCA・クレームの窓が閉じる</td></tr><tr><td>残存リスク</td><td>既にダウンロードされた分は回収不能（これはどの案でも同じ）。GitHub Pages 未使用のため対外影響なし（<code>gh api .../pages</code> が 404 ＝ 2026-08-24 確認済み）</td></tr><tr><td><strong>可逆性</strong></td><td><strong>完全に可逆。</strong>いつでも PUBLIC に戻せる</td></tr><tr><td><strong>判定</strong></td><td><strong>推奨。可逆な1操作で、不可逆なリスクを止められる</strong></td></tr></tbody></table>
+<h3>推奨：<strong>D → C → B の順で、段階的に</strong></h3>
+<pre><code>即時   D  リポジトリを Private 化（5分・可逆・社長の1操作）
+        └ 出血を止める。ここまでは今日中に終わる
+
+次に   C  Tier 1・Tier 2 を履歴から除去（§4.1 承認 → ケンジが実行）
+        └ Private のまま安全に作業できる。カタログ URL の張り直しもこの中で
+
+最後   B  .gitignore ＋ 受入基準を整備し、リポ外の素材置き場へ移す
+        └ 再発防止。ここまで終われば PUBLIC 復帰も検討可能</code></pre>
+<p><strong>社長が PUBLIC 継続を強く望まれる場合の代替（B&#x27;）</strong></p>
+<p>社長は 2026-08-24・08-26 に PUBLIC 継続をご判断済みですが、<strong>そのご判断は「自社の事業情報を見せてよいか」についてのものであり、第三者著作物は判断材料に入っていませんでした。</strong>したがって、この点だけを切り出して再判断いただく必要があります。</p>
+<p>PUBLIC を維持するなら、<strong>C を「先に」実行するほかありません</strong>（B だけでは履歴が残り、公開状態が続くため）。この場合、<strong>出血を止められるまでに半日〜1日かかります。</strong>その間、侵害状態が継続することをご了解いただく必要があります。<strong>当職は、この待ち時間を許容する合理的理由を見出せません。</strong></p>
+<hr>
+<h2>5. 依頼事項④：再発防止策（1つに絞ります）</h2>
+<h3>提案：<strong><code>_inbox_社長共有/</code> の棚卸しに「出所チェック」を1手だけ足す</strong></h3>
+<p>新しい仕組みは作りません。<strong>既にある仕組み（マリエの inbox 棚卸し／<code>agents/general_affairs/skills/inbox-intake.md</code>）に、判断が1つで済むゲートを差し込みます。</strong></p>
+<p><code>docs/reference/</code> へ振り分ける前に、<strong>次の1問だけ答える。</strong></p>
+<blockquote><p><strong>「このファイルは、自分（社長）または当社が作ったものか？」</strong></p><p>- <strong>YES</strong> → そのまま <code>docs/reference/</code> へ（Git 追跡）
+- <strong>NO（第三者が作った）</strong> → <strong>原本はリポに入れない。</strong><code>~/Documents/AI Company 素材/Amazon物販事業/&lt;topic&gt;-&lt;YYYYMMDD&gt;/</code> へ置き、リポには<strong>「事実・数値・当社の評価だけを書いた README」</strong>を残す
+- <strong>判断がつかない</strong> → 法務へ回す（<code>waiting/</code> ではなく Agent 発注で足りる）</p></blockquote>
+<p><strong>この1問で本件は全部防げます。</strong>PDF は NO、セミナー録画は NO、PoiPoi の docx とスクショは NO（<strong>これは既に正しく処理されています</strong>）、Unsplash 写真は NO だが<strong>ライセンスを確認して CREDITS.md を添えたので OK</strong>、というように、既存の良い実例がそのままお手本になります。</p>
+<p><strong>書き込む場所は2箇所だけ</strong>（どちらも既存ファイルへの1〜2行追記）：</p>
+<ol><li><code>agents/general_affairs/skills/inbox-intake.md</code> — 振り分け前のゲートとして上記の1問を追加</li><li><code>.gitignore</code> — 既に「第三者著作物はリポに入れない」旨のコメントがある（2026-08-26 追記分）ので、<strong>「原本を入れない／抽出したナレッジだけ残す」を判断基準として明示</strong>する形で補強</li></ol>
+<p><strong>やらないこと</strong>：新しいチェックリスト、新しいフック、新しいレビュー工程。<strong>増やすほど守られなくなります。</strong>当社は既に「inbox に21件・12日間滞留」（T-20260821-009）を経験しており、<strong>工程を足す方向の対策は破綻することが証明されています。</strong></p>
+<hr>
+<h2>6. 断定できない点と、何が分かれば確定するか</h2>
+<p><strong>当職は以下を断定しません。</strong>推測を事実として報告することは、法務として最も避けるべき行為です。</p>
+<table><thead><tr><th>#</th><th>断定できない点</th><th>何が分かれば確定するか</th><th>取得方法</th></tr></thead><tbody><tr><td>1</td><td><strong>2026-06-10 のセミナーが有料だったか無料だったか</strong></td><td>参加費の有無・金額</td><td>社長の記憶／申込メール・決済履歴（satoyselect@ または satoyukinori1018@ の受信箱）。<strong>有償なら 123条2項（非親告罪）の検討が必要になり、重さが変わる</strong></td></tr><tr><td>2</td><td><strong>PDF・セミナー申込時の規約（再配布禁止条項の有無）</strong></td><td>申込フォームの同意文言・特典ページの注意書き</td><td>同上の受信箱、および <code>ecstarslab.com/blog/present-2/</code>（パスワード保護ページ）。<strong>契約違反が並立するかが決まる</strong></td></tr><tr><td>3</td><td><strong>セミナー当日に録画・撮影の禁止アナウンスがあったか</strong></td><td>冒頭スライド・司会の発言</td><td>素材置き場の録画（<code>~/Documents/AI Company 素材/Amazon物販事業/maker-shiire-seminar-20260610/</code>）の冒頭を確認。<strong>ただし音声トラックが無いと当社記録にあるため、スライドでしか確認できない可能性</strong></td></tr><tr><td>4</td><td><strong>PDF が第三者に実際にダウンロードされたか</strong></td><td>アクセス実績</td><td><strong>GitHub は PUBLIC リポジトリの raw アクセスログを提供しません。確認手段がありません。</strong>Traffic API は clone/view の集計のみ（14日分）。<strong>「されていない」と主張する根拠を当社は持てません</strong></td></tr><tr><td>5</td><td><code>docs/reference/web-site-build/web-site-build-playbook.md</code> の作成者</td><td>社長ご自身の作か、第三者の配布物か</td><td>社長への確認1問。<strong>第三者作なら Tier 2 へ格上げ</strong></td></tr><tr><td>6</td><td>Keepa 用語集2件が API T&amp;C §11(1) 違反として実際に問題視されるか</td><td>Keepa の運用実態</td><td>断定不能。ただし<strong>条文は明文で translate / reproduce を禁止しており、当社に有利な解釈の余地は乏しい</strong></td></tr><tr><td>7</td><td>権利者が実際に行動を起こす確率</td><td>—</td><td><strong>予測不能。</strong>確率が低くても、影響が不可逆（リポジトリ無効化・アカウント停止）である以上、当社の3軸基準ではアラート対象です</td></tr></tbody></table>
+<hr>
+<h2>7. 弁護士に相談すべきか（線引き）</h2>
+<p><strong>当職の結論：現時点では不要。ただし下記のいずれかが起きたら、その日のうちに弁護士へ。</strong></p>
+<h3>弁護士なしで進めてよい理由</h3>
+<p>本件の Tier 1 は、<strong>法解釈が争われる事案ではありません。</strong>「他人の配布物をまるごと公開している」という、要件の当てはめが一義的な事案です。<strong>やるべきことは『止める』であり、法律論を戦わせることではありません。</strong>弁護士費用（相談料 1〜2万円/時、通知対応なら数十万円）を払って得られる追加情報が乏しい。</p>
+<h3>弁護士が必要になる分水嶺（この線を越えたら即・社長判断で相談）</h3>
+<table><thead><tr><th>#</th><th>トリガー</th><th>理由</th></tr></thead><tbody><tr><td>1</td><td><strong>権利者・代理人から連絡が来た</strong>（メール／内容証明／SNS DM を問わず）</td><td><strong>返信内容そのものが証拠になります。</strong>当社が謝罪や事実の認否をした瞬間に交渉の土台が固まる。<strong>返信前に相談。当職が下書きを作ることはできますが、送信は §4.1（第三者連絡）です</strong></td></tr><tr><td>2</td><td><strong>GitHub から DMCA 通報の通知が来た</strong></td><td>反論通知（counter notice）は<strong>米国裁判所の管轄への同意を含みます</strong>。素人が出すべき書面ではありません</td></tr><tr><td>3</td><td><strong>損害賠償請求・支払要求を受けた</strong></td><td>金額の妥当性判断は専門領域</td></tr><tr><td>4</td><td><strong>本件を理由に、当社から権利者へ何らかの申し出をする場合</strong>（謝罪・和解金の提示等）</td><td>不用意な申し出は債務の承認と評価されうる</td></tr><tr><td>5</td><td>Tier 2・Tier 3 を<strong>削除せずに公開継続する</strong>と社長が判断される場合</td><td><strong>当職の意見（削除すべき）と社長のご判断が食い違う場面です。</strong>当社の判断だけで押し切るべきではありません</td></tr></tbody></table>
+<p><strong>#1〜#4 はいずれも「相手が動いた後」です。</strong>先手で削除しておけば、そもそもこの分水嶺に到達しません。<strong>弁護士費用を払わない最良の方法が、今すぐ消すことです。</strong></p>
+<hr>
+<h2>8. 社長にご判断いただきたいこと（3点）</h2>
+<table><thead><tr><th>#</th><th>論点</th><th>選択肢</th><th>当職の推奨</th></tr></thead><tbody><tr><td>1</td><td><strong>リポジトリを Private 化するか</strong></td><td>①即時 Private 化（5分・可逆） ②PUBLIC 維持のまま C 案を先行</td><td><strong>①</strong>。可逆な手段で不可逆なリスクを止められる場面で、迷う理由がありません</td></tr><tr><td>2</td><td><strong>Tier 1・Tier 2 を履歴から除去するか（§4.1）</strong></td><td>①除去する ②HEAD からのみ削除（B案） ③維持</td><td><strong>①</strong>。ただし実行はケンジ、事前に <code>git bundle</code> でフルバックアップ。<strong>当職は実行しません</strong></td></tr><tr><td>3</td><td><strong>Tier 3（Keepa 用語集2件・動画要約 README 5件）の扱い</strong></td><td>①Tier 1・2 と同時に処理 ②注記を足して残す ③別チケットで再評価</td><td><strong>③別チケット。</strong>Tier 1・2 の処理を Tier 3 の議論で遅らせてはいけません。<strong>ただし Keepa 用語集2件だけは、契約の明文違反なので ① に含めることを推奨します</strong></td></tr></tbody></table>
+<hr>
+<h2>9. 本レビューで確認した範囲・限界</h2>
+<ul><li><strong>確認した範囲</strong>：<code>git ls-files docs/reference</code>（12件・全件目視）、<code>git ls-files workspace/output/deliverables</code>（403件・拡張子別分類＋第三者名9語での全文検索＋該当ファイルの冒頭精読）、<code>.gitignore</code>、<code>github-sync.sh</code>、GitHub API、Software Heritage API。</li><li><strong>確認していない範囲</strong>：<code>agents/*/memory/</code> 配下（法務メモリ以外）、<code>workspace/tickets/</code> 配下、<code>docs/</code> の <code>reference</code> 以外、Git 履歴内にのみ存在し現在は追跡されていないファイル。<strong>後者は Tier 1 と同じ問題を抱えうるため、C 案を実行する際は履歴全体を対象にスキャンすること。</strong></li><li><strong>当職は本件で、ファイルの削除・移動・<code>git</code> 操作を一切行っていません。</strong>読み取りと外部への未認証 GET（自社リポジトリの公開確認・Software Heritage 検索）のみです。</li></ul>
+<hr>
+<p>*作成：法務ハルオ／2026-08-26。本書は社内向け法務評価であり、弁護士による法律意見ではありません。*</p>
+</div>
+</body>
+</html>
