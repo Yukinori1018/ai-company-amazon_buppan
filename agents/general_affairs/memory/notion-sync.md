@@ -375,3 +375,27 @@ frontmatter は `labels: [整理, 可視化, 全体像]`。Notion の Labels 選
   `owner-tasks-summary-ownership.md` のとおり**「まとめ」を持つカードは0件**（廃止済みカードの遺物）。
   実質すべて英語 kebab-case。
 - 作成したカード: `T-20260826-002` / page_id `3c8b0a40-44fa-81d6-a93a-f47227aab304`
+
+## Labels は「日本語の思いつき」で書かない（2026-08-26 / T-20260826-002）
+
+**事象**: チケット frontmatter に `labels: [整理, 可視化, 全体像]` と日本語で書かれており、Notion の Labels（multi_select）に該当オプションが1つも無かった。マリエは推測で新規オプションを作らず**空のまま起票者へ差し戻し**、社長／秘書の判断で **B案（既存語彙へ寄せる）＝`ops` / `workflow` / `strategy`** に確定。frontmatter を書き換えたうえで Notion 側に3つとも設定した（新規オプション追加ゼロ）。
+
+**再利用できる手順**
+
+1. 同期前に `notion-fetch` で `collection://366b0a40-44fa-81ec-8342-000b6d0a25e0` を引き、`<sqlite-table>` の `"Labels" TEXT -- JSON array with zero or more of [...]` を**選択肢の正**として読む。ここが唯一の確定情報源。
+2. frontmatter の labels が既存オプションに無い場合、**勝手に新規オプションを作らない／推測で似た語に丸めない**。空のまま差し戻し、A案（Notion に選択肢追加）/ B案（既存語彙へ寄せる）を提示する。**2026-08-26 は B案が採られた** → 以後は B案を既定の推奨とする。
+3. 書き込みは `notion-update-page` の `update_properties` に**素の JSON 配列**（`["ops","workflow","strategy"]`）で渡せば通る。Labels に展開キーや特殊値は不要（日付・チェックボックスとは違う）。
+4. 書き込み後は `notion-query-data-sources` で読み戻して確認する。
+
+**2026-08-26 時点の既存 Labels オプション（29件）**
+`まとめ / research / tooling / maker-shiire / sato-scope / dev / seller-central / notion / foundation / axis-b / workflow / strategy / ops / netsea / legal / learning / knowledge / keepa / google-sheets / catalog / spreadsheet / pdca / org / onboarding / infrastructure / infra / dennou-sedori / deliverable / content`
+
+> `infrastructure` と `infra` が重複している。統合すべき候補だが、既存カードの付け替えが要るので社長判断待ち事項として保留（勝手に消さない＝非破壊原則）。
+
+## 成果物の微修正でカタログ CSV を触るかの判断基準（2026-08-26 / T-20260826-002）
+
+`03_process-board.html` に凡例ブロックを1つ足しただけの改訂で、CSV を更新すべきか迷った。**基準は「内容要約の記述が、その改訂によって事実と食い違うか」**。
+
+- 今回の要約は「Mermaid図3枚（…）にA〜Fの6セクションを添えた1枚もの」。凡例はセクション C の**内側**に入っただけで、図の枚数もセクション数（A〜Fの6本）も変わっていない → **要約は依然として正確なので CSV は無変更**（＝シート同期の再実行も不要）。
+- 逆に、**成果物が増減した／ファイル名が変わった／要約が名指ししている構成要素（枚数・セクション数・対象範囲）が動いた**場合は必ず CSV を更新する。
+- 判定は「見た目が変わったか」ではなく「**要約の文が嘘になるか**」で行う。追記のたびに CSV を触ると 156 行の diff ノイズが増え、本当に必要な更新が埋もれる。
