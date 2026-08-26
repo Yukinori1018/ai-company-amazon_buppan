@@ -9,7 +9,7 @@ updated_at: 2026-08-26
 requires_approval: true
 labels: [compliance, ops]
 parent_ticket: ""
-next_check_at: 2026-08-27
+next_check_at: 2026-08-29
 related_tickets: [T-20260715-001, T-20260727-001, T-20260826-003, T-20260826-002]
 ---
 
@@ -117,3 +117,9 @@ related_tickets: [T-20260715-001, T-20260727-001, T-20260826-003, T-20260826-002
 - 2026-08-26 13:06 **CAから新着メール「Take needed actions within 60 days to avoid deactivation of your Amazon.ca account」**＝カナダ法に基づくKYC。60日以内に情報・書類（beneficial owners のデータ／self-attestation または letter of authorization）を提出しないと amazon.ca が無効化。手順＝Account Health の「Identity information」→ 入力 →「Save」→「Submit for verification」。**期限は2026-10-25頃**
 - 2026-08-26 CA の Account Health ページに **「Call me now」で電話サポートを依頼できる**旨の記載あり（日本店の窓口はEメールのみだった）
 - 2026-08-26 請求の実測：カナダ・メキシコとも**ペイメントデータなし**、未払い残高0円。「Amazon出品サービス」欄の表示は**小口3か国・大口1か国**（大口＝メキシコ）
+- 2026-08-26 **ビデオ本人確認の申込フォーム（Qualtrics）を送信完了**。入力は「オンライン本人確認への登録＝はい」＋マーチャントトークン（北米＝カナダ/メキシコ/米国 共通のもの。日本のトークンとは別）の2項目のみ。フォームは2画面構成で確認画面なし
+  - 完了画面の表示：「ご回答は記録されました。**72時間以内**に本人確認手続きの詳細を記載したメールをお送りします」「面接時には**有効な政府発行の写真付き身分証明書の原本とデジタルコピーの両方**をご用意ください」
+  - **面接日は未定。** 日程は次に届く案内メールで、希望時間帯を選ぶ形で決まる
+  - 案内メールの期限＝**2026-08-29**。届かなければケース3498857863で催促する
+  - ⚠️ 案内メールは satoyselect@gmail.com に届く可能性あり（サポートケースの主要連絡先がこちら）。カズヨのGmailコネクタは satoyukinori1018@gmail.com のみ読める
+- 2026-08-26 next_check_at を 2026-08-29 へ（案内メールの到着確認）
