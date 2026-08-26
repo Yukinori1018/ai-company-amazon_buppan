@@ -533,6 +533,7 @@ html:not(.js) .reveal{opacity:1;transform:none}
   .notice-badge{margin-top:0}
   .sp-br{display:none}
   .btn{width:100%;justify-content:center;padding-inline:22px}
+  .form-actions .btn{width:100%}
   .hero-actions{gap:10px}
 }
 @media (max-width:400px){
@@ -860,3 +861,17 @@ table.cmp thead th.on{background:var(--gold);color:#241B08}
 .faq>div{padding:0 0 24px}
 .faq p{font-size:14.5px;line-height:2.1;color:var(--ink-2)}
 .faq p strong{color:var(--navy)}
+
+/* 送信完了（Google フォームからの応答を受けて表示） */
+.form-actions{display:flex;flex-wrap:wrap;gap:14px 18px;align-items:center}
+.form-actions .hint{font-size:13px;color:var(--ink-2)}
+.formdone{
+  display:none;margin-top:34px;border:1px solid var(--gold-pale);background:var(--gold-soft);
+  padding:clamp(24px,3vw,34px);text-align:center;
+}
+.formdone.on{display:block}
+.formdone b{
+  display:block;font-family:var(--mincho);font-size:clamp(19px,2.2vw,24px);color:var(--navy);
+  letter-spacing:.05em;margin-bottom:12px;
+}
+.formdone p{font-size:14px;line-height:2;color:var(--ink-2)}

@@ -67,20 +67,25 @@
     </div>
 
     <div class="callout reveal" style="border-color:var(--gold-pale);background:var(--gold-soft)">
-      <b>これはデザイン案です</b>
+      <b>このフォームは実際に送信されます</b>
       <p style="font-size:14px;line-height:2;color:var(--ink-2)">
-        下のフォームは<strong>見た目の確認用で、送信できません</strong>（送信先を設定していません）。
-        公開版のフォームは実際に稼働しています。
+        公開版と<strong>同じ Google フォームに繋いであります</strong>。
+        お試しで送信された内容も、本番のお問い合わせと同じ場所に届きます。
+        テストと分かるように、お名前欄に「テスト」と入れてお送りください。
       </p>
     </div>
 
-    <form class="mockform reveal" onsubmit="return false" novalidate>
-      <label><span>お名前 <i>必須</i></span><input type="text" name="name" autocomplete="off"></label>
-      <label><span>メールアドレス <i>必須</i></span><input type="email" name="email" autocomplete="off">
+    <form class="mockform reveal" id="contactForm"
+          action="https://docs.google.com/forms/d/e/1FAIpQLSeIr3l6wy1b_dI4o0EfsUyUwBbMp4kLGXyZ7nObOaXFrGYFuA/formResponse"
+          method="POST" target="formSink">
+      <label for="f-name"><span>お名前 <i>必須</i></span>
+        <input type="text" id="f-name" name="entry.413562624" required autocomplete="name"></label>
+      <label for="f-email"><span>メールアドレス <i>必須</i></span>
+        <input type="email" id="f-email" name="entry.1979176138" required autocomplete="email">
         <small>このアドレスへ返信します。</small></label>
-      <label><span>ご用件 <i>必須</i></span>
-        <select name="topic">
-          <option>選んでください</option>
+      <label for="f-type"><span>ご用件 <i>必須</i></span>
+        <select id="f-type" name="entry.1040083166" required>
+          <option value="">選んでください</option>
           <option>商品についての質問</option>
           <option>探している商品の相談</option>
           <option>届いた商品の不具合・返品について</option>
@@ -88,16 +93,29 @@
           <option>メーカー・卸売業者としてのお取引の相談</option>
           <option>その他</option>
         </select></label>
-      <label><span>お問い合わせ内容 <i>必須</i></span>
-        <textarea rows="6" name="message" placeholder="商品名やご状況を書いていただけると、より具体的にお答えできます。"></textarea></label>
-      <label class="check"><input type="checkbox" name="news">
+      <label for="f-message"><span>お問い合わせ内容 <i>必須</i></span>
+        <textarea id="f-message" rows="6" name="entry.1168806993" required
+                  placeholder="商品名やご状況を書いていただけると、より具体的にお答えできます。"></textarea></label>
+      <label class="check"><input type="checkbox" name="entry.579424899" value="希望する">
         <span><b>新しく入荷した商品のお知らせを受け取る</b><small>月に1回程度、取り扱いを始めた商品をご案内します。配信停止はいつでもできます。</small></span></label>
-      <button class="btn btn-navy btn-lg" type="submit" disabled>この内容で送信する（デザイン案のため無効）</button>
+      <div class="form-actions">
+        <button class="btn btn-navy btn-lg" type="submit">この内容で送信する</button>
+        <span class="hint" id="formStatus"></span>
+      </div>
       <p class="formnote">
         ご入力いただいた個人情報は、お問い合わせへのご返信、および（ご希望の場合のみ）
         新着商品のご案内のために使用します。ご本人の同意なく第三者へ提供することはありません。
       </p>
     </form>
+
+    <div class="formdone" id="formDone" role="status">
+      <b>送信しました</b>
+      <p>2営業日以内に返信します。届かないときは迷惑メールフォルダをご覧ください。</p>
+    </div>
+
+    <!-- Google フォームへの送信を受け取る（画面遷移させないため） -->
+    <iframe name="formSink" id="formSink" title="送信結果" aria-hidden="true"
+            style="position:absolute;width:0;height:0;border:0;opacity:0"></iframe>
   </div>
 </section>
 
@@ -160,6 +178,30 @@
   </div>
 </footer>
 
+<script>
+  (function () {
+    var form = document.getElementById('contactForm');
+    if (!form) return;
+    var sink = document.getElementById('formSink');
+    var done = document.getElementById('formDone');
+    var status = document.getElementById('formStatus');
+    var submitted = false;
+
+    form.addEventListener('submit', function () {
+      submitted = true;
+      status.textContent = '送信しています…';
+    });
+
+    // Google フォームへの送信は非表示 iframe が受け取る。
+    // 読み込み完了＝送信完了とみなして、お礼メッセージに差し替える。
+    sink.addEventListener('load', function () {
+      if (!submitted) return;
+      form.style.display = 'none';
+      done.classList.add('on');
+      done.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    });
+  })();
+</script>
 <script src="assets/motion.js" defer></script>
 </body>
 </html>
