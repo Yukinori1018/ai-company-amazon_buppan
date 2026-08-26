@@ -40,3 +40,4 @@ related_tickets: [T-20260826-001, T-20260821-010]
 - 2026-08-26 todo 起票（カズヨ）。マリエの是正作業で削除のみ実施、正しい値の取得は本チケットへ分離。
 - 2026-08-26 マリエ: Notion にカードが**存在しなかった**ため新規作成（Status=todo / Assignee=researcher / Priority=medium / ParentTicket=T-20260826-001 / RequiresApproval=✓なし） https://app.notion.com/p/3c8b0a4044fa81c68e2ecc378886f7d5
   - Labels は frontmatter の `[調査, 是正]` が Notion の Labels 選択肢（30語）に**いずれも無い**ため未設定。推測でオプション追加はしない運用（`ticket-frontmatter-contract.md`）。`調査` は既存の `research` へ寄せられる可能性があるが、`是正` に相当する語は無い。**カズヨ判断待ち**
+- 2026-08-26 マリエ: カズヨ判断A案を受け、Notion カードの Labels に `research` + `ops` を設定（frontmatter commit `2e93bb3` と一致）。日本語ラベルの起票癖は英語語彙へ統一する方針で決着
