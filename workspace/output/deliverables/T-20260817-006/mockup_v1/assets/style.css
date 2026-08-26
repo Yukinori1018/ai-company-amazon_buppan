@@ -97,6 +97,7 @@ strong{font-weight:700}
 /* ---------------- ヘッダー ---------------- */
 .site-header{
   position:sticky;top:0;z-index:100;
+  border-top:2px solid var(--gold);
   background:rgba(250,248,244,.82);
   backdrop-filter:saturate(150%) blur(10px);
   -webkit-backdrop-filter:saturate(150%) blur(10px);
@@ -225,26 +226,27 @@ strong{font-weight:700}
   display:flex;align-items:center;justify-content:center;
   box-shadow:0 30px 60px -34px rgba(16,27,49,.55);
 }
+/* 紙色の地に対して写真の輪郭を締める（金の内枠は写真の上では読めないため不採用） */
 .panel::before{
-  content:"";position:absolute;inset:14px;border:1px solid rgba(201,162,75,.28);pointer-events:none;
+  content:"";position:absolute;inset:0;z-index:4;pointer-events:none;
+  border:1px solid rgba(27,42,74,.12);border-radius:3px;
 }
+/* 写真の下端だけ紺に沈める。ロゴマークを重ねる余地をつくるため */
 .panel::after{
-  content:"";position:absolute;width:150%;aspect-ratio:1;left:-25%;top:-40%;
-  background:radial-gradient(circle,rgba(201,162,75,.16),transparent 58%);
+  content:"";position:absolute;left:0;right:0;bottom:0;height:38%;
+  background:linear-gradient(transparent,rgba(16,27,49,.5));pointer-events:none;
 }
-.panel-art{position:relative;width:74%;opacity:.92}
-.panel-art img{filter:drop-shadow(0 0 24px rgba(201,162,75,.14))}
-.panel-cap{
-  position:absolute;left:0;right:0;bottom:0;z-index:2;
-  padding:18px 22px;
-  background:linear-gradient(transparent,rgba(16,27,49,.86) 46%);
-  color:rgba(255,255,255,.9);
+.panel-photo{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  /* 紙色の地に馴染ませるため、ごく僅かに彩度を落として温度を上げる */
+  filter:saturate(.92) contrast(1.02);
 }
-.panel-cap b{
-  display:block;font-size:10.5px;font-weight:700;letter-spacing:.2em;
-  color:var(--gold);text-transform:uppercase;margin-bottom:5px;
+.panel-mark{
+  position:absolute;left:22px;bottom:22px;z-index:3;
+  width:46px;height:46px;border-radius:50%;overflow:hidden;
+  box-shadow:0 6px 18px -6px rgba(16,27,49,.7),0 0 0 3px rgba(250,248,244,.9);
 }
-.panel-cap span{display:block;font-size:12px;line-height:1.7;color:rgba(255,255,255,.72)}
+.panel-mark img{width:100%;height:100%}
 .panel-note{
   margin-top:14px;font-size:12px;letter-spacing:.04em;color:var(--ink-2);
   padding-left:16px;position:relative;
@@ -375,6 +377,28 @@ strong{font-weight:700}
 }
 .promise span{display:block;font-size:13.5px;line-height:1.95;color:var(--ink-2)}
 
+/* ---------------- 写真バンド ---------------- */
+.band{
+  position:relative;overflow:hidden;
+  height:clamp(230px,26vw,360px);
+  display:flex;align-items:center;
+}
+.band-photo{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  filter:saturate(.88);
+}
+.band::after{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(100deg,rgba(16,27,49,.78) 0%,rgba(16,27,49,.5) 58%,rgba(16,27,49,.34) 100%);
+}
+.band-inner{position:relative;z-index:2;width:100%}
+.band-inner p{
+  font-family:var(--mincho);font-weight:600;color:#fff;
+  font-size:clamp(19px,2.5vw,31px);line-height:1.75;letter-spacing:.06em;
+  text-shadow:0 2px 18px rgba(16,27,49,.35);
+  padding-left:22px;border-left:2px solid var(--gold);
+}
+
 /* ---------------- メーカー向け ---------------- */
 .partners{
   position:relative;overflow:hidden;color:#fff;
@@ -405,6 +429,17 @@ strong{font-weight:700}
   margin:22px 0 30px;padding-left:16px;border-left:2px solid var(--gold);
   font-size:13.5px;line-height:1.95;color:rgba(255,255,255,.86);
 }
+.partners-side{display:grid;gap:clamp(22px,2.6vw,32px)}
+.partners-photo{
+  position:relative;margin:0;overflow:hidden;border-radius:3px;
+  aspect-ratio:16/9;
+}
+.partners-photo::after{
+  content:"";position:absolute;inset:0;
+  border:1px solid rgba(201,162,75,.34);
+  background:linear-gradient(180deg,rgba(16,27,49,.18),rgba(16,27,49,.42));
+}
+.partners-photo img{width:100%;height:100%;object-fit:cover;filter:saturate(.9)}
 .partners-points{border-top:1px solid rgba(255,255,255,.14)}
 .partners-points li{padding-block:22px;border-bottom:1px solid rgba(255,255,255,.14)}
 .partners-points b{
@@ -454,8 +489,8 @@ html:not(.js) .reveal{opacity:1;transform:none}
 /* ---------------- レスポンシブ ---------------- */
 @media (max-width:1024px){
   .hero-grid{grid-template-columns:1fr;gap:44px}
-  .hero-visual{max-width:520px}
-  .panel{aspect-ratio:16/11}
+  /* 写真が縦位置なので、1カラムに畳んでも縦比を保つ（横長に潰すと主題が切れる） */
+  .hero-visual{max-width:460px}
   .partners-grid{grid-template-columns:1fr}
   .cat-grid{grid-template-columns:repeat(2,1fr)}
 
@@ -491,6 +526,7 @@ html:not(.js) .reveal{opacity:1;transform:none}
   .promise{grid-template-columns:1fr}
   .footer-inner{grid-template-columns:1fr;gap:28px}
   .footer-nav{grid-template-columns:1fr 1fr}
+  .band-inner p{padding-left:16px}
   .notice{flex-direction:column;gap:12px}
   .notice-badge{margin-top:0}
   .sp-br{display:none}
