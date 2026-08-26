@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>無在庫物販 進捗＋既存ツール調査 2026-08-12</title>
+<style>
+  :root{--bg:#f7f8fa;--card:#fff;--ink:#1c2430;--sub:#5b6673;--line:#e3e8ef;--accent:#2563eb;--good:#0f9d58;--warn:#d97706;--bad:#dc2626;--chip:#eef2ff;}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;line-height:1.7;font-size:15px}
+  .wrap{max-width:1040px;margin:0 auto;padding:28px 20px 80px}
+  h1{font-size:24px;margin:0 0 4px;letter-spacing:.02em}
+  .meta{color:var(--sub);font-size:13px;margin-bottom:22px}
+  h2{font-size:18px;margin:34px 0 12px;padding-left:10px;border-left:4px solid var(--accent)}
+  h3{font-size:15px;margin:20px 0 8px;color:var(--sub)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:14px 0;box-shadow:0 1px 2px rgba(20,30,50,.04)}
+  .lead{background:linear-gradient(135deg,#eff4ff,#f7f8fa);border:1px solid #d5e0ff}
+  table{width:100%;border-collapse:collapse;font-size:13px;margin:8px 0;display:block;overflow-x:auto;white-space:nowrap}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top;white-space:normal}
+  th{background:#f0f3f8;font-weight:600}
+  .rec{background:#ecfdf3;border:1px solid #b7ecc9}
+  .chip{display:inline-block;background:var(--chip);color:var(--accent);border-radius:999px;padding:2px 10px;font-size:12px;font-weight:600;margin-right:6px}
+  .good{color:var(--good);font-weight:700}.warn{color:var(--warn);font-weight:700}.bad{color:var(--bad);font-weight:700}
+  ul{margin:8px 0 8px 2px;padding-left:20px}li{margin:4px 0}
+  a{color:var(--accent);word-break:break-all}
+  .src{font-size:12px;color:var(--sub)}
+  .kpi{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0}
+  .kpi div{flex:1;min-width:150px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+  .kpi b{display:block;font-size:12px;color:var(--sub);font-weight:600}
+  footer{margin-top:40px;color:var(--sub);font-size:12px;border-top:1px solid var(--line);padding-top:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>無在庫（FBM）物販 — 進捗サマリ＋既製ツール網羅調査</h1>
+  <div class="meta">チケット T-20260812-002 ／ 調査: サトル（リサーチャー）・統合: カズヨ（秘書） ／ 2026-08-12<br>
+  前提: 自作Chrome拡張「Re-Sale AutoSync」保有。方針＝自作より既存・無料・既契約を優先確認。</div>
+
+  <div class="card lead">
+    <span class="chip">最重要の発見</span>
+    <p style="margin:8px 0 0">当社の中核＝<b>「他店（ヤフオク）の売切れ検知 → Amazon在庫を自動0化」を丸ごと代替する既製品は、国内に実質存在しない</b>（網羅調査時点・推定）。国内の「無在庫ツール」は大半が<b>方向が逆</b>（Amazon在庫→楽天/Yahoo横展開＝クロスマ型）。<br>
+    → 自作を捨てる案は防御機能を失うため非推奨。ただし<b>当社に無い「守り」機能（価格改定・評価依頼・停止予防）は既製・低コストで補える</b>。</p>
+  </div>
+
+  <h2>第0部：無在庫（④）の進捗・成果 — 現在地</h2>
+  <div class="card">
+    <p style="margin:0 0 8px"><b>結論：自作ツールは「main統合済み・設計/雛形は完成」まで。実走テスト・本番Go判断・法務リスク判断が未了。</b></p>
+    <table>
+      <tr><th>項目</th><th>状態</th><th>実体</th></tr>
+      <tr><td>自作ツールの発見・統合</td><td class="good">✅ 完了</td><td>社長が携帯Claude Codeで開発 → PC側で所在特定し PR #5 で main 統合（2026-08-10）</td></tr>
+      <tr><td>Chrome拡張（MV3）本体</td><td class="good">✅ コード完成</td><td>tools/re-sale-autosync-extension/（常駐サーバー不要・SP-API秘密鍵を保存しない）</td></tr>
+      <tr><td>サーバー版（参照実装）</td><td class="good">✅ 残置</td><td>tools/re-sale-autosync/（TS+SP-API+Prisma）</td></tr>
+      <tr><td>設計思想の確定</td><td class="good">✅ 確定</td><td>核心＝「Amazonで売れたのに仕入れられない」注文を防ぎアカウント健全性を守る</td></tr>
+    </table>
+    <h3>拡張の2コア機能</h3>
+    <ul>
+      <li>① ヤフオク先売れ → Amazon在庫を自動0化（終了/取消/消滅・現在価格&gt;損益分岐で仕入れ不能を検知）</li>
+      <li>② Amazon受注 → ヤフオクで1クリック購入（半自動・上限価格ガード内のみ）</li>
+      <li>安全弁＝DRY_RUN既定ON・上限価格ガード・1日購入上限・二重購入防止・購入失敗アラート</li>
+    </ul>
+    <h3>未了（本番の壁）</h3>
+    <ul>
+      <li><span class="bad">🔴 法務リスク未判断</span>：ドロップシッピングポリシー抵触リスク（社長のKYC停止経験と直結する最重要ゲート）</li>
+      <li><span class="warn">🟡</span> DOMセレクタ実調整・実走テスト未了 ／ 監視はChrome起動中のみ</li>
+      <li>位置づけ＝②メーカー仕入れ（本命）が回った後の並行探索</li>
+    </ul>
+  </div>
+
+  <h2>カテゴリ1：既存の無在庫ツール/SaaS（国内）</h2>
+  <div class="card">
+  <table>
+    <tr><th>名称</th><th>料金（税込・要確認含む）</th><th>主要機能</th><th>無在庫適合</th><th>自作との重複/優位</th></tr>
+    <tr><td><b>マカド！</b></td><td>月4,980円（年契約 月2,980円）。登録月＋翌月無料</td><td>価格自動改定・出品・FBA納品・在庫/売上管理</td><td>△ 価格改定◎／仕入元同期・売切れ検知なし</td><td>重複なし。<b>補完（価格）</b></td></tr>
+    <tr><td><b>プライスター</b></td><td>月5,280円。初月無料。大口専用</td><td>価格改定・<b>サンクスメール（規約準拠評価依頼）</b>・出荷通知</td><td>△ 価格/評価が主</td><td>重複なし。<b>補完（評価依頼）</b></td></tr>
+    <tr><td><b>ネクストエンジン</b></td><td>月3,000円〜＋受注従量</td><td>受注・在庫連携(50モール超)・自動発注</td><td>○ 汎用一元管理／仕入元巡回0化は用途外</td><td>規模拡大時の受注基盤として補完</td></tr>
+    <tr><td><b>クロスマ</b></td><td>2モール=0円／4モール=月14,800円+初期</td><td>Amazon商品→他モール出品・在庫/価格自動調整</td><td><span class="bad">✕ 方向が逆</span></td><td>用途逆で競合せず</td></tr>
+    <tr><td>アマストリーム</td><td>要確認</td><td>出品・価格改定・在庫管理・利益計算</td><td>△ せどり在庫管理型</td><td>マカド/プライスターと重複</td></tr>
+    <tr><td>TEMPOSTAR</td><td>要確認（従量）</td><td>多店舗受注・在庫一元、カスタマイズ可</td><td>○ 汎用基盤</td><td>大規模化の選択肢</td></tr>
+  </table>
+  <p class="src">事実：「他店で売切れたらAmazon在庫を0化」の自動巡回は国内主流SaaSの標準機能ではない（主流は自社/FBA在庫前提の在庫連動）。</p>
+  </div>
+
+  <h2>カテゴリ2：既存Chrome拡張（無在庫運用向け・リサーチ系除く）</h2>
+  <div class="card">
+  <table>
+    <tr><th>名称</th><th>料金</th><th>主要機能</th><th>無在庫適合</th><th>自作との差分</th></tr>
+    <tr><td><b>HARU（NOMAD TOOL）</b></td><td>従量（管理点数・要確認）</td><td>仕入元URLを1日4回巡回しアラート、eBay出品停止/再出品</td><td>○ 仕入元巡回は近い／eBay輸出主軸・<b>在庫取下げ手動</b></td><td>自作優位=Amazon自動0化・半自動購入</td></tr>
+    <tr><td>Tooliz</td><td>要確認</td><td>一括出品・出品後の価格/在庫管理</td><td>○ eBay主</td><td>重複少</td></tr>
+    <tr><td><b>セラースケット「ワカルンダ」</b></td><td>本体料金に付属</td><td>仕入前に<b>危険度A〜D</b>（真贋・知財・出品制限）表示</td><td class="good">◎ 違反を事前回避</td><td>自作に無い。<b>補完最有力</b></td></tr>
+  </table>
+  <p class="src">Keepa/ERESA/AMZScout（リサーチ拡張）は既調査済みのため除外。</p>
+  </div>
+
+  <h2>カテゴリ3：その他（代行・健全性維持）</h2>
+  <div class="card">
+  <table>
+    <tr><th>名称/類型</th><th>料金</th><th>主要機能</th><th>無在庫適合</th><th>差分</th></tr>
+    <tr><td><b>セラースケット</b></td><td>2,480円 / 4,980円、価格改定+500円（要確認）。<b>20日無料</b></td><td>停止の予防と復活サポート・専門担当がAmazonと折衝・危険商品検知</td><td class="good">◎◎ 停止リスクに直結</td><td>自作に無い領域。<b>最優先で採否検討</b></td></tr>
+    <tr><td>出品/商品登録代行</td><td>商品単価×点数（要確認）</td><td>商品登録・画像・SEO</td><td>△ 単発出品外注</td><td>手動品向け</td></tr>
+    <tr><td>発送/受注/FBA納品代行</td><td>従量（要確認）</td><td>受注・梱包・発送・FBA納品</td><td>△ 無在庫は相性限定／②で有効</td><td>無在庫では優先度低</td></tr>
+  </table>
+  </div>
+
+  <h2>無在庫ポリシー現況（2025-2026・事実）</h2>
+  <div class="card">
+    <ul>
+      <li><b>原則禁止</b>：第三者が出品者に代わり発送する行為は、購入者にとって出品者が唯一の「記録上の販売者」と明確でない限り不可。</li>
+      <li><b>明確な違反</b>：他小売から購入しそのまま顧客へ直送／納品書・外装に出品者以外の名称が残る発送。</li>
+      <li><b>許容条件</b>：出品者のみが記録上の販売者となる契約、発送前に第三者書類を全除去、返品/CS責任を出品者が負う。</li>
+      <li><b>棲み分け（推定含む）</b>：<span class="good">安全</span>＝自分で一旦受領し自社名義で再梱包発送｜<span class="warn">グレー</span>＝自宅受取だが書類除去/返品体制が曖昧｜<span class="bad">抵触</span>＝仕入元から直送/他店伝票のまま発送。</li>
+      <li><b>健全性</b>：無在庫は欠品→キャンセル率悪化が停止主因。停止予防の実利が大きい。</li>
+    </ul>
+    <p class="src">出典：<a href="https://sellercentral.amazon.co.jp/forums/t/topic/76506">Amazon Seller Central 公式(日本)</a> ／ <a href="https://note.com/ecbuppan/n/n9f26d60983d7">石井道明 note</a> ／ <a href="https://www.autods.com/blog/suppliers-marketplaces/amazon-dropshipping-policy/">AutoDS 2026(英語)</a></p>
+  </div>
+
+  <h2>A / B / C ＋ 推奨</h2>
+  <div class="card">
+    <p><b>A：既存へ全面移行（自作を捨てる）</b> — <span class="bad">❌ 非推奨</span>。中核「ヤフオク売切れ検知→Amazon自動0化」を代替する既製品が国内に無く、移行で防御機能を失う。</p>
+    <p><b>B：自作のみ継続</b> — <span class="warn">△</span>。差別化機能は自作でしか得られないが、価格改定/評価/停止予防の「守り」が手薄。無在庫はアカウント停止が最大リスク。</p>
+  </div>
+  <div class="card rec">
+    <span class="chip" style="background:#d1fae5;color:#047857">推奨</span>
+    <p style="margin:8px 0 6px"><b>C：ハイブリッド（自作＋既製の補完）</b></p>
+    <ul>
+      <li>同期エンジンは<b>自作Re-Sale AutoSyncを継続</b>（代替不能な差別化）</li>
+      <li>価格改定＋評価依頼＝<b>プライスター（月5,280円）/マカド（年契約 月2,980円）</b>で即補完</li>
+      <li>停止予防＝<b>セラースケット</b>（月2,480〜4,980円＋ワカルンダで仕入前に危険商品除外）</li>
+    </ul>
+    <div class="kpi">
+      <div><b>入口①（費用ゼロ）</b>セラースケット 20日無料体験</div>
+      <div><b>入口②（費用ゼロ）</b>マカド/プライスター 初月無料</div>
+      <div><b>入口③</b>同期は自作を継続</div>
+    </div>
+    <p style="margin:6px 0 0">まず無料枠で1ヶ月検証 → 役割分担を見てから本契約可否を判断。<b>本採用は §4.1「金銭が動く」＝社長承認が必要</b>。</p>
+  </div>
+
+  <footer>
+    参照URL: Amazon公式 sellercentral.amazon.co.jp/forums/t/topic/76506 ／ マカド makad.pw ／ プライスター pricetar.com ／ セラースケット sellersket.com ／ ネクストエンジン next-engine.net ／ クロスマ crossma.jp ／ HARU nomadtool.com/haru ／ Tooliz tooliz.hp.peraichi.com<br>
+    要確認（数値未確定）：マカド月契約額の表記揺れ／セラースケット各プラン円建て最新額／HARU・Tooliz・アマストリーム・TEMPOSTARの正確な料金。本採用検討時に各公式で再確認。
+  </footer>
+</div>
+</body>
+</html>
