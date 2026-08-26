@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """03_process-board.html の「数字だけ」を集計値で差し替える。
 
-    python3 update_board.py <board.html> <counts.json> [--check]
+    python3 update_board.py <board.html> <counts.json> [--tickets N] [--check]
 
 なぜ作り直さずに書き換えるのか
 ------------------------------
@@ -56,7 +56,7 @@ def bar(done: int, doing: int, todo: int) -> str:
     return "".join(parts)
 
 
-def apply(html: str, counts: dict) -> tuple[str, list[str]]:
+def apply(html: str, counts: dict, tickets: int = 0) -> tuple[str, list[str]]:
     mids = {m["id"]: m for m in counts["mid"]}
     majors = {m["no"]: m for m in counts["major"]}
     tot = counts["total"]
@@ -73,6 +73,14 @@ def apply(html: str, counts: dict) -> tuple[str, list[str]]:
         if m:
             note(f"totals.{cls}", m.group(2), str(tot[key]))
             html = pat.sub(rf"\g<1>{tot[key]}\g<3>", html, count=1)
+
+    # A章のチケット総数。放っておくと静かに古くなる数字なので機械で面倒を見る。
+    if tickets:
+        pat = re.compile(r'(<span class="n">)(\d+)(</span><span class="k">チケット総数)')
+        m = pat.search(html)
+        if m:
+            note("totals.tickets", m.group(2), str(tickets))
+            html = pat.sub(rf"\g<1>{tickets}\g<3>", html, count=1)
 
     # Mermaid 図1: 大項目ノード S1〜S8 の "<br/><br/>10 / 10 / 11"
     def stage_node(m: re.Match[str]) -> str:
@@ -165,8 +173,14 @@ def apply(html: str, counts: dict) -> tuple[str, list[str]]:
 
 
 def main() -> int:
-    args = [a for a in sys.argv[1:] if a != "--check"]
-    check = "--check" in sys.argv[1:]
+    argv = sys.argv[1:]
+    check = "--check" in argv
+    tickets = 0
+    if "--tickets" in argv:
+        i = argv.index("--tickets")
+        tickets = int(argv[i + 1])
+        del argv[i : i + 2]
+    args = [a for a in argv if a != "--check"]
     if len(args) != 2:
         print(__doc__)
         return 2
@@ -176,7 +190,7 @@ def main() -> int:
     with open(counts_path, encoding="utf-8") as f:
         counts = json.load(f)
 
-    updated, notes = apply(html, counts)
+    updated, notes = apply(html, counts, tickets)
 
     if check:
         if notes:

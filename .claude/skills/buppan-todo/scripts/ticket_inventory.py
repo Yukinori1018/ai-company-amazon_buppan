@@ -19,6 +19,20 @@ import re
 import sys
 
 FOLDERS = ("done", "doing", "waiting", "todo")
+
+# 01_master-todo.md の大項目1〜8に対応。0 だけは「会社そのものの整備」で、
+# ToDoリストの本文には現れない（Amazon の業務ではなく社内インフラの整備なので）。
+STAGES = [
+    ("0", "基盤・会社運営（AIエージェント体制/Notion/自動同期/カタログ）"),
+    ("1", "開業・アカウント登録（開業届・古物商・税務・銀行/カード・セラーアカウント・健全性/停止対応）"),
+    ("2", "事業戦略・仕入れ手法の選定（せどり/メーカー仕入れ/OEM/無在庫、カテゴリ選定、撤退条件）"),
+    ("3", "リサーチ・ツール（Keepa/ERESA/SellerSprite/自作ツール・リサーチ手法・利益計算）"),
+    ("4", "仕入れ・サプライヤー開拓（卸/メーカー交渉・NETSEA・仕入れリスト・与信/信用作り）"),
+    ("5", "出品・カタログ登録（出品制限解除・SKU/ASIN・商品ページ）"),
+    ("6", "FBA納品・在庫オペレーション（梱包・ラベル・納品プラン・代行/外注）"),
+    ("7", "販売・価格・広告（カートボックス・価格改定・スポンサー広告・レビュー）"),
+    ("8", "顧客対応・クレーム/返品・アカウント維持（返品/返金・評価削除依頼・パフォーマンス指標）"),
+]
 RE_FM = re.compile(r"^---\n(.*?)\n---\n", re.S)
 
 
@@ -103,6 +117,7 @@ def main() -> int:
     tickets_dir, out_path = args
 
     rows = collect(tickets_dir)
+    dup = {r["id"] for r in rows if sum(1 for x in rows if x["id"] == r["id"]) > 1}
     prev = load_prev(prev_path)
     deliv_root = os.path.join(
         os.path.dirname(tickets_dir.rstrip("/")), "output", "deliverables"
@@ -130,6 +145,12 @@ def main() -> int:
         "段階 0〜8 と「実質何が終わったか」は判断です。前回台帳から引き継ぎ、",
         "新規・状態変化ぶんだけを付け直しています。`?` は他分類とも取れるもの。",
         "",
+        "## ライフサイクル段階の定義",
+        "",
+        "| # | 段階 |",
+        "|---|---|",
+        *[f"| {k} | {v} |" for k, v in STAGES],
+        "",
     ]
     for folder in FOLDERS:
         lines += [
@@ -149,6 +170,8 @@ def main() -> int:
         f.write("\n".join(lines))
 
     print(f"inventory: {out_path}（{len(rows)}枚）")
+    if dup:
+        print("!! ticket_id の重複（カズヨへ要報告・採番の事故）: " + ", ".join(sorted(dup)))
     if todo_classify:
         print(f"要分類 {len(todo_classify)}枚:")
         for t in todo_classify:
