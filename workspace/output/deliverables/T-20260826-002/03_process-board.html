@@ -150,6 +150,19 @@ code{font-family:var(--mono);font-size:.9em;background:var(--surface-2);border:1
 .next{margin:14px 16px 16px;padding:10px 12px;background:var(--marine-soft);border-left:2px solid var(--marine);border-radius:0 3px 3px 0;font-size:13px;display:flex;gap:9px;align-items:baseline}
 .next .lb{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--marine);flex:none;text-transform:uppercase}
 
+/* ---------- key / legend box ---------- */
+.keybox{background:var(--surface);border:1px solid var(--rule);border-left:3px solid var(--marine);border-radius:0 4px 4px 0;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.keyrow{display:flex;gap:13px;align-items:baseline}
+.keyrow .sample{flex:none;width:74px;text-align:right;font-family:var(--mono);font-size:12.5px;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.keyrow .sample b{color:var(--done)} .keyrow .sample i{font-style:normal;color:var(--doing)}
+.keyrow .bar-sample{display:flex;height:6px;border-radius:100px;overflow:hidden;background:var(--rule-soft);align-self:center;width:74px}
+.keyrow .bar-sample i{display:block;height:100%}
+.keyrow .bar-sample .d{background:var(--done)} .keyrow .bar-sample .g{background:var(--doing)} .keyrow .bar-sample .t{background:var(--todo);opacity:.42}
+.keyrow .plain-sample{color:var(--done);font-weight:600}
+.keytext{font-size:13px;color:var(--ink-2);line-height:1.65}
+.keytext b{font-weight:700}
+.keytext .kd{color:var(--done)} .keytext .kg{color:var(--doing);font-style:normal;font-weight:700} .keytext .kt{color:var(--todo);font-weight:700}
+
 /* ---------- tables ---------- */
 .tablewrap{overflow-x:auto;background:var(--surface);border:1px solid var(--rule);border-radius:4px;box-shadow:var(--shadow)}
 table{border-collapse:collapse;width:100%;min-width:560px;font-size:13.5px}
@@ -175,7 +188,9 @@ footer{border-top:1px solid var(--rule);padding-top:20px;color:var(--ink-3);font
 footer code{font-size:11.5px}
 @media (max-width:640px){
   .wrap{padding:28px 14px 60px;gap:34px}
-  .mids .ct{display:none}
+  .mids li{flex-wrap:wrap}
+  .mids .nm{min-width:0}
+  .keyrow .sample{width:62px}
 }
 </style>
 
@@ -335,6 +350,11 @@ flowchart LR
 
   <section>
     <h2><span class="num">C</span>大項目ごとの内訳と次の一手</h2>
+    <div class="keybox">
+      <div class="keyrow"><span class="sample"><b>2</b>/<i>3</i>/1</span><span class="keytext">各行の数字は、その中項目に入っている<b>小項目の内訳</b>です。左から <b class="kd">済</b> / <i class="kg">着手中</i> / <span class="kt">未着手</span>。3つの合計がその中項目の小項目数です。</span></div>
+      <div class="keyrow"><span class="sample bar-sample"><i class="d" style="width:29%"></i><i class="g" style="width:35.5%"></i><i class="t" style="width:35.5%"></i></span><span class="keytext">カード上部の帯は、同じ比率を大項目まるごとで示したものです。緑が長いほど実行済み。</span></div>
+      <div class="keyrow"><span class="sample plain-sample">済</span><span class="keytext">「済」は現実に実行したものだけ。調べた・ナレッジ化した・ルール化しただけのものは含めていません。</span></div>
+    </div>
     <div class="stages">
 
       <article class="stage is-doing">

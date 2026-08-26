@@ -7,7 +7,7 @@ priority: high
 created_at: 2026-08-26
 updated_at: 2026-08-26
 requires_approval: false
-labels: [整理, 可視化, 全体像]
+labels: [ops, workflow, strategy]
 parent_ticket: ""
 next_check_at: 2026-08-27
 related_tickets: [T-20260531-002, T-20260603-003, T-20260826-001]
@@ -85,3 +85,5 @@ Notion カード: https://app.notion.com/p/3c8b0a4044fa81d6a93af47227aab304
 - **妥協点2**: 社長の「太字を減らす」と依頼の「数値・しきい値を落とさない」が衝突するため、引用部分の太字は保持し、自分が書いた地の文からは太字をほぼ全廃する形で折り合いを付けました。
 - **社長判断が要る3件**（`[x]` にも `[ ]` にもなりうるもの）は最終メッセージに列挙しました。特に 1-1 の青色申告承認申請の提出可否は、確定申告に直結するため早めの確認を推奨します。
 - **未実施**: git commit は自分の成果物2ファイル＋READMEのみ実施。Mermaid図の発行とカタログ同期は未着手（カズヨ・マリエの担当）。
+- 2026-08-26 社長ご質問「数字の意味」を受け、03_process-board.html に数字の凡例（済/着手中/未着手）を追加して再発行
+- 2026-08-26 labels を Notion 既存語彙へ寄せる（整理→ops / 可視化→workflow / 全体像→strategy）
