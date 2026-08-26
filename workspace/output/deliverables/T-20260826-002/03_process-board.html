@@ -241,7 +241,7 @@ footer code{font-size:11.5px}
       <span class="chip alert">⚠ 社長の一手で止まっている</span>
     </div>
     <figure class="figure">
-      <figcaption><span class="t">8大項目の流れと進捗</span><span class="s">数字は 済 / 着手中 / 未着手（小項目ベース）</span><span class="zoom"><button type="button" data-zoom="out" aria-label="図を縮小">－</button><span class="lv">100%</span><button type="button" data-zoom="in" aria-label="図を拡大">＋</button><button type="button" data-zoom="fit" aria-label="幅に合わせる">幅に合わせる</button><button type="button" data-zoom="full" aria-label="全画面で見る" hidden>全画面</button></span></figcaption>
+      <figcaption><span class="t">8大項目の流れと進捗</span><span class="s">矢印＝この順にしか進めない。数字は 済 / 着手中 / 未着手</span><span class="zoom"><button type="button" data-zoom="out" aria-label="図を縮小">－</button><span class="lv">100%</span><button type="button" data-zoom="in" aria-label="図を拡大">＋</button><button type="button" data-zoom="fit" aria-label="幅に合わせる">幅に合わせる</button><button type="button" data-zoom="full" aria-label="全画面で見る" hidden>全画面</button></span></figcaption>
       <div class="scroller">
 <pre class="mermaid">
 %%{init:{"themeVariables":{"fontSize":"17px"},"flowchart":{"nodeSpacing":46,"rankSpacing":56,"padding":10}}}%%
@@ -276,37 +276,38 @@ flowchart TB
     </figure>
 
     <figure class="figure">
-      <figcaption><span class="t">大項目 → 中項目（準備フェーズ 1〜4）</span><span class="s">括弧内は小項目の 済 / 着手中 / 未着手</span><span class="zoom"><button type="button" data-zoom="out" aria-label="図を縮小">－</button><span class="lv">100%</span><button type="button" data-zoom="in" aria-label="図を拡大">＋</button><button type="button" data-zoom="fit" aria-label="幅に合わせる">幅に合わせる</button><button type="button" data-zoom="full" aria-label="全画面で見る" hidden>全画面</button></span></figcaption>
+      <figcaption><span class="t">大項目の内訳（準備フェーズ 1〜4）</span><span class="s">細い線＝内訳（順序ではありません）。括弧内は小項目の 済 / 着手中 / 未着手</span><span class="zoom"><button type="button" data-zoom="out" aria-label="図を縮小">－</button><span class="lv">100%</span><button type="button" data-zoom="in" aria-label="図を拡大">＋</button><button type="button" data-zoom="fit" aria-label="幅に合わせる">幅に合わせる</button><button type="button" data-zoom="full" aria-label="全画面で見る" hidden>全画面</button></span></figcaption>
       <div class="scroller">
 <pre class="mermaid">
 %%{init:{"themeVariables":{"fontSize":"17px"},"flowchart":{"nodeSpacing":46,"rankSpacing":66,"padding":10}}}%%
 flowchart LR
-  A1["① 開業・法務<br/>アカウント登録"] --> A11["1-1 事業体・税務の届出<br/>(2 / 3 / 1)"]
-  A1 --> A12["1-2 消費税・インボイスの判断<br/>(1 / 2 / 2)"]
-  A1 --> A13["1-3 出品用アカウントの開設<br/>(1 / 1 / 1)"]
-  A1 --> A14["1-4 本人確認（KYC）書類<br/>(2 / 2 / 1)"]
-  A1 --> A15["1-5 セラーセントラル初期設定<br/>(2 / 2 / 2)"]
-  A1 --> A16["1-6 許認可・法令チェック<br/>(1 / 1 / 4)"]
+  A1["① 開業・法務<br/>アカウント登録"] --- A11["1-1 事業体・税務の届出<br/>(2 / 3 / 1)"]
+  A1 --- A12["1-2 消費税・インボイスの判断<br/>(1 / 2 / 2)"]
+  A1 --- A13["1-3 出品用アカウントの開設<br/>(1 / 1 / 1)"]
+  A1 --- A14["1-4 本人確認（KYC）書類<br/>(2 / 2 / 1)"]
+  A1 --- A15["1-5 セラーセントラル初期設定<br/>(2 / 2 / 2)"]
+  A1 --- A16["1-6 許認可・法令チェック<br/>(1 / 1 / 4)"]
 
-  A2["② 事業戦略<br/>仕入れ手法の選定"] --> A21["2-1 手法の棚卸しと優先順位<br/>(3 / 2 / 0)"]
-  A2 --> A22["2-2 目標KPIと撤退条件<br/>(2 / 2 / 1)"]
-  A2 --> A23["2-3 資金計画・資金繰り<br/>(2 / 1 / 3)"]
-  A2 --> A24["2-4 オペレーション設計<br/>(2 / 2 / 0)"]
+  A2["② 事業戦略<br/>仕入れ手法の選定"] --- A21["2-1 手法の棚卸しと優先順位<br/>(3 / 2 / 0)"]
+  A2 --- A22["2-2 目標KPIと撤退条件<br/>(2 / 2 / 1)"]
+  A2 --- A23["2-3 資金計画・資金繰り<br/>(2 / 1 / 3)"]
+  A2 --- A24["2-4 オペレーション設計<br/>(2 / 2 / 0)"]
 
-  A3["③ リサーチ<br/>ツール整備"] --> A31["3-1 ツールの導入と設定<br/>(3 / 3 / 0)"]
-  A3 --> A32["3-2 Keepaグラフの読み方<br/>(4 / 0 / 0)"]
-  A3 --> A33["3-3 需要・競合の定量判定<br/>(3 / 1 / 0)"]
-  A3 --> A34["3-4 利益計算の型<br/>(4 / 1 / 1)"]
-  A3 --> A35["3-5 出品可否の事前判定<br/>(2 / 2 / 1)"]
-  A3 --> A36["3-6 候補リストの管理<br/>(1 / 3 / 0)"]
+  A3["③ リサーチ<br/>ツール整備"] --- A31["3-1 ツールの導入と設定<br/>(3 / 3 / 0)"]
+  A3 --- A32["3-2 Keepaグラフの読み方<br/>(4 / 0 / 0)"]
+  A3 --- A33["3-3 需要・競合の定量判定<br/>(3 / 1 / 0)"]
+  A3 --- A34["3-4 利益計算の型<br/>(4 / 1 / 1)"]
+  A3 --- A35["3-5 出品可否の事前判定<br/>(2 / 2 / 1)"]
+  A3 --- A36["3-6 候補リストの管理<br/>(1 / 3 / 0)"]
 
-  A4["④ 仕入れ<br/>サプライヤー開拓"] --> A41["4-1 メーカー・卸の開拓<br/>(3 / 0 / 3)"]
-  A4 --> A42["4-2 取引条件の交渉と初回発注<br/>(0 / 0 / 6)"]
-  A4 --> A43["4-3 簡易OEM<br/>(0 / 4 / 2)"]
-  A4 --> A44["4-4 仕入れ書類の整備<br/>(2 / 2 / 1)"]
-  A4 --> A45["4-5 入荷・検品の手配<br/>(0 / 0 / 4)"]
+  A4["④ 仕入れ<br/>サプライヤー開拓"] --- A41["4-1 メーカー・卸の開拓<br/>(3 / 0 / 3)"]
+  A4 --- A42["4-2 取引条件の交渉と初回発注<br/>(0 / 0 / 6)"]
+  A4 --- A43["4-3 簡易OEM<br/>(0 / 4 / 2)"]
+  A4 --- A44["4-4 仕入れ書類の整備<br/>(2 / 2 / 1)"]
+  A4 --- A45["4-5 入荷・検品の手配<br/>(0 / 0 / 4)"]
 
 
+  linkStyle default stroke:#9AA5B1,stroke-width:1.1px
   classDef stage fill:#F7E8CD,stroke:#B5761A,stroke-width:1.5px,color:#3A2A0C
   classDef mixed fill:#FFFFFF,stroke:#B0BAC5,stroke-width:1px,color:#23292F
   classDef todo fill:#E3E7EC,stroke:#7E8894,stroke-width:1px,color:#23292F
@@ -319,37 +320,38 @@ flowchart LR
     </figure>
 
     <figure class="figure">
-      <figcaption><span class="t">大項目 → 中項目（実行フェーズ 5〜8）</span><span class="s">白＝一部着手 / グレー＝小項目すべて未着手</span><span class="zoom"><button type="button" data-zoom="out" aria-label="図を縮小">－</button><span class="lv">100%</span><button type="button" data-zoom="in" aria-label="図を拡大">＋</button><button type="button" data-zoom="fit" aria-label="幅に合わせる">幅に合わせる</button><button type="button" data-zoom="full" aria-label="全画面で見る" hidden>全画面</button></span></figcaption>
+      <figcaption><span class="t">大項目の内訳（実行フェーズ 5〜8）</span><span class="s">細い線＝内訳（順序ではありません）。白＝一部着手 / グレー＝すべて未着手</span><span class="zoom"><button type="button" data-zoom="out" aria-label="図を縮小">－</button><span class="lv">100%</span><button type="button" data-zoom="in" aria-label="図を拡大">＋</button><button type="button" data-zoom="fit" aria-label="幅に合わせる">幅に合わせる</button><button type="button" data-zoom="full" aria-label="全画面で見る" hidden>全画面</button></span></figcaption>
       <div class="scroller">
 <pre class="mermaid">
 %%{init:{"themeVariables":{"fontSize":"17px"},"flowchart":{"nodeSpacing":46,"rankSpacing":66,"padding":10}}}%%
 flowchart LR
-  B5["⑤ 出品<br/>カタログ登録"] --> B51["5-1 出品前の最終確認<br/>(0 / 0 / 4)"]
-  B5 --> B52["5-2 相乗り出品<br/>(0 / 0 / 4)"]
-  B5 --> B53["5-3 新規カタログ作成<br/>(0 / 0 / 4)"]
-  B5 --> B54["5-4 リスティング最適化<br/>(0 / 0 / 6)"]
-  B5 --> B55["5-5 ブランド登録・知財<br/>(0 / 0 / 4)"]
+  B5["⑤ 出品<br/>カタログ登録"] --- B51["5-1 出品前の最終確認<br/>(0 / 0 / 4)"]
+  B5 --- B52["5-2 相乗り出品<br/>(0 / 0 / 4)"]
+  B5 --- B53["5-3 新規カタログ作成<br/>(0 / 0 / 4)"]
+  B5 --- B54["5-4 リスティング最適化<br/>(0 / 0 / 6)"]
+  B5 --- B55["5-5 ブランド登録・知財<br/>(0 / 0 / 4)"]
 
-  B6["⑥ FBA納品<br/>在庫オペレーション"] --> B61["6-1 納品プランの作成<br/>(0 / 0 / 6)"]
-  B6 --> B62["6-2 ラベルと梱包<br/>(0 / 1 / 5)"]
-  B6 --> B63["6-3 輸送・配送業者<br/>(0 / 0 / 6)"]
-  B6 --> B64["6-4 受領確認とトラブル処理<br/>(0 / 0 / 4)"]
-  B6 --> B65["6-5 在庫の健全性管理<br/>(0 / 1 / 5)"]
+  B6["⑥ FBA納品<br/>在庫オペレーション"] --- B61["6-1 納品プランの作成<br/>(0 / 0 / 6)"]
+  B6 --- B62["6-2 ラベルと梱包<br/>(0 / 1 / 5)"]
+  B6 --- B63["6-3 輸送・配送業者<br/>(0 / 0 / 6)"]
+  B6 --- B64["6-4 受領確認とトラブル処理<br/>(0 / 0 / 4)"]
+  B6 --- B65["6-5 在庫の健全性管理<br/>(0 / 1 / 5)"]
 
-  B7["⑦ 販売・価格<br/>広告"] --> B71["7-1 価格設定とカート獲得<br/>(1 / 2 / 2)"]
-  B7 --> B72["7-2 スポンサープロダクト広告<br/>(1 / 0 / 5)"]
-  B7 --> B73["7-3 レビュー獲得（適法境界）<br/>(2 / 0 / 2)"]
-  B7 --> B74["7-4 販促と新規特典<br/>(1 / 0 / 3)"]
-  B7 --> B75["7-5 売上・利益のモニタリング<br/>(0 / 1 / 3)"]
+  B7["⑦ 販売・価格<br/>広告"] --- B71["7-1 価格設定とカート獲得<br/>(1 / 2 / 2)"]
+  B7 --- B72["7-2 スポンサープロダクト広告<br/>(1 / 0 / 5)"]
+  B7 --- B73["7-3 レビュー獲得（適法境界）<br/>(2 / 0 / 2)"]
+  B7 --- B74["7-4 販促と新規特典<br/>(1 / 0 / 3)"]
+  B7 --- B75["7-5 売上・利益のモニタリング<br/>(0 / 1 / 3)"]
 
-  B8["⑧ 顧客対応<br/>クレーム・返品"] --> B81["8-1 問い合わせ・メッセージ対応<br/>(0 / 0 / 4)"]
-  B8 --> B82["8-2 返品・返金<br/>(0 / 0 / 5)"]
-  B8 --> B83["8-3 A-to-z保証・チャージバック<br/>(0 / 0 / 4)"]
-  B8 --> B84["8-4 アカウント健全性の監視<br/>(1 / 2 / 2)"]
-  B8 --> B85["8-5 違反・停止時の対応<br/>(2 / 2 / 1)"]
-  B8 --> B86["8-6 記帳・税務の継続<br/>(0 / 1 / 4)"]
+  B8["⑧ 顧客対応<br/>クレーム・返品"] --- B81["8-1 問い合わせ・メッセージ対応<br/>(0 / 0 / 4)"]
+  B8 --- B82["8-2 返品・返金<br/>(0 / 0 / 5)"]
+  B8 --- B83["8-3 A-to-z保証・チャージバック<br/>(0 / 0 / 4)"]
+  B8 --- B84["8-4 アカウント健全性の監視<br/>(1 / 2 / 2)"]
+  B8 --- B85["8-5 違反・停止時の対応<br/>(2 / 2 / 1)"]
+  B8 --- B86["8-6 記帳・税務の継続<br/>(0 / 1 / 4)"]
 
 
+  linkStyle default stroke:#9AA5B1,stroke-width:1.1px
   classDef stage fill:#E3E7EC,stroke:#4A5560,stroke-width:1.5px,color:#23292F
   classDef mixed fill:#FFFFFF,stroke:#B0BAC5,stroke-width:1px,color:#23292F
   classDef todo fill:#EDEFF2,stroke:#A6AFBA,stroke-width:1px,stroke-dasharray:4 3,color:#4A5560
