@@ -7,7 +7,7 @@ priority: medium
 created_at: 2026-08-26
 updated_at: 2026-08-26
 requires_approval: false
-labels: [調査, 是正]
+labels: [research, ops]
 parent_ticket: T-20260826-001
 next_check_at: 2026-08-29
 related_tickets: [T-20260826-001, T-20260821-010]
