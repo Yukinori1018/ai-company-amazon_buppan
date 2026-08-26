@@ -15,6 +15,7 @@
   --gold:#C9A24B;
   --gold-ink:#7F6229;      /* 明るい背景上の小さな文字用（コントラスト 5.2:1） */
   --gold-pale:#E7DCC4;
+  --gold-soft:#F7F1E4;
 
   /* --- surface --- */
   --paper:#FAF8F4;         /* 温かみのある紙色。純白を避けて印刷物の質感に */
@@ -284,6 +285,7 @@ strong{font-weight:700}
   font-family:var(--mincho);font-size:13px;letter-spacing:.1em;color:var(--navy);
   padding-right:12px;border-right:1px solid var(--line);
 }
+.sec-label .num:only-child{border-right:none;padding-right:0}
 .sec-label.light{color:var(--gold)}
 .sec-label.light .num{color:rgba(255,255,255,.9);border-right:none;padding-right:0}
 .sec-head h2{
@@ -810,3 +812,51 @@ table.cmp thead th.on{background:var(--gold);color:#241B08}
   .blade-svg .blade,.drop,.stain,.bead{animation:none !important}
   .progress i{transition:none}
 }
+
+/* ---------------- お問い合わせフォーム（デザイン案・送信不可） ---------------- */
+.mockform{display:grid;gap:22px;margin-top:34px}
+.mockform label{display:block}
+.mockform label>span{
+  display:block;font-size:13.5px;font-weight:700;color:var(--navy);letter-spacing:.04em;margin-bottom:9px;
+}
+.mockform label>span i{
+  font-style:normal;font-size:10.5px;font-weight:700;letter-spacing:.1em;
+  color:#A2543C;border:1px solid rgba(162,84,60,.35);padding:3px 7px;margin-left:8px;vertical-align:2px;
+}
+.mockform input,.mockform select,.mockform textarea{
+  font:inherit;font-size:15px;width:100%;padding:13px 14px;
+  background:#fff;color:var(--ink);border:1px solid var(--line);border-radius:2px;
+  transition:border-color .2s ease,box-shadow .2s ease;
+}
+.mockform input:focus,.mockform select:focus,.mockform textarea:focus{
+  outline:none;border-color:var(--navy);box-shadow:0 0 0 3px rgba(27,42,74,.09);
+}
+.mockform textarea{resize:vertical;line-height:1.9}
+.mockform small{display:block;margin-top:7px;font-size:12px;color:var(--ink-2)}
+.mockform .check{display:flex;gap:12px;align-items:flex-start;background:var(--paper-2);padding:18px 20px}
+.mockform .check input{width:18px;height:18px;flex:0 0 auto;margin-top:3px;padding:0}
+.mockform .check span{display:block}
+.mockform .check b{display:block;font-size:14px;color:var(--navy);margin-bottom:4px}
+.mockform button[disabled]{opacity:.45;cursor:not-allowed}
+.mockform button[disabled]:hover{transform:none}
+.formnote{font-size:12px;line-height:1.9;color:var(--ink-2)}
+
+/* ---------------- FAQ（開閉） ---------------- */
+.faq{border-bottom:1px solid var(--line);background:transparent}
+.faq:first-of-type{border-top:1px solid var(--line)}
+.faq summary{
+  list-style:none;cursor:pointer;padding:22px 40px 22px 0;position:relative;
+  font-family:var(--mincho);font-size:16.5px;font-weight:600;color:var(--navy);
+  letter-spacing:.04em;line-height:1.7;
+}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{
+  content:"";position:absolute;right:8px;top:31px;width:11px;height:11px;
+  border-right:1.5px solid var(--gold);border-bottom:1.5px solid var(--gold);
+  transform:rotate(45deg);transition:transform .3s ease;
+}
+.faq[open] summary::after{transform:rotate(-135deg)}
+.faq summary:hover{color:var(--navy-soft)}
+.faq>div{padding:0 0 24px}
+.faq p{font-size:14.5px;line-height:2.1;color:var(--ink-2)}
+.faq p strong{color:var(--navy)}

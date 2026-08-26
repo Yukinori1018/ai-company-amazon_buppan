@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>お問い合わせ｜Satoy Select［デザイン案 v1］</title>
+<meta name="description" content="買う前のご相談も、買ったあとのご連絡も、どちらも承ります。">
+<meta name="robots" content="noindex,nofollow">
+<meta name="format-detection" content="telephone=no">
+<link rel="icon" href="assets/favicon.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Zen+Old+Mincho:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<script>
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      && 'IntersectionObserver' in window) {
+    document.documentElement.classList.add('js');
+  }
+</script>
+</head>
+<body>
+
+<a class="skip" href="#main">本文へスキップ</a>
+
+<header class="site-header" id="siteHeader">
+  <div class="wrap header-inner">
+    <a class="brand" href="index.html" aria-label="Satoy Select ホーム">
+      <img src="assets/logo-mark.svg" alt="" width="40" height="40">
+      <span class="brand-text"><b>Satoy</b><em>SELECT</em></span>
+    </a>
+    <button class="nav-toggle" id="navToggle" type="button" aria-expanded="false" aria-controls="siteNav" aria-label="メニューを開く">
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="nav" id="siteNav" aria-label="メインナビゲーション">
+      <a href="index.html">ホーム</a>
+      <a href="guides.html">選び方ガイド</a>
+      <a href="business.html">取り扱い商品</a>
+      <a href="about.html">私たちについて</a>
+      <a href="contact.html" class="cta current">お問い合わせ</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+<div class="wrap">
+  <p class="crumb"><a href="index.html">ホーム</a><span>／</span>お問い合わせ</p>
+</div>
+
+<section class="art-hero">
+  <div class="wrap">
+    
+    <h1 class="reveal" data-d="1">お問い合わせ</h1>
+    <p class="art-sub reveal" data-d="2">買う前のご相談も、買ったあとのご連絡も、どちらも承ります。</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap" style="max-width:760px">
+    <div class="sec-head reveal">
+      <p class="sec-label"><span class="num">Contact form</span></p>
+      <h2>お問い合わせフォーム</h2>
+      <p class="sec-lead">
+        下のフォームからお送りください。原則として2営業日以内にご返信します。
+        いただいた内容は、ご返信以外の目的には使用しません。
+      </p>
+    </div>
+
+    <div class="callout reveal" style="border-color:var(--gold-pale);background:var(--gold-soft)">
+      <b>これはデザイン案です</b>
+      <p style="font-size:14px;line-height:2;color:var(--ink-2)">
+        下のフォームは<strong>見た目の確認用で、送信できません</strong>（送信先を設定していません）。
+        公開版のフォームは実際に稼働しています。
+      </p>
+    </div>
+
+    <form class="mockform reveal" onsubmit="return false" novalidate>
+      <label><span>お名前 <i>必須</i></span><input type="text" name="name" autocomplete="off"></label>
+      <label><span>メールアドレス <i>必須</i></span><input type="email" name="email" autocomplete="off">
+        <small>このアドレスへ返信します。</small></label>
+      <label><span>ご用件 <i>必須</i></span>
+        <select name="topic">
+          <option>選んでください</option>
+          <option>商品についての質問</option>
+          <option>探している商品の相談</option>
+          <option>届いた商品の不具合・返品について</option>
+          <option>ご意見・ご要望</option>
+          <option>メーカー・卸売業者としてのお取引の相談</option>
+          <option>その他</option>
+        </select></label>
+      <label><span>お問い合わせ内容 <i>必須</i></span>
+        <textarea rows="6" name="message" placeholder="商品名やご状況を書いていただけると、より具体的にお答えできます。"></textarea></label>
+      <label class="check"><input type="checkbox" name="news">
+        <span><b>新しく入荷した商品のお知らせを受け取る</b><small>月に1回程度、取り扱いを始めた商品をご案内します。配信停止はいつでもできます。</small></span></label>
+      <button class="btn btn-navy btn-lg" type="submit" disabled>この内容で送信する（デザイン案のため無効）</button>
+      <p class="formnote">
+        ご入力いただいた個人情報は、お問い合わせへのご返信、および（ご希望の場合のみ）
+        新着商品のご案内のために使用します。ご本人の同意なく第三者へ提供することはありません。
+      </p>
+    </form>
+  </div>
+</section>
+
+<section class="section soft">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="sec-label"><span class="num">Help</span></p>
+      <h2>こんなご相談を承っています</h2>
+    </div>
+    <ol class="standard-list">
+      <li class="reveal">
+        <span class="idx">01</span>
+        <div class="std-body"><h3>商品についてのご質問</h3><p>サイズ・素材・付属品・使い方・お手入れ方法など。商品ページに書ききれていないことは、遠慮なくお尋ねください。買う前のご相談も歓迎です。</p></div>
+      </li>
+      <li class="reveal" data-d="1">
+        <span class="idx">02</span>
+        <div class="std-body"><h3>お探しの商品のご相談</h3><p>「こういうものを探しているが見つからない」というご相談も承ります。扱えるかどうかを調べて、ご返事します。</p></div>
+      </li>
+      <li class="reveal" data-d="2">
+        <span class="idx">03</span>
+        <div class="std-body"><h3>届いた商品の不具合・違い</h3><p>破損していた、注文したものと違う、といった場合はご連絡ください。Amazon の返品ポリシーに沿って対応します。</p></div>
+      </li>
+      <li class="reveal" data-d="3">
+        <span class="idx">04</span>
+        <div class="std-body"><h3>ご意見・ご要望</h3><p>品ぞろえやご案内について、お気づきの点をお寄せください。小さな店ですので、いただいたご意見はそのまま次に反映できます。</p></div>
+      </li>
+      <li class="reveal" data-d="4">
+        <span class="idx">05</span>
+        <div class="std-body"><h3>メーカー・卸売業者の皆さまから</h3><p>お取引のご相談も、このフォームから承ります。ご用件で「メーカー・卸売業者としてのお取引の相談」をお選びください。</p></div>
+      </li>
+    </ol>
+  </div>
+</section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <div class="brand">
+          <img src="assets/logo-mark.svg" alt="" width="40" height="40">
+          <span class="brand-text"><b>Satoy</b><em>SELECT</em></span>
+        </div>
+        <p class="footer-addr">
+          〔所在地〕<br>
+          <small>※ このページはデザイン案です。事業者情報は公開版に掲載しています。</small>
+        </p>
+      </div>
+      <nav class="footer-nav" aria-label="フッターナビゲーション">
+        <a href="index.html">ホーム</a>
+        <a href="guides.html">選び方ガイド</a>
+        <a href="business.html">取り扱い商品</a>
+        <a href="about.html">私たちについて</a>
+        <a href="contact.html">お問い合わせ</a>
+        <a href="partners.html">メーカー・卸売業者の皆さまへ</a>
+      </nav>
+    </div>
+    <p class="footer-meta">© Satoy Select. All rights reserved.　<span class="mock-tag">Design mockup v1 — 非公開のたたき台</span></p>
+  </div>
+</footer>
+
+<script src="assets/motion.js" defer></script>
+</body>
+</html>
