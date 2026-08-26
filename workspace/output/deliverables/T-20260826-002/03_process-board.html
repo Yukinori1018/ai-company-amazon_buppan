@@ -112,13 +112,22 @@ ul.plain li::marker{color:var(--marine)}
 code{font-family:var(--mono);font-size:.9em;background:var(--surface-2);border:1px solid var(--rule-soft);border-radius:3px;padding:.5px 5px;color:var(--ink-2)}
 
 /* ---------- mermaid frame ---------- */
-.figure{background:var(--surface);border:1px solid var(--rule);border-radius:4px;box-shadow:var(--shadow);overflow:hidden}
+/* 図は本文の段幅を抜けて、画面いっぱいまで広がる */
+.figure{background:var(--surface);border:1px solid var(--rule);border-radius:4px;box-shadow:var(--shadow);overflow:hidden;
+  width:min(96vw,1720px);margin-left:calc(50% - min(48vw,860px));max-width:none}
 .figure > figcaption{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:baseline;padding:12px 18px;border-bottom:1px solid var(--rule-soft);background:var(--surface-2)}
 .figure figcaption .t{font-family:var(--display);font-weight:700;font-size:13.5px}
 .figure figcaption .s{font-size:12px;color:var(--ink-3)}
-.scroller{overflow-x:auto;padding:22px 18px}
-.mermaid{min-width:640px}
-.mermaid svg{max-width:none !important;height:auto}
+.figure figcaption .zoom{margin-left:auto;display:flex;align-items:center;gap:4px}
+.zoom button{font-family:var(--mono);font-size:12px;line-height:1;color:var(--ink-2);background:var(--surface);border:1px solid var(--rule);border-radius:3px;padding:5px 9px;cursor:pointer;transition:background .12s,border-color .12s}
+.zoom button:hover{background:var(--marine-soft);border-color:var(--marine);color:var(--marine)}
+.zoom button:focus-visible{outline:2px solid var(--marine);outline-offset:1px}
+.zoom .lv{font-family:var(--mono);font-size:11.5px;color:var(--ink-3);min-width:3.6em;text-align:center;font-variant-numeric:tabular-nums}
+.scroller{overflow:auto;max-height:78vh;padding:22px 18px;overscroll-behavior:contain}
+.figure:fullscreen{width:100vw;margin:0;border:0;border-radius:0;display:flex;flex-direction:column;background:var(--surface)}
+.figure:fullscreen .scroller{flex:1;max-height:none;display:flex;align-items:flex-start;justify-content:center;overflow:auto}
+.mermaid{zoom:var(--z,1)}
+.mermaid svg{width:auto !important;max-width:none !important;height:auto;display:block;margin:0 auto}
 
 /* ---------- legend ---------- */
 .legend{display:flex;flex-wrap:wrap;gap:8px}
@@ -186,6 +195,9 @@ td.st{white-space:nowrap;font-size:12px;color:var(--ink-3)}
 
 footer{border-top:1px solid var(--rule);padding-top:20px;color:var(--ink-3);font-size:12.5px;display:flex;flex-direction:column;gap:5px}
 footer code{font-size:11.5px}
+@media (max-width:1120px){
+  .figure{width:auto;margin-left:0}
+}
 @media (max-width:640px){
   .wrap{padding:28px 14px 60px;gap:34px}
   .mids li{flex-wrap:wrap}
@@ -229,10 +241,11 @@ footer code{font-size:11.5px}
       <span class="chip alert">⚠ 社長の一手で止まっている</span>
     </div>
     <figure class="figure">
-      <figcaption><span class="t">8大項目の流れと進捗</span><span class="s">数字は 済 / 着手中 / 未着手（小項目ベース）</span></figcaption>
+      <figcaption><span class="t">8大項目の流れと進捗</span><span class="s">数字は 済 / 着手中 / 未着手（小項目ベース）</span><span class="zoom"><button type="button" data-zoom="out" aria-label="図を縮小">－</button><span class="lv">100%</span><button type="button" data-zoom="in" aria-label="図を拡大">＋</button><button type="button" data-zoom="fit" aria-label="幅に合わせる">幅に合わせる</button><button type="button" data-zoom="full" aria-label="全画面で見る" hidden>全画面</button></span></figcaption>
       <div class="scroller">
 <pre class="mermaid">
-flowchart LR
+%%{init:{"themeVariables":{"fontSize":"17px"},"flowchart":{"nodeSpacing":46,"rankSpacing":56,"padding":10}}}%%
+flowchart TB
   subgraph PREP["準備フェーズ ── 進行中"]
     direction LR
     S1["① 開業・法務<br/>アカウント登録<br/><br/>9 / 11 / 11"]
@@ -263,9 +276,10 @@ flowchart LR
     </figure>
 
     <figure class="figure">
-      <figcaption><span class="t">大項目 → 中項目（準備フェーズ 1〜4）</span><span class="s">括弧内は小項目の 済 / 着手中 / 未着手</span></figcaption>
+      <figcaption><span class="t">大項目 → 中項目（準備フェーズ 1〜4）</span><span class="s">括弧内は小項目の 済 / 着手中 / 未着手</span><span class="zoom"><button type="button" data-zoom="out" aria-label="図を縮小">－</button><span class="lv">100%</span><button type="button" data-zoom="in" aria-label="図を拡大">＋</button><button type="button" data-zoom="fit" aria-label="幅に合わせる">幅に合わせる</button><button type="button" data-zoom="full" aria-label="全画面で見る" hidden>全画面</button></span></figcaption>
       <div class="scroller">
 <pre class="mermaid">
+%%{init:{"themeVariables":{"fontSize":"17px"},"flowchart":{"nodeSpacing":46,"rankSpacing":66,"padding":10}}}%%
 flowchart LR
   A1["① 開業・法務<br/>アカウント登録"] --> A11["1-1 事業体・税務の届出<br/>(2 / 3 / 1)"]
   A1 --> A12["1-2 消費税・インボイスの判断<br/>(1 / 2 / 2)"]
@@ -292,7 +306,6 @@ flowchart LR
   A4 --> A44["4-4 仕入れ書類の整備<br/>(2 / 2 / 1)"]
   A4 --> A45["4-5 入荷・検品の手配<br/>(0 / 0 / 4)"]
 
-  A1 --> A2 --> A3 --> A4
 
   classDef stage fill:#F7E8CD,stroke:#B5761A,stroke-width:1.5px,color:#3A2A0C
   classDef mixed fill:#FFFFFF,stroke:#B0BAC5,stroke-width:1px,color:#23292F
@@ -306,9 +319,10 @@ flowchart LR
     </figure>
 
     <figure class="figure">
-      <figcaption><span class="t">大項目 → 中項目（実行フェーズ 5〜8）</span><span class="s">白＝一部着手 / グレー＝小項目すべて未着手</span></figcaption>
+      <figcaption><span class="t">大項目 → 中項目（実行フェーズ 5〜8）</span><span class="s">白＝一部着手 / グレー＝小項目すべて未着手</span><span class="zoom"><button type="button" data-zoom="out" aria-label="図を縮小">－</button><span class="lv">100%</span><button type="button" data-zoom="in" aria-label="図を拡大">＋</button><button type="button" data-zoom="fit" aria-label="幅に合わせる">幅に合わせる</button><button type="button" data-zoom="full" aria-label="全画面で見る" hidden>全画面</button></span></figcaption>
       <div class="scroller">
 <pre class="mermaid">
+%%{init:{"themeVariables":{"fontSize":"17px"},"flowchart":{"nodeSpacing":46,"rankSpacing":66,"padding":10}}}%%
 flowchart LR
   B5["⑤ 出品<br/>カタログ登録"] --> B51["5-1 出品前の最終確認<br/>(0 / 0 / 4)"]
   B5 --> B52["5-2 相乗り出品<br/>(0 / 0 / 4)"]
@@ -335,7 +349,6 @@ flowchart LR
   B8 --> B85["8-5 違反・停止時の対応<br/>(2 / 2 / 1)"]
   B8 --> B86["8-6 記帳・税務の継続<br/>(0 / 1 / 4)"]
 
-  B5 --> B6 --> B7 --> B8
 
   classDef stage fill:#E3E7EC,stroke:#4A5560,stroke-width:1.5px,color:#23292F
   classDef mixed fill:#FFFFFF,stroke:#B0BAC5,stroke-width:1px,color:#23292F
@@ -571,3 +584,58 @@ flowchart LR
   </footer>
 
 </div>
+
+<script>
+(function(){
+  var STEP=[0.5,0.65,0.8,1,1.25,1.5,1.8,2.2,2.6,3];
+  document.querySelectorAll('.figure').forEach(function(fig){
+    var pre=fig.querySelector('.mermaid'), box=fig.querySelector('.scroller'),
+        lv=fig.querySelector('.lv'), nat=0, i=3;
+    if(!pre||!box) return;
+    function apply(z){ pre.style.setProperty('--z',z); lv.textContent=Math.round(z*100)+'%'; }
+    function nearest(z){ return STEP.reduce(function(b,v,k){ return Math.abs(v-z)<Math.abs(STEP[b]-z)?k:b; },3); }
+    // mermaid の SVG を viewBox どおりの実寸に固定する（100% = 図の原寸）
+    function pin(){
+      var svg=pre.querySelector('svg'); if(!svg) return 0;
+      var vb=svg.viewBox && svg.viewBox.baseVal;
+      if(!vb || !vb.width) return 0;
+      svg.removeAttribute('width'); svg.removeAttribute('height');
+      svg.style.width=vb.width+'px'; svg.style.height=vb.height+'px';
+      return vb.width;
+    }
+    function fit(){
+      if(!nat) return;
+      var z=(box.clientWidth-36)/nat;
+      z=Math.max(0.4,Math.min(2.2,z));
+      i=nearest(z); apply(z);
+    }
+    var fs=fig.querySelector('[data-zoom="full"]');
+    if(fs && fig.requestFullscreen){
+      fs.hidden=false;
+      fs.addEventListener('click',function(){
+        if(document.fullscreenElement===fig){ document.exitFullscreen(); }
+        else { fig.requestFullscreen().then(function(){ setTimeout(fit,120); }).catch(function(){ fs.hidden=true; }); }
+      });
+      document.addEventListener('fullscreenchange',function(){
+        fs.textContent = (document.fullscreenElement===fig) ? '閉じる' : '全画面';
+        setTimeout(fit,120);
+      });
+    }
+    fig.querySelectorAll('[data-zoom]').forEach(function(b){
+      b.addEventListener('click',function(){
+        if(b.dataset.zoom==='full'){ return; }
+        if(b.dataset.zoom==='fit'){ fit(); return; }
+        i=Math.max(0,Math.min(STEP.length-1,i+(b.dataset.zoom==='in'?1:-1)));
+        apply(STEP[i]);
+      });
+    });
+    var tries=0;
+    (function settle(){
+      nat=pin();
+      if(nat){ fit(); return; }
+      if(tries++<40) setTimeout(settle,150);
+    })();
+    var t; window.addEventListener('resize',function(){ clearTimeout(t); t=setTimeout(fit,200); });
+  });
+})();
+</script>
