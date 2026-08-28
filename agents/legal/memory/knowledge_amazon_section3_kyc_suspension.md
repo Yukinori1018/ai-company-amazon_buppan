@@ -2,13 +2,39 @@
 
 初出：T-20260826-004（2026-08-28 ハルオ）。当社の**事業存続に直結する最重要案件**。同種の通知を見たら真っ先にここを読む。
 
+## 0. ★Amazon 公式規約（BSA）の取得方法 — 5経路失敗のあと判明（2026-08-28）
+
+**取れます。カナダ版の公開ページにロケール指定を付ける。**
+
+```
+https://sellercentral.amazon.ca/help/hub/reference/external/G1791?mons_sel_locale=en_CA
+```
+
+| 条件 | 結果 |
+|---|---|
+| 上記 URL（`mons_sel_locale=en_CA` 付き） | **本文が出る。ログイン不要** |
+| ロケール指定なし／表示言語が日本語 | 「選択した言語ではまだご利用いただけません」だけ返る（**これが罠**） |
+| ログイン済み `sellercentral.amazon.com` | アカウントの表示言語が日本語だと逆に取れない |
+| `www.amazon.com` / `www.amazon.ca` の `display.html?nodeId=1161302` | HTTP 503 |
+| `curl`（UA 偽装・Accept-Language 指定） | HTTP 200 / 156KB 返るが **本文なし（SPA シェルのみ）** |
+| WebFetch | 503 またはナビゲーションのみ |
+
+→ **結論：URL は公開で正しいが JS レンダリングが必要。ブラウザツールでしか本文を取れない。**
+→ 既存メモ `knowledge_amazon_agent_policy_2026.md` の「Amazon 規約はログイン済みブラウザでしか読めない」は**半分不正確だった**。正しくは「**ログインではなくレンダリングとロケールの問題**」。Agent Policy（G47071）も同じ手で取れる可能性が高い。**次に法務案件が来たらまずこれを試すこと。**
+
 ## 1. 「ABSA 違反」通知は不正の認定ではない（が、安心材料でもない）
 
-- ABSA **Section 3(b)** 原文：`your account has been, or our controls identify that it may be used for deceptive or fraudulent, or illegal activity`
-- 画面の日本語「〜に関与するために**使用された可能性があります**」は、この "our controls identify that it **may** be used" の訳。
-  → **Amazon が事実認定した文ではなく、自動検知がフラグを立てたという条文の引き写し。**
-- **一次情報は取れない。**2026-08-28 に 5 経路（amazon.com / amazon.ca の nodeId=1161302、sellercentral の G1791 / G521、amazon.ca ヘルプ）を試して全滅（503 またはログイン必須）。
-  → 二次情報3件（amazonsellerslawyer / riverbendconsulting / e-cabilly）で文言一致を確認して代用した。**この壁は既存メモ `knowledge_amazon_agent_policy_2026.md` と同じ。Amazon 規約はログイン済みブラウザでしか読めない。**
+**Section 3「Term and Termination」原文（一次情報・2026-08-28 取得）**
+
+> We may suspend or terminate your account or this Agreement immediately if we determine that (a) you have materially breached the Agreement and failed to cure within 7 days of a cure notice...; **(b) your account has been, or our controls identify that it may be used for deceptive or fraudulent, or illegal activity**; (c) your use of the Services has harmed, or our controls identify that it might harm, other sellers, customers, or Amazon's legitimate interests; **(d) your Account Health Rating falls below our published threshold(s) for deactivation**; or (e) if we are required to do so by law.
+
+- 画面の日本語「〜に関与するために**使用された可能性があります**」は **(b) の逐語訳**。「可能性があります」＝原文の **may**。
+  → **Amazon が事実認定した文ではなく、自動検知（controls）のフラグを条文どおり通知した定型文。**
+- **(d) は独立した停止事由。** AHR が公表閾値を下回るだけで停止できる。当社は AHR＝0 なので **3(b) と 3(d) の2本で止まっている**。
+  → **(b) が晴れても (d) は自動では消えない可能性がある。**本人確認の通過と AHR の回復は別問題として追うこと。
+- **Section 2** に売上金の留保条項あり（`To be eligible for fund disbursement, you must refrain from deceptive, fraudulent, or illegal activity... We will offer you an avenue to appeal our fund withholding decision`）。異議申立ての機会は明文で用意されている。
+- **準拠法はワシントン州法、紛争解決は AAA の仲裁＋クラスアクション放棄。**
+  → **「法的手段で争う」は実質的に選択肢にならない。**Amazon の手続の中で解決する前提で設計する。社長を煽らないこと。
 - 実務上の特徴：**理由が開示されない／書面の弁明が効きにくい／appeal path が不明瞭。**「無実だから通る」で臨むと落ちる。防御は行為の潔白の主張ではなく、**身元証明の一字一句の整合**に絞る。
 
 ## 2. 新規・無販売アカウントでも Section 3 は立つ
@@ -60,3 +86,8 @@
 - 本リポジトリは PUBLIC。**住所・電話番号・口座番号・マーチャントトークンは書かない。**「登録住所」「登録電話番号」と抽象化する。メールアドレスは既出のため可。
 - **推測を事実として書かない**（社長が最も嫌う失敗）。仮説は「★仮説」と明示し、確度を付ける。一次情報が取れなかった場合は**試行先と失敗理由を表で残す**。
 - 一文を短く。前置きなし。太字は最小限。並べられるものは表。
+
+## 9. この案件で法務がやらかしかけたこと（自戒）
+
+- 「一次情報は取得不能」と**早く結論を出しすぎた。**WebFetch と curl の失敗は「取得不能」ではなく「**レンダリングとロケールの条件を外していた**」だけだった。カズヨがブラウザで取ってきて覆った。
+- **教訓：一次情報が取れないと書く前に、(1) 別マーケットプレイスの公開ページ、(2) ロケールパラメータ、(3) ブラウザレンダリングの3つを試す。**それでも駄目なら「未取得」と書き、試行内容を表で残す（この形式自体は正しかった。だから差し替えが1分で済んだ）。
