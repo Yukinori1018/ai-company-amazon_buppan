@@ -914,7 +914,9 @@ def run(args) -> None:
     log(f"    停止させたいときは: touch {STOP_FILE}")
 
     plan = shards()
-    skip = {b.strip() for b in (args.skip_bands or "").split(",") if b.strip()}
+    # getattr にしてあるのは、run() をライブラリとして呼ぶテストが
+    # 古い引数セットのままでも動くようにするため（Namespace に無くても落ちない）。
+    skip = {b.strip() for b in (getattr(args, "skip_bands", "") or "").split(",") if b.strip()}
     if skip:
         plan = [s for s in plan if s[4] not in skip]
         log(f"    掘り切り済みとして {len(skip)}シャードを飛ばします（周回管理は always_on.py）")

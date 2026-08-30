@@ -86,7 +86,7 @@ def sandbox(tmp_path, monkeypatch):
 
 
 def _args(**over):
-    base = dict(max_hours=1.0, pilot=0, resume=False, rebuild=False)
+    base = dict(max_hours=1.0, pilot=0, resume=False, rebuild=False, skip_bands="")
     base.update(over)
     return types.SimpleNamespace(**base)
 
@@ -111,10 +111,42 @@ def test_stop_file_halts_the_run(sandbox):
 
 
 def test_max_hours_halts_the_run(sandbox):
+    """正の値を渡したら、その時間で止まる。"""
     s = sandbox.s
-    s.run(_args(max_hours=0.0))
+    s.run(_args(max_hours=1e-9))
     prog = json.loads((sandbox.out / "progress.json").read_text(encoding="utf-8"))
     assert "時間に達しました" in prog["stop_reason"]
+
+
+def test_max_hours_zero_means_no_time_limit(sandbox):
+    """--max-hours 0 は「時間では止めない」。常時稼働（always_on.py）の前提。
+
+    時間で止まらないので、止まる理由は掘り切り側になる。
+    """
+    s = sandbox.s
+    s.run(_args(max_hours=0))
+    prog = json.loads((sandbox.out / "progress.json").read_text(encoding="utf-8"))
+    assert "時間に達しました" not in (prog["stop_reason"] or "")
+    assert prog["auto_stop"]["max_hours"] == 0
+
+
+def test_skip_bands_are_not_visited(sandbox):
+    """掘り切り済みとして渡した帯は Finder を1回も叩かない（トークンを払わない）。"""
+    s = sandbox.s
+    skipped = [b[4] for b in s.shards()][:5]
+    s.run(_args(skip_bands=",".join(skipped)))
+    prog = json.loads((sandbox.out / "progress.json").read_text(encoding="utf-8"))
+    # 飛ばした帯は最終 progress の exhausted に必ず入っている（周回管理が読む）
+    assert set(skipped) <= set(prog["cursor"]["exhausted"])
+
+
+def test_skipping_every_band_stops_immediately_without_tokens(sandbox):
+    """全帯が掘り切り済みなら、Finder を1回も叩かずに即終了する（＝一周完了の合図）。"""
+    s = sandbox.s
+    s.run(_args(skip_bands=",".join(b[4] for b in s.shards())))
+    prog = json.loads((sandbox.out / "progress.json").read_text(encoding="utf-8"))
+    assert "掘り切りました" in prog["stop_reason"]
+    assert sandbox.calls["finder"] == 0
 
 
 def test_exhausting_all_shards_halts_the_run(sandbox):

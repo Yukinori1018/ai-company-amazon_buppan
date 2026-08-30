@@ -195,7 +195,7 @@ def run_rollup() -> None:
     try:
         r = subprocess.run([sys.executable, str(HERE / "daily_rollup.py")],
                            cwd=str(HERE), capture_output=True, text=True, timeout=1800)
-        log(f"日次ロールアップ rc={r.returncode} {（r.stdout or '').strip()[-300:] if False else (r.stdout or '').strip()[-300:]}")
+        log(f"日次ロールアップ rc={r.returncode} {(r.stdout or '').strip()[-300:]}")
         if r.returncode != 0:
             log(f"WARN ロールアップ stderr: {(r.stderr or '').strip()[-500:]}")
     except Exception as e:

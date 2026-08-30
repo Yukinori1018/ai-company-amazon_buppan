@@ -1,0 +1,823 @@
+﻿name,cls,n,flag,cat,ean,jan,isbn,pref
+ウォルト・ディズニー・ジャパン株式会社,A_法人格つき,25,中小候補,DVD,27,True,True,495
+UGREEN,C_英数字のみ,23,大手/海外疑い,家電＆カメラ,24,False,False,694
+CIO,C_英数字のみ,19,中小候補,パソコン・周辺機器,19,True,False,457
+Anker,C_英数字のみ,18,大手/海外疑い,家電＆カメラ,32,False,False,019
+UNIVERSAL MUSIC GROUP,C_英数字のみ,16,中小候補,ミュージック,17,True,False,498
+Universal,C_英数字のみ,16,中小候補,DVD,20,True,True,002
+SONY MUSIC,C_英数字のみ,15,大手/海外疑い,DVD,13,True,False,454
+BANDAI,C_英数字のみ,14,大手/海外疑い,おもちゃ,17,True,False,458
+WARNER BROS,C_英数字のみ,14,中小候補,DVD,17,False,True,505
+マタインク,B_和名(法人格なし),13,中小候補,パソコン・周辺機器,9,False,False,078
+ソニー・インタラクティブエンタテインメント,B_和名(法人格なし),13,大手/海外疑い,ゲーム,18,True,False,220
+パナソニック(Panasonic),B_和名(法人格なし),12,大手/海外疑い,家電＆カメラ,14,True,False,498
+LxTek,C_英数字のみ,12,大手/海外疑い,パソコン・周辺機器,10,False,False,078
+エレコム(ELECOM),B_和名(法人格なし),11,大手/海外疑い,パソコン・周辺機器,15,True,False,495
+iClever,C_英数字のみ,11,中小候補,パソコン・周辺機器,3,False,False,697
+Soundcore,C_英数字のみ,11,大手/海外疑い,家電＆カメラ,11,False,False,019
+任天堂,B_和名(法人格なし),11,大手/海外疑い,ゲーム,15,True,False,490
+ノーブランド品,B_和名(法人格なし),10,中小候補,大型家電,1,True,False,494
+講談社,B_和名(法人格なし),10,中小候補,本,4,False,True,978
+Dyoac,C_英数字のみ,9,中小候補,家電＆カメラ,1,False,False,073
+スクウェア・エニックス(SQUARE ENIX),B_和名(法人格なし),9,中小候補,ゲーム,12,True,False,498
+Bandai Namco,C_英数字のみ,9,大手/海外疑い,ゲーム,11,True,False,457
+ワーナーホームビデオ,B_和名(法人格なし),9,中小候補,DVD,11,True,True,088
+KODAK,C_英数字のみ,8,中小候補,家電＆カメラ,22,False,False,004
+ポニーキャニオン,B_和名(法人格なし),8,中小候補,DVD,9,True,False,498
+ワコーズ(Wako's),B_和名(法人格なし),8,中小候補,車＆バイク,11,True,False,493
+ロイヤルカナン,B_和名(法人格なし),8,中小候補,ペット用品,8,False,False,318
+GPC Image Flex,C_英数字のみ,6,大手/海外疑い,パソコン・周辺機器,10,False,False,071
+COOAU,C_英数字のみ,6,中小候補,家電＆カメラ,3,False,False,088
+Sony,C_英数字のみ,6,大手/海外疑い,ゲーム,10,True,False,230
+Logitech,C_英数字のみ,6,大手/海外疑い,パソコン・周辺機器,7,True,False,692
+ビクターエンタテインメント,B_和名(法人格なし),6,中小候補,DVD,9,True,False,498
+Sony Pictures Home Entertainment,C_英数字のみ,6,大手/海外疑い,DVD,7,True,False,454
+ジェイストーム,B_和名(法人格なし),6,中小候補,DVD,5,True,False,458
+20TH CENTURY STUDIOS,C_英数字のみ,6,中小候補,DVD,11,False,True,002
+Gudluky,C_英数字のみ,5,大手/海外疑い,家電＆カメラ,0,False,False,
+Hamee(ハミィ),B_和名(法人格なし),5,中小候補,家電＆カメラ,9,True,False,452
+skybest,C_英数字のみ,5,中小候補,家電＆カメラ,6,False,False,073
+Evinof,C_英数字のみ,5,中小候補,家電＆カメラ,5,False,False,073
+ieGeek,C_英数字のみ,5,中小候補,家電＆カメラ,7,False,False,073
+タカラトミー(TAKARA TOMY),B_和名(法人格なし),5,大手/海外疑い,おもちゃ,7,True,False,490
+Moondrop,C_英数字のみ,5,中小候補,家電＆カメラ,0,False,False,
+バンダイビジュアル,B_和名(法人格なし),5,大手/海外疑い,DVD,4,True,False,493
+Bloomsbury,C_英数字のみ,5,中小候補,洋書,5,False,True,978
+アイオーデータ,B_和名(法人格なし),5,中小候補,パソコン・周辺機器,9,True,False,495
+Warner,C_英数字のみ,5,中小候補,DVD,6,False,True,088
+Paramount,C_英数字のみ,5,中小候補,DVD,8,False,True,009
+THREEKEY,C_英数字のみ,4,中小候補,家電＆カメラ,0,False,False,
+SHEENGO,C_英数字のみ,4,中小候補,パソコン・周辺機器,4,False,False,075
+CASIO(カシオ),B_和名(法人格なし),4,大手/海外疑い,ファッション,8,True,False,456
+RemarksJapan,C_英数字のみ,4,中小候補,ファッション,4,True,False,457
+KEENKLE,C_英数字のみ,4,大手/海外疑い,パソコン・周辺機器,2,False,False,075
+ejet,C_英数字のみ,4,大手/海外疑い,パソコン・周辺機器,1,False,False,697
+Mumay,C_英数字のみ,4,中小候補,家電＆カメラ,0,False,False,
+MACOO,C_英数字のみ,4,中小候補,家電＆カメラ,4,False,False,078
+Gimama,C_英数字のみ,4,中小候補,パソコン・周辺機器,4,False,False,019
+ProtoArc,C_英数字のみ,4,中小候補,パソコン・周辺機器,0,False,False,
+PHILIPS,C_英数字のみ,4,大手/海外疑い,家電＆カメラ,14,False,False,489
+バッファロー,B_和名(法人格なし),4,大手/海外疑い,パソコン・周辺機器,4,True,False,498
+SoundPEATS(サウンドピーツ),B_和名(法人格なし),4,中小候補,家電＆カメラ,12,False,False,694
+‎バーベイタム(Verbatim),B_和名(法人格なし),4,中小候補,パソコン・周辺機器,4,True,False,499
+Makita(マキタ),B_和名(法人格なし),4,中小候補,DIY・工具・ガーデン,3,False,False,008
+BOIFUN,C_英数字のみ,4,中小候補,家電＆カメラ,2,False,False,079
+KADOKAWA,C_英数字のみ,4,中小候補,本,7,True,True,978
+愛知電線,B_和名(法人格なし),4,中小候補,産業・研究開発用品,4,True,False,457
+コナミデジタルエンタテインメント(Konami Digital Entertainment),B_和名(法人格なし),4,中小候補,ゲーム,4,True,False,498
+ワーナー・ブラザース・ホームエンターテイメント,B_和名(法人格なし),4,大手/海外疑い,DVD,4,True,False,454
+BURTLE,C_英数字のみ,4,大手/海外疑い,産業・研究開発用品,2,True,False,457
+すごろくや,B_和名(法人格なし),4,中小候補,おもちゃ,4,True,False,457
+Hoxhyon,C_英数字のみ,4,中小候補,ホーム＆キッチン,4,False,False,079
+Lexar,C_英数字のみ,4,中小候補,パソコン・周辺機器,5,False,False,084
+HAGOOGI,C_英数字のみ,4,中小候補,スポーツ＆アウトドア,4,True,False,458
+Razer(レイザー),B_和名(法人格なし),4,中小候補,パソコン・周辺機器,4,True,False,457
+HEIBAS,C_英数字のみ,3,中小候補,家電＆カメラ,0,False,False,
+KIOXIA,C_英数字のみ,3,中小候補,パソコン・周辺機器,5,True,False,458
+Yaizk,C_英数字のみ,3,中小候補,家電＆カメラ,3,False,False,535
+Runbod,C_英数字のみ,3,中小候補,パソコン・周辺機器,1,False,False,075
+CPWORLD,C_英数字のみ,3,中小候補,DIY・工具・ガーデン,0,False,False,
+GADEBAO,C_英数字のみ,3,中小候補,パソコン・周辺機器,2,False,False,075
+Besecou,C_英数字のみ,3,中小候補,家電＆カメラ,0,False,False,
+詰め替えそのまま,B_和名(法人格なし),3,中小候補,ホーム＆キッチン,3,True,False,456
+TANITA,C_英数字のみ,3,中小候補,ホーム＆キッチン,6,True,False,490
+ラブホーム美家,B_和名(法人格なし),3,中小候補,ホーム＆キッチン,3,False,False,076
+HUAKUA,C_英数字のみ,3,中小候補,家電＆カメラ,3,False,False,506
+Eufy (ユーフィ),B_和名(法人格なし),3,大手/海外疑い,ホーム＆キッチン,3,False,False,019
+Aliliy,C_英数字のみ,3,中小候補,ホーム＆キッチン,1,False,False,076
+サンワダイレクト,B_和名(法人格なし),3,中小候補,家電＆カメラ,5,True,False,496
+四日市ばんこ焼 【日本製】,B_和名(法人格なし),3,中小候補,ホーム＆キッチン,3,True,False,453
+Fochai,C_英数字のみ,3,中小候補,ホーム＆キッチン,0,False,False,
+Penguin,C_英数字のみ,3,中小候補,洋書,3,False,True,978
+Brook,C_英数字のみ,3,中小候補,ゲーム,3,True,False,471
+KT,C_英数字のみ,3,中小候補,ゲーム,3,True,False,498
+レベルファイブ,B_和名(法人格なし),3,中小候補,ゲーム,3,True,False,457
+Biwin,C_英数字のみ,3,中小候補,パソコン・周辺機器,3,False,False,088
+小学館,B_和名(法人格なし),3,中小候補,本,1,True,False,491
+JIT,C_英数字のみ,3,大手/海外疑い,パソコン・周辺機器,0,False,False,
+happilaff,C_英数字のみ,3,中小候補,ホーム＆キッチン,0,False,False,
+Rolling Square,C_英数字のみ,3,中小候補,パソコン・周辺機器,3,False,False,764
+宝島社,B_和名(法人格なし),3,中小候補,本,4,True,True,978
+Universal Pictures,C_英数字のみ,3,中小候補,DVD,3,False,False,505
+BANDAI SPIRITS(バンダイ スピリッツ),B_和名(法人格なし),3,大手/海外疑い,ホビー,3,True,False,454
+Krunia,C_英数字のみ,3,中小候補,車＆バイク,0,False,False,
+SanDisk,C_英数字のみ,3,大手/海外疑い,パソコン・周辺機器,4,False,False,061
+アイリスオーヤマ(IRIS OHYAMA),B_和名(法人格なし),3,大手/海外疑い,DIY・工具・ガーデン,5,True,False,490
+Betenet,C_英数字のみ,3,中小候補,DIY・工具・ガーデン,0,False,False,
+ブシロード(BUSHIROAD),B_和名(法人格なし),3,中小候補,おもちゃ,3,True,False,457
+Turtleback,C_英数字のみ,3,中小候補,洋書,3,False,True,978
+SBクリエイティブ,B_和名(法人格なし),3,中小候補,本,3,False,True,978
+NBCユニバーサル・エンターテイメントジャパン(LAQ),B_和名(法人格なし),3,中小候補,DVD,3,True,False,498
+Random House Books for Young Readers,C_英数字のみ,3,中小候補,洋書,3,False,True,978
+Johnny & Associates,C_英数字のみ,3,中小候補,DVD,1,True,False,459
+Paramount Home Entertainment,C_英数字のみ,3,中小候補,DVD,3,False,False,401
+iface,C_英数字のみ,3,中小候補,家電＆カメラ,3,True,False,457
+ワーナーミュージック・ジャパン,B_和名(法人格なし),3,中小候補,DVD,3,True,False,458
+東宝,B_和名(法人格なし),3,中小候補,DVD,2,True,False,498
+Disney(ディズニー),B_和名(法人格なし),3,中小候補,DVD,3,False,False,401
+Leacco,C_英数字のみ,2,中小候補,家電＆カメラ,2,False,False,076
+Zeniss,C_英数字のみ,2,中小候補,家電＆カメラ,1,False,False,072
+Ailewu,C_英数字のみ,2,中小候補,家電＆カメラ,2,False,False,077
+TXWDFHL,C_英数字のみ,2,中小候補,ホーム＆キッチン,2,False,False,076
+Negolas,C_英数字のみ,2,中小候補,家電＆カメラ,2,False,False,079
+Tuwejia,C_英数字のみ,2,中小候補,家電＆カメラ,0,False,False,
+basemax,C_英数字のみ,2,中小候補,車＆バイク,0,False,False,
+CITIZEN,C_英数字のみ,2,中小候補,スポーツ＆アウトドア,2,True,False,456
+Ralkepy,C_英数字のみ,2,中小候補,家電＆カメラ,0,False,False,
+YOCOEI,C_英数字のみ,2,中小候補,家電＆カメラ,2,False,False,076
+Hanmir,C_英数字のみ,2,中小候補,車＆バイク,2,False,False,695
+GLAMERGY,C_英数字のみ,2,中小候補,パソコン・周辺機器,0,False,False,
+Tufuha,C_英数字のみ,2,大手/海外疑い,パソコン・周辺機器,0,False,False,
+KEEZING,C_英数字のみ,2,中小候補,ホーム＆キッチン,2,False,False,073
+Hobbywing,C_英数字のみ,2,中小候補,おもちゃ,2,True,False,457
+Keypal,C_英数字のみ,2,中小候補,家電＆カメラ,2,False,False,073
+Sanlao,C_英数字のみ,2,中小候補,家電＆カメラ,0,False,False,
+Boleve,C_英数字のみ,2,中小候補,家電＆カメラ,0,False,False,
+Toyomii,C_英数字のみ,2,中小候補,家電＆カメラ,0,False,False,
+INTEX,C_英数字のみ,2,中小候補,DIY・工具・ガーデン,7,False,False,694
+タカギ(Takagi),B_和名(法人格なし),2,中小候補,ホーム＆キッチン,2,True,False,000
+NEW ERA(ニューエラ),B_和名(法人格なし),2,中小候補,ファッション,0,False,False,
+KEEPRO,C_英数字のみ,2,大手/海外疑い,家電＆カメラ,0,False,False,
+DUNLOP,C_英数字のみ,2,中小候補,スポーツ＆アウトドア,2,True,False,490
+SKYBASIC,C_英数字のみ,2,中小候補,家電＆カメラ,0,False,False,
+SPAHER,C_英数字のみ,2,中小候補,ファッション,0,False,False,
+ファイナル(final),B_和名(法人格なし),2,中小候補,家電＆カメラ,4,True,False,457
+Augnner,C_英数字のみ,2,大手/海外疑い,家電＆カメラ,0,False,False,
+NIKE(ナイキ),B_和名(法人格なし),2,大手/海外疑い,ファッション,5,True,False,019
+Kemeskin,C_英数字のみ,2,中小候補,家電＆カメラ,2,False,False,061
+Iosare,C_英数字のみ,2,中小候補,ホーム＆キッチン,2,False,False,078
+BOS,C_英数字のみ,2,中小候補,DIY・工具・ガーデン,2,True,False,456
+Listening Library,C_英数字のみ,2,中小候補,洋書,4,False,True,978
+Yaotin,C_英数字のみ,2,中小候補,ホーム＆キッチン,2,False,False,067
+Pursay,C_英数字のみ,2,中小候補,ホーム＆キッチン,0,False,False,
+YINCODI,C_英数字のみ,2,中小候補,家電＆カメラ,0,False,False,
+WISHOLY,C_英数字のみ,2,中小候補,家電＆カメラ,0,False,False,
+CREATIVE,C_英数字のみ,2,中小候補,パソコン・周辺機器,6,True,False,458
+キヤノン,B_和名(法人格なし),2,大手/海外疑い,パソコン・周辺機器,2,True,False,458
+Boweer,C_英数字のみ,2,中小候補,ホーム＆キッチン,2,False,False,076
+ハイポネックス,B_和名(法人格なし),2,中小候補,DIY・工具・ガーデン,2,True,False,497
+Dr.'s care,C_英数字のみ,2,中小候補,ペット用品,2,True,False,490
+SCYROX,C_英数字のみ,2,中小候補,パソコン・周辺機器,2,False,False,697
+Nextorage,C_英数字のみ,2,中小候補,パソコン・周辺機器,2,False,False,081
+Bmax,C_英数字のみ,2,中小候補,パソコン・周辺機器,1,False,False,697
+ビーイング,B_和名(法人格なし),2,中小候補,DVD,1,True,False,456
+シー・エフ・デー販売,B_和名(法人格なし),2,中小候補,パソコン・周辺機器,2,True,False,498
+Veoyads,C_英数字のみ,2,中小候補,ホーム＆キッチン,2,False,False,061
+Edifier,C_英数字のみ,2,中小候補,家電＆カメラ,3,False,False,087
+ホリ,B_和名(法人格なし),2,大手/海外疑い,ゲーム,2,True,False,496
+エプソン,B_和名(法人格なし),2,大手/海外疑い,パソコン・周辺機器,2,True,False,498
+DEPSTECH,C_英数字のみ,2,中小候補,産業・研究開発用品,0,False,False,
+Capitol,C_英数字のみ,2,中小候補,DVD,2,True,False,498
+Jabra(ジャブラ),B_和名(法人格なし),2,中小候補,パソコン・周辺機器,2,False,False,570
+iWIMIUS,C_英数字のみ,2,中小候補,家電＆カメラ,0,False,False,
+Marshall,C_英数字のみ,2,中小候補,家電＆カメラ,2,False,False,734
+BACOENG,C_英数字のみ,2,中小候補,車＆バイク,0,False,False,
+コムテック(COMTEC),B_和名(法人格なし),2,中小候補,車＆バイク,2,True,False,495
+HIKMICRO,C_英数字のみ,2,中小候補,産業・研究開発用品,1,False,False,697
+カプコン(CAPCOM),B_和名(法人格なし),2,中小候補,ゲーム,2,True,False,497
+HOUOA,C_英数字のみ,2,中小候補,家電＆カメラ,0,False,False,
+RiDATA,C_英数字のみ,2,中小候補,パソコン・周辺機器,4,True,False,458
+ZYQ,C_英数字のみ,2,中小候補,ホーム＆キッチン,0,False,False,
+コンテンツ・ファクトリー,B_和名(法人格なし),2,中小候補,本,2,False,True,978
+Kachiari,C_英数字のみ,2,中小候補,DIY・工具・ガーデン,0,False,False,
+Beanet,C_英数字のみ,2,中小候補,ホーム＆キッチン,0,False,False,
+KAYOTOYS カヨトイズ,B_和名(法人格なし),2,中小候補,おもちゃ,2,True,False,458
+アステッキホールディングス株式会社,A_法人格つき,2,中小候補,本,2,False,True,978
+Aiolo Innovation,C_英数字のみ,2,中小候補,パソコン・周辺機器,2,False,False,085
+アセキ,B_和名(法人格なし),2,中小候補,ホーム＆キッチン,3,False,False,072
+Mzyxxel,C_英数字のみ,2,中小候補,おもちゃ,2,False,False,070
+経済法令研究会,B_和名(法人格なし),2,中小候補,本,2,False,True,978
+Yorano,C_英数字のみ,2,中小候補,ホーム＆キッチン,2,False,False,071
+Lamake,C_英数字のみ,2,中小候補,DIY・工具・ガーデン,1,False,False,075
+富士フイルム(FUJIFILM),B_和名(法人格なし),2,中小候補,家電＆カメラ,1,False,False,007
+COMEDYKING,C_英数字のみ,2,中小候補,ホーム＆キッチン,2,False,False,061
+OOFOS(ウーフォス),B_和名(法人格なし),2,中小候補,ファッション,1,False,False,084
+Ci-Fotto,C_英数字のみ,2,中小候補,家電＆カメラ,0,False,False,
+GOYOJO,C_英数字のみ,2,中小候補,産業・研究開発用品,0,False,False,
+viangs,C_英数字のみ,2,中小候補,スポーツ＆アウトドア,2,False,False,074
+JASON MARKK(ジェイソンマーク),B_和名(法人格なし),2,中小候補,ファッション,7,False,False,081
+モリドライブ(MORIDRIVE),B_和名(法人格なし),2,中小候補,車＆バイク,2,True,False,490
+BabySmile,C_英数字のみ,2,中小候補,ベビー＆マタニティ,2,True,False,458
+Tibnozt,C_英数字のみ,2,中小候補,ホーム＆キッチン,2,False,False,079
+adidas Originals,C_英数字のみ,2,大手/海外疑い,ファッション,2,False,False,406
+UTRAI,C_英数字のみ,2,中小候補,車＆バイク,0,False,False,
+ドリーミュージック,B_和名(法人格なし),2,中小候補,DVD,2,True,False,458
+株式会社ストームレーベルズ/イーラブ・レーベル,A_法人格つき,2,中小候補,DVD,0,False,False,
+SOOEO,C_英数字のみ,2,中小候補,家電＆カメラ,0,False,False,
+ZIPPO,C_英数字のみ,2,中小候補,ファッション,1,True,False,497
+イガラシ(Igarashi),B_和名(法人格なし),2,中小候補,おもちゃ,2,True,False,497
+イースター株式会社,A_法人格つき,2,中小候補,ペット用品,3,True,False,497
+BESROY,C_英数字のみ,2,中小候補,ホーム＆キッチン,2,False,False,071
+ルイファン ジャパン(Ruifan Japan),B_和名(法人格なし),2,中小候補,おもちゃ,2,True,False,456
+ピュアクリスタル,B_和名(法人格なし),2,中小候補,ペット用品,2,True,False,497
+LIXIL,C_英数字のみ,2,中小候補,DIY・工具・ガーデン,0,False,False,
+PDP,C_英数字のみ,2,大手/海外疑い,ゲーム,2,False,False,070
+suptronics,C_英数字のみ,2,中小候補,パソコン・周辺機器,0,False,False,
+Rhino,C_英数字のみ,2,中小候補,ミュージック,2,False,False,009
+Pearson Education,C_英数字のみ,2,中小候補,洋書,2,False,True,978
+メディコム・トイ(MEDICOM TOY),B_和名(法人格なし),2,中小候補,ホビー,4,True,False,453
+LEGO(レゴ),B_和名(法人格なし),2,中小候補,おもちゃ,2,False,False,570
+STUDIOCANAL,C_英数字のみ,2,中小候補,DVD,2,False,False,505
+タイトー,B_和名(法人格なし),2,中小候補,ゲーム,2,True,False,498
+Happinet,C_英数字のみ,2,中小候補,DVD,31,True,False,495
+株式会社,A_法人格つき,2,中小候補,本,0,False,False,
+Omron,C_英数字のみ,2,中小候補,パソコン・周辺機器,2,True,False,454
+"KEIYO ENGINEERING CO.,LTD.",A_法人格つき,2,中小候補,パソコン・周辺機器,3,True,False,454
+Zach Top,C_英数字のみ,2,中小候補,ミュージック,2,False,False,075
+STSEETOP,C_英数字のみ,2,中小候補,家電＆カメラ,0,False,False,
+ナトコ,B_和名(法人格なし),2,中小候補,DIY・工具・ガーデン,0,False,False,
+WORKPRO,C_英数字のみ,2,中小候補,DIY・工具・ガーデン,2,False,False,082
+集英社,B_和名(法人格なし),2,大手/海外疑い,本,1,False,True,978
+地域開発研究所,B_和名(法人格なし),2,中小候補,本,2,False,True,978
+トイコー(Toyco),B_和名(法人格なし),2,中小候補,おもちゃ,4,True,False,496
+Motowolf,C_英数字のみ,2,中小候補,DVD,2,True,False,498
+52TOYS,C_英数字のみ,2,中小候補,ホビー,0,False,False,
+ホンダ(Honda),B_和名(法人格なし),2,中小候補,車＆バイク,4,True,False,457
+SSYFEI,C_英数字のみ,2,中小候補,ホーム＆キッチン,2,False,False,071
+ブリヂストン(BRIDGESTONE),B_和名(法人格なし),2,中小候補,スポーツ＆アウトドア,2,True,False,454
+Crimson,C_英数字のみ,2,中小候補,ミュージック,2,True,False,495
+avex trax,C_英数字のみ,2,中小候補,DVD,2,True,False,498
+バンプレスト,B_和名(法人格なし),2,中小候補,ゲーム,2,True,False,498
+SME,C_英数字のみ,2,中小候補,DVD,2,True,False,454
+トイズファクトリー,B_和名(法人格なし),2,中小候補,ミュージック,1,True,False,498
+アリオラジャパン,B_和名(法人格なし),2,中小候補,ミュージック,2,True,False,454
+SNK,C_英数字のみ,2,中小候補,ゲーム,3,True,False,496
+レゴ(LEGO),B_和名(法人格なし),2,中小候補,おもちゃ,3,False,False,570
+Lions Gate,C_英数字のみ,2,中小候補,DVD,3,False,True,001
+MIKIHOUSE(ミキハウス),B_和名(法人格なし),2,中小候補,ベビー＆マタニティ,2,True,False,454
+SilentPower,C_英数字のみ,2,中小候補,DIY・工具・ガーデン,2,True,False,456
+htrahy,C_英数字のみ,1,中小候補,家電＆カメラ,0,False,False,
+CHUSII,C_英数字のみ,1,中小候補,家電＆カメラ,1,False,False,078
+ZZU,C_英数字のみ,1,中小候補,家電＆カメラ,1,False,False,066
+Vulendu,C_英数字のみ,1,中小候補,家電＆カメラ,1,False,False,074
+AirDry,C_英数字のみ,1,中小候補,家電＆カメラ,0,False,False,
+Boytond,C_英数字のみ,1,中小候補,家電＆カメラ,0,False,False,
+VELIKE,C_英数字のみ,1,中小候補,家電＆カメラ,1,False,False,078
+オウルテック,B_和名(法人格なし),1,中小候補,パソコン・周辺機器,1,True,False,494
+actiTube,C_英数字のみ,1,中小候補,ホーム＆キッチン,1,False,False,426
+PRXA,C_英数字のみ,1,中小候補,家電＆カメラ,1,False,False,067
+Newluck,C_英数字のみ,1,中小候補,パソコン・周辺機器,0,False,False,
+TIGORA(ティゴラ),B_和名(法人格なし),1,中小候補,スポーツ＆アウトドア,0,False,False,
+クイックル,B_和名(法人格なし),1,中小候補,ホーム＆キッチン,1,True,False,490
+FleekFit,C_英数字のみ,1,中小候補,家電＆カメラ,0,False,False,
+ZVZHM,C_英数字のみ,1,中小候補,パソコン・周辺機器,1,False,False,074
+AWINEY,C_英数字のみ,1,大手/海外疑い,家電＆カメラ,1,False,False,072
+ニチアス,B_和名(法人格なし),1,中小候補,DIY・工具・ガーデン,2,True,False,452
+Kungix,C_英数字のみ,1,中小候補,パソコン・周辺機器,0,False,False,
+TRAOO,C_英数字のみ,1,中小候補,パソコン・周辺機器,0,False,False,
+Fodalum,C_英数字のみ,1,中小候補,家電＆カメラ,0,False,False,
+ブレイン(BRAIN),B_和名(法人格なし),1,中小候補,家電＆カメラ,1,True,False,458
+充電の達人,B_和名(法人格なし),1,中小候補,家電＆カメラ,1,False,False,076
+RUOEVA,C_英数字のみ,1,中小候補,家電＆カメラ,1,False,False,803
+Juliyas,C_英数字のみ,1,中小候補,ホーム＆キッチン,1,False,False,076
+Vibaleg,C_英数字のみ,1,中小候補,パソコン・周辺機器,0,False,False,
+FIDECO,C_英数字のみ,1,中小候補,パソコン・周辺機器,0,False,False,
+Svoko,C_英数字のみ,1,中小候補,DIY・工具・ガーデン,1,False,False,076
+Lenovo,C_英数字のみ,1,中小候補,パソコン・周辺機器,0,False,False,
+Glaazo,C_英数字のみ,1,中小候補,パソコン・周辺機器,0,False,False,
+JOKITA,C_英数字のみ,1,中小候補,ホーム＆キッチン,0,False,False,
+Gumsry,C_英数字のみ,1,中小候補,パソコン・周辺機器,1,False,False,079
+Klszear,C_英数字のみ,1,中小候補,パソコン・周辺機器,0,False,False,
+Finish Line,C_英数字のみ,1,中小候補,スポーツ＆アウトドア,1,False,False,003
+E-enemo,C_英数字のみ,1,中小候補,DIY・工具・ガーデン,2,True,False,459
+SK-CinDa,C_英数字のみ,1,中小候補,家電＆カメラ,0,False,False,
+Rikuto,C_英数字のみ,1,中小候補,パソコン・周辺機器,1,False,False,078
+山形工房(Yamagata Koubou),B_和名(法人格なし),1,中小候補,おもちゃ,2,True,False,078
+JGUG,C_英数字のみ,1,中小候補,家電＆カメラ,0,False,False,
+YUDOFICAL,C_英数字のみ,1,中小候補,パソコン・周辺機器,0,False,False,
+Tryone,C_英数字のみ,1,中小候補,車＆バイク,0,False,False,
+SAZAC,C_英数字のみ,1,中小候補,おもちゃ,1,True,False,458
+Casio,C_英数字のみ,1,大手/海外疑い,家電＆カメラ,1,False,False,404
+DYKL,C_英数字のみ,1,中小候補,ホーム＆キッチン,1,False,False,073
+CEREMONY,C_英数字のみ,1,中小候補,ホーム＆キッチン,1,False,False,078
+ビーエムオンライン,B_和名(法人格なし),1,中小候補,車＆バイク,0,False,False,
+Airクリーンラボ,B_和名(法人格なし),1,中小候補,ホーム＆キッチン,1,True,False,459
+ELUTENG,C_英数字のみ,1,中小候補,パソコン・周辺機器,0,False,False,
+Ashei,C_英数字のみ,1,中小候補,DIY・工具・ガーデン,1,False,False,072
+LongFlight,C_英数字のみ,1,中小候補,ホーム＆キッチン,0,False,False,
+GOODNEW,C_英数字のみ,1,中小候補,ホーム＆キッチン,0,False,False,
+MINLU,C_英数字のみ,1,中小候補,パソコン・周辺機器,2,False,False,072
+曙産業,B_和名(法人格なし),1,中小候補,ホーム＆キッチン,1,True,False,495
+富士フレーバー,B_和名(法人格なし),1,中小候補,DIY・工具・ガーデン,1,True,False,458
+Generic,C_英数字のみ,1,中小候補,スポーツ＆アウトドア,1,False,False,077
+BRJR,C_英数字のみ,1,中小候補,パソコン・周辺機器,1,False,False,076
+Gourde,C_英数字のみ,1,中小候補,パソコン・周辺機器,0,False,False,
+BUODCO,C_英数字のみ,1,中小候補,パソコン・周辺機器,0,False,False,
+日進医療器,B_和名(法人格なし),1,中小候補,スポーツ＆アウトドア,1,True,False,495
+LXCRTONE,C_英数字のみ,1,中小候補,車＆バイク,0,False,False,
+PACPAK,C_英数字のみ,1,中小候補,ペット用品,1,True,False,490
+YOSH,C_英数字のみ,1,中小候補,車＆バイク,0,False,False,
+BINGFU,C_英数字のみ,1,中小候補,家電＆カメラ,1,False,False,079
+Screwpop,C_英数字のみ,1,中小候補,ファッション,2,False,False,085
+Feesun,C_英数字のみ,1,中小候補,ホーム＆キッチン,2,False,False,697
+Lamicall,C_英数字のみ,1,中小候補,スポーツ＆アウトドア,0,False,False,
+HARU,C_英数字のみ,1,中小候補,ホーム＆キッチン,1,False,False,063
+リッチェル(Richell),B_和名(法人格なし),1,中小候補,ベビー＆マタニティ,1,True,False,497
+鈴木ラテックス(SUZUKILATEX),B_和名(法人格なし),1,中小候補,おもちゃ,3,True,False,078
+バイクハンド(Bike Hand),B_和名(法人格なし),1,中小候補,スポーツ＆アウトドア,0,False,False,
+Cryfokt,C_英数字のみ,1,中小候補,産業・研究開発用品,0,False,False,
+Onalra,C_英数字のみ,1,中小候補,家電＆カメラ,1,False,False,070
+アイサポモバイル,B_和名(法人格なし),1,中小候補,家電＆カメラ,0,False,False,
+Yukimoto,C_英数字のみ,1,中小候補,ホーム＆キッチン,1,False,False,078
+Mountsafe,C_英数字のみ,1,中小候補,家電＆カメラ,0,False,False,
+Liaolee,C_英数字のみ,1,中小候補,ホーム＆キッチン,1,False,False,074
+Mtricpop,C_英数字のみ,1,中小候補,家電＆カメラ,1,False,False,075
+IAPOS,C_英数字のみ,1,中小候補,家電＆カメラ,0,False,False,
+ＡＮＤＥＲＹ,D_記号/数字のみ,1,中小候補,家電＆カメラ,1,False,False,019
+YIERSAN,C_英数字のみ,1,大手/海外疑い,家電＆カメラ,0,False,False,
+MIATONE,C_英数字のみ,1,中小候補,家電＆カメラ,0,False,False,
+Trywon,C_英数字のみ,1,中小候補,家電＆カメラ,0,False,False,
+Gillmar,C_英数字のみ,1,中小候補,家電＆カメラ,0,False,False,
+Speiow,C_英数字のみ,1,中小候補,家電＆カメラ,0,False,False,
+Erssimo,C_英数字のみ,1,中小候補,家電＆カメラ,1,False,False,077
+BONTEC,C_英数字のみ,1,中小候補,家電＆カメラ,0,False,False,
+Audwierr,C_英数字のみ,1,中小候補,家電＆カメラ,0,False,False,
+TELESIN,C_英数字のみ,1,中小候補,家電＆カメラ,0,False,False,
+Yokizu,C_英数字のみ,1,中小候補,ホーム＆キッチン,0,False,False,
+IKUNTOP,C_英数字のみ,1,中小候補,家電＆カメラ,0,False,False,
+Letpedi,C_英数字のみ,1,中小候補,家電＆カメラ,0,False,False,
+Cambink,C_英数字のみ,1,中小候補,家電＆カメラ,1,False,False,060
+atolla,C_英数字のみ,1,中小候補,パソコン・周辺機器,0,False,False,
+マーナ(Marna),B_和名(法人格なし),1,中小候補,ファッション,1,True,False,497
+LISEN,C_英数字のみ,1,中小候補,家電＆カメラ,0,False,False,
+Seiko,C_英数字のみ,1,大手/海外疑い,ホーム＆キッチン,1,True,False,451
+河合出版,B_和名(法人格なし),1,中小候補,本,1,False,True,978
+Belkin,C_英数字のみ,1,中小候補,家電＆カメラ,1,False,False,074
+Vellope,C_英数字のみ,1,中小候補,ホーム＆キッチン,1,False,False,019
+Eynew,C_英数字のみ,1,中小候補,家電＆カメラ,0,False,False,
+zonzon,C_英数字のみ,1,中小候補,家電＆カメラ,0,False,False,
+OMKUY,C_英数字のみ,1,中小候補,家電＆カメラ,0,False,False,
+矢崎エナジーシステム㈱,B_和名(法人格なし),1,中小候補,DIY・工具・ガーデン,0,False,False,
+GooSpy,C_英数字のみ,1,中小候補,家電＆カメラ,1,False,False,078
+FiiO,C_英数字のみ,1,中小候補,家電＆カメラ,1,True,False,456
+経営科学出版,B_和名(法人格なし),1,中小候補,本,1,False,True,978
+KJKD,C_英数字のみ,1,中小候補,家電＆カメラ,0,False,False,
+Alprojec,C_英数字のみ,1,中小候補,家電＆カメラ,0,False,False,
+VANBOKEE,C_英数字のみ,1,中小候補,家電＆カメラ,0,False,False,
+TAREASS,C_英数字のみ,1,中小候補,ホーム＆キッチン,1,False,False,078
+Dreemstar,C_英数字のみ,1,中小候補,ホーム＆キッチン,0,False,False,
+Mattel Games,C_英数字のみ,1,中小候補,おもちゃ,1,False,False,088
+Yibest,C_英数字のみ,1,中小候補,ホーム＆キッチン,1,False,False,070
+ウッディプッディ(Woodypuddy),B_和名(法人格なし),1,中小候補,おもちゃ,1,True,False,452
+Bulonchi,C_英数字のみ,1,中小候補,ホーム＆キッチン,1,False,False,074
+Tecaki,C_英数字のみ,1,中小候補,家電＆カメラ,0,False,False,
+コンチネンタル(Continental),B_和名(法人格なし),1,中小候補,スポーツ＆アウトドア,1,False,False,401
+GOBOT,C_英数字のみ,1,中小候補,ホーム＆キッチン,0,False,False,
+アイアップ,B_和名(法人格なし),1,中小候補,おもちゃ,2,True,False,454
+NIPLUX,C_英数字のみ,1,中小候補,ホーム＆キッチン,1,True,False,457
+Aterm,C_英数字のみ,1,中小候補,パソコン・周辺機器,2,True,False,455
+COOLERPLUS,C_英数字のみ,1,大手/海外疑い,パソコン・周辺機器,0,False,False,
+KOSS(コス),B_和名(法人格なし),1,中小候補,家電＆カメラ,1,False,False,002
+Magcubic,C_英数字のみ,1,中小候補,家電＆カメラ,0,False,False,
+ZWILLING,C_英数字のみ,1,中小候補,ホーム＆キッチン,1,False,False,400
+コロンバスサークル,B_和名(法人格なし),1,中小候補,ゲーム,1,True,False,458
+Jimveo,C_英数字のみ,1,中小候補,家電＆カメラ,1,False,False,077
+シーゲイト(SEAGATE),B_和名(法人格なし),1,大手/海外疑い,パソコン・周辺機器,1,True,False,452
+Yuuscc,C_英数字のみ,1,中小候補,ホーム＆キッチン,0,False,False,
+YEAHYO,C_英数字のみ,1,中小候補,家電＆カメラ,0,False,False,
+コールマン(Coleman),B_和名(法人格なし),1,中小候補,スポーツ＆アウトドア,5,True,False,499
+BMSE,C_英数字のみ,1,中小候補,パソコン・周辺機器,0,False,False,
+東芝(TOSHIBA),B_和名(法人格なし),1,大手/海外疑い,パソコン・周辺機器,5,True,False,060
+Butterfly,C_英数字のみ,1,中小候補,スポーツ＆アウトドア,1,True,False,490
+BIALETTI(ビアレッティ),B_和名(法人格なし),1,中小候補,ホーム＆キッチン,1,False,False,800
+Keculbo,C_英数字のみ,1,中小候補,家電＆カメラ,1,False,False,071
+Trafalgar Square Publishing,C_英数字のみ,1,中小候補,洋書,1,False,True,978
+KOJIHOMU,C_英数字のみ,1,中小候補,DIY・工具・ガーデン,0,False,False,
+iGPSPORT,C_英数字のみ,1,中小候補,スポーツ＆アウトドア,1,False,False,697
+HANMATEK,C_英数字のみ,1,中小候補,DIY・工具・ガーデン,0,False,False,
+Bosch,C_英数字のみ,1,中小候補,家電＆カメラ,1,False,False,316
+LEKGAVD,C_英数字のみ,1,中小候補,ホーム＆キッチン,1,False,False,078
+BMAXPAD,C_英数字のみ,1,中小候補,パソコン・周辺機器,0,False,False,
+TTJJ,C_英数字のみ,1,中小候補,大型家電,1,True,False,499
+Wacom(ワコム),B_和名(法人格なし),1,中小候補,パソコン・周辺機器,1,True,False,494
+フライングドッグ,B_和名(法人格なし),1,中小候補,ミュージック,1,True,False,458
+SACRA MUSIC,C_英数字のみ,1,中小候補,ミュージック,1,True,False,454
+SP Silicon Power,C_英数字のみ,1,中小候補,パソコン・周辺機器,1,False,False,471
+祥伝社,B_和名(法人格なし),1,中小候補,本,1,False,True,978
+OTTOCAST,C_英数字のみ,1,中小候補,車＆バイク,1,False,False,079
+Galaxy,C_英数字のみ,1,中小候補,家電＆カメラ,1,True,False,498
+サイバーガジェット,B_和名(法人格なし),1,中小候補,ゲーム,1,True,False,454
+LONPOO,C_英数字のみ,1,中小候補,家電＆カメラ,0,False,False,
+NBCユニバーサル・エンターテイメントジャパン,B_和名(法人格なし),1,中小候補,DVD,1,True,False,498
+medicom,C_英数字のみ,1,中小候補,ホビー,1,True,False,453
+Gigastone,C_英数字のみ,1,中小候補,パソコン・周辺機器,1,False,False,080
+Graphixly,C_英数字のみ,1,中小候補,PCソフト,1,False,False,086
+Saluyar,C_英数字のみ,1,中小候補,家電＆カメラ,0,False,False,
+マイクロソフト,B_和名(法人格なし),1,中小候補,ゲーム,1,True,False,454
+シュナイダーエレクトリック(APC),B_和名(法人格なし),1,中小候補,パソコン・周辺機器,1,True,False,453
+Headwolf,C_英数字のみ,1,中小候補,パソコン・周辺機器,0,False,False,
+TCエンタテインメント,B_和名(法人格なし),1,中小候補,DVD,1,True,False,456
+朝日新聞出版,B_和名(法人格なし),1,中小候補,本,1,False,True,978
+Wondershare,C_英数字のみ,1,中小候補,PCソフト,1,True,False,458
+うちのこエレクトリック,B_和名(法人格なし),1,中小候補,ペット用品,2,True,False,458
+ドウシシャ(DOSHISHA),B_和名(法人格なし),1,中小候補,ホーム＆キッチン,1,True,False,455
+ブロッコリー(BROCCOLI),B_和名(法人格なし),1,中小候補,ゲーム,1,True,False,451
+メデラ,B_和名(法人格なし),1,中小候補,ベビー＆マタニティ,1,False,False,761
+ジャニーズ･エンタテイメント,B_和名(法人格なし),1,中小候補,DVD,1,True,False,458
+C&G,C_英数字のみ,1,中小候補,スポーツ＆アウトドア,0,False,False,
+NIMASO,C_英数字のみ,1,中小候補,家電＆カメラ,0,False,False,
+UNOKKI,C_英数字のみ,1,中小候補,ホビー,1,False,False,697
+ワンナイト人狼,B_和名(法人格なし),1,中小候補,おもちゃ,1,True,False,457
+USAYAMA,C_英数字のみ,1,中小候補,ペット用品,1,True,False,458
+MiliCamp,C_英数字のみ,1,中小候補,スポーツ＆アウトドア,0,False,False,
+iFLEX,C_英数字のみ,1,中小候補,家電＆カメラ,1,False,False,002
+ColorfulHome,C_英数字のみ,1,中小候補,ホーム＆キッチン,1,True,False,457
+Biyoso,C_英数字のみ,1,中小候補,家電＆カメラ,0,False,False,
+RABLISS,C_英数字のみ,1,中小候補,ホーム＆キッチン,1,True,False,458
+ワンダーランド,B_和名(法人格なし),1,中小候補,おもちゃ,1,True,False,452
+OHAJIKI,C_英数字のみ,1,中小候補,車＆バイク,1,True,False,457
+TORRAS,C_英数字のみ,1,中小候補,家電＆カメラ,0,False,False,
+SAPHIR(サフィール),B_和名(法人格なし),1,中小候補,ファッション,1,True,False,496
+ZAKUSA,C_英数字のみ,1,中小候補,ホーム＆キッチン,1,False,False,074
+YBYP,C_英数字のみ,1,中小候補,家電＆カメラ,0,False,False,
+Ｌａｚｙｍｅ,D_記号/数字のみ,1,中小候補,ホーム＆キッチン,0,False,False,
+LENUTO,C_英数字のみ,1,中小候補,家電＆カメラ,1,False,False,078
+Yonker,C_英数字のみ,1,中小候補,ホーム＆キッチン,1,True,False,453
+ロジテック,B_和名(法人格なし),1,中小候補,パソコン・周辺機器,1,True,False,458
+あしあげ隊,B_和名(法人格なし),1,中小候補,DIY・工具・ガーデン,1,True,False,457
+Sinjimoru,C_英数字のみ,1,中小候補,家電＆カメラ,1,False,False,880
+Oregon,C_英数字のみ,1,中小候補,DIY・工具・ガーデン,0,False,False,
+mimimamo,C_英数字のみ,1,中小候補,家電＆カメラ,1,True,False,458
+ＭＥＮＧＬＩ盟励,B_和名(法人格なし),1,中小候補,ホーム＆キッチン,0,False,False,
+BTIHCEUOT,C_英数字のみ,1,中小候補,DIY・工具・ガーデン,1,False,False,071
+STARTRC,C_英数字のみ,1,中小候補,家電＆カメラ,0,False,False,
+ホーチキ(Hochiki),B_和名(法人格なし),1,中小候補,DIY・工具・ガーデン,1,True,False,456
+PYLAMISON,C_英数字のみ,1,中小候補,ホーム＆キッチン,1,False,False,078
+TABITUS+,C_英数字のみ,1,中小候補,ファッション,0,False,False,
+TP-Link,C_英数字のみ,1,中小候補,パソコン・周辺機器,1,False,False,693
+LAOPAO,C_英数字のみ,1,中小候補,ホーム＆キッチン,0,False,False,
+1Mii,C_英数字のみ,1,中小候補,家電＆カメラ,1,False,False,697
+TOPADRE,C_英数字のみ,1,中小候補,家電＆カメラ,0,False,False,
+Clipa,C_英数字のみ,1,中小候補,ファッション,1,True,False,456
+Portta,C_英数字のみ,1,大手/海外疑い,パソコン・周辺機器,1,False,False,489
+サーモス(THERMOS),B_和名(法人格なし),1,中小候補,スポーツ＆アウトドア,1,True,False,456
+太平洋工業,B_和名(法人格なし),1,中小候補,車＆バイク,0,False,False,
+KCUVSSKKII,C_英数字のみ,1,中小候補,スポーツ＆アウトドア,1,False,False,070
+BAL,C_英数字のみ,1,中小候補,車＆バイク,1,True,False,496
+LEICA(ライカ),B_和名(法人格なし),1,中小候補,スポーツ＆アウトドア,1,True,False,495
+Vexify,C_英数字のみ,1,中小候補,パソコン・周辺機器,1,False,False,071
+三陽金属(Sanyo Metal),B_和名(法人格なし),1,中小候補,DIY・工具・ガーデン,1,True,False,498
+タカラ産業,B_和名(法人格なし),1,中小候補,DIY・工具・ガーデン,1,True,False,454
+JELLY JELLY GAMES,C_英数字のみ,1,中小候補,おもちゃ,1,True,False,458
+H&W,C_英数字のみ,1,中小候補,スポーツ＆アウトドア,0,False,False,
+hololive OFFICIAL CARD GAME,C_英数字のみ,1,中小候補,おもちゃ,1,True,False,457
+PKBジャパン,B_和名(法人格なし),1,中小候補,ペット用品,1,False,False,004
+PONAOO,C_英数字のみ,1,中小候補,家電＆カメラ,0,False,False,
+Annexfun,C_英数字のみ,1,中小候補,おもちゃ,1,False,False,070
+駿台文庫,B_和名(法人格なし),1,中小候補,本,1,False,True,978
+コーナン,B_和名(法人格なし),1,中小候補,DIY・工具・ガーデン,1,True,False,452
+丸隆,B_和名(法人格なし),1,中小候補,大型家電,1,True,False,495
+Honda,C_英数字のみ,1,中小候補,車＆バイク,1,True,False,457
+Oliforu,C_英数字のみ,1,中小候補,ホーム＆キッチン,0,False,False,
+Lector House,C_英数字のみ,1,中小候補,洋書,1,False,True,978
+ZTCUIK,C_英数字のみ,1,中小候補,家電＆カメラ,0,False,False,
+Topcony,C_英数字のみ,1,中小候補,ベビー＆マタニティ,0,False,False,
+INFOCAR,C_英数字のみ,1,中小候補,車＆バイク,0,False,False,
+Blaze Entertainment,C_英数字のみ,1,中小候補,PCソフト,1,False,False,506
+Sinessy,C_英数字のみ,1,中小候補,ホーム＆キッチン,0,False,False,
+MJJC,C_英数字のみ,1,中小候補,DIY・工具・ガーデン,1,True,False,457
+LG,C_英数字のみ,1,中小候補,家電＆カメラ,1,True,False,498
+からからつみき(KARAKARATSUMIKI),B_和名(法人格なし),1,中小候補,おもちゃ,2,True,False,457
+BEAMS BOY(ビームスボーイ),B_和名(法人格なし),1,中小候補,ファッション,0,False,False,
+inforest,C_英数字のみ,1,中小候補,本,1,False,True,978
+UYIKOO,C_英数字のみ,1,中小候補,家電＆カメラ,0,False,False,
+ぴあ,B_和名(法人格なし),1,中小候補,本,1,True,False,490
+パイロットコーポレーション(PILOT CORPORATION),A_法人格つき,1,中小候補,おもちゃ,1,True,False,497
+Kiboer,C_英数字のみ,1,中小候補,スポーツ＆アウトドア,0,False,False,
+ＹＡＺＡＫＩ,D_記号/数字のみ,1,中小候補,DIY・工具・ガーデン,0,False,False,
+フロムソフトウェア,B_和名(法人格なし),1,中小候補,ゲーム,1,True,False,494
+ジェネオン・ユニバーサル,B_和名(法人格なし),1,中小候補,DVD,1,True,False,498
+コクヨ(KOKUYO),B_和名(法人格なし),1,大手/海外疑い,家電＆カメラ,1,True,False,490
+EJD,C_英数字のみ,1,中小候補,ホーム＆キッチン,0,False,False,
+RK ROYAL KLUDGE,C_英数字のみ,1,中小候補,パソコン・周辺機器,0,False,False,
+Barbie,C_英数字のみ,1,中小候補,PCソフト,2,False,False,019
+Franklin Sensors,C_英数字のみ,1,中小候補,DIY・工具・ガーデン,1,False,False,085
+カワサキ(Kawasaki),B_和名(法人格なし),1,中小候補,車＆バイク,0,False,False,
+Harvill Secker,C_英数字のみ,1,中小候補,洋書,1,False,True,978
+Garnier Editora,C_英数字のみ,1,中小候補,洋書,1,False,True,978
+ロゴヴィスタ,B_和名(法人格なし),1,中小候補,PCソフト,1,True,False,494
+etoe,C_英数字のみ,1,中小候補,家電＆カメラ,0,False,False,
+YZO,C_英数字のみ,1,中小候補,スポーツ＆アウトドア,1,False,False,074
+Business,C_英数字のみ,1,中小候補,洋書,1,False,True,978
+中央法規出版,B_和名(法人格なし),1,中小候補,本,1,False,True,978
+日本電興株式会社,A_法人格つき,1,中小候補,DIY・工具・ガーデン,1,True,False,496
+Flirva,C_英数字のみ,1,中小候補,車＆バイク,1,False,False,076
+Hachette Audio,C_英数字のみ,1,中小候補,洋書,1,False,True,978
+Laoynd,C_英数字のみ,1,中小候補,ホーム＆キッチン,0,False,False,
+Mobile Fidelity Sound Lab,C_英数字のみ,1,大手/海外疑い,ミュージック,2,False,True,082
+フォーライフミュージックエンタテイメント,B_和名(法人格なし),1,中小候補,ミュージック,1,True,False,498
+Island Uk,C_英数字のみ,1,中小候補,ミュージック,1,False,False,060
+DVDBOX5枚組,B_和名(法人格なし),1,中小候補,PCソフト,1,True,False,498
+ERJ,C_英数字のみ,1,中小候補,ミュージック,1,True,False,498
+Vintage Canada,C_英数字のみ,1,中小候補,洋書,1,False,True,978
+Imports,C_英数字のみ,1,中小候補,DVD,1,False,False,505
+VITURE,C_英数字のみ,1,中小候補,ゲーム,1,False,False,085
+iZotope,C_英数字のみ,1,中小候補,PCソフト,1,True,False,453
+ESET,C_英数字のみ,1,中小候補,PCソフト,1,True,False,495
+ベンキュージャパン,B_和名(法人格なし),1,中小候補,パソコン・周辺機器,1,True,False,454
+atRise,C_英数字のみ,1,中小候補,おもちゃ,1,True,False,458
+快適設計IBR,B_和名(法人格なし),1,中小候補,産業・研究開発用品,1,True,False,457
+TEOOT,C_英数字のみ,1,中小候補,車＆バイク,1,False,False,075
+Hikari(ヒカリ),B_和名(法人格なし),1,中小候補,ペット用品,1,True,False,497
+Scndtne,C_英数字のみ,1,中小候補,家電＆カメラ,2,False,False,079
+LETMY,C_英数字のみ,1,中小候補,スポーツ＆アウトドア,0,False,False,
+Safigor,C_英数字のみ,1,中小候補,家電＆カメラ,0,False,False,
+四国化成工業,B_和名(法人格なし),1,中小候補,産業・研究開発用品,0,False,False,
+FAR EAST GADGET,C_英数字のみ,1,中小候補,パソコン・周辺機器,1,True,False,458
+Tarkins,C_英数字のみ,1,中小候補,スポーツ＆アウトドア,1,False,False,062
+eue,C_英数字のみ,1,中小候補,ホーム＆キッチン,1,False,False,078
+Twofox,C_英数字のみ,1,中小候補,車＆バイク,0,False,False,
+ナイキ(NIKE),B_和名(法人格なし),1,大手/海外疑い,スポーツ＆アウトドア,1,True,False,456
+THRIVE(スライヴ),B_和名(法人格なし),1,中小候補,ホーム＆キッチン,2,True,False,497
+IMDEN CHARGE,C_英数字のみ,1,中小候補,家電＆カメラ,0,False,False,
+ZRZK,C_英数字のみ,1,大手/海外疑い,家電＆カメラ,0,False,False,
+SEMOTU,C_英数字のみ,1,中小候補,パソコン・周辺機器,1,False,False,079
+BeeTool,C_英数字のみ,1,中小候補,ホーム＆キッチン,0,False,False,
+ACMEZING,C_英数字のみ,1,中小候補,家電＆カメラ,0,False,False,
+SCM Microsystems,C_英数字のみ,1,中小候補,パソコン・周辺機器,1,False,False,065
+ルートアール,B_和名(法人格なし),1,中小候補,パソコン・周辺機器,1,True,False,456
+Bolvunes,C_英数字のみ,1,中小候補,パソコン・周辺機器,0,False,False,
+Yamazaki(山崎実業),B_和名(法人格なし),1,中小候補,ホーム＆キッチン,1,True,False,490
+AooDen,C_英数字のみ,1,中小候補,ホーム＆キッチン,0,False,False,
+日本のオラクルカード・タロットカード全集,B_和名(法人格なし),1,中小候補,おもちゃ,1,True,False,457
+MAXZIQF,C_英数字のみ,1,中小候補,DIY・工具・ガーデン,0,False,False,
+ビクター(VICTOR),B_和名(法人格なし),1,中小候補,パソコン・周辺機器,1,True,False,499
+TOWOOZ,C_英数字のみ,1,中小候補,パソコン・周辺機器,0,False,False,
+138OnlineShop,C_英数字のみ,1,中小候補,車＆バイク,0,False,False,
+GuMosh,C_英数字のみ,1,中小候補,車＆バイク,0,False,False,
+イーサプライ,B_和名(法人格なし),1,中小候補,パソコン・周辺機器,1,True,False,458
+LINKChef,C_英数字のみ,1,中小候補,ホーム＆キッチン,0,False,False,
+Perixx,C_英数字のみ,1,中小候補,パソコン・周辺機器,1,False,False,404
+Douyear,C_英数字のみ,1,中小候補,ホーム＆キッチン,0,False,False,
+Earbood,C_英数字のみ,1,中小候補,ホーム＆キッチン,0,False,False,
+ホビージャパン(HobbyJAPAN),B_和名(法人格なし),1,中小候補,おもちゃ,1,True,False,498
+KYG,C_英数字のみ,1,中小候補,ペット用品,1,False,False,697
+VentaPak,C_英数字のみ,1,中小候補,ファッション,1,False,False,086
+iplusmile,C_英数字のみ,1,中小候補,DIY・工具・ガーデン,0,False,False,
+ニュートンプレス,B_和名(法人格なし),1,中小候補,本,1,True,False,491
+Sugeko,C_英数字のみ,1,中小候補,ホーム＆キッチン,0,False,False,
+DEXION,C_英数字のみ,1,中小候補,家電＆カメラ,2,False,False,074
+NOE,C_英数字のみ,1,中小候補,車＆バイク,0,False,False,
+AIZEO,C_英数字のみ,1,中小候補,車＆バイク,1,False,False,019
+Plata Publishing,C_英数字のみ,1,中小候補,洋書,1,False,True,978
+Bit Trade One,C_英数字のみ,1,中小候補,パソコン・周辺機器,1,True,False,456
+マイナビ出版,B_和名(法人格なし),1,中小候補,本,1,False,True,978
+レヂトン(Resiton),B_和名(法人格なし),1,中小候補,DIY・工具・ガーデン,1,True,False,493
+オーム社,B_和名(法人格なし),1,中小候補,本,1,False,True,978
+SwanScout,C_英数字のみ,1,中小候補,家電＆カメラ,0,False,False,
+Foxkoo,C_英数字のみ,1,中小候補,ホーム＆キッチン,1,False,False,075
+フィード,B_和名(法人格なし),1,中小候補,ホーム＆キッチン,0,False,False,
+モリグリーン(Moly Green),B_和名(法人格なし),1,中小候補,車＆バイク,2,True,False,498
+ジョブカン Desktop,B_和名(法人格なし),1,中小候補,PCソフト,1,True,False,458
+AthleteBody株式会社,A_法人格つき,1,中小候補,本,1,False,True,978
+明治図書出版,B_和名(法人格なし),1,中小候補,本,1,False,True,978
+AboveTEK,C_英数字のみ,1,中小候補,パソコン・周辺機器,1,False,False,085
+Avylet,C_英数字のみ,1,中小候補,車＆バイク,0,False,False,
+WAVLINK,C_英数字のみ,1,中小候補,パソコン・周辺機器,1,False,False,069
+Everline,C_英数字のみ,1,中小候補,おもちゃ,1,False,False,037
+オスモカラー,B_和名(法人格なし),1,中小候補,DIY・工具・ガーデン,1,False,False,400
+本間ゴルフ,B_和名(法人格なし),1,中小候補,スポーツ＆アウトドア,0,False,False,
+8Bitdo,C_英数字のみ,1,大手/海外疑い,ゲーム,2,False,False,222
+CyclingDeal,C_英数字のみ,1,中小候補,スポーツ＆アウトドア,3,False,False,081
+BQEYZ,C_英数字のみ,1,中小候補,家電＆カメラ,1,False,False,069
+グッドスマイルカンパニー(GOOD SMILE COMPANY),B_和名(法人格なし),1,中小候補,おもちゃ,1,True,False,458
+AQielev,C_英数字のみ,1,中小候補,ゲーム,0,False,False,
+ウェイモール (WEIMALL),B_和名(法人格なし),1,大手/海外疑い,車＆バイク,0,False,False,
+Roadlamp,C_英数字のみ,1,中小候補,ミュージック,1,False,False,075
+パワーブリーズ(POWER BREATHE),B_和名(法人格なし),1,中小候補,スポーツ＆アウトドア,1,False,False,506
+白泉社,B_和名(法人格なし),1,中小候補,本,2,True,True,491
+ストレッチングボード,B_和名(法人格なし),1,中小候補,スポーツ＆アウトドア,1,True,False,496
+ワー ナー・ブ ラザース・ホームエ ンターテイ メント,B_和名(法人格なし),1,中小候補,DVD,1,True,False,458
+Lusciouz,C_英数字のみ,1,中小候補,ホーム＆キッチン,1,True,False,457
+Shout! Factory,C_英数字のみ,1,中小候補,DVD,1,False,False,082
+Mill Creek Entertainment,C_英数字のみ,1,中小候補,文房具・オフィス用品,1,False,False,068
+GoveeLife,C_英数字のみ,1,中小候補,大型家電,2,False,False,081
+Judout,C_英数字のみ,1,中小候補,ホーム＆キッチン,0,False,False,
+Handeful,C_英数字のみ,1,中小候補,スポーツ＆アウトドア,1,False,False,060
+東映,B_和名(法人格なし),1,中小候補,DVD,0,False,False,
+CME,C_英数字のみ,1,中小候補,楽器・音響機器,2,False,False,019
+株式会社ソニー・ピクチャーズ エンタテインメント,A_法人格つき,1,大手/海外疑い,DVD,0,False,False,
+Syitren,C_英数字のみ,1,中小候補,家電＆カメラ,1,False,False,697
+AHS,C_英数字のみ,1,中小候補,PCソフト,1,True,False,456
+矢崎化工(Yazaki Kako),B_和名(法人格なし),1,中小候補,DIY・工具・ガーデン,0,False,False,
+SENPPLE,C_英数字のみ,1,中小候補,ホーム＆キッチン,1,False,False,076
+Collonil(コロニル),B_和名(法人格なし),1,中小候補,ファッション,0,False,False,
+スリーエム(3M),B_和名(法人格なし),1,中小候補,車＆バイク,2,True,False,005
+Avrpqiwy,C_英数字のみ,1,中小候補,産業・研究開発用品,1,False,False,471
+roborock,C_英数字のみ,1,中小候補,ホーム＆キッチン,1,False,False,697
+筒井時正商店,B_和名(法人格なし),1,中小候補,おもちゃ,1,True,False,451
+金鳥,B_和名(法人格なし),1,中小候補,DIY・工具・ガーデン,1,True,False,498
+MiiElAOD,C_英数字のみ,1,中小候補,パソコン・周辺機器,0,False,False,
+ブレイス(Braith),B_和名(法人格なし),1,中小候補,車＆バイク,1,True,False,493
+消臭ビーズ,B_和名(法人格なし),1,中小候補,ペット用品,1,True,False,452
+aestiquo,C_英数字のみ,1,中小候補,車＆バイク,0,False,False,
+富士通,B_和名(法人格なし),1,中小候補,パソコン・周辺機器,3,True,False,065
+NorwegianStyle,C_英数字のみ,1,中小候補,スポーツ＆アウトドア,0,False,False,
+大島屋(Ooshimaya),B_和名(法人格なし),1,中小候補,ホーム＆キッチン,1,True,False,453
+Maxell,C_英数字のみ,1,中小候補,家電＆カメラ,1,True,False,490
+Laundrin'(ランドリン),B_和名(法人格なし),1,中小候補,車＆バイク,1,True,False,458
+こぐま会,B_和名(法人格なし),1,中小候補,本,2,False,True,978
+ゼンハイザー(Sennheiser),B_和名(法人格なし),1,中小候補,家電＆カメラ,1,False,False,404
+ハズブロ(HASBRO),B_和名(法人格なし),1,中小候補,おもちゃ,1,False,False,063
+NANOXone(ナノックスワン),B_和名(法人格なし),1,中小候補,産業・研究開発用品,1,True,False,490
+THANKO,C_英数字のみ,1,中小候補,ホーム＆キッチン,2,True,False,458
+LIHILIS,C_英数字のみ,1,中小候補,ホーム＆キッチン,1,False,False,074
+山善(YAMAZEN),B_和名(法人格なし),1,大手/海外疑い,家電＆カメラ,1,True,False,455
+NETGEAR,C_英数字のみ,1,中小候補,パソコン・周辺機器,1,False,False,060
+PLUS91(プラス91）,B_和名(法人格なし),1,中小候補,車＆バイク,0,False,False,
+KJK,C_英数字のみ,1,中小候補,家電＆カメラ,1,False,False,079
+Blackstone Publishing,C_英数字のみ,1,中小候補,洋書,1,False,True,979
+空調服,B_和名(法人格なし),1,中小候補,家電＆カメラ,0,False,False,
+マンフロット(Manfrotto),B_和名(法人格なし),1,中小候補,家電＆カメラ,1,False,False,071
+Def Jam,C_英数字のみ,1,中小候補,ミュージック,1,False,False,060
+Philoent,C_英数字のみ,1,中小候補,家電＆カメラ,1,False,False,074
+Goal Zero,C_英数字のみ,1,中小候補,スポーツ＆アウトドア,1,False,False,084
+B3 BIGTHREE,C_英数字のみ,1,中小候補,パソコン・周辺機器,0,False,False,
+マスプロ電工,B_和名(法人格なし),1,中小候補,家電＆カメラ,1,True,False,497
+Kimwood,C_英数字のみ,1,中小候補,車＆バイク,1,False,False,076
+Derila,C_英数字のみ,1,中小候補,ホーム＆キッチン,1,False,False,506
+Google,C_英数字のみ,1,中小候補,家電＆カメラ,1,False,False,084
+Globular Cluster,C_英数字のみ,1,中小候補,ゲーム,0,False,False,
+Evercade,C_英数字のみ,1,中小候補,PCソフト,1,False,False,506
+メロリン,B_和名(法人格なし),1,中小候補,産業・研究開発用品,1,True,False,458
+N-style,C_英数字のみ,1,中小候補,車＆バイク,1,True,False,457
+Audio Technica(オーディオテクニカ),B_和名(法人格なし),1,中小候補,パソコン・周辺機器,1,True,False,496
+Spopal,C_英数字のみ,1,中小候補,スポーツ＆アウトドア,0,False,False,
+Braun,C_英数字のみ,1,中小候補,ホーム＆キッチン,1,True,False,498
+サムスン(SAMSUNG),B_和名(法人格なし),1,中小候補,パソコン・周辺機器,1,False,False,088
+Tipkook,C_英数字のみ,1,中小候補,スポーツ＆アウトドア,0,False,False,
+アイホン,B_和名(法人格なし),1,中小候補,DIY・工具・ガーデン,1,True,False,496
+マガジンハウス,B_和名(法人格なし),1,中小候補,本,3,True,True,491
+ヘリノックス(Helinox),B_和名(法人格なし),1,中小候補,スポーツ＆アウトドア,1,False,False,100
+フジクリーン,B_和名(法人格なし),1,中小候補,DIY・工具・ガーデン,1,False,False,210
+HP,C_英数字のみ,1,中小候補,パソコン・周辺機器,0,False,False,
+NGK,C_英数字のみ,1,中小候補,車＆バイク,1,False,False,401
+プロクソン(PROXXON),B_和名(法人格なし),1,中小候補,DIY・工具・ガーデン,1,True,False,495
+Speakers Corner,C_英数字のみ,1,中小候補,ミュージック,1,False,False,075
+安永,B_和名(法人格なし),1,中小候補,DIY・工具・ガーデン,1,True,False,458
+LEGACY RECORDINGS,C_英数字のみ,1,中小候補,ミュージック,1,False,False,088
+Semtyait,C_英数字のみ,1,中小候補,DIY・工具・ガーデン,1,False,False,079
+プリンストン,B_和名(法人格なし),1,大手/海外疑い,パソコン・周辺機器,1,True,False,498
+BIUBLE,C_英数字のみ,1,中小候補,車＆バイク,1,False,False,071
+OM SYSTEM/オリンパス,B_和名(法人格なし),1,中小候補,楽器・音響機器,1,True,False,454
+MEDICOM TOY,C_英数字のみ,1,中小候補,ホビー,1,True,False,453
+KingSpec,C_英数字のみ,1,中小候補,パソコン・周辺機器,1,False,False,695
+マクサー電機,B_和名(法人格なし),1,中小候補,家電＆カメラ,1,True,False,494
+ロッキングオン,B_和名(法人格なし),1,中小候補,本,4,True,False,491
+Winning,C_英数字のみ,1,中小候補,スポーツ＆アウトドア,1,True,False,457
+amBand,C_英数字のみ,1,大手/海外疑い,家電＆カメラ,0,False,False,
+ヤマハ(YAMAHA),B_和名(法人格なし),1,中小候補,家電＆カメラ,1,True,False,495
+アーテック(artec),B_和名(法人格なし),1,中小候補,おもちゃ,1,True,False,452
+Kung Long,C_英数字のみ,1,中小候補,車＆バイク,1,False,False,471
+BGB,C_英数字のみ,1,中小候補,ホーム＆キッチン,1,False,False,079
+Mt.SUMI,C_英数字のみ,1,中小候補,スポーツ＆アウトドア,1,True,False,458
+コロコロ堂,B_和名(法人格なし),1,中小候補,おもちゃ,1,True,False,457
+英治出版,B_和名(法人格なし),1,中小候補,本,1,False,True,978
+コンフィデンス,B_和名(法人格なし),1,中小候補,ペット用品,1,True,False,495
+AZ(エーゼット),B_和名(法人格なし),1,中小候補,DIY・工具・ガーデン,1,True,False,496
+三菱電機(MITSUBISHI ELECTRIC),B_和名(法人格なし),1,中小候補,大型家電,0,False,False,
+東レ(TORAY),B_和名(法人格なし),1,中小候補,ホーム＆キッチン,1,True,False,496
+マテル(MATTEL),B_和名(法人格なし),1,中小候補,おもちゃ,3,False,False,088
+テイクツー・インタラクティブ・ジャパン,B_和名(法人格なし),1,中小候補,ゲーム,1,True,False,457
+スプラトゥーン3,B_和名(法人格なし),1,中小候補,おもちゃ,1,True,False,494
+ユーブロック,B_和名(法人格なし),1,中小候補,パソコン・周辺機器,0,False,False,
+Hodderscape,C_英数字のみ,1,中小候補,洋書,1,False,True,978
+E-Kitap Projesi & Cheapest Books,C_英数字のみ,1,中小候補,洋書,1,False,True,978
+ピュリナ ワン,B_和名(法人格なし),1,中小候補,ペット用品,1,True,False,490
+GEMBLO COMPANY,C_英数字のみ,1,中小候補,おもちゃ,2,False,False,880
+カモ井加工紙,B_和名(法人格なし),1,中小候補,DIY・工具・ガーデン,1,True,False,497
+SAVOX,C_英数字のみ,1,中小候補,おもちゃ,1,False,False,471
+メグロ化学工業,B_和名(法人格なし),1,中小候補,産業・研究開発用品,0,False,False,
+MINTGAMES,C_英数字のみ,1,中小候補,おもちゃ,1,False,False,880
+Abrams Books,C_英数字のみ,1,中小候補,洋書,1,False,True,978
+Vitantonio (ビタントニオ),B_和名(法人格なし),1,中小候補,ホーム＆キッチン,1,True,False,496
+ウエスタンデジタル(Western Digital),B_和名(法人格なし),1,中小候補,パソコン・周辺機器,1,True,False,451
+NEC,C_英数字のみ,1,中小候補,パソコン・周辺機器,2,True,False,455
+新日本法規出版,B_和名(法人格なし),1,中小候補,本,1,False,True,978
+récolte,C_英数字のみ,1,中小候補,ホーム＆キッチン,1,True,False,458
+DXアンテナ,B_和名(法人格なし),1,中小候補,家電＆カメラ,1,True,False,497
+JLab,C_英数字のみ,1,中小候補,家電＆カメラ,1,False,False,081
+フシマン,B_和名(法人格なし),1,中小候補,車＆バイク,1,True,False,456
+メディックメディア,B_和名(法人格なし),1,中小候補,本,1,False,True,978
+Doubleday,C_英数字のみ,1,中小候補,洋書,2,False,True,978
+第一ビニール,B_和名(法人格なし),1,中小候補,DIY・工具・ガーデン,1,True,False,496
+Taishita,C_英数字のみ,1,中小候補,DVD,1,True,False,498
+Yale University Press,C_英数字のみ,1,中小候補,洋書,1,False,True,978
+株式会社ストームレーベルズ,A_法人格つき,1,中小候補,DVD,1,True,False,458
+Bolinda/Audible Audio,C_英数字のみ,1,中小候補,洋書,1,False,True,978
+Teenage Engineering,C_英数字のみ,1,中小候補,楽器・音響機器,1,True,False,453
+AMOVO,C_英数字のみ,1,中小候補,DVD,1,False,False,006
+Hi-Spec,C_英数字のみ,1,中小候補,DIY・工具・ガーデン,1,False,False,088
+ポケモン(Pokemon),B_和名(法人格なし),1,中小候補,ゲーム,1,False,False,220
+arboleaf,C_英数字のみ,1,中小候補,ホーム＆キッチン,1,False,False,085
+Seefox,C_英数字のみ,1,中小候補,DVD,1,False,False,019
+Lemorele,C_英数字のみ,1,中小候補,パソコン・周辺機器,0,False,False,
+エーペックス(Apex),B_和名(法人格なし),1,中小候補,ホビー,1,False,False,697
+LEWITT,C_英数字のみ,1,中小候補,楽器・音響機器,1,True,False,453
+MIHAMA,C_英数字のみ,1,中小候補,ホーム＆キッチン,0,False,False,
+株式会社マーベラス,A_法人格つき,1,中小候補,DVD,0,False,False,
+Barnes & Noble,C_英数字のみ,1,中小候補,洋書,1,False,True,978
+Wantek,C_英数字のみ,1,中小候補,パソコン・周辺機器,2,False,False,071
+LEONINE,C_英数字のみ,1,中小候補,DVD,1,False,False,401
+テスコム,B_和名(法人格なし),1,中小候補,ペット用品,1,True,False,497
+Funimation,C_英数字のみ,1,中小候補,DVD,1,False,False,070
+Simon & Schuster,C_英数字のみ,1,中小候補,洋書,2,False,True,978
+Seesii,C_英数字のみ,1,中小候補,DIY・工具・ガーデン,0,False,False,
+21Technology,C_英数字のみ,1,中小候補,スポーツ＆アウトドア,1,True,False,456
+anoutway,C_英数字のみ,1,中小候補,スポーツ＆アウトドア,1,False,False,697
+ATLANTIC RECORDS,C_英数字のみ,1,中小候補,ミュージック,1,False,False,008
+Eonon,C_英数字のみ,1,中小候補,車＆バイク,1,False,False,697
+Xvive,C_英数字のみ,1,中小候補,楽器・音響機器,1,False,False,694
+リンナイ(Rinnai),B_和名(法人格なし),1,中小候補,DIY・工具・ガーデン,0,False,False,
+JPjoy,C_英数字のみ,1,中小候補,おもちゃ,0,False,False,
+小川耕太郎∞百合子社,B_和名(法人格なし),1,中小候補,DIY・工具・ガーデン,0,False,False,
+ダイヤモンド社,B_和名(法人格なし),1,中小候補,本,1,False,True,978
+城東テクノ,B_和名(法人格なし),1,中小候補,DIY・工具・ガーデン,0,False,False,
+シャープ(SHARP),B_和名(法人格なし),1,大手/海外疑い,パソコン・周辺機器,1,True,False,497
+Faber & Faber,C_英数字のみ,1,中小候補,洋書,1,False,True,978
+pa-man,C_英数字のみ,1,中小候補,産業・研究開発用品,0,False,False,
+ソフトーク,B_和名(法人格なし),1,中小候補,産業・研究開発用品,1,True,False,490
+Greneo,C_英数字のみ,1,中小候補,ホーム＆キッチン,1,False,False,061
+RAILROAD SOCK(レイルロードソック),B_和名(法人格なし),1,中小候補,ファッション,0,False,False,
+CoolDove,C_英数字のみ,1,中小候補,DIY・工具・ガーデン,1,False,False,078
+Smith & Nephew,C_英数字のみ,1,中小候補,産業・研究開発用品,0,False,False,
+技術評論社,B_和名(法人格なし),1,中小候補,本,1,False,True,978
+野田琺瑯(Nodahoro),B_和名(法人格なし),1,中小候補,ホーム＆キッチン,1,True,False,497
+naef,C_英数字のみ,1,中小候補,ベビー＆マタニティ,0,False,False,
+アース渦巻香,B_和名(法人格なし),1,中小候補,スポーツ＆アウトドア,1,True,False,490
+KÄRCHER,C_英数字のみ,1,中小候補,DIY・工具・ガーデン,1,False,False,403
+いいずな書店,B_和名(法人格なし),1,中小候補,本,1,False,True,978
+King Records,C_英数字のみ,1,中小候補,DVD,1,True,False,498
+Earth Plus,C_英数字のみ,1,中小候補,パソコン・周辺機器,0,False,False,
+デビフ,B_和名(法人格なし),1,中小候補,ペット用品,1,True,False,497
+シモジマ(SHIMOJIMA),B_和名(法人格なし),1,中小候補,ホーム＆キッチン,1,True,False,490
+辻希美プロデュース,B_和名(法人格なし),1,中小候補,ベビー＆マタニティ,1,True,False,457
+イースター,B_和名(法人格なし),1,中小候補,ペット用品,4,True,False,497
+ドレミ楽譜出版社,B_和名(法人格なし),1,中小候補,本,1,False,True,978
+Deltran,C_英数字のみ,1,中小候補,車＆バイク,1,False,False,073
+NSW,C_英数字のみ,1,大手/海外疑い,ゲーム,1,True,False,457
+日経BP,B_和名(法人格なし),1,中小候補,本,1,False,True,978
+Kitty Media,C_英数字のみ,1,中小候補,DVD,1,False,False,063
+Magrathea Publishing,C_英数字のみ,1,中小候補,洋書,1,False,True,978
+ピープル,B_和名(法人格なし),1,中小候補,おもちゃ,1,True,False,497
+Sweet Cherry Publishing,C_英数字のみ,1,中小候補,洋書,1,False,True,978
+Arrow Video,C_英数字のみ,1,中小候補,ホーム＆キッチン,1,False,False,502
+P&S Detailing Products,C_英数字のみ,1,中小候補,車＆バイク,1,False,False,076
+昭文社,B_和名(法人格なし),1,中小候補,本,1,False,True,978
+スズキ機工(Suzuki Kikoh),B_和名(法人格なし),1,中小候補,車＆バイク,0,False,False,
+日経BP 日本経済新聞出版本部,B_和名(法人格なし),1,中小候補,本,1,False,True,978
+コミネ(KOMINE),B_和名(法人格なし),1,中小候補,産業・研究開発用品,1,True,False,458
+Public Publishing,C_英数字のみ,1,中小候補,洋書,1,False,True,978
+ジャニーズ・エンタテイメント,B_和名(法人格なし),1,中小候補,DVD,2,True,False,453
+SAMSUNG,C_英数字のみ,1,中小候補,パソコン・周辺機器,1,False,False,088
+美和ロック(Miwalock),B_和名(法人格なし),1,中小候補,DIY・工具・ガーデン,0,False,False,
+Kurilon,C_英数字のみ,1,中小候補,ベビー＆マタニティ,1,True,False,456
+Baby Shusher,C_英数字のみ,1,中小候補,ベビー＆マタニティ,4,False,False,060
+EveryDrop by Whirlpool,C_英数字のみ,1,中小候補,大型家電,1,False,False,088
+Workman Publishing,C_英数字のみ,1,中小候補,洋書,1,False,True,978
+Authors Equity,C_英数字のみ,1,中小候補,洋書,1,False,True,979
+StarTech.com(スターテック),B_和名(法人格なし),1,中小候補,パソコン・周辺機器,1,False,False,006
+HiGrace,C_英数字のみ,1,中小候補,パソコン・周辺機器,1,False,False,076
+ACKDZU,C_英数字のみ,1,中小候補,DVD,1,False,False,004
+Perfection Learning,C_英数字のみ,1,中小候補,洋書,1,False,True,978
+Revive Classics,C_英数字のみ,1,中小候補,洋書,1,False,True,978
+新書館,B_和名(法人格なし),1,中小候補,本,1,False,True,978
+WSS Playground,C_英数字のみ,1,中小候補,ゲーム,1,True,False,496
+Leatherwood Bespoke Rosin 社,B_和名(法人格なし),1,中小候補,楽器・音響機器,0,False,False,
+SMM ITAKU (MUSIC),C_英数字のみ,1,中小候補,ミュージック,1,True,False,456
+MITSUBA(ミツバサンコーワ),B_和名(法人格なし),1,中小候補,車＆バイク,2,True,False,458
+日本一ソフトウェア,B_和名(法人格なし),1,中小候補,ゲーム,1,True,False,499
+Rough Trade,C_英数字のみ,1,中小候補,ミュージック,2,False,False,050
+中央経済社,B_和名(法人格なし),1,中小候補,本,1,False,True,978
+TABWEE,C_英数字のみ,1,中小候補,パソコン・周辺機器,1,False,False,081
+KORG(コルグ),B_和名(法人格なし),1,中小候補,楽器・音響機器,3,True,False,019
+Scuf,C_英数字のみ,1,中小候補,ゲーム,1,False,False,085
+ARZOPA,C_英数字のみ,1,中小候補,パソコン・周辺機器,1,False,False,079
+EDISONmama(エジソンママ),B_和名(法人格なし),1,中小候補,ベビー＆マタニティ,1,True,False,454
+phiten(ファイテン),B_和名(法人格なし),1,中小候補,スポーツ＆アウトドア,1,True,False,494
+Ergobaby(エルゴベビー),B_和名(法人格なし),1,中小候補,ベビー＆マタニティ,1,False,False,019
+Wipuku,C_英数字のみ,1,中小候補,DVD,1,False,False,004
+Import,C_英数字のみ,1,中小候補,ミュージック,1,False,False,001
+METRO GOLDWYN MAYER,C_英数字のみ,1,中小候補,DVD,1,False,False,088
+株式会社 山本人形,A_法人格つき,1,中小候補,おもちゃ,0,False,False,
+WARNER RECORDS,C_英数字のみ,1,中小候補,ミュージック,2,False,True,009
+La Tromba,C_英数字のみ,1,中小候補,楽器・音響機器,1,False,False,403
+"Farrar, Straus and Giroux",C_英数字のみ,1,中小候補,洋書,1,False,True,978
+KRE,C_英数字のみ,1,中小候補,DVD,1,True,False,454
+海洋堂(KAIYODO),B_和名(法人格なし),1,中小候補,おもちゃ,1,True,False,453
+ENTEKE,C_英数字のみ,1,中小候補,DVD,1,False,False,078
+Puffin,C_英数字のみ,1,中小候補,洋書,1,False,True,978
+asics(アシックス),B_和名(法人格なし),1,中小候補,ファッション,2,True,False,457
+Focusrite,C_英数字のみ,1,中小候補,楽器・音響機器,1,False,False,081
+Amigo Spiel + Freizeit,C_英数字のみ,1,中小候補,おもちゃ,4,False,False,079
+幻冬舎,B_和名(法人格なし),1,中小候補,本,1,False,False,192
+Nulea,C_英数字のみ,1,中小候補,パソコン・周辺機器,0,False,False,
+よしもとミュージックエンタテインメント,B_和名(法人格なし),1,中小候補,DVD,1,True,False,457
+Hawk Press,C_英数字のみ,1,中小候補,洋書,1,False,True,978
+Outlook Verlag,C_英数字のみ,1,中小候補,洋書,1,False,True,978
+MGM (Video & DVD),C_英数字のみ,1,中小候補,DVD,1,False,False,088
+IK Multimedia,C_英数字のみ,1,中小候補,楽器・音響機器,1,True,False,453
+MANGA ENTERTAINMENT,C_英数字のみ,1,中小候補,DVD,1,False,False,502
+new balance(ニューバランス),B_和名(法人格なし),1,中小候補,ファッション,0,False,False,
+Logicool G(ロジクール G),B_和名(法人格なし),1,大手/海外疑い,家電＆カメラ,2,True,False,494
+日立(HITACHI),B_和名(法人格なし),1,大手/海外疑い,大型家電,2,True,False,490

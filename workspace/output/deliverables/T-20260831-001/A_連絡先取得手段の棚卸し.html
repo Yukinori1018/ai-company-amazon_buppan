@@ -1,0 +1,408 @@
+<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>A：メーカー連絡先の取得手段 棚卸し（T-20260831-001）</title>
+<style>
+:root{--fg:#1c1c1e;--mut:#6b6b70;--line:#e2e2e6;--acc:#0b5fff;--bg:#fff;--hl:#fff8e1}
+*{box-sizing:border-box}
+body{margin:0;padding:2.4rem 1.2rem 6rem;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",sans-serif;
+color:var(--fg);background:var(--bg);line-height:1.75;-webkit-text-size-adjust:100%}
+main{max-width:1100px;margin:0 auto}
+h1{font-size:1.7rem;border-bottom:3px solid var(--acc);padding-bottom:.5rem;margin:0 0 1.6rem}
+h2{font-size:1.28rem;margin:2.6rem 0 .9rem;padding-left:.6rem;border-left:5px solid var(--acc)}
+h3{font-size:1.08rem;margin:1.8rem 0 .6rem;color:#333}
+h4{font-size:1rem;margin:1.3rem 0 .4rem;color:#444}
+p{margin:.55rem 0}
+hr{border:0;border-top:1px solid var(--line);margin:2.2rem 0}
+table{border-collapse:collapse;width:100%;margin:1rem 0;font-size:.86rem;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:.5rem .6rem;text-align:left;vertical-align:top}
+th{background:#f5f6f8;font-weight:600;white-space:nowrap}
+tbody tr:nth-child(even){background:#fafafb}
+code{background:#f1f2f4;padding:.12em .38em;border-radius:4px;font-size:.86em;
+font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+blockquote{margin:1rem 0;padding:.8rem 1rem;background:var(--hl);border-left:4px solid #f0b429;border-radius:0 6px 6px 0}
+ul,ol{margin:.5rem 0;padding-left:1.5rem}
+li{margin:.25rem 0}
+a{color:var(--acc);word-break:break-all}
+strong{font-weight:700}
+.meta{color:var(--mut);font-size:.85rem}
+@media print{body{padding:0} table{font-size:.7rem}}
+</style></head><body><main>
+<h1>A：メーカー連絡先の取得手段 棚卸し</h1>
+
+<ul>
+<li>チケット：T-20260831-001 / Phase A</li>
+<li>担当：リサーチャー サトル</li>
+<li>作成日：2026-08-31</li>
+<li>対象データ：<code>workspace/output/deliverables/T-20260817-005/v14/03_メーカー名寄せ.csv</code>（822行）</li>
+<li>前提：Phase B（法務ハルオ）の適法性判定を反映済み</li>
+</ul>
+
+<hr>
+
+<h2>0. イシュー</h2>
+
+<p><strong>822件のブランド名文字列だけを入力に、連絡先を機械的に埋められるか。埋まるとしたら英字ブランドで何社／和名で何社、いくらかかるか。</strong></p>
+
+<h2>スコープと打ち切り条件</h2>
+
+<table><thead><tr><th>項目</th><th>宣言</th></tr></thead><tbody>
+<tr><td>調べた</td><td>公的DB4種／GS1系2種／<strong>検索API7種</strong>／商用DB3種／自前データからの推定手段</td></tr>
+<tr><td>調べない</td><td>Amazon側の経路（<strong>ハルオが不可と判定済み</strong>）／各社の個別調査（Phase C）／適法性の判断（ハルオの領分）</td></tr>
+<tr><td>打ち切り線</td><td>料金・API仕様・制限は公式ページで確認できたものだけを「事実」とする。取れなかったものは「未確認」と明記して止める</td></tr>
+<tr><td>実測したこと</td><td>①822社の名前分布・JAN分布 ②英字526社のドメイン推測ヒット率（HTTP実測 N=517） ③英字526社の「日本シグナル」4指標</td></tr>
+</tbody></table>
+
+<hr>
+
+<h2>1. 結論（先に4つ）</h2>
+
+<h3>① 公式HP探索は自動化できます。塞がっていません</h3>
+
+<p>Google Custom Search JSON API は新規受付停止、Bing Search API は2025-08-11で廃止済み。ですが <strong>Google の正規代替が存在します。</strong></p>
+
+<blockquote><strong>最有力：Gemini API の「Grounding with Google Search」。Gemini 3.x モデルで月5,000リクエストが無料。822社は無料枠に完全に収まります。</strong><br>Google 自身が提供する正規APIで、検索結果のスクレイピングではありません。カード登録も不要（無料枠のみ利用の場合）。</blockquote>
+
+<p>次点として Serper.dev（2,500クエリ無料・カード不要）、Tavily（月1,000クレジット無料・カード不要）があります。詳細は §5-2。</p>
+
+<h3>② 和名293社と英字526社は、まったく別の問題です</h3>
+
+<p>和名側は公的DB（国税庁・gBizINFO）が主戦力。英字側は商号検索なので<strong>原理的に効きません</strong>。</p>
+
+<h3>③ 英字526社のうち、日本の実体を示すシグナルがあるのは実測145社（27.6%）</h3>
+
+<p>残り381社（72.4%）はシグナルゼロ。<strong>この判別は0円・追加申請なしで、すでに手元にあるデータだけで付けられます</strong>（§4）。</p>
+
+<h3>④ 381社は「取れない」と結論づけるのが合理的です</h3>
+
+<p>Amazon経路（出品者の特商法表記・ブランドストア）がハルオの判定で<strong>使用不可</strong>になったため、日本法人を持たない中国系ブランドを辿る道が消えました。深追いしても交渉相手には行き着きません。</p>
+
+<p><strong>推奨構成の実費：0円。社長の手が要る申請は2件（gBizINFOトークン、Gemini APIキー）。</strong></p>
+
+<hr>
+
+<h2>2. 母集団の実態（自前集計・N=822）</h2>
+
+<p>すべて <code>03_メーカー名寄せ.csv</code> と <code>v14/raw</code> の Keepa 生データから自分で数えた実測値です。</p>
+
+<h3>2-1. 名前の型</h3>
+
+<table><thead><tr><th>型</th><th>社数</th><th>比率</th><th>例</th></tr></thead><tbody>
+<tr><td>A. 法人格つき</td><td>13</td><td>1.6%</td><td>ウォルト・ディズニー・ジャパン株式会社</td></tr>
+<tr><td>B. 和名だが法人格なし</td><td>280</td><td>34.1%</td><td>サンデーペイント、日進医療器</td></tr>
+<tr><td><strong>A+B（＝和名系）</strong></td><td><strong>293</strong></td><td><strong>35.6%</strong></td><td>—</td></tr>
+<tr><td>C. 英数字のみ</td><td><strong>526</strong></td><td><strong>64.0%</strong></td><td>UGREEN、htrahy、Gudluky、KODAK</td></tr>
+<tr><td>D. 記号/数字のみ</td><td>3</td><td>0.4%</td><td>—</td></tr>
+</tbody></table>
+
+<blockquote>タカシの分類（英字528／和名289）とは±2社の差。判定 regex の違い（<code>Co.,Ltd</code> を法人格と見るか等）によるもので、結論に影響しません。以降は自分の集計値で書きます。</blockquote>
+
+<h3>2-2. JAN（GS1 Japan 事業者コード 45/49始まり）の有無</h3>
+
+<p>Keepa 生データの <code>eanList</code> を全ブランドについて集計（対象商品 N=2,100、うち eanList あり 1,569件＝74.7%）。</p>
+
+<table><thead><tr><th>名前の型</th><th>JAN(45/49)あり</th><th>非JAN</th><th>EAN自体が取れず</th><th>計</th></tr></thead><tbody>
+<tr><td>A+B（和名系）</td><td><strong>193（65.9%）</strong></td><td>64</td><td>36</td><td>293</td></tr>
+<tr><td>C（英字）</td><td><strong>91（17.3%）</strong></td><td>265</td><td>170</td><td>526</td></tr>
+<tr><td>D</td><td>0</td><td>1</td><td>2</td><td>3</td></tr>
+<tr><td><strong>合計</strong></td><td><strong>284（34.5%）</strong></td><td>330（40.1%）</td><td>208（25.3%）</td><td>822</td></tr>
+</tbody></table>
+
+<p>EAN先頭2桁の内訳（社数）：45=144 / 49=129 / 07=104 / 97=67(ISBN) / 08=36 / 69=23(中国) / 06=23 / 00=21</p>
+
+<blockquote><strong>注意（推測・確度中）：</strong> 米国系プレフィックス（00/01/06/07/08）が200社ありますが、中国系セラーが米国の UPC を購入して使うのは既知のパターンです。<strong>「07始まり＝米国企業」とは読めません。</strong></blockquote>
+
+<h3>2-3. その他の実測</h3>
+
+<table><thead><tr><th>指標</th><th>値</th></tr></thead><tbody>
+<tr><td>規模フラグ「中小候補」</td><td>760社（92.5%）／「大手・海外疑い」62社（7.5%）</td></tr>
+<tr><td>該当商品数が1件だけ</td><td>575社（70.0%）。2-4件 200社、5-9件 28社、10件以上 19社</td></tr>
+<tr><td>メーカー直販フラグ</td><td>197社（24.0%）※Amazon経路が不可のため活用先が限定</td></tr>
+<tr><td>主なカテゴリ上位</td><td>家電＆カメラ148 / PC周辺109 / ホーム＆キッチン95 / DVD58 / DIY54</td></tr>
+<tr><td>ISBN（978/979）商品を持つ</td><td>80社（＝出版社。交渉対象として別枠）</td></tr>
+</tbody></table>
+
+<hr>
+
+<h2>3. ハルオの判定で消えた道と、その影響</h2>
+
+<table><thead><tr><th>手段</th><th>ハルオ判定</th><th><strong>本調査への影響</strong></th></tr></thead><tbody>
+<tr><td>Amazon 商品ページ／ブランドストアの自動取得</td><td><strong>不可</strong></td><td>「輸入者」表記の取得が不可能に。Keepa 経由で取れる brand/manufacturer で代替する（§4④）</td></tr>
+<tr><td><strong>Amazon 出品者の特定商取引法に基づく表記</strong></td><td><strong>不可</strong>（Amazon上のページのため）</td><td><strong>英字ブランドの最後の砦だった経路が消滅。</strong> メーカー直販フラグ197社を活かす道がなくなった。§6のシグナルゼロ381社を「取得不可」と結論づける根拠のひとつ</td></tr>
+<tr><td>Google 検索結果のスクレイピング</td><td><strong>不可</strong></td><td>影響なし（もともと採用していない）</td></tr>
+<tr><td>Google Custom Search JSON API</td><td>新規受付終了</td><td><strong>正規代替あり（§5-2）。公式HP探索の道は塞がっていません</strong></td></tr>
+<tr><td>メーカー公式サイトの自動取得</td><td><strong>条件付き可</strong>（robots.txt尊重・同一ホスト3秒間隔・UA明示・会社概要/問い合わせ系ページ限定）</td><td>§3-3のドメイン実測と §7 のHTML抽出はこの条件下で実行可能。<strong>822ホストは互いに別ホストなので、3秒間隔は並列実行で吸収できます</strong></td></tr>
+<tr><td>商用企業DB</td><td>条件付き可。ただし<strong>「第三者へ公衆送信してはならず」</strong></td><td><strong>このリポは PUBLIC のため、購入データを <code>deliverables/</code> に置くと規約違反になります。</strong> 商用DBを使うなら、成果物の置き場を分ける設計変更が先に必要（§8の論点）</td></tr>
+</tbody></table>
+
+<hr>
+
+<h2>4. 英字526社を「日本の実体があるか」で機械的に分ける方法【実測】</h2>
+
+<p>タカシの論点「<code>DUNLOP</code>（日本法人）と <code>Gudluky</code>（中国系）を名前だけでは分けられない」への回答です。</p>
+<p><strong>名前では分けられませんが、名前以外の4つの信号で分けられます。全部0円・手元のデータで完結します。</strong></p>
+
+<h3>4-1. 4つの判別信号と、実際に何社に立ったか（N=526）</h3>
+
+<table><thead><tr><th>#</th><th>信号</th><th>何を意味するか</th><th>立った社数</th><th>取得元・費用</th></tr></thead><tbody>
+<tr><td>①</td><td>EAN先頭が 45/49（JANコード）</td><td><strong>GS1 Japan が採番＝日本の事業者が登録している</strong></td><td><strong>91</strong></td><td>Keepa 生データ（取得済み・0円）</td></tr>
+<tr><td>②</td><td>推測ドメインが <code>.jp</code> / <code>.co.jp</code></td><td>日本向けサイトを持つ</td><td>23</td><td>HTTP実測（0円）</td></tr>
+<tr><td>③</td><td>サイトのタイトルに日本語</td><td>日本語で商売している</td><td>40</td><td>HTTP実測（0円）</td></tr>
+<tr><td>④</td><td>Keepa の <code>manufacturer</code> に日本語が入る</td><td>Amazon上の製造元表記が日本語（例 <code>ダンロップ(DUNLOP)</code>、<code>角川書店</code>）</td><td><strong>77</strong>（うち法人格つき13）</td><td>Keepa 生データ（取得済み・0円）</td></tr>
+<tr><td>—</td><td><strong>①〜④のいずれか＝「日本シグナルあり」</strong></td><td>—</td><td><strong>145（27.6%）</strong></td><td><strong>0円</strong></td></tr>
+<tr><td>—</td><td><strong>シグナルゼロ</strong></td><td>—</td><td><strong>381（72.4%）</strong></td><td>—</td></tr>
+</tbody></table>
+
+<p>信号の重なり：JAN∩日本語サイト=17、JANのみ=74、日本語サイトのみ=29、<strong>④だけで拾えた社=25</strong>（<code>KODAK</code> <code>SanDisk</code> <code>NETGEAR</code> <code>KÄRCHER</code> <code>NGK</code> <code>Bosch</code> <code>INTEX</code> <code>LxTek</code> など）。④は単独で25社を追加しており、入れる価値があります。</p>
+
+<h3>4-2. この判別の精度（正直に）</h3>
+
+<ul>
+<li><strong>偽陰性が出ます。</strong> 確認例：<code>Anker</code> は EAN が <code>0194644...</code>（米国UPC）、サイトは英語 <code>anker.com</code> のためシグナルゼロ判定になりますが、アンカー・ジャパン株式会社が実在します。</li>
+<li><strong>偽陽性は少ない</strong>と見ています（推測・確度中）。JAN 45/49 は GS1 Japan への登録が前提で、日本に登録者がいることの直接証拠だからです。</li>
+<li><strong>よってこの判別は「足切り」ではなく「優先順位づけ」に使ってください。</strong> シグナルあり145社を先に処理し、シグナルゼロ381社は抽出調査に留めるのが実務的です。</li>
+</ul>
+
+<blockquote>出力済み：<code>agent_output/T-20260831-001/英字ブランド_日本シグナル.csv</code>（526社 × 4信号 × 推測ドメイン × manufacturer例）</blockquote>
+
+<h3>4-3. 実測：ブランド名からのドメイン推測は何%当たるか</h3>
+
+<p>推測ではなく実際に走らせた結果です（実施日 2026-08-31）。</p>
+
+<ul>
+<li>対象：英字526社のうち英数字化して3〜25文字になった <strong>517社</strong></li>
+<li>方法：<code>&lt;brand&gt;.com</code> → <code>.jp</code> → <code>.co.jp</code> の順に DNS 解決 → GET し、HTTP&lt;400 をヒットとする（各ホスト1回のみアクセス）</li>
+</ul>
+
+<table><thead><tr><th>段階</th><th>社数</th><th>率</th></tr></thead><tbody>
+<tr><td>試行</td><td>517</td><td>100%</td></tr>
+<tr><td>①いずれかのTLDで生きているサイトに到達</td><td><strong>321</strong></td><td>62.1%</td></tr>
+<tr><td>②ページ本文/タイトルにブランド名が出現（無関係サイトを除外）</td><td><strong>237</strong></td><td>45.8%</td></tr>
+<tr><td>③うち <code>.jp</code> / <code>.co.jp</code></td><td>23</td><td>4.4%</td></tr>
+<tr><td>③うち ページタイトルに日本語</td><td>40</td><td>7.7%</td></tr>
+<tr><td>参考：ドメインパーキング疑い（売却文言を検出）</td><td>34</td><td>—</td></tr>
+</tbody></table>
+
+<blockquote><strong>事実：英字ブランドの公式HPは0円で237社ぶん候補が出せる。ただし日本語サイトはそのうち40社だけ。</strong><br><strong>推測（確度：高／根拠＝上記TLD・言語の実測）：残り197社は海外本社サイトで、日本語での仕入れ交渉窓口ではありません。</strong></blockquote>
+
+<hr>
+
+<h2>5. ソース別評価表</h2>
+
+<p>費用は <strong>822社を1回流したときの実費</strong>。為替は 1USD=150円（2026-08-31時点の概算）。</p>
+<p>空白セルは「該当なし」、<code>未確認</code> は調べたが一次確認できなかったものです。</p>
+
+<h3>5-1. データベース系（英字526 / 和名293 を分離）</h3>
+
+<table><thead><tr><th>#</th><th>ソース</th><th>取れる項目</th><th><strong>和名293社</strong></th><th><strong>英字526社</strong></th><th>費用</th><th>API/自動化</th><th>認証・申請</th><th>詰まり所</th></tr></thead><tbody>
+<tr><td>1</td><td><strong>国税庁 法人番号 全件データ（CSV一括DL）</strong></td><td>法人番号／商号／所在地</td><td><strong>◎ 主戦力</strong>。上限293社（推測120〜200社）</td><td><strong>× 原理的に不可</strong>（<code>Gudluky</code> は登記商号ではない）</td><td><strong>0円</strong></td><td>◎ ローカル照合・回数無制限</td><td><strong>不要</strong></td><td>ブランド名＝略称のため完全一致では落ちる。名寄せ精度が全て</td></tr>
+<tr><td>2</td><td>国税庁 法人番号 Web-API</td><td>同上＋<strong>英語表記検索（target=3）</strong></td><td>○（#1で足りる）</td><td><strong>△</strong> 英語表記を任意登録した法人のみ。登録母数は<strong>未確認</strong></td><td>0円</td><td>○ 部分一致（mode=2）あり</td><td>アプリケーションID要（無料・添付書類不要）</td><td>「短時間における大量アクセス」は規約で禁止。#1の方が安全</td></tr>
+<tr><td>3</td><td><strong>gBizINFO REST API v2</strong></td><td>法人番号／法人名／<strong>企業HP(company_url)</strong>／所在地／代表者／資本金／従業員数／業種</td><td><strong>◎ 公式HPの主戦力</strong></td><td><strong>× 法人番号が無いと引けない</strong></td><td>0円（公式に料金記載なし＝未確認）</td><td>◎ 法人名の<strong>部分一致検索</strong>あり（page 1-10 × limit最大5000）</td><td><strong>APIトークン要</strong></td><td><strong>電話番号のフィールドが存在しない</strong>。company_url の充足率<strong>未確認</strong></td></tr>
+<tr><td>4</td><td>gBizINFO 一括CSVダウンロード</td><td>同上（9種別）</td><td>◎</td><td>×</td><td>0円</td><td>◎</td><td>アクセストークン要</td><td>同上</td></tr>
+<tr><td>5</td><td>GS1 Japan「GS1事業者コード情報確認サービス」</td><td>事業者名／基本GLN</td><td>△（JAN保有193社）</td><td>△（JAN保有91社）</td><td>非公開</td><td>×</td><td><strong>自社がGS1事業者コードの貸与を受けている必要</strong></td><td><strong>利用資格を満たさず現状使えない。</strong> 1日50回上限</td></tr>
+<tr><td>6</td><td>Verified by GS1（GEPIR後継）</td><td>事業者名・商品基本情報</td><td>同上</td><td>同上</td><td>未確認</td><td>未確認</td><td>未確認</td><td>gs1.org が bot を403で遮断。<strong>すべて未確認</strong></td></tr>
+<tr><td>7</td><td><strong>特許庁 国内特許情報取得API（商標）</strong></td><td>商標の出願人・権利者情報</td><td>○</td><td><strong>○ 英字側で唯一効く公的DB。</strong> Amazonブランド登録には商標が必要なので、登録済みブランドは日本で出願している</td><td>0円</td><td>○ 日次アクセス上限あり（2026-03に2倍緩和）</td><td>申込書をメール送付＋規約同意＝§4.1</td><td><strong>レスポンスに権利者住所が含まれるか未確認</strong>。※新規受付停止は OPD-API のみ、国内API は受付中</td></tr>
+<tr><td>8</td><td><strong>ブランド名からのドメイン推測</strong></td><td>公式HPのURL</td><td>×（英数字化できない）</td><td><strong>◎ 実測237社が候補</strong></td><td><strong>0円</strong></td><td>◎</td><td>不要</td><td>パーキング・同名他社の誤爆を弾く検証が必須</td></tr>
+<tr><td>9</td><td><strong>Keepa <code>manufacturer</code> フィールド</strong></td><td>製造元表記（日本語商号を含むことがある）</td><td>○</td><td><strong>○ 単独で25社を追加</strong></td><td><strong>0円（取得済み）</strong></td><td>◎</td><td>不要</td><td>表記ゆれあり</td></tr>
+<tr><td>10</td><td>FUMA（フーマ）</td><td>企業基本情報。CSVは有料の「FDS」</td><td>○（収録160万社・二次情報）</td><td>×</td><td>検索無料／<strong>CSV単価5円・最低500円</strong> → 822社＝<strong>4,110円</strong></td><td>検索はブラウザのみ。API未確認</td><td>購入＝§4.1／<strong>PUBLICリポと規約衝突</strong></td><td>公式がSPAで一次確認できず。件数・項目・電話有無すべて<strong>未確認</strong></td></tr>
+<tr><td>11</td><td>Musubu（Baseconnect）</td><td>企業URL・住所等</td><td>○（1,200万件以上）</td><td>×</td><td><strong>月20万円（6ヶ月契約）／月16万円（12ヶ月契約）</strong>（税別）</td><td>CSV出力。API記載なし</td><td>契約＝§4.1／<strong>PUBLICリポと規約衝突</strong></td><td>822社のためにこの単価は釣り合わない。電話番号の有無<strong>未確認</strong></td></tr>
+<tr><td>—</td><td>Amazon 商品ページ／ブランドストア／出品者の特商法表記</td><td>—</td><td><strong>不可</strong></td><td><strong>不可</strong></td><td>—</td><td>—</td><td>—</td><td><strong>ハルオ判定により評価対象外</strong></td></tr>
+</tbody></table>
+
+<h3>5-2. 検索API系（Google Custom Search の代替）— 優先調査</h3>
+
+<p><strong>Google Custom Search JSON API は新規受付停止（既存顧客も2027-01-01期限）。Bing Search API は2025-08-11に廃止済み。</strong> その上で、正規に契約できるものを並べます。</p>
+
+<table><thead><tr><th>ソース</th><th>無料枠</th><th>超過時の単価</th><th><strong>822社×3クエリ（2,466件）の実費</strong></th><th>新規登録</th><th>カード要否</th><th>備考</th></tr></thead><tbody>
+<tr><td><strong>Gemini API「Grounding with Google Search」（Gemini 3.x）</strong></td><td><strong>月5,000リクエスト無料</strong>（3.x系で共有）</td><td>$14 / 1,000 requests</td><td><strong>0円</strong>（無料枠内に収まる）</td><td><strong>可</strong></td><td><strong>不要</strong>（無料枠のみなら）</td><td><strong>最有力。</strong> Google 正規。検索スクレイピングではない。規約同意＝§4.1</td></tr>
+<tr><td>同（Gemini 2.5系）</td><td>1,500 RPD 無料</td><td>$35 / 1,000 grounded prompts</td><td>0円（分割実行なら）</td><td>可</td><td>不要</td><td>3.x の方が条件が良い</td></tr>
+<tr><td><strong>Serper.dev</strong></td><td><strong>2,500クエリ無料</strong></td><td>公式ページに単価の記載なし（<strong>未確認</strong>）</td><td><strong>0円</strong>（無料枠内）</td><td>可</td><td><strong>不要</strong></td><td>Google SERP を返す。次点候補</td></tr>
+<tr><td><strong>Tavily</strong></td><td><strong>月1,000クレジット無料</strong></td><td>$0.008 / credit（Pay As You Go）</td><td>822クエリ＝無料枠内／2,466なら約 $11.7≒<strong>1,760円</strong></td><td>可</td><td><strong>不要</strong>（Freeプラン）</td><td>AI用途向けの検索API</td></tr>
+<tr><td>Brave Search API</td><td>月$5分のクレジット≒1,000クエリ</td><td><strong>$5 / 1,000</strong></td><td>$12.3≒<strong>1,850円</strong></td><td>可</td><td><strong>必要＝§4.1</strong></td><td>2026年2月に無料ティア廃止。超過で自動課金</td></tr>
+<tr><td>SerpApi</td><td>月250検索</td><td>Developer <strong>$75/月</strong>（5,000検索）</td><td>月額課金のため 822件でも <strong>$75≒11,250円</strong></td><td>可</td><td>必要</td><td>単発用途には割高</td></tr>
+<tr><td>Google Custom Search JSON API</td><td>100件/日</td><td>$5 / 1,000</td><td>—</td><td><strong>不可（新規受付終了）</strong></td><td>—</td><td>既存顧客も2027-01-01期限</td></tr>
+<tr><td>Bing Search API (Azure)</td><td>—</td><td>—</td><td>—</td><td><strong>不可（2025-08-11廃止）</strong></td><td>—</td><td>後継は Azure AI Agents の「Grounding with Bing Search」。SERP API ではない</td></tr>
+</tbody></table>
+
+<blockquote><strong>結論：公式HP探索は自動化できます。実費0円で。</strong> Gemini の Grounding（月5,000無料）を第1候補、Serper.dev（2,500無料・カード不要）を第2候補に置いてください。</blockquote>
+
+<hr>
+
+<h2>6. 推奨する組み合わせ（歩留まりの積み上げ）</h2>
+
+<p><strong>和名レーンと英字レーンを分けて走らせてください。</strong></p>
+
+<h3>共通 Step 0：手元データで前処理（0円・実施済み）</h3>
+<p>Keepa 生データから EAN/JAN・manufacturer を822社に付与し、英字526社に「日本シグナル」を立てる。</p>
+<p>→ <strong>英字：日本シグナルあり145社／なし381社に分割済み</strong></p>
+
+<hr>
+
+<h3>和名レーン（293社）</h3>
+
+<table><thead><tr><th>Step</th><th>内容</th><th>費用</th><th>見込み</th></tr></thead><tbody>
+<tr><td><strong>J-1</strong></td><td><strong>国税庁 全件データ</strong>（全国CSV Unicode / <strong>254MB</strong> / 月次・最新 令和8年7月31日）をローカル突合。完全一致→法人格除去後の前方一致→部分一致の3段</td><td>0円</td><td><strong>120〜200社</strong>に法人番号・正式商号・所在地（推測・確度中／<strong>要実測</strong>）</td></tr>
+<tr><td><strong>J-2</strong></td><td><strong>gBizINFO</strong> で法人番号→<code>company_url</code></td><td>0円</td><td>J-1で埋まった社の<strong>30〜60%</strong>（推測・確度低／充足率が未確認）</td></tr>
+<tr><td><strong>J-3</strong></td><td>残りを <strong>Gemini Grounding</strong>（<code>&quot;&lt;名前&gt; 会社概要&quot;</code> <code>&quot;&lt;名前&gt; お問い合わせ&quot;</code>）</td><td><strong>0円</strong></td><td>上積み<strong>50〜100社</strong>（推測・確度低）</td></tr>
+<tr><td><strong>J-4</strong></td><td>取れた公式HPから <code>tel:</code> ／ <code>/contact</code>・<code>/inquiry</code>・<code>/company</code> を抽出（<strong>robots.txt尊重・同一ホスト3秒間隔</strong>）</td><td>0円</td><td>HPが取れた社の<strong>問い合わせフォーム60〜80%・電話30〜50%</strong>（推測・確度中）</td></tr>
+</tbody></table>
+
+<h3>英字レーン（526社）</h3>
+
+<table><thead><tr><th>Step</th><th>内容</th><th>費用</th><th>見込み</th></tr></thead><tbody>
+<tr><td><strong>E-1</strong></td><td><strong>ドメイン推測の結果をそのまま投入</strong>（実測済み）</td><td>0円</td><td><strong>237社に公式HP候補（実測値・確定）</strong></td></tr>
+<tr><td><strong>E-2</strong></td><td><strong>日本シグナルあり145社に絞る。</strong> ここが「日本で交渉できる可能性がある英字ブランド」の全量</td><td>0円</td><td>145社</td></tr>
+<tr><td><strong>E-3</strong></td><td>145社について Gemini Grounding で <code>&quot;&lt;ブランド&gt; 日本 総代理店&quot;</code> <code>&quot;&lt;ブランド&gt; 株式会社&quot;</code> を引き、日本法人名を得る → J-1/J-2 に流す</td><td><strong>0円</strong></td><td><strong>20〜50社</strong>（推測・確度低）</td></tr>
+<tr><td><strong>E-4</strong></td><td>特許庁 商標API で出願人を引く（申請が通れば）</td><td>0円</td><td>未実測（推測・確度低）</td></tr>
+<tr><td><strong>E-5</strong></td><td><strong>シグナルゼロ381社は「日本の連絡先なし」で確定させ、理由コードを付けて空欄</strong></td><td>0円</td><td><strong>381社</strong></td></tr>
+</tbody></table>
+
+<hr>
+
+<h3>中国系ブランドの現実的な着地（タカシの論点3への回答）</h3>
+
+<p><strong>事実：</strong></p>
+<ul>
+<li>英字526社のうち中国 GS1（69始まり）が確認できたのは21社だけ。<strong>大多数は米国UPC を使っており、EAN からは出自が判別できません。</strong></li>
+<li>英字526社のうち <code>.jp/.co.jp</code> ドメインは23社、日本語サイトは40社。</li>
+<li><strong>Amazon 出品者の特商法表記はハルオ判定で使用不可</strong>。日本の輸入者/販売者を辿る唯一の自動経路が閉じました。</li>
+</ul>
+
+<p><strong>推奨する結論（事実＋上記判定から）：</strong></p>
+
+<blockquote><strong>シグナルゼロ381社は「日本の連絡先は取得できない」と結論づけ、理由コード <code>日本実体シグナルなし</code> を付けて空欄で確定させる。</strong></blockquote>
+
+<p>残る道は Alibaba/1688 での中国側工場検索ですが、<strong>本チケットのスコープ外</strong>であり、②メーカー仕入れ（国内メーカーとの直取引）の戦略とも別物です。</p>
+<p><strong>どこで線を引くか（381社を全部捨てるか、シグナル1つでも立った社だけ拾うか）は戦略判断＝タケシの領分</strong>です。</p>
+
+<hr>
+
+<h3>積み上げの見通し</h3>
+
+<p><strong>「事実」列は実測で確定した数字、「見込み」列は推測です。Phase C で実測して置換してください。</strong></p>
+
+<table><thead><tr><th>列</th><th>和名293（事実）</th><th>和名293（見込み）</th><th>英字526（事実）</th><th>英字526（見込み）</th><th>822合計（見込み）</th></tr></thead><tbody>
+<tr><td>日本シグナル判定</td><td>—</td><td>—</td><td><strong>145 / 381</strong></td><td>—</td><td>—</td></tr>
+<tr><td>正式商号・法人番号・所在地</td><td>0</td><td>120〜200</td><td>0</td><td>20〜50</td><td><strong>140〜250</strong></td></tr>
+<tr><td>公式HP</td><td>0</td><td>180〜260</td><td><strong>237</strong></td><td>237〜280</td><td><strong>420〜540</strong></td></tr>
+<tr><td>問い合わせフォームURL</td><td>0</td><td>120〜200</td><td>0</td><td>60〜120</td><td><strong>180〜320</strong></td></tr>
+<tr><td>電話番号</td><td>0</td><td>80〜150</td><td>0</td><td><strong>20〜60</strong>（※Amazon経路が消えたため下方修正）</td><td><strong>100〜210</strong></td></tr>
+<tr><td><strong>埋まらない見込み</strong></td><td>—</td><td>90〜170</td><td>—</td><td><strong>330〜400</strong></td><td><strong>420〜570</strong></td></tr>
+</tbody></table>
+
+<hr>
+
+<h2>7. 費用と、社長の手が必要な申請</h2>
+
+<h3>費用（822社を1回流す実費）</h3>
+
+<table><thead><tr><th>手段</th><th>実費</th></tr></thead><tbody>
+<tr><td>国税庁 全件データ／Web-API</td><td><strong>0円</strong></td></tr>
+<tr><td>gBizINFO API／一括DL</td><td><strong>0円</strong>（公式に料金記載なしのため「無料」と断定はしない）</td></tr>
+<tr><td><strong>Gemini API Grounding with Google Search</strong></td><td><strong>0円</strong>（月5,000リクエスト無料枠内）</td></tr>
+<tr><td>ドメイン推測＋日本シグナル判定＋HTML抽出</td><td><strong>0円</strong></td></tr>
+<tr><td>特許庁 国内特許情報取得API</td><td><strong>0円</strong></td></tr>
+<tr><td><strong>推奨構成の合計</strong></td><td><strong>0円</strong></td></tr>
+<tr><td>（参考）Serper.dev / Tavily を使う場合</td><td>0円〜1,760円</td></tr>
+<tr><td>（参考）Brave Search API</td><td>約1,850円</td></tr>
+<tr><td>（参考）FUMA FDS</td><td>4,110円 ※PUBLICリポと規約衝突</td></tr>
+<tr><td>（参考）Musubu</td><td>月160,000〜200,000円（税別）→ <strong>非推奨</strong></td></tr>
+</tbody></table>
+
+<h3>社長の手が必要なもの（分離）</h3>
+
+<table><thead><tr><th>#</th><th>何を</th><th>§4.1該当</th><th>所要</th><th>要否</th></tr></thead><tbody>
+<tr><td>1</td><td><strong>gBizINFO APIトークン申請</strong>（申請フォーム→メールでトークン受領）</td><td>規約同意 → <strong>要承認</strong></td><td>入力5分＋メール待ち</td><td><strong>推奨構成で必須</strong></td></tr>
+<tr><td>2</td><td><strong>Gemini API キー取得</strong>（Google AI Studio・無料枠）</td><td>規約同意 → <strong>要承認</strong>（金銭は発生しない）</td><td>数分</td><td><strong>推奨構成で必須</strong></td></tr>
+<tr><td>3</td><td>国税庁 Web-API アプリケーションID発行届出</td><td>規約同意 → 要承認</td><td>メール受領式</td><td><strong>全件DLで足りるため不要</strong></td></tr>
+<tr><td>4</td><td>特許庁 国内特許情報取得API 利用申込</td><td>規約同意 → 要承認</td><td>申込書作成＋メール</td><td>英字側を深掘りするなら</td></tr>
+<tr><td>5</td><td>Serper.dev / Tavily のアカウント作成（代替案）</td><td>規約同意 → 要承認</td><td>数分</td><td>Gemini で足りれば不要</td></tr>
+<tr><td>6</td><td>Brave / FUMA / Musubu</td><td><strong>金銭 → 要承認</strong></td><td>—</td><td><strong>推奨しません</strong></td></tr>
+</tbody></table>
+
+<blockquote><strong>最小構成なら社長の手は①②の2件だけ。いずれも無料・カード登録不要です。</strong></blockquote>
+
+<hr>
+
+<h2>8. ここから先はタケシ（プランナー）の領分</h2>
+
+<p>事実を並べた結果、戦略判断が要る論点が4つ出ました。私はここで止めます。</p>
+
+<ol>
+<li><strong>母集団の再定義。</strong> 和名293社＋英字の日本シグナルあり145社＝<strong>438社が現実的な射程</strong>。残り384社に工数をかけるか。</li>
+<li><strong>埋める列の優先順位。</strong> gBizINFO に電話番号フィールドが無く、Amazon経路も閉じたため、電話を必須にすると歩留まりが大きく落ちます（100〜210社）。仕入れ交渉に本当に要るのは電話か、問い合わせフォームか。</li>
+<li><strong>該当商品1件の575社（70%）の扱い。</strong> 「母数最大」の方針（2026-08-24社長指示）と、連絡先取得の工数のバランス。</li>
+<li><strong>商用DBを使うなら、成果物の置き場を先に変える必要がある。</strong> ハルオ判定「第三者へ公衆送信してはならず」と、このリポが PUBLIC であることが衝突します。使わないなら論点は消えます。</li>
+</ol>
+
+<hr>
+
+<h2>9. 出典一覧（すべて2026-08-31取得）</h2>
+
+<table><thead><tr><th>#</th><th>ページタイトル</th><th>URL</th></tr></thead><tbody>
+<tr><td>1</td><td>法人番号システム Web-API｜国税庁法人番号公表サイト</td><td><a href="https://www.houjin-bangou.nta.go.jp/webapi/">https://www.houjin-bangou.nta.go.jp/webapi/</a></td></tr>
+<tr><td>2</td><td>第一編 Web-API の利用手続について（共通編）4.8版</td><td><a href="https://www.houjin-bangou.nta.go.jp/documents/k-web-api-tetuduki.pdf">https://www.houjin-bangou.nta.go.jp/documents/k-web-api-tetuduki.pdf</a></td></tr>
+<tr><td>3</td><td>第二編 Web-API のリクエストの設定方法及び提供データの内容について（概要編）</td><td><a href="https://www.houjin-bangou.nta.go.jp/documents/k-web-api-kinou-gaiyo.pdf">https://www.houjin-bangou.nta.go.jp/documents/k-web-api-kinou-gaiyo.pdf</a></td></tr>
+<tr><td>4</td><td>第六編 Web-API（Ver.4.0）のリクエストの設定方法及び提供データの内容について</td><td><a href="https://www.houjin-bangou.nta.go.jp/documents/k-web-api-kinou-ver4.pdf">https://www.houjin-bangou.nta.go.jp/documents/k-web-api-kinou-ver4.pdf</a></td></tr>
+<tr><td>5</td><td>基本３情報ダウンロード｜国税庁法人番号公表サイト</td><td><a href="https://www.houjin-bangou.nta.go.jp/download/">https://www.houjin-bangou.nta.go.jp/download/</a></td></tr>
+<tr><td>6</td><td>全件データのダウンロード｜国税庁法人番号公表サイト（全国CSV Unicode 254MB）</td><td><a href="https://www.houjin-bangou.nta.go.jp/download/zenken/">https://www.houjin-bangou.nta.go.jp/download/zenken/</a></td></tr>
+<tr><td>7</td><td>GビズインフォREST API v2 OpenAPI仕様（公式配信JSON）</td><td><a href="https://api.info.gbiz.go.jp/hojin/v3/api-docs/v2">https://api.info.gbiz.go.jp/hojin/v3/api-docs/v2</a></td></tr>
+<tr><td>8</td><td>APIの利用｜Gビズインフォ</td><td><a href="https://content.info.gbiz.go.jp/api/index.html">https://content.info.gbiz.go.jp/api/index.html</a></td></tr>
+<tr><td>9</td><td>データダウンロード｜Gビズインフォ</td><td><a href="https://info.gbiz.go.jp/hojin/DownloadTop">https://info.gbiz.go.jp/hojin/DownloadTop</a></td></tr>
+<tr><td>10</td><td>データダッシュボード｜Gビズインフォ（登録法人 5,827,306件 / 2026-08-31時点）</td><td><a href="https://info.gbiz.go.jp/hojin/dashboard">https://info.gbiz.go.jp/hojin/dashboard</a></td></tr>
+<tr><td>11</td><td>GS1事業者コード情報確認サービス｜GS1 Japan</td><td><a href="https://www.gs1jp.org/database_service/gcp-search/about_gcp-search.html">https://www.gs1jp.org/database_service/gcp-search/about_gcp-search.html</a></td></tr>
+<tr><td>12</td><td>Verified by GS1｜GS1 Japan</td><td><a href="https://www.gs1jp.org/database_service/vbg/">https://www.gs1jp.org/database_service/vbg/</a></td></tr>
+<tr><td>13</td><td>Custom Search JSON API｜Google for Developers（新規受付終了・2027-01-01期限）</td><td><a href="https://developers.google.com/custom-search/v1/overview">https://developers.google.com/custom-search/v1/overview</a></td></tr>
+<tr><td>14</td><td><strong>Gemini API Pricing（Grounding with Google Search：Gemini 3.x で月5,000リクエスト無料 / 超過 $14 per 1,000）</strong></td><td><a href="https://ai.google.dev/gemini-api/docs/pricing">https://ai.google.dev/gemini-api/docs/pricing</a></td></tr>
+<tr><td>15</td><td>Bing Search APIs Retiring on August 11, 2025｜Microsoft Learn</td><td><a href="https://learn.microsoft.com/en-us/lifecycle/announcements/bing-search-api-retirement">https://learn.microsoft.com/en-us/lifecycle/announcements/bing-search-api-retirement</a></td></tr>
+<tr><td>16</td><td>Serper.dev（2,500 free queries / No credit card required）</td><td><a href="https://serper.dev/">https://serper.dev/</a></td></tr>
+<tr><td>17</td><td>Tavily Pricing（Researcher: 1,000 API credits/month, No credit card required / Pay As You Go $0.008 per credit）</td><td><a href="https://tavily.com/pricing">https://tavily.com/pricing</a></td></tr>
+<tr><td>18</td><td>Brave Search API（$5 per 1,000 requests）</td><td><a href="https://brave.com/search/api/">https://brave.com/search/api/</a></td></tr>
+<tr><td>19</td><td>SerpApi Pricing（Free 250/月、Developer $75/月 5,000検索）</td><td><a href="https://serpapi.com/pricing">https://serpapi.com/pricing</a></td></tr>
+<tr><td>20</td><td>APIを利用した特許情報の試行提供｜特許庁（更新日 2026-04-15）</td><td><a href="https://www.jpo.go.jp/system/laws/sesaku/data/api-provision.html">https://www.jpo.go.jp/system/laws/sesaku/data/api-provision.html</a></td></tr>
+<tr><td>21</td><td>API情報提供サイト（特許情報取得API）</td><td><a href="https://ip-data.jpo.go.jp/">https://ip-data.jpo.go.jp/</a></td></tr>
+<tr><td>22</td><td>Musubu（Baseconnect）</td><td><a href="https://musubu.in/">https://musubu.in/</a></td></tr>
+<tr><td>23</td><td>FUMA（フーマ）</td><td><a href="https://fumadata.com/">https://fumadata.com/</a></td></tr>
+</tbody></table>
+
+<h3>未確認として残したもの（推測で埋めていません）</h3>
+
+<table><thead><tr><th>項目</th><th>理由</th></tr></thead><tbody>
+<tr><td>gBizINFO の利用料が明示的に無料か</td><td>公式ページに料金表記なし。二次情報では「無料」だが一次確認できず</td></tr>
+<tr><td>gBizINFO の <code>company_url</code> の充足率</td><td>公開統計なし。一括CSVを落として非空率を数えるしかない（Phase C の最初のタスク）</td></tr>
+<tr><td>gBizINFO API の1日あたりリクエスト上限</td><td>OpenAPI仕様・公式ページとも記載を発見できず</td></tr>
+<tr><td>国税庁 Web-API の英語表記登録の母数</td><td>公表統計を発見できず。英字ブランドへの効き目が読めない</td></tr>
+<tr><td>Verified by GS1 の一般公開検索の可否・回数制限・API</td><td>gs1.org が bot を403で遮断</td></tr>
+<tr><td>特許庁 商標API のレスポンスに権利者住所が含まれるか</td><td>仕様書PDFが403、詳細仕様は利用登録者向け</td></tr>
+<tr><td>Serper.dev の有料単価</td><td>公式トップに記載なし</td></tr>
+<tr><td>FUMA の収録件数・取得項目・電話番号の有無・API</td><td>公式がSPAで本文を取得できず。二次情報のみ</td></tr>
+<tr><td>Musubu の電話番号フィールドの有無</td><td>公式に明記なし</td></tr>
+<tr><td>Step J-1（国税庁照合）の実マッチ率</td><td>254MBの全件データ未取得。Phase C で実測すべき</td></tr>
+</tbody></table>
+
+<hr>
+
+<h2>10. Phase C（ITエンジニア タカシ）への申し送り</h2>
+
+<p>実装の順序はこれを推奨します。<strong>最初の2つは「実測して数字を確定させる」タスクで、機能実装ではありません。</strong></p>
+
+<ol>
+<li><strong>gBizINFO 基本情報の一括CSVを落として <code>company_url</code> の非空率を数える。</strong> この数字が Step J-2 の価値を決めます</li>
+<li><strong>国税庁 全件データ（全国CSV Unicode / 254MB）を落として、和名293社の実マッチ率を数える。</strong> 完全一致・法人格除去後の前方一致・部分一致の3方式で比較</li>
+<li><strong>英字526社の日本シグナルは計算済み。</strong> <code>英字ブランド_日本シグナル.csv</code> を取り込めば、シグナルあり145社を優先処理できます</li>
+<li><strong>ドメイン推測の237社は公式HP列の初期値にそのまま使えます</strong>（<code>domain_verify_result.csv</code>）</li>
+<li><strong>公式サイトの取得はハルオ条件を守ること</strong>：robots.txt尊重・<strong>同一ホスト3秒間隔</strong>・UA明示・会社概要/問い合わせ系ページ限定。822ホストは互いに別ホストなので、ホスト単位のキューを並列に回せば3秒間隔でも実時間は伸びません</li>
+<li>冪等・再開可能・出典URL必須のスキーマは、チケット本文の「連絡先列の定義」に従ってください</li>
+</ol>
+
+<h3>作業ファイル（<code>workspace/output/agent_output/T-20260831-001/</code>）</h3>
+
+<table><thead><tr><th>ファイル</th><th>中身</th></tr></thead><tbody>
+<tr><td><code>822_classified.csv</code></td><td>822社の型・JAN有無・カテゴリ・規模フラグつき分類</td></tr>
+<tr><td><code>英字ブランド_日本シグナル.csv</code></td><td><strong>英字526社 × 4信号 × 推測ドメイン × manufacturer例</strong></td></tr>
+<tr><td><code>domain_probe_result.csv</code></td><td>英字517社のドメイン推測 生結果（321ヒット）</td></tr>
+<tr><td><code>domain_verify_result.csv</code></td><td>237社の検証済み候補＋ページタイトル</td></tr>
+<tr><td><code>distribution.txt</code></td><td>分布集計の生ログ</td></tr>
+<tr><td><code>sources/</code></td><td>国税庁仕様PDF・gBizINFO OpenAPI JSON 等の一次資料</td></tr>
+</tbody></table>
+
+</main></body></html>
