@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>B. メーカー822社 連絡先収集 — 手段別 適法性判定 | T-20260831-001</title>
+<style>
+:root{--fg:#1a1a1a;--line:#e2e2e2;--acc:#8c1c13}
+*{box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",sans-serif;
+line-height:1.85;color:var(--fg);background:#fff;max-width:1000px;margin:0 auto;padding:48px 28px 120px;font-size:15px}
+h1{font-size:1.9em;border-bottom:3px solid var(--acc);padding-bottom:.4em;margin-top:0}
+h2{font-size:1.35em;margin-top:2.4em;border-left:6px solid var(--acc);padding-left:.6em}
+h3{font-size:1.1em;margin-top:1.8em;color:#333;border-bottom:1px dashed var(--line);padding-bottom:.2em}
+p{margin:.7em 0}
+table{border-collapse:collapse;width:100%;margin:1.2em 0;font-size:.92em}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:#f5f2f0;font-weight:700}
+tr:nth-child(even) td{background:#fafafa}
+code{background:#f2f2f2;padding:1px 5px;border-radius:3px;font-size:.9em;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+pre{background:#1e1e1e;color:#e8e8e8;padding:16px 18px;border-radius:6px;overflow-x:auto;line-height:1.6}
+pre code{background:none;color:inherit;padding:0;font-size:.85em;white-space:pre}
+blockquote{border-left:4px solid #c9c2bd;background:#faf8f6;margin:1em 0;padding:.7em 1em;color:#333}
+hr{border:none;border-top:1px solid var(--line);margin:2.6em 0}
+ul{margin:.6em 0;padding-left:1.4em}
+li{margin:.28em 0}
+li.sub{list-style:circle}
+strong{color:var(--acc)}
+a{color:#0b5394;word-break:break-all}
+</style></head><body>
+<h1>B. メーカー822社 連絡先収集 — 手段別 適法性判定</h1>
+<ul>
+<li>チケット: T-20260831-001 / Phase B</li>
+<li>判定者: 法務 ハルオ</li>
+<li>判定日: 2026-08-31</li>
+<li>判定基準: 発生確率 × 影響度 × 不可逆性。<strong>グレーは原則 NO。</strong></li>
+</ul>
+<hr>
+<h2>0. 結論（1枚）</h2>
+<table><thead><tr><th>#</th><th>手段</th><th>判定</th><th>決め手</th></tr></thead><tbody><tr><td>1</td><td>国税庁 法人番号 Web-API</td><td><strong>条件付き可</strong></td><td>規約に営利・再配布の制限なし。届出ID・出典明示・レート制限が条件</td></tr><tr><td>2</td><td>gBizINFO REST API / データDL</td><td><strong>条件付き可</strong></td><td>CC BY 互換。申請時の申告目的の範囲内に限定</td></tr><tr><td>3</td><td>メーカー公式サイトの自動取得</td><td><strong>条件付き可</strong></td><td>著作権上の問題は薄いが、<strong>業務妨害罪リスクが本丸</strong>。速度制限が生命線</td></tr><tr><td>4</td><td>Amazon 商品ページ/ブランドストアの自動取得</td><td><strong>不可</strong></td><td>利用規約が「データ収集・抽出ツール」を名指しで許諾外と明記</td></tr><tr><td>5-a</td><td>Google 検索結果のスクレイピング</td><td><strong>不可</strong></td><td>robots.txt <code>Disallow: /search</code> ＋ Google 利用規約が明文禁止</td></tr><tr><td>5-b</td><td>Google Custom Search JSON API</td><td><strong>条件付き可、ただし調達不能の見込み</strong></td><td>規約上は白。<strong>公式に「新規顧客の受付を終了」</strong>。かつ課金＝§4.1</td></tr><tr><td>6</td><td>商用企業DB（Musubu 等）</td><td><strong>条件付き可。現行の公開リポ運用のままでは不可</strong></td><td>「第三者への公衆送信の禁止」に GitHub public への commit が抵触</td></tr><tr><td>7</td><td>連絡先の保有そのもの</td><td><strong>条件付き可</strong></td><td>法人情報は個人情報でない。<strong>個人事業主が混ざる前提で全体を個人情報として扱う</strong></td></tr><tr><td>8</td><td>収集後の営業メール送信</td><td><strong>条件付き可（実送信は §4.1 で別途承認）</strong></td><td>法3条1項4号の例外に乗る。<strong>「お断り」文言の検知を収集時点で実装すること</strong></td></tr></tbody></table>
+<p><strong>最終リスト（本書 §9 に再掲）</strong></p>
+<ul>
+<li>実装してよい手段: <strong>法人番号 Web-API ＋ gBizINFO API ＋ メーカー公式サイトの低速クロール（robots.txt 尊重・3秒間隔・UA明示・会社概要/問い合わせ系ページ限定）</strong></li>
+<li>使ってはいけない手段: <strong>Amazon 商品ページ/ブランドストアの自動取得と、Google 検索結果のスクレイピング</strong></li>
+</ul>
+<hr>
+<h2>1. 判定の前提</h2>
+<ul>
+<li><strong>本チケットの目的は「連絡先を集めるところまで」</strong>。実連絡・見積依頼は §4.1（第三者連絡）でスコープ外。</li>
+<li><strong>当社は Amazon 日本店アカウントが停止中</strong>。Amazon 側規約への違反の上乗せは、事業の存続そのものを失う。よって Amazon 関連は他手段より一段厳しく判定した。</li>
+<li><strong>このリポジトリは PUBLIC で、30分ごとに自動 push される</strong>。「commit した瞬間に全世界へ公衆送信」が既定値である。これを前提に、第三者DB由来データと個人事業主の連絡先の格納先を判定した。</li>
+<li>822社には<strong>個人事業主・屋号のみのブランドが混在する</strong>（依頼元の申告）。法人前提の設計は不可。</li>
+</ul>
+<hr>
+<h2>2. 国税庁 法人番号システム Web-API — <strong>条件付き可</strong></h2>
+<h3>根拠（一次情報）</h3>
+<table><thead><tr><th>論点</th><th>条項</th><th>内容</th></tr></thead><tbody><tr><td>利用資格</td><td>第3条</td><td>「アプリケーションID発行届出情報」を送信して届出。<strong>費用は無料</strong>。営利・非営利の区別なし</td></tr><tr><td>営利利用の可否</td><td>—</td><td><strong>制限条項なし</strong>。第9条の禁止事項に商用利用は含まれない</td></tr><tr><td>コンテンツの利用条件</td><td>第7条</td><td>「別に定める『国税庁法人番号公表サイト利用規約』により取り扱います」</td></tr><tr><td>同・実体</td><td>サイト利用規約</td><td><strong>「公共データ利用規約（第1.0版）」に準拠</strong>。同規約は「複製、公衆送信、翻訳・変形等の翻案等、自由に利用できます。<strong>商用利用も可能です</strong>」「CC BY 4.0 と互換性があり」</td></tr><tr><td>出典表示</td><td>第6条</td><td>サービス提供時は「このサービスは、国税庁法人番号システムWeb-API 機能を利用して取得した情報をもとに作成しているが、サービスの内容は国税庁によって保証されたものではない」を明示</td></tr><tr><td>出典表示（コンテンツ）</td><td>サイト利用規約 1)</td><td>「出典：国税庁法人番号公表サイト（国税庁）（当該ページのURL）」。<strong>編集・加工した場合はその旨も別途記載</strong></td></tr><tr><td>禁止事項</td><td>第9条1項3号</td><td>「<strong>短時間における大量アクセス</strong>その他本機能の運用に支障を与えること」</td></tr><tr><td>禁止事項</td><td>第9条1項5号</td><td>「IDを第三者に譲渡、貸与又は開示すること」</td></tr><tr><td>停止権限</td><td>第9条3項</td><td>違反の疑いがあれば<strong>利用停止できる</strong></td></tr><tr><td>管轄</td><td>第14条</td><td>日本法・東京地裁専属</td></tr></tbody></table>
+<h3>実装制約（そのままコードへ）</h3>
+<pre><code>
+NTA_APP_ID           = 環境変数から読む。リポにコミットしない（第9条1項5号）
+NTA_RATE_LIMIT       = 1 req / 1.0 sec（同時実行1）
+NTA_RETRY            = 5xx/429 は指数バックオフ、3回連続失敗で当該バッチ停止
+NTA_ATTRIBUTION      = 出力CSVの全行に source=&quot;国税庁法人番号公表サイト(国税庁) &lt;当該URL&gt;&quot;
+                       ＋ 成果物の README に第6条の定型文をそのまま記載
+NTA_DERIVED_NOTICE   = 名寄せ・突合を行うため「加工して作成」の旨を README に明記
+</code></pre>
+<h3>リスク（3軸）</h3>
+<table><thead><tr><th>軸</th><th>評価</th></tr></thead><tbody><tr><td>発生確率</td><td>低（規約遵守なら実質ゼロ）</td></tr><tr><td>影響度</td><td>小（利用停止のみ）</td></tr><tr><td>不可逆性</td><td>低（ID再取得可）</td></tr></tbody></table>
+<h3>取れるもの／取れないもの</h3>
+<ul>
+<li>取れる: 法人番号・<strong>商号（正式）</strong>・本店所在地・変更履歴</li>
+<li><strong>取れない: 電話番号・メール・HP・問い合わせフォーム</strong></li>
+</ul>
+<p>→ 本APIは「連絡先を取る手段」ではなく「<strong>商号と所在地を確定させ、同名企業を切り分ける手段</strong>」。連絡先列の <code>正式商号 / 法人番号 / 所在地</code> はここで埋め、確度を <code>確定</code> にできる。</p>
+<hr>
+<h2>3. gBizINFO — <strong>条件付き可</strong></h2>
+<h3>根拠（一次情報）</h3>
+<p><strong>A. 本体「利用規約」（最終更新 2025-12-22）</strong></p>
+<blockquote>「Gビズインフォで公開している情報（以下「コンテンツ」といいます。）は、どなたでも以下の1）～8)に従って、<strong>複製、公衆送信、翻訳・変形等の翻案等、自由に利用できます。商用利用も可能です。</strong>」<br>「本利用ルールは、<strong>政府標準利用規約（第2.0版）に準拠</strong>したものです。」「<strong>CC BY</strong> と互換性があり、本利用ルールが適用されるコンテンツはCC BYに従うことでも利用することができます。」</blockquote>
+<p>出典表示の要求（本体規約 1)）:</p>
+<blockquote>「出典：「Gビズインフォ」（経済産業省）（当該ページのURL）（○年○月○日に利用）」<br>「編集・加工等して利用する場合は、上記出典とは別に、編集・加工等を行ったことを記載してください。」</blockquote>
+<p><strong>注意条項</strong>（本体規約）:</p>
+<blockquote>「<strong>外部データベース等とのAPI連携等により取得しているコンテンツについては、その提供元の利用条件に従ってください。</strong>」</blockquote>
+<p>→ gBizINFO の中には他機関由来のデータが混ざる。<strong>丸ごと CC BY と思い込むな。</strong>「別紙」に列挙された対象は別扱い。</p>
+<p><strong>B.「API・データダウンロード利用規約」（制定 2025-12-21 / 最終更新 2026-04-08）</strong></p>
+<table><thead><tr><th>論点</th><th>条項</th><th>内容</th></tr></thead><tbody><tr><td>利用申請</td><td>1)</td><td>事前申請＋アクセストークン取得が必須。申請時に<strong>法人番号・法人名・担当部署・所在地・連絡先・利用目的</strong>を申告</td></tr><tr><td><strong>利用目的の拘束</strong></td><td>2)</td><td>「本サービスの利用は、<strong>申請時に申告した目的の範囲内に限られます</strong>」</td></tr><tr><td>レート制限</td><td>2)</td><td>利用者ごとにアクセス頻度・リクエスト数・通信量の上限を設けることがある。<strong>具体的数値は非公開</strong></td></tr><tr><td>遮断</td><td>2)</td><td>「短時間における過度なアクセス…が確認された場合には、<strong>事前の通知なく</strong>、アクセス制限、通信遮断、アクセストークンの一時停止または取消し」</td></tr><tr><td>禁止</td><td>3)</td><td>「利用制限を回避または無効化する目的で、<strong>複数のアクセストークンを取得・利用する行為</strong>」</td></tr><tr><td>知財</td><td>4)</td><td>本体「利用規約」に準じる</td></tr><tr><td>管轄</td><td>7)</td><td>日本法・東京地裁専属</td></tr></tbody></table>
+<h3>実装制約</h3>
+<pre><code>
+GBIZ_TOKEN           = 環境変数。リポにコミットしない
+GBIZ_PURPOSE         = 申請時の利用目的欄に「自社のメーカー仕入れに係る取引先候補の
+                       法人情報照合（商号・所在地・法人番号の名寄せ）」と記載し、
+                       この範囲を超える使い方をしない（規約2)）
+GBIZ_TOKENS          = 1本のみ。並列化のためのトークン増設は規約3)違反
+GBIZ_RATE_LIMIT      = 1 req / 1.0 sec（上限が非公開なので保守的に）
+GBIZ_ON_429_403      = 即時停止し、翌日まで再開しない（自動リトライで押し切らない）
+GBIZ_ATTRIBUTION     = 「出典：「Gビズインフォ」（経済産業省）（URL）（YYYY年M月D日に利用）」
+                       ＋「…をもとに作成」を README に記載
+</code></pre>
+<h3>取れるもの／取れないもの</h3>
+<ul>
+<li>取れる: 法人基本情報（商号・所在地・法人番号）、<strong>自社プロフィール登録企業は企業HP URL</strong> を持つことがある、届出・認定・補助金・調達・特許情報</li>
+<li><strong>取れない: 電話番号・メールアドレス（原則）</strong></li>
+</ul>
+<p>→ 法人番号APIと同じく「<strong>確度を上げる</strong>」手段。連絡先そのものは §4 の公式サイトからしか取れない。</p>
+<h3>補足（重要）</h3>
+<ul>
+<li>利用申請は「金銭が動かない・法的拘束が軽い」ため §4.1 の「契約・利用規約への同意」に<strong>形式的には該当します</strong>。無償・行政サービス・撤退自由であっても、<strong>規約への同意は法的拘束</strong>です。→ <strong>申請の実行はハルオもタカシもしない。秘書経由で社長に上げること。</strong>（本書 §10 に整理）</li>
+</ul>
+<hr>
+<h2>4. メーカー公式サイトの自動アクセス — <strong>条件付き可</strong></h2>
+<p>ここが本件の主戦場です。<strong>著作権よりも、業務妨害罪と各社規約が本丸</strong>です。</p>
+<h3>4-1. 著作権法上の評価 → <strong>問題は小さい</strong></h3>
+<table><thead><tr><th>論点</th><th>判断</th><th>根拠</th></tr></thead><tbody><tr><td>電話番号・住所・会社名そのもの</td><td><strong>著作物でない</strong>。創作性のない事実・データ</td><td>著作権法2条1項1号の「思想又は感情を創作的に表現したもの」に当たらない</td></tr><tr><td>HTML の一時取得・解析</td><td><strong>適法</strong></td><td>30条の4第2号「<strong>情報解析</strong>（多数の著作物その他の大量の情報から…抽出し、比較、分類その他の解析を行うこと）の用に供する場合」は「その必要と認められる限度において、いずれの方法によるかを問わず、利用することができる」</td></tr><tr><td>30条の4 のただし書</td><td>抵触しない</td><td>「著作権者の利益を不当に害することとなる場合」＝有償のデータベース著作物を代替する等。<strong>連絡先の抽出は該当しない</strong></td></tr><tr><td>47条の5（軽微利用）</td><td><strong>援用しない</strong></td><td>同条は「検索結果の提供」「解析結果の提供」を<strong>外部に提供する</strong>行為に付随する軽微利用の規定。当社は社内利用なので<strong>30条の4だけで足りる</strong>。47条の5は1項柱書で「<strong>政令で定める基準に従って行う者に限る</strong>」と主体を絞っており、無理に乗せると逆にリスクになる</td></tr></tbody></table>
+<blockquote><strong>依頼にあった「47条の5の射程」への回答</strong>: 本件は 47条の5 の射程に入れる必要がありません。社内利用なら 30条の4第2号で説明が完結します。将来「集めた連絡先を外部に見せるサービス」に発展させる場合に初めて 47条の5 の主体要件（政令基準）を検討してください。</blockquote>
+<h3>4-2. 刑事リスク → <strong>ここが本丸</strong></h3>
+<table><thead><tr><th>条文</th><th>内容</th><th>法定刑</th></tr></thead><tbody><tr><td>刑法233条（偽計業務妨害）</td><td>「偽計を用いて…その業務を妨害した者」</td><td>3年以下の拘禁刑 or 50万円以下の罰金</td></tr><tr><td>刑法234条の2（電子計算機損壊等業務妨害）</td><td>「電子計算機に…使用目的に反する動作をさせて、人の業務を妨害した者」</td><td>5年以下の拘禁刑 or 100万円以下の罰金。<strong>未遂も処罰</strong></td></tr></tbody></table>
+<p><strong>岡崎市立中央図書館事件（Librahack事件・2010年）の教訓</strong></p>
+<ul>
+<li>蔵書検索システムに対し <strong>1秒に1回・1日1時間程度</strong>のアクセスを行った男性が、偽計業務妨害の疑いで<strong>逮捕、21日間勾留、起訴猶予</strong>。</li>
+<li>真因は<strong>図書館側システムの不具合</strong>だった。それでも身柄拘束は起きた。</li>
+<li><strong>教訓は「技術的に妥当な速度でも、相手が『攻撃された』と申告すれば逮捕され得る」</strong>。当社の場合、逮捕されなくても「メーカーから抗議を受けた事実」だけで、これから取引を申し込む相手との関係が終わります。<strong>不可逆性が極めて高い。</strong></li>
+</ul>
+<p>→ よって速度は「技術的に許される限界」ではなく「<strong>相手が絶対に気づかない水準</strong>」に設定します。</p>
+<h3>4-3. robots.txt の扱い</h3>
+<ul>
+<li>robots.txt そのものに<strong>法的拘束力はありません</strong>（法令上の根拠がない）。</li>
+<li>しかし ①サイト運営者の明示の意思表示であり、②これを無視した事実は業務妨害の「故意」認定や民事の不法行為評価で<strong>明確に不利に働きます</strong>。</li>
+<li>明文主義の立場から: <strong>robots.txt に従わない理由が当社に一つもない</strong>。従います。</li>
+</ul>
+<h3>4-4. 実装制約（そのままコードへ）</h3>
+<pre><code>
+# --- アクセス制御 ---
+RESPECT_ROBOTS_TXT      = True        # 取得前に必ず robots.txt を取得しパース
+                                      # Disallow パスは踏まない。取得失敗時は「許可なし」と扱う
+USER_AGENT              = &quot;SatoySelectBot/1.0 (+mailto:&lt;当社連絡先&gt;) — 仕入先調査目的&quot;
+                                      # 実在の連絡先を書く。ブラウザUAの詐称はしない
+CRAWL_DELAY_MIN_SEC     = 3.0         # 同一ホストへの最小間隔。robots.txt の Crawl-delay が
+                                      # これより大きければそちらを採用（大きい方を取る）
+MAX_CONCURRENCY_PER_HOST= 1
+MAX_GLOBAL_CONCURRENCY  = 4           # 異なるホストへの並列は4まで
+MAX_PAGES_PER_COMPANY   = 10
+MAX_DEPTH               = 2           # トップから2階層まで
+TIMEOUT_SEC             = 20
+ACCESS_WINDOW           = &quot;09:00-23:00 JST&quot;  # 深夜の無人大量アクセスは避ける（誤検知を招く）
+
+# --- 停止条件（ここが一番大事） ---
+ON_HTTP_429_503         = 当該ホストを即時打ち切り。同ホストへの再訪は7日以上あける
+ON_HTTP_403             = 当該ホストを即時打ち切り。再訪しない（拒否の意思表示）
+ON_5XX_TWICE            = 当該ホストを即時打ち切り
+ON_CAPTCHA_OR_WAF       = 即時打ち切り。**回避を試みない**（不正アクセス禁止法・規約違反の領域）
+GLOBAL_ERROR_RATE_STOP  = 直近100リクエストの5xx率が20%を超えたらジョブ全体を停止
+
+# --- 取得対象の限定 ---
+ALLOW_PATH_HINTS        = [&quot;company&quot;,&quot;about&quot;,&quot;corporate&quot;,&quot;kaisha&quot;,&quot;gaiyo&quot;,&quot;profile&quot;,
+                           &quot;contact&quot;,&quot;inquiry&quot;,&quot;otoiawase&quot;,&quot;toiawase&quot;,&quot;support&quot;,
+                           &quot;tokushoho&quot;,&quot;law&quot;,&quot;legal&quot;,&quot;privacy&quot;]
+                          # トップ＋上記に該当するリンクのみ辿る。商品ページ・ブログは辿らない
+DENY                    = ログイン必須ページ / 会員ページ / 有料ページ / フォームのPOST送信
+                          # 「取得」であって「送信」はしない。問い合わせフォームは
+                          #  URL を記録するだけで、絶対に送信しない（§4.1 第三者連絡）
+
+# --- 保存 ---
+STORE                   = 抽出項目（電話 / フォームURL / メール / 所在地 / 商号）
+                        + 出典URL + 取得日時(UTC) + HTTPステータス
+DO_NOT_STORE            = HTML全文の恒久保存。キャッシュは agent_output/ に7日で自動削除
+REVISIT_INTERVAL_DAYS   = 30          # 同一URLの再取得は30日あける（冪等・再開可能）
+</code></pre>
+<h3>4-5. 各社サイトの利用規約</h3>
+<ul>
+<li>サイトによっては規約に「ロボット・自動収集の禁止」を置いています。<strong>規約がある以上、明文が優先します。</strong></li>
+<li>全822社の規約を人力で読むのは不可能。<strong>折衷案として、以下を実装すること。</strong></li>
+</ul>
+<pre><code>
+TOS_KEYWORD_SCAN = 取得した各ページ本文に対し、以下の語を検索。
+                   ヒットしたら当該ドメインを即時ブラックリスト化し、以後アクセスしない。
+  [&quot;クローリング&quot;, &quot;クロール&quot;, &quot;スクレイピング&quot;, &quot;自動収集&quot;, &quot;自動取得&quot;,
+   &quot;ロボット&quot;, &quot;自動化されたプログラム&quot;, &quot;データマイニング&quot;, &quot;無断複製&quot;, &quot;無断転載&quot;]
+                   ※ ヒット＝即NGではないが、**個別に人が読むまで止める**のが明文主義。
+                   ヒット件数は多くないはずなので、その分だけハルオが読む。
+</code></pre>
+<h3>リスク（3軸）</h3>
+<table><thead><tr><th>軸</th><th>評価</th></tr></thead><tbody><tr><td>発生確率</td><td>中（速度制御を誤ると容易に発生）</td></tr><tr><td>影響度</td><td><strong>大</strong>（抗議・アクセス遮断・最悪は刑事）</td></tr><tr><td>不可逆性</td><td><strong>高</strong>（これから取引を申し込む相手に嫌われる。関係は戻らない）</td></tr></tbody></table>
+<p>→ <strong>確率が低くても止める類の話ではなく、確率が中で影響が大。速度制御は交渉不可の絶対条件。</strong></p>
+<hr>
+<h2>5. Amazon 商品ページ／ブランドストアの自動取得 — <strong>不可</strong></h2>
+<h3>5-1. 決定的根拠（一次情報・当社が今日取得）</h3>
+<p><strong>Amazon.co.jp 利用規約</strong>（更新日: 2025年9月1日 / 確認日: 2026-08-31 / <code>https://www.amazon.co.jp/gp/help/customer/display.html?nodeId=643006</code>）</p>
+<p>「利用許可およびサイトへのアクセス」より、原文のまま:</p>
+<blockquote>「本規約およびサービス規約の遵守を条件とし、アマゾンまたはコンテンツ提供者は、アマゾンサービスを<strong>限定的、非独占的、非商業的および個人的に利用する権利</strong>をお客様に許諾します（譲渡およびサブライセンス不可）。この利用許可には、アマゾンサービスまたはそのコンテンツの<strong>転売および商業目的での利用、製品リスト、解説、価格などの収集と利用</strong>、アマゾンサービスまたはそのコンテンツの二次的利用、第三者のために行うアカウント情報のダウンロードとコピーやその他の利用、<strong>データマイニング、ロボットなどのデータ収集・抽出ツールの使用は、一切含まれません</strong>。」<br>「アマゾンサービスまたはそのいかなる部分も、アマゾンからの書面による明示的な承諾を得ていない限り、<strong>商業目的のために、複製、複写、コピー、販売、再販、アクセス、その他の利用はできません</strong>。」</blockquote>
+<p><strong>これ以上議論の余地はありません。</strong>「商業目的でのアクセス」自体が許諾外です。当社の目的は完全に商業目的です。</p>
+<h3>5-2. 補強根拠</h3>
+<p><strong>(a) robots.txt（<code>https://www.amazon.co.jp/robots.txt</code> / 確認日 2026-08-31）</strong></p>
+<ul>
+<li>全491行。末尾に <strong><code>Disallow: /</code> を付した User-agent が100個</strong>列挙されています。</li>
+<li>名指しされているものの一部: <code>GPTBot</code> / <code>CCBot</code> / <code>PerplexityBot</code> / <code>Google-Extended</code> / <code>GoogleAgent-Shopping</code> / <strong><code>ClaudeBot</code></strong> / <strong><code>Claude-User</code></strong> / <strong><code>Claude-SearchBot</code></strong> / <strong><code>Scrapy</code></strong> / <strong><code>Devin</code></strong> / <code>ChatGPT-User</code> / <code>xAI-Grok</code> ほか。</li>
+<li><strong><code>Scrapy</code>（汎用スクレイピングフレームワーク）と Claude 系エージェントが明示的に全面拒否されている</strong>。当社の実装がどのUAを名乗ろうと、Amazon の意思は robots.txt 上で明白です。</li>
+</ul>
+<p><strong>(b) BSA 改定 / エージェントポリシー（二次情報）</strong></p>
+<ul>
+<li>報道（ネットショップ担当者フォーラム 2026-08-05）によれば、<strong>2026年10月28日付</strong>で Amazon サービスビジネスソリューション契約が改定され、</li>
+<li class="sub">「データマイニングやロボットなどの自動化ツール」による「Amazon の資料の収集・利用」を禁止事項に追加</li>
+<li class="sub">LLM・機械学習モデルの開発・改善への利用を禁止</li>
+<li class="sub">リバースエンジニアリング・逆コンパイル・セキュリティ対策の回避を禁止</li>
+<li class="sub">エージェント使用時は「自動化システムであることを明確に識別し、エージェント名を開示する」義務</li>
+<li><strong>確度の申告: 二次情報のみ。BSA 本文（一次情報）は未取得。</strong> 取得方法は <code>agents/legal/memory/knowledge_amazon_agent_policy_2026.md</code>（<code>?mons_sel_locale=en_CA</code> ＋ブラウザ）に記載済み。<strong>別チケットで一次情報を取ること。</strong></li>
+</ul>
+<p><strong>(c) 当社固有の事情</strong></p>
+<ul>
+<li>日本店アカウントが停止中（北米KYC連鎖）。復旧交渉中に規約違反が1件でも積み上がることの影響度は測定不能。</li>
+</ul>
+<h3>リスク（3軸）</h3>
+<table><thead><tr><th>軸</th><th>評価</th></tr></thead><tbody><tr><td>発生確率</td><td>中〜高（Amazon はボット検知に極めて強い）</td></tr><tr><td>影響度</td><td><strong>最大</strong>（アカウント永久停止＝事業消滅）</td></tr><tr><td>不可逆性</td><td><strong>最高</strong>（社長は既に停止を経験済み。日本店の停止は終わり）</td></tr></tbody></table>
+<h3>5-3. そもそも不要である</h3>
+<p>822社のメーカー名は <strong>T-20260817-005 の v14 で抽出済み</strong>です。本チケットは「その822社の連絡先を埋める」フェーズであり、<strong>Amazon への新規アクセスは1回も必要ありません</strong>。リスクを取る理由がゼロです。</p>
+<h3>5-4. どうしても Amazon 由来データが要る場合の代替</h3>
+<table><thead><tr><th>代替</th><th>可否</th><th>条件</th></tr></thead><tbody><tr><td>SP-API（自社セラーアカウントの正規API）</td><td>将来的に可</td><td><strong>アカウント復旧が前提</strong>。かつ Developer 登録＝規約同意で §4.1</td></tr><tr><td>Keepa API（既契約）</td><td>業務目的の範囲で可</td><td>Price Data API T&amp;C §2(2) 自社業務目的限定 / §6.1(1) 再販厳禁 / <strong>§11(1) 改変・翻訳・複製の禁止</strong>。<strong>PUBLIC リポへの commit は §11(1)・§6.1 に触れるおそれあり（既知の未解決論点）</strong></td></tr><tr><td>手作業でのブラウザ閲覧</td><td>可</td><td>人が見る分には「個人的利用」の範囲。ただし822社分は非現実的</td></tr></tbody></table>
+<hr>
+<h2>6. Google — 検索結果スクレイピング vs 正規API</h2>
+<h3>6-1. Google 検索結果のスクレイピング — <strong>不可</strong></h3>
+<p><strong>(a) robots.txt（<code>https://www.google.com/robots.txt</code> / 確認日 2026-08-31）</strong></p>
+<pre><code>
+User-agent: *
+User-agent: Yandex
+Disallow: /search
+Allow: /search/about
+Allow: /search/howsearchworks
+</code></pre>
+<p>→ <strong>検索結果ページ（<code>/search</code>）は全ボットに対して Disallow。</strong></p>
+<p><strong>(b) Google 利用規約</strong>（<code>https://policies.google.com/terms?hl=ja</code> / 確認日 2026-08-31）</p>
+<p>「サービスの不正使用」の禁止例として、次を明示:</p>
+<blockquote>「Google のウェブページの機械可読な指示（<strong>クロール、トレーニングなどのアクティビティを禁止する robots.txt ファイルなど</strong>）に違反する、Google のいずれかのサービスのコンテンツにアクセスすることを目的とした<strong>自動化された手段の使用</strong>」</blockquote>
+<p>→ robots.txt 違反が、規約違反として明文化されています。<strong>グレーですらない。黒。</strong></p>
+<h3>6-2. Custom Search JSON API — <strong>条件付き可。ただし調達できない見込み</strong></h3>
+<p><strong>(a) 規約上の評価</strong>: 正規APIであり、robots.txt・利用規約に抵触しません。<strong>規約上は白。</strong></p>
+<p><strong>(b) 致命的な事実</strong>（<code>https://developers.google.com/custom-search/v1/overview</code> / 確認日 2026-08-31）</p>
+<blockquote>「The API is now <strong>closed to new customers</strong>. Existing Custom Search JSON API customers have until <strong>January 1, 2027</strong> to transition to an alternative solution.」</blockquote>
+<ul>
+<li><strong>新規顧客の受付を終了</strong>しています。当社は新規です。→ <strong>契約できない可能性が高い。</strong></li>
+<li>無料枠は 100 クエリ/日、超過分は $5/1000クエリ（上限10,000/日）。仮に使えても <strong>822社×複数クエリなら無料枠を大きく超え、課金＝§4.1。</strong></li>
+<li>姉妹APIの Site Restricted JSON API は <strong>2025-01-08 に停止済み</strong>。移行先として Google Cloud の <strong>Vertex AI Search</strong> が指定されています。</li>
+</ul>
+<p><strong>(c) 判定</strong></p>
+<table><thead><tr><th>手段</th><th>規約</th><th>調達可否</th><th>§4.1</th></tr></thead><tbody><tr><td>Custom Search JSON API</td><td>白</td><td><strong>不可の見込み（新規停止）</strong></td><td>課金時は該当</td></tr><tr><td>Vertex AI Search</td><td>白</td><td>可（Google Cloud アカウント要）</td><td><strong>課金＝該当。契約は社長承認</strong></td></tr><tr><td>Brave Search API 等の第三者検索API</td><td><strong>未検証</strong></td><td>可</td><td><strong>課金＝該当。導入前に法務レビューを別途要求すること</strong></td></tr></tbody></table>
+<h3>6-3. 法務からの設計上の勧告</h3>
+<p><strong>検索APIに依存しない設計を推奨します。</strong> 理由は3つ。</p>
+<ul>
+<li>Custom Search が新規停止した以上、無料で正規に検索結果を得る手段が実質ありません。</li>
+<li>代替APIはすべて課金＝§4.1。社長の承認待ちがボトルネックになり、パイプラインが止まります。</li>
+<li>検索結果の「1位のURLが本当にそのメーカーの公式か」は保証されず、<strong>確度を <code>確定</code> にできません</strong>。チケットが定める「推測厳禁」に反します。</li>
+</ul>
+<p>→ 公式HP URL の一次ソースは、<strong>gBizINFO の法人プロフィール</strong>、<strong>既存55社の実績</strong>、<strong>JAN/GS1事業者コードからの企業特定</strong>などを優先し、検索APIは「どうしても埋まらない残りを埋める最後の手段」に位置づけてください（手段の具体設計はタカシ／サトルの領分）。</p>
+<hr>
+<h2>7. 商用の企業DB／名簿サービス — <strong>条件付き可。現行の公開リポ運用のままでは不可</strong></h2>
+<h3>7-1. Musubu（Baseconnect株式会社）の規約（<code>https://musubu.in/terms/</code> / 確認日 2026-08-31）</h3>
+<table><thead><tr><th>条項</th><th>内容</th><th>当社への影響</th></tr></thead><tbody><tr><td>第1条【2】</td><td>「<strong>自らの法人営業目的のためにのみ</strong>本サービスをご利用いただき、本目的以外の利用を固く禁じます」</td><td>メーカー仕入れの営業は「法人営業目的」に当たる。<strong>この点は問題なし</strong></td></tr><tr><td>第1条【2】</td><td>「第三者に対し当社DB等及びユーザー自身において当社DB等を編集・加工した派生物を<strong>譲渡、頒布、貸与、公衆送信してはならず</strong>」</td><td><strong>★致命的。GitHub public への commit は「公衆送信」に該当します。</strong></td></tr><tr><td>第15条【10】【11】</td><td>第三者に当社DB／顧客情報を利用させる行為、第三者のために利用する行為の禁止</td><td>同上</td></tr><tr><td>第15条</td><td>「<strong>クローリング、スクレイピングその他顧客情報を網羅的に取得し又は抽出する行為</strong>」の禁止</td><td>自動一括エクスポートは禁止。<strong>UI が許すエクスポート機能の範囲でのみ利用可</strong></td></tr><tr><td>第9条【1】</td><td>利用料金はサイト掲示の料金表による</td><td><strong>契約＝§4.1（金銭）。申込は絶対に自分でしない</strong></td></tr></tbody></table>
+<h3>7-2. 判定</h3>
+<ul>
+<li><strong>自社の営業に使うこと自体は可。</strong>「派生物を含めて第三者へ公衆送信しない」が絶対条件。</li>
+<li><strong>当社の現行運用（deliverables を PUBLIC リポに commit → 30分ごと自動 push）とは両立しません。</strong></li>
+<li>使うなら、<strong>Musubu 由来データは一切リポに入れず、限定共有の Google スプレッドシートのみに置く</strong>という分離設計が前提になります。この分離が守られる保証がない限り、<strong>法務としては採用を推奨しません</strong>。</li>
+</ul>
+<h3>7-3. FUMA / Baseconnect 他</h3>
+<ul>
+<li><strong>FUMA の利用規約は一次情報を取得できていません</strong>（サイト上に規約ページが見つからず）。<strong>未検証のまま採用しないこと。</strong></li>
+<li>一般に無料の企業DBほど「再配布禁止」「スクレイピング禁止」を強く置きます。<strong>「無料だから自由」は誤りです。</strong></li>
+</ul>
+<h3>リスク（3軸）</h3>
+<table><thead><tr><th>軸</th><th>評価</th></tr></thead><tbody><tr><td>発生確率</td><td><strong>高</strong>（PUBLIC リポなので commit した瞬間に成立。事故は「うっかり」で起きる）</td></tr><tr><td>影響度</td><td>中（契約解除・損害賠償請求）</td></tr><tr><td>不可逆性</td><td><strong>高</strong>（一度 push した内容は Git 履歴に残り、force push は §4.1）</td></tr></tbody></table>
+<hr>
+<h2>8. 収集した連絡先の「保有」— 個人情報保護法</h2>
+<h3>8-1. 法人情報は個人情報か → <strong>原則ノー。ただし例外が3つある</strong></h3>
+<p>個人情報保護法2条1項:</p>
+<blockquote>「この法律において『個人情報』とは、<strong>生存する個人に関する情報</strong>であって…<strong>特定の個人を識別することができるもの</strong>…をいう。」</blockquote>
+<p>個人情報保護委員会ガイドライン（通則編）:</p>
+<blockquote>「<strong>法人その他の団体は『個人』に該当しないため、法人等の団体そのものに関する情報は『個人情報』に該当しない</strong>」（ただし「役員、従業員等に関する情報は個人情報に該当する」）</blockquote>
+<table><thead><tr><th>収集する項目</th><th>個人情報か</th><th>理由</th></tr></thead><tbody><tr><td>商号・法人番号・本店所在地</td><td><strong>× 非該当</strong></td><td>法人そのものの情報</td></tr><tr><td>代表電話番号</td><td><strong>× 非該当</strong></td><td>同上</td></tr><tr><td>問い合わせフォームURL</td><td><strong>× 非該当</strong></td><td>同上</td></tr><tr><td><code>info@</code> <code>contact@</code> 等の組織アドレス</td><td><strong>× 非該当</strong></td><td>特定個人を識別しない</td></tr><tr><td><strong>代表者氏名・役員氏名</strong></td><td><strong>○ 該当</strong></td><td>ガイドライン明記</td></tr><tr><td><strong><code>yamada@</code> <code>t.suzuki@</code> 等の個人名入りアドレス</strong></td><td><strong>○ 該当し得る</strong></td><td>商号と併せて特定個人を識別しうる</td></tr><tr><td><strong>個人事業主・屋号のみのブランドの情報一式</strong></td><td><strong>○ 該当</strong></td><td>事業情報がそのまま個人の情報になる</td></tr></tbody></table>
+<h3>8-2. 822社に個人事業主が混ざる → <strong>全体を個人情報として扱う</strong></h3>
+<p>822社を1件ずつ「法人か個人事業主か」判定してから扱いを分けるのは、実務上破綻します。</p>
+<p><strong>判定を待たず、データセット全体に個人情報の取扱いルールを適用してください。</strong> これが最も安全で、かつ最も安い方法です。</p>
+<h3>8-3. 発生する義務と実装制約</h3>
+<table><thead><tr><th>条</th><th>義務</th><th>実装</th></tr></thead><tbody><tr><td>17条</td><td>利用目的をできる限り特定</td><td>「<strong>当社のメーカー仕入れに係る取引先候補の調査、連絡、商談管理のため</strong>」で確定</td></tr><tr><td>18条</td><td>目的外利用の禁止</td><td>上記以外（名簿販売・他事業への転用）は禁止。<strong>転売は論外</strong></td></tr><tr><td>20条1項</td><td>「<strong>偽りその他不正の手段</strong>」による取得の禁止</td><td>公表情報の閲覧・取得は「不正の手段」に当たらない。ただし<strong>ログイン回避・CAPTCHA回避・UA詐称は「不正の手段」寄りの評価を招く</strong>。§4-4 の実装制約でこれらを禁じたのはこの条文が理由</td></tr><tr><td>21条1項</td><td>取得したら<strong>速やかに利用目的を本人に通知または公表</strong></td><td><strong>公表の場を用意する必要がある。</strong>「通知」は822社に連絡することになり本末転倒。公表先の候補: 自社サイトのプライバシーポリシー / 営業メール本文への記載</td></tr><tr><td>27条</td><td>第三者提供の制限（本人同意が必要）</td><td><strong>★PUBLIC リポへの commit は第三者提供に当たり得る。</strong> §8-4 参照</td></tr></tbody></table>
+<h3>8-4. ★最大の実務リスク — 公開リポジトリへの格納</h3>
+<ul>
+<li>CLAUDE.md §6 は「最終納品物は deliverables に直納し、その場で commit」と定めています。</li>
+<li>一方このリポジトリは PUBLIC で、30分ごとに自動 push されます。</li>
+<li><strong>個人事業主の氏名・住所・電話番号を含む822社の連絡先CSVを commit すると、それは「不特定多数への提供」です。</strong> 27条1項の同意はありません。</li>
+</ul>
+<p><strong>法務の結論:</strong></p>
+<pre><code>
+連絡先の実データ（電話・メール・所在地・氏名）は deliverables に置かない。
+  → 限定共有の Google スプレッドシートに格納する（Phase D でマリエが行う想定）
+  → リポジトリには「カバー率」「未取得理由の内訳」などの統計と、
+     スプレッドシートへのリンクだけを置く
+  → 途中データは agent_output/（.gitignore 対象）に置き、
+     ジョブ完了後に削除する
+</code></pre>
+<p>これは CLAUDE.md §6 の原則と衝突します。<strong>衝突を勝手に解消せず、秘書経由で社長判断を仰いでください</strong>（§10 に整理）。</p>
+<h3>8-5. 既に commit 済みの <code>contacts_v1.csv</code> の点検（2026-08-31 時点）</h3>
+<p>Phase C（タカシ）が commit <code>1e1840e</code> で <code>contacts_v1.csv</code>（822行）を PUBLIC リポに納品済みです。<strong>現時点では問題ありません。</strong> 根拠は以下のとおり、法務が全822行を実査した結果です。</p>
+<table><thead><tr><th>確認項目</th><th>結果</th></tr></thead><tbody><tr><td>連絡先が1つ以上埋まっている行</td><td><strong>14行のみ</strong>（残り808行は空欄）</td></tr><tr><td>埋まっている14件の性質</td><td>すべて<strong>法人の公表窓口</strong>（スクウェア・エニックス、エプソン、シモジマ、DUNLOP 等）。代表電話・カスタマーサポート窓口・企業サイトURL</td></tr><tr><td>個人名を含むメールアドレス</td><td><strong>0件</strong>（<code>customerservice.japan@…</code>、<code>weimallyh@…</code> の2件のみで、いずれも組織アドレス）</td></tr><tr><td>代表者・役員の氏名</td><td><strong>0件</strong></td></tr><tr><td>「ノーブランド・個人らしき」分類の3件</td><td><strong>すべて空欄</strong>。個人の情報は1件も入っていない</td></tr></tbody></table>
+<p>→ 法2条1項の「生存する個人に関する情報」に当たるものが含まれていないため、現状の commit は個人情報保護法上の問題を生じません。<strong>取り下げ不要です。</strong></p>
+<p><strong>ただし、これは「今は空だから安全」というだけです。</strong> パイプラインが実際に埋め始めた瞬間に状況が変わります。以下のガードを <strong>CSV 出力の直前に実装してください。</strong></p>
+<pre><code>
+# --- commit 前ゲート（実装必須） ---
+BLOCK_IF = 次のいずれかに該当する行が1件でも存在するとき、
+           deliverables への書き出しを中止し、agent_output/ に留めて人へエスカレーションする
+
+  1) entity_type == &quot;個人事業主&quot;
+  2) 分類 == &quot;ノーブランド・個人らしき&quot; かつ 連絡先が1つ以上埋まっている
+  3) メールのローカル部が姓名パターン（姓名ローマ字 / first.last / f.last 等）
+  4) 「代表者氏名」「担当者名」に相当する値が入っている
+  5) 所在地が「◯◯マンション◯◯号室」等の居宅を示す形式
+
+# 該当ゼロなら従来どおり deliverables に commit してよい。
+# 該当ありなら、その行だけを除いた版を commit し、除外分は限定共有シートへ。
+</code></pre>
+<h3>9-1. 当社の営業メールは「特定電子メール」に当たる</h3>
+<p>法2条2号: 送信者（<strong>営利を目的とする団体</strong>及び営業を営む場合における個人）が「自己又は他人の営業につき広告又は宣伝を行うための手段として送信をする電子メール」。</p>
+<p>→ 当社からメーカーへの仕入れ打診メールは、自己の営業の宣伝を含む以上、<strong>該当します</strong>。</p>
+<h3>9-2. オプトイン原則と、当社が乗るべき例外</h3>
+<p>法3条1項（<strong>原文</strong>）:</p>
+<blockquote>送信者は、次に掲げる者<strong>以外の者に対し、特定電子メールの送信をしてはならない</strong>。<br>一　あらかじめ…同意する旨を…通知した者<br>二　…総務省令・内閣府令で定めるところにより自己の電子メールアドレスを送信者…に対し通知した者<br>三　…当該特定電子メールを手段とする広告又は宣伝に係る<strong>営業を営む者と取引関係にある者</strong><br>四　…総務省令・内閣府令で定めるところにより<strong>自己の電子メールアドレスを公表している団体又は個人（個人にあっては、営業を営む者に限る。）</strong></blockquote>
+<p><strong>当社が乗るのは第4号です。</strong></p>
+<p>施行規則3条（<strong>原文</strong>）:</p>
+<blockquote>（自己の電子メールアドレスの公表の方法）<br>第三条　法第三条第一項第四号の規定による自己の電子メールアドレスの公表の方法は、<strong>自己の電子メールアドレスをインターネットを利用して公衆が閲覧することができる状態に置く方法</strong>とする。<br><strong>ただし、自己の電子メールアドレスと併せて特定電子メールの送信をしないように求める旨の文言をインターネットを利用して公衆が閲覧することができる状態に置いたときは、この限りではない。</strong></blockquote>
+<h3>9-3. これが収集フェーズに与える制約 —— ★ここが依頼の核心</h3>
+<p><strong>「送れないアドレス」は集める段階で分別できます。</strong> 以下を必ず実装してください。</p>
+<pre><code>
+# 収集スキーマに、連絡先列の定義に加えて次の4列を必須で追加する
+
+email_source_url    : そのメールアドレスが「公表」されていたページのURL（法3条1項4号の立証責任は送信者側にある。
+                      後から探し直せない設計は不可）
+email_published_at  : 取得日時（UTC）。公表状態を確認した時点の記録
+email_optout_notice : bool。**同一ページ内に下記のいずれかの語があれば true**
+                      [&quot;営業メール&quot;, &quot;営業目的&quot;, &quot;勧誘&quot;, &quot;セールス&quot;, &quot;売り込み&quot;, &quot;広告メール&quot;,
+                       &quot;DM&quot;, &quot;ダイレクトメール&quot;, &quot;特定電子メール&quot;, &quot;お断り&quot;, &quot;ご遠慮&quot;,
+                       &quot;固くお断り&quot;, &quot;受け付けておりません&quot;]
+                      ※「お断り」等の否定語と、メール/営業/勧誘の語が同一ブロック内に
+                        共起する場合を検出する。単純OR検索は誤検知が多いので近接判定にすること
+                      ※ true のものは **送信対象から恒久的に除外**（施行規則3条ただし書）
+entity_type         : &quot;法人&quot; / &quot;個人事業主&quot; / &quot;不明&quot;
+                      ※ 法人番号APIで法人番号が確定 → &quot;法人&quot;
+                      ※ 確定しない → &quot;不明&quot;。**&quot;不明&quot; は送信対象にしない**
+                      （4号の個人は「営業を営む者」に限られる。営業性が不明なら送れない）
+personal_suspect    : bool。ローカル部が姓名らしい（例: yamada, t.suzuki, taro_yamada）場合 true
+                      ※ 法的には4号で送信可でも、**実務上は送信対象から外す**。
+                        個人宛と受け取られた瞬間に印象が最悪になり、取引の芽が消える
+</code></pre>
+<p><strong>問い合わせフォーム経由の送信について</strong></p>
+<p>フォームからの送信は「電子メールの送信」ではないため、特定電子メール法の直接適用外です。ただし<strong>フォームのページに「営業目的のご連絡はお断りします」とあれば、そこへ営業を送るのは規約違反であり、心証も最悪です</strong>。<code>form_optout_notice</code> も同様に判定してください。</p>
+<h3>9-4. 送信フェーズの制約（実送信は §4.1。設計だけ先に固定する）</h3>
+<table><thead><tr><th>要件</th><th>根拠</th><th>実装</th></tr></thead><tbody><tr><td>送信者の氏名または名称を表示</td><td>法4条1号</td><td>メール本文に「Satoy Select（運営者名）」を明記</td></tr><tr><td>受信拒否の通知先を表示</td><td>法4条2号</td><td>オプトアウト用メールアドレス or URL</td></tr><tr><td>拒否リンクは所定の位置に</td><td>規則7条1項2号</td><td>「受信拒否の通知先」表示の<strong>直前または直後</strong></td></tr><tr><td>送信者の<strong>住所</strong>を表示</td><td>規則9条2号</td><td>省略不可</td></tr><tr><td>苦情・問合せ窓口（電話 or メール or URL）</td><td>規則9条3号</td><td>省略不可</td></tr><tr><td>拒否通知を受けたら送信禁止</td><td>法3条3項</td><td><strong>サプレッションリストを必ず実装</strong>。手運用は不可</td></tr><tr><td>送信者情報を偽らない</td><td>法5条</td><td>From/Return-Path の詐称禁止</td></tr></tbody></table>
+<p><strong>罰則（不可逆性の評価に使うこと）</strong></p>
+<table><thead><tr><th>条</th><th>対象</th><th>罰</th></tr></thead><tbody><tr><td>34条2号</td><td>措置命令（法7条）違反</td><td><strong>1年以下の拘禁刑</strong> または100万円以下の罰金</td></tr><tr><td>37条1号</td><td>上記の<strong>法人両罰</strong></td><td><strong>3000万円以下の罰金</strong></td></tr><tr><td>34条1号</td><td>送信者情報を偽った送信（法5条違反）</td><td>1年以下の拘禁刑 または100万円以下の罰金</td></tr></tbody></table>
+<p>→ 措置命令は総務大臣・内閣総理大臣が出します。<strong>いきなり刑罰ではなく命令が先</strong>ですが、命令を受けた事実が公表される時点で信用毀損は不可逆です。</p>
+<h3>9-5. 判定</h3>
+<ul>
+<li><strong>収集: 条件付き可</strong>（上記4列の実装が条件）</li>
+<li><strong>送信: §4.1 該当。社長承認なしに1通も送らない</strong>（外部発信・第三者連絡の両方に該当）</li>
+</ul>
+<hr>
+<h2>10. 実装してよい手段／使ってはいけない手段</h2>
+<p><strong>実装してよい手段（1行）</strong></p>
+<blockquote>国税庁 法人番号 Web-API ＋ gBizINFO REST API で商号・法人番号・所在地を確定させ、各メーカー公式サイトのみを robots.txt 尊重・同一ホスト3秒間隔・UA明示・会社概要/問い合わせ系ページ限定でクロールして電話・フォームURL・メールを抽出する。</blockquote>
+<p><strong>使ってはいけない手段（1行）</strong></p>
+<blockquote>Amazon.co.jp の商品ページ／ブランドストアの自動取得（利用規約が「データ収集・抽出ツール」を名指しで許諾外と明記、robots.txt で Scrapy/Claude 系を含む100 UA を全面拒否）と、Google 検索結果のスクレイピング（robots.txt <code>Disallow: /search</code> ＋ Google 利用規約が明文で禁止）。</blockquote>
+<hr>
+<h2>11. 社長判断が必要な論点（秘書カズヨへ）</h2>
+<p>法務は判断材料を出す係です。以下は<strong>私が決めてはいけない事項</strong>なので、A/B/C にして渡します。</p>
+<h3>論点① 連絡先の実データを PUBLIC リポに置くか</h3>
+<table><thead><tr><th>案</th><th>内容</th><th>評価</th></tr></thead><tbody><tr><td><strong>A（法務推奨）</strong></td><td>実データは限定共有の Google スプレッドシートのみ。リポには統計とリンクのみ</td><td>個人事業主混在の27条リスクと、商用DB規約の「公衆送信禁止」の両方を同時に消せる。CLAUDE.md §6 の例外扱いが必要</td></tr><tr><td>B</td><td>実データを deliverables に commit（現行ルール通り）</td><td>運用は単純。ただし個人事業主の氏名・住所・電話が全世界に公開される。<strong>削除には force push（§4.1）が要る＝不可逆</strong></td></tr><tr><td>C</td><td>個人事業主を除いた法人のみを commit、個人分は別管理</td><td>理屈は通るが、判定コストが高く、判定ミスが即漏洩になる</td></tr></tbody></table>
+<p>→ <strong>推奨は A。</strong> 影響度が大きく不可逆なので、運用の単純さより安全を取るべきです。</p>
+<h3>論点② 各種API・サービスの利用申請（＝規約への同意）</h3>
+<table><thead><tr><th>対象</th><th>費用</th><th>§4.1 該当</th></tr></thead><tbody><tr><td>国税庁 法人番号 Web-API のアプリケーションID発行届出</td><td>無料</td><td><strong>該当（法的拘束＝利用規約への同意）</strong></td></tr><tr><td>gBizINFO REST API の利用申請</td><td>無料</td><td><strong>該当（同上）</strong></td></tr><tr><td>Google Cloud / Vertex AI Search</td><td>有料</td><td><strong>該当（金銭＋法的拘束）</strong></td></tr><tr><td>Musubu 等の商用DB</td><td>有料</td><td><strong>該当（金銭＋法的拘束）</strong>。加えて論点①の解決が前提</td></tr></tbody></table>
+<p>→ <strong>無料であっても規約同意は法的拘束です。ハルオもタカシも実行しません。</strong> 社長の一手が要ります。</p>
+<p>→ ただし国税庁・gBizINFO の2つは<strong>規約内容を精査済みで、当社に不利な条項はありません</strong>（禁止事項は「大量アクセス禁止」「ID共有禁止」「申告目的の範囲内」の3点のみ、金銭債務なし、いつでも離脱可）。<strong>承認して差し支えない、と法務は判断します。</strong></p>
+<h3>論点③ 検索APIをどうするか</h3>
+<p>Custom Search JSON API が新規停止しているため、<strong>「検索で公式HPを探す」設計は当面成立しません。</strong> Phase C の設計をタカシに戻す必要があるか、秘書のご判断を仰ぎます。</p>
+<hr>
+<h2>12. 出典一覧（すべて 2026-08-31 確認）</h2>
+<table><thead><tr><th>#</th><th>資料</th><th>URL</th></tr></thead><tbody><tr><td>1</td><td>国税庁 法人番号システム Web-API機能利用規約（令和5年4月1日施行）</td><td><a href="https://www.houjin-bangou.nta.go.jp/pc/webapi/riyokiyaku.html">https://www.houjin-bangou.nta.go.jp/pc/webapi/riyokiyaku.html</a></td></tr><tr><td>2</td><td>国税庁法人番号公表サイト 利用規約</td><td><a href="https://www.houjin-bangou.nta.go.jp/riyokiyaku/">https://www.houjin-bangou.nta.go.jp/riyokiyaku/</a></td></tr><tr><td>3</td><td>公共データ利用規約（第1.0版）／デジタル庁</td><td><a href="https://www.digital.go.jp/resources/open_data/public_data_license_v1.0">https://www.digital.go.jp/resources/open_data/public_data_license_v1.0</a></td></tr><tr><td>4</td><td>gBizINFO 利用規約（最終更新 2025-12-22）</td><td><a href="https://help.info.gbiz.go.jp/hc/ja/articles/4795140981406">https://help.info.gbiz.go.jp/hc/ja/articles/4795140981406</a></td></tr><tr><td>5</td><td>gBizINFO API・データダウンロード利用規約（制定 2025-12-21 / 更新 2026-04-08）</td><td><a href="https://help.info.gbiz.go.jp/hc/ja/articles/4999421139102">https://help.info.gbiz.go.jp/hc/ja/articles/4999421139102</a></td></tr><tr><td>6</td><td><strong>Amazon.co.jp 利用規約（更新日 2025年9月1日）</strong></td><td><a href="https://www.amazon.co.jp/gp/help/customer/display.html?nodeId=643006">https://www.amazon.co.jp/gp/help/customer/display.html?nodeId=643006</a></td></tr><tr><td>7</td><td>amazon.co.jp robots.txt（全491行・末尾に100 UA の <code>Disallow: /</code>）</td><td><a href="https://www.amazon.co.jp/robots.txt">https://www.amazon.co.jp/robots.txt</a></td></tr><tr><td>8</td><td>Amazon エージェントポリシー報道（<strong>二次情報</strong>・2026-08-05）</td><td><a href="https://netshop.impress.co.jp/n/2026/08/05/16525">https://netshop.impress.co.jp/n/2026/08/05/16525</a></td></tr><tr><td>9</td><td>google.com robots.txt</td><td><a href="https://www.google.com/robots.txt">https://www.google.com/robots.txt</a></td></tr><tr><td>10</td><td>Google 利用規約</td><td><a href="https://policies.google.com/terms?hl=ja">https://policies.google.com/terms?hl=ja</a></td></tr><tr><td>11</td><td>Custom Search JSON API Overview（&quot;closed to new customers&quot;）</td><td><a href="https://developers.google.com/custom-search/v1/overview">https://developers.google.com/custom-search/v1/overview</a></td></tr><tr><td>12</td><td>Custom Search Site Restricted JSON API（2025-01-08 停止）</td><td><a href="https://developers.google.com/custom-search/v1/site_restricted_api">https://developers.google.com/custom-search/v1/site_restricted_api</a></td></tr><tr><td>13</td><td>Musubu 利用規約</td><td><a href="https://musubu.in/terms/">https://musubu.in/terms/</a></td></tr><tr><td>14</td><td>著作権法 30条の4 / 47条の5（e-Gov API <code>345AC0000000048</code>）</td><td><a href="https://laws.e-gov.go.jp/law/345AC0000000048">https://laws.e-gov.go.jp/law/345AC0000000048</a></td></tr><tr><td>15</td><td>個人情報保護法 2条・17条・18条・20条・21条・27条（e-Gov API <code>415AC0000000057</code>）</td><td><a href="https://laws.e-gov.go.jp/law/415AC0000000057">https://laws.e-gov.go.jp/law/415AC0000000057</a></td></tr><tr><td>16</td><td>個人情報保護法ガイドライン（通則編）／個人情報保護委員会</td><td><a href="https://www.ppc.go.jp/personalinfo/legal/guidelines_tsusoku/">https://www.ppc.go.jp/personalinfo/legal/guidelines_tsusoku/</a></td></tr><tr><td>17</td><td>特定電子メール法 3条・4条・7条・34条・35条・37条（e-Gov API <code>414AC0100000026</code>）</td><td><a href="https://laws.e-gov.go.jp/law/414AC0100000026">https://laws.e-gov.go.jp/law/414AC0100000026</a></td></tr><tr><td>18</td><td>特定電子メール法施行規則 3条（e-Gov API <code>414M60000008066</code>）</td><td><a href="https://laws.e-gov.go.jp/law/414M60000008066">https://laws.e-gov.go.jp/law/414M60000008066</a></td></tr><tr><td>19</td><td>刑法 233条・234条の2（e-Gov API <code>140AC0000000045</code>）</td><td><a href="https://laws.e-gov.go.jp/law/140AC0000000045">https://laws.e-gov.go.jp/law/140AC0000000045</a></td></tr><tr><td>20</td><td>岡崎市立中央図書館事件（Librahack事件・<strong>二次情報</strong>）</td><td><a href="https://ja.wikipedia.org/wiki/岡崎市立中央図書館事件">https://ja.wikipedia.org/wiki/岡崎市立中央図書館事件</a> / <a href="http://librahack.jp/okazaki-library-case/">http://librahack.jp/okazaki-library-case/</a></td></tr></tbody></table>
+<h3>一次情報が取れなかったもの（正直に申告します）</h3>
+<table><thead><tr><th>対象</th><th>状況</th><th>対処</th></tr></thead><tbody><tr><td>Amazon サービスビジネスソリューション契約（BSA）／エージェントポリシー本文</td><td><strong>未取得</strong>。JS レンダリング必須。二次情報のみで判定した</td><td>別チケットで、<code>?mons_sel_locale=en_CA</code> ＋カズヨのブラウザで取得。詳細は <code>agents/legal/memory/knowledge_amazon_agent_policy_2026.md</code></td></tr><tr><td>FUMA の利用規約</td><td><strong>未取得</strong>。サイト上に規約ページを発見できず</td><td><strong>未検証のまま採用しない</strong></td></tr><tr><td>gBizINFO のレート制限の具体値</td><td><strong>非公開</strong>（規約が「一定の上限」としか書かない）</td><td>保守的に 1 req/sec を採用</td></tr></tbody></table>
+</body></html>
