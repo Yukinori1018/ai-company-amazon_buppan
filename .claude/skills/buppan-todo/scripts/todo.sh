@@ -42,9 +42,15 @@ prepare)
   python3 "$HERE/ticket_inventory.py" "$REPO/workspace/tickets" \
     "$WORK/01_ticket-inventory.md" --prev "$PREV"
 
+  # 根拠チケットの本文を1ファイルに集める。タイトルだけで判定させないための工程で、
+  # ここで作る索引が build の鮮度検査の基準にもなる（prepare 抜きでは build が通らない）。
+  echo
+  python3 "$HERE/evidence.py" extract "$DELIV" "$WORK"
+
   echo
   echo "編集対象: $DELIV/01_master-todo.md"
   echo "骨格の原本（本文は触らない）: $DELIV/02_lifecycle-checklist.md"
+  echo "判定の入力（必ず読む）: $WORK/02_evidence-excerpts.md"
   ;;
 
 build)

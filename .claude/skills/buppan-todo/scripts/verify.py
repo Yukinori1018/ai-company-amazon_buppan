@@ -3,7 +3,7 @@
 
     python3 verify.py <deliverables_dir>
 
-見るのは5点です。
+見るのは7点です。
 
 1. 骨格の同一性 — 01 の小項目本文が 02（標準チェックリスト）と1文字も違わないか。
    02 はサトルが一次情報で裏を取った原本で、進捗更新のたびに本文が書き換わると
@@ -12,8 +12,13 @@
 3. A章サマリ表 — 表の数字が awk 集計と一致するか。前回、集計と本文がズレて
    説明が必要になりました。人が表を手で直すと必ず起きます。
 4. マークの記法 — [x] [~] [ ] 以外が紛れ込んでいないか。
-5. 個人特定情報 — このリポジトリは PUBLIC です。利用者識別番号・受付番号・
-   口座番号・電話番号を成果物に書くと、コミットした瞬間に公開されます。
+5. 個人特定情報 — このリポジトリは PUBLIC です。利用者識別番号・受付番号・口座番号・
+   電話番号・メールアドレス・サポートのケース番号を成果物に書くと、コミットした瞬間に
+   公開されます。
+6. 根拠の実在・鮮度・整合（evidence.py）— 根拠IDのチケットが実在するか、資料の更新日
+   より新しいチケットが無いか、prepare 以降に本文が変わっていないか。2026-08-31 の
+   誤判定10件・不整合14件・日付凍結は、ここが無かったから通ってしまいました。
+7. ボードの数字（update_board.py --check）。
 """
 
 from __future__ import annotations
@@ -31,12 +36,23 @@ RE_TICKET_SUFFIX = re.compile(r"\s*〔[^〕]*〕\s*$")
 RE_MAJOR = re.compile(r"^## ([1-8])\. (.+?)（中項目(\d+) / 小項目(\d+)）\s*$")
 
 # 公開リポに出してはいけないもの。値そのものではなくラベルで拾う（値は書かない）。
+# 2026-08-31 追加: メールアドレスとサポートのケース番号。ヒデアキが目視で見つけたのに
+# ここが拾えていなかった＝検査をすり抜けた実績があります。
 PII_PATTERNS = [
     (r"利用者識別番号", "e-Tax の利用者識別番号"),
     (r"受付番号\s*[:：]?\s*\d", "e-Tax の受付番号"),
     (r"\b\d{3,4}-\d{2,4}-\d{4}\b", "電話番号らしき数字列"),
     (r"口座番号\s*[:：]?\s*\d", "銀行口座番号"),
     (r"マイナンバー\s*[:：]?\s*\d", "マイナンバー"),
+    # メールアドレス。TLD のドットを必須にして `@sellonamazonjp`（公式LINE ID）や
+    # Google Fonts の `wght@500`、CSS の `@media` を巻き込まないようにする。
+    (r"[A-Za-z0-9._%+\-]+@[A-Za-z0-9\-]+(?:\.[A-Za-z0-9\-]+)*\.[A-Za-z]{2,}", "メールアドレス"),
+    (r"(?:ケース|案件|問い合わせ|お問い合わせ|Case|CASE)\s*(?:番号|ID|#)?\s*[:：]?\s*\d{5,}",
+     "サポートのケース番号"),
+    (r"(?:Case|CASE|ケース)\s*ID\s*[:：]?\s*\S+", "サポートのケースID"),
+    # 桁の長い裸の数字列。Amazon のケース番号・注文番号・口座番号はここに落ちる。
+    # 政策ID（G201808410 等）は英字が前に付くので除外される。
+    (r"(?<![A-Za-z0-9\-])\d{9,}(?![0-9\-])", "9桁以上の裸の数字列（ケース番号・注文番号の疑い）"),
 ]
 
 
@@ -160,6 +176,27 @@ def check_pii(paths: list[str], fail) -> None:
         print("  OK 個人特定情報の検出なし")
 
 
+def run_evidence_check(deliv: str, fail) -> None:
+    """根拠の実在・鮮度・整合を evidence.py に委ねる（update_board.py --check と同じ作法）。
+
+    作業場は `agent_output/<ticket_id>/`。prepare が作った索引と今のチケットを突き合わせ、
+    ズレていれば NG になる。抜粋を読まずに判定する経路を塞ぐための検査です。
+    """
+    tid = os.path.basename(deliv.rstrip("/"))
+    repo = os.path.abspath(os.path.join(HERE, "..", "..", "..", ".."))
+    work = os.path.join(repo, "workspace", "output", "agent_output", tid)
+    r = subprocess.run(
+        [sys.executable, os.path.join(HERE, "evidence.py"), "check", deliv, work],
+        capture_output=True,
+        text=True,
+    )
+    sys.stdout.write(r.stdout)
+    if r.stderr.strip():
+        print(r.stderr.strip())
+    if r.returncode != 0:
+        fail("根拠の実在・鮮度・整合が通らない（上の NG を参照）")
+
+
 def main() -> int:
     if len(sys.argv) != 2:
         print(__doc__)
@@ -194,7 +231,9 @@ def main() -> int:
     check_headings(master, counts, fail)
     check_summary_table(master, counts, fail)
     check_marks(master, fail)
-    check_pii([p for p in (master, checklist) if os.path.exists(p)], fail)
+    # ボードも見る。narrative は人が手で書き足す場所で、PII が混ざるならここです。
+    check_pii([p for p in (master, checklist, board) if os.path.exists(p)], fail)
+    run_evidence_check(d, fail)
 
     if os.path.exists(board):
         r = subprocess.run(
