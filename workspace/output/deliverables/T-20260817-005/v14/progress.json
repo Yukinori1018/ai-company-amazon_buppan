@@ -1,10 +1,10 @@
 {
   "ticket": "T-20260817-005",
   "scanner": "scan_v14",
-  "updated_at": "2026-08-31 06:12:29",
+  "updated_at": "2026-08-31 07:11:44",
   "started_at": "2026-08-31 02:52:06",
-  "elapsed_sec": 12022,
-  "elapsed_hhmm": "03:20:22",
+  "elapsed_sec": 15577,
+  "elapsed_hhmm": "04:19:37",
   "stop_reason": null,
   "auto_stop": {
     "max_hours": 6.0,
@@ -13,22 +13,22 @@
     "stop_file": "/Users/yukinori/Claude Code/ai-company-amazon_buppan/workspace/output/deliverables/T-20260817-005/v14/STOP"
   },
   "keepa": {
-    "tokens_consumed": 4739,
-    "tokens_left": 33,
+    "tokens_consumed": 5896,
+    "tokens_left": 56,
     "refill_per_min": 20,
     "note": "トークン上限1200・補充20/分。貯め込めないので12時間で約14,400が天井"
   },
   "counts": {
-    "processed": 600,
-    "rows": 600,
-    "go": 453,
-    "offers_verified": 514,
-    "rejected_seller": 61,
-    "rejected_cheap": 86
+    "processed": 750,
+    "rows": 750,
+    "go": 569,
+    "offers_verified": 654,
+    "rejected_seller": 85,
+    "rejected_cheap": 96
   },
-  "makers_listed": 1024,
+  "makers_listed": 1082,
   "cursor": {
-    "round": 1,
+    "round": 2,
     "cursors": {},
     "exhausted": []
   },
