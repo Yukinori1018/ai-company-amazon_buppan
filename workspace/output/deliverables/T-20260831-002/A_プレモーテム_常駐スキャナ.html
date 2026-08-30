@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>プレモーテム — 無人常駐スキャナ（T-20260831-002 Phase A）</title>
+<style>
+:root{--fg:#1c1c1e;--mut:#6b6b70;--line:#e3e3e6;--acc:#0b4f9e;--warn:#a3230c;--bg:#fff}
+*{box-sizing:border-box}
+body{margin:0;padding:2.5rem 1.25rem 6rem;background:var(--bg);color:var(--fg);
+ font-family:-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif;line-height:1.85;
+ font-size:15.5px;-webkit-font-smoothing:antialiased}
+main{max-width:960px;margin:0 auto}
+h1{font-size:1.75rem;line-height:1.4;margin:0 0 .5rem;padding-bottom:.75rem;border-bottom:3px solid var(--acc)}
+h2{font-size:1.3rem;margin:2.75rem 0 .9rem;padding-left:.6rem;border-left:5px solid var(--acc)}
+h3{font-size:1.08rem;margin:2rem 0 .6rem;color:var(--acc)}
+h4{font-size:1rem;margin:1.4rem 0 .4rem}
+p{margin:.7rem 0}
+hr{border:0;border-top:1px solid var(--line);margin:2.2rem 0}
+table{border-collapse:collapse;width:100%;margin:1rem 0;font-size:14px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:.5rem .65rem;text-align:left;vertical-align:top}
+th{background:#f4f6f9;font-weight:600;white-space:nowrap}
+tbody tr:nth-child(even){background:#fafbfc}
+ul,ol{margin:.6rem 0;padding-left:1.5rem}
+li{margin:.3rem 0}
+code{background:#f1f2f4;padding:.12em .38em;border-radius:4px;font-size:.88em;
+ font-family:"SF Mono",Menlo,monospace}
+pre{background:#1c1c1e;color:#e8e8ea;padding:1rem 1.1rem;border-radius:8px;overflow-x:auto;
+ line-height:1.6;font-size:13px}
+pre code{background:none;color:inherit;padding:0}
+blockquote{margin:1rem 0;padding:.6rem 1rem;background:#f7f8fa;border-left:4px solid var(--mut);color:#3a3a3e}
+strong{font-weight:700}
+a{color:var(--acc)}
+@media print{body{padding:0;font-size:11pt}h2{page-break-after:avoid}table{page-break-inside:avoid}}
+</style></head>
+<body><main>
+<h1>A. プレモーテム — 無人常駐スキャナ（T-20260831-002 / Phase A）</h1>
+<p>シミュレーター マサル / 2026-08-31<br>対象: <code>scan_v14.py</code> を launchd で常駐化し、時間上限を外して回し続ける案</p>
+<hr>
+<h2>0. 結論</h2>
+<ol><li><strong>このまま常駐させると、稼働14日目に母数を掘り尽くし、以後は1日28,800トークンを新規0件のために焼き続けます。</strong> しかも画面表示は「全シャードを掘り切りました」＝正常終了に見えます。確度85%。</li><li><strong>一番怖いのは落ちることではなく、落ちたのに成功と表示されることです。</strong> 現行コードは Keepa の API エラーを「母数の枯渇」と誤って記録します（後述 F2）。night-shift が14日間 exit 127 で死んでいたのと同じ構図が、より気づきにくい形で再発します。</li><li><strong>「やらなければよかった」の本命は技術ではありません。</strong> 6日前に作った822社のリストが、連絡先も無く、店舗も停止中で、1社も使われていない。そこへ12,000社を足す計画です。<strong>積み上げ件数と使用件数を分けて見ると、悪いシナリオでの使用件数は0〜20社です。</strong></li></ol>
+<p><strong>判定: タケシ／タカシへ差し戻し。</strong> 下記 M1〜M7 を満たすまで常駐させてはいけません。あわせて、ゴールを「無限に積む」から「毎朝10社を出す」へ変える案を社長判断に上げるべきです。</p>
+<hr>
+<h2>1. 読んだ実物と、そこから出た実測値</h2>
+<table><thead><tr><th>出典</th><th>実測値</th></tr></thead><tbody><tr><td><code>FINISHED</code> / <code>progress.json</code></td><td>12.04時間・14,403トークン・1,800商品・候補1,353件・822社</td></tr><tr><td>計算</td><td><strong>8.0トークン/商品</strong>、<strong>149.5商品/時 = 3,588商品/日</strong></td></tr><tr><td><code>scan_v14.py</code> docstring（2026-08-24 Finder 実測）</td><td>母集団 <strong>48,760件</strong>（A 30,133 + B 18,627）</td></tr><tr><td><code>du -sh v14/raw v14/raw_offers</code></td><td>209MB + 291MB = <strong>500MB / 12時間 = 278KB/商品 ≒ 1.0GB/日</strong></td></tr><tr><td><code>01_候補プール_全件.csv</code></td><td>1,988,015B / 1,800行 = <strong>1,104 B/行</strong></td></tr><tr><td><code>00_候補リスト.html</code></td><td>1,341,104B / 1,353行 = <strong>991 B/行</strong></td></tr><tr><td><code>scan_v14.log</code></td><td>12時間で <strong>APIエラー0件・トークン補充待ち420回</strong></td></tr><tr><td><code>launchctl list</code></td><td>night-shift = <strong>exit 127</strong>（<code>.claude/scripts/night-shift.sh</code> が存在しない。8/17以降14日間、誰も気づかず）</td></tr><tr><td><code>df -h</code></td><td>空き <strong>308GB</strong></td></tr><tr><td><code>grep -rn &quot;v14/raw&quot; --include=*.py</code></td><td><strong>該当なし＝ raw/ raw_offers/ の .json.gz はどのコードも読んでいない</strong></td></tr></tbody></table>
+<h3>1.1 ここから出る、この案件の核心の数字</h3>
+<pre><code>母集団 48,760件 ÷ 3,588件/日 = 13.6日</code></pre>
+<p><strong>探索空間は2週間で尽きます。</strong> 3ヶ月走らせる設計ではなく、2週間で終わる仕事に3ヶ月の常駐を被せる設計になっています。設計上の主題は「どう回し続けるか」ではなく、<strong>「15日目に何をするか」</strong>です。</p>
+<p>掘り切った時点の姿（実測単価からの外挿・確度80%）:</p>
+<table><thead><tr><th></th><th>14日目</th></tr></thead><tbody><tr><td>候補プール全件CSV</td><td>53.8MB</td></tr><tr><td>社長用CSV</td><td>39.3MB</td></tr><tr><td>候補リストHTML</td><td><strong>36.3MB</strong>（Safari で開くと固まる領域）</td></tr><tr><td>raw + raw_offers</td><td><strong>13.6GB</strong>（誰も読まない）</td></tr><tr><td>メーカー</td><td>推定 12,000〜15,000社</td></tr></tbody></table>
+<hr>
+<h2>2. プレモーテム — 3ヶ月後に「やらなければよかった」と言っている理由</h2>
+<h3>2.1 期待損害の大きい順</h3>
+<table><thead><tr><th>#</th><th>失敗</th><th>発生確率</th><th>損害</th><th>気づくまで</th><th>期待損害</th></tr></thead><tbody><tr><td><strong>F1</strong></td><td><strong>積み上がるが、社長は1社も連絡しない</strong></td><td>55%</td><td>S</td><td>3ヶ月（＝手遅れ）</td><td><strong>最大</strong></td></tr><tr><td><strong>F2</strong></td><td><strong>APIエラーを「掘り切りました」と誤報告する</strong></td><td>75%</td><td>A</td><td>永久に気づかない設計</td><td><strong>極大</strong></td></tr><tr><td><strong>F3</strong></td><td><strong>14日で枯渇、以後トークン100%を0件のために焼く</strong></td><td>85%</td><td>B</td><td>30日〜</td><td><strong>大</strong></td></tr><tr><td><strong>F4</strong></td><td>リポ肥大／100MB超で<strong>全社の自動同期が止まる</strong></td><td>45%</td><td>A</td><td>数日〜（push失敗はログのみ）</td><td>大</td></tr><tr><td><strong>F5</strong></td><td>静かな死（クラッシュ・依存欠落で停止、無通知）</td><td>70%</td><td>B</td><td>7〜30日</td><td>中</td></tr><tr><td><strong>F6</strong></td><td>二重起動でトークン二重消費・raw上書き・CSV重複</td><td>35%</td><td>B</td><td>気づかない</td><td>中</td></tr><tr><td><strong>F7</strong></td><td>Keepa 側の制限・遮断</td><td>25%（停止は5%）</td><td><strong>S</strong></td><td>即日</td><td>中〜大</td></tr><tr><td><strong>F8</strong></td><td><code>seen</code> 台帳消失 → 重複が「該当商品数」を水増しし、<strong>社長の連絡順が壊れる</strong></td><td>25%</td><td>A</td><td>気づかない</td><td>中</td></tr><tr><td><strong>F9</strong></td><td>90日前の価格で交渉し、赤字条件で合意する</td><td>発生90% / 実損20%</td><td>A</td><td>発注後</td><td>中</td></tr><tr><td><strong>F10</strong></td><td>PUBLICリポに仕入れ台帳を毎日公開する</td><td>95%（実害10%）</td><td>B</td><td>—</td><td>小〜中</td></tr><tr><td><strong>F11</strong></td><td>90GBの読まれないゴミがディスクに残る</td><td>100%（枯渇は5%）</td><td>C</td><td>—</td><td>小</td></tr><tr><td><strong>F12</strong></td><td>想定外の課金</td><td>10%</td><td>B（信頼はA）</td><td>請求時</td><td>小</td></tr></tbody></table>
+<p>損害の目安: S=事業の前提が壊れる / A=会社全体か社長の実行が止まる / B=時間と資源の浪費 / C=軽微</p>
+<hr>
+<h3>2.2 F2 — 失敗が成功として記録される（最優先で潰す）</h3>
+<p><strong>これが技術面の最重要バグです。</strong></p>
+<p><code>keepa_get()</code> は <code>payload[&quot;error&quot;]</code> を検知すると <code>{}</code> を返します（scan_v14.py 545行〜）。呼び出し側はこうなります。</p>
+<pre><code>Finder が {} を返す → asins が空 → exhausted.add(band)
+→ 25シャード全部が exhausted → watch.stop(&quot;全シャードを掘り切りました&quot;)
+→ progress.json / STATUS.md / FINISHED に「掘り切りました」と書かれる</code></pre>
+<p>つまり <strong>APIキー失効・プラン切れ・Keepa の障害・アカウント制限が、すべて「母数を掘り尽くした」という正常終了として記録されます。</strong> 秘書も社長も STATUS.md を見て「順調に終わった」と解釈します。</p>
+<ul><li><strong>予兆</strong>: なし。ログに <code>API エラー</code> の行は出ますが、<code>v14/*.log</code> は gitignore されていて誰も読みません</li><li><strong>12時間の走行でAPIエラーは0件</strong>でした。つまり<strong>このエラー処理は一度も本番で動いたことがありません</strong>。2,160時間の常駐では、Keepa 側のメンテ・5xx・キー更新で必ず発火します</li><li><strong>打ち手</strong>: 「0件」と「エラー」を必ず区別する。エラー由来なら <code>exhausted</code> に入れず <code>ALERT</code> を書く（M2）</li></ul>
+<p><strong>3手先まで:</strong> うちが誤報告する → 秘書が「枯渇したので条件を広げましょう」と提案する → タケシが母集団の再設計に着手する → 実際はキーが死んでいるだけなので、広げても0件のまま → 数週間を溶かす。</p>
+<hr>
+<h3>2.3 F3 — 14日目からの「動いているが無価値」</h3>
+<p><code>exhausted</code> はメモリ上の集合で、<strong>永続化されていません</strong>（859行〜）。launchd の <code>KeepAlive</code> を付けた場合こうなります。</p>
+<pre><code>掘り切る → exit 0 → KeepAlive が10秒後に再起動
+→ 25シャードを頭から再探索（1シャード20トークン ≒ 500トークン ≒ 25分）
+→ また掘り切る → 再起動 …</code></pre>
+<p>トークンは20/分でしか回復しないので、プロセスは大半を <code>Budget.wait</code> で過ごし、<strong>回復した28,800トークン/日を全額 Finder の空振りに使い、新規0件を生産し続けます。</strong> 表示は「掘り切りました」。ディスクだけは静かに増えます。</p>
+<ul><li><strong>正味の新規流入</strong>（掘り切った後に本当に増える件数）: 追跡180日超という条件があるため、母集団48,760件への月次流入は推定3〜8% ＝ <strong>1日あたり50〜130件</strong>（確度50%・未検証）</li><li><strong>容量3,588件/日に対し、実需は1.4〜3.6%。</strong> 96%以上が無駄撃ちになります</li><li><strong>打ち手</strong>: 掘り切ったら止めるのでも回し続けるのでもなく、<strong>鮮度の古い順に巡回し直すモードへ切り替える</strong>（M10）。ただし追記CSVのままでは重複するので M5 が前提</li></ul>
+<hr>
+<h3>2.4 F4 — 全社の自動同期が止まる</h3>
+<p><code>github-sync.sh</code> は30分ごとに <code>git add -A</code> します。スキャナの出力 <code>01_〜.csv</code> <code>02_〜.csv</code> <code>03_〜.csv</code> <code>00_候補リスト.html</code> は<strong>Git 追跡対象</strong>です。</p>
+<p><strong>2つの経路のどちらかで必ず問題になります。</strong></p>
+<table><thead><tr><th>経路</th><th>起きること</th></tr></thead><tbody><tr><td><strong>コミットされ続ける</strong></td><td>1日18回前後 × 数MB〜数十MBのCSVが履歴に積まれる。現在 <code>.git</code> は65MB。<strong>2週間で1.5〜3GBに膨らむ</strong>（確度60%）</td></tr><tr><td><strong>コミットされない</strong></td><td><code>QUIET_MIN=5</code>。スキャナは約8分ごとにCSVへ追記するため、同期のたび「編集中」と判定されて <strong>HOLD</strong> になる。実測比率で6割前後の同期回がコミットを見送る。<strong>他エージェントの未コミット成果物も巻き添えで放置される</strong>（確度70%）</td></tr></tbody></table>
+<p>さらに決定的なのは<strong>100MB の壁</strong>です。追記のみで重複排除が無いため、<strong>鮮度更新のために全件を1周し直すと <code>01_候補プール_全件.csv</code> は 53.8MB → 107.6MB</strong> になり、GitHub の1ファイル100MB上限を超えて <strong>push が恒久的に失敗します</strong>。CLAUDE.md に「30分ごとの自動同期が丸ごと止まる」と明記された事故が、<strong>約4週間後に確定的に起きます</strong>。</p>
+<ul><li><strong>予兆</strong>: <code>workspace/.sync/github-sync.log</code> に <code>ERROR push に失敗</code> が並ぶ。誰も見ていない</li><li><strong>打ち手</strong>: 全件CSV・HTML・DBは追跡外へ。リポに載せるのは日次サマリ（数十行）と 03 の差分だけ（M6）</li></ul>
+<hr>
+<h3>2.5 F5 — 静かな死（この会社の実績値は「2本中1本」）</h3>
+<p><strong>night-shift.plist は8月17日から exit 127 で死んでいます。</strong> 原因は単純で、<code>ProgramArguments</code> が指す <code>.claude/scripts/night-shift.sh</code> が存在しません（<code>.claude/scripts/</code> には <code>github-sync.sh</code> しかない）。stderr ログには同じ行が30本以上並んでいますが、14日間誰も読んでいません。</p>
+<p><strong>この案件で同じことが起きる具体的な口は3つあります。</strong></p>
+<ol><li><strong><code>.env</code> の場所</strong>: scan_v14.py は起動時に <code>workspace/output/agent_output/T-20260521-005/code/.env</code> を<strong>モジュール読み込み中に <code>open()</code> します</strong>（96行）。<code>agent_output/</code> は gitignore 対象で、CLAUDE.md が「worktree が消えると成果物ごと消える」と明記している層です。消えた瞬間、import 時に例外 → 即死 → <code>KeepAlive</code> が10秒ごとに再起動を繰り返す</li><li><strong>private import</strong>: <code>from adapters.amazon_data import _map_category_key</code> — 他チケットの agent_output 配下にあるアンダースコア付き関数に依存しています</li><li><strong>PIDベースの生存判定</strong>: <code>watch_v14.py</code> の <code>alive()</code> は <code>os.kill(pid, 0)</code>。再起動後にPIDが再利用されると<strong>死んでいるスキャナを「走行中」と表示します</strong></li></ol>
+<ul><li><strong>打ち手</strong>: 心拍ファイル（60秒ごとに mtime 更新）＋ SessionStart フックで「最終心拍 N 分前」を毎回表示（M1）。依存チェックに失敗したら <code>ALERT</code> を書いて <strong>exit 0</strong>（再起動ループを作らない・M3）</li></ul>
+<hr>
+<h3>2.6 F6 — 二重起動</h3>
+<p><code>run_v14.sh</code> の多重起動ガードは <code>kill -0 $(cat v14/scan.pid)</code> です。</p>
+<ul><li><strong>再起動後にPIDが再利用されていると「すでに走っています」と誤判定</strong> → 起動しない（静かな死）</li><li>逆に <strong>launchd と <code>run_v14.sh</code> を両方使うと2プロセスが並走</strong>します。<code>raw_idx</code> は起動時の <code>len(glob(&quot;*.json.gz&quot;))</code> で決まるので、<strong>両者が同じファイル名を書いて上書きし合います</strong>。CSVには重複行が入り、トークンは倍速で枯れ、双方が <code>Budget.wait</code> で待ち続けます</li><li><strong>打ち手</strong>: <code>flock</code> による単一インスタンス保証。起動口を launchd の1本に集約し、<code>run_v14.sh</code> は警告を出す（M4）</li></ul>
+<hr>
+<h3>2.7 F7 — Keepa 側からの遮断（低確率・最大損害）</h3>
+<p>Keepa は本事業の生命線です。ここだけは確率でなく損害で判断すべき項目です。</p>
+<ul><li>連続アクセス自体はトークンで律速されており、<strong>通常運転が規約違反になる確率は低い</strong>（10%未満・確度60%）</li><li>危ないのは <strong>F3 の再起動ストーム</strong>です。10秒間隔で再起動しながら Finder を叩き続ける挙動は、レート制限側からは異常に見えます</li><li><strong>未検証の重要事項</strong>: 2026年3月の改定で <strong>データクォータ（毎時5%回復）</strong> が導入されています（マサルのメモリ index に記載）。<code>Budget</code> クラスは <code>tokensLeft</code> しか追跡しておらず、<strong>このクォータを一切見ていません</strong>。常駐でこれを焼き切った時に何が起きるかは読めません</li><li><strong>打ち手</strong>: Keepa からの警告通知が1通でも来たら即時停止（撤退条件B-4）。データクォータの有無と挙動をタカシが公式で確認してから稼働（M11）</li></ul>
+<hr>
+<h3>2.8 F8 — 台帳が消えると、社長の連絡順が静かに壊れる</h3>
+<p><code>seen_asins.txt</code> は gitignore 対象で、<code>v14/</code> 配下にあります。<code>git clean -xdf</code> や別環境での clone で消えます。</p>
+<pre><code>seen が消える → 全ASINを再取得 → append_rows は重複排除しない → CSV_GO に同じASINが2行
+→ rebuild_maker_csv() の 該当商品数 = len(items) が2倍に
+→ 03_メーカー名寄せ.csv は「該当商品数の多い順」でソート
+→ 社長が上から連絡するリストの先頭が、重複でかさ増しされた企業に入れ替わる</code></pre>
+<p><strong>件数は増え、順番は壊れ、見た目では判別できません。</strong> 社長の時間という最も高価な資源を、水増しされた順序に沿って消費させます。</p>
+<ul><li><strong>打ち手</strong>: ASIN を主キーにした upsert（SQLite）へ移行。CSVは派生物に降格（M5）</li></ul>
+<hr>
+<h3>2.9 F9 — データの腐敗</h3>
+<p><code>FIELDS</code> に <code>取得日時</code> はあります。しかし <strong><code>MAKER_FIELDS</code>（社長が実際に見る 03_メーカー名寄せ.csv）には日付列が1つもありません。</strong></p>
+<p><code>想定仕入れ金額(上限)</code> は取得時点の価格スナップショットから逆算した値です。90日前の価格で「この金額以下なら利益率20%」と判断し、その額で交渉して合意すると、現在価格が15%下がっていれば<strong>そのまま赤字仕入れになります</strong>。</p>
+<ul><li><strong>社長の使い方は「片っ端から連絡して、想定仕入れ金額以下なら仕入れる」</strong>です。腐った数字が直接お金に変わる導線が既にできています</li><li>店舗停止中は発注しない可能性が高いため、3ヶ月内の実損確率は20%程度に留まります。ただし<strong>復旧直後が最も危険</strong>です（古いリストしか無い状態で一気に動く）</li><li><strong>打ち手</strong>: 03 に <code>最終取得日</code> を必須列で追加。30日超は「要再取得」フラグ。連絡直前に1コマンドで引き直す導線（M9）</li></ul>
+<hr>
+<h3>2.10 F1 — 本命。増えるほど使われなくなる</h3>
+<p>技術の話ではありません。<strong>これが「やらなければよかった」の直接原因です。</strong></p>
+<p>現在の事実だけを並べます。</p>
+<table><thead><tr><th>事実</th><th>出典</th></tr></thead><tbody><tr><td>候補1,520件・822社が <strong>8月25日から存在している</strong></td><td><code>00_サマリ.md</code></td></tr><tr><td><strong>822社の連絡先はまだ取得できていない</strong>（取得手段の確立が別チケットで進行中）</td><td>T-20260831-001</td></tr><tr><td><strong>日本店は8月1日から停止中</strong>。CA店のKYCは8/28に却下、サポートケースは回答ゼロで閉鎖</td><td>T-20260826-004</td></tr><tr><td><strong>1SKUも出品していない</strong></td><td>T-20260826-004</td></tr><tr><td>社長がこれまでに連絡したメーカー数</td><td>記録なし＝<strong>おそらく0社</strong></td></tr></tbody></table>
+<p><strong>ボトルネックは上流（リストの件数）ではなく、下流（連絡先・社長の架電時間・売る場所）にあります。</strong> 822社を消化できていない状態で12,000社を足す行為は、渋滞の先頭ではなく最後尾に車を追加するのと同じです。</p>
+<p><strong>社長の実行容量を見積もると:</strong></p>
+<table><thead><tr><th>ペース</th><th>1社あたり</th><th>3ヶ月の到達</th></tr></thead><tbody><tr><td>良い</td><td>15分 × 10社/日 × 20日 × 3ヶ月</td><td>600社</td></tr><tr><td>普通</td><td>3社/日 × 15日 × 3ヶ月</td><td>135社</td></tr><tr><td>悪い（店舗対応に忙殺）</td><td>—</td><td>0〜20社</td></tr></tbody></table>
+<p><strong>すでにある822社ですら、良いペースでも1.4ヶ月分の在庫です。</strong> 3ヶ月で12,000社に増やしても、使用率は<strong>最良で5%、中央値で1.1%</strong>にしかなりません。</p>
+<p>さらに悪い連鎖があります。</p>
+<pre><code>リストが12,000社になる → 社長は「どこから手を付けるか」が分からなくなる
+→ 開かなくなる → 「増えている」という報告だけが毎日届く
+→ 3ヶ月後「毎日増えていると聞いていたが、何も進んでいない」</code></pre>
+<p><strong>打ち手（これは実装ではなく方針の変更なので、社長判断に上げる必要があります）:</strong><br>成果物を「リスト」から「<strong>毎朝の10社</strong>」に変える。スキャナの出力は社長には見せず、<code>今日連絡する10社.md</code>（連絡先入り・鮮度検証済み・重複除外済み）だけを毎朝出す。<strong>件数の報告をやめる。</strong></p>
+<hr>
+<h2>3. 3ヶ月後の予測（2026-11-30 時点）</h2>
+<p><strong>「積み上がった件数」と「社長が実際に使った件数」を必ず分けて見てください。前者だけ増えて後者が0なのが最悪の形です。</strong></p>
+<table><thead><tr><th>軸</th><th>良い（22%）</th><th>普通（40%）</th><th>悪い（28%）</th></tr></thead><tbody><tr><td><strong>積み上がった候補</strong></td><td>36,000件</td><td>25,000件</td><td>15,000〜50,000件（重複込みで水増し）</td></tr><tr><td><strong>積み上がったメーカー</strong></td><td>12,000社</td><td>8,000社</td><td>見かけ上10,000社（重複あり）</td></tr><tr><td><strong>社長が連絡した社数</strong></td><td><strong>300〜600社</strong></td><td><strong>50〜150社</strong></td><td><strong>0〜20社</strong></td></tr><tr><td><strong>使用率</strong></td><td>2.5〜5.0%</td><td>0.6〜1.9%</td><td><strong>0〜0.2%</strong></td></tr><tr><td>返信 → 見積 → 取引口座</td><td>90社 → 30社 → 6社</td><td>20社 → 6社 → 1社</td><td>0</td></tr><tr><td><strong>稼働率</strong>（実際に走っていた日数/90日）</td><td>85日</td><td>60日（静かな死2回・各10日）</td><td>30日（死んだまま）</td></tr><tr><td>消費トークン</td><td>250万</td><td>170万</td><td>90万（大半が空振り）</td></tr><tr><td>ディスク</td><td>25GB（巡回モードで抑制）</td><td>60GB</td><td>90GB（全部ゴミ）</td></tr><tr><td>リポ</td><td>追跡外に分離済み・影響なし</td><td><code>.git</code> 1.5GB・重い</td><td><strong>push不能・全社の自動同期停止</strong></td></tr><tr><td>事故</td><td>0〜1件（24時間以内に検知）</td><td>2〜3件（各5〜10日）</td><td>同期停止＋Keepa警告＋90GB</td></tr><tr><td>社長の一言</td><td>「毎朝10社が届くので助かる」</td><td>「あるのは知っているが見ていない」</td><td><strong>「やらなければよかった」</strong></td></tr></tbody></table>
+<p><strong>想定外（10%）</strong> — 読めない領域:</p>
+<ul><li>Keepa の仕様/課金体系の変更（2026年に既に2回変更あり）</li><li>日本店が想定より早く復旧し、リストより出品作業が最優先になる</li><li>逆に日本店が閉鎖され、メーカー仕入れ戦略そのものが白紙になる</li><li>Mac の入れ替え・OS アップデートで launchd 設定が失われる</li></ul>
+<p><strong>この3シナリオが示す構造は単純です。</strong> 積み上げ件数は良いシナリオと悪いシナリオで大差ありません（36,000 vs 15,000〜50,000）。<strong>分かれるのは使用件数だけで、その差は30倍以上です。</strong> つまり<strong>スキャナの性能はほとんど結果を決めません。</strong> 決めるのは、下流（連絡先・鮮度・毎朝10社）が繋がっているかどうかです。</p>
+<hr>
+<h2>4. 撤退・停止条件</h2>
+<h3>4.1 スキャナ自身が自動で止まる条件（そのままコードに書ける粒度）</h3>
+<table><thead><tr><th>ID</th><th>条件</th><th>動作</th></tr></thead><tbody><tr><td><strong>S1</strong></td><td>直近24時間の<strong>新規ユニークASIN &lt; 200件</strong></td><td>探索モードを終了し巡回モードへ切替（M10）。切替先が無ければ停止</td></tr><tr><td><strong>S2</strong></td><td>直近6時間で<strong>新規候補行 = 0</strong> かつ<strong>消費トークン &gt; 3,000</strong></td><td>停止 + <code>ALERT</code> 書き出し（＝無価値に焼いている）</td></tr><tr><td><strong>S3</strong></td><td>直近100リクエストの<strong>APIエラー率 &gt; 20%</strong></td><td>停止 + <code>ALERT</code>。<strong>「掘り切りました」とは絶対に書かない</strong></td></tr><tr><td><strong>S4</strong></td><td><code>tokensLeft</code> が <strong>90分以上</strong> 必要数に届かない</td><td>停止 + <code>ALERT</code></td></tr><tr><td><strong>S5</strong></td><td><strong>連続例外3回</strong>（import / 認証 / ディスク書込）</td><td>停止 + <code>ALERT</code> + <strong>exit 0</strong>（KeepAlive の再起動ループを作らない）</td></tr><tr><td><strong>S6</strong></td><td><code>v14/</code> 合計 <strong>&gt; 20GB</strong> または ディスク空き <strong>&lt; 50GB</strong></td><td>停止 + <code>ALERT</code></td></tr><tr><td><strong>S7</strong></td><td>Git 追跡対象の単一ファイル <strong>&gt; 40MB</strong></td><td>追記停止（100MBの半分で先に止める）</td></tr><tr><td><strong>S8</strong></td><td><code>flock</code> が取れない</td><td>即終了（二重起動防止）</td></tr><tr><td><strong>S9</strong></td><td><code>STOP</code> ファイルが存在</td><td>現行どおり安全停止（維持）</td></tr><tr><td><strong>S10</strong></td><td>心拍が <strong>10分以上</strong>更新されていない（外側の監視から）</td><td>プロセスを kill し <code>ALERT</code></td></tr></tbody></table>
+<h3>4.2 人間が「やめる」と判断する条件</h3>
+<table><thead><tr><th>ID</th><th>時点</th><th>条件</th><th>判断</th></tr></thead><tbody><tr><td><strong>W1</strong></td><td>稼働30日</td><td>社長が連絡したメーカー数 <strong>&lt; 30社</strong></td><td>常駐を週1回・1時間へ縮退。<strong>積み上げに意味が無いことの証拠</strong></td></tr><tr><td><strong>W2</strong></td><td>稼働60日</td><td>累計連絡 <strong>&lt; 100社</strong></td><td>常駐を停止し、必要時の手動起動へ戻す</td></tr><tr><td><strong>W3</strong></td><td>随時</td><td><code>github-sync</code> が <strong>48時間</strong> push できていない</td><td>スキャナを止める（優先順位はリポ &gt; リスト）</td></tr><tr><td><strong>W4</strong></td><td>随時</td><td>Keepa から警告・制限の通知が <strong>1通</strong>でも来る</td><td>即時停止し社長へ報告（生命線のため例外なし）</td></tr><tr><td><strong>W5</strong></td><td>随時</td><td>想定外の課金が <strong>1円でも</strong>発生</td><td>即時停止（CLAUDE.md §4.1）</td></tr><tr><td><strong>W6</strong></td><td>随時</td><td>日本店の停止が <strong>11月末まで</strong>解消しない</td><td>リスト構築の優先度を下げ、リソースを店舗復旧へ寄せる</td></tr></tbody></table>
+<p><strong>W1 と W2 が本命の撤退条件です。</strong> 技術的な停止条件（S1〜S10）は全部満たしても、W1 で止まる可能性が最も高い。</p>
+<hr>
+<h2>5. タカシへの必須要求（これが無いなら稼働させてはいけない）</h2>
+<h3>5.1 Must — 未実装のまま常駐開始は不可</h3>
+<table><thead><tr><th>ID</th><th>要求</th><th>潰す失敗</th></tr></thead><tbody><tr><td><strong>M1</strong></td><td><strong>心拍の外形化</strong>。<code>heartbeat.json</code> を60秒ごとに更新し、SessionStart フックで「最終心拍 N 分前 / 昨日 +N件 / 累計 / 新規獲得率」を毎回表示する。<strong>STATUS.md の「走行中」は信用しない</strong>（PID再利用で誤表示する）</td><td>F5</td></tr><tr><td><strong>M2</strong></td><td><strong>失敗を成功と書かない</strong>。Finder が空を返した時、<code>totalResults=0</code> による真の枯渇と、HTTP非200 / <code>payload.error</code> / 例外 を必ず区別する。後者は <code>exhausted</code> に入れず <code>ALERT</code> を書く。<strong>最優先</strong></td><td>F2</td></tr><tr><td><strong>M3</strong></td><td><strong>依存の脱・agent_output</strong>。<code>.env</code> と <code>adapters.amazon_data._map_category_key</code> への依存を解消するか、起動時に依存チェックし、欠けたら <code>ALERT</code> を書いて <strong>exit 0</strong> する</td><td>F5</td></tr><tr><td><strong>M4</strong></td><td><strong>単一インスタンス保証</strong>。<code>flock</code> を使う。起動口は launchd 1本に集約し、<code>run_v14.sh</code> は直接起動を警告する</td><td>F6</td></tr><tr><td><strong>M5</strong></td><td><strong>追記CSVをやめる</strong>。ASIN を主キーに SQLite で upsert。CSV / HTML はエクスポート（派生物）に降格</td><td>F4・F8</td></tr><tr><td><strong>M6</strong></td><td><strong>Git に載せるものを絞る</strong>。追跡するのは <code>daily_summary.json</code>（数十行）と 03 の差分のみ。全件CSV・HTML・DB・raw は gitignore。40MB のガード（S7）を実装</td><td>F4</td></tr><tr><td><strong>M7</strong></td><td><strong>無限ループを作らない</strong>。<code>--max-hours</code> を外すなら、<code>Budget.wait</code>（現在ネットワーク断で無限に回る）と <code>keepa_get</code> に絶対上限を入れる。<strong>「時間で止めない」は「無限に待ってよい」ではない</strong></td><td>F3・F5</td></tr></tbody></table>
+<h3>5.2 Must — 稼働前に決着させる</h3>
+<table><thead><tr><th>ID</th><th>要求</th><th>潰す失敗</th></tr></thead><tbody><tr><td><strong>M8</strong></td><td><strong>raw/ の方針決定</strong>。現状どのコードも読んでいない（grep 実証済み）。①保存をやめる ②N日で <code>_trash/</code> へ移動し週次で社長に一覧提示 ③リポ外へ、のいずれか。<strong>削除の自動化は CLAUDE.md §4.1 に触れるので、移動＋提示に留めること</strong></td><td>F11</td></tr><tr><td><strong>M9</strong></td><td><strong>鮮度の可視化</strong>。<code>03_メーカー名寄せ.csv</code> に <code>最終取得日</code> <code>最古取得日</code> を追加。30日超は「要再取得」。連絡直前に価格を引き直す <code>refresh --asin</code> を用意</td><td>F9</td></tr><tr><td><strong>M10</strong></td><td><strong>探索 → 巡回の自動切替</strong>。全シャード掘り切り後は停止でも再起動でもなく、<code>最終取得日が古い順</code>の再取得へ移行（M5 が前提）</td><td>F3</td></tr><tr><td><strong>M11</strong></td><td><strong>課金ゼロの確認と証跡</strong>。①トークン上限超過で従量課金が発生しないこと ②2026年3月導入の<strong>データクォータ</strong>（毎時5%回復）の有無と、<code>Budget</code> が追跡していない件。<strong>1円でも従量なら §4.1 で社長承認</strong>（タカシは実行せず秘書へ差し戻し）</td><td>F12・F7</td></tr><tr><td><strong>M12</strong></td><td><strong>止め方は1つ</strong>。<code>STOP</code> ファイル。README の1行目に置く。launchd の unload 手順を併記。<code>ALERT</code> が置かれたら次セッションで秘書が必ず気づく導線を作る</td><td>全般</td></tr></tbody></table>
+<h3>5.3 Should — 社長判断が必要（タケシ経由で秘書へ）</h3>
+<table><thead><tr><th>ID</th><th>論点</th></tr></thead><tbody><tr><td><strong>P1</strong></td><td><strong>ゴールの再定義</strong>。「リストを増やす」→「<strong>毎朝10社を出す</strong>」。社長に見せるのは件数ではなく <code>今日連絡する10社.md</code>。F1 を潰す唯一の手</td></tr><tr><td><strong>P2</strong></td><td><strong>PUBLICリポへの公開範囲</strong>。36,000行の候補と12,000社の想定仕入れ金額は、この事業の唯一の優位です。「公開してよい情報ばかり」というご判断は、リポが文書中心だった時点のものです。<strong>仕入れ台帳を毎日公開してよいかを取り直すべき</strong></td></tr><tr><td><strong>P3</strong></td><td><strong>稼働時期</strong>。日本店停止・連絡先未取得の現状で常駐を始めるか、①連絡先パイプライン（T-20260831-001）の完成、②店舗復旧の見通し、のどちらかが立つまで<strong>現行822社の消化に集中する</strong>か</td></tr></tbody></table>
+<hr>
+<h2>6. 判定</h2>
+<p><strong>この案は、まだ社長承認に上げられません。タケシ／タカシへ差し戻します。</strong></p>
+<p>理由は3つです。</p>
+<ol><li><strong>M2 が未実装のまま常駐すると、壊れたことを検知する手段がありません。</strong> 障害が「正常終了」として記録される設計で無人運転を始めるのは、night-shift の14日間と同じ失敗を、より発見しにくい形で繰り返すことになります</li><li><strong>M5 / M6 が無いと、約4週間後に全社の自動同期が確定的に止まります。</strong> これはスキャナの問題ではなく会社全体の問題です</li><li><strong>F1（使われない）に対する打ち手が案の中にありません。</strong> 現在の案は「もっと積む」ですが、詰まっているのは下流です。<strong>P1 を決めない限り、技術的にどれだけ完璧に動いても3ヶ月後の使用件数は変わりません</strong></li></ol>
+<p><strong>条件付きの進め方（推奨）:</strong></p>
+<table><thead><tr><th>段階</th><th>内容</th><th>前提</th></tr></thead><tbody><tr><td>1</td><td>M1〜M7 を実装し、<strong>まず24時間だけ</strong>無人で回す。心拍・ALERT・停止条件の発火を実地で確認</td><td>—</td></tr><tr><td>2</td><td>M8〜M12 を入れ、7日間の連続稼働。<strong>14日で枯れる</strong>ことを実測で確かめる</td><td>1 が無事故</td></tr><tr><td>3</td><td>巡回モード（M10）へ移行し常駐化</td><td>2 で S1 が正しく発火</td></tr><tr><td>4</td><td>P1 の「毎朝10社」を実装</td><td>社長判断</td></tr></tbody></table>
+<p><strong>段階1と2の間に、必ず社長へ P1〜P3 を上げてください。</strong> 技術要求（M）は秘書判断で進めて構いませんが、<strong>P1（ゴールの再定義）を決めずに常駐させると、良いシナリオでも使用率5%です。</strong></p>
+<hr>
+<h2>7. 読めない領域（正直に）</h2>
+<table><thead><tr><th>項目</th><th>なぜ読めないか</th><th>誰に振るべきか</th></tr></thead><tbody><tr><td>掘り切った後の<strong>真の新規流入件数</strong></td><td>実測がない。推定50〜130件/日（確度50%）</td><td>巡回モードで1週間実測すれば分かる</td></tr><tr><td>Keepa の<strong>データクォータ</strong>の挙動</td><td>2026年3月導入。当社での実測ゼロ。<code>Budget</code> が見ていない</td><td>サトル（公式確認）＋タカシ</td></tr><tr><td>Keepa の<strong>連続アクセス許容度</strong></td><td>規約の文言と実運用の乖離が読めない</td><td>ハルオ（規約）＋サトル</td></tr><tr><td><strong>日本店の復旧時期</strong></td><td>CA の KYC が却下され、サポートは回答ゼロで閉鎖。読みようがない</td><td>T-20260826-004（社長対応中）</td></tr><tr><td><strong>社長が実際に何社/日 連絡できるか</strong></td><td>実績が0社なので base rate が無い。<strong>まず10社かけてみるまで、この案件全体の費用対効果は誰にも分からない</strong></td><td>社長</td></tr></tbody></table>
+<p>最後の行が、この案件で最も重要な未知数です。<strong>12,000社を積む前に、10社かけてみる価値があります。</strong></p>
+</main></body></html>
