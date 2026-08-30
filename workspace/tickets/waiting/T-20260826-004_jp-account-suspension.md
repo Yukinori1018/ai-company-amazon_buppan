@@ -5,7 +5,7 @@ status: waiting
 assignee: owner
 priority: high
 created_at: 2026-08-26
-updated_at: 2026-08-28
+updated_at: 2026-08-30
 requires_approval: true
 labels: [compliance, ops]
 parent_ticket: ""
