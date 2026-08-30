@@ -71,7 +71,7 @@ related_tickets: [T-20260817-005, T-20260804-001, T-20260803-001, T-20260831-001
 | # | 内容 | 担当 | 状態 |
 |---|---|---|---|
 | A | プレモーテム（無人常駐の失敗シナリオ洗い出し） | simulator | 着手 |
-| B | 設計・実装・稼働開始 | it_engineer | 着手 |
+| B | 設計・実装・稼働開始 | it_engineer | **完了（2026-08-31 02:52 稼働開始）** |
 | C | 稼働後の日次確認を秘書のルーティンに組み込む | secretary | 未 |
 
 ## ログ
@@ -114,3 +114,51 @@ Phase A を完了しました（マサル）。
   - 停止条件は S2 / S3 / S5 / S7 / W4 を実装。S1（巡回切替）は上記により不要。
   - **CLAUDE.md §6「成果物は Git 追跡する」に対する、社長判断による明示的な例外**。README に明記させる。
   - 🟡 後日の論点：8/25 までにコミット済みの候補リスト（全件CSV 1.9MB・HTML 1.3MB）は**公開履歴に残る**。追跡から外しても履歴からは消えない。履歴削除は §4.1（不可逆）のため T-20260826-001 とあわせて別途伺う。
+
+## 現在地（2026-08-31 02:55 / タカシ）
+
+**稼働中。** launchd `com.aicompany.amazon-buppan.list-builder`（PID 24693 / exit 0）。
+実測で25件を61秒・200トークンで取得、心拍は4秒前、ALERT なし。
+
+社長判断（P1 枯渇で停止・P2 GitHubに載せない・P3 今すぐ）とマサルの必須要求
+M1/M2/M4/M6/M7 ＋ 停止条件 S2/S3/S5/S6/S7/S8/S9/S10/W4 を実装済み。
+
+## ログ
+
+- 2026-08-31 起票・doing。社長指示「常にリスト化していってほしい」。A/B を並行発注。
+- 2026-08-31 02:3x マサルのプレモーテムを受領。M1〜M12 と S1〜S10 を実装計画へ取り込み。
+- 2026-08-31 02:4x 社長判断 P1〜P3 を受領。巡回モードを不採用に変更、行データを Git 追跡外へ。
+- 2026-08-31 02:52 launchd bootstrap。実取得を確認して稼働開始。
+
+## 成果物
+
+- workspace/output/deliverables/T-20260831-002/README.md — 社長向け運用書（止め方が最上部）
+- workspace/output/deliverables/T-20260831-002/always_on.py — 常駐ループ（ガード・心拍監視）
+- workspace/output/deliverables/T-20260831-002/cycle_state.py — 周回と停止判定の純ロジック
+- workspace/output/deliverables/T-20260831-002/daily_rollup.py — 日次ロールアップ（0トークン）
+- workspace/output/deliverables/T-20260831-002/test_cycle_state.py / test_always_on.py — 26本
+- workspace/output/deliverables/T-20260831-002/com.aicompany.amazon-buppan.list-builder.plist
+- .claude/scripts/list-builder.sh — launchd の入口 + stop/start/status/resume-research
+- .claude/hooks/session-start.sh — リマインダー④（稼働状態・増分・最終心拍）を追加
+- workspace/output/deliverables/T-20260817-005/scan_v14.py — M2/M3/M7/M8/M9/F8 を修正
+- workspace/output/deliverables/T-20260817-005/test_scan_v14_loop.py — 32本（10本追加）
+
+## 完了報告（カズヨ宛）
+
+**稼働しました。** 実測で回っていることを確認済みです（launchctl exit 0 / 実取得25件 /
+心拍4秒前 / ALERT なし）。母数はおよそ **12日後に尽きる見込み**で、その時点で
+「尽きました」と報告して自動終了します。再開は社長の指示（`resume-research`）だけです。
+
+**Keepa の課金は追加ゼロ**です。公式ドキュメントで確認しました（§4.1 非該当）。
+
+**妥協点は3つ。** いずれも稼働の妨げにはなりませんが、記録として残します。
+
+1. **M5（SQLite への upsert 移行）は未実施。** 代わりに、台帳が消えたら CSV から
+   復元する仕組みと、名寄せ時の ASIN 重複排除を入れ、「連絡順が静かに壊れる」経路は塞ぎました。
+   巡回モードが不採用になったので upsert の必要性が下がっています。
+2. **M3 は「.env の冗長化 + 依存チェック」まで。** `adapters` モジュールへの
+   agent_output 依存は残っています。欠けたら ALERT を書いて exit 0 するので、
+   静かな死にはなりません。
+3. **既存の raw/ 500MB は残置**（削除は §4.1）。新規の保存は止めました。
+
+**社長判断が要る論点が1件**残っています（下記「残課題」）。
