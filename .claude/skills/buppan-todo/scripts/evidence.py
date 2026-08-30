@@ -34,6 +34,10 @@ MEMORY_REF = re.compile(r"memory:\s*([A-Za-z0-9_\-./]+)")
 RE_TASK = re.compile(r"^- \[([x~ ])\] (.*)$")
 RE_REFS = re.compile(r"〔([^〕]*)〕")
 RE_DOC_DATE = re.compile(r"更新:\s*(\d{4}-\d{2}-\d{2})")
+# 「進捗の根拠: チケット全数棚卸し（106枚 / done 61・doing 10・waiting 25・todo 10）」
+RE_CENSUS = re.compile(
+    r"（(\d+)枚 / done (\d+)・doing (\d+)・waiting (\d+)・todo (\d+)）"
+)
 RE_UPDATED_AT = re.compile(r"^updated_at:\s*(\S+)", re.M)
 RE_TITLE = re.compile(r"^title:\s*(.+)$", re.M)
 RE_TICKET_ID_FM = re.compile(r"^ticket_id:\s*(\S+)", re.M)
@@ -479,7 +483,35 @@ def cmd_check(deliv: str, work: str, repo: str) -> int:
                 f"（例: 〔T-…・画面確認〕）: {it['body'][:44]}"
             )
 
-    # (f) memory 出典の実在
+    # (f) チケット枚数の census。冒頭に手書きしてある「106枚 / done 61・…」は
+    #     誰も更新しない場所で、ボードの数字（update_board.py が自動同期する）とだけ
+    #     食い違う。数えられる事実なので機械が数える。
+    master_text = open(os.path.join(deliv, "01_master-todo.md"), encoding="utf-8").read()
+    m = RE_CENSUS.search(master_text)
+    if m:
+        real = {
+            f: len(
+                [
+                    n
+                    for n in os.listdir(os.path.join(repo, "workspace", "tickets", f))
+                    if n.endswith(".md") and not n.startswith("_")
+                ]
+            )
+            if os.path.isdir(os.path.join(repo, "workspace", "tickets", f))
+            else 0
+            for f in ("done", "doing", "waiting", "todo")
+        }
+        want = (sum(real.values()), real["done"], real["doing"], real["waiting"], real["todo"])
+        got = tuple(int(g) for g in m.groups())
+        if got != want:
+            warns.append(
+                "冒頭のチケット枚数が実数と違う: 記載="
+                + "（{}枚 / done {}・doing {}・waiting {}・todo {}）".format(*got)
+                + " 実数="
+                + "（{}枚 / done {}・doing {}・waiting {}・todo {}）".format(*want)
+            )
+
+    # (g) memory 出典の実在
     dirs = memory_dirs(repo)
     if dirs:
         for it in idx["items"]:
