@@ -89,11 +89,25 @@ from pathlib import Path
 ROOT = Path("/Users/yukinori/Claude Code/ai-company-amazon_buppan")
 CODE = ROOT / "workspace/output/agent_output/T-20260521-005/code"
 sys.path.insert(0, str(CODE))
-for _line in open(CODE / ".env", encoding="utf-8"):
-    _line = _line.strip()
-    if _line and not _line.startswith("#") and "=" in _line:
-        _k, _v = _line.split("=", 1)
-        os.environ.setdefault(_k, _v.strip().strip('"').strip("'"))
+
+# .env の探索順（M3 / T-20260831-002）。
+#   ① 環境変数に既にある → 何も読まない
+#   ② ~/.config/ai-company-amazon-buppan/keepa.env  ← リポ外・gitignore不要・worktree で消えない
+#   ③ agent_output 側の .env                        ← 元の場所。**gitignore 対象なので消えうる**
+# 常駐ジョブが ③ だけに依存していると、agent_output が消えた瞬間に
+# import 時例外 → launchd が再起動を繰り返す、という「静かな死」になる。
+ENV_CANDIDATES = [
+    Path.home() / ".config/ai-company-amazon-buppan/keepa.env",
+    CODE / ".env",
+]
+for _env_path in ENV_CANDIDATES:
+    if not _env_path.exists():
+        continue
+    for _line in _env_path.read_text(encoding="utf-8").splitlines():
+        _line = _line.strip()
+        if _line and not _line.startswith("#") and "=" in _line:
+            _k, _v = _line.split("=", 1)
+            os.environ.setdefault(_k, _v.strip().strip('"').strip("'"))
 
 from adapters.amazon_data import _map_category_key  # noqa: E402
 
@@ -193,6 +207,19 @@ TOKEN_STARVE_MINUTES = 60           # ②トークンが回復しないまま何
 # raw/ raw_offers/ の合計がこれを超えたら **生レスポンスの保存だけをやめる**（削除はしない）。
 # 削除は CLAUDE.md §4.1（不可逆な削除）なので、自動では絶対に踏まない。
 RAW_MAX_GB_DEFAULT = 10.0
+# **既定では生レスポンスを保存しない**（M8 / T-20260831-002）。
+# 2026-08-31 に `grep -rn "v14/raw" --include=*.py` で確認したところ、
+# raw/ raw_offers/ の .json.gz を読むコードは1本もありませんでした。
+# 12時間で500MB＝1日1GB を、誰も読まないまま書いていたことになります。
+# 残したいときだけ `--keep-raw` を付けてください（既存ファイルは削除しません）。
+KEEP_RAW_DEFAULT = False
+
+# ==========================================================================
+# 異常の可視化（M1/M2/S3 — T-20260831-002）
+# ==========================================================================
+HEARTBEAT_SEC = 60          # 心拍ファイルを何秒ごとに打つか
+API_WINDOW = 100            # 直近この件数のリクエスト成否を見る
+API_ERROR_RATE_MAX = 0.20   # S3: エラー率がこれを超えたら停止して ALERT
 EMPTY_ROUNDS_LIMIT = 3              # ③新規ゼロが何ラウンド続いたら止めるか
 # これを割ったら補充待ち。DETAIL_CHUNK=25 なら1バッチ45トークンで足りるので、
 # 150 を要求すると必要のない足踏みが増える。必要量ぎりぎり + 少しの余裕にする。
@@ -223,10 +250,16 @@ FIELDS = [
 ]
 
 MAKER_FIELDS = [
-    "メーカー/ブランド", "該当商品数", "想定仕入れ金額の中央値", "Amazon価格の中央値",
+    "メーカー/ブランド", "該当商品数",
+    # ★鮮度（M9 / T-20260831-002）。想定仕入れ金額は**取得時点の価格**から逆算した値で、
+    #   90日前の数字で交渉して合意すると、そのまま赤字仕入れになりうる。
+    #   だから社長が実際に見る 03 に日付を必ず出す。
+    "鮮度", "最終取得日", "最古取得日",
+    "想定仕入れ金額の中央値", "Amazon価格の中央値",
     "消化月数の中央値", "代表ASIN", "代表商品名", "代表Amazonページ", "代表Keepaリンク",
     "メーカー検索(Google)", "主なカテゴリ", "規模フラグ", "リスク区分あり件数",
 ]
+STALE_DAYS = 30             # 最終取得日がこれより古ければ「要再取得」
 
 
 # ==========================================================================
@@ -471,6 +504,83 @@ def evaluate(product: dict, preset: str, band: str, seller: dict = None) -> dict
 # ==========================================================================
 # Keepa API
 # ==========================================================================
+ALERT_FILE = OUT / "ALERT.md"
+HEARTBEAT = OUT / "heartbeat.json"
+
+
+def write_alert(title: str, detail: str) -> None:
+    """異常を1つのファイルに書き出す。SessionStart フックがこれを拾って社長に見せる。
+
+    **「掘り切りました」と書いてよいのは、Keepa が正常に 0件 を返したときだけ。**
+    API エラー・通信断・キー失効を「掘り切り」と記録すると、
+    誰も壊れたことに気づけません（night-shift が14日間 exit 127 で死んでいたのと同じ構図）。
+    """
+    ALERT_FILE.write_text(
+        f"""# ALERT — 候補リスト常時稼働ジョブ
+
+発生: {time.strftime('%Y-%m-%d %H:%M:%S')}
+
+## {title}
+
+{detail}
+
+## 対応
+
+1. `v14/scan_v14.log` の末尾を見る
+2. 直せたら、このファイルを消してから常駐ジョブを起こし直す
+   （`launchctl kickstart -k gui/$(id -u)/com.aicompany.amazon-buppan.list-builder`）
+3. 直せない・課金や契約の話なら、秘書カズヨへ差し戻す（CLAUDE.md §4.1）
+""", encoding="utf-8")
+    log(f"!! ALERT を書きました: {title}")
+
+
+def beat(extra: dict = None) -> None:
+    """心拍。**PID の生死ではなくこのファイルの mtime で「生きているか」を判定する。**
+
+    PID は再利用されるので `os.kill(pid, 0)` は死んだプロセスを「走行中」と誤表示します。
+    """
+    data = {"at": time.strftime("%Y-%m-%d %H:%M:%S"), "pid": os.getpid(),
+            "epoch": int(time.time())}
+    data.update(extra or {})
+    try:
+        HEARTBEAT.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
+    except OSError:
+        pass
+
+
+class ApiHealth:
+    """直近 API_WINDOW 件のリクエストが成功したかを覚えておく（S3 の材料）。"""
+
+    def __init__(self):
+        self.window = []            # True=成功 / False=失敗
+        self.last_failed = False
+        self.last_error = ""
+        self.total_errors = 0
+
+    def ok(self) -> None:
+        self.window.append(True)
+        del self.window[:-API_WINDOW]
+        self.last_failed = False
+
+    def fail(self, why: str) -> None:
+        self.window.append(False)
+        del self.window[:-API_WINDOW]
+        self.last_failed = True
+        self.last_error = why
+        self.total_errors += 1
+
+    def error_rate(self) -> float:
+        if len(self.window) < 20:       # サンプルが少ないうちは判断しない
+            return 0.0
+        return 1 - sum(self.window) / len(self.window)
+
+    def unhealthy(self) -> bool:
+        return self.error_rate() > API_ERROR_RATE_MAX
+
+
+API = ApiHealth()
+
+
 class Budget:
     """トークンの出入りを1か所で管理する。消費量の集計と補充待ちの両方をここでやる。"""
 
@@ -488,25 +598,45 @@ class Budget:
             self.left = int(left)
 
     def wait(self, need: int, deadline: "StopWatch") -> bool:
-        """need に届くまで待つ。回復しないまま TOKEN_STARVE_MINUTES 経ったら False。"""
+        """need に届くまで待つ。回復しないまま TOKEN_STARVE_MINUTES 経ったら False。
+
+        ★M7: 以前は `token_status()` が例外を投げ続ける経路（ネットワーク断・DNS障害）で
+        `starving_since` が一度も立たず、**永久に10秒スリープを繰り返していました**。
+        「時間で止めない」は「無限に待ってよい」ではありません。ここに絶対上限を置きます。
+        """
+        if self.starving_since is None:
+            self.starving_since = time.time()
         while True:
+            beat({"state": "token_wait", "need": need, "left": self.left})
             if deadline.should_stop():
+                return False
+            if time.time() - self.starving_since > TOKEN_STARVE_MINUTES * 60:
+                deadline.stop(f"トークンが{TOKEN_STARVE_MINUTES}分以上回復しませんでした"
+                              f"（left={self.left} need={need}）")
+                write_alert("トークンが回復しません",
+                            f"{TOKEN_STARVE_MINUTES}分待っても need={need} に届きませんでした"
+                            f"（最後に見えた残り: {self.left}）。\n"
+                            "Keepa 側の障害・契約の失効・ネットワーク断のいずれかです。")
                 return False
             try:
                 d = token_status()
-            except Exception:
+                API.ok()
+            except Exception as e:
+                API.fail(f"token: {e}")
+                if API.unhealthy():
+                    deadline.stop(f"API エラー率が{API.error_rate():.0%}を超えました")
+                    write_alert("Keepa API がエラーを返し続けています",
+                                f"直近{len(API.window)}件のうち"
+                                f"{API.error_rate():.0%}が失敗。最後の理由: {e}\n"
+                                "**これは母数の枯渇ではありません。** "
+                                "キー失効・プラン切れ・Keepa 障害を疑ってください。")
+                    return False
                 time.sleep(10)
                 continue
             self.left = int(d.get("tokensLeft", 0))
             if self.left >= need:
                 self.starving_since = None
                 return True
-            if self.starving_since is None:
-                self.starving_since = time.time()
-            elif time.time() - self.starving_since > TOKEN_STARVE_MINUTES * 60:
-                deadline.stop(f"トークンが{TOKEN_STARVE_MINUTES}分以上回復しませんでした"
-                              f"（left={self.left} need={need}）")
-                return False
             rate = d.get("refillRate") or 20
             wait = min(max((need - self.left) / rate * 60, 15), 300)
             log(f"  トークン補充待ち: left={self.left} need={need} → {wait:.0f}秒")
