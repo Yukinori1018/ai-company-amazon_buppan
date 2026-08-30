@@ -1,0 +1,35 @@
+{
+  "generated_at": "2026-08-31 02:49:05",
+  "date": "2026-08-31",
+  "status": "稼働中",
+  "totals": {
+    "go": 1574,
+    "all": 2175,
+    "makers": 853
+  },
+  "delta": {
+    "go": 54,
+    "all": 75,
+    "makers": 31
+  },
+  "since": "2026-08-31",
+  "cycle": 1,
+  "cycles_completed": 0,
+  "exhausted": 0,
+  "bands": 25,
+  "recent": [
+    {
+      "date": "2026-08-31",
+      "processed": 50,
+      "go": 36,
+      "tokens": 362,
+      "yield_per_1k": 138.1,
+      "sessions": 1
+    }
+  ],
+  "warning": null,
+  "outputs": {
+    "html": "/Users/yukinori/Claude Code/ai-company-amazon_buppan/workspace/output/deliverables/T-20260817-005/v14/00_候補リスト.html",
+    "makers": "/Users/yukinori/Claude Code/ai-company-amazon_buppan/workspace/output/deliverables/T-20260817-005/v14/03_メーカー名寄せ.csv"
+  }
+}

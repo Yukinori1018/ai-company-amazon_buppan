@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  候補リスト常時稼働ジョブ（T-20260831-002）
+  ~/Library/LaunchAgents/ に置く実体と同じものをリポにも保存しています
+  （github-sync.plist と同じ扱い。Mac を入れ替えたときの復元手順が README にあります）。
+
+  ⚠ ProgramArguments が指すスクリプトの実在を必ず確認してから load すること。
+     night-shift.plist は存在しないスクリプトを指したまま14日間 exit 127 を吐き続けました。
+       ls -l /Users/yukinori/Claude\ Code/ai-company-amazon_buppan/.claude/scripts/list-builder.sh
+-->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.aicompany.amazon-buppan.list-builder</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>/Users/yukinori/Claude Code/ai-company-amazon_buppan/.claude/scripts/list-builder.sh</string>
+    </array>
+
+    <!-- ログイン直後・plist 再読込直後に走らせる -->
+    <key>RunAtLoad</key>
+    <true/>
+
+    <!--
+      落ちても戻す。ただし常駐ループ側が「異常でも exit 0」で終わるように書いてあるので、
+      依存欠落での10秒ごとの再起動ストームにはなりません（ALERT を書いて素直に終わる）。
+      ThrottleInterval で最低60秒は間を空けます。
+    -->
+    <key>KeepAlive</key>
+    <true/>
+    <key>ThrottleInterval</key>
+    <integer>60</integer>
+
+    <key>WorkingDirectory</key>
+    <string>/Users/yukinori/Claude Code/ai-company-amazon_buppan</string>
+
+    <!-- 本体のログは state/always_on.log。こちらは launchd レベルの異常専用 -->
+    <key>StandardOutPath</key>
+    <string>/Users/yukinori/Claude Code/ai-company-amazon_buppan/workspace/output/deliverables/T-20260831-002/state/launchd.out.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/yukinori/Claude Code/ai-company-amazon_buppan/workspace/output/deliverables/T-20260831-002/state/launchd.err.log</string>
+
+    <!-- Keepa のトークン補充待ちが大半なので、CPU/IO は最低優先でよい -->
+    <key>ProcessType</key>
+    <string>Background</string>
+    <key>LowPriorityIO</key>
+    <true/>
+</dict>
+</plist>

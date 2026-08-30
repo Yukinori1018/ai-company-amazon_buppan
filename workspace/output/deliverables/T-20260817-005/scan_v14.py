@@ -60,17 +60,21 @@
 
 ## 自動停止条件（暴走防止・社長の明示要望）
 
-1. 通算 `--max-hours`（既定 **12時間**）を超えた
-2. Keepa トークンが枯れ、**60分以上回復しない**
+1. 通算 `--max-hours`（既定 **12時間**。`0` を渡すと時間では止まらない）を超えた
+2. Keepa トークンが枯れ、**60分以上回復しない**（`--token-starve-minutes`）
 3. **3ラウンド連続で新規 ASIN がゼロ**（探索空間を掘り尽くした）
 4. `v14/STOP` ファイルが置かれた
+5. **直近100リクエストの API エラー率が20%を超えた**（T-20260831-002 / S3）
 
 止まった理由は必ず `v14/progress.json` の `stop_reason` とログに残ります。
+**異常で止まったときは `v14/ALERT.md` も書きます。**「掘り切りました」と
+書いてよいのは、Keepa が正常に0件を返したときだけです。
 """
 from __future__ import annotations
 
 import argparse
 import csv
+import datetime as dt
 import gzip
 import json
 import math
@@ -84,7 +88,7 @@ from pathlib import Path
 
 # --------------------------------------------------------------------------
 # 依存: 共有ライブラリ（Keepa 正規化・料率表）と、このチケットのローカルモジュール
-#   .env の実在場所は agent_output 側だけ（deliverables 側には無い）。何度も踏んだ罠。
+#   .env は ~/.config/ai-company-amazon-buppan/keepa.env → agent_output の順に探す（M3）。
 # --------------------------------------------------------------------------
 ROOT = Path("/Users/yukinori/Claude Code/ai-company-amazon_buppan")
 CODE = ROOT / "workspace/output/agent_output/T-20260521-005/code"
@@ -669,6 +673,13 @@ class StopWatch:
             return True
         if STOP_FILE.exists():                      # ④ STOP ファイル
             self.stop("STOP ファイルを検知しました（手動停止）")
+        elif API.unhealthy():                       # ⑤ S3: API エラー率
+            self.stop(f"API エラー率が{API.error_rate():.0%}に達しました"
+                      f"（最後の理由: {API.last_error}）")
+            write_alert("Keepa API がエラーを返し続けています",
+                        f"直近{len(API.window)}件のうち{API.error_rate():.0%}が失敗。"
+                        f"最後の理由: {API.last_error}\n"
+                        "**これは母数の枯渇ではありません。**")
         elif self.elapsed > self.max_sec:           # ① 時間切れ（max_sec=inf なら発火しない）
             self.stop(f"通算 {self.max_sec / 3600:.1f} 時間に達しました")
         elif self.empty_rounds >= EMPTY_ROUNDS_LIMIT:  # ③ 新規ゼロ
@@ -679,6 +690,7 @@ class StopWatch:
 
 
 RAW_MAX_BYTES = int(RAW_MAX_GB_DEFAULT * 1024 ** 3)
+KEEP_RAW = [KEEP_RAW_DEFAULT]      # --keep-raw で True。既定は「書かない」
 _RAW_FULL = [False]        # 一度いっぱいになったら以降は測らない（毎回 du すると遅い）
 _RAW_CHECK = [0.0]
 
@@ -719,10 +731,20 @@ def keepa_get(path: str, params: dict, budget: Budget, label: str) -> dict:
         try:
             resp = requests.get(f"https://api.keepa.com/{path}", params=params, timeout=300)
         except Exception as e:
+            API.fail(f"{label} 通信エラー: {e}")
             log(f"    {label} 通信エラー: {e}")
             time.sleep(15)
             continue
+        if resp.status_code not in (200, 429):
+            # 402=契約が無効 / 400=クエリ不正 / 5xx=Keepa 側の障害。
+            # ★どれも「母数の枯渇」ではない。ここを {} で返して呼び出し側に
+            #   「0件だった」と解釈させたのが F2（失敗を成功と記録する）の正体。
+            API.fail(f"{label} HTTP {resp.status_code}")
+            log(f"    {label} HTTP {resp.status_code}（{resp.text[:150]}）")
+            time.sleep(min(30 * (attempt + 1), 180))
+            continue
         if resp.status_code == 429:
+            # 429 は「トークン切れ」＝正常なレート制御。**障害ではないので数えない。**
             wait = min(30 * (attempt + 1), 180)
             log(f"    {label} 429（トークン上限）→ {wait}秒待機")
             time.sleep(wait)
@@ -730,14 +752,18 @@ def keepa_get(path: str, params: dict, budget: Budget, label: str) -> dict:
         try:
             payload = resp.json()
         except Exception as e:
+            API.fail(f"{label} JSON 解釈失敗: {e}")
             log(f"    {label} JSON 解釈失敗: {e}")
             time.sleep(10)
             continue
         budget.note(payload)
         if payload.get("error"):
+            API.fail(f"{label} API エラー: {payload['error']}")
             log(f"    {label} API エラー: {payload['error']}")
             return {}
+        API.ok()
         return payload
+    API.fail(f"{label} 5回試して駄目でした")
     log(f"    {label} 5回試して駄目でした。このバッチは飛ばします")
     return {}
 
@@ -796,9 +822,30 @@ def append_rows(path: Path, fields: list, rows: list) -> None:
 
 
 def load_seen() -> set:
-    if not SEEN.exists():
+    """取得済み ASIN の台帳。**無ければ CSV から作り直す。**
+
+    台帳（gitignore 対象）だけが消えると、全 ASIN を取り直したうえで
+    `append_rows` が重複排除しないため CSV に同じ ASIN が2行入ります。
+    すると `03_メーカー名寄せ.csv` の「該当商品数」が水増しされ、
+    **社長が上から連絡する順番が静かに壊れます**（件数は増え、見た目では分からない）。
+    CSV には ASIN 列があるので、台帳は完全に再構築できます。
+    """
+    if SEEN.exists():
+        return {line.strip() for line in SEEN.read_text(encoding="utf-8").splitlines()
+                if line.strip()}
+    if not CSV_ALL.exists():
         return set()
-    return {line.strip() for line in SEEN.read_text(encoding="utf-8").splitlines() if line.strip()}
+    log("台帳 seen_asins.txt がありません。CSV から作り直します（重複行の防止）")
+    seen = set()
+    with open(CSV_ALL, encoding="utf-8-sig") as f:
+        for row in csv.DictReader(f):
+            a = (row.get("ASIN") or "").strip()
+            if a:
+                seen.add(a)
+    if seen:
+        SEEN.write_text("\n".join(sorted(seen)) + "\n", encoding="utf-8")
+    log(f"    {len(seen)}件の ASIN を台帳に復元しました")
+    return seen
 
 
 def remember(asins: list) -> None:
@@ -844,6 +891,14 @@ def rebuild_maker_csv() -> int:
         return 0
     with open(CSV_GO, encoding="utf-8-sig") as f:
         rows = list(csv.DictReader(f))
+    # ★同じ ASIN が複数行あっても1件として数える（F8: 該当商品数の水増し防止）。
+    #   後勝ち＝新しく取得した行を採用する。
+    unique = {}
+    for r in rows:
+        asin = (r.get("ASIN") or "").strip()
+        unique[asin or f"__row{len(unique)}"] = r
+    rows = list(unique.values())
+
     by_maker = {}
     for r in rows:
         m = (r.get("メーカー/ブランド") or "").strip()
@@ -854,8 +909,20 @@ def rebuild_maker_csv() -> int:
         vals = [v for v in (_f(x.get(key)) for x in items) if v is not None]
         return round(statistics.median(vals)) if vals else ""
 
+    def fetched_days(items):
+        """取得日時（`YYYY-MM-DD HH:MM:SS`）から (最終, 最古, 経過日数) を出す。"""
+        days = sorted(d for d in ((r.get("取得日時") or "")[:10] for r in items) if d)
+        if not days:
+            return "", "", None
+        try:
+            age = (dt.date.today() - dt.date(*map(int, days[-1].split("-")))).days
+        except (ValueError, TypeError):
+            age = None
+        return days[-1], days[0], age
+
     out = []
     for maker, items in by_maker.items():
+        newest, oldest, age = fetched_days(items)
         # 代表商品＝消化月数が最も短い行（＝一番売れている商品を看板にする）
         rep = min(items, key=lambda r: _f(r.get("消化月数"), 9999))
         cats = {}
@@ -866,6 +933,11 @@ def rebuild_maker_csv() -> int:
         out.append({
             "メーカー/ブランド": maker,
             "該当商品数": len(items),
+            # 想定仕入れ金額は「取得時点の価格」から逆算した値。古いまま交渉すると赤字になる。
+            "鮮度": ("要再取得" if (age is not None and age > STALE_DAYS)
+                     else ("" if age is None else "OK")),
+            "最終取得日": newest,
+            "最古取得日": oldest,
             "想定仕入れ金額の中央値": med(items, "想定仕入れ金額(上限)"),
             "Amazon価格の中央値": med(items, "Amazon価格"),
             "消化月数の中央値": med(items, "消化月数"),
@@ -922,6 +994,8 @@ def checkpoint(watch: StopWatch, budget: Budget, state: dict, stat: dict) -> Non
         },
     }
     PROGRESS.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+    beat({"state": "checkpoint", "processed": stat["processed"], "go": stat["go"],
+          "makers": makers, "stop_reason": watch.reason})
     log(f"[checkpoint] 処理{stat['processed']}件 / 候補{stat['go']}件 / メーカー{makers}社 "
         f"/ 消費{budget.consumed}トークン / 経過{data['elapsed_hhmm']}")
 
@@ -1092,11 +1166,23 @@ def run(args) -> None:
                 payload = keepa_get("query",
                                     {"selection": json.dumps(sel, separators=(",", ":"))},
                                     budget, f"Finder {preset} {band} p{page}")
+                total = payload.get("totalResults")
                 asins = payload.get("asinList") or []
                 log(f"[Finder {preset} {band}] page={page} 取得={len(asins)} "
-                    f"該当総数={payload.get('totalResults')} tokensLeft={budget.left}")
+                    f"該当総数={total} tokensLeft={budget.left}")
                 if not asins:
-                    exhausted.add(band)     # このシャードは掘り切った
+                    # ★M2: 空の理由は2つある。混ぜてはいけない。
+                    #   ・totalResults が整数で返っている → **本当に掘り切った**
+                    #   ・レスポンスが壊れている/エラーだった → **障害**。掘り切りではない
+                    if API.last_failed or not isinstance(total, int):
+                        write_alert(
+                            "Finder が空を返しましたが、掘り切りではありません",
+                            f"シャード {band} / page={page} / totalResults={total!r}\n"
+                            f"直近の API 失敗: {API.last_error or '(不明)'}\n"
+                            "**このシャードを「掘り切り済み」として記録していません。**")
+                        watch.stop("Finder が異常応答を返しました（掘り切りではありません）")
+                        break
+                    exhausted.add(band)     # このシャードは掘り切った（正常な0件）
                     cursors[band] = page + 1
                     continue
                 queues[band] = [a for a in asins if a not in seen]
@@ -1121,7 +1207,7 @@ def run(args) -> None:
             products = payload.get("products") or []
             if not products:
                 continue
-            if raw_has_room():
+            if KEEP_RAW[0] and raw_has_room():
                 with gzip.open(RAW / f"{preset}_{raw_idx[0]:05d}.json.gz", "wt",
                                encoding="utf-8") as f:
                     json.dump(payload, f, ensure_ascii=False)
@@ -1157,6 +1243,8 @@ def run(args) -> None:
             stat["rows"] += len(final)
             stat["go"] += len(go_rows)
             watch.processed = stat["processed"]
+            beat({"state": "scanning", "processed": stat["processed"], "go": stat["go"],
+                  "tokens_left": budget.left, "band": band})
             new_this_round += len(products)
             since_checkpoint += len(products)
             log(f"  [{preset} {band}] 処理{stat['processed']} 候補{stat['go']} "
@@ -1208,6 +1296,8 @@ def main() -> None:
                     help="取得済み ASIN を飛ばして続きから（既定でも同じ挙動）")
     ap.add_argument("--rebuild", action="store_true",
                     help="API を叩かず、既存CSVからメーカー名寄せだけ作り直す（0トークン）")
+    ap.add_argument("--keep-raw", action="store_true",
+                    help="Keepa の生レスポンスを保存する（既定は保存しない。どのコードも読んでいないため）")
     ap.add_argument("--skip-bands", default="",
                     help="掘り切り済みシャードのラベルをカンマ区切りで（always_on.py が渡す）")
     ap.add_argument("--raw-max-gb", type=float, default=raw_gb_default,
@@ -1216,6 +1306,7 @@ def main() -> None:
                     help=f"トークンが回復しないまま何分で諦めるか（既定 {starve_default}）")
     args = ap.parse_args()
 
+    KEEP_RAW[0] = bool(args.keep_raw)
     RAW_MAX_BYTES = int(args.raw_max_gb * 1024 ** 3)
     TOKEN_STARVE_MINUTES = args.token_starve_minutes
 

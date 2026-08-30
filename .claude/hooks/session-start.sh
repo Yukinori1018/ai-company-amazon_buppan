@@ -157,7 +157,65 @@ ${INBOX_SAMPLE}
   fi
 fi
 
-MESSAGE="${SYNC_MSG}${REMINDER_MSG}${INBOX_MSG}"
+# --- リマインダー④: 候補リスト常時稼働ジョブの生死と増分（2026-08-31 / T-20260831-002）---
+#
+# 背景: night-shift.plist は存在しないスクリプトを指したまま **14日間・814回** exit 127 で
+#       死に続け、誰も気づきませんでした。stderr ログは誰も読みません。
+#       だから「生きているか」は毎セッション必ず目に入るところへ出します。
+#
+# 生死の判定に **PID は使いません**。PID は再利用されるので、死んだプロセスを
+# 「走行中」と誤表示します。判定材料は heartbeat.json の mtime だけです。
+
+LB_DIR="$REPO/workspace/output/deliverables/T-20260831-002"
+LB_V14="$REPO/workspace/output/deliverables/T-20260817-005/v14"
+LIST_MSG=""
+
+if [ -f "$LB_DIR/daily/latest.json" ] || [ -f "$LB_V14/ALERT.md" ]; then
+  LB_ALERT=""
+  if [ -f "$LB_V14/ALERT.md" ]; then
+    LB_ALERT="
+
+⚠ **ALERT が出ています**（ジョブは止まっています）。中身: \`$LB_V14/ALERT.md\`
+$(sed -n '5,10p' "$LB_V14/ALERT.md" 2>/dev/null | sed 's/^/  /')
+直したら ALERT.md を消してから \`bash .claude/scripts/list-builder.sh start\`。
+課金・契約・削除が絡むなら自分で判断せず社長へ（CLAUDE.md §4.1）。"
+  fi
+
+  # 心拍の古さ（分）。ファイルが無ければ「不明」。
+  LB_BEAT="不明"
+  if [ -f "$LB_V14/heartbeat.json" ]; then
+    LB_M="$(stat -f %m "$LB_V14/heartbeat.json" 2>/dev/null || echo 0)"
+    [ "$LB_M" -gt 0 ] && LB_BEAT="$(( ( $(date +%s) - LB_M ) / 60 ))分前"
+  fi
+
+  LB_LINE="（まだロールアップがありません）"
+  if [ -f "$LB_DIR/daily/latest.json" ] && command -v python3 >/dev/null 2>&1; then
+    LB_LINE="$(python3 -c "
+import json,sys
+try:
+    d=json.load(open('$LB_DIR/daily/latest.json',encoding='utf-8'))
+except Exception as e:
+    print('latest.json を読めません:', e); sys.exit(0)
+t,dl=d['totals'],d['delta']
+print(f\"状態={d['status']} / 前回比 候補+{dl['go']}・メーカー+{dl['makers']} / \"
+      f\"累計 候補{t['go']}件・メーカー{t['makers']}社 / 更新 {d['generated_at']}\")
+w=d.get('warning')
+if w: print('  ⚠', w)
+" 2>/dev/null)"
+  fi
+
+  LIST_MSG="
+
+【SessionStart リマインダー④：候補リスト常時稼働ジョブ】
+${LB_LINE}
+最終心拍: ${LB_BEAT}（**STATUS.md の「走行中」ではなくこれを見る**。PIDは再利用されるため）${LB_ALERT}
+
+- 詳しく見る: \`bash .claude/scripts/list-builder.sh status\`
+- 止める: \`bash .claude/scripts/list-builder.sh stop\`
+- 運用書: workspace/output/deliverables/T-20260831-002/README.md"
+fi
+
+MESSAGE="${SYNC_MSG}${REMINDER_MSG}${INBOX_MSG}${LIST_MSG}"
 
 # JSON エスケープ（python が無い環境を考慮し、jq があれば使う）
 if command -v jq >/dev/null 2>&1; then

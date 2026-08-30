@@ -8,6 +8,7 @@
 from __future__ import annotations
 
 import json
+import sys
 
 import pytest
 
@@ -30,6 +31,10 @@ def sandbox(tmp_path, monkeypatch):
     monkeypatch.setattr(ao, "PROGRESS", v14 / "progress.json")
     monkeypatch.setattr(ao, "SCAN_LOG", v14 / "scan_v14.log")
     monkeypatch.setattr(ao, "DAILY_DIR", tmp_path / "daily")
+    monkeypatch.setattr(ao, "ALERT_FILE", v14 / "ALERT.md")
+    monkeypatch.setattr(ao, "V14", v14)
+    monkeypatch.setattr(ao, "HEARTBEAT", v14 / "heartbeat.json")
+    monkeypatch.setattr(ao, "resource_block", lambda: "")
 
     bands = [f"band{i}" for i in range(3)]
     monkeypatch.setattr(ao, "all_bands", lambda: bands)
@@ -65,10 +70,47 @@ def test_stop_file_prevents_the_scanner_from_running(sandbox):
 
 
 def test_low_disk_prevents_the_scanner_from_running(sandbox, monkeypatch):
-    """ディスクを食い潰さない。空きが下限を割ったら走らない。"""
-    monkeypatch.setattr(ao, "free_gb", lambda: 1.0)
+    """ディスクを食い潰さない。空きが下限を割ったら走らず ALERT を残す（S6）。"""
+    monkeypatch.setattr(ao, "resource_block", lambda: "ディスクの空きが 1.0GB しかありません")
     ao.loop(once=True)
     assert sandbox.calls["scan"] == 0
+    assert "ディスク" in (sandbox.v14 / "ALERT.md").read_text(encoding="utf-8")
+
+
+def test_an_oversized_tracked_file_blocks_the_run(sandbox, monkeypatch):
+    """★S7。Git 追跡ファイルが40MBを超えたら走らない。
+
+    100MB を超えると GitHub への push が恒久的に失敗し、
+    30分ごとの自動同期が丸ごと止まります（＝他エージェントの成果物も巻き添え）。
+    """
+    monkeypatch.setattr(ao, "resource_block",
+                        lambda: "Git 追跡ファイルが 40.0MB を超えました: big.csv（41.0MB）（S7）")
+    ao.loop(once=True)
+    assert sandbox.calls["scan"] == 0
+
+
+def test_a_leftover_alert_blocks_the_run(sandbox):
+    """★M12。前回の異常を誰も見ていないうちは走らない（壊れたまま回り続けない）。"""
+    (sandbox.v14 / "ALERT.md").write_text("前回の異常", encoding="utf-8")
+    ao.loop(once=True)
+    assert sandbox.calls["scan"] == 0
+
+
+def test_preflight_failure_exits_zero_without_running(sandbox, monkeypatch):
+    """★M3/S5。依存が欠けても異常終了しない（KeepAlive の再起動ストームを作らない）。"""
+    monkeypatch.setattr(ao, "preflight", lambda: ["Keepa の API キーが見つかりません"])
+    monkeypatch.setattr(sys, "argv", ["always_on.py"])
+    assert ao.main() == 0
+    assert sandbox.calls["scan"] == 0
+    assert "依存" in (sandbox.v14 / "ALERT.md").read_text(encoding="utf-8")
+
+
+def test_an_alert_written_during_a_session_marks_it_as_failed(sandbox):
+    """★M2 の締め。ALERT が書かれた回は rc=0 でも「正常」と数えない。"""
+    (sandbox.v14 / "ALERT.md").write_text("障害", encoding="utf-8")
+    p = sandbox.v14 / "progress.json"
+    p.write_text(json.dumps({"counts": {"processed": 10}, "stop_reason": "x"}), encoding="utf-8")
+    assert ao.read_session_result(0.0, 0)["ok"] is False
 
 
 def test_halted_state_prevents_the_scanner_from_running(sandbox):

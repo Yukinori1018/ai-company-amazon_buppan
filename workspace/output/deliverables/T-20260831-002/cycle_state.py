@@ -31,6 +31,11 @@ MAX_CONSECUTIVE_ERRORS = 5       # スキャナが連続でこれだけ異常終
 MAX_ZERO_NEW_SESSIONS = 8        # 新規0件のセッションがこれだけ続いたら自動停止
 LOW_YIELD_PER_1K = 20.0          # 1000トークンあたりの新規取得件数がこれを割ったら警告
 HEALTHY_YIELD_PER_1K = 116.0     # 実測 8.6トークン/件 → 116件/1000トークンが健全値
+# S2: 1セッション（6時間）走って **新規候補0件なのにトークンを3,000以上焼いた** ら止める。
+# 「動いているが無価値」を放置しないための線。掘り切り（＝クールダウン）とは別物。
+BURN_TOKENS_WITHOUT_RESULT = 3000
+# S1: 24時間の新規取得がこれを割ったら「探索は終わった」とみなして警告を出す
+LOW_INTAKE_PER_DAY = 200
 
 ISO = "%Y-%m-%dT%H:%M:%S"
 
@@ -125,7 +130,14 @@ def note_session(state: dict, result: dict, all_bands: list, now: dt.datetime,
         state["zero_new_sessions"] = 0
 
     if cycle_complete(state, all_bands):
+        # 掘り切りは「異常」ではない。クールダウンへ入るだけで halted にはしない。
         start_cooldown(state, now, cooldown_days)
+    elif (result.get("ok") and int(result.get("go") or 0) == 0
+            and tokens > BURN_TOKENS_WITHOUT_RESULT and not state.get("halted")):
+        # S2: 走ってはいるが何も生んでいない。トークンを焼いているだけ。
+        state["halted"] = (f"1セッションで新規候補0件のままトークンを{tokens}消費しました"
+                           f"（S2: 上限{BURN_TOKENS_WITHOUT_RESULT}）。"
+                           "母数が枯れたか、抽出条件が何も拾えなくなっています")
     elif (state["zero_new_sessions"] >= MAX_ZERO_NEW_SESSIONS
             and not state.get("halted")):
         state["halted"] = (f"新規0件のセッションが{state['zero_new_sessions']}回続きました。"
@@ -187,6 +199,23 @@ def daily_report(state: dict, days: int = 7) -> list:
                     "go": d.get("go", 0), "tokens": d.get("tokens", 0),
                     "yield_per_1k": yield_per_1k(d), "sessions": d.get("sessions", 0)})
     return out
+
+
+def intake_warning(state: dict, threshold: int = LOW_INTAKE_PER_DAY) -> Optional[str]:
+    """S1: 直近の丸1日の新規取得が細ったら知らせる（＝探索フェーズの終わり）。
+
+    止めはしません。巡回モード（鮮度の古い順に取り直す）はまだ実装していないので、
+    ここで「次に何をするか」を人が決める必要があります。
+    """
+    rows = daily_report(state, days=3)
+    if len(rows) < 2:            # 丸1日ぶんのデータが揃うまでは判断しない
+        return None
+    full_day = rows[1]           # 直近の「終わった日」
+    if full_day["processed"] >= threshold:
+        return None
+    return (f"新規取得が細っています（{full_day['date']}: {full_day['processed']}件・"
+            f"目安 {threshold}件）。探索フェーズは実質終わりです。"
+            "巡回モード（鮮度の古い順に取り直す）への切替か、抽出条件の見直しが要ります")
 
 
 def yield_warning(state: dict, threshold: float = LOW_YIELD_PER_1K) -> Optional[str]:
