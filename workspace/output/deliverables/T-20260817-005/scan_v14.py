@@ -186,8 +186,13 @@ PRICE_DEF_CHANGE_KEEPA_MIN = 7966080
 # ==========================================================================
 # 自動停止（暴走防止）
 # ==========================================================================
-MAX_HOURS_DEFAULT = 12.0            # ①通算の走行時間
+MAX_HOURS_DEFAULT = 12.0            # ①通算の走行時間（0 = 無制限。常時稼働はこちら）
 TOKEN_STARVE_MINUTES = 60           # ②トークンが回復しないまま何分で諦めるか
+# ↑ --token-starve-minutes で上書きできる（常時稼働では長めにする。
+#   補充は20/分で保証されているので、ここに引っかかるのは Keepa 側の障害のときだけ）。
+# raw/ raw_offers/ の合計がこれを超えたら **生レスポンスの保存だけをやめる**（削除はしない）。
+# 削除は CLAUDE.md §4.1（不可逆な削除）なので、自動では絶対に踏まない。
+RAW_MAX_GB_DEFAULT = 10.0
 EMPTY_ROUNDS_LIMIT = 3              # ③新規ゼロが何ラウンド続いたら止めるか
 # これを割ったら補充待ち。DETAIL_CHUNK=25 なら1バッチ45トークンで足りるので、
 # 150 を要求すると必要のない足踏みが増える。必要量ぎりぎり + 少しの余裕にする。
@@ -513,7 +518,8 @@ class StopWatch:
 
     def __init__(self, max_hours: float, pilot: int = 0):
         self.t0 = time.time()
-        self.max_sec = max_hours * 3600
+        # 0 以下は「時間では止めない」。常時稼働（always_on.py）はこれを使う。
+        self.max_sec = float("inf") if max_hours <= 0 else max_hours * 3600
         self.pilot = pilot
         self.processed = 0
         self.empty_rounds = 0
@@ -533,13 +539,46 @@ class StopWatch:
             return True
         if STOP_FILE.exists():                      # ④ STOP ファイル
             self.stop("STOP ファイルを検知しました（手動停止）")
-        elif self.elapsed > self.max_sec:           # ① 時間切れ
+        elif self.elapsed > self.max_sec:           # ① 時間切れ（max_sec=inf なら発火しない）
             self.stop(f"通算 {self.max_sec / 3600:.1f} 時間に達しました")
         elif self.empty_rounds >= EMPTY_ROUNDS_LIMIT:  # ③ 新規ゼロ
             self.stop(f"新規 ASIN がゼロのラウンドが {EMPTY_ROUNDS_LIMIT} 回続きました")
         elif self.pilot and self.processed >= self.pilot:
             self.stop(f"パイロット {self.pilot} 件に到達しました")
         return self.reason is not None
+
+
+RAW_MAX_BYTES = int(RAW_MAX_GB_DEFAULT * 1024 ** 3)
+_RAW_FULL = [False]        # 一度いっぱいになったら以降は測らない（毎回 du すると遅い）
+_RAW_CHECK = [0.0]
+
+
+def raw_has_room() -> bool:
+    """raw/ raw_offers/ の合計が上限内かどうか。上限に達したら保存だけをやめる。
+
+    **古いファイルの削除はしない。** 削除は CLAUDE.md §4.1 に該当するため、
+    無人ジョブが自分で踏んではいけない。README に手動での掃除手順を書いてある。
+    """
+    if _RAW_FULL[0]:
+        return False
+    now = time.time()
+    if now - _RAW_CHECK[0] < 300:      # 5分に1回だけ測る
+        return True
+    _RAW_CHECK[0] = now
+    total = 0
+    for d in (RAW, RAW_OFFERS):
+        for f in d.glob("*.gz"):
+            try:
+                total += f.stat().st_size
+            except OSError:
+                pass
+    if total >= RAW_MAX_BYTES:
+        _RAW_FULL[0] = True
+        log(f"!! raw の合計が上限 {RAW_MAX_BYTES / 1024 ** 3:.1f}GB に達しました "
+            f"（実測 {total / 1024 ** 3:.1f}GB）。以後は生レスポンスを保存しません"
+            f"（CSV への追記は続きます。古いファイルは削除しません）")
+        return False
+    return True
 
 
 def keepa_get(path: str, params: dict, budget: Budget, label: str) -> dict:
@@ -733,7 +772,7 @@ def checkpoint(watch: StopWatch, budget: Budget, state: dict, stat: dict) -> Non
         "elapsed_hhmm": time.strftime("%H:%M:%S", time.gmtime(watch.elapsed)),
         "stop_reason": watch.reason,
         "auto_stop": {
-            "max_hours": watch.max_sec / 3600,
+            "max_hours": (0 if watch.max_sec == float("inf") else watch.max_sec / 3600),
             "token_starve_minutes": TOKEN_STARVE_MINUTES,
             "empty_rounds_limit": EMPTY_ROUNDS_LIMIT,
             "stop_file": str(STOP_FILE),
@@ -875,7 +914,18 @@ def run(args) -> None:
     log(f"    停止させたいときは: touch {STOP_FILE}")
 
     plan = shards()
+    skip = {b.strip() for b in (args.skip_bands or "").split(",") if b.strip()}
+    if skip:
+        plan = [s for s in plan if s[4] not in skip]
+        log(f"    掘り切り済みとして {len(skip)}シャードを飛ばします（周回管理は always_on.py）")
     log(f"    探索シャード {len(plan)}本（価格帯で刻んで母集団を端から掘る）")
+    if not plan:
+        # 全シャードが掘り切り済み。ここで即終了して、上位（always_on.py）に
+        # 「一周終わった」と伝える。空の for を回してもトークンを1つも生まないため。
+        watch.stop("全シャードを掘り切りました（skip-bands で全件除外）")
+        checkpoint(watch, budget, {"finished": True, "exhausted": sorted(skip)}, stat)
+        log("=== 終了: 全シャード掘り切り済み ===")
+        return
     # 起動直後に1回打つ。これが無いと、最初のチェックポイントまで progress.json が
     # **前回の走行の内容**のままで、見張りが「もう止まっています」と誤って表示する。
     checkpoint(watch, budget, {"starting": True}, stat)
@@ -939,10 +989,11 @@ def run(args) -> None:
             products = payload.get("products") or []
             if not products:
                 continue
-            with gzip.open(RAW / f"{preset}_{raw_idx[0]:05d}.json.gz", "wt",
-                           encoding="utf-8") as f:
-                json.dump(payload, f, ensure_ascii=False)
-            raw_idx[0] += 1
+            if raw_has_room():
+                with gzip.open(RAW / f"{preset}_{raw_idx[0]:05d}.json.gz", "wt",
+                               encoding="utf-8") as f:
+                    json.dump(payload, f, ensure_ascii=False)
+                raw_idx[0] += 1
             rows = [evaluate(p, preset, band) for p in products]
             by_asin = {p["asin"]: p for p in products if p.get("asin")}
             survivors = [r["ASIN"] for r in rows if r["判定"] == "候補(実セラー未検証)"]
@@ -1001,7 +1052,9 @@ def run(args) -> None:
 
     if watch.reason is None:
         watch.stop("探索シャードを最後まで掘り切りました")
-    checkpoint(watch, budget, {"finished": True}, stat)
+    checkpoint(watch, budget,
+               {"finished": True, "round": round_no, "cursors": cursors,
+                "exhausted": sorted(exhausted | skip)}, stat)
     log(f"=== 終了: {watch.reason} ===")
     log(f"    処理 {stat['processed']}件 / 候補 {stat['go']}件 / "
         f"実セラー確定 {stat['offers_verified']}件 / 消費 {budget.consumed}トークン")
@@ -1010,16 +1063,29 @@ def run(args) -> None:
 
 
 def main() -> None:
+    # 上書きするモジュール変数（argparse の help 文で読む前に宣言しておく必要がある）
+    global RAW_MAX_BYTES, TOKEN_STARVE_MINUTES
+    starve_default = TOKEN_STARVE_MINUTES
+    raw_gb_default = RAW_MAX_GB_DEFAULT
     ap = argparse.ArgumentParser(description="メーカー仕入れ 候補プール継続スキャナ v14")
     ap.add_argument("--max-hours", type=float, default=MAX_HOURS_DEFAULT,
-                    help=f"自動停止までの通算時間（既定 {MAX_HOURS_DEFAULT}）")
+                    help=f"自動停止までの通算時間。**0 なら時間では止めない**（既定 {MAX_HOURS_DEFAULT}）")
     ap.add_argument("--pilot", type=int, default=0,
                     help="この件数を処理したら止まる（動作確認用）")
     ap.add_argument("--resume", action="store_true",
                     help="取得済み ASIN を飛ばして続きから（既定でも同じ挙動）")
     ap.add_argument("--rebuild", action="store_true",
                     help="API を叩かず、既存CSVからメーカー名寄せだけ作り直す（0トークン）")
+    ap.add_argument("--skip-bands", default="",
+                    help="掘り切り済みシャードのラベルをカンマ区切りで（always_on.py が渡す）")
+    ap.add_argument("--raw-max-gb", type=float, default=raw_gb_default,
+                    help=f"raw/ raw_offers/ の合計上限GB。超えたら保存だけやめる（既定 {raw_gb_default}）")
+    ap.add_argument("--token-starve-minutes", type=int, default=starve_default,
+                    help=f"トークンが回復しないまま何分で諦めるか（既定 {starve_default}）")
     args = ap.parse_args()
+
+    RAW_MAX_BYTES = int(args.raw_max_gb * 1024 ** 3)
+    TOKEN_STARVE_MINUTES = args.token_starve_minutes
 
     if args.rebuild:
         n = rebuild_maker_csv()
