@@ -7,6 +7,8 @@
 #   ./list-builder.sh start      再開する（STOP ファイルを消す）
 #   ./list-builder.sh status     今どうなっているかを1画面で見る
 #   ./list-builder.sh once       1セッションだけ試す（検証用）
+#   ./list-builder.sh resume-research   母数枯渇で終了した状態から再開する
+#                                       （★社長の指示があるときだけ打つ）
 #
 # 設計方針は github-sync.sh に倣っています（PATH を明示・ログをローテート・
 # 異常でも exit 0）。**異常終了しないのが肝**で、launchd の KeepAlive と
@@ -53,6 +55,11 @@ print(f\"  候補 {d['totals']['go']}件 (+{d['delta']['go']}) / メーカー {d
     echo "== 直近のログ =="
     tail -n 8 "$JOB/state/always_on.log" 2>/dev/null || echo "  まだありません"
     ;;
+  resume-research)
+    "$PYTHON" "$JOB/always_on.py" --resume-research
+    echo "リサーチを再開しました。常駐ジョブが次の見直し（最大30分後）で走り始めます。"
+    echo "すぐ始めたいなら: launchctl kickstart -k gui/$(id -u)/com.aicompany.amazon-buppan.list-builder"
+    ;;
   once)
     exec "$PYTHON" "$JOB/always_on.py" --once
     ;;
@@ -63,7 +70,7 @@ print(f\"  候補 {d['totals']['go']}件 (+{d['delta']['go']}) / メーカー {d
     exec "$PYTHON" "$JOB/always_on.py"
     ;;
   *)
-    echo "使い方: $0 [run|stop|start|status|once|preflight]" >&2
+    echo "使い方: $0 [run|stop|start|status|once|preflight|resume-research]" >&2
     exit 0
     ;;
 esac

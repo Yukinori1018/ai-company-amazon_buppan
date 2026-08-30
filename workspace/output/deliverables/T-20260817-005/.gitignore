@@ -38,8 +38,17 @@ v14/*.csv.tmp
 # だけにします。下の3つはローカルには残り、社長の Finder からも見えます
 # （`~/Documents/AI Company Outputs/Amazon物販事業` は deliverables への
 #   シンボリックリンクなので、**Git 追跡と可視性は無関係**です）。
+#
+# ★2026-08-31 社長判断で **行データは一切 Git に載せません**（P2）。
+#   「公開はしなくて良いです。なので、GitHubには保存しなくて良いです。」
+#   → 03_メーカー名寄せ.csv も追跡外にしました。Git に載るのは
+#      00_サマリ.md / progress.json / T-20260831-002/daily/*.json（統計だけ）です。
+#   CLAUDE.md §6「成果物は Git 追跡する」に対する、社長判断による明示的な例外です。
+#   社長の閲覧口 `~/Documents/AI Company Outputs/Amazon物販事業` は
+#   deliverables へのシンボリックリンクなので、**追跡していなくても普通に見えます**。
 v14/01_候補プール_全件.csv
 v14/02_候補リスト_社長用.csv
+v14/03_メーカー名寄せ.csv
 v14/00_候補リスト.html
 v14/ALERT.md
 v14/heartbeat.json

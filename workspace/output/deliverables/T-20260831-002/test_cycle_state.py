@@ -27,30 +27,40 @@ def test_exhausted_bands_are_skipped_next_session():
     assert cs.skip_bands(s, BANDS) == ["band0", "band2"]
 
 
-def test_finishing_every_band_starts_a_cooldown_instead_of_spinning():
-    """全帯を掘り切ったら、走り続けずにクールダウンへ入る（新規0件でトークンを焼かない）。"""
+def test_finishing_every_band_stops_and_says_so():
+    """★2026-08-31 社長判断。母数が尽きたら止まって「尽きた」と言って終わる。"""
     s = cs.new_state(T0)
     cs.note_session(s, result(exhausted=BANDS), BANDS, T0)
     assert cs.cycle_complete(s, BANDS)
-    assert s["cooldown_until"] is not None
-    assert "クールダウン" in cs.pause_reason(s, T0)
+    assert s["exhausted_at"]
+    assert "掘り尽くしました" in s["halted"]
+    assert "掘り尽くしました" in cs.pause_reason(s, T0)
 
 
-def test_cooldown_blocks_then_a_new_cycle_starts():
-    """クールダウン中は走らない。明けたら掘り切りの印が消えて次の周が始まる。"""
+def test_exhaustion_survives_a_restart_and_does_not_re_explore():
+    """★これが無いと KeepAlive が10秒ごとに25シャードを再探索し、
+    1日28,800トークンを新規0件のために焼き続けます。"""
+    import json
     s = cs.new_state(T0)
     cs.note_session(s, result(exhausted=BANDS), BANDS, T0)
+    after_restart = json.loads(json.dumps(s, ensure_ascii=False))     # プロセス再起動を模す
+    assert cs.pause_reason(after_restart, T0 + dt.timedelta(days=30)) is not None
+    assert cs.skip_bands(after_restart, BANDS) == BANDS
 
-    still = T0 + dt.timedelta(days=cs.REVISIT_COOLDOWN_DAYS - 1)
-    assert cs.maybe_start_new_cycle(s, still) is False
-    assert cs.pause_reason(s, still) is not None
 
-    after = T0 + dt.timedelta(days=cs.REVISIT_COOLDOWN_DAYS, seconds=1)
-    assert cs.maybe_start_new_cycle(s, after) is True
+def test_only_an_explicit_instruction_restarts_the_research():
+    """再開は社長の指示だけ。時間の経過では絶対に再開しない。"""
+    s = cs.new_state(T0)
+    cs.note_session(s, result(exhausted=BANDS), BANDS, T0)
+    much_later = T0 + dt.timedelta(days=365)
+    assert cs.pause_reason(s, much_later) is not None       # 1年経っても止まったまま
+
+    cs.resume_research(s, much_later)
     assert s["cycle"] == 2
     assert s["exhausted"] == {}
+    assert s["halted"] is None
     assert cs.skip_bands(s, BANDS) == []
-    assert cs.pause_reason(s, after) is None
+    assert cs.pause_reason(s, much_later) is None
 
 
 def test_consecutive_errors_halt_the_job():
@@ -60,7 +70,7 @@ def test_consecutive_errors_halt_the_job():
         cs.note_session(s, result(ok=False, processed=0, tokens=0), BANDS, T0)
     assert s["halted"]
     assert "異常終了" in s["halted"]
-    assert "自動停止中" in cs.pause_reason(s, T0)
+    assert "停止中" in cs.pause_reason(s, T0)
 
 
 def test_one_success_resets_the_error_counter():
@@ -81,12 +91,12 @@ def test_zero_new_sessions_halt_the_job():
     assert "新規0件" in s["halted"]
 
 
-def test_completing_a_cycle_is_not_mistaken_for_a_failure():
-    """掘り切りは「異常」ではない。クールダウンに入るだけで halted にはしない。"""
+def test_exhaustion_is_reported_as_exhaustion_not_as_an_error():
+    """掘り切りは「異常」ではない。停止理由に必ず「掘り尽くした」と書く。"""
     s = cs.new_state(T0)
     cs.note_session(s, result(exhausted=BANDS, processed=0, tokens=500), BANDS, T0)
-    assert s["halted"] is None
-    assert s["cooldown_until"] is not None
+    assert "掘り尽くしました" in s["halted"]
+    assert "異常" not in s["halted"]
 
 
 def test_yield_warning_fires_only_when_the_pool_dries_up():

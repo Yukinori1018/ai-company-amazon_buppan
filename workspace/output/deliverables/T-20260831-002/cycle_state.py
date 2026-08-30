@@ -6,19 +6,29 @@
 ここはその制御だけを持つモジュールです。**ファイル I/O も API 呼び出しもしません。**
 だから全部テストできます（`test_cycle_state.py`）。実際に走らせるのは `always_on.py`。
 
-## 周回の考え方
+## 掘り切ったらどうするか（2026-08-31 社長判断）
 
-    1周 = 全シャード（価格帯25本）を掘り切るまで
-      ↓ 掘り切った
-    クールダウン（既定7日）… 走らない。Keepa の母集団に新商品が入るのを待つ
-      ↓ 明けた
-    次の周へ。cursors をリセットし、exhausted を空にする
-      → `seen_asins.txt` は消さないので、2周目以降に積まれるのは**本当の新規だけ**
+> 「尽きたら、尽きたと言って、リサーチを終了してもらって結構です。
+>   そのあとは、任意のタイミングで、リサーチを指示します。」
 
-再訪は無駄ではありません。`salesRankDrops30` は直近30日の指標なので、
-条件に入ってくる商品が毎週入れ替わります。ただし**取れる数は必ず減る**ので、
-「新規獲得率」を毎日記録して、下がったら警告を出します（＝条件見直しの合図）。
-条件そのものを緩めるのは社長判断（仕入れ方針 v1.3 の変更）なので、機械は警告までです。
+つまり **自動で再訪しません。** 全シャードを掘り切ったら停止し、そう報告して終わります。
+再開は社長の明示的な指示（`list-builder.sh resume-research`）だけです。
+
+    全シャードを掘り切った
+      ↓
+    halted に「母数を掘り尽くしました」を書いて停止
+      ↓ **再起動しても再探索を始めない**（exhausted を状態ファイルに永続化してあるため）
+    社長の再開指示 → exhausted を空にして次の周へ
+      → `seen_asins.txt` は消さないので、次の周に積まれるのは**本当の新規だけ**
+
+`exhausted` をメモリ上だけに持つと、launchd の KeepAlive が再起動するたびに
+25シャードを頭から探索し直し、**1日28,800トークンを新規0件のために焼き続けます**。
+だからここは必ずディスクへ書きます。
+
+## 「掘り切った」と書いてよいのは正常な0件のときだけ
+
+API エラーを掘り切りと記録すると、**「尽きました」という報告そのものが嘘になります。**
+区別は `scan_v14.py` の Finder 呼び出し側で行い、障害時は `ALERT` を書いて止まります。
 """
 from __future__ import annotations
 
@@ -26,7 +36,6 @@ import datetime as dt
 from typing import Optional
 
 # --- 設定（ここだけ見れば挙動が分かる）------------------------------------
-REVISIT_COOLDOWN_DAYS = 7        # 1周し切ったあと、次の周まで空ける日数
 MAX_CONSECUTIVE_ERRORS = 5       # スキャナが連続でこれだけ異常終了したら自動停止
 MAX_ZERO_NEW_SESSIONS = 8        # 新規0件のセッションがこれだけ続いたら自動停止
 LOW_YIELD_PER_1K = 20.0          # 1000トークンあたりの新規取得件数がこれを割ったら警告
@@ -58,8 +67,8 @@ def new_state(now: dt.datetime) -> dict:
         "ticket": "T-20260831-002",
         "cycle": 1,
         "cycle_started_at": now_iso(now),
-        "cooldown_until": None,
-        "exhausted": {},          # band ラベル -> 掘り切った時刻
+        "exhausted": {},          # band ラベル -> 掘り切った時刻（★必ず永続化する）
+        "exhausted_at": None,     # 全シャードを掘り切った時刻
         "halted": None,           # 自動停止の理由。None なら稼働中
         "sessions": 0,
         "consecutive_errors": 0,
@@ -87,8 +96,7 @@ def cycle_complete(state: dict, all_bands: list) -> bool:
 
 
 # --- セッション1回ぶんの反映 -------------------------------------------------
-def note_session(state: dict, result: dict, all_bands: list, now: dt.datetime,
-                 cooldown_days: int = REVISIT_COOLDOWN_DAYS) -> dict:
+def note_session(state: dict, result: dict, all_bands: list, now: dt.datetime) -> dict:
     """スキャナ1セッションの結果を状態に畳み込む。
 
     result: {"ok": bool, "exhausted": [band...], "processed": int,
@@ -130,8 +138,7 @@ def note_session(state: dict, result: dict, all_bands: list, now: dt.datetime,
         state["zero_new_sessions"] = 0
 
     if cycle_complete(state, all_bands):
-        # 掘り切りは「異常」ではない。クールダウンへ入るだけで halted にはしない。
-        start_cooldown(state, now, cooldown_days)
+        mark_exhausted(state, now)
     elif (result.get("ok") and int(result.get("go") or 0) == 0
             and tokens > BURN_TOKENS_WITHOUT_RESULT and not state.get("halted")):
         # S2: 走ってはいるが何も生んでいない。トークンを焼いているだけ。
@@ -145,39 +152,41 @@ def note_session(state: dict, result: dict, all_bands: list, now: dt.datetime,
     return state
 
 
-def start_cooldown(state: dict, now: dt.datetime, days: int = REVISIT_COOLDOWN_DAYS) -> dict:
-    """1周し切った。次の周まで走らない（走っても新規0件でトークンを焼くだけ）。"""
-    state["cooldown_until"] = now_iso(now + dt.timedelta(days=days))
+def mark_exhausted(state: dict, now: dt.datetime) -> dict:
+    """母数を掘り尽くした。**止まって、そう報告して終わる。**（2026-08-31 社長判断）
+
+    自動で再訪はしません。再開は社長の明示的な指示だけです。
+    """
+    state["exhausted_at"] = now_iso(now)
     state["totals"]["cycles_completed"] = state["totals"].get("cycles_completed", 0) + 1
+    total = state["totals"].get("processed", 0)
+    state["halted"] = (
+        f"母数を掘り尽くしました（{state.get('cycle', 1)}周目・全シャード完了・"
+        f"このジョブでの取得 {total}件）。リサーチを終了します。"
+        "再開は社長の指示で `list-builder.sh resume-research`")
     return state
 
 
-def maybe_start_new_cycle(state: dict, now: dt.datetime) -> bool:
-    """クールダウンが明けていたら次の周を始める。始めたら True。
+def resume_research(state: dict, now: dt.datetime) -> dict:
+    """社長の指示で次の周を始める。**このコマンドでしか再探索は始まりません。**
 
     `exhausted` を空にするだけで `seen_asins.txt` は触りません。
-    だから2周目に積まれるのは **前回以降にKeepaの母集団へ入ってきた商品だけ**です。
+    だから次の周に積まれるのは **前回以降に Keepa の母集団へ入ってきた商品だけ**です。
     """
-    until = parse_iso(state.get("cooldown_until"))
-    if until is None or now < until:
-        return False
-    state["cooldown_until"] = None
     state["exhausted"] = {}
+    state["exhausted_at"] = None
+    state["halted"] = None
+    state["consecutive_errors"] = 0
+    state["zero_new_sessions"] = 0
     state["cycle"] = state.get("cycle", 1) + 1
     state["cycle_started_at"] = now_iso(now)
-    state["zero_new_sessions"] = 0
-    return True
+    return state
 
 
 def pause_reason(state: dict, now: dt.datetime) -> Optional[str]:
     """今このセッションを走らせるべきでないなら理由を返す。走ってよいなら None。"""
     if state.get("halted"):
-        return f"自動停止中: {state['halted']}"
-    until = parse_iso(state.get("cooldown_until"))
-    if until and now < until:
-        rest = until - now
-        return (f"周回クールダウン中（{state['totals'].get('cycles_completed', 0)}周完了・"
-                f"あと {rest.days}日{rest.seconds // 3600}時間）")
+        return f"停止中: {state['halted']}"
     return None
 
 
@@ -202,10 +211,9 @@ def daily_report(state: dict, days: int = 7) -> list:
 
 
 def intake_warning(state: dict, threshold: int = LOW_INTAKE_PER_DAY) -> Optional[str]:
-    """S1: 直近の丸1日の新規取得が細ったら知らせる（＝探索フェーズの終わり）。
+    """直近の丸1日の新規取得が細ったら知らせる（＝母数の底が近い）。
 
-    止めはしません。巡回モード（鮮度の古い順に取り直す）はまだ実装していないので、
-    ここで「次に何をするか」を人が決める必要があります。
+    止めはしません。止めるのは「全シャード掘り切り」か S2/S3/S5 です。
     """
     rows = daily_report(state, days=3)
     if len(rows) < 2:            # 丸1日ぶんのデータが揃うまでは判断しない

@@ -121,8 +121,8 @@ def test_halted_state_prevents_the_scanner_from_running(sandbox):
     assert sandbox.calls["scan"] == 0
 
 
-def test_cooldown_prevents_the_scanner_from_running(sandbox):
-    """1周し切ったあとは走らない（走っても新規0件でトークンを焼くだけ）。"""
+def test_exhaustion_prevents_the_scanner_from_running(sandbox):
+    """★母数を掘り尽くしたら走らない。再起動しても再探索を始めない。"""
     import datetime as dt
     now = dt.datetime.now()
     s = cs.new_state(now)

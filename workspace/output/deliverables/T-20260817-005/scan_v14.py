@@ -735,6 +735,18 @@ def keepa_get(path: str, params: dict, budget: Budget, label: str) -> dict:
             log(f"    {label} 通信エラー: {e}")
             time.sleep(15)
             continue
+        if resp.status_code == 402:
+            # W4: Keepa が「このキーではアクセスできない」と言っている＝契約・制限の問題。
+            # 生命線なので例外なく即停止する。リトライしても状況は変わらない。
+            API.fail(f"{label} HTTP 402 契約が無効です")
+            for _ in range(API_WINDOW):        # 直ちに unhealthy にする
+                API.fail("HTTP 402")
+            write_alert("Keepa から「アクセス権がない」と返ってきました（HTTP 402）",
+                        "契約の失効・支払いの失敗・キーの無効化のいずれかです。\n"
+                        "**母数の枯渇ではありません。** リトライしても直りません。\n"
+                        "課金・契約に関わるので、自分で判断せず秘書カズヨへ差し戻してください"
+                        "（CLAUDE.md §4.1）。")
+            return {}
         if resp.status_code not in (200, 429):
             # 402=契約が無効 / 400=クエリ不正 / 5xx=Keepa 側の障害。
             # ★どれも「母数の枯渇」ではない。ここを {} で返して呼び出し側に

@@ -23,8 +23,8 @@ launchd（`com.aicompany.amazon-buppan.list-builder`）から起動されます�
     STOP がある？          → 5分寝て見直す（止まるが死なない）
     ディスクが足りない？    → ALERT を書いて待つ
     Git 追跡ファイルが40MB超？ → ALERT を書いて停止（100MBの壁の手前で止める）
-    自動停止した？          → 走らない。次セッションで秘書が ALERT に気づく
-    クールダウン中？        → 明けるまで寝る。明けたら次の周へ
+    停止した？              → 走らない。次セッションで秘書が ALERT に気づく
+                              （母数の掘り尽くしもここ。**自動では再開しない**）
     ↓
     scan_v14.py を6時間ぶん走らせる（掘り切った帯は --skip-bands で飛ばす）
       心拍が10分止まったら子プロセスを殺す（S10）
@@ -81,7 +81,7 @@ DAILY_DIR = HERE / "daily"
 # 環境変数で上書きできるのは**動作確認のため**。運用では触りません。
 SESSION_HOURS = float(os.environ.get("LIST_BUILDER_SESSION_HOURS", "6.0"))
 STOP_POLL_SEC = 300          # STOP がある間、何秒ごとに見直すか
-BLOCKED_POLL_SEC = 1800      # 停止・クールダウン中に寝る間隔
+BLOCKED_POLL_SEC = 1800      # 停止中に寝る間隔
 MIN_FREE_GB = 50.0           # S6: 空きがこれを割ったら走らない
 MAX_V14_GB = 20.0            # S6: v14/ の合計がこれを超えたら走らない
 MAX_TRACKED_MB = 40.0        # S7: Git 追跡ファイルの上限（GitHub の100MB上限の手前）
@@ -390,11 +390,6 @@ def loop(once: bool = False) -> int:
             sleep_interruptible(BLOCKED_POLL_SEC)
             continue
 
-        if cs.maybe_start_new_cycle(state, now):
-            log(f"クールダウンが明けました。{state['cycle']}周目を開始します"
-                f"（掘り切りの印だけリセット。seen_asins は残すので新規だけが積まれます）")
-            save_state(state)
-
         reason = cs.pause_reason(state, now)
         if reason:
             log(reason)
@@ -412,7 +407,12 @@ def loop(once: bool = False) -> int:
             if warn:
                 log(f"WARN {warn}")
         if state.get("halted"):
-            alert("ジョブが自分で止まりました", state["halted"])
+            title = ("母数を掘り尽くしたのでリサーチを終了しました"
+                     if state.get("exhausted_at") else "ジョブが自分で止まりました")
+            alert(title, state["halted"] + "\n\n"
+                  + ("再開したくなったら `bash .claude/scripts/list-builder.sh resume-research`。"
+                     if state.get("exhausted_at") else
+                     "原因を直してから ALERT.md を消し、`list-builder.sh start`。"))
 
         maybe_rollup(state, dt.datetime.now())
         if once:
@@ -427,6 +427,8 @@ def main() -> int:
     ap = argparse.ArgumentParser(description="候補リスト常時稼働ジョブ")
     ap.add_argument("--once", action="store_true", help="1セッションだけ回して終わる（検証用）")
     ap.add_argument("--preflight", action="store_true", help="依存チェックだけして終わる")
+    ap.add_argument("--resume-research", action="store_true",
+                    help="母数枯渇で止まった状態から次の周を始める（★社長の指示があるときだけ）")
     args = ap.parse_args()
 
     STATE_DIR.mkdir(parents=True, exist_ok=True)
@@ -442,6 +444,15 @@ def main() -> int:
         return 0
     lock.write(str(os.getpid()))
     lock.flush()
+
+    if args.resume_research:
+        now = dt.datetime.now()
+        state = cs.resume_research(load_state(now), now)
+        save_state(state)
+        ALERT_FILE.unlink(missing_ok=True)
+        log(f"リサーチを再開します（{state['cycle']}周目）。"
+            "掘り切りの印だけ消しました。seen_asins は残すので新規だけが積まれます")
+        return 0
 
     problems = preflight()
     if problems:

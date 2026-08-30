@@ -1,37 +1,34 @@
 {
   "ticket": "T-20260817-005",
   "scanner": "scan_v14",
-  "updated_at": "2026-08-31 02:48:51",
-  "started_at": "2026-08-31 02:47:05",
-  "elapsed_sec": 105,
-  "elapsed_hhmm": "00:01:45",
-  "stop_reason": "通算 0.0 時間に達しました",
+  "updated_at": "2026-08-31 02:52:08",
+  "started_at": "2026-08-31 02:52:06",
+  "elapsed_sec": 1,
+  "elapsed_hhmm": "00:00:01",
+  "stop_reason": null,
   "auto_stop": {
-    "max_hours": 0.025,
+    "max_hours": 6.0,
     "token_starve_minutes": 240,
     "empty_rounds_limit": 3,
     "stop_file": "/Users/yukinori/Claude Code/ai-company-amazon_buppan/workspace/output/deliverables/T-20260817-005/v14/STOP"
   },
   "keepa": {
-    "tokens_consumed": 362,
-    "tokens_left": 712,
+    "tokens_consumed": 0,
+    "tokens_left": 792,
     "refill_per_min": 20,
     "note": "トークン上限1200・補充20/分。貯め込めないので12時間で約14,400が天井"
   },
   "counts": {
-    "processed": 50,
-    "rows": 50,
-    "go": 36,
-    "offers_verified": 42,
-    "rejected_seller": 6,
-    "rejected_cheap": 4
+    "processed": 0,
+    "rows": 0,
+    "go": 0,
+    "offers_verified": 0,
+    "rejected_seller": 0,
+    "rejected_cheap": 0
   },
   "makers_listed": 853,
   "cursor": {
-    "finished": true,
-    "round": 1,
-    "cursors": {},
-    "exhausted": []
+    "starting": true
   },
   "outputs": {
     "all": "/Users/yukinori/Claude Code/ai-company-amazon_buppan/workspace/output/deliverables/T-20260817-005/v14/01_候補プール_全件.csv",
