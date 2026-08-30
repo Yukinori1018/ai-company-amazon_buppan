@@ -198,3 +198,9 @@ gBizINFO の `company_url` 充足率・利用料の公式明記・日次上限�
   - 未確認（推測で埋めていない）＝gBizINFO の company_url 充足率と利用料の公式明記／国税庁全件データの実マッチ率／特許庁商標APIの権利者住所の有無／Verified by GS1（403）／FUMA の項目。上2件は Phase C 冒頭の実測タスクへ申し送り。
 - 2026-08-31 上記により**ご承認①の対象を差し替え**（国税庁Web-API → 不要。gBizINFO トークン ＋ Gemini API キーの2件）。owner-tasks.md を更新。
 - 2026-08-31 **ご判断②は決着**。社長の P2「公開はしなくて良い。GitHub には保存しなくて良い」を本件にも適用＝**連絡先の実データは限定共有の Google シートにのみ置き、リポには統計とリンクのみ**。**残るご判断は①（gBizINFO トークン＋Gemini API キーの取得と規約同意・無料・§4.1）のみ。**
+- 2026-08-31 **ご承認①を実行。ただし A（無料枠プロジェクト）は検証の結果、検索用途では成立せず。**
+  - 社長が新規プロジェクト `claud cord`（`gen-lang-client-0905123111`）を作成。**請求階層＝無料枠**を画面で確認。APIキーは作成済みだったため新規作成せず、値を `~/.config/ai-company-amazon-buppan/gemini.env`（chmod 600・リポ外）へクリップボード経由で保存。**キーの値は会話ログにも Git にも残していない。**
+  - **実測**：素の `generateContent` は HTTP 200（`gemini-3-flash-preview` 等で応答確認）。しかし **`tools:[{google_search:{}}]` を付けると全モデルで一貫して HTTP 429 RESOURCE_EXHAUSTED**（`gemini-3-flash-preview` / `gemini-flash-latest` を単発でも連投でも再現）。`gemini-2.5-flash` 系は `NOT_FOUND - no longer available to new users`。
+  - レート制限画面の「検索によるグラウンディング」はモデル選択が **Gemini 2 系**で上限1,500/日と表示されるが、**その Gemini 2 系が新規プロジェクトでは使えない**。結果として**無料枠では検索グラウンディングが実質使えない**。
+  - ⚠️ **サトルの「Gemini 3.x のグラウンディングが月5,000リクエスト無料」は、新規の無料枠プロジェクトでは成立しない。** 文書上の記載と実際の払い出しが食い違う。A_連絡先取得手段の棚卸し.md の当該箇所は要訂正。
+  - → 検索APIの選択を社長へ差し戻し（B＝clawdbot の有料枠で約1,700円 / C＝Serper.dev 2,500クエリ無料・カード不要）。
