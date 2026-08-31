@@ -142,18 +142,34 @@ if [ -d "$INBOX_DIR" ]; then
   - …ほか $((INBOX_COUNT - 5)) 件"
     fi
 
+    # 滞留日数を出す（2026-08-31 / T-20260831-003）。
+    # 「最古 2026-08-30」より「9日間放置」のほうが行動を促す。日付だけだと古さが直感に入らない。
+    INBOX_AGE=""
+    if [ -n "$OLDEST_DATE" ] && command -v python3 >/dev/null 2>&1; then
+      INBOX_AGE="$(python3 -c "
+import datetime,sys
+try:
+    d=datetime.date.fromisoformat('$OLDEST_DATE')
+    n=(datetime.date.today()-d).days
+    print(f'・最古 {n} 日滞留' if n>0 else '・本日投函')
+except Exception: pass
+" 2>/dev/null)"
+    fi
+
     INBOX_MSG="
 
-【SessionStart リマインダー③：_inbox_社長共有 に未処理ファイル】
-未処理 ${INBOX_COUNT} 件（最古 ${OLDEST_DATE:-不明}）。社長に「棚卸ししますか？」と1行で確認してください。
+【SessionStart リマインダー③：_inbox_社長共有 に未処理ファイル ${INBOX_COUNT} 件${INBOX_AGE}】
 
 ${INBOX_SAMPLE}
 
-処理は**庶務マリエの定常責務**です。カズヨが自分で開いて読まないこと（抱え込み＝T-20260821-001）。
-手順: agents/general_affairs/skills/inbox-intake.md
-- 社長が「お願い」→ マリエへ Agent 発注（棚卸し → 紐付け → \`_archive/YYYY-MM/\` へ退避）
-- 社長が「後で」→ 何もしない（次セッションで再度この行が出ます）
-- 削除は CLAUDE.md §4.1（不可逆な削除）。破棄候補はリスト化して社長承認を取ること"
+**社長に「棚卸ししますか？」と聞かないでください。そのまま庶務マリエへ Agent 発注してください**
+（subagent_type: general-affairs / 手順: agents/general_affairs/skills/inbox-intake.md）。
+
+- 棚卸しは**退避・リネームのみ**で不可逆操作を含まないため、CLAUDE.md §4.2 の自律範囲です。
+  確認を挟むほど滞留します（2026-08 に21件・12日間、2026-08-30 に2件が滞留したのはこの確認待ちが原因）。
+- 社長が明示的に「後にして」と言った場合だけ止めます。
+- カズヨが自分で inbox を開いて処理しないこと（抱え込み＝T-20260821-001）。
+- **削除だけは別**。CLAUDE.md §4.1（不可逆な削除）なので、破棄候補はリスト化して社長承認を取ること。"
   fi
 fi
 
@@ -215,7 +231,17 @@ ${LB_LINE}
 - 運用書: workspace/output/deliverables/T-20260831-002/README.md"
 fi
 
-MESSAGE="${SYNC_MSG}${REMINDER_MSG}${INBOX_MSG}${LIST_MSG}"
+# --- 掲出順（2026-08-31 / T-20260831-003 で変更）---
+#
+# 旧: ① → ②(next_check_at) → ③(inbox) → ④
+# 新: ① → ③(inbox) → ④ → ②(next_check_at)
+#
+# 理由: ② は実測で 22 件・約 2,600 文字に膨らんでおり、その後ろに置かれた ③ の数行は
+#       まず読まれません。**③ は「今 turn で発注すれば片付く 1 アクション」**なのに対し、
+#       ② は社長への問いかけリストであり、②が長い日ほど ③ が埋没するという逆相関がある。
+#       件数が増えるほど埋もれる配置は、放置を検知する仕組みとして自己矛盾しています。
+#       行動を要する短いものを前に、一覧性の長いものを後ろに置きます。
+MESSAGE="${SYNC_MSG}${INBOX_MSG}${LIST_MSG}${REMINDER_MSG}"
 
 # JSON エスケープ（python が無い環境を考慮し、jq があれば使う）
 if command -v jq >/dev/null 2>&1; then
