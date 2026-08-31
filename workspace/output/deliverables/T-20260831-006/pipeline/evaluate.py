@@ -14,7 +14,7 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from . import config, keepa_verify, paths, screen
+from . import config, keepa_verify, pack, paths, screen
 from .screen import Candidate
 
 paths.ensure()
@@ -45,8 +45,12 @@ class Evaluation:
     storage_fee: float = 0.0
     misc_cost: float = 0.0
     inbound_shipping: float = 0.0
-    # この ASIN が1注文で何個ぶんか。まとめ売りなら2以上で、卸値をこの数だけ掛ける。
+    # NETSEA 1単位に対して Amazon 1出品が何単位ぶんか。卸値をこの数だけ掛ける。
     pack_size: int = 1
+    # 入数をどう判断したかの説明（CSV にそのまま出す。根拠を値と一緒に運ぶ）。
+    pack_reason: str = ""
+    # 自動判定を信用してはいけない行の理由。空でなければ利益判定を出さない。
+    review_reason: str = ""
     status: str = ""                       # 利益判定できたか／できなかった理由
 
     @property
@@ -57,6 +61,7 @@ class Evaluation:
 STATUS_NOT_ON_AMAZON = "Amazon未出品(同一JANのASINなし)"
 STATUS_NO_PRICE = "Amazon価格が取得できず(出品はあるが在庫なし等)"
 STATUS_OK = "計算済み"
+STATUS_NEEDS_REVIEW = "要確認"
 
 # 「回転」の判定に使う直近30日のランク下落回数。
 # Keepa 公式が概算の販売個数として使う代理指標で、**販売数そのものではありません**。
@@ -92,6 +97,9 @@ def overall_verdict(ev: "Evaluation") -> str:
     """
     if ev.result is None:
         return ev.status
+    # ⚠️ 要確認は赤字判定より先。**「儲かる」と言い切れない行を儲かる側に見せない。**
+    if ev.review_reason:
+        return f"要確認（{ev.review_reason}）"
     if ev.result.net_profit <= 0:
         return "はずれ(赤字)"
     drops = ev.facts.drops30
@@ -154,10 +162,13 @@ def evaluate(
     ev.misc_cost = facts.price_yen * costs.misc_cost_rate
 
     # ⚠️ まとめ売り出品への対応。**ここを忘れると利益が数倍に膨らんで出ます。**
-    # 同じ JAN に「単品」と「【10個セット】」の ASIN がぶら下がっているのは普通のことで
-    # （実データで確認済み）、10個セットの Amazon 価格に単品の卸値を突き合わせたら嘘になります。
-    # 売値が N 個ぶんなら、原価も N 個ぶん。
-    ev.pack_size = max(facts.pack_size or 1, 1)
+    # 入数は **Amazon 側の商品名にしか書かれていないことが多い**（NETSEA 側は単品名）。
+    # 事故2回とも、Amazon のタイトルを読まなかったこと（読めなかったこと）が原因でした。
+    # NETSEA 側も複数個入りのことがあるので、**両側を読んで倍率を出す**。
+    ev.pack_size, ev.pack_reason, needs_review = pack.resolve_multiplier(
+        candidate.product_name, facts.title)
+    if needs_review:
+        ev.review_reason = ev.pack_reason
     wholesale_for_listing = candidate.wholesale_ex_tax * ev.pack_size
 
     size_key_for_fee = "standard_2" if ev.size_key == "unknown" else ev.size_key
@@ -174,9 +185,16 @@ def evaluate(
             threshold_net_profit_yen=cfg.min_net_profit,
         )
     )
-    ev.status = STATUS_OK
+    # 機械的な異常値ガード。人の注意力に頼らず、ここで捕まえる。
+    ratio = facts.price_yen / max(wholesale_for_listing * (1 + fees.CONSUMPTION_TAX_RATE), 1)
+    if ratio >= config.SUSPICIOUS_PRICE_RATIO and not ev.review_reason:
+        ev.review_reason = (
+            f"売価が仕入の{ratio:.1f}倍。入数の読み落としの疑い"
+            f"（Amazon商品名を確認してください）")
+
+    ev.status = STATUS_NEEDS_REVIEW if ev.review_reason else STATUS_OK
     if ev.pack_size > 1:
-        ev.status += f"（まとめ売り{ev.pack_size}個。卸値を{ev.pack_size}倍で計上）"
+        ev.status += f"（Amazonはケース売り{ev.pack_size}倍。卸値を{ev.pack_size}倍で計上）"
     if ev.size_key == "unknown":
         ev.status += "（FBAサイズ不明のため標準2で仮置き・保管料は未計上）"
     elif volume_cm3 == 0:
@@ -189,12 +207,12 @@ def evaluate(
 # =============================================================================
 
 COLUMNS = [
-    "商品名", "JAN", "ASIN", "サプライヤー名", "業態", "NETSEA卸値(税抜)", "NETSEA卸値(税込)",
+    "商品名", "Amazon商品名", "JAN", "ASIN", "サプライヤー名", "業態", "NETSEA卸値(税抜)", "NETSEA卸値(税込)",
     "Amazon価格", "価格の出所", "純利益", "利益率%", "利益率区分", "ROI%",
     "月間販売数(30日ランク下落数)", "月間販売数(90日ドロップ÷3)",
     "出品者数", "出品者数の出所", "Amazon本体の有無", "ランキング",
     "FBAサイズ", "手数料内訳", "販売手数料", "FBA配送料", "保管料", "納品送料", "雑費",
-    "出品の入数", "最小発注数", "最小発注額(税込)", "他サプライヤー数", "同一JANのASIN数", "ネット販売可否",
+    "出品の入数", "入数の根拠", "要確認理由", "最小発注数", "最小発注額(税込)", "他サプライヤー数", "同一JANのASIN数", "ネット販売可否",
     "総合判定", "利益判定", "法令要確認", "発注前に必ず確認",
     "状態", "Amazonページ", "Keepaリンク", "NETSEA商品ページ", "備考",
 ]
@@ -214,6 +232,7 @@ def to_row(ev: Evaluation) -> dict:
     tax = 1 + fees.CONSUMPTION_TAX_RATE
     row = {
         "商品名": c.product_name,
+        "Amazon商品名": f.title,
         "JAN": c.jan,
         "ASIN": f.asin or "",
         "サプライヤー名": c.supplier_name,
@@ -240,6 +259,8 @@ def to_row(ev: Evaluation) -> dict:
         "納品送料": round(ev.inbound_shipping) if ev.inbound_shipping else "",
         "雑費": round(ev.misc_cost) if ev.misc_cost else "",
         "出品の入数": ev.pack_size,
+        "入数の根拠": ev.pack_reason,
+        "要確認理由": ev.review_reason,
         "最小発注数": c.set_num,
         "最小発注額(税込)": c.set_price_incl_tax or "",
         "他サプライヤー数": c.alt_supplier_count,

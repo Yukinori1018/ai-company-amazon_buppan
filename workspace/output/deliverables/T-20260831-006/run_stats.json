@@ -1,5 +1,5 @@
 {
-  "started_at": "2026-08-31T15:30:35.860678+09:00",
+  "started_at": "2026-08-31T15:43:39.951302+09:00",
   "assumptions": "FBA納品送料100円/個・NETSEA送料は10個按分・保管2.0ヶ月(繁忙期レート)・雑費3%",
   "profile_rows": 480,
   "screen": {
@@ -25,26 +25,26 @@
     "keepa_codes_sent": 0,
     "keepa_products_returned": 0,
     "keepa_tokens_consumed": 0,
-    "keepa_tokens_before": 187,
-    "keepa_tokens_left": 187,
+    "keepa_tokens_before": 146,
+    "keepa_tokens_left": 146,
     "keepa_cost_per_candidate": null
   },
   "result": {
     "evaluated": 250,
     "margin_bands": {
-      "20%以上": 13,
-      "5%未満": 2,
-      "5〜10%": 3,
-      "赤字": 142
+      "20%以上": 9,
+      "5%未満": 3,
+      "5〜10%": 1,
+      "赤字": 147
     },
-    "suppliers_with_profitable_item": 1,
+    "suppliers_with_profitable_item": 3,
     "suppliers_listed": 210,
-    "profitable_with_sales": 7,
+    "profitable_with_sales": 5,
     "amazon_found": 171,
     "not_on_amazon": 79,
-    "profitable": 18,
-    "gems": 13,
-    "hit_rate_vs_evaluated": 7.2
+    "profitable": 13,
+    "gems": 8,
+    "hit_rate_vs_evaluated": 5.2
   },
-  "elapsed_sec": 63.2
+  "elapsed_sec": 66.1
 }

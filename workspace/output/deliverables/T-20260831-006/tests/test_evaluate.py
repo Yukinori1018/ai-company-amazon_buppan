@@ -179,18 +179,18 @@ def test_複数ASINの件数が記録される():
 def test_利益が出ても30日で売れていなければ総合判定でそう書く():
     # 初回実走で「利益率55.9%・純利益7230円・drops30=0」が最上位に来た。
     # 在庫は現金なので、これを「原石」と呼んではいけない。
-    ev = evaluate.evaluate(_cand(wholesale_ex_tax=1000), _facts(price_yen=9000, drops30=0), CFG)
+    ev = evaluate.evaluate(_cand(wholesale_ex_tax=3000), _facts(price_yen=9000, drops30=0), CFG)
     assert ev.result.verdict == "原石"          # 利益だけ見れば原石
     assert evaluate.overall_verdict(ev) == "利益は出るが直近30日に売れた形跡なし"
 
 
 def test_回転が遅い場合は個数を添えて総合判定に出す():
-    ev = evaluate.evaluate(_cand(wholesale_ex_tax=1000), _facts(price_yen=9000, drops30=2), CFG)
+    ev = evaluate.evaluate(_cand(wholesale_ex_tax=3000), _facts(price_yen=9000, drops30=2), CFG)
     assert "回転が遅い" in evaluate.overall_verdict(ev)
 
 
 def test_利益も回転もあれば利益判定がそのまま総合判定になる():
-    ev = evaluate.evaluate(_cand(wholesale_ex_tax=1000), _facts(price_yen=9000, drops30=30), CFG)
+    ev = evaluate.evaluate(_cand(wholesale_ex_tax=3000), _facts(price_yen=9000, drops30=30), CFG)
     assert evaluate.overall_verdict(ev) == "原石"
 
 
@@ -200,7 +200,7 @@ def test_赤字は回転に関係なくはずれ():
 
 
 def test_販売実績が不明な場合は不明と書く():
-    ev = evaluate.evaluate(_cand(wholesale_ex_tax=1000), _facts(price_yen=9000, drops30=None), CFG)
+    ev = evaluate.evaluate(_cand(wholesale_ex_tax=3000), _facts(price_yen=9000, drops30=None), CFG)
     assert evaluate.overall_verdict(ev) == "利益は出るが販売実績が不明"
 
 
@@ -268,11 +268,12 @@ def test_まとめ売りは卸値を入数ぶん掛ける():
 
 
 def test_まとめ売りであることを状態と列に出す():
-    f = _facts(title="【5個セット】テスト", pack_size=5)
+    f = _facts(title="【5個セット】テスト", price_yen=1200)
     row = evaluate.to_row(evaluate.evaluate(_cand(wholesale_ex_tax=200), f, CFG))
     assert row["出品の入数"] == 5
-    assert "まとめ売り5個" in row["状態"]
+    assert "ケース売り5倍" in row["状態"]
     assert row["NETSEA卸値(税込)"] == 1100      # 200 × 1.1 × 5
+    assert "5倍" in row["入数の根拠"]
 
 
 def test_同一JANなら単品を優先する_売れ行きが同じなら():
