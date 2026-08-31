@@ -219,7 +219,7 @@ def test_電気製品の行には法令要確認が出る():
 
 # -- まとめ売り（同一JANに単品と N個セットの ASIN がぶら下がる）----------------------
 def test_商品名から入数を読む():
-    # 実データ（同一JAN 4966307300037 にぶら下がっていた実在のASIN名）から写している。
+    # すべて実在の Amazon 出品名（NETSEA の単品JANにぶら下がっていたもの）。
     d = keepa_verify.detect_pack_size
     assert d("グロー球・ナツメ球お取り替えセット") == 1
     assert d("【3個セット】グロー球・ナツメ球セット") == 3
@@ -228,10 +228,28 @@ def test_商品名から入数を読む():
     assert d("サンワサプライ コネクタカバー TK-CA×10") == 10
 
 
-def test_型番の数字を入数と誤読しない():
-    assert keepa_verify.detect_pack_size("ヤザワ ステレオイヤホン 3m") == 1
-    assert keepa_verify.detect_pack_size("レフ形白熱ランプ 40W") == 1
-    assert keepa_verify.detect_pack_size("グロー球FG1E・5Pセット") == 1
+def test_ケース売りの入数を読む():
+    # NETSEA は蒟蒻ゼリー1個117円、Amazon は48本入ケース6,798円。
+    # 入数を1と読むと利益率77%という存在しない儲けが最上位に出る（実際に出た）。
+    d = keepa_verify.detect_pack_size
+    assert d("オリヒロ ぷるんと蒟蒻Plus グレープフルーツ味 130gパウチ×48本入") == 48
+    assert d("オリヒロ ぷるんと凍らすアイス スタンディング(ST) グレープ 130gパウチ×48個入") == 48
+
+
+def test_入れ子の掛け算は全部掛け合わせる():
+    # 「(20gパウチ×12個)×12袋入」は内側だけでも外側だけでも12。正解は144。
+    d = keepa_verify.detect_pack_size
+    assert d("オリヒロ ぷるんと蒟蒻ゼリー 塩うめ+塩レモン (20gパウチ×12個)×12袋入") == 144
+    assert d("オリヒロ ぷるんと凍らすアイス プレミアム バニラ (18g×10個)×12袋入") == 120
+
+
+def test_型番や寸法の数字を入数と誤読しない():
+    d = keepa_verify.detect_pack_size
+    assert d("ヤザワ ステレオイヤホン 3m") == 1
+    assert d("レフ形白熱ランプ 40W") == 1
+    assert d("グロー球FG1E・5Pセット") == 1
+    assert d("YAZAWA シャンデリア球 C32 E17") == 1
+    assert d("抗菌まな板 20×30cm") == 1        # 寸法の × を掛け算と読まない
 
 
 def test_まとめ売りは卸値を入数ぶん掛ける():
