@@ -28,6 +28,7 @@
 """
 
 import os
+import re
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -104,6 +105,9 @@ class AmazonFacts:
     found: bool = False
     # この JAN に紐づいた ASIN の数。2以上なら同じ商品が複数出品されている。
     asin_count: int = 0
+    # この ASIN が「1注文で何個ぶんか」。まとめ売り出品なら2以上。
+    # 卸値はこの数だけ掛かるので、利益計算で必ず使う。
+    pack_size: int = 1
 
     @property
     def seller_count_source(self) -> str:
@@ -356,6 +360,43 @@ class KeepaVerifier:
         return out
 
 
+# 「【10個セット】」のようなまとめ売り出品の入数を商品名から読む。
+# 実データ例（すべて同一 JAN 4966307300037 にぶら下がっていた ASIN）:
+#   「グロー球・ナツメ球お取り替えセット」          → 1
+#   「【3個セット】グロー球・ナツメ球セット」        → 3
+#   「【5個セット】…」「【10個セット】…」          → 5 / 10
+#   「変換名人 LAN 中継アダプタ LAN-BB ×10」      → 10
+_PACK_PATTERNS = [
+    re.compile(r"[【\[(（]\s*(\d{1,3})\s*(?:個|本|枚|セット|入|pcs?)\s*(?:セット|組)?\s*[】\])）]"),
+    re.compile(r"(\d{1,3})\s*(?:個|本|枚|入)\s*(?:セット|組|パック)"),
+    re.compile(r"[×x]\s*(\d{1,3})\s*(?:個|本|枚|セット)?\s*$"),
+]
+
+# これ以上は誤検知の方が疑わしい（型番の数字を拾ってしまう）。
+_PACK_MAX = 100
+
+
+def detect_pack_size(title: str) -> int:
+    """商品名から「1注文で何個ぶんか」を読む。読めなければ 1。
+
+    ⚠️ **これが無いと利益計算が嘘になります。**
+       同じ JAN に「単品」と「10個セット」の ASIN がぶら下がっているのが普通で、
+       10個セットの Amazon 価格に対して**単品の卸値**を突き合わせると、
+       利益が10倍近く過大に出ます。実データで確認した実在パターンです。
+
+    読めなかったときに 1 を返すのは安全側です（入数を大きく見積もると
+    原価が膨らみ、利益を**小さく**見せるため。逆よりずっとまし）。
+    """
+    text = str(title or "")
+    for pattern in _PACK_PATTERNS:
+        m = pattern.search(text)
+        if m:
+            n = int(m.group(1))
+            if 2 <= n <= _PACK_MAX:
+                return n
+    return 1
+
+
 def _pick_best(products: list) -> dict:
     """同一 JAN の複数 ASIN から「実際に売れている方」を選ぶ。
 
@@ -369,7 +410,10 @@ def _pick_best(products: list) -> dict:
         drops = _num(stats.get("salesRankDrops30")) or 0
         has_price = 1 if (len(cur) > IDX_NEW and _num(cur[IDX_NEW]) is not None) else 0
         rank = _num(cur[IDX_SALES_RANK]) if len(cur) > IDX_SALES_RANK else None
-        return (drops, has_price, -(rank if rank is not None else 10**9))
+        # まとめ売りより単品を好む（在庫リスクが小さく、入数の読み違えも起きない）。
+        # ただし「売れているか」を最優先にするのは変えない。
+        single = 1 if detect_pack_size(p.get("title") or "") == 1 else 0
+        return (drops, has_price, single, -(rank if rank is not None else 10**9))
 
     return max(products, key=key)
 
@@ -400,10 +444,11 @@ def _to_facts(jan: str, p: dict) -> AmazonFacts:
         if isinstance(d, (int, float)) and d > 0
     )
     weight = p.get("packageWeight")
+    title = p.get("title") or ""
     return AmazonFacts(
         jan=jan,
         asin=p.get("asin"),
-        title=p.get("title") or "",
+        title=title,
         brand=p.get("brand") or p.get("manufacturer") or "",
         price_yen=int(price) if price is not None else None,
         price_source=source,
@@ -418,6 +463,7 @@ def _to_facts(jan: str, p: dict) -> AmazonFacts:
         package_mm=dims,
         package_g=int(weight) if isinstance(weight, (int, float)) and weight > 0 else None,
         found=True,
+        pack_size=detect_pack_size(title),
     )
 
 

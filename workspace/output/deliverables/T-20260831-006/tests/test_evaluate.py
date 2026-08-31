@@ -215,3 +215,64 @@ def test_電気製品の行には法令要確認が出る():
     row = evaluate.to_row(
         evaluate.evaluate(_cand(product_name="LEDライト ACアダプタ付"), _facts(), CFG))
     assert "PSE" in row["法令要確認"]
+
+
+# -- まとめ売り（同一JANに単品と N個セットの ASIN がぶら下がる）----------------------
+def test_商品名から入数を読む():
+    # 実データ（同一JAN 4966307300037 にぶら下がっていた実在のASIN名）から写している。
+    d = keepa_verify.detect_pack_size
+    assert d("グロー球・ナツメ球お取り替えセット") == 1
+    assert d("【3個セット】グロー球・ナツメ球セット") == 3
+    assert d("【10個セット】変換名人 LAN 中継アダプタ") == 10
+    assert d("変換名人 LAN 中継アダプタ LAN-BB ×10") == 10
+    assert d("サンワサプライ コネクタカバー TK-CA×10") == 10
+
+
+def test_型番の数字を入数と誤読しない():
+    assert keepa_verify.detect_pack_size("ヤザワ ステレオイヤホン 3m") == 1
+    assert keepa_verify.detect_pack_size("レフ形白熱ランプ 40W") == 1
+    assert keepa_verify.detect_pack_size("グロー球FG1E・5Pセット") == 1
+
+
+def test_まとめ売りは卸値を入数ぶん掛ける():
+    # ここが抜けると「10個セットの売値 対 単品の卸値」になり、利益が嘘になる。
+    single = keepa_verify.AmazonFacts(
+        jan="j", asin="B1", title="グロー球", found=True, price_yen=3000,
+        drops30=5, category_names=["ホーム&キッチン"],
+        package_mm=(200, 150, 80), package_g=300, pack_size=1)
+    ten = keepa_verify.AmazonFacts(**{**single.__dict__, "pack_size": 10,
+                                      "title": "【10個セット】グロー球"})
+    a = evaluate.evaluate(_cand(wholesale_ex_tax=200), single, CFG)
+    b = evaluate.evaluate(_cand(wholesale_ex_tax=200), ten, CFG)
+    assert abs(a.result.wholesale_price_incl_tax - 220) < 1
+    assert abs(b.result.wholesale_price_incl_tax - 2200) < 1
+    assert b.result.net_profit < a.result.net_profit
+
+
+def test_まとめ売りであることを状態と列に出す():
+    f = _facts(title="【5個セット】テスト", pack_size=5)
+    row = evaluate.to_row(evaluate.evaluate(_cand(wholesale_ex_tax=200), f, CFG))
+    assert row["出品の入数"] == 5
+    assert "まとめ売り5個" in row["状態"]
+    assert row["NETSEA卸値(税込)"] == 1100      # 200 × 1.1 × 5
+
+
+def test_同一JANなら単品を優先する_売れ行きが同じなら():
+    def prod(asin, title, drops):
+        return {"asin": asin, "title": title, "eanList": [1],
+                "stats": {"current": [-1, 5000, -1, 100] + [0]*8,
+                          "salesRankDrops30": drops}}
+    pack = prod("BPACK", "【10個セット】グロー球", 5)
+    single = prod("BSINGLE", "グロー球", 5)
+    assert keepa_verify._pick_best([pack, single])["asin"] == "BSINGLE"
+
+
+def test_売れている方が優先される_入数より売れ行きが強い():
+    def prod(asin, title, drops):
+        return {"asin": asin, "title": title, "eanList": [1],
+                "stats": {"current": [-1, 5000, -1, 100] + [0]*8,
+                          "salesRankDrops30": drops}}
+    assert keepa_verify._pick_best([
+        prod("BPACK", "【10個セット】グロー球", 50),
+        prod("BSINGLE", "グロー球", 1),
+    ])["asin"] == "BPACK"

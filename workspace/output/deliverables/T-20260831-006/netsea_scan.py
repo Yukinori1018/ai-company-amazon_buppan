@@ -250,7 +250,12 @@ def _dict_to_facts(row: dict):
     row = dict(row)
     row["package_mm"] = tuple(row.get("package_mm") or ())
     known = keepa_verify.AmazonFacts.__dataclass_fields__.keys()
-    return keepa_verify.AmazonFacts(**{k: v for k, v in row.items() if k in known})
+    facts = keepa_verify.AmazonFacts(**{k: v for k, v in row.items() if k in known})
+    # 入数は**常に商品名から計算し直す**。pack_size を持たない古いキャッシュ行を
+    # 「入数1」として読むと、まとめ売り出品の利益が数倍に膨らんで出てしまう。
+    # 導出できる値をキャッシュの有無に依存させない。
+    facts.pack_size = keepa_verify.detect_pack_size(facts.title)
+    return facts
 
 
 # =============================================================================

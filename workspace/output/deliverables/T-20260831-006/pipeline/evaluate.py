@@ -45,6 +45,8 @@ class Evaluation:
     storage_fee: float = 0.0
     misc_cost: float = 0.0
     inbound_shipping: float = 0.0
+    # この ASIN が1注文で何個ぶんか。まとめ売りなら2以上で、卸値をこの数だけ掛ける。
+    pack_size: int = 1
     status: str = ""                       # 利益判定できたか／できなかった理由
 
     @property
@@ -151,10 +153,17 @@ def evaluate(
 
     ev.misc_cost = facts.price_yen * costs.misc_cost_rate
 
+    # ⚠️ まとめ売り出品への対応。**ここを忘れると利益が数倍に膨らんで出ます。**
+    # 同じ JAN に「単品」と「【10個セット】」の ASIN がぶら下がっているのは普通のことで
+    # （実データで確認済み）、10個セットの Amazon 価格に単品の卸値を突き合わせたら嘘になります。
+    # 売値が N 個ぶんなら、原価も N 個ぶん。
+    ev.pack_size = max(facts.pack_size or 1, 1)
+    wholesale_for_listing = candidate.wholesale_ex_tax * ev.pack_size
+
     size_key_for_fee = "standard_2" if ev.size_key == "unknown" else ev.size_key
     ev.result = profit.calculate(
         profit.ProfitInput(
-            wholesale_price=candidate.wholesale_ex_tax,
+            wholesale_price=wholesale_for_listing,
             wholesale_price_is_tax_included=costs.wholesale_is_tax_included,
             amazon_price=facts.price_yen,
             category_key=ev.category_key,
@@ -166,6 +175,8 @@ def evaluate(
         )
     )
     ev.status = STATUS_OK
+    if ev.pack_size > 1:
+        ev.status += f"（まとめ売り{ev.pack_size}個。卸値を{ev.pack_size}倍で計上）"
     if ev.size_key == "unknown":
         ev.status += "（FBAサイズ不明のため標準2で仮置き・保管料は未計上）"
     elif volume_cm3 == 0:
@@ -183,7 +194,7 @@ COLUMNS = [
     "月間販売数(30日ランク下落数)", "月間販売数(90日ドロップ÷3)",
     "出品者数", "出品者数の出所", "Amazon本体の有無", "ランキング",
     "FBAサイズ", "手数料内訳", "販売手数料", "FBA配送料", "保管料", "納品送料", "雑費",
-    "最小発注数", "最小発注額(税込)", "他サプライヤー数", "同一JANのASIN数", "ネット販売可否",
+    "出品の入数", "最小発注数", "最小発注額(税込)", "他サプライヤー数", "同一JANのASIN数", "ネット販売可否",
     "総合判定", "利益判定", "法令要確認", "発注前に必ず確認",
     "状態", "Amazonページ", "Keepaリンク", "NETSEA商品ページ", "備考",
 ]
@@ -208,7 +219,7 @@ def to_row(ev: Evaluation) -> dict:
         "サプライヤー名": c.supplier_name,
         "業態": c.business_type,
         "NETSEA卸値(税抜)": c.wholesale_ex_tax,
-        "NETSEA卸値(税込)": round(c.wholesale_ex_tax * tax),
+        "NETSEA卸値(税込)": round(c.wholesale_ex_tax * tax * (ev.pack_size or 1)),
         "Amazon価格": f.price_yen if f.price_yen is not None else "",
         "価格の出所": f.price_source,
         "純利益": "", "利益率%": "", "利益率区分": "", "ROI%": "",
@@ -228,6 +239,7 @@ def to_row(ev: Evaluation) -> dict:
         "保管料": round(ev.storage_fee) if ev.storage_fee else "",
         "納品送料": round(ev.inbound_shipping) if ev.inbound_shipping else "",
         "雑費": round(ev.misc_cost) if ev.misc_cost else "",
+        "出品の入数": ev.pack_size,
         "最小発注数": c.set_num,
         "最小発注額(税込)": c.set_price_incl_tax or "",
         "他サプライヤー数": c.alt_supplier_count,
