@@ -1,0 +1,101 @@
+<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>出展社リスト二次利用・NETSEA・展示会登録の適法性判定</title><style>
+:root{--ink:#1a1a1a;--mute:#666;--line:#e2e2e2;--bg:#fff;--accent:#0b5;}
+*{box-sizing:border-box}
+body{font-family:-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif;line-height:1.75;color:var(--ink);background:#f7f7f5;margin:0;padding:0}
+.wrap{max-width:1080px;margin:0 auto;padding:40px 24px 80px;background:var(--bg);box-shadow:0 0 24px rgba(0,0,0,.05)}
+h1{font-size:1.7rem;border-bottom:3px solid var(--ink);padding-bottom:.5em;margin-top:0}
+h2{font-size:1.3rem;margin-top:2.2em;border-left:5px solid var(--ink);padding-left:.6em}
+h3{font-size:1.08rem;margin-top:1.8em;color:#222}
+h4{font-size:1rem;margin-top:1.4em}
+p{margin:.7em 0}
+code{background:#f0f0ee;padding:.12em .4em;border-radius:3px;font-size:.88em;font-family:ui-monospace,Menlo,monospace}
+pre{background:#1e1e1e;color:#e8e8e8;padding:14px 16px;border-radius:6px;overflow-x:auto}
+pre code{background:none;color:inherit;padding:0}
+blockquote{border-left:4px solid #bbb;margin:1em 0;padding:.3em 1em;color:#444;background:#fafaf8}
+.tw{overflow-x:auto;margin:1.1em 0}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:#f2f2ef;font-weight:600;white-space:nowrap}
+tr:nth-child(even) td{background:#fbfbfa}
+hr{border:none;border-top:1px solid var(--line);margin:2.4em 0}
+a{color:#0a5ca8;word-break:break-all}
+ul,ol{padding-left:1.5em}
+li{margin:.3em 0}
+strong{background:linear-gradient(transparent 62%,#ffe9a8 62%)}
+</style></head><body><div class="wrap"><h1>出展社リスト二次利用・NETSEA・展示会登録の適法性判定</h1>
+<p>判定者：法務ハルオ／判定日：2026-08-31／チケット：T-20260831-005</p>
+<p>一次情報はすべて当職が自分で取得しました。サトルの引用は再検証済みです（②で1件、決定的な条文の見落としを発見）。</p>
+<hr>
+<h2>0. 結論（先に3行）</h2>
+<div class="tw"><table><thead><tr><th>#</th><th>論点</th><th>判定</th></tr></thead><tbody><tr><td>①</td><td>出展社リストの二次利用</td><td><strong>1) 社内CSV化＝可（条件付き）／2) PUBLIC commit＝不可／3) 社名を手がかりに公式サイト調査＝可（最も安全）</strong></td></tr><tr><td>②</td><td>NETSEA</td><td><strong>発見経路からは外す。仕入れ先としては残す。</strong>外での直接取引は違約金200万円＋代金50%の対象</td></tr><tr><td>③</td><td>展示会の事前登録</td><td><strong>§4.1 の判断は論理として正しい。ただし招待状請求は既に終了しており、実行の余地がない。</strong>入場は当日登録（名刺持参・無料）。<strong>むしろ登録しない方が有利</strong></td></tr></tbody></table></div>
+<p><strong>①の作業は再開できます。</strong>CSV は <code>agent_output/</code> に置いたまま使ってください。PUBLIC リポには入れないでください。</p>
+<hr>
+<h2>① 出展社リストの二次利用</h2>
+<h3>1-0. 当職が実査した事実（推測ではありません）</h3>
+<div class="tw"><table><thead><tr><th>事実</th><th>確認方法・結果</th></tr></thead><tbody><tr><td>表示の原文</td><td><code>pdftotext</code> で全4ページを抽出。1ページ目フッタに1回だけ出現。<strong>「発行・主催：（株）ビジネスガイド社 …（C）2026 BUSINESS GUIDE-SHA,INC. 無断掲載及び他のメディアへの加工を禁止します。」</strong></td></tr><tr><td>取得に同意手続きがあるか</td><td><strong>無い。</strong><code>curl -I</code> で HTTP/2 200。ログイン無し・クリック同意画面無し・ダウンロード前の規約提示無し</td></tr><tr><td>robots.txt</td><td><code><a href="https://www.giftshow.co.jp/robots.txt">https://www.giftshow.co.jp/robots.txt</a></code> は <strong>404（存在しない）</strong></td></tr><tr><td>PDF の中身</td><td>小間番号＋社名の2列。地図・会場図・見出しデザインを含む</td></tr><tr><td>CSV の中身</td><td>2,353行。<code>booth, exhibitor</code> の2列のみ。地図・レイアウト・デザインは一切含まない</td></tr></tbody></table></div>
+<h3>1-1. 段階1：PDF から CSV へ変換して社内で使う → <strong>可（条件付き）</strong></h3>
+<p><strong>根拠</strong></p>
+<div class="tw"><table><thead><tr><th>論点</th><th>判断</th><th>条文・理由</th></tr></thead><tbody><tr><td>社名そのものに著作権があるか</td><td><strong>無い</strong></td><td>著作権法2条1項1号「思想又は感情を<strong>創作的に表現</strong>したもの」。会社名は事実であり、短い語句に創作性は認められない</td></tr><tr><td>PDF 全体は著作物か</td><td><strong>著作物と扱うべき</strong></td><td>12条（編集著作物）。素材の選択・配列＋地図・レイアウトに創作性がある。ここは争わない</td></tr><tr><td>ではCSV化は複製にあたるか</td><td><strong>抽出物は編集著作物の「素材」部分のみ</strong>。創作性のある配列・レイアウトを再現していない</td><td>12条は「素材の選択又は配列」を保護する規定であり、素材そのもの（＝事実）には及ばない（12条2項も素材側の権利を別扱いする建付け）</td></tr><tr><td>ダウンロード・解析のための一時複製</td><td><strong>30条の4第2号で説明可能</strong></td><td>「情報解析（多数の著作物その他の大量の情報から…比較、分類その他の解析を行う）の用に供する場合」。当社の用途は仕入れ先候補の分類・突合であり、表現を享受する利用ではない</td></tr><tr><td>30条の4のただし書（利益を不当に害する）に当たるか</td><td><strong>社内利用に留まる限り、当たらない</strong></td><td>主催者はこの PDF を無償で公開しており、社内解析が主催者の市場を代替しない</td></tr><tr><td>「無断掲載及び加工の禁止」に契約としての拘束力はあるか</td><td><strong>無い</strong></td><td>民法522条の申込み・承諾がない。ダウンロード前に条件を提示され承諾する手続き（クリックラップ）が一切存在しないことを実測で確認済み。<strong>PDF を開いた後に初めて読める一方的表示は、契約条項ではなく利用者への要望・警告</strong>。ブラウズラップ型の拘束力は日本の裁判例でも一般に否定的</td></tr></tbody></table></div>
+<p><strong>ただし、契約でないからといって著作権法上の許諾範囲まで自由になるわけではありません。</strong>この表示は「著作権者が許諾していない利用態様の宣言」としては有効に読めます。したがって<strong>表現の複製・公開に近づくほど危険になる</strong>、という構造です。段階2が危ない理由がここにあります。</p>
+<p><strong>遵守条件（これを外すと判定が変わります）</strong></p>
+<ol><li>CSV の保管先は <code>workspace/output/agent_output/T-20260831-005/</code>（<code>.gitignore</code> 対象）に限定する</li><li>社外の誰にも配布しない。限定共有スプレッドシートに載せる場合も閲覧者を社長のみに限定する</li><li>出典（URL・取得日時・元PDFのハッシュ）を CSV と同フォルダに残す</li><li>元PDFのレイアウト・地図・デザインは複製・公開しない</li><li><strong>主催者から削除要請が来たら、争わず即時に削除する</strong>（争う実益がない）</li></ol>
+<h3>1-2. 段階2：PUBLIC の GitHub リポジトリに commit → <strong>不可（NO）</strong></h3>
+<p>グレーではありません。<strong>黒です。</strong></p>
+<div class="tw"><table><thead><tr><th>理由</th><th>内容</th></tr></thead><tbody><tr><td><strong>行為の性質が変わる</strong></td><td>リポに置く＝21条（複製）、公開状態にする＝23条1項・2条1項9号の5（送信可能化）。<strong>誰もダウンロードしていないは抗弁になりません。</strong>アップした時点で送信可能化は完成します</td></tr><tr><td><strong>30条の4は使えない</strong></td><td>同条は「享受を目的としない利用」に限り、しかも「<strong>その必要と認められる限度において</strong>」。全件を第三者が読める形で公開する行為は、情報解析に必要な限度を明らかに超えます</td></tr><tr><td><strong>47条の5（軽微利用）も使えない</strong></td><td>「<strong>軽微なもの</strong>に限る」が要件。2,353社の全件掲載は軽微ではありません</td></tr><tr><td><strong>編集著作物性を否定しきれない</strong></td><td>「第102回に出展する2,353社」という集合は、主催者の営業投資と選別の成果です。全件をそのまま公開する態様は、主催者データベースの市場代替に最も近い。タウンページDB事件（東京地判平12.3.17）は職業別分類の体系に創作性を認めています。<strong>社内で分類に使うのと、集合をそのまま再公開するのとでは、評価が別物になります</strong></td></tr><tr><td><strong>著作権が白でも不法行為が残る</strong></td><td>民法709条。読売オンライン見出し事件（知財高判平17.10.6）の枠組み。<strong>「無断加工禁止」と明示されている以上、相手の意思に反することは明白</strong>で、故意が認定されやすい</td></tr><tr><td><strong>個人情報保護法27条</strong></td><td>CSV には「深田養蜂」「茶師 木村」「越田鮮魚店」など<strong>屋号のみの個人事業主が多数混ざっています</strong>。個人事業主の事業情報は個人情報です。PUBLIC commit ＝ 不特定多数への提供＝第三者提供に当たり得ます。本人同意はありません</td></tr><tr><td><strong>不可逆性が最悪</strong></td><td>一度 push すれば Git 履歴に残ります。履歴からの除去は <code>filter-repo</code> ＋ force push ＝ <strong>CLAUDE.md §4.1（不可逆な削除）で社長承認が必要</strong>。さらに成果物カタログの blob URL が一斉に切れます</td></tr><tr><td><strong>DMCA が最速の脅威</strong></td><td>権利者は訴訟より先に GitHub に通報します。<strong>被害は当該ファイルに留まらず、リポジトリごと止まります</strong>（30分ごとの自動同期も道連れ）</td></tr></tbody></table></div>
+<p><strong>リスク3軸</strong></p>
+<div class="tw"><table><thead><tr><th>軸</th><th>評価</th></tr></thead><tbody><tr><td>発生確率</td><td>中（主催者は毎回リストを出す事業者であり、無断転載の監視インセンティブがある）</td></tr><tr><td>影響度</td><td>大（リポジトリ停止＝全事業の作業基盤が止まる）</td></tr><tr><td><strong>不可逆性</strong></td><td><strong>最大（履歴に残る／除去に社長承認と副作用）</strong></td></tr></tbody></table></div>
+<p>→ <strong>3軸すべてで悪い。議論の余地なし。</strong></p>
+<p><strong>代替（サトルの現在の措置は正しい。そのまま維持）</strong></p>
+<div class="tw"><table><thead><tr><th>置くもの</th><th>場所</th></tr></thead><tbody><tr><td>再現スクリプト（<code>02_出展社リスト抽出.py</code>）</td><td>deliverables（公開可）※スクリプトは当社の著作物</td></tr><tr><td>件数・国内外比率・カテゴリ分布などの<strong>統計</strong></td><td>deliverables（公開可）※事実の統計に主催者の権利は及ばない</td></tr><tr><td>CSV 実データ</td><td><code>agent_output/</code>（Git除外）＋必要なら限定共有スプレッドシート</td></tr></tbody></table></div>
+<h3>1-3. 段階3：社名を手がかりに各社公式サイトを自分で調べる → <strong>可（最も安全な線）</strong></h3>
+<div class="tw"><table><thead><tr><th>論点</th><th>判断</th></tr></thead><tbody><tr><td>社名という事実の利用</td><td><strong>白。</strong>事実に著作権は発生しません（2条1項1号）。「知ってしまった事実を使うな」という権利は著作権法に存在しません</td></tr><tr><td>出展社名は秘密か</td><td><strong>秘密ではありません。</strong>出展社は会場で社名を掲示し、来場者に知られることを目的に出展しています。公知情報です</td></tr><tr><td>各社公式サイトへのアクセス</td><td><strong>条件付き可</strong>（既判定：<code>knowledge_scraping_and_public_db_2026</code>）。低速クロール・robots.txt尊重・UA詐称なし・連絡先を名乗る</td></tr><tr><td>営業メール送信</td><td><strong>特定電子メール法3条1項4号</strong>で、自らアドレスを公表している事業者には同意なく送れます。<strong>ただし施行規則3条ただし書：サイトに「営業メールお断り」の表示があるアドレスには送れません。</strong>収集時点で判定して記録すること（立証責任は送信者側）</td></tr><tr><td>個人事業主の連絡先の扱い</td><td>個人情報。<strong>PUBLIC リポへは出さない</strong>（段階2と同じ）</td></tr></tbody></table></div>
+<h3>1-4. 線引き（これが答えです）</h3>
+<pre><code>白 ── 社名という「事実」を知り、それを手がかりに各社公式サイトから自分で情報を取る
+   ── PDF を社内で解析し、分類・突合に使う（agent_output 限定・非公開）
+   ── 件数・比率などの統計を公開する
+────────────────────────────────────────────────
+黒 ── 抽出した全件リストを PUBLIC リポに commit する
+   ── 第三者に配布・販売する
+   ── PDF のレイアウト・地図をそのまま再掲する</code></pre>
+<p><strong>判断基準は一つです。「主催者のリストの代わりになるか」。</strong>代わりになる形で外に出せば黒、社内で消費するだけなら白。</p>
+<hr>
+<h2>② NETSEA</h2>
+<h3>2-0. サトルの引用は正しい。ただし<strong>もっと重い条文を見落としています</strong></h3>
+<p>原文出典：<a href="https://www.netsea.jp/agreement/statement">https://www.netsea.jp/agreement/statement</a> （NETSEAバイヤー会員規約／2026-08-31 取得。附則：2024年8月20日施行、2025年4月1日 改訂版施行）</p>
+<p>全文は <code>workspace/output/agent_output/T-20260831-005/legal/netsea_buyer_agreement_20260831.txt</code> に保存。</p>
+<div class="tw"><table><thead><tr><th>条文</th><th>原文</th></tr></thead><tbody><tr><td>第7条1項3号（<strong>事前承諾の例外なし＝絶対禁止</strong>）</td><td>「利用者は、次に掲げる行為をしてはなりません。…三 <strong>本サービスを利用する他の者の情報の収集を目的とする行為</strong>」</td></tr><tr><td>第7条2項5号（事前承諾があれば可）</td><td>「利用者は、当社の事前の承諾なく、次に掲げる行為をしてはなりません。…五 <strong>当社が定めた方法又は当社が提供する機能以外の方法を利用して、サプライヤーと直接又は間接問わず連絡を取ること。</strong>」</td></tr><tr><td>第7条2項3号</td><td>「三 利用者の権利の行使の範囲を超えて、<strong>本サービスの情報を利用すること</strong>。」</td></tr><tr><td><strong>第19条3項（サトル未指摘・最重要）</strong></td><td>「<strong>バイヤー会員は、NETSEAを利用することなく、サプライヤー会員との間で商品等に係る売買契約等を締結してはならないものとします。</strong>」</td></tr><tr><td><strong>第27条4項（制裁・サトル未指摘）</strong></td><td>「バイヤー会員が第19条第3項の規定に違反して売買契約等を締結したときは…一 <strong>バイヤー会員の氏名又は名称及びその運営する事業の名称の公表</strong> 二 売買契約等の解除 三 損害の賠償の請求とは別に、<strong>違約金として、200万円及び売買契約等の代金の50%に相当する金額を請求すること。</strong>」</td></tr><tr><td>第24条1項（社長に告知が必要）</td><td>「<strong>バイヤー会員の法人の名称又は事業者の氏名、住所、電話番号、代表者及び担当者の氏名は、ウェブサイト上で公開されます。</strong>」</td></tr><tr><td>第7条1項4号</td><td>「四 一般消費又は個人消費を目的…として購入する行為」＝<strong>事業目的での購入に限る</strong></td></tr></tbody></table></div>
+<p><strong>当社は既に「利用者」です。</strong>Buyer API トークンは <code><a href="https://www.netsea.jp/account/">https://www.netsea.jp/account/</a></code> の API 設定画面で発行するものであり（<code>knowledge_netsea_buyer_api</code>）、会員登録済みでなければ発行できません。したがって上記条文は<strong>現に当社を拘束しています</strong>。</p>
+<h3>2-1. 3つの問いへの回答</h3>
+<div class="tw"><table><thead><tr><th>問い</th><th>回答</th></tr></thead><tbody><tr><td>「NETSEA で見つけて、外で直接交渉する」は規約違反か</td><td><strong>明確に違反です。</strong>連絡した時点で第7条2項5号違反。外で売買契約を締結すれば第19条3項違反となり、<strong>違約金200万円＋代金の50%＋事業者名の公表</strong>（第27条4項）。<strong>やってはいけません。</strong></td></tr><tr><td>NETSEA 内で完結して仕入れるのは問題ないか</td><td><strong>問題ありません。</strong>第19条1項がまさにその形を予定しています。ただし条件が3つ：①事業目的の購入であること（第7条1項4号）、②<strong>社長の氏名・住所・電話番号がサイト上で公開される</strong>（第24条1項）— 個人事業主で自宅を事業所にしている場合、<strong>自宅住所が公開されます</strong>。ここは社長判断が要ります、③支払・与信は NETSEA の審査に従う（第19条2項・第22条保証金）</td></tr><tr><td>既存 API 実装・蓄積データの扱い</td><td><strong>用途を仕入れ実務に限定して残す。発見用途では使わない。</strong>理由：第7条1項3号は「他の利用者の情報の収集を目的とする行為」を<strong>事前承諾の余地なく</strong>禁じており、サプライヤー会員の情報を集めること自体が対象。第7条2項3号も「権利の行使の範囲を超えて本サービスの情報を利用すること」を禁じています。<strong>サイトマップから取得した622社の企業名リストは、発見リストとして使わないでください</strong></td></tr></tbody></table></div>
+<h3>2-2. 措置（3点）</h3>
+<ol><li><strong>発見経路の一覧から NETSEA を削除</strong>する（サトルの調査書 §表の18番）。仕入れ先候補としては残す</li><li>サイトマップ由来の NETSEA 企業名データは <code>agent_output/</code> 内に留め、<strong>メーカー発見リストに合流させない</strong></li><li><code>agents/it_engineer/</code> 側の <code>adapters/netsea.py</code> の用途コメントに「<strong>発見用途禁止・仕入れ実務のみ</strong>」を明記する（秘書経由でタカシへ）</li></ol>
+<p><strong>なお、API 規約（<code>knowledge_netsea_buyer_api</code> の第8条2：加工には書面承諾が必要）は本会員規約とは別文書です。</strong>API 経由データの加工・外部提供を検討する際は、そちらを別途確認してください。今回は射程外です。</p>
+<hr>
+<h2>③ 展示会への事前登録</h2>
+<h3>3-1. まず事実。<strong>招待状請求は既に終了しています</strong></h3>
+<div class="tw"><table><thead><tr><th>事実</th><th>根拠（2026-08-31 当職確認）</th></tr></thead><tbody><tr><td>招待状請求（＝オンライン事前登録）は終了</td><td>公式ページ <code><a href="https://www.giftshow.co.jp/tigs/102tigs/">https://www.giftshow.co.jp/tigs/102tigs/</a></code> の該当ボタンが <code>alt=&quot;招待状請求 ※終了しました&quot;</code> / <code>alt=&quot;招待状請求【終了】&quot;</code> の画像に差し替わっている（HTMLソースで確認）</td></tr><tr><td><strong>入場手段は当日登録</strong></td><td>同ページ本文：「<strong>※招待状をお持ちでない方は、お名刺をご持参の上、会場にて当日登録が可能です。（無料）</strong>」（赤字表示・コメントアウトされていない生きた記述であることをソースで確認）</td></tr></tbody></table></div>
+<p>→ <strong>サトルが「二次情報のみ・未確認」としていた「名刺持参で当日登録・無料」は、一次情報で確認できました。</strong></p>
+<h3>3-2. 秘書の §4.1 判断について</h3>
+<p><strong>判断は正しい。</strong>オンライン事前登録は Gift Net の利用登録であり、その利用規約 第1条2項に「<strong>第3条の利用登録が完了したことをもって、本規約の全ての条項に同意をしたものとみなされます</strong>」とあります。これは §4.1「法的拘束（契約・利用規約への同意）」そのものです。</p>
+<p><strong>ただし本件では、締切済みのため実行の余地がありません。</strong>したがって §4.1 の承認案件は消滅します。</p>
+<h3>3-3. 【重要】むしろ登録しない方が有利です</h3>
+<p>Gift Net 利用規約（<a href="https://giftnet.jp/terms/">https://giftnet.jp/terms/</a> ・2026-08-31取得）第5条（禁止事項）に、<strong>当社の計画と正面衝突する条項</strong>があります。</p>
+<blockquote>・<strong>出展社情報を，本サービス利用以外の目的で利用する行為</strong><br>・<strong>他のお客様，出展社に関する個人情報等を収集または蓄積する行為</strong><br>・当社が許諾しない本サービス上での宣伝，広告，勧誘，または営業行為</blockquote>
+<p><strong>登録すればこれらが契約上の義務になります。</strong>当社がやろうとしていること（出展社情報を集めて蓄積し、営業する）は、この条項の下では実行できません。</p>
+<p>対して、<strong>当日登録（名刺持参）は Gift Net の利用登録ではなく、この規約に同意する行為ではありません。</strong></p>
+<p>→ <strong>法務としての推奨：Gift Net には登録せず、当日登録で入場する。</strong>これは費用ゼロ・手続きゼロで、契約上の制約を丸ごと回避できます。</p>
+<p>※ 当日登録票に記載される条件（記入項目・同意文言）は会場でしか読めず、<strong>現物は未確認です</strong>。当日、記入前に文面を読んでください。「出展社への情報提供に同意」等の記載があれば、その範囲は把握して記入すること。</p>
+<h3>3-4. 主催者のプライバシーポリシーで注意すべき点</h3>
+<p>出典：<a href="https://www.giftshow.co.jp/aboutus/privacy.htm">https://www.giftshow.co.jp/aboutus/privacy.htm</a> （2005年3月30日制定／2022年5月最終改訂・2026-08-31確認）</p>
+<div class="tw"><table><thead><tr><th>項目</th><th>原文の要旨</th><th>注意点</th></tr></thead><tbody><tr><td>利用目的⑥</td><td>郵送・FAX・e-mail によるキャンペーン案内、広告宣伝</td><td><strong>「お客様の同意に基づく」「ご要望でいつでも中止できる」と明記</strong>。DM が不要なら中止を申し出られます</td></tr><tr><td>利用目的⑧</td><td><strong>見本市にて撮影した写真・映像を印刷物・Web 等で広報宣伝に使用</strong></td><td>社長の姿が主催者の広報物に載る可能性があります。写り込みを避けたい場合は自衛が必要</td></tr><tr><td>第三者提供</td><td>「皆さまのご承諾がない限り第三者に開示いたしません」<strong>ただし</strong>「お客様が当社経由で当社以外の企業・団体に対して情報提供、商品の問合せ、接触、仲介をご依頼いただいた場合などには、当該企業・団体に個人情報を開示・提供することがあります」</td><td><strong>主催者経由で出展社に問い合わせると、その出展社に個人情報が渡ります。</strong>社長が自分で出展社ブースに行って名刺交換する分にはこの経路を通りません</td></tr><tr><td>委託</td><td>守秘義務契約を結んだ企業に取扱いを委託することがある</td><td>通常の範囲。問題なし</td></tr></tbody></table></div>
+<h3>3-5. 屋号「Satoy Select」・個人事業主での来場</h3>
+<div class="tw"><table><thead><tr><th>論点</th><th>判定</th></tr></thead><tbody><tr><td>個人事業主で入場できるか</td><td><strong>できます。</strong>入場要件は「業者であること」であり、公式の来場者データにも「その他小売」「通販・訪販」「販促・記念品・直販」等の区分があります（<a href="https://www.giftshow.co.jp/tigs/102tigs/visitorsdata.htm）。法人格は要件ではありません。">https://www.giftshow.co.jp/tigs/102tigs/visitorsdata.htm）。法人格は要件ではありません。</a><strong>名刺は必須</strong>です（当日登録の唯一の資格証明）</td></tr><tr><td>屋号名義の名刺で足りるか</td><td>実務上足ります。ただし当日登録票の記載要件は現物未確認。<strong>屋号・氏名・連絡先・業態が書かれた名刺</strong>を用意してください</td></tr><tr><td><strong>Amazon 日本店が停止中であることの影響</strong></td><td><strong>展示会の来場資格には一切関係ありません。</strong>主催者は Amazon アカウントの状態を審査しません。この点は問題なしと断定します</td></tr><tr><td>ただし法務として1点指摘</td><td><strong>出展社との商談で「Amazon で販売します」と説明することには注意が必要です。</strong>現に販売できない状態を伏せて取引を求めるのは、詐欺には至らないとしても、契約締結過程の説明義務の観点で不誠実です。相手は「どこで売るのか」を必ず聞きます。<strong>「Amazon を主軸に、現在アカウント整備中。他販路も並行」と正直に言える形に整えてから商談に臨んでください。</strong>初回取引の信頼を失うと、そのメーカーは二度と戻りません</td></tr></tbody></table></div>
+<h3>3-6. 補足：出展社リストの取得タイミング</h3>
+<p>サトルの指摘どおり、過去回の同名PDFはすべて404です。<strong>第102回のPDFは会期終了後に消える可能性が高い。</strong>①の判定により社内保管は可なので、<code>agent_output/</code> の CSV と原本PDFは<strong>消さずに残してください</strong>（削除は §4.1 の対象でもあります）。</p>
+<hr>
+<h2>出典一覧（すべて 2026-08-31 に当職が取得）</h2>
+<div class="tw"><table><thead><tr><th>#</th><th>対象</th><th>URL</th></tr></thead><tbody><tr><td>1</td><td>出展社リストPDF（第102回）</td><td><a href="https://www.giftshow.co.jp/tigs/102tigs/pdf/list.pdf">https://www.giftshow.co.jp/tigs/102tigs/pdf/list.pdf</a></td></tr><tr><td>2</td><td>ギフトショー第102回 公式トップ（当日登録・招待状終了の記載）</td><td><a href="https://www.giftshow.co.jp/tigs/102tigs/">https://www.giftshow.co.jp/tigs/102tigs/</a></td></tr><tr><td>3</td><td>ビジネスガイド社 個人情報保護方針</td><td><a href="https://www.giftshow.co.jp/aboutus/privacy.htm">https://www.giftshow.co.jp/aboutus/privacy.htm</a></td></tr><tr><td>4</td><td>Gift Net 利用規約</td><td><a href="https://giftnet.jp/terms/">https://giftnet.jp/terms/</a></td></tr><tr><td>5</td><td>来場者データ（業態別内訳）</td><td><a href="https://www.giftshow.co.jp/tigs/102tigs/visitorsdata.htm">https://www.giftshow.co.jp/tigs/102tigs/visitorsdata.htm</a></td></tr><tr><td>6</td><td>NETSEAバイヤー会員規約</td><td><a href="https://www.netsea.jp/agreement/statement">https://www.netsea.jp/agreement/statement</a></td></tr><tr><td>7</td><td>著作権法（12条・12条の2・30条の4・47条の5）</td><td>e-Gov API v2 <code>law_data/345AC0000000048</code>（XML実取得）</td></tr><tr><td>8</td><td>特定電子メール法3条1項4号・施行規則3条ただし書</td><td>既判定（<code>knowledge_scraping_and_public_db_2026</code>）</td></tr></tbody></table></div>
+<p><strong>判例の引用は当職の法律知識に基づくものであり、今回、判決文原文までは当たっていません</strong>（タウンページDB事件・東京地判平12.3.17／読売オンライン見出し事件・知財高判平17.10.6）。結論の向きは変わりませんが、事実として区別しておきます。</p>
+<hr>
+<h2>社長判断が必要な事項（2件）</h2>
+<div class="tw"><table><thead><tr><th>#</th><th>論点</th><th>A</th><th>B</th><th>推奨</th></tr></thead><tbody><tr><td>1</td><td>展示会（9/2〜4）に行くか</td><td>当日登録で来場（無料・名刺持参）</td><td>行かない</td><td><strong>法務としては A に障害なし。</strong>行くかどうかは戦略・時間の判断です。Gift Net への登録だけは避けてください</td></tr><tr><td>2</td><td>NETSEA を仕入れ先として使い続けるか</td><td>使う（第24条1項により<strong>氏名・住所・電話番号がサイト上で公開される</strong>ことを承知の上で）</td><td>使わない</td><td><strong>住所の公開を許容できるかが分岐点。</strong>自宅を事業所にしている場合、B または住所の切り分けを推奨</td></tr></tbody></table></div></div></body></html>
