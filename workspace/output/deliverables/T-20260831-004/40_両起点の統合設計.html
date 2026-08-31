@@ -1,0 +1,194 @@
+<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>両起点の統合設計 — Amazon起点／非Amazon起点</title><style>
+:root{--fg:#1a1a1a;--mut:#666;--line:#e0e0e0;--accent:#0b5fa5;--bg-alt:#f7f9fb}
+*{box-sizing:border-box}
+body{font-family:-apple-system,"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;
+ line-height:1.75;color:var(--fg);max-width:1080px;margin:0 auto;padding:32px 24px 96px;font-size:15px}
+h1{font-size:1.85em;border-bottom:3px solid var(--accent);padding-bottom:.4em;margin-top:0}
+h2{font-size:1.35em;margin-top:2.2em;border-left:5px solid var(--accent);padding-left:.55em}
+h3{font-size:1.1em;margin-top:1.8em;color:#333}
+table{border-collapse:collapse;width:100%;margin:1.1em 0;font-size:.9em}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--bg-alt);font-weight:600;white-space:nowrap}
+tbody tr:nth-child(even){background:#fbfcfd}
+code{background:#f0f2f5;padding:1px 5px;border-radius:3px;font-size:.9em;
+ font-family:"SF Mono",Menlo,Consolas,monospace}
+pre{background:#1e2430;color:#e6edf3;padding:14px 16px;border-radius:6px;overflow-x:auto;font-size:.85em}
+pre code{background:none;color:inherit;padding:0}
+blockquote{border-left:4px solid #f0a500;background:#fffbf0;margin:1.1em 0;padding:.7em 1em;color:#5a4a20}
+hr{border:0;border-top:1px solid var(--line);margin:2.2em 0}
+strong{color:#0a4d8c}
+ul,ol{padding-left:1.5em}
+@media print{body{max-width:none;font-size:11pt}h2{page-break-after:avoid}table{page-break-inside:avoid}}
+</style></head><body>
+<h1>両起点の統合設計 — Amazon起点をセミナーに戻し、「困っている度合い」で並べ替える</h1>
+<p>T-20260831-004 / 2026-08-31 / プランナー タケシ<br>基準データ: Keepa 生レスポンス 3,045商品（履歴込み）・連絡候補262社・手作業ラベル200社<br><strong>この文書の数字は全て既存データへの実測です。追加で使った Keepa トークンはランク帯の検証分のみ（課金なし＝月額固定）。</strong></p>
+<hr>
+<h2>0. 結論（先に4つ）</h2>
+<table><thead><tr><th>#</th><th>結論</th><th>根拠（実測）</th></tr></thead><tbody><tr><td>1</td><td><strong>ランク帯は効かない。条件から外す。</strong></td><td>当社の候補プールは<strong>96.8%が既に5万位以内</strong>。5万〜15万位は1.2%しかなく、社長修正は実質発動していなかった。帯を細かく刻んでも本命率は 15.8%／21.4%／8.3% で単調でない</td></tr><tr><td>2</td><td><strong>「困っている度合い」は作れた。ただし本命ほどスコアが低い。</strong></td><td>A1（日本の小規模メーカー）の困り度中央値 24.4 に対し、大企業31.2・版元32.4・中国系OEM 28.7。<strong>適格性フィルタの後にだけ使う指標</strong></td></tr><tr><td>3</td><td><strong>一番刺さるのは10社。</strong> 「メーカー自身がAmazonに直販店を出している × その商品が値崩れしている × 相乗りが増えている」</td><td>262社中10社。すごろくや・愛知電線・CIO・BOS(クリロン化成)・オウルテック・プリンストン 他。期待月利合計52.5万円</td></tr><tr><td>4</td><td><strong>非Amazon起点の売上予想は「桁」までしか当たらない。</strong></td><td>類似商品から予測したときの80%区間は<strong>実測0.3〜4.3倍</strong>。ランクが分かる場合の説明力39.5%に対し、類似商品だけだと15.8%</td></tr></tbody></table>
+<p><strong>やらないことは §8 に5件。</strong> 資源配分は §7（推奨＝Amazon起点7:非Amazon起点3、ただし2週間後に9:1へ落とす）。</p>
+<hr>
+<h2>1. ランク条件の決着（宿題①(a)(b)(c)）</h2>
+<h3>(b) 当社は大カテゴリ順位を使っている。取り違えは起きていない</h3>
+<p><code>scan_v14.py</code> 809行 <code>current_SALES_gte/lte</code> は Keepa の <strong>SALES＝そのASINの参照カテゴリ（大カテゴリ）順位</strong>です。サブカテゴリ順位（<code>salesRanks</code>）は判定に使っていません。<strong>厳しい側の読み方であり、事故ではありません。</strong></p>
+<p>念のため両者の差を実測しました（3,045商品）。</p>
+<table><thead><tr><th></th><th>件数</th><th>割合</th></tr></thead><tbody><tr><td>大カテゴリ順位 ≤5万位</td><td>2,953</td><td>97.0%</td></tr><tr><td>サブカテゴリ最良順位 ≤5万位</td><td>3,037</td><td>99.7%</td></tr><tr><td>大カテゴリ&gt;5万位 だが サブ≤5万位</td><td>84</td><td>2.8%</td></tr></tbody></table>
+<p><strong>大カテゴリ順位はサブ最良順位の中央76倍</strong>（p25=14倍／p75=248倍）。つまり「サブで5万位以内」は条件としてほぼ無意味です（99.7%が通過）。<strong>セミナーの5万位は大カテゴリ順位と解釈すべき</strong>で、当社の実装はそれに一致しています。</p>
+<h3>(a) 帯を動かしても中小メーカーには寄らない</h3>
+<p>手作業ラベル200社を、そのメーカーの商品ランク中央値で帯分けしました。</p>
+<table><thead><tr><th>帯</th><th>メーカー数</th><th>本命率(A1+A2)</th></tr></thead><tbody><tr><td>1〜5,000位</td><td>114</td><td>15.8%</td></tr><tr><td>5,001〜10,000位</td><td>56</td><td>21.4%</td></tr><tr><td>10,001〜20,000位</td><td>12</td><td>8.3%</td></tr><tr><td>20,001〜50,000位</td><td>8</td><td>0.0%</td></tr><tr><td>50,001位〜</td><td>10</td><td>10.0%</td></tr></tbody></table>
+<p>単調ではなく、n も小さい。<strong>帯の位置は本命率を説明していません。</strong></p>
+<p>さらに重要な事実：<strong>候補プール2,635件のランク分布は中央値3,840位、96.8%が5万位以内</strong>です。RANK_MAX は30万位に設定されているのに、実際には5万位以内しか集まっていません。理由は Finder のソートが <code>salesRankDrops30 降順</code>（＝よく売れている順）だからです。<strong>社長が2026-08-04に指示した「5万〜15万位」は、設定上は入っているのに、データ上は1.2%しか実現していませんでした。</strong></p>
+<h3>(c) 提案：ランクは条件から外し、上限だけ残す</h3>
+<table><thead><tr><th>案</th><th>内容</th><th>判定</th></tr></thead><tbody><tr><td>セミナー通り5万位以内</td><td>現状と実質同じ（96.8%が該当）</td><td>変える意味がない</td></tr><tr><td>社長修正 5万〜15万位</td><td>未検証。今の実装では集まらない</td><td><strong>ソートを変えないと検証すらできない</strong></td></tr><tr><td>サブカテゴリで5万位以内</td><td>99.7%通過。フィルタとして機能しない</td><td>不可</td></tr><tr><td><strong>帯を条件から外す（推奨）</strong></td><td><code>current_SALES</code> は上限30万位のまま。<strong>代わりに <code>salesRankDrops30 ≥ 10</code> を実需の下限として使う</strong></td><td><strong>採用</strong></td></tr></tbody></table>
+<p><strong>理由</strong>：ランク順位は「カテゴリ内の相対順位」であって販売個数ではありません（<code>reference_keepa_reading_pitfalls</code>）。当社が本当に見たいのは実需で、それは月間ドロップ数が直接表します。ランクで切ると<strong>カテゴリの大きさの違いをそのまま持ち込む</strong>（DVDの5万位とペット用品の5万位は別物）。実測でも帯は本命率を説明していません。</p>
+<p><strong>ただし社長の問題意識（「10万位以下＝中小メーカーが多いはず」）は未検証のまま残ります。</strong> 検証は Finder のソートを変えた1本の走行（約300トークン・課金なし）で済みます。§9 に実験として置きました。</p>
+<hr>
+<h2>2. Amazon起点をセミナーに忠実に作り直す（v16 ゲート定義）</h2>
+<p>セミナー原本の基準は3つ＋前提1つ。当社の実装との対応を1行ずつ埋めました。</p>
+<table><thead><tr><th>セミナー</th><th>当社 v15 の実装</th><th>v16 で直すこと</th></tr></thead><tbody><tr><td>①Amazon本体がいないこと</td><td><code>current_AMAZON=-1</code> かつ <code>availabilityAmazon=-1</code></td><td><strong>本体の過去180日在庫率も見る</strong>（現在いなくても、断続的に戻る商品は交渉価値が落ちる）。実測：候補の90%は在庫率0%、上位10%だけが8%以上</td></tr><tr><td>②FBAライバルセラーが2人以上</td><td><code>distinct sellerId ≥ 2</code></td><td><strong>自演401件の問題。「独立セラー数≥1 かつ 国内事業者≥1」に置き換え済み</strong>（下記）</td></tr><tr><td>③ランキング5万位以内</td><td><code>current_SALES ≤ 300,000</code>（実データは96.8%が5万位以内）</td><td><strong>条件から外す。<code>salesRankDrops30 ≥ 10</code> に置き換える</strong></td></tr><tr><td>前提：中小メーカー狙い。大手は代理店卸で不可</td><td><strong>実装されていなかった</strong></td><td><strong>gBizINFO の従業員数・資本金を列に持つ（実装済み・30番台）。足切りにはしない（社長訂正）</strong></td></tr></tbody></table>
+<h3>②の再定義（自演401件への対処）</h3>
+<p><code>distinct sellerId ≥ 2</code> は卸の証拠になりません。実測で <strong>401件がブランド自身の別名ストアの並び</strong>でした（<code>Ailewu</code> は4セラー全部が自社の「メーカー直営店」）。</p>
+<pre><code>独立セラー数 = 全セラー − ブランド名を冠する店 − 直営/公式/正規販売店を名乗る店 − 名前が解決できない店
+必須ゲート  = 独立セラー数 ≥ 1 かつ そのうち国内事業者 ≥ 1</code></pre>
+<p><strong>「2人以上」に落とさなかった理由</strong>：独立セラー1社と2社で本命率は 12.0% vs 10.9% と差がありません。2社を要求する根拠がデータにない。セミナーの「2人以上」は<strong>メーカー直販を含めた数</strong>と解釈すれば、当社の「独立1社＋直販1社」と一致します。</p>
+<h3>v16 のゲート適用順（トークン効率）</h3>
+<p>安い判定を先に置きます。<code>offers</code>（6.5トークン）の前で 62.6% を落とせるので、<strong>同じ予算で商品2.19倍</strong>を検査できます。</p>
+<pre><code>1. Finder      本体不在 / COUNT_NEW 2-6 / 価格帯 / drops30≥10 / 追跡180日以上   … 20トークン/1000件
+2. product     カテゴリ除外（DVD・CD・本・洋書・ゲーム・PCソフト）             … 1トークン/件
+3. product     日本実体判定・中国系判定（brand / manufacturer / EAN）
+4. offers      独立セラー数・国内事業者の有無                                … 6.5トークン/件
+5. gBizINFO    従業員数・資本金（列に出すだけ。足切りにしない）                  … 0トークン
+6. 困り度      §3。価格・オファー数の履歴から算出                             … 0トークン（取得済みデータ）</code></pre>
+<p><strong>5と6は追加トークンがかかりません。</strong></p>
+<hr>
+<h2>3. 「困っている度合い」スコア（本命）</h2>
+<h3>3.1 何を測っているか（推論と観測を分ける）</h3>
+<p><strong>観測</strong>：Amazon上で値崩れと相乗り増加が実際に起きているか。<br><strong>推論</strong>：それがメーカーの困り事につながっているか。<br><strong>この2つは別物です。</strong> スコアが測るのは前者だけです。セミナー第5章の「メーカーの困り事＝値崩れ・無断販売者・仕組みが分からない」に対応します。</p>
+<h3>3.2 材料の採否（全て実データに当てて決めた）</h3>
+<table><thead><tr><th>材料</th><th>Keepa の出所</th><th>採否</th><th>実測</th></tr></thead><tbody><tr><td><strong>D1 下方向の値幅</strong> (中央値−下位10%)/中央値</td><td><code>csv[1]</code> NEW 価格履歴180日</td><td><strong>採用</strong></td><td>中央9.3%・上位10%は40%超</td></tr><tr><td><strong>D2 価格改定回数</strong>（±1%超）/180日</td><td>同上</td><td><strong>採用</strong></td><td>中央20回・上位10%は89回</td></tr><tr><td><strong>D3 直近30日の下落率</strong> 30日中央値 vs 180日中央値</td><td>同上</td><td><strong>採用</strong></td><td>中央0%・上位10%は13%</td></tr><tr><td><strong>D4 新品オファー数の増分</strong> 直近30日 − 90〜180日前</td><td><code>csv[11]</code> COUNT_NEW</td><td><strong>採用</strong></td><td>中央0・上位10%は+2</td></tr><tr><td>Amazon本体の在庫率</td><td><code>csv[0]</code> AMAZON</td><td><strong>ゲートへ</strong>（スコアに入れない）</td><td>候補の90%が在庫率0%＝差がつかない</td></tr><tr><td>上方向の値幅（値上がり）</td><td><code>csv[1]</code></td><td><strong>不採用</strong></td><td>転売プレミア（MEDICOM TOY 13,820→19,800円）を「困っている」と誤判定する</td></tr><tr><td>BuyBox の奪取回数</td><td><code>csv[18]</code></td><td><strong>不採用</strong></td><td><code>offers</code> を付けた回のみ更新されるため、時系列が歯抜けで比較できない</td></tr></tbody></table>
+<blockquote><strong>COUNT_NEW は出品者数ではありません。「新品オファー数」です。</strong>1社がFBAとFBMに出すと2になります（<code>knowledge_verify_field_semantics_not_names</code> の事故6件のうちの1つ）。スコアでは「増分」だけを見るので、この定義の差は方向を歪めません。</blockquote>
+<p><strong>スコア = 4成分をそれぞれ0〜1に正規化して平均 ×100。</strong> 正規化の上限は実測の90パーセンタイル（D1=0.30 / D2=40回 / D3=0.20 / D4=+3.0）。履歴120日未満の商品は判定しません。</p>
+<p>成分どうしの相関は最大でも D1×D3 = +0.43。<strong>重複していません。</strong></p>
+<h3>3.3 交絡チェック（「単に人気商品を拾っているだけ」ではないか）</h3>
+<table><thead><tr><th>相関</th><th>r</th></tr></thead><tbody><tr><td>困り度 × 現在のオファー数</td><td>+0.184</td></tr><tr><td>困り度 × ランク</td><td>+0.020</td></tr><tr><td>困り度 × 価格</td><td>+0.066</td></tr><tr><td>困り度 × 履歴の長さ</td><td>−0.025</td></tr></tbody></table>
+<p><strong>どれも弱い。</strong>「オファーが多い商品」「売れている商品」を言い換えているわけではありません。</p>
+<h3>3.4 一番大事な負の実測 — 本命ほど困っていない</h3>
+<p>手作業ラベル200社の商品で、区分別に困り度を出しました。</p>
+<table><thead><tr><th>区分</th><th>商品数</th><th>困り度の中央値</th><th>45以上の割合</th></tr></thead><tbody><tr><td><strong>A1 日本の小規模メーカー（本命）</strong></td><td>37</td><td><strong>24.4</strong></td><td>13.5%</td></tr><tr><td>A2 日本の中堅</td><td>15</td><td>25.2</td><td>13.3%</td></tr><tr><td>B 大企業</td><td>105</td><td>31.2</td><td>24.8%</td></tr><tr><td>C 版元・レーベル</td><td>107</td><td>32.4</td><td>22.4%</td></tr><tr><td>D 中国系OEM</td><td>153</td><td>28.7</td><td>20.3%</td></tr><tr><td>E 海外（非中国）</td><td>16</td><td>22.2</td><td>12.5%</td></tr></tbody></table>
+<p>成分別に分解すると理由が分かります。</p>
+<table><thead><tr><th>区分</th><th>下方向値幅の中央</th><th>「オファー+1以上」の割合</th><th>「値崩れ15%以上」の割合</th></tr></thead><tbody><tr><td><strong>A1 日本の小規模</strong></td><td>7.7%</td><td><strong>10.8%</strong></td><td>27.0%</td></tr><tr><td>B 大企業</td><td>9.3%</td><td>35.2%</td><td>24.8%</td></tr><tr><td>C 版元</td><td>8.3%</td><td>36.4%</td><td>40.2%</td></tr><tr><td>D 中国系OEM</td><td>5.0%</td><td>44.4%</td><td>22.9%</td></tr></tbody></table>
+<p><strong>相乗りが増えているのは大企業・版元・中国系OEMであって、日本の小規模メーカーではありません（10.8% 対 35〜44%）。</strong> 値崩れ（15%以上）は A1 でも27%起きており、そこは差がない。</p>
+<blockquote><strong>したがって困り度スコアを母集団全体の並べ替えに使うと、本命が沈み、外したはずのノイズが浮きます。</strong><br><strong>使い方は1つだけ：適格性フィルタを通した後の並べ替え。</strong> 順番を逆にすると、前チケットで潰したノイズがそのまま戻ってきます。</blockquote>
+<h3>3.5 262社に当てた結果</h3>
+<table><thead><tr><th>提案タイプ</th><th>社数</th><th>期待月利1万円以上の割合</th></tr></thead><tbody><tr><td>①値崩れ＋相乗り増（提案が最も刺さる）</td><td>32</td><td><strong>59%</strong></td></tr><tr><td>②値崩れのみ</td><td>29</td><td>28%</td></tr><tr><td>③相乗り増のみ</td><td>58</td><td>34%</td></tr><tr><td>④静か（独占提案は早い。まず仕入れ）</td><td>143</td><td>27%</td></tr></tbody></table>
+<p><strong>タイプ①は儲けの面でも他より倍近く良い。</strong> 相乗りが増える＝売れている、という当たり前の裏返しですが、<strong>「困っている」と「儲かる」が同時に立つ群が実在する</strong>ことが確認できました（2軸の相関は r=+0.231 と弱いので、片方だけでは代用できません）。</p>
+<h3>3.6 メーカー直販の有無で切ると、さらに鋭くなる（★最重要）</h3>
+<table><thead><tr><th>区分</th><th>社数</th><th>独占提案の刺さり方</th></tr></thead><tbody><tr><td><strong>a 直販あり × 値崩れ × 相乗り増</strong></td><td><strong>10</strong></td><td><strong>「あなたの公式ストアの価格が崩されています」＝最も刺さる</strong></td></tr><tr><td>c 直販あり × 静か</td><td>26</td><td>既に管理できている。独占の話は不要。普通に仕入れ交渉</td></tr><tr><td>d 直販なし × 値崩れ × 相乗り増</td><td>24</td><td>「知らないところで安売りされています」＝情報提供として刺さる</td></tr><tr><td>e 直販なし × 値崩れのみ</td><td>11</td><td>弱い</td></tr><tr><td>f 静か</td><td>191</td><td>独占提案は早い。「初対面で結婚を申し込むな」</td></tr></tbody></table>
+<p><strong>区分a の10社（期待月利合計52.5万円）:</strong><br>すごろくや / 愛知電線 / CIO / BOS（クリロン化成）/ オウルテック / プリンストン / atRise / マタインク / ラブホーム美家 / BEAMS BOY</p>
+<h3>3.7 2軸マトリクス（262社）</h3>
+<table><thead><tr><th></th><th>期待月利1万円以上</th><th>1万円未満</th></tr></thead><tbody><tr><td><strong>困り度45以上</strong></td><td><strong>Q1 最優先 21社</strong></td><td>Q2 24社</td></tr><tr><td>困り度45未満</td><td>Q3 65社</td><td>Q4 152社</td></tr></tbody></table>
+<ul><li>Q1（21社・期待月利合計101.9万円）＝<strong>今週連絡するのはここ</strong></li><li>Q2＝提案は刺さるが薄い。独占が取れる前提でのみ意味がある</li><li>Q3＝普通に仕入れ交渉する。独占の話は持ち出さない</li><li>Q4＝後回し</li></ul>
+<p><strong>規模の偏りは無し。</strong> 困り度45以上の45社のうち「規模が大きいと分かった社」は1社だけ（45未満は8社）。スコアが大企業を釣り上げてはいません。</p>
+<h3>3.8 上位を目視した結果（不都合な事実込み）</h3>
+<p>Q1の21社を1社ずつ見ました。<strong>確度は「名前からの判断」で、従業員数の実確認はしていません。</strong></p>
+<table><thead><tr><th>メーカー</th><th>見立て</th><th>判定</th></tr></thead><tbody><tr><td>CIO</td><td>大阪の充電器メーカー。相乗り・値崩れが激しいのは公知</td><td><strong>妥当</strong></td></tr><tr><td>すごろくや</td><td>34人（gBizINFO実測）。直販あり×値崩れ×相乗り増</td><td><strong>妥当</strong></td></tr><tr><td>愛知電線</td><td>〜300人（gBizINFO実測）</td><td><strong>妥当</strong></td></tr><tr><td>BOS（クリロン化成）</td><td>直販「BOS-SHOP【メーカー公式】」あり</td><td><strong>妥当</strong></td></tr><tr><td>オウルテック / プリンストン</td><td>PC周辺機器の国内中堅</td><td>妥当（規模は要確認）</td></tr><tr><td>ワコーズ（和光ケミカル）</td><td><strong>正規販売店制度で既に管理している側</strong>。値崩れは実在するが新規取引は通りにくい</td><td><strong>困り度は当たり／取引可能性は低い</strong></td></tr><tr><td>BURTLE（バートル）</td><td>同上。<code>scan_v14.py</code> の大手ヒント一覧にも載っている</td><td>同上</td></tr><tr><td>ブシロード</td><td>上場（gBizINFO：259人・資本金57.8億）</td><td><strong>除外相当</strong></td></tr><tr><td>SoundPEATS / ラブホーム美家</td><td>前チケットで名指しした「日本語ブランド名の中国系OEM」の残存誤検出</td><td><strong>誤検出</strong></td></tr><tr><td>MEDICOM TOY</td><td>価格が上がっている（13,820→19,800円）。転売プレミアであって値崩れではない</td><td><strong>誤検出</strong></td></tr><tr><td>ピュアクリスタル</td><td>GEXの商品ブランド。会社名ではない</td><td><strong>要名寄せ</strong></td></tr></tbody></table>
+<p><strong>Q1の21社のうち、少なくとも5社は取引先として不適格または既に対処済みです（21社中24%）。</strong> スコアは値崩れを正しく捉えていますが、<strong>「困っている」と「取引できる」は別</strong>です。</p>
+<p><strong>機械的に分離できるか：</strong>「既に管理している側」は<strong>オファー数が減っている</strong>はずです。262社中89社（34%）がこれに該当します。ただし<strong>オファー減は「メーカーが排除に動いた」と「単に売れなくなった」の区別がつきません。</strong> 外形からは分けられないので、列に出して警告するに留めました（除外しない — 弱い根拠をゲートにすると本命が死ぬ）。</p>
+<hr>
+<h2>4. 非Amazon起点：類似商品からの売上予想</h2>
+<h3>4.1 「類似」の定義を4通り実装して比べた</h3>
+<p>被説明変数は Keepa の <strong>月間販売数（monthlySold）</strong>。Amazon表示の実測値で、階級値（100/200/300/500/1000…）です。取得できたのは2,635商品中1,424件（54%）。</p>
+<p><strong>交差検証（Leave-One-Out：自分自身を除いた同群の中央値で自分を当てる）</strong></p>
+<table><thead><tr><th>「類似」の定義</th><th>説明力 R²(LOO)</th></tr></thead><tbody><tr><td><strong>① 大カテゴリのみ</strong></td><td><strong>15.8%</strong></td></tr><tr><td>② 中カテゴリ</td><td>5.8%</td></tr><tr><td>③ 小カテゴリ</td><td>11.2%</td></tr><tr><td>④ 中カテゴリ × 価格帯（1.6倍刻み）</td><td>9.9%</td></tr><tr><td>⑤ 小カテゴリ × 価格帯</td><td>5.8%</td></tr><tr><td>⑥ 中カテゴリ × 価格帯（n≧10の群のみ）</td><td>10.3%</td></tr></tbody></table>
+<p><strong>細かくするほど悪くなります。</strong> 群あたりの件数が1〜2件に落ちるためで、見かけのR²（過学習込みなら60%）と交差検証の値は別物です。<strong>最も単純な「大カテゴリのみ」が最良でした。</strong></p>
+<p><strong>キーワード一致は効きませんでした。</strong></p>
+<table><thead><tr><th>同じ中カテゴリ内のペア</th><th>n</th><th>月間販売数の差（中央値）</th></tr></thead><tbody><tr><td>タイトル語の重なり15%以上</td><td>190</td><td><strong>2.00倍</strong></td></tr><tr><td>15%未満</td><td>3,794</td><td><strong>2.00倍</strong></td></tr></tbody></table>
+<p><strong>完全に同じ。</strong> タイトルの語が一致していても、売れる量は近づきません。<strong>「同用途／キーワード一致」で類似を定義する実装はしないでください。</strong></p>
+<h3>4.2 どこまで言えて、どこから言えないか</h3>
+<p>実務形（コホート中央値 ÷（出品者数+1）＝キーゾンの式のコホート版）で予測したときの誤差を実測しました。</p>
+<pre><code>n=587  予測比の p10 / p50 / p90 = 0.33倍 / 1.00倍 / 4.29倍
+→ 80%区間はおよそ 0.3〜4.3倍（13倍の幅）</code></pre>
+<table><thead><tr><th>言えること</th><th>言えないこと</th></tr></thead><tbody><tr><td>「このジャンル・この価格帯は月<strong>30個</strong>が中央値」</td><td>「<strong>この商品</strong>が月30個売れる」</td></tr><tr><td>「桁」（月3個か30個か300個か）</td><td>「30個か60個か」</td></tr><tr><td>「そのジャンルに需要があるか無いか」＝<strong>行く/行かないの足切り</strong></td><td><strong>初回の仕入れ数量</strong></td></tr></tbody></table>
+<p><strong>中央値で言った数字は、実際には0.3〜4.3倍の間に落ちます。</strong> 月30個と言ったら、実際は10〜130個です。</p>
+<p><strong>比較のため</strong>：その商品がAmazonに既にあってランクが取れる場合、ランク（対数）だけで説明力39.5%です。</p>
+<pre><code>log10(月間販売数) = 4.302 − 0.598 × log10(ランク)
+→ 1万位で月82個 / 5万位で月31個 / 15万位で月16個</code></pre>
+<p><strong>非Amazon起点の予測は、Amazon起点の約40%の情報量しかありません（15.8% 対 39.5%）。</strong> これが両起点の質の差であり、資源配分の根拠です（§7）。</p>
+<h3>4.3 だから設計をこう変える</h3>
+<p><strong>予測精度を上げようとしないでください。上げられません（実測済み）。</strong><br>代わりに<strong>外れても死なない発注量</strong>で回します。これはセミナーの「初回は最小5個」と同じ結論です。</p>
+<table><thead><tr><th>場面</th><th>使い方</th></tr></thead><tbody><tr><td>メーカーに連絡するかどうか</td><td>コホート中央値が月<strong>10個未満</strong>なら連絡しない（下振れ0.3倍でも3個。話にならない）</td></tr><tr><td>見積が返ってきた後</td><td><strong>初回ロットは5個固定。</strong> コホート予測を数量決定に使わない</td></tr><tr><td>リピート判断</td><td><strong>実売2週間の実測に切り替える。</strong> ここで初めて予測を捨てる</td></tr></tbody></table>
+<h3>4.4 コホート表の作り方と費用</h3>
+<table><thead><tr><th>項目</th><th>トークン</th></tr></thead><tbody><tr><td>コホート1群を作る（Finder 1回＋商品100件）</td><td><strong>110</strong></td></tr><tr><td><strong>判定1件（既にある群を引くだけ）</strong></td><td><strong>0</strong></td></tr><tr><td>群が無いカテゴリ×価格帯に当たった場合</td><td>110</td></tr><tr><td>全カテゴリを埋める初期投資（18大カテゴリ×6価格帯＝約108群）</td><td><strong>約11,900</strong>（20/分で約10時間＝1日分の41%）</td></tr></tbody></table>
+<p><strong>現状で n≧20 のコホートは12群・399件しかありません。</strong> ここが最大の穴で、埋めるのは<strong>1回きりの固定費</strong>です。埋めたあとの運用コストはゼロ。</p>
+<p><strong>主要コホートの実測（今すぐ使える12群のうち上位）</strong></p>
+<table><thead><tr><th>カテゴリ</th><th>価格帯</th><th>n</th><th>下位20%</th><th>中央</th><th>上位80%</th><th>出品者中央</th><th>1社あたり月販</th></tr></thead><tbody><tr><td>家電＆カメラ &gt; 携帯電話・スマートフォン</td><td>1,844-2,951円</td><td>47</td><td>200</td><td>500</td><td>1000</td><td>3</td><td>125</td></tr><tr><td>パソコン・周辺機器 &gt; PCアクセサリ</td><td>1,844-2,951円</td><td>45</td><td>100</td><td>100</td><td>300</td><td>2</td><td>33</td></tr><tr><td>パソコン・周辺機器 &gt; PCアクセサリ</td><td>4,722-7,555円</td><td>43</td><td>50</td><td>100</td><td>200</td><td>2</td><td>33</td></tr><tr><td>ホーム＆キッチン &gt; 家電</td><td>2,951-4,722円</td><td>39</td><td>100</td><td>300</td><td>1000</td><td>3</td><td>75</td></tr><tr><td>ホーム＆キッチン &gt; 家電</td><td>4,722-7,555円</td><td>28</td><td>200</td><td>500</td><td>800</td><td>3</td><td>125</td></tr></tbody></table>
+<h3>4.5 手順の順序 — カズヨの案でよい。ただし0番を足す</h3>
+<p>カズヨの案「①候補メーカー発見 → ②Keepaで類似商品の売上予想 → ③卸値を聞く → ④利益計算」は<strong>順序として正しい</strong>です。売れないジャンルのメーカーに連絡する時間を省けます。</p>
+<p><strong>ただし②の前に「0番」が要ります。</strong></p>
+<pre><code>0. そのメーカーの商品が既にAmazonにあるか、メーカー名で検索する   … 10トークン
+   → ある  → Amazon起点の判定に合流（ランクが取れる＝説明力39.5%）
+   → 無い  → 1へ進む
+1. 候補メーカー発見（展示会出展社名簿 2,353社／Keepa由来との重複0.1%）
+2. コホートで需要推定（既存群なら0トークン）→ 月10個未満なら打ち切り
+3. メーカーに連絡して卸値を聞く   ← §4.1（第三者連絡）＝社長承認必須
+4. 利益計算 → 初回5個</code></pre>
+<p><strong>0番を飛ばすと、Amazon起点で既に拾えている会社に、情報量の少ないやり方で連絡することになります。</strong> 展示会名簿とKeepa由来の重複は0.1%（2社）と実測済みなので、実際にはほとんど1へ進みますが、この1手は10トークンで確実に効きます。</p>
+<hr>
+<h2>5. KPI（3階層）と会社KPIへの接続</h2>
+<table><thead><tr><th>階層</th><th>指標</th><th>現在地</th><th>目標</th></tr></thead><tbody><tr><td><strong>北極星</strong></td><td><strong>取引が開始したメーカー数</strong></td><td>0社</td><td>12ヶ月で136社</td></tr><tr><td><strong>先行</strong></td><td>見積回答を得たメーカー数 / 返信のあったメーカー数</td><td>0 / 0</td><td>返信率30%（EC STARs 実績値）</td></tr><tr><td><strong>行動</strong></td><td>1日あたりの問い合わせ送信数 / Q1レーンの残数</td><td>0件・21社</td><td>1日5件</td></tr></tbody></table>
+<h3>会社KPIへの接続（ここが一番の発見）</h3>
+<table><thead><tr><th>項目</th><th>実測</th></tr></thead><tbody><tr><td>262社の期待月利の合計（全社成約した場合の理論上限）</td><td>309.7万円</td></tr><tr><td>1社あたりの平均期待月利</td><td>1.18万円</td></tr><tr><td>月商800万円 × 利益率20% ＝ 必要月利</td><td><strong>160万円</strong></td></tr><tr><td><strong>必要な成約社数</strong></td><td><strong>136社</strong></td></tr><tr><td>成約率10%として、必要な問い合わせ数</td><td><strong>1,360社</strong></td></tr><tr><td>現在の候補</td><td><strong>262社</strong></td></tr></tbody></table>
+<p><strong>母数が5.2倍足りません。</strong> 社長の「あらゆることをやらないと売上を立てられない」は、数字の上で正しいです。片方の起点だけでは届きません。</p>
+<p><strong>ただし別の解があります。</strong> 262社の対象SKU数は中央値1・平均1.64・総数430。<strong>1社あたりのSKU収量を上げれば、必要成約数は反比例で減ります。</strong></p>
+<table><thead><tr><th>1社あたりSKU</th><th>必要成約社数</th></tr></thead><tbody><tr><td>1.64（現状）</td><td>136社</td></tr><tr><td>3.0</td><td>74社</td></tr><tr><td>5.0</td><td>45社</td></tr></tbody></table>
+<p><strong>通過メーカーをブランド名でKeepa再検索して全SKUを列挙する Expansion 段が、母数を増やすより効きます。</strong> 実装は <code>scan_v14.py</code> への追加で、社長の時間は1秒も使いません。<strong>これを最優先の実装タスクとして推薦します。</strong></p>
+<hr>
+<h2>6. 打ち手 A / B / C ＋推奨</h2>
+<h3>案A：Q1の21社に集中し、Expansion を実装する（推奨）</h3>
+<table><thead><tr><th></th><th></th></tr></thead><tbody><tr><td>やること</td><td>Q1 21社（うち誤検出5社を除く16社）へ連絡。並行して Expansion 実装。非Amazon起点はコホート表の初期投資だけ</td></tr><tr><td>想定リターン</td><td>16社×返信率30%＝返信5社（中央値）。楽観8社（確率20%）／悲観2社（確率20%）／<strong>期待値5.0社</strong>。成約は返信の3割として<strong>1.5社</strong>（期待月利 約3.5万円）</td></tr><tr><td>想定リスク</td><td>日本店が停止中で、返信が来ても「今は仕入れられない」。信用面でも実績ゼロ＋停止中は不利</td></tr><tr><td>撤退条件</td><td>16社送って<strong>返信2社未満</strong>なら文面か対象選定が誤り。文面を作り直して次の16社へ</td></tr><tr><td>必要な打ち手</td><td>会社概要ページ（返信率46%→66.5%の実績あり）／問い合わせ文面の型4構成／Expansion実装（IT）</td></tr></tbody></table>
+<h3>案B：262社に全部送る</h3>
+<table><thead><tr><th></th><th></th></tr></thead><tbody><tr><td>想定リターン</td><td>262社×30%＝返信79社（中央値）。期待値79社・成約約24社（期待月利28万円）</td></tr><tr><td>想定リスク</td><td><strong>Q4の152社は「静か」＝独占提案が刺さらない層。</strong> 同じ文面で送ると当社の初回接触の質が下がる。文面を分けると社長の時間が262回分</td></tr><tr><td>撤退条件</td><td>50社送った時点で返信率20%未満なら中止</td></tr><tr><td>判定</td><td><strong>時間あたりの期待値が案Aより低い。</strong> ただし §5 の「1,360社必要」を踏まえると、いずれ通る道</td></tr></tbody></table>
+<h3>案C：非Amazon起点（展示会出展社2,353社）を主軸にする</h3>
+<table><thead><tr><th></th><th></th></tr></thead><tbody><tr><td>想定リターン</td><td>母集団2,353社・Keepa由来との重複0.1%＝ほぼ全部が新規。<strong>ただし需要予測の情報量は40%</strong></td></tr><tr><td>想定リスク</td><td>売れないジャンルのメーカーに連絡する空振りが増える。コホート表の初期投資11,900トークン</td></tr><tr><td>撤退条件</td><td>コホート推定で月10個以上のジャンルに属する社が<strong>2,353社中300社を下回る</strong>なら、母集団として弱い</td></tr><tr><td>判定</td><td><strong>単独では推奨しない。案Aと並走させる</strong></td></tr></tbody></table>
+<h3>推奨：A を主軸、C を並走。B は A/C の後</h3>
+<p><strong>理由</strong>：期待値の順ではなく、<strong>学習の順</strong>です。案Aの16社で「文面が効くか」「返信が来るか」「日本店停止中でも商談が進むか」が分かります。それが分かる前に262社へ送るのは、<strong>検証していない仮説で最大の資産（初回接触）を消費する</strong>行為です。</p>
+<hr>
+<h2>7. 資源配分（宿題④）</h2>
+<p>社長のご指示は「両方フルで」。<strong>トークンと社長の時間は性質が違うので、分けて答えます。</strong></p>
+<h3>Keepa トークン（1日の上限28,800／20分毎補充）</h3>
+<table><thead><tr><th>期間</th><th>Amazon起点</th><th>非Amazon起点</th><th>根拠</th></tr></thead><tbody><tr><td><strong>最初の2週間</strong></td><td><strong>70%</strong></td><td><strong>30%</strong></td><td>非Amazon起点はコホート表の初期投資（11,900トークン＝約10時間）が要る。これは<strong>1回きりの固定費</strong></td></tr><tr><td><strong>3週目以降</strong></td><td><strong>90%</strong></td><td><strong>10%</strong></td><td>コホート表ができれば判定コストは<strong>0トークン</strong>。10%は新カテゴリの追加分のみ</td></tr></tbody></table>
+<p><strong>「非Amazon起点は初期投資型で、運用コストがほぼゼロ」</strong> — これが8:2でも5:5でもなく、時間で変える理由です。恒常的に3割を割く必要はありません。</p>
+<h3>社長の時間（これが本当の律速）</h3>
+<table><thead><tr><th>配分</th><th>内訳</th></tr></thead><tbody><tr><td><strong>80%：Amazon起点の問い合わせ</strong></td><td>Q1→（誤検出除去後）Q3→Q2 の順。1日5件</td></tr><tr><td><strong>20%：非Amazon起点の実験枠</strong></td><td>週5社。展示会名簿から、コホート推定で月10個以上のジャンルの社に限定</td></tr></tbody></table>
+<p><strong>理由</strong>：需要予測の情報量が 39.5% 対 15.8% と2.5倍違います。同じ1時間なら、確証のある側から使うのが期待値最大です。ただし<strong>非Amazon起点を止めない</strong>のは、①Amazon起点の母数262社では目標に5.2倍足りない、②Amazon起点はいずれ枯れる（新規獲得率を毎日記録している）、の2点によります。</p>
+<hr>
+<h2>8. やらないこと（5件）</h2>
+<ol><li><strong>ランク帯のチューニングをしない。</strong> 実測で本命率を説明していない。<code>salesRankDrops30 ≥ 10</code> に置き換える</li><li><strong>困り度スコアを母集団全体の並べ替えに使わない。</strong> 本命が沈み、ノイズが浮く（A1中央24.4 対 大企業31.2）。適格性フィルタの<strong>後</strong>にだけ使う</li><li><strong>類似商品予測を仕入れ数量の決定に使わない。</strong> 80%区間が0.3〜4.3倍。初回は5個固定</li><li><strong>キーワード一致による類似判定を実装しない。</strong> タイトル語の重なり15%以上と未満で、月販の差が完全に同じ（2.00倍 対 2.00倍）</li><li><strong>NETSEA を発見の母集団に使わない。</strong> バイヤー会員規約 第7条2項5号・第19条3項に違反。制裁は第27条4項（違約金200万円＋売買代金の50%＋事業者名の公表）。NETSEA内で完結する仕入れは適法（法務ハルオ判定 / T-20260831-005）</li></ol>
+<hr>
+<h2>9. マサル（シミュレーター）への引き渡し — 仮想実行できる粒度</h2>
+<h3>実行単位1：Q1レーンへの問い合わせ（社長の実Do）</h3>
+<pre><code>対象   : 43_連絡候補_困り度2軸つき.csv の 象限=Q1 かつ 誤検出印なし（16社）
+手順   : ①会社概要ページを用意 ②文面4構成（挨拶／取引したい旨／会社案内URL／終わりの一言）
+         ③1日5社ずつ ④返信が来たら卸値と最低ロットを聞く ⑤利益計算 ⑥初回5個
+前提   : 日本店は停止中。「近日中に販売を再開する」と書くか伏せるかは社長判断（§4.1 第三者連絡）
+測る数字: 返信数 / 見積回答数 / 断り理由（個人事業主だからか、規模か、代理店経由か）
+撤退   : 16社で返信2社未満 → 文面を作り直す</code></pre>
+<h3>実行単位2：Expansion 段の実装（IT・社長の時間0）</h3>
+<pre><code>入力   : 262社のブランド名
+処理   : Keepa Product Finder で brand 完全一致検索 → 全SKUを列挙 → v16ゲートを適用
+費用   : 262社 × (Finder 10 + 商品平均30件×1) = 約10,500トークン（9時間）
+成果   : 1社あたりSKU収量。1.64 → 3.0 になれば必要成約社数が136 → 74に半減</code></pre>
+<h3>実行単位3：コホート表の全カテゴリ整備（IT・社長の時間0）</h3>
+<pre><code>費用   : 約11,900トークン（10時間）
+成果   : 非Amazon起点の判定コストが 110トークン → 0トークン</code></pre>
+<h3>実行単位4：ランク帯の検証実験（未決着の唯一の論点）</h3>
+<pre><code>内容   : Finder のソートを salesRankDrops30 降順から変え、5万〜15万位の帯を実際に採取する
+費用   : 約300トークン
+判定   : 帯5万〜15万で本命率が現状（16.0%）を有意に上回れば、社長修正が正しかったことになる</code></pre>
+<hr>
+<h2>10. 撤退条件</h2>
+<table><thead><tr><th>対象</th><th>条件</th><th>発動時</th></tr></thead><tbody><tr><td>困り度スコア</td><td>Q1の16社で返信率が<strong>Q3の対照群と差が無い</strong>（±5ポイント以内）なら、スコアは並べ替えの役に立っていない</td><td>2軸をやめ、期待月利の一本ソートに戻す</td></tr><tr><td>非Amazon起点</td><td>コホート推定で月10個以上のジャンルに属する社が2,353社中<strong>300社未満</strong></td><td>展示会名簿を母集団から外す。受け皿は残らないので、そのときは母集団の再探索をサトルに発注</td></tr><tr><td>Amazon起点</td><td>新規獲得率が<strong>50件/1000トークンを下回る</strong>日が7日続く</td><td>シャードの網を組み替える。それでも戻らなければ母集団が枯れた</td></tr><tr><td>メーカー仕入れ全体</td><td>3ヶ月で<strong>成約0社</strong></td><td>手法ではなく前提（日本店停止・実績ゼロ）が原因。停止解除まで問い合わせを止め、会社概要・実績づくりに切り替える</td></tr></tbody></table>
+<hr>
+<h2>11. 前提と確度</h2>
+<table><thead><tr><th>#</th><th>事項</th><th>確度</th></tr></thead><tbody><tr><td>1</td><td>困り度スコアの4成分・分布・相関</td><td><strong>実測</strong>（3,045商品・Keepa生レスポンス）</td></tr><tr><td>2</td><td>ラベル別の困り度（本命ほど低い）</td><td><strong>実測</strong>。ただし手作業ラベル200社は前チケットのタケシの判断で、従業員数の実確認はしていない</td></tr><tr><td>3</td><td>Q1 21社のうち5社が不適格</td><td><strong>目視。名前からの判断であり、裏取りはしていない</strong></td></tr><tr><td>4</td><td>類似商品予測の80%区間 0.3〜4.3倍</td><td><strong>実測</strong>（n=587・交差検証）</td></tr><tr><td>5</td><td>月間販売数（monthlySold）は階級値</td><td>公式定義。100/200/300/500/1000 の刻みなので、細かい差は測れない</td></tr><tr><td>6</td><td>必要成約社数136社</td><td><strong>計算</strong>。期待月利は「仕入れ上限（目標利益率25%）で買えた場合」の値。実際の卸値がこれより安ければ上振れる</td></tr><tr><td>7</td><td>返信率30%・成約率10%</td><td><strong>EC STARs の実績値／成約率は仮置き。当社の一次データはまだ無い</strong></td></tr><tr><td>8</td><td>5万〜15万位の帯が有効かどうか</td><td><strong>未検証。</strong> 当社はその帯を採取していない（実データの1.2%）</td></tr></tbody></table>
+</body></html>
