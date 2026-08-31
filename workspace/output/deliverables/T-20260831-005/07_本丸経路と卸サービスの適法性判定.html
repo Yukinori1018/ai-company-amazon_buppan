@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>本丸経路と卸サービスの適法性判定 — T-20260831-005</title>
+<style>
+:root{--fg:#1a1a1a;--mut:#666;--line:#dcdcdc;--ng:#b3261e;--ok:#1b5e20;--bg:#fff;--accent:#0b4a6f}
+*{box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",sans-serif;
+line-height:1.85;color:var(--fg);background:var(--bg);max-width:1080px;margin:0 auto;padding:40px 24px 120px;font-size:15.5px}
+h1{font-size:1.85em;border-bottom:4px solid var(--accent);padding-bottom:.4em;margin:0 0 1em;letter-spacing:.01em}
+h1+p,h1~p:nth-of-type(-n+5){color:var(--mut)}
+h2{font-size:1.4em;margin:2.4em 0 .8em;padding:.35em .7em;background:var(--accent);color:#fff;border-radius:4px}
+h3{font-size:1.15em;margin:1.9em 0 .6em;border-left:5px solid var(--accent);padding-left:.6em}
+h4{font-size:1.02em;margin:1.4em 0 .5em;color:var(--accent)}
+p{margin:.7em 0}
+table{border-collapse:collapse;width:100%;margin:1.1em 0;font-size:.9em;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:8px 11px;text-align:left;vertical-align:top}
+th{background:#eef3f7;font-weight:600;white-space:nowrap}
+tbody tr:nth-child(even){background:#fafbfc}
+code{background:#f1f3f5;padding:1px 5px;border-radius:3px;font-size:.87em;
+font-family:"SF Mono",Menlo,Consolas,monospace;word-break:break-all}
+pre{background:#1f2430;color:#e6e9ef;padding:16px 18px;border-radius:6px;overflow-x:auto;line-height:1.6}
+pre code{background:none;color:inherit;padding:0;font-size:.85em}
+blockquote{margin:1.1em 0;padding:.85em 1.1em;background:#fdf6e3;border-left:5px solid #d4a017;border-radius:0 4px 4px 0}
+strong{font-weight:700}
+hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+ul,ol{margin:.7em 0;padding-left:1.6em}
+li{margin:.3em 0}
+.badge{display:inline-block;padding:1px 8px;border-radius:3px;font-size:.85em;font-weight:700}
+@media print{body{max-width:none;font-size:10.5pt}h2{background:#eee;color:#000}}
+</style></head><body>
+<h1>本丸経路と卸サービスの適法性判定</h1>
+<ul>
+<li>チケット: T-20260831-005 / Phase B</li>
+<li>判定: 法務 ハルオ</li>
+<li>判定日: <strong>2026-08-31</strong>（本書のURLはすべて同日に実取得。日付の記載がないものは 2026-08-31 取得）</li>
+<li>前提: サトル <code>06_仕入れ経路の横展開調査.md</code> §6「要法務確認13件」を読了。本書はその13件すべてに回答する</li>
+</ul>
+<hr>
+<h2>0. 結論（先に表で）</h2>
+<table><thead><tr><th>#</th><th>対象</th><th>判定</th><th>一行理由</th></tr></thead><tbody>
+<tr><td><strong>①</strong></td><td><strong>kougeihin.jp 275ページのクロール</strong></td><td><strong>条件付き可（社内限定）</strong></td><td>robots.txt が <code>/craft/</code> を許可。抽出対象を組合名・住所・TEL・FAX 等の<strong>事実に限定</strong>すれば著作物の複製に当たらない。<strong>公開は不可</strong></td></tr>
+<tr><td><strong>②</strong></td><td><strong>orosy バイヤーAPI での Amazon 再販</strong></td><td><strong>可（条件付き）</strong></td><td>全35条に転売・販路・価格拘束の条項が<strong>存在しない</strong>。第1条7号が本サービスを「事業者に対し卸売価格で販売するEC」と定義＝再販が前提。ただし<strong>orosy の商品説明文・画像を Amazon に転載するのは不可</strong></td></tr>
+<tr><td>3</td><td>スーパーデリバリー</td><td><strong>条件付き可</strong></td><td>出展者ごとの販売方法制限に<strong>従う契約上の義務がある</strong>（会員規約第6条2項）。<strong>発注前に人が読むゲート</strong>を必須化すれば可</td></tr>
+<tr><td>4</td><td>ザッカネット</td><td><strong>現時点 NO</strong></td><td><strong>利用規約が公開ページに存在しない</strong>（実査済み）。規約を読まずに登録＝白紙で法的拘束を受ける行為。法務として不可</td></tr>
+<tr><td>5</td><td>YouTube Data API で候補リスト作成</td><td><strong><span class="badge" style="background:#fde7e5;color:#b3261e">NO</span></strong></td><td>Developer Policies が <strong>「Do not aggregate API Data」</strong> と明記。加えて非認可データの保存は<strong>30暦日まで</strong>。永続的な候補リストは規約違反</td></tr>
+<tr><td>6-a</td><td>卸の達人</td><td><strong><span class="badge" style="background:#fde7e5;color:#b3261e">NO</span></strong></td><td>会員規約第6条「<strong>法人のみ</strong>」。個人事業主は入口で落ちる</td></tr>
+<tr><td>6-b</td><td>Amazon ドロップシッピングポリシー</td><td><strong>未確認 → 着手不可</strong></td><td>本文がSPAで取得できず。<strong>秘書のブラウザ確認が済むまで TopSeller 型無在庫は着手しない</strong></td></tr>
+<tr><td>6-c</td><td>商工会議所への入会</td><td>法的障害なし。<strong>§4.1（金銭）で社長承認</strong></td><td>加入金3,000円＋年会費10,000円〜</td></tr>
+<tr><td>6-d</td><td>X API / TikTok Research API / Instagram</td><td><strong>NO（現時点）</strong></td><td>X＝従量課金で §4.1。TikTok＝申請＝規約同意で §4.1。Instagram＝仕様が非公開で未確認</td></tr>
+</tbody></table>
+<p><strong>動かしてよい2本：①の社内リスト化と、②の orosy。</strong> どちらも下記の条件をそのまま実装してください。条件を落とすと判定は反転します。</p>
+<hr>
+<h1>第I部　最優先① kougeihin.jp のクロール可否</h1>
+<h2>1-1. 運営者の確認（ここで判断の枠組みが決まる）</h2>
+<table><thead><tr><th>項目</th><th>実測</th></tr></thead><tbody>
+<tr><td>サイト名</td><td><strong>伝統工芸 青山スクエア</strong></td></tr>
+<tr><td>運営者</td><td><strong>一般財団法人 伝統的工芸品産業振興協会</strong>（代表理事 舞鶴一雄）／<code>https://kougeihin.jp/privacy/</code></td></tr>
+<tr><td>法的性格</td><td><strong>民間法人。公的機関ではない</strong></td></tr>
+<tr><td>帰結</td><td><strong>政府標準利用規約2.0 も 公共データ利用規約1.0（PDL1.0）も適用されない。</strong> 「経産省指定の工芸品だから公的データ」は誤り</td></tr>
+</tbody></table>
+<blockquote>ここを間違えると全部間違えます。<strong>指定しているのが国であることと、サイトを運営しているのが誰かは別の話</strong>です。</blockquote>
+<h2>1-2. サイト規約の原文（<code>https://kougeihin.jp/sitepolicy/</code>）</h2>
+<blockquote><strong>サイト内の著作物の取り扱いについて</strong><br>伝統工芸 青山スクエアWEBサイト（以下、「当サイト」）に掲載されている情報の財産権は法令等により保護されています。<strong>著作権法により認められている「私的使用のための複製」や論文や発表などでの「引用」などの場合を除き、当サイトに掲載されている文章・写真・動画・イラストを含むすべての情報を複製、転用、販売することはできません。</strong><br>（中略）出典元として明示する場合には次のように表示すること。一般財団法人 伝統的工芸品産業振興協会「伝統工芸 青山スクエア」</blockquote>
+<p><strong>この表示の法的性質（2026-08-31 T-20260831-005 で確立した型をそのまま適用）</strong></p>
+<table><thead><tr><th>論点</th><th>判定</th></tr></thead><tbody>
+<tr><td>契約か</td><td><strong>契約ではない。</strong> ログイン不要（HTTP 200）・クリック同意なし・ページを開いた後に初めて読める一方的表示。民法522条の申込みと承諾がない</td></tr>
+<tr><td>では自由か</td><td><strong>違う。</strong> 「著作権者が許諾していない旨の宣言」としては有効に読める。<strong>契約が成立していないことと、著作権法上自由であることは別</strong>。ここを混同しない</td></tr>
+<tr><td>「私的使用」に当社は当たるか</td><td><strong>当たらない。</strong> 事業目的の利用は著作権法30条1項の「個人的に又は家庭内その他これに準ずる限られた範囲内において使用する」に該当しない。<strong>この抜け道は使えません</strong></td></tr>
+</tbody></table>
+<h2>1-3. robots.txt（<code>https://kougeihin.jp/robots.txt</code>）</h2>
+<pre><code>User-agent: *
+Disallow: /wp/wp-admin/
+Allow: /wp/wp-admin/admin-ajax.php
+Sitemap: https://kougeihin.jp/sitemap.xml</code></pre>
+<p><strong><code>/craft/</code> は許可されています。</strong> UA 名指しの <code>Disallow: /</code> もありません。サトルの報告どおりです。</p>
+<h2>1-4. 判定 — 3段階に割る</h2>
+<p><code>/craft/0103/</code> を実取得して、ページに何が載っているかを確認しました（HTTP 200）。載っているものを2つに分けます。</p>
+<table><thead><tr><th>ページ上の要素</th><th>著作物性</th><th>扱い</th></tr></thead><tbody>
+<tr><td>工芸品名・よみがな・分類・主な製品・主要製造地域・指定年月日</td><td><strong>なし（事実）</strong></td><td>取得・社内保持 <strong>可</strong></td></tr>
+<tr><td><strong>■産地組合：組合名・〒・住所・TEL・FAX</strong></td><td><strong>なし（事実）</strong></td><td>取得・社内保持 <strong>可</strong></td></tr>
+<tr><td>「特徴」「作り方」「技術・技法・原材料」の説明文</td><td><strong>あり（言語の著作物）</strong></td><td><strong>取得しない・保存しない</strong></td></tr>
+<tr><td>写真・動画・イラスト</td><td><strong>あり</strong></td><td><strong>取得しない・保存しない</strong></td></tr>
+</tbody></table>
+<h3>段階1：取得して社内の候補リストに保持する → <strong>可</strong></h3>
+<p>根拠：</p>
+<ul>
+<li><strong>抽出対象が事実であること。</strong> 著作権法2条1項1号は著作物を「思想又は感情を創作的に表現したもの」と定義します。組合名・住所・電話番号はこれに当たりません。<strong>事実そのものに著作権は発生しません。</strong></li>
+<li><strong>クロール時にページ全体が一時的に複製される点は、著作権法30条の4第2号（情報解析の用に供する場合）で足ります。</strong> ただし同条は「<strong>その必要と認められる限度において</strong>」であり、ただし書で「著作権者の利益を不当に害することとなる場合は、この限りでない」と制限されます。<strong>だから「特徴」「作り方」は保存しない</strong>という条件が要ります。</li>
+<li><strong>編集著作物（12条）の問題も生じません。</strong> 244品目という選択は経済産業大臣の指定（伝産法）によって決まっており、協会の選択・配列の創作性ではありません。タウンページDB事件（東京地判平12.3.17）が分類体系に創作性を認めたのとは事情が異なります。<strong>ただし原文まで当たっていない引用であり、これは推測（確度：中）です。</strong></li>
+</ul>
+<h3>段階2：PUBLIC リポ・Web・外部配布に載せる → <strong><span class="badge" style="background:#fde7e5;color:#b3261e">不可</span></strong></h3>
+<p>根拠は3つ重なります。<strong>1つでも当たれば不可です。</strong></p>
+<table><thead><tr><th>根拠</th><th>内容</th></tr></thead><tbody>
+<tr><td>著作権法21条・23条1項</td><td>「特徴」「作り方」「写真」を含む形での再公開は複製権・公衆送信権の侵害</td></tr>
+<tr><td>サイト規約の明示</td><td>「複製、転用、販売することはできません」＝<strong>著作権者が許諾していないことが明文で宣言されている</strong></td></tr>
+<tr><td><strong>個人情報保護法27条</strong></td><td><strong>244品目の産地組合には、屋号のみの個人事業主・個人経営の工房が混じります。</strong> その事業情報は個人情報です。PUBLIC リポへの commit は第三者提供に当たり得る</td></tr>
+</tbody></table>
+<blockquote><strong>本リポジトリは PUBLIC で、30分ごとに自動 push されます。</strong> commit した瞬間に世界へ公開されます。<strong>組合の住所・TEL を含むファイルは <code>deliverables/</code> にも <code>agent_output/</code> にも置かないでください。</strong></blockquote>
+<h3>段階3：そこで知った組合を手がかりに、自分で一次情報を取りに行く → <strong>可・推奨</strong></h3>
+<p>kougeihin.jp で「羽越しな布の産地組合が山形県鶴岡市にある」と知り、<strong>組合の自社サイト・公式資料から改めて連絡先を取る</strong>。この経路が最も安全です。<strong>最終的な社内リストは、可能な限りこの経路で作った値に置き換えてください。</strong></p>
+<h2>1-5. クロールの条件（数字で指定します。守れないなら実行しない）</h2>
+<table><thead><tr><th>項目</th><th>指定値</th><th>理由</th></tr></thead><tbody>
+<tr><td><strong>アクセス間隔</strong></td><td><strong>同一ホスト 3秒以上・同時接続1</strong></td><td>岡崎市立中央図書館事件（2010）。1秒1回・1日1時間で<strong>逮捕・21日勾留・起訴猶予</strong>。真因は図書館側の不具合でも身柄は飛んだ</td></tr>
+<tr><td><strong>総所要</strong></td><td>275ページ × 3秒 ＝ <strong>約14分</strong></td><td>1回で終わる。分割・並列にする理由がない</td></tr>
+<tr><td><strong>User-Agent</strong></td><td><strong>自社名と連絡先を明示</strong>（例: <code>SatoySelectResearchBot/1.0 (+mailto:&lt;連絡先&gt;)</code>）</td><td>個人情報保護法20条1項「偽りその他不正の手段」。<strong>UA詐称・ブラウザ偽装はここに寄る。絶対にやらない</strong></td></tr>
+<tr><td><strong>robots.txt</strong></td><td>実行直前に再取得し、<code>/craft/</code> の許可を確認してから開始</td><td>規約は変わる</td></tr>
+<tr><td><strong>停止条件</strong></td><td><strong>403 / 429 / 5xx が1回でも出たら即時・永久に打ち切り</strong></td><td>再開しない。相手が「攻撃された」と申告すれば身柄が飛ぶ</td></tr>
+<tr><td><strong>時間帯</strong></td><td>平日日中（先方が異常に気づいて連絡できる時間）</td><td>深夜の無人大量アクセスは最も心証が悪い</td></tr>
+<tr><td><strong>取得回数</strong></td><td><strong>原則1回のみ。</strong> 再取得は年1回まで</td><td>監視型の反復取得は「不当に害する」側に寄る</td></tr>
+<tr><td><strong>保存するフィールド</strong></td><td>品目名・よみ・分類・主な製品・主要製造地域・指定年月日・組合名・〒・住所・TEL・FAX・出典URL・取得日</td><td><strong>これ以外は保存しない。</strong>「特徴」「作り方」「画像」は取得もしない</td></tr>
+<tr><td><strong>出典の記録</strong></td><td>全レコードに <code>source_url</code> と <code>fetched_at</code> を持たせる</td><td>後から根拠を示せない情報は使えない</td></tr>
+</tbody></table>
+<h2>1-6. 併用を強く推奨する公的ソース（こちらは公開も可）</h2>
+<p>経済産業省のサイトから、<strong>商用利用・再公開が可能なファイル</strong>を2本実取得しました。</p>
+<table><thead><tr><th>ファイル</th><th>内容</th><th>URL</th></tr></thead><tbody>
+<tr><td><code>list_20251027.xlsx</code></td><td><strong>国が指定した伝統的工芸品244品目の一覧</strong>（品目名・よみ・都道府県・指定年月日・関連URL）</td><td><code>https://www.meti.go.jp/policy/mono_info_service/mono/nichiyo-densan/xlsx/list_20251027.xlsx</code></td></tr>
+<tr><td><code>planlist.xlsx</code></td><td><strong>伝産法に基づく認定計画の一覧。「作成主体」列に組合名・企業名が入っている</strong>（例：京都青窯会協同組合、新潟漆器製造株式会社、一般財団法人京都伝統工芸産業支援センター）</td><td><code>https://www.meti.go.jp/policy/mono_info_service/mono/nichiyo-densan/xlsx/planlist.xlsx</code></td></tr>
+</tbody></table>
+<p><strong>経済産業省ウェブサイト利用規約</strong>（<code>https://www.meti.go.jp/main/rules.html</code>）：</p>
+<blockquote>コンテンツの著作権は、特記されていない限り経済産業省に帰属し、権利表記の記載がない限り「<strong>公共データ利用規約（第1.0版）</strong>」（PDL1.0）に準拠した利用条件の下で、利用することができます。<br>コンテンツを利用する際は<strong>出典を記載してください</strong>。（出典記載例）出典：経済産業省ウェブサイト（当該ページのURL）</blockquote>
+<p>→ <strong>PDL1.0 は CC BY 4.0 互換。商用利用可・改変可・再公開可。条件は出典明記のみ。</strong></p>
+<p>→ <strong>住所・TEL は入っていません</strong>（実確認済み）。連絡先は kougeihin.jp 側にしかありません。したがって：</p>
+<pre><code>品目名・都道府県・組合名／企業名  … METI 由来 → 社内可・PUBLIC 公開も可（出典明記）
+住所・TEL・FAX                    … kougeihin.jp 由来 → 社内のみ。公開は不可</code></pre>
+<p><strong>この2層でリストを持ってください。</strong> 公開できる列と公開できない列をファイルレベルで分けておけば、事故が起きません。</p>
+<h2>1-7. 産地組合への連絡（§4.1 第三者連絡・社長承認前提）</h2>
+<p><strong>法的な障害はありません。</strong> ただし着手前に3つ整えてください。</p>
+<table><thead><tr><th>#</th><th>論点</th><th>対応</th></tr></thead><tbody>
+<tr><td>1</td><td><strong>電話</strong></td><td>事業者間の営業電話は特定商取引法の規制対象外。<strong>法的障害なし。</strong> 産地組合は日中に人がいる時間が限られるため常識的な時間帯に</td></tr>
+<tr><td>2</td><td><strong>メール</strong></td><td>特定電子メール法3条1項4号により、<strong>サイトにアドレスを公表している事業者には同意なく送れます</strong>。ただし<strong>施行規則3条ただし書</strong>に注意 ——「自己の電子メールアドレスと併せて<strong>特定電子メールの送信をしないように求める旨の文言</strong>を…公衆が閲覧することができる状態に置いたとき」は送信不可。<strong>「営業メールお断り」表示の有無を収集時に判定してレコードに記録すること。</strong> 後から遡れません（立証責任は送信者側）。罰則は措置命令違反で1年以下の拘禁刑／100万円以下の罰金、<strong>法人両罰3,000万円以下</strong></td></tr>
+<tr><td>3</td><td><strong>利用目的の公表</strong></td><td>個人情報保護法21条1項。244組合に個別通知は非現実的なので、<strong>「公表の場」を先に用意</strong>する（自社サイトに1ページ置く）。連絡開始より前に</td></tr>
+</tbody></table>
+<p><strong>連絡そのものの実行は §4.1 該当です。社長承認が下りるまで、当職も他のエージェントも一切実行しません。</strong></p>
+<h2>1-8. リスクシナリオ・対応策・撤退条件（グレーを進める際の3点セット）</h2>
+<table><thead><tr><th>項目</th><th>内容</th></tr></thead><tbody>
+<tr><td><strong>リスクシナリオ</strong></td><td>協会から「サイトポリシー違反である。データを削除せよ」と連絡が来る</td></tr>
+<tr><td><strong>発生確率</strong></td><td>低（社内保持のみ・14分・1回・UA明示のため検知される可能性が低い）</td></tr>
+<tr><td><strong>影響度</strong></td><td>小〜中（削除要求への応諾で終息。損害賠償に至る筋は考えにくい）</td></tr>
+<tr><td><strong>不可逆性</strong></td><td><strong>低。</strong> 社内データを消せば原状回復できる。<strong>だから進めてよい</strong>と判断しました</td></tr>
+<tr><td><strong>対応策</strong></td><td>削除要求が来たら<strong>争わず即時に全削除</strong>。段階3（自分で取り直した一次情報）だけを残す</td></tr>
+<tr><td><strong>撤退条件</strong></td><td>①403/429/5xx が1回でも返る ②協会から連絡が来る ③robots.txt に <code>/craft/</code> の Disallow が追加される —— <strong>いずれか1つで即時・永久に停止</strong></td></tr>
+</tbody></table>
+<blockquote><strong>なお、公開（段階2）だけは不可逆性が高いので、確率が低くても許可しません。</strong> PUBLIC リポに commit した瞬間に世界へ配布され、取り消せません。</blockquote>
+<hr>
+<h1>第II部　最優先② orosy 利用規約 第14条</h1>
+<h2>2-1. 規約の特定（まずここを間違えない）</h2>
+<table><thead><tr><th>項目</th><th>実測</th></tr></thead><tbody>
+<tr><td>文書名</td><td><strong>orosyバイヤーAPI利用規約</strong></td></tr>
+<tr><td>制定 / 改定</td><td><strong>2026年7月23日 制定 / 2026年8月29日 改定</strong>（改定からわずか2日後の判定です）</td></tr>
+<tr><td>取得元</td><td><code>https://wholesale-portal.orosy.com/terms</code>（SPA。JSバンドル <code>/assets/index-D5L8jyX8.js</code> に構造化データとして規約全文が埋め込まれている。全35条）</td></tr>
+<tr><td><strong>API利用規約は別文書か</strong></td><td><strong>別文書ではありません。</strong> 第4章（第12条〜第16条）が API 専用章として<strong>同一の規約内</strong>にあります。<strong>NETSEA のような別建て規約の罠はありません</strong></td></tr>
+</tbody></table>
+<blockquote>サトルの懸念（#3 別文書の罠）は<strong>空振り</strong>でした。良い確認です。ただし後述の第30条に別の穴があります。</blockquote>
+<h2>2-2. 第14条 原文</h2>
+<blockquote><strong>第１４条（商品データ等の利用許諾の範囲）</strong><br>１　APIユーザーは、APIを通じて取得した本商品に関するデータ（商品情報、価格、在庫等を含みます。以下「本データ」といいます。）を、<strong>APIユーザー自身が本サービスにより本商品を仕入れ、又は販売する目的の範囲においてのみ</strong>利用することができます。<br>２　APIユーザーは、本データを、前項の目的に必要な範囲で、<strong>APIユーザーが運営するウェブサイト、システムその他の媒体に表示することができます。</strong>ただし、APIユーザーは、本データを第三者に<strong>再配布し、提供し、開示し、又は販売してはならない</strong>ものとします。<br>３　APIユーザーは、本データを常に最新の内容に更新して利用するものとし、orosyが本サイト上の情報を変更した場合には、速やかにこれに合わせるものとします。</blockquote>
+<h2>2-3. 「その他の媒体」に Amazon は入るか — <strong>入りません。しかし経路は死にません</strong></h2>
+<h3>(1) 文言解釈</h3>
+<p>「<strong>APIユーザーが運営する</strong>ウェブサイト、システムその他の媒体」——「APIユーザーが運営する」が3語すべてに係ります。<strong>Amazon の商品ページを運営しているのは Amazon であって当社ではありません。</strong></p>
+<blockquote>明文主義で読みます。「出品者だから自分の媒体だ」は、書かれていないことを都合よく補う読み方です。<strong>採りません。</strong></blockquote>
+<h3>(2) それでも経路が成立する理由 — <strong>設問の立て方が違います</strong></h3>
+<p><strong>問うべきは「Amazon に表示してよいか」ではなく「そもそも orosy の本データを Amazon に表示する必要があるか」です。答えは No です。</strong></p>
+<table><thead><tr><th>出品の型</th><th>Amazon に置くもの</th><th>orosy の本データを表示するか</th><th>判定</th></tr></thead><tbody>
+<tr><td><strong>既存 ASIN への相乗り出品</strong>（JAN でカタログに一致）</td><td><strong>自分が決めた販売価格・在庫数・コンディション・SKU</strong> のみ</td><td><strong>しない。</strong> 商品名・説明・画像はすでにある Amazon カタログのもの。価格は自分の意思決定であって orosy の卸価格ではない</td><td><strong>第14条2項の問題が発生しない → 可</strong></td></tr>
+<tr><td><strong>新規 ASIN を作る</strong>（orosy の商品名・説明文・画像を使う）</td><td>orosy の商品情報そのもの</td><td><strong>する</strong></td><td><strong>不可。</strong> 第14条2項（自社の媒体に限る）＋<strong>第28条2項</strong>（写真その他のコンテンツの複製・転載・改変・二次利用の禁止）に抵触</td></tr>
+</tbody></table>
+<p><strong>そして orosy の掲載20万点は、JAN が付いた既製品です。相乗り出品が基本形になります。したがって「今・数を打つ」用途では第14条2項は障害になりません。</strong></p>
+<h3>(3) 実装ルール（そのままエンジニアへ）</h3>
+<pre><code>可：  JAN・buyer_price・retail_price・stock_qty・order_unit を社内DBに保持し、
+      利益計算・仕入判断に使う（第14条1項「仕入れ、又は販売する目的の範囲」に該当）
+可：  自社の管理画面・自社サイトに本データを表示する（第14条2項）
+可：  JAN で Amazon カタログを引き当て、既存 ASIN に相乗り出品する
+不可：orosy の商品名・説明文・スペック文・画像を Amazon の商品ページに入れる
+不可：本データを PUBLIC リポに commit する（＝第14条2項ただし書「第三者に…開示」に該当）
+不可：本データを第三者に見せる・売る・共有する
+必須：第14条3項。在庫と価格は「常に最新」に更新する。古い値で出品したまま放置しない</code></pre>
+<blockquote><strong>PUBLIC リポへの commit が第14条2項ただし書に当たる点は特に注意してください。</strong> 「社内DBだから」は通りません。<strong>このリポジトリは公開されており、30分ごとに自動 push されます。</strong></blockquote>
+<h2>2-4. 第25条(4)(9) と 第14条 の優劣 — <strong>第14条が優先します</strong></h2>
+<table><thead><tr><th>条項</th><th>原文</th></tr></thead><tbody>
+<tr><td>第25条(4)</td><td>本サービスによって得られた情報を<strong>商業的に利用する行為</strong></td></tr>
+<tr><td>第25条(9)</td><td>本サービス並びに本サービスのコンテンツ及びその内容について、その全部又は一部を問わず、<strong>商業目的で利用</strong>（使用、複製、複写、蓄積、再生、販売、再販売その他形態のいかんを問いません）すること</td></tr>
+</tbody></table>
+<p><strong>第14条が優先する根拠は、推測ではなく明文です。</strong></p>
+<blockquote><strong>第２８条２項</strong> 利用者等は、orosy又は仕入元が本サービスに掲載した本商品の写真その他のコンテンツについて、複製、転載、改変その他の二次利用をすることはできないものとします。<strong>なお、APIを通じて取得した本データの利用については、第１４条の定めによるものとします。</strong></blockquote>
+<p><strong>規約自身が「API 経由の本データは第14条による」と明記しています。</strong> これは第14条が API データについての特別条項（lex specialis）であることの、規約内部からの明文の指示です。加えて構造上も、第14条は「第4章 API利用」に、第25条は「第5章 一般条項」に置かれています。<strong>特別条項が一般条項に優先する、という一般原則と、この明文の指示が一致します。</strong></p>
+<p><strong>残る適用範囲：第25条(4)(9) は「API を通さずに本サイトを閲覧して得た情報」には引き続き効きます。</strong> つまり <strong>orosy のサイトを画面で見て手作業でコピーする、あるいはサイトをスクレイピングする行為は、第25条(4)(9) と第15条2項に抵触します。API 以外の取得経路は使わないでください。</strong></p>
+<h2>2-5. Amazon での再販そのものは禁止されているか — <strong>禁止されていません</strong></h2>
+<p>全35条を「転売／再販／再販売／販路／モール／Amazon／アマゾン／楽天／小売／販売先／チャネル／値引／価格を」で機械走査しました。</p>
+<table><thead><tr><th>語</th><th>ヒット数</th></tr></thead><tbody>
+<tr><td>転売・販路・モール・Amazon・アマゾン・楽天・小売・販売先・チャネル・値引</td><td><strong>すべて 0件</strong></td></tr>
+<tr><td>再販売</td><td><strong>1件のみ</strong>（第25条(9) の禁止行為列挙の中。販路の話ではない）</td></tr>
+</tbody></table>
+<p>さらに、<strong>規約自身が再販を前提としています。</strong></p>
+<blockquote><strong>第１条７項</strong> 「本サービス」とは、orosyが売主として、仕入元から仕入れた本商品を<strong>事業者に対し卸売価格で販売するEC</strong>及び当該取引に係るAPIを通じた利用に関するサービス「orosyバイヤーAPI」をいいます。</blockquote>
+<p><strong>卸売価格で事業者に売るサービスです。買った事業者が再販することが、サービスの定義そのものに含まれています。</strong> 第25条(14)「本来のサービス提供の目的とは異なる目的で利用する行為」にも当たりません。</p>
+<p><strong>価格拘束の条項もありません。</strong> 仮にあったとしても、<strong>独占禁止法2条9項4号（再販売価格の拘束）</strong>に該当し、公正取引委員会の規制対象です。当社が価格を自由に決めることを妨げる条項は、少なくとも一般消費財については無効の余地が大きい。</p>
+<p><strong>なお、承認制の壁が無いというサトルの読みは正しい。</strong> 第5条により売主は orosy 自身で、利用者と仕入元の間に契約関係が生じません。<strong>ただし「壁ゼロ」ではありません</strong> —— 第3条1項により<strong>会員登録自体に orosy の承諾が必要</strong>で、公式 <code>llms.txt</code> も「初回発注の前に事業者確認（審査制）があります」と明記しています。<strong>サプライヤーごとの壁が無いだけで、入口に1枚審査があります。</strong></p>
+<h2>2-6. 旧規約（<code>tos.spaceengine.io/retailer</code>）は及ぶか — <strong>及びません</strong></h2>
+<table><thead><tr><th>項目</th><th>旧「orosyバイヤー利用規約」</th><th>新「orosyバイヤーAPI利用規約」</th></tr></thead><tbody>
+<tr><td>本サービスの定義</td><td>第1条6号「<strong>サプライヤーが設定する価格で商品の販売ができるサービス「orosy」</strong>」</td><td>第1条7号「orosyが売主として…<strong>卸売価格で販売するEC</strong>及びAPI…「<strong>orosyバイヤーAPI</strong>」」</td></tr>
+<tr><td>売主</td><td>サプライヤー（第8条1項）</td><td><strong>orosy</strong>（第5条）</td></tr>
+<tr><td>取引申請制</td><td><strong>あり</strong>（第7条）</td><td><strong>なし</strong></td></tr>
+<tr><td>画像の二次利用</td><td>禁止（第20条2項）</td><td>禁止（第28条2項）※ API データは第14条による</td></tr>
+<tr><td>適用範囲条項</td><td>第2条「orosyと<strong>バイヤー</strong>との<strong>本サービス</strong>の利用に関する条件」</td><td>第2条「orosyと<strong>利用者等</strong>との<strong>本サービス</strong>の利用に関する条件」</td></tr>
+</tbody></table>
+<p><strong>それぞれの第2条が、自らの「本サービス」に適用範囲を限定しています。</strong> 別サービス・別契約です。<strong>旧サービス（<code>retailer.orosy.com</code>）に登録しない限り、旧規約に拘束されません。</strong></p>
+<blockquote><strong>条件：旧サービスには登録しないでください。</strong> 両方に登録すると旧規約が別途適用され、第7条の取引申請制と第20条2項が復活します。設計が崩れます。</blockquote>
+<h2>2-7. 【赤線】不利な条項 — 削除交渉は不可能なので、運用で防ぐ</h2>
+<p>定型約款であり交渉余地はありません。<strong>運用で潰します。</strong></p>
+<table><thead><tr><th>条項</th><th>内容</th><th>何が起きるか</th><th>防御策</th></tr></thead><tbody>
+<tr><td><strong>第7条3項</strong></td><td>orosy は在庫切れ・仕入条件変更・誤表示・<strong>「その他適当でないと判断した場合」</strong>に承諾を拒絶／契約を解除できる。損害の責任は負わない</td><td><strong>注文が通る保証がない</strong></td><td><strong>無在庫（受注後発注）を採らない。</strong> 有在庫で仕入れて FBA へ</td></tr>
+<tr><td><strong>第9条3項</strong></td><td>納期は目安。確定納期を保証しない</td><td>同上</td><td>同上</td></tr>
+<tr><td><strong>第10条1項</strong></td><td>破損・誤配送・数量不足は<strong>受領後5日以内</strong>に連絡。それを過ぎたら<strong>一切責任を負わない</strong>（3項）</td><td><strong>開梱せずに FBA へ横流しすると、権利を失ってから不良が発覚する</strong></td><td><strong>入荷したら自分で開梱・検品してから FBA へ送る。</strong> 5日を絶対に超えない</td></tr>
+<tr><td><strong>第10条2項</strong></td><td>都合による返品・交換・キャンセル不可</td><td>売れ残りを戻せない</td><td>初回ロットを小さく</td></tr>
+<tr><td><strong>第11条</strong></td><td>受領拒否・引取り不能で<strong>商品相当額の違約金</strong></td><td>配送先ミスが致命傷になる</td><td>配送先は FBA 納品先を都度確認</td></tr>
+<tr><td><strong>第8条3項</strong></td><td>遅延損害金 <strong>年14.6%</strong></td><td>—</td><td>クレカ決済のみなので実務上は与信の問題</td></tr>
+<tr><td><strong>第23条6項</strong></td><td>損害賠償の上限＝<strong>当該売買契約の商品代金額</strong></td><td><strong>偽物・知財侵害品を掴んでも、回収できるのは仕入代金だけ。</strong> Amazon 側の出品権限停止は補償されない</td><td>第23条3項で orosy は真正性・適法性・第三者権利の非侵害を<strong>一切保証しない</strong>。<strong>知財クレームのリスクは全部こちら持ち</strong>と理解して仕入れる</td></tr>
+<tr><td><strong>第23条5項</strong></td><td>法令・ガイドライン適合の確認は<strong>利用者の費用と責任</strong></td><td>薬機法・食品表示法・PSE 等の責任はこちら</td><td>カテゴリごとに事前確認</td></tr>
+<tr><td><strong>第24条</strong></td><td>14日の予告で規約を変更できる</td><td><strong>今日の判定が14日後に変わり得る</strong></td><td><strong>「orosy 規約 差分確認」を月次ルーチンに入れる。</strong> 改定日（現在：2026-08-29）を監視</td></tr>
+<tr><td><strong>第30条</strong></td><td>「本サービスに掲載する<strong>本サービスの利用に関するルール等も、本契約の内容を構成する</strong>」</td><td><strong><code>help.orosy.com</code> は非ログインで HTTP 403。読めていないルールが契約内容に入っている</strong></td><td><strong>未確認領域として明示。</strong> 登録後に秘書がログインしてヘルプ全文を確認するまで、大口の発注はしない</td></tr>
+<tr><td><strong>第15条2項(1)(3)</strong></td><td>定める制約を超える大量アクセス／認められた範囲を超える蓄積の禁止</td><td>API キー停止</td><td>レート制限を守る。全件ダンプ型の取得をしない</td></tr>
+</tbody></table>
+<h2>2-8. orosy の総合判定</h2>
+<p><strong>可。ただし下記5つを実装条件とします。</strong></p>
+<ol>
+<li><strong>有在庫のみ。</strong> 受注後発注（無在庫）は第7条3項・第9条3項により採らない</li>
+<li><strong>入荷したら自分で開梱・検品。</strong> 第10条1項の5日以内を絶対に守る</li>
+<li><strong>相乗り出品のみ。</strong> orosy の商品説明文・画像を使った新規 ASIN 作成はしない</li>
+<li><strong>本データを PUBLIC リポに commit しない</strong>（第14条2項ただし書）</li>
+<li><strong>旧サービス <code>retailer.orosy.com</code> には登録しない</strong></li>
+</ol>
+<p><strong>残る未確認：<code>help.orosy.com</code>（HTTP 403）のルール本文。第30条により契約内容を構成します。→ 秘書に依頼（ログイン後の確認）。</strong></p>
+<p><strong>会員登録・API キー取得は §4.1（法的拘束＝利用規約への同意）該当。当職は実行しません。社長承認をお取りください。</strong></p>
+<hr>
+<h1>第III部　3〜6の判定</h1>
+<h2>3. スーパーデリバリー — <strong>条件付き可。「発注前に人が読むゲート」を必須化する</strong></h2>
+<h3>3-1. 会員規約の所在（サトルが辿り着けなかった場所）</h3>
+<p><code>https://www.superdelivery.com/p/contents/guide/rules.jsp</code>（HTTP 200・160KB）。<strong>トップからは辿れず、<code>/p/contents/guide/sitemap.jsp</code> 経由でのみ到達できます。</strong></p>
+<h3>3-2. 第6条 原文（承認制の壁は「ある」）</h3>
+<blockquote><strong>第6条（当サイトにおける会員と出展者の関係）</strong><br>会員は、当サイトにおいて、各出展者の商品の購入を初めて希望するときは、<strong>当該出展者の審査を受けるもの</strong>とします。（中略）<br>当サイトにおいては、商品は、出展者又はその仕入先から会員に直送されるものとし、送料の負担、返品の可否及び方法、<strong>購入した商品の販売方法の制限（ウェブサイトを通じた販売の禁止等）</strong>その他の取引条件については、<strong>出展者が当サイト中の各出展者個別の画面に記載された定めに従うもの</strong>とします。<strong>当社は、出展者からの商品の送付、各出展者が個別に定める取引条件については責任を負いません。</strong></blockquote>
+<p><strong>サトルの報告「一律禁止ではない」は正しい。</strong> ただし2点を補います。</p>
+<ul>
+<li><strong>承認制の壁は SD にもあります</strong>（第6条1項）。「壁がないのは orosy だけ」という整理が正しい</li>
+<li><strong>「従うものとします」＝会員は出展者の制限に従う契約上の義務を負います。</strong> 破れば会員規約違反であり、SD からの会員資格剥奪と、出展者からの損害賠償請求の両方があり得ます</li>
+</ul>
+<h3>3-3. 実務上どう運用するか（ご依頼の「導線」）</h3>
+<p><strong>「発注ボタンの手前に、人間が1回だけ読むゲートを置く」——これしかありません。機械判定は不可能です（個別画面はログイン後にしか存在しない）。</strong></p>
+<pre><code>【出展者ゲート（初回1回のみ・以後は台帳を参照）】
+
+  発注しようとする
+      ↓
+  社内台帳に この出展者の判定があるか？
+      ├─ ある → 判定が amazon_ok なら発注可 / ng・要確認なら発注ブロック
+      └─ ない → ここで停止。人が出展者個別画面を開いて読む
+                    ↓
+             ① 「販売方法の制限」欄の全文を読む
+             ② 画面のスクリーンショットを保存する（後日の立証用）
+             ③ 台帳に記録：
+                  supplier_id / supplier_name
+                  amazon_ok = ok | ng | 要確認
+                  原文の該当箇所（コピー）
+                  screenshot_path
+                  confirmed_at（確認日）
+                  confirmed_by（誰が読んだか）
+             ④ 「要確認」（記載なし・曖昧・&quot;要相談&quot;）は
+                → **ng と同じ扱いにする。読めないものを ok にしない**</code></pre>
+<table><thead><tr><th>ルール</th><th>理由</th></tr></thead><tbody>
+<tr><td><strong>読むのは初回1回でよい</strong></td><td>第6条1項により、審査に合格すれば「以後出展者より別段の意思表示がない限り、継続的に販売するもの」とされている</td></tr>
+<tr><td><strong>ただしスクリーンショットと確認日を必ず残す</strong></td><td>出展者は条件を変えます。争いになったとき「その日の画面はこうだった」を示せない側が負けます</td></tr>
+<tr><td><strong>「要確認」は ng 扱い</strong></td><td><strong>グレーは NO。</strong> 判別できないまま仕入れた場合、責任は当社にあります（第6条2項「当社は…責任を負いません」）。SD は守ってくれません</td></tr>
+<tr><td><strong>年1回は台帳を洗い替える</strong></td><td>条件変更の検知</td></tr>
+</tbody></table>
+<h3>3-4. 非会員での JAN 機械収集 — <strong>可（条件付き）</strong></h3>
+<table><thead><tr><th>論点</th><th>判定</th></tr></thead><tbody>
+<tr><td>robots.txt</td><td><code>User-agent: *</code> セクションは <strong><code>/p/r/pd_p/</code> を Disallow していない</strong>（Disallow は検索の絞り込みパラメータ付きURL・ログイン系のみ）。実取得で確認済み。<strong>ただし <code>meta-externalagent</code> <code>PetalBot</code> には <code>Crawl-delay: 10</code> と広い Disallow が設定されている</strong> → 当社も <strong>10秒間隔</strong>に合わせるのが安全</td></tr>
+<tr><td>会員規約は非会員に及ぶか</td><td><strong>及びません。</strong> 契約が成立していない（第2条以下は会員との契約）</td></tr>
+<tr><td>収集してよいもの</td><td><strong>JAN・メーカー品番・参考上代（税抜）・販売単位。すべて事実データで著作物性なし</strong></td></tr>
+<tr><td>収集してはいけないもの</td><td><strong>商品説明文・商品画像</strong>（著作物）</td></tr>
+<tr><td>速度</td><td><strong>同一ホスト10秒間隔・同時1・403/429で即時永久停止</strong>（robots.txt の Crawl-delay: 10 に合わせる）</td></tr>
+</tbody></table>
+<h3>3-5. 【赤線】会員登録した後は第17条が効きます</h3>
+<blockquote><strong>第17条（著作権等）</strong><br>当サイト（当サイトにおける出展者個別の画面を含みます）に掲載されている画像・文章・マーク・標章等<strong>一切の情報</strong>（その全部か一部かを問いません）を、<strong>当社の事前の同意なく、他のサイトに複製・転用又は発信することを禁じます。</strong><br>商品によっては、会員の運営・関係するホームページ上で紹介することは可能です。<strong>ただし、掲載の可否、方法については、当社の事前の同意を要するものとします。</strong></blockquote>
+<p><strong>帰結（orosy と真逆です。混同すると事故ります）</strong></p>
+<table><thead><tr><th>行為</th><th>判定</th></tr></thead><tbody>
+<tr><td>収集した JAN 等を<strong>社内DB</strong>に持つ</td><td><strong>可</strong>（「他のサイトに複製・転用又は発信」に当たらない）</td></tr>
+<tr><td>SD の商品画像・説明文を <strong>Amazon に転載</strong></td><td><strong>不可。</strong> 第17条1項に真正面から違反。第17条2項の例外は「<strong>会員の運営・関係するホームページ</strong>」に限られ、Amazon は該当しない。しかもその例外にすら<strong>SD の事前同意が要る</strong></td></tr>
+<tr><td>SD 由来データを <strong>PUBLIC リポに commit</strong></td><td><strong>不可。</strong>「他のサイトに…発信」に当たる</td></tr>
+<tr><td>既存 ASIN への相乗り出品</td><td><strong>可</strong>（SD のコンテンツを何も使わないため）</td></tr>
+</tbody></table>
+<h3>3-6. 未確認 → 秘書に依頼</h3>
+<ul>
+<li><strong>3,413社のうち Amazon 再販が許される社数</strong>（有効母数）</li>
+<li><strong>絞り込みに「ネット販売可」相当のフィルタがあるか</strong>（非ログインでは「画像転載できる」までしか見えない）</li>
+<li><strong>上記ゲートを機械化できる項目が API/CSV で取れるか</strong></li>
+</ul>
+<blockquote><strong>いずれもログイン後の画面です。ログインは社長本人の一手です。秘書が在席確認のうえ、社長にログインだけお願いして、以降は秘書が操作してください（CLAUDE.md §4.4）。</strong></blockquote>
+<hr>
+<h2>4. ザッカネット — <strong>現時点 NO。規約が読めない</strong></h2>
+<h3>4-1. 実査結果：利用規約は公開ページに存在しません</h3>
+<table><thead><tr><th>確認先</th><th>結果</th></tr></thead><tbody>
+<tr><td><code>https://www.zakka.net/robots.txt</code></td><td>200。<code>/zmadm/</code> <code>/kanri/</code> <code>/gen_sitemap.php</code> のみ Disallow</td></tr>
+<tr><td>トップページの全リンク</td><td><strong>規約系は <code>guide/privacy.php</code>（プライバシーポリシー）のみ。利用規約なし</strong></td></tr>
+<tr><td><code>guide/</code> 配下の全リンク</td><td>同上。<strong>利用規約なし</strong></td></tr>
+<tr><td><code>guide/kiyaku.php</code> <code>guide/terms.php</code> <code>guide/rule.php</code> <code>guide/agreement.php</code> <code>reg/kiyaku.php</code></td><td><strong>すべて 404</strong></td></tr>
+<tr><td><code>sitemap.xml</code> → <code>sitemap-1〜4.xml</code> を全件走査</td><td><strong><code>guide/</code> <code>guide/corporate.php</code> <code>guide/inquiry.php</code> <code>guide/reg_require_buy.php</code> <code>guide/reg_require_sup.php</code> のみ。規約URLは1本もない</strong></td></tr>
+<tr><td><code>reg/reg_01.php</code>（登録フロー1画面目）</td><td>200。審査基準は載っているが、<strong>規約へのリンクなし</strong></td></tr>
+</tbody></table>
+<p><strong>サトルの「4パターン試行してすべて404」を、独立に再現・拡大確認しました。公開されていないのは事実です。</strong></p>
+<h3>4-2. 判定</h3>
+<p><strong>NO。</strong> 理由は1行です。</p>
+<blockquote><strong>規約を読まずに会員登録することは、内容を知らないまま法的拘束を受けることです。§4.1（法的拘束＝利用規約への同意）に該当する行為を、白紙で行うことになります。法務として承認できません。</strong></blockquote>
+<h3>4-3. 解除の手順（進めたいなら）</h3>
+<ol>
+<li><strong>秘書が <code>reg/index.php</code> → <code>reg_01.php</code> → 「次へ進む」で step2（入力画面）へ進む</strong>。多くの日本のBtoBサイトは、この画面に規約全文または規約リンクを置いています</li>
+<li><strong>同意チェックボックスは絶対に押さない。押した時点で §4.1 の違反になります</strong></li>
+<li>規約全文を取得したら当職に回してください。<strong>その時点で改めて判定します</strong></li>
+<li>見つからなければ <strong><code>guide/inquiry.php</code> から「利用規約の開示を求める」</strong>。ただし<strong>問い合わせ送信は §4.1（第三者連絡）</strong> です。社長承認が要ります</li>
+</ol>
+<h3>4-4. 「固定電話」要件（社長は個人事業主で固定電話なし）</h3>
+<p>登録審査基準（<code>reg/reg_01.php</code> 原文・実取得）：</p>
+<blockquote>- 法人または個人事業主でビジネスを目的として利用する方。（<strong>商業登記簿や開業届の確認がございます</strong>）<br>- <strong>事業者名で固定電話による受信が可能であること。</strong><br>- 事務所や店舗の存在が何らかの形で確認出来ること。<br>- 過去の営業実績や新たな事業計画の具体性が確認出来ること。</blockquote>
+<table><thead><tr><th>論点</th><th>判定</th></tr></thead><tbody>
+<tr><td>この要件は適法か</td><td><strong>適法。</strong> 私企業が取引相手を選ぶ基準であり、法的な問題はありません</td></tr>
+<tr><td>個人事業主でも通るか</td><td><strong>要件上は可能。</strong> 1行目が「法人または個人事業主」と明記しています。<strong>開業届は済んでいます</strong>（<code>knowledge_kaigyo_todoke_2026</code>）</td></tr>
+<tr><td>固定電話は満たせるか</td><td><strong>0ABJ番号（光電話等）を実際に契約すれば満たせます。</strong>「固定電話」は通常 03/06 等の地域番号を指し、<strong>050 の IP 電話は含まれない扱いが多い</strong>（ただし<strong>ザッカネットの定義は未確認</strong>）</td></tr>
+<tr><td><strong>費用</strong></td><td><strong>回線契約は §4.1（金銭）。社長承認が必要です</strong></td></tr>
+<tr><td><strong>やってはいけないこと</strong></td><td><strong>バーチャルオフィスの転送番号を「事務所」として申告する等の虚偽申告。</strong> 規約違反であり、程度によっては刑法246条（詐欺）の問題になります。<strong>絶対にやりません</strong></td></tr>
+<tr><td>「過去の営業実績」</td><td>社長は物販実績ゼロ。<strong>「新たな事業計画の具体性」で通す</strong>しかありません。これは事実の問題で、法務の領分ではありません</td></tr>
+</tbody></table>
+<h3>4-5. FAQ の「直接の取引交渉が可能」を本丸経路の根拠にしてよいか — <strong><span class="badge" style="background:#fde7e5;color:#b3261e">不可</span></strong></h3>
+<p><strong>FAQ は契約条項ではありません。</strong> 運営が任意に書き換えられる説明文です。<strong>規約本文で裏が取れるまで、これを前提に設計しないでください。</strong> 影響が大きい論点ほど、契約文書で確認します。</p>
+<hr>
+<h2>5. YouTube Data API <code>search.list</code> — <strong><span class="badge" style="background:#fde7e5;color:#b3261e">NO</span></strong></h2>
+<h3>5-1. 決定的な条文2つ（<code>https://developers.google.com/youtube/terms/developer-policies</code>・最終更新 2026-06-24）</h3>
+<p><strong>(1) データ集約の禁止（III.E）</strong></p>
+<blockquote><strong>Data Aggregation</strong><br><strong>Do not aggregate API Data</strong> except that you may only aggregate API Data relating to YouTube channels that are under the same content owner as recognized by YouTube pursuant to content licensing agreement(s) between YouTube and such content owner. Such aggregated API Data must only be viewable by that content owner.</blockquote>
+<p><strong>「複数チャンネルの情報を集めて一覧にする」——これがまさに aggregate です。</strong> 例外は「同一コンテンツオーナー配下のチャンネル」に限られ、当社は該当しません。<strong>「EC が弱いメーカーを探すために数千チャンネルを集めてリスト化する」は、文言上この禁止に真正面から当たります。</strong></p>
+<p><strong>(2) 非認可データの保存は30暦日まで（III.E.4.d）</strong></p>
+<blockquote>API Clients may temporarily store limited amounts of <strong>Non-Authorized Data</strong> for as long as is necessary for the purposes of the API Client but <strong>not longer than 30 calendar days.</strong> … after 30 calendar days, the API Client must either <strong>delete or refresh</strong> the stored data.<br>（同 c）<strong>an API Client must not store statistics retrieved as Non-Authorized Data for more than 30 days.</strong> For example, an API Client must not store the subscriber count for a YouTube channel for more than 30 days without authorization from the channel owner.</blockquote>
+<p>OAuth なしで <code>search.list</code> / <code>channels.list</code> から取るチャンネル名・概要欄・登録者数は、すべて <strong>Non-Authorized Data</strong> です。<strong>永続的な候補リストとして保持することは規約違反です。</strong></p>
+<p><strong>(3) スクレイピング禁止（III.E）</strong></p>
+<blockquote><strong>Scraping</strong><br>You and your API Clients must not … directly or indirectly, <strong>scrape YouTube Applications or Google Applications, or obtain scraped YouTube data or content.</strong></blockquote>
+<p><strong>API を使わずに YouTube を直接スクレイピングする代替案も、同時に潰れています。</strong></p>
+<h3>5-2. リスク評価（3軸）</h3>
+<table><thead><tr><th>軸</th><th>評価</th></tr></thead><tbody>
+<tr><td>発生確率</td><td><strong>中〜低</strong>（自動監査は主にクォータ超過を見る。ただし Policies III.H で YouTube は「survey, monitor, and/or audit」の権利を明示的に留保しています）</td></tr>
+<tr><td>影響度</td><td><strong>大</strong></td></tr>
+<tr><td><strong>不可逆性</strong></td><td><strong>高。</strong> 制裁は API キー停止に留まらず、<strong>Google アカウントの停止</strong>に及び得ます（III.D「Prohibited Access」は、認証情報が停止された場合に新規 Google アカウントを作って回避することまで禁じている＝アカウント単位の制裁が前提）。社長の Google アカウントには<strong>成果物カタログのスプレッドシート（Drive）</strong>が乗っており、<strong>事業運営のインフラです</strong></td></tr>
+</tbody></table>
+<blockquote><strong>行動原則1のとおり、不可逆性が高いものは確率が低くてもアラートを上げます。</strong></blockquote>
+<h3>5-3. しかも、リスクを取る理由がありません</h3>
+<p><strong>サトル自身がこう書いています。</strong></p>
+<blockquote><strong>展示会出展社2,353社（既に手元にある）の方が、母数でも即時性でも上です。</strong></blockquote>
+<p><strong>手元に上位互換の母集団がある状況で、Google アカウントを賭ける合理性はゼロです。</strong></p>
+<h3>5-4. 残された使い方（これだけ可）</h3>
+<table><thead><tr><th>行為</th><th>判定</th></tr></thead><tbody>
+<tr><td><strong>人が YouTube を画面で見て、気になった1社を個別に調べる</strong></td><td><strong>可。</strong> 一般利用者と同じ行為。API を使わない</td></tr>
+<tr><td>そこで知ったメーカー名を手がかりに、<strong>自社サイト・法人番号公表サイト・gBizINFO から一次情報を取り直す</strong></td><td><strong>可・推奨。</strong>（3段階の型の段階3）</td></tr>
+<tr><td><code>search.list</code> で一覧を取って候補リストを作る</td><td><strong><span class="badge" style="background:#fde7e5;color:#b3261e">不可</span></strong>（Data Aggregation）</td></tr>
+<tr><td>チャンネル情報を候補リストに30日超保持する</td><td><strong><span class="badge" style="background:#fde7e5;color:#b3261e">不可</span></strong>（III.E.4.d）</td></tr>
+<tr><td>YouTube 由来データを PUBLIC リポに commit</td><td><strong><span class="badge" style="background:#fde7e5;color:#b3261e">不可</span></strong>（store かつ再配布方向）</td></tr>
+</tbody></table>
+<h3>5-5. 他の SNS</h3>
+<table><thead><tr><th>SNS</th><th>判定</th><th>根拠・確認日</th></tr></thead><tbody>
+<tr><td><strong>X（旧Twitter）</strong></td><td><strong>NO（現時点）</strong></td><td>従量課金＝<strong>§4.1（金銭）</strong>。単価表URLが特定できず<strong>未確認</strong>。金額が分からない課金の承認は取れません</td></tr>
+<tr><td><strong>TikTok Research API</strong></td><td><strong>NO（現時点）</strong></td><td>申請＝規約同意で <strong>§4.1</strong>。<strong>利用資格の要件が公式ドキュメントに未記載＝未確認</strong>。研究用途向け API を営業リスト作成に使えるかも未確認</td></tr>
+<tr><td><strong>Instagram</strong></td><td><strong>NO（現時点）</strong></td><td>ハッシュタグ検索の公式ドキュメントが 404/400。<strong>仕様が確認できないものは判定できません。判定できないものは NO です</strong></td></tr>
+</tbody></table>
+<hr>
+<h2>6. 残る要法務確認（サトル §6 の通し回答）</h2>
+<table><thead><tr><th>#</th><th>対象</th><th>判定</th><th>根拠・条件</th></tr></thead><tbody>
+<tr><td><strong>1</strong></td><td>orosy 第14条2項「その他の媒体」に Amazon</td><td><strong>Amazon は含まれない。だが経路は成立する</strong></td><td>「APIユーザーが運営する」が全体に係る。<strong>ただし相乗り出品では本データを表示しないため問題が生じない。</strong> 第II部 2-3</td></tr>
+<tr><td><strong>2</strong></td><td>第25条(4)(9) vs 第14条</td><td><strong>第14条が優先</strong></td><td><strong>第28条2項後段「なお、APIを通じて取得した本データの利用については、第14条の定めによる」という明文の指示。</strong> 第25条は API を通さない取得（サイト閲覧・スクレイピング）に効き続ける</td></tr>
+<tr><td><strong>3</strong></td><td>旧規約が API 規約に及ぶか</td><td><strong>及ばない</strong></td><td>各規約の第2条が適用範囲を自らの「本サービス」に限定。第1条の定義も別物。<strong>条件：旧サービスに登録しないこと</strong></td></tr>
+<tr><td><strong>4</strong></td><td>SD 非会員の JAN 機械収集</td><td><strong>可（条件付き）</strong></td><td>robots.txt の <code>User-agent: *</code> は <code>/p/r/pd_p/</code> を Disallow していない。会員規約は非会員に及ばない。<strong>10秒間隔・事実データのみ・403/429 で永久停止</strong></td></tr>
+<tr><td><strong>5</strong></td><td>SD 第6条2項の機械判定と責任</td><td><strong>機械判定は不可能。人的ゲートを必須化</strong></td><td>出展者個別画面はログイン後にのみ存在。<strong>第6条2項で「従うものとします」＝会員に義務あり。SD は責任を負わない（同項後段）。「要確認」は ng 扱い。</strong> 第III部 3-3</td></tr>
+<tr><td><strong>6</strong></td><td>ザッカネット 規約本文</td><td><strong>公開されていない（実査で確定）→ 登録 NO</strong></td><td>全リンク・sitemap 4本・URL 5パターンを走査。<strong>規約を読まずに §4.1 の同意はしない</strong></td></tr>
+<tr><td><strong>7</strong></td><td>ザッカネット FAQ を本丸経路の根拠にする</td><td><strong><span class="badge" style="background:#fde7e5;color:#b3261e">不可</span></strong></td><td><strong>FAQ は契約条項ではない。</strong> 規約本文で裏を取るまで設計に組み込まない</td></tr>
+<tr><td><strong>8</strong></td><td>Amazon ドロップシッピングポリシー（G201808410）</td><td><strong>未確認 → TopSeller 型無在庫は着手不可</strong></td><td><code>sell.amazon.co.jp/learn/dropshipping</code> から公式リンクを特定（<code>https://sellercentral.amazon.co.jp/help/hub/reference/external/G201808410</code>）。<strong>3つのURL・3ロケールで実取得したが、いずれも SPA シェルで本文が返らない。</strong>→ <strong>秘書がブラウザで取得</strong>。加えて<strong>日本店が停止中</strong>であり、出品権限に関わる論点を確定できないまま無在庫を始めるのは、当職としては明確に反対です</td></tr>
+<tr><td><strong>9</strong></td><td>卸の達人 個人事業主可否</td><td><strong>不可。法人化すれば可</strong></td><td>会員規約第6条「本サイトに取引登録ができるのは店舗又はインターネット販売サイトを所有する<strong>法人のみ</strong>とし、一般消費者は利用できない」（実取得。EUC-JP）</td></tr>
+<tr><td><strong>10</strong></td><td>卸の達人 送料の記載不一致</td><td><strong>不一致を実確認。発注前に書面で確定させること</strong></td><td>会員規約第20条「<strong>700円（税込）</strong>」／第21条 代引「<strong>315円（税込）</strong>」 vs 特商法表記「<strong>送料990円（税込）</strong>」「<strong>代引き手数料330円（税込）</strong>」。<strong>加えて第2条「弊社はいつでも利用者の事前、事後の承諾無しに本契約を変更することができる」は民法548条の4（定型約款の変更）の要件を満たさず、不利益変更については無効となる余地が大きい。</strong> さらに特商法表記の「<strong>メーカー都合による販売方針の変更（販売ルートの制限など）は、ご返品不可</strong>」＝<strong>Amazon 販売が後から禁止されても在庫を戻せません</strong></td></tr>
+<tr><td><strong>11</strong></td><td>商工会議所への入会</td><td><strong>法的障害なし。§4.1（金銭）で社長承認</strong></td><td>加入金3,000円＋個人 年会費1口10,000円〜。ザ・ビジネスモール自体の利用・マッチング・成約手数料は0円</td></tr>
+<tr><td><strong>12</strong></td><td>kougeihin.jp</td><td><strong>条件付き可（社内限定）</strong></td><td>第I部のとおり</td></tr>
+<tr><td><strong>13</strong></td><td>YouTube / TikTok / X API</td><td><strong><span class="badge" style="background:#fde7e5;color:#b3261e">NO</span></strong></td><td>第III部 5 のとおり</td></tr>
+</tbody></table>
+<hr>
+<h2>7. 全経路に共通してかかる規制（見落とし防止）</h2>
+<table><thead><tr><th>法令</th><th>当社への当たり方</th><th>判定</th></tr></thead><tbody>
+<tr><td><strong>古物営業法</strong></td><td><strong>今回の5経路はすべて不要。</strong> orosy・SD・ザッカネット・卸の達人・産地組合はいずれも<strong>事業者からの新品仕入れ</strong>。要否は「新品か」ではなく「<strong>一度消費者の手に渡ったか</strong>」で決まる（<code>knowledge_kobutsusho_license</code>）</td><td><strong>許可不要</strong></td></tr>
+<tr><td><strong>薬機法</strong></td><td><strong>卸の達人はサプリ・化粧品が中心</strong>（健康サプリメント102／スキンケア185等）。<strong>製造販売業許可は不要（国内メーカー品の転売）だが、Amazon の商品ページ・広告での効能効果表現は法66条（虚偽誇大広告）の規制対象</strong>。違反は行政指導＋<strong>Amazon の出品停止</strong></td><td><strong>カテゴリごとに要注意</strong></td></tr>
+<tr><td><strong>景品表示法</strong></td><td>「日本一」「最安」等の表示は優良誤認・有利誤認。<strong>2026年時点で確約手続・課徴金制度あり</strong></td><td>表現を作る段階でヒデアキ経由で確認</td></tr>
+<tr><td><strong>食品表示法・食品衛生法</strong></td><td>SD・orosy・ザッカネットに食品カテゴリあり。<strong>賞味期限管理は FBA の45日ルールと衝突する</strong>（<code>knowledge_fba_shipment_playbook</code>）</td><td>初期は食品を避けるのが安全</td></tr>
+<tr><td><strong>電気用品安全法（PSE）</strong></td><td><strong>自分が輸入者にならない限り、届出・表示義務は生じません。</strong> 国内メーカー品・国内卸経由なら製造/輸入事業者が対応済み</td><td>国内仕入れに限る限り<strong>問題なし</strong></td></tr>
+<tr><td><strong>独占禁止法2条9項4号</strong></td><td>仕入先が販売価格を拘束してきた場合、それ自体が不公正な取引方法。<strong>今回の4サービスの規約に価格拘束条項はありません</strong>（走査済み）</td><td><strong>問題なし</strong></td></tr>
+<tr><td><strong>個人情報保護法21条1項</strong></td><td>組合・メーカーの担当者情報を取得する場合、利用目的の通知<strong>または公表</strong>が必要</td><td><strong>連絡開始前に「公表の場」を用意</strong></td></tr>
+<tr><td><strong>特定電子メール法3条1項4号・規則3条ただし書</strong></td><td>事業者への営業メールは同意不要。<strong>ただし「営業メールお断り」表示があるアドレスには送れない</strong></td><td><strong>収集時に判定・記録する設計にする</strong></td></tr>
+</tbody></table>
+<hr>
+<h2>8. 秘書カズヨへの依頼事項（ログインが必要で当職には確認できないもの）</h2>
+<table><thead><tr><th>#</th><th>依頼内容</th><th>必要な一手</th></tr></thead><tbody>
+<tr><td>A</td><td><strong>Amazon ドロップシッピングポリシー G201808410 の本文取得</strong></td><td>ブラウザツール（SPA のため curl 不可）。ログイン不要の可能性あり。<code>?mons_sel_locale=</code> 併用（<code>knowledge_scraping_and_public_db_2026</code> §3）</td></tr>
+<tr><td>B</td><td><strong>ザッカネット 登録フロー step2 の規約全文取得</strong></td><td>ブラウザ。<strong>同意チェックは絶対に押さない</strong></td></tr>
+<tr><td>C</td><td><strong>SD：Amazon 再販可の出展者数、「ネット販売可」フィルタの有無</strong></td><td>社長のログイン1手 → 以降は秘書が操作（§4.4）</td></tr>
+<tr><td>D</td><td><strong>orosy <code>help.orosy.com</code> のルール本文</strong>（第30条により契約内容を構成）</td><td>登録後。<strong>登録自体が §4.1</strong></td></tr>
+<tr><td>E</td><td><strong>ザッカネットの「固定電話」の定義</strong>（050 が可か）</td><td>問い合わせは §4.1（第三者連絡）</td></tr>
+</tbody></table>
+<hr>
+<h2>9. 社長判断が必要な論点（§4.1 該当・当職は実行していません）</h2>
+<table><thead><tr><th>論点</th><th>内容</th><th>当職の推奨</th></tr></thead><tbody>
+<tr><td><strong>orosy 会員登録＋APIキー取得</strong></td><td>法的拘束（規約同意）。費用は0円</td><td><strong>推奨する。</strong> 第II部の実装条件5つを守れるなら、規約上の障害はない</td></tr>
+<tr><td><strong>スーパーデリバリー入会</strong></td><td>法的拘束（規約同意）。入会金・会費0円。審査あり</td><td><strong>可。</strong> ただし第III部 3-3 の出展者ゲートを実装してからにする</td></tr>
+<tr><td><strong>ザッカネット入会</strong></td><td>法的拘束＋固定電話の回線契約（金銭）</td><td><strong>現時点では見送り。</strong> 規約が読めない</td></tr>
+<tr><td><strong>商工会議所入会</strong></td><td>加入金3,000円＋年会費10,000円〜（金銭）</td><td>判断材料は経理ハジメへ。<strong>法的障害はない</strong></td></tr>
+<tr><td><strong>産地組合244件への連絡</strong></td><td>第三者連絡</td><td><strong>可。</strong> ただし §1-7 の3点（電話優先・オプトアウト判定・利用目的の公表）を整えてから</td></tr>
+<tr><td><strong>YouTube / X / TikTok の API 登録</strong></td><td>規約同意＋（X は）課金</td><td><strong>反対。</strong> 第III部 5 のとおり</td></tr>
+</tbody></table>
+<hr>
+<h2>10. 出典一覧（すべて 2026-08-31 実取得）</h2>
+<h3>① kougeihin.jp</h3>
+<ul>
+<li>サイトポリシー: <code>https://kougeihin.jp/sitepolicy/</code></li>
+<li>プライバシーポリシー（運営者の確認）: <code>https://kougeihin.jp/privacy/</code></li>
+<li>robots.txt: <code>https://kougeihin.jp/robots.txt</code></li>
+<li>品目ページ実例: <code>https://kougeihin.jp/craft/0103/</code>（HTTP 200）</li>
+<li>経済産業省「伝統的工芸品」: <code>https://www.meti.go.jp/policy/mono_info_service/mono/nichiyo-densan/index.html</code>（最終更新 2026年3月3日）</li>
+<li>244品目一覧: <code>https://www.meti.go.jp/policy/mono_info_service/mono/nichiyo-densan/xlsx/list_20251027.xlsx</code></li>
+<li>認定計画一覧: <code>https://www.meti.go.jp/policy/mono_info_service/mono/nichiyo-densan/xlsx/planlist.xlsx</code></li>
+<li>経済産業省 利用規約（PDL1.0）: <code>https://www.meti.go.jp/main/rules.html</code></li>
+</ul>
+<h3>② orosy</h3>
+<ul>
+<li>orosyバイヤーAPI利用規約（2026年7月23日制定 / 2026年8月29日改定・全35条）: <code>https://wholesale-portal.orosy.com/terms</code>（本文は JS バンドル <code>https://wholesale-portal.orosy.com/assets/index-D5L8jyX8.js</code> に埋め込み）</li>
+<li>llms.txt（審査制の記述）: <code>https://wholesale-portal.orosy.com/llms.txt</code></li>
+<li>OpenAPI: <code>https://wholesale-api.orosy.com/openapi.json</code>（HTTP 200 / 60,470 bytes / openapi 3.1.0）</li>
+<li>旧「orosyバイヤー利用規約」: <code>https://tos.spaceengine.io/retailer</code></li>
+</ul>
+<h3>③〜⑥</h3>
+<ul>
+<li>スーパーデリバリー 会員規約: <code>https://www.superdelivery.com/p/contents/guide/rules.jsp</code></li>
+<li>スーパーデリバリー robots.txt: <code>https://www.superdelivery.com/robots.txt</code></li>
+<li>ザッカネット robots.txt / sitemap / 登録審査基準: <code>https://www.zakka.net/robots.txt</code> / <code>https://www.zakka.net/sitemap.xml</code>（+ <code>sitemap-1〜4.xml</code>）/ <code>https://www.zakka.net/reg/reg_01.php</code></li>
+<li>卸の達人 会員規約: <code>https://www.oroshi-tatsujin.com/e-commex/cgi-bin/ex_top_disp_page.cgi?kind=3</code></li>
+<li>卸の達人 サイト利用規約: 同 <code>?kind=2</code></li>
+<li>卸の達人 特商法表記: <code>https://www.oroshi-tatsujin.com/e-commex/cgi-bin/ex_law.cgi</code></li>
+<li>YouTube API Services — Developer Policies（最終更新 2026-06-24）: <code>https://developers.google.com/youtube/terms/developer-policies</code></li>
+<li>YouTube API Services Terms of Service: <code>https://developers.google.com/youtube/terms/api-services-terms-of-service</code></li>
+<li>Amazon ドロップシッピング（入口ページ）: <code>https://sell.amazon.co.jp/learn/dropshipping</code></li>
+<li>Amazon ドロップシッピングポリシー（<strong>本文未取得</strong>）: <code>https://sellercentral.amazon.co.jp/help/hub/reference/external/G201808410</code></li>
+</ul>
+<h3>法令</h3>
+<ul>
+<li>著作権法（law_id: 345AC0000000048）2条1項1号／12条／21条／23条1項／30条1項／30条の4第2号</li>
+<li>個人情報保護法（415AC0000000057）20条1項／21条1項／27条</li>
+<li>特定電子メール法（414AC0100000026）3条1項4号、同施行規則（414M60000008066）3条ただし書</li>
+<li>民法 522条（契約の成立）／548条の4（定型約款の変更）</li>
+<li>独占禁止法 2条9項4号</li>
+<li>刑法 233条・234条の2（業務妨害）／246条（詐欺）</li>
+<li>参考事件: 岡崎市立中央図書館事件（2010）、タウンページDB事件（東京地判平12.3.17・<strong>原文未確認</strong>）</li>
+</ul>
+<hr>
+<h2>11. 事実と推測の分離（確度の申告）</h2>
+<table><thead><tr><th>内容</th><th>区分</th></tr></thead><tbody>
+<tr><td>各規約の原文・robots.txt・HTTPステータス・ファイルの中身</td><td><strong>すべて実測</strong>（本書の日付で取得）</td></tr>
+<tr><td>orosy 全35条に販路制限条項が無いこと</td><td><strong>実測</strong>（機械走査。ヒット数を本文に記載）</td></tr>
+<tr><td>ザッカネットに公開の利用規約が無いこと</td><td><strong>実測</strong>（全リンク＋sitemap 4本＋URL 5パターン）</td></tr>
+<tr><td>卸の達人の送料不一致</td><td><strong>実測</strong>（両ページを取得して照合）</td></tr>
+<tr><td>「その他の媒体」に Amazon が含まれないという解釈</td><td><strong>法務の解釈。確度：高</strong>（文言上「APIユーザーが運営する」が係る）</td></tr>
+<tr><td>第14条が第25条に優先するという解釈</td><td><strong>法務の解釈。確度：高</strong>（第28条2項後段という明文の根拠がある）</td></tr>
+<tr><td>244品目の選択に編集著作物性が無いという評価</td><td><strong>法務の解釈。確度：中</strong>（大臣指定に依拠するため。判例原文は未確認）</td></tr>
+<tr><td>YouTube「aggregate」に候補リスト作成が含まれるという読み</td><td><strong>法務の解釈。確度：中〜高</strong>。文言は極めて広く、条文の趣旨（YouTube のビジネス洞察の防止）に照らすと狭く読む余地はある。<strong>ただし当社の行動原則は「グレーは原則 NO」であり、かつ不可逆性が高いため NO とした</strong></td></tr>
+<tr><td>Amazon ドロップシッピングポリシーの内容</td><td><strong>未確認。取得できていません</strong></td></tr>
+<tr><td>ザッカネットの「固定電話」の定義（050 の可否）</td><td><strong>未確認</strong></td></tr>
+<tr><td><code>help.orosy.com</code> のルール本文</td><td><strong>未確認</strong>（HTTP 403）</td></tr>
+</tbody></table>
+<hr>
+<p style="color:#666;font-size:.85em">法務 ハルオ / T-20260831-005 Phase B / 判定日 2026-08-31<br>
+本書のURLはすべて同日に実取得。<strong>「未確認」と明記した項目は判定していません。</strong></p>
+</body></html>
