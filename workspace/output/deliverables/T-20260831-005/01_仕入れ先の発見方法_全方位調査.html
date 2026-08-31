@@ -1,0 +1,228 @@
+<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>仕入れ先の発見方法 — 全方位調査（Amazon起点以外）</title><style>
+:root{--ink:#1a1a1a;--mute:#666;--line:#e2e2e2;--bg:#fff;--accent:#0b5;}
+*{box-sizing:border-box}
+body{font-family:-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif;line-height:1.75;color:var(--ink);background:#f7f7f5;margin:0;padding:0}
+.wrap{max-width:1080px;margin:0 auto;padding:40px 24px 80px;background:var(--bg);box-shadow:0 0 24px rgba(0,0,0,.05)}
+h1{font-size:1.7rem;border-bottom:3px solid var(--ink);padding-bottom:.5em;margin-top:0}
+h2{font-size:1.3rem;margin-top:2.2em;border-left:5px solid var(--ink);padding-left:.6em}
+h3{font-size:1.08rem;margin-top:1.8em;color:#222}
+h4{font-size:1rem;margin-top:1.4em}
+p{margin:.7em 0}
+code{background:#f0f0ee;padding:.12em .4em;border-radius:3px;font-size:.88em;font-family:ui-monospace,Menlo,monospace}
+pre{background:#1e1e1e;color:#e8e8e8;padding:14px 16px;border-radius:6px;overflow-x:auto}
+pre code{background:none;color:inherit;padding:0}
+blockquote{border-left:4px solid #bbb;margin:1em 0;padding:.3em 1em;color:#444;background:#fafaf8}
+.tw{overflow-x:auto;margin:1.1em 0}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:#f2f2ef;font-weight:600;white-space:nowrap}
+tr:nth-child(even) td{background:#fbfbfa}
+hr{border:none;border-top:1px solid var(--line);margin:2.4em 0}
+a{color:#0a5ca8;word-break:break-all}
+ul,ol{padding-left:1.5em}
+li{margin:.3em 0}
+strong{background:linear-gradient(transparent 62%,#ffe9a8 62%)}
+</style></head><body><div class="wrap"><h1>仕入れ先の発見方法 — 全方位調査（Amazon起点以外）</h1>
+
+<ul><li>チケット: T-20260831-005 / Phase A</li><li>担当: リサーチャー サトル</li><li>調査日: 2026-08-31（すべての出典は同日取得。以下、日付の記載がないURLは 2026-08-31 取得）</li><li>スコープ: 発見経路の洗い出し（27件）＋ 上位経路の実測。<strong>戦略判断（どれを何件やるか、予算配分）はタケシの領分</strong></li></ul>
+
+<hr>
+
+<h2>0. 結論（先に3行）</h2>
+
+<ol><li><strong>展示会の出展社リストは、無料・PDF・1回のダウンロードで 2,353社が手に入った（実測）。</strong> 今日から使える最大の母集団で、しかも中身が Keepa 由来の母集団とほぼ重ならない。</li><li><strong>その「重ならなさ」は測った。</strong> Keepa由来メーカー1,249社と、ギフトショー出展社2,346社の重複は <strong>2社（0.1%）</strong>。探索の向きを反転させる根拠はこの数字です。</li><li><strong>Keepa は JAN さえあれば1トークンで検証できる（実測）。</strong> 展示会・卸サイトでは JAN が手に入る。「発見＝現物側／検証＝Keepa」の分業は技術的に成立します。</li><li><strong>出展社サンプル N=26 の実測では、国内表記18社のうち6社（33.3%）が社名検索だけで Amazon 上に自社ブランド商品を確認できました</strong>（これは下限値）。海外表記8社は全滅。<strong>空振りの母集団ではありません。</strong></li></ol>
+
+<hr>
+
+<h2>1. イシューと前提</h2>
+
+<p><strong>イシュー：Amazon商品ページを起点にせずに、「実績ゼロの個人事業主が日本語で商談を始められる国内中小メーカー」を機械的に見つけられる経路はどれか。</strong></p>
+
+<p>社長の条件（チケット記載・確定）:</p>
+
+<div class="tw"><table><thead><tr><th>条件</th><th>内容</th></tr></thead><tbody><tr><td>事業形態</td><td>個人事業主</td></tr><tr><td>物販実績</td><td>ゼロ</td></tr><tr><td>ロット</td><td>初回は小ロット</td></tr><tr><td>言語</td><td>日本語での商談が前提（英語の電話対応不可）</td></tr><tr><td>相手の規模</td><td>従業員300人以下</td></tr><tr><td>支払</td><td>掛け取引不可の前提（前払い）</td></tr><tr><td>制約</td><td>Amazon 日本店アカウント停止中（T-20260826-004・復旧時期未定）</td></tr></tbody></table></div>
+
+<p><strong>評価の主軸は「実績ゼロの個人事業主が問い合わせて、門前払いされずに話が始まるか」。</strong> 件数が多くても門前払いなら価値ゼロと評価しました。</p>
+
+<p><strong>禁止事項（法務ハルオ判定・T-20260831-001 B）を踏襲:</strong></p>
+
+<ul><li>Amazon 商品ページ／ブランドストアの自動取得 → <strong>不可</strong></li><li>Google 検索結果のスクレイピング → <strong>不可</strong></li><li>メーカー公式サイトの低速クロール（robots.txt尊重・3秒間隔・UA明示）→ 条件付き可</li></ul>
+
+<hr>
+
+<h2>2. 発見方法の一覧（推奨順）</h2>
+
+<p>「社長が仕入れられる可能性」は A（実績ゼロでも話が始まる）／B（条件次第）／C（門前払いが濃厚 or 商品情報に届かない）／D（不可）で評価。</p>
+
+<h3>2-1. 推奨上位（1〜8位）</h3>
+
+<div class="tw"><table><thead><tr><th>#</th><th>方法</th><th>何が手に入るか</th><th>件数の規模</th><th>取得コスト</th><th>社長が仕入れられる可能性</th><th>検証の難易度</th></tr></thead><tbody><tr><td><strong>1</strong></td><td><strong>展示会の出展社リスト（主催者配布PDF）</strong></td><td>出展社名＋小間番号。会場で現物・カタログ・JAN・担当者</td><td><strong>実測 2,353社</strong>（東京ギフトショー第102回・1PDF）／うち国内 約85%</td><td><strong>0円・登録不要・GET 1回で取得</strong>。パースまで自動</td><td><strong>A</strong>。出展社は新規取引先を探しに来ている側。名刺交換から始まる。ただし来場は「業者対象・一般不可」＝事前登録必須</td><td>中（会社名≠Amazonブランド名。§4参照）</td></tr><tr><td><strong>2</strong></td><td><strong>展示会カレンダーから展示会自体を洗い出す</strong></td><td>国内BtoB展示会の一覧（業種・会場・開催月）</td><td><strong>実測 約360件</strong>（2026/8〜2027/9・Expo Eye掲載）</td><td>0円・GET 1回</td><td><strong>A</strong>（#1の母集団を増やす前段）</td><td>低</td></tr><tr><td><strong>3</strong></td><td><strong>楽天市場API／Yahoo!ショッピングAPIでメーカー直販店を抽出</strong></td><td>店舗名・店舗URL・商品名・価格</td><td>1クエリあたり最大 30件×100ページ＝<strong>3,000件</strong>（楽天・公式仕様）</td><td>0円。<strong>アプリIDは取得済み</strong>（<code>RAKUTEN_APP_ID</code>／<code>YAHOO_APP_ID</code> 実在確認済）</td><td><strong>B+</strong>。メーカー直販店は連絡先が公開されており日本語。ただし「卸をやっていない直販専業」が混ざる</td><td>低（商品名・JANが取れる）</td></tr><tr><td><strong>4</strong></td><td><strong>卸サイト（スーパーデリバリー）</strong></td><td>出店企業名・卸価格・ロット</td><td><strong>3,414社／2,198,616商品</strong>（公式トップ表示・実測）</td><td>会員登録が必要＝<strong>§4.1（規約同意）で社長承認事項</strong></td><td><strong>A−</strong>。会員資格は「当社が入会を認めた<strong>個人又は法人</strong>」＝<strong>個人事業主OK</strong>（規約第1条・実測）。ただし①出展者ごとの審査、②<strong>出展者が販売方法を個別に制限でき「ウェブサイトを通じた販売の禁止」が明文で例示されている</strong>（第6条）＝Amazon不可の出展者が存在する</td><td>低（商品ページに JAN あり）</td></tr><tr><td><strong>5</strong></td><td><strong>クラウドファンディング実行者（Makuake等）</strong></td><td>新商品を持つ中小メーカー、実行者名・所在地</td><td>未実測（Makuake公開サイトマップは直近 <strong>270URL</strong> のみ）</td><td>0円。ただし<strong>実行者情報はJS描画で自動取得不可</strong>（robots.txt が <code>/api/*</code> を Disallow）</td><td><strong>B+</strong>。販路を持たない実行者が多く提案は歓迎されやすい。<strong>制約：配送完了前は他販路での販売禁止</strong>（Makuake規定）</td><td>中</td></tr><tr><td><strong>6</strong></td><td><strong>J-GoodTech（ジェグテック／中小機構）</strong></td><td>国内中小企業の企業情報・直接問い合わせ</td><td><strong>日本の中小企業 約30,000社</strong>（公式・英語ページ表示）</td><td><strong>無料</strong>。会員登録＝<strong>§4.1（規約同意）</strong></td><td><strong>B</strong>。公的機関運営で日本語・中小限定。ただし①主力は部品/技術系で消費財の厚みは<strong>未実測</strong>、②<strong>企業検索ページはJS描画＋要ログインで、非会員には件数すら見えない</strong>（実測：<code>/system/corporations/search</code> は840KB返るが本文テキストは空）</td><td>中</td></tr><tr><td><strong>7</strong></td><td><strong>業界団体の会員名簿</strong></td><td>会員企業名（団体により所在地・URL付き）</td><td>例：<strong>日本玩具協会 正会員 企業180社・団体10・賛助4社</strong>（2026-07-29現在・HTMLで一覧公開）</td><td>0円・GET 1回。団体ごとに公開/非公開が分かれる</td><td><strong>B</strong>。大手と中小が混在。連絡先は各社HP経由</td><td>中</td></tr><tr><td><strong>8</strong></td><td><strong>ふるさと納税の返礼品事業者</strong></td><td>地場の食品・工芸メーカー</td><td>未実測</td><td>0円（閲覧）。事業者名は自治体ページに分散</td><td><strong>B−</strong>。日本語・小規模・小ロット可。ただし<strong>JANを持たない商品が多く Amazon 検証に載らない</strong>ものが混じる</td><td>高</td></tr></tbody></table></div>
+
+<h3>2-2. 中位（9〜17位）</h3>
+
+<div class="tw"><table><thead><tr><th>#</th><th>方法</th><th>何が手に入るか</th><th>件数の規模</th><th>取得コスト</th><th>仕入れられる可能性</th><th>検証の難易度</th></tr></thead><tbody><tr><td>9</td><td>展示会の出展社検索DB（Gift Net、RX Japan directory）</td><td>出展社＋取扱品目＋所在地で絞り込み</td><td>未実測（<strong>結果がXHR描画のため単純GETでは0件</strong>）</td><td>0円だがブラウザ操作が必要</td><td>A（中身は#1と同じ）</td><td>中</td></tr><tr><td>10</td><td>グッドデザイン賞 受賞者DB</td><td>受賞商品と受賞企業</td><td>未実測（SPAでAPI未特定）</td><td>0円</td><td>B。受賞＝商品力の外部保証。ただし大手も多い</td><td>中</td></tr><tr><td>11</td><td>orosy</td><td>ブランド・卸条件</td><td>未実測（<code>orosy.com</code> はSPA・数値取得できず）</td><td>会員登録＝§4.1</td><td>B</td><td>低</td></tr><tr><td>12</td><td>TopSeller等の在庫レス卸</td><td>商品データ・自動連携</td><td>掲載プランは「約5,161〜279,666商品」（公式・プラン別）</td><td><strong>月額課金＝§4.1</strong></td><td>C+。メーカー直取引ではなく再販代行に近い</td><td>低</td></tr><tr><td>13</td><td>gBizINFO REST API v2</td><td>法人番号・商号・所在地・<strong>企業HP URL</strong>・補助金/認定履歴</td><td>全法人規模。業種×規模で絞込可</td><td>0円。<strong>トークン申請＝§4.1（規約同意）</strong>。電話番号は取れない</td><td>C+。<strong>「何を売っているか」が分からない</strong>ため単独では使えない。#1〜#7の裏取り用</td><td>高</td></tr><tr><td>14</td><td>国税庁 法人番号 全件CSV</td><td>法人番号・正式商号・所在地</td><td>全国CSV 254MB・月次</td><td><strong>0円・申請不要</strong></td><td>C。商品情報ゼロ。名寄せ専用</td><td>高</td></tr><tr><td>15</td><td>自治体・中小企業庁の支援先リスト（地域未来牽引企業／はばたく300社 等）</td><td>選定企業名</td><td>未実測（<code>chusho.meti.go.jp</code> は 403 で取得不可）</td><td>0円</td><td>C+。選定＝中小の保証にはなるが商品情報なし</td><td>高</td></tr><tr><td>16</td><td>X / Instagram / TikTok の中小メーカー発信</td><td>商品写真・中の人・DM窓口</td><td>網羅不能（探索型）</td><td>0円だが<strong>人力</strong>。X APIは有料</td><td><strong>B</strong>。DMが通れば距離は最短。実績ゼロでも人柄で始まる余地あり。<strong>ただし機械的な母数化は不可</strong></td><td>中</td></tr><tr><td>17</td><td>業界紙・専門誌（日刊工業新聞のイベント欄など）</td><td>新製品リリース・展示会情報</td><td>未実測</td><td>一部有料</td><td>C+</td><td>高</td></tr></tbody></table></div>
+
+<h3>2-3. 下位・条件付き（18〜27位）</h3>
+
+<div class="tw"><table><thead><tr><th>#</th><th>方法</th><th>判定の要点</th></tr></thead><tbody><tr><td>18</td><td><strong>NETSEA</strong></td><td><strong>要注意。</strong> バイヤー会員規約 第7条2項5号「<strong>当社が定めた方法又は当社が提供する機能以外の方法を利用して、サプライヤーと直接又は間接問わず連絡を取ること</strong>」を事前承諾なく禁止。同条1項3号は「本サービスを利用する他の者の情報の収集を目的とする行為」も禁止。<strong>「NETSEAでメーカーを見つけて直接交渉」は規約上できない</strong>（→ §5 要法務確認）。仕入れ先としては可（API契約済）</td></tr><tr><td>19</td><td>Makuake「応援仕入れ」</td><td><strong>招待制</strong>（公募ページなし）。2022年春に本格提供開始、バイヤー会員100社突破の発表あり。<code>buyer.makuake.com</code> はDNS解決せず＝<strong>2026-08時点の現況は未確認</strong></td></tr><tr><td>20</td><td>JANコード事業者（GS1 Japan）</td><td>GEPIRは2024-09-30終了。後継の事業者コード確認サービスは<strong>自社がGS1事業者コードの貸与を受けていないと使えない</strong>（1日50回）</td></tr><tr><td>21</td><td>特許・意匠の出願人</td><td>特許庁 国内特許情報取得APIは0円で生きている。ただし出願＝商品化とは限らず、大企業比率が高い</td></tr><tr><td>22</td><td>実店舗・現物起点（商品裏面の製造元表示）</td><td>確度は最高だが件数が伸びない。展示会の下位互換</td></tr><tr><td>23</td><td>楽天ふるさと納税・産直EC（食べチョク等）の生産者</td><td>生産者は個人・小規模。ただし<strong>Amazon向けのJAN/ロットに乗らない</strong>ことが多い</td></tr><tr><td>24</td><td>商工会議所・商工会の会員名簿</td><td>非公開が多い。会員になれば閲覧可の場合あり（＝加入＝金銭・§4.1）</td></tr><tr><td>25</td><td>既存取引先からの紹介</td><td><strong>実績ゼロの現時点では成立しない</strong>（起点となる取引先が無い）</td></tr><tr><td>26</td><td>海外展示会・海外卸</td><td>社長条件「日本語での商談が前提」に反する。<strong>除外</strong></td></tr><tr><td>27</td><td>過去回の展示会 出展社リスト</td><td><strong>実測：取得不可。</strong> 第101回・第100回・大阪ギフトショー・プレミアムインセンティブショーの <code>pdf/list.pdf</code> はいずれも <strong>HTTP 404</strong>。<strong>出展社リストは開催回ごとの消えもの</strong></td></tr></tbody></table></div>
+
+<blockquote>空白セルの扱い：「未実測」＝調べたが数値を取れなかった／「未確認」＝当たっていない。<strong>「該当なし」は本表には存在しません。</strong></blockquote>
+
+<hr>
+
+<h2>3. 実測ログ（手を動かした結果）</h2>
+
+<h3>3-1. 【実測①】展示会の出展社リスト — 2,353社を無料・自動で取得</h3>
+
+<div class="tw"><table><thead><tr><th>項目</th><th>実測値</th></tr></thead><tbody><tr><td>対象</td><td>第102回 東京インターナショナル・ギフト・ショー秋2026（2026-09-02〜04・東京ビッグサイト）</td></tr><tr><td>取得元</td><td><code>https://www.giftshow.co.jp/tigs/102tigs/pdf/list.pdf</code>（HTTP 200 / 795,244 bytes / application/pdf）</td></tr><tr><td>認証・課金</td><td><strong>なし</strong>（会員登録不要）</td></tr><tr><td>抽出結果</td><td>ブース番号トークン <strong>2,833個</strong>／ユニーク <strong>2,103個</strong>／<strong>社名ユニーク 2,353件</strong></td></tr><tr><td>国内・海外の内訳</td><td>国内セクション 2,084／海外セクション 378（ブース番号ベース。国内 <strong>約85%</strong>）</td></tr><tr><td>所要時間</td><td>ダウンロード〜CSV化まで <strong>約2分</strong>（<code>pdftotext -layout</code> ＋ 正規表現）</td></tr><tr><td>出力</td><td><code>booth, exhibitor</code> の2列CSV。<strong>本体は <code>workspace/output/agent_output/T-20260831-005/tigs102_出展社リスト_全件.csv</code>（Git除外）</strong>。再現スクリプトを <code>02_出展社リスト抽出.py</code> として納品（理由は §5 #3）</td></tr><tr><td>品質の妥協点</td><td>PDFが多段組みのため、列跨ぎで社名が切れた行が数十件ある（例：<code>（株）</code> 単独行）。<strong>クリーニング1パスが必要</strong></td></tr><tr><td><strong>重要な制約</strong></td><td>過去回（101/100回）・大阪ギフトショー・プレミアムインセンティブショーの同名PDFは<strong>すべて404</strong>。<strong>開催回ごとに取りに行かないと消える</strong></td></tr></tbody></table></div>
+
+<p><strong>来場条件（公式FAQ）</strong></p>
+
+<blockquote>「本見本市は商談会となります。<strong>一般・学生の方はご来場いただけません。</strong>」</blockquote>
+<blockquote>「東京ギフト・ショー及び同時開催展は、<strong>業者対象の専門見本市</strong>です。下記より、事前登録をお願いします。」</blockquote>
+<blockquote>— <code>https://www.giftshow.co.jp/tigs/102tigs/faq.htm</code></blockquote>
+
+<p>事実：<strong>事前登録制／業者限定／会期は 2026年9月2日（水）〜4日（金）</strong>。</p>
+<p>推測（確度：中）：招待状が無くても名刺持参で当日登録・無料入場が可能。根拠は複数の二次情報で一致しているが、<strong>公式ページの原文は未取得</strong>（招待状請求フォームがリダイレクトのみで本文を返さなかった）。</p>
+
+<h3>3-2. 【実測②】新旧の母集団は重ならない — 重複 2 / 2,346 = 0.1%</h3>
+
+<div class="tw"><table><thead><tr><th>母集団</th><th>由来</th><th>正規化後ユニーク件数</th></tr></thead><tbody><tr><td>A：Keepa由来メーカー</td><td>T-20260817-005 v14 <code>03_メーカー名寄せ.csv</code>（Amazonで売れている商品からの逆引き）</td><td>1,249</td></tr><tr><td>B：ギフトショー出展社</td><td>本調査の実測①</td><td>2,346</td></tr><tr><td><strong>A ∩ B</strong></td><td>—</td><td><strong>2社（オウルテック／ビイング）＝ Bの 0.1%</strong></td></tr></tbody></table></div>
+
+<p>正規化ルール：NFKC → 法人格語（株式会社・有限会社・（株）等）除去 → 記号・空白除去 → 小文字化。</p>
+
+<p><strong>この数字の読み方（事実と推測を分けます）</strong></p>
+
+<ul><li>事実：現行の Keepa 起点の探索では、ギフトショー出展社の 99.9% に到達していない。</li><li>推測（確度：高）：探索の向きを反転させれば、母数は単純に足し算で増える。</li><li><strong>推測（確度：中）・かつリスク</strong>：重ならない理由には「出展社の商品がそもそも Amazon に無い」も含まれる。<strong>「競合がいない」と「需要が無い」は同じ数字で観測される。</strong> ここを切り分けるのが Keepa の役目（§4）。</li></ul>
+
+<h3>3-3. 【実測③】Keepa は「JAN → ASIN」を 1トークンで引ける</h3>
+
+<p><code>GET <a href="https://api.keepa.com/product?key=&lt;KEY&gt;&amp;domain=5&amp;code=4570188380820" target="_blank" rel="noopener">https://api.keepa.com/product?key=&lt;KEY&gt;&amp;domain=5&amp;code=4570188380820</a></code></p>
+
+<div class="tw"><table><thead><tr><th>項目</th><th>実測</th></tr></thead><tbody><tr><td>結果</td><td>ASIN <code>B0D53Z5BYG</code> を1件返した（JAN13 → ASIN 逆引き成功）</td></tr><tr><td><strong>tokensConsumed</strong></td><td><strong>1</strong></td></tr><tr><td>tokensLeft</td><td>497（契約は 20 tokens/min）</td></tr><tr><td>併せて取得</td><td><code>stats.salesRankDrops30 = 53</code>（直近30日のランク下落回数＝概算販売個数の代理指標）</td></tr></tbody></table></div>
+
+<p>→ <strong>JAN が1,000件あっても、理論上 1,000トークン＝約50分で Amazon 実売の一次判定が終わる。</strong></p>
+
+<h3>3-4. 【実測④】出展社名で Keepa を引いたときの当たり方（N=26）</h3>
+
+<p>ギフトショー出展社から無作為抽出（seed=20260831）し、Keepa Product Search（<code>/search&amp;type=product&amp;domain=5</code>・10トークン/回）を実行。</p>
+<p><strong>当初 N=40 で計画し、時間制約により N=26 で打ち切りました。</strong> 生データは <code>03_keepa検証_ギフトショー出展社サンプル.csv</code>。</p>
+
+<div class="tw"><table><thead><tr><th>指標</th><th>実測</th></tr></thead><tbody><tr><td>サンプル数</td><td><strong>26</strong>（計画40・打ち切り）</td></tr><tr><td>検索ヒット1件以上</td><td>12（<strong>46.2%</strong>）</td></tr><tr><td>ヒット0件</td><td>14（53.8%）</td></tr><tr><td><strong><code>brand</code> または <code>manufacturer</code> が社名と一致（strict）</strong></td><td><strong>6（23.1%）</strong></td></tr><tr><td>社名が海外表記（CO.,LTD／LIMITED／INC 等）のもの</td><td>8件 → <strong>8件すべてヒット0</strong></td></tr><tr><td><strong>社名が国内表記のもの</strong></td><td>18件 → <strong>strict一致 6件（33.3%）</strong></td></tr></tbody></table></div>
+
+<p><strong>読み方（事実と推測を分けます）</strong></p>
+
+<ul><li>事実：<strong>国内表記の出展社は、社名で引くだけでも3社に1社（6/18）が Amazon 上に自社ブランド商品を持っていた。</strong></li><li>事実：<strong>海外表記の8社はすべてヒット0。</strong> 「日本語での商談が前提」という社長条件と、Amazon不在という結果が一致しています。実測①で見た海外セクション約15%は、二重の意味で対象外。</li><li><strong>この 33.3% は下限です。</strong> 判定は「社名と brand/manufacturer の部分一致」で行っており、<strong>社名とブランド名が違うメーカーは全部 NO に落ちています</strong>（例：「播州織」はヒット20件だがブランドは Cottonroll／HaTaKaKe 等で NO 判定）。実際の Amazon 進出率はこれより高い。</li><li>推測（確度：中）：残り約2/3の中には「Amazonに出していない国内メーカー」が相当数含まれる。<strong>相乗りではなく新規カタログ作成になる</strong>ため、初回の1社としては 33.3% 側から選ぶのが安全。</li></ul>
+
+<p><strong>結論（手順への含意）：社名検索は「粗い足切り」には使えるが、「その社の商品が売れているか」の判定には使えない。</strong></p>
+<p>ヒット件数は商品タイトルの部分一致であって製造元の一致ではありません（例：「播州織」20件、「ジェッカ ブロック」20件、いずれも strict NO）。</p>
+<p>→ <strong>検証の入力は「会社名」ではなく「ブランド名」または「JAN」。</strong> 展示会で現物・カタログを取る意味はここにあります（§4）。</p>
+
+<h3>3-5. 【実測⑤】卸サイトの規模と、NETSEAの決定的な制約</h3>
+
+<div class="tw"><table><thead><tr><th>サイト</th><th>実測</th><th>出典</th></tr></thead><tbody><tr><td>スーパーデリバリー</td><td><strong>3,414社／2,198,616商品</strong></td><td>トップページ表示（2026-08-31取得）</td></tr><tr><td>NETSEA</td><td>公開サイトマップに <strong>商品URL 3,536,926件／ユニーク出店企業ID 622件</strong>。<code>/shop/&lt;id&gt;</code> で企業名が1リクエストで取れる（例：<code>/shop/5113</code> → 株式会社フジキン）</td><td><code>https://www.netsea.jp/sitemap.xml</code> 配下71ファイルを実取得して集計</td></tr><tr><td>Makuake</td><td>公開サイトマップは <strong>270URL のみ</strong>（直近分。全プロジェクトは載っていない）</td><td><code>https://www.makuake.com/sitemap/</code></td></tr></tbody></table></div>
+
+<p><strong>NETSEA バイヤー会員規約 第7条（禁止事項）— 原文</strong></p>
+
+<blockquote>（第1項）三　本サービスを利用する他の者の<strong>情報の収集を目的とする行為</strong></blockquote>
+<blockquote>（第2項）五　当社が定めた方法又は当社が提供する機能以外の方法を利用して、<strong>サプライヤーと直接又は間接問わず連絡を取ること</strong></blockquote>
+
+<p>出典：<code>https://www.netsea.jp/agreement/statement</code>（2026-08-31取得）</p>
+
+<p>→ <strong>「NETSEAでメーカーを発見し、外で直接交渉して安く仕入れる」は規約違反。</strong> NETSEA は「仕入れ先」であって「メーカー発見の入口」には使えません。</p>
+
+<p><strong>スーパーデリバリー 会員規約（改訂 2023.9.1・運営：株式会社ラクーンコマース）— 対照</strong></p>
+
+<p>出典：<code>https://www.superdelivery.com/p/contents/guide/rules.jsp</code>（2026-08-31取得。トップからは辿れず、<code>/p/contents/guide/sitemap.jsp</code> 経由で発見）</p>
+
+<div class="tw"><table><thead><tr><th>論点</th><th>NETSEA</th><th>スーパーデリバリー</th></tr></thead><tbody><tr><td>プラットフォーム外での供給者への直接連絡</td><td><strong>第7条2項5号で明文禁止</strong></td><td><strong>同種条項は見当たらない</strong>（全文12,671字を「クローリング／スクレイピング／自動収集／ロボット／自動化／データマイニング／直接」で走査してヒットなし）</td></tr><tr><td>他利用者の情報収集</td><td><strong>第7条1項3号で明文禁止</strong></td><td>同上、明文なし</td></tr><tr><td>会員資格</td><td>「事業又は営業のために」締結する者に限る</td><td>「当社が入会を認めた<strong>個人又は法人</strong>」（第1条）＝<strong>個人事業主可</strong></td></tr><tr><td>取引の成立</td><td>—</td><td><strong>出展者ごとに審査を受ける</strong>（第6条）。当社は購入申込に応じる義務を負わない</td></tr><tr><td><strong>販売先の制限</strong></td><td>—</td><td><strong>「購入した商品の販売方法の制限（ウェブサイトを通じた販売の禁止等）…については、出展者が当サイト中の各出展者個別の画面に記載された定めに従う」（第6条）</strong></td></tr></tbody></table></div>
+
+<p>→ <strong>スーパーデリバリーの落とし穴は「Amazon等での再販を禁止している出展者が混ざる」こと。</strong> 3,414社という母数は、この条件で絞ってからでないと意味を持ちません。<strong>絞り込み後の実数は未実測</strong>（出展者個別画面はログイン後にしか読めない見込み）。</p>
+
+<h3>3-6. 【実測⑥】その他</h3>
+
+<div class="tw"><table><thead><tr><th>対象</th><th>実測</th></tr></thead><tbody><tr><td>国内BtoB展示会の総数</td><td><strong>約360件</strong>（2026年8月〜2027年9月）。うち雑貨・ライフスタイル13／食品・飲料42／ヘルスケア・医療22／美容・化粧品11／小売・流通50／スポーツ・アウトドア5。会場別：東京ビッグサイト142／幕張メッセ61／インテックス大阪56。出典 <code>https://www.expo-eye.com/exhibitions</code></td></tr><tr><td>ライフスタイルWeek（RX Japan）</td><td>夏2026で <strong>1,250社出展</strong>。次回は秋2026＝<strong>2026年10月7〜9日</strong>。ただし出展社検索はJS描画で単純GETでは0件</td></tr><tr><td>J-messe（JETRO の見本市DB）</td><td><strong>2026年3月31日で提供終了。</strong> 「J-messeで展示会を探す」と書いた記事はすべて失効。代替として展示会ナビ／OpenEXPO／10times／EventsEye／展示会カレンダー／イベスルが案内されている</td></tr><tr><td>日本玩具協会 会員一覧</td><td><strong>正会員 企業180社・団体10・賛助4社</strong>（2026年7月29日現在）。HTMLベタ書きで社名一覧が公開、1リクエストで全件取得可</td></tr><tr><td>国税庁 法人番号 全件CSV</td><td>HTTP 200・生存（0円・申請不要）</td></tr><tr><td>gBizINFO</td><td>HTTP 200・生存</td></tr><tr><td>中小企業庁「元気なモノ作り中小企業300社」</td><td><strong>HTTP 403</strong>。自動取得不可</td></tr><tr><td>robots.txt</td><td>giftshow.co.jp = <strong>robots.txt 自体が無い</strong>（404）／makuake.com は <code>/api/*</code> Disallow・GPTBot/Amazonbot 全面拒否／netsea.jp・superdelivery.com は <code>*</code> に対し検索パラメータのみ Disallow</td></tr></tbody></table></div>
+
+<hr>
+
+<h2>4. Keepa を「検証役」として使う手順</h2>
+
+<p>前提：<strong>手元にあるのは「メーカー名」であって「ASIN」ではない。</strong> 実測④のとおり、社名からのテキスト検索は当たりません。したがって手順は「識別子をどう手に入れるか」から始まります。</p>
+
+<h3>ステップ0：入力の質を上げる（ここが成否を決める）</h3>
+
+<div class="tw"><table><thead><tr><th>入力</th><th>入手先</th><th>検証の確度</th></tr></thead><tbody><tr><td><strong>JAN（EAN13）</strong></td><td>展示会でもらうカタログ／卸サイトの商品ページ／メーカー公式サイトの製品ページ</td><td><strong>最高</strong>（1トークンで確定）</td></tr><tr><td>ブランド名</td><td>出展社の公式サイト・Gift Net の商品情報</td><td>中（表記ゆれで落ちる）</td></tr><tr><td>会社名のみ</td><td>出展社リスト</td><td><strong>低（使えない）</strong></td></tr></tbody></table></div>
+
+<h3>ステップ1：JAN がある場合（推奨）</h3>
+
+<pre><code>
+GET https://api.keepa.com/product?key=&lt;KEY&gt;&amp;domain=5&amp;code=&lt;JAN13&gt;&amp;stats=90
+</code></pre>
+<ul><li><code>domain=5</code> = amazon.co.jp</li><li><strong>1トークン/件</strong>（実測）</li><li>返り値が空 → <strong>Amazon にカタログが存在しない</strong>＝新規出品（相乗りではない）になる</li></ul>
+
+<h3>ステップ2：JAN が無い場合</h3>
+
+<pre><code>
+GET https://api.keepa.com/search?key=&lt;KEY&gt;&amp;domain=5&amp;type=product&amp;term=&lt;ブランド名&gt;
+</code></pre>
+<ul><li>10トークン/回</li><li><strong>返ってきた商品の <code>brand</code> / <code>manufacturer</code> が対象メーカーと一致するものだけを採用する。</strong> タイトル一致で拾うと汚染される（実測④）</li></ul>
+
+<h3>ステップ3：売れているかの判定（既存の社内基準に接続）</h3>
+
+<div class="tw"><table><thead><tr><th>見る値</th><th>意味</th><th>注意</th></tr></thead><tbody><tr><td><code>stats.salesRankDrops30</code></td><td>直近30日のランク下落回数＝<strong>概算の販売個数</strong></td><td>個数そのものではない。カテゴリ間比較は不可</td></tr><tr><td><code>stats.current[3]</code>（SALES）</td><td>現在のカテゴリランク</td><td><strong>BSRは売上ではなく個数ベースの相対順位</strong>（社内メモ <code>reference_keepa_reading_pitfalls</code>）</td></tr><tr><td><code>stats.current[18]</code>（BUY_BOX）</td><td>現在のカート価格</td><td><code>offers</code> を付けないと BuyBox/評価/レビュー数は更新されない</td></tr><tr><td>出品者数</td><td>相乗り競合の数</td><td><strong><code>COUNT_NEW</code> を出品者数と誤読した事故が過去にある</strong>（<code>knowledge_verify_field_semantics_not_names</code>）。フィールド定義まで遡ること</td></tr></tbody></table></div>
+
+<h3>ステップ4：「仕入れられるか」を先に判定する（社長条件のゲート）</h3>
+
+<p>Keepa を叩く前に、次のゲートで落とすほうが安上がりです。</p>
+
+<div class="tw"><table><thead><tr><th>ゲート</th><th>落とす条件</th></tr></thead><tbody><tr><td>言語</td><td>出展社リストの海外セクション（実測で約15%）は除外</td></tr><tr><td>規模</td><td>法人番号／gBizINFO で従業員300人超を除外</td></tr><tr><td>カテゴリ</td><td>DVD/CD/本/ゲーム/音楽は除外（チケット確定事項）</td></tr><tr><td>取引形態</td><td>「小売のみ・卸不可」と明記している先は除外</td></tr></tbody></table></div>
+
+<h3>判定結果の意味づけ（3分岐）</h3>
+
+<div class="tw"><table><thead><tr><th>Keepaの結果</th><th>意味</th><th>打ち手</th></tr></thead><tbody><tr><td>ASIN あり・ランク動く</td><td><strong>売れている。相乗り or 卸交渉の対象</strong></td><td>出品者数と価格推移で利益を計算</td></tr><tr><td>ASIN あり・ランクほぼ動かない</td><td>需要が薄い</td><td>見送り</td></tr><tr><td><strong>ASIN なし</strong></td><td>Amazon 未展開。<strong>競合ゼロだが需要も未証明</strong></td><td>新規カタログ作成が必要。初心者には重い。楽天/Yahoo での実売を代替指標にする</td></tr></tbody></table></div>
+
+<hr>
+
+<h2>5. 要法務確認（ハルオへ回すもの）</h2>
+
+<div class="tw"><table><thead><tr><th>#</th><th>論点</th><th>理由</th></tr></thead><tbody><tr><td>1</td><td><strong>NETSEA 規約 第7条2項5号</strong> — 「サプライヤーと platform 外で直接連絡を取ること」の禁止が、当社の「メーカー発見→直接交渉」構想にどこまで及ぶか</td><td>規約の原文は取得済み。<strong>発見経路としての採否を左右する</strong></td></tr><tr><td>2</td><td>スーパーデリバリーは、<strong>出展者が個別に「ウェブサイトを通じた販売の禁止」を課せる</strong>（会員規約第6条）。Amazon再販を許す出展者だけを事前に判別する手段があるか</td><td>規約本文は取得済み。<strong>出展者個別の取引条件はログイン後にしか読めない見込み</strong>＝母数3,414社の有効分が読めない</td></tr><tr><td>3</td><td>展示会出展社リストPDF（第三者著作物）を社内CSV化して保管・加工することの可否</td><td>ギフトショーのPDF内に「<strong>無断掲載及び他のメディアへの加工を禁止します</strong>」の表示あり（発行：ビジネスガイド社）。<strong>社内利用が著作権法30条の4で説明できるか、明文の禁止が優先するか</strong></td></tr><tr><td>4</td><td>Gift Net / RX directory のXHRエンドポイントを直接叩くこと</td><td>robots.txt の射程外だがサイト規約は未確認</td></tr><tr><td>5</td><td>会員登録（スーパーデリバリー／J-GoodTech／Makuake）は §4.1（規約同意）該当</td><td><strong>サトル・タケシは実行しない。社長承認が必要</strong></td></tr></tbody></table></div>
+
+<p><strong>論点3は重要です。</strong> 実測①のCSVは既に作成しましたが、外部公開はしていません。本リポジトリは PUBLIC のため、<strong>CSVを deliverables に commit してよいかはハルオの判断待ち</strong>とし、本納品では<strong>社名の全件CSVを別ファイルに分離</strong>して、可否判定後に扱いを決められるようにしています。</p>
+
+<hr>
+
+<h2>6. 最初に試すべき1つ</h2>
+
+<h3>東京インターナショナル・ギフト・ショー 第102回（2026年9月2〜4日・東京ビッグサイト）の出展社リストを起点にする</h3>
+
+<p><strong>理由（すべて実測に基づく）</strong></p>
+
+<ol><li><strong>もう手元にある。</strong> 2,353社を0円・登録なし・2分で取得済み。追加の意思決定なしに今日から回せる。</li><li><strong>既存の母集団と重ならない（0.1%）。</strong> 探索の向きを反転させた効果が、この1本で最大に出る。</li><li><strong>相手が「新規取引先を探しに来ている」側。</strong> 実績ゼロの個人事業主に対する門前払い確率が構造的に最も低い経路。</li><li><strong>JAN が手に入る。</strong> 会場でカタログを取れば、Keepa の 1トークン検証にそのまま流し込める（実測③）。他のどの経路も、この「識別子を取れる」性質を同時には満たさない。</li><li><strong>会期が 2026年9月2〜4日＝2日後。</strong> 過去回のPDFはすべて404だった（実測①）＝<strong>この機会は消える</strong>。次にこの規模で同じことができるのは 2026年10月7〜9日のライフスタイルWeek（1,250社）。</li><li>Amazon 日本店が停止中でも<strong>この作業は一切止まらない</strong>。停止期間を仕込みに使える。</li></ol>
+
+<p><strong>着手前に社長の判断が要ること（＝タケシ／カズヨへ）</strong></p>
+
+<ul><li>来場するのか、リストだけで机上に留めるのか（来場には事前登録が必要。<strong>事前登録＝規約同意で §4.1</strong>）</li><li>論点3（PDFのCSV化・保管）の法務判断</li><li>2,353社をどう絞るのか（＝どの軸で優先順位をつけるか）は<strong>戦略判断であり、ここから先はタケシの領分です。</strong> 私からは「絞る材料」として、国内/海外・小間サイズ（＝出展コスト＝企業規模の代理指標）・カテゴリの3つが出展社リストから取れることだけ申し添えます。</li></ul>
+
+<hr>
+
+<h2>7. 分かっていないこと（正直な申告）</h2>
+
+<div class="tw"><table><thead><tr><th>項目</th><th>状態</th></tr></thead><tbody><tr><td>2,353社のうち従業員300人以下は何社か</td><td><strong>未実測</strong>。法人番号／gBizINFOで判定可能だがトークン申請（§4.1）が未完</td></tr><tr><td>2,353社のうち Amazon に商品がある社の割合</td><td><strong>N=26 のサンプルで下限 23.1%（国内表記のみなら 33.3%）</strong>。計画のN=40には届かず打ち切り。社名一致判定のため<strong>真値はこれより高い</strong>。全件を測るには社名→ブランド名の対応付けが要る</td></tr><tr><td>スーパーデリバリー 3,414社のうち Amazon 再販が許される出展者の数</td><td><strong>未実測</strong>（出展者個別画面が非ログインで読めない）</td></tr><tr><td>orosy の規約</td><td>未確認</td></tr><tr><td>J-GoodTech の消費財メーカー比率・検索可能件数</td><td><strong>未実測</strong>。企業検索は要ログイン（非会員では0件も30,000件も確認できない）</td></tr><tr><td>Makuake「応援仕入れ」の2026年現況</td><td>未確認（専用ドメインがDNS解決せず）</td></tr><tr><td>SNS（X/Instagram）経由の歩留まり</td><td><strong>測りようがない</strong>。探索型のため母数が定義できない。ここは定量化を諦め、定性的に「B」評価に留めた</td></tr><tr><td>ギフトショーの当日登録・入場料</td><td>公式原文を取得できず。<strong>二次情報では「名刺2枚で当日登録・無料」で一致するが未確認</strong></td></tr></tbody></table></div>
+
+<hr>
+
+<h2>8. 出典一覧（すべて 2026-08-31 取得）</h2>
+
+<div class="tw"><table><thead><tr><th>#</th><th>ページタイトル</th><th>URL</th></tr></thead><tbody><tr><td>1</td><td>第102回 東京インターナショナル・ギフト・ショー秋2026 出展社一覧（PDF）</td><td><a href="https://www.giftshow.co.jp/tigs/102tigs/pdf/list.pdf" target="_blank" rel="noopener">https://www.giftshow.co.jp/tigs/102tigs/pdf/list.pdf</a></td></tr><tr><td>2</td><td>よくある質問｜東京インターナショナル・ギフト・ショー</td><td><a href="https://www.giftshow.co.jp/tigs/102tigs/faq.htm" target="_blank" rel="noopener">https://www.giftshow.co.jp/tigs/102tigs/faq.htm</a></td></tr><tr><td>3</td><td>ホール別出展社名入り会場図｜第102回</td><td><a href="https://www.giftshow.co.jp/tigs/102tigs/map.htm" target="_blank" rel="noopener">https://www.giftshow.co.jp/tigs/102tigs/map.htm</a></td></tr><tr><td>4</td><td>Gift Net（ビジネスガイド社 出展社商品情報ポータル）</td><td><a href="https://www.giftnet.jp/" target="_blank" rel="noopener">https://www.giftnet.jp/</a></td></tr><tr><td>5</td><td>展示会一覧・検索【2026-2027年】国内のBtoB展示会・見本市｜Expo Eye</td><td><a href="https://www.expo-eye.com/exhibitions" target="_blank" rel="noopener">https://www.expo-eye.com/exhibitions</a></td></tr><tr><td>6</td><td>世界の見本市・展示会情報（J-messe）※2026-03-31 提供終了</td><td><a href="https://www.jetro.go.jp/j-messe/" target="_blank" rel="noopener">https://www.jetro.go.jp/j-messe/</a></td></tr><tr><td>7</td><td>ライフスタイル Week【秋】｜RX Japan</td><td><a href="https://www.lifestyle-expo.jp/autumn/ja-jp.html" target="_blank" rel="noopener">https://www.lifestyle-expo.jp/autumn/ja-jp.html</a></td></tr><tr><td>8</td><td>【1,250社が出展】第29回ライフスタイルWeek夏（PR TIMES）</td><td><a href="https://prtimes.jp/main/html/rd/p/000002055.000026157.html" target="_blank" rel="noopener">https://prtimes.jp/main/html/rd/p/000002055.000026157.html</a></td></tr><tr><td>9</td><td>スーパーデリバリー トップ（3,414社／2,198,616商品の表示）</td><td><a href="https://www.superdelivery.com/" target="_blank" rel="noopener">https://www.superdelivery.com/</a></td></tr><tr><td>10</td><td>NETSEA バイヤー会員規約</td><td><a href="https://www.netsea.jp/agreement/statement" target="_blank" rel="noopener">https://www.netsea.jp/agreement/statement</a></td></tr><tr><td>11</td><td>NETSEA サイトマップ（71ファイル／3,536,926 URL）</td><td><a href="https://www.netsea.jp/sitemap.xml" target="_blank" rel="noopener">https://www.netsea.jp/sitemap.xml</a></td></tr><tr><td>12</td><td>Makuake robots.txt / サイトマップ</td><td><a href="https://www.makuake.com/robots.txt" target="_blank" rel="noopener">https://www.makuake.com/robots.txt</a> , <a href="https://www.makuake.com/sitemap/" target="_blank" rel="noopener">https://www.makuake.com/sitemap/</a></td></tr><tr><td>13</td><td>「Makuake」応援仕入れサービス バイヤー会員登録開始（2021-07-12）</td><td><a href="https://netshop.impress.co.jp/node/8880" target="_blank" rel="noopener">https://netshop.impress.co.jp/node/8880</a></td></tr><tr><td>14</td><td>マクアケ、バイヤー向け「Makuake応援仕入れ」本格提供開始</td><td><a href="https://www.makuake.co.jp/2783/" target="_blank" rel="noopener">https://www.makuake.co.jp/2783/</a></td></tr><tr><td>15</td><td>J-GoodTech（中小機構）</td><td><a href="https://jgoodtech.smrj.go.jp/" target="_blank" rel="noopener">https://jgoodtech.smrj.go.jp/</a></td></tr><tr><td>16</td><td>一般社団法人 日本玩具協会 会員一覧（2026-07-29現在）</td><td><a href="https://www.toys.or.jp/kaiin_ichiran.html" target="_blank" rel="noopener">https://www.toys.or.jp/kaiin_ichiran.html</a></td></tr><tr><td>17</td><td>楽天市場商品検索API 仕様</td><td><a href="https://webservice.rakuten.co.jp/documentation/ichiba-item-search" target="_blank" rel="noopener">https://webservice.rakuten.co.jp/documentation/ichiba-item-search</a></td></tr><tr><td>18</td><td>国税庁 法人番号 全件データダウンロード</td><td><a href="https://www.houjin-bangou.nta.go.jp/download/zenken/" target="_blank" rel="noopener">https://www.houjin-bangou.nta.go.jp/download/zenken/</a></td></tr><tr><td>19</td><td>gBizINFO</td><td><a href="https://info.gbiz.go.jp/" target="_blank" rel="noopener">https://info.gbiz.go.jp/</a></td></tr><tr><td>20</td><td>【2026年版】Amazonメーカー仕入れは個人でも可能！（EC STARs Lab.）※実務者の数値</td><td><a href="https://ecstarslab.com/blog/amazon-メーカー仕入れ-個人-2/" target="_blank" rel="noopener">https://ecstarslab.com/blog/amazon-メーカー仕入れ-個人-2/</a></td></tr><tr><td>21</td><td>メーカー・卸問屋仕入れ、展示会 営業トーク（実践者ブログ・puu.technology）</td><td><a href="https://puu.technology/wp/メーカー・卸問屋仕入れ-個人でも契約できる！/" target="_blank" rel="noopener">https://puu.technology/wp/メーカー・卸問屋仕入れ-個人でも契約できる！/</a></td></tr><tr><td>22</td><td>[個人でメーカー仕入] 展示会事前準備を徹底解説（note・リリィ）</td><td><a href="https://note.com/lily_maker/n/nec5db794877e" target="_blank" rel="noopener">https://note.com/lily_maker/n/nec5db794877e</a></td></tr><tr><td>23</td><td>メーカー仕入れは展示会がおすすめ（日本郵便 BizPost）</td><td><a href="https://www.post.japanpost.jp/bizpost/column/sales_promotion19/exhibition/" target="_blank" rel="noopener">https://www.post.japanpost.jp/bizpost/column/sales_promotion19/exhibition/</a></td></tr><tr><td>24</td><td>仕入先の探し方（J-Net21／中小機構）</td><td><a href="https://j-net21.smrj.go.jp/startup/manual/list3/3-2-7.html" target="_blank" rel="noopener">https://j-net21.smrj.go.jp/startup/manual/list3/3-2-7.html</a></td></tr><tr><td>25</td><td>Amazon.co.jp 利用規約（自動収集の禁止・T-20260831-001で取得済）</td><td><a href="https://www.amazon.co.jp/gp/help/customer/display.html?nodeId=643006" target="_blank" rel="noopener">https://www.amazon.co.jp/gp/help/customer/display.html?nodeId=643006</a></td></tr></tbody></table></div>
+
+<p><strong>実務者の発信から得た数値（二次情報・出典20）</strong></p>
+
+<div class="tw"><table><thead><tr><th>指標</th><th>値</th><th>出典</th></tr></thead><tbody><tr><td>メール送付からの返信率</td><td>30%</td><td>EC STARs Lab.</td></tr><tr><td>見積取得率</td><td>8〜10%</td><td>同</td></tr><tr><td>成約率</td><td><strong>3〜5%</strong></td><td>同</td></tr><tr><td>月利50万円に必要な取引社数</td><td>50社</td><td>同</td></tr><tr><td>想定アプローチ量</td><td>月300社（1日10社・30分〜1時間）</td><td>同</td></tr></tbody></table></div>
+
+<p>→ 事実：成約率3〜5%を前提にすると、<strong>50社と取引するには1,000〜1,600社への接触が要る</strong>。</p>
+<p>→ 推測（確度：高）：<strong>2,353社という母数は、この計算に対して「ちょうど1年分」の規模。</strong>「母数を最大化せよ」（<code>feedback_maximize_pool_not_ranking</code>）という社長の指示と整合します。</p>
+
+<p>なお出典20の EC STARs Lab. 自身が推奨する探し方は「カテゴリーリサーチ（Amazonカテゴリから）」「セラーリサーチ（競合セラーから）」の2つで、<strong>いずれもAmazon起点</strong>です。今回の反転は、実務者の標準からも外れた打ち手であることを申し添えます（＝差別化の余地があるとも、誰もやらない理由があるとも読めます。ここの評価はタケシへ）。</p>
+</div></body></html>
