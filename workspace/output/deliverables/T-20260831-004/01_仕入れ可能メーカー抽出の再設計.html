@@ -1,6 +1,6 @@
 <!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>仕入れ可能メーカー抽出の再設計（v15） — T-20260831-004</title><style>body{font-family:-apple-system,'Hiragino Sans','Noto Sans JP',sans-serif;line-height:1.75;max-width:1080px;margin:0 auto;padding:28px 22px 80px;color:#1a1d21;background:#fbfbfc}
 h1{font-size:1.75rem;border-bottom:4px solid #c0392b;padding-bottom:.5rem;margin-top:0}
-h2{font-size:1.32rem;margin-top:2.4rem;border-left:6px solid #c0392b;padding-left:.65rem;background:#f4f5f7;padding-top:.35rem;padding-bottom:.35rem}
+h2{font-size:1.32rem;margin-top:2.4rem;border-left:6px solid #c0392b;padding-left:.65rem;background:#f4f5f7;padding:.35rem .65rem}
 h3{font-size:1.08rem;margin-top:1.7rem;color:#8e2b20;border-bottom:1px dotted #ccc;padding-bottom:.25rem}
 table{border-collapse:collapse;width:100%;margin:1rem 0;font-size:.9rem;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.07)}
 th,td{border:1px solid #dfe2e6;padding:8px 10px;text-align:left;vertical-align:top}
@@ -9,13 +9,12 @@ tbody tr:nth-child(even){background:#f7f8fa}
 code{background:#eef1f4;padding:1px 5px;border-radius:3px;font-size:.87em;font-family:ui-monospace,Menlo,monospace}
 pre{background:#232b33;color:#e6edf3;padding:14px 16px;border-radius:6px;overflow-x:auto;font-size:.85rem;line-height:1.6}
 blockquote{border-left:5px solid #f0ad4e;background:#fdf7ec;margin:1rem 0;padding:.7rem 1rem;color:#5c4a2a}
-strong{color:#a02012}
-hr{border:0;border-top:1px solid #dde1e5;margin:2.2rem 0}
+strong{color:#a02012}hr{border:0;border-top:1px solid #dde1e5;margin:2.2rem 0}
 ul,ol{padding-left:1.5rem}li{margin:.35rem 0}</style></head><body><h1>仕入れ可能メーカー抽出の再設計（v15）</h1>
 <ul><li>チケット：T-20260831-004 / 担当：プランナー タケシ</li><li>作成：2026-08-31</li><li>入力：<code>deliverables/T-20260817-005/v14/02_候補リスト_社長用.csv</code>（<strong>2026-08-31 11:21 時点のスナップショット＝2,635商品 / 1,254メーカー</strong>。常時稼働ジョブ T-20260831-002 が追記中で、11:45 には 2,654 行に増えていました。以降の数字はすべて 11:21 断面）</li><li>社長の確定条件：<strong>従業員300人以下</strong>／<strong>DVD・CD・本・ゲームは今回外す</strong>／中国系OEM除外／KPIは「連絡できるメーカー数」</li></ul>
 <hr>
 <h2>1. 結論</h2>
-<ol><li><strong>現行リスト1,254社のうち、社長が連絡して意味があるのは推定200社（16.0%）。84%はノイズです。</strong> 無作為200社を1社ずつ手で分類した実測値（95%信頼区間 10.9〜21.1%＝137〜265社）。</li><li><strong>ノイズの正体は3つで、除去の難易度が全く違います。</strong> 版元23%とメディア（機械判定・適合率91.8%）、中国系OEM 35.5%（部分的に機械判定可）、大企業18%（<strong>既存CSVだけでは判定不能。gBizINFOが要る</strong>）。</li><li><strong>本当の問題は精度ではなく母数です。</strong> メーカー仕入れの標準稼働は月530件の問い合わせ（EC STARs 実績値）。今の設計は<strong>累計で200社</strong>しか供給できません。<strong>必要量の 3/8</strong>。精度を上げるのは母数を正しく測るためであって、絞るためではありません。</li></ol>
+<ol><li><strong>現行リスト1,254社のうち、社長が連絡して意味があるのは推定200社（16.0%）。84%はノイズです。</strong> 無作為200社を1社ずつ手で分類した実測値（95%信頼区間 10.9〜21.1%＝137〜265社）。</li><li><strong>ノイズの正体は3つで、除去の難易度が全く違います。</strong> 版元23%とメディア（機械判定・適合率91.8%）、中国系OEM 35.5%（部分的に機械判定可）、大企業18%（<strong>既存CSVだけでは判定不能。gBizINFOが要る</strong>）。</li><li><strong>設計した v15 は、本命を1社も捨てません。</strong> ラベル済み200社で検証したところ、除外504社に本命は<strong>0社</strong>。すべてレーン分けで残っています（再現率100%）。</li><li><strong>本当の問題は精度ではなく母数です。</strong> メーカー仕入れの標準稼働は月530件の問い合わせ（EC STARs 実績値）。今の設計は<strong>累計で200社</strong>しか供給できません。<strong>必要量の 3/8</strong>。精度を上げるのは母数を正しく測るためであって、絞るためではありません。</li></ol>
 <hr>
 <h2>2. 現状診断（実測）</h2>
 <h3>2-1. 無作為200メーカーの手作業分類</h3>
@@ -40,12 +39,14 @@ ul,ol{padding-left:1.5rem}li{margin:.35rem 0}</style></head><body><h1>仕入れ�
 <h2>4. 論点への回答</h2>
 <h3>論点1「仕入れられそう」の操作的定義</h3>
 <p><strong>社長の確定条件（従業員300人以下）を軸に、次の4条件のANDと定義します。</strong></p>
-<table><thead><tr><th>#</th><th>条件</th><th>判定材料</th><th>判定力</th><th>コスト</th></tr></thead><tbody><tr><td>1</td><td>日本に実体がある法人</td><td>Keepa <code>manufacturer</code>／ブランド名の日本語＋JAN 45/49</td><td>中（単体では不足）</td><td>0円・取得済</td></tr><tr><td>2</td><td><strong>従業員300人以下 または 資本金3億円以下</strong></td><td><strong>gBizINFO REST API v2</strong>（法人名の部分一致検索・従業員数・資本金あり）</td><td><strong>高。ここが決定打</strong></td><td>0円。<strong>トークン申請＝社長の手が1回要る</strong></td></tr><tr><td>3</td><td>中国系OEMでない</td><td>CNスコア（本書 §3-1）</td><td>中〜高</td><td>0円・取得済</td></tr><tr><td>4</td><td>第三者に卸している</td><td>ブランド自社出品を除いた実セラー数≧2</td><td>低（§論点5）</td><td>0円・取得済</td></tr></tbody></table>
+<table><thead><tr><th>#</th><th>条件</th><th>判定材料</th><th>判定力</th><th>コスト</th></tr></thead><tbody><tr><td>1</td><td>日本に実体がある法人</td><td>Keepa <code>manufacturer</code>／ブランド名の日本語＋JAN 45/49</td><td>中（単体では不足）</td><td>0円・取得済</td></tr><tr><td>2</td><td><strong>従業員300人以下 または 資本金3億円以下</strong></td><td><strong>gBizINFO REST API v2</strong>（法人名の部分一致検索・従業員数・資本金あり）</td><td><strong>高。ここが決定打</strong></td><td>0円。<strong>トークン申請＝社長の手が1回要る</strong></td></tr><tr><td>3</td><td>中国系OEMでない</td><td>CNスコア（本書 §3-1）</td><td>中〜高</td><td>0円・取得済</td></tr><tr><td>4</td><td>第三者に卸している</td><td>ブランド自社出品を除いた実セラー数≧<strong>1</strong></td><td>低（§論点5）</td><td>0円・取得済</td></tr></tbody></table>
 <p><strong>条件2を機械判定できるのは「日本語の商号が取れている会社」だけです。</strong> メインレーン345社は全社が該当（日本語シグナルありが通過条件のため）。英字レーン201社は商号が引けないため gBizINFO が原理的に効きません（サトルの実測：英字526社への商号検索は不可）。<strong>この非対称性は設計として受け入れ、レーンを分けます。</strong></p>
 <p><strong>従業員数が取れない会社をどうするか（私の設計判断）：落としません。</strong> <code>規模=不明</code> として<strong>メインレーンに残し、末尾にソート</strong>します。理由は §論点7（母数が足りない）。落とした場合の実測影響は gBizINFO 実行後でないと出せないため、<strong>現時点では未測定</strong>です。</p>
 <h3>論点2 中国系ブランドの判定</h3>
 <p>§3-1 のとおり。<strong>要点は「セラー名だけでは足りない」こと。</strong> OTTOCAST のように日本の転売業者しか並んでいない中国系ブランドが実在します。逆に S1（ブランド自社出品）は適合率86.1%と最も強力です。<strong>中国系ブランドは自分で日本にストアを出す</strong>ため、これが構造的なシグナルになります。</p>
-<p><strong>誤検出の実例（CNスコア≧1 で誤って引っかかった16社）：</strong> BOS（クリロン化成・日本のSME）が S1 で発火しました。<code>BOS-SHOP【メーカー公式】</code> という自社ストアを持っているためです。<strong>日本のSMEも自社ストアを出すので、S1単独では落とせません。</strong> よって CNスコア≧1 は「除外」ではなく「<strong>英字レーンへの振り分け</strong>」に使います。CNスコア≧3（適合率100%）だけを確定除外にします。</p>
+<p><strong>誤検出の実例（CNスコア≧1 で誤って引っかかった16社）：</strong> BOS（クリロン化成・日本のSME）が S1 で発火しました。<code>BOS-SHOP【メーカー公式】</code> という自社ストアを持っているためです。<strong>日本のSMEも自社ストアを出すので、S1単独では落とせません。</strong> よって設計はこうします。</p>
+<ul><li><strong>CNスコア≧3（適合率100%）だけを確定除外にする</strong></li><li><strong>CNスコア1〜2は除外しない。<code>要注意</code> 列に理由を書いてレーン末尾へ回す</strong></li></ul>
+<p>実測（ラベル済み200社）：<code>要注意</code> が付いた13社の本命は <strong>0社</strong>。フラグとしては非常によく効いていますが、母数が小さいので<strong>ゲートにはしません</strong>（BOS を落とした失敗の再発防止）。</p>
 <h3>論点3 大企業・版元の除外</h3>
 <ul><li><strong>版元＝カテゴリで落とす。</strong> 適合率91.8%・再現率97.8%。名前を見る必要はありません。</li><li><strong>大企業＝gBizINFO の従業員数でしか落とせません。</strong> 現物で確認したとおり、メインレーンの最上位には依然として BANDAI・パナソニック・タカラトミー・東芝・富士フイルム・アイリスオーヤマ・バッファロー・CASIO が並びます。<strong>これらは全社、日本語商号が取れているので gBizINFO で必ず解決します。</strong> 社長の条件は、残った唯一の欠陥にぴったり合った道具です。</li><li><strong>残る穴（正直に）：外資の日本法人は従業員数が300人以下になり得ます。</strong> ベンキュージャパン、アンカー・ジャパン、ツヴィリング J.A. ヘンケルスジャパン、マイヤージャパン、Implus Japan などです。<strong>従業員数フィルタを抜けます。</strong> 対策は「<strong>資本金が親会社100%出資の外資系</strong>」を別途フラグする（gBizINFO の <code>資本金</code>＋法人番号の設立年で部分的に可）ですが、<strong>完全には解けません</strong>。人手確認の対象として残します。</li></ul>
 <h3>論点4 カテゴリの適合性 → <strong>母集団から外します</strong></h3>
@@ -56,8 +57,10 @@ ul,ol{padding-left:1.5rem}li{margin:.35rem 0}</style></head><body><h1>仕入れ�
 <blockquote>記録用に、除外ログ（<code>06_除外ログ_全件.csv</code>）の <code>判定理由</code> 列で「再販制度対象（法人化でも解けない）」と「版元直取引は法人+実績が前提（法人化で条件付きに開く）」を<strong>区別して保存しています</strong>。捨てていません。</blockquote>
 <h3>論点5 「卸してくれる証拠」の再定義</h3>
 <p>現行の「実セラー数≧2」の欠陥は、社長のご指摘どおりです。ただし<strong>修正の効果は小さい</strong>というのが実測結果でした。</p>
-<table><thead><tr><th>定義</th><th>メインレーン345社での該当</th><th>評価</th></tr></thead><tbody><tr><td>現行：実セラー数≧2</td><td>100%</td><td>ゲートとして機能していない</td></tr><tr><td><strong>W1：ブランド自社出品を除く第三者セラー≧2</strong></td><td>98.9%</td><td><strong>採用。</strong> 効果は小さいが、「ブランド自身しか売っていない」偽陽性を確実に消す</td></tr><tr><td>W2：+屋号型セラー≧1</td><td>59.7%</td><td><strong>不採用。適合率を下げる</strong>（§3-2）</td></tr><tr><td>W3：+屋号型セラー≧2</td><td>28.0%</td><td><strong>不採用。母数を7割削って適合率が上がらない</strong></td></tr></tbody></table>
-<p><strong>結論：セラー名から「メーカーが卸している証拠」を取り出す道は、ほぼ行き止まりです。</strong> 決定的な証拠はメーカー自身のサイトにある「卸・お取引・代理店募集」ページであって、Amazon 側のデータには無い。<strong>これは Keepa の抽出条件ではなく、Phase C の HP 巡回（T-20260831-001 でサトルが道筋を作った領域）で埋める項目</strong>として設計を移します。</p>
+<p><strong>閾値を実測で決めました</strong>（ラベル済み200社／落ちる社に本命が何社混ざるか）。</p>
+<table><thead><tr><th>定義</th><th>全1,254社での該当</th><th>落ちる中の本命率</th><th>評価</th></tr></thead><tbody><tr><td>現行：実セラー数≧2</td><td>0社が落ちる</td><td>—</td><td>ゲートとして機能していない</td></tr><tr><td><strong>W1a：ブランド自社出品を除く第三者セラー≧1</strong></td><td><strong>48社が落ちる</strong></td><td><strong>0.0%</strong>（9/9が中国系OEM）</td><td><strong>採用。ブランド自身しか売っていない＝卸していない、を確実に消す</strong></td></tr><tr><td>W1b：同 ≧2</td><td>192社が落ちる</td><td><strong>8.8%（本命3社を巻き込む）</strong></td><td><strong>不採用。</strong> uchiko・ROOMMATE・Azb.Studio を落としました</td></tr><tr><td>W2：+屋号型セラー≧1</td><td>—</td><td>—</td><td><strong>不採用。適合率を 48.1%→38.2% に下げる</strong>（§3-2）</td></tr><tr><td>W3：+屋号型セラー≧2</td><td>—</td><td>—</td><td><strong>不採用。母数を7割削って適合率が上がらない</strong></td></tr></tbody></table>
+<p><strong>「第三者セラーが1社」と「2社」で本命率は変わりません</strong>（12.0% vs 10.9%）。<strong>2社を要求する根拠はデータにありません。</strong> 1社の場合は <code>要注意</code> 列に「卸の証拠が弱い」と書いて残します。</p>
+<p><strong>結論：セラー名から「メーカーが卸している証拠」を取り出せるのは「ゼロか、1社以上か」までです。その先は行き止まりです。</strong> 決定的な証拠はメーカー自身のサイトにある「卸・お取引・代理店募集」ページであって、Amazon 側のデータには無い。<strong>これは Keepa の抽出条件ではなく、Phase C の HP 巡回（T-20260831-001 でサトルが道筋を作った領域）で埋める項目</strong>として設計を移します。</p>
 <h3>論点6 リストの単位 → <strong>メーカー起点に組み替えます</strong></h3>
 <p><strong>実測が決定的でした。メインレーン345社の「1社あたりSKU数」は中央値1・平均1.76。</strong> 2SKU以上は97社しかありません。</p>
 <p>これは<strong>商品起点で探しているから当然</strong>です。Finder が拾った1商品からメーカーを逆引きしているので、そのメーカーの他の商品は見えていません。メーカー仕入れの経済は「1回の交渉 → 複数SKU」で成り立つので、<strong>この構造では交渉1回あたりの見返りが最小になります</strong>。</p>
@@ -77,15 +80,25 @@ ul,ol{padding-left:1.5rem}li{margin:.35rem 0}</style></head><body><h1>仕入れ�
 <h3>5-1. 母集団定義（Finder 条件）の変更</h3>
 <table><thead><tr><th>項目</th><th>v14（現行）</th><th><strong>v15</strong></th></tr></thead><tbody><tr><td>rootCategory</td><td>全カテゴリ</td><td><strong>DVD・ミュージック・本・洋書・ゲーム・PCソフト を除外</strong></td></tr><tr><td>効果</td><td>—</td><td>Keepaトークン <strong>-30.3%</strong>／版元ノイズ <strong>-97.8%</strong></td></tr><tr><td>浮いたトークンの使途</td><td>—</td><td>①未スキャンのサブカテゴリ深掘り ②<strong>Expansion（メーカー起点の全SKU列挙）</strong></td></tr></tbody></table>
 <h3>5-2. パイプライン（判定順。上から順に評価し、最初に当たった段で確定）</h3>
-<pre>0. ノーブランド判定       : メーカー名 ∈ {ノーブランド品, Generic, 不明} → 除外
-1. メディア判定           : 主カテゴリ ∈ メディア6種 → 除外（理由コードで①再販対象/②法人で開く を区別）
-2. 中国系OEM（確定）      : CNスコア ≧3 → 除外
-3. 中国系OEM（疑い）      : CNスコア ≧1 → 除外（※将来の再評価用に保存）
-4. 卸の証拠              : ブランド自社出品を除く第三者セラー &lt;2 → 除外
-5. 日本語シグナル         : jp_signal_valid() が真 → 【A メインレーン】/ 偽 → 【B 英字レーン】
-6. ★規模判定（新規・要トークン）: gBizINFO で商号照合 → 従業員&gt;300人 or 資本金&gt;3億円 → 除外
-                                  取得不能 → 規模=不明 のままメインレーン末尾へ
-7. Expansion（新規）      : 通過メーカーをブランド名でKeepa再検索し全SKUを列挙</pre>
+<pre>【除外ゲート】上から順に評価し、最初に当たった段で確定
+ 0. ノーブランド      : メーカー名 ∈ {ノーブランド品, Generic, 不明}
+ 1. メディア          : 主カテゴリ ∈ メディア6種（理由コードで①再販対象/②法人化で開く を区別）
+ 2. 中国系OEM（確定） : CNスコア ≧3                     … 適合率100%
+ 3. 卸の証拠なし      : ブランド自社出品を除く第三者セラー &lt;1 … 実測9/9が中国系・本命0
+
+【レーン分け】除外されなかったものを2つに分ける
+ 4. jp_signal_valid() 真 → 【A メインレーン】/ 偽 → 【B 英字レーン】
+
+【要注意フラグ】除外はしない。列に理由を書き、レーン内の末尾へソート
+  - CNスコア 1〜2         （中国系の疑い。日本のSMEも自社公式ストアを持つため落とさない）
+  - 互換インク/トナー       （知財クレームのリスク）
+  - 第三者セラーが1社だけ    （卸の証拠が弱い）
+
+【次段】
+ 5. ★規模判定（要gBizINFOトークン）: 商号照合 → 従業員&gt;300人 or 資本金&gt;3億円 → 除外
+                                      取得不能 → 規模=不明 のままメインレーン末尾へ
+ 6. ★Expansion            : 通過メーカーをブランド名でKeepa再検索し全SKUを列挙</pre>
+<p><strong>この順序には理由があります。</strong> 当初 CNスコア≧1 を除外にしていたところ、<strong>BOS（クリロン化成・日本のSME）が落ちました</strong>。<code>BOS-SHOP【メーカー公式】</code> という自社ストアを持つためです。同様に第三者セラー≧2 を要求すると <strong>uchiko・ROOMMATE・Azb.Studio</strong> が落ちました。<strong>強いゲートを重ねるほど、日本の小規模メーカーから先に消えます。</strong></p>
 <p><strong>CNスコアの重み：</strong> S1=2 / S2=2 / S3=2 / S4=3 / S5=3 / S6=1。実装は <code>03_rules.py</code> にそのままあります。</p>
 <p><strong>5の落とし穴（実測済み・v15で修正）：</strong> <code>manufacturer</code> が「キヤノン(Canon)対応 CRG-337 互換トナー」のような<strong>商品説明文</strong>のとき、日本語が含まれるので日本企業と誤読します。<code>jp_signal_valid()</code> は「対応／互換／for／カートリッジ／トナー」を含む文字列を日本語シグナルから除外します。これでマタインク・GPC Image Flex・ejet の3社が正しく英字レーンへ移りました。</p>
 <h3>5-3. 出力単位</h3>
@@ -93,17 +106,18 @@ ul,ol{padding-left:1.5rem}li{margin:.35rem 0}</style></head><body><h1>仕入れ�
 <hr>
 <h2>6. 既存データへの遡及適用（論点3）— <strong>完了しています</strong></h2>
 <p><strong>Keepaトークン消費ゼロで、6段のうち0〜5をすでに全件に当てました。</strong>（6の規模判定のみ未実施＝トークン申請待ち）</p>
-<table><thead><tr><th>レーン</th><th>社数</th><th>内容</th></tr></thead><tbody><tr><td><strong>A メインレーン</strong></td><td><strong>345社</strong></td><td>日本語商号あり・中国系シグナルなし・非メディア。<strong>gBizINFO 投入対象</strong></td></tr><tr><td><strong>B 英字レーン</strong></td><td><strong>201社</strong></td><td>中国系判定は白だが日本語の手がかりなし。人手/HTTP確認が要る</td></tr><tr><td>除外：メディア</td><td>337社</td><td>うち再販対象183社・法人で開く149社（理由コードで区別保存）</td></tr><tr><td>除外：中国系OEM（確定）</td><td>117社</td><td>CNスコア≧3・適合率100%</td></tr><tr><td>除外：中国系OEM（疑い）</td><td>214社</td><td>CNスコア1〜2</td></tr><tr><td>除外：卸の証拠なし</td><td>38社</td><td>第三者セラー&lt;2</td></tr><tr><td>除外：ノーブランド</td><td>2社</td><td>—</td></tr><tr><td>合計</td><td>1,254社</td><td></td></tr></tbody></table>
-<p><strong>A メインレーン345社の実像</strong>（<code>04_メーカーリスト_Aメインレーン.csv</code>）：想定仕入れ上限の中央値1,836円／Amazon価格の中央値4,900円／法人格表記あり40社／主カテゴリはおもちゃ42・DIY38・PC周辺36・ペット33・ホーム32。</p>
-<p><strong>この345社にはまだ大企業が約4割混ざっています</strong>（サンプル実測：メインレーン54社中B23社＝42.6%）。<strong>gBizINFO を通すまで社長にお渡ししないでください。</strong> 今の345社は「gBizINFO の入力データ」です。</p>
-<p><strong>gBizINFO 通過後の見込み（推定・確度中）：</strong> 345社 → <strong>190〜230社</strong>、うち本命 <strong>120〜160社</strong>。ラベル済み54社の内訳から外挿した推定であり、<strong>実測ではありません</strong>。外資日本法人が抜ける穴（§論点3）を織り込んでいます。</p>
+<table><thead><tr><th>レーン</th><th>社数</th><th>本命率（実測）</th><th>内容</th></tr></thead><tbody><tr><td><strong>A メインレーン</strong></td><td><strong>396社</strong></td><td>38.8%</td><td><strong>gBizINFO 投入対象</strong></td></tr><tr><td>└ 要注意なし</td><td>342社</td><td><strong>48.1%</strong></td><td>最優先。gBizINFO を通せば本命率が跳ね上がる</td></tr><tr><td>└ 要注意あり</td><td>54社</td><td><strong>0.0%</strong></td><td>CN疑い・互換消耗品・卸の証拠が弱い</td></tr><tr><td><strong>B 英字レーン</strong></td><td><strong>354社</strong></td><td>11.3%</td><td>中国系判定は白だが日本語の手がかりなし。<strong>ここに BOS・uchiko・Mt.SUMI など日本のSMEが6社埋まっています</strong></td></tr><tr><td>除外：メディア</td><td>337社</td><td>0.0%</td><td>うち再販対象183社・法人化で開く149社（理由コードで区別保存）</td></tr><tr><td>除外：中国系OEM（確定）</td><td>117社</td><td>0.0%</td><td>CNスコア≧3</td></tr><tr><td>除外：卸の証拠なし</td><td>48社</td><td>0.0%</td><td>第三者セラー0</td></tr><tr><td>除外：ノーブランド</td><td>2社</td><td>—</td><td>—</td></tr><tr><td>合計</td><td>1,254社</td><td></td><td></td></tr></tbody></table>
+<p><strong>除外504社に本命は0社でした（再現率100%）。</strong> ラベル済み200社の本命32社は、A に26社・B に6社と、すべてレーンの中に残っています。</p>
+<p><strong>A メインレーンの実像</strong>：想定仕入れ上限の中央値1,836円／Amazon価格の中央値4,900円／主カテゴリはおもちゃ・DIY工具・PC周辺・ペット用品・ホーム＆キッチン。実際に入っている日本の中小メーカーの例＝<strong>株式会社三輝（詰め替えそのまま）／シースター株式会社（BabySmile）／株式会社タツフト（あしあげ隊）／フィフティスクエア株式会社（mimimamo）／カヨ通商株式会社（KAYOTOYS）／すごろくや／愛知電線／バートル</strong>。</p>
+<p><strong>ただし、まだ大企業が約4割混ざっています</strong>（実測42.6%：BANDAI・パナソニック・タカラトミー・東芝・富士フイルム・アイリスオーヤマ・バッファロー・CASIO など）。<strong>gBizINFO を通すまで社長にお渡ししないでください。</strong> 今の396社は「gBizINFO の入力データ」です。</p>
+<p><strong>gBizINFO 通過後の見込み（推定・確度中）：</strong> 342社（要注意なし）→ <strong>190〜230社</strong>、うち本命 <strong>120〜160社</strong>。ラベル済み54社の内訳から外挿した推定であり、<strong>実測ではありません</strong>。外資日本法人が抜ける穴（§論点3）を織り込んでいます。</p>
 <hr>
 <h2>7. A/B/C ＋ 推奨</h2>
 <p>前提：日本店アカウントは停止中（T-20260826-004）で復旧未定。<strong>どの案も「仕入れ交渉の準備」までしか進められません。</strong> 発注・出品は復旧後です。逆に言えば、<strong>停止期間はリスト整備に使える唯一の時間</strong>です。</p>
 <h3>案A：gBizINFO を通してから出す（精度優先）</h3>
-<table><thead><tr><th>項目</th><th>内容</th></tr></thead><tbody><tr><td>やること</td><td>社長がトークン申請（5分＋メール待ち）→ 345社を商号照合 → 従業員300人以下だけを納品</td></tr><tr><td>想定リターン</td><td><strong>中央値 205社</strong>／楽観 265社（20%）／悲観 150社（20%）／<strong>期待値 205社</strong>。うち本命率 65〜80%</td></tr><tr><td>想定リスク</td><td>トークン発行までリストが1社も出ない。商号の表記ゆれ（<code>(株)タカギ</code> vs <code>株式会社タカギ</code>）で照合が落ちる</td></tr><tr><td>撤退条件</td><td>照合ヒット率が <strong>50%未満</strong>なら gBizINFO 単独運用を捨て、国税庁法人番号全件CSV（254MB・申請不要）との2段照合に切り替える</td></tr><tr><td>必要な打ち手</td><td>①社長のトークン申請（<strong>§4.1：規約同意＝要承認</strong>）②照合スクリプト ③表記ゆれ正規化</td></tr></tbody></table>
+<table><thead><tr><th>項目</th><th>内容</th></tr></thead><tbody><tr><td>やること</td><td>社長がトークン申請（5分＋メール待ち）→ 342社を商号照合 → 従業員300人以下だけを納品</td></tr><tr><td>想定リターン</td><td><strong>中央値 205社</strong>／楽観 265社（20%）／悲観 150社（20%）／<strong>期待値 205社</strong>。うち本命率 65〜80%</td></tr><tr><td>想定リスク</td><td>トークン発行までリストが1社も出ない。商号の表記ゆれ（<code>(株)タカギ</code> vs <code>株式会社タカギ</code>）で照合が落ちる</td></tr><tr><td>撤退条件</td><td>照合ヒット率が <strong>50%未満</strong>なら gBizINFO 単独運用を捨て、国税庁法人番号全件CSV（254MB・申請不要）との2段照合に切り替える</td></tr><tr><td>必要な打ち手</td><td>①社長のトークン申請（<strong>§4.1：規約同意＝要承認</strong>）②照合スクリプト ③表記ゆれ正規化</td></tr></tbody></table>
 <h3>案B：345社をそのまま出し、社長が見ながら削る（速度優先）</h3>
-<table><thead><tr><th>項目</th><th>内容</th></tr></thead><tbody><tr><td>やること</td><td>今日できあがっている345社をそのまま渡す</td></tr><tr><td>想定リターン</td><td>即日。ただし<strong>4割が大企業</strong>なので、社長が手で捨てる作業が発生</td></tr><tr><td>想定リスク</td><td><strong>今回の差し戻しと同じ失敗の再発。</strong> 「私が手動でKeepaで絞るのと変わらない」に逆戻りします</td></tr><tr><td>撤退条件</td><td>—</td></tr><tr><td>必要な打ち手</td><td>なし</td></tr></tbody></table>
+<table><thead><tr><th>項目</th><th>内容</th></tr></thead><tbody><tr><td>やること</td><td>今日できあがっている396社をそのまま渡す</td></tr><tr><td>想定リターン</td><td>即日。ただし<strong>4割が大企業</strong>なので、社長が手で捨てる作業が発生</td></tr><tr><td>想定リスク</td><td><strong>今回の差し戻しと同じ失敗の再発。</strong> 「私が手動でKeepaで絞るのと変わらない」に逆戻りします</td></tr><tr><td>撤退条件</td><td>—</td></tr><tr><td>必要な打ち手</td><td>なし</td></tr></tbody></table>
 <h3>案C：母集団を組み替えてスキャンし直す（母数優先）</h3>
 <table><thead><tr><th>項目</th><th>内容</th></tr></thead><tbody><tr><td>やること</td><td>メディアを外した Finder で常時稼働ジョブを再起動＋Expansion を実装。gBizINFO は後追い</td></tr><tr><td>想定リターン</td><td>浮いた30%のトークンで、<strong>月あたりの新規メーカー供給量が現在の1.4倍</strong>（推定）。Expansion で1社あたりSKUが中央値1→3〜5（推定・未実測）</td></tr><tr><td>想定リスク</td><td>実装2〜3日。その間リストが更新されない</td></tr><tr><td>撤退条件</td><td>4週間で「連絡できるメーカー」の週次増加が <strong>20社/週</strong>を割ったら、Keepa 以外の母集団（NETSEA・展示会出展社名簿）へ軸足を移す</td></tr><tr><td>必要な打ち手</td><td><code>scan_v14.py</code> の Finder 条件変更／Expansion 実装／IT エンジニア発注</td></tr></tbody></table>
 <h3>推奨：<strong>A → C の順で同時並走。B は採りません。</strong></h3>
@@ -111,7 +125,7 @@ ul,ol{padding-left:1.5rem}li{margin:.35rem 0}</style></head><body><h1>仕入れ�
 <ol><li><strong>残った唯一の欠陥（大企業4割）は gBizINFO でしか解けない。</strong> ここを埋めない限り、何社出しても社長の指摘は解消しません。トークン申請は社長の手が5分。<strong>最短で最大の効果</strong>です</li><li><strong>同時にCを走らせないと母数が足りない。</strong> 累計200社では月530件の稼働に届きません。Aだけでは「きれいだが短いリスト」で終わります</li><li><strong>B（そのまま出す）は、今回の差し戻しを再現するだけです</strong></li></ol>
 <hr>
 <h2>8. やらないこと（明示）</h2>
-<ol><li><strong>英字ブランドの中国系判定を100%にしようとしない。</strong> CNスコア≧3で適合率100%・再現率38%が取れています。残りは英字レーンに送って人手で見る。ここに完璧を求めると開発が止まり、母数が増えません</li><li><strong>屋号型セラーをゲートに使わない。</strong> 実測で適合率が48.1%→38.2%に<strong>下がりました</strong>（大企業のサインでもあるため）。表示だけします</li><li><strong>メディアカテゴリを Keepa で叩かない。</strong> トークンの30.3%です</li><li><strong>商品単位のランキング（top100 の厳選）を作らない。</strong> 2026-08-24 の社長指示（<code>feedback_maximize_pool_not_ranking</code>）どおり、順位付けに労力を割きません</li><li><strong>345社を今 社長に出さない。</strong> gBizINFO 前は入力データであって成果物ではありません</li></ol>
+<ol><li><strong>英字ブランドの中国系判定を100%にしようとしない。</strong> CNスコア≧3で適合率100%・再現率38%が取れています。残りは英字レーンに送って人手で見る。ここに完璧を求めると開発が止まり、母数が増えません</li><li><strong>屋号型セラーをゲートに使わない。</strong> 実測で適合率が48.1%→38.2%に<strong>下がりました</strong>（大企業のサインでもあるため）。表示だけします</li><li><strong>メディアカテゴリを Keepa で叩かない。</strong> トークンの30.3%です</li><li><strong>商品単位のランキング（top100 の厳選）を作らない。</strong> 2026-08-24 の社長指示（<code>feedback_maximize_pool_not_ranking</code>）どおり、順位付けに労力を割きません</li><li><strong>A メインレーンを今 社長に出さない。</strong> gBizINFO 前は入力データであって成果物ではありません</li><li><strong>強い除外ゲートを重ねない。</strong> CNスコア≧1 で BOS が、第三者セラー≧2 で uchiko・ROOMMATE・Azb.Studio が落ちました。<strong>日本の小規模メーカーから先に消えます。</strong> 迷ったら除外せず <code>要注意</code> 列に書いて末尾へ回す</li></ol>
 <hr>
 <h2>9. KPI（3階層）</h2>
 <table><thead><tr><th>階層</th><th>指標</th><th>目標</th><th>測り方</th></tr></thead><tbody><tr><td><strong>北極星</strong></td><td><strong>卸取引が始まったメーカー数</strong>（初回発注に到達）</td><td>12ヶ月で <strong>30社</strong></td><td>発注実績</td></tr><tr><td><strong>先行</strong></td><td>①<strong>連絡できるメーカー数（累計）</strong> ②問い合わせ返信率</td><td>①<strong>月100社増</strong> ②<strong>30%以上</strong>（EC STARs の合格ライン）</td><td>①メインレーンの gBizINFO 通過数 ②送付/返信の実測</td></tr><tr><td><strong>行動</strong></td><td>③週次の新規メーカー供給数 ④1社あたりSKU数</td><td>③<strong>25社/週</strong> ④<strong>中央値3以上</strong>（現在1）</td><td>③常時稼働ジョブの週次差分 ④Expansion の出力</td></tr></tbody></table>
@@ -124,4 +138,4 @@ ul,ol{padding-left:1.5rem}li{margin:.35rem 0}</style></head><body><h1>仕入れ�
 <table><thead><tr><th>条件</th><th>期限</th><th>判定</th></tr></thead><tbody><tr><td>gBizINFO の商号照合ヒット率が50%未満</td><td>実装から1週間</td><td>gBizINFO 単独をやめ、国税庁法人番号全件CSVとの2段照合へ</td></tr><tr><td>「連絡できるメーカー」の週次増加が20社/週を割る</td><td>4週間</td><td>Keepa 起点の母集団を諦め、NETSEA／展示会出展社名簿へ軸足を移す</td></tr><tr><td>問い合わせ返信率が15%未満（合格ライン30%の半分）</td><td>送付100社時点</td><td>文面・自社HPの整備を先に行う（EC STARs：HP整備で46%→66.5%）</td></tr><tr><td>メインレーンの本命率が gBizINFO 後も60%未満</td><td>照合完了時</td><td>本設計を破棄し、Amazon 起点をやめて「展示会・卸サイト起点」に全面転換</td></tr></tbody></table>
 <hr>
 <h2>12. 正直な限界</h2>
-<ol><li><strong>手作業ラベル200社は私の判断です。</strong> 各社の従業員数を実際に確認したわけではありません。A2（中堅）とB（大企業）の境界には誤りが含まれます。95%CIは統計的なばらつきのみを表し、ラベル誤りは含みません</li><li><strong>gBizINFO 通過後の見込み（190〜230社）は推定です。</strong> 外資日本法人の従業員数を実測していません</li><li><strong>「法人化すれば何社増えるか」は出せていません。</strong> 上限149社と言えるだけです</li><li><strong>成約率10%は仮置きです。</strong> 一次情報がありません。返信率30%は EC STARs の実績値です</li><li><strong>本書の全数値は 2026-08-31 11:21 のスナップショット。</strong> 常時稼働ジョブが追記を続けており、比率は変わりませんが絶対数は増えます</li><li><strong>§4.1 該当で実行していないもの：</strong> gBizINFO トークン申請（規約同意）／Gemini API キー取得／メーカーへの実連絡／商用DB契約。すべて社長承認が要ります</li></ol></body></html>
+<ol><li><strong>手作業ラベル200社は私の判断です。</strong> 各社の従業員数を実際に確認したわけではありません。A2（中堅）とB（大企業）の境界には誤りが含まれます。95%CIは統計的なばらつきのみを表し、ラベル誤りは含みません</li><li><strong>gBizINFO 通過後の見込み（190〜230社）は推定です。</strong> 外資日本法人の従業員数を実測していません</li><li><strong>「法人化すれば何社増えるか」は出せていません。</strong> 上限149社と言えるだけです</li><li><strong>成約率10%は仮置きです。</strong> 一次情報がありません。返信率30%は EC STARs の実績値です</li><li><strong><code>要注意</code> フラグの検証はサンプル13社（本命0社）でしかありません。</strong> 効いて見えますが、ゲートにするには母数不足です</li><li><strong>本書の全数値は 2026-08-31 11:21 のスナップショット。</strong> 常時稼働ジョブが追記を続けており、比率は変わりませんが絶対数は増えます</li><li><strong>§4.1 該当で実行していないもの：</strong> gBizINFO トークン申請（規約同意）／Gemini API キー取得／メーカーへの実連絡／商用DB契約。すべて社長承認が要ります</li></ol></body></html>
