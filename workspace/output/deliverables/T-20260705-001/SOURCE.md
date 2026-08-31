@@ -18,8 +18,12 @@
 | `netsea_run.log` | 実行ログ（黒字商品の商品名を含む） | 26行 |
 
 **企業名・サプライヤー名の列はありません。**`netsea_scan_results.csv` の列は
-`jan, name(＝商品名), buy_excl, amazon, asin, net, margin, verdict, offers, msales, rank, tier1, tier2` の13列のみで、
+`jan, name(＝商品名), amazon, asin, verdict, offers, msales, rank, tier1, tier2` の10列のみで、
 供給元を特定できる列を持ちません（2026-08-31 タカシが実測して確認）。
+
+> **2026-08-31 マリエが `buy_excl`（卸価格・税抜）／`net`／`margin` の3列を削除しました。**
+> 卸価格は NETSEA 会員限定情報であり、当リポジトリは PUBLIC のため（法務ハルオ判定 T-20260831-006 §5・A案）。
+> **NETSEA 由来の卸価格を今後 `deliverables/` に出さないこと。** 経緯は同フォルダの `README.md`。
 
 ## NETSEA データの用途ルール（法務ハルオ判定 2026-08-31 / T-20260831-005）
 
