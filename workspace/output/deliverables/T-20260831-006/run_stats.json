@@ -1,45 +1,42 @@
 {
-  "started_at": "2026-08-31T13:40:06.380295+09:00",
+  "started_at": "2026-08-31T13:46:07.558035+09:00",
   "assumptions": "FBA納品送料100円/個・NETSEA送料は10個按分・保管2.0ヶ月(繁忙期レート)・雑費3%",
   "harvest": {
-    "suppliers_total": 5,
-    "suppliers_fetched": 5,
-    "items_fetched": 3303,
-    "suppliers_empty": 0,
-    "errors": []
+    "suppliers_total": 225,
+    "suppliers_fetched": 220,
+    "items_fetched": 253764,
+    "suppliers_empty": 15,
+    "errors": [
+      {
+        "supplier_id": 395962,
+        "error": "NETSEA /items 通信失敗(supplier=395962): HTTPSConnectionPool(host='api.netsea.jp', port=443): Read timed out. (read timeout=20)"
+      },
+      {
+        "supplier_id": 704136,
+        "error": "NETSEA /items 通信失敗(supplier=704136): HTTPSConnectionPool(host='api.netsea.jp', port=443): Read timed out. (read timeout=20)"
+      },
+      {
+        "supplier_id": 774633,
+        "error": "NETSEA /items 通信失敗(supplier=774633): HTTPSConnectionPool(host='api.netsea.jp', port=443): Read timed out. (read timeout=20)"
+      }
+    ]
   },
   "screen": {
-    "netsea_products": 3303,
-    "candidates_expanded": 6690,
-    "passed_screen": 1998,
-    "deduped_by_jan": 22,
-    "to_keepa": 150,
+    "netsea_products": 257067,
+    "candidates_expanded": 1714571,
+    "passed_screen": 42074,
+    "deduped_by_jan": 15132,
+    "to_keepa": 26942,
     "screen_reasons": {
-      "JANなし": 4282,
-      "通過": 1998,
-      "在庫なし": 368,
-      "卸価格が採用レンジ外": 33,
-      "規制品・危険物の疑い": 7,
-      "JAN形式不正": 1,
-      "上代でも利益が出ない": 1
+      "JANなし": 1591152,
+      "JAN形式不正": 60233,
+      "通過": 42074,
+      "上代でも利益が出ない": 9677,
+      "在庫なし": 7250,
+      "卸価格が採用レンジ外": 3192,
+      "規制品・危険物の疑い": 925,
+      "中古品の疑い": 68
     }
   },
-  "keepa": {
-    "keepa_requests": 2,
-    "keepa_codes_sent": 150,
-    "keepa_products_returned": 95,
-    "keepa_tokens_consumed": 95,
-    "keepa_tokens_before": 1200,
-    "keepa_tokens_left": 1105,
-    "keepa_cost_per_candidate": 0.633
-  },
-  "result": {
-    "evaluated": 150,
-    "amazon_found": 80,
-    "not_on_amazon": 70,
-    "profitable": 5,
-    "gems": 4,
-    "hit_rate_vs_evaluated": 3.3
-  },
-  "elapsed_sec": 49.7
+  "elapsed_sec": 2986.9
 }

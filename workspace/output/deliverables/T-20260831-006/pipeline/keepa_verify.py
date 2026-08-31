@@ -4,14 +4,27 @@
 やらないこと: 商品の発見（Product Finder は一切叩きません）。
 
 ━━ トークンの実測（2026-08-31 / T-20260831-006）━━━━━━━━━━━━━━━━━━━━━━━
-    JAN 20件を `code` にカンマ区切りで1回投げ → 16商品が返り、**tokensConsumed = 16**。
-    ⇒ **Amazon に存在した商品だけが1トークン。ヒットしなかった JAN は0トークン。**
-    これは設計上とても大きい話で、「NETSEA にあるが Amazon に無い商品」を
-    **無料で仕分けられる**ことを意味します。前段フィルタを通した数がそのまま
-    課金件数になるわけではありません。
+    課金の単位は **「返ってきた商品数」× 1トークン**。投げた JAN の数ではありません。
 
-    バッチは100件（Keepa の code パラメータ上限）。1バッチ最大100トークン＝補充20/分で
-    約5分。「1周が5〜10分」は無人運転で生死が見える下限です（T-20260817-005 の教訓）。
+    | 投げた JAN | 返った商品 | tokensConsumed |
+    |---|---|---|
+    | 20件 | 16件 | 16 |
+    | 150件 | 95件 | 95 |
+    | **70件（全部ハズレ）** | **0件** | **1** |
+    | **100件（メーカー中心）** | **≒190件** | **190** |
+
+    ここから分かることが2つあります。
+
+    1. **ヒットしなかった JAN はタダ。** 「NETSEA にあるが Amazon に無い商品」の
+       仕分けは実質無料で終わります。
+    2. ⚠️ **1件あたり1トークンが上限だと思ってはいけません。**
+       1つの JAN が複数 ASIN を返せば、その数だけ課金されます。
+       最後の行がそれで、残高が **マイナス101** まで落ちました
+       （`tokenFlowReduction` は 0＝ペナルティではなく、単に読みが甘かった）。
+       → `TokenBudget` は**走りながら実測レートで見積もり直します**（固定値を信じない）。
+
+    バッチは100件（Keepa の code パラメータ上限）。「1周が5〜10分」は
+    無人運転で生死が見える下限です（T-20260817-005 の教訓）。
 """
 
 import os
@@ -134,28 +147,53 @@ class TokenBudget:
         self.left: Optional[int] = None
         self.refill_in_ms: int = 0
         self.consumed_total = 0
+        self.codes_total = 0
         self.starved_since: Optional[float] = None
 
-    def note(self, payload: dict) -> None:
+    def note(self, payload: dict, codes: int = 0) -> None:
         if "tokensLeft" in payload:
             self.left = payload.get("tokensLeft")
         self.refill_in_ms = payload.get("refillIn") or 0
         self.consumed_total += payload.get("tokensConsumed") or 0
+        self.codes_total += codes
 
-    def wait_if_needed(self, log=print) -> bool:
+    @property
+    def tokens_per_code(self) -> float:
+        """実測の「JAN 1件あたり何トークン掛かっているか」。
+
+        ⚠️ **1件＝1トークン上限だと思ってはいけません。**
+           課金は「**返ってきた商品数**」に対して起きるので、1つの JAN が複数 ASIN を
+           返せば 1件で2も3も掛かります。実測で 100件のバッチが **190トークン**掛かり、
+           残高がマイナス101まで落ちました（`tokenFlowReduction` は 0＝ペナルティではなく、
+           単に実コストが読みより高かった）。
+           だから固定値で見積もらず、**走りながら実測値で見積もり直します。**
+        """
+        if self.codes_total <= 0:
+            return 1.0
+        return max(self.consumed_total / self.codes_total, 0.1)
+
+    def required_for(self, batch_size: int) -> int:
+        """次のバッチを撃つ前に持っておくべき残トークン（実測レートから逆算）。"""
+        need = batch_size * self.tokens_per_code * 1.3   # 3割の安全代
+        return int(max(need, self.min_before_batch))
+
+    def wait_if_needed(self, log=print, batch_size: int = 0) -> bool:
         """必要なら回復を待つ。諦めるべき状況なら False を返す（呼び出し側が止める）。"""
-        if self.left is None or self.left >= self.min_before_batch:
+        threshold = self.required_for(batch_size) if batch_size else self.min_before_batch
+        if self.left is None or self.left >= threshold:
             self.starved_since = None
             return True
+        self.min_before_batch = threshold
         if self.starved_since is None:
             self.starved_since = time.time()
         elif time.time() - self.starved_since > config.KEEPA_STARVATION_MINUTES * 60:
             log(f"!! トークンが {config.KEEPA_STARVATION_MINUTES} 分回復しません。停止します")
             return False
-        need = self.min_before_batch - self.left
+        need = threshold - self.left            # 残高がマイナスならその分も足りない
         wait = max(need / 20.0 * 60.0, self.refill_in_ms / 1000.0, 15.0)
-        wait = min(wait, 600.0)
-        log(f"   トークン残 {self.left} → {self.min_before_batch} まで {wait:.0f}秒待機")
+        wait = min(wait, 900.0)
+        log(f"   トークン残 {self.left} → {threshold} まで {wait:.0f}秒待機"
+            f"（実測 {self.tokens_per_code:.2f} トークン/件）")
         time.sleep(wait)
         return True
 
@@ -177,7 +215,7 @@ class KeepaVerifier:
         self.products_returned = 0
 
     # -- HTTP ----------------------------------------------------------------
-    def _get(self, path: str, params: dict, label: str) -> dict:
+    def _get(self, path: str, params: dict, label: str, codes: int = 0) -> dict:
         """Keepa を1回叩く。落ちない・黙らない。失敗は {} を返し、理由をログに出す。"""
         import requests
 
@@ -211,7 +249,7 @@ class KeepaVerifier:
                 self.log(f"   {label} JSON 解釈失敗: {e}")
                 time.sleep(10)
                 continue
-            self.budget.note(payload)
+            self.budget.note(payload, codes)
             if payload.get("error"):
                 self.log(f"   {label} API エラー: {payload['error']}")
                 return {}
@@ -238,6 +276,7 @@ class KeepaVerifier:
             "product",
             {"code": ",".join(jans), "stats": 90},
             f"product(code×{len(jans)})",
+            codes=len(jans),
         )
         self.requests_made += 1
         self.codes_sent += len(jans)
@@ -268,18 +307,22 @@ class KeepaVerifier:
         batch_size = batch_size or config.KEEPA_CODE_BATCH
         results = []
         for i in range(0, len(jans), batch_size):
-            if not self.budget.wait_if_needed(self.log):
+            if not self.budget.wait_if_needed(self.log, batch_size):
                 self.log("!! トークン枯渇のため打ち切ります（ここまでの結果は保存済み）")
                 break
             chunk = jans[i : i + batch_size]
+            before = self.products_returned
             got = self.verify_batch(chunk)
+            returned = self.products_returned - before
             results.extend(got)
             if on_batch:
                 on_batch(got)
             hit = sum(1 for f in got if f.found)
             self.log(
-                f"   [{i + len(chunk)}/{len(jans)}] Keepa {len(chunk)}件 → ヒット{hit}件 "
-                f"/ 累計消費{self.budget.consumed_total}トークン / 残{self.budget.left}"
+                f"   [{i + len(chunk)}/{len(jans)}] Keepa {len(chunk)}件 → "
+                f"返却{returned}商品・ヒット{hit}件 "
+                f"/ 累計{self.budget.consumed_total}トークン "
+                f"({self.budget.tokens_per_code:.2f}/件) / 残{self.budget.left}"
             )
         return results
 
@@ -293,7 +336,7 @@ class KeepaVerifier:
         """
         out: dict = {}
         for i in range(0, len(asins), 20):
-            if not self.budget.wait_if_needed(self.log):
+            if not self.budget.wait_if_needed(self.log, 20 * 7):
                 break
             chunk = asins[i : i + 20]
             payload = self._get(
