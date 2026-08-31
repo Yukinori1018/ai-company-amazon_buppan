@@ -29,7 +29,7 @@ a{color:var(--acc)}
 <ul><li>チケット: T-20260831-005 / Phase B</li><li>担当: リサーチャー サトル</li><li>調査日: <strong>2026-08-31</strong>（本書のURLはすべて同日取得。日付の記載がないものは 2026-08-31 取得）</li><li>前提: Phase A（<code>01_仕入れ先の発見方法_全方位調査.md</code>）と法務判定（<code>04_出展社リストとNETSEAの適法性判定.md</code>）を読了済み</li></ul>
 <hr>
 <h2>0. 結論（先に5行）</h2>
-<ol><li><strong>社長の言う「本丸」は、定義上 Keepa でも卸サイトでも見つかりません。</strong> 「ネット販売に疎い」＝ Amazon に出ていない。Amazon 起点で探す限り、母集団に本丸は1社も入りません。<strong>精度の問題ではなく母集団の定義の問題</strong>です。卸サイト（NETSEA・スーパーデリバリー等）も同じで、そこに載っている時点でネットに疎くありません。</li><li><strong>その「Amazon にいない側」を実測しました。展示会出展社（国内表記）を無作為抽出して Keepa で照合したところ、N=61 で Amazon 上に自社ブランド商品を確認できたのは 20社（32.8%）。残る 41社（67.2%）は確認できず、うち 28社（45.9%）は社名で1件もヒットしませんでした。</strong>Phase A（N=18・33.3%）と再現しています。<strong>本丸候補は、既に手元にある2,353社の中に3分の2いる</strong>という数字です。</li><li><strong>今日から0円で機械的に取れる本丸リストが2本あります。</strong> ①展示会出展社2,353社を「Amazon不在」で切った側（既存データ・追加コスト0）②経済産業大臣指定の伝統的工芸品<strong>244品目</strong>の<strong>産地組合の名称・住所・電話番号</strong>（公式サイトに構造化されて公開・robots.txt 上も取得可）。</li><li><strong>SNS で機械的に探せるのは実質 YouTube だけです。</strong> YouTube Data API は無料だが <code>search.list</code> が <strong>1日100回</strong>に制限（2026-06-01 更新の公式仕様）。X API は<strong>従量課金</strong>、TikTok Research API は<strong>申請承認制</strong>、Instagram のハッシュタグ検索は公式ドキュメントが非公開化されており<strong>未確認</strong>。</li><li><strong>「数を打つ」側では、NETSEA の完全な代替が1つ見つかりました。<code>orosy バイヤーAPI</code> です。</strong> 公開 OpenAPI・<strong>JAN から卸価格を直接引ける</strong>・<strong>サプライヤーごとの承認制の壁が構造的に存在しない</strong>・0円。社長の「仕入れ値が推定で不正確」というボトルネックに直接効きます。</li></ol>
+<ol><li><strong>社長の言う「本丸」は、定義上 Keepa でも卸サイトでも見つかりません。</strong> 「ネット販売に疎い」＝ Amazon に出ていない。Amazon 起点で探す限り、母集団に本丸は1社も入りません。<strong>精度の問題ではなく母集団の定義の問題</strong>です。卸サイト（NETSEA・スーパーデリバリー等）も同じで、そこに載っている時点でネットに疎くありません。</li><li><strong>その「Amazon にいない側」を実測しました。展示会出展社（国内表記）を無作為抽出して Keepa で照合したところ、N=100 で Amazon 上に自社ブランド商品を確認できたのは 33社（33.0%）。残る 67社（67.0%）は確認できず、うち 51社（51.0%）は社名で1件もヒットしませんでした。</strong>Phase A（N=18・33.3%）と2つの独立サンプルで再現しています。<strong>本丸候補は、既に手元にある2,353社の中に3分の2いる</strong>という数字です。</li><li><strong>今日から0円で機械的に取れる本丸リストが2本あります。</strong> ①展示会出展社2,353社を「Amazon不在」で切った側（既存データ・追加コスト0）②経済産業大臣指定の伝統的工芸品<strong>244品目</strong>の<strong>産地組合の名称・住所・電話番号</strong>（公式サイトに構造化されて公開・robots.txt 上も取得可）。</li><li><strong>SNS で機械的に探せるのは実質 YouTube だけです。</strong> YouTube Data API は無料だが <code>search.list</code> が <strong>1日100回</strong>に制限（2026-06-01 更新の公式仕様）。X API は<strong>従量課金</strong>、TikTok Research API は<strong>申請承認制</strong>、Instagram のハッシュタグ検索は公式ドキュメントが非公開化されており<strong>未確認</strong>。</li><li><strong>「数を打つ」側では、NETSEA の完全な代替が1つ見つかりました。<code>orosy バイヤーAPI</code> です。</strong> 公開 OpenAPI・<strong>JAN から卸価格を直接引ける</strong>・<strong>サプライヤーごとの承認制の壁が構造的に存在しない</strong>・0円。社長の「仕入れ値が推定で不正確」というボトルネックに直接効きます。</li></ol>
 <hr>
 <h2>1. イシューと二段構え</h2>
 <p><strong>イシュー：「ネット販売に疎い中小メーカー」を、ネットの仕入れプラットフォームの外で機械的に見つける経路はどれか。あわせて、実績づくりのために数を打つ経路が NETSEA 以外に何本あるか。</strong></p>
@@ -44,7 +44,7 @@ a{color:var(--acc)}
 <table><thead><tr><th>条件</th><th>内容</th></tr></thead><tbody>
 <tr><td>会員登録の手前で停止</td><td>登録・申込・課金・第三者連絡は <strong>§4.1 該当のため一切実行していません</strong>。読めるのは非ログイン画面と公開規約まで</td></tr>
 <tr><td>推測を書かない</td><td>裏が取れないものは「未確認」「未実測」と明記。埋めていません</td></tr>
-<tr><td>Keepa 実測</td><td>トークン枠（20/分）の範囲。N=100 で計画し、<strong>N=61 で中間集計</strong>（末尾に最終値の追記欄あり）</td></tr>
+<tr><td>Keepa 実測</td><td>トークン枠（20/分）の範囲。<strong>N=100 で計画し、N=100 で完走</strong>（末尾に最終値）</td></tr>
 </tbody></table>
 <hr>
 <h1>第I部　【本丸】ネットに疎いメーカーを、ネット以外で見つける</h1>
@@ -61,20 +61,20 @@ a{color:var(--acc)}
 <p>事実：<strong>現行の Keepa 起点の探索は、展示会出展社の 99.9% に到達していません。</strong><br>そして本丸は、その到達していない 99.9% の側にいます。</p>
 <h2>2-2. 【実測①・本丸の中核数字】展示会出展社のうち、Amazon にいない割合</h2>
 <p><strong>方法</strong>：Phase A で取得した第102回東京ギフトショー出展社 2,353社から、海外表記（<code>CO.,LTD</code> <code>INC</code> 等・ASCII比率70%超）と Phase A で既出の26社を除いた <strong>国内表記プール 1,203社</strong> を作り、<code>seed=20260831</code> で無作為抽出。Keepa Product Search（<code>/search?type=product&amp;domain=5&amp;term=&lt;社名&gt;</code>・10トークン/回）を実行し、返ってきた商品の <code>brand</code> または <code>manufacturer</code> が社名と正規化一致するかで判定（Phase A と同一手法）。</p>
-<table><thead><tr><th>指標</th><th>実測値（N=61・中間集計）</th></tr></thead><tbody>
-<tr><td>サンプル数</td><td><strong>61</strong>（計画100・トークン枠のため中間集計）</td></tr>
-<tr><td>検索ヒット1件以上</td><td>33（54.1%）</td></tr>
-<tr><td><strong><code>brand</code>/<code>manufacturer</code> が社名と一致（＝Amazon にいる）</strong></td><td><strong>20社（32.8%）</strong></td></tr>
-<tr><td><strong>一致せず（＝Amazon にいない側）</strong></td><td><strong>41社（67.2%）</strong></td></tr>
-<tr><td><strong>社名で1件もヒットしない（＝Amazon 上に痕跡なし）</strong></td><td><strong>28社（45.9%）</strong></td></tr>
+<table><thead><tr><th>指標</th><th>実測値（<strong>N=100・完了</strong>）</th></tr></thead><tbody>
+<tr><td>サンプル数</td><td><strong>100</strong>（計画どおり完走）</td></tr>
+<tr><td>検索ヒット1件以上</td><td>49（49.0%）</td></tr>
+<tr><td><strong><code>brand</code>/<code>manufacturer</code> が社名と一致（＝Amazon にいる）</strong></td><td><strong>33社（33.0%）</strong></td></tr>
+<tr><td><strong>一致せず（＝Amazon にいない側）</strong></td><td><strong>67社（67.0%）</strong></td></tr>
+<tr><td><strong>社名で1件もヒットしない（＝Amazon 上に痕跡なし）</strong></td><td><strong>51社（51.0%）</strong></td></tr>
 </tbody></table>
-<p><strong>Phase A（国内表記 N=18）は 6社／33.3% が Amazon にいる、でした。今回 N=61 で 32.8%。再現しています。</strong></p>
+<p><strong>Phase A（国内表記 N=18）は 6社／33.3%。今回 N=100 で 33.0%。合算すると N=118 で 39社／33.1%。ほぼ完全に再現しています。</strong></p>
 <p><strong>この数字の読み方（事実と推測を分けます）</strong></p>
-<ul><li>事実：<strong>国内表記の出展社のうち、Amazon に自社ブランド商品を持っているのは約3社に1社。</strong> 残る約3分の2が「Amazon にいない側」＝<strong>本丸候補の母集団</strong>です。</li><li>事実：<strong>2,353社に外挿すると、本丸候補は約1,500社規模</strong>（国内表記プール1,203社 × 67.2% ≒ 808社を確実な下限、海外除外前の全体で見れば約1,500社）。<strong>追加コスト0円で今日から使えます。</strong></li><li><strong>推測（確度：高）・かつ重要な誤差</strong>：この 67.2% は<strong>上振れします</strong>。判定は「社名 vs brand/manufacturer の一致」なので、<strong>社名とブランド名が違う会社は全部「いない」側に落ちています</strong>。実測中に <code>トヨタ自動車（株）</code> が strict=NO と判定されました（ブランドは <code>TOYOTA</code>）。<strong>したがって 67.2% は「Amazon不在率の上限」であって点推定ではありません。</strong></li><li><strong>より確実な下限は「社名で1件もヒットしない 45.9%」</strong>です。この 28社は Amazon 上に社名の痕跡すらありません。</li><li><strong>推測（確度：中）・かつリスク</strong>：「Amazon にいない」には「需要がない」も含まれます。<strong>「競合ゼロ」と「需要ゼロ」は同じ数字で観測されます。</strong> 切り分けは、その会社の<strong>商品のJANを取ってから</strong> Keepa を引く以外にありません（＝展示会でカタログを取る意味）。</li></ul>
+<ul><li>事実：<strong>国内表記の出展社のうち、Amazon に自社ブランド商品を持っているのは 33.0%（3社に1社）。</strong> 残る <strong>67.0%</strong> が「Amazon にいない側」＝<strong>本丸候補の母集団</strong>です。</li><li>事実：<strong>国内表記プール1,203社に外挿すると、本丸候補は 806社</strong>（1,203 × 67.0%）。<strong>社名で1件もヒットしない層だけに絞っても 614社</strong>（1,203 × 51.0%）。<strong>追加コスト0円・社長の手0回で今日から使えます。</strong></li><li><strong>推測（確度：高）・かつ重要な誤差</strong>：この 67.0% は<strong>上振れします</strong>。判定は「社名 vs brand/manufacturer の一致」なので、<strong>社名とブランド名が違う会社は全部「いない」側に落ちています</strong>。実測中に <code>トヨタ自動車（株）</code> が strict=NO と判定されました（ブランドは <code>TOYOTA</code>）。<strong>したがって 67.0% は「Amazon不在率の上限」であって点推定ではありません。</strong></li><li><strong>より確実な下限は「社名で1件もヒットしない 51.0%」</strong>です。この 51社は Amazon 上に社名の痕跡すらありません。</li><li><strong>推測（確度：中）・かつリスク</strong>：「Amazon にいない」には「需要がない」も含まれます。<strong>「競合ゼロ」と「需要ゼロ」は同じ数字で観測されます。</strong> 切り分けは、その会社の<strong>商品のJANを取ってから</strong> Keepa を引く以外にありません（＝展示会でカタログを取る意味）。</li></ul>
 <h2>2-3. 本丸の経路一覧（推奨順）</h2>
 <p><strong>「独占の見込み」は、社長の狙い（独占販売）に対する私の観測です。事実と推測を欄内で分けています。</strong></p>
 <table><thead><tr><th>順</th><th>経路</th><th>何が手に入るか</th><th>件数（実測）</th><th>機械化</th><th>コスト</th><th><strong>独占の見込み</strong></th><th>段階</th></tr></thead><tbody>
-<tr><td><strong>1</strong></td><td><strong>展示会出展社を「Amazon不在」で切った側</strong></td><td>社名＋小間番号。会場で現物・カタログ・JAN・担当者</td><td><strong>2,353社</strong>のうち<strong>約67%が Amazon 不在側</strong>（N=61 実測。上限値）／確実な下限は<strong>45.9%</strong></td><td><strong>済</strong>（既存データ＋Keepa 1件10トークン）</td><td><strong>0円</strong></td><td><strong>高。</strong>事実：出展社は新規取引先を探しに来ている側。推測（確度：中）：Amazon にいない＝自社で売る手段を持たない＝販路を任せる相手を探している可能性が高い</td><td><strong>本丸</strong></td></tr>
+<tr><td><strong>1</strong></td><td><strong>展示会出展社を「Amazon不在」で切った側</strong></td><td>社名＋小間番号。会場で現物・カタログ・JAN・担当者</td><td><strong>2,353社</strong>のうち<strong>67.0%が Amazon 不在側</strong>（N=100 実測・上限値）／確実な下限は<strong>51.0%</strong>＝国内表記プール1,203社なら <strong>806社／614社</strong></td><td><strong>済</strong>（既存データ＋Keepa 1件10トークン）</td><td><strong>0円</strong></td><td><strong>高。</strong>事実：出展社は新規取引先を探しに来ている側。推測（確度：中）：Amazon にいない＝自社で売る手段を持たない＝販路を任せる相手を探している可能性が高い</td><td><strong>本丸</strong></td></tr>
 <tr><td><strong>2</strong></td><td><strong>経済産業大臣指定の伝統的工芸品 産地組合</strong></td><td><strong>産地組合名・郵便番号・住所・TEL・FAX</strong>、工芸品分類、主要製造地域、主な製品</td><td><strong>244品目</strong>（経産省・2025-10-27時点）／公式サイトの品目ページ <strong>275URL</strong>（サイトマップ実測）</td><td><strong>可</strong>。1品目1リクエスト。robots.txt は <code>/wp/wp-admin/</code> のみ Disallow</td><td><strong>0円</strong></td><td><strong>中。</strong>事実：産地組合は個社ではなく組合。推測（確度：中）：独占契約より「正規取扱店」の形になりやすい。ただし<strong>組合経由で個社を紹介してもらえる</strong>構造は他経路にない</td><td><strong>本丸</strong></td></tr>
 <tr><td><strong>3</strong></td><td><strong>SNS発信しているが EC が弱いメーカー（YouTube 起点）</strong></td><td>チャンネル名・概要欄の自社サイトURL・動画内の商品名</td><td><strong>未実測</strong>（API キー未取得＝§4.1）</td><td><strong>可だが制限つき</strong>。<code>search.list</code> <strong>1日100回</strong>（無料枠・2026-06-01 公式）。<code>channels.list</code>/<code>videos.list</code> は別枠10,000units/日</td><td><strong>0円</strong>（Google Cloud プロジェクト作成＝規約同意で §4.1）</td><td><strong>高。</strong>推測（確度：中）：発信しているのに Amazon にいない＝「売り方が分からない」の最も強いシグナル。社長の言うとおり<strong>フォロワーが少ない方が本丸に近い</strong></td><td><strong>本丸</strong></td></tr>
 <tr><td><strong>4</strong></td><td><strong>道の駅・直売所（実店舗のみのメーカー）</strong></td><td>出荷者＝地場の小規模製造者</td><td><strong>道の駅 1,231駅</strong>（国交省の地域別掲載数を合算。北海道128／東北181／関東188／北陸84／中部137／近畿159／中国108／四国91／九州145／沖縄10）</td><td><strong>不可に近い</strong>。出荷者名簿は各駅にしかない</td><td>0円（閲覧）／交通費</td><td><strong>高だが到達コストが高い。</strong>推測（確度：中）：出荷者は個人・零細で、JAN を持たない商品が混じる</td><td><strong>本丸</strong></td></tr>
@@ -252,8 +252,8 @@ a{color:var(--acc)}
 <hr>
 <h2>7. 分かっていないこと（正直な申告）</h2>
 <table><thead><tr><th>項目</th><th>状態</th></tr></thead><tbody>
-<tr><td>展示会出展社の Amazon 不在率の真値</td><td><strong>N=61 で 67.2%（strict NO）。ただしこれは上限</strong>。社名≠ブランド名の会社が全部「不在」に落ちるため（実測中に <code>トヨタ自動車（株）</code> が strict NO と判定された）。<strong>確実な下限は「社名で1件もヒットしない 45.9%」</strong></td></tr>
-<tr><td>同・計画の N=100</td><td><strong>トークン枠（20/分）のため N=61 で中間集計。</strong>残りは継続実行中（末尾の追記欄参照）</td></tr>
+<tr><td>展示会出展社の Amazon 不在率の真値</td><td><strong>N=100 完了。67.0%（strict NO）。ただしこれは上限</strong>。社名≠ブランド名の会社が全部「不在」に落ちるため（実測中に <code>トヨタ自動車（株）</code> が strict NO と判定された）。<strong>確実な下限は「社名で1件もヒットしない 51.0%」</strong></td></tr>
+<tr><td>出力CSVの2行</td><td>出展社名に PDF 抽出由来の文字化けが残り、CSV の再読込では2行が壊れる。<strong>集計はスクリプトのメモリ内カウント（N=100）が正</strong>（<code>keepa_absence_scan.log</code> 末尾の <code>=== RESULT ===</code>）</td></tr>
 <tr><td>「Amazon にいない」の内訳（需要なし vs 競合なし）</td><td><strong>切り分け不能。</strong> 商品のJANを取るまで判定できない</td></tr>
 <tr><td>伝統的工芸品244品目の産地組合の総数・重複</td><td><strong>未実測</strong>（品目ページ275本のクロールは法務判定 #12 待ち）</td></tr>
 <tr><td>SNS 経路の歩留まり</td><td><strong>測りようがない。</strong> 探索型のため母数を定義できない</td></tr>
@@ -333,5 +333,15 @@ a{color:var(--acc)}
 <tr><td>7</td><td><strong>独占販売をどの経路で取りに行くか</strong></td><td>事実：orosy は仕入元が開示されない＝独占交渉の相手に到達できない。事実：展示会・産地組合・SNS は個社に直接到達できる。<strong>独占は本丸経路でしか取れません</strong></td></tr>
 </tbody></table>
 <hr>
-<h2>追記欄：Keepa 不在率スキャンの最終値</h2>
-<p>本書 §2-2 は <strong>N=61 の中間集計</strong>です。スキャンは実行中で、完了時の最終値は<br><code>workspace/output/agent_output/T-20260831-005/phaseB/keepa_absence_scan.csv</code> と同 <code>.log</code> に出ます。<br><strong>結論の向き（約3分の2が Amazon 不在側）は Phase A（N=18・33.3%）と N=61（32.8%）で再現しており、変わらない見込みです。</strong></p></div></body></html>
+<h2>追記：Keepa 不在率スキャンの最終値（<strong>完了</strong>）</h2>
+<p><strong>N=100 で完走しました。</strong></p>
+<pre><code>=== RESULT N=100 ===
+hit&gt;=1: 49 (49.0%)
+strict YES: 33 (33.0%)  -&gt; Amazon不在(strict NO): 67 (67.0%)</code></pre>
+<p>出典：<code>workspace/output/agent_output/T-20260831-005/phaseB/keepa_absence_scan.log</code>（再現スクリプトは同フォルダ <code>keepa_absence_scan.py</code>・<code>seed=20260831</code>）</p>
+<table><thead><tr><th>サンプル</th><th>N</th><th>Amazon にいる（strict YES）</th></tr></thead><tbody>
+<tr><td>Phase A（国内表記）</td><td>18</td><td>6社（33.3%）</td></tr>
+<tr><td>Phase B（本スキャン）</td><td>100</td><td>33社（33.0%）</td></tr>
+<tr><td><strong>合算</strong></td><td><strong>118</strong></td><td><strong>39社（33.1%）</strong></td></tr>
+</tbody></table>
+<p><strong>2つの独立したサンプルで 33.3% / 33.0%。再現しています。この数字は動かないと考えて構いません。</strong></p></div></body></html>
