@@ -1,0 +1,183 @@
+<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NETSEA 仕入れ → Amazon 販売の適法性判定 — T-20260831-006</title>
+<style>
+:root{--fg:#1b1b1b;--mut:#5c6470;--line:#d8dee6;--bg:#fff;--accent:#256a93;--warn:#fff7e6}
+*{box-sizing:border-box}
+body{font-family:-apple-system,"Hiragino Sans","Yu Gothic",Meiryo,sans-serif;line-height:1.85;
+color:var(--fg);background:#eef1f4;margin:0;padding:0 16px 80px;-webkit-text-size-adjust:100%}
+.wrap{max-width:1180px;margin:0 auto;background:var(--bg);padding:44px 52px 64px;
+box-shadow:0 1px 4px rgba(0,0,0,.09)}
+h1{font-size:1.9em;border-bottom:4px solid var(--accent);padding-bottom:.4em;margin-top:0}
+h2{font-size:1.4em;margin-top:2.4em;border-left:7px solid var(--accent);padding:.2em .6em;background:#f2f6f9}
+h3{font-size:1.15em;margin-top:1.9em;border-bottom:1px solid var(--line);padding-bottom:.25em}
+h4{font-size:1.02em;margin-top:1.5em;color:var(--accent)}
+table{border-collapse:collapse;width:100%;margin:1.1em 0;font-size:.9em;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:.5em .7em;text-align:left;vertical-align:top}
+th{background:#eaf0f5;font-weight:600;white-space:nowrap}
+tbody tr:nth-child(even){background:#fafbfc}
+code{background:#eef1f4;padding:.12em .4em;border-radius:3px;font-size:.87em;
+font-family:"SF Mono",Menlo,Consolas,monospace;word-break:break-all}
+blockquote{border-left:5px solid #f0a63a;background:var(--warn);margin:1.2em 0;padding:.9em 1.2em;color:#4a3c22}
+blockquote p{margin:.35em 0}
+hr{border:0;border-top:1px solid var(--line);margin:2.4em 0}
+a{color:var(--accent)}
+.meta{color:var(--mut);font-size:.9em;margin:.6em 0 2em}
+.toc{background:#f4f7f9;border:1px solid var(--line);padding:1em 1.6em;margin:1.6em 0}
+.toc a{text-decoration:none}
+ul,ol{padding-left:1.5em}
+@media(max-width:760px){.wrap{padding:22px 16px 40px}body{padding:0 6px 40px}th{white-space:normal}}
+
+pre{background:#1f2430;color:#e6e9ef;padding:1em 1.2em;overflow-x:auto;border-radius:5px;
+font-size:.85em;line-height:1.6}
+pre code{background:transparent;color:inherit;padding:0;word-break:normal}
+</style></head>
+<body><div class="wrap">
+<h1>NETSEA 仕入れ → Amazon 販売の適法性判定</h1>
+<p class="meta">T-20260831-006 ／ 法務：ハルオ ／ <strong>確認日 2026-08-31</strong><br>
+一次情報＝NETSEA バイヤー会員規約／サプライヤー会員規約／API 利用規約（openapi.json）／公式ヘルプ／商品ページ実測
+＋ 電気用品安全法・家庭用品品質表示法・食品衛生法・薬機法・製造物責任法・古物営業法</p>
+<h1 id="NETSEA-仕入れ-Amazon-販売の適法性判定">NETSEA 仕入れ → Amazon 販売の適法性判定</h1>
+<p>法務ハルオ / 2026-08-31 / T-20260831-006（前提：T-20260831-005 の NETSEA 判定書）</p>
+<hr>
+<h2 id="0-結論-3行-">0. 結論（3行）</h2>
+<table><thead><tr><th>#</th><th>論点</th><th>判定</th></tr></thead><tbody><tr><td>①</td><td>NETSEA で仕入れた商品を Amazon で売ってよいか</td><td><strong>条件付き可。</strong> 会員規約に販路制限は無い。ただし<strong>サプライヤーが商品単位で「ネット販売 不可」を掛けられる仕組みが実在する</strong>ため、<strong>商品ごとの確認が必須</strong></td></tr><tr><td>②</td><td>第24条1項（バイヤー情報の公開）</td><td><strong>公開範囲が条文から特定できない。</strong> 公開バイヤー名簿は実測で発見できず。<strong>社長の登録内容の実確認が必要</strong>（ログイン＝秘書へ依頼）</td></tr><tr><td>③</td><td>仕入れ商品の規制</td><td><strong>転売者にも義務が生じる法律が4つある</strong>（電安法・酒税法・家表法・薬機法広告）。<strong>古物商許可は「原則不要」だが NETSEA には中古品が実在する</strong>ため一律不要とは言えない</td></tr></tbody></table>
+<p><strong>加えて、着手前に処理すべき既発事案が1件あります。</strong> 公開 GitHub リポジトリに <strong>NETSEA の卸価格 227 行が commit 済み</strong>です。§4.1（不可逆な削除）に当たるため当職は手を出していません。→ §5</p>
+<hr>
+<h2 id="①-NETSEA-で仕入れた商品を-Amazon-で転売してよいか">① NETSEA で仕入れた商品を Amazon で転売してよいか</h2>
+<h3 id="1-1-会員規約本体に販路制限は無い-原則-OK-">1-1. 会員規約本体に販路制限は無い（＝原則 OK）</h3>
+<p>バイヤー会員規約全文（<code>agent_output/T-20260831-005/legal/netsea_buyer_agreement_20260831.txt</code>、49,614字）を全文検索。</p>
+<table><thead><tr><th>検索語</th><th>ヒット</th></tr></thead><tbody><tr><td>転売 / 販路 / 再販 / 販売先 / 販売方法 / ネット販売 / 販売不可</td><td><strong>0件</strong></td></tr><tr><td>モール</td><td>3件（いずれも「モールクーポン」＝NETSEA自社クーポンの名称。販路の意味ではない）</td></tr></tbody></table>
+<p>第15条は「バイヤー会員は…商品等を<strong>購入することができます</strong>」とだけ定め、購入後の処分に条件を付けていません。第7条（禁止事項）にも販路に関する号はありません。</p>
+<blockquote><p><strong>明文が無い＝禁止されていない。</strong> 会員規約のレベルでは、Amazon で売ることは制限されていません。 出典：https://www.netsea.jp/agreement/statement （2024-08-20施行／2025-04-01改訂版施行・2026-08-31 当職確認）</p></blockquote>
+<h3 id="1-2-ただしサプライヤーが個別に販路制限を掛けられる-仕組みは3層ある">1-2. ただしサプライヤーが個別に販路制限を掛けられる。仕組みは3層ある</h3>
+<p>スーパーデリバリー第6条と同種の仕組みが、NETSEA にも<strong>別の形で存在します</strong>。むしろ NETSEA のほうが機械可読で扱いやすい。</p>
+<h4 id="-第1層-商品ページの可否テーブル-で明示-">【第1層】商品ページの可否テーブル（○／✕ で明示）</h4>
+<p>商品詳細ページに <code>colAvailableInfo</code> という表があり、<strong>5項目が ○ / ✕ で表示されます</strong>。</p>
+<table><thead><tr><th>表示項目</th><th>意味</th><th>Amazon 販売への効き方</th></tr></thead><tbody><tr><td>消費者直送</td><td>エンドユーザーへの直送可否</td><td>無在庫でやるなら必須</td></tr><tr><td>画像転載</td><td>サプライヤー画像の転用可否</td><td><strong>✕ なら Amazon 出品画像に使えない</strong></td></tr><tr><td><strong>ネット販売</strong></td><td><strong>ネットショップでの販売可否</strong></td><td><strong>✕ なら Amazon 販売は不可</strong></td></tr><tr><td>ネットオークション</td><td>オークション形式での販売可否</td><td>Amazon は該当しない（後述の注意あり）</td></tr><tr><td>消費者向け商品説明</td><td>説明文の転用可否</td><td>✕ なら商品説明を自作する必要</td></tr></tbody></table>
+<p><strong>実測サンプル</strong>（https://www.netsea.jp/shop/357136/4901070130801 ／ハリマ共和物産・2026-08-31 取得）：</p>
+<pre><code>&lt;tr&gt;&lt;th&gt;消費者直送&lt;/th&gt;       &lt;td&gt;&lt;i class=&quot;fa-regular fa-circle&quot;&gt;&lt;/i&gt;&lt;/td&gt;&lt;/tr&gt;  ← ○
+&lt;tr&gt;&lt;th&gt;画像転載&lt;/th&gt;         &lt;td&gt;&lt;i class=&quot;fa-regular fa-circle&quot;&gt;&lt;/i&gt;&lt;/td&gt;&lt;/tr&gt;  ← ○
+&lt;tr&gt;&lt;th&gt;ネット販売&lt;/th&gt;       &lt;td&gt;&lt;i class=&quot;fa-regular fa-circle&quot;&gt;&lt;/i&gt;&lt;/td&gt;&lt;/tr&gt;  ← ○
+&lt;tr&gt;&lt;th&gt;ネットオークション&lt;/th&gt;&lt;td&gt;&lt;i class=&quot;fa-solid fa-xmark&quot;&gt;&lt;/i&gt;&lt;/td&gt;&lt;/tr&gt;    ← ✕
+&lt;tr&gt;&lt;th&gt;消費者向け商品説明&lt;/th&gt;&lt;td&gt;&lt;i class=&quot;fa-regular fa-circle&quot;&gt;&lt;/i&gt;&lt;/td&gt;&lt;/tr&gt;  ← ○
+</code></pre>
+<p><strong>このテーブルはログイン不要で読めます</strong>（卸価格だけが会員限定）。</p>
+<h4 id="-第2層-API-のフラグ-タカシが機械判定できる-">【第2層】API のフラグ（＝タカシが機械判定できる）</h4>
+<p>第1層と同じ情報が Buyer API のレスポンスに載ります。<strong>公式スキーマの定義</strong>（https://api.netsea.jp/docs/buyer/schemas/items.json ／2026-08-31 取得）：</p>
+<table><thead><tr><th>フィールド</th><th>公式 description</th><th>値</th></tr></thead><tbody><tr><td><code>deal_net_shop_flag</code></td><td>ネット販売可</td><td><code>Y</code> 可 / <code>N</code> 不可</td></tr><tr><td><code>deal_net_auction_flag</code></td><td>ネットオークション可</td><td><code>Y</code> 可 / <code>N</code> 不可</td></tr><tr><td><code>image_copy_flag</code></td><td>画像転載可</td><td><code>Y</code> 可 / <code>N</code> 不可</td></tr><tr><td><code>direct_send_flag</code></td><td>商品配送可</td><td><code>Y</code> 可 / <code>N</code> 不可</td></tr><tr><td><code>net_bulk_order_flag</code></td><td>CSVダイレクト注文可</td><td><code>Y</code> 可 / <code>N</code> 不可</td></tr></tbody></table>
+<p><strong>→ 実装上の必須ガード（タカシへ）</strong></p>
+<pre><code>候補として採用してよい条件： deal_net_shop_flag == &quot;Y&quot;
+Amazon 画像に流用してよい条件： image_copy_flag == &quot;Y&quot;
+</code></pre>
+<p><code>deal_net_shop_flag == &quot;N&quot;</code> の商品は、<strong>利益が出ても候補リストに載せてはいけません。</strong>フィルタではなく除外です。</p>
+<h4 id="-第3層-サプライヤーの自由記述-販売条件-API-では取れない-">【第3層】サプライヤーの自由記述「販売条件」（<strong>API では取れない</strong>）</h4>
+<p>商品ページには「販売条件／支払方法／送料／返品条件」というタブがあり、NETSEA 自身が <strong>「出展企業毎に異なりますので、必ずご確認ください」</strong>と注記しています。</p>
+<p>実測サンプル（同商品の「販売条件」原文・抜粋）：</p>
+<blockquote><p>■販売について】 ・<strong>直接のお取引はお断りしております。NETSEAを通してのご購入をお願いします。</strong> ・<strong>『定価販売』『売価厳守』等の記載のある商品の販売価格は記載を遵守して下さい。</strong></p></blockquote>
+<p><strong>ここに「Amazon 不可」「モール不可」が書かれうる。</strong>そして<strong>この自由記述テキストは API の商品スキーマに含まれていません</strong>（<code>items.json</code> の全フィールドを確認済み。<code>delivery_terms</code>＝出荷条件はあるが、販売条件の自由記述は無い）。</p>
+<blockquote><p><strong>結論：API だけで自動判定を完結させることはできません。</strong> API で <code>deal_net_shop_flag == &quot;Y&quot;</code> に絞り、<strong>発注前に商品ページの「販売条件」を人が読む</strong>。この二段構えが唯一の安全な運用です。</p></blockquote>
+<h4 id="-前段の関門-取引申請の承認制">【前段の関門】取引申請の承認制</h4>
+<p>サプライヤー会員規約 第7条1項（https://supplier.netsea.jp/agreement/statement ／2026-08-31 取得）：</p>
+<blockquote><p>会員は、当社所定の方法で選択する<strong>自己の取引対象バイヤーに該当しないバイヤーからは取引申請を受けることができない</strong>ものとします。</p></blockquote>
+<p>同2項：</p>
+<blockquote><p>会員は、<strong>取引申請の承諾をいつでも撤回できる</strong>ものとします。</p></blockquote>
+<p><strong>→ サプライヤーは相手を選べるし、後から切れます。</strong>「今買えている」は「明日も買える」を意味しません。<strong>単一サプライヤー依存の SKU 構成は撤退リスクが高い。</strong></p>
+<h3 id="1-3-売価厳守-条項の扱い-当職の警告-">1-3. 「売価厳守」条項の扱い（当職の警告）</h3>
+<p>上記サンプルの「『定価販売』『売価厳守』等の記載のある商品の販売価格は記載を遵守して下さい」は、 売り手側から見れば<strong>再販売価格の拘束</strong>（独占禁止法2条9項4号・不公正な取引方法）に触れうる類型です。 ただし<strong>当社は買い手であり、違反の主体ではありません。</strong>当社にとっての問題は法違反ではなく実務です。</p>
+<table><thead><tr><th>選択肢</th><th>帰結</th></tr></thead><tbody><tr><td>従う</td><td>Amazon の価格競争でカートを取れない。値下げ不能な SKU を抱える</td></tr><tr><td>従わない</td><td>契約違反 → 取引申請の承諾撤回（サプライヤー規約7条2項）→ <strong>仕入れ経路が消える</strong></td></tr></tbody></table>
+<p><strong>→ 「売価厳守」表記のある商品は、Amazon 販売の候補から外すのが合理的です。</strong>利益計算の前に落としてください。</p>
+<h3 id="1-4-API-利用規約-第8条2-別文書-前回の宿題">1-4. API 利用規約 第8条2（別文書）— 前回の宿題</h3>
+<p>API 利用規約の全文は <strong>公開されています</strong>（ログイン不要）。 出典：https://api.netsea.jp/docs/buyer/openapi.json の <code>info.description</code>（2026-08-31 当職取得。原本は <code>agent_output/T-20260831-006/legal/netsea_api_openapi_20260831.json</code>）</p>
+<p>押さえるべき条文：</p>
+<table><thead><tr><th>条</th><th>原文</th><th>効き方</th></tr></thead><tbody><tr><td><strong>第8条2</strong></td><td>「APIユーザーは本ライセンスの使用により得た情報を<strong>加工する場合、事前に当社に書面による承諾を得る</strong>ものとします。」</td><td><strong>本件の最大の未解決論点。</strong>§4 で詳述</td></tr><tr><td>第5条3</td><td>当社の事前の明示的書面による許諾なく、本ライセンスを販売・賃貸・再許諾すること、もしくは<strong>本ライセンスの使用または提供から収入を得ること</strong>を禁止</td><td>「API そのもの」で収入を得る禁止。<strong>API で仕入れて商品を売る行為は該当しない</strong>（ライセンスの転売・API 提供事業の禁止と読むのが素直）</td></tr><tr><td>第10条</td><td>規約終了後、当社の要請があれば、<strong>情報・情報を加工したもの</strong>を返還または廃棄し、書面で通知</td><td>データの保持期間に上限がある</td></tr><tr><td>第13条</td><td>有効期間は<strong>トークン認証日から半年間</strong>。再認証で延長</td><td>トークン180日と同期。<strong>切れたら止まる</strong>前提でパイプラインを組むこと</td></tr><tr><td>第15条</td><td><strong>秘密保持。</strong>事前の書面承諾なく第三者に開示・漏洩してはならない</td><td><strong>公開リポジトリへの commit と正面衝突する。</strong>§5 参照</td></tr></tbody></table>
+<p><strong>API の取得範囲にも制限があります</strong>（公式ヘルプ https://www.netsea.jp/help/manual/api.html ／2026-08-31）：</p>
+<blockquote><p>以下の商品情報を取得することが可能です。<strong>（消費者直送可能かつ、取引申請が承認されているサプライヤーの商品に限ります。）</strong></p></blockquote>
+<p><strong>→ API は「まだ取引していないサプライヤー」の商品を返しません。</strong>「NETSEA 全体をスキャンして宝を探す」設計は API では成立しません。タカシの設計前提に直結します。</p>
+<h3 id="1-5-スクレイピングで代替できるか-できません-">1-5. スクレイピングで代替できるか → <strong>できません</strong></h3>
+<p><code>https://www.netsea.jp/robots.txt</code>（2026-08-31 取得）：</p>
+<ul><li><code>GPTBot</code> <code>Bytespider</code> <code>PetalBot</code> <code>Amazonbot</code> ほか named crawler は <strong><code>Disallow: /</code>（全面禁止）</strong></li><li><code>User-agent: *</code> は <code>/api/</code> および一部の検索クエリ（<code>ds_flg=</code> 等）を Disallow</li></ul>
+<p>加えてバイヤー会員規約 <strong>第7条1項3号</strong>（他の利用者の情報の収集を目的とする行為＝<strong>事前承諾の例外なし</strong>）と <strong>第7条2項3号</strong>（権利の行使の範囲を超えた情報利用）があります。</p>
+<blockquote><p><strong>大量スクレイピングは規約違反。</strong> 商品データの取得経路は API 一本です。 ただし<strong>発注前の1商品ごとの目視確認（販売条件の読み合わせ）は「収集」ではなく通常利用</strong>であり、問題ありません。</p></blockquote>
+<h3 id="1-6-①の判定表-タカシ-社長がそのまま使える形-">1-6. ①の判定表（タカシ／社長がそのまま使える形）</h3>
+<table><thead><tr><th>段階</th><th>確認するもの</th><th>どこで</th><th>誰が</th><th>NG なら</th></tr></thead><tbody><tr><td>1</td><td><code>deal_net_shop_flag == &quot;Y&quot;</code></td><td>Buyer API</td><td>タカシ（自動）</td><td><strong>候補から除外</strong></td></tr><tr><td>2</td><td><code>image_copy_flag</code></td><td>Buyer API</td><td>タカシ（自動）</td><td><code>N</code> なら画像は自前撮影</td></tr><tr><td>3</td><td>商品ページ「販売条件」の自由記述に「Amazon」「モール」「ネット販売」「売価厳守」「定価販売」が無いか</td><td>商品ページ（ログイン不要）</td><td>人（発注前に必ず）</td><td><strong>発注しない</strong></td></tr><tr><td>4</td><td>取引申請が承認されているか</td><td>マイページ</td><td>社長／秘書</td><td>未承認なら仕入れ不能</td></tr><tr><td>5</td><td>規制品に該当しないか</td><td>§3 のチェックリスト</td><td>人</td><td>該当なら §3 の要件を満たすまで発注しない</td></tr><tr><td>6</td><td>Amazon 側の出品制限（ゲート）</td><td>Amazon セラーセントラル</td><td>社長／秘書</td><td><code>knowledge_listing_restrictions_ungating</code> の手順へ</td></tr></tbody></table>
+<hr>
+<h2 id="②-第24条1項-バイヤー情報の公開-のリスク評価">② 第24条1項（バイヤー情報の公開）のリスク評価</h2>
+<h3 id="2-1-条文-原文-">2-1. 条文（原文）</h3>
+<p>バイヤー会員規約 第24条1項・2項：</p>
+<blockquote><p>1 バイヤー会員の法人の名称又は事業者の氏名、住所、電話番号、代表者及び担当者の氏名は、<strong>ウェブサイト上で公開されます。</strong> 2 バイヤー会員のNETSEAの利用履歴は、当社が定める期間、<strong>ウェブサイト上で公開されます。</strong></p></blockquote>
+<p>同 第18条2項：</p>
+<blockquote><p>当社は、取引申請に係るサプライヤー会員に対して、取引申請に係る<strong>バイヤー会員の情報を提供することができます。</strong></p></blockquote>
+<p>サプライヤー会員規約 第7条3項（裏側の対応条文）：</p>
+<blockquote><p>当社は、会員が取引申請を承諾した場合、<strong>当該会員の登録情報をバイヤーに対し提供することができる</strong>ものとします。</p></blockquote>
+<h3 id="2-2-実画面で確かめたこと-2026-08-31-非ログインで確認-">2-2. 実画面で確かめたこと（2026-08-31・非ログインで確認）</h3>
+<table><thead><tr><th>確認先</th><th>結果</th></tr></thead><tbody><tr><td>公開のバイヤー名簿ページ</td><td><strong>見つからない。</strong>サイトマップ（https://www.netsea.jp/sitemap）にバイヤー一覧に相当するページは無い（<code>/shop</code>＝サプライヤー一覧はある）</td></tr><tr><td>サプライヤーレビュー一覧（https://www.netsea.jp/shop/order_review/357136 ／79件）</td><td>表示されるのは<strong>業種（例：小売業・卸売業／その他）・注文日時・レビュー日時・注文商品名・過去1年間の購入回数</strong>のみ。<strong>事業者名・住所・電話番号は表示されていない</strong></td></tr><tr><td>同上の1件</td><td>レビュー本文に投稿者自身が「日向澤 合同会社 代表」と<strong>自分で書いている</strong>例あり（システムの自動表示ではない）</td></tr></tbody></table>
+<h3 id="2-3-当職の評価">2-3. 当職の評価</h3>
+<p><strong>条文（24条1項）と実装（実画面）が一致していません。</strong>条文は「ウェブサイト上で公開」と広く書いてありますが、 不特定多数に氏名・住所を晒す実装は確認できませんでした。<strong>実態は「取引申請したサプライヤーに対して開示される」</strong>（18条2項）と読むのが自然です。</p>
+<p>しかし<strong>明文主義の立場からは、これで安心とは言えません。</strong></p>
+<table><thead><tr><th>軸</th><th>評価</th></tr></thead><tbody><tr><td>発生確率</td><td>中。条文は現に「公開されます」と書いてあり、NETSEA は仕様をいつでも変更できる（第2条：規約の一方的変更）</td></tr><tr><td>影響度</td><td>大。自宅住所は一度出ると回収できない</td></tr><tr><td><strong>不可逆性</strong></td><td><strong>極大。住所の露出は取り消せない</strong></td></tr></tbody></table>
+<blockquote><p><strong>不可逆性が極大なので、確率が中でもアラートを上げます。</strong>「たぶん公開されていない」で放置してはいけません。</p></blockquote>
+<h3 id="2-4-対処-優先順-">2-4. 対処（優先順）</h3>
+<table><thead><tr><th>#</th><th>対処</th><th>実行者</th><th>備考</th></tr></thead><tbody><tr><td>1</td><td><strong>現在の登録内容を実確認する</strong>（マイページ &gt; 登録情報変更）</td><td><strong>秘書カズヨ</strong>（社長にログインの一手を依頼）</td><td>何が入っているか分からないまま議論しても意味がない</td></tr><tr><td>2</td><td>住所を<strong>自宅以外</strong>に変更できるか確認</td><td>秘書</td><td>バーチャルオフィス／私書箱／レンタル事務所。<strong>ただし第17条3項2号「日本国内に営業所又は居所を有しないとき」は入会拒否事由</strong>。実体のない住所は登録事項の虚偽（第20条）にあたるおそれがあり、当職は推奨しません</td></tr><tr><td>3</td><td>屋号「Satoy Select」で<strong>事業者氏名</strong>欄を置き換えられるか確認</td><td>秘書</td><td>24条1項は「法人の名称<strong>又は</strong>事業者の氏名」。個人事業主は氏名側になる可能性が高い。<strong>屋号で代替できるかは実画面依存＝要確認</strong></td></tr><tr><td>4</td><td>開示先が「取引申請したサプライヤーのみ」かを NETSEA サポートへ書面照会</td><td>秘書 →（第三者連絡＝§4.1）社長承認</td><td><strong>これが唯一の確定手段。</strong>当職の判定はここまでが限界</td></tr></tbody></table>
+<blockquote><p><strong>社長へお伝えいただきたいこと（そのまま使えます）</strong> 「NETSEA の規約には『事業者の氏名・住所・電話番号はウェブサイト上で公開されます』と明記されています。 現に公開名簿は見当たりませんが、規約上はいつでもそうできる建て付けです。 個人事業主の登録住所＝自宅であれば、露出は取り消せません。 続ける前に、①今の登録内容の確認、②住所の変更可否、③開示先の書面確認、の3つを済ませることを推奨します。」</p></blockquote>
+<p><strong>なお、既に登録済みである以上、上記は「これから同意するか」ではなく「既に負っているリスクの棚卸し」です。</strong> 判断が出るまで NETSEA の利用を止める必要はありません（停止しても既登録情報は残ります）。<strong>退会（第26条）が唯一の遮断手段</strong>ですが、それは仕入れ計画の全否定なので、当職は推奨しません。</p>
+<hr>
+<h2 id="③-仕入れ商品の法的な注意点-転売者-当社が負う義務-">③ 仕入れ商品の法的な注意点（転売者＝当社が負う義務）</h2>
+<h3 id="3-1-前提-NETSEA-仕入れは-輸入-ではない-ここが有利">3-1. 前提：NETSEA 仕入れは「輸入」ではない ＝ ここが有利</h3>
+<p>当社が NETSEA から国内サプライヤーを通じて仕入れる限り、<strong>当社は輸入者ではありません。</strong> これにより、直輸入（並行輸入・中国仕入れ）で負う重い義務の大半を回避できます。</p>
+<p><strong>製造物責任法 第2条3項</strong>（「製造業者等」の定義）： 1号 業として<strong>製造、加工又は輸入した者</strong> / 2号 <strong>自ら製造業者として氏名・商号・商標等を表示した者</strong>、または製造業者と誤認させる表示をした者 / 3号 実質的な製造業者と認めうる表示をした者</p>
+<blockquote><p><strong>NETSEA 品をそのまま売る限り、当社は PL 法上の「製造業者等」に当たりません。</strong>（1号にも2号にも該当しない） <strong>ただし OEM・自社ラベル貼付をした瞬間に2号で責任を負います。</strong>③OEM 路線と混ぜないこと。 出典：https://hourei.net/law/406AC0000000085 （2026-08-31 確認）</p></blockquote>
+<h3 id="3-2-転売者にも義務が生じる法律-ここが本題-">3-2. 転売者にも義務が生じる法律（<strong>ここが本題</strong>）</h3>
+<table><thead><tr><th>法律</th><th>当社（非輸入・転売者）の義務</th><th>根拠</th><th>実務での効き方</th></tr></thead><tbody><tr><td><strong>電気用品安全法</strong></td><td><strong>PSE マーク等の表示が付されていない電気用品を、販売・販売目的で陳列してはならない</strong>（第27条）。違反は<strong>1年以下の拘禁刑または100万円以下の罰金</strong>（第57条）</td><td>電安法27条／METI「電気用品安全法の概要」 https://www.meti.go.jp/policy/consumer/seian/denan/act_outline.html</td><td><strong>届出は不要。ただし「マークの確認義務」は転売者にもある。</strong>家電・PC・AV機器・照明・ACアダプタ付き商品を仕入れるなら<strong>現物のPSE表示を必ず確認</strong></td></tr><tr><td><strong>酒税法（酒類販売業免許）</strong></td><td>酒類を販売するには<strong>酒類販売業免許</strong>が必要。一般消費者に売るなら<strong>一般酒類小売業免許</strong></td><td>酒税法9条／NETSEA公式 https://www.netsea.jp/help/manual/liquor_purchasing.html</td><td><strong>NETSEA 側でゲートされている。</strong>免許確認済みバイヤーしか酒類カテゴリを仕入れられない。公式に「仕入れた商品は、酒税法に則り、所持する免許の区分にて認められた品目、販売先に対して販売を行ってください」と明記。<strong>免許なしなら酒類カテゴリは触らない</strong></td></tr><tr><td><strong>家庭用品品質表示法</strong></td><td><strong>表示義務者は「製造業者、販売業者、又は表示業者」のいずれか。販売業者も名宛人。</strong>不適正表示 → 指示 → <strong>事業者名の公表</strong> → 表示命令 → 販売禁止命令</td><td>消費者庁 https://www.caa.go.jp/policies/policy/representation/household_goods/outline/outline_02.html</td><td>対象は<strong>繊維製品・合成樹脂加工品・電気機械器具・雑貨工業品</strong>の政令指定品。<strong>アパレル・日用雑貨は直撃。</strong>タグ・表示のない商品を仕入れないこと</td></tr><tr><td><strong>薬機法（広告規制）</strong></td><td><strong>第66条1項は「何人も」。</strong>当社が製造販売業者でなくても、<strong>商品説明・広告の表現規制を受ける</strong>。違反は罰則＋<strong>課徴金</strong>（2021年8月〜）</td><td>薬機法66条／東京都保健医療局 https://www.hokeniryo.metro.tokyo.lg.jp/anzen/iyaku/koukokukisei/bassui</td><td><strong>化粧品・医薬部外品・健康食品を扱うなら、Amazon の商品説明文が規制対象。</strong>「効く」「治る」を書いた瞬間にアウト</td></tr><tr><td>食品衛生法</td><td><strong>常温保存可能な容器包装入り食品のみを販売する場合は、営業許可・営業届出とも不要。</strong>ただし<strong>乳類・食肉・魚介類・野菜果物・米穀類・弁当</strong>は包装済みでも<strong>届出が必要</strong></td><td>食品衛生法（2021-06-01 施行の届出制度）／愛知県 https://www.pref.aichi.jp/soshiki/eisei/kyoka-todokede-minaoshi.html</td><td><strong>NETSEA の食品カテゴリには要届出業種が混在。</strong>カテゴリ単位で「食品はOK」と判断しないこと</td></tr><tr><td>薬機法（販売業）</td><td><strong>化粧品・医薬部外品の「販売」に許可・届出は不要</strong>（他社が製造・輸入したものを仕入れて売る場合）。<strong>医薬品は店舗販売業許可が必要</strong></td><td>埼玉県 https://www.pref.saitama.lg.jp/a0707/hajimete1.html ／東京都健康安全研究センター https://www.tmiph.metro.tokyo.lg.jp/k_yakuji/i-sinsa/bugaihin/bugaihin_yaku/</td><td>化粧品・医薬部外品は<strong>販売自体は自由</strong>。効くのは上の広告規制のみ</td></tr><tr><td>景品表示法</td><td>「自己の供給する商品」の表示をした者が名宛人。<strong>Amazon 出品者は表示主体。</strong>優良誤認・有利誤認は課徴金対象</td><td>景表法5条・8条</td><td>サプライヤーの説明文をそのままコピーしても、<strong>責任は出品者である当社が負う</strong></td></tr></tbody></table>
+<blockquote><p><strong>「輸入者でないから安全」は誤りです。</strong>電安法27条・家表法・薬機法66条は、<strong>転売者を名宛人に含みます。</strong></p></blockquote>
+<h3 id="3-3-古物営業法-NETSEA-は卸だから不要-は-正しくない-">3-3. 古物営業法 — 「NETSEA は卸だから不要」は<strong>正しくない</strong></h3>
+<p>既存メモリ <code>knowledge_kobutsusho_license</code> の判定基準（要否は「新品か」ではなく「<strong>一度消費者の手に渡ったか</strong>」）は正しく、 <strong>NETSEA のサプライヤーがメーカー・卸である限り、古物商許可は不要</strong>です。</p>
+<p><strong>しかし NETSEA には中古品が実在します。</strong></p>
+<p>実測（https://www.netsea.jp/search/?keyword=中古 ／2026-08-31・非ログイン）：</p>
+<ul><li><strong>「中古」でヒット 212 件</strong></li><li>例：「<strong>中古</strong>vintage アクセサリーかわいい ダックスフント ブローチ コサージュ ピン」</li></ul>
+<p>古物営業法2条1項の「古物」＝①一度使用された物品、②<strong>使用されない物品で使用のために取引されたもの</strong>、③これらに幾分の手入れをしたもの。 これを<strong>売買する営業</strong>は許可が必要（同2条2項1号）。</p>
+<blockquote><p><strong>判定：NETSEA 仕入れ一般には古物商許可は不要。ただし中古・ヴィンテージ・リユース品を1点でも扱うなら必要。</strong> <strong>運用ルール（守れば安全）：</strong> 商品名・説明に「中古」「ヴィンテージ」「USED」「リユース」「アウトレット（返品再生品）」を含む商品は、<strong>許可取得まで仕入れ候補から除外する。</strong> 許可は手数料19,000円・審査約40日。②メーカー仕入れ・③OEM では不要ですが、<strong>①電脳せどり・④無在庫を将来やるなら必須</strong>です。先行取得は依然として合理的、という前回結論は維持します。</p></blockquote>
+<h3 id="3-4-並行輸入品-真贋-日本店が停止中の今-最も危ない論点">3-4. 並行輸入品・真贋 — 日本店が停止中の今、最も危ない論点</h3>
+<table><thead><tr><th>リスク</th><th>評価</th></tr></thead><tbody><tr><td>発生確率</td><td>中。NETSEA には正規卸も並行輸入業者も混在する。サプライヤー名だけでは判別できない</td></tr><tr><td>影響度</td><td>極大。Amazon の知財クレームは<strong>アカウント停止</strong>に直結</td></tr><tr><td><strong>不可逆性</strong></td><td><strong>極大。日本店は現在 KYC 連鎖で停止中。復旧直後に知財クレームを食らえば、復旧そのものが吹き飛ぶ</strong></td></tr></tbody></table>
+<p><strong>具体的な危険の所在（実測）：</strong> サンプルで見たサプライヤー（ハリマ共和物産／19,058商品）は、<strong>TSUBAKI・ギャツビー・ルシード・スクラビングバブル</strong>等の<strong>大手ブランド品</strong>を扱っています。 これらは Amazon 上で<strong>ブランドゲート／出品制限の対象になりやすい</strong>カテゴリです。</p>
+<p><strong>当社が取るべき防御：</strong></p>
+<ol><li><strong>請求書を必ず確保する。</strong> ただし——</li></ol>
+<blockquote><p><strong>【重要な落とし穴】</strong> NETSEA からダウンロードできる納品書・請求書には、公式ヘルプに <strong>「ダウンロードできる書類は、社内管理用としてご利用ください」</strong>と明記されています。 出典：https://www.netsea.jp/help/manual/invoice.html （2026-08-31 確認）</p>
+<p><strong>→ Amazon の出品制限解除／真贋調査に提出する請求書としてそのまま通る保証はありません。</strong> 同ページは「書式や項目の変更が必要な場合は、各サプライヤーへご相談ください。<strong>書類発行を行っていない場合もございます</strong>ので、事前にお確かめの上お取引をお願いします」とも書いています。</p>
+<p><strong>運用ルール：ブランド品・ゲート対象商品を仕入れる前に、「サプライヤー発行の正式請求書をもらえるか」を取引申請の段階で確認する。</strong> 既存メモリ <code>knowledge_listing_restrictions_ungating</code> の要件（メーカー/卸の請求書・180日以内・10点以上・<strong>購入者名と住所の記載</strong>）を満たす書類が出ないサプライヤーは、ゲート商材の仕入れ先として使えません。</p></blockquote>
+<ol><li><strong>並行輸入品を避ける。</strong> 商品ページに「並行輸入」「海外正規品」の記載があるもの、および<strong>中国サプライヤー</strong>（NETSEA の検索条件で絞り込み可能）は、初期フェーズでは除外を推奨します。</li><li><strong>真贋リスクの高いカテゴリを避ける。</strong> ブランド化粧品・ブランドアパレル・アクセサリ・キャラクターグッズ。</li><li><strong>サプライヤーレビューを読む。</strong> 公開されており（例：https://www.netsea.jp/shop/order_review/357136 ）、ログイン不要で読めます。<strong>発注前の一次情報として有用です。</strong></li></ol>
+<hr>
+<h2 id="④-未解決の論点-API-第8条2-加工-グレー-原則-NO-の対象-">④ 未解決の論点 — API 第8条2「加工」（<strong>グレー。原則 NO の対象</strong>）</h2>
+<h3 id="4-1-何が問題か">4-1. 何が問題か</h3>
+<p>API 利用規約 第8条2：</p>
+<blockquote><p>APIユーザーは本ライセンスの使用により得た情報を<strong>加工する場合、事前に当社に書面による承諾を得る</strong>ものとします。</p></blockquote>
+<p>タカシが設計しているパイプライン（NETSEA の卸価格 × Keepa の相場 → 利益計算 → 候補リスト生成）は、 <strong>文言上「加工」に読める余地があります。</strong>「加工」の定義は規約内になく、NETSEA の公開文書にも見当たりません（2026-08-31 時点で当職が確認した範囲）。</p>
+<h3 id="4-2-当職の判定">4-2. 当職の判定</h3>
+<table><thead><tr><th>用途</th><th>判定</th><th>理由</th></tr></thead><tbody><tr><td>API データを<strong>自社内</strong>で読み、仕入れ判断のために計算する</td><td><strong>可と解する。</strong>ただし断定はしない</td><td>第2条が「APIユーザー自身の便益をはかる<strong>商用目的</strong>に使用することを認める」と明記。仕入れ判断は商用目的そのもの。これを禁じると API の存在意義が消える</td></tr><tr><td>加工結果を<strong>外部に公開・第三者提供する</strong></td><td><strong>明確に NO</strong></td><td>第15条（秘密保持）・第5条3。<strong>書面承諾なしに例外なし</strong></td></tr><tr><td>加工結果を<strong>公開 GitHub リポジトリに commit する</strong></td><td><strong>明確に NO</strong></td><td>上に同じ。§5 参照</td></tr></tbody></table>
+<p><strong>グレーゾーンなので、3点セットを付します（当職の行動原則4）。</strong></p>
+<table><thead><tr><th></th><th></th></tr></thead><tbody><tr><td><strong>リスクシナリオ</strong></td><td>NETSEA が「利益計算＝加工」と主張。第12条により<strong>催告なく API 提供を解除</strong>。第10条により<strong>取得済みデータ・加工物の廃棄</strong>を要求される</td></tr><tr><td><strong>発生時の対応策</strong></td><td>①API 停止に耐える設計にする（キャッシュ済みデータで当面回る）②書面承諾を求める照会を先に出す（<strong>第三者連絡＝§4.1。社長承認が必要</strong>）③廃棄要求に応じられるよう、NETSEA 由来データを1箇所に隔離しておく</td></tr><tr><td><strong>撤退条件</strong></td><td>NETSEA から「加工にあたる」旨の通知が来たら、<strong>その時点でパイプラインを停止</strong>し、手動の目視仕入れに切り替える。争わない</td></tr></tbody></table>
+<h3 id="4-3-直ちに実行すべき歯止め-タカシへ-">4-3. 直ちに実行すべき歯止め（タカシへ）</h3>
+<ol><li>NETSEA 由来データは <strong><code>agent_output/</code> 配下の1ディレクトリに隔離</strong>する（廃棄要求に1コマンドで応じられる状態）</li><li><strong><code>deliverables/</code> に NETSEA の卸価格・商品名を出さない。</strong>成果物に出すのは「ASIN・想定利益・仕入れ先＝NETSEA」までとし、<strong>卸価格の生値は出さない</strong></li><li>既存の <code>adapters/netsea.py</code> の <code>assert_procurement_use()</code> に加え、<strong>出力先が deliverables かどうかのガード</strong>を入れる</li></ol>
+<hr>
+<h2 id="⑤-要対処-既発事案-公開リポジトリに-NETSEA-の卸価格が-commit-済み">⑤ 【要対処・既発事案】公開リポジトリに NETSEA の卸価格が commit 済み</h2>
+<h3 id="5-1-事実">5-1. 事実</h3>
+<table><thead><tr><th>項目</th><th>内容</th></tr></thead><tbody><tr><td>ファイル</td><td><code>workspace/output/deliverables/T-20260705-001/netsea_scan_results.csv</code></td></tr><tr><td>行数</td><td>270行（ヘッダ含む）</td></tr><tr><td>内容</td><td><code>jan, name, buy_excl(卸価格・税抜), amazon, asin, net, margin, ...</code></td></tr><tr><td><strong>卸価格が非ゼロの行</strong></td><td><strong>227行</strong></td></tr><tr><td>実例</td><td><code>4589978064437, 木製棚付き収納式リクライニングベッド(手動タイプ・電動タイプ), 30940, ...</code></td></tr><tr><td>リポジトリ</td><td>https://github.com/Yukinori1018/ai-company-amazon_buppan （<strong>PUBLIC</strong>）</td></tr></tbody></table>
+<h3 id="5-2-抵触しうる条項">5-2. 抵触しうる条項</h3>
+<table><thead><tr><th>根拠</th><th>内容</th></tr></thead><tbody><tr><td>NETSEA 公式ガイド</td><td>「<strong>商品の卸価格は会員様にのみ公開しております</strong>」 https://www.netsea.jp/help/guide （2026-08-31 確認）</td></tr><tr><td>バイヤー会員規約 第7条2項3号</td><td>権利の行使の範囲を超えて本サービスの情報を利用すること（事前承諾なく禁止）</td></tr><tr><td>API 利用規約 第15条1項</td><td>相手方の一切の情報を秘密として保持し、<strong>事前の書面承諾なく第三者に開示または漏洩してはならない</strong></td></tr><tr><td>API 利用規約 第8条2</td><td>得た情報の加工には事前の書面承諾</td></tr></tbody></table>
+<h3 id="5-3-リスク評価">5-3. リスク評価</h3>
+<table><thead><tr><th>軸</th><th>評価</th></tr></thead><tbody><tr><td>発生確率</td><td>低〜中。NETSEA が能動的に GitHub を監視している可能性は高くない</td></tr><tr><td>影響度</td><td>大。API 提供の解除（第12条）＋会員登録の取消し（会員規約第27条）＋<strong>サプライヤー各社の卸価格を公開した</strong>という信用問題</td></tr><tr><td><strong>不可逆性</strong></td><td><strong>極大。既に push 済み＝Git 履歴に残る。ファイルを消しても履歴からは消えない</strong></td></tr></tbody></table>
+<h3 id="5-4-当職の勧告-当職は実行しません-">5-4. 当職の勧告（<strong>当職は実行しません</strong>）</h3>
+<p><strong>§4.1「不可逆な削除」（ファイル/データ削除、履歴を含むもの）に該当するため、当職は一切手を触れていません。</strong> 以下を秘書経由で社長判断に上げてください。</p>
+<table><thead><tr><th>案</th><th>内容</th><th>当職の評価</th></tr></thead><tbody><tr><td><strong>A（推奨）</strong></td><td>①当該 CSV から <code>buy_excl</code> 列を削除して commit（履歴には残るが、現在の HEAD からは消える）②以後 NETSEA 由来の価格を deliverables に出さない運用ルールを CLAUDE.md 相当に明記</td><td><strong>費用ゼロ・可逆・今日できる。</strong>まずこれ</td></tr><tr><td>B</td><td>Git 履歴からも消す（<code>filter-repo</code> + force push）</td><td><strong>§4.1 の破壊的 Git 操作。</strong>自動同期を壊すリスクがあり、効果も限定的（GitHub のキャッシュ・フォークには残りうる）。<strong>当職は推奨しません</strong></td></tr><tr><td>C</td><td>何もしない</td><td>不可逆性が極大な事案で「様子を見る」は、当職の原則上とれません</td></tr></tbody></table>
+<p><strong>なお、この件は今回の NETSEA 仕入れ計画を止める理由にはなりません。</strong>A を実行した上で、①の判定表に沿って進めて差し支えありません。</p>
+<hr>
+<h2 id="⑥-秘書カズヨへの依頼事項-ログインが要る確認-当職は実行しない-">⑥ 秘書カズヨへの依頼事項（ログインが要る確認・当職は実行しない）</h2>
+<table><thead><tr><th>#</th><th>確認内容</th><th>画面</th><th>優先</th></tr></thead><tbody><tr><td>1</td><td>現在の登録情報（事業者氏名／住所／電話番号／代表者名／担当者名）に何が入っているか</td><td>マイページ &gt; 登録情報変更</td><td><strong>高</strong>（②の前提）</td></tr><tr><td>2</td><td>「酒類購入」の項目が「購入可能」か（不可なら酒類カテゴリは触らない）</td><td>マイページ &gt; 登録情報変更</td><td>中</td></tr><tr><td>3</td><td>API 登録情報欄で、同意済みの API 利用規約の版・トークンの有効期限</td><td>マイページ &gt; 登録情報管理</td><td>中（第13条＝半年で失効）</td></tr><tr><td>4</td><td>取引申請が承認済みのサプライヤー一覧（＝API で商品が取れる範囲）</td><td>マイページ</td><td><strong>高</strong>（タカシの設計前提）</td></tr><tr><td>5</td><td>事業者氏名欄を屋号「Satoy Select」に変更できるか（入力欄の仕様）</td><td>マイページ &gt; 登録情報変更</td><td>中</td></tr></tbody></table>
+<p><strong>社長にお願いする一手はログイン（ID/PW＋電話認証）のみ</strong>です。以後の画面操作は秘書が引き取ってください（CLAUDE.md §4.4）。</p>
+<hr>
+<h2 id="出典一覧-すべて-2026-08-31-当職確認-">出典一覧（すべて 2026-08-31 当職確認）</h2>
+<table><thead><tr><th>文書</th><th>URL</th></tr></thead><tbody><tr><td>NETSEA バイヤー会員規約</td><td>https://www.netsea.jp/agreement/statement</td></tr><tr><td>NETSEA サプライヤー会員規約</td><td>https://supplier.netsea.jp/agreement/statement</td></tr><tr><td>NETSEA API 利用規約（全文・公開）</td><td>https://api.netsea.jp/docs/buyer/openapi.json</td></tr><tr><td>NETSEA Buyer API 商品スキーマ</td><td>https://api.netsea.jp/docs/buyer/schemas/items.json</td></tr><tr><td>NETSEA API の利用方法（取得範囲の制限）</td><td>https://www.netsea.jp/help/manual/api.html</td></tr><tr><td>NETSEA バイヤーご利用ガイド</td><td>https://www.netsea.jp/help/guide</td></tr><tr><td>NETSEA 納品書について（社内管理用の注記）</td><td>https://www.netsea.jp/help/manual/invoice.html</td></tr><tr><td>NETSEA 酒類の取引について</td><td>https://www.netsea.jp/help/manual/liquor_purchasing.html</td></tr><tr><td>NETSEA 消費者直送可能商材について</td><td>https://www.netsea.jp/help/manual/dropshipping.html</td></tr><tr><td>NETSEA サプライヤーレビュー機能について</td><td>https://www.netsea.jp/help/manual/supplier_review.html</td></tr><tr><td>NETSEA robots.txt</td><td>https://www.netsea.jp/robots.txt</td></tr><tr><td>商品ページ実測サンプル</td><td>https://www.netsea.jp/shop/357136/4901070130801</td></tr><tr><td>サプライヤーレビュー実測サンプル</td><td>https://www.netsea.jp/shop/order_review/357136</td></tr><tr><td>電気用品安全法の概要（METI）</td><td>https://www.meti.go.jp/policy/consumer/seian/denan/act_outline.html</td></tr><tr><td>家庭用品品質表示法のしくみ（消費者庁）</td><td>https://www.caa.go.jp/policies/policy/representation/household_goods/outline/outline_02.html</td></tr><tr><td>営業許可制度の見直し及び営業届出制度の創設について（愛知県）</td><td>https://www.pref.aichi.jp/soshiki/eisei/kyoka-todokede-minaoshi.html</td></tr><tr><td>医薬品医療機器等法（抜粋）第66条（東京都保健医療局）</td><td>https://www.hokeniryo.metro.tokyo.lg.jp/anzen/iyaku/koukokukisei/bassui</td></tr><tr><td>初めて医薬品・医薬部外品・化粧品を製造販売、製造、輸入される方へ（埼玉県）</td><td>https://www.pref.saitama.lg.jp/a0707/hajimete1.html</td></tr><tr><td>製造物責任法 条文</td><td>https://hourei.net/law/406AC0000000085</td></tr></tbody></table>
+<p><strong>原本の保管先：</strong> <code>workspace/output/agent_output/T-20260831-006/legal/</code> （サプライヤー規約全文・API 規約 JSON・商品スキーマ・商品ページ HTML/テキスト・バイヤーガイド）</p>
+<h2 id="未確認と明記するもの">未確認と明記するもの</h2>
+<ul><li>第24条1項の<strong>実際の公開範囲</strong>（不特定多数か、取引申請済みサプライヤー限定か）— ログイン後の実画面と NETSEA への書面照会が必要</li><li>API 第8条2 の「<strong>加工</strong>」の定義 — 公開文書に定義なし</li><li>事業者氏名欄を<strong>屋号で登録できるか</strong> — 入力欄の仕様はログイン後でないと分からない</li><li>サプライヤーが<strong>正式請求書を発行するか</strong>は個社ごと。取引申請時に個別確認が必要</li></ul>
+</div></body></html>
