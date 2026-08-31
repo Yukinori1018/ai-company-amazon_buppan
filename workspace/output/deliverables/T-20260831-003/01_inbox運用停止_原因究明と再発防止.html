@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>inbox運用停止 原因究明と再発防止 — T-20260831-003</title>
+<style>
+  :root{
+    --bg:#faf9f7; --card:#fff; --ink:#22201d; --muted:#6b6560; --line:#e5e0d9;
+    --accent:#8a6d3b; --accent-bg:#fdf6e6; --bad:#a4433a; --bad-bg:#fdf1ef;
+    --good:#3d6b4a; --good-bg:#f0f6f1;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{ --bg:#1a1917; --card:#232120; --ink:#eae6e0; --muted:#a09a93; --line:#3a3633;
+      --accent:#d3b071; --accent-bg:#2d271c; --bad:#e08b80; --bad-bg:#2f211f;
+      --good:#8fc4a0; --good-bg:#1e2a22; }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",sans-serif;
+    line-height:1.85;font-size:16px;}
+  .wrap{max-width:920px;margin:0 auto;padding:48px 24px 96px}
+  header{border-bottom:3px solid var(--accent);padding-bottom:20px;margin-bottom:36px}
+  h1{font-size:1.75rem;margin:0 0 10px;letter-spacing:.01em;line-height:1.45}
+  .meta{color:var(--muted);font-size:.88rem}
+  h2{font-size:1.22rem;margin:52px 0 16px;padding-left:13px;border-left:5px solid var(--accent)}
+  h3{font-size:1.03rem;margin:32px 0 10px;color:var(--accent)}
+  p{margin:.8em 0}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:20px 24px;margin:20px 0}
+  .kicker{background:var(--accent-bg);border:1px solid var(--accent);border-radius:10px;padding:20px 24px;margin:24px 0}
+  .kicker ol{margin:0;padding-left:22px}
+  .kicker li{margin:.55em 0}
+  .warn{background:var(--bad-bg);border-left:5px solid var(--bad);border-radius:0 8px 8px 0;padding:16px 20px;margin:20px 0}
+  .ok{background:var(--good-bg);border-left:5px solid var(--good);border-radius:0 8px 8px 0;padding:16px 20px;margin:20px 0}
+  table{width:100%;border-collapse:collapse;margin:18px 0;font-size:.93rem;display:block;overflow-x:auto;white-space:nowrap}
+  @media(min-width:700px){table{display:table;white-space:normal}}
+  th,td{border:1px solid var(--line);padding:9px 13px;text-align:left;vertical-align:top}
+  th{background:var(--accent-bg);font-weight:600}
+  code{background:var(--accent-bg);padding:2px 6px;border-radius:4px;font-size:.87em;
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  pre{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--muted);
+    border-radius:0 8px 8px 0;padding:14px 18px;overflow-x:auto;font-size:.85rem;line-height:1.6}
+  blockquote{margin:20px 0;padding:2px 0 2px 20px;border-left:4px solid var(--line);color:var(--muted)}
+  blockquote strong{color:var(--ink)}
+  .lead{font-size:1.06rem;font-weight:600;margin:26px 0}
+  .tag{display:inline-block;background:var(--bad);color:#fff;font-size:.72rem;
+    padding:2px 9px;border-radius:99px;vertical-align:middle;margin-left:8px;font-weight:600}
+  .tag.g{background:var(--good)}
+  ul{padding-left:22px} li{margin:.4em 0}
+  hr{border:0;border-top:1px solid var(--line);margin:44px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>`_inbox_社長共有` の「共有 → 退避」運用はなぜ止まったのか</h1>
+  <div class="meta">T-20260831-003 ／ 2026-08-31 ／ 庶務マリエ</div>
+</header>
+
+<div class="kicker">
+  <strong>結論（先に3行）</strong>
+  <ol>
+    <li><strong>フックは壊れていませんでした。</strong>手元で実行すると未処理6件を正しく検知して発火します。登録も正常です。</li>
+    <li>止まったのは<strong>運用の設計</strong>です。フックは「社長に<strong>棚卸ししますか？と聞け</strong>」としか言っておらず、社長が黙れば何も起きない仕掛けでした。</li>
+    <li>さらに<strong>検知はセッション開始時にしか動きません。</strong>社長がファイルを置くのは会話の最中なので、<strong>いちばん新しい共有ほど取りこぼす</strong>構造でした。今日の4件がまさにそれです。</li>
+  </ol>
+  <p style="margin-bottom:0"><strong>「検知の仕組みは作ったが、検知の後に誰が確認なしで何をするかを決めていなかった」</strong> — これが答えです。</p>
+</div>
+
+<h2>1. 何が起きていたか（事実）</h2>
+
+<h3>1-1. 滞留していたもの</h3>
+<table>
+<tr><th>投函</th><th>件数</th><th>滞留</th></tr>
+<tr><td>2026-08-30 23:42 / 23:50</td><td>2件</td><td><strong>約1日</strong>（本日の指摘まで未処理）</td></tr>
+<tr><td>2026-08-31 10:13〜10:34</td><td>4件</td><td>同日（セッション進行中に投函）</td></tr>
+</table>
+
+<h3>1-2. 仕組み側は生きていた</h3>
+<p><code>.claude/hooks/session-start.sh</code> を手元で実行した結果です。</p>
+<pre>【SessionStart リマインダー③：_inbox_社長共有 に未処理ファイル】
+未処理 6 件（最古 2026-08-30）。社長に「棚卸ししますか？」と1行で確認してください。</pre>
+<ul>
+  <li>検知ロジック（<code>find -maxdepth 1 -type f</code>、<code>README.txt</code> / <code>.DS_Store</code> / <code>.gitkeep</code> の除外）は<strong>正しく動作</strong></li>
+  <li><code>_archive/</code> はディレクトリなので <code>-type f</code> で自然に除外されており、<strong>誤検知も取りこぼしもなし</strong></li>
+  <li><code>.claude/settings.json</code> の <code>SessionStart</code> 登録も正常、終了コードも 0</li>
+</ul>
+<div class="ok"><strong>T-20260821-009 で作った検知そのものは、宣言どおり今日まで生きています。</strong></div>
+
+<h3>1-3. 証跡の限界（先に申し上げます）</h3>
+<p>「検知は出ていたが処理されなかった」のか「そもそも検知が出ていなかった」のかを、セッションログから<strong>直接立証することはできませんでした</strong>。SessionStart フックが注入する <code>additionalContext</code> は transcript に保存されない仕様のためです（全セッションを走査し、フック出力の目印となる文字列が1件も残っていないことを確認済み）。</p>
+<p>したがって以下の切り分けは、<strong>投函時刻とセッション開始時刻の突合</strong>および<strong>現在のコードの実挙動</strong>から導いた推論です。断定できる部分と推論の部分を分けて書きます。</p>
+
+<h2>2. 原因（3つ重なっています）</h2>
+
+<h3>原因① 検知の出口が「社長への質問」だった<span class="tag">本丸</span></h3>
+<p>フックの文言はこうでした。</p>
+<blockquote>
+未処理 6 件。<strong>社長に「棚卸ししますか？」と1行で確認してください。</strong><br>
+・社長が「お願い」→ マリエへ Agent 発注<br>
+・<strong>社長が「後で」→ 何もしない</strong>（次セッションで再度この行が出ます）
+</blockquote>
+<p>検知が出ても、<strong>社長が「お願い」と言わない限り1ミリも動きません。</strong>社長が別の話題を話していれば、カズヨはそちらを優先します。翌セッションでまた同じ行が出て、また流れます。</p>
+<p>社長の今回のお言葉は「<strong>共有フォルダの中身を読み取ったら、あなたのほうでその資料を適切な場所に移動する</strong>」でした。<strong>社長は最初から「聞かれること」を期待していません。</strong>仕組みが求めていた動作と、社長が期待していた動作が、正面からずれていました。</p>
+<p>しかも棚卸しは<strong>退避とリネームだけ</strong>で、不可逆な操作を1つも含みません。CLAUDE.md §4.2（秘書判断で自動進行してよいもの）にそのまま該当します。<strong>確認を取る必要が最初から無かった</strong>のです。</p>
+<div class="warn">これは T-20260821-009 の再発防止が「半分だけ」だったということです。<strong>検知（プッシュ型）は作ったのに、その先の実行を承認待ち（プル型）に戻していた。</strong>社長依存を断つために作った仕組みの出口が、社長依存でした。</div>
+
+<h3>原因② 検知がセッション開始時にしか動かない<span class="tag">今日の4件</span></h3>
+<table>
+<tr><th>時刻</th><th>出来事</th></tr>
+<tr><td>10:03</td><td>セッション開始（この時点の未処理は2件）→ SessionStart フックが1回だけ実行される</td></tr>
+<tr><td>10:13〜10:34</td><td>社長が4件を投函</td></tr>
+<tr><td>—</td><td><strong>SessionStart はとうに終わっているため、この4件は原理的に検知不可能</strong></td></tr>
+</table>
+<p>社長がファイルを置くのは、たいてい「その話をしている最中」です。つまり<strong>いちばん新しい共有ほど取りこぼす</strong>という、望ましくない向きの偏りがありました。この4件について「気づかなかった」のは運用の怠慢ではなく、<strong>仕組みに検知手段が存在しなかった</strong>というのが正確です。</p>
+
+<h3>原因③ 検知が長いリストの後ろに埋もれていた</h3>
+<p>フックの出力順は ①朝ルーティン → ②<code>next_check_at</code> → ③inbox → ④候補ジョブ でした。本日実測で <strong>②は22件・約2,600文字</strong>あります。行動を要する数行の③が、その後ろに置かれていました。</p>
+<div class="warn"><strong>チケットが溜まっている日ほど③が埋もれる</strong> — 放置を検知する仕組みとしては自己矛盾です。</div>
+
+<h2>3. もう1つ見つかった問題（こちらのほうが危険です）</h2>
+<p class="lead">スキル <code>inbox-intake.md</code> の振り分け先が2つしかなく、その2つとも<strong>リポジトリ配下</strong>でした。</p>
+<table>
+<tr><th>旧・行き先</th><th>Git</th></tr>
+<tr><td><code>docs/reference/&lt;topic&gt;/</code></td><td><strong>追跡される</strong></td></tr>
+<tr><td><code>_inbox_社長共有/_archive/YYYY-MM/</code></td><td><code>.gitignore</code> 対象</td></tr>
+</table>
+<p>本リポジトリは PUBLIC で、30分ごとに <code>git add -A</code> → push されます。旧スキルに素直に従うと、<strong>本人確認書類や税務書類が <code>docs/reference/</code> に置かれ、そのまま公開されます。</strong></p>
+<div class="warn"><code>_inbox_社長共有/</code> 自体は <code>.gitignore</code> 対象なので、<strong>inbox に置かれている限りは安全</strong>でした。つまり<strong>棚卸しをした瞬間に危険になる</strong>という、最悪の向きの欠陥です。運用が止まっていたことが、結果的に事故を防いでいた形になります。</div>
+<div class="ok"><strong>実害は出ていません</strong>（今回リポ外へ退避したため）。ただし、これは運が良かっただけです。</div>
+
+<h2>4. 実施した修正</h2>
+
+<h3>修正① フック文言：確認待ちをやめ、発注を既定にした</h3>
+<blockquote>
+<strong>社長に「棚卸ししますか？」と聞かないでください。そのまま庶務マリエへ Agent 発注してください</strong><br>
+・棚卸しは<strong>退避・リネームのみ</strong>で不可逆操作を含まないため、CLAUDE.md §4.2 の自律範囲です。<br>
+・社長が明示的に「後にして」と言った場合だけ止めます。<br>
+・<strong>削除だけは別。</strong>§4.1（不可逆な削除）なので破棄候補はリスト化して社長承認を取ること。
+</blockquote>
+
+<h3>修正② 新フック <code>inbox-intake-check.sh</code>（UserPromptSubmit・毎ターン）</h3>
+<p>原因②を塞ぎます。<strong>セッション中の投函をその場でつかまえます。</strong></p>
+<table>
+<tr><th>挙動</th><th>内容</th></tr>
+<tr><td>発火条件 A</td><td>ファイル集合が<strong>前回から変化</strong>した（＝新しく投函された）→ 即発火し、<strong>新規分を名指し</strong>する</td></tr>
+<tr><td>発火条件 B</td><td>変化はないが未処理のまま30分経過 → 再点火（忘れ防止）</td></tr>
+<tr><td>無音条件</td><td>inbox が健全（<code>README.txt</code> と <code>_archive/</code> のみ）／クールダウン中</td></tr>
+<tr><td>安全性</td><td><strong>ターンを絶対にブロックしない</strong>（常に exit 0）。状態ファイルは <code>$TMPDIR</code>（リポを汚さない）</td></tr>
+</table>
+<p>未処理カウントの定義は SessionStart 側と厳密に揃えてあります（片方だけ鳴ると、どちらも信用されなくなるため）。</p>
+<p><strong>動作検証済み（4パターン）</strong></p>
+<table>
+<tr><th>#</th><th>条件</th><th>期待</th><th>結果</th></tr>
+<tr><td>1</td><td>inbox が健全</td><td>無音</td><td>✅ 無音</td></tr>
+<tr><td>2</td><td>1件投函</td><td>発火</td><td>✅ 発火</td></tr>
+<tr><td>3</td><td>同じ状態で即再実行</td><td>無音（クールダウン）</td><td>✅ 無音</td></tr>
+<tr><td>4</td><td>セッション中に2件目を投函</td><td>即発火＋新規分を名指し</td><td>✅「このセッション中に新しく投函されました: …」</td></tr>
+</table>
+
+<h3>修正③ 掲出順の変更</h3>
+<p><code>① → ②(22件) → ③ → ④</code> を <strong><code>① → ③(inbox) → ④ → ②(next_check_at)</code></strong> に変更。行動を要する短いものを前に、一覧性の長いものを後ろに置きます。</p>
+
+<h3>修正④ 滞留日数の表示</h3>
+<p><code>最古 2026-08-30</code> → <strong><code>最古 9 日滞留</code></strong>。日付だけでは古さが直感に入りません。</p>
+
+<h3>修正⑤ スキルの振り分け先を3つに増やした（§3 の対策）</h3>
+<p><code>agents/general_affairs/skills/inbox-intake.md</code> の Step 3 を改訂。<strong>内容の価値を見るより先に「リポジトリに置けるか」を判定する</strong>2段階にしました。</p>
+<table>
+<tr><th>リポ外にする条件</th><th>例</th></tr>
+<tr><td><strong>本人特定情報（PII）を含む</strong></td><td>身分証の撮影画像、税務・金融機関の受信通知や帳票</td></tr>
+<tr><td>第三者著作物の原本</td><td>有料セミナーの録画・スライド</td></tr>
+<tr><td>1ファイル 50MB 超</td><td>動画・大きなアーカイブ</td></tr>
+</table>
+<div class="ok">判定の合言葉を入れました — <strong>「これが GitHub の検索結果に出てきて困るか？ 困るならリポ外」</strong></div>
+
+<h2>5. inbox の Before / After</h2>
+<table>
+<tr><th></th><th>Before</th><th>After</th></tr>
+<tr><td>直下の未処理ファイル</td><td><strong>6件</strong></td><td><strong>0件</strong></td></tr>
+<tr><td>直下の中身</td><td>未処理6件 + <code>README.txt</code> + <code>_archive/</code></td><td><strong><code>README.txt</code> と <code>_archive/</code> のみ（＝健全）</strong></td></tr>
+<tr><td>リポジトリ配下に残る PII</td><td>6件</td><td><strong>0件</strong></td></tr>
+<tr><td>退避先の README</td><td>0</td><td><strong>2つ新規作成</strong>（各ファイルが何の証明になるかまで記載）</td></tr>
+</table>
+
+<h3>退避先</h3>
+<table>
+<tr><th>行き先</th><th>件数</th><th>中身</th></tr>
+<tr><td><code>~/Documents/AI Company 素材/Amazon物販事業/開業届-20260821/</code></td><td>3件（06〜08）</td><td>e-Tax の受信通知2件（<strong>提出証明の正本</strong>）と一覧画面1件</td></tr>
+<tr><td>同上 <code>/_重複_控え/</code></td><td>1件（09）</td><td>既存 02 と SHA-256 完全一致の重複。<strong>削除せず控えとして保管</strong></td></tr>
+<tr><td><code>~/Documents/AI Company 素材/Amazon物販事業/本人確認書類-20260830/</code></td><td>2件</td><td>身分証の撮影画像（同一ページの撮り直し2枚）</td></tr>
+</table>
+<div class="ok"><strong>いずれもリポジトリ外</strong>です（PII を含むため）。<strong>削除は1件も行っていません。</strong>親フォルダの README にも2フォルダを索引済みです。</div>
+
+<h2>6. 社長へのご確認事項 → <span class="tag g">ありません（自己解決）</span></h2>
+<p>作業中、身分証の撮影画像2枚の用途を社長にお尋ねするつもりでした。<strong>その必要はなくなりました。</strong></p>
+<p>T-20260826-004 の本日のログで用途が確定しています。<strong>この2枚は 2026-08-31 に実際に使われました。</strong></p>
+<ul>
+<li>Amazon の本人確認が却下されていた真因は「<strong>パスポート欄に、住所証明用の水道料金請求書を誤ってアップロードしていた</strong>」こと。有効な本人確認書類が最初から1件も提出されていなかった</li>
+<li>8/31 の訂正提出で、正しい旅券顔写真ページのカラー画像を再添付（提出時のファイル名 <code>passport_photo_page.jpg</code>）</li>
+<li>提出は受理済み。<strong>回答期限は 2026-09-01〜09-02 目安</strong></li>
+</ul>
+<p>退避先 README にも確定内容を反映済みです。あわせて、同じ事故を繰り返さないための注意書きを入れました。</p>
+<div class="ok"><strong>このフォルダに入っているのは顔写真ページ（＝本人確認書類）だけです。住所証明</strong>（水道・電気・ガスの請求書等）は別物であり、ここにはありません。欄を取り違えないでください。</div>
+<div class="warn"><strong>提出は社長ご本人が公式画面から直接行ってください。</strong>エージェントが身分証を外部サービスへ送信することは CLAUDE.md §4.1（機密情報の外部送信）に該当します。</div>
+
+<h2>7. カズヨへの申し送り（推奨・私の権限外）</h2>
+<p><strong>CLAUDE.md §6 の「3層」表に、リポ外を選ぶ判定基準として PII が書かれていません。</strong>現在の記載は「1ファイル50MB超、または第三者著作物」の2つだけです。</p>
+<p>同じ §6 の「このリポジトリは PUBLIC です」節には本人特定情報を除外する旨が書かれているので、<strong>方針としては既に存在しますが、置き場の判定表には反映されていません。</strong>§3 の欠陥はここに由来します。</p>
+<p>CLAUDE.md は会社の憲法にあたるため私の判断では書き換えず、修正案の提示に留めます。</p>
+<blockquote><strong>③ 大容量バイナリ素材</strong> → <strong>③ リポジトリに置けないもの</strong><br>
+判定：<strong>本人特定情報（PII）を含む</strong>、第三者著作物の原本、または1ファイル50MB超</blockquote>
+
+<hr>
+
+<h2>8. この件から残す教訓</h2>
+<div class="kicker">
+<p style="margin-top:0"><strong>検知を作っただけでは、運用は回りません。<br>
+「検知 → 誰が・確認を挟まずに・何をするか」まで決めて、初めて回ります。</strong></p>
+<p>T-20260821-009 は検知（プッシュ型）を作りました。しかしその出口を承認待ち（プル型）にしたため、断ったはずの社長依存が出口側に残りました。<strong>自動化の効果は、経路上でいちばん人間に依存する一点で決まります。</strong></p>
+<p style="margin-bottom:0">もう1つ。<strong>「行き先が2つしかない」ような閉じた選択肢は、想定外の入力が来たときに必ずどちらかへ誤って流れます。</strong>今回は身分証が <code>docs/reference/</code>（公開追跡）へ流れる寸前でした。選択肢を閉じるときは「ここに当てはまらないものが来たらどうするか」を必ず併記すべきです。</p>
+</div>
+
+</div>
+</body>
+</html>
