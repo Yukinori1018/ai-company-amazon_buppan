@@ -1,7 +1,7 @@
 ---
 ticket_id: T-20260831-003
 title: _inbox_社長共有 の棚卸し＋「共有→退避」運用が止まった原因究明と再発防止
-status: doing
+status: waiting
 assignee: general_affairs
 priority: high
 created_at: 2026-08-31
@@ -73,3 +73,8 @@ related_tickets: [T-20260821-009, T-20260820-002, T-20260821-011, T-20260826-004
 
 提案：「③ 大容量バイナリ素材」→「**③ リポジトリに置けないもの**」、判定に **PII を含む** を追加。
 CLAUDE.md は会社の憲法のためマリエの判断では書き換えていない。
+
+## ログ（カズヨ）
+
+- 2026-08-31 マリエの作業完了を受け **doing → waiting** へ。実作業（inbox 6件→0件・PII のリポ外退避・フック増設 `inbox-intake-check.sh` の settings.json 登録）はカズヨが実物確認済み。
+- waiting の理由＝**社長のご判断1件**。CLAUDE.md §6「成果物の保管ルール（3層）」の③を「大容量バイナリ素材」から「**リポジトリに置けないもの**」へ改め、判定基準に **PII を含む** を追加してよいか。CLAUDE.md は会社の憲法のため、秘書判断では書き換えない。
