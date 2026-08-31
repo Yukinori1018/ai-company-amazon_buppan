@@ -118,5 +118,27 @@ def independent_sellers(brand_norm, sellers):
     return out
 
 def jp_sellers(sellers):
-    """日本の事業者と判定できるセラー（かな表記 or 日本法人格 or インボイス登録）。"""
-    return [x for x in sellers if KANA.search(x) or JP_CORP.search(x) or INVOICE.search(x)]
+    """日本の事業者と判定できるセラー。
+
+    かな or 日本法人格 or インボイス登録 or 漢字（中国語マーカーが無い場合）。
+    漢字を足した理由: `ABEAM RIDESHOP (木曜日定休)` `國光商店` のような
+    「かなが1文字も無い日本語店名」を取りこぼしていた（実測）。
+    ただし漢字は日中共通なので、中国企業表記・地名・簡体字があれば除く。
+    """
+    out = []
+    for x in sellers:
+        if CN_CORP.search(x) or CN_PLACE.search(x) or CN_SIMP.search(x):
+            continue
+        if KANA.search(x) or JP_CORP.search(x) or INVOICE.search(x) or re.search(r"[一-鿿]", x):
+            out.append(x)
+    return out
+
+
+def unresolved_sellers(sellers):
+    """Keepa が名前を解決できず sellerId のまま返したセラー。
+
+    実測 2.8%（8,713件中242件）。45社は全商品で全セラーが未解決。
+    **これを「直営店」と同じ扱いにすると、曙産業・筒井時正商店のような
+    国内SMEを『卸の証拠なし』で捨てる。** 判定保留として残すこと。
+    """
+    return [x for x in sellers if SELLER_ID.match(x.strip())]
