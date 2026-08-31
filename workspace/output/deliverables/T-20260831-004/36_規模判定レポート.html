@@ -1,0 +1,181 @@
+<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>連絡候補メーカーの規模情報（gBizINFO 実測）</title><style>
+:root{--fg:#1a1a1a;--mut:#666;--line:#e0e0e0;--accent:#0b5fa5;--bg-alt:#f7f9fb}
+*{box-sizing:border-box}
+body{font-family:-apple-system,"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;
+ line-height:1.75;color:var(--fg);max-width:1080px;margin:0 auto;padding:32px 24px 96px;font-size:15px}
+h1{font-size:1.85em;border-bottom:3px solid var(--accent);padding-bottom:.4em;margin-top:0}
+h2{font-size:1.35em;margin-top:2.2em;border-left:5px solid var(--accent);padding-left:.55em}
+h3{font-size:1.1em;margin-top:1.8em;color:#333}
+table{border-collapse:collapse;width:100%;margin:1.1em 0;font-size:.9em}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--bg-alt);font-weight:600;white-space:nowrap}
+tbody tr:nth-child(even){background:#fbfcfd}
+code{background:#f0f2f5;padding:1px 5px;border-radius:3px;font-size:.9em;
+ font-family:"SF Mono",Menlo,Consolas,monospace}
+pre{background:#1e2430;color:#e6edf3;padding:14px 16px;border-radius:6px;overflow-x:auto;font-size:.85em}
+pre code{background:none;color:inherit;padding:0}
+blockquote{border-left:4px solid #f0a500;background:#fffbf0;margin:1.1em 0;padding:.7em 1em;color:#5a4a20}
+hr{border:0;border-top:1px solid var(--line);margin:2.2em 0}
+strong{color:#0a4d8c}
+ul,ol{padding-left:1.5em}
+@media print{body{max-width:none;font-size:11pt}h2{page-break-after:avoid}table{page-break-inside:avoid}}
+</style></head><body>
+<h1>連絡候補メーカーの規模情報（gBizINFO 実測）</h1>
+<p>T-20260831-004 / IT エンジニア タカシ / 2026-08-31</p>
+<p>入力：<code>10_連絡候補メーカー.csv</code>（262社・タケシ 実装検証レーン）</p>
+<blockquote><strong>社長の訂正（2026-08-31）を反映済み。</strong><br>「従業員300人以下はあくまで目安（私の感想）です。参考数字としていいですが、絶対的な数字としないでください。あくまで参考です。仕入れサイトからだともしかしたら大企業でも仕入れられるかもしれません。」<br>→ <strong>規模を足切りに使うのをやめ、列と並び順にだけ使っています。262社は262社のまま出しています。</strong></blockquote>
+<hr>
+<h2>0. 結論</h2>
+<table><thead><tr><th>#</th><th>結論</th></tr></thead><tbody>
+<tr><td>1</td><td><strong>262社を1社も落としていません。</strong> 規模は「直接交渉での通りやすさの目安」であって、仕入れ可能性そのものではありません。卸サイト経由なら経路が変わり、答えも変わります。</td></tr>
+<tr><td>2</td><td><strong>規模が大きいと分かったのは9社</strong>（アイホン1,100人・アルインコ900人・矢崎化工858人など）。リストの末尾に置き、<code>△</code> の印を付けました。</td></tr>
+<tr><td>3</td><td><strong>中小の目安に入ったのは14社</strong>（すごろくや34人・山形工房16人・Mt.SUMI 10人など）。リストの先頭です。</td></tr>
+<tr><td>4</td><td><strong>残る239社は規模を確認できませんでした。</strong> 落としていません。Amazon の <code>manufacturer</code> は商号ではなくブランド表記なので、法人番号を特定できたのは262社中75社（28.6%）です。</td></tr>
+<tr><td>5</td><td>「従業員300人以下」だけを見ると<strong>上場企業が中小に入ります</strong>（ブシロード259人・Hamee 176人）。資本金を併記して初めて規模が分かります。</td></tr>
+</tbody></table>
+<hr>
+<h2>1. 段階別の実測件数</h2>
+<table><thead><tr><th>段階</th><th>社数</th><th>対 262社</th></tr></thead><tbody>
+<tr><td>入力（連絡候補）</td><td>262</td><td>100%</td></tr>
+<tr><td>① 法人番号を特定できた</td><td><strong>75</strong></td><td>28.6%</td></tr>
+<tr><td>② 従業員数を取得できた</td><td><strong>23</strong></td><td>8.8%</td></tr>
+<tr><td>③ 資本金を取得できた</td><td>6</td><td>2.3%</td></tr>
+<tr><td>④ 中小の目安に入った（〜300人かつ資本金3億円以下）</td><td><strong>14</strong></td><td>5.3%</td></tr>
+<tr><td>⑤ 規模が大きいと分かった（<strong>落としていない</strong>）</td><td><strong>9</strong></td><td>3.4%</td></tr>
+<tr><td>⑥ 規模を確認できなかった（<strong>落としていない</strong>）</td><td><strong>239</strong></td><td>91.2%</td></tr>
+<tr><td><strong>出力社数</strong></td><td><strong>262</strong></td><td><strong>100%</strong></td></tr>
+</tbody></table>
+<h3>規模区分（従業員数）</h3>
+<table><thead><tr><th>区分</th><th>社数</th></tr></thead><tbody>
+<tr><td>〜300人</td><td>17</td></tr>
+<tr><td>301〜1000人</td><td>5</td></tr>
+<tr><td>1000人超</td><td>1</td></tr>
+<tr><td>不明</td><td>239</td></tr>
+</tbody></table>
+<h3>直接交渉の目安（並び順もこの順）</h3>
+<table><thead><tr><th>目安</th><th>社数</th><th>意味</th></tr></thead><tbody>
+<tr><td>◎ 中小の目安（直接交渉が通りやすい）</td><td>14</td><td>リスト先頭</td></tr>
+<tr><td>— 規模を確認できず（落としていない）</td><td>239</td><td>リスト中段</td></tr>
+<tr><td>△ 規模が大きい（直接は不利。卸サイト経由なら可能性あり）</td><td>9</td><td>リスト末尾</td></tr>
+</tbody></table>
+<p><strong>社長が自分で線を引き直せるように、<code>規模区分</code> <code>資本金区分</code> <code>従業員数</code> <code>資本金</code> を素の値で持たせてあります。</strong> 「301〜1000人も直接当たってみる」も、CSV のフィルタだけで切り替わります。</p>
+<hr>
+<h2>2. 検算</h2>
+<table><thead><tr><th>会社</th><th>期待</th><th>実測</th><th>判定</th><th>根拠</th></tr></thead><tbody>
+<tr><td>ブシロード</td><td>△ の印がつく</td><td>△</td><td>OK</td><td>従業員259人・<strong>資本金57.8億円</strong></td></tr>
+<tr><td>Hamee</td><td>△ の印がつく</td><td>△</td><td>OK</td><td>従業員176人・<strong>資本金6.4億円</strong></td></tr>
+<tr><td>すごろくや</td><td>◎</td><td>◎</td><td>OK</td><td>株式会社すごろくや・従業員34人</td></tr>
+<tr><td>愛知電線</td><td>◎</td><td>◎</td><td>OK</td><td>愛知電線株式会社・従業員70人</td></tr>
+<tr><td>BOS</td><td>リストに残る</td><td>残る（—）</td><td>OK</td><td>候補3社で特定保留</td></tr>
+<tr><td>オスモカラー</td><td>リストに残る</td><td>残る（—）</td><td>OK</td><td>商号ではなく商品ブランド名</td></tr>
+<tr><td>全体</td><td>1社も落ちない</td><td>262→262</td><td>OK</td><td>—</td></tr>
+</tbody></table>
+<p>再現：<code>python3 34_verify.py</code></p>
+<h3>「従業員300人以下」だけでは規模が分からない</h3>
+<table><thead><tr><th>会社</th><th>従業員数</th><th>規模区分</th><th>資本金</th></tr></thead><tbody>
+<tr><td>株式会社ブシロード</td><td>259人</td><td><strong>〜300人</strong></td><td>57.8億円（東証上場）</td></tr>
+<tr><td>Ｈａｍｅｅ株式会社</td><td>176人</td><td><strong>〜300人</strong></td><td>6.4億円（東証プライム）</td></tr>
+</tbody></table>
+<p>gBizINFO の <code>employee_number</code> は<strong>その法人単体</strong>の数字です。製造を外に出している会社や持株構造の会社は、上場していても本体は数百人しかいません。そこで資本金3億円（中小企業基本法・製造業の基準）を併記しました。</p>
+<p><strong>資本金は「大きい」を示す方向にだけ使っています。</strong> 取得できたのは262社中6社で、その6社全部が3億円超でした。＝<strong>取得できた会社は大企業に偏る</strong>ので、「資本金が取れた」ことを中小の条件にすると小さい会社から先に消えます。</p>
+<hr>
+<h2>3. 規模が大きいと分かった9社（落としていません）</h2>
+<table><thead><tr><th>コード</th><th>メーカー</th><th>従業員数</th><th>資本金</th><th>gBiz商号</th></tr></thead><tbody>
+<tr><td>L1</td><td>アイホン</td><td>1,100</td><td>53.9億</td><td>アイホン株式会社</td></tr>
+<tr><td>L1</td><td>アルインコ(Alinco)</td><td>900</td><td>63.6億</td><td>アルインコ株式会社</td></tr>
+<tr><td>L1</td><td>矢崎化工(Yazaki Kako)</td><td>858</td><td>—</td><td>矢崎化工株式会社</td></tr>
+<tr><td>L1</td><td>カモ井加工紙</td><td>420</td><td>—</td><td>カモ井加工紙株式会社</td></tr>
+<tr><td>L1</td><td>城東テクノ</td><td>400</td><td>—</td><td>城東テクノ株式会社</td></tr>
+<tr><td>L1</td><td>GSI クレオス(GSI Creos)</td><td>311</td><td>71.9億</td><td>株式会社ＧＳＩクレオス</td></tr>
+<tr><td>L2</td><td>ブシロード(BUSHIROAD)</td><td>259</td><td>57.8億</td><td>株式会社ブシロード</td></tr>
+<tr><td>L2</td><td>ナトコ</td><td>282</td><td>16.3億</td><td>ナトコ株式会社</td></tr>
+<tr><td>L2</td><td>Hamee(ハミィ)</td><td>176</td><td>6.4億</td><td>Ｈａｍｅｅ株式会社</td></tr>
+</tbody></table>
+<p><strong>この9社は候補から外れていません。</strong> 直接交渉では門前払いの可能性が高い、というだけです。カモ井加工紙（マスキングテープ mt）や GSI クレオス（Mr.カラー）は卸ルートが太い会社なので、<strong>卸サイト経由や代理店経由なら仕入れられる可能性があります。</strong></p>
+<p><code>33b_規模が大きいと分かった社.csv</code> に9社だけ抜き出したファイルも置いてあります。</p>
+<h3>タケシの手判定との突き合わせ</h3>
+<table><thead><tr><th>タケシの規模列</th><th>社数</th><th>うち「規模が大きい」と判明</th></tr></thead><tbody>
+<tr><td>中小の見込み（手判定）</td><td>119</td><td><strong>0</strong></td></tr>
+<tr><td>規模未確認</td><td>82</td><td><strong>0</strong></td></tr>
+<tr><td>規模未確認（大きい可能性あり）</td><td>61</td><td><strong>9</strong></td></tr>
+</tbody></table>
+<p><strong>9社は全部、タケシが「大きい可能性あり」と印を付けた61社の中から出ました。</strong> 手判定と機械判定が独立に一致しています。彼の「中小の見込み」119社は今のところ反証されていません。</p>
+<hr>
+<h2>4. 規模を確認できなかった239社の内訳</h2>
+<table><thead><tr><th>コード</th><th>意味</th><th>社数</th></tr></thead><tbody>
+<tr><td>U1</td><td>法人は特定できたが、従業員数も資本金も gBizINFO に未登録</td><td>52</td></tr>
+<tr><td>U2</td><td>同名の現存法人が複数あり、1社に決められない</td><td>71</td></tr>
+<tr><td>U3</td><td>商号が完全一致する現存法人を特定できず</td><td>116</td></tr>
+</tbody></table>
+<p><strong>U2 は推測で1社に決めていません。</strong> <code>ワコーズ</code> は現存の完全一致が8社、<code>コムテック</code> は45社、<code>BOS</code> は3社（しかも Amazon の BOS はクリロン化成のブランドで3社とも別会社）。候補は <code>候補一覧</code> 列に全件書き出してあります。</p>
+<p><strong>取得できないことと小さいことは無関係です。</strong> 実測で従業員数が取れた会社は10人〜1,100人に広がっており（中央値176人）、gBizINFO が数字を持っているのは補助金・調達・財務公開のいずれかに関わった会社に偏ります。</p>
+<hr>
+<h2>5. 副産物：前方一致の未検証候補（73社）</h2>
+<p>商号が「ブランド名 + α」になっている会社が実在します。完全一致では拾えませんが、<strong>取得済みの検索結果を読み直すだけで</strong>（API アクセス追加ゼロ）手がかりが出ました。</p>
+<table><thead><tr><th>メーカー名</th><th>前方一致で見つかった法人</th></tr></thead><tbody>
+<tr><td>デビフ</td><td>デビフペット株式会社（新潟）</td></tr>
+<tr><td>ハイポネックス</td><td>株式会社ハイポネックスジャパン（大阪）</td></tr>
+<tr><td>Collonil(コロニル)</td><td>株式会社コロニルジャパン（東京）</td></tr>
+<tr><td>ドギーマン</td><td>ドギーマンハヤシ株式会社（大阪）</td></tr>
+<tr><td>BIALETTI</td><td>Ｂｉａｌｅｔｔｉ　Ｊａｐａｎ株式会社（東京）</td></tr>
+<tr><td>ヘリノックス(Helinox)</td><td>株式会社Ｈｅｌｉｎｏｘ　Ｊａｐａｎ（東京）</td></tr>
+</tbody></table>
+<p><strong>判定には使っていません。</strong> 誤りも混ざります（<code>ユーブロック</code> に u-blox の <code>ユーブロックスジャパン株式会社</code> が当たる、<code>BAL</code> に無関係な <code>Balloon Partners</code> が当たる等）。<code>参考_前方一致の未検証候補</code> 列に置いてあるので、<strong>目視で潰せば法人番号の特定率を上げられます。</strong> 73社ぶんの手がかりがあります。</p>
+<hr>
+<h2>6. やらなかったこと（意図的に）</h2>
+<table><thead><tr><th>やらなかったこと</th><th>理由</th></tr></thead><tbody>
+<tr><td><strong>規模での足切り</strong></td><td>社長の訂正のとおり。規模は経路（直接交渉か卸サイトか）に依存する目安であって、仕入れ可能性そのものではない</td></tr>
+<tr><td>同名企業から1社を推測で選ぶ</td><td>当社の原則。<code>ワコーズ</code> の8社から選ぶ根拠がデータに無い</td></tr>
+<tr><td>ブランド名のカタカナ↔ラテン変換で検索を広げる</td><td><code>BURTLE</code>→<code>バートル</code> は当たるが、変換自体が推測。前方一致ヒントで代替した</td></tr>
+<tr><td>一括ダウンロード（361MB ZIP）での全件突合</td><td><code>POST /hojin/Download</code> が2通りの投げ方で<strong>両方サーバーエラー</strong>。API 2段（検索→詳細）に倒した</td></tr>
+<tr><td>条件付き候補333社（再販/版元）への適用</td><td>障壁が規模ではなく再販制度・取次。同じスクリプトに <code>--input 11_条件付き候補_再販版元カテゴリ.csv</code> を渡せば同じ列が付く</td></tr>
+</tbody></table>
+<hr>
+<h2>7. 規約の遵守</h2>
+<p>社長がトークン申請時に申告した利用目的：</p>
+<blockquote>約1,300社の企業名リストに法人番号・従業員数・資本金・所在地を照合し、取引先候補を規模で絞り込む社内分析。再配布・外部公開なし。API は1秒1リクエスト以下。</blockquote>
+<table><thead><tr><th>申告</th><th>実際</th></tr></thead><tbody>
+<tr><td>1秒1リクエスト以下</td><td><strong>アダプタ側で1.15秒の最小間隔を強制</strong>（<code>30_gbizinfo.py</code> の <code>MIN_INTERVAL_SEC</code>）。人が守るのではなくコードが守る</td></tr>
+<tr><td>実アクセス回数</td><td><strong>365回</strong>（262社ぶん。再実行はディスクキャッシュから返るのでゼロ）</td></tr>
+<tr><td>再配布・外部公開なし</td><td>行データを含む CSV は<strong>すべて Git 追跡外</strong>（社長判断 P2）。このリポジトリは PUBLIC のため</td></tr>
+<tr><td>申告した目的の範囲内</td><td>規模の照合のみ。他用途に使っていない</td></tr>
+</tbody></table>
+<hr>
+<h2>8. 成果物</h2>
+<table><thead><tr><th>ファイル</th><th>中身</th><th>Git</th></tr></thead><tbody>
+<tr><td><code>33_連絡候補_規模情報つき.csv</code></td><td><strong>262社。社長が今日から使うのはこれ</strong>（◎→—→△ の順）</td><td>追跡外</td></tr>
+<tr><td><code>33b_規模が大きいと分かった社.csv</code></td><td>9社を抜き出したもの（落としてはいない）</td><td>追跡外</td></tr>
+<tr><td><code>35_全メーカー台帳_規模判定込み.csv</code></td><td>1,247社の統合台帳。全社に「なぜ今ここにいるか」が入る</td><td>追跡外</td></tr>
+<tr><td><code>33d_集計_規模判定.json</code> / <code>35b_集計_台帳.json</code></td><td>段階別内訳の統計</td><td>追跡</td></tr>
+<tr><td><code>30_gbizinfo.py</code></td><td>gBizINFO アダプタ（スロットリング＋キャッシュ）</td><td>追跡</td></tr>
+<tr><td><code>31_name_match.py</code></td><td>ブランド表記→商号の照合（純関数のみ）</td><td>追跡</td></tr>
+<tr><td><code>32_resolve_size.py</code></td><td>本体</td><td>追跡</td></tr>
+<tr><td><code>34_verify.py</code></td><td>検算</td><td>追跡</td></tr>
+<tr><td><code>35_merge_ledger.py</code></td><td>1,247社台帳への合流</td><td>追跡</td></tr>
+<tr><td><code>37_render.py</code></td><td>Markdown → HTML</td><td>追跡</td></tr>
+</tbody></table>
+<h3>追加した列</h3>
+<table><thead><tr><th>列</th><th>中身</th></tr></thead><tbody>
+<tr><td><code>直接交渉の目安</code></td><td>◎ / — / △。<strong>仕入れ可能性ではなく、直接交渉での通りやすさ</strong></td></tr>
+<tr><td><code>規模区分</code></td><td>〜300人 / 301〜1000人 / 1000人超 / 不明</td></tr>
+<tr><td><code>資本金区分</code></td><td>3億円以下 / 3億円超 / 不明</td></tr>
+<tr><td><code>従業員数</code> <code>資本金</code> <code>設立年月日</code></td><td>gBizINFO の素の値。取れなければ空欄（推測で埋めない）</td></tr>
+<tr><td><code>法人番号</code> <code>gBiz商号</code> <code>代表者名</code> <code>所在地</code> <code>郵便番号</code> <code>事業概要</code> <code>企業URL</code></td><td>連絡時にそのまま使える</td></tr>
+<tr><td><code>理由コード</code> <code>理由</code></td><td>なぜその判定になったか</td></tr>
+<tr><td><code>候補件数</code> <code>候補一覧</code></td><td>同名法人が複数あったときの全候補</td></tr>
+<tr><td><code>参考_前方一致の未検証候補</code></td><td>§5。<strong>未検証</strong></td></tr>
+<tr><td><code>照合の注意</code></td><td>商号が3文字以下で偶然一致の可能性がある場合の印（7社）</td></tr>
+</tbody></table>
+<h3>再現手順</h3>
+<pre><code>python3 32_resolve_size.py     # 262社に規模情報を付ける（2回目以降はキャッシュから即返る）
+python3 34_verify.py           # 検算
+python3 35_merge_ledger.py     # 1,247社台帳へ合流</code></pre>
+<hr>
+<h2>9. 残る論点</h2>
+<table><thead><tr><th>#</th><th>論点</th><th>選択肢</th><th>推奨</th></tr></thead><tbody>
+<tr><td>1</td><td>前方一致の未検証候補73社を目視で潰すか</td><td>やる（法人番号の特定率が上がる）/ 今はやらない</td><td><strong>サトルへ発注。</strong> 1社1分で73分。連絡先取得（T-20260831-001）と同時にやれば二度手間にならない</td></tr>
+<tr><td>2</td><td>規模が大きい9社に、卸サイト経由の可能性を当たるか</td><td>当たる / 直接交渉だけに絞る</td><td><strong>当たる。</strong> 社長のご指摘どおり経路が変われば答えが変わる。ただし NETSEA は法務ハルオが規約リスクを指摘済み（T-20260831-005）なので、<strong>使う卸サイトの選定は法務を通してから</strong></td></tr>
+<tr><td>3</td><td>条件付き候補333社にも同じ列を付けるか</td><td>付ける（約30分・API 500回）/ 付けない</td><td><strong>今は付けない。</strong> 障壁が規模ではないので判断が変わらない</td></tr>
+<tr><td>4</td><td>名寄せ率28.6%をどう上げるか</td><td>外部データで補う / ブランド→社名の対応表を人手で育てる</td><td><strong>対応表を育てる。</strong> 一度作れば以後のスキャン全部に効く。T-20260831-001 の連絡先取得と同じ作業で副産物として溜まる</td></tr>
+</tbody></table>
+</body></html>
