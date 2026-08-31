@@ -1,0 +1,433 @@
+T-20260831-004 検証ログ — すべて workspace/output/agent_output/T-20260831-004/ で実行
+スナップショット: 02_候補リスト_社長用.csv @2026-08-31 11:34  md5=474e06738f1f8e55d3987bce0c4a4215 (2,635行)
+生成: 2026-08-31 12:03
+
+########## [1] v1診断（初版ルール。誤検出込み。記録のため残す） ##########
+商品行 2635 / メーカー 1247
+
+=== 1. カテゴリ（メーカー単位・最頻カテゴリ）===
+  家電＆カメラ                     185社
+  パソコン・周辺機器                  138社
+  ホーム＆キッチン                   116社
+  DVD                         93社
+  DIY・工具・ガーデン                 83社
+  本                           72社
+  スポーツ＆アウトドア                  70社
+  車＆バイク                       70社
+  おもちゃ                        69社
+  洋書                          58社
+  ミュージック                      53社
+  ゲーム                         42社
+  ペット用品                       40社
+  産業・研究開発用品                   37社
+  ファッション                      31社
+  ホビー                         25社
+  ベビー＆マタニティ                   20社
+  楽器・音響機器                     20社
+  PCソフト                       15社
+  大型家電                         8社
+
+=== 2. 再販系カテゴリ（DVD/ミュージック/本/洋書/ゲーム）===
+  該当 318社 / 商品 949件
+
+=== 3. 日本シグナル（メーカー単位・N=1247）===
+  日本の独立セラーが流通                    831社 (66.6%)
+  manufacturer日本語                504社 (40.4%)
+  メーカー名日本語                       450社 (36.1%)
+  JAN45/49                       424社 (34.0%)
+  インボイス登録セラーが流通                  285社 (22.9%)
+  日本法人格                           65社 (5.2%)
+  → 日本シグナルゼロ              370社 (29.7%)
+
+=== 4. 海外(中国系)シグナル ===
+  セラー名がピンイン/無作為英字                102社 (8.2%)
+  JAN690-699(中国)                  37社 (3.0%)
+  ブランド名が無意味英字列                    21社 (1.7%)
+  セラー名に中国企業表記                      6社 (0.5%)
+  manufacturerが中国企業表記              2社 (0.2%)
+  → 海外シグナルあり              162社 (13.0%)
+
+=== 5. 大手（名称ベース）===
+  該当 109社 / 商品 737件
+  例: ASUS, Anker, Avex Entertainment, BANDAI, BANDAI SPIRITS(バンダイ スピリッツ), Bandai Namco, Bosch, CASIO(カシオ), CITIZEN, Casio, DISNEY PIXAR(ディズニー ピクサー), DUNLOP, Disney Baby, Disney(ディズニー), EMI, Honda, KADOKAWA, KOCHCHEMIE, KODAK, KÄRCHER, LEGO(レゴ), Lenovo, Logicool G(ロジクール G), Logitech, Logitech G, Makita(マキタ), Mattel Games, NBCユニバーサル・エンターテイメントジャパン, NBCユニバーサル・エンターテイメントジャパン(LAQ), NETGEAR
+
+=== 6. 卸の証拠：実セラー数 vs 独立セラー数 ===
+  実セラー数分布      : {2: 1047, 3: 590, 4: 411, 5: 337, 6: 238, 7: 9, 8: 3}
+  独立セラー数分布    : {0: 139, 1: 262, 2: 817, 3: 499, 4: 368, 5: 314, 6: 224, 7: 9, 8: 3}
+  日本独立セラー数分布: {0: 816, 1: 652, 2: 556, 3: 294, 4: 203, 5: 93, 6: 20, 7: 1}
+  実セラー2以上だが独立セラー2未満（＝ブランド自演の疑い）: 401件
+     THREEKEY               実2 → 独立0 | Threekey-Office / Threekey Direct
+     Vulendu                実2 → 独立1 | Vulendu-【メーカー直営店】 / Xs【メーカー直営店】
+     Ailewu                 実4 → 独立0 | AilewuDirect [保証付き・日本語サポート] / AILEWU メーカー直営店 / AILEWU 直営店 / Ailewu Direct
+     Boytond                実2 → 独立1 | Boytond / LiXiangMeicvhnj
+     Anker                  実2 → 独立1 | amito(アミト） / AnkerDirect
+     Negolas                実2 → 独立1 | Negolas-XGXL1年間保証付き｜日本語サポート対応 / （Monvera-メーカー直営店・１年保証付き・日本語サポート）
+     Yaizk                  実2 → 独立0 | Yaizk-DQ [メーカー直営＆品質保証] / Yaizk-MW[メーカー直営＆品質保証]
+     ZVZHM                  実2 → 独立1 | Z-公式直営店 / ZVZHM-JP公式直営店
+
+
+======================================================================
+7. ファネル（メーカー単位・N=1247）
+======================================================================
+  入口（現行 02_候補リスト_社長用.csv）                       1247社 / 商品  2635件
+  G1 再販系カテゴリを外す（DVD/音楽/本/洋書/ゲーム）             929社 / 商品  1686件
+  G2 メーカー側に日本実体シグナル / 海外シグナルなし             437社 / 商品   844件
+  G3 大手を外す（名称ベース・暫定）                         392社 / 商品   657件
+  G4 卸証拠（独立セラー2社以上・うち日本事業者1社以上）          343社 / 商品   591件
+  G5 メーカー直営店しか居ない先を外す                        342社 / 商品   590件
+
+--- G5 通過メーカー（該当商品数 順・上位60）---
+   21件 CIO                                    パソコン・周辺機器      JAN45/49
+   17件 マタインク                                  パソコン・周辺機器      manufacturer日本語/メーカー名日本語
+   17件 ロイヤルカナン                                ペット用品          manufacturer日本語/メーカー名日本語
+   15件 ノーブランド品                                おもちゃ           JAN45/49/manufacturer日本語/メーカー名日本語
+   14件 LxTek                                  パソコン・周辺機器      manufacturer日本語
+   10件 ワコーズ(Wako's)                           車＆バイク          JAN45/49/manufacturer日本語/メーカー名日本語
+    9件 Razer(レイザー)                            パソコン・周辺機器      JAN45/49/manufacturer日本語/メーカー名日本語
+    8件 ラブホーム美家                                ホーム＆キッチン       manufacturer日本語/メーカー名日本語
+    7件 Hamee(ハミィ)                             家電＆カメラ         JAN45/49/manufacturer日本語/メーカー名日本語
+    7件 BURTLE                                 産業・研究開発用品      JAN45/49/manufacturer日本語
+    6件 すごろくや                                  おもちゃ           JAN45/49/manufacturer日本語/メーカー名日本語
+    6件 BOS                                    DIY・工具・ガーデン    JAN45/49
+    6件 ブシロード(BUSHIROAD)                       おもちゃ           JAN45/49/manufacturer日本語/メーカー名日本語
+    6件 愛知電線                                   産業・研究開発用品      JAN45/49/manufacturer日本語/メーカー名日本語
+    5件 Hobbywing                              おもちゃ           JAN45/49
+    5件 ファイナル(final)                           家電＆カメラ         JAN45/49/メーカー名日本語
+    5件 ‎バーベイタム(Verbatim)                      パソコン・周辺機器      JAN45/49/manufacturer日本語/メーカー名日本語
+    5件 アイオーデータ                                パソコン・周辺機器      JAN45/49/manufacturer日本語/メーカー名日本語
+    4件 KIOXIA                                 パソコン・周辺機器      JAN45/49/manufacturer日本語
+    4件 詰め替えそのまま                               ホーム＆キッチン       JAN45/49/manufacturer日本語/メーカー名日本語/日本法人格
+    4件 ピュアクリスタル                               ペット用品          JAN45/49/manufacturer日本語/メーカー名日本語/日本法人格
+    4件 シー・エフ・デー販売                             パソコン・周辺機器      JAN45/49/manufacturer日本語/メーカー名日本語
+    4件 medicom                                ホビー            JAN45/49/manufacturer日本語
+    4件 iface                                  家電＆カメラ         JAN45/49/manufacturer日本語
+    4件 BabySmile                              ベビー＆マタニティ      JAN45/49/manufacturer日本語/日本法人格
+    4件 本間ゴルフ                                  スポーツ＆アウトドア     JAN45/49/manufacturer日本語/メーカー名日本語
+    3件 イースター株式会社                              ペット用品          JAN45/49/manufacturer日本語/メーカー名日本語/日本法人格
+    3件 TANITA                                 ホーム＆キッチン       JAN45/49/manufacturer日本語
+    3件 タカギ(Takagi)                            ホーム＆キッチン       JAN45/49/manufacturer日本語/メーカー名日本語/日本法人格
+    3件 NEW ERA(ニューエラ)                         ファッション         メーカー名日本語
+    3件 Eufy (ユーフィ)                            ホーム＆キッチン       メーカー名日本語
+    3件 四日市ばんこ焼 【日本製】                          ホーム＆キッチン       JAN45/49/manufacturer日本語/メーカー名日本語
+    3件 ルイファン ジャパン(Ruifan Japan)               おもちゃ           JAN45/49/メーカー名日本語
+    3件 コムテック(COMTEC)                          車＆バイク          JAN45/49/manufacturer日本語/メーカー名日本語
+    3件 ピープル                                   おもちゃ           JAN45/49/manufacturer日本語/メーカー名日本語
+    3件 オスモカラー                                 DIY・工具・ガーデン    manufacturer日本語/メーカー名日本語/日本法人格
+    3件 JBL                                    家電＆カメラ         JAN45/49/manufacturer日本語
+    2件 山形工房(Yamagata Koubou)                  おもちゃ           JAN45/49/manufacturer日本語/メーカー名日本語/日本法人格
+    2件 イガラシ(Igarashi)                         おもちゃ           JAN45/49/manufacturer日本語/メーカー名日本語
+    2件 Generic                                スポーツ＆アウトドア     manufacturer日本語
+    2件 Laundrin'(ランドリン)                       車＆バイク          JAN45/49/manufacturer日本語/メーカー名日本語
+    2件 FiiO                                   家電＆カメラ         JAN45/49
+    2件 suptronics                             パソコン・周辺機器      manufacturer日本語
+    2件 ハイポネックス                                DIY・工具・ガーデン    JAN45/49/manufacturer日本語/メーカー名日本語
+    2件 Butterfly                              スポーツ＆アウトドア     JAN45/49/manufacturer日本語
+    2件 Dr.'s care                             ペット用品          JAN45/49/manufacturer日本語
+    2件 メディコム・トイ(MEDICOM TOY)                  ホビー            JAN45/49/manufacturer日本語/メーカー名日本語
+    2件 メロリン                                   産業・研究開発用品      JAN45/49/manufacturer日本語/メーカー名日本語
+    2件 Audio Technica(オーディオテクニカ)              パソコン・周辺機器      JAN45/49/manufacturer日本語/メーカー名日本語
+    2件 Jabra(ジャブラ)                            パソコン・周辺機器      manufacturer日本語/メーカー名日本語
+    2件 安永                                     DIY・工具・ガーデン    JAN45/49/manufacturer日本語/メーカー名日本語
+    2件 ドウシシャ(DOSHISHA)                        ホーム＆キッチン       JAN45/49/manufacturer日本語/メーカー名日本語
+    2件 MEDICOM TOY                            ホビー            JAN45/49/manufacturer日本語
+    2件 Omron                                  パソコン・周辺機器      JAN45/49/manufacturer日本語
+    2件 KEIYO ENGINEERING CO.,LTD.             パソコン・周辺機器      JAN45/49
+    2件 ワンダーランド                                おもちゃ           JAN45/49/manufacturer日本語/メーカー名日本語
+    2件 ナトコ                                    DIY・工具・ガーデン    メーカー名日本語
+    2件 あしあげ隊                                  DIY・工具・ガーデン    JAN45/49/manufacturer日本語/メーカー名日本語/日本法人格
+    2件 mimimamo                               家電＆カメラ         JAN45/49/manufacturer日本語/日本法人格
+    2件 JELLY JELLY GAMES                      おもちゃ           JAN45/49
+
+--- G5 通過メーカー（1商品のみ・ランダム40）---
+      Braun                                  ホーム＆キッチン       JAN45/49
+      METIYA                                 パソコン・周辺機器      manufacturer日本語
+      吉田製油所                                  DIY・工具・ガーデン    JAN45/49/メーカー名日本語
+      TRIGGERPOINT(トリガーポイント)                 スポーツ＆アウトドア     メーカー名日本語
+      シーラケース                                 ペット用品          manufacturer日本語/メーカー名日本語
+      NANOXone(ナノックスワン)                      産業・研究開発用品      JAN45/49/manufacturer日本語/メーカー名日本語
+      LEICA(ライカ)                             スポーツ＆アウトドア     JAN45/49/manufacturer日本語/メーカー名日本語
+      マスプロ電工                                 家電＆カメラ         JAN45/49/manufacturer日本語/メーカー名日本語
+      IK Multimedia                          楽器・音響機器        JAN45/49/manufacturer日本語
+      ワイドハイター                                産業・研究開発用品      manufacturer日本語/メーカー名日本語
+      Bit Trade One                          パソコン・周辺機器      JAN45/49
+      Kurilon                                ベビー＆マタニティ      JAN45/49/manufacturer日本語/日本法人格
+      イージースタンド                               大型家電           manufacturer日本語/メーカー名日本語
+      小川耕太郎∞百合子社                             DIY・工具・ガーデン    manufacturer日本語/メーカー名日本語/日本法人格
+      La Fairy                               ホーム＆キッチン       JAN45/49
+      Oregon                                 DIY・工具・ガーデン    manufacturer日本語
+      アイアップ                                  おもちゃ           JAN45/49/manufacturer日本語/メーカー名日本語
+      Leatherwood Bespoke Rosin 社            楽器・音響機器        manufacturer日本語/メーカー名日本語
+      Finish Line                            スポーツ＆アウトドア     manufacturer日本語
+      自然暮らし                                  DIY・工具・ガーデン    JAN45/49/manufacturer日本語/メーカー名日本語/日本法人格
+      ヴィータ                                   ベビー＆マタニティ      JAN45/49/manufacturer日本語/メーカー名日本語
+      Hikari(ヒカリ)                            ペット用品          JAN45/49/manufacturer日本語/メーカー名日本語
+      naef                                   ベビー＆マタニティ      manufacturer日本語
+      アニマル・ワン                                ペット用品          manufacturer日本語/メーカー名日本語
+      タイル(Tile)                              家電＆カメラ         メーカー名日本語
+      Sunday Pets                            ペット用品          manufacturer日本語
+      オウルテック                                 パソコン・周辺機器      JAN45/49/manufacturer日本語/メーカー名日本語
+      コニーエレクトロニクスサービス                        楽器・音響機器        JAN45/49/manufacturer日本語/メーカー名日本語
+      イースター                                  ペット用品          JAN45/49/manufacturer日本語/メーカー名日本語
+      東レ(TORAY)                              ホーム＆キッチン       JAN45/49/manufacturer日本語/メーカー名日本語
+      タイガーゴム                                 おもちゃ           JAN45/49/manufacturer日本語/メーカー名日本語
+      Mont-bell(モンベル)                        ファッション         メーカー名日本語
+      サーモス(THERMOS)                          スポーツ＆アウトドア     JAN45/49/manufacturer日本語/メーカー名日本語
+      Thomson                                DIY・工具・ガーデン    JAN45/49/manufacturer日本語
+      NIPLUX                                 ホーム＆キッチン       JAN45/49/manufacturer日本語/日本法人格
+      récolte                                ホーム＆キッチン       JAN45/49/manufacturer日本語/日本法人格
+      ドギーマン                                  ペット用品          manufacturer日本語/メーカー名日本語
+      ニチアス                                   DIY・工具・ガーデン    JAN45/49/manufacturer日本語/メーカー名日本語
+      ブレイン(BRAIN)                            家電＆カメラ         JAN45/49/manufacturer日本語/メーカー名日本語
+      ジクラ (Zicra)                            ペット用品          JAN45/49/manufacturer日本語/メーカー名日本語
+
+--- 各ゲートが単独で落とす社数（入口1247社に対して）---
+  再販系カテゴリ                    318社
+  日本実体シグナルなし                 613社
+  海外シグナルあり                   162社
+  大手（名称）                     109社
+  卸証拠なし                      457社
+  直営店のみ                       85社
+
+########## [2] 条件付き母数・手判定・偽陰性回帰（v1） ##########
+商品行 2635 / メーカー 1247
+========================================================================
+A. 条件付き母数（国内実体＋卸証拠は満たすが、カテゴリ or 規模で落ちる先）
+========================================================================
+  国内実体＋卸証拠を満たす            553社 / 商品 1307件
+   ├ 再販系カテゴリのみで落ちる        130社 / 商品  240件
+   ├ 大手（名称）のみで落ちる           45社 / 商品  187件
+   ├ 両方で落ちる                     36社 / 商品  290件
+   └ G5通過                         342社 / 商品  590件
+
+  再販系のみで落ちる先・該当商品数上位25:
+      12件 宝島社                                      本
+      12件 ジェイストーム                                  DVD
+       7件 SME                                      ミュージック
+       5件 KT                                       ゲーム
+       5件 SBクリエイティブ                                本
+       5件 トイズファクトリー                                ミュージック
+       4件 レベルファイブ                                  ゲーム
+       4件 Happinet                                 DVD
+       4件 マイクロソフト                                  ゲーム
+       4件 Zach Top                                 ミュージック
+       4件 King Records                             DVD
+       4件 Gakken                                   本
+       3件 河合出版                                     本
+       3件 Brook                                    ゲーム
+       3件 SACRA MUSIC                              ミュージック
+       3件 ホリ                                       ゲーム
+       3件 マガジンハウス                                  本
+       3件 経済法令研究会                                  本
+       3件 Johnny & Associates                      DVD
+       3件 Motowolf                                 DVD
+       3件 ERJ                                      ミュージック
+       3件 Crimson                                  ミュージック
+       3件 アリオラジャパン                                 ミュージック
+       3件 株式会社ストームレーベルズ/イーラブ・レーベル                  DVD
+       3件 スパイク・チュンソフト                              ゲーム
+
+========================================================================
+B. G5通過342社の手判定（タケシ・確度中／gBizINFOで機械検証すべき）
+========================================================================
+  M 中小の可能性が高い                           121社 / 商品  201件
+  U 名前から会社を特定できない                        47社 / 商品   90件
+  L 大企業（従業員300人超がほぼ確実）                  149社 / 商品  256件
+  N そもそも会社名でない（商品名・作品名・PB）               25社 / 商品   43件
+  ─ 計 342社 / 商品590件
+
+========================================================================
+C. 偽陰性の回帰サンプル：日本法人があるのに G2 で落ちる会社
+========================================================================
+  リスト中に存在した既知の日本法人あり企業: 24社
+   **DROP**  ASUS                                 s_jp=[] cn=[]
+   **DROP**  Anker                                s_jp=[] cn=[]
+   **DROP**  Belkin                               s_jp=[] cn=[]
+   PASS      Bosch                                s_jp=['manufacturer日本語'] cn=[]
+   **DROP**  INTEX                                s_jp=['manufacturer日本語'] cn=['JAN690-699(中国)']
+   PASS      JBL                                  s_jp=['JAN45/49', 'manufacturer日本語'] cn=[]
+   PASS      KODAK                                s_jp=['manufacturer日本語'] cn=[]
+   **DROP**  KÄRCHER                              s_jp=['manufacturer日本語', '日本法人格'] cn=['ブランド名が無意味英字列']
+   PASS      LEGO(レゴ)                             s_jp=['manufacturer日本語', 'メーカー名日本語'] cn=[]
+   **DROP**  Lenovo                               s_jp=[] cn=[]
+   PASS      Logicool G(ロジクール G)                  s_jp=['JAN45/49', 'manufacturer日本語', 'メーカー名日本語'] cn=[]
+   **DROP**  Logitech                             s_jp=['JAN45/49', 'manufacturer日本語'] cn=['JAN690-699(中国)', 'セラー名がピンイン/無作為英字']
+   **DROP**  Logitech G                           s_jp=[] cn=[]
+   PASS      NETGEAR                              s_jp=['manufacturer日本語'] cn=[]
+   PASS      NGK                                  s_jp=['manufacturer日本語'] cn=[]
+   PASS      PHILIPS                              s_jp=['manufacturer日本語'] cn=[]
+   PASS      Razer(レイザー)                          s_jp=['JAN45/49', 'manufacturer日本語', 'メーカー名日本語'] cn=[]
+   **DROP**  SAMSUNG                              s_jp=[] cn=[]
+   PASS      SanDisk                              s_jp=['manufacturer日本語'] cn=[]
+   **DROP**  TP-Link                              s_jp=[] cn=['JAN690-699(中国)', 'ブランド名が無意味英字列']
+   **DROP**  UGREEN                               s_jp=[] cn=['JAN690-699(中国)', 'セラー名がピンイン/無作為英字']
+   PASS      サムスン(SAMSUNG)                        s_jp=['メーカー名日本語'] cn=[]
+   PASS      ゼンハイザー(Sennheiser)                   s_jp=['メーカー名日本語'] cn=[]
+   PASS      レゴ(LEGO)                             s_jp=['manufacturer日本語', 'メーカー名日本語'] cn=[]
+  → 偽陰性（落ちてしまう）: 11/24社 = 46%
+
+========================================================================
+D. 除外ルールの誤検出サンプル（海外シグナルで落ちた162社の中身）
+========================================================================
+    38件 UNIVERSAL MUSIC GROUP            cn=['セラー名がピンイン/無作為英字'] jp=['JAN45/49', 'manufacturer日本語', 'インボイス登録セラーが流通', '日本の独立セラーが流通']
+    34件 Universal                        cn=['セラー名がピンイン/無作為英字'] jp=['JAN45/49', 'manufacturer日本語', 'インボイス登録セラーが流通', '日本の独立セラーが流通']
+    30件 SONY MUSIC                       cn=['セラー名がピンイン/無作為英字'] jp=['JAN45/49', 'manufacturer日本語', 'インボイス登録セラーが流通', '日本の独立セラーが流通']
+    24件 UGREEN                           cn=['JAN690-699(中国)', 'セラー名がピンイン/無作為英字'] jp=['インボイス登録セラーが流通', '日本の独立セラーが流通']
+    23件 ワーナーホームビデオ                       cn=['セラー名がピンイン/無作為英字'] jp=['JAN45/49', 'manufacturer日本語', 'インボイス登録セラーが流通', 'メーカー名日本語', '日本の独立セラーが流通']
+    23件 WARNER BROS                      cn=['セラー名がピンイン/無作為英字'] jp=['日本の独立セラーが流通']
+    21件 Sony Pictures Home Entertainme   cn=['セラー名がピンイン/無作為英字'] jp=['JAN45/49', 'manufacturer日本語', 'インボイス登録セラーが流通', '日本の独立セラーが流通']
+    18件 20TH CENTURY STUDIOS             cn=['セラー名がピンイン/無作為英字'] jp=['日本の独立セラーが流通']
+    13件 iClever                          cn=['JAN690-699(中国)'] jp=[]
+    12件 Paramount                        cn=['セラー名がピンイン/無作為英字'] jp=['インボイス登録セラーが流通', '日本の独立セラーが流通']
+    11件 Gudluky                          cn=['セラー名がピンイン/無作為英字'] jp=['日本の独立セラーが流通']
+     9件 Bloomsbury                       cn=['セラー名がピンイン/無作為英字'] jp=['日本の独立セラーが流通']
+     6件 GPC Image Flex                   cn=['JAN690-699(中国)'] jp=['manufacturer日本語', '日本の独立セラーが流通']
+     6件 COOAU                            cn=['ブランド名が無意味英字列'] jp=['日本の独立セラーが流通']
+     6件 Logitech                         cn=['JAN690-699(中国)', 'セラー名がピンイン/無作為英字'] jp=['JAN45/49', 'manufacturer日本語', 'インボイス登録セラーが流通', '日本の独立セラーが流通']
+     6件 Warner                           cn=['セラー名がピンイン/無作為英字'] jp=['インボイス登録セラーが流通', '日本の独立セラーが流通']
+     6件 Universal Pictures               cn=['セラー名がピンイン/無作為英字'] jp=['日本の独立セラーが流通']
+     5件 SoundPEATS(サウンドピーツ)              cn=['JAN690-699(中国)'] jp=['manufacturer日本語', 'メーカー名日本語']
+     5件 Listening Library                cn=['セラー名がピンイン/無作為英字'] jp=['日本の独立セラーが流通']
+     5件 GPC Image                        cn=['JAN690-699(中国)'] jp=['manufacturer日本語', '日本の独立セラーが流通']
+     4件 KEENKLE                          cn=['JAN690-699(中国)'] jp=['manufacturer日本語']
+     4件 ejet                             cn=['JAN690-699(中国)'] jp=['manufacturer日本語', '日本の独立セラーが流通']
+     4件 Keypal                           cn=['セラー名がピンイン/無作為英字'] jp=['日本の独立セラーが流通']
+     4件 Turtleback                       cn=['セラー名がピンイン/無作為英字'] jp=['日本の独立セラーが流通']
+     4件 Capitol                          cn=['セラー名がピンイン/無作為英字'] jp=['JAN45/49', '日本の独立セラーが流通']
+     4件 Paramount Home Entertainment     cn=['セラー名がピンイン/無作為英字'] jp=['日本の独立セラーが流通']
+     3件 TXWDFHL                          cn=['ブランド名が無意味英字列'] jp=[]
+     3件 Yaizk                            cn=['セラー名がピンイン/無作為英字'] jp=['日本の独立セラーが流通']
+     3件 CPWORLD                          cn=['ブランド名が無意味英字列'] jp=[]
+     3件 aestiquo                         cn=['セラー名に中国企業表記'] jp=['日本の独立セラーが流通']
+
+========================================================================
+E. 日本シグナルゼロ613社のサンプル（本当に落としてよいか）
+========================================================================
+     1件 Vexify                           パソコン・周辺機器    sellers=TANG MJING / wangzeng JP
+     1件 G7th                             楽器・音響機器      sellers=Guitar Shop UNLIMITed / ギター・バイオリンショップ　ロッコーマン
+     1件 Sawyer                           スポーツ＆アウトドア   sellers=Amazon US / UPI(ユーピーアイ)
+     1件 VANBOKEE                         家電＆カメラ       sellers=Meng Zhongli / Li Guangzan / GUYU-JP / Zhang Qiang5121 / Stseetop Life
+     1件 EveryDrop by Whirlpool           大型家電         sellers=MIA AMIA / 【安心の国内発送】三重の輸入商 Import Anywhere Co. / MDK　shop / レベルカンパニー /
+     1件 Arthur A. Levine Books           洋書           sellers=thebookcommunity / Book Reach USA / thurmanbooks / SmallerWorldFuture 
+     1件 Dibuy                            車＆バイク        sellers=YAGYU KEN / XUYANSHOP / Kalmode Goods
+     1件 NorwegianStyle                   スポーツ＆アウトドア   sellers=A3JTM0K3TULAJ2 / A3VAFIWMM2CJYM / AMWO8T6GW32FW / A33E1MG0V0GJ9X
+    29件 Anker                            パソコン・周辺機器    sellers=amito(アミト） / AnkerDirect
+     1件 Keiby Citom                      家電＆カメラ       sellers=tanko-jp / oringine-jp
+     2件 UYIKOO                           家電＆カメラ       sellers=小型カメラ専門店（年中無休、丁寧な対応、迅速に発送） / LIK カメラ専門店（年中無休、丁寧な対応、迅速に発送）
+     1件 KOCHCHEMIE                       車＆バイク        sellers=Fun Style『賞味期限等コンディション欄確認お願い致します』 / リジットモンキー / SKショップオンライン / グローバル＆モバイ
+     1件 Portta                           パソコン・周辺機器    sellers=PORTTA JP / Amazon US
+     2件 DEPSTECH                         産業・研究開発用品    sellers=LENSPro / DEPSTECH
+     1件 Vector Optics                    ホビー          sellers=つぼみストア / 【全品即納】実物タクティカルギア・エアソフト商品の専門店「HobbyBox」（ホビーボックス）
+     1件 Warner Music Interna             ミュージック       sellers=TheWorldShop / Rarewaves-USA / ★英国の販売代理店★ / ビビッドメディアストア / インポートショップ泉堂
+     1件 Kreg                             DIY・工具・ガーデ   sellers=Japan Liebe / M’2マーケット / ROROワールド / 美的生活★ヘルシーライフ本店【インボイス登録事業者】 / CHAKO
+     1件 Concorde Home Entertainment      DVD          sellers=Grotte　verde / thebookcommunity / thurmanbooks / SmallerWorldFuture / 
+     3件 Import                           ミュージック       sellers=thebookcommunity / thurmanbooks
+     5件 Lexar                            パソコン・周辺機器    sellers=フラッシュ市場 / 元気shop / エルメ
+     2件 TOPADRE                          家電＆カメラ       sellers=TOPADRE Tech JP / TOPADRE-JP販売店
+     1件 COOLERPLUS                       パソコン・周辺機器    sellers=UOZAWA（ｲﾝﾎﾞｲｽ制度対応） / あずみんストア（適格請求書発行事業者登録済） / TOMIIIZ STORE【適格請求書発行事業者
+     1件 GAERUO                           ホーム＆キッチン     sellers=「Pedrain直営店一年保証付き」 / MAIHONG-JP
+     1件 Rough Trade                      ミュージック       sellers=TheWorldShop / thurmanbooks / thebookcommunity
+     3件 Yaizk                            家電＆カメラ       sellers=Yaizk-DQ [メーカー直営＆品質保証] / Yaizk-MW[メーカー直営＆品質保証]
+     1件 BUODCO                           パソコン・周辺機器    sellers=A2MVNAHECS12RY / HIDEMI SHOP
+     1件 Kimwood                          車＆バイク        sellers=ShaoShiMaoYi / KIMWOOD直営店-cww【30日の無料交換・2年間保証】 / WenSiDunMaoYi / 1liang
+     1件 Virgin                           ミュージック       sellers=グローバル・ハブ / インポートショップ泉堂 / thebookcommunity / thurmanbooks
+     2件 SOOEO                            家電＆カメラ       sellers=A21523GRWLI5HV / A27YLD306VPQ59 / A3G6SFVOFKFKCP / A3SS664NBX2Q3M / A2
+     2件 LEONINE                          DVD          sellers=Grotte　verde / RAREWAVES-JP / prime ショッピング（1st） / soragadgetshop
+     1件 Vibaleg                          パソコン・周辺機器    sellers=Vibaleg-JP / Vibaleg / Hero Wer
+     2件 COMEDYKING                       ホーム＆キッチン     sellers=COMEDYKING 専門店 保証付き / COMEDYKING専門店-保証付き / COMEDYKING専門店 - 保証付き
+     1件 Universal Import                 ミュージック       sellers=TheWorldShop / Foolproof_Japan
+     1件 William Collins                  洋書           sellers=Paper Cavalier JP / Ergodebooks Ships From USA / ClipDeal
+     2件 MGM (Video & DVD)                DVD          sellers=グローバル輸入館 / セトウチInternational market / Foolproof_Japan / prime ショッピング（1
+
+########## [3] v2ルール適用（採用版） ##########
+==========================================================================
+F. ルール v2 ファネル（メーカー単位）
+==========================================================================
+  入口（現行 02_候補リスト_社長用.csv）                               1247社 / 商品 2635件
+  G1 再販/版元カテゴリを外す                                        914社 / 商品 1670件
+  G2 メーカー側に日本実体シグナル（S級）あり                                429社 / 商品  834件
+  G3 卸証拠（独立セラー2社以上・うち日本事業者1社以上）                          374社 / 商品  757件
+
+  参考: G2 で落ちた 485社 のうち 海外シグナルが立ったのは 27社（残りは判定材料なし）
+
+==========================================================================
+G. 回帰サンプル：日本法人が実在する企業を落としていないか（v1 vs v2）
+==========================================================================
+   **DROP**  ASUS                             n=  1 S級=[]
+   **DROP**  Anker                            n= 29 S級=[]
+   **DROP**  Belkin                           n=  1 S級=[]
+   **DROP**  Bosch                            n=  1 S級=[]
+   **DROP**  INTEX                            n=  2 S級=[]
+   PASS      JBL                              n=  3 S級=['JAN45/49']
+   PASS      KODAK                            n= 11 S級=['manufacturer日本語']
+   PASS      KÄRCHER                          n=  1 S級=['manufacturer日本語', '日本法人格']
+   PASS      LEGO(レゴ)                         n=  4 S級=['メーカー名日本語']
+   **DROP**  Lenovo                           n=  2 S級=[]
+   PASS      Logicool G(ロジクール G)              n=  3 S級=['JAN45/49', 'メーカー名日本語']
+   PASS      Logitech                         n=  6 S級=['JAN45/49']
+   **DROP**  Logitech G                       n=  1 S級=[]
+   PASS      NETGEAR                          n=  1 S級=['manufacturer日本語']
+   **DROP**  NGK                              n=  2 S級=[]
+   PASS      PHILIPS                          n=  5 S級=['manufacturer日本語']
+   PASS      Razer(レイザー)                      n=  9 S級=['JAN45/49', 'メーカー名日本語']
+   **DROP**  SAMSUNG                          n=  1 S級=[]
+   PASS      SanDisk                          n=  5 S級=['manufacturer日本語']
+   PASS      SoundPEATS(サウンドピーツ)              n=  5 S級=['メーカー名日本語']
+   **DROP**  TP-Link                          n=  1 S級=[]
+   **DROP**  UGREEN                           n= 24 S級=[]
+   **DROP**  iClever                          n= 13 S級=[]
+   PASS      サムスン(SAMSUNG)                    n=  1 S級=['メーカー名日本語']
+   PASS      ゼンハイザー(Sennheiser)               n=  1 S級=['メーカー名日本語']
+   PASS      レゴ(LEGO)                         n=  2 S級=['メーカー名日本語']
+  → 落ちた: 12/26社（46%）
+
+==========================================================================
+H. v2 で「海外」と断定した社の全件（誤検出があればここに出る）
+==========================================================================
+  27社 / 商品47件
+     4件 Keypal                       ['セラー名に中国企業表記/ピンイン'] | hefeilaifanbaihuodian; renyiwangluoshangmao
+     3件 aestiquo                     ['セラー名に中国企業表記/ピンイン'] | AESTIQUO_直营店
+     3件 Tufuha                       ['セラー名に中国企業表記/ピンイン'] | Yanzhekeji
+     3件 HUAKUA                       ['セラー名に中国企業表記/ピンイン'] | rouxiangshangmao
+     3件 SKYBASIC                     ['セラー名に中国企業表記/ピンイン'] | chengxiankeji
+     3件 Fochai                       ['セラー名に中国企業表記/ピンイン'] | wuzhixianshulijiajuchang
+     3件 happilaff                    ['セラー名に中国企業表記/ピンイン'] | JiNuoShuMaKeJi(JiNan)YouXianGongSi
+     2件 SOOEO                        ['セラー名に中国企業表記/ピンイン'] | Zhengweidianzi JP
+     2件 YIERSAN                      ['セラー名に中国企業表記/ピンイン'] | louyingmaoyi
+     2件 Kemeskin                     ['セラー名に中国企業表記/ピンイン'] | henanjinganlongkejiyouxian; zhengzhoujinyuzaishengziyuanhuishou
+     2件 KCUVSSKKII                   ['セラー名に中国企業表記/ピンイン'] | sichuanxingmengyuandianzishangwuyouxiangongsizzs
+     2件 GuMosh                       ['セラー名に中国企業表記/ピンイン'] | chentingkeji
+     1件 CHUSII                       ['セラー名に中国企業表記/ピンイン'] | 惠州市博莱博科技有限公司
+     1件 Newluck                      ['セラー名に中国企業表記/ピンイン'] | Qigedianzi JP; jifeidianzi JP
+     1件 Onalra                       ['セラー名に中国企業表記/ピンイン'] | BinZhouChengShangJianCaiYouXianGongSi
+     1件 ＡＮＤＥＲＹ                       ['セラー名に中国企業表記/ピンイン'] | HongYeKeJifhj
+     1件 GooSpy                       ['セラー名に中国企業表記/ピンイン'] | dongguanshiqixingyaokejiyouxiangongsi
+     1件 Kimwood                      ['セラー名に中国企業表記/ピンイン'] | ShaoShiMaoYi; WenSiDunMaoYi
+     1件 LENUTO                       ['セラー名に中国企業表記/ピンイン'] | Dougao Wangluo Keji
+     1件 YZO                          ['セラー名に中国企業表記/ピンイン'] | WeiHaoShang Mao
+     1件 Greneo                       ['セラー名に中国企業表記/ピンイン'] | GuangzhouJing
+     1件 Okanne                       ['セラー名に中国企業表記/ピンイン'] | ZHENG WEI MAOYI
+     1件 kstime                       ['セラー名に中国企業表記/ピンイン'] | Shidengmaoyi jp
+     1件 Gvyugke                      ['セラー名に中国企業表記/ピンイン'] | DangYangShiChaoXiBaiHuoDian
+     1件 Surfola                      ['セラー名に中国企業表記/ピンイン'] | Surfola直营店
+     1件 QIUYMI                       ['セラー名に中国企業表記/ピンイン'] | HeFeiShiQiaWangLuo
+     1件 KDD                          ['セラー名に中国企業表記/ピンイン'] | Changxindianzi
+
+==========================================================================
+I. G3 通過社の手判定（規模）
+==========================================================================
+  M 中小の可能性が高い                         117社 / 商品  197件
+  U 名前から会社を特定できない                      46社 / 商品   78件
+  L 大企業（従業員300人超がほぼ確実）                187社 / 商品  440件
+  N 会社名でない（商品名/作品名/PB）                 24社 / 商品   42件
+
+########## [4] 成果物CSV生成 ##########
+  連絡候補                           163社 / 商品  275件
+  条件付き（再販/版元カテゴリ）                333社 / 商品  965件
+  除外（規模：大企業）                     187社 / 商品  440件
+  除外（卸の証拠なし）                      55社 / 商品   77件
+  除外（会社名でない）                      24社 / 商品   42件
+  除外（日本実体の証拠なし）                  458社 / 商品  789件
+  除外（海外・国内窓口なし）                   27社 / 商品   47件
+
+連絡候補の規模内訳: {'中小の見込み': 117, '判定不能': 46}
+連絡候補 163 社 / 商品 275 件
