@@ -46,7 +46,17 @@ for p in (str(HERE), str(LEGACY_CODE)):
     if p not in sys.path:
         sys.path.insert(0, p)
 
-from pipeline import config, evaluate, keepa_verify, screen, store  # noqa: E402
+from pipeline import (  # noqa: E402
+    config, evaluate, keepa_verify, screen, store, supplier_profile,
+)
+
+# 業態（メーカー／卸専業／…）の一次情報。Buyer API は業態を持たないため、
+# 秘書カズヨが社長のログイン中に管理画面から取得した CSV を名寄せして使う。
+# ⚠️ API では再取得できません。取引先が増えたら取り直し（＝またログインの一手）が要ります。
+PROFILE_CSV_DEFAULT = (
+    REPO / "workspace" / "output" / "agent_output" / "T-20260831-006"
+    / "netsea_取引申請状況_480社.csv"
+)
 
 OUT = HERE / "out"
 ITEMS_JSONL = OUT / "netsea_items.jsonl"         # 段1の生データ（Git 追跡外）
@@ -129,7 +139,7 @@ def harvest(limit_suppliers: int, max_items_per_supplier: int) -> dict:
 # =============================================================================
 # 段2: 機械的に落とす（0トークン）
 # =============================================================================
-def build_candidates(cfg: config.ScanConfig) -> tuple:
+def build_candidates(cfg: config.ScanConfig, profiles=None) -> tuple:
     """JSONL の生データ → 判定済み候補。戻り値は (通過, 全件, 統計)。"""
     raw = list(store.JsonlStore(ITEMS_JSONL, key="_uid").load().values())
     log(f"段2: NETSEA 商品 {len(raw)}件 を判定します（Keepa は1トークンも使いません）")
@@ -138,6 +148,16 @@ def build_candidates(cfg: config.ScanConfig) -> tuple:
     for item in raw:
         all_c.extend(screen.to_candidates(item))
     log(f"  規格(set)単位に展開: {len(all_c)}件")
+
+    # 業態を貼る。名寄せできなかった社は**空欄のまま**にする（推測で埋めない）。
+    unmatched = set()
+    if profiles and len(profiles):
+        for c in all_c:
+            c.business_type = profiles.business_type(c.supplier_name)
+            if not c.business_type:
+                unmatched.add(c.supplier_name)
+        tagged = len({c.supplier_name for c in all_c}) - len(unmatched)
+        log(f"  業態を付与: {tagged}社に付与 / {len(unmatched)}社は名寄せできず空欄")
 
     for c in all_c:
         screen.screen_one(c, cfg)
@@ -157,6 +177,7 @@ def build_candidates(cfg: config.ScanConfig) -> tuple:
         "deduped_by_jan": dropped,
         "to_keepa": len(deduped),
         "screen_reasons": reasons,
+        "suppliers_without_business_type": len(unmatched),
     }
     return deduped, all_c, stats
 
@@ -310,6 +331,12 @@ def main() -> None:
                     help="利益ライン超えの行だけ実セラー数を確定（6.5トークン/件）")
     ap.add_argument("--allow-regulated", action="store_true",
                     help="規制品キーワードで落とさない")
+    ap.add_argument("--profile-csv", default=str(PROFILE_CSV_DEFAULT),
+                    help="取引申請状況CSV（業態の一次情報）。カズヨが管理画面から取得したもの")
+    ap.add_argument("--makers-first", action="store_true", default=True,
+                    help="Keepaトークンをメーカーから先に使う（既定）。社長の狙いはメーカー仕入れ")
+    ap.add_argument("--only-makers", action="store_true",
+                    help="業態がメーカーのサプライヤーだけを対象にする")
     ap.add_argument("--allow-used", action="store_true",
                     help="中古品を除外しない。⛔ 古物商許可を取得してからのみ使用可")
     args = ap.parse_args()
@@ -330,14 +357,30 @@ def main() -> None:
     if args.stage in ("all", "harvest"):
         stats["harvest"] = harvest(args.suppliers, args.max_items)
 
-    candidates, all_candidates, screen_stats = build_candidates(cfg)
+    profiles = supplier_profile.SupplierProfiles.load(args.profile_csv)
+    if len(profiles):
+        log(f"取引申請状況CSV: {len(profiles)}社を読み込みました（業態の一次情報）")
+    else:
+        log(f"⚠ 取引申請状況CSVが見つかりません（{args.profile_csv}）。業態は空欄になります")
+    stats["profile_rows"] = len(profiles)
+
+    candidates, all_candidates, screen_stats = build_candidates(cfg, profiles)
     stats["screen"] = screen_stats
 
+    if args.only_makers:
+        candidates = [c for c in candidates if c.business_type.startswith("メーカー")]
+        log(f"  --only-makers により メーカーのみ {len(candidates)}件")
+    elif args.makers_first:
+        # 限られたトークンをメーカーから使う。業態不明は卸の後ろ（除外はしない）。
+        rank = {"メーカー": 0, "卸専業": 1, "卸および小売業": 2, "その他": 3}
+        candidates.sort(key=lambda c: (
+            rank.get(c.business_type.split("（")[0], 9), c.wholesale_ex_tax))
+        log("  メーカー優先で並べ替えました（--keepa-limit はこの順で消費されます）")
+
     if args.keepa_limit:
-        # 「よく売れていそうな順」に並べる材料が段2には無いので、卸値の安い順にする。
-        # 安い商品ほど利益率で戦えるため、限られたトークンの配り先としては妥当。
-        candidates = sorted(candidates, key=lambda c: c.wholesale_ex_tax)[: args.keepa_limit]
-        log(f"  --keepa-limit により {len(candidates)}件に絞ります（卸値の安い順）")
+        # 直前の並べ替え（メーカー優先・その中で卸値の安い順）を尊重して先頭から取る。
+        candidates = candidates[: args.keepa_limit]
+        log(f"  --keepa-limit により先頭 {len(candidates)}件に絞ります")
         stats["screen"]["to_keepa"] = len(candidates)
 
     if args.stage in ("all", "verify"):

@@ -47,6 +47,9 @@ class Candidate:
     product_url: str
     # 卸価格（税抜・1個あたり単価）。NETSEA set[].price。
     wholesale_ex_tax: int
+    # 業態（メーカー／卸専業／…）。Buyer API は持っていないので、
+    # カズヨが管理画面から取った CSV を名寄せして後から入れる。不明なら空文字。
+    business_type: str = ""
     # 上代（希望小売・税抜）。空欄の商品が多い。0 は「不明」を意味する。
     reference_price_ex_tax: int = 0
     # 最小発注のまとまり。set_num=10 なら「10個単位でしか買えない」。

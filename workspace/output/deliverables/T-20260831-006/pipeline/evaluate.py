@@ -178,7 +178,7 @@ def evaluate(
 # =============================================================================
 
 COLUMNS = [
-    "商品名", "JAN", "ASIN", "サプライヤー名", "NETSEA卸値(税抜)", "NETSEA卸値(税込)",
+    "商品名", "JAN", "ASIN", "サプライヤー名", "業態", "NETSEA卸値(税抜)", "NETSEA卸値(税込)",
     "Amazon価格", "価格の出所", "純利益", "利益率%", "利益率区分", "ROI%",
     "月間販売数(30日ランク下落数)", "月間販売数(90日ドロップ÷3)",
     "出品者数", "出品者数の出所", "Amazon本体の有無", "ランキング",
@@ -206,6 +206,7 @@ def to_row(ev: Evaluation) -> dict:
         "JAN": c.jan,
         "ASIN": f.asin or "",
         "サプライヤー名": c.supplier_name,
+        "業態": c.business_type,
         "NETSEA卸値(税抜)": c.wholesale_ex_tax,
         "NETSEA卸値(税込)": round(c.wholesale_ex_tax * tax),
         "Amazon価格": f.price_yen if f.price_yen is not None else "",
@@ -267,7 +268,7 @@ def to_row(ev: Evaluation) -> dict:
 # =============================================================================
 
 SUPPLIER_COLUMNS = [
-    "サプライヤー名", "supplier_id", "取引状態", "取扱商品数", "規格数",
+    "サプライヤー名", "supplier_id", "業態", "取引状態", "取扱商品数", "規格数",
     "JAN保有率%", "候補数(前段通過)", "Keepa検証済み", "Amazonに存在",
     "利益プラス", "利益率5%以上", "利益率10%以上", "利益率20%以上",
     "回転もある候補", "最良の純利益", "最良商品のASIN", "NETSEA店舗ページ",
@@ -288,7 +289,7 @@ def supplier_summary(evaluations: list, all_candidates: list) -> list:
 
     def slot(sid, name, url=""):
         row = agg.setdefault(sid, {
-            "サプライヤー名": name, "supplier_id": sid,
+            "サプライヤー名": name, "supplier_id": sid, "業態": "",
             "取引状態": TRADE_STATUS_APPROVED,
             "取扱商品数": 0, "規格数": 0, "_jan": 0,
             "候補数(前段通過)": 0, "Keepa検証済み": 0, "Amazonに存在": 0,
@@ -303,6 +304,8 @@ def supplier_summary(evaluations: list, all_candidates: list) -> list:
     products: dict = {}
     for c in all_candidates:
         row = slot(c.supplier_id, c.supplier_name)
+        if c.business_type and not row["業態"]:
+            row["業態"] = c.business_type
         row["規格数"] += 1
         if c.jan:
             row["_jan"] += 1
@@ -339,6 +342,10 @@ def supplier_summary(evaluations: list, all_candidates: list) -> list:
         row["JAN保有率%"] = round(n / row["規格数"] * 100, 1) if row["規格数"] else 0
         out.append(row)
     # 「使える取引先」が上に来る順。利益が出た数 → 回転もある数 → 候補数。
-    out.sort(key=lambda r: (r["利益プラス"], r["回転もある候補"], r["候補数(前段通過)"]),
-             reverse=True)
+    maker_rank = {"メーカー": 0, "卸専業": 1, "卸および小売業": 2, "その他": 3}
+    out.sort(key=lambda r: (
+        -r["利益プラス"], -r["回転もある候補"],
+        maker_rank.get(str(r["業態"]).split("（")[0], 9),   # 社長の狙いはメーカー仕入れ
+        -r["候補数(前段通過)"],
+    ))
     return out
