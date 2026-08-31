@@ -55,8 +55,10 @@ def test_残高がマイナスなら不足分まで含めて待つ():
     waited = []
     keepa_verify.time.sleep = lambda s: waited.append(s)
     assert b.wait_if_needed(log=lambda m: None, batch_size=100) is True
-    # 必要247 − 残高(-101) = 348トークン ÷ 20/分 = 約17分 → 上限900秒でクリップ
-    assert waited and waited[0] == 900.0
+    # 必要247 − 残高(-101) = 348トークン ÷ 20/分 = 約17分 → 上限900秒でクリップ。
+    # sleep は心拍を打つため30秒刻みに割られるので、**合計**で見る。
+    assert sum(waited) == 900.0
+    assert max(waited) <= 30.0, "長い sleep を丸ごと寝ると待機中に心拍が止まる"
 
 
 def test_回復しないまま制限時間を過ぎたら諦める():

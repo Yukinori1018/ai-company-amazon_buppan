@@ -47,7 +47,7 @@ for p in (str(HERE), str(LEGACY_CODE)):
         sys.path.insert(0, p)
 
 from pipeline import (  # noqa: E402
-    config, evaluate, keepa_verify, screen, store, supplier_profile,
+    config, evaluate, heartbeat, keepa_verify, screen, store, supplier_profile,
 )
 
 # 業態（メーカー／卸専業／…）の一次情報。Buyer API は業態を持たないため、
@@ -65,6 +65,11 @@ CANDIDATES_CSV = OUT / "candidates.csv"          # 最終成果（Git 追跡外�
 REJECTED_CSV = OUT / "rejected_by_screen.csv"    # 落とした理由つき（Git 追跡外）
 SUPPLIERS_CSV = OUT / "suppliers.csv"            # 取引先単位の集計（Git 追跡外）
 STATS_JSON = HERE / "run_stats.json"             # 統計だけは Git 追跡する
+HEARTBEAT = OUT / "heartbeat.json"               # 生死の証拠（Git 追跡外）
+
+# 心拍。**プロセスの存在ではなく、これの更新時刻で生死を判断する。**
+# `python3 netsea_scan.py --status` で人が読める形に出ます。
+BEAT = heartbeat.Heartbeat(HEARTBEAT)
 LOG_PATH = OUT / "scan.log"
 
 JST = timezone(timedelta(hours=9))
@@ -125,6 +130,8 @@ def harvest(limit_suppliers: int, max_items_per_supplier: int) -> dict:
         itemstore.append(rows)
         stats["suppliers_fetched"] += 1
         stats["items_fetched"] += len(rows)
+        BEAT.beat("段1 NETSEA収集", done=i, total=len(suppliers),
+                  note=f"商品{stats['items_fetched']}件を取得")
         if not rows:
             stats["suppliers_empty"] += 1
         log(
@@ -141,6 +148,7 @@ def harvest(limit_suppliers: int, max_items_per_supplier: int) -> dict:
 # =============================================================================
 def build_candidates(cfg: config.ScanConfig, profiles=None) -> tuple:
     """JSONL の生データ → 判定済み候補。戻り値は (通過, 全件, 統計)。"""
+    BEAT.beat("段2 前段フィルタ", note="NETSEA商品を読み込み中")
     raw = list(store.JsonlStore(ITEMS_JSONL, key="_uid").load().values())
     log(f"段2: NETSEA 商品 {len(raw)}件 を判定します（Keepa は1トークンも使いません）")
 
@@ -166,6 +174,8 @@ def build_candidates(cfg: config.ScanConfig, profiles=None) -> tuple:
     deduped, dropped = screen.dedupe_by_jan(passed)
     log(f"  通過 {len(passed)}件 → 同一JAN重複を{dropped}件まとめて {len(deduped)}件")
 
+    BEAT.beat("段2 前段フィルタ", done=len(deduped), total=len(all_c),
+              note="判定完了")
     reasons = screen.summarize(all_c)
     for reason, n in reasons.items():
         log(f"    {reason}: {n}件")
@@ -202,8 +212,17 @@ def verify(candidates: list, cfg: config.ScanConfig, verify_sellers: bool) -> tu
     def save(batch):
         factstore.append([_facts_to_dict(f) for f in batch])
 
+    def tick(done, total, waiting_sec):
+        BEAT.beat(
+            "段3 Keepa検証", done=done, total=total,
+            tokens_left=verifier.budget.left,
+            tokens_per_code=round(verifier.budget.tokens_per_code, 2),
+            note=(f"トークン回復待ち あと{waiting_sec}秒" if waiting_sec else "検証中"),
+        )
+
+    BEAT.beat("段3 Keepa検証", done=0, total=len(todo), note="開始")
     if todo:
-        verifier.verify_all(todo, batch_size=cfg.keepa_batch, on_batch=save)
+        verifier.verify_all(todo, batch_size=cfg.keepa_batch, on_batch=save, on_tick=tick)
 
     cached = factstore.load()
     facts_by_jan = {jan: _dict_to_facts(row) for jan, row in cached.items()}
@@ -321,6 +340,8 @@ def profit_gem() -> str:
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--status", action="store_true",
+                    help="走っているスキャンの生死と進捗を1行で表示して終了")
     ap.add_argument("--stage", choices=["all", "harvest", "verify"], default="all")
     ap.add_argument("--suppliers", type=int, default=5,
                     help="処理するサプライヤー数。0 で全社（既定5＝小さく試す）")
@@ -345,6 +366,12 @@ def main() -> None:
     ap.add_argument("--allow-used", action="store_true",
                     help="中古品を除外しない。⛔ 古物商許可を取得してからのみ使用可")
     args = ap.parse_args()
+
+    if args.status:
+        # ⚠️ ここで ps や PID を見ないこと。PID は使い回されるし、
+        #    生きているだけで何もしていないプロセスもある。**心拍の更新時刻だけを見る。**
+        print(heartbeat.describe(HEARTBEAT))
+        return
 
     cfg = config.ScanConfig(
         wholesale_min=args.min_wholesale,
@@ -411,6 +438,7 @@ def main() -> None:
         log(f"  → {CANDIDATES_CSV}")
 
     stats["elapsed_sec"] = round(time.time() - started, 1)
+    BEAT.beat("完了", note=f"所要 {stats['elapsed_sec']:.0f}秒")
     store.write_json(STATS_JSON, stats)
     log(f"統計を {STATS_JSON} に保存しました")
 

@@ -181,8 +181,13 @@ class TokenBudget:
         need = batch_size * self.tokens_per_code * 1.3   # 3割の安全代
         return int(max(need, self.min_before_batch))
 
-    def wait_if_needed(self, log=print, batch_size: int = 0) -> bool:
-        """必要なら回復を待つ。諦めるべき状況なら False を返す（呼び出し側が止める）。"""
+    def wait_if_needed(self, log=print, batch_size: int = 0, on_tick=None) -> bool:
+        """必要なら回復を待つ。諦めるべき状況なら False を返す（呼び出し側が止める）。
+
+        `on_tick` は待機中に約30秒ごとに呼ばれます。**心拍を打ち続けるため**で、
+        これが無いと「トークンを待っている15分」と「死んでいる15分」が
+        外から同じに見えます（実際にその取り違えをやりました）。
+        """
         threshold = self.required_for(batch_size) if batch_size else self.min_before_batch
         if self.left is None or self.left >= threshold:
             self.starved_since = None
@@ -198,7 +203,14 @@ class TokenBudget:
         wait = min(wait, 900.0)
         log(f"   トークン残 {self.left} → {threshold} まで {wait:.0f}秒待機"
             f"（実測 {self.tokens_per_code:.2f} トークン/件）")
-        time.sleep(wait)
+        # 長い sleep をぶつ切りにして、その隙間で心拍を打つ。
+        remaining = wait
+        while remaining > 0:
+            slice_sec = min(30.0, remaining)
+            time.sleep(slice_sec)
+            remaining -= slice_sec
+            if on_tick:
+                on_tick(int(remaining))
         return True
 
 
@@ -306,12 +318,17 @@ class KeepaVerifier:
             out.append(facts)
         return out
 
-    def verify_all(self, jans: list, *, batch_size: int = None, on_batch=None) -> list:
-        """全 JAN をバッチに割って検証する。バッチごとに on_batch(results) を呼ぶ（逐次保存用）。"""
+    def verify_all(self, jans: list, *, batch_size: int = None, on_batch=None,
+                   on_tick=None) -> list:
+        """全 JAN をバッチに割って検証する。バッチごとに on_batch(results) を呼ぶ（逐次保存用）。
+
+        `on_tick(done, total, waiting_sec)` は待機中も呼ばれます（心拍用）。
+        """
         batch_size = batch_size or config.KEEPA_CODE_BATCH
         results = []
         for i in range(0, len(jans), batch_size):
-            if not self.budget.wait_if_needed(self.log, batch_size):
+            tick = (lambda rest, _i=i: on_tick(_i, len(jans), rest)) if on_tick else None
+            if not self.budget.wait_if_needed(self.log, batch_size, on_tick=tick):
                 self.log("!! トークン枯渇のため打ち切ります（ここまでの結果は保存済み）")
                 break
             chunk = jans[i : i + batch_size]
@@ -321,6 +338,8 @@ class KeepaVerifier:
             results.extend(got)
             if on_batch:
                 on_batch(got)
+            if on_tick:
+                on_tick(i + len(chunk), len(jans), 0)
             hit = sum(1 for f in got if f.found)
             self.log(
                 f"   [{i + len(chunk)}/{len(jans)}] Keepa {len(chunk)}件 → "
