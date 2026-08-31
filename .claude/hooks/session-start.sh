@@ -231,6 +231,74 @@ ${LB_LINE}
 - 運用書: workspace/output/deliverables/T-20260831-002/README.md"
 fi
 
+# --- リマインダー⑤: Amazon セラーセントラル日次チェックの実行漏れ検知（2026-08-31 / T-20260826-004）---
+#
+# 背景: 日本店が 2026-08-01 に停止したことに約4週間気づきませんでした。再発防止として
+#       毎日12:00のスケジュールタスク（~/.claude/scheduled-tasks/amazon-seller-central-daily-check/）
+#       を組みましたが、**「タスクを登録した」ことと「実際に動いている」ことは別**です。
+#       アプリが閉じていれば発火せず、Chrome が落ちていれば画面確認が失敗します。
+#       そして止まっていても誰も気づきません（night-shift.plist は814回死に続けました）。
+#
+# だから判定材料はログの最新見出し（`## YYYY-MM-DD`）**だけ**にします。
+# スケジューラの内部状態は見ません。見えたとしても「実行したが何も確認できなかった」を
+# 成功と区別できないためです。**ログに行が増えたことだけが、動いた証拠です。**
+
+MON_LOG="$REPO/workspace/monitoring/amazon-daily-check.md"
+MON_MSG=""
+MON_HOWTO="確認先: ~/.claude/scheduled-tasks/amazon-seller-central-daily-check/
+- アプリのサイドバー「Scheduled」に amazon-seller-central-daily-check があるか、enabled か
+- 無い／無効なら再登録が必要。スケジュールは毎日12:00（cron \`0 12 * * *\`）
+- ログ本体: workspace/monitoring/amazon-daily-check.md
+- 手順書: workspace/output/deliverables/T-20260826-004/03_日次モニタリングの仕組みと確認手順_20260831.md"
+
+# 「2日以上前」の閾値＝昨日。昨日より古ければ警告する（今日・昨日は正常）。
+MON_THRESHOLD="$(date -v-1d +%Y-%m-%d 2>/dev/null || date -d 'yesterday' +%Y-%m-%d 2>/dev/null || echo "$TODAY")"
+
+if [ ! -f "$MON_LOG" ]; then
+  MON_MSG="
+
+【SessionStart リマインダー⑤：Amazon 日次チェックのログが存在しません】
+\`workspace/monitoring/amazon-daily-check.md\` が見つかりません。**日次チェックが一度も実行されていないか、ログが消えています。**
+スケジュールタスクが止まっている可能性があります。
+
+${MON_HOWTO}"
+else
+  # 最新の日付見出しを1件だけ取る。ログは新しい順なので先頭が最新。
+  MON_LAST="$(grep -m1 -oE '^## [0-9]{4}-[0-9]{2}-[0-9]{2}' "$MON_LOG" 2>/dev/null | awk '{print $2}' || true)"
+
+  if [ -z "$MON_LAST" ]; then
+    MON_MSG="
+
+【SessionStart リマインダー⑤：Amazon 日次チェックの記録が0件です】
+\`workspace/monitoring/amazon-daily-check.md\` に \`## YYYY-MM-DD\` の見出しが1件もありません。**日次チェックが一度も記録されていません。**
+スケジュールタスクが止まっている可能性があります。
+
+${MON_HOWTO}"
+  elif [[ "$MON_LAST" < "$MON_THRESHOLD" ]]; then
+    MON_DAYS="?"
+    if command -v python3 >/dev/null 2>&1; then
+      MON_DAYS="$(python3 -c "
+import datetime
+try:
+    d = datetime.date.fromisoformat('$MON_LAST')
+    print((datetime.date.today() - d).days)
+except Exception:
+    print('?')
+" 2>/dev/null || echo '?')"
+    fi
+
+    MON_MSG="
+
+【SessionStart リマインダー⑤：Amazon 日次チェックが ${MON_DAYS} 日間実行されていません】
+最後の記録は **${MON_LAST}**（今日=${TODAY}）。**日次チェックが ${MON_DAYS} 日間実行されていません。スケジュールタスクが止まっている可能性があります。**
+
+Amazon の通知・申し立てステータス・サポート返信を見落とすと復旧が止まります（2026-08-01 の日本店停止に約4週間気づかなかった前例あり）。
+まず今この turn で手動確認を回し、そのうえで下記を点検してください。
+
+${MON_HOWTO}"
+  fi
+fi
+
 # --- 掲出順（2026-08-31 / T-20260831-003 で変更）---
 #
 # 旧: ① → ②(next_check_at) → ③(inbox) → ④
@@ -241,7 +309,10 @@ fi
 #       ② は社長への問いかけリストであり、②が長い日ほど ③ が埋没するという逆相関がある。
 #       件数が増えるほど埋もれる配置は、放置を検知する仕組みとして自己矛盾しています。
 #       行動を要する短いものを前に、一覧性の長いものを後ろに置きます。
-MESSAGE="${SYNC_MSG}${INBOX_MSG}${LIST_MSG}${REMINDER_MSG}"
+# ⑤ は 2026-08-31 に追加。掲出は ① の直後（① → ⑤ → ③ → ④ → ②）。
+# 番号は作成順、掲出順とは別です（③④② が既にそうなっています）。
+# ⑤ は「止まっている時だけ」出るため、平常日は1行も増えません。だから最前列に置けます。
+MESSAGE="${SYNC_MSG}${MON_MSG}${INBOX_MSG}${LIST_MSG}${REMINDER_MSG}"
 
 # JSON エスケープ（python が無い環境を考慮し、jq があれば使う）
 if command -v jq >/dev/null 2>&1; then
