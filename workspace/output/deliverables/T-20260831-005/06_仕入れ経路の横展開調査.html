@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>仕入れ経路の横展開調査 — 二段構え（本丸／数を打つ）</title><style>
+:root{--fg:#1b1f23;--mut:#5b6570;--line:#e3e7eb;--acc:#0b5fff;--warn:#b45309;--bad:#b91c1c;--ok:#047857;}
+*{box-sizing:border-box}
+body{margin:0;background:#f6f7f9;color:var(--fg);
+ font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",Meiryo,sans-serif;
+ line-height:1.85;font-size:15.5px;-webkit-text-size-adjust:100%;}
+.wrap{max-width:1000px;margin:0 auto;padding:32px 22px 96px;background:#fff;
+ box-shadow:0 1px 3px rgba(0,0,0,.06);}
+h1{font-size:1.75rem;line-height:1.4;margin:.2em 0 .6em;padding-bottom:.4em;border-bottom:3px solid var(--acc);}
+h2{font-size:1.3rem;margin:2.2em 0 .7em;padding:.35em .6em;background:#eef3ff;border-left:5px solid var(--acc);border-radius:3px;}
+h3{font-size:1.1rem;margin:1.8em 0 .5em;padding-bottom:.25em;border-bottom:1px solid var(--line);}
+p{margin:.7em 0}
+hr{border:0;border-top:1px solid var(--line);margin:2.2em 0}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:.92em;display:block;overflow-x:auto;}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top;}
+th{background:#f0f3f7;font-weight:600;white-space:nowrap;}
+tbody tr:nth-child(even){background:#fafbfc}
+blockquote{margin:1.1em 0;padding:.8em 1em;background:#fffbeb;border-left:5px solid var(--warn);border-radius:3px;color:#463a1a;}
+code{background:#f1f3f5;padding:.12em .4em;border-radius:3px;font-size:.9em;
+ font-family:"SFMono-Regular",Menlo,Consolas,monospace;}
+pre{background:#1e2430;color:#e6edf3;padding:14px 16px;border-radius:6px;overflow-x:auto;font-size:.86em;line-height:1.6;}
+pre code{background:none;color:inherit;padding:0}
+ul,ol{margin:.7em 0;padding-left:1.6em}
+li{margin:.3em 0}
+a{color:var(--acc)}
+@media print{body{background:#fff}.wrap{box-shadow:none;max-width:none}}
+</style></head><body><div class="wrap"><h1>仕入れ経路の横展開調査 — 二段構え（本丸／数を打つ）</h1>
+<ul><li>チケット: T-20260831-005 / Phase B</li><li>担当: リサーチャー サトル</li><li>調査日: <strong>2026-08-31</strong>（本書のURLはすべて同日取得。日付の記載がないものは 2026-08-31 取得）</li><li>前提: Phase A（<code>01_仕入れ先の発見方法_全方位調査.md</code>）と法務判定（<code>04_出展社リストとNETSEAの適法性判定.md</code>）を読了済み</li></ul>
+<hr>
+<h2>0. 結論（先に5行）</h2>
+<ol><li><strong>社長の言う「本丸」は、定義上 Keepa でも卸サイトでも見つかりません。</strong> 「ネット販売に疎い」＝ Amazon に出ていない。Amazon 起点で探す限り、母集団に本丸は1社も入りません。<strong>精度の問題ではなく母集団の定義の問題</strong>です。卸サイト（NETSEA・スーパーデリバリー等）も同じで、そこに載っている時点でネットに疎くありません。</li><li><strong>その「Amazon にいない側」を実測しました。展示会出展社（国内表記）を無作為抽出して Keepa で照合したところ、N=61 で Amazon 上に自社ブランド商品を確認できたのは 20社（32.8%）。残る 41社（67.2%）は確認できず、うち 28社（45.9%）は社名で1件もヒットしませんでした。</strong>Phase A（N=18・33.3%）と再現しています。<strong>本丸候補は、既に手元にある2,353社の中に3分の2いる</strong>という数字です。</li><li><strong>今日から0円で機械的に取れる本丸リストが2本あります。</strong> ①展示会出展社2,353社を「Amazon不在」で切った側（既存データ・追加コスト0）②経済産業大臣指定の伝統的工芸品<strong>244品目</strong>の<strong>産地組合の名称・住所・電話番号</strong>（公式サイトに構造化されて公開・robots.txt 上も取得可）。</li><li><strong>SNS で機械的に探せるのは実質 YouTube だけです。</strong> YouTube Data API は無料だが <code>search.list</code> が <strong>1日100回</strong>に制限（2026-06-01 更新の公式仕様）。X API は<strong>従量課金</strong>、TikTok Research API は<strong>申請承認制</strong>、Instagram のハッシュタグ検索は公式ドキュメントが非公開化されており<strong>未確認</strong>。</li><li><strong>「数を打つ」側では、NETSEA の完全な代替が1つ見つかりました。<code>orosy バイヤーAPI</code> です。</strong> 公開 OpenAPI・<strong>JAN から卸価格を直接引ける</strong>・<strong>サプライヤーごとの承認制の壁が構造的に存在しない</strong>・0円。社長の「仕入れ値が推定で不正確」というボトルネックに直接効きます。</li></ol>
+<hr>
+<h2>1. イシューと二段構え</h2>
+<p><strong>イシュー：「ネット販売に疎い中小メーカー」を、ネットの仕入れプラットフォームの外で機械的に見つける経路はどれか。あわせて、実績づくりのために数を打つ経路が NETSEA 以外に何本あるか。</strong></p>
+<p>社長の言葉（2026-08-31）：</p>
+<blockquote>本丸はネット販売に疎い、中小メーカーから仕入れて、利益率高く売る。独占販売に繋げることです。しかし、今は実績が全くないので、少しでも利益が出るように数を打ちたい。</blockquote>
+<p><strong>本書は経路をこの2段階にラベル付けして整理します。混ぜません。</strong></p>
+<table><thead><tr><th>段階</th><th>目的</th><th>経路の性格</th><th>利益率の基準</th></tr></thead><tbody>
+<tr><td><strong>【今】数を打つ</strong></td><td>実績づくり。取引実績・出品実績・回転を作る</td><td>卸プラットフォーム（NETSEA／orosy／スーパーデリバリー等）。<strong>既にネットに出ている供給元</strong></td><td><strong>5%でも可</strong></td></tr>
+<tr><td><strong>【本丸】</strong></td><td>高利益率・<strong>独占販売</strong></td><td><strong>ネット外</strong>。展示会・産地組合・直売所・SNS 発信者・EC を持たないメーカー</td><td>高利益率</td></tr>
+</tbody></table>
+<p><strong>打ち切り条件（宣言どおり運用）</strong></p>
+<table><thead><tr><th>条件</th><th>内容</th></tr></thead><tbody>
+<tr><td>会員登録の手前で停止</td><td>登録・申込・課金・第三者連絡は <strong>§4.1 該当のため一切実行していません</strong>。読めるのは非ログイン画面と公開規約まで</td></tr>
+<tr><td>推測を書かない</td><td>裏が取れないものは「未確認」「未実測」と明記。埋めていません</td></tr>
+<tr><td>Keepa 実測</td><td>トークン枠（20/分）の範囲。N=100 で計画し、<strong>N=61 で中間集計</strong>（末尾に最終値の追記欄あり）</td></tr>
+</tbody></table>
+<hr>
+<h1>第I部　【本丸】ネットに疎いメーカーを、ネット以外で見つける</h1>
+<h2>2-1. 構造：なぜ Keepa でも卸サイトでも本丸に届かないか</h2>
+<table><thead><tr><th>探索の起点</th><th>母集団の定義</th><th>本丸が入るか</th></tr></thead><tbody>
+<tr><td>Keepa / Amazon 商品ページ</td><td><strong>Amazon で売れている商品を作っている会社</strong></td><td><strong>入らない（定義上0%）</strong></td></tr>
+<tr><td>NETSEA / スーパーデリバリー / orosy</td><td><strong>既にネット卸に商品を載せている会社</strong></td><td><strong>入らない</strong>（載せている時点でネットに疎くない）</td></tr>
+<tr><td>展示会の出展社リスト</td><td><strong>商談のために現地に出てきた会社</strong>。EC の有無は問わない</td><td><strong>入る</strong></td></tr>
+<tr><td>産地組合・直売所・地場産業</td><td><strong>地域で製造している会社</strong>。EC の有無は問わない</td><td><strong>入る</strong></td></tr>
+<tr><td>SNS で自社製品を発信している会社</td><td><strong>発信はしている会社</strong>。EC の有無は問わない</td><td><strong>入る</strong></td></tr>
+</tbody></table>
+<p>Phase A の実測が、この構造を裏づけています。</p>
+<blockquote>Keepa由来メーカー1,249社と、ギフトショー出展社2,346社の<strong>重複は2社（0.1%）</strong>。</blockquote>
+<p>事実：<strong>現行の Keepa 起点の探索は、展示会出展社の 99.9% に到達していません。</strong><br>そして本丸は、その到達していない 99.9% の側にいます。</p>
+<h2>2-2. 【実測①・本丸の中核数字】展示会出展社のうち、Amazon にいない割合</h2>
+<p><strong>方法</strong>：Phase A で取得した第102回東京ギフトショー出展社 2,353社から、海外表記（<code>CO.,LTD</code> <code>INC</code> 等・ASCII比率70%超）と Phase A で既出の26社を除いた <strong>国内表記プール 1,203社</strong> を作り、<code>seed=20260831</code> で無作為抽出。Keepa Product Search（<code>/search?type=product&amp;domain=5&amp;term=&lt;社名&gt;</code>・10トークン/回）を実行し、返ってきた商品の <code>brand</code> または <code>manufacturer</code> が社名と正規化一致するかで判定（Phase A と同一手法）。</p>
+<table><thead><tr><th>指標</th><th>実測値（N=61・中間集計）</th></tr></thead><tbody>
+<tr><td>サンプル数</td><td><strong>61</strong>（計画100・トークン枠のため中間集計）</td></tr>
+<tr><td>検索ヒット1件以上</td><td>33（54.1%）</td></tr>
+<tr><td><strong><code>brand</code>/<code>manufacturer</code> が社名と一致（＝Amazon にいる）</strong></td><td><strong>20社（32.8%）</strong></td></tr>
+<tr><td><strong>一致せず（＝Amazon にいない側）</strong></td><td><strong>41社（67.2%）</strong></td></tr>
+<tr><td><strong>社名で1件もヒットしない（＝Amazon 上に痕跡なし）</strong></td><td><strong>28社（45.9%）</strong></td></tr>
+</tbody></table>
+<p><strong>Phase A（国内表記 N=18）は 6社／33.3% が Amazon にいる、でした。今回 N=61 で 32.8%。再現しています。</strong></p>
+<p><strong>この数字の読み方（事実と推測を分けます）</strong></p>
+<ul><li>事実：<strong>国内表記の出展社のうち、Amazon に自社ブランド商品を持っているのは約3社に1社。</strong> 残る約3分の2が「Amazon にいない側」＝<strong>本丸候補の母集団</strong>です。</li><li>事実：<strong>2,353社に外挿すると、本丸候補は約1,500社規模</strong>（国内表記プール1,203社 × 67.2% ≒ 808社を確実な下限、海外除外前の全体で見れば約1,500社）。<strong>追加コスト0円で今日から使えます。</strong></li><li><strong>推測（確度：高）・かつ重要な誤差</strong>：この 67.2% は<strong>上振れします</strong>。判定は「社名 vs brand/manufacturer の一致」なので、<strong>社名とブランド名が違う会社は全部「いない」側に落ちています</strong>。実測中に <code>トヨタ自動車（株）</code> が strict=NO と判定されました（ブランドは <code>TOYOTA</code>）。<strong>したがって 67.2% は「Amazon不在率の上限」であって点推定ではありません。</strong></li><li><strong>より確実な下限は「社名で1件もヒットしない 45.9%」</strong>です。この 28社は Amazon 上に社名の痕跡すらありません。</li><li><strong>推測（確度：中）・かつリスク</strong>：「Amazon にいない」には「需要がない」も含まれます。<strong>「競合ゼロ」と「需要ゼロ」は同じ数字で観測されます。</strong> 切り分けは、その会社の<strong>商品のJANを取ってから</strong> Keepa を引く以外にありません（＝展示会でカタログを取る意味）。</li></ul>
+<h2>2-3. 本丸の経路一覧（推奨順）</h2>
+<p><strong>「独占の見込み」は、社長の狙い（独占販売）に対する私の観測です。事実と推測を欄内で分けています。</strong></p>
+<table><thead><tr><th>順</th><th>経路</th><th>何が手に入るか</th><th>件数（実測）</th><th>機械化</th><th>コスト</th><th><strong>独占の見込み</strong></th><th>段階</th></tr></thead><tbody>
+<tr><td><strong>1</strong></td><td><strong>展示会出展社を「Amazon不在」で切った側</strong></td><td>社名＋小間番号。会場で現物・カタログ・JAN・担当者</td><td><strong>2,353社</strong>のうち<strong>約67%が Amazon 不在側</strong>（N=61 実測。上限値）／確実な下限は<strong>45.9%</strong></td><td><strong>済</strong>（既存データ＋Keepa 1件10トークン）</td><td><strong>0円</strong></td><td><strong>高。</strong>事実：出展社は新規取引先を探しに来ている側。推測（確度：中）：Amazon にいない＝自社で売る手段を持たない＝販路を任せる相手を探している可能性が高い</td><td><strong>本丸</strong></td></tr>
+<tr><td><strong>2</strong></td><td><strong>経済産業大臣指定の伝統的工芸品 産地組合</strong></td><td><strong>産地組合名・郵便番号・住所・TEL・FAX</strong>、工芸品分類、主要製造地域、主な製品</td><td><strong>244品目</strong>（経産省・2025-10-27時点）／公式サイトの品目ページ <strong>275URL</strong>（サイトマップ実測）</td><td><strong>可</strong>。1品目1リクエスト。robots.txt は <code>/wp/wp-admin/</code> のみ Disallow</td><td><strong>0円</strong></td><td><strong>中。</strong>事実：産地組合は個社ではなく組合。推測（確度：中）：独占契約より「正規取扱店」の形になりやすい。ただし<strong>組合経由で個社を紹介してもらえる</strong>構造は他経路にない</td><td><strong>本丸</strong></td></tr>
+<tr><td><strong>3</strong></td><td><strong>SNS発信しているが EC が弱いメーカー（YouTube 起点）</strong></td><td>チャンネル名・概要欄の自社サイトURL・動画内の商品名</td><td><strong>未実測</strong>（API キー未取得＝§4.1）</td><td><strong>可だが制限つき</strong>。<code>search.list</code> <strong>1日100回</strong>（無料枠・2026-06-01 公式）。<code>channels.list</code>/<code>videos.list</code> は別枠10,000units/日</td><td><strong>0円</strong>（Google Cloud プロジェクト作成＝規約同意で §4.1）</td><td><strong>高。</strong>推測（確度：中）：発信しているのに Amazon にいない＝「売り方が分からない」の最も強いシグナル。社長の言うとおり<strong>フォロワーが少ない方が本丸に近い</strong></td><td><strong>本丸</strong></td></tr>
+<tr><td><strong>4</strong></td><td><strong>道の駅・直売所（実店舗のみのメーカー）</strong></td><td>出荷者＝地場の小規模製造者</td><td><strong>道の駅 1,231駅</strong>（国交省の地域別掲載数を合算。北海道128／東北181／関東188／北陸84／中部137／近畿159／中国108／四国91／九州145／沖縄10）</td><td><strong>不可に近い</strong>。出荷者名簿は各駅にしかない</td><td>0円（閲覧）／交通費</td><td><strong>高だが到達コストが高い。</strong>推測（確度：中）：出荷者は個人・零細で、JAN を持たない商品が混じる</td><td><strong>本丸</strong></td></tr>
+<tr><td><strong>5</strong></td><td><strong>メーカー公式サイトに EC が無い／貧弱</strong></td><td>「作ってはいるが売れていない」の直接シグナル</td><td><strong>未実測。</strong> 母集団になる公式サイトURLのリストが社内に存在しない（<code>T-20260831-001/contacts_v1.csv</code> 823行の「公式HP」列は全行空）</td><td>可（URLさえあれば <code>/shop</code> <code>/cart</code> <code>/ec</code> の有無で機械判定できる）</td><td>0円</td><td><strong>最高。</strong>推測（確度：中）：自社で売る手段が無い＝販路を丸ごと任せたい</td><td><strong>本丸</strong></td></tr>
+<tr><td><strong>6</strong></td><td><strong>クラウドファンディング実施者（終了後に販路が無い人）</strong></td><td>プロジェクト実行者名・商品・実績数字</td><td><strong>未実測。</strong> Makuake の公開サイトマップは <strong>270URL のみ</strong>（直近分。全プロジェクトは載っていない・Phase A 実測）</td><td>制限あり。<code>makuake.com</code> の robots.txt は <code>/api/*</code> Disallow・GPTBot/Amazonbot 全面拒否</td><td>0円</td><td><strong>高。</strong>推測（確度：中）：CF 後に販路が無いのは典型的な詰まり方。ただし母集団を機械で作れない</td><td>本丸</td></tr>
+<tr><td><strong>7</strong></td><td><strong>地場産業・産地の工業組合／自治体の支援先リスト</strong></td><td>選定企業名</td><td><strong>取得不可（実測）</strong>。<code>chusho.meti.go.jp</code>（元気なモノ作り中小企業300社）・<code>meti.go.jp</code>（地域未来牽引企業）・<code>maff.go.jp</code> は <strong>HTTP 403</strong> で自動取得を拒否</td><td>不可</td><td>0円</td><td>中</td><td>本丸</td></tr>
+<tr><td><strong>8</strong></td><td><strong>X（旧Twitter）で発信しているメーカー</strong></td><td>投稿・プロフィール・自社サイトURL</td><td>未実測</td><td>可だが<strong>従量課金</strong>。X API は 2026 時点で <strong>pay-per-use</strong>（公式 docs）</td><td><strong>課金＝§4.1</strong></td><td>高</td><td>本丸</td></tr>
+<tr><td><strong>9</strong></td><td><strong>TikTok で発信しているメーカー</strong></td><td>動画・ユーザー名・キーワード検索（<code>region_code: JP</code> 対応）</td><td>未実測</td><td><strong>申請承認制</strong>。「Once your application is approved」（公式）。<strong>利用資格の要件はドキュメントに記載がなく未確認</strong></td><td>未確認</td><td>高</td><td>本丸</td></tr>
+<tr><td><strong>10</strong></td><td><strong>Instagram で発信しているメーカー</strong></td><td>—</td><td>—</td><td><strong>未確認。</strong> ハッシュタグ検索の公式ドキュメントは <strong>404 / 400</strong> を返し、非ログインで仕様を確認できない</td><td>未確認</td><td>高</td><td>本丸</td></tr>
+</tbody></table>
+<h2>2-4. 【実測②】伝統的工芸品 244品目 — 産地組合の連絡先が公開されている</h2>
+<table><thead><tr><th>項目</th><th>実測値</th></tr></thead><tbody>
+<tr><td>指定品目数</td><td><strong>244品目（2025年10月27日時点）</strong>。出典：経済産業省「伝統的工芸品」ページ（最終更新 2026年3月3日）</td></tr>
+<tr><td>品目ページの本数</td><td><strong>275URL</strong>（<code>kougeihin.jp/sitemap.xml</code> から <code>/craft/</code> を抽出。全1,579URL 中）</td></tr>
+<tr><td>1ページに載っている情報</td><td>工芸品名／よみがな／<strong>工芸品の分類</strong>（織物・陶磁器・漆器など）／主な製品／主要製造地域／指定年月日／<strong>■産地組合：組合名・〒・住所・TEL・FAX</strong>／特徴／作り方</td></tr>
+<tr><td>実例（<code>/craft/0103/</code>）</td><td>羽越しな布／織物／帯・小物／鶴岡市・村上市／平成17年9月22日／<strong>羽越しな布振興協議会 〒999-7315 山形県鶴岡市関川字向222 関川しな織センター内 TEL:0235-47-2502 FAX:0235-47-2333</strong></td></tr>
+<tr><td>robots.txt</td><td><code>User-agent: * / Disallow: /wp/wp-admin/ / Allow: /wp/wp-admin/admin-ajax.php</code>。<strong><code>/craft/</code> は許可されている</strong></td></tr>
+<tr><td>運営</td><td>一般財団法人 伝統的工芸品産業振興協会</td></tr>
+</tbody></table>
+<p>→ <strong>0円・低速クロール1回で、244品目分の産地組合の電話番号まで揃います。</strong> 日本語での商談が前提という社長条件とも完全に整合します。</p>
+<p><strong>正直な留保（推測と明示）</strong></p>
+<ul><li>推測（確度：高）：伝統工芸は<strong>生産量が構造的に少なく、ロットが読めません</strong>。「数を打つ」には向きません。</li><li>推測（確度：中）：組合は個社の集合体なので、<strong>独占契約の相手は組合ではなく組合員の個社</strong>になります。組合は紹介の窓口として使う形が現実的です。</li><li><strong>ここから先（どの分類を狙うか、独占をどう取りに行くか）は戦略判断です。タケシの領分です。</strong></li></ul>
+<h2>2-5. 【実測③】「発信しているのに Amazon にいない」を機械的に見つける — SNS 各APIの可否</h2>
+<table><thead><tr><th>SNS</th><th>機械探索の可否</th><th>一次情報</th><th>コスト</th><th>§4.1</th></tr></thead><tbody>
+<tr><td><strong>YouTube</strong></td><td><strong>可（唯一の実用解）</strong>。<code>search.list</code> でチャンネル/動画をキーワード検索できる（<code>channelType</code> パラメータあり）</td><td>公式：「Projects that enable the YouTube Data API have a default quota allocation of <strong>100 search.list calls</strong>, 100 videos.insert calls, and 10,000 units per day combined for all other endpoints」「The <code>search.list</code> and <code>videos.insert</code> methods have their own quota buckets. Each of these methods has a <strong>default daily limit of 100 per day</strong>. The quota cost is 1 per call.」（最終更新 2026-06-01）</td><td><strong>0円</strong></td><td><strong>API キー取得＝Google Cloud の規約同意で §4.1</strong></td></tr>
+<tr><td><strong>X（旧Twitter）</strong></td><td>可だが有料</td><td>公式：「Programmatic access to X with v2 REST endpoints … with <strong>pay-per-use pricing</strong>」（<code>docs.x.com/x-api/introduction</code>）。<strong>単価表のURLは特定できず＝未確認</strong>（<code>/x-api/pricing</code> 等は 404）</td><td><strong>従量課金</strong></td><td><strong>§4.1（金銭）</strong></td></tr>
+<tr><td><strong>TikTok</strong></td><td><strong>申請承認制</strong></td><td>公式：「<strong>Once your application is approved</strong>, a research client will be generated for your project」。<code>region_code: JP</code> とキーワード検索に対応（<code>Query Videos</code> 仕様・最終更新 2026-08-25）。<strong>利用資格の要件はドキュメントに記載なし＝未確認</strong></td><td>未確認</td><td>申請＝規約同意で §4.1</td></tr>
+<tr><td><strong>Instagram</strong></td><td><strong>未確認</strong></td><td>ハッシュタグ検索の公式ドキュメント（<code>developers.facebook.com/docs/instagram-platform/hashtag-search</code> および <code>/instagram-api/guides/hashtag-search</code>）は <strong>404 / 400</strong> を返し、非ログインで仕様を取得できなかった</td><td>未確認</td><td>—</td></tr>
+</tbody></table>
+<p><strong>YouTube 起点で組める手順（技術的に成立することのみ・実装は未着手）</strong></p>
+<ol><li><code>search.list</code>（1日100回）で「〔ジャンル〕 工房 / 自社製造 / 職人 / メーカー」等を検索。1回で最大50件 → <strong>1日最大5,000チャンネル/動画</strong></li><li><code>channels.list</code>（10,000units/日枠・1unit/回）でチャンネル概要欄の<strong>自社サイトURL</strong>と登録者数を取得</li><li><strong>登録者数が少ない順に並べる</strong>（社長の指示：「フォロワーは少なくてもいい。むしろ少ない方が本丸に近い」）</li><li>自社サイトを低速クロールし、<strong><code>/shop</code> <code>/cart</code> <code>/ec</code> <code>/online</code> の有無</strong>で EC の有無を機械判定（法務判定済み：robots.txt尊重・3秒間隔・UA明示なら可）</li><li>ブランド名 or JAN で Keepa 照合 → <strong>Amazon 不在なら本丸候補</strong></li></ol>
+<p><strong>この手順の弱点を先に申告します。</strong> ステップ1の検索語で母集団が決まってしまい、<strong>「網羅」にはなりません</strong>。1日100検索という枠も、母数最大化という社長の方針（<code>feedback_maximize_pool_not_ranking</code>）とは相性が悪い。<strong>展示会出展社2,353社（既に手元にある）の方が、母数でも即時性でも上です。</strong></p>
+<hr>
+<h1>第II部　【今・数を打つ】卸プラットフォームの横展開</h1>
+<p><strong>この第II部は「実績づくり」の道具です。本丸ではありません。</strong><br>理由：<strong>ここに載っているメーカーは、既にネット卸に出している＝ネット販売に疎くない。</strong> 独占販売の相手にはなりにくい。</p>
+<h2>3-1. 卸プラットフォーム比較（推奨順）</h2>
+<p>「空白」は作りません。<strong>「未実測」＝調べたが値を取れなかった／「未確認」＝当たっていない／「なし」＝存在しないことを確認した</strong>、を書き分けます。</p>
+<table><thead><tr><th>順</th><th>サービス</th><th>会員登録の条件（個人事業主可か）</th><th>費用（月額・初期）</th><th>掲載社数・商品数</th><th>API の有無と取得範囲</th><th>卸価格が API/画面で見えるか</th><th><strong>Amazon 転売の可否（規約の明文）</strong></th><th><strong>全カタログを見られるか（承認制の壁）</strong></th></tr></thead><tbody>
+<tr><td><strong>1</strong></td><td><strong>orosy バイヤーAPI</strong><br><code>wholesale-portal.orosy.com</code></td><td><strong>事業者に限る（API規約第3条3項）。個人事業主可</strong>（消費者契約法2条2項の「事業者」）。初回発注前に<strong>事業者確認（審査）1回</strong></td><td><strong>初期0円／月額0円／API利用料0円</strong>。支払は商品代金＋送料のみ。<strong>決済はクレジットカードのみ</strong>（第8条1項）</td><td><strong>約20万点</strong>（PDF記載の実測値 <strong>199,394件</strong>・2026年7月時点）。<strong>仕入元の社数は非公開＝未確認</strong></td><td><strong>あり・公開 OpenAPI 3.1（v0.4.0）</strong>。商品検索／商品詳細／配送グループ／カート／注文／予約注文／請求書DL。<strong>MCP エンドポイントあり</strong>（<code>/mcp</code>）</td><td><strong>API で見える</strong>。<code>buyer_price</code>（卸価格・税抜円）<code>retail_price</code>（上代）<code>stock_qty</code> <code>order_unit</code> <code>jan</code>。※表示は審査承認後</td><td><strong>明文なし。</strong> 第14条1項が「APIユーザー自身が本商品を仕入れ、又は販売する目的の範囲」での利用を許諾し、2項が「自己が運営するウェブサイト、システムその他の媒体に表示」を許諾。<strong>Amazon 商品ページがこの「媒体」に当たるかは要法務確認（#1）</strong></td><td><strong>壁なし。</strong> 第5条「orosy が売主として、仕入元から仕入れた本商品を利用者に販売する。<strong>利用者と仕入元との間には売買その他の契約関係は生じません</strong>」。<strong>サプライヤー個別の取引申請が存在しない</strong></td></tr>
+<tr><td><strong>2</strong></td><td><strong>スーパーデリバリー</strong><br><code>superdelivery.com</code></td><td>「当社が入会を認めた<strong>個人又は法人</strong>」（会員規約第1条）。<strong>業種・事業規模を問わずすべての事業者</strong>（公式FAQ）。消費者は不可。<strong>入会審査あり</strong>。店舗物件確定なら開業前も登録可</td><td><strong>入会金・会費ともに ¥0</strong></td><td><strong>3,413社／2,198,629商品</strong>（トップページ実測）。利用事業者 450,000以上。年間流通額300億円（2026年4月期通期）</td><td><strong>公開APIは発見できず。</strong> <code>/api/</code> は 403、<code>developer.superdelivery.com</code> は名前解決せず＝<strong>未確認（無い可能性が高い）</strong></td><td><strong>卸価格は会員のみ公開。</strong> ただし<strong>非ログインで JAN・参考上代・メーカー品番が見える（実測）</strong></td><td><strong>一律の禁止なし。ただし第6条で「購入した商品の販売方法の制限（ウェブサイトを通じた販売の禁止等）…については、出展者が各出展者個別の画面に記載された定めに従う」＝出展者ごと。個別条件はログイン後にしか読めない</strong></td><td><strong>壁あり。</strong> 企業ごとに「卸価格を見る（申請画面へ）」→企業の許可で表示。<strong>ただし「一括申請」で申請可能な全企業へまとめて申請できる</strong></td></tr>
+<tr><td><strong>3</strong></td><td><strong>ザッカネット</strong><br><code>zakka.net</code></td><td>無料。<strong>登録審査あり（即日〜3営業日）</strong>。基準4つ：①法人または個人事業主でビジネス目的（<strong>商業登記簿や開業届の確認</strong>）②<strong>事業者名で固定電話による受信が可能</strong>③事務所や店舗の存在が確認できる④過去の営業実績や新たな事業計画の具体性</td><td><strong>バイヤーは無料</strong></td><td><strong>国内1,495社</strong>（トップページ実測）。商品数は未実測</td><td><strong>なし</strong>（発見できず）</td><td>会員登録＋<strong>サプライヤーの承認後</strong>に表示</td><td><strong>未確認。</strong> 利用規約の公開ページを発見できず（<code>/guide/</code> 配下の kiyaku / terms / rule / agreement はいずれも <strong>404</strong>）</td><td><strong>壁あり。</strong> ただし FAQ に「サプライヤーが『情報開示を依頼する』→バイヤーが承認で住所・電話番号が双方に開示。<strong>その後は直接の取引交渉が可能</strong>」と明記。<strong>NETSEA と正反対（要法務確認 #7）</strong></td></tr>
+<tr><td><strong>4</strong></td><td><strong>TopSeller（もしも）</strong><br><code>top-seller.jp</code></td><td>無料登録（おためしプラン永年0円・5商品）。<strong>個人事業主可否は規約本文未確認</strong></td><td><strong>セレクトコース</strong>：0／480／980／1,480／2,480／3,980／4,980 円/月（税抜）<br><strong>全商品コース</strong>：1,980／4,980／24,800／27,800 円/月（税抜）</td><td>全商品コースの取扱可能数＝約 <strong>5,161／20,748／157,614／279,666</strong> 商品（プラン別）。掲載社数は未実測</td><td><strong>なし。CSV 連携が前提</strong>（各モールの「FTP経由での商品登録サービス」への申込が必要）</td><td>会員登録後に画面で表示（非ログインでは未確認）</td><td><strong>可。運営ガイドラインに明文：</strong>「その他のショッピングモールやショッピングカートを利用してTopSeller商品を<strong>自由に販売いただくことができます</strong>」<br><strong>ただしメルカリ・ラクマ・PayPayフリマ・ヤフオク！は禁止</strong>。楽天/Yahoo!は1アカウント3サイト上限</td><td><strong>壁なし</strong>（契約プランの範囲は全て扱える）</td></tr>
+<tr><td><strong>5</strong></td><td><strong>卸の達人（ASJコマース）</strong><br><code>oroshi-tatsujin.com</code></td><td><strong>不可の可能性が高い。</strong> 会員規約第6条「取引登録ができるのは店舗又はインターネット販売サイトを所有する<strong>法人のみ</strong>とし、一般消費者は利用できない」</td><td>登録料・月会費 無料。送料は<strong>規約第20条＝700円（税込）／税抜30,000円以上は無料</strong>、一方<strong>特商法表記＝990円（税込）</strong>。<strong>不一致＝未確定</strong>。代引手数料も 315円／330円で不一致</td><td>商品数・会員数は JS 描画で値を取得できず＝<strong>未実測</strong></td><td><strong>なし</strong></td><td>会員のみ</td><td><strong>明文なし。</strong> 第4条「弊社が転載を許可した商品ページについては許可を得ることなく掲載できる。ただし<strong>弊社との取引以外で掲載ページを使用してはならない</strong>」＝<strong>画像を使える商品がある</strong></td><td><strong>壁あり。</strong> 第7条「取引登録申請をし、弊社が承認した場合に限って取引ができる」。登録有効期限1年・更新審査あり</td></tr>
+<tr><td>—</td><td><strong>NETSEA（基準線・既知）</strong></td><td>会員登録済み</td><td>—</td><td>公開サイトマップに商品URL 3,536,926件（Phase A）</td><td>あり（Buyer API）</td><td><strong>取引申請が承認済みのサプライヤーの商品に限る</strong></td><td>—</td><td><strong>壁あり（最も厳しい）</strong>。加えて<strong>発見用途は禁止</strong>（第7条1項3号・2項5号／第19条3項／第27条4項＝違約金200万円＋代金50%）</td></tr>
+</tbody></table>
+<p><strong>名前だけ挙がっているが実測できなかったもの（URL 未確定・二次情報のみ）</strong></p>
+<p>卸売ドットコム／国分ネット卸／TEN TO TEN-MARKET／マルモトネット／シイレル／Oh!motenasi／PandaHall／TOPWHOLE／江綿オンライン／BUYON。<br>私が推測した URL はすべて名前解決に失敗しました。<strong>推測でURLを書くと以後の作業が全部ズレる</strong>ため空欄のままにします。<br><code>cmall.jp</code> は生存を確認しましたが、実測の結果<strong>「テスト株式会社」運営の小規模通販サイト</strong>でBtoB卸プラットフォームではありませんでした。候補から外します。</p>
+<h2>3-2. 【実測④】orosy バイヤーAPI — 公開 OpenAPI があり、JAN で卸価格が引ける</h2>
+<table><thead><tr><th>項目</th><th>実測値</th></tr></thead><tbody>
+<tr><td>OpenAPI 仕様</td><td><code>https://wholesale-api.orosy.com/openapi.json</code> → <strong>HTTP 200 / 60,470 bytes</strong>。<code>openapi: 3.1.0</code> / <code>orosy バイヤーAPI</code> / <code>v0.4.0</code></td></tr>
+<tr><td>認証</td><td><code>GET /v1/products</code> を無認証で叩くと <strong>401</strong>：<code>{&quot;code&quot;:&quot;UNAUTHORIZED&quot;,&quot;message&quot;:&quot;API key required (Authorization: Bearer orosy_live_...)&quot;}</code>。<strong>OAuth 不要</strong></td></tr>
+<tr><td>エンドポイント</td><td><strong>22本</strong>（health / products / product詳細 / delivery-groups / cart 4本 / orders 4本 / preorders 2本 / me 8本）</td></tr>
+<tr><td><strong>JAN 検索</strong></td><td><code>/v1/products</code> の <code>q</code> 仕様：「<strong>数字8〜13桁を指定すると JAN コード検索（商品またはバリエーションの完全一致）になります</strong>」</td></tr>
+<tr><td>返る価格</td><td><code>Variation.buyer_price</code>＝<strong>卸価格（税抜・円）</strong>／<code>retail_price</code>＝上代（<code>msrp</code>/<code>reference</code>/<code>open</code> 区分つき）／<code>tax_category</code>／<code>order_unit</code>（発注単位）／<code>stock_qty</code>／<code>stock_observed_at</code>／<code>jan</code></td></tr>
+<tr><td>掲載数</td><td><strong>約20万点。</strong>サービス紹介PDFに「2026年7月時点の実測: <strong>199,394件</strong>」</td></tr>
+<tr><td>料金</td><td><strong>初期0円／月額0円／API利用料0円</strong>。「仕入れ先から手数料をいただいているため、仕入れる側のご利用は無料です」</td></tr>
+<tr><td>運営</td><td>orosy株式会社（<strong>株式会社ギフティ〈東証プライム上場〉の持分法適用関連会社</strong>）。適格請求書発行事業者 T8120001213457。決済 Stripe</td></tr>
+</tbody></table>
+<p><strong>「承認制の壁」が構造的に無いことの根拠（規約原文）</strong></p>
+<blockquote><strong>第5条</strong> 本サービスは、<strong>orosyが売主として、仕入元から仕入れた本商品を利用者に販売するもの</strong>です。<strong>利用者と仕入元との間には、本商品の売買その他の契約関係は生じません。</strong></blockquote>
+<blockquote><strong>第14条</strong> １　APIユーザーは、APIを通じて取得した本商品に関するデータ（商品情報、価格、在庫等）を、<strong>APIユーザー自身が本サービスにより本商品を仕入れ、又は販売する目的の範囲においてのみ</strong>利用することができます。<br>２　APIユーザーは、本データを、前項の目的に必要な範囲で、<strong>APIユーザーが運営するウェブサイト、システムその他の媒体に表示することができます。</strong>ただし、<strong>第三者に再配布し、提供し、開示し、又は販売してはならない</strong>ものとします。</blockquote>
+<p>出典：<code>https://wholesale-portal.orosy.com/terms</code>（SPA のため HTML では取得できず、<strong>同サイトの JS バンドル <code>/assets/index-D5L8jyX8.js</code> に構造化データとして埋め込まれた規約本文を抽出</strong>。全35条・36,035字。全文は <code>agent_output/.../phaseB/orosy_api_terms.txt</code>）</p>
+<table><thead><tr><th>論点</th><th>NETSEA</th><th>orosy バイヤーAPI</th></tr></thead><tbody>
+<tr><td>誰が売主か</td><td>サプライヤー会員</td><td><strong>orosy 自身</strong></td></tr>
+<tr><td>サプライヤーごとの承認</td><td><strong>必要</strong>（API は承認済みサプライヤーの商品しか返さない）</td><td><strong>不要</strong></td></tr>
+<tr><td>プラットフォーム外での直接取引</td><td><strong>禁止・違約金200万円＋代金50%</strong></td><td><strong>相当条項なし</strong>（仕入元は利用者に開示されない設計）</td></tr>
+<tr><td>会員情報の公開</td><td><strong>氏名・住所・電話番号がサイト上で公開</strong>（第24条1項）</td><td><strong>相当条項なし</strong></td></tr>
+<tr><td>費用</td><td>—</td><td>0円</td></tr>
+</tbody></table>
+<p><strong>注意（事実と推測を分けます）</strong></p>
+<ul><li>事実：規約に <strong>Amazon 転売を禁じる条文はありません</strong>（全35条を「転売／再販／販路／モール／Amazon」で走査）。</li><li>推測（確度：中）・かつリスク：第25条(4)「本サービスによって得られた情報を商業的に利用する行為」という一般禁止条項と、第14条の個別許諾が形式上ぶつかって見えます。<strong>個別条項が優先すると読むのが自然ですが、これは法務の判断です（要法務確認 #2）。</strong></li><li>事実：<strong>旧来の orosy（<code>retailer.orosy.com</code>）は別サービス・別規約</strong>で、そちらには<strong>第7条の取引申請制</strong>と<strong>第20条2項の画像二次利用禁止</strong>があります（<code>https://tos.spaceengine.io/retailer</code>）。<strong>混同すると設計が崩れます（要法務確認 #3）。</strong></li><li><strong>仕入元は開示されません。</strong> つまり orosy は <strong>「本丸」には一切使えません</strong>。数を打つ道具です。</li></ul>
+<h2>3-3. 【実測⑤】スーパーデリバリー — 非ログインで JAN が読める</h2>
+<table><thead><tr><th>項目</th><th>実測値</th></tr></thead><tbody>
+<tr><td>掲載規模</td><td><strong>3,413社／2,198,629商品</strong>（Phase A の 3,414社／2,198,616商品から社数 −1・商品 +13）</td></tr>
+<tr><td>入会金・月会費</td><td><strong>¥0</strong>（<code>/p/entry/mail.do</code>：「入会金・会費ともに￥0。ずっと無料で仕入れできます。」）</td></tr>
+<tr><td>入会資格</td><td>「<strong>業種・事業規模を問わず、すべての事業者にご利用いただいております</strong>」／「消費者の方はご入会いただけない事業者専用のサービスです。<strong>ご商売や事業の確認のため、ご登録情報をもとに入会の審査をさせていただきます</strong>」</td></tr>
+<tr><td>最低ロット</td><td>「掲載商品の<strong>75%以上は1点から</strong>」。最低注文金額の設定なし</td></tr>
+<tr><td>卸率</td><td>「定価のおよそ <strong>56%</strong>（平均）で仕入れることが可能です」</td></tr>
+<tr><td>決済</td><td>クレジットカード／後払い（Paid・別途審査）／代引。<strong>初回取引から後払い可・限度額70万円</strong></td></tr>
+<tr><td><strong>非ログインで読める情報</strong></td><td>商品ページ <code>/p/r/pd_p/&lt;id&gt;/</code> に <strong><code>JAN：4982642102594</code>／参考上代（税抜）¥600／メーカー品番 10259／販売単位「1セット（150点）」</strong>。<strong>卸価格のみ「会員のみ公開」</strong></td></tr>
+<tr><td>カタログの網羅性</td><td><code>sitemap_index.xml</code> に<strong>サブサイトマップ100本</strong>。<code>sitemap1.xml.gz</code> を実取得したところ <strong>50,000 URL</strong>、すべて商品ページ形式</td></tr>
+<tr><td>robots.txt</td><td><strong>商品詳細ページ <code>/p/r/pd_p/</code> は Disallow されていない</strong>（Disallow は検索の絞り込みパラメータ付きURLのみ）</td></tr>
+<tr><td>承認制の壁</td><td>企業ごとの申請→許可。<strong>「一括申請なら、申請可能なすべての企業にまとめて申請できます」</strong>（反映に約10分）</td></tr>
+<tr><td>検索の絞り込み</td><td>「在庫あり」「1点販売あり」「<strong>画像転載できる</strong>」「代引き可能」。<strong>「ネット販売可」相当のフィルタは非ログインでは確認できず</strong></td></tr>
+</tbody></table>
+<p><strong>Amazon 転売の可否（会員規約 第6条 原文）</strong></p>
+<blockquote>送料の負担、返品の可否及び方法、<strong>購入した商品の販売方法の制限（ウェブサイトを通じた販売の禁止等）</strong>その他の取引条件については、<strong>出展者が当サイト中の各出展者個別の画面に記載された定めに従う</strong>ものとします。</blockquote>
+<p>→ <strong>一律禁止ではありません。ただし「Amazon 再販を禁じる出展者」が3,413社の中に混ざっており、判別はログイン後の個別画面でしかできません。</strong> 有効社数は依然<strong>未実測</strong>です。</p>
+<h2>3-4. 【実測⑥】ザッカネット・TopSeller・卸の達人</h2>
+<p><strong>ザッカネット 登録審査の基準（原文・<code>/reg/reg_01.php?mkid=2</code>）</strong></p>
+<blockquote>- 法人または個人事業主でビジネスを目的として利用する方。（<strong>商業登記簿や開業届の確認がございます</strong>）<br>- <strong>事業者名で固定電話による受信が可能であること。</strong><br>- 事務所や店舗の存在が何らかの形で確認出来ること。<br>- 過去の営業実績や新たな事業計画の具体性が確認出来ること。</blockquote>
+<p>審査期間は<strong>即日〜3営業日</strong>。<strong>「固定電話」要件が社長の現状で満たせるかは未確認</strong>で、ここが通らなければこの経路は落ちます。</p>
+<p><strong>ザッカネットは「直接の取引交渉」を公式FAQで認めている（NETSEA と正反対）</strong></p>
+<blockquote>サプライヤーが「情報開示を依頼する」ボタンを押し、バイヤーが承認することで、住所・電話番号などの詳細情報が双方に開示されます。<strong>その後は直接の取引交渉が可能になります。</strong></blockquote>
+<p>→ <strong>この一文が規約本文でも裏づけられれば、ザッカネットは「数を打つ」と「本丸」の両方に使える唯一の卸になります。</strong> ただし<strong>利用規約の本文を公開ページで見つけられませんでした</strong>（4パターン試行しすべて404。robots.txt が指す <code>sitemap.xml</code> は HTTP 200 だが <strong>502 bytes</strong> で中身が無い）。<strong>要法務確認 #6・#7。</strong></p>
+<p><strong>付随機能「これ探してます」（逆オファー）の実測</strong></p>
+<table><thead><tr><th>指標</th><th>実測値</th></tr></thead><tbody>
+<tr><td>掲載中の案件</td><td><strong>98件</strong>（募集中 <strong>21件</strong>／募集終了 77件）</td></tr>
+<tr><td>カテゴリ内訳</td><td>健康・美容・介護 32／おもちゃ・ホビー・手芸 28／生活雑貨・日用品 15／食品・菓子・飲料 11／食器・キッチン 5／インテリア・電化製品・家具 5／ファッション 3</td></tr>
+<tr><td><strong>オファー数（N=20・1ページ目）</strong></td><td>合計 <strong>16件</strong>／平均 <strong>0.8件</strong>／<strong>オファー0件が10件＝50%</strong></td></tr>
+<tr><td>閲覧数（N=20）</td><td>中央値 <strong>130</strong>／最大 <strong>259</strong></td></tr>
+<tr><td>投稿コスト</td><td><strong>無料</strong></td></tr>
+</tbody></table>
+<p>→ 事実：<strong>投稿すれば見られる（中央値130閲覧）が、提案は半数の案件で0件。期待値は1案件あたり1件未満。</strong></p>
+<p><strong>TopSeller（無在庫）の重大な前提</strong></p>
+<p>Amazon 公式（<code>https://sell.amazon.co.jp/learn/dropshipping</code>）：</p>
+<blockquote>Amazonが定めるドロップシッピングポリシーを満たせば、Amazonでも無在庫販売が可能です。<strong>ドロップシッピングポリシーに従わない場合、出品権限が取り消される可能性があります。</strong></blockquote>
+<p><strong>ポリシー本文はセラーセントラル（要ログイン）にあり、今回は取得できていません。</strong> 日本店が停止中で復旧時期未定という文脈も踏まえると、<strong>出品権限に関わる論点をログイン前に確定できないのは弱点です（要法務確認 #8）。</strong></p>
+<p><strong>卸の達人 — 個人事業主は規約上使えない</strong></p>
+<blockquote><strong>第6条（取引登録）</strong> 本サイトに取引登録ができるのは店舗又はインターネット販売サイトを所有する<strong>法人のみ</strong>とし、一般消費者は利用できないものとします。</blockquote>
+<p>現時点では入口で落ちます。法人化すれば選択肢に戻ります。</p>
+<h2>3-5. 卸以外で「今・数を打つ」に効く経路</h2>
+<table><thead><tr><th>経路</th><th>実測</th><th>コスト</th><th>段階</th></tr></thead><tbody>
+<tr><td><strong>ザ・ビジネスモール（商工会議所・商工会）</strong></td><td>全国<strong>590団体以上</strong>が共同運営。企業DB <strong>約29万社</strong>。<strong>募集中の商談90件・本日締切7件</strong>。実例に「<strong>大手ECモールで販売可能な商品を幅広く募集しています</strong>」（埼玉県・8/3投稿）。サイト利用・マッチング・成約手数料は<strong>すべて無料</strong></td><td><strong>入会が別途必要。</strong>東京商工会議所の場合＝<strong>加入金3,000円＋個人 年会費1口10,000円以上</strong>（初年度13,000円〜）＝<strong>§4.1（金銭）</strong></td><td>今／本丸の両方（DB29万社にはネットに疎い会社も含まれるが、EC 有無で絞る手段が未確認）</td></tr>
+<tr><td><strong>J-GoodTech（中小機構）— 除外</strong></td><td>登録企業＝中小約30,000社／大手約1,100社／海外約9,000社＝<strong>約40,000社</strong>。企業検索は要ログイン（<code>/pub/ja/search/</code> は404）</td><td>無料</td><td><strong>除外。</strong>公式FAQ「<strong>※一般消費者向け取引（B to C取引）…については対象外です</strong>」。社長の事業（BtoC小売/EC）は登録対象外</td></tr>
+<tr><td><strong>海外の卸</strong></td><td><code>japanese.alibaba.com</code> は生存（日本語UI）。掲載数・手数料・規約は<strong>未実測</strong></td><td>未実測</td><td>今（ただし社長は英語の電話対応が不可。チャット/メールに限定できるかが分岐点）</td></tr>
+<tr><td><strong>問屋街・卸売市場</strong></td><td>未実測</td><td>交通費</td><td>今（PC完結を好む社長の条件と不整合。優先度最下位）</td></tr>
+</tbody></table>
+<h2>3-6. その他の生存確認（実測）</h2>
+<table><thead><tr><th>対象</th><th>実測</th></tr></thead><tbody>
+<tr><td><code>zakkanet.com</code></td><td><strong>ドメイン失効</strong>（<code>expireddomains.com</code> へリダイレクト）。正しいのは <strong><code>zakka.net</code></strong></td></tr>
+<tr><td><code>topseller.jp</code></td><td><strong>別会社の別サービス</strong>（インドネシア拠点の食材輸送 TopCellar.JP）。目的の TopSeller は <strong><code>top-seller.jp</code></strong>（株式会社もしも）</td></tr>
+<tr><td><code>tatsujin.net</code></td><td>HTTP 403。卸の達人の正しいドメインは <strong><code>oroshi-tatsujin.com</code></strong></td></tr>
+<tr><td><code>chusho.meti.go.jp</code> / <code>meti.go.jp/policy/sme_chiiki/</code> / <code>maff.go.jp/j/tokei/</code></td><td><strong>HTTP 403</strong>（自動取得を拒否）。一方 <code>meti.go.jp/policy/mono_info_service/</code> は 200</td></tr>
+<tr><td><code>help.orosy.com</code></td><td><strong>HTTP 403</strong>（ヘルプセンターは非ログインで読めず）</td></tr>
+<tr><td><code>wholesale-portal.orosy.com/llms.txt</code></td><td><strong>HTTP 200</strong>。AI 向けのサイト要約を自ら公開（国内卸では珍しい）</td></tr>
+</tbody></table>
+<hr>
+<h2>4. 「今の作業と並行して回せるか」への回答</h2>
+<p><strong>私が答えられるのは「社長の手が何回要るか」「コストがぶつかるか」までです。優先順位と配分はタケシの領分です。</strong></p>
+<table><thead><tr><th>経路</th><th>段階</th><th>社長本人にしかできない一手</th><th>回数</th><th>金銭</th><th>その後を社内で巻き取れるか</th></tr></thead><tbody>
+<tr><td><strong>展示会出展社を Amazon不在で切る</strong></td><td><strong>本丸</strong></td><td><strong>なし</strong>（既存データ＋Keepa）</td><td><strong>0回</strong></td><td><strong>0円</strong></td><td><strong>◎ 今すぐ着手可能</strong></td></tr>
+<tr><td><strong>伝統的工芸品244品目の産地組合リスト化</strong></td><td><strong>本丸</strong></td><td><strong>なし</strong></td><td><strong>0回</strong></td><td><strong>0円</strong></td><td><strong>◎ 今すぐ着手可能</strong></td></tr>
+<tr><td>展示会への来場（9/2〜4）</td><td>本丸</td><td>当日登録・名刺交換</td><td>1回</td><td>交通費</td><td>○</td></tr>
+<tr><td>YouTube 起点の探索</td><td>本丸</td><td>Google Cloud プロジェクト作成＋APIキー発行（規約同意）</td><td>1回</td><td>0円</td><td>○（以降は自動）</td></tr>
+<tr><td><strong>orosy バイヤーAPI</strong></td><td>今</td><td>①メール登録（規約同意）②事業者確認の提出</td><td><strong>2回</strong></td><td><strong>0円</strong></td><td><strong>◎ 以降は API で全自動</strong></td></tr>
+<tr><td><strong>スーパーデリバリー</strong></td><td>今</td><td>①会員登録②入会審査③卸価格の<strong>一括申請</strong>（1クリック）</td><td><strong>3回</strong></td><td><strong>0円</strong></td><td>○（JAN 収集は登録前から可能）</td></tr>
+<tr><td>ザッカネット</td><td>今＋本丸</td><td>①会員登録②審査（<strong>固定電話が要件</strong>）③サプライヤーごとの承認</td><td>3回＋n</td><td>0円</td><td>△</td></tr>
+<tr><td>TopSeller</td><td>今</td><td>①会員登録②<strong>有料プラン契約（課金）</strong>③モール側の FTP 登録申込</td><td>3回</td><td><strong>480〜27,800円/月</strong></td><td>○</td></tr>
+<tr><td>ザ・ビジネスモール</td><td>今＋本丸</td><td>①<strong>商工会議所へ入会（課金）</strong>②ユーザー登録</td><td>2回</td><td><strong>13,000円〜</strong></td><td>○</td></tr>
+<tr><td>卸の達人</td><td>今</td><td>—</td><td>—</td><td>—</td><td><strong>×（法人のみ）</strong></td></tr>
+<tr><td>J-GoodTech</td><td>—</td><td>—</td><td>—</td><td>—</td><td><strong>×（BtoC は対象外）</strong></td></tr>
+</tbody></table>
+<p><strong>事実として言えること</strong></p>
+<ul><li><strong>本丸の上位2本（展示会出展社の Amazon不在切り／産地組合244件）は、社長の手が0回・費用0円で今日から動きます。</strong> 並行の可否を議論する必要すらありません。</li><li><strong>0円で並行できる組み合わせが存在します。</strong> 本丸2本＋orosy＋スーパーデリバリー＋ザッカネット＋逆オファー投稿の6本は<strong>すべて費用0円</strong>で、社長の一手はのべ<strong>9回</strong>（すべて登録・審査・申請の一手で、継続作業ではありません）。</li><li><strong>手が取り合いません。</strong> 卸系はいずれも「登録して審査を待つ」構造で、待ち時間が並行します。待っている間、本丸2本は社内だけで進みます。</li><li><strong>課金が発生するのは TopSeller と商工会議所の2本だけ</strong>です（§4.1）。</li><li><strong>Amazon 日本店の停止は、上記のどの経路の登録も止めません。</strong> ただし TopSeller（無在庫）だけは出品権限に直結します。</li></ul>
+<hr>
+<h2>5. 「NETSEA が使えなかった場合の代替」として成立するもの</h2>
+<p><strong>前提：これは「今・数を打つ」側の話です。NETSEA も代替も、本丸の道具ではありません。</strong></p>
+<table><thead><tr><th>NETSEA の機能</th><th>代替が成立するもの</th><th>判定の根拠</th></tr></thead><tbody>
+<tr><td><strong>① API で商品データを機械取得</strong></td><td><strong>orosy バイヤーAPI</strong>（唯一）</td><td>公開 OpenAPI 3.1・22エンドポイント・401 認証まで実測</td></tr>
+<tr><td><strong>② 卸価格を数値で取得（＝仕入れ値の実測）</strong></td><td><strong>orosy バイヤーAPI</strong>（唯一）</td><td><code>buyer_price</code> を返す。他の4サービスは画面表示 or 会員限定</td></tr>
+<tr><td><strong>③ 大量のカタログ母数</strong></td><td><strong>スーパーデリバリー</strong>（2,198,629商品／3,413社）＞ TopSeller（最大279,666商品）＞ orosy（約20万点）＞ ザッカネット（1,495社）</td><td>各社の公式表示値</td></tr>
+<tr><td><strong>④ その場で発注できる</strong></td><td>orosy／スーパーデリバリー／ザッカネット／TopSeller／卸の達人の<strong>全部</strong></td><td>いずれもサイト内発注が可能</td></tr>
+</tbody></table>
+<p><strong>結論（事実として）</strong></p>
+<ul><li><strong>①②を同時に満たす代替は <code>orosy バイヤーAPI</code> の1本だけ</strong>です。しかも NETSEA が抱えていた「API が承認済みサプライヤーの商品しか返さない」という制約を、<strong>設計上持ちません</strong>。</li><li><strong>③（母数）を求めるなら <code>スーパーデリバリー</code>。</strong> ただし卸価格には登録＋企業別承認が要り、Amazon 再販の可否は出展者ごと・ログイン後にしか読めません。</li><li><strong>この2本は排他ではありません。</strong> 「orosy で仕入れ値を実測し、スーパーデリバリーで母数を稼ぐ」は費用0円で両立します。</li></ul>
+<hr>
+<h2>6. 要法務確認（ハルオへ回すもの・13件）</h2>
+<table><thead><tr><th>#</th><th>対象</th><th>論点</th><th>なぜ止まるか</th></tr></thead><tbody>
+<tr><td><strong>1</strong></td><td>orosy バイヤーAPI 第14条2項</td><td>「APIユーザーが運営するウェブサイト、システム<strong>その他の媒体</strong>」に、<strong>Amazon の商品ページ／出品データ</strong>は含まれるか</td><td>含まれないなら API で取った商品情報を Amazon に載せられない＝経路が成立しない</td></tr>
+<tr><td><strong>2</strong></td><td>同 第25条(4)(9) vs 第14条</td><td>一般禁止条項「本サービスによって得られた情報を商業的に利用する行為」と個別許諾（第14条）の優劣</td><td>一般条項が優先すると読まれると①が崩れる</td></tr>
+<tr><td><strong>3</strong></td><td>orosy 旧バイヤー規約（<code>tos.spaceengine.io/retailer</code>）</td><td><strong>第7条 取引申請制</strong>・<strong>第20条2項 商品画像の二次利用禁止</strong>が <code>orosy バイヤーAPI</code> にも及ぶか</td><td>及ぶなら「壁なし」「画像が使える」が両方崩れる</td></tr>
+<tr><td><strong>4</strong></td><td>スーパーデリバリー</td><td><strong>非会員</strong>が公開商品ページ（<code>/p/r/pd_p/&lt;id&gt;/</code>）から JAN を機械収集することの可否。robots.txt は当該パスを Disallow していないが、会員規約は非会員に及ぶか</td><td>「JAN→Keepa」の実務価値がここに乗る</td></tr>
+<tr><td><strong>5</strong></td><td>同 会員規約第6条</td><td>出展者個別の「ウェブサイトを通じた販売の禁止等」を登録後にどう機械判定するか。判定できないまま仕入れた場合の責任</td><td>3,413社の有効数が未知のまま</td></tr>
+<tr><td><strong>6</strong></td><td>ザッカネット</td><td><strong>利用規約の本文が公開ページで見つからない</strong>（4パターン試行しすべて404）</td><td>規約を読まずに登録するのは §4.1 の観点でも不可</td></tr>
+<tr><td><strong>7</strong></td><td>ザッカネット FAQ</td><td>「情報開示後は<strong>直接の取引交渉が可能</strong>」を根拠に、ザッカネットを<strong>発見（本丸）経路</strong>として使ってよいか</td><td>使えるなら「本丸にも使える唯一の卸」になる。影響が大きい</td></tr>
+<tr><td><strong>8</strong></td><td>Amazon ドロップシッピングポリシー</td><td>TopSeller 経由の無在庫販売がポリシーに適合するか。<strong>本文はセラーセントラル要ログインで未取得</strong></td><td>違反すると<strong>出品権限の取消</strong></td></tr>
+<tr><td><strong>9</strong></td><td>卸の達人 会員規約第6条</td><td>「法人のみ」＝個人事業主での登録は規約違反か。法人化すれば可か</td><td>現状は入口で落ちる</td></tr>
+<tr><td><strong>10</strong></td><td>卸の達人</td><td><strong>送料の記載不一致</strong>（規約700円 vs 特商法990円／代引 315円 vs 330円）</td><td>経費を実測値で持つ方針に直接影響</td></tr>
+<tr><td><strong>11</strong></td><td>商工会議所への入会</td><td>加入金3,000円＋年会費10,000円〜の支出。<strong>§4.1（金銭）</strong></td><td>社長承認が要る</td></tr>
+<tr><td><strong>12</strong></td><td><strong><code>kougeihin.jp</code> の品目ページ（244品目・産地組合の住所TEL）</strong></td><td>低速クロールして社内リスト化することの可否。robots.txt は <code>/craft/</code> を許可しているが、<strong>サイト規約は未確認</strong>。組合の電話番号は法人情報だが、<strong>個人経営の組合が混じる可能性</strong></td><td><strong>本丸の上位経路。ここで止まると2本のうち1本が動かない</strong></td></tr>
+<tr><td><strong>13</strong></td><td><strong>YouTube Data API / TikTok Research API / X API</strong></td><td>利用登録＝<strong>規約同意で §4.1</strong>。加えて、取得したチャンネル情報を社内リスト化し営業に使うことが各プラットフォームの規約で許されるか</td><td>本丸のSNS経路が全部ここに依存</td></tr>
+</tbody></table>
+<p><strong>なお、以下はすべて §4.1 に該当するため一切実行していません</strong>：各卸サービスの<strong>会員登録</strong>、TopSeller の<strong>有料プラン契約</strong>、商工会議所への<strong>入会</strong>、各API の<strong>キー取得</strong>、メーカー・組合への<strong>連絡</strong>。</p>
+<hr>
+<h2>7. 分かっていないこと（正直な申告）</h2>
+<table><thead><tr><th>項目</th><th>状態</th></tr></thead><tbody>
+<tr><td>展示会出展社の Amazon 不在率の真値</td><td><strong>N=61 で 67.2%（strict NO）。ただしこれは上限</strong>。社名≠ブランド名の会社が全部「不在」に落ちるため（実測中に <code>トヨタ自動車（株）</code> が strict NO と判定された）。<strong>確実な下限は「社名で1件もヒットしない 45.9%」</strong></td></tr>
+<tr><td>同・計画の N=100</td><td><strong>トークン枠（20/分）のため N=61 で中間集計。</strong>残りは継続実行中（末尾の追記欄参照）</td></tr>
+<tr><td>「Amazon にいない」の内訳（需要なし vs 競合なし）</td><td><strong>切り分け不能。</strong> 商品のJANを取るまで判定できない</td></tr>
+<tr><td>伝統的工芸品244品目の産地組合の総数・重複</td><td><strong>未実測</strong>（品目ページ275本のクロールは法務判定 #12 待ち）</td></tr>
+<tr><td>SNS 経路の歩留まり</td><td><strong>測りようがない。</strong> 探索型のため母数を定義できない</td></tr>
+<tr><td>Instagram のハッシュタグ検索の可否</td><td><strong>未確認</strong>（公式ドキュメントが 404/400）</td></tr>
+<tr><td>TikTok Research API の利用資格</td><td><strong>未確認</strong>（ドキュメントに記載なし）</td></tr>
+<tr><td>X API の単価</td><td><strong>未確認</strong>（<code>pricing</code> ページのURLを特定できず）</td></tr>
+<tr><td>orosy の仕入元社数</td><td><strong>非公開＝未確認</strong></td></tr>
+<tr><td>orosy API の実データ</td><td><strong>未実測</strong>（APIキーの発行に登録＋審査が必要＝§4.1）</td></tr>
+<tr><td>スーパーデリバリー 3,413社のうち Amazon 再販が許される社数</td><td><strong>未実測</strong>（Phase A から進展なし）</td></tr>
+<tr><td>スーパーデリバリー商品の JAN 保有率</td><td><strong>未実測</strong>（サンプル1件で JAN あり。母集団は未測定）</td></tr>
+<tr><td>ザッカネットの規約本文・商品数</td><td><strong>未確認／未実測</strong></td></tr>
+<tr><td>TopSeller の掲載社数・個人事業主の可否</td><td><strong>未実測／未確認</strong></td></tr>
+<tr><td>卸の達人の商品数・会員数</td><td><strong>未実測</strong>（JS 描画で値が入らない）</td></tr>
+<tr><td>メーカー公式サイトの「EC の有無」の分布</td><td><strong>未実測。</strong> 母集団になる公式サイトURLのリストが社内に無い（<code>contacts_v1.csv</code> の公式HP列は823行すべて空）</td></tr>
+<tr><td>実測できなかった卸サイト10件</td><td><strong>URL 未確定</strong></td></tr>
+</tbody></table>
+<hr>
+<h2>8. 出典一覧（すべて 2026-08-31 取得）</h2>
+<h3>本丸側</h3>
+<table><thead><tr><th>#</th><th>ページタイトル</th><th>URL</th></tr></thead><tbody>
+<tr><td>1</td><td>経済産業省「伝統的工芸品」（<strong>244品目・2025年10月27日時点</strong>／最終更新 2026年3月3日）</td><td>https://www.meti.go.jp/policy/mono_info_service/mono/nichiyo-densan/index.html</td></tr>
+<tr><td>2</td><td>伝統的工芸品産業振興協会 トップ</td><td>https://kougeihin.jp/</td></tr>
+<tr><td>3</td><td>同 サイトマップ（全1,579URL／うち <code>/craft/</code> <strong>275本</strong>）</td><td>https://kougeihin.jp/sitemap.xml</td></tr>
+<tr><td>4</td><td>同 品目ページ実例（羽越しな布・<strong>産地組合の住所TEL掲載</strong>）</td><td>https://kougeihin.jp/craft/0103/</td></tr>
+<tr><td>5</td><td>同 robots.txt（<code>/wp/wp-admin/</code> のみ Disallow）</td><td>https://kougeihin.jp/robots.txt</td></tr>
+<tr><td>6</td><td>国土交通省「道の駅案内」（地域別掲載数・合算 <strong>1,231駅</strong>）</td><td>https://www.mlit.go.jp/road/Michi-no-Eki/</td></tr>
+<tr><td>7</td><td>YouTube Data API クォータ（<strong>search.list は1日100回</strong>・最終更新 2026-06-01）</td><td>https://developers.google.com/youtube/v3/determine_quota_cost</td></tr>
+<tr><td>8</td><td>YouTube Data API <code>search.list</code> 仕様（<code>channelType</code> 等）</td><td>https://developers.google.com/youtube/v3/docs/search/list</td></tr>
+<tr><td>9</td><td>X API 概要（<strong>pay-per-use pricing</strong>）</td><td>https://docs.x.com/x-api/introduction</td></tr>
+<tr><td>10</td><td>TikTok Research API <code>Query Videos</code>（<code>region_code: JP</code>・最終更新 2026-08-25）</td><td>https://developers.tiktok.com/doc/research-api-specs-query-videos/</td></tr>
+<tr><td>11</td><td>TikTok Research API 入門（「<strong>Once your application is approved</strong>」）</td><td>https://developers.tiktok.com/doc/research-api-get-started/</td></tr>
+<tr><td>12</td><td>第102回 東京ギフト・ショー 出展社一覧PDF（Phase A で取得・2,353社）</td><td>https://www.giftshow.co.jp/tigs/102tigs/pdf/list.pdf</td></tr>
+</tbody></table>
+<h3>数を打つ側</h3>
+<table><thead><tr><th>#</th><th>ページタイトル</th><th>URL</th></tr></thead><tbody>
+<tr><td>13</td><td>orosy バイヤーAPI（バイヤーポータル）</td><td>https://wholesale-portal.orosy.com/</td></tr>
+<tr><td>14</td><td>orosy バイヤーAPI 利用規約（SPA。本文は同サイト JS バンドル内）</td><td>https://wholesale-portal.orosy.com/terms ／ https://wholesale-portal.orosy.com/assets/index-D5L8jyX8.js</td></tr>
+<tr><td>15</td><td>orosy バイヤーAPI OpenAPI 仕様（3.1.0 / v0.4.0）</td><td>https://wholesale-api.orosy.com/openapi.json</td></tr>
+<tr><td>16</td><td>orosy バイヤーAPI サービス紹介資料（PDF・全17ページ）</td><td>https://wholesale-portal.orosy.com/docs-assets/orosy-api-service-intro.pdf</td></tr>
+<tr><td>17</td><td>orosy バイヤー利用規約（旧・retailer 向け／<strong>別規約</strong>）</td><td>https://tos.spaceengine.io/retailer</td></tr>
+<tr><td>18</td><td>スーパーデリバリー トップ（3,413社／2,198,629商品）</td><td>https://www.superdelivery.com/</td></tr>
+<tr><td>19</td><td>スーパーデリバリー 会員登録（入会金・会費 ¥0／入会審査）</td><td>https://www.superdelivery.com/p/entry/mail.do</td></tr>
+<tr><td>20</td><td>スーパーデリバリー 会員規約（第1条・<strong>第6条</strong>）</td><td>https://www.superdelivery.com/p/contents/guide/rules.jsp</td></tr>
+<tr><td>21</td><td>スーパーデリバリー ご利用ガイド（卸価格の申請・<strong>一括申請</strong>）</td><td>https://www.superdelivery.com/p/contents/welcome/welcome.jsp</td></tr>
+<tr><td>22</td><td>スーパーデリバリー 商品ページ（<strong>JAN が非ログインで表示</strong>）</td><td>https://www.superdelivery.com/p/r/pd_p/9974985/</td></tr>
+<tr><td>23</td><td>スーパーデリバリー sitemap_index（サブサイトマップ100本）</td><td>https://www.superdelivery.com/sitemap_index.xml</td></tr>
+<tr><td>24</td><td>スーパーデリバリー robots.txt</td><td>https://www.superdelivery.com/robots.txt</td></tr>
+<tr><td>25</td><td>ザッカネット トップ（国内1,495社）</td><td>https://www.zakka.net/</td></tr>
+<tr><td>26</td><td>ザッカネット 仕入れ会員 登録前の確認（<strong>審査基準4項目</strong>）</td><td>https://www.zakka.net/reg/reg_01.php?mkid=2</td></tr>
+<tr><td>27</td><td>ザッカネット よくあるご質問（承認制／<strong>直接の取引交渉</strong>）</td><td>https://www.zakka.net/guide/faq.php</td></tr>
+<tr><td>28</td><td>ザッカネット これ探してます（98件／募集中21件）</td><td>https://www.zakka.net/needs/</td></tr>
+<tr><td>29</td><td>TopSeller トップ・料金プラン</td><td>https://top-seller.jp/</td></tr>
+<tr><td>30</td><td>TopSeller 運営ガイドライン（<strong>他モールでの自由な販売／フリマ禁止</strong>）</td><td>https://top-seller.jp/www/document/guideline</td></tr>
+<tr><td>31</td><td>TopSeller 利用規約</td><td>https://top-seller.jp/www/document/term</td></tr>
+<tr><td>32</td><td>卸の達人 会員規約（取引基本契約・全34条・<strong>第6条 法人のみ</strong>）</td><td>https://www.oroshi-tatsujin.com/e-commex/cgi-bin/ex_top_disp_page.cgi?kind=3</td></tr>
+<tr><td>33</td><td>卸の達人 特定商取引法における法定表記（送料990円）</td><td>https://www.oroshi-tatsujin.com/e-commex/cgi-bin/ex_law.cgi</td></tr>
+<tr><td>34</td><td>ザ・ビジネスモール トップ（募集中の商談90件）</td><td>https://www.b-mall.ne.jp/</td></tr>
+<tr><td>35</td><td>ザ・ビジネスモール ご案内（590団体・企業DB約29万社・無料）</td><td>https://www.b-mall.ne.jp/guide/</td></tr>
+<tr><td>36</td><td>東京商工会議所 会費と入会資格（加入金3,000円／個人 1口10,000円以上）</td><td>https://www.tokyo-cci-nyukai.jp/ex/fee/</td></tr>
+<tr><td>37</td><td>J-GoodTech ジェグテックとは（中小約30,000社・海外約9,000社）</td><td>https://jgoodtech.smrj.go.jp/pub/ja/about/</td></tr>
+<tr><td>38</td><td>J-GoodTech FAQ（対象業種・<strong>BtoC は対象外</strong>）</td><td>https://jgoodtech.smrj.go.jp/pub/ja/faq/</td></tr>
+<tr><td>39</td><td>Amazon「ドロップシッピングとは？」（ポリシー遵守なら可・違反で出品権限取消）</td><td>https://sell.amazon.co.jp/learn/dropshipping</td></tr>
+<tr><td>40</td><td>NETSEA バイヤー会員規約（比較の基準線）</td><td>https://www.netsea.jp/agreement/statement</td></tr>
+</tbody></table>
+<p><strong>作業ファイル（Git 除外・<code>workspace/output/agent_output/T-20260831-005/phaseB/</code>）</strong></p>
+<ul><li><code>keepa_absence_scan.py</code> / <code>keepa_absence_scan.csv</code> / <code>keepa_absence_scan.log</code>（本丸の中核実測・再現可能）</li><li><code>orosy_openapi.json</code>（60,470 bytes）／<code>orosy_api_terms.txt</code>（全35条・36,035字）／<code>orosy_api_intro.pdf</code></li><li><code>sd_rules.txt</code>（スーパーデリバリー会員規約 全文）／<code>sd_prod.txt</code>（JAN が見える商品ページ）／<code>sd_sitemap_index.xml</code></li><li><code>zakka_reg_buyer.html</code>（審査基準）／<code>zakka_needs.html</code>／<code>ts_guideline.txt</code>／<code>tat_k3.txt</code></li><li><code>kg_sm.xml</code>（kougeihin サイトマップ）／<code>kg_one.html</code>（産地組合の実例）／<code>meti_dento.html</code>／<code>michinoeki.html</code></li><li><code>yt_quota.html</code>／<code>yt_search.html</code>／<code>tt_start.html</code>／<code>xapi.html</code></li></ul>
+<hr>
+<h2>9. タケシ（プランナー）への引き渡し</h2>
+<p><strong>事実シート</strong>＝§2〜§3 の実測。<strong>論点シート</strong>＝以下。ここから先は戦略判断であり、私は踏み込みません。</p>
+<table><thead><tr><th>#</th><th>論点</th><th>判断に使える事実</th></tr></thead><tbody>
+<tr><td>1</td><td><strong>本丸の第一手を「展示会出展社の Amazon不在切り」にするか「産地組合244件」にするか</strong></td><td>前者：母数808〜1,500社・既存データ・0円・0手。後者：244品目・電話番号つき・0円・0手だがロットが読めない</td></tr>
+<tr><td>2</td><td>「数を打つ」を何本走らせるか</td><td>orosy（API・卸価格実測・壁なし・0円／社長2手）と スーパーデリバリー（母数220万商品・0円／社長3手）は<strong>費用が競合しない</strong></td></tr>
+<tr><td>3</td><td>「仕入れ値の実測」を最優先するなら</td><td>卸価格を<strong>数値で機械取得できるのは orosy のみ</strong>。他は画面表示 or 会員限定</td></tr>
+<tr><td>4</td><td>無在庫（TopSeller / orosy の売れてから仕入れ）を採るか</td><td>在庫リスクは消えるが、<strong>Amazon ドロップシッピングポリシー</strong>と<strong>日本店停止中</strong>の二重の制約</td></tr>
+<tr><td>5</td><td>ザッカネットの「固定電話」要件をどう扱うか</td><td>満たせなければ落ちる。代替手段（IP電話・転送番号）の可否は未調査</td></tr>
+<tr><td>6</td><td>商工会議所へ入会するか（初年度13,000円〜）</td><td>見返りは 企業DB約29万社＋商談モール（募集中90件・成約手数料0円）。実績ゼロでも入会可</td></tr>
+<tr><td>7</td><td><strong>独占販売をどの経路で取りに行くか</strong></td><td>事実：orosy は仕入元が開示されない＝独占交渉の相手に到達できない。事実：展示会・産地組合・SNS は個社に直接到達できる。<strong>独占は本丸経路でしか取れません</strong></td></tr>
+</tbody></table>
+<hr>
+<h2>追記欄：Keepa 不在率スキャンの最終値</h2>
+<p>本書 §2-2 は <strong>N=61 の中間集計</strong>です。スキャンは実行中で、完了時の最終値は<br><code>workspace/output/agent_output/T-20260831-005/phaseB/keepa_absence_scan.csv</code> と同 <code>.log</code> に出ます。<br><strong>結論の向き（約3分の2が Amazon 不在側）は Phase A（N=18・33.3%）と N=61（32.8%）で再現しており、変わらない見込みです。</strong></p></div></body></html>
