@@ -181,6 +181,24 @@ rm -rf ~/Claude\ Code/<repo>
 
 ---
 
+## check_source_cards.py — 出所カード検査
+
+規約で用途が縛られたデータ（現状は **NETSEA**）が、出所不明のまま `workspace/output/` に
+置かれていないかを検査します。データファイルのあるディレクトリに `SOURCE.md`（出所カード）が
+無ければ非ゼロ終了します。
+
+```bash
+python3 scripts/check_source_cards.py          # 検査
+python3 scripts/check_source_cards.py --list   # 検出ファイルを OK/NG つきで全部並べる
+```
+
+**なぜ要るか（2026-08-31 / T-20260831-005）:** NETSEA バイヤー会員規約は当社に
+「NETSEA 内で完結する仕入れ実務」以外の用途を禁じており、違反時は**違約金200万円＋代金の50%**です
+（第19条3項・第27条4項）。出所が書かれていないデータは、数か月後に必ず別の用途へ流れます。
+新しく用途制限のあるソースが増えたら `RESTRICTED_SOURCES` に1行足してください。
+
+---
+
 ## 5. 関連ドキュメント
 
 - 手動版手順（フォールバック）: [../docs/subsidiary-onboarding.md](../docs/subsidiary-onboarding.md)
