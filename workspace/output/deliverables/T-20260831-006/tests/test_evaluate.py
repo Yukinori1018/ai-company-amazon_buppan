@@ -1,0 +1,217 @@
+"""利益計算層のテスト。**ここが1円でもごまかしたら、この事業の判断が全部狂う。**
+
+Keepa の実レスポンス（2026-08-31 実測）から写した形をテストデータに使う。
+"""
+
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from pipeline import config, evaluate, keepa_verify, screen  # noqa: E402
+
+CFG = config.ScanConfig()
+
+
+def _cand(**over):
+    base = dict(
+        jan="4971493901777", product_name="テスト商品", supplier_id=6804,
+        supplier_name="オリヒロ 株式会社", product_url="https://www.netsea.jp/shop/6804/6",
+        wholesale_ex_tax=1000,
+    )
+    base.update(over)
+    return screen.Candidate(**base)
+
+
+def _facts(**over):
+    base = dict(
+        jan="4971493901777", asin="B006W1FQGE", title="仏壇下台", found=True,
+        price_yen=5000, price_source="現在の新品最安(送料込)", sales_rank=378652,
+        drops30=53, drops90=150, offer_count=5, availability_amazon=-1,
+        category_names=["ホーム&キッチン"], package_mm=(300, 200, 100), package_g=800,
+    )
+    base.update(over)
+    return keepa_verify.AmazonFacts(**base)
+
+
+# -- Amazon に無い場合 ---------------------------------------------------------
+def test_Amazonに同一JANが無い場合は利益計算せず正直に状態を残す():
+    ev = evaluate.evaluate(_cand(), keepa_verify.AmazonFacts(jan="x", found=False), CFG)
+    assert ev.result is None
+    assert ev.status == evaluate.STATUS_NOT_ON_AMAZON
+    assert not ev.is_profitable
+
+
+def test_出品はあるが価格が取れない場合も計算しない():
+    ev = evaluate.evaluate(_cand(), _facts(price_yen=None), CFG)
+    assert ev.result is None
+    assert ev.status == evaluate.STATUS_NO_PRICE
+
+
+# -- 利益計算 -----------------------------------------------------------------
+def test_純利益は売値から全コストを引いた額と一致する():
+    ev = evaluate.evaluate(_cand(wholesale_ex_tax=1000), _facts(price_yen=5000), CFG)
+    r = ev.result
+    # 手で足し直して一致すること。丸めをどこかに隠していないかの検算。
+    total = (r.referral_fee + r.fba_fee + r.wholesale_price_incl_tax
+             + r.inbound_shipping + r.other_costs)
+    assert abs(r.net_profit - (5000 - total)) < 0.01
+    assert abs(r.margin_rate - r.net_profit / 5000) < 1e-9
+
+
+def test_卸価格は税抜として税込に換算される():
+    ev = evaluate.evaluate(_cand(wholesale_ex_tax=1000), _facts(), CFG)
+    assert abs(ev.result.wholesale_price_incl_tax - 1100) < 0.01
+
+
+def test_カテゴリはKeepaのカテゴリ名から料率に対応づく():
+    ev = evaluate.evaluate(_cand(), _facts(category_names=["家電&カメラ"]), CFG)
+    assert ev.category_key == "electronics"
+    assert abs(ev.result.referral_rate - 0.084) < 1e-9
+
+
+def test_不明カテゴリは辛い側のdefault料率になる():
+    ev = evaluate.evaluate(_cand(), _facts(category_names=["よく分からない棚"]), CFG)
+    assert ev.category_key == "default"
+    assert abs(ev.result.referral_rate - 0.154) < 1e-9
+
+
+def test_大型は大型のFBA手数料が使われる():
+    ev = evaluate.evaluate(_cand(), _facts(package_mm=(900, 400, 300), package_g=12000), CFG)
+    assert ev.size_key == "large_1"
+    assert ev.result.fba_fee == 603
+
+
+def test_寸法も重量も無ければ不明として標準2で仮置きしその旨を状態に残す():
+    ev = evaluate.evaluate(_cand(), _facts(package_mm=(), package_g=None), CFG)
+    assert ev.size_key == "unknown"
+    assert ev.result.fba_fee == 430
+    assert "FBAサイズ不明" in ev.status
+    # 体積が分からないので保管料は計上しない（0で埋めて安く見せない）
+    assert ev.storage_fee == 0
+
+
+def test_保管料は体積と月数から計算され純利益に反映される():
+    ev = evaluate.evaluate(_cand(), _facts(package_mm=(300, 200, 100)), CFG)
+    # 30×20×10cm = 6,000cm³ / 繁忙期 10.087円 per 1,000cm³ / 2ヶ月
+    assert abs(ev.storage_fee - 6.0 * 10.087 * 2) < 0.01
+    assert ev.result.other_costs >= ev.storage_fee
+
+
+def test_納品送料はFBA納品分とNETSEA送料の按分の合計():
+    ev = evaluate.evaluate(_cand(ship_fee=800), _facts(), CFG)
+    # FBA納品100円 + NETSEA送料800円 ÷ 10個
+    assert abs(ev.inbound_shipping - 180) < 0.01
+
+
+def test_赤字でもはずれとして必ず評価が返る():
+    ev = evaluate.evaluate(_cand(wholesale_ex_tax=9000), _facts(price_yen=5000), CFG)
+    assert ev.result.net_profit < 0
+    assert ev.result.verdict == "はずれ"
+    assert not ev.is_profitable
+
+
+# -- CSV 行 -------------------------------------------------------------------
+def test_計算できない行でも列は揃い数値欄は空欄になる():
+    ev = evaluate.evaluate(_cand(), keepa_verify.AmazonFacts(jan="x", found=False), CFG)
+    row = evaluate.to_row(ev)
+    assert set(row) == set(evaluate.COLUMNS)
+    assert row["純利益"] == ""
+    assert row["ASIN"] == ""
+    # 卸値は NETSEA から取れているので空欄にはならない
+    assert row["NETSEA卸値(税抜)"] == 1000
+
+
+def test_手数料内訳は各費目の合計と一致する():
+    ev = evaluate.evaluate(_cand(), _facts(), CFG)
+    row = evaluate.to_row(ev)
+    parts = row["販売手数料"] + row["FBA配送料"] + row["保管料"] + row["納品送料"] + row["雑費"]
+    total = row["Amazon価格"] - row["純利益"] - row["NETSEA卸値(税込)"]
+    assert abs(parts - total) <= 3  # 表示丸めぶんの誤差だけ許容
+
+
+def test_出品者数の出所は未検証であることを明示する():
+    row = evaluate.to_row(evaluate.evaluate(_cand(), _facts(), CFG))
+    assert row["出品者数"] == 5
+    assert "COUNT_NEW" in row["出品者数の出所"]
+
+
+def test_実セラー数が確定していればそちらが優先され出所も切り替わる():
+    f = _facts()
+    f.real_seller_count = 1        # 出所ラベルは代入しない（値から導出される）
+    row = evaluate.to_row(evaluate.evaluate(_cand(), f, CFG))
+    assert row["出品者数"] == 1
+    assert row["出品者数の出所"] == "実セラー数(offers検証済み)"
+
+
+def test_Amazon本体の有無はavailabilityAmazonで判定する():
+    # current[0] == -1 は「今この瞬間の価格が無い」だけで本体不在の証拠にならない。
+    assert evaluate.to_row(
+        evaluate.evaluate(_cand(), _facts(availability_amazon=-1), CFG))["Amazon本体の有無"] == "なし"
+    assert evaluate.to_row(
+        evaluate.evaluate(_cand(), _facts(availability_amazon=0), CFG))["Amazon本体の有無"] == "あり"
+
+
+def test_リンク列はASINから組み立てられる():
+    row = evaluate.to_row(evaluate.evaluate(_cand(), _facts(), CFG))
+    assert row["Amazonページ"] == "https://www.amazon.co.jp/dp/B006W1FQGE"
+    assert row["Keepaリンク"] == "https://keepa.com/#!product/5-B006W1FQGE"
+
+
+# -- 同一JANに複数ASIN / 総合判定 ------------------------------------------------
+def test_同一JANに複数ASINが返ったら売れている方を選ぶ():
+    # 実測で150件中15件がこの形だった。最初の1件を採るのはただのくじ引きになる。
+    def prod(asin, drops, rank):
+        return {"asin": asin, "title": asin, "eanList": [4971493901777],
+                "stats": {"current": [-1, 5000, -1, rank, 0, 0, 0, 0, 0, 0, 0, 3],
+                          "salesRankDrops30": drops}}
+    dead, alive = prod("BDEAD", 0, 900000), prod("BALIVE", 12, 3000)
+    got = keepa_verify._pick_best([dead, alive])
+    assert got["asin"] == "BALIVE"
+
+
+def test_複数ASINの件数が記録される():
+    f = _facts()
+    f.asin_count = 2
+    assert evaluate.to_row(evaluate.evaluate(_cand(), f, CFG))["同一JANのASIN数"] == 2
+
+
+def test_利益が出ても30日で売れていなければ総合判定でそう書く():
+    # 初回実走で「利益率55.9%・純利益7230円・drops30=0」が最上位に来た。
+    # 在庫は現金なので、これを「原石」と呼んではいけない。
+    ev = evaluate.evaluate(_cand(wholesale_ex_tax=1000), _facts(price_yen=9000, drops30=0), CFG)
+    assert ev.result.verdict == "原石"          # 利益だけ見れば原石
+    assert evaluate.overall_verdict(ev) == "利益は出るが直近30日に売れた形跡なし"
+
+
+def test_回転が遅い場合は個数を添えて総合判定に出す():
+    ev = evaluate.evaluate(_cand(wholesale_ex_tax=1000), _facts(price_yen=9000, drops30=2), CFG)
+    assert "回転が遅い" in evaluate.overall_verdict(ev)
+
+
+def test_利益も回転もあれば利益判定がそのまま総合判定になる():
+    ev = evaluate.evaluate(_cand(wholesale_ex_tax=1000), _facts(price_yen=9000, drops30=30), CFG)
+    assert evaluate.overall_verdict(ev) == "原石"
+
+
+def test_赤字は回転に関係なくはずれ():
+    ev = evaluate.evaluate(_cand(wholesale_ex_tax=9000), _facts(price_yen=5000, drops30=99), CFG)
+    assert evaluate.overall_verdict(ev) == "はずれ(赤字)"
+
+
+def test_販売実績が不明な場合は不明と書く():
+    ev = evaluate.evaluate(_cand(wholesale_ex_tax=1000), _facts(price_yen=9000, drops30=None), CFG)
+    assert evaluate.overall_verdict(ev) == "利益は出るが販売実績が不明"
+
+
+def test_全行に発注前の販売条件確認と商品ページURLが載る():
+    # 販売条件の自由記述は API に無い（ハルオ判定・第3層）。人が読む導線を必ず添える。
+    row = evaluate.to_row(evaluate.evaluate(_cand(), _facts(), CFG))
+    assert "販売条件" in row["発注前に必ず確認"]
+    assert row["NETSEA商品ページ"].startswith("https://www.netsea.jp/")
+
+
+def test_電気製品の行には法令要確認が出る():
+    row = evaluate.to_row(
+        evaluate.evaluate(_cand(product_name="LEDライト ACアダプタ付"), _facts(), CFG))
+    assert "PSE" in row["法令要確認"]

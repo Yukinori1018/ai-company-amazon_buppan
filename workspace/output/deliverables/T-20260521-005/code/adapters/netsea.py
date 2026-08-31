@@ -134,6 +134,10 @@ NETSEA_SUPPLIERS_ENDPOINT = NETSEA_BASE_URL + "/suppliers"
 # /items は supplier_ids をカンマ区切りで最大10件まで受け付ける（仕様）。
 _MAX_SUPPLIER_IDS_PER_REQUEST = 10
 
+# GET /suppliers の1ページ取得件数。既定は100件で打ち切られる（OpenAPI 仕様に記載なし）。
+# 実機確認（2026-08-31）で `limit` と `next_supplier_id` が効くことを確認した。
+_SUPPLIERS_PAGE_LIMIT = 200
+
 # サンプルJSONの置き場（このファイルから見た相対）
 _SAMPLE_PATH = Path(__file__).resolve().parent.parent / "sample_data" / "netsea_items.json"
 
@@ -297,6 +301,9 @@ class NetseaClient:
             self._supplier_ids_cache = []
             return []
         ids = [int(s["id"]) for s in data if s.get("id") is not None]
+        # ⚠️ ここも1ページ(100件)しか見ていない。JAN突合の網が狭くなるだけで壊れはしないが、
+        #    全承認サプライヤーを当てたい場合は list_suppliers() の結果を使うこと
+        #    （T-20260831-006 でページング済み）。
         self._supplier_ids_cache = ids
         return ids
 
@@ -409,28 +416,60 @@ class NetseaClient:
 
         本番では GET /suppliers をそのまま使う（id と社名）。本番に行けない／失敗時は
         サンプル商品から supplier_id を抽出して擬似サプライヤー一覧を作る（デモが回る）。
+
+        ⚠️ 2026-08-31 修正（T-20260831-006）:
+           このメソッドは以前 **先頭100件しか返していませんでした**。
+           `/suppliers` は1レスポンス100件で打ち切り、続きがあると `next_supplier_id` を
+           付けて返します（**OpenAPI 仕様には記載が無く、実機で発見**）。
+           当社の承認済みサプライヤーは実測 **225社** なので、旧実装は 125社を静かに
+           取りこぼしていました。「仕入れられる相手が誰か」を数え違える＝母数の欠落なので、
+           ページングを実装しました。
         """
         if not self.is_live:
             self.last_error = self._why_not_live()
             return self._sample_suppliers()
 
+        import time
+
         import requests  # 遅延 import
 
-        try:
-            resp = requests.get(
-                NETSEA_SUPPLIERS_ENDPOINT, headers=self._headers(), timeout=15
-            )
-        except requests.RequestException as e:
-            self.last_error = f"NETSEA /suppliers 通信失敗: {e}"
-            return self._sample_suppliers()
-        if resp.status_code != 200:
-            self.last_error = self._explain_http_error(resp)
-            return self._sample_suppliers()
-        try:
-            data = resp.json().get("data", [])
-        except ValueError:
-            self.last_error = "NETSEA /suppliers が非JSONを返却"
-            return self._sample_suppliers()
+        data = []
+        next_id = None
+        for _ in range(50):  # 保険の上限（225社なら2周で終わる）
+            params = {"limit": _SUPPLIERS_PAGE_LIMIT}
+            if next_id is not None:
+                params["next_supplier_id"] = next_id
+            try:
+                resp = requests.get(
+                    NETSEA_SUPPLIERS_ENDPOINT,
+                    headers=self._headers(),
+                    params=params,
+                    timeout=30,
+                )
+            except requests.RequestException as e:
+                self.last_error = f"NETSEA /suppliers 通信失敗: {e}"
+                if data:
+                    break  # 途中まで取れているなら、それは正直な部分結果として返す
+                return self._sample_suppliers()
+            if resp.status_code != 200:
+                self.last_error = self._explain_http_error(resp)
+                if data:
+                    break
+                return self._sample_suppliers()
+            try:
+                payload = resp.json()
+            except ValueError:
+                self.last_error = "NETSEA /suppliers が非JSONを返却"
+                if data:
+                    break
+                return self._sample_suppliers()
+            page = payload.get("data", []) if isinstance(payload, dict) else (payload or [])
+            data.extend(page)
+            next_id = payload.get("next_supplier_id") if isinstance(payload, dict) else None
+            if not next_id:
+                break
+            time.sleep(0.3)
+
         out = []
         for s in data:
             sid = s.get("id")
@@ -471,9 +510,44 @@ class NetseaClient:
             }
         return self._list_supplier_items_live(supplier_id, max_items, sleep_sec)
 
+    def list_supplier_items_raw(
+        self,
+        supplier_id: int,
+        *,
+        max_items: int = 100_000,
+        sleep_sec: float = 0.2,
+    ) -> tuple[list[dict], dict]:
+        """1サプライヤーの商品を **生の dict のまま** ページング取得する。
+
+        `list_supplier_items()` は共通型 `YahooItem` に正規化して返しますが、
+        その過程で **利益計算に要る情報が落ちます**（上代 reference_price / セット入数 set_num /
+        ネット販売可否 deal_net_shop_flag / 送料 ship_fee / 規格ごとの税区分）。
+        NETSEA 起点の利益スキャン（T-20260831-006）はそれらを全部使うため、
+        生データを触れる入口を1つ用意しました。
+
+        ⛔ 用途はモジュール冒頭の制限どおり **NETSEA 内で完結する仕入れ実務のみ**。
+           戻り値には `shop_name`（社名）が入ります。名簿化しないこと。
+
+        戻り値: (生 data の行リスト, coverage dict)
+        coverage は list_supplier_items() と同じ形（requested/fetched/pages/truncated/error）。
+        """
+        if not self.is_live:
+            self.last_error = self._why_not_live()
+            return [], {
+                "requested": max_items, "fetched": 0, "pages": 0,
+                "truncated": False, "error": self._why_not_live(), "sample": True,
+            }
+        return self._fetch_supplier_items_raw(supplier_id, max_items, sleep_sec)
+
     def _list_supplier_items_live(
         self, supplier_id: int, max_items: int, sleep_sec: float
     ) -> tuple[list[YahooItem], dict]:
+        rows, coverage = self._fetch_supplier_items_raw(supplier_id, max_items, sleep_sec)
+        return self._normalize(rows, is_sample=False), coverage
+
+    def _fetch_supplier_items_raw(
+        self, supplier_id: int, max_items: int, sleep_sec: float
+    ) -> tuple[list[dict], dict]:
         import time
 
         import requests  # 遅延 import
@@ -548,10 +622,10 @@ class NetseaClient:
         if len(collected) >= max_items and next_id:
             truncated = True  # 上限で打ち切り、まだ続きがある
 
-        items = self._normalize(collected[:max_items], is_sample=False)
-        return items, {
+        rows = collected[:max_items]
+        return rows, {
             "requested": max_items,
-            "fetched": len(items),
+            "fetched": len(rows),
             "pages": pages,
             "truncated": truncated,
             "error": error,
