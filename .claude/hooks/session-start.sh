@@ -299,6 +299,144 @@ ${MON_HOWTO}"
   fi
 fi
 
+# --- リマインダー⑥: 自律リサーチ資産「控え ⇔ 実体」の乖離検知（2026-09-02 / T-20260902-004）---
+#
+# 背景: T-20260902-003 でリポジトリ内 docs/reference/claude-research-skill/ に置いた5ファイルは
+#       **控え**であり、正は ~/.claude/ にある実体です。実体を編集しても控えは追随しません。
+#       T-20260902-002 では退避アーカイブが**作成翌日に既に657バイト古く**なっていました。
+#       README に更新義務を書いてありますが、文書だけの約束は風化します。
+#       そして**古い控えは、控えが無いより危険**です（「バックアップがある」と誤認させるため）。
+#
+# ⚠️ ここでやることは **検知と警告表示だけ** です（2026-09-02 社長の明示条件）。
+#    自動同期・自動コピー・自動 commit は**実装しません**。どちらが正かを機械は判断できないからです
+#    （実体が新しいのか、控え側の巻き戻しが意図的なのかは人間にしか分かりません）。
+#    「便利だから」と cp / rsync / git add を走らせる分岐をここに足さないでください。編集を失います。
+#    出力する cp は「人間が読んで判断してから自分で打つ」ための**文字列**です。
+
+# 対応表はここ1箇所だけ。控えと実体で相対パスが共通なので、資産が増えたら行を1つ足すだけで済みます。
+RESEARCH_MIRROR_PATHS=(
+  "skills/research/SKILL.md"
+  "skills/research/references/external-sources.md"
+  "agents/research-collector.md"
+  "agents/research-verifier.md"
+  "agents/research-integrator.md"
+)
+MIRROR_COPY_ROOT="$REPO/docs/reference/claude-research-skill"  # 控え（リポジトリ内・Git 追跡）
+MIRROR_COPY_REL="docs/reference/claude-research-skill"         # 表示用（リポジトリルート相対）
+MIRROR_LIVE_ROOT="$HOME/.claude"                               # 実体＝正（リポジトリ外・Git 管理外）
+
+# BSD(macOS) / GNU 両対応。取れなくても絶対に落とさない（フックがセッション開始を妨げないこと）。
+mirror_mtime_human() {
+  stat -f '%Sm' -t '%Y-%m-%d %H:%M' "$1" 2>/dev/null && return 0
+  stat -c '%y' "$1" 2>/dev/null | cut -c1-16 && return 0
+  echo '不明'
+}
+mirror_mtime_epoch() {
+  stat -f '%m' "$1" 2>/dev/null && return 0
+  stat -c '%Y' "$1" 2>/dev/null && return 0
+  echo 0
+}
+mirror_size() {
+  stat -f '%z' "$1" 2>/dev/null && return 0
+  stat -c '%s' "$1" 2>/dev/null && return 0
+  echo '?'
+}
+# 秒差 → 「2日3時間5分」。0分未満は「1分未満」。
+mirror_delta_human() {
+  local s="${1:-0}" out=""
+  case "$s" in (*[!0-9]*|'') echo '差不明'; return 0 ;; esac
+  [ "$s" -ge 86400 ] && out="${out}$(( s / 86400 ))日"
+  [ "$(( (s % 86400) / 3600 ))" -gt 0 ] && out="${out}$(( (s % 86400) / 3600 ))時間"
+  [ "$(( (s % 3600) / 60 ))" -gt 0 ] && out="${out}$(( (s % 3600) / 60 ))分"
+  [ -z "$out" ] && out="1分未満"
+  echo "$out"
+}
+
+MIRROR_MSG=""
+MIRROR_BODY=""
+MIRROR_COUNT=0
+
+# ~/.claude が無い環境（クラウド実行時など）は素通り。控えのディレクトリごと無い場合も同様。
+if [ -d "$MIRROR_LIVE_ROOT" ] && [ -d "$MIRROR_COPY_ROOT" ]; then
+  for rel in "${RESEARCH_MIRROR_PATHS[@]}"; do
+    live="$MIRROR_LIVE_ROOT/$rel"
+    copy="$MIRROR_COPY_ROOT/$rel"
+
+    # 両方無い＝資産ごと廃止された。削除された資産まで警告し続けない。
+    if [ ! -e "$live" ] && [ ! -e "$copy" ]; then
+      continue
+    fi
+
+    # 表示用の cp コマンド（**文字列としてだけ**出す。実行はしない）。
+    # $HOME は展開せずに出す: このリポジトリは PUBLIC なのでユーザー名を出力に載せない。
+    CP_LIVE_TO_COPY="cp \"\$HOME/.claude/${rel}\" \"${MIRROR_COPY_REL}/${rel}\""
+    CP_COPY_TO_LIVE="cp \"${MIRROR_COPY_REL}/${rel}\" \"\$HOME/.claude/${rel}\""
+
+    if [ -e "$live" ] && [ -e "$copy" ]; then
+      ck_live="$(cksum "$live" 2>/dev/null | awk '{print $1}' || true)"
+      ck_copy="$(cksum "$copy" 2>/dev/null | awk '{print $1}' || true)"
+
+      # 一致＝何も出さない（無風時は完全に静か）
+      if [ -n "$ck_live" ] && [ "$ck_live" = "$ck_copy" ]; then
+        continue
+      fi
+
+      live_t="$(mirror_mtime_human "$live")"; copy_t="$(mirror_mtime_human "$copy")"
+      live_z="$(mirror_size "$live")";        copy_z="$(mirror_size "$copy")"
+      live_e="$(mirror_mtime_epoch "$live")"; copy_e="$(mirror_mtime_epoch "$copy")"
+
+      if [ "$live_e" -gt "$copy_e" ]; then
+        newer="→ **実体（\$HOME/.claude/）のほうが $(mirror_delta_human $(( live_e - copy_e ))) 新しい**"
+      elif [ "$copy_e" -gt "$live_e" ]; then
+        newer="→ **控え（${MIRROR_COPY_REL}/）のほうが $(mirror_delta_human $(( copy_e - live_e ))) 新しい**"
+      else
+        newer="→ **更新時刻は同じですが中身が違います**（cksum 不一致）"
+      fi
+
+      MIRROR_COUNT=$(( MIRROR_COUNT + 1 ))
+      MIRROR_BODY="${MIRROR_BODY}
+■ ${rel} ［不一致］
+  実体: ${live_t} / ${live_z} bytes （cksum ${ck_live}）
+  控え: ${copy_t} / ${copy_z} bytes （cksum ${ck_copy}）
+  ${newer}（※「新しい＝正しい」ではありません。控え側の巻き戻しが意図的な場合もあります）
+  判断したうえで、**どちらか一方だけ**をリポジトリルートで実行:
+    実体 → 控え: ${CP_LIVE_TO_COPY}
+    控え → 実体: ${CP_COPY_TO_LIVE}
+"
+    elif [ -e "$live" ]; then
+      MIRROR_COUNT=$(( MIRROR_COUNT + 1 ))
+      MIRROR_BODY="${MIRROR_BODY}
+■ ${rel} ［控えが欠損］
+  実体: $(mirror_mtime_human "$live") / $(mirror_size "$live") bytes
+  控え: 存在しません（${MIRROR_COPY_REL}/${rel}）
+  → 控えが失われています。実体を控えへ戻すか、資産ごと廃止したなら対応表と README から外してください。
+    実体 → 控え: ${CP_LIVE_TO_COPY}
+"
+    else
+      MIRROR_COUNT=$(( MIRROR_COUNT + 1 ))
+      MIRROR_BODY="${MIRROR_BODY}
+■ ${rel} ［実体が欠損］
+  実体: 存在しません（\$HOME/.claude/${rel}）
+  控え: $(mirror_mtime_human "$copy") / $(mirror_size "$copy") bytes
+  → 実体が消えています。控えから復元するか、意図的な削除なら控えと README を整理してください。
+    控え → 実体: ${CP_COPY_TO_LIVE}
+"
+    fi
+  done
+
+  if [ "$MIRROR_COUNT" -gt 0 ]; then
+    MIRROR_MSG="
+
+【SessionStart リマインダー⑥：リサーチ資産の控えと実体が乖離しています（${MIRROR_COUNT}/${#RESEARCH_MIRROR_PATHS[@]} 件）】
+正は \$HOME/.claude/ の実体、\`${MIRROR_COPY_REL}/\` は控えです（T-20260902-003）。
+${MIRROR_BODY}
+**このフックは検知だけを行います。自動同期・自動コピー・自動 commit は一切しません**（2026-09-02 社長指示）。
+どちらが正かは機械には判断できません。必ず両者の中身を見比べ、**人間が決めてから**上のコマンドを打ってください。
+- 控えの README: ${MIRROR_COPY_REL}/README.md
+- 控えを更新した場合は commit まで行うこと（控えは Git 追跡対象）。"
+  fi
+fi
+
 # --- 掲出順（2026-08-31 / T-20260831-003 で変更）---
 #
 # 旧: ① → ②(next_check_at) → ③(inbox) → ④
@@ -309,10 +447,10 @@ fi
 #       ② は社長への問いかけリストであり、②が長い日ほど ③ が埋没するという逆相関がある。
 #       件数が増えるほど埋もれる配置は、放置を検知する仕組みとして自己矛盾しています。
 #       行動を要する短いものを前に、一覧性の長いものを後ろに置きます。
-# ⑤ は 2026-08-31 に追加。掲出は ① の直後（① → ⑤ → ③ → ④ → ②）。
+# ⑤ は 2026-08-31 に追加。⑥ は 2026-09-02 に追加。掲出は ① → ⑤ → ⑥ → ③ → ④ → ②。
 # 番号は作成順、掲出順とは別です（③④② が既にそうなっています）。
-# ⑤ は「止まっている時だけ」出るため、平常日は1行も増えません。だから最前列に置けます。
-MESSAGE="${SYNC_MSG}${MON_MSG}${INBOX_MSG}${LIST_MSG}${REMINDER_MSG}"
+# ⑤⑥ はいずれも「異常な時だけ」出るため、平常日は1行も増えません。だから最前列に置けます。
+MESSAGE="${SYNC_MSG}${MON_MSG}${MIRROR_MSG}${INBOX_MSG}${LIST_MSG}${REMINDER_MSG}"
 
 # JSON エスケープ（python が無い環境を考慮し、jq があれば使う）
 if command -v jq >/dev/null 2>&1; then
