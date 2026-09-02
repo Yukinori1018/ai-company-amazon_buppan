@@ -1,7 +1,7 @@
 ---
 ticket_id: T-20260902-001
 title: ディープリサーチ用プラグインの導入
-status: waiting
+status: done
 assignee: secretary
 priority: medium
 created_at: 2026-09-02
@@ -9,7 +9,6 @@ updated_at: 2026-09-02
 requires_approval: false
 labels: [tooling, research]
 parent_ticket: ""
-next_check_at: 2026-09-03
 related_tickets: [T-20260831-004, T-20260831-005]
 ---
 
@@ -24,21 +23,23 @@ related_tickets: [T-20260831-004, T-20260831-005]
 - [x] 候補3件を特定（exa / tavily / youdotcom-agent-skills）
 - [x] 最有力の exa をインストール
 - [x] 認証方式の特定（APIキーではなく OAuth。非対話セッションでは起動不可と判明）
-- [ ] **社長**: 対話ターミナルで `claude` → `/mcp` → `plugin:exa:exa` → Authenticate
-- [ ] 疎通確認（`claude mcp list` が connected になるか）
+- [x] **社長**: 対話ターミナルで `/mcp` → `plugin:exa:exa` → Authenticate（2026-09-02 完了）
+- [x] 疎通確認 → `claude mcp list` が `✔ Connected`
 
 ## 現在地
 
-**waiting（社長の番）。** exa プラグインは導入済みだが、MCP サーバ
-`https://mcp.exa.ai/mcp?client=claude-code-plugin` が **`Needs authentication`** を返す。
-このアプリのセッションは非対話（non-interactive）のため、**カズヨ側で OAuth フローを起動できない**。
-社長が対話ターミナルで `claude` を起動し `/mcp` から認証する必要がある。
+**done。** 導入・認証・疎通まで完了。
+
+- `claude mcp list` → `plugin:exa:exa: https://mcp.exa.ai/mcp?client=claude-code-plugin (HTTP) - ✔ Connected`
+- 使えるようになるのは**次のセッションから**。MCP のツール一覧はセッション開始時に確定するため、開始時点で未認証だった当セッションには exa のツールが登録されていない（`ToolSearch` で不在を確認済み）。プラグイン同梱 skill は `exa:search`（ディープリサーチ）/ `exa:exa-agent`（多段リサーチ・リスト構築・エンリッチ）。
 
 ### 9/2 の訂正
-前回「APIキーの登録は不要・匿名で動く」と報告したが、**この構成では誤り**。
+前回「APIキーの登録は不要・匿名で動く」と報告したが、**この構成では誤り**だった。
 README の「匿名でもレート制限付きで動く」は素の URL の話で、プラグイン同梱の
 `?client=claude-code-plugin` 付きエンドポイントは OAuth を要求する
-（`claude mcp list` の健全性チェックで確認）。
+（`claude mcp list` の健全性チェックが `! Needs authentication` を返した）。
+`claude mcp` CLI に認証サブコマンドは無く、非対話セッションからは起動不可。
+**認証は社長の対話ターミナル `/mcp` からしか通せない。**
 
 ## 調査結果
 
@@ -54,3 +55,4 @@ README の「匿名でもレート制限付きで動く」は素の URL の話�
 
 - 2026-09-02 doing 起票。カタログ調査 → exa をインストール
 - 2026-09-02 waiting へ。MCP が Needs authentication。非対話セッションでは OAuth 起動不可のため社長の対話ターミナル操作待ち
+- 2026-09-02 社長が /mcp から Exa のアクセスを承認 → `✔ Connected` を確認。done へ
