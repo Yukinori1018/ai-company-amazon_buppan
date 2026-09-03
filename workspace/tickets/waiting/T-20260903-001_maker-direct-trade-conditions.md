@@ -1,15 +1,15 @@
 ---
 ticket_id: T-20260903-001
 title: メーカー直取引の新規取引条件リサーチ
-status: doing
+status: waiting
 assignee: researcher
 priority: high
 created_at: 2026-09-03
-updated_at: 2026-09-03
+updated_at: 2026-09-04
 requires_approval: false
 labels: [research, maker-shiire]
 parent_ticket: ""
-next_check_at: 2026-09-04
+next_check_at: 2026-09-08
 related_tickets: [T-20260817-005, T-20260831-001, T-20260831-004, T-20260804-001]
 ---
 
@@ -20,19 +20,32 @@ related_tickets: [T-20260817-005, T-20260831-001, T-20260831-004, T-20260804-001
 ## タスク分解
 
 - [x] Phase 0 問いの分解（question.md）
-- [ ] Phase 1 並列収集（6カテゴリ）
-- [ ] Phase 2 統合（notes.md）
-- [ ] Phase 3 検証（出典の本文確認）
-- [ ] Phase 4 カバレッジ判定
-- [ ] Phase 5 執筆（draft.md）
+- [x] Phase 1 並列収集（6カテゴリ・120件）
+- [x] Phase 2 統合（notes.md・117件に統合）
+- [x] Phase 3 検証（58/117件を本文確認）
+- [x] Phase 4 カバレッジ判定（空カテゴリ0）
+- [x] Phase 5 執筆（draft.md + HTML）
+- [x] 出典一覧の追補（108件・本文の[#n]と一致）
+- [ ] 社長レビュー
 
 ## 現在地
 
-/research スキルで自律リサーチ実行中。成果物は `workspace/output/deliverables/T-20260903-001/research/`。
+リサーチ完了。**社長レビュー待ち（waiting）**。
+
+成果物: `workspace/output/deliverables/T-20260903-001/01_メーカー直取引の新規取引条件.html`
+
+社長に判断を仰ぐ論点（`research/escalation.md`）:
+- 論点1: Amazon名指し禁止条項の独禁法適合性 → ハルオ（法務）へ回すか
+- 論点2: 新規取引の前払い要求率に公的統計が無い → 保守的前提を置くかタケシ（プランナー）判断
+- 論点3: 下請法/取適法が本事業に及ぶか → ハルオ（法務）確認
+- D-1/D-2: 問合せ返信率と再アプローチの価値。いずれも二次情報同士の対立で裁定不能
 
 ## ログ
 
 - 2026-09-03 doing 起票（/research 起動と同時に着手）
+- 2026-09-03 Phase 1 完了。research-collector 6体並列で120件収集
+- 2026-09-04 Phase 2-5 完了。notes.md 117件 / verification.md（58件検証・不一致1件は本文から除外）/ draft.md / HTML
+- 2026-09-04 出典一覧108件を draft.md に追補、HTML 再生成。waiting へ移動（社長レビュー待ち）
 
 ## ログ（追記）
 
