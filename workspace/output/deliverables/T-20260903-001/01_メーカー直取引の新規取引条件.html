@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>メーカー直取引の新規取引条件（T-20260903-001）</title>
+<meta name="robots" content="noindex, nofollow">
+<style>
+:root{
+  color-scheme: light dark;
+  --bg:#ffffff; --surface:#f5f7f9; --surface2:#eceff3;
+  --text:#1b1f24; --muted:#525b66; --faint:#6c7681;
+  --border:#d5dae1; --border-strong:#b8c0ca;
+  --accent:#1c5b86; --accent-bg:#eef5fa;
+  --warn:#8a4b00; --warn-bg:#fdf1df; --warn-border:#dd9a3c;
+  --alert:#7d2b2b; --alert-bg:#fbeeee; --alert-border:#d08b8b;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#15181c; --surface:#1d2126; --surface2:#252a31;
+    --text:#e4e8ec; --muted:#aab4bf; --faint:#949eaa;
+    --border:#333a43; --border-strong:#48515c;
+    --accent:#79b4dc; --accent-bg:#1a2a36;
+    --warn:#f0b866; --warn-bg:#332616; --warn-border:#7a5a2a;
+    --alert:#e79a9a; --alert-bg:#331e1e; --alert-border:#6e4040;
+  }
+}
+*{box-sizing:border-box;}
+html{ -webkit-text-size-adjust:100%; }
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic Medium","Yu Gothic",
+              "Noto Sans JP","Meiryo",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:16px; line-height:1.85;
+  font-feature-settings:"palt" 1;
+  text-align:left;
+}
+.wrap{max-width:900px; margin:0 auto; padding:32px 20px 96px;}
+
+/* ---------- header ---------- */
+.kicker{
+  font-size:12px; letter-spacing:.14em; color:var(--faint);
+  margin:0 0 10px; font-variant-numeric:tabular-nums;
+}
+h1{
+  font-size:27px; line-height:1.5; margin:0 0 20px;
+  letter-spacing:.01em; font-weight:700; text-wrap:balance;
+}
+.lead{
+  margin:0; color:var(--muted); font-size:15px; line-height:1.8;
+  border-left:3px solid var(--border-strong); padding:2px 0 2px 14px;
+}
+
+/* ---------- toc ---------- */
+.toc{
+  margin:30px 0 8px; padding:18px 22px 20px;
+  background:var(--surface); border:1px solid var(--border); border-radius:10px;
+}
+.toc-h{
+  margin:0 0 10px; font-size:13px; font-weight:700;
+  letter-spacing:.1em; color:var(--muted);
+}
+.toc ol,.toc ul{margin:0; padding:0; list-style:none;}
+.toc li{margin:.26em 0; line-height:1.65;}
+/* .toc ul より詳細度を上げないと padding:0 に負ける */
+.toc ul.toc-l2{padding-left:1.6em; margin:.25em 0 .6em;}
+.toc ul.toc-l2 li{font-size:14.5px; color:var(--muted); margin:.16em 0;}
+.toc ul.toc-l2 li::before{content:"–"; color:var(--faint); margin-right:.45em;}
+.toc a{color:var(--accent); text-decoration:none; border-bottom:1px solid transparent;}
+.toc a:hover{border-bottom-color:currentColor;}
+
+/* ---------- sections ---------- */
+.sec{margin:0;}
+.sec>*:last-child{margin-bottom:0;}
+h2{
+  font-size:21px; line-height:1.5; margin:46px 0 16px; padding-bottom:9px;
+  border-bottom:2px solid var(--border-strong); font-weight:700;
+  scroll-margin-top:16px;
+}
+h3{
+  font-size:17px; line-height:1.6; margin:32px 0 12px; font-weight:700;
+  color:var(--text); scroll-margin-top:16px;
+}
+h3::before{content:""; display:inline-block; width:4px; height:1em;
+  background:var(--accent); margin-right:9px; vertical-align:-.13em; border-radius:2px;}
+p{margin:0 0 1.1em;}
+ul,ol{margin:0 0 1.2em; padding-left:1.6em;}
+li{margin:.4em 0;}
+li>ul{margin:.45em 0 .2em;}
+blockquote{
+  margin:0 0 1.2em; padding:14px 18px;
+  background:var(--surface); border-left:4px solid var(--accent); border-radius:0 8px 8px 0;
+}
+blockquote p{margin:0;}
+hr.rule{
+  border:0; border-top:1px solid var(--border);
+  margin:40px 0 0; opacity:.55;
+}
+hr.rule:has(+ .sec-box){display:none;}
+
+/* ---------- tables ---------- */
+.tw{
+  overflow-x:auto; -webkit-overflow-scrolling:touch;
+  margin:0 0 1.4em; border:1px solid var(--border); border-radius:9px;
+  background:
+    linear-gradient(to right, var(--bg) 30%, rgba(0,0,0,0)) left / 28px 100% no-repeat local,
+    linear-gradient(to left,  var(--bg) 30%, rgba(0,0,0,0)) right / 28px 100% no-repeat local,
+    radial-gradient(farthest-side at 0 50%, rgba(90,110,130,.28), rgba(0,0,0,0)) left / 12px 100% no-repeat scroll,
+    radial-gradient(farthest-side at 100% 50%, rgba(90,110,130,.28), rgba(0,0,0,0)) right / 12px 100% no-repeat scroll;
+}
+.tw:focus{outline:2px solid var(--accent); outline-offset:2px;}
+table{border-collapse:collapse; width:100%; font-size:14.5px; line-height:1.72;}
+thead th{
+  background:var(--surface2); text-align:left; font-weight:700;
+  padding:11px 14px; border-bottom:2px solid var(--border-strong);
+  white-space:nowrap; vertical-align:bottom;
+}
+tbody td{padding:11px 14px; border-bottom:1px solid var(--border); vertical-align:top;}
+tbody tr:last-child td{border-bottom:0;}
+tbody tr:nth-child(even){background:color-mix(in srgb, var(--surface) 55%, transparent);}
+tbody td:first-child{font-weight:600;}
+thead th:first-child,tbody td:first-child{min-width:7.5em;}
+thead th:last-child,tbody td:last-child{white-space:normal;}
+
+/* ---------- inline markers ---------- */
+.ref{
+  font-size:.75em; color:var(--faint); margin-left:.15em;
+  white-space:nowrap; font-variant-numeric:tabular-nums;
+  letter-spacing:.01em; vertical-align:.06em;
+}
+.chk{
+  display:inline-block; font-size:.75em; line-height:1.5;
+  padding:0 .5em; margin:0 .12em; border-radius:4px;
+  background:var(--warn-bg); color:var(--warn);
+  border:1px solid var(--warn-border); font-weight:700;
+  white-space:nowrap; vertical-align:.09em;
+}
+
+/* ---------- emphasised sections ---------- */
+.sec-box{
+  margin:28px 0 0; padding:6px 26px 20px;
+  border:1px solid var(--border-strong); border-radius:10px;
+}
+.sec-box h2{margin-top:26px;}
+.sec-box .tw{background-color:var(--bg);}
+.sec-conclusion{background:var(--accent-bg); border-left:6px solid var(--accent);}
+.sec-conclusion h2{border-bottom-color:var(--accent);}
+.sec-alert{background:var(--alert-bg); border-color:var(--alert-border);
+  border-left:6px solid var(--alert);}
+.sec-alert h2{border-bottom-color:var(--alert-border);}
+
+/* ---------- footer / nav ---------- */
+.prov{
+  margin:56px 0 0; padding-top:16px; border-top:1px solid var(--border);
+  font-size:12.5px; line-height:1.8; color:var(--faint); word-break:break-all;
+}
+.top{
+  position:fixed; right:18px; bottom:18px; z-index:5;
+  display:block; width:42px; height:42px; line-height:40px; text-align:center;
+  border-radius:50%; text-decoration:none; font-size:17px;
+  background:var(--surface); color:var(--muted);
+  border:1px solid var(--border-strong);
+  box-shadow:0 2px 8px rgba(0,0,0,.14);
+}
+.top:hover{color:var(--accent); border-color:var(--accent);}
+
+/* ---------- narrow screens ---------- */
+@media (max-width:640px){
+  body{font-size:15.5px;}
+  .wrap{padding:22px 14px 88px;}
+  h1{font-size:22px;}
+  h2{font-size:19px;}
+  h3{font-size:16.5px;}
+  .toc{padding:14px 16px 16px;}
+  .sec-box{padding:4px 14px 14px;}
+  table{font-size:14px;}
+  thead th,tbody td{padding:9px 11px;}
+}
+
+/* ---------- print ---------- */
+@media print{
+  :root{
+    --bg:#fff; --surface:#fff; --surface2:#fff; --text:#000; --muted:#333; --faint:#555;
+    --border:#999; --border-strong:#555; --accent:#000; --accent-bg:#fff;
+    --warn:#000; --warn-bg:#fff; --warn-border:#000;
+    --alert:#000; --alert-bg:#fff; --alert-border:#000;
+  }
+  body{background:#fff; color:#000; font-size:10.5pt; line-height:1.7;}
+  .wrap{max-width:none; padding:0;}
+  a{color:#000; text-decoration:none;}
+  .top{display:none;}
+  .tw{overflow:visible; background:none; border:1px solid #999;}
+  table{font-size:9pt;}
+  thead th{background:#fff; border-bottom:1.5pt solid #000;}
+  tbody tr:nth-child(even){background:#fff;}
+  .sec-box{background:#fff; border:1.5pt solid #000;}
+  .chk{background:#fff; color:#000; border:1pt solid #000;}
+  .ref{color:#555; opacity:1;}
+  blockquote{background:#fff; border-left:3pt solid #000;}
+  h2,h3{break-after:avoid; page-break-after:avoid;}
+  .tw,blockquote,tr{break-inside:avoid; page-break-inside:avoid;}
+  .toc{border:1px solid #999; background:#fff;}
+}
+</style>
+</head>
+<body id="top">
+<div class="wrap">
+<p class="kicker">T-20260903-001</p>
+<h1>中小メーカーに新規取引口座を開くとき、何が要求され、どこで落とされるか</h1>
+<p class="lead">対象読者：個人事業主（法人格なし）・販売実績ほぼゼロ・Amazon日本アカウント復旧作業中。これから中小メーカーへ直接連絡する段階。</p>
+<nav class="toc" aria-label="目次"><p class="toc-h">目次</p><ol class="toc-l1"><li><a href="#s1">1. 結論</a></li><li><a href="#s2">2. 供給側が実際に課している条件</a></li><li><a href="#s3">3. 必要書類</a></li><li><a href="#s4">4. 最低発注（MOQ）と支払条件</a><ul class="toc-l2"><li><a href="#s4-1">4-1. 初回</a></li><li><a href="#s4-2">4-2. 2回目以降</a></li><li><a href="#s4-3">4-3. 制度側の動き（本事業に及ぶかは未確定）</a></li></ul></li><li><a href="#s5">5. 落とされる理由（反証）</a><ul class="toc-l2"><li><a href="#s5-1">5-1. 明示的な断り文句</a></li><li><a href="#s5-2">5-2. 断られ方の内訳</a></li><li><a href="#s5-3">5-3. 数字で見た通過率</a></li><li><a href="#s5-4">5-4. 断りが最終回答とは限らない、という反対側</a></li><li><a href="#s5-5">5-5. 周辺で塞がっている道</a></li></ul></li><li><a href="#s6">6. 販路制限は法的にどこまで許されるか</a></li><li><a href="#s7">7. 米国との差分</a><ul class="toc-l2"><li><a href="#s7-1">米国側で標準的に求められるもの</a></li><li><a href="#s7-2">実店舗要件は日本固有ではない</a></li><li><a href="#s7-3">Amazon名指し禁止も日本固有ではない</a></li><li><a href="#s7-4">反対側（オンライン専業でも通る例）</a></li><li><a href="#s7-5">支払条件の差</a></li></ul></li><li><a href="#s8">8. 時系列（3年前・5年前との比較）</a><ul class="toc-l2"><li><a href="#s8-1">軸1：チャネルへのアクセスは広がっている</a></li><li><a href="#s8-2">軸2：支払条件の規律は厳しくなっている</a></li><li><a href="#s8-3">軸3：測る物差し自体が変わっている</a></li><li><a href="#s8-4">この章の結論</a></li></ul></li><li><a href="#s9">9. わからなかったこと</a></li><li><a href="#s10">この資料の信頼度</a></li></ol></nav>
+<section id="s1" class="sec sec-box sec-conclusion">
+<h2>1. 結論</h2>
+<p>揃えるもの（供給側が実際に提出を求めた実例があるもの）</p>
+<div class="tw" tabindex="0"><table><thead><tr><th>#</th><th>もの</th><th>根拠</th></tr></thead><tbody><tr><td>1</td><td>屋号または会社名（個人名だけでは登録を断る例あり）</td><td><span class="ref">[#5]</span></td></tr><tr><td>2</td><td>開業届控え／確定申告書第1表（いずれか1点で足りる例あり）</td><td><span class="ref">[#75]</span></td></tr><tr><td>3</td><td>事業用の電話番号・HP／ネットショップURL</td><td><span class="ref">[#45]</span><span class="ref">[#66]</span></td></tr><tr><td>4</td><td>販路の証拠（直近3ヶ月の売上表・ECカート月額請求書・決済手数料表）</td><td><span class="ref">[#44]</span></td></tr><tr><td>5</td><td>初回前払いの現金（初回2万円下限・代引・振込前払いの例）</td><td><span class="ref">[#20]</span><span class="ref">[#21]</span><span class="ref">[#43]</span></td></tr><tr><td>6</td><td>本人確認書類・賃貸契約書または物件写真（卸プラットフォーム登録時）</td><td><span class="ref">[#73]</span></td></tr></tbody></table></div>
+<p>落とされる主な関門（1つの一次証言による整理）</p>
+<ul><li>①法人でないとNG ②新規のAmazon取引はしていない ③実店舗がないとNG ④Amazon・オンライン販売NG。交渉の余地があるのは①のみ <span class="ref">[#58]</span></li><li>既存取引先とEC上で競合する販路しか持たない場合の謝絶 <span class="ref">[#2]</span></li><li>「せどり」「転売」「総合的な商品の取り扱い」と判定されての拒否 <span class="ref">[#44]</span><span class="ref">[#45]</span></li><li>そもそも返信が来ない（14社問合せて直接契約0、うち11社が無反応という1件の実例）<span class="ref">[#61]</span></li></ul>
+</section>
+<hr class="rule">
+<section id="s2" class="sec">
+<h2>2. 供給側が実際に課している条件</h2>
+<p>業種横断で確認できた条件の類型です。各行は個別企業の一次記載であり、業界の相場を示すものではありません。</p>
+<div class="tw" tabindex="0"><table><thead><tr><th>条件の類型</th><th>具体的な記載</th><th>出典の性格</th><th>根拠</th></tr></thead><tbody><tr><td>事業者限定（一般消費者不可）</td><td>「個人（一般）のお客様はアンテナショップをご利用ください」</td><td>1社の卸専用サイト</td><td><span class="ref">[#3]</span></td></tr><tr><td>個人名義そのものの排除</td><td>「個人でのご登録はお断りしております」会社名または屋号が必須</td><td>1社</td><td><span class="ref">[#5]</span></td></tr><tr><td>法人格または実店舗のいずれか必須</td><td>法人、または自社実店舗（ジム・整骨院含む）を持つ個人事業主に限定。登記未完了の「法人設立中」は登録不可</td><td>1社</td><td><span class="ref">[#46]</span></td></tr><tr><td>業種の限定</td><td>個人事業主への卸は「ペット業を主業とする場合」に限定</td><td>1社</td><td><span class="ref">[#44]</span></td></tr><tr><td>財務情報の申告</td><td>創業年・資本金・従業員数・年商（前期／前々期）・経常利益（前期／前々期）・主要仕入先・主要販売先。合否の年商閾値は非公開</td><td>1社（本文未確認、検索ハイライトのみ）</td><td><span class="ref">[#4]</span></td></tr><tr><td>販路の申告と競合審査</td><td>主力販売先・現状販路（Amazon・楽天等も要記載）を確認し、既存取引先とEC上で競合する販路のみなら本部判断で謝絶</td><td>1社</td><td><span class="ref">[#2]</span></td></tr><tr><td>販路の「格」の指定</td><td>楽天市場出店または月額3,000円程度以上の有料ECカートを条件とし、Amazon（大口含む）・Yahoo!・BASE・メルカリShops等の無料/低額カートはNG</td><td>1社</td><td><span class="ref">[#44]</span></td></tr><tr><td>電話で聞かれる項目</td><td>売上規模・事業年数・従業員数、Amazon販売での既往トラブル対応、掛け率と購入希望数量、会社HP URL、訪問希望、取扱商材・販路</td><td>1名の営業経験に基づく整理（自社コンサル誘導記事）</td><td><span class="ref">[#66]</span></td></tr><tr><td>個人事業主を明示的に受け入れる側</td><td>法人格を問わず個人事業主・開業準備中（店舗物件確定者）も登録可</td><td>卸プラットフォーム1社</td><td><span class="ref">[#1]</span></td></tr><tr><td>同上</td><td>審査制で法人・個人事業主とも登録可</td><td>D2C卸1社</td><td><span class="ref">[#20]</span></td></tr></tbody></table></div>
+<p>母集団の差に注意してください。「個人事業主可」の記載が多いのは卸プラットフォームおよびそこに出品する中小・地場メーカー、「個人には門前払い」とされるのは大手ナショナルブランドです。両者は同じ母集団ではありません <span class="ref">[#1]</span><span class="ref">[#20]</span><span class="ref">[#58]</span><span class="ref">[#62]</span>。</p>
+</section>
+<hr class="rule">
+<section id="s3" class="sec">
+<h2>3. 必要書類</h2>
+<p>企業ごとにばらつきます。以下は個別企業の一次記載です。</p>
+<div class="tw" tabindex="0"><table><thead><tr><th>供給側</th><th>求められた書類</th><th>根拠</th></tr></thead><tbody><tr><td>卸プラットフォーム（開業準備中の入会）</td><td>賃貸物件なら賃貸契約書（住所・期間・事業用途・大家と本人の署名捺印の4点）／自己物件なら準備中の外観・内観写真／個人事業主または固定電話なし法人は運転免許証等の本人確認書類。開業届の提出は必須と明記されていない</td><td><span class="ref">[#73]</span></td></tr><tr><td>サプリ・OEM系の販売店代理店契約</td><td>個人事業者は「開業届控え／確定申告書第1表／営業許可証／WEB掲載情報」のいずれか1点＋店内写真3点（陳列スペース・固定設備・外観）。法人は登記事項証明書（発行3ヶ月以内）</td><td><span class="ref">[#75]</span></td></tr><tr><td>医薬品卸の代理店・加盟</td><td>入会申込書、決算書（直近3期分）または確定申告書（貸借対照表・損益計算書・販売管理費内訳・勘定科目）、商業登記簿謄本1通、医薬品販売許可証コピー、契約者・連帯保証人の印鑑証明書各1通（本文未確認・検索ハイライトのみ）</td><td><span class="ref">[#77]</span></td></tr><tr><td>ガラス製品メーカー（請求書払い希望時）</td><td>「得意先登録用紙」の提出</td><td><span class="ref">[#21]</span><span class="ref">[#74]</span></td></tr><tr><td>ペット用品卸（ネットショップのみの事業者）</td><td>直近3ヶ月分の売上表・ECカート月額費用請求書・決済手数料表</td><td><span class="ref">[#44]</span></td></tr><tr><td>化粧品メーカー（取引申請フォーム）</td><td>会社名/屋号・担当者名・住所・電話・HP URL・業務内容</td><td><span class="ref">[#45]</span></td></tr></tbody></table></div>
+<p>開業届について。卸プラットフォームの一次ページは開業届の提出を必須とは書いていません <span class="ref">[#73]</span>。「必須ではないが最有力な証明」「開業1年目・副業でも審査対象」とする二次解説が2件あります <span class="ref">[#76]</span><span class="ref">[#49]</span>。一方、代理店契約では開業届控えが選択肢の1つとして明示されています <span class="ref">[#75]</span>。個人ブロガーの体験では、新規契約時に個人事業主／法人の証明を求められることがあり、法人限定の業者は法人でなければ別を探すしかないとされています（1件の証言）<span class="ref">[#78]</span>。</p>
+<p>いつまでに用意するか。日本側の審査所要日数を示す資料は notes.md にありません。米国では承認まで48時間とする1社、最短7営業日程度とする1社の記載があります <span class="ref">[#98]</span><span class="ref">[#113]</span>。</p>
+</section>
+<hr class="rule">
+<section id="s4" class="sec">
+<h2>4. 最低発注（MOQ）と支払条件</h2>
+<h3 id="s4-1">4-1. 初回</h3>
+<div class="tw" tabindex="0"><table><thead><tr><th>供給側</th><th>初回の発注条件</th><th>出典の性格</th><th>根拠</th></tr></thead><tbody><tr><td>卸プラットフォーム</td><td>掲載商品の75%以上が1点から購入可、最低注文金額の設定なし</td><td>1プラットフォームの一次記載</td><td><span class="ref">[#1]</span></td></tr><tr><td>D2C卸</td><td>発注ロットなし・1点から可。ただし初回のみ税込20,000円以上（未満はキャンセル）</td><td>1社</td><td><span class="ref">[#20]</span><span class="ref">[#43]</span></td></tr><tr><td>和紙製品メーカー</td><td>商品により10個から。5,000個超は納品方法を別途相談</td><td>1社</td><td><span class="ref">[#3]</span></td></tr><tr><td>インテリア雑貨サプライヤー</td><td>1個〜（バラ対応可能）、ケース入数40個</td><td>1社（本文未確認）</td><td><span class="ref">[#50]</span></td></tr><tr><td>地方菓子卸</td><td>1商品200ピース（20入×10箱等）程度。営業担当が訪問して条件提示する対面商談方式</td><td>1社</td><td><span class="ref">[#6]</span></td></tr><tr><td>キムチメーカー</td><td>卸プラットフォーム経由。初回は各卸仕入サービスとも卸価格で10,000円分が無料になるキャンペーン</td><td>1社（本文未確認）</td><td><span class="ref">[#7]</span></td></tr><tr><td>サプリ・OEM代理店契約</td><td>契約金30万円（掛け率65%）の振込後に取引開始</td><td>1社</td><td><span class="ref">[#75]</span></td></tr></tbody></table></div>
+<p>体感値として流通しているもの（一次データの裏付けなし）</p>
+<ul><li>最低発注金額は業者によるが2〜3万円が多く、ロット単位は6個〜120個等（個人ブロガー1名の体感）<span class="ref">[#9]</span></li><li>メーカー直接仕入れ可の場合でも「1回の注文で最低◯◯万円以上」「1商品100個から」という条件を提示されたケースがある（せどり塾運営者1名の証言。自身の塾へ勧誘する記事）<span class="ref">[#8]</span></li></ul>
+<p>MOQの水準は取引形態で割れます。卸プラットフォーム経由の小口卸は1点〜数万円、メーカー直接の代理店・独占契約は100個・契約金30万円といった水準です <span class="ref">[#6]</span><span class="ref">[#7]</span><span class="ref">[#9]</span> vs <span class="ref">[#8]</span><span class="ref">[#75]</span>。同じ「メーカー仕入れ」という言葉で両者を比較しないでください。</p>
+<h3 id="s4-2">4-2. 2回目以降</h3>
+<div class="tw" tabindex="0"><table><thead><tr><th>供給側</th><th>支払条件</th><th>根拠</th></tr></thead><tbody><tr><td>D2C卸</td><td>銀行振込（初回前払い、2回目以降後払い）またはクレジットカード</td><td><span class="ref">[#20]</span><span class="ref">[#43]</span></td></tr><tr><td>ガラス製品メーカー</td><td>クレジット／代金引換（上限30万円）／銀行・郵便振込（前払い）／後払いPaid／請求書払い（法人専用、締日から支払いまで40日以内）。請求書払いは官公庁・学校・上場企業のみ初回から可、一般企業は継続取引先のみ</td><td><span class="ref">[#21]</span></td></tr><tr><td>後払いサービスPaid</td><td>法人または個人事業主が対象、利用可能金額30万円〜1,000万円、登録料・利用料無料、事前申込・審査が必要</td><td><span class="ref">[#23]</span></td></tr><tr><td>花き卸売市場</td><td>通常買参権は保証人・保証金が必要（利用料10,000円/月）。WEB買参権は保証人・保証金不要（利用料5,000円/月＋購入額の5%）</td><td><span class="ref">[#22]</span></td></tr><tr><td>卸プラットフォーム</td><td>クレジットカード／後払い（要審査、開業前でも初回利用可・限度額70万円）／代金引換</td><td><span class="ref">[#1]</span></td></tr></tbody></table></div>
+<p>いずれも1社ごとの記載です。「新規の個人事業主が実際にどの程度の頻度で前払いを固定的に求められるか」を数値化した公的統計は見つかっていません。近接するのは、支払いを受ける側の業務課題として「新規取引先の与信審査」が54.1%で最多、「売掛金の貸し倒れ・支払遅延」が45.0%という民間調査（対象600人、年商1億〜250億円企業、2022年6月）だけで、これは前払い要求の頻度そのものではありません <span class="ref">[#19]</span><span class="chk">要確認 #19</span>。<br>この結論は #19 まわりの統計的欠落をどう扱うか（保守的に「新規はほぼ前払い」と置くか）の裁定次第で変わります。</p>
+<p>なお #19 の「銀行振込が受取時89.4%・支払時94.1%」という内訳数値は、出典プレスリリース本文には「約9割」としか記載がなく、小数点以下は確認できていません。本稿では「企業間決済は銀行振込が約9割」までを採ります <span class="ref">[#19]</span>。</p>
+<h3 id="s4-3">4-3. 制度側の動き（本事業に及ぶかは未確定）</h3>
+<ul><li>2024年11月1日以降、手形等のサイトが60日を超えると「割引困難な手形」に該当するおそれがあるとして行政指導の対象（旧基準は繊維業90日・その他120日、1966年以降運用）<span class="ref">[#10]</span></li><li>経産省は下請中小企業振興法の「振興基準」を2024年11月1日付で改正し、支払サイトを業種を問わず60日以内と規定 <span class="ref">[#11]</span></li><li>2025年5月16日成立の改正法により、対象取引での手形払いが全面禁止、施行は2026年1月1日 <span class="ref">[#13]</span><span class="ref">[#90]</span>。ただし公取委の一次発表に記載された改正後の正式題名は「製造委託等に係る中小受託事業者に対する代金の支払の遅延等の防止に関する法律」で、「中小受託取引適正化法」という名称はこのページに登場しません。「取適法」という略称は別の一次資料（2025年11月11日付要請文）と報道で使われています <span class="ref">[#90]</span><span class="ref">[#91]</span></li><li>中小企業庁は2025年8月、全国の中小企業30万社対象・6万5,000社余り回答（回収率21.9%）のアンケートを基に、手形サイトが60日を超え割引料を下請側に負担させる例が確認された15社（シャトレーゼ、三菱鉛筆、テルモ、住友重機械工業、三協立山、セーレン等）を最低評価として社名公表 <span class="ref">[#17]</span></li></ul>
+<p>これらは主に発注者側を規制対象とする制度改正です。個人事業主がメーカーから仕入れる取引が適用対象に入るかは、資本金要件・取引類型次第で変わります <span class="chk">要確認 #13</span><span class="chk">要確認 #90</span>。<br>この結論は下請法・取適法の適用範囲についての法務裁定次第で変わります。</p>
+</section>
+<hr class="rule">
+<section id="s5" class="sec">
+<h2>5. 落とされる理由（反証）</h2>
+<h3 id="s5-1">5-1. 明示的な断り文句</h3>
+<p>実際に受領されたメール文言（1名の当事者が公開した1通）</p>
+<blockquote><p>「現状amazonでの販売をご希望の方は全てお断りさせて頂いております」<span class="ref">[#59]</span></p></blockquote>
+<p>サイト上に書かれている条件文（各社1件の一次記載）</p>
+<div class="tw" tabindex="0"><table><thead><tr><th>供給側の業種</th><th>断りの条件文</th><th>根拠</th></tr></thead><tbody><tr><td>プロテイン・サプリ</td><td>楽天・Amazon・Yahoo!・au PAY・Qoo10等のモール系EC、メルカリ・ラクマ等のフリマでの販売を一切不可</td><td><span class="ref">[#46]</span></td></tr><tr><td>ペット用品卸／OEM</td><td>Amazon（大口出品含む）・Yahoo!ショッピング・BASE・メルカリShops等はNG。「せどり」「転売」「総合的な商品の取り扱い」を行っている場合は取引を断る</td><td><span class="ref">[#44]</span></td></tr><tr><td>石鹸ブランド正規代理店</td><td>「ご商売をされている方、会社様のみお取引」。Amazonへの出品は不可、ネット販売は取引開始（購入）後に限り可、オークション不可、日本国内販売限定、メーカー希望小売価格への協力</td><td><span class="ref">[#47]</span></td></tr><tr><td>家電・生活雑貨卸</td><td>既存取引先とEC上で競合する販路のみの場合は本部判断で新規契約を謝絶。新規契約には社内稟議が必要</td><td><span class="ref">[#2]</span></td></tr><tr><td>業務用米卸</td><td>「個人でのご登録はお断り」。転売もお断りで、ネット販売・卸売販売の可能性がある場合はアカウント停止の可能性</td><td><span class="ref">[#5]</span></td></tr><tr><td>自然派化粧品</td><td>二次卸不可。フリマサイト・リサイクルショップ・ディスカウント形態の小売・転売目的は不可。原則定価販売</td><td><span class="ref">[#45]</span></td></tr><tr><td>製薬（通販専売品）</td><td>「卸売販売は一切行っておりません」。自社公式チャネル以外での販売品はすべて転売品として扱う</td><td><span class="ref">[#51]</span></td></tr><tr><td>宇治茶</td><td>転売・再販・営利目的の注文を全面的にお断り。同一住所への複数人配送、短期間の複数回注文、個人利用範囲を超える大量注文はキャンセル対象。判断理由は非開示</td><td><span class="ref">[#52]</span></td></tr><tr><td>ヘアケア</td><td>公式オンラインショップまたは正式取引店以外での販売を固く禁止。転売等の商用利用目的の法人・個人への販売も全面的に断る（本文未確認）</td><td><span class="ref">[#54]</span></td></tr><tr><td>健康食品ブランド</td><td>「卸販売は一切行っておりません」「転売等の商用利用を目的とした方（事業者含む）のご利用、販売を全面的にお断り」（本文確認済の範囲はこの2文まで）</td><td><span class="ref">[#53]</span></td></tr><tr><td>石鹸メーカー</td><td>「転売を目的としたご購入や、営利目的での大量購入などの行為を一切お断り」。転売品は返品・交換・サポート対象外（本文未確認）</td><td><span class="ref">[#56]</span></td></tr><tr><td>オーガニックコスメ</td><td>転売・オークション・フリマ出品を規制。卸業者に対しても定価以外の販売を禁止（本文未確認）</td><td><span class="ref">[#55]</span></td></tr><tr><td>化粧品ブランド</td><td>公式ショップ・正式取引店以外での販売を禁止（本文未確認）</td><td><span class="ref">[#57]</span></td></tr><tr><td>和紙・雑貨系サプライヤー</td><td>商品ページ個別にAmazon出品を禁止し、その他ECでも画面記載の上代での販売協力を求める。制限はブランド単位でなくSKU単位で課される例が多い（本文未確認）</td><td><span class="ref">[#50]</span></td></tr></tbody></table></div>
+<p>卸プラットフォーム内部でも、「出店先がAmazonだけの場合、審査に通らない・取引をしてくれないショップもある」と伝える二次解説記事が2件一致しています。公式FAQの直接引用ではなく解説者の要約であり、一次ページでの同一文言は確認できていません <span class="ref">[#48]</span>。</p>
+<h3 id="s5-2">5-2. 断られ方の内訳</h3>
+<p>1名の一次証言による整理では、断りパターンは①法人でないとNG ②新規のAmazon取引はしていない ③実店舗がないとNG ④Amazon・オンライン販売NG で、交渉の余地があるのは①のみとされます <span class="ref">[#58]</span>。発信者は自社コンサルへ誘導する立場です。</p>
+<h3 id="s5-3">5-3. 数字で見た通過率</h3>
+<p>すべて個人の体験談で、母集団も期間も揃っていません。</p>
+<div class="tw" tabindex="0"><table><thead><tr><th>内容</th><th>数値</th><th>出典の性格</th><th>根拠</th></tr></thead><tbody><tr><td>個人事業主がAmazon物販開始直後に150社リストアップ→14社問合せ</td><td>直接契約0件（断り2・代理店紹介1・無反応11）</td><td>セラーフォーラムへの本人投稿1件</td><td><span class="ref">[#61]</span></td></tr><tr><td>卸業者への問合せ</td><td>10カ所で2〜3業者が話を聞き、そのうち半分が仕入れまで至る</td><td>個人ブロガー1名の体感</td><td><span class="ref">[#63]</span></td></tr><tr><td>メーカーへのメール</td><td>10件送っても返事が返ってこない場合がほとんど</td><td>物販歴6年の1名（リード獲得導線あり）</td><td><span class="ref">[#64]</span></td></tr><tr><td>半年間のメーカー仕入れ</td><td>問合せメールは無視、卸値もAmazon販売価格とほぼ同等、最低発注ロット・現金払い・年間最低取引額が厳しく「やるだけムダ」と結論</td><td>実践者1名</td><td><span class="ref">[#65]</span></td></tr><tr><td>返信率</td><td>30%程度と言われる／10〜20%程度と言われる</td><td>二次記事2本が食い違い</td><td><span class="ref">[#70]</span><span class="ref">[#71]</span><span class="chk">要確認 #70</span><span class="chk">要確認 #71</span></td></tr><tr><td>副業1年目</td><td>メール300件送付（1ヶ月目）、年商1,000万・利益月10万円</td><td>コンサル会社の受講生体験談</td><td><span class="ref">[#68]</span></td></tr></tbody></table></div>
+<p>返信率の見積りは #70 と #71 のどちらを採るかの裁定次第で変わります。10件送って3件返る前提と1〜2件返る前提では、必要な送付数が倍以上ずれます。</p>
+<h3 id="s5-4">5-4. 断りが最終回答とは限らない、という反対側</h3>
+<ul><li>電話で断られた後「仕入れ量が増えれば直接可能か」と聞くと「実績があれば可能」と返答があり、半年後の再チャレンジで契約に至った（自己申告1件、実績数値の裏付けなし）<span class="ref">[#67]</span></li><li>最初のメールで断られたメーカーに3ヶ月後に販売実績レポートを添えて再アプローチし、取引成立と独占販売権を得たという匿名の第三者事例（伝聞か直接取材か不明、検証不能）<span class="ref">[#72]</span></li></ul>
+<p>再アプローチにリソースを割くべきかは #58 と #67 のどちらを採るかの裁定次第で変わります。</p>
+<h3 id="s5-5">5-5. 周辺で塞がっている道</h3>
+<ul><li>大手（資生堂・バンダイ等）は直接販売せず、「決まった卸問屋にしか商品提供していない」と断られたケースが多々ある（せどり塾運営者1名の証言）<span class="ref">[#62]</span></li><li>副業段階での融資は、地元信用金庫に「副業の方には融資はできない」と断られた例がある（コンサル会社の顧客事例1件）<span class="ref">[#69]</span></li><li>メーカー・卸との交渉で「取り扱い商品のリストを全て送ってください」と依頼すると断られる場合がある。楽天・Yahoo!は可でもAmazonは断られるメーカーもある（記名なしのノウハウ記事）<span class="ref">[#60]</span></li></ul>
+</section>
+<hr class="rule">
+<section id="s6" class="sec">
+<h2>6. 販路制限は法的にどこまで許されるか</h2>
+<p>判断枠組みは公取委「流通・取引慣行に関する独占禁止法上の指針」（1991年制定／2017年直近改正）です。</p>
+<div class="tw" tabindex="0"><table><thead><tr><th>区分</th><th>内容</th><th>根拠</th></tr></thead><tbody><tr><td>黒に近い</td><td>再販売価格維持行為は原則違法</td><td><span class="ref">[#25]</span></td></tr><tr><td>グレー（個別判断）</td><td>非価格制限行為は市場閉鎖効果／価格維持効果の有無で判断</td><td><span class="ref">[#25]</span></td></tr><tr><td>白になり得る条件</td><td>選択的流通が適法となる要件は①基準の合理性 ②同等基準の適用 の2点</td><td><span class="ref">[#24]</span></td></tr></tbody></table></div>
+<p>判例側。資生堂東京販売＝富士喜本店事件／花王化粧品販売＝江川企画事件（最高裁第三小法廷、1998年12月18日、2件同日判決）が化粧品の対面販売義務について判断しています。「合理的理由」＋「他の取引先にも同等の制限」の2要件という整理は解説記事経由で採録されたものですが、notes.md が挙げた有斐閣OnlineのURLでは無料公開部分が判示事項の見出しにとどまり、2要件の文言そのものはこのURLからは裏取りできていません <span class="ref">[#26]</span>。ガイドライン側の2要件 <span class="ref">[#24]</span> は本文で確認済みです。</p>
+<p>実際に「黒」と判定された例</p>
+<div class="tw" tabindex="0"><table><thead><tr><th>事案</th><th>処分</th><th>根拠</th></tr></thead><tbody><tr><td>資生堂（1995年）</td><td>希望小売価格からの値引き阻止・生協への実質再販契約が不公正な取引方法（一般指定12項1号）に該当し排除措置の同意審決</td><td><span class="ref">[#27]</span></td></tr><tr><td>アップリカ・チルドレンズプロダクツ（2019年7月）</td><td>再販売価格拘束で排除措置命令</td><td><span class="ref">[#41]</span></td></tr><tr><td>一蘭（2022年）</td><td>2018年1月以降、小売業者にカップ麺等を希望小売価格で販売するよう要請し同意した業者のみと取引していた疑いで、改善計画（確約手続き）が認定</td><td><span class="ref">[#37]</span><span class="ref">[#38]</span></td></tr></tbody></table></div>
+<p>ハマナカ毛糸事件（東京高裁2011年4月22日）は希望小売価格の周知による再販売価格拘束の成立要件と「正当な理由」を争った事案です。notes.md は解説記事の事案要旨のみで、判旨本文は未読です <span class="ref">[#28]</span>。</p>
+<p>Amazon側の条件も審査対象になっています。</p>
+<ul><li>Amazonマーケットプレイス出品契約の「価格等の同等性条件」（他販路より安く売らせないMFN条項）と「品揃えの同等性条件」が拘束条件付取引の疑いとして審査され、条項削除により2017年6月に審査終了 <span class="ref">[#33]</span></li><li>納入業者への在庫補償契約による代金減額・協賛金強要・不当返品等が優越的地位の濫用の疑いとされ、2020年9月に確約計画認定。対象納入業者約1,400社に総額約20億円の金銭的価値回復 <span class="ref">[#34]</span></li><li>カートボックス優先表示条件（他社サイトより低価格・FBA利用の要求）について2024年11月26日に立入検査、同年12月4日から出品者向け情報募集。2026年9月時点で最終処分は未確認 <span class="ref">[#35]</span></li></ul>
+<p>実務上の線引き。メーカーが「Amazonだけ」を名指しで禁止し、自社EC・有料カート・楽天は許容する制限が、選択的流通の「同等基準の適用」を満たすかは、Amazonと他モールを区別する合理的理由を個別に立証できるかに依存します。一次資料からは各社の禁止理由の法的正当性を判定できません <span class="ref">[#24]</span><span class="ref">[#44]</span><span class="ref">[#46]</span><span class="ref">[#47]</span><span class="ref">[#50]</span><span class="chk">要確認 #24</span><span class="chk">要確認 #44</span>。<br>この結論は、Amazon限定禁止条項が独禁法上争える余地があるかという法務裁定次第で変わります。実務的には、争えるかどうかにかかわらず、供給側は「禁止」と書いて実際に断っています。</p>
+</section>
+<hr class="rule">
+<section id="s7" class="sec">
+<h2>7. 米国との差分</h2>
+<h3 id="s7-1">米国側で標準的に求められるもの</h3>
+<p>連邦EIN、州または自治体のbusiness license、resale certificate（州の売上税免除証明）。信販部門がtrade referenceに連絡して与信審査を行い、与信ラインの規模次第で個人保証を求められる場合がある。これは法律解説サイト1件の記載です <span class="ref">[#95]</span>。</p>
+<h3 id="s7-2">実店舗要件は日本固有ではない</h3>
+<div class="tw" tabindex="0"><table><thead><tr><th>供給側</th><th>条件</th><th>根拠</th></tr></thead><tbody><tr><td>インテリア卸（米）</td><td>「qualified brick-and-mortar retailers and interior designers」限定。オンライン専業への卸とAmazon・eBay等での再販を明示的に禁止</td><td><span class="ref">[#96]</span></td></tr><tr><td>ガラス（米、2025年8月改訂）</td><td>「established brick-and-mortar storefronts」限定。オンラインリテーラー・骨董転売業者・仮設ブースは不可。実店舗以外での再販は「direct competition」とみなし不可</td><td><span class="ref">[#105]</span></td></tr><tr><td>トレカ（米）</td><td>店舗売上が全体の60%以上、週40時間以上営業、店舗外観・内観・航空写真等4枚、sales tax permitの写しと直近納税証明、賃貸契約書の写し。卸売自体が禁止、越境販売も禁止、eBay出品の有無は申告必須</td><td><span class="ref">[#106]</span></td></tr><tr><td>アパレル（米）</td><td>実店舗ごとに個別承認。外観・内観・レジ周りを含む店舗写真一式の提出が申請プロセスの一部</td><td><span class="ref">[#107]</span></td></tr><tr><td>コスメ（英）</td><td>「bricks and mortar store」と確立した顧客基盤を持つ事業者のみ検討対象。店舗の内外観写真・棚割図・棚の寸法が必須。年間最低発注額は卸価格ベースで£5,000</td><td><span class="ref">[#108]</span></td></tr><tr><td>壁面アート（英）</td><td>「trade only」。オンライン専業への卸は不可。申請フォームに現在取引のある仕入先（credit terms付き）の記入が必須でreference照会あり</td><td><span class="ref">[#109]</span></td></tr></tbody></table></div>
+<h3 id="s7-3">Amazon名指し禁止も日本固有ではない</h3>
+<div class="tw" tabindex="0"><table><thead><tr><th>供給側</th><th>記載</th><th>根拠</th></tr></thead><tbody><tr><td>アウトドア（米）</td><td>Amazon/eBay/Target+/Walmart Marketplaceを含む「publicly accessible website」での販売は事前の書面同意が必須</td><td><span class="ref">[#99]</span></td></tr><tr><td>アパレル大手（米）</td><td>ブランドごとにOnline Dealerの個別承認が必要（ブランド横断の自動承認なし）。Amazon.com等での販売は別途書面承認必須、承認なしの出品は一律禁止</td><td><span class="ref">[#100]</span></td></tr><tr><td>工具（米）</td><td>申請プロセスは「Amazon, eBay, Walmart Marketplaceでの販売authorizeには使えない」と明記</td><td><span class="ref">[#101]</span></td></tr><tr><td>製薬（米）</td><td>Authorized Resellerに分類された顧客にのみ再販許可。Amazon.com、Groupon等の第三者マーケットプレイス運営者への販売は書面同意なしに禁止。ログイン制B2Bポータルは「publicly accessible website」に該当せず許容</td><td><span class="ref">[#103]</span></td></tr><tr><td>プロ向けコスメ（米）</td><td>Amazon/eBay/Etsy/Walmart等いかなるマーケットプレイスでの販売も禁止、MSRP維持義務あり</td><td><span class="ref">[#104]</span></td></tr><tr><td>アパレル（蘭）</td><td>書面許可なくAmazon/Zalando/Bol.com/Walmart/eBay等での販売は不可。違反者は値引き権喪失＋出荷停止</td><td><span class="ref">[#110]</span></td></tr></tbody></table></div>
+<p>Amazon販売を認める場合でも追加条件が付く例があります。Rev-A-Shelf は「Authorized Website」として個別承認された販路のみで販売可とし、Amazonでの販売にはAmazon固有の追加要件（Exhibit A）への同意、FBA使用禁止、ASIN新規作成禁止（承認済ASINのみ）、Amazon Business Seller Programオプトアウト必須、Amazon Renewedでの再販禁止、INFORM Act遵守を課します <span class="ref">[#102]</span>。</p>
+<h3 id="s7-4">反対側（オンライン専業でも通る例）</h3>
+<ul><li>アパレル卸1社は、事業登録・resale certificate・稼働中のwebsiteまたはInstagram/Etsy/Faireプロフィールを求める一方、「オンライン専業リテーラー・ポップアップストア・開業準備中のブティックも承認する」と明言 <span class="ref">[#94]</span></li><li>別の1社は実店舗写真を必須とせず、「機能するURL（構築中の証明可）」「実店舗の写真」「電話番号の確認」「名刺等」のうち2点以上で足りるとする（本文未確認）<span class="ref">[#114]</span></li><li>卸商品発見プラットフォームRangeMe自体はAmazon等への出品制限を課さない。バーコード必須、商品画像は白背景・80%以上フレーム占有等の規格あり、MOQは「Pricing Comments」欄への任意記載で必須フィールドではない <span class="ref">[#111]</span></li></ul>
+<h3 id="s7-5">支払条件の差</h3>
+<p>米国・欧州側では初回pro-forma（前払い）→与信申請でNet 30という段階が明文化されている例があります。オランダのアパレル卸1社は初回pro-forma、30日与信口座は申請により利用可能な場合あり、標準は請求書日付から厳格な30日ネット払い、期限外支払いの値引きは無効化、延滞は年利9%の契約利息と規定 <span class="ref">[#110]</span>。米国のガラス1社はティア別にBasic $1,000／Standard $2,500／Premium $5,000のMOV（Collegiateは$1,400）、年間$20,000要件があり、割引率はBasic 30%／Standard 35%／Premium 40%／Collegiate 15%。Basic/Collegiateは注文時払い、Standard/Premiumはfulfillment時払いで、Net termsが使えるのはPremiumのみです <span class="ref">[#105]</span>。</p>
+<p>差分のまとめ。「実店舗必須」「Amazon名指し禁止」「書面による個別承認制」は日米英蘭いずれの一次資料にも現れており、日本固有の慣行とは言えません <span class="ref">[#96]</span><span class="ref">[#99]</span>〜<span class="ref">[#110]</span>。書類の中身は異なります（米国＝EIN・business license・resale certificate、日本＝開業届控え・確定申告書・登記事項証明書）<span class="ref">[#95]</span><span class="ref">[#73]</span><span class="ref">[#75]</span><span class="ref">[#77]</span>。日本側で目立つのは「せどり」「転売」という語による排除の書き方 <span class="ref">[#44]</span><span class="ref">[#45]</span><span class="ref">[#52]</span>、米国側で目立つのは「Authorized Reseller」という契約上の地位の設計です <span class="ref">[#102]</span><span class="ref">[#103]</span>。</p>
+</section>
+<hr class="rule">
+<section id="s8" class="sec">
+<h2>8. 時系列（3年前・5年前との比較）</h2>
+<p>門戸が開いたかどうかは、見る軸によって逆方向の答えが出ます。</p>
+<h3 id="s8-1">軸1：チャネルへのアクセスは広がっている</h3>
+<div class="tw" tabindex="0"><table><thead><tr><th>時点</th><th>事実</th><th>根拠</th></tr></thead><tbody><tr><td>2021-09</td><td>食品BtoB EC「Mマート」の買い手会員数が前年から1.3万社増の17.9万社（見出しのみ確認、本文有料）</td><td><span class="ref">[#83]</span></td></tr><tr><td>2021-09</td><td>2020年度の通販市場は前年比20.1%増の10.6兆円</td><td><span class="ref">[#85]</span></td></tr><tr><td>2021-08</td><td>通販実施企業の78%が「21年下期以降も通販市場は拡大する」と回答。新規参入事業者の拡大も要因</td><td><span class="ref">[#84]</span></td></tr><tr><td>2023-05</td><td>BtoB卸EC「Bカート」導入企業1,500社以上（2023年4月時点）</td><td><span class="ref">[#86]</span></td></tr><tr><td>2023-08</td><td>「orosy」出展ブランド4,000社以上（自社PR）</td><td><span class="ref">[#87]</span></td></tr><tr><td>2024-02</td><td>「orosy」シリーズAで約3億円調達、6,000社以上のブランド利用（自社PR）</td><td><span class="ref">[#89]</span></td></tr><tr><td>2026-05</td><td>「Bカート」導入実績2,500社突破、発注企業（買い手）延べ135万社超（自社PR）</td><td><span class="ref">[#92]</span></td></tr><tr><td>2026-06</td><td>「orosy」登録バイヤー2万社以上・登録ブランド約5,000社、「orosy API」開始（自社PR）</td><td><span class="ref">[#93]</span></td></tr></tbody></table></div>
+<p>orosy の 2024-02「6,000社以上のブランド利用」と 2026-06「登録ブランド約5,000社」は集計定義が異なる可能性があります。notes.md に定義の説明はありません <span class="ref">[#89]</span><span class="ref">[#93]</span>。またこれらはいずれも自社発表です。</p>
+<h3 id="s8-2">軸2：支払条件の規律は厳しくなっている</h3>
+<p>2019年度→2026年の間に、下請法まわりで規制が段階的に強化されました <span class="ref">[#10]</span><span class="ref">[#11]</span><span class="ref">[#13]</span><span class="ref">[#17]</span><span class="ref">[#90]</span><span class="ref">[#91]</span>。詳細は §4-3。</p>
+<h3 id="s8-3">軸3：測る物差し自体が変わっている</h3>
+<p>「取引条件改善状況調査」は年度ごとに実施機関・対象規模が異なります。令和元年度は帝国データバンク実施・66,600社・回収率37.9%、令和3年度は東京商工リサーチ実施・88,800社・29.2%、令和5年度は90,000社・29.4%、令和6年度は9万社（回答30,770社）、令和7年度は発注側調査を廃止して受注側98,000社に拡大 <span class="ref">[#79]</span><span class="ref">[#80]</span><span class="ref">[#81]</span><span class="ref">[#82]</span>。時系列で同じ数字を並べる前提が揃っていません。</p>
+<h3 id="s8-4">この章の結論</h3>
+<p>「新規取引の条件が緩んだのか」を直接測った統計は見つかっていません。言えるのは次の2点までです。</p>
+<ol><li>卸ECプラットフォームという迂回路は明らかに拡大した（ただし数値は各社の自社発表）<span class="ref">[#86]</span><span class="ref">[#87]</span><span class="ref">[#89]</span><span class="ref">[#92]</span><span class="ref">[#93]</span></li><li>支払サイト・手形をめぐる規律は厳格化した。ただし本事業がその規制の対象に入るかは未確定 <span class="ref">[#10]</span><span class="ref">[#11]</span><span class="ref">[#13]</span><span class="ref">[#90]</span><span class="chk">要確認 #13</span></li></ol>
+<p>参考として、2021年版小規模企業白書では、受取手形の支払サイトが60日以内の企業は業種を問わず1〜2割にとどまり、120日超も1割程度存在、代金の支払期日・支払手段を「販売先が一方的に決定」と回答した企業がそれぞれ3割以上でした <span class="ref">[#16]</span>。</p>
+</section>
+<hr class="rule">
+<section id="s9" class="sec sec-box sec-alert">
+<h2>9. わからなかったこと</h2>
+<p>事実として埋まらなかった箇所です。推測で補っていません。</p>
+<div class="tw" tabindex="0"><table><thead><tr><th>項目</th><th>状態</th></tr></thead><tbody><tr><td>新規取引先が前払いを固定的に求められる比率</td><td>該当統計なし。公的統計から推定不能 <span class="ref">[#19]</span></td></tr><tr><td>メーカーへの問合せ返信率</td><td>30%程度 <span class="ref">[#70]</span> と 10〜20%程度 <span class="ref">[#71]</span> が対立。どちらも一次データの裏付けなし、裁定不能</td></tr><tr><td>一度断られた後の再交渉の見込み</td><td><span class="ref">[#58]</span>（ほぼ交渉不可）と <span class="ref">[#67]</span>（実績提示で契約成立）が対立、裁定不能</td></tr><tr><td>卸取引の合否を分ける年商の閾値</td><td>非公開（1社が「合否の年商閾値は非公開」と明記）<span class="ref">[#4]</span></td></tr><tr><td>代理店契約の入会金の額</td><td>非公開（1社）<span class="ref">[#77]</span></td></tr><tr><td>日本の供給側の審査所要日数</td><td>該当資料なし。米国の2社のみ48時間・最短7営業日の記載 <span class="ref">[#98]</span><span class="ref">[#113]</span></td></tr><tr><td>MOQの業界相場</td><td>統計なし。個社の記載と個人の体感値のみ <span class="ref">[#1]</span><span class="ref">[#3]</span><span class="ref">[#6]</span><span class="ref">[#8]</span><span class="ref">[#9]</span><span class="ref">[#20]</span><span class="ref">[#50]</span></td></tr><tr><td>Amazon出品制限ブランドが2023→2025年で2倍以上増加したという説</td><td>出典が記事本文に記載されておらず裏取り不能 <span class="ref">[#40]</span></td></tr><tr><td>Amazonカートボックス事件の最終処分</td><td>2026年9月時点で未確認 <span class="ref">[#35]</span></td></tr><tr><td>非価格制限のセーフハーバー基準の確定内容</td><td>2016年の改正案段階のレポートのみで、確定後の条文異同は未検証。かつ検証時点で当該PDFのURLが取得できず <span class="ref">[#29]</span></td></tr><tr><td>下請代金の現金払い比率・手形廃止予定の推移</td><td>出典PDFがテキスト化できず数値を裏取りできていない <span class="ref">[#14]</span><span class="ref">[#15]</span><span class="ref">[#18]</span></td></tr><tr><td>卸売業の事業所数（令和3年経済センサス）</td><td>出典PDFがテキスト化できず未検証 <span class="ref">[#115]</span></td></tr><tr><td>資生堂・花王事件の「2要件」の判旨本文</td><td>notes.md が挙げたURLでは有料会員限定エリアにあり、当該URLからは確認できていない <span class="ref">[#26]</span></td></tr><tr><td>ハマナカ毛糸事件の判旨本文</td><td>未読（解説記事の事案要旨のみ）<span class="ref">[#28]</span></td></tr><tr><td>「Amazonだけ名指し禁止」の独禁法上の適法性</td><td>一次資料からは各社の禁止理由の法的正当性を判定できない <span class="ref">[#24]</span><span class="ref">[#44]</span></td></tr><tr><td>下請法・取適法が本事業の取引形態に及ぶか</td><td>資本金要件・取引類型次第で変わり、一次資料からは断定できない <span class="ref">[#13]</span><span class="ref">[#90]</span></td></tr></tbody></table></div>
+</section>
+<hr class="rule">
+<section id="s10" class="sec sec-box sec-alert">
+<h2>この資料の信頼度</h2>
+<ul><li>統合後の事実件数: 117件 / 本文検証済: 58件（約50%）。うち出典本文と一致が確認できたのは42件、不一致1件、要注意7件、未確認8件。本稿が参照した事実はおよそ90件で、その約半数は出典本文レベルの再確認を経ていません。</li><li>使用しなかった事実: <span class="ref">[#12]</span>（注意喚起の件数内訳。出典本文に「9月27日付600者／11月22日付追加100者」という分解が存在しないと検証で判明したため、支払条件の記述に使っていません）。</li><li>要注意とされた7件は、いずれも検証で確認できた狭い範囲に限定して使いました。</li><ul><li><span class="ref">[#17]</span> 「大企業446社を評価」は確認できなかったため書いていません（30万社対象・6万5,000社余り回答・回収率21.9%・15社公表・社名のみ使用）— §4-3</li><li><span class="ref">[#19]</span> 「受取時89.4%・支払時94.1%」は本文になく「約9割」に置き換え — §4-2</li><li><span class="ref">[#26]</span> 2要件の文言は当該URLから裏取り不能である旨を本文に明記 — §6、§9</li><li><span class="ref">[#53]</span> 「共同出店の実店舗」を含む4チャネルの記述は使わず、確認できた2文のみ — §5-1</li><li><span class="ref">[#90]</span> 「中小受託取引適正化法」が一次発表の正式題名ではない旨を明記 — §4-3</li><li><span class="ref">[#105]</span> Collegiateティア15%を含めて記載 — §7</li><li><span class="ref">[#111]</span> 「原価$0.01・粗利0%は却下」は確認できなかったため書いていません — §7</li></ul><li>単独ソースに依存している記述: 本稿の個別企業の条件・書類・MOQ・支払条件・断り文句はほぼすべて [単独ソース]（notes.md 全117件中96件）です。該当箇所は §2 全行、§3 全行、§4-1 全行、§4-2 全行、§5-1 の表全行、§5-3 の <span class="ref">[#61]</span><span class="ref">[#63]</span><span class="ref">[#64]</span><span class="ref">[#65]</span><span class="ref">[#68]</span>、§7 の <span class="ref">[#94]</span>〜<span class="ref">[#111]</span><span class="ref">[#114]</span>、§8 の <span class="ref">[#83]</span>〜<span class="ref">[#93]</span>。本文中では「1社の記載」「1名の証言」と明示し、相場として書いていません。複数ソースで裏が取れているのは <span class="ref">[#10]</span>（経産省一次＋二次報道）、<span class="ref">[#17]</span>（2媒体）、<span class="ref">[#26]</span>（2媒体）、<span class="ref">[#35]</span>（2媒体）、<span class="ref">[#48]</span>（2記事）、<span class="ref">[#82]</span>（2媒体）、<span class="ref">[#112]</span>（2媒体、本稿では未使用）のみです。</li><li>未検証のまま使った事実: 概数で45件前後。集中しているのは §2（<span class="ref">[#2]</span><span class="ref">[#3]</span><span class="ref">[#4]</span><span class="ref">[#6]</span><span class="ref">[#7]</span>）、§3（<span class="ref">[#73]</span><span class="ref">[#74]</span><span class="ref">[#76]</span><span class="ref">[#77]</span><span class="ref">[#78]</span>）、§4-1・§4-2（<span class="ref">[#8]</span><span class="ref">[#9]</span><span class="ref">[#20]</span><span class="ref">[#21]</span><span class="ref">[#22]</span><span class="ref">[#23]</span><span class="ref">[#50]</span>）、§5-1 の後半（<span class="ref">[#50]</span><span class="ref">[#53]</span>の一部<span class="ref">[#54]</span><span class="ref">[#55]</span><span class="ref">[#56]</span><span class="ref">[#57]</span><span class="ref">[#60]</span>）、§5-3（<span class="ref">[#62]</span><span class="ref">[#63]</span><span class="ref">[#64]</span><span class="ref">[#65]</span><span class="ref">[#67]</span><span class="ref">[#68]</span><span class="ref">[#69]</span><span class="ref">[#72]</span>）、§7 の大半（<span class="ref">[#95]</span><span class="ref">[#97]</span><span class="ref">[#98]</span><span class="ref">[#99]</span><span class="ref">[#104]</span><span class="ref">[#105]</span><span class="ref">[#107]</span><span class="ref">[#108]</span><span class="ref">[#109]</span><span class="ref">[#110]</span><span class="ref">[#113]</span><span class="ref">[#114]</span>）、§8（<span class="ref">[#83]</span><span class="ref">[#84]</span><span class="ref">[#85]</span><span class="ref">[#87]</span><span class="ref">[#89]</span><span class="ref">[#92]</span><span class="ref">[#93]</span>）です。特に §7 の米国・欧州事例は21件中の多くが未検証の単独ソースです。</li><li>[要確認] の一覧</li><ul><li><span class="chk">要確認 #19</span> 新規取引での前払い要求率に公的統計がない。保守的に「新規はほぼ前払い」と置くかはプランナー裁定（§4-2）</li><li><span class="chk">要確認 #70</span><span class="chk">要確認 #71</span> 問合せ返信率 30% と 10〜20% の対立。必要送付数の見積りが倍以上変わる（§5-3）</li><li><span class="chk">要確認 #58</span><span class="chk">要確認 #67</span> 断られた後の再アプローチに価値があるか。次の候補に切り替えるかの行動方針が変わる（§5-4）</li><li><span class="chk">要確認 #24</span><span class="chk">要確認 #44</span> Amazon限定禁止が選択的流通の「同等基準の適用」を満たすか。法務が個別契約で検討（§6）</li><li><span class="chk">要確認 #13</span><span class="chk">要確認 #90</span> 下請法・取適法の規制強化が本事業の取引形態に及ぶか。法務裁定（§4-3、§8）</li></ul></ul>
+</section>
+<p class="prov">HTML版。内容の唯一の正は workspace/output/deliverables/T-20260903-001/research/draft.md です（本ファイルは同ファイルから機械変換したもので、加筆・削除はありません）。</p>
+</div>
+<a class="top" href="#top" aria-label="先頭へ戻る">&#8593;</a>
+</body>
+</html>
