@@ -44,21 +44,36 @@ BRJORDAN = (
 KYORIN = "海外代理店への販売のみとなります。"
 
 
-def test_法務ルール単体ではブラザージョルダンをA_PLUSと誤判定する():
-    """**現状の欠陥を明示的に固定する。** 直ったらこのテストが落ちて気づける。
+def test_v1_1はブラザージョルダンをA_PLUSにしない():
+    """**このテストは一度、正反対のことを主張していた。**
 
-    法務ルールJSONは法務の所有物なので私が直すことはできない。
-    だからこそ「今はこう誤る」を書き残して、検知器で補っていることを示す。
+    v1.0 には『新規お取引は行っておりません』が A_PLUS（最優先で打診）に化ける
+    欠陥があり、法務ルールJSONは法務の所有物で私が直せなかった。
+    そこで「今はこう誤る」を固定して、検知器で補っていることを示していた。
+
+    法務が v1.1 で D6_trade_window_negated を入れて塞いだので、
+    固定していた欠陥は消えた。**役目を終えた証拠テストは、
+    消すのではなく、直ったことの証拠に書き換える。**
     """
     r = classify_window(BRJORDAN, "https://www.brjordan.com/contact-2/")
-    assert r["optout_class"] == "A_PLUS"
-    assert "A1_trade_window" in r["optout_rule_ids"]
+    assert r["optout_class"] != "A_PLUS", "v1.0 の欠陥が再発している: %r" % r
+    assert r["optout_class"] in ("D", "E"), r
+    # ※実際に発火するのは E4_web_only_refused（適用順が E → D のため）。
+    #   D6 は needs_review を持つが E4 は持たないので、この社の
+    #   optout_needs_review は False になる。**それは法務の設計判断**であり、
+    #   こちらで True を要求しない。気になる点として報告に回す。
 
 
-def test_検知器がブラザージョルダンの否定を捕まえる():
-    r = classify_window(BRJORDAN, "https://www.brjordan.com/contact-2/")
-    hit = detect_negated_trade_window(BRJORDAN, r["optout_hit_terms"])
-    assert hit is not None, "A_PLUS への誤爆を検知できていない"
+def test_検知器はv1_1でも同じ否定を捕まえる():
+    """検知器は残す。役割が『クラスを決める』から
+    **『ルールに穴があることを見つける』**に変わっただけで、価値は変わらない。
+    ルールが先に塞いでも、検知器が別経路で同じ否定を指せることを確かめておく。
+    """
+    # classify_window の hit_terms を経由しない。v1.1 では E4 が先に当たるため
+    # hit_terms に取引窓口の語が載らない。検知器は**独立した第2の目**として
+    # 成立している必要があるので、取引窓口の語を直接渡して確かめる。
+    hit = detect_negated_trade_window(BRJORDAN, "新規お取引")
+    assert hit is not None
     term, ng, excerpt = hit
     assert ng == "行っておりません"
     assert term in excerpt

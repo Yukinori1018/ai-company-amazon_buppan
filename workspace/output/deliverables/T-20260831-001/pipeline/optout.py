@@ -73,6 +73,18 @@ def load_rules(path: str = None) -> dict:
 
 
 # --- マッチャ ---------------------------------------------------------------
+class UnknownMatchKind(Exception):
+    """法務ルールに、実装が知らない match 種別があった。
+
+    **黙って読み飛ばさない。** 読み飛ばすと法務が塞いだ穴が実装側で開いたまま
+    になり、しかも「0件ヒット」は「該当なし」と見分けがつかないので誰も気づかない。
+    v1.0 で A1 の否定右辺が落ちていた事故が、まさにこれだった（法務 v1.1 の要求）。
+    """
+
+
+KNOWN_MATCH_KINDS = frozenset(("cooccur", "any", "suffix_negation"))
+
+
 def _guarded_positions(text: str, term: str, guards: Sequence[str]) -> List[int]:
     """`term` の出現位置のうち、`guards`（営業部・営業時間 等）の一部でないものを返す。
 
@@ -124,6 +136,76 @@ def _any_term(text: str, terms: Sequence[str]) -> List[str]:
     return [t for t in (terms or ()) if t in text]
 
 
+def _left_guarded(text: str, li: int, guards: Sequence[str], win: int) -> bool:
+    """left 語の出現位置の**直前** win 文字以内にガード語があるか。
+
+    『一般のお客様との直接のお取引は行っておりません』は、
+    卸専業の会社が消費者向けに書いている文であって、当社への拒絶ではない。
+    むしろ本命に近い。ここを D にすると本丸を捨てる。
+    """
+    head = text[max(0, li - win):li]
+    return any(g in head for g in guards or ())
+
+
+def _suffix_negation(text: str, rule: dict) -> List[str]:
+    """left 語の**直後** lookahead 文字以内に否定語があるときだけヒット。
+
+    ★方向を持つこと自体が要求である。無方向の共起で代用してはならない。
+      代用すると『新規お取引はこちらから。なお電話はお受けしておりません』が
+      D になり、**打てる相手を捨てる。**（法務 v1.1 engine_requirements）
+    """
+    look = rule.get("negation_lookahead_chars", 25)
+    gwin = rule.get("left_context_window_chars", 20)
+    guards = rule.get("left_context_guard", ())
+    hits: List[str] = []
+    for lt in rule.get("left", ()):
+        for m in re.finditer(re.escape(lt), text):
+            li = m.start()
+            if _left_guarded(text, li, guards, gwin):
+                continue
+            # ★文の境界で打ち切る。
+            #   法務の要求文は lookahead を「直後25文字以内」としか書いていないが、
+            #   同じ engine_requirements が
+            #   『新規お取引はこちらから。なお電話はお受けしておりません』を
+            #   **D にしてはならない例として名指ししている。**
+            #   この文では否定語が17文字先＝25文字以内にあるため、
+            #   文字数だけで判定すると要求文と実装が矛盾する。
+            #   要求（この文を D にしない）が上位なので、句点をまたがせない。
+            #   ※文字数だけで足りないことは法務ルール側にも書かれていないので、
+            #     v1.2 で明文化してもらうよう差し戻す。ここでクラスは変えていない。
+            tail = _SENTENCE_SPLIT.split(text[m.end():m.end() + look])[0]
+            for ng in rule.get("negation", ()):
+                if ng in tail:
+                    pair = "%s+%s" % (lt, ng)
+                    if pair not in hits:
+                        hits.append(pair)
+                    break
+    return hits
+
+
+def _drop_negated(text: str, terms: List[str], rule: dict) -> List[str]:
+    """`any` のヒットのうち、直後が否定のものを落とす。
+
+    A1（取引窓口＝A_PLUS）用。『新規お取引は行っておりません』を
+    最優先の打診先にしてしまう、**誤りの向きが最悪**の欠陥を塞ぐ。
+    """
+    ngs = rule.get("negation_terms")
+    if not ngs:
+        return terms
+    look = rule.get("negation_lookahead_chars", 25)
+    kept = []
+    for t in terms:
+        alive = False
+        for m in re.finditer(re.escape(t), text):
+            tail = text[m.end():m.end() + look]
+            if not any(ng in tail for ng in ngs):
+                alive = True
+                break
+        if alive:
+            kept.append(t)
+    return kept
+
+
 def _rule_hits(text: str, rule: dict, window: int) -> List[str]:
     kind = rule.get("match")
     hits = []
@@ -133,10 +215,17 @@ def _rule_hits(text: str, rule: dict, window: int) -> List[str]:
         if not hits and rule.get("alt_terms"):
             hits = _any_term(text, rule["alt_terms"])
     elif kind == "any":
-        hits = _any_term(text, rule.get("terms"))
+        hits = _drop_negated(text, _any_term(text, rule.get("terms")), rule)
         alt = rule.get("cooccur_alt")
         if not hits and alt:
             hits = _cooccur(text, alt.get("left"), alt.get("right"), window)
+    elif kind == "suffix_negation":
+        hits = _suffix_negation(text, rule)
+    else:
+        raise UnknownMatchKind(
+            "規則 %s の match 種別 %r を実装が知らない。"
+            "黙って読み飛ばすと法務が塞いだ穴が開いたままになる。"
+            % (rule.get("id"), kind))
     return hits
 
 
@@ -156,7 +245,10 @@ def classify_window(text: str, source_url: str = "", rules: dict = None) -> dict
     hit_terms = []
     allowed = None
     remove = []
-    recheck = ""
+    rechecks = []          # ★取りこぼさないよう全部ためる（後で ／ で連結）
+    e_subclass = ""
+    needs_review = False
+    review_reasons = []
 
     for cls in rules["apply_order"]:
         for rule in rules["rules"]:
@@ -175,7 +267,15 @@ def classify_window(text: str, source_url: str = "", rules: dict = None) -> dict
                 allowed = list(rule["set_allowed_channels"])
             remove.extend(rule.get("remove_channels", []))
             if rule.get("recheck_condition"):
-                recheck = rule["recheck_condition"]
+                # ★1つしか残さないと、片方の条件が解消されても再評価されない。
+                #   E1（実店舗が要る）と E2（モール禁止）に同時に当たる社は実在する。
+                rechecks.append(rule["recheck_condition"])
+            if rule.get("e_subclass") and not e_subclass:
+                e_subclass = rule["e_subclass"]
+            if rule.get("needs_review"):
+                needs_review = True
+                if rule.get("reason"):
+                    review_reasons.append(rule["reason"])
         if matched_class:
             break
 
@@ -187,6 +287,19 @@ def classify_window(text: str, source_url: str = "", rules: dict = None) -> dict
         ch = spec.get("channels")
         allowed = list(ch) if isinstance(ch, list) else ["form"]
     allowed = [c for c in allowed if c not in remove]
+
+    # review_triggers は**判定を変えない**。フラグだけ立てる（法務 v1.1 の明示要求）。
+    # 『〜のみ』は文脈で正反対になる（『卸売のみ』は当社に有利、
+    # 『既存取引先のみ』は実質的な新規拒否）。機械で断定してはならない。
+    trig = rules.get("review_triggers") or {}
+    fired = [t for k, v in trig.items()
+             if k not in ("$comment", "reason") and isinstance(v, list)
+             for t in v if t in text]
+    if fired:
+        needs_review = True
+        review_reasons.append("%s（該当語: %s）"
+                              % (trig.get("reason", "人の確認が必要"),
+                                 "、".join(dict.fromkeys(fired))))
     # ★ recheck_condition は**実際にヒットした規則のもの**だけを使う。
     #   クラス単位でフォールバックすると、D2（営業お断り）に当たった社に
     #   D5（採用専用）の再評価条件『取引窓口の新設』が付いてしまう。実際に踏んだ。
@@ -199,7 +312,10 @@ def classify_window(text: str, source_url: str = "", rules: dict = None) -> dict
         "contact_priority": spec["priority"],
         "action": spec["action"],
         "optout_source_url": source_url,
-        "recheck_condition": recheck,
+        "recheck_condition": " ／ ".join(dict.fromkeys(rechecks)),
+        "optout_e_subclass": e_subclass,
+        "optout_needs_review": needs_review,
+        "optout_review_reason": " ／ ".join(dict.fromkeys(review_reasons)),
     }
 
 
@@ -239,7 +355,15 @@ def message_rules(rules: dict = None) -> List[str]:
 
 def individual_decisions(rules: dict = None) -> Dict[str, dict]:
     """法務が個社について明示した判定（自動判定より優先する）。"""
-    return {d["company"]: d for d in (rules or load_rules()).get("individual_decisions", [])}
+    # ★company だけで引くと、表記ゆれの重複行に個別判断が乗らず、
+    #   **除外したはずの会社が別表記で打診キューに残る。**
+    #   ストームレーベルズが3表記で登録され、D が付いたのは1行だけだった
+    #   （2026-09-04 検出。法務 v1.1 engine_requirements）。
+    out: Dict[str, dict] = {}
+    for d in (rules or load_rules()).get("individual_decisions", []):
+        for key in [d["company"]] + list(d.get("aliases", ())):
+            out.setdefault(key, d)
+    return out
 
 
 # --- 個人名らしいローカル部（従来からの機能。法務B §9-3 personal_suspect） ---

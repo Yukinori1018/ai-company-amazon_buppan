@@ -23,7 +23,7 @@ CONTACT = ("電話", "問い合わせフォームURL", "メール")
 
 COLS = ["順位","スコア","メーカー名", "宛名の注意",
         # --- 法務ハルオの A〜E 判定（B1L_optout_rules.json v1.0）---
-        "optout_class","contact_priority","action","allowed_channels",
+        "optout_class","optout_notice_status","contact_priority","action","allowed_channels",
         "optout_hit_terms","optout_rule_ids","form_optout_notice","optout_source_url",
         "optout_checked_at","recheck_condition","optout_e_subclass","optout_decided_by","optout_needs_review","optout_review_reason",
         # --- 連絡先 ---
@@ -36,12 +36,17 @@ COLS = ["順位","スコア","メーカー名", "宛名の注意",
 #: 法務判定：本文・署名にURLを貼った瞬間に特定電子メール法2条2号の
 #: 「広告宣伝ウェブサイトへの誘導」に当たり、相手の「営業お断り」表示が法的効力を持つ。
 HEADER_NOTE = (
-    "# 【打診文の絶対条件・法務判定 v1.0】メール本文・署名にURLを一切貼らないこと"
+    "# 【打診文の絶対条件・法務判定 v1.1】メール本文・署名にURLを一切貼らないこと"
     "（AmazonストアURL・自社サイト satoy-select.com・SNS すべて）。"
     "貼った瞬間に特定電子メール法2条2号の『広告宣伝ウェブサイトへの誘導』に該当し、"
     "相手の『営業お断り』表示が法的効力を持つ。白が黒に転ぶ唯一の分岐点。"
     " ／ 1社1通・追送しない・断られたら即終了・一斉送信ツール禁止・実績ゼロを正直に書く。"
-    " ／ optout_class が D・E の社には打診しない。C は A/A_PLUS/B を全件消化した後・フォームのみ・1回限り。")
+    " ／ optout_class が D・E の社には打診しない。C は A/A_PLUS/B を全件消化した後・フォームのみ・1回限り。"
+    " ／ 【optout_notice_status を必ず併せて読むこと】この列が『未取得』の社は、"
+    "お断り表示が無いことを確認できていない（窓口ページを検分した記録が無い）だけで、"
+    "**表示が無いと確認した社ではない**。399社中『注記あり』66・『確認済み_表示なし』34・"
+    "『未取得』299。したがって『打診可能◯◯社』という数字を単独で読まないこと。"
+    "打診前にその社の窓口ページを一度開いて表示を確認する。")
 
 
 def load_lookups():
@@ -87,7 +92,8 @@ def build_all_rows(lookups, v14, contacts_cls):
         row = {c: "" for c in COLS}
         row["メーカー名"] = name
         for k in ("正式商号","法人番号","所在地","公式HP","電話","問い合わせフォームURL","メール",
-                  "確度","備考","出典URL","optout_class","contact_priority","action",
+                  "確度","備考","出典URL","optout_class","optout_notice_status",
+                  "contact_priority","action",
                   "allowed_channels","optout_hit_terms","optout_rule_ids","form_optout_notice",
                   "optout_source_url","optout_checked_at","recheck_condition",
                   "optout_e_subclass","optout_decided_by",
@@ -227,7 +233,7 @@ def main():
                      "想定仕入れ金額の中央値","Amazon価格の中央値","代表商品名")})
         for k in ("正式商号","法人番号","所在地","公式HP","電話",
                   "問い合わせフォームURL","メール","確度","備考","出典URL",
-                  "optout_class","contact_priority","action","allowed_channels",
+                  "optout_class","optout_notice_status","contact_priority","action","allowed_channels",
                   "optout_hit_terms","optout_rule_ids","form_optout_notice",
                   "optout_source_url","optout_checked_at","recheck_condition",
                   "optout_e_subclass","optout_decided_by",
@@ -342,7 +348,28 @@ def main():
         os.remove(OUT_TMP)          # 不正なものをディスクに残さない
         raise SystemExit(bad)
     os.replace(OUT_TMP, OUT)        # ここで初めて所定の名前になる
-    print("検算: top50 に D/E なし（%d行）" % len(back))
+    # ★宣言だけして一度も埋まらない列を捕まえる。
+    #   commit ゲートの entity_type、この notice_status と、
+    #   **同じ事故を3度やっている**。列を足すのは1箇所では済まず、
+    #   COLS・main の取り込み・build_all_rows の取り込みの3箇所に要る。
+    #   「列がある」と「列が埋まっている」は別。
+    ALLOW_EMPTY = {"optout_e_subclass", "optout_decided_by", "optout_review_reason",
+                   "optout_needs_review", "form_optout_notice", "宛名の注意",
+                   "optout_hit_terms", "recheck_condition", "optout_rule_ids",
+                   "法人番号", "メール", "allowed_channels", "optout_source_url",
+                   # 全社版は contact_priority + 順位 で並べるため スコア を持たない
+                   # （top50 用のキュー由来の値で、全社側には元データが無い）。
+                   # ★これは検算が見つけた既存の穴。仕様として明示しておく。
+                   "スコア"}
+    for col in COLS:
+        if col in ALLOW_EMPTY:
+            continue
+        if not any(str(r.get(col) or "").strip() for r in all_rows):
+            raise SystemExit(
+                "列 %r が全%d行で空。宣言しただけで埋め忘れている"
+                % (col, len(all_rows)))
+
+    print("検算: top50 に D/E なし（%d行）／ 全列に値あり" % len(back))
 
     print("\nwrote", OUT)
     print("wrote", ALL)
