@@ -6,7 +6,11 @@
 B1_work_queue.csv（利益ヒューリスティック順）と exa_lookups.jsonl（実取得）を結合する。
 """
 from __future__ import annotations
-import csv, io, json, os, sys
+import csv, io, json, os, re, sys
+sys.path.insert(0, os.path.join(HERE_PIPE, "pipeline") if False else os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+    "T-20260831-001", "pipeline"))
+from redact import strip_unit_number  # noqa: E402
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 DELIV = os.path.dirname(HERE)
@@ -17,7 +21,7 @@ OUT = os.path.join(HERE, "B1_contacts_top50.csv")
 
 CONTACT = ("電話", "問い合わせフォームURL", "メール")
 
-COLS = ["順位","スコア","メーカー名",
+COLS = ["順位","スコア","メーカー名", "宛名の注意",
         # --- 法務ハルオの A〜E 判定（B1L_optout_rules.json v1.0）---
         "optout_class","contact_priority","action","allowed_channels",
         "optout_hit_terms","optout_rule_ids","form_optout_notice","optout_source_url",
@@ -158,6 +162,56 @@ def _int(v):
         return 0
 
 
+
+# --- 出力直前に全行へかける後処理 -------------------------------------
+# 手で消しても次のビルドで復活する、を繰り返さないためにコードに置く。
+
+def _addressee_warning(r):
+    """**キューの名称をそのまま宛名に使うと届かない行**にだけ警告を立てる。
+
+    情報自体は 正式商号 と 備考 に書いてあるが、どちらも長文で、
+    社長がリストを上から流すときに読み飛ばす。1列に切り出して目に入れる。
+
+    ★何を立てないかの方が大事。
+      最初「備考に『商号変更』とあるか」で拾って19件、うち多くが
+      「矢崎エナジーシステム㈱ → 矢崎エナジーシステム株式会社」の表記違いだけ。
+      次に「メーカー名が正式商号に含まれるか」で拾ったら113件になり、
+      その大半が `BUNDOK → 株式会社カワセ` のような**ブランド名と法人名の違い**だった。
+      それは異常ではなく普通のことで、しかも隣の 正式商号 列を見れば分かる。
+      **狼少年になった警告は読まれない。** 立てるのは次の3つだけにする。
+
+        1. その名前の法人が存在しない  … 出しても届かない
+        2. 旧商号                     … 出しても届かない
+        3. そもそもメーカー名ではない   … 出す先が無い
+
+      重複は危険ではないので、警告ではなく事実として添える。
+    """
+    formal = r.get("正式商号") or ""
+    blob = " ".join((formal, r.get("備考") or "", r.get("entity_type") or ""))
+    if (r.get("確度") or "") == "抽出ノイズ":
+        return "⚠ メーカー名ではない（抽出ノイズ）。打診先なし"
+    if ("現存しない法人" in blob or "法人格が存在しない" in blob
+            or "吸収合併により消滅" in blob):
+        return "⚠ この名称の法人は存在しない。宛名は正式商号を使うこと"
+    if "旧商号" in formal:
+        return "⚠ 旧商号。宛名は正式商号を使うこと"
+    if "【重複" in blob:
+        return "重複。別エントリと同じ打診先"
+    return ""
+
+
+def finalize(rows):
+    """PUBLIC リポに出す直前の共通処理。伏せ字 → 宛名の注意 の順。"""
+    for r in rows:
+        # 部屋番号は落とす。建物名は残す（規模のシグナルになるため）。
+        # 打診経路は電話・フォーム・メールで、住所は使わない。
+        # 使わない情報でリスクを取らない（2026-09-04 秘書カズヨ判断）。
+        r["所在地"], _ = strip_unit_number(r.get("所在地") or "", address_field=True)
+        r["備考"], _ = strip_unit_number(r.get("備考") or "", address_field=False)
+        r["宛名の注意"] = _addressee_warning(r)
+    return rows
+
+
 def main():
     lookups = load_lookups()
     with io.open(QUEUE, encoding="utf-8-sig") as fp:
@@ -196,6 +250,7 @@ def main():
     rows = [r for r in rows if r["optout_class"] not in ("D", "E")][:50]
 
     # ★PUBLIC リポに出す前に、個人事業主の疑いがある社の連絡先を落とす
+    finalize(rows)
     held = redact_sole_proprietors(rows, lookups)
 
     # 打診優先度順（法務の contact_priority 昇順）にも並べ替えた版を作る
@@ -246,6 +301,7 @@ def main():
     with io.open(V14, encoding="utf-8-sig") as fp:
         v14 = {r["メーカー/ブランド"]: r for r in csv.DictReader(fp)}
     all_rows = build_all_rows(lookups, v14, None)
+    finalize(all_rows)
     held_all = redact_sole_proprietors(all_rows, lookups)
     ALL = os.path.join(HERE, "B1_打診候補_全社_優先度順.csv")
     with io.open(ALL, "w", encoding="utf-8-sig", newline="") as fp:
