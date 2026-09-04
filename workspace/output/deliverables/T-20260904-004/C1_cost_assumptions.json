@@ -1,0 +1,420 @@
+{
+  "ticket_id": "T-20260904-004",
+  "task": "C-1 コスト前提の実測化",
+  "author": "経理ハジメ",
+  "generated_at": "2026-09-04",
+  "supersedes": "workspace/output/deliverables/T-20260831-006 の CostAssumptions（FBA納品送料100円/個・NETSEA送料10個按分・保管2.0ヶ月・雑費3%）",
+  "confidence_legend": {
+    "実測": "一次情報（公式料金ページ・公開料金表・自社取得データ）を直接確認",
+    "二次情報": "独立した解説2系統以上で一致。一次情報の目視確認はしていない",
+    "推定": "根拠のある仮定。assumption を必ず読むこと",
+    "未確認": "取得できず。value は null。推測で埋めていない"
+  },
+  "scope": {
+    "予算": "総額50,000円以下（税込）",
+    "SKU数": "5〜10",
+    "FBAサイズ": "小型／標準のみ",
+    "出品プラン": "小口（基本成約料100円/点が掛かる）",
+    "事業者区分": "個人事業主・免税事業者・インボイス未登録",
+    "納品方式": "納品代行へ外注 → FBA（社長はPC上で完結）",
+    "利益率下限": 0.05
+  },
+  "items": [
+    {
+      "id": "referral_rate",
+      "name": "Amazon販売手数料率",
+      "value": 0.104,
+      "unit": "率(売価に対して)",
+      "confidence": "実測",
+      "range": [
+        0.084,
+        0.154
+      ],
+      "source": "https://sell.amazon.co.jp/pricing",
+      "note": "カテゴリ別 5〜15.4%。代表値は一般雑貨帯の10.4%。750円以下は一律5%。最低手数料30円/点。カテゴリ別の正確値は calc/fees.py の REFERRAL_FEE_TABLE を使う"
+    },
+    {
+      "id": "referral_fee_tax_multiplier",
+      "name": "販売手数料にかかる消費税",
+      "value": 1.1,
+      "unit": "倍率",
+      "confidence": "二次情報",
+      "range": null,
+      "source": "https://brandbuppan.jp/amazon-selling-fee-tax/ ／ https://wise.com/jp/blog/amazon-seller-fees",
+      "note": "【現行モデルに欠落】販売手数料は税抜表示。実際の請求は×1.1。FBA配送代行手数料・在庫保管手数料は税込表示なので二重に掛けないこと"
+    },
+    {
+      "id": "closing_fee_koguchi_ex_tax",
+      "name": "小口プラン 基本成約料（税抜）",
+      "value": 100,
+      "unit": "円/点",
+      "confidence": "実測",
+      "range": null,
+      "source": "https://sell.amazon.co.jp/pricing",
+      "note": "【現行モデルに欠落】小口プランのみ。売れた商品1点ごと。大口(月4,900円税抜)にはない"
+    },
+    {
+      "id": "closing_fee_koguchi_incl_tax",
+      "name": "小口プラン 基本成約料（税込・計算に使う値）",
+      "value": 110,
+      "unit": "円/点",
+      "confidence": "推定",
+      "range": null,
+      "source": "https://www.theckb.com/archive/small-cansell/",
+      "note": "税別100円との記載を採用し10%を加算。税区分は一次情報で未確認のため推定扱い"
+    },
+    {
+      "id": "category_closing_fee_media",
+      "name": "カテゴリー成約料（メディアのみ）",
+      "value": 140,
+      "unit": "円/点",
+      "confidence": "二次情報",
+      "range": [
+        80,
+        140
+      ],
+      "source": "https://ecstarslab.com/blog/fba-tesuuryo/",
+      "note": "本80円／CD・DVD・ビデオ140円。非メディアカテゴリは0円。初回候補は非メディア想定＝0"
+    },
+    {
+      "id": "fba_fee_standard1_over1000",
+      "name": "FBA配送代行手数料 標準1（売価1,000円超・税込）",
+      "value": 318,
+      "unit": "円/点",
+      "confidence": "二次情報",
+      "range": [
+        288,
+        472
+      ],
+      "source": "https://sell.amazon.co.jp/pricing ／ calc/fees.py (T-20260817-005で2026年8月に検証)",
+      "note": "小型288／標準1 318／標準2 410-430／標準3 472。売価1,000円以下は一律66円引き（小型222・標準1 252）"
+    },
+    {
+      "id": "fba_fee_discount_under1000",
+      "name": "売価1,000円以下のFBA配送代行手数料引き下げ",
+      "value": -66,
+      "unit": "円/点",
+      "confidence": "二次情報",
+      "range": null,
+      "source": "https://netshop.impress.co.jp/node/11874",
+      "note": "2024年4月1日〜。サイズ・重量を問わず一律66円引き"
+    },
+    {
+      "id": "storage_rate_regular",
+      "name": "FBA在庫保管手数料（通常期1〜9月・小型/標準）",
+      "value": 5.676,
+      "unit": "円/1,000cm³/月(税込)",
+      "confidence": "二次情報",
+      "range": null,
+      "source": "https://ecstarslab.com/blog/fba-tesuuryo/ ／ calc/fees.py",
+      "note": "ecstarslab記載の5.68〜10.09円/1,000cm³と一致。大型3.278／アパレル3.100"
+    },
+    {
+      "id": "storage_rate_peak",
+      "name": "FBA在庫保管手数料（繁忙期10〜12月・小型/標準）",
+      "value": 10.087,
+      "unit": "円/1,000cm³/月(税込)",
+      "confidence": "二次情報",
+      "range": null,
+      "source": "同上",
+      "note": "大型6.984／アパレル5.500"
+    },
+    {
+      "id": "storage_months",
+      "name": "保管月数（計算に使う値）",
+      "value": 1.5,
+      "unit": "ヶ月",
+      "confidence": "推定",
+      "range": [
+        1.5,
+        3.0
+      ],
+      "source": "社内算定（T-20260904-004 / 経理ハジメ）",
+      "note": "【現行モデル2.0ヶ月を1.5ヶ月へ修正】保管料は月次の平均在庫に課される。3ヶ月で線形に売り切る前提なら平均在庫は初期数量の1/2＝実効1.5ヶ月分。仮定：回転3ヶ月以内（会社方針）・線形消化。6ヶ月かかる悲観ケースは3.0ヶ月"
+    },
+    {
+      "id": "storage_peak_season",
+      "name": "繁忙期レートを使うか",
+      "value": true,
+      "unit": "真偽",
+      "confidence": "推定",
+      "range": null,
+      "source": "社内算定",
+      "note": "初回納品は9〜10月想定。保管期間が10〜12月に重なるため繁忙期レート（保守側）を採用"
+    },
+    {
+      "id": "long_term_storage_min_fee",
+      "name": "長期在庫最低手数料（365日超）",
+      "value": 20,
+      "unit": "円/点/月",
+      "confidence": "二次情報",
+      "range": null,
+      "source": "https://www.cyber-records.co.jp/amazon-fba-long-term-storage-fee/",
+      "note": "2026年4月15日新設。回転3ヶ月方針なら発生しない想定だが、売れ残り時のテールリスク"
+    },
+    {
+      "id": "low_inventory_fee",
+      "name": "低在庫レベル手数料",
+      "value": null,
+      "unit": "円/点",
+      "confidence": "未確認",
+      "range": [
+        5,
+        30
+      ],
+      "source": "https://sellercentral.amazon.co.jp/help/hub/reference/external/GV43F6S76Y9DHYRH?locale=ja-JP",
+      "note": "過去在庫日数が14日未満で発生。少量仕入れの初回は構造的に該当しうる。販売実績の少ないASINが免除対象かどうかを一次情報で確認できていない。セラーセントラル復旧後に実確認が必要。値は空欄のまま"
+    },
+    {
+      "id": "netsea_ship_fee_api_coverage",
+      "name": "NETSEA送料がAPIで取得できた商品の割合",
+      "value": 0.0037,
+      "unit": "率",
+      "confidence": "実測",
+      "range": null,
+      "source": "workspace/output/deliverables/T-20260831-006/out/netsea_items.jsonl 全257,067件を集計（2026-09-04）",
+      "note": "【重大】ship_fee>0 は 951件のみ（0.37%）。残り99.6%は0で入っている。つまり現行の『10個按分』は分子がほぼ常にゼロで、実質NETSEA送料を計上していない"
+    },
+    {
+      "id": "netsea_ship_fee_median",
+      "name": "NETSEA送料（取得できた951件の中央値）",
+      "value": 1500,
+      "unit": "円/発注",
+      "confidence": "実測",
+      "range": [
+        200,
+        11000
+      ],
+      "source": "同上",
+      "note": "最頻値1,500円(365件)／200円(171件)／1,600円(155件)。平均1,263円。1発注ごとに掛かる。サプライヤーを分けると回数分掛かる"
+    },
+    {
+      "id": "netsea_tariffs_free_shipping_line",
+      "name": "NETSEA 送料無料ライン（/tariffs 実データ）",
+      "value": 20000,
+      "unit": "円/発注",
+      "confidence": "実測",
+      "range": null,
+      "source": "workspace/output/deliverables/T-20260904-004/_tariffs_cache.json（ITタカシ取得・1社ぶん。社名/IDはPUBLICリポのため非掲載）",
+      "note": "送料の実額は /items の ship_fee ではなく /tariffs にある。当該社は gradual_border_price=20000・price2=0＝20,000円以上で送料無料、未満は770円（一部1,650円）。apply_type=higher（複数社注文時は高い方が適用）。【サンプル1社のみ】無料ラインはサプライヤーごとに異なる。全社分布はITタカシの取得完了待ち"
+    },
+    {
+      "id": "netsea_first_order_free_shipping",
+      "name": "NETSEA 初回注文送料無料特集",
+      "value": 0,
+      "unit": "円/発注",
+      "confidence": "実測",
+      "range": null,
+      "source": "https://www.netsea.jp/special/freeshipping",
+      "note": "2026/9/1〜2026/10/1 12:00 開催中。掲載サプライヤーとの初回取引が対象。購入時のコメント欄に『送料無料』の入力が必須。他特集の特典と重複不可。離島・山間部は対象外。初回仕入れは条件に合致する。ただしAmazonアカウント復活時期と期限が競合する"
+    },
+    {
+      "id": "prep_service_per_item",
+      "name": "FBA納品代行 作業費（資材込）",
+      "value": 12,
+      "unit": "円/点",
+      "confidence": "実測",
+      "range": [
+        10,
+        30
+      ],
+      "source": "https://e-fba.com/ （公開料金表・単品商品 通常12円・大型25円・月額0円）",
+      "note": "相場は検品10〜30円＋ラベル貼付10〜30円。e-fbaは資材込みで単品12円。【現行モデルに欠落】社長方針は物理作業の外注前提（owner_pc_complete_outsourcing）なのに、NETSEA側の利益計算には外注費が1円も入っていない"
+    },
+    {
+      "id": "prep_to_fba_shipping_box",
+      "name": "納品代行→FBA 配送料（140サイズ）",
+      "value": 750,
+      "unit": "円/箱",
+      "confidence": "実測",
+      "range": [
+        750,
+        860
+      ],
+      "source": "https://e-fba.com/ （140サイズ750円〜・160サイズ860円〜）",
+      "note": "地域により変動。自分で発送する場合はFBAパートナーキャリア・ヤマトの方が安い"
+    },
+    {
+      "id": "partnered_carrier_yamato_140",
+      "name": "FBAパートナーキャリア ヤマト 140サイズ（関東→関東・税込）",
+      "value": 608,
+      "unit": "円/箱",
+      "confidence": "実測",
+      "range": [
+        608,
+        1260
+      ],
+      "source": "https://business.kuronekoyamato.co.jp/promotion/toAmazonseller2024/index.html",
+      "note": "関東→関西857円。160サイズ関東→関東762円・関東→関西1,121円。基本運賃比 最大73〜77%引き。追加契約・条件交渉は不要、請求はAmazonから。サイズ別の全料金表は納品プラン作成画面でしか見られない（PDFにも非掲載）"
+    },
+    {
+      "id": "units_per_box",
+      "name": "1箱あたりの収容個数（計算に使う値）",
+      "value": 20,
+      "unit": "点/箱",
+      "confidence": "推定",
+      "range": [
+        10,
+        30
+      ],
+      "source": "社内算定",
+      "note": "仮定：FBA小型／標準サイズのみ、140サイズ段ボール1箱。実測は初回納品時に確定する"
+    },
+    {
+      "id": "inbound_shipping_per_item",
+      "name": "納品送料（1点あたり・計算に使う値）",
+      "value": 37.5,
+      "unit": "円/点",
+      "confidence": "推定",
+      "range": [
+        25.0,
+        86.0
+      ],
+      "source": "社内算定（prep_to_fba_shipping_box ÷ units_per_box）",
+      "note": "【現行モデル100円/点を37.5円/点へ修正】750円÷20点。悲観は e-fba 160サイズ860円÷10点=86.0円、楽観は750円÷30点=25.0円。旧100円/点は『160サイズ1,500円÷15点』という根拠不明の按分で、パートナーキャリア／代行の実料金を当てると過大だった"
+    },
+    {
+      "id": "misc_cost_rate_deprecated",
+      "name": "雑費（売価の3%）",
+      "value": null,
+      "unit": "率",
+      "confidence": "未確認",
+      "range": null,
+      "source": "—",
+      "note": "【廃止】何を含むのか定義がなかった。下の3費目に分解して実額で積む。売価連動にする経理的な根拠がない（返品コストは売価でなく手数料と原価で決まる）"
+    },
+    {
+      "id": "return_rate",
+      "name": "返品率（引当に使う値）",
+      "value": 0.03,
+      "unit": "率",
+      "confidence": "推定",
+      "range": [
+        0.02,
+        0.05
+      ],
+      "source": "社内算定",
+      "note": "実測値なし。社長の販売実績がゼロのため自社データが存在しない。初回販売後に実績で置き換える。仮定：一般雑貨3%"
+    },
+    {
+      "id": "refund_administration_fee",
+      "name": "返金処理手数料",
+      "value": null,
+      "unit": "円/件",
+      "confidence": "二次情報",
+      "range": null,
+      "source": "https://force-r.co.jp/column/column-28008/",
+      "note": "500円 と 販売手数料の10% のいずれか低い方。返金時に販売手数料は返還されるがFBA配送代行手数料は返還されない"
+    },
+    {
+      "id": "return_disposal_fee",
+      "name": "FBA返送／所有権の放棄手数料",
+      "value": null,
+      "unit": "円/点",
+      "confidence": "二次情報",
+      "range": [
+        60,
+        870
+      ],
+      "source": "https://sobani.co.jp/columnlist/amazon_return-disposal ／ https://ecstarslab.com/blog/fba-tesuuryo/",
+      "note": "小型・標準1,500gで242.5円（税込）という実例。1,000g超は1g単位で加算。売れ残りを引き上げる／捨てるときに必ず掛かる。SKU単位の撤退コスト"
+    },
+    {
+      "id": "unfulfillable_inspection_fee",
+      "name": "納品不備受領作業手数料",
+      "value": null,
+      "unit": "円/点",
+      "confidence": "二次情報",
+      "range": [
+        51,
+        122
+      ],
+      "source": "https://ecstarslab.com/blog/fba-tesuuryo/",
+      "note": "梱包・ラベル不備でFCに届いた場合。正しい納品で回避できるので引当に入れない"
+    },
+    {
+      "id": "payout_bank_fee",
+      "name": "売上金の振込手数料",
+      "value": 0,
+      "unit": "円/回",
+      "confidence": "二次情報",
+      "range": null,
+      "source": "https://sobani.co.jp/columnlist/amazon_provision",
+      "note": "Amazon負担。小口プランは自動振込ではなく手動リクエストが必要な点に注意"
+    },
+    {
+      "id": "materials_cost",
+      "name": "梱包資材費",
+      "value": 0,
+      "unit": "円/点",
+      "confidence": "実測",
+      "range": null,
+      "source": "https://e-fba.com/ （資材込み料金）",
+      "note": "納品代行の12円/点に資材が含まれるため二重計上しない。自分で納品する場合のみ別途"
+    },
+    {
+      "id": "consumption_tax_position",
+      "name": "消費税の立場",
+      "value": null,
+      "unit": "—",
+      "confidence": "実測",
+      "range": null,
+      "source": "agents/accounting/memory/tax_invoice_menzei_seller.md（T-20260726-002）",
+      "note": "社長は免税事業者・インボイス未登録。仕入税額控除ができないため、NETSEA卸値は税込が実コスト。Amazon手数料の消費税も同様に丸ごとコスト。売上に含まれる消費税の納税義務はない。税務判断は税理士確認を推奨"
+    }
+  ],
+  "calculation_parameters": {
+    "referral_rate_representative": 0.104,
+    "referral_min_fee_yen": 30,
+    "referral_fee_tax_multiplier": 1.1,
+    "closing_fee_koguchi_incl_tax_yen": 110,
+    "storage_rate_peak_yen_per_1000cm3_month": 10.087,
+    "representative_volume_cm3": 2000
+  },
+  "scenarios": {
+    "楽観": {
+      "units_per_box": 30,
+      "prep_per_item": 12,
+      "netsea_ship_per_order": 0,
+      "storage_months": 1.5,
+      "return_rate": 0.02,
+      "fba_fee_over1000": 288,
+      "note": "小型サイズ・箱30点・NETSEA初回送料無料・返品2%",
+      "prep_to_fba": 750
+    },
+    "中央": {
+      "units_per_box": 20,
+      "prep_per_item": 12,
+      "netsea_ship_per_order": 0,
+      "storage_months": 1.5,
+      "return_rate": 0.03,
+      "fba_fee_over1000": 318,
+      "note": "標準1・箱20点・NETSEA初回送料無料特集を使う・返品3%（★推奨値）",
+      "prep_to_fba": 750
+    },
+    "悲観": {
+      "units_per_box": 10,
+      "prep_per_item": 30,
+      "netsea_ship_per_order": 1500,
+      "storage_months": 3.0,
+      "return_rate": 0.05,
+      "fba_fee_over1000": 430,
+      "note": "標準2・箱10点・NETSEA送料1,500円/発注・6ヶ月滞留・返品5%",
+      "prep_to_fba": 860
+    }
+  },
+  "recommended_scenario": "中央",
+  "missing_from_current_model": [
+    "小口プラン 基本成約料 110円/点（税込）",
+    "販売手数料の消費税 10%",
+    "FBA納品代行の作業費 12円/点（社長方針は外注前提なのに未計上）",
+    "NETSEA送料（/items の ship_fee は99.6%が0。実額は /tariffs から取ること）"
+  ],
+  "open_questions": [
+    "低在庫レベル手数料（5〜30円/点）が初回の少量在庫に適用されるか。セラーセントラルで要確認",
+    "基本成約料100円の税区分（税別か税込か）。一次情報で未確認のため110円で保守計上",
+    "FBAパートナーキャリアが小口プランで利用できるか。ヤマト公式に制限記載はないが未確認",
+    "NETSEA送料無料ラインの全社分布。/tariffs 実データはまだ1社ぶんしかない（ITタカシが取得中・9/6〜9/7完了見込み）",
+    "返品率3%は自社実績ゼロのための仮置き。初回販売後に実績へ差し替える"
+  ]
+}

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>C-1 コスト前提の実測版｜初回仕入れ5〜10SKU｜T-20260904-004</title><style>
+:root{--fg:#1b1f23;--mut:#5b6570;--line:#e3e7eb;--acc:#0b5fff;--warn:#b45309;--bad:#b91c1c;--ok:#047857;}
+*{box-sizing:border-box}
+body{margin:0;background:#f6f7f9;color:var(--fg);
+ font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",Meiryo,sans-serif;
+ line-height:1.85;font-size:15.5px;-webkit-text-size-adjust:100%;}
+.wrap{max-width:1000px;margin:0 auto;padding:32px 22px 96px;background:#fff;
+ box-shadow:0 1px 3px rgba(0,0,0,.06);}
+h1{font-size:1.75rem;line-height:1.4;margin:.2em 0 .6em;padding-bottom:.4em;border-bottom:3px solid var(--acc);}
+h2{font-size:1.3rem;margin:2.2em 0 .7em;padding:.35em .6em;background:#eef3ff;border-left:5px solid var(--acc);border-radius:3px;}
+h3{font-size:1.1rem;margin:1.8em 0 .5em;padding-bottom:.25em;border-bottom:1px solid var(--line);}
+p{margin:.7em 0}
+hr{border:0;border-top:1px solid var(--line);margin:2.2em 0}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:.92em;display:block;overflow-x:auto;}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top;}
+th{background:#f0f3f7;font-weight:600;white-space:nowrap;}
+tbody tr:nth-child(even){background:#fafbfc}
+blockquote{margin:1.1em 0;padding:.8em 1em;background:#fffbeb;border-left:5px solid var(--warn);border-radius:3px;color:#463a1a;}
+code{background:#f1f3f5;padding:.12em .4em;border-radius:3px;font-size:.9em;
+ font-family:"SFMono-Regular",Menlo,Consolas,monospace;}
+pre{background:#1e2430;color:#e6edf3;padding:14px 16px;border-radius:6px;overflow-x:auto;font-size:.86em;line-height:1.6;}
+pre code{background:none;color:inherit;padding:0}
+ul,ol{margin:.7em 0;padding-left:1.6em}
+li{margin:.3em 0}
+a{color:var(--acc)}
+@media print{body{background:#fff}.wrap{box-shadow:none;max-width:none}}
+</style></head><body><div class="wrap"><h1>C-1 コスト前提の実測版（初回仕入れ5〜10SKU・予算5万円）</h1>
+<p>経理ハジメ / 2026-09-04 / T-20260904-004</p>
+<p><strong>ラベルの意味</strong></p>
+<table><thead><tr><th>ラベル</th><th>意味</th></tr></thead><tbody>
+<tr><td>〔実測〕</td><td>一次情報（公式料金ページ・業者の公開料金表・自社取得データ）を直接確認した</td></tr>
+<tr><td>〔二次〕</td><td>独立した解説2系統以上で一致。一次情報の目視確認はしていない</td></tr>
+<tr><td>〔推定〕</td><td>根拠のある仮定。仮定の中身を必ず併記した</td></tr>
+<tr><td>〔未確認〕</td><td>取れなかった。値は空欄。推測で埋めていない</td></tr>
+</tbody></table>
+<hr>
+<h2>1. 結論</h2>
+<p><strong>現行モデルには2つの費目が丸ごと抜けています。金額は1点あたり合計 約122〜127円です。</strong></p>
+<table><thead><tr><th>抜けている費目</th><th>金額</th><th>確度</th></tr></thead><tbody>
+<tr><td>小口プラン 基本成約料</td><td>110円/点（税込）</td><td>〔実測〕100円税別＋消費税</td></tr>
+<tr><td>販売手数料にかかる消費税</td><td>販売手数料 × 10%</td><td>〔二次〕売価1,740円なら約17円</td></tr>
+<tr><td>FBA納品代行の作業費</td><td>12円/点</td><td>〔実測〕社長方針は外注前提なのに未計上</td></tr>
+</tbody></table>
+<p><strong>一方で、過大に見積もっていた費目もあります。</strong></p>
+<table><thead><tr><th>過大だった費目</th><th>現行</th><th>実測版</th></tr></thead><tbody>
+<tr><td>FBA納品送料</td><td>100円/点</td><td><strong>37.5円/点</strong>（750円/箱 ÷ 20点）</td></tr>
+<tr><td>雑費</td><td>売価の3%</td><td><strong>返品引当へ置換</strong>（売価連動にする根拠がない）</td></tr>
+<tr><td>保管月数</td><td>2.0ヶ月</td><td><strong>1.5ヶ月</strong>（3ヶ月線形消化なら平均在庫は1/2）</td></tr>
+</tbody></table>
+<p><strong>差し引きの向きは売価で逆転します。</strong></p>
+<table><thead><tr><th>売価</th><th>現行の計上額</th><th>実測版・中央</th><th>差</th></tr></thead><tbody>
+<tr><td>1,000円</td><td>170円</td><td>218円</td><td><strong>+47円（厳しくなる）</strong></td></tr>
+<tr><td>1,740円</td><td>193円</td><td>230円</td><td><strong>+37円</strong></td></tr>
+<tr><td>3,000円</td><td>230円</td><td>254円</td><td>+24円</td></tr>
+<tr><td>5,000円</td><td>290円</td><td>290円</td><td>±0円</td></tr>
+<tr><td>7,500円</td><td>365円</td><td>337円</td><td>−29円（緩くなる）</td></tr>
+<tr><td>10,000円</td><td>440円</td><td>381円</td><td>−59円</td></tr>
+</tbody></table>
+<p>低単価品ほど厳しくなり、高単価品ほど緩くなります。雑費3%が売価連動だったためです。<br><strong>「前提を直せば全部厳しくなる」ではありません。</strong></p>
+<hr>
+<h2>2. 4つの前提の実測結果</h2>
+<h3>2-1. FBA納品送料 100円/個 → <strong>37.5円/点</strong>〔推定：実測単価 ÷ 仮定個数〕</h3>
+<p>現行の根拠はコード内コメントの「160サイズ1,500円 / 1箱15個と仮定」でした。実料金に当てると過大です。</p>
+<table><thead><tr><th>経路</th><th>実料金</th><th>確度</th><th>出典</th></tr></thead><tbody>
+<tr><td>納品代行 → FBA 140サイズ</td><td><strong>750円/箱〜</strong></td><td>〔実測〕</td><td><a href="https://e-fba.com/">e-fba.com 公開料金表</a></td></tr>
+<tr><td>納品代行 → FBA 160サイズ</td><td>860円/箱〜</td><td>〔実測〕</td><td>同上</td></tr>
+<tr><td>自分で発送（FBAパートナーキャリア・ヤマト）140サイズ 関東→関東</td><td><strong>608円/箱</strong>（税込）</td><td>〔実測〕</td><td><a href="https://business.kuronekoyamato.co.jp/promotion/toAmazonseller2024/index.html">ヤマト運輸 公式</a></td></tr>
+<tr><td>同 160サイズ 関東→関東</td><td>762円/箱</td><td>〔実測〕</td><td>同上</td></tr>
+<tr><td>同 140サイズ 関東→関西</td><td>857円/箱</td><td>〔実測〕</td><td>同上</td></tr>
+<tr><td>（参考）通常の宅急便 160サイズ 関東→関東</td><td>3,020円/箱</td><td>〔実測〕</td><td>同上</td></tr>
+</tbody></table>
+<ul><li>1箱あたりの収容個数 <strong>20点</strong>〔推定〕。FBA小型／標準のみ・140サイズ段ボール1箱という仮定です。</li><li>750円 ÷ 20点 = <strong>37.5円/点</strong>。楽観25.0円（30点）／悲観86.0円（860円÷10点）。</li><li><strong>60〜120サイズの料金表は取得できませんでした</strong>〔未確認〕。ヤマト公式PDF・Amazon公開資料のいずれにも載っておらず、セラーセントラルの納品プラン作成画面でしか見られません。アカウント復旧後に実確認が必要です。</li><li><strong>小口プランでFBAパートナーキャリアを使えるかは未確認</strong>〔未確認〕。ヤマト公式に制限の記載はなく「追加の契約や利用条件の交渉は不要」とありますが、明示的に「小口可」とは書かれていません。</li></ul>
+<h3>2-2. NETSEA送料の10個按分 → <strong>前提以前に、送料がほぼ計上されていない</strong></h3>
+<p>NETSEA の生データ 257,067件を全数集計しました〔実測〕。</p>
+<table><thead><tr><th>項目</th><th>実測値</th></tr></thead><tbody>
+<tr><td><code>ship_fee &gt; 0</code> の商品</td><td><strong>951件（0.37%）</strong></td></tr>
+<tr><td><code>ship_fee = 0</code> の商品</td><td>256,116件（99.6%）</td></tr>
+<tr><td>951件の中央値</td><td>1,500円/発注</td></tr>
+<tr><td>同 最頻値</td><td>1,500円（365件）／200円（171件）／1,600円（155件）</td></tr>
+<tr><td>同 平均</td><td>1,263円</td></tr>
+<tr><td>同 レンジ</td><td>200円 〜 11,000円</td></tr>
+</tbody></table>
+<p><code>ship_fee</code> が0なら送料は0円として計算されます。つまり <strong>「10個按分」という前提が働くのは全商品の0.37%だけで、残り99.6%はNETSEA送料ゼロで利益を計算しています。</strong><br>送料は1発注ごとに掛かるため、サプライヤーを5社に分けると5回掛かります。中央値1,500円で5社なら7,500円。<strong>予算5万円の15%です。</strong></p>
+<p><strong>送料の実額は <code>/items</code> ではなく <code>/tariffs</code> から取れます</strong>〔実測〕</p>
+<p><code>ship_fee</code> が0であることは「送料無料」を意味しません。<strong>送料設定は別エンドポイント <code>/tariffs</code> にあり、そちらには都道府県別・金額段階別の実額が入っています。</strong>同日に IT タカシが取得を開始しており（<code>_tariffs_cache.json</code>）、実データが1社ぶん取れています。</p>
+<table><thead><tr><th>取得できた1社の実データ（社名・IDは PUBLIC リポのため伏せます）</th><th>値</th></tr></thead><tbody>
+<tr><td>段階の境目</td><td><strong>20,000円</strong></td></tr>
+<tr><td>20,000円未満の送料</td><td>770円（一部地域1,650円）</td></tr>
+<tr><td>20,000円以上の送料</td><td><strong>0円（＝送料無料）</strong></td></tr>
+<tr><td>複数社注文時の適用</td><td><code>apply_type: higher</code>（高い方の送料が適用される）</td></tr>
+</tbody></table>
+<p><strong>問い「5万円の発注で送料無料に届くのか」への回答：この1社については届きます。</strong>予算5万円のうち20,000円を1社に寄せれば送料はゼロです。<br>ただし<strong>サンプルは1社のみ</strong>であり、送料無料ラインはサプライヤーごとに異なります〔未確認：全社分布〕。全社の分布は IT タカシの <code>/tariffs</code> 取得完了（9/6〜9/7見込み）を待ってください。</p>
+<p><strong>サプライヤーを集約すべき経理上の理由はここにあります。</strong>5社に分ければ送料が5回かかるうえ、どの社も無料ラインに届きません。1〜2社に寄せれば送料をゼロにできる可能性があります。</p>
+<p><strong>使える事実：初回注文送料無料特集が現在開催中</strong>〔実測〕</p>
+<ul><li>期間 2026/9/1 〜 2026/10/1 12:00（<a href="https://www.netsea.jp/special/freeshipping">NETSEA 公式</a>）</li><li>対象は特集掲載サプライヤーとの<strong>初回</strong>取引のみ</li><li><strong>購入時のコメント欄に「送料無料」と入力しないと適用されない</strong></li><li>他特集の特典と重複不可。離島・山間部は対象外</li></ul>
+<p>初回仕入れは条件にぴたりと合います。ただし<strong>Amazonアカウントは現在3か国とも停止中</strong>（T-20260826-004）で、10/1の期限までに復活する保証はありません。仕入れ自体はアカウント状態と無関係に可能ですが、売れる目処が立たないうちに在庫を持つのは別の判断です。</p>
+<h3>2-3. 保管2.0ヶ月（繁忙期レート）→ <strong>1.5ヶ月（繁忙期レート）</strong>〔推定：仮定を明示〕</h3>
+<table><thead><tr><th>項目</th><th>値</th><th>確度</th></tr></thead><tbody>
+<tr><td>保管料率（通常期1〜9月・小型/標準）</td><td>5.676円 / 1,000cm³ / 月（税込）</td><td>〔二次〕</td></tr>
+<tr><td>保管料率（繁忙期10〜12月・小型/標準）</td><td>10.087円 / 1,000cm³ / 月（税込）</td><td>〔二次〕</td></tr>
+<tr><td>長期在庫最低手数料（365日超）</td><td>20円/点/月</td><td>〔二次〕2026年4月15日新設</td></tr>
+</tbody></table>
+<p>出典：<a href="https://ecstarslab.com/blog/fba-tesuuryo/">EC STARs Lab.</a> が「5.68〜10.09円/1,000cm³」と記載し、社内 <code>calc/fees.py</code>（2026-08検証済）の値と一致。</p>
+<p><strong>月数を2.0 → 1.5に修正します。理由は次の1点です。</strong><br>保管料は月末在庫ではなく <strong>月次の平均在庫量</strong> に課されます。3ヶ月で線形に売り切るなら、各月の平均在庫は初期数量の 5/6・1/2・1/6 で、合計は <strong>1.5ヶ月分</strong>です。2.0ヶ月は1.33倍の過大計上でした。</p>
+<ul><li>レートは繁忙期（10.087円）を維持します。初回納品は9〜10月想定で、保管期間が10〜12月に重なるためです。</li><li>悲観シナリオは6ヶ月消化＝3.0ヶ月分。</li><li>ただし<strong>保管料はそもそも金額が小さい</strong>。標準サイズ1（体積2L仮定）で 2L × 10.087円 × 1.5ヶ月 = <strong>30円/点</strong>。判定を動かす費目ではありません。</li></ul>
+<h3>2-4. 雑費3% → <strong>廃止。返品引当に置換</strong></h3>
+<p>現行は売価の3%。何を含むのか定義がありませんでした。<strong>返品コストは売価ではなく「手数料と仕入原価」で決まる</strong>ため、売価連動にする経理的な根拠がありません。</p>
+<p>置換後の定義：</p>
+<pre><code>返品引当 = 返品率 × ( FBA配送代行手数料 + 返金処理手数料 + 仕入原価 × 50% )</code></pre>
+<table><thead><tr><th>構成要素</th><th>値</th><th>確度</th><th>根拠</th></tr></thead><tbody>
+<tr><td>返品率</td><td>3%（楽観2%／悲観5%）</td><td>〔推定〕</td><td><strong>自社実績ゼロ。初回販売後に実績へ差し替える</strong></td></tr>
+<tr><td>FBA配送代行手数料</td><td>返金しても戻らない</td><td>〔二次〕</td><td><a href="https://force-r.co.jp/column/column-28008/">FORCE-R</a></td></tr>
+<tr><td>返金処理手数料</td><td>500円 と 販売手数料の10% の低い方</td><td>〔二次〕</td><td>同上</td></tr>
+<tr><td>仕入原価 × 50%</td><td>返品品の半分は再販不可と仮定</td><td>〔推定〕</td><td>—</td></tr>
+</tbody></table>
+<p>旧「雑費」に含まれていたと思われる費目の実額：</p>
+<table><thead><tr><th>費目</th><th>実額</th><th>確度</th><th>根拠</th></tr></thead><tbody>
+<tr><td>梱包資材費</td><td><strong>0円</strong>（納品代行の12円/点に込み）</td><td>〔実測〕</td><td><a href="https://e-fba.com/">e-fba.com</a></td></tr>
+<tr><td>売上金の振込手数料</td><td><strong>0円</strong>（Amazon負担）</td><td>〔二次〕</td><td><a href="https://sobani.co.jp/columnlist/amazon_provision">そばに</a></td></tr>
+<tr><td>値下げ</td><td>引当に入れない</td><td>—</td><td>売価そのものを下げて再計算するのが正しい</td></tr>
+</tbody></table>
+<hr>
+<h2>3. 抜けていた費目（②の洗い出し）</h2>
+<h3>3-1. 小口プラン 基本成約料 110円/点 — <strong>これが最大の抜けです</strong></h3>
+<table><thead><tr><th>項目</th><th>内容</th></tr></thead><tbody>
+<tr><td>金額</td><td><strong>100円/点（税別）</strong>〔実測・<a href="https://sell.amazon.co.jp/pricing">Amazon公式</a>〕→ 計算には税込110円を使う〔推定〕</td></tr>
+<tr><td>発生</td><td>売れた商品1点ごと。大口プラン（月額4,900円税抜）には存在しない</td></tr>
+<tr><td>影響</td><td>売価1,740円・利益率5%なら利益は87円。<strong>110円が抜けていれば黒字判定が赤字に反転します</strong></td></tr>
+</tbody></table>
+<p>税区分（税別か税込か）は一次情報で確認できませんでした〔未確認〕。保守側の110円で計上します。</p>
+<p><strong>あわせて、小口プランには費用より重い制約があります。</strong></p>
+<table><thead><tr><th>制約</th><th>影響</th><th>確度</th></tr></thead><tbody>
+<tr><td><strong>カートボックス（購入ボタン）の獲得権がない</strong></td><td>Amazonの購買の約8割はカート経由。相乗り出品では実質売れない</td><td>〔二次2系統〕<a href="https://www.theckb.com/archive/small-cansell/">THE CKB</a> ほか</td></tr>
+<tr><td>スポンサープロダクト広告が使えない</td><td>露出を買えない</td><td>〔二次〕</td></tr>
+<tr><td>新規カタログ作成ができない</td><td>既存ASINへの相乗りのみ。OEM・セット品は不可</td><td>〔二次〕</td></tr>
+<tr><td>一括出品ツール（CSV）が使えない</td><td>1点ずつ手作業</td><td>〔二次〕</td></tr>
+<tr><td>FBAは使える</td><td>—</td><td>〔二次〕</td></tr>
+</tbody></table>
+<p><strong>経理としての指摘：</strong>初回の目的は「1周回すこと」です。カートを取れない状態では、出品しても注文が入らず<strong>0周で終わる</strong>可能性があります。</p>
+<table><thead><tr><th>プラン</th><th>3ヶ月の固定費</th><th>損益分岐</th></tr></thead><tbody>
+<tr><td>小口</td><td>110円 × 販売点数</td><td>—</td></tr>
+<tr><td>大口</td><td>4,900円/月（税抜）× 3 = 14,700円</td><td><strong>月45点（税込5,390円 ÷ 110円）</strong></td></tr>
+</tbody></table>
+<p>初回の販売見込みは5〜10SKU × 数点＝数十点なので、<strong>手数料の総額だけを見れば小口が安い</strong>です。判断材料は費用ではなく「カートを取れないまま1周回せるか」で、これは社長判断の論点です（§5に記載）。</p>
+<h3>3-2. FBA納品代行の作業費 12円/点〔実測〕</h3>
+<p>社長方針は物理作業の外注（memory <code>owner_pc_complete_outsourcing</code>）ですが、現行の NETSEA 利益計算には<strong>外注費が1円も入っていません</strong>。</p>
+<table><thead><tr><th>項目</th><th>値</th><th>確度</th><th>出典</th></tr></thead><tbody>
+<tr><td>単品商品（通常）・資材込</td><td><strong>12円/点</strong></td><td>〔実測〕</td><td><a href="https://e-fba.com/">e-fba.com 公開料金表</a></td></tr>
+<tr><td>単品商品（大型）・資材込</td><td>25円/点</td><td>〔実測〕</td><td>同上</td></tr>
+<tr><td>月額基本料</td><td><strong>0円</strong></td><td>〔実測〕</td><td>同上</td></tr>
+<tr><td>保管（スチールラック1本）</td><td>3,000円/月（税別）</td><td>〔実測〕</td><td>同上</td></tr>
+<tr><td>相場（検品＋FNSKUラベル貼付）</td><td>10〜30円/点</td><td>〔二次〕</td><td><a href="https://www.kamiyashouten.com/column/ec%E7%89%A9%E6%B5%81/fba/">神谷商店 2026-09-01更新</a></td></tr>
+</tbody></table>
+<p>中央値は12円/点、悲観30円/点とします。<strong>1社しか公開料金を確認できていません。</strong>相見積り2〜3社は実行前の宿題です。</p>
+<h3>3-3. Amazonラベル貼付サービス（外注しない場合の代替）</h3>
+<table><thead><tr><th>項目</th><th>値</th><th>確度</th></tr></thead><tbody>
+<tr><td>小型／標準サイズ</td><td>22円/点（税込）</td><td>〔実測〕公式G200483750（2026-07-27社内確認）</td></tr>
+<tr><td>大型サイズ</td><td>51円/点（税込）</td><td>〔実測〕同上</td></tr>
+</tbody></table>
+<p>納品代行に出すなら二重計上しません。<strong>海外品・並行輸入品はバーコード欠如で対象外になることが多い</strong>点に注意。</p>
+<h3>3-4. その他（引当に入れないが、発生しうる費目）</h3>
+<table><thead><tr><th>費目</th><th>金額</th><th>確度</th><th>扱い</th></tr></thead><tbody>
+<tr><td>FBA返送／所有権の放棄手数料</td><td>小型・標準1,500gで242.5円（税込）。レンジ60〜870円</td><td>〔二次〕</td><td><strong>売れ残りの撤退コスト。SKU単位で別枠計上</strong></td></tr>
+<tr><td>低在庫レベル手数料</td><td>5〜30円/点</td><td>〔未確認〕</td><td>過去在庫日数14日未満で発生。<strong>少量仕入れの初回は構造的に該当しうる。免除条件を一次情報で確認できず、値は空欄</strong></td></tr>
+<tr><td>納品不備受領作業手数料</td><td>51〜122円/点</td><td>〔二次〕</td><td>正しい梱包・ラベルで回避可。引当に入れない</td></tr>
+<tr><td>カテゴリー成約料</td><td>メディアのみ 80〜140円/点</td><td>〔二次〕</td><td>初回候補は非メディア想定＝0円</td></tr>
+<tr><td>長期在庫追加手数料</td><td>271日超で 16.66〜27.43円/1,000cm³</td><td>〔二次〕</td><td>回転3ヶ月方針なら発生しない</td></tr>
+</tbody></table>
+<h3>3-5. 消費税の扱い〔実測・社内確定〕</h3>
+<p>社長は<strong>個人事業主・免税事業者・インボイス未登録</strong>（memory <code>tax_invoice_menzei_seller</code>）。</p>
+<ul><li><strong>仕入税額控除ができません。</strong>NETSEA卸値は税込が実コスト、Amazon手数料の消費税も丸ごとコストです。本モデルはすべて税込で積んでいます。</li><li>売上に含まれる消費税の納税義務はありません。</li><li>ハジメは税理士ではありません。<strong>税務判断は税理士確認を推奨します。</strong></li></ul>
+<hr>
+<h2>4. 初回5〜10SKU の損益シミュレーション</h2>
+<p><strong>問い：1SKUに5,000／7,500／10,000円を投じたとき、利益率5%を取るにはいくらで売る必要があるか。</strong></p>
+<p>「掛け率」＝ 仕入れ値 ÷ 販売価格。<strong>数字が大きいほど楽</strong>です（高く仕入れても成立する）。<br>NETSEA の卸値は上代の40〜60%が目安なので、<strong>掛け率50%以上が要求されるケースは、条件を満たす商品を探すのが現実的に難しくなります</strong>。</p>
+<h3>中央シナリオ（推奨値）：利益率5%に必要な販売価格</h3>
+<table><thead><tr><th>1SKU予算</th><th>仕入れ個数</th><th>仕入れ単価（税込）</th><th>必要販売価格</th><th>要求掛け率</th><th>1点あたり利益</th><th>SKU全体の利益</th></tr></thead><tbody>
+<tr><td>5,000円</td><td>1個</td><td>5,000円</td><td><strong>6,695円</strong></td><td>74.7%</td><td>335円</td><td>335円</td></tr>
+<tr><td>5,000円</td><td>3個</td><td>1,667円</td><td><strong>2,645円</strong></td><td>63.0%</td><td>132円</td><td>397円</td></tr>
+<tr><td>5,000円</td><td>5個</td><td>1,000円</td><td><strong>1,834円</strong></td><td>54.5%</td><td>92円</td><td>458円</td></tr>
+<tr><td>5,000円</td><td>10個</td><td>500円</td><td><strong>1,227円</strong></td><td>40.8%</td><td>61円</td><td>614円</td></tr>
+<tr><td>7,500円</td><td>1個</td><td>7,500円</td><td><strong>9,733円</strong></td><td>77.1%</td><td>487円</td><td>487円</td></tr>
+<tr><td>7,500円</td><td>3個</td><td>2,500円</td><td><strong>3,657円</strong></td><td>68.4%</td><td>183円</td><td>549円</td></tr>
+<tr><td>7,500円</td><td>5個</td><td>1,500円</td><td><strong>2,442円</strong></td><td>61.4%</td><td>122円</td><td>611円</td></tr>
+<tr><td>7,500円</td><td>10個</td><td>750円</td><td><strong>1,531円</strong></td><td>49.0%</td><td>77円</td><td>766円</td></tr>
+<tr><td>10,000円</td><td>1個</td><td>10,000円</td><td><strong>12,771円</strong></td><td>78.3%</td><td>639円</td><td>639円</td></tr>
+<tr><td>10,000円</td><td>3個</td><td>3,333円</td><td><strong>4,670円</strong></td><td>71.4%</td><td>234円</td><td>701円</td></tr>
+<tr><td>10,000円</td><td>5個</td><td>2,000円</td><td><strong>3,050円</strong></td><td>65.6%</td><td>153円</td><td>763円</td></tr>
+<tr><td>10,000円</td><td>10個</td><td>1,000円</td><td><strong>1,834円</strong></td><td>54.5%</td><td>92円</td><td>917円</td></tr>
+</tbody></table>
+<p>3シナリオの全108通りは <code>C1_損益シミュレーション.csv</code> にあります。</p>
+<h3>この表から読める3点</h3>
+<ol><li><strong>1点あたり約160円の固定費（基本成約料110＋納品代行12＋納品送料37.5）が売価に関係なく乗ります。</strong>低単価品ほどこれに食われます。売価1,000円の商品では、この160円だけで売価の16%です。</li><li><strong>同じ5,000円を「1個に集中」させるほど掛け率の要求が緩みます</strong>（10個 40.8% → 1個 74.7%）。単価の高い商品を少数買うほうが、条件を満たす商品を見つけやすくなります。</li><li><strong>予算5万円の全体像（中央・利益率5%）</strong>：5SKU × 各10,000円 = 5万円で、SKU全体の利益は 639〜917円 × 5 = <strong>約3,200〜4,600円</strong>。回収まで最短でも、納品→販売→入金で <strong>6〜8週間</strong>（Amazon入金サイクル：小口は約1週間ごとの手動振込リクエスト）。</li></ol>
+<p>   <strong>初回は儲けではなく授業料です。</strong>目的が「1周回すこと」である以上、これは想定内の数字として扱ってください。</p>
+<h3>3シナリオの前提</h3>
+<table><thead><tr><th></th><th>楽観</th><th>中央（推奨）</th><th>悲観</th></tr></thead><tbody>
+<tr><td>FBAサイズ</td><td>小型（288円）</td><td>標準1（318円）</td><td>標準2（430円）</td></tr>
+<tr><td>1箱の収容個数</td><td>30点</td><td>20点</td><td>10点</td></tr>
+<tr><td>納品代行</td><td>12円/点</td><td>12円/点</td><td>30円/点</td></tr>
+<tr><td>NETSEA送料</td><td>0円（初回無料特集）</td><td>0円（初回無料特集）</td><td>1,500円/発注</td></tr>
+<tr><td>保管月数</td><td>1.5ヶ月</td><td>1.5ヶ月</td><td>3.0ヶ月</td></tr>
+<tr><td>返品率</td><td>2%</td><td>3%</td><td>5%</td></tr>
+</tbody></table>
+<hr>
+<h2>5. 社長判断が要る論点</h2>
+<p><strong>出品プランを小口のままにするか、大口へ切り替えるか。</strong></p>
+<table><thead><tr><th>案</th><th>3ヶ月の固定費</th><th>利点</th><th>欠点</th></tr></thead><tbody>
+<tr><td><strong>A. 小口のまま</strong></td><td>110円 × 販売点数（数十点なら数千円）</td><td>費用が最小。売れなければ費用も出ない</td><td><strong>カートを取れない＝相乗り出品では売れない可能性が高い。「1周回す」という目的自体が達成できないリスク</strong></td></tr>
+<tr><td><strong>B. 大口へ切替</strong></td><td>14,700円（税抜）＋販売手数料</td><td>カート獲得の土俵に乗る。広告・一括出品も使える</td><td>予算5万円に対し<strong>固定費が29%</strong>。売れなくても出ていく</td></tr>
+<tr><td><strong>C. 小口で出品 → 2週間売れなければ大口へ</strong></td><td>0〜14,700円</td><td>小口で売れるなら最安。ダメなら即切替</td><td>判定に2週間かかる。カート不在が原因か商品選定が原因かの切り分けが要る</td></tr>
+</tbody></table>
+<p><strong>経理としての材料：</strong>費用だけを見れば A が最安です。しかし初回の目的は利益ではなく「完走」であり、<strong>売れないことのコスト（在庫の滞留・保管料・返送手数料・時間）は、大口の14,700円より大きくなり得ます</strong>。ただし「小口ではカートを取れない」は二次情報2系統での確認であり、<strong>セラーセントラルの一次情報では未確認</strong>です。§4.1 該当（金銭が動く）なので、実行はしていません。</p>
+<hr>
+<h2>6. 既存シミュレータの扱い（③の判断）</h2>
+<p><strong><code>T-20260804-001/損益分岐シミュレータ_メーカー仕入れ.xlsx</code> は構造を流用し、本チケットに更新版を新規作成しました。</strong></p>
+<ul><li>流用する理由：入力／実測／自動計算の色分けと「損益分岐仕入れ値」「交渉目標上限」という出力設計は妥当です。作り直す価値がありません。</li><li>新規作成する理由：既存ファイルは<strong>メーカー直取引レーン用</strong>で、①小口基本成約料 ②販売手数料の消費税 の2行がありません。他チケットの納品物を上書きすると、そちらの再現性が壊れます。</li></ul>
+<p>新規：<code>C1_損益分岐シミュレータ_初回仕入れ.xlsx</code>（追加した行を黄色で明示）</p>
+<p><strong>IT タカシへ：<code>C1_cost_assumptions.json</code> を読んでください。</strong> <code>items[]</code> に費目・値・単位・confidence・source・note、<code>scenarios</code> に3シナリオのパラメータ、<code>missing_from_current_model</code> に現行モデルへ追加すべき費目が入っています。<code>confidence</code> は 実測／二次情報／推定／未確認 の4値のみです。</p>
+<hr>
+<h2>7. 無料・即日でできる不確実性つぶし（3手）</h2>
+<table><thead><tr><th>#</th><th>やること</th><th>所要</th><th>何が確定するか</th></tr></thead><tbody>
+<tr><td>1</td><td>FBA料金シミュレーターに候補ASINを実投入</td><td>5分</td><td>販売手数料・FBA配送代行の<strong>実額</strong>（カテゴリ・サイズの推定誤差が消える）</td></tr>
+<tr><td>2</td><td>セラーセントラルで納品プランを1本作り、配送料見積りを表示</td><td>15分</td><td><strong>60〜120サイズのパートナーキャリア料金</strong>と、小口プランで使えるかの可否</td></tr>
+<tr><td>3</td><td>納品代行2社に相見積り（e-fba 以外）</td><td>1〜2日</td><td>外注12円/点が妥当か。<strong>§4.1非該当</strong>（見積り依頼は契約ではない）だが第三者連絡にあたるため秘書経由で社長承認を取ること</td></tr>
+</tbody></table>
+<p>いずれも<strong>アカウント復旧が前提</strong>です（現在3か国とも停止中）。</p>
+<hr>
+<h2>8. 出典一覧</h2>
+<table><thead><tr><th>#</th><th>出典</th><th>何を取ったか</th></tr></thead><tbody>
+<tr><td>1</td><td>https://sell.amazon.co.jp/pricing</td><td>小口基本成約料100円、大口4,900円、販売手数料率、FBA配送代行レンジ</td></tr>
+<tr><td>2</td><td>https://business.kuronekoyamato.co.jp/promotion/toAmazonseller2024/index.html</td><td>FBAパートナーキャリア・ヤマトの実料金（140/160サイズ）</td></tr>
+<tr><td>3</td><td>https://business.kuronekoyamato.co.jp/promotion/pdf/Amazon_PCP_2024.pdf</td><td>同サービスの利用条件（追加契約不要・請求元はAmazon）。<strong>料金表は非掲載</strong></td></tr>
+<tr><td>4</td><td>https://e-fba.com/</td><td>納品代行の公開料金（12円/点・資材込・月額0円・140サイズ750円〜）</td></tr>
+<tr><td>5</td><td>https://www.kamiyashouten.com/column/ec%E7%89%A9%E6%B5%81/fba/</td><td>納品代行の相場（2026-09-01更新）</td></tr>
+<tr><td>6</td><td>https://www.netsea.jp/special/freeshipping</td><td>初回注文送料無料特集（2026/9/1〜10/1 12:00）</td></tr>
+<tr><td>7</td><td>https://www.netsea.jp/help/faq/faq02.html</td><td>送料はサプライヤー設定。複数社注文時の適用ルール</td></tr>
+<tr><td>8</td><td>NETSEA Buyer API 取得データ 257,067件</td><td>ship_fee の実分布（0.37%しか値がない）</td></tr>
+<tr><td>9</td><td>https://ecstarslab.com/blog/fba-tesuuryo/</td><td>保管料率、返送/廃棄、受領作業、低在庫レベル手数料のレンジ</td></tr>
+<tr><td>10</td><td>https://netshop.impress.co.jp/node/11874</td><td>1,000円以下の配送代行66円引き、低在庫レベル手数料の導入日</td></tr>
+<tr><td>11</td><td>https://force-r.co.jp/column/column-28008/</td><td>返金処理手数料の定義</td></tr>
+<tr><td>12</td><td>https://brandbuppan.jp/amazon-selling-fee-tax/</td><td>販売手数料は税抜表示・FBA配送代行と保管料は税込表示</td></tr>
+<tr><td>13</td><td>https://www.theckb.com/archive/small-cansell/</td><td>小口の制約（カート不可・広告不可・新規カタログ不可・FBA可）</td></tr>
+<tr><td>14</td><td>https://sobani.co.jp/columnlist/amazon_provision</td><td>振込手数料はAmazon負担。小口は手動振込リクエスト</td></tr>
+<tr><td>15</td><td>社内 <code>calc/fees.py</code>（T-20260817-005 / 2026-08検証済）</td><td>販売手数料率テーブル、FBA配送代行、保管料率</td></tr>
+<tr><td>16</td><td>社内 memory <code>tax_invoice_menzei_seller.md</code></td><td>免税事業者・インボイス未登録の扱い</td></tr>
+</tbody></table>
+<hr>
+<h2>9. この修正で既存の黒字判定20件がどう動くか（見立て）</h2>
+<p><strong>測定の起点</strong>：2026-08-31 実行時点のスナップショット（1,200件評価・利益率20%以上20件・5%以上44件・赤字931件）。<br>中央値は 売価2,130円／純利益683円（20%以上の20件）。<br>※ このCSVは 2026-09-04 に IT タカシの再スキャンで上書き中です。以下は上書き前の値で測っています。</p>
+<table><thead><tr><th>シナリオ</th><th>1点あたりのコスト増減</th><th>20%以上20件のうち20%を維持</th><th>5%以上44件のうち黒字を維持</th></tr></thead><tbody>
+<tr><td>楽観</td><td>+17〜+28円</td><td>17〜18件</td><td>40〜42件</td></tr>
+<tr><td><strong>中央（推奨）</strong></td><td><strong>+24〜+47円</strong></td><td><strong>16〜17件</strong></td><td><strong>38〜40件</strong></td></tr>
+<tr><td>悲観</td><td>+298〜+311円</td><td><strong>11件</strong></td><td><strong>22件</strong></td></tr>
+</tbody></table>
+<ul><li>中央シナリオなら20件のうち<strong>3〜4件が20%を割り込む</strong>程度で、順位が大きく入れ替わることはありません。<strong>判定が根本から覆るわけではない、が結論です。</strong></li><li>悲観シナリオ（NETSEA送料を実費計上・外注30円/点・1箱10点）では <strong>20%以上が11件、黒字候補が半減</strong>します。差の大半はNETSEA送料です。<strong>サプライヤーを1〜2社に集約して送料無料ラインに乗せられるかが、候補数を半減させるかどうかを決めます。</strong></li><li>20%以上20件の売価中央値は2,130円で、社長の想定レンジ（1SKU 5,000〜10,000円）より低い帯にいます。<strong>この帯は1点あたり160円の固定費に最も弱い帯</strong>です。予算配分を「安いものを多数」ではなく「単価の高いものを少数」に寄せるほど、条件を満たす商品は見つけやすくなります（§4）。</li><li>上の件数は<strong>線形加算による内挿</strong>です〔推定〕。確定値は IT タカシが <code>A_初回仕入れ候補_卸レーン.csv</code> を <code>C1_cost_assumptions.json</code> で再計算した時点で出ます。</li></ul></div></body></html>

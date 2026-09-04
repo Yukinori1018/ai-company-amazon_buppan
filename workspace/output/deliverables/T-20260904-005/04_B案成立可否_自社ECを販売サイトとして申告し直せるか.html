@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>B案成立可否｜自社ECを販売サイトとして申告し直せるか（T-20260904-005）</title><style>
+:root{--fg:#1b1f23;--mut:#5b6570;--line:#e3e7eb;--acc:#0b5fff;--warn:#b45309;--bad:#b91c1c;--ok:#047857;}
+*{box-sizing:border-box}
+body{margin:0;background:#f6f7f9;color:var(--fg);
+ font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",Meiryo,sans-serif;
+ line-height:1.85;font-size:15.5px;-webkit-text-size-adjust:100%;}
+.wrap{max-width:1000px;margin:0 auto;padding:32px 22px 96px;background:#fff;
+ box-shadow:0 1px 3px rgba(0,0,0,.06);}
+h1{font-size:1.75rem;line-height:1.4;margin:.2em 0 .6em;padding-bottom:.4em;border-bottom:3px solid var(--acc);}
+h2{font-size:1.3rem;margin:2.2em 0 .7em;padding:.35em .6em;background:#eef3ff;border-left:5px solid var(--acc);border-radius:3px;}
+h3{font-size:1.1rem;margin:1.8em 0 .5em;padding-bottom:.25em;border-bottom:1px solid var(--line);}
+p{margin:.7em 0}
+hr{border:0;border-top:1px solid var(--line);margin:2.2em 0}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:.92em;display:block;overflow-x:auto;}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top;}
+th{background:#f0f3f7;font-weight:600;white-space:nowrap;}
+tbody tr:nth-child(even){background:#fafbfc}
+blockquote{margin:1.1em 0;padding:.8em 1em;background:#fffbeb;border-left:5px solid var(--warn);border-radius:3px;color:#463a1a;}
+code{background:#f1f3f5;padding:.12em .4em;border-radius:3px;font-size:.9em;
+ font-family:"SFMono-Regular",Menlo,Consolas,monospace;}
+pre{background:#1e2430;color:#e6edf3;padding:14px 16px;border-radius:6px;overflow-x:auto;font-size:.86em;line-height:1.6;}
+pre code{background:none;color:inherit;padding:0}
+ul,ol{margin:.7em 0;padding-left:1.6em}
+li{margin:.3em 0}
+a{color:var(--acc)}
+@media print{body{background:#fff}.wrap{box-shadow:none;max-width:none}}
+</style></head><body><div class="wrap"><h1>B案（自社EC = satoy-select.com を SD の販売サイトとして申告し直す）の成立可否</h1>
+<ul><li>担当：リサーチャー サトル／調査日：<strong>2026-09-04</strong></li><li>イシュー：<strong>satoy-select.com を SD の販売サイトとして申告し直せば、追加提出物 #1（販売サイト申込書 または 申込完了画面のキャプチャ）を満たせるか。</strong></li><li>スコープと打ち切り条件：<strong>非ログインで取得できる一次情報のみ</strong>（SD 公式ページ＋FAQ 全16,661質問の網羅検索＋satoy-select.com の実 HTTP 取得）。SD 会員ページとサポートデスクへの照会結果はスコープ外＝これ以上は推測になるため踏み込まない。</li><li>証跡（生 HTML 19本）と SD メール原文の逐語引用は Git 追跡外の <code>workspace/output/agent_output/T-20260904-005/</code> に保管。本ファイルは公開リポ向けに<strong>住所を伏せ、SD からの個別メール本文の逐語引用を外した版</strong>。</li></ul>
+<hr>
+<h2>1. 結論</h2>
+<p><strong>現状の satoy-select.com のままでは B案は成立しない。</strong> 独立した3つの根拠がある。</p>
+<table><thead><tr><th>#</th><th>根拠</th><th>一次情報（すべて 2026-09-04 取得）</th></tr></thead><tbody>
+<tr><td>①</td><td><strong>販売機能が無い。</strong> 商品ページ0件・価格表示0・カート0・決済0。サイト自身が「当サイトでは販売しておりません」と明記</td><td>https://satoy-select.com/business ／ https://satoy-select.com/sitemap.xml</td></tr>
+<tr><td>②</td><td><strong>SD のネット販売 入会不可条件の筆頭が「オープン前」。</strong> FAQ には「オープン前のECサイトでも入会できますか？」「開業前のECサイトでも入会できますか？」という質問が同記事に紐づき、答えは「ご入会いただけません」</td><td>https://faq.superdelivery.com/---637f401932cc2d001d51fcad （記事名「ネット販売の審査基準」）</td></tr>
+<tr><td>③</td><td><strong>「申込完了画面」に相当するものが物理的に存在しない。</strong> 自社ドメイン＋自前の静的サイト（Cloudflare Pages 配信）のため、SD が代替として唯一挙げている「申込完了が確認できる画面」を生成できない</td><td>SD メール（2026-09-02）／HTTP レスポンスヘッダ実測</td></tr>
+</tbody></table>
+<p>補強となる SD の明文：</p>
+<ul><li>「<strong>ネットショップは、オープン後のサイト内容を審査させていただきます。</strong>」 — https://www.superdelivery.com/p/contents/open-business/open-business.jsp</li><li>「開業準備中の方（<strong>実店舗のみ</strong>）」 — https://faq.superdelivery.com/審査にあたってご用意いただくもの-637f401832cc2d001d51fc2c</li></ul>
+<p>  ＝ 開業準備中の受け皿は実店舗に限定され、ネット販売には用意されていない。</p>
+<hr>
+<h2>2. satoy-select.com の実態（実確認）</h2>
+<p><code>sitemap.xml</code> 実測で全8ページ。<code>/</code>（トップ）<code>/about</code>『私たちについて』<code>/business</code>『取り扱い商品』<code>/contact</code>『お問い合わせ』<code>/guides</code> <code>/guide-cutting-board</code> <code>/guide-bottle</code>（記事）<code>/partners</code>『メーカー・卸売業者の皆さまへ』。<br><code>/tokusho</code> <code>/tokushoho</code> <code>/law</code> <code>/legal</code> <code>/company</code> はいずれも <strong>404</strong>。</p>
+<table><thead><tr><th>依頼された確認項目</th><th>結果</th><th>根拠</th></tr></thead><tbody>
+<tr><td><strong>(a) 商品を購入できる販売機能</strong></td><td><strong>無い</strong></td><td><code>/business</code>「商品の販売は Amazon.co.jp のストア「Satoy Select」で行っています。<strong>当サイトでは販売しておりませんので、ご注文は Amazon のページからお願いします。</strong>（ストアの公開は、準備が整い次第ご案内します。）」／トップ「<strong>Amazonストア、まもなく公開します</strong>」。商品URLは sitemap に0件。フォームは問い合わせ用のみ</td></tr>
+<tr><td><strong>(b) 特定商取引法表記</strong></td><td><strong>無い（意図的に Amazon 側へ委任）</strong></td><td><code>/about</code> 末尾「※ 通信販売に関する法定の表示事項は、<strong>販売ページ（Amazon.co.jp ストア「Satoy Select」）に掲載しています。</strong>」／専用ページは 404</td></tr>
+<tr><td><strong>(c) 屋号・住所・代表者名</strong></td><td><strong>ある</strong>（<code>/about</code>「事業者情報」）</td><td>店名・屋号：Satoy Select（サトイセレクト）／代表者：佐藤 之則／所在地：〒146-00xx 東京都大田区（以下略・全ページのフッターにも表示）／開業：2026年8月／事業内容：インターネット通信販売業／<strong>販売サイト：Amazon.co.jp ストア「Satoy Select」</strong>／配送：Amazon FBA</td></tr>
+</tbody></table>
+<p>→ <strong>事実：satoy-select.com は「Amazon ストアへの送客と、仕入先メーカーへの信用提示」を目的とするブランドサイトであり、EC（販売サイト）ではない。</strong> サイト自身が販売サイトを Amazon だと申告している。そしてその Amazon ストアも未公開。</p>
+<h3>リポジトリ内の制作物の所在（<code>grep -rl &quot;satoy-select&quot; .</code>）</h3>
+<table><thead><tr><th>パス</th><th>内容</th></tr></thead><tbody>
+<tr><td><code>workspace/output/deliverables/T-20260817-006/site/</code></td><td><strong>サイト本体のソース</strong>（<code>index.html</code> 他8ページ＋<code>assets/</code>・<code>fill.py</code>）</td></tr>
+<tr><td><code>workspace/output/deliverables/T-20260817-006/deploy.sh</code> / <code>公開手順書.html</code></td><td>デプロイ手順</td></tr>
+<tr><td><code>workspace/output/deliverables/T-20260817-006/.wrangler/cache/pages.json</code></td><td>Cloudflare Pages（wrangler）キャッシュ</td></tr>
+<tr><td><code>workspace/tickets/done/T-20260817-006_shiire-credibility-prep.md</code></td><td>制作チケット</td></tr>
+<tr><td><code>workspace/tickets/doing/T-20260825-001_site-mockup-v1.md</code></td><td>サイトモック v1</td></tr>
+<tr><td><code>docs/reference/web-site-build/</code></td><td>制作プレイブック</td></tr>
+</tbody></table>
+<p><strong>静的サイト（Cloudflare Pages）。Shopify・BASE 等の EC カートは使っていない＝申込先となるプラットフォームが存在しない。</strong></p>
+<hr>
+<h2>3. SD の「販売サイト」要件（一次情報）</h2>
+<h3>3.1 提出物 #1 が求めているもの</h3>
+<p>SD メール（2026-09-02）の要旨（逐語引用は agent_output 側に保管）：</p>
+<ul><li>目的は「<strong>ご登録販売サイトの販売ページ確認</strong>」</li><li>原則は<strong>申込書</strong>（屋号名・申込者名・住所が確認できるもの）</li><li><strong>申込書面が存在しない場合の代替は「申込完了が確認できる画面のキャプチャ画像」の1択のみ</strong></li><li>Amazon の場合、小口出品は不可。小口でないと分かるキャプチャも併せて要求</li></ul>
+<p>→ 「申込書」「申込完了画面」という語が示すとおり、<strong>#1 は申込先となるプラットフォーム事業者の存在を前提にしている</strong>。</p>
+<h3>3.2 SD における「販売サイト」の定義</h3>
+<p>FAQ 記事「ネット販売」 https://faq.superdelivery.com/---648706a169c4ac001cb2f1fb （2026-09-04）</p>
+<blockquote>スーパーデリバリーでは、<strong>会員情報に登録された販売サイトのみ出品が可能です。</strong> ネット販売をご希望の場合、まずは会員情報の変更より販売サイトをご登録ください。<strong>弊社基準にてご登録希望の販売サイトを審査いたします。</strong>（後略：出展企業ごとに取引条件が異なる）</blockquote>
+<p>FAQ 記事「店舗情報を変更したい」 https://faq.superdelivery.com/---637f401832cc2d001d51fc41 （2026-09-04）</p>
+<blockquote>※<strong>ネットショップURL・販売形態の変更は、サポートデスクにて変更内容を確認します。</strong>反映までに多少お時間をいただく場合がございます。</blockquote>
+<p>→ <strong>販売サイトを差し替える手続き自体は公式に存在する。</strong> ただし会員情報変更画面はログイン後（当方は未確認）、かつサポートデスクによる確認・審査が入る。</p>
+<h3>3.3 ネット販売の審査基準（入会不可条件）— 原文</h3>
+<p>https://faq.superdelivery.com/---637f401932cc2d001d51fcad （記事名「ネット販売の審査基準」・2026-09-04）</p>
+<blockquote>以下の条件に該当するサイトは、ご入会いただけません。ショッピングサイトの規模感、コンセプト、クオリティーなどをもって総合的に審査します。<br>・<strong>オープン前</strong> ・オークション ・フリーマーケット ・極端な値下げ ・受注発注など在庫を持たないサイト<br>※ご商売内容、状況によってはご入会いただけない場合がございます。また、審査の内容や結果の理由についてはお答えできかねます。</blockquote>
+<h3>3.4 審査にあたって用意するもの</h3>
+<p>https://faq.superdelivery.com/審査にあたってご用意いただくもの-637f401832cc2d001d51fc2c （2026-09-04）</p>
+<table><thead><tr><th>区分</th><th>求められるもの</th></tr></thead><tbody>
+<tr><td>実店舗販売の方</td><td>店舗写真3枚（看板/屋号入り外観・内観・商品陳列）</td></tr>
+<tr><td><strong>開業準備中の方（実店舗のみ）</strong></td><td>賃貸物件＝賃貸契約書（住所／賃貸期間／事業用途／大家と本人の署名捺印）。自己所有＝準備中の外観写真＋店内写真2点以上</td></tr>
+<tr><td><strong>ネット販売の方</strong></td><td><strong>弊社サイトで仕入れた商品を販売予定のネットショップ URL</strong></td></tr>
+</tbody></table>
+<p>冒頭に「※下記の他、確認書類のご提出をお願いする場合がございます」とあり、今回の3点要求はこれに当たる。</p>
+<h3>3.5 FAQ 全件の網羅検索（N=16,661 質問）</h3>
+<p>Helpfeel の全FAQデータ <code>https://faq.superdelivery.com/data/helpdata.json</code>（8,354,276 bytes・2026-09-04 取得）を全件検索。</p>
+<table><thead><tr><th>検索語</th><th>質問ヒット数</th><th>該当記事</th></tr></thead><tbody>
+<tr><td><strong>Amazon / amazon</strong></td><td><strong>0</strong></td><td>該当なし</td></tr>
+<tr><td><strong>小口</strong></td><td><strong>0</strong></td><td>該当なし</td></tr>
+<tr><td>大口</td><td>14</td><td>すべて Paid（後払い）決済の記事。<strong>出品プランとは無関係</strong></td></tr>
+<tr><td><strong>販売サイト</strong>（質問文中）</td><td><strong>0</strong></td><td>記事タイトル「ネット販売」の本文にのみ登場</td></tr>
+<tr><td>開業準備</td><td>0</td><td>記事本文（3.4）にのみ登場</td></tr>
+<tr><td>モール／楽天／Yahoo／Shopify／STORES／転売／せどり</td><td>各 0</td><td>該当なし</td></tr>
+<tr><td>BASE</td><td>221</td><td>「BASE連携」「BASEに自動で商品が取り込めない」（連携機能の記事）</td></tr>
+<tr><td>メルカリ</td><td>4</td><td>「メルカリShops連携」</td></tr>
+<tr><td>ECサイト</td><td>79</td><td>すべて「ネット販売の審査基準」。<strong>「オープン前のECサイトでも入会できますか？」「開業前のECサイトでも入会できますか？」を含む</strong></td></tr>
+<tr><td>ネットショップ</td><td>186</td><td>大半が「ネット販売の審査基準」</td></tr>
+</tbody></table>
+<p><strong>事実：SD の公開 FAQ 全記事に「Amazon」「小口」は1件も存在しない。</strong><br>→ 「Amazon の小口はご遠慮」は<strong>公開されていない運用ルール</strong>であり、公式ページでの裏取りはできない。同様に「<strong>自社EC の場合に #1 の代わりに何を出すか</strong>」も公開情報に定義が無い。</p>
+<hr>
+<h2>4. 「申込完了画面」に相当するものとして何を出せるか</h2>
+<table><thead><tr><th>候補</th><th>屋号・申込者名・住所が揃うか</th><th>SD 公式に「可」と書かれているか</th><th>判定</th></tr></thead><tbody>
+<tr><td><code>/about</code> の事業者情報ページのスクショ</td><td><strong>揃う（実測）</strong></td><td><strong>書かれていない</strong></td><td>3項目は満たすが、SD の要求は「<strong>販売ページ</strong>確認」。事業者情報ページは販売ページではない</td></tr>
+<tr><td>ドメイン登録完了メール／Cloudflare 管理画面</td><td>屋号・住所は通常入らない</td><td>書かれていない</td><td>不可の見込み</td></tr>
+<tr><td>EC カート（BASE・Shopify・STORES 等）の申込完了画面</td><td>プラットフォーム登録内容次第で揃う</td><td><strong>SD の想定どおりの形</strong></td><td><strong>当社は未契約＝現時点で出せない（「該当なし」であって「未調査」ではない）</strong></td></tr>
+<tr><td>特定商取引法表記ページ</td><td>新設すれば揃う</td><td>書かれていない</td><td>現サイトには<strong>存在しない</strong>（404・法定表示は Amazon 側に委任と明記）</td></tr>
+</tbody></table>
+<p><strong>事実：SD の公開情報の範囲では、自社ドメイン EC に対する #1 の代替物は定義されていない。</strong> 定義が無い以上、可否は <strong>SD サポートデスクの個別回答でしか確定しない</strong>。ここを推測で埋めてはいけない。</p>
+<hr>
+<h2>5. ギャップ表（軸 × 現状）</h2>
+<table><thead><tr><th>軸</th><th>SD の要求（一次情報）</th><th>satoy-select.com の現状（実測 2026-09-04）</th><th>判定</th></tr></thead><tbody>
+<tr><td>販売ページの存在</td><td>「ご登録販売サイトの<strong>販売ページ</strong>確認のため」</td><td>商品ページ0・価格0・カート0</td><td><strong>未充足</strong></td></tr>
+<tr><td>サイトのオープン</td><td>「オープン前」は入会不可／「オープン後のサイト内容を審査」</td><td>サイト自体は公開中。ただし販売は「まもなく公開」</td><td><strong>未充足</strong>（§6参照）</td></tr>
+<tr><td>屋号・申込者名・住所</td><td>申込書に3点必須</td><td><code>/about</code> に3点すべて記載・フッターにも住所</td><td><strong>充足</strong></td></tr>
+<tr><td>在庫を持つ販売</td><td>「受注発注など在庫を持たないサイト」は不可</td><td>配送は Amazon FBA（＝在庫を持つ）と明記</td><td>充足の方向。ただし販売実体が無く評価不能</td></tr>
+<tr><td>業種・取扱内容</td><td>オークション／フリマ／極端な値下げ／アダルトは不可</td><td>日用品・キッチン・インテリア・文具・小型家電。医薬品・酒・食品・危険物は取扱外と明記</td><td><strong>充足</strong></td></tr>
+<tr><td>販売サイトの登録変更</td><td>「会員情報に登録された販売サイトのみ出品可能」「URL・販売形態の変更はサポートデスクが確認」</td><td>SD に登録済みの URL が何かは<strong>未調査</strong>（要ログイン）</td><td><strong>要確認（社長の1手）</strong></td></tr>
+</tbody></table>
+<blockquote><strong>未調査で、かつ判断に効く1点：SD 会員情報に登録された販売サイト URL が「Amazon ストア」なのか「satoy-select.com」なのか。</strong><br>前者なら B案は「書類の差し替え」ではなく「<strong>販売サイトの変更申請</strong>」となり、サポートデスクの再審査が入る。会員ページはログインが必要なため当方では確認できない。</blockquote>
+<hr>
+<h2>6. 「翌々月末（2026-11-30）までにサイトオープン」を自社EC で満たせるか</h2>
+<ul><li><strong>事実</strong>：SD は「サイトオープン」を定義していない。メール中にも FAQ 全16,661質問にも定義記事は無い。</li><li><strong>事実</strong>：ただし当該条項の見出しは「<strong>販売開始後の販売サイト審査</strong>に関して」であり、入会不可条件が「<strong>オープン前</strong>」、かつ SD は「<strong>オープン後のサイト内容を審査</strong>」と明言している。</li><li><strong>推測（確度：高／根拠：上記2つの明文）</strong>：ドメインが生きてページが表示されているだけでは「サイトオープン」と判定されない。SD が見るのは<strong>販売ページの有無</strong>。</li><li><strong>したがって（事実の帰結）</strong>：自社EC で 11/30 条件を満たすには、2026-11-30 までに satoy-select.com 上に<strong>実際に購入できる商品ページ</strong>を並べる必要がある。現サイトは決済機能を持たない静的サイトのため、EC カート導入が前提になる（＝ 課金・契約が発生しうる＝ §4.1）。</li><li><strong>参考（事実）</strong>：11/30 までに Amazon ストアを公開できるなら #1 は Amazon（大口）で満たす道に戻る。ただし Amazon 出品アカウントは3か国とも停止中（T-20260826-004）。</li></ul>
+<hr>
+<h2>7. 副次的に判明した、チケット記載の要訂正点</h2>
+<h3>7.1 #3 本人確認書類 —「パスポート撮影済み → 流用可 ✅」は<strong>そのままでは不足</strong></h3>
+<p>https://www.superdelivery.com/p/contents/guide/important_documents.jsp （2026-09-04）</p>
+<table><thead><tr><th>選択肢</th><th>条件</th></tr></thead><tbody>
+<tr><td>マイナンバーカード</td><td>表裏。<strong>裏面のマイナンバーはマスキング必須</strong>。有効期限内</td></tr>
+<tr><td>運転免許証</td><td>表裏（裏に変更記載があれば裏も）。有効期限内</td></tr>
+<tr><td>住民票</td><td><strong>6ヵ月以内</strong>発行。マイナンバー記載があればマスキング</td></tr>
+<tr><td>印鑑証明</td><td><strong>6ヵ月以内</strong>発行</td></tr>
+<tr><td><strong>パスポート＋公共料金明細書</strong></td><td><strong>パスポート単体では不可。</strong>公共料金明細書（氏名・住所が代表者本人／<strong>発行3ヵ月以内</strong>）とセットで1点扱い</td></tr>
+<tr><td>特別永住者証明書</td><td>表裏。有効期限内</td></tr>
+</tbody></table>
+<p><strong>※在留カードは不可と明記。</strong> すべて「代表者本人・現住所」であることが条件。運転免許証かマイナンバーカードがあれば1点で済む。</p>
+<h3>7.2 #2 事業確認書類 — e-Tax 提出のため<strong>受信通知の同梱が必須</strong></h3>
+<p>https://www.superdelivery.com/p/contents/guide/important_documents_business.jsp （2026-09-04）</p>
+<p>「<strong>屋号、業種、住所</strong>が確認できるいずれか1点」＝ 開業届／登記簿謄本／確定申告書／事業許認可証／法人設立届出書。<br>開業届の合格条件（公式が4項目で明示）：❶屋号・<strong>業種</strong>・住所が確認できる ❷受領印がある ❸<strong>マイナンバーがマスキングされている</strong> ❹受付日時・受付番号の記載がある。</p>
+<blockquote><strong>e-Tax で提出した場合は「電子申請等証明データシート（e-Tax受信通知）」を併せて提出。</strong> 当社の開業届は e-Tax 提出（T-20260820-002）のため<strong>該当</strong>。</blockquote>
+<h3>7.3 第3のカテゴリ「事業運営確認書類」の存在</h3>
+<p>https://www.superdelivery.com/p/contents/guide/important_documents_businessoperation.jsp （2026-09-04）<br>納品書／請求書／領収書のいずれか。<strong>❶屋号・住所が確認できる ❷3ヵ月以内発行 ❸他社発行 ❹印字タイプ（手書き不可）</strong>。<br>紙で開業届を出した場合や登記簿謄本を出す場合に併せて要求される。当社は e-Tax 受信通知を出せば分岐上は不要。</p>
+<hr>
+<h2>8. ここから先はタケシ（プランナー）の領分です</h2>
+<p>事実として確定したのは次の3点だけです。</p>
+<ol><li>現状の satoy-select.com のままでは B案は成立しない（販売機能なし・SD の「オープン前」不可条件に真正面から該当）</li><li>自社ドメイン EC に対する #1 の代替物は SD 公式に<strong>未定義</strong></li><li>可否を確定できる唯一の手段は <strong>SD サポートデスクへの照会</strong></li></ol>
+<p>以下は戦略判断であり、私は踏み込みません。</p>
+<ul><li>SD サポートデスクへ照会するか／照会文でどこまで開示するか（→ 秘書カズヨ・ヒデアキ）</li><li>EC カート（BASE 等）を導入して「申込完了画面」を実在させる道を取るか（→ 課金＝§4.1。タケシ／ハジメ）</li><li>11/30 を Amazon 復旧に賭けるか、自社EC に賭けるか（→ タケシ／マサル）</li></ul>
+<h2>9. 出典一覧（すべて 2026-09-04 に非ログインで取得。規約同意・登録ボタンは一切押していない）</h2>
+<table><thead><tr><th>ページタイトル</th><th>URL</th></tr></thead><tbody>
+<tr><td>Satoy Select トップ／取り扱い商品／私たちについて／お問い合わせ／メーカー・卸売業者の皆さまへ</td><td>https://satoy-select.com/ ほか計8ページ・<code>/sitemap.xml</code></td></tr>
+<tr><td>事業確認書類案内ページ</td><td>https://www.superdelivery.com/p/contents/guide/important_documents_business.jsp</td></tr>
+<tr><td>本人確認書類案内ページ</td><td>https://www.superdelivery.com/p/contents/guide/important_documents.jsp</td></tr>
+<tr><td>事業運営確認書類案内ページ</td><td>https://www.superdelivery.com/p/contents/guide/important_documents_businessoperation.jsp</td></tr>
+<tr><td>ネット販売の審査基準（＝依頼で指定された「入会資格」URL の実タイトル）</td><td>https://faq.superdelivery.com/---637f401932cc2d001d51fcad</td></tr>
+<tr><td>審査にあたってご用意いただくもの</td><td>https://faq.superdelivery.com/審査にあたってご用意いただくもの-637f401832cc2d001d51fc2c</td></tr>
+<tr><td>ネット販売</td><td>https://faq.superdelivery.com/---648706a169c4ac001cb2f1fb</td></tr>
+<tr><td>店舗情報を変更したい</td><td>https://faq.superdelivery.com/---637f401832cc2d001d51fc41</td></tr>
+<tr><td>会員登録からご利用開始までの流れ</td><td>https://faq.superdelivery.com/---637f401832cc2d001d51fc2f</td></tr>
+<tr><td>会員登録についてのご連絡</td><td>https://faq.superdelivery.com/---637f401932cc2d001d51fcb3</td></tr>
+<tr><td>個人利用</td><td>https://faq.superdelivery.com/---648c12ea351324001c4783df</td></tr>
+<tr><td>審査時間</td><td>https://faq.superdelivery.com/---637f401932cc2d001d51fcb0</td></tr>
+<tr><td>開業準備中の方のご入会について</td><td>https://www.superdelivery.com/p/contents/open-business/open-business.jsp</td></tr>
+<tr><td>FAQ 全件データ（N=16,661 質問・8,354,276 bytes）</td><td>https://faq.superdelivery.com/data/helpdata.json</td></tr>
+<tr><td>SD メール「＜SD＞【重要】書類提出のお願い」（2026-09-02 13:09）</td><td><code>_inbox_社長共有/</code>（Git 追跡外）</td></tr>
+</tbody></table></div></body></html>
