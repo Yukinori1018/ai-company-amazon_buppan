@@ -36,7 +36,7 @@ related_tickets: []
 
 ## 現在地
 
-2026-09-04 タカシ作業完了。`/Users/yukinori/Claude Code/ai-company-homepage/` に163ファイルを生成。
+2026-09-04 タカシ是正完了（秘書の受け入れ指摘に対応）。`/Users/yukinori/Claude Code/ai-company-homepage/` に163ファイルを生成。
 検証（bash -n 7本 / フック実行 5本 / Python 3本 / JSON 4本 / リンク切れ0 / 秘密スキャン）すべて通過。
 **秘書の受け入れ確認待ち。** 社長判断が必要な論点は4件（下記「完了報告」）。
 
@@ -44,6 +44,9 @@ related_tickets: []
 
 - 2026-09-04 doing 起票（社長依頼を受け即着手）
 - 2026-09-04 マリエ：Notion カード作成（Status=doing）。labels を [ops, template] → [ops, foundation] に修正。Notion の Labels に `template` オプションが無く、新規オプションを勝手に作らない方針（T-20260904-001 と同じ）に従い、既存の `foundation`（骨格・基盤）へ寄せた。owner-tasks.md も ℹ️ 欄に追記（社長タスクの純増ゼロ）
+- 2026-09-04 タカシ（是正）: 秘書指摘の「社長タスクまとめカードの矛盾」を修正。併せて横断確認で
+  **元リポの Notion 実 ID がスキルに残っていたのを発見**（新事業のチケットが旧事業ボードに書き込まれる不具合）。
+  実在しない節参照2件も是正。作業範囲は雛形フォルダ内のみ、元リポは無変更。
 - 2026-09-04 タカシ: 生成先の骨格作成 → 汎用ファイル移植 → メモリ選別（69/112）→
   スクリプト/フックのパス依存を除去 → CLAUDE.md/README.md/SETUP.md 執筆 → 全検証通過。
   コピー元リポは読み取りのみ（1ファイルも変更していない）。
@@ -94,3 +97,50 @@ JSON が返ることまで確認しました。相対リンク切れ0件、秘�
 ほぼ全滅し（17本 → 8本、うち HP 制作の知識は0本）、規範だけ新しくて知識がゼロの状態で走り出すためです。
 
 完了しました。確認お願いします。
+
+---
+
+## 是正報告（2026-09-04・秘書指摘への対応）
+
+**指摘事項:** Notion「社長タスクまとめ」カードの矛盾が元リポからそのまま持ち込まれていた
+（CLAUDE.md §3 鉄則8 は「まとめカードを最新化せよ」、§6 は「まとめカードは廃止・waiting 列が引き継いだ」。
+実態はカードが 404 で Status 選択肢も4つのみ。マリエが3回読み替えていた）。
+
+**対応: waiting 列＝社長タスク一覧に統一し、同期先を `workspace/owner-tasks.md` の1つだけにしました。**
+
+### 直したファイル（7本）
+
+| ファイル | 内容 |
+|---|---|
+| `CLAUDE.md` §3 鉄則8 | 「まとめカードを最新化」→「`owner-tasks.md` を最新化 ＋ `waiting/` と突合」。Stop フックのブロックは維持。**なぜまとめカードを作らないか**（廃止の経緯・404 を3回踏んだ事実）を注記として追加 |
+| `CLAUDE.md` §7 | プレースホルダー表から `{{ NOTION_OWNER_TASKS_CARD_ID }}` の行を削除 |
+| `.claude/hooks/owner-tasks-sync-check.sh` | `CARD_ID` 変数ごと削除。リマインド文を「waiting/ と突合」手順に置換。**冒頭に「ここに『Notion まとめカードも更新せよ』と書き足すな」と明記** |
+| `workspace/owner-tasks.md` | 冒頭の「Notion まとめカードと同じ内容を保つ」を削除。「更新のしかた」に**突合コマンド（comm による取りこぼし検出）**を追加 |
+| `.claude/agents/general-affairs.md` | マリエの責務から「Notion まとめカードを最新化」を削除し、突合に置換 |
+| `agents/secretary/skills/notion-ticket-sync.md` | `§チケット言及時の即時同期確認` を新設（後述） |
+| `SETUP.md` | 手順4 から「Status=「まとめ」のカードを作る」を削除。**§5-C（是正の記録）と §5-D（同系統の不備）を新設**。修正一覧に6行追加 |
+
+`docs/notion-board-schema.md` は**元から Status 4選択肢のみで正しく**、修正不要でした。
+
+### 横断確認で追加発見した不備3件（すべて是正済み）
+
+**1つ目が重大です。**
+
+| # | 内容 | 影響 | 対応 |
+|---|---|---|---|
+| 1 | `agents/general_affairs/skills/notion-ticket-sync.md` §2・§5-1 に**先行事業の Notion 実 ID が4種残っていた**（Database ID / Data Source ID / Table view URL / 親ページ ID）。初回移植で `.claude/commands/` しか実 ID 検索していなかったのが原因 | **新事業のチケットが旧事業の Notion ボードに書き込まれる。** 動くので、データが混ざるまで誰も気づかない | 全て `{{ }}` 化。CLAUDE.md §7 の表に追加し、SETUP.md 手順4 に「§2 の接続先テーブルを埋める」ステップを追加。「他事業の DB ID を流用するな」と両方に明記 |
+| 2 | CLAUDE.md §3 鉄則7 が指す `agents/secretary/skills/notion-ticket-sync.md §チケット言及時の即時同期確認` が**実在しなかった**（元リポでも同じ） | 鉄則7 の手順が、どこにも書かれていない状態 | 参照を消すのではなく**節を新設**（読み合わせ4手順）。鉄則7 が要求する運用として妥当なため |
+| 3 | `.claude/hooks/delegation-check.sh` が `routing.md §着手前の可視化` を指していたが、**`§振り分けの原則` に改題済み**（元リポでも旧名のまま） | 委譲チェックのメッセージが存在しない節へ誘導 | 新しい節名に修正 |
+
+### 検証（是正後に再実行）
+
+シェル7本 `bash -n` 通過 / フック5本の実行スモークテスト通過（owner-tasks-sync-check はブロック経路も強制発火させて文面を目視確認）/ Markdown 相対リンク切れ 0 件 / 規範側に Notion 実 ID の残存なし（残るのは memory のみ＝歴史記録として意図的）。
+
+### 申し送り
+
+- **元リポ側には同じ矛盾が4件とも残っています。** 本チケットの制約（元リポは読むだけ）により手を付けていません。
+  **別チケットでの起票を推奨します。** 放置するとマリエが4回目の 404 を踏みます。
+  対象は `CLAUDE.md` §3 鉄則8 / `.claude/hooks/owner-tasks-sync-check.sh` / `workspace/owner-tasks.md` /
+  `.claude/agents/general-affairs.md` / `agents/secretary/skills/notion-ticket-sync.md`（§新設）/
+  `.claude/hooks/delegation-check.sh`（§着手前の可視化 → §振り分けの原則）。
+- なお、元リポの `workspace/owner-tasks.md` に未コミットの変更がありますが、**私の作業ではありません**（カズヨの担当領域のため触っていません）。
