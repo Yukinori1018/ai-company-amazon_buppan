@@ -29,9 +29,35 @@ from pipeline.optout import is_personal_local_part  # noqa: E402
 
 CONTACT_COLS = ("公式HP", "電話", "問い合わせフォームURL", "メール")
 
+#: **重要な穴だった点。** contacts_v1.csv には entity_type 列が無い（schema.ContactFields に
+#: 無いため）。そのため「個人事業主の疑い」を CSV だけでは検知できなかった。
+#: resolver の入力である JSONL 側を直接読んで補う。
+EXA_JSONL = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                         "pipeline", "data", "exa_lookups.jsonl")
+
+
+def load_entity_types():
+    import json
+    types = {}
+    if os.path.exists(EXA_JSONL):
+        with io.open(EXA_JSONL, encoding="utf-8") as fp:
+            for line in fp:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    e = json.loads(line)
+                except ValueError:
+                    continue
+                if e.get("entity_type"):
+                    types[e.get("メーカー名", "")] = e["entity_type"]
+    return types
+
 #: 居宅を示しやすい表記。オフィスビル名にも「◯号室」は出るので、
 #: ヒットしたら人が地図で確認すること（自動では白黒つけない）。
-RESIDENCE_HINTS = re.compile(r"マンション|ハイツ|アパート|コーポ|[０-９0-9]+荘|レジデンス|団地")
+RESIDENCE_HINTS = re.compile(r"マンション|ハイツ|アパート|コーポ|[０-９0-9]+荘|レジデンス|(?<!工業)(?<!産業)(?<!流通)団地")
+# ※「つくば明野工業団地」のような**産業用地**を居宅と誤判定した実例があるため除外している
+#   （2026-09-04 / 旭化成ワッカーシリコンの所在地で発火）
 ROOM_NUMBER = re.compile(r"[0-9０-９]+号室")
 
 
@@ -39,6 +65,7 @@ def check(path: str):
     with io.open(path, encoding="utf-8-sig") as fp:
         rows = list(csv.DictReader(fp))
 
+    entity_types = load_entity_types()
     filled = [r for r in rows if any((r.get(c) or "").strip() for c in CONTACT_COLS)]
     hits = []
 
@@ -46,8 +73,9 @@ def check(path: str):
         name = r.get("メーカー名", "")
 
         # 1) 個人事業主 / 2) ノーブランド・個人らしき に連絡先が入った
-        if (r.get("entity_type") or "").strip() == "個人事業主":
-            hits.append(("個人事業主", name, ""))
+        et = (r.get("entity_type") or entity_types.get(name) or "").strip()
+        if et.startswith("個人事業主"):   # 「個人事業主」「個人事業主の疑い」の両方を拾う
+            hits.append((et, name, ""))
         if (r.get("分類") or "").strip() == "ノーブランド・個人らしき":
             hits.append(("ノーブランド・個人らしきに連絡先", name, ""))
 

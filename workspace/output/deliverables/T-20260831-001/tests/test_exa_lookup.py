@@ -12,7 +12,7 @@ import unittest
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from pipeline.normalize import normalize_row  # noqa: E402
-from pipeline.optout import detect_optout, is_personal_local_part  # noqa: E402
+from pipeline.optout import is_personal_local_part  # noqa: E402
 from pipeline.resolvers.exa_lookup import ExaLookupResolver  # noqa: E402
 from pipeline.schema import CONF_CANDIDATE, CONF_CONFIRMED, CONF_UNKNOWN  # noqa: E402
 
@@ -78,41 +78,11 @@ class TestExaLookupResolver(unittest.TestCase):
         self.assertFalse(ExaLookupResolver.needs_network)
 
 
-class TestOptout(unittest.TestCase):
-    def test_営業お断りを検出する(self):
-        self.assertIsNotNone(detect_optout("営業目的のメールは固くお断りいたします。"))
-        self.assertIsNotNone(detect_optout("セールスの電話・メールはご遠慮ください"))
-
-    def test_営業時間は誤検知しない(self):
-        text = "営業時間は9:00〜17:00です。" + "あ" * 300 + "在庫切れの場合はご注文をお断りすることがあります。"
-        self.assertIsNone(detect_optout(text))
-
-    def test_語が片方だけなら検出しない(self):
-        self.assertIsNone(detect_optout("勧誘に関するご相談を承ります"))
-        self.assertIsNone(detect_optout("returnはお断りします"))
-
-    def test_空文字(self):
-        self.assertIsNone(detect_optout(""))
-
-    def test_個人名らしいローカル部(self):
-        self.assertTrue(is_personal_local_part("t.suzuki@example.co.jp"))
-        self.assertTrue(is_personal_local_part("taro_yamada@example.jp"))
-        self.assertFalse(is_personal_local_part("info@example.co.jp"))
-        self.assertFalse(is_personal_local_part("support@ottocast.co.jp"))
-        self.assertFalse(is_personal_local_part("not-an-email"))
+# 旧 detect_optout（真偽値の1段判定）のテストは、法務の A〜E 判定への作り替えに伴い
+# tests/test_optout_classes.py へ移管した。個人名ローカル部の判定も同ファイルに集約している。
 
 
 if __name__ == "__main__":
     unittest.main()
 
 
-class TestOptoutFalsePositives(unittest.TestCase):
-    """2026-09-04 に実データで踏んだ誤検知の再発防止（T-20260904-004 / B-1）。"""
-
-    def test_窓口名を人名と誤認しない(self):
-        for addr in (
-            "Askfender.jp@fender.com",
-            "customerservice.japan@ap.hasbro.com",
-            "infobox@astro-p.co.jp",
-        ):
-            self.assertFalse(is_personal_local_part(addr), addr)
