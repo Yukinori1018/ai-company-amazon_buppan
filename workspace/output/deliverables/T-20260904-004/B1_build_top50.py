@@ -161,7 +161,7 @@ def _int(v):
 def main():
     lookups = load_lookups()
     with io.open(QUEUE, encoding="utf-8-sig") as fp:
-        queue = list(csv.DictReader(fp))[:50]
+        queue = list(csv.DictReader(fp))
 
     rows = []
     for q in queue:
@@ -182,20 +182,38 @@ def main():
         row["取引可否シグナル"] = signal(e if e else None, note)
         rows.append(row)
 
+    # ★D/E を top50 から外してから50社を切る。
+    #
+    # **以前は queue の先頭50社をそのまま top50 にしていた。**
+    # その結果、法務判定が D（営業お断りの明示）や E（当社を名指しで取引対象外）の社が
+    # 「打診候補 上位50社」に3社混ざっていた（岩手県木炭協会・エリエール・ハイメス）。
+    # ヘッダ注記に「D・E には打診しない」と書いてはあるが、
+    # **社長はこのファイルを上から順に手を動かすためのリストとして使う。**
+    # 打ってはいけない相手を上位50に載せておいて注記で止める設計は、
+    # 「間違った連絡先は取れなかったより悪い」という本件の原則に反する。
+    # 除外したぶんは後続の社で埋める（50社という枠は維持する）。
+    excluded = [r for r in rows if r["optout_class"] in ("D", "E")]
+    rows = [r for r in rows if r["optout_class"] not in ("D", "E")][:50]
+
     # ★PUBLIC リポに出す前に、個人事業主の疑いがある社の連絡先を落とす
     held = redact_sole_proprietors(rows, lookups)
 
     # 打診優先度順（法務の contact_priority 昇順）にも並べ替えた版を作る
-    with io.open(OUT, "w", encoding="utf-8-sig", newline="") as fp:
+    # ★一時ファイルに書いて、検算に通ってから所定の名前に置く。
+    #
+    # **このリポジトリは PUBLIC で30分ごとに自動 push される。**
+    # 「先に書いて、後から検算して落ちる」順序だと、落ちた瞬間から
+    # 次の自動 push までの間、不正なCSVがディスクに残る。
+    # 検算が仕事をするほど危険、という逆立ちした設計になるので、
+    # 所定の名前に置くのは検算を通ってからにする。
+    OUT_TMP = OUT + ".tmp"
+    with io.open(OUT_TMP, "w", encoding="utf-8-sig", newline="") as fp:
         fp.write(HEADER_NOTE + "\n")
         w = csv.DictWriter(fp, fieldnames=COLS)
         w.writeheader(); w.writerows(rows)
 
-    prio = sorted(rows, key=lambda r: (int(r["contact_priority"] or 99), int(r["順位"])))
-    with io.open(os.path.join(HERE, "B1_打診候補_全社_優先度順.csv"), "w", encoding="utf-8-sig", newline="") as fp:
-        fp.write(HEADER_NOTE + "\n")
-        w = csv.DictWriter(fp, fieldnames=COLS)
-        w.writeheader(); w.writerows(prio)
+    # ※ここで B1_打診候補_全社_優先度順.csv を書いていたが、
+    #   直後の全社版が同じパスを上書きしていて**書き捨てになっていた**ので削除した。
 
     # --- 数字 ---
     n = len(rows)
@@ -216,8 +234,8 @@ def main():
         n = sum(1 for r in rows if r["optout_class"] == c)
         if n:
             print("  %-7s %2d" % (c, n))
-    ng = [r for r in rows if r["optout_class"] in ("D", "E")]
-    print("  → 打診対象から除外: %d社" % len(ng))
+    print("  → top50 から除外した D/E: %d社（%s）"
+          % (len(excluded), "、".join(r["メーカー名"] for r in excluded) or "なし"))
     print()
     print("--- 有望・連絡可の社 ---")
     for r in rows:
@@ -249,6 +267,27 @@ def main():
             print("  - %s（%s）" % (h["メーカー名"], h["entity_type"]))
         print("  実データ: agent_output/T-20260904-004/B1/HELD_BACK_個人事業主疑い.jsonl")
         print("  → 掲載可否は社長判断。判断が出るまで CSV には出しません。")
+    # --- 出したものを、出した直後に検算する ---------------------------
+    # 「フィルタを書いた」と「フィルタが効いていた」は別。ここで自分の出力を読み直す。
+    def _reread(path):
+        ls = io.open(path, encoding="utf-8-sig").read().splitlines(True)
+        while ls and ls[0].lstrip("\ufeff").startswith("#"):
+            ls.pop(0)
+        return list(csv.DictReader(io.StringIO("".join(ls))))
+    import io as _io  # noqa
+    back = _reread(OUT_TMP)
+    leaked = [r["メーカー名"] for r in back if r.get("optout_class") in ("D", "E")]
+    bad = ""
+    if leaked:
+        bad = "top50 に D/E が残っている: %s" % "、".join(leaked)
+    elif len(back) != len(rows):
+        bad = "top50 の行数が合わない: %d != %d" % (len(back), len(rows))
+    if bad:
+        os.remove(OUT_TMP)          # 不正なものをディスクに残さない
+        raise SystemExit(bad)
+    os.replace(OUT_TMP, OUT)        # ここで初めて所定の名前になる
+    print("検算: top50 に D/E なし（%d行）" % len(back))
+
     print("\nwrote", OUT)
     print("wrote", ALL)
 
