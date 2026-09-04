@@ -371,3 +371,100 @@ Amazon公式フォーラム上の実務助言（一次寄り）は「Amazonは�
 - グッズステーション（上海倉庫）固有の出品制限・真贋トラブルの実例は**見つからなかった**。第1部6は同社固有の事故事例ではなく、中国輸入品一般のリスクからの推論である。
 - 「国内の卸経由で中国製品を仕入れた場合の責任の所在」を現場セラー自身が明言している一次情報は**見つからなかった**（専門家の解説記事のみ）。
 - FBAの寸法・重量上限 [#53] の出典は2011年版PDFであり、現行性は未検証。
+
+---
+
+## 出典一覧
+
+本文中の `[#n]` は `notes.md` の行番号に対応する。確度は `notes.md` のラベルをそのまま引き継いだ。検証欄は `verification.md` で実地確認した行のみ判定を記載し、それ以外は「未実施」（＝「一致」ではない）。発行日欄が空欄のものは出典に発行日の記載がなく未確認。**全出典の取得日は 2026-09-04。**
+
+| # | 主張の要旨 | 出典URL | 確度 | 発行日 | 検証（verification.md） |
+|---|---|---|---|---|---|
+| 1 | 出品許可申請の請求書要件：①180日以内発行 ②出品アカウントの名前・住所と一致 ③メーカー/卸の名前・住所記載 ④合計10点以上 ⑤価格省略可 ⑥Amazonが取引先へ照会。固定値として扱わない | https://sedori.co.jp/amazon-listing-restrictions/ ／ https://wac-works-ec.jp/amazon/application-for-exhibition-permission/ ／ https://jagoo.co.jp/column/amazon-sellinglimit/ ／ https://force-r.co.jp/column/column-4546/ | 二次・複数ソースで数値収束・一次未確認 | force-r分は2023-07時点 | **一致**（3URLとも記載確認。ただしAmazon公式の明示引用はなく二次のまま） |
+| 5 | 出品制限の種類は3種（カテゴリー/ブランド/ASIN）、5区分とする整理もあり | https://bxo.co.jp/magazine/2300 ／ https://link-ecconsulting.co.jp/column/amazon-selling-guide/ | 二次・一次原文未確認 | — | 未実施 |
+| 7 | 制限対象ブランドの一覧はAmazon公式には非公開 | https://jagoo.co.jp/column/amazon-sellinglimit/ ／ https://bxo.co.jp/magazine/2300 | 二次 | — | **一致**（#1の検証時にjagoo記事内で併せて確認） |
+| 8 | 一部高級ブランドはメーカー意向で新規出品者を認めず、どの書類でも解除不可のケースあり | https://jagoo.co.jp/column/amazon-sellinglimit/ | 二次・未検証 | — | 未実施 |
+| 9 | 2023年7月頃追加とされる「動画視聴＋テスト合格で書類なし解除」（1クリック解除） | https://sedori.co.jp/amazon-listing-restrictions/ | 二次・要検証 | — | 未実施 |
+| 10 | 出品大学FAQ：事前承認が必要な場合ありと案内するのみ。承認不要カテゴリー一覧の明記なし | https://sell.amazon.co.jp/learn | 一次 | — | **一致**（具体リストが無いことを確認） |
+| 11 | Amazon公式ヘルプ5ページ（G200333160／GDQ9K277NYP6WNEW／G200936440／201730840／G84EFS4CKK43USMF）は実在確認済みだが本文取得不可 | https://sellercentral.amazon.co.jp/gp/help/external/G200333160 ／ https://sellercentral.amazon.com/help/hub/reference/external/GDQ9K277NYP6WNEW ／ https://sellercentral.amazon.co.jp/help/hub/reference/external/G200936440 ／ https://sellercentral.amazon.co.jp/gp/help/external/201730840 ／ https://sellercentral.amazon.co.jp/help/hub/reference/external/G84EFS4CKK43USMF | 一次・未読＝要検証 | — | 未実施（**本文到達不能**：JS＋ログイン必須） |
+| 12 | 制限対象商品として二次情報が一致して挙げる22カテゴリー（酒類・化粧品・食品&飲料・医療機器等） | https://biz.acrove.co.jp/colum_kiso/371/ | 二次 | — | 未実施 |
+| 13 | 「承認不要で出品できるカテゴリー」を明示リスト化したAmazon公式ページは発見できず | （該当ページなし。sell.amazon.co.jp/learn に該当記述なしを確認） | 該当なし（不存在の確認） | — | 未実施 |
+| 14 | メーカーより直接10点購入した請求書でも却下。理由「注文確認書・納品書・見積等は受け付けない」 | https://sellercentral.amazon.co.jp/seller-forums/discussions/t/ac2fba04-d58e-4473-8413-5ad1e8ff0a2f | 一次・実体験 | — | **一致**（却下メッセージの文言をほぼ原文通り確認） |
+| 15 | 正規卸の請求書（自社/仕入先の名称住所あり）でも「仕入先情報を確認できない」で却下、再申請もクローズ | https://sellercentral.amazon.co.jp/seller-forums/discussions/t/f412ccf9-697c-4af6-9fa8-091536b33c8b | 一次・実体験 | — | **一致** |
+| 16 | スーパーデリバリー仕入れで請求書・納品書・領収書を全提出したが「改ざんの可能性」で却下 | https://sellercentral.amazon.co.jp/seller-forums/discussions/t/45d098a6-f8fa-4007-a904-600b7cf7d424 | 一次・実体験 | 2025-10-28投稿 | 未実施 |
+| 17 | NIKE申請で「10点以上」→後日「30点以上」に要件変更。担当者「数量基準はフォーラムで開示できない」 | https://sellercentral.amazon.co.jp/seller-forums/discussions/t/20a27499-bae2-4395-9b8c-35341aefac07 | 一次・実体験 | 2026-07-19投稿 | **一致**（7/10→7/19の日付付きやり取り、担当者回答の文言まで確認） |
+| 18 | 食品サブカテゴリで6回書類を変更提出したが「改ざん疑い」「購買者情報の不一致」で却下継続 | https://sellercentral.amazon.co.jp/seller-forums/discussions/t/6d40a28e-47bc-4272-a1d1-7f9e9eb12d14 | 一次・実体験 | 2026-03-02投稿 | 未実施 |
+| 19 | 要件を満たす大手卸の請求書でも不許可。同一請求書で他ブランドは解除できたのに1ブランドのみ不通過 | https://sellercentral.amazon.co.jp/seller-forums/discussions/t/7287778d-47d1-4a62-8db7-bb01eb7bc050 | 一次・実体験 | 2025-11-28投稿 | **一致** |
+| 20 | 「Amazonは検証可能なサプライヤーの請求書のみ受け付け、小売店やeコマースの領収書は受け付けない」 | https://sellercentral.amazon.co.jp/seller-forums/discussions/t/aef4977a-4bc1-4457-b932-41f8551d9218 | 一次寄り | 2025-08-27投稿 | **部分一致（要注意）**：文言は原文通り存在するが「eコマース」の定義が原文にもなく、曖昧さはソース自体に内在 |
+| 21 | ヤフオクの数量「1」の領収書で規制解除に成功したという個人ブログ報告（規約要件を満たさない＝グレー） | https://matsuo50.jp/?p=21663 | 一次・実体験・要検証 | 2025-07-10投稿 | 未実施 |
+| 22 | NETSEAで10点以上仕入れ、請求書・領収書・商品写真の3点提出で「最近はだいぶ成功する」（塾教材からの抜粋） | https://matsuo50.jp/?p=22619 | 一次・実体験（情報商材の可能性） | 2026-01-19投稿 | 未実施 |
+| 23 | 「ネット系問屋の請求書で停止された情報は一切ない」「2022年9月以降、無効ルールは撤廃されているようだ」 | https://sedori.co.jp/how-to-get-an-invoice/ | 二次・要検証（根拠データ不明） | 2024-09-22投稿 | **一致（根拠なしも確認）**：両フレーズとも原文確認。実証データなしという評価も裏付けられた |
+| 24 | NETSEA公式：「制限の多いカテゴリでは卸売・問屋からの仕入れが有効」「フリマ等では請求書取得が困難」 | https://www.netsea.jp/media/amazon-listing-restriction-2026/ ／ https://chanyama.info/superdelivery-netsea-invoice/ | 一次だがポジショントーク | 2026-06-30 | **一致**（自社メディアの主張である点も含め確認） |
+| 25 | 「現在は納品書・領収書でも受理されるケースが増えた」「通りやすさは請求書＞納品書＞領収書」との体感ベースの主張 | https://link-ecconsulting.co.jp/column/amazon-category-ungating-guide/ ／ https://sedori-hacks.com/amazon-sell-restriction-ungate-2026/ ／ https://www.maru-fufu.com/restrictedproducts/ ／ https://sedori-hacks.com/amazon-regulation-invoice-denied/ | 二次・要検証 | 2026-03-17／2025-08-22／2025-11-26／2025-12-21 | 未実施 |
+| 26 | 手書き請求書・レシートへの宛名書き込みは却下されやすい。偽造・改ざんはアカウント停止につながる | https://note.com/amazon_suspend/n/n348b85eb2fa4 ／ https://www.maru-fufu.com/restrictedproducts/ | 二次・複数ソース一致 | 2026-08-17／2025-11-26 | 未実施 |
+| 28 | 大文字小文字の表記違いだけでブランドIDが別扱いになり、許可済みでも再申請が必要になった事例 | https://hokomama.com/amazon-brand-case-sensitive/ | 一次・実体験 | 2026-05-29投稿 | 未実施 |
+| 30 | 並行輸入品＝正規代理店以外を通じて輸入された商品。多くはメーカー保証・修理の対象外 | https://www.amazon.co.jp/gp/help/customer/display.html?nodeId=201999660 | 一次 | — | 未実施 |
+| 31 | 並行輸入品は「並行輸入品」と明示すれば出品可。商品名末尾の表記は出品者側で消せない | https://bxo.co.jp/magazine/920 | 二次 | — | 未実施 |
+| 34 | 「2024年現在、ランダムチェックの真贋調査はほとんど無くなった」（実務者所感・一次裏付けなし） | https://sedori.co.jp/amazon-authenticity-investigation/ | 二次・要検証・体感ベース・断定表現で使わないこと | — | **一致**（記事内の記述を原文確認。#156と同一主張） |
+| 36 | 偽物クレーム1件で在庫80個停止。復活に領収書・契約書・サマリー資料が必要だった | https://www.sabosedo-experience.com/amazon-shingan-chosa-gibutsu-jirei/4272/ | 一次・実体験・商業目的混在 | 2025-12-08投稿 | 未実施 |
+| 38 | 国内正規卸からの仕入れでも請求書の記載形式不備で停止・売上金約150万円凍結、45日後に復活 | https://law-bright.com/corporationlaw/articles/amazon-shingan-account-fukkatsu-jirei/ | 二次・要検証・宣伝目的の疑い | 2026-05-14投稿 | **一致**（金額・日数・理由とも原文確認） |
+| 39 | OEM商品への相乗り出品で偽造品通報→真贋調査、改善計画書2回却下（結論未確定） | https://www.busoken.com/blog/amazon/authenticity-investigation | 一次・利益相反あり・進行中未解決 | 2026-06-27投稿 | 未実施 |
+| 46 | ゲート解除代行は「典型的に偽造請求書を捏造」、あるサービスの顧客数百件が一斉停止 | https://riverbendconsulting.com/blog/ungating-platform-manipulation/ | 二次 | 公開2021-04-19／最終更新2025-06-11 | **一致**（"typically falsify invoices" "Hundreds of its customers were suspended" を原文確認） |
+| 48 | リチウムイオン電池は常に特定の輸送要件。2020-01-01以降UN38.3テスト概要の提出が必要 | https://m.media-amazon.com/images/G/65/SG3P/Requirements_for_lithium_batteries_and_products_that_are_shipped_with_lithium_batteries.pdf | 一次（米国/グローバル版・日本版との異同要検証） | — | 未実施 |
+| 49 | FBA新規出品時は電池・危険物情報の提供が必須。審査2営業日、未提出なら出品者負担で廃棄 | https://m.media-amazon.com/images/G/65/SG3P/Dangerous_goods_required_information_and_documentation_hazmat.pdf | 一次（米国/グローバル版・日本版との異同要検証） | — | 未実施 |
+| 50 | 2026-01-01よりICAO準拠で要件更新。2.7Wh超のリチウム電池同梱品は充電30%以下でないと航空便不可 | https://sellercentral.amazon.co.jp/seller-forums/discussions/t/5f0c7560-d398-46ba-8143-840dfb98e140 | 一次・日本版 | 2026-01-01施行の告知 | 未実施 |
+| 51 | FBA危険物納品プログラムの申請は大口出品者のみ、審査おおむね2週間 | https://force-r.co.jp/column/column-26229/ | 二次・要検証 | — | 未実施 |
+| 53 | 3辺合計170cm超または30kg超はFBA取り扱い不可 | http://g-ecx.images-amazon.com/images/G/09/marketing/as/sales/FBA_SellerManual_MA._V396301573_.pdf | 一次（2011年版PDF・現行性要検証） | 2011年版 | 未実施 |
+| 54 | FBAで取り扱えない商品：常温管理不可／動物／医薬品／医療機器／金券類／古銭等／大麻由来品 | https://sobani.co.jp/columnlist/amazon_prohibited-products | 二次・要検証（一次原文未読） | — | 未実施 |
+| 55 | 要期限管理商品：FC納品時点で期限70日以内は不可、期限未記載品も不可 | https://sobani.co.jp/columnlist/amazon_prohibited-products | 二次・要検証 | — | 未実施 |
+| 56 | 大口出品者でもFBA不可の例（常温管理不可品・危険物・医療機器・医薬品・酒類・金券等） | https://network-biz1.com/886.html | 二次・2017年時点＝古い・要検証 | 2017年時点 | 未実施 |
+| 57 | 申請不要の主なカテゴリ7種と、申請必要カテゴリの難易度★評価（食品&飲料★★★★） | https://note.com/rehero/n/na7cb9183a345 | 二次・**単一ソース**（★は著者主観） | 2025年 | **一致**（表・本文とも確認） |
+| 58 | 「食品は一般に思われているほど厳しくない」。電池入り商品・コンタクトレンズの方が実務上手強い | https://link-ecconsulting.co.jp/column/amazon-category-ungating-guide/ | 二次・**単一ソース依存（自社支援実感）**。#57と直接矛盾 | — | **一致**（両方の記述を原文確認） |
+| 59 | 初心者向けリスク低カテゴリの推奨（本・文房具・キッチン消耗品等）が複数記事で一致、とする主張 | https://sedori-hacks.com/amazon-sedori-kinshi-item-2025/ ／ https://note.com/ebi_marketing/n/n7092f88be0cb ／ https://oikura.jp/shopsupport/guidebook/start/start1798 | 二次・複数ソース一致（と主張） | — | **不一致 → 本資料の根拠としては使用していない。** note.com/ebi_marketing の記事に「本を推奨する」記述は存在せず、逆に本・CD・DVDを危険視する記述（＝#60）のみが存在する。3ソース一致ではなく実質2ソース。本文（第2部・3-B・3-C）では「使用しない」旨の言及としてのみ登場する |
+| 60 | 「魔の5大ジャンル」として家電・PC周辺機器と本・CD・DVDを名指し | https://note.com/ebi_marketing/n/n7092f88be0cb | 二次・**単一ソース依存**。#59と直接矛盾 | 2025-12-15投稿 | **一致**（記事の主張はこちら側にのみ存在） |
+| 61 | 危険商品6パターンと初心者向け推奨ジャンル（文房具・キッチン消耗品・専門書籍・DIYパーツ・季節雑貨） | https://sedori-hacks.com/amazon-sedori-kinshi-item-2025/ | 一次・実体験＋二次解説（粗利目安20〜35%は根拠なし） | — | 未実施 |
+| 62 | 新規セラーが避けるべきカテゴリ（電子機器・衣料・サプリ・大型品・トレンド品・壊れ物・子供向け） | https://thefbagirl.com/blog/amazon-fba-categories-to-avoid-2026/ | 米国版・日本未検証 | — | 未実施 |
+| 63 | 新規セラーが避けるべき商品13種。ゲート付きカテゴリは「多くのセラーに割に合わない」 | https://www.repricer.com/blog/products-you-should-avoid-selling-on-amazon/ | 米国版・日本未検証・やや古い | 2023-07-14投稿 | 未実施 |
+| 64 | IP/特許リスク品はソーシング前にIPステータス確認必須。Amazon自社PBが上位のカテゴリは避ける | https://ecommerceparadise.com/best-amazon-fba-products/ | 米国版・日本未検証 | — | 未実施 |
+| 65 | 特許取得済み商品と気づかず販売開始し、リスティング削除・在庫が売れ残った実体験 | https://jansonsmith.com/amazon-fba-products-to-avoid/ | 米国版・実体験 | — | 未実施 |
+| 66 | PSE法上、輸入者は製造者と並んで規定され義務もほぼ同一（届出30日以内・適合確認・記録3年・表示） | https://aog-partners.com/denkiyouhinanzenhoutoyunyubizinesu/ | 二次 | — | **一致**（両方の記述を原文確認） |
+| 67 | 中国工場の「PSE対応済み」主張は日本の届出・適合確認・自主検査を意味しない。偽マーク等の実例 | https://j-tokyotrading.com/pse-certificate/ | 二次 | — | 未実施 |
+| 68 | Amazon PSE審査の落とし穴：型番の不一致、届出事業者名とセラー情報の名義不一致、付属品の資料不足 | https://bxo.co.jp/magazine/15749 | 二次 | — | 未実施 |
+| 69 | 中国輸入OEM/ODMでもPSE対象なら表示と試験が必要、日本の輸入者が最終責任者 | https://www.gray01.com/entry/2025/07/08/080000 | 二次 | 2025-07-08 | 未実施 |
+| 70 | Bluetooth製品は技適・PSE・Bluetooth SIG認証の三重規制。他社ブランド転売ならSIG再認証は不要 | https://j-tokyotrading.com/china-bluetooth/ | 二次 | — | 未実施 |
+| 71 | 中国輸入はノーブランド品が基本。PSE表示がない電気製品は販売不可で「初心者が避けるべき領域」 | https://buppan-navi.challenge8.co.jp/amazon-china-import/ | 二次 | — | 未実施 |
+| 73 | Alibabaの「ジェネリック品」が実は商標登録済みデザインで、偽造/IP申立てによりアカウント停止 | https://sellercentral.amazon.com/seller-forums/discussions/t/31666463-562d-4bbe-8913-313408c0fe8a | 米国版・実体験 | 停止は2025-11-04 | 未実施 |
+| 74 | ブランド品を「ジェネリック」として出品するな、との複数セラー警告（本物の請求書でも証明できない） | https://sellercentral.amazon.com/seller-forums/discussions/t/908eb17e-2805-4db1-a634-1168c7126183 | 米国版・実体験（複数投稿混合） | — | 未実施 |
+| 75 | 第三者（卸・小売含む）も不正輸入品と知りながら扱えば責任。国内卸から買った事実だけでは免責されない | https://www.kroll.com/en/publications/transfer-pricing/what-the-new-doj-dhs-guide-signals-for-importers | 米国・二次（税関法一般論、Amazonセラー限定でない） | 2026年新ガイドに関する解説 | **一致**（原文確認。初回WebFetchは403、Exa fetchで到達） |
+| 78 | ungatingは3階層で1承認が他をカバーしない。却下理由の大半は請求書の発行元または名義の不一致 | https://fbatactics.com/guides/ungating-restricted-categories/ | 米国・二次・要検証 | — | **一致**（"Sources disagree on the date window" 等を確認。初回403、Exa fetchで到達） |
+| 79 | 2026年にウェルネス系カテゴリで審査拡大、ラボテスト厳格化。ゲート承認に14〜90日 | https://baregold.ca/resources/amazon-restricted-categories-the-2026-navigation-guide | 米国・二次・未読＝要検証 | — | 未実施 |
+| 80 | 「小売店のレシートは正規調達の証明にならない」。強制措置はAI主導で誤検知あり、24時間以内の上訴は低品質判定 | https://fbatactics.com/guides/account-suspension-appeal/ | 米国・二次・要検証 | — | **部分一致**：AI主導・誤検知・パニック上訴の趣旨は一致したが、引用フレーズ "retail receipts are not proof of authorised sourcing" 自体は取得範囲（記事前半）に見当たらず |
+| 81 | 電安法の対象行為は製造/輸入/販売の3つ。国内で買い受けて販売するだけなら事業届出は不要 | https://www.meti.go.jp/policy/consumer/seian/denan/procedure_02.html | 一次 | — | **一致**（原文の該当文を確認。初回403、Exa fetchで到達） |
+| 82 | 販売事業者の義務は「表示が付されていることの確認」のみ。適合確認・記録保存・適合性検査の義務なし | https://www.meti.go.jp/policy/consumer/seian/denan/procedure.html ／ https://www.meti.go.jp/policy/consumer/seian/denan/procedure_08.html | 一次 | — | **一致**（#81/#82/#84 一括で確認） |
+| 83 | 電安法第27条：PSE表示のないものを販売・陳列してはならない（罰則規定あり） | https://laws.e-gov.go.jp/law/336AC0000000234?occasion_date=20210401 | 一次 | 2021-04-01時点の条文 | 未実施 |
+| 84 | PSE表示なしの電気用品の販売は販売専業でも法27条違反。ただし義務は「表示の確認」に限定 | https://www.meti.go.jp/policy/consumer/seian/denan/procedure.html ／ https://laws.e-gov.go.jp/law/336AC0000000234 | 一次 | — | **一致**（#81/#82/#84 一括で確認） |
+| 85 | 電気用品は政令指定457品目。うち特定電気用品116品目（菱形・第三者検査必須）、以外341品目（丸形・自主検査） | https://www.meti.go.jp/policy/consumer/seian/denan/procedure_01.html ／ http://www.meti.go.jp/policy/consumer/seian/denan/specified_electrical.html | 一次 | — | 未実施 |
+| 86 | モバイルバッテリーは2019-02-01以降PSEマークなしの販売禁止（流通在庫含む）。丸形PSE対象 | https://www.meti.go.jp/policy/consumer/seian/denan/topics.html ／ https://www.meti.go.jp/policy/consumer/seian/denan/mlb_faq.html | 一次 | 2019-02-01施行 | 未実施 |
+| 87 | ACアダプター（直流電源装置）は特定電気用品＝菱形PSE対象。セット販売時はアダプター部分に規制 | https://www.meti.go.jp/policy/consumer/seian/denan/procedure_01.html ／ https://smepprd-kansai-meti-gov.note.jp/n/n79754f242123 | 一次 | — | 未実施 |
+| 92 | 営業届出が必要な業種に「通信販売・訪問販売による販売業」「その他の食料・飲料販売業」が明記 | https://web.pref.hyogo.lg.jp/kf14/shokuhineigyou/kyoka_todokede_tetuduki.html ／ https://www.city.nagoya.jp/kenkofukushi/eisei/1014927/1015056/1015059/1015063.html | 一次相当 | 厚労省令和2年3月31日付通知に基づく | **一致**（#92/#93 一括で原文確認） |
+| 93 | 「常温保存可能な包装済みの食品・添加物を販売する営業」は営業届出の対象外 | https://web.pref.hyogo.lg.jp/kf14/shokuhineigyou/kyoka_todokede_tetuduki.html ／ https://www.mhlw.go.jp/content/000772503.pdf | 一次 | 厚労省Q&A 問19 | **一致**（#92/#93 一括で原文確認） |
+| 94 | 届出不要でも、原則すべての食品等事業者はHACCPに沿った衛生管理の実施義務を負う | https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000197196.html | 一次 | — | **一致**（原文確認） |
+| 101 | 国内の化粧品製造販売業者から仕入れ、表示・包装を変更せず販売する場合は薬機法上の許可不要 | https://www.pref.kanagawa.jp/docs/n3x/yakumu/kyoninka/kesyohin.html | 一次相当 | — | 未実施 |
+| 102 | 化粧品を輸入して国内販売する場合は製造販売業許可＋製造業許可（包装・表示・保管）の両方が必要 | https://www.pref.ibaraki.jp/hokenfukushi/yakumu/yakuji/seizougyoutou/kesyouhin/hazimete.html ／ https://www.pref.kanagawa.jp/docs/n3x/yakumu/kyoninka/kesyohin.html | 一次相当 | — | 未実施 |
+| 103 | 化粧品を輸入販売する場合、PMDA経由で「化粧品外国製造販売（製造）業者届書」の提出も必要 | https://www.pref.ibaraki.jp/hokenfukushi/yakumu/yakuji/seizougyoutou/kesyouhin/hazimete.html | 一次相当 | — | 未実施 |
+| 104 | 化粧品製造販売業許可の取得要件4点（欠格条項・三役設置・GQP適合・GVP適合）。総括責任者は薬剤師等 | https://www.pref.kanagawa.jp/docs/n3x/yakumu/kyoninka/kesyohin.html | 一次相当 | — | 未実施 |
+| 105 | 化粧品製造販売業許可の申請手数料は都道府県により異なる（茨城県57,400円の例） | https://www.pref.ibaraki.jp/hokenfukushi/yakumu/yakuji/seizougyoutou/sinnseisyokankei/kesyouhin/kesyouhin-kyokasinsei-seizouhanbaigyou.html | 一次相当 | — | 未実施 |
+| 106 | 個人使用目的の輸入は許可対象外だが販売目的の輸入は許可必要。国内正規品の転売は許可なく可能 | https://www.pref.kanagawa.jp/docs/n3x/yakumu/kyoninka/kesyohin.html | 一次相当 | — | 未実施 |
+| 110 | 家庭用品品質表示法の対象は4区分（繊維38／合成樹脂加工品8／電気機械器具17／雑貨工業品30品目） | https://www.caa.go.jp/policies/policy/representation/household_goods/list ／ https://www.pref.miyagi.jp/soshiki/syoubun/kateiyo1.html | 一次 | — | 未実施 |
+| 111 | 表示義務が及ぶ条件は「一般消費者に販売する時点で表示されていること」（消費者庁FAQ回答） | https://www.caa.go.jp/policies/policy/representation/household_goods/information/asset/information_230728_01.pdf | 一次 | 令和4年度運用状況資料 | 未実施 |
+| 121 | 古物営業法第2条：古物＝一度使用された物品、使用のために取引された未使用品（新古品含む）等 | https://laws.e-gov.go.jp/law/324AC0000000108/ | 一次 | — | 未実施 |
+| 122 | 警察庁「古物営業法等の解釈運用基準」：通常の買取りは古物営業に該当する | https://www.npa.go.jp/laws/notification/seian/seiki/2024kobutsukaisyaku.pdf | 一次 | 令和6年制定通達 | 未実施 |
+| 123 | 新潟県警：「他の輸入業者が輸入したものを国内で買って売る行為」は許可不要のケースに含まれない | https://www.pref.niigata.lg.jp/site/kenkei/tetuzuki-keibigyou-1-keibigyou-kobutu1-keibigyou-kobutu2-keibigyou-kobutu2.html | 一次相当 | — | **部分一致 → 行の後半（引用した箇所）のみ本文で使用。前半は使用していない。** 引用文言は確認できたが、「メーカー・卸・小売から直接仕入れた新品は許可不要」という前半の要約は当該ページに見当たらない |
+| 124 | 愛知県警Q&A：自身が輸入したものを売るのは許可不要。他業者が輸入したものを買い取って売るなら許可必要 | https://www.pref.aichi.jp/police/shinsei/sonota/qanda.html | 一次相当 | — | **一致**（Q5に両方の文言をほぼ原文通り確認） |
+| 129 | 真贋調査での売上金凍結は規約上最大90日間 | https://law-bright.com/corporationlaw/articles/amazon-shingan-chosa-account-teishi/ | 一次（米国/グローバル版・日本版との異同要検証） | — | 未実施 |
+| 136 | 「復帰後90〜180日は厳格監視」「ODR実効しきい値0.7%」「対応時間12時間」 | https://titannetwork.com/account-suspension-amazon-prevention-recovery-guide/ | 米国・二次・具体数値の根拠不明。**#136〜#138は単一ソース依存の一群**（いずれも米国のアカウント健全性コンサル会社の自社ブログで、相互に独立した一次データを持たない） | — | **一致（根拠なしも確認）**：主張は原文に存在するが数値の根拠・出典は一切示されず、有料会員誘導記事 |
+| 137 | 「復帰後30日はHyper-Vigilance」「再発時の2度目の停止はしばしば恒久的」「Rolling Reserve 14日以上」 | https://ave7lift.ai/blog/amazon-account-banned | 米国・二次。**#136〜#138は単一ソース依存の一群** | — | **一致（根拠なしも確認）**：記述は確認できたが裏付け・出典の提示なし |
+| 138 | 「Amazonは復帰後も注視し続ける」「復帰はprobation（保護観察）と考えるべき」 | https://tracefuse.ai/blog/reinstate-amazon-account-after-suspension/ | 米国・二次。**#136〜#138は単一ソース依存の一群** | — | **一致**（原文通り確認） |
+| 143 | 2026-04-01よりFBA配送代行手数料を平均38円引き下げ、販売手数料率0.4%引き上げ。04-15より長期在庫追加手数料20円/点を新設 | https://sellercentral.amazon.co.jp/seller-forums/discussions/t/ee4ad6a7-0a17-495e-b1cd-1a6d8bc69de9 ／ https://blog.goaltech.co.jp/articles/17/ | 一次 | 2025-12-12告知／2026-03-30再掲 | **一致**（数値・日付とも原文確認） |
+| 155 | 出品制限に対応する主要ブランド一覧（NIKE, Apple, Canon, Panasonic等）。リストは非公開で随時変動 | https://force-r.co.jp/column/column-4546/ | 二次・未読要検証・古い | 2023-07時点 | 未実施 |
+| 156 | 「2024年現在、ランダムチェックの真贋調査はほとんど無くなった」（#34と同一主張の重複確認） | https://sedori.co.jp/amazon-authenticity-investigation/ | 二次・未読要検証・体感ベース・断定表現で使わないこと | — | **一致**（#34と一括で原文確認。一次資料なしの点も同じ） |
