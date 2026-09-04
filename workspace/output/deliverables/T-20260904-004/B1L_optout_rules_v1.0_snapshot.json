@@ -1,0 +1,156 @@
+{
+  "$comment": "T-20260904-004 / 法務ハルオ 2026-09-04 / 『営業お断り』表示の機械判定ルール。判定根拠は B1L_営業お断り表示への打診可否_法務判定.md を参照。",
+  "version": "1.0",
+  "created_at": "2026-09-04",
+  "author": "legal_haruo",
+  "apply_order": ["D", "E", "B", "C", "A_PLUS", "A"],
+  "scope_note": "判定は『窓口単位』。会社単位でまとめない。同一社に複数窓口がある場合は窓口ごとに判定し、最も緩い有効な窓口を採用する。抽出範囲はフォーム周辺／問い合わせ窓口の注記ブロックに限定し、ページ全文検索はしない。",
+  "classes": {
+    "A_PLUS": { "action": "contact", "priority": 1, "channels": ["form", "mail", "phone"], "label": "取引窓口が明示" },
+    "A":      { "action": "contact", "priority": 2, "channels": ["form", "mail", "phone"], "label": "表示なし" },
+    "B":      { "action": "contact_restricted", "priority": 3, "channels": "see allowed_channels", "label": "経路指定あり" },
+    "C":      { "action": "hold", "priority": 9, "channels": ["form"], "label": "売り込み・提案お断り（保留・A/B消化後のみ・1回限り）" },
+    "D":      { "action": "exclude", "priority": 99, "channels": [], "label": "NO-GO" },
+    "E":      { "action": "exclude", "priority": 99, "channels": [], "label": "取引条件を構造的に満たさない" }
+  },
+  "proximity_window_chars": 30,
+  "rules": [
+    {
+      "class": "D",
+      "id": "D1_legal_optout",
+      "match": "cooccur",
+      "left": ["特定電子メール", "広告メール", "宣伝メール", "迷惑メール", "広告宣伝メール", "DM", "ダイレクトメール"],
+      "right": ["お断り", "拒否", "受け取りません", "送信しない", "送信をしないよう", "ご遠慮"],
+      "reason": "施行規則3条ただし書を意識した法定文言。法的知識を持って運用している相手。"
+    },
+    {
+      "class": "D",
+      "id": "D2_sales_refusal",
+      "match": "cooccur",
+      "left": ["営業", "セールス", "勧誘", "飛び込み", "テレアポ", "営業目的"],
+      "right": ["お断り", "固くお断り", "一切お受けし", "受け付けており", "禁止", "ご遠慮", "応じかね"],
+      "false_positive_guard": ["営業部", "営業本部", "営業時間", "営業日", "営業所", "営業担当"],
+      "reason": "強い拒絶表示。近接判定（同一文または±30文字）必須。単語単独ヒット禁止。"
+    },
+    {
+      "class": "D",
+      "id": "D3_report_threat",
+      "match": "any",
+      "terms": ["通報", "迷惑メール相談センター", "特定電子メール法に基づき", "法的措置", "しかるべき対応", "警察に", "プロバイダに報告"],
+      "reason": "通報の事前表明。送信ドメインのレピュテーション毀損＝残り450社への到達を巻き添えにする（不可逆性が高い）。"
+    },
+    {
+      "class": "D",
+      "id": "D4_no_new_supplier",
+      "match": "any",
+      "terms": ["新規のお取引はお受けしておりません", "新規のお取引は行っておりません", "新規のお取引は募集しておりません", "お取引のご依頼はお受けし", "取引先の募集は行っておりません"],
+      "reason": "新規取引の明文拒絶。打診が無益かつ心証を損なう。"
+    },
+    {
+      "class": "D",
+      "id": "D5_recruit_only",
+      "match": "any",
+      "terms": ["採用に関するお問い合わせのみ", "採用専用", "採用担当直通"],
+      "cooccur_alt": { "left": ["求人以外"], "right": ["お受けし", "ご遠慮", "お断り"] },
+      "reason": "用件を受け付ける窓口が存在しない。採用窓口への商談持ち込みは心証破壊の最悪類型。",
+      "recheck_condition": "取引窓口の新設"
+    },
+    {
+      "class": "E",
+      "id": "E1_store_required",
+      "match": "cooccur",
+      "left": ["実店舗", "店舗をお持ち", "店舗をお持ちでない", "無店舗", "オンライン専売", "ネット販売のみ", "ネットショップのみ", "EC専業", "無店舗販売"],
+      "right": ["お断り", "不可", "対象外", "お取引できません", "限ります", "必須"],
+      "reason": "当社は実店舗なし＝取引条件を構造的に満たさない。",
+      "recheck_condition": "実店舗取得または実店舗事業者との提携成立時"
+    },
+    {
+      "class": "E",
+      "id": "E2_mall_prohibited",
+      "match": "cooccur",
+      "left": ["Amazon", "アマゾン", "楽天", "モール", "マーケットプレイス", "ネット通販"],
+      "right": ["お断り", "禁止", "不可", "認めておりません", "お取引しておりません"],
+      "reason": "販路制限。仕入れられても当社の出口（Amazon）が塞がれる。"
+    },
+    {
+      "class": "E",
+      "id": "E3_corporate_only",
+      "match": "any",
+      "terms": ["法人のみ", "法人格を有する", "個人事業主はお断り", "個人事業主の方はお受けし"],
+      "reason": "当社は個人事業主。条件不充足。",
+      "recheck_condition": "法人化時"
+    },
+    {
+      "class": "B",
+      "id": "B1_written_only",
+      "match": "cooccur",
+      "left": ["書面", "文書", "郵送", "封書", "FAX"],
+      "right": ["にて", "でお送り", "でお願い", "で受け付け"],
+      "alt_terms": ["本社宛", "本社総務部宛"],
+      "set_allowed_channels": ["mail_post"],
+      "reason": "拒絶ではなく経路の指定。指定に従えば正規の受付ルート。"
+    },
+    {
+      "class": "B",
+      "id": "B2_no_phone",
+      "match": "any",
+      "terms": ["お電話でのお問い合わせはお受けしておりません", "電話でのお問い合わせはご遠慮"],
+      "remove_channels": ["phone"],
+      "reason": "経路の絞り込み。"
+    },
+    {
+      "class": "B",
+      "id": "B3_no_mail",
+      "match": "any",
+      "terms": ["メールでのお問い合わせはお受けしておりません", "メールでのご連絡はご遠慮"],
+      "remove_channels": ["mail"],
+      "reason": "経路の絞り込み。"
+    },
+    {
+      "class": "C",
+      "id": "C1_pitch_refusal",
+      "match": "cooccur",
+      "left": ["売り込み", "売込み", "セールス目的のご連絡", "営業目的のご連絡", "商品のご提案", "製品アイデア", "企画のご提案", "持ち込み企画", "商材のご案内", "サービスのご紹介"],
+      "right": ["ご遠慮", "お断り", "お受けしておりません", "お控え"],
+      "reason": "文言が禁じるのは『売る』『提案する』行為。当社の『買う』打診は文言上は非該当だが、相手の意図が不明でグレー。",
+      "conditions": {
+        "prerequisite": "A/A_PLUS/B 群を全件消化した後にのみ着手",
+        "channel": "法人向け／取引用フォームのみ・1回限り",
+        "abort_rule": "C群で拒絶反応が3件出た時点でC群全体を打ち切る／返信率がA群の1/3を下回った時点でも打ち切る"
+      }
+    },
+    {
+      "class": "A_PLUS",
+      "id": "A1_trade_window",
+      "match": "any",
+      "terms": ["お取引に関するお問い合わせ", "新規お取引", "取引希望", "お取引窓口", "仕入", "卸売", "卸のご相談", "代理店", "販売店募集", "取扱店募集", "OEM", "営業部", "営業本部"],
+      "reason": "相手が取引打診を受け付けると明示している窓口。最優先。"
+    }
+  ],
+  "output_schema": {
+    "form_optout_notice": "text / 検出した注意書きの原文（要約しない）",
+    "optout_class": "enum A_PLUS|A|B|C|D|E",
+    "optout_hit_terms": "text / ヒットした語を ; 区切り（監査証跡として必須）",
+    "allowed_channels": "json array / 例 [\"form\"] [\"mail_post\"] []",
+    "contact_priority": "int / A_PLUS=1 A=2 B=3 C=9 D,E=99",
+    "optout_source_url": "url / 表示を確認した窓口ページのURL",
+    "optout_checked_at": "date",
+    "recheck_condition": "text / 再評価の条件（該当時のみ）"
+  },
+  "mandatory_message_rules": [
+    "メール本文・署名にURLを一切貼らない（AmazonストアURL・自社サイト・SNSすべて）。貼ると特定電子メール法2条2号の『広告宣伝ウェブサイトへの誘導』に該当し、相手の『営業お断り』表示が法的効力を持つ。",
+    "1社1通。返信がなくても追送しない。",
+    "断られたら即終了。謝意を述べて再接触しない。",
+    "屋号・氏名・住所・電話・メールを明記し、身元を隠さない。",
+    "実績ゼロを正直に書く。販売実績・取引社数を誇張しない。",
+    "一斉送信ツール（BCC一括・配信サービス）を使わない。1通ずつ個別送信。",
+    "拒絶反応があったドメインは送信除外リストへ即登録。"
+  ],
+  "individual_decisions": [
+    { "company": "リッチェル", "class": "C", "priority": 9, "channels": ["form"], "note": "法人向けフォーム(https://www.richell.co.jp/form/business/contact.php)に表示。A/B消化後まで保留推奨。" },
+    { "company": "すごろくや", "class": "E", "priority": 99, "channels": [], "recheck_condition": "実店舗取得時" },
+    { "company": "愛知電線", "class": "D", "priority": 99, "channels": [], "note": "通報明示。最優先で除外。" },
+    { "company": "カプコン", "class": "B", "priority": 99, "channels": ["mail_post"], "note": "形式はB（書面のみ）。ただし卸取引窓口の存在が未確認・物販商材が事実上ない可能性が高く、当面は打診しない。" },
+    { "company": "ストームレーベルズ", "class": "D", "priority": 99, "channels": [], "recheck_condition": "取引窓口の新設" }
+  ]
+}

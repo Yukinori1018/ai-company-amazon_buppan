@@ -1,22 +1,39 @@
-<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>営業お断り表示への打診可否 — 法務判定 / T-20260904-004</title><style>body{font-family:-apple-system,'Hiragino Sans','Yu Gothic',sans-serif;line-height:1.75;max-width:1080px;margin:0 auto;padding:32px 24px 96px;color:#1a1a1a;background:#fff}
-h1{font-size:1.7rem;border-bottom:4px solid #b3261e;padding-bottom:12px;margin-top:0}
-h2{font-size:1.3rem;margin-top:2.4em;border-left:6px solid #b3261e;padding-left:12px}
-h3{font-size:1.08rem;margin-top:1.8em;color:#333;border-bottom:1px solid #ddd;padding-bottom:4px}
-h4{font-size:1rem;margin-top:1.4em;color:#555}
-table{border-collapse:collapse;width:100%;margin:1em 0;font-size:.9rem}
-th,td{border:1px solid #d8d8d8;padding:8px 10px;text-align:left;vertical-align:top}
-th{background:#f3f3f3;font-weight:600;white-space:nowrap}
-tbody tr:nth-child(even){background:#fafafa}
-blockquote{border-left:4px solid #e0a800;background:#fffbe9;margin:1em 0;padding:12px 16px;color:#4a3c00}
-pre{background:#1e1e2e;color:#e6e6e6;padding:14px 16px;border-radius:6px;overflow-x:auto;font-size:.83rem;line-height:1.5}
-code{background:#f0f0f4;padding:1px 5px;border-radius:3px;font-size:.88em;font-family:'SF Mono',Menlo,monospace}
-pre code{background:none;padding:0;color:inherit}
-a{color:#0b57d0;word-break:break-all}
-hr{border:0;border-top:1px solid #e0e0e0;margin:2.5em 0}
-strong{color:#b3261e}
-th strong,h1 strong,h2 strong{color:inherit}</style></head><body><h1>「営業・売り込みお断り」表示企業への仕入れ打診 — 法務判定（一般則）</h1>
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>「営業お断り」表示企業への仕入れ打診 — 法務判定 v1.1</title><style>
+:root{--fg:#1b1f23;--mut:#5b6570;--line:#e3e7eb;--acc:#0b5fff;--warn:#b45309;--bad:#b91c1c;--ok:#047857;}
+*{box-sizing:border-box}
+body{margin:0;background:#f6f7f9;color:var(--fg);
+ font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",Meiryo,sans-serif;
+ line-height:1.85;font-size:15.5px;-webkit-text-size-adjust:100%;}
+.wrap{max-width:1000px;margin:0 auto;padding:32px 22px 96px;background:#fff;
+ box-shadow:0 1px 3px rgba(0,0,0,.06);}
+h1{font-size:1.75rem;line-height:1.4;margin:.2em 0 .6em;padding-bottom:.4em;border-bottom:3px solid var(--acc);}
+h2{font-size:1.3rem;margin:2.2em 0 .7em;padding:.35em .6em;background:#eef3ff;border-left:5px solid var(--acc);border-radius:3px;}
+h3{font-size:1.1rem;margin:1.8em 0 .5em;padding-bottom:.25em;border-bottom:1px solid var(--line);}
+p{margin:.7em 0}
+hr{border:0;border-top:1px solid var(--line);margin:2.2em 0}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:.92em;display:block;overflow-x:auto;}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top;}
+th{background:#f0f3f7;font-weight:600;white-space:nowrap;}
+tbody tr:nth-child(even){background:#fafbfc}
+blockquote{margin:1.1em 0;padding:.8em 1em;background:#fffbeb;border-left:5px solid var(--warn);border-radius:3px;color:#463a1a;}
+code{background:#f1f3f5;padding:.12em .4em;border-radius:3px;font-size:.9em;
+ font-family:"SFMono-Regular",Menlo,Consolas,monospace;}
+pre{background:#1e2430;color:#e6edf3;padding:14px 16px;border-radius:6px;overflow-x:auto;font-size:.86em;line-height:1.6;}
+pre code{background:none;color:inherit;padding:0}
+ul,ol{margin:.7em 0;padding-left:1.6em}
+li{margin:.3em 0}
+a{color:var(--acc)}
+@media print{body{background:#fff}.wrap{box-shadow:none;max-width:none}}
+</style></head><body><div class="wrap"><h1>「営業・売り込みお断り」表示企業への仕入れ打診 — 法務判定（一般則）</h1>
 <p><strong>結論：仕入れ打診（＝買う側からの取引申込み）は「特定電子メール」に当たらず、「営業お断り」表示があっても法律上は送信できます。ただし送信可＝送ってよい、ではありません。451社は下記5判定（GO／GO限定／CAUTION／NO-GO／対象外）に機械的に振り分け、NO-GO と対象外は打診対象から外してください。</strong></p>
-<table><thead><tr><th>項目</th><th>内容</th></tr></thead><tbody><tr><td>チケット</td><td>T-20260904-004（タスク B-1 派生）</td></tr><tr><td>作成</td><td>法務ハルオ / 2026-09-04</td></tr><tr><td>一次情報確認日</td><td>2026-09-04</td></tr><tr><td>適用範囲</td><td>国内メーカーへの「仕入れさせてほしい」という取引打診（メール・フォーム・電話・書面）</td></tr><tr><td>適用外</td><td>自社商品・サービスの売り込み、代理店募集への応募以外の営業、海外事業者</td></tr></tbody></table>
+<table><thead><tr><th>項目</th><th>内容</th></tr></thead><tbody>
+<tr><td>チケット</td><td>T-20260904-004（タスク B-1 派生）</td></tr>
+<tr><td>作成</td><td>法務ハルオ / 2026-09-04</td></tr>
+<tr><td>一次情報確認日</td><td>2026-09-04</td></tr>
+<tr><td>適用範囲</td><td>国内メーカーへの「仕入れさせてほしい」という取引打診（メール・フォーム・電話・書面）</td></tr>
+<tr><td>適用外</td><td>自社商品・サービスの売り込み、代理店募集への応募以外の営業、海外事業者</td></tr>
+</tbody></table>
 <hr>
 <h2>0. 判定の要旨（3行）</h2>
 <ol><li><strong>法的リスクはほぼゼロ。</strong> 仕入れ打診は広告宣伝ではないため、特定電子メール法のオプトイン規制（法3条1項）の射程外です。「営業お断り」表示は、この規制を作動させるスイッチであり、規制の外にあるメールを止める効力はありません（総務省・消費者庁ガイドラインに明文あり）。</li><li><strong>事業リスクは無視できない。</strong> 通報 → 送信ドメインのレピュテーション毀損は、<strong>当社の他450社への到達率まで巻き添えにする</strong>。1社の門前払いと違い、失うものが共有資産で、回復に時間がかかります（不可逆性が高い）。</li><li>よって判定は <strong>法の可否ではなく「通報・ブロックの誘発確率」で切ります。</strong> 通報を明示している企業には送りません。</li></ol>
@@ -25,31 +42,43 @@ th strong,h1 strong,h2 strong{color:inherit}</style></head><body><h1>「営業�
 <h3>1-1. 仕入れ打診メールは「特定電子メール」に当たるか → <strong>原則、当たりません</strong></h3>
 <p><strong>条文（特定電子メールの送信の適正化等に関する法律 第2条第2号）</strong></p>
 <blockquote>二　特定電子メール　電子メールの送信（略）をする者（<strong>営利を目的とする団体及び営業を営む場合における個人に限る。</strong>以下「送信者」という。）が<strong>自己又は他人の営業につき広告又は宣伝を行うための手段として送信をする電子メール</strong>をいう。</blockquote>
-<p>出典：e-Gov法令検索 平成十四年法律第二十六号 <a href="https://laws.e-gov.go.jp/law/414AC0100000026">https://laws.e-gov.go.jp/law/414AC0100000026</a> （2026-09-04 API取得）</p>
+<p>出典：e-Gov法令検索 平成十四年法律第二十六号 https://laws.e-gov.go.jp/law/414AC0100000026 （2026-09-04 API取得）</p>
 <p><strong>該当性の判断</strong></p>
-<table><thead><tr><th>要件</th><th>当社の仕入れ打診</th><th>充足</th></tr></thead><tbody><tr><td>送信者が営利団体・営業を営む個人</td><td>個人事業主（屋号 Satoy Select）</td><td><strong>○</strong></td></tr><tr><td><strong>自己又は他人の営業につき広告又は宣伝を行うための手段</strong></td><td>相手の商品を買いたいという申込み。自社の商品・役務を広告宣伝していない</td><td><strong>×</strong></td></tr></tbody></table>
+<table><thead><tr><th>要件</th><th>当社の仕入れ打診</th><th>充足</th></tr></thead><tbody>
+<tr><td>送信者が営利団体・営業を営む個人</td><td>個人事業主（屋号 Satoy Select）</td><td><strong>○</strong></td></tr>
+<tr><td><strong>自己又は他人の営業につき広告又は宣伝を行うための手段</strong></td><td>相手の商品を買いたいという申込み。自社の商品・役務を広告宣伝していない</td><td><strong>×</strong></td></tr>
+</tbody></table>
 <p>3要件のうち中核の1つを欠くため、<strong>定義上、特定電子メールに該当しません。</strong> したがって法3条（オプトイン）・法4条（表示義務）は適用されません。</p>
 <p><strong>所轄官庁の解説（決定的）</strong></p>
 <p>総務省総合通信基盤局消費者行政課・消費者庁取引対策課「特定電子メールの送信等に関するガイドライン」p.2 は、<strong>特定電子メールに当たらない例</strong>を明示しています。</p>
 <blockquote>一方で、次のような電子メールについては、広告又は宣伝のための手段として送信されたものとは考えられず、特定電子メールには当たらないものもある。<br>ア）<strong>取引上の条件を案内する事務連絡や料金請求のお知らせなど取引関係に係る通知であって広告又は宣伝の内容を含まず、広告又は宣伝のウェブサイトへの誘導もしない電子メール</strong><br>イ）単なる時候の挨拶であって、広告や宣伝の内容を含まず広告又は宣伝のウェブサイトへの誘導もしない電子メール</blockquote>
-<p>出典：<a href="https://www.soumu.go.jp/main_sosiki/joho_tsusin/d_syohi/pdf/m_mail_081114_1.pdf">https://www.soumu.go.jp/main_sosiki/joho_tsusin/d_syohi/pdf/m_mail_081114_1.pdf</a> （2026-09-04 PDF取得・p.2）</p>
+<p>出典：https://www.soumu.go.jp/main_sosiki/joho_tsusin/d_syohi/pdf/m_mail_081114_1.pdf （2026-09-04 PDF取得・p.2）</p>
 <p>同 p.1 は<strong>該当する</strong>例として次を挙げています。ここが当社の落とし穴です。</p>
 <blockquote>ア）<strong>営業上のサービス・商品等に関する情報を広告又は宣伝しようとするウェブサイトへ誘導することがその送信目的に含まれる電子メール</strong></blockquote>
 <p><strong>⚠️ 実務上の最重要ルール（ここを守らないと、白が黒に転びます）</strong></p>
-<table><thead><tr><th>禁止</th><th>理由</th></tr></thead><tbody><tr><td>署名・本文に <strong>Amazonストア（Satoy Select）のURL を貼らない</strong></td><td>自社の販売サイトへの誘導＝「広告又は宣伝しようとするウェブサイトへ誘導」に該当し、特定電子メールに転化する</td></tr><tr><td>自社サイト・LP・SNS の URL を貼らない</td><td>同上</td></tr><tr><td>「当社は◯◯が強みです」等の<strong>自社の売り込み文言を入れない</strong></td><td>「自己の営業につき広告又は宣伝」の要素が混入する</td></tr><tr><td>屋号・氏名・住所・電話・返信先メールアドレスのみ記載</td><td>身元開示は必要。URLだけ落とす</td></tr></tbody></table>
+<table><thead><tr><th>禁止</th><th>理由</th></tr></thead><tbody>
+<tr><td>署名・本文に <strong>Amazonストア（Satoy Select）のURL を貼らない</strong></td><td>自社の販売サイトへの誘導＝「広告又は宣伝しようとするウェブサイトへ誘導」に該当し、特定電子メールに転化する</td></tr>
+<tr><td>自社サイト・LP・SNS の URL を貼らない</td><td>同上</td></tr>
+<tr><td>「当社は◯◯が強みです」等の<strong>自社の売り込み文言を入れない</strong></td><td>「自己の営業につき広告又は宣伝」の要素が混入する</td></tr>
+<tr><td>屋号・氏名・住所・電話・返信先メールアドレスのみ記載</td><td>身元開示は必要。URLだけ落とす</td></tr>
+</tbody></table>
 <blockquote><strong>グレーの明示：</strong> ガイドラインの非該当例ア）は「取引関係に係る通知」＝<strong>既に取引関係にある相手</strong>への連絡を主に想定した例示です。当社の打診は<strong>新規・未取引先</strong>であり、この例示そのものではありません。ただし該当性は第一義的に<strong>法2条2号の定義（広告宣伝の手段か）</strong>で決まり、当社の打診はその定義を満たしません。「例示に完全一致はしないが、定義上は明確に非該当」というのが正確な整理です。</blockquote>
 <h3>1-2. 「取引の申込み・承諾」の適用除外はあるか → <strong>除外規定ではなく「そもそも適用がない」</strong></h3>
 <p>同法に「取引の申込みは除外する」という明文の適用除外条項は<strong>ありません</strong>。上記のとおり、定義該当性の段階で外れます。</p>
 <p>なお法3条3項ただし書・施行規則6条1号に、拒否者への送信禁止の例外として</p>
 <blockquote>一　<strong>契約の申込みをした者又は契約を締結した者に対し当該契約の申込み、内容又は履行に関する事項を通知するために送信される電子メール</strong>において広告又は宣伝が付随的に行われる場合</blockquote>
 <p>という規定がありますが、これは<strong>広告が付随する場合の例外</strong>であり、当社が根拠にすべき条文ではありません（当社は広告を付随させないため、そもそも到達しない）。<strong>混同しないこと。</strong></p>
-<p>出典：特定電子メールの送信の適正化等に関する法律施行規則（平成十四年総務省令第六十六号）第6条 <a href="https://laws.e-gov.go.jp/law/414M60000008066">https://laws.e-gov.go.jp/law/414M60000008066</a></p>
+<p>出典：特定電子メールの送信の適正化等に関する法律施行規則（平成十四年総務省令第六十六号）第6条 https://laws.e-gov.go.jp/law/414M60000008066</p>
 <h3>1-3. 問い合わせフォームからの送信は対象か → <strong>対象外（メールより法的に安全）</strong></h3>
 <p><strong>法2条1号</strong>は「電子メール」を「<strong>総務省令で定める通信方式</strong>を用いるもの」に限定しています。その省令は次の2方式のみを指定します。</p>
 <blockquote>一　その全部又は一部において<strong>シンプルメールトランスファープロトコル（SMTP）</strong>が用いられる通信方式<br>二　携帯して使用する通信端末機器に、<strong>電話番号</strong>を送受信のために用いて通信文その他の情報を伝達する通信方式（＝SMS）</blockquote>
-<p>出典：特定電子メールの送信の適正化等に関する法律第二条第一号の通信方式を定める省令（平成二十一年総務省令第八十五号） <a href="https://laws.e-gov.go.jp/law/421M60000008085">https://laws.e-gov.go.jp/law/421M60000008085</a></p>
+<p>出典：特定電子メールの送信の適正化等に関する法律第二条第一号の通信方式を定める省令（平成二十一年総務省令第八十五号） https://laws.e-gov.go.jp/law/421M60000008085</p>
 <p>Webフォームの送信は HTTP/HTTPS であり、SMTP でも SMS でもありません。加えて、フォーム受信後に相手方サーバが管理者宛メールを生成する場合、その<strong>SMTP送信をしているのは相手方自身</strong>であって当社ではありません。<strong>したがってフォーム送信に特定電子メール法の適用はありません。</strong></p>
-<table><thead><tr><th></th><th>特定電子メール法</th><th>実務上の意味</th></tr></thead><tbody><tr><td><strong>フォーム</strong></td><td><strong>適用なし</strong></td><td>法的に最も安全。ただし<strong>フォーム画面上の注意書きは相手の受付条件</strong>であり、破れば信用を失う</td></tr><tr><td>メール（SMTP）</td><td>適用あり（ただし仕入れ打診は非該当）</td><td>内容にURL・売り込みを混ぜた瞬間に規制対象化する</td></tr><tr><td>SMS</td><td>適用あり</td><td><strong>使用禁止</strong>（B2B打診で使う合理性がなく、心証も最悪）</td></tr></tbody></table>
+<table><thead><tr><th></th><th>特定電子メール法</th><th>実務上の意味</th></tr></thead><tbody>
+<tr><td><strong>フォーム</strong></td><td><strong>適用なし</strong></td><td>法的に最も安全。ただし<strong>フォーム画面上の注意書きは相手の受付条件</strong>であり、破れば信用を失う</td></tr>
+<tr><td>メール（SMTP）</td><td>適用あり（ただし仕入れ打診は非該当）</td><td>内容にURL・売り込みを混ぜた瞬間に規制対象化する</td></tr>
+<tr><td>SMS</td><td>適用あり</td><td><strong>使用禁止</strong>（B2B打診で使う合理性がなく、心証も最悪）</td></tr>
+</tbody></table>
 <blockquote><strong>注意：</strong> 「法の適用がない＝注意書きを無視してよい」ではありません。<strong>法と受付条件は別問題です。</strong>「売り込み禁止」と書かれたフォームに売り込みを投げれば、法違反ではなくとも取引拒絶・ブラックリスト化の理由になります。</blockquote>
 <h3>1-4. 電話での打診に法的制約はあるか → <strong>特商法の規制は及びません</strong></h3>
 <p><strong>(a) 電話勧誘販売（法2条3項）— 定義から外れる</strong></p>
@@ -59,34 +88,69 @@ th strong,h1 strong,h2 strong{color:inherit}</style></head><body><h1>「営業�
 <blockquote>第二十六条　前三節の規定は、次の販売又は役務の提供で訪問販売、通信販売又は電話勧誘販売に該当するものについては、適用しない。<br>一　売買契約又は役務提供契約で、（略）<strong>購入者若しくは役務の提供を受ける者が営業のために若しくは営業として締結するもの</strong>に係る販売又は役務の提供</blockquote>
 <p><strong>(c) 訪問購入（法58条の4以下）— 二重に外れる</strong></p>
 <p>「<strong>営業所等以外の場所において</strong>」という場所要件があり、電話・メールには適用されません。加えて法58条の17第1号で、営業のために締結する売買契約は適用除外です。</p>
-<p>出典：特定商取引に関する法律（昭和五十一年法律第五十七号）<a href="https://laws.e-gov.go.jp/law/351AC0000000057">https://laws.e-gov.go.jp/law/351AC0000000057</a> （2026-09-04 API取得）</p>
+<p>出典：特定商取引に関する法律（昭和五十一年法律第五十七号）https://laws.e-gov.go.jp/law/351AC0000000057 （2026-09-04 API取得）</p>
 <p><strong>(d) 残る制約は一般法のみ</strong></p>
-<table><thead><tr><th>リスク</th><th>成立要件</th><th>当社の1〜2回の通常な打診</th></tr></thead><tbody><tr><td>威力業務妨害（刑法234条）</td><td>執拗・反復・威圧により業務を妨害</td><td><strong>成立しない</strong>（通常の商談申込みは正当な業務行為）</td></tr><tr><td>不法行為（民法709条）</td><td>権利侵害・損害の発生</td><td><strong>成立しない</strong></td></tr></tbody></table>
+<table><thead><tr><th>リスク</th><th>成立要件</th><th>当社の1〜2回の通常な打診</th></tr></thead><tbody>
+<tr><td>威力業務妨害（刑法234条）</td><td>執拗・反復・威圧により業務を妨害</td><td><strong>成立しない</strong>（通常の商談申込みは正当な業務行為）</td></tr>
+<tr><td>不法行為（民法709条）</td><td>権利侵害・損害の発生</td><td><strong>成立しない</strong></td></tr>
+</tbody></table>
 <blockquote><strong>ただし「断られた後の再架電」は評価が変わります。</strong> 1回断られたら二度とかけない。これを守る限り法的問題は生じません。</blockquote>
 <hr>
 <h2>② サイト表示の法的性質</h2>
 <h3>2-1. 「売り込みお断り」表示に法的拘束力があるか</h3>
-<table><thead><tr><th>論点</th><th>判定</th><th>根拠</th></tr></thead><tbody><tr><td><strong>契約としての拘束力</strong></td><td><strong>なし</strong></td><td>民法522条の申込み・承諾がない。サイトを閲覧しただけで契約は成立しない。同意クリックを経ないサイト上の一方的表示は、<strong>要望・警告</strong>であって契約条項ではない</td></tr><tr><td><strong>特定電子メール法上の効果</strong></td><td><strong>あり（ただし広告宣伝メールに対してのみ）</strong></td><td>施行規則3条ただし書。下記</td></tr><tr><td><strong>仕入れ打診（非広告メール）への効果</strong></td><td><strong>なし</strong></td><td>ガイドライン p.19 に明文。下記</td></tr></tbody></table>
+<table><thead><tr><th>論点</th><th>判定</th><th>根拠</th></tr></thead><tbody>
+<tr><td><strong>契約としての拘束力</strong></td><td><strong>なし</strong></td><td>民法522条の申込み・承諾がない。サイトを閲覧しただけで契約は成立しない。同意クリックを経ないサイト上の一方的表示は、<strong>要望・警告</strong>であって契約条項ではない</td></tr>
+<tr><td><strong>特定電子メール法上の効果</strong></td><td><strong>あり（ただし広告宣伝メールに対してのみ）</strong></td><td>施行規則3条ただし書。下記</td></tr>
+<tr><td><strong>仕入れ打診（非広告メール）への効果</strong></td><td><strong>なし</strong></td><td>ガイドライン p.19 に明文。下記</td></tr>
+</tbody></table>
 <p><strong>施行規則第3条（自己の電子メールアドレスの公表の方法）</strong></p>
 <blockquote>法第三条第一項第四号の規定による自己の電子メールアドレスの公表の方法は、自己の電子メールアドレスをインターネットを利用して公衆が閲覧することができる状態に置く方法とする。<strong>ただし、自己の電子メールアドレスと併せて特定電子メールの送信をしないように求める旨の文言をインターネットを利用して公衆が閲覧することができる状態に置いたときは、この限りではない。</strong></blockquote>
 <p>つまり「営業お断り」表示の法的正体は、<strong>「公表アドレス宛なら広告メールを送ってよい」というオプトイン例外（法3条1項4号）を打ち消すスイッチ</strong>です。打ち消される対象は<strong>特定電子メールに限られます。</strong></p>
 <p><strong>ガイドライン p.19（決定的な一文）</strong></p>
 <blockquote>なお、このような表示をした場合であっても、<strong>単なる私信等の特定電子メールに該当しない電子メールの送信まで行えなくなるものではない。</strong></blockquote>
-<p>出典：<a href="https://www.soumu.go.jp/main_sosiki/joho_tsusin/d_syohi/pdf/m_mail_081114_1.pdf">https://www.soumu.go.jp/main_sosiki/joho_tsusin/d_syohi/pdf/m_mail_081114_1.pdf</a> p.19（2026-09-04 確認）</p>
+<p>出典：https://www.soumu.go.jp/main_sosiki/joho_tsusin/d_syohi/pdf/m_mail_081114_1.pdf p.19（2026-09-04 確認）</p>
 <p><strong>したがって、「営業お断り」表示のある企業に仕入れ打診メールを送っても、特定電子メール法違反にはなりません。</strong> これが本件の法的結論です。</p>
 <h3>2-2. 罰則の構造 — 1通送っていきなり刑事罰、はありません</h3>
-<table><thead><tr><th>段階</th><th>条文</th><th>内容</th></tr></thead><tbody><tr><td>① 法3条違反</td><td>—</td><td><strong>直罰規定なし</strong></td></tr><tr><td>② 措置命令</td><td>法7条</td><td>総務大臣・内閣総理大臣が「一時に多数の者に対してする送信」等につき改善措置を命令</td></tr><tr><td>③ 命令違反</td><td>法34条2号</td><td><strong>1年以下の拘禁刑又は100万円以下の罰金</strong></td></tr><tr><td>④ 両罰</td><td>法37条</td><td>法人は3,000万円以下の罰金（<strong>個人事業主は各本条の罰金刑</strong>）</td></tr></tbody></table>
+<table><thead><tr><th>段階</th><th>条文</th><th>内容</th></tr></thead><tbody>
+<tr><td>① 法3条違反</td><td>—</td><td><strong>直罰規定なし</strong></td></tr>
+<tr><td>② 措置命令</td><td>法7条</td><td>総務大臣・内閣総理大臣が「一時に多数の者に対してする送信」等につき改善措置を命令</td></tr>
+<tr><td>③ 命令違反</td><td>法34条2号</td><td><strong>1年以下の拘禁刑又は100万円以下の罰金</strong></td></tr>
+<tr><td>④ 両罰</td><td>法37条</td><td>法人は3,000万円以下の罰金（<strong>個人事業主は各本条の罰金刑</strong>）</td></tr>
+</tbody></table>
 <p>法7条は「<strong>一時に多数の者に対してする</strong>」送信を要件に含みます。1社1通の個別打診は、条文の想定する対象ではありません。</p>
 <h3>2-3. 踏んだ場合に実際に起きること（法的措置ではなく、これが本当のリスク）</h3>
-<table><thead><tr><th>#</th><th>実害</th><th>発生確率</th><th>影響度</th><th>不可逆性</th><th>総合</th></tr></thead><tbody><tr><td>1</td><td>無視・返信なし</td><td>高</td><td>極小</td><td>可逆</td><td><strong>許容</strong></td></tr><tr><td>2</td><td>当該社からの取引拒絶・ブラックリスト化</td><td>中</td><td>小（451社中の1社）</td><td>中（一度嫌われると覆しにくい）</td><td><strong>許容</strong></td></tr><tr><td>3</td><td><strong>送信ドメイン／IPが通報・ブロックリスト入り</strong></td><td>低〜中</td><td><strong>大</strong></td><td><strong>高</strong></td><td><strong>🔴 これが本丸</strong></td></tr><tr><td>4</td><td>メールサービス（Gmail等）のアカウント停止</td><td>低</td><td><strong>大</strong></td><td>中</td><td>🔴</td></tr><tr><td>5</td><td>業界内での評判低下（同カテゴリのメーカー間で共有）</td><td>低</td><td>中</td><td>中</td><td>⚠️</td></tr><tr><td>6</td><td>法的措置（差止・損害賠償）</td><td><strong>極低</strong></td><td>中</td><td>中</td><td>許容</td></tr><tr><td>7</td><td>行政処分（措置命令）</td><td><strong>極低</strong></td><td>大</td><td>高</td><td>許容（1社1通では要件不充足）</td></tr></tbody></table>
+<table><thead><tr><th>#</th><th>実害</th><th>発生確率</th><th>影響度</th><th>不可逆性</th><th>総合</th></tr></thead><tbody>
+<tr><td>1</td><td>無視・返信なし</td><td>高</td><td>極小</td><td>可逆</td><td><strong>許容</strong></td></tr>
+<tr><td>2</td><td>当該社からの取引拒絶・ブラックリスト化</td><td>中</td><td>小（451社中の1社）</td><td>中（一度嫌われると覆しにくい）</td><td><strong>許容</strong></td></tr>
+<tr><td>3</td><td><strong>送信ドメイン／IPが通報・ブロックリスト入り</strong></td><td>低〜中</td><td><strong>大</strong></td><td><strong>高</strong></td><td><strong>🔴 これが本丸</strong></td></tr>
+<tr><td>4</td><td>メールサービス（Gmail等）のアカウント停止</td><td>低</td><td><strong>大</strong></td><td>中</td><td>🔴</td></tr>
+<tr><td>5</td><td>業界内での評判低下（同カテゴリのメーカー間で共有）</td><td>低</td><td>中</td><td>中</td><td>⚠️</td></tr>
+<tr><td>6</td><td>法的措置（差止・損害賠償）</td><td><strong>極低</strong></td><td>中</td><td>中</td><td>許容</td></tr>
+<tr><td>7</td><td>行政処分（措置命令）</td><td><strong>極低</strong></td><td>大</td><td>高</td><td>許容（1社1通では要件不充足）</td></tr>
+</tbody></table>
 <p><strong>#3 を最優先で潰す理由：</strong> 当社は451社に打診する計画です。送信ドメインのレピュテーションは<strong>451社すべてへの到達率を支える共有インフラ</strong>であり、1社の通報でこれを毀損すると、<strong>まだ打診していない450社にも届かなくなる</strong>。可逆性が低く、回復に数ヶ月かかります。「1社くらい嫌われても」という発想が通用しない構造です。</p>
 <p><strong>加えて当社固有の事情：</strong> Amazon 出品アカウントが3か国とも停止中で復旧待ち、実績ゼロ。この局面で外形的なトラブルを1件も作らないことに、通常より高い価値があります。</p>
 <hr>
 <h2>③ 実務ルール（機械判定）</h2>
 <h3>3-1. 判定区分（5段階）</h3>
-<table><thead><tr><th>区分</th><th>意味</th><th>打診</th><th>経路</th><th>優先度</th></tr></thead><tbody><tr><td><strong>A / GO</strong></td><td>表示なし、または取引窓口が明示されている</td><td><strong>可</strong></td><td>フォーム＞メール＞電話</td><td>1（最優先）</td></tr><tr><td><strong>B / GO限定</strong></td><td>経路が指定されている（書面のみ等）</td><td><strong>可（指定経路のみ）</strong></td><td>指定された経路のみ。他経路は使わない</td><td>2</td></tr><tr><td><strong>C / CAUTION</strong></td><td>「売り込み・ご提案お断り」（＝<strong>売る</strong>行為への拒絶）</td><td><strong>条件付き可・原則は保留</strong></td><td>法人／取引窓口のフォーム<strong>1回のみ</strong></td><td>4（A/B を消化してから）</td></tr><tr><td><strong>D / NO-GO</strong></td><td>「セールス・勧誘お断り」＋通報明示、特定電子メール拒否の明示、採用専用窓口のみ、新規取引拒絶の明文</td><td><strong>不可</strong></td><td><strong>なし</strong></td><td>—</td></tr><tr><td><strong>E / 対象外</strong></td><td>取引条件を満たさない（実店舗必須等）。法的可否ではなく<strong>無益</strong></td><td><strong>不可</strong></td><td><strong>なし</strong></td><td>—（条件充足時に再評価）</td></tr></tbody></table>
+<table><thead><tr><th>区分</th><th>意味</th><th>打診</th><th>経路</th><th>優先度</th></tr></thead><tbody>
+<tr><td><strong>A / GO</strong></td><td>表示なし、または取引窓口が明示されている</td><td><strong>可</strong></td><td>フォーム＞メール＞電話</td><td>1（最優先）</td></tr>
+<tr><td><strong>B / GO限定</strong></td><td>経路が指定されている（書面のみ等）</td><td><strong>可（指定経路のみ）</strong></td><td>指定された経路のみ。他経路は使わない</td><td>2</td></tr>
+<tr><td><strong>C / CAUTION</strong></td><td>「売り込み・ご提案お断り」（＝<strong>売る</strong>行為への拒絶）</td><td><strong>条件付き可・原則は保留</strong></td><td>法人／取引窓口のフォーム<strong>1回のみ</strong></td><td>4（A/B を消化してから）</td></tr>
+<tr><td><strong>D / NO-GO</strong></td><td>「セールス・勧誘お断り」＋通報明示、特定電子メール拒否の明示、採用専用窓口のみ、新規取引拒絶の明文</td><td><strong>不可</strong></td><td><strong>なし</strong></td><td>—</td></tr>
+<tr><td><strong>E / 対象外</strong></td><td>取引条件を満たさない（実店舗必須等）。法的可否ではなく<strong>無益</strong></td><td><strong>不可</strong></td><td><strong>なし</strong></td><td>—（条件充足時に再評価）</td></tr>
+</tbody></table>
 <h3>3-2. 類型別の判定表（依頼された粒度）</h3>
-<table><thead><tr><th>表示の類型</th><th>判定</th><th>打診してよいか</th><th>経路</th><th>根拠</th></tr></thead><tbody><tr><td>「<strong>売り込み・ご提案お断り</strong>」</td><td><strong>C</strong></td><td>条件付き可（下記3-4の型を厳守）。<strong>優先度は最下位</strong></td><td>法人向け／取引用フォーム <strong>1回のみ</strong>。メール・電話は使わない</td><td>文言が禁じているのは「売る」「提案する」行為。当社の用件は「買う」であり文言上は非該当。ただし相手の意図が「未取引先からの一方的接触の抑制」である可能性が残るためグレー</td></tr><tr><td>「<strong>セールス・勧誘お断り</strong>」＋<strong>通報の明示</strong></td><td><strong>D</strong></td><td><strong>不可</strong></td><td>なし</td><td>法的には送信できるが、通報 → ドメインレピュテーション毀損（②2-3 #3）の期待損失が、1社の期待利益を上回る</td></tr><tr><td>「特定電子メール／広告メール／迷惑メールお断り」（法定文言）</td><td><strong>D</strong></td><td><strong>不可</strong></td><td>なし</td><td>施行規則3条ただし書の要件を意識的に満たしている＝法的知識を持って運用している相手。触らない</td></tr><tr><td><strong>取引先の条件を限定</strong>（実店舗必須・法人のみ等）</td><td><strong>E</strong></td><td><strong>不可</strong></td><td>なし</td><td>当社は実店舗なし＝構造的に不適格。法的問題ではなく、<strong>通る見込みがゼロ</strong>。打診は時間の損失かつ心証悪化</td></tr><tr><td>「<strong>営業は書面で</strong>」</td><td><strong>B</strong></td><td><strong>可</strong></td><td><strong>書面（郵送）のみ。</strong>電話・フォーム・メールは使わない</td><td>拒絶ではなく<strong>経路の指定</strong>。指定に従えば正規の受付ルート。ただしコスト（郵送・封入）に見合うかは経理判断</td></tr><tr><td><strong>採用専用の窓口しかない</strong></td><td><strong>D</strong></td><td><strong>不可</strong></td><td>なし</td><td>用件が窓口の受付範囲外。採用窓口への商談持ち込みは最も心証を損なう類型。<strong>公式サイトに取引窓口が新設されるまで保留</strong></td></tr><tr><td><strong>表示なし</strong></td><td><strong>A</strong></td><td><strong>可</strong></td><td>フォーム＞メール＞電話</td><td>制約なし</td></tr><tr><td>「お取引に関するお問い合わせ」窓口が<strong>明示されている</strong></td><td><strong>A＋</strong></td><td><strong>可（最優先）</strong></td><td>当該窓口</td><td>相手が取引打診を受け付けると明示している</td></tr></tbody></table>
+<table><thead><tr><th>表示の類型</th><th>判定</th><th>打診してよいか</th><th>経路</th><th>根拠</th></tr></thead><tbody>
+<tr><td>「<strong>売り込み・ご提案お断り</strong>」</td><td><strong>C</strong></td><td>条件付き可（下記3-4の型を厳守）。<strong>優先度は最下位</strong></td><td>法人向け／取引用フォーム <strong>1回のみ</strong>。メール・電話は使わない</td><td>文言が禁じているのは「売る」「提案する」行為。当社の用件は「買う」であり文言上は非該当。ただし相手の意図が「未取引先からの一方的接触の抑制」である可能性が残るためグレー</td></tr>
+<tr><td>「<strong>セールス・勧誘お断り</strong>」＋<strong>通報の明示</strong></td><td><strong>D</strong></td><td><strong>不可</strong></td><td>なし</td><td>法的には送信できるが、通報 → ドメインレピュテーション毀損（②2-3 #3）の期待損失が、1社の期待利益を上回る</td></tr>
+<tr><td>「特定電子メール／広告メール／迷惑メールお断り」（法定文言）</td><td><strong>D</strong></td><td><strong>不可</strong></td><td>なし</td><td>施行規則3条ただし書の要件を意識的に満たしている＝法的知識を持って運用している相手。触らない</td></tr>
+<tr><td><strong>取引先の条件を限定</strong>（実店舗必須・法人のみ等）</td><td><strong>E</strong></td><td><strong>不可</strong></td><td>なし</td><td>当社は実店舗なし＝構造的に不適格。法的問題ではなく、<strong>通る見込みがゼロ</strong>。打診は時間の損失かつ心証悪化</td></tr>
+<tr><td>「<strong>営業は書面で</strong>」</td><td><strong>B</strong></td><td><strong>可</strong></td><td><strong>書面（郵送）のみ。</strong>電話・フォーム・メールは使わない</td><td>拒絶ではなく<strong>経路の指定</strong>。指定に従えば正規の受付ルート。ただしコスト（郵送・封入）に見合うかは経理判断</td></tr>
+<tr><td><strong>採用専用の窓口しかない</strong></td><td><strong>D</strong></td><td><strong>不可</strong></td><td>なし</td><td>用件が窓口の受付範囲外。採用窓口への商談持ち込みは最も心証を損なう類型。<strong>公式サイトに取引窓口が新設されるまで保留</strong></td></tr>
+<tr><td><strong>表示なし</strong></td><td><strong>A</strong></td><td><strong>可</strong></td><td>フォーム＞メール＞電話</td><td>制約なし</td></tr>
+<tr><td>「お取引に関するお問い合わせ」窓口が<strong>明示されている</strong></td><td><strong>A＋</strong></td><td><strong>可（最優先）</strong></td><td>当該窓口</td><td>相手が取引打診を受け付けると明示している</td></tr>
+</tbody></table>
 <h3>3-3. 機械判定ロジック（<code>form_optout_notice</code> 列への実装仕様）</h3>
 <p><strong>適用順序：D → E → B → C → A。上から順に当て、最初にヒットした区分で確定します。</strong></p>
 <h4>D 判定語（1つでもヒットしたら NO-GO）</h4>
@@ -128,20 +192,42 @@ th strong,h1 strong,h2 strong{color:inherit}</style></head><body><h1>「営業�
 <pre><code>&quot;お取引に関するお問い合わせ&quot; / &quot;新規お取引&quot; / &quot;取引希望&quot; / &quot;お取引窓口&quot; / &quot;仕入&quot; / &quot;卸売&quot;
 / &quot;卸のご相談&quot; / &quot;代理店&quot; / &quot;販売店募集&quot; / &quot;取扱店募集&quot; / &quot;OEM&quot; / &quot;営業部&quot; / &quot;営業本部&quot;</code></pre>
 <h4>出力スキーマ（タカシ向け）</h4>
-<table><thead><tr><th>列名</th><th>型</th><th>値</th></tr></thead><tbody><tr><td><code>form_optout_notice</code></td><td>text</td><td>検出した注意書きの原文（そのまま。要約しない）</td></tr><tr><td><code>optout_class</code></td><td>enum</td><td><code>A_PLUS</code> / <code>A</code> / <code>B</code> / <code>C</code> / <code>D</code> / <code>E</code></td></tr><tr><td><code>optout_hit_terms</code></td><td>text</td><td>ヒットした語（<code>;</code> 区切り）。<strong>判定の監査証跡として必須</strong></td></tr><tr><td><code>allowed_channels</code></td><td>json</td><td>例 <code>[&quot;form&quot;]</code> <code>[&quot;mail_post&quot;]</code> <code>[]</code></td></tr><tr><td><code>contact_priority</code></td><td>int</td><td>A_PLUS=1 / A=2 / B=3 / C=9 / D,E=99（99は打診しない）</td></tr><tr><td><code>optout_source_url</code></td><td>url</td><td>表示を確認したページのURL</td></tr><tr><td><code>optout_checked_at</code></td><td>date</td><td>確認日</td></tr></tbody></table>
+<table><thead><tr><th>列名</th><th>型</th><th>値</th></tr></thead><tbody>
+<tr><td><code>form_optout_notice</code></td><td>text</td><td>検出した注意書きの原文（そのまま。要約しない）</td></tr>
+<tr><td><code>optout_class</code></td><td>enum</td><td><code>A_PLUS</code> / <code>A</code> / <code>B</code> / <code>C</code> / <code>D</code> / <code>E</code></td></tr>
+<tr><td><code>optout_hit_terms</code></td><td>text</td><td>ヒットした語（<code>;</code> 区切り）。<strong>判定の監査証跡として必須</strong></td></tr>
+<tr><td><code>allowed_channels</code></td><td>json</td><td>例 <code>[&quot;form&quot;]</code> <code>[&quot;mail_post&quot;]</code> <code>[]</code></td></tr>
+<tr><td><code>contact_priority</code></td><td>int</td><td>A_PLUS=1 / A=2 / B=3 / C=9 / D,E=99（99は打診しない）</td></tr>
+<tr><td><code>optout_source_url</code></td><td>url</td><td>表示を確認したページのURL</td></tr>
+<tr><td><code>optout_checked_at</code></td><td>date</td><td>確認日</td></tr>
+</tbody></table>
 <h3>3-4. C 判定を実行する場合の3点セット（グレーを踏むなら必須）</h3>
 <p>法務としての原則はグレー＝NO です。C を進めるなら、以下3点をチケットに明記した上で、<strong>A/B を全件消化した後に限り</strong>着手してください。</p>
-<table><thead><tr><th></th><th>内容</th></tr></thead><tbody><tr><td><strong>リスクシナリオ</strong></td><td>①無視される（最頻）②「お断りと書いてある」と返信され心証悪化 ③まれに通報 → ドメインレピュテーション毀損</td></tr><tr><td><strong>発生時の対応策</strong></td><td>拒絶反応が返ってきたら<strong>即座に謝意を述べて終了。再送・反論は一切しない</strong>。通報を示唆されたら当該ドメインを送信除外リストへ登録し、以後接触禁止</td></tr><tr><td><strong>撤退条件</strong></td><td><strong>C 群で拒絶反応が3件出た時点で、C 群全体を打ち切る</strong>。返信率が A 群の1/3を下回った時点でも打ち切る</td></tr></tbody></table>
+<table><thead><tr><th></th><th>内容</th></tr></thead><tbody>
+<tr><td><strong>リスクシナリオ</strong></td><td>①無視される（最頻）②「お断りと書いてある」と返信され心証悪化 ③まれに通報 → ドメインレピュテーション毀損</td></tr>
+<tr><td><strong>発生時の対応策</strong></td><td>拒絶反応が返ってきたら<strong>即座に謝意を述べて終了。再送・反論は一切しない</strong>。通報を示唆されたら当該ドメインを送信除外リストへ登録し、以後接触禁止</td></tr>
+<tr><td><strong>撤退条件</strong></td><td><strong>C 群で拒絶反応が3件出た時点で、C 群全体を打ち切る</strong>。返信率が A 群の1/3を下回った時点でも打ち切る</td></tr>
+</tbody></table>
 <p><strong>C 群に送る文面の型（厳守事項）</strong></p>
 <ol><li>件名に用件を明示：<code>【お取引のご相談】貴社商品の仕入れについて（Satoy Select）</code></li><li><strong>冒頭で「売り込みではなく、購入の相談である」ことを1行で宣言する</strong></li><li><strong>URL を一切貼らない</strong>（①1-1 のとおり、貼った瞬間に特定電子メールに転化しうる）</li><li>屋号・氏名・住所・電話・メールを記載（身元を隠さない）</li><li><strong>実績ゼロを正直に書く。</strong>「Amazonで販売実績があります」等の誇張は絶対に書かない（虚偽の申告は取引開始後に発覚すると契約解除・信用毀損の直接原因になります）</li><li><strong>1社1通。返信がなくても追送しない</strong></li></ol>
 <h3>3-5. 実装上の注意（誤判定を必ず生む3点）</h3>
-<table><thead><tr><th>#</th><th>罠</th><th>対策</th></tr></thead><tbody><tr><td>1</td><td><strong>「営業」の誤爆</strong></td><td>「営業部」「営業時間」「営業日」「営業所」に「営業」が含まれる。<strong>必ず「営業」と拒絶語の近接（同一文・±30文字以内）で判定</strong>。単語単独でのヒット禁止</td></tr><tr><td>2</td><td><strong>注意書きブロックの外を拾う</strong></td><td>ページ全文検索をすると、ニュースリリースやFAQ本文を拾う。<strong>フォーム周辺・問い合わせ窓口の注記ブロックに限定</strong>して抽出する</td></tr><tr><td>3</td><td><strong>窓口ごとに表示が違う</strong></td><td>一般消費者向けフォームには「売り込みお断り」があり、法人／取引窓口には無い、という構成が普通にある。<strong>窓口単位で判定し、<code>optout_source_url</code> を必ず窓口URLで記録</strong>する</td></tr></tbody></table>
+<table><thead><tr><th>#</th><th>罠</th><th>対策</th></tr></thead><tbody>
+<tr><td>1</td><td><strong>「営業」の誤爆</strong></td><td>「営業部」「営業時間」「営業日」「営業所」に「営業」が含まれる。<strong>必ず「営業」と拒絶語の近接（同一文・±30文字以内）で判定</strong>。単語単独でのヒット禁止</td></tr>
+<tr><td>2</td><td><strong>注意書きブロックの外を拾う</strong></td><td>ページ全文検索をすると、ニュースリリースやFAQ本文を拾う。<strong>フォーム周辺・問い合わせ窓口の注記ブロックに限定</strong>して抽出する</td></tr>
+<tr><td>3</td><td><strong>窓口ごとに表示が違う</strong></td><td>一般消費者向けフォームには「売り込みお断り」があり、法人／取引窓口には無い、という構成が普通にある。<strong>窓口単位で判定し、<code>optout_source_url</code> を必ず窓口URLで記録</strong>する</td></tr>
+</tbody></table>
 <blockquote>#3 は本件で実際に起きています（リッチェルは逆に法人フォーム側に表示あり）。<strong>「会社単位で1判定」ではなく「窓口単位で判定 → 最も緩い有効な窓口を採用」</strong>が正しい設計です。</blockquote>
 <hr>
 <h2>④ 個別判断（5社）</h2>
-<table><thead><tr><th>#</th><th>企業</th><th>表示</th><th>判定</th><th>打診可否</th><th>経路</th></tr></thead><tbody><tr><td>1</td><td><strong>リッチェル</strong></td><td>「商品やサービスの売り込み、製品アイデア等のご提案はご遠慮ください」</td><td><strong>C</strong></td><td><strong>条件付き可・ただし優先度は最下位（保留継続を推奨）</strong></td><td>法人向けフォーム 1回のみ</td></tr><tr><td>2</td><td><strong>すごろくや</strong></td><td>「実店舗を持たないオンライン専売業者とは一律お断り」</td><td><strong>E</strong></td><td><strong>不可</strong></td><td>なし</td></tr><tr><td>3</td><td><strong>愛知電線</strong></td><td>「セールス・勧誘は特定電子メール法に基づき固くお断り／迷惑メール相談センターに通報します」</td><td><strong>D</strong></td><td><strong>不可</strong></td><td>なし</td></tr><tr><td>4</td><td><strong>カプコン</strong></td><td>「営業・ご提案は書面にて本社宛に」</td><td><strong>B</strong></td><td><strong>可（ただし別途 E の疑いあり。下記）</strong></td><td><strong>書面（郵送）のみ</strong></td></tr><tr><td>5</td><td><strong>ストームレーベルズ</strong></td><td>公開電話が採用専用のみ</td><td><strong>D</strong></td><td><strong>不可</strong></td><td>なし</td></tr></tbody></table>
+<table><thead><tr><th>#</th><th>企業</th><th>表示</th><th>判定</th><th>打診可否</th><th>経路</th></tr></thead><tbody>
+<tr><td>1</td><td><strong>リッチェル</strong></td><td>「商品やサービスの売り込み、製品アイデア等のご提案はご遠慮ください」</td><td><strong>C</strong></td><td><strong>条件付き可・ただし優先度は最下位（保留継続を推奨）</strong></td><td>法人向けフォーム 1回のみ</td></tr>
+<tr><td>2</td><td><strong>すごろくや</strong></td><td>「実店舗を持たないオンライン専売業者とは一律お断り」</td><td><strong>E</strong></td><td><strong>不可</strong></td><td>なし</td></tr>
+<tr><td>3</td><td><strong>愛知電線</strong></td><td>「セールス・勧誘は特定電子メール法に基づき固くお断り／迷惑メール相談センターに通報します」</td><td><strong>D</strong></td><td><strong>不可</strong></td><td>なし</td></tr>
+<tr><td>4</td><td><strong>カプコン</strong></td><td>「営業・ご提案は書面にて本社宛に」</td><td><strong>B</strong></td><td><strong>可（ただし別途 E の疑いあり。下記）</strong></td><td><strong>書面（郵送）のみ</strong></td></tr>
+<tr><td>5</td><td><strong>ストームレーベルズ</strong></td><td>公開電話が採用専用のみ</td><td><strong>D</strong></td><td><strong>不可</strong></td><td>なし</td></tr>
+</tbody></table>
 <h3>1. リッチェル — <strong>C（保留継続を推奨）</strong></h3>
-<p><strong>確認した事実（2026-09-04）：</strong> 当該文言は<strong>法人のお客様向けお問い合わせフォーム</strong>（<a href="https://www.richell.co.jp/form/business/contact.php">https://www.richell.co.jp/form/business/contact.php</a> ）に掲示されています。一般消費者向けだけの注記ではありません。</p>
+<p><strong>確認した事実（2026-09-04）：</strong> 当該文言は<strong>法人のお客様向けお問い合わせフォーム</strong>（https://www.richell.co.jp/form/business/contact.php ）に掲示されています。一般消費者向けだけの注記ではありません。</p>
 <p><strong>法的判定：</strong> 打診しても違法ではありません（②2-1・2-2）。文言が禁じているのは「<strong>売り込み</strong>」＝当社が売る行為と、「<strong>製品アイデア等のご提案</strong>」＝提案行為であり、「貴社商品を仕入れたい」という購入の申込みは<strong>文言上、いずれにも含まれません</strong>（明文主義）。</p>
 <p><strong>それでも優先度を最下位に置く理由：</strong></p>
 <ul><li>表示が<strong>法人窓口そのものに</strong>付いている。「B2Bの一方的接触を抑制したい」という意図と読むのが自然で、当社の解釈（買う打診は対象外）が相手に共有される保証はありません。<strong>グレーです。</strong></li><li>相手はベビー・ペット・園芸用品の大手。<strong>Amazon での転売に対する統制が強い可能性</strong>が高く、実績ゼロの個人事業主が新規取引に至る確率は低い。期待値が低いのに、グレーを踏むコストだけ先に払う構図です。</li></ul>
@@ -164,12 +250,130 @@ th strong,h1 strong,h2 strong{color:inherit}</style></head><body><h1>「営業�
 <p><strong>推奨：</strong> 公式サイト上に取引・卸・営業の窓口が新設されるまで保留（<code>recheck_condition=&quot;取引窓口の新設&quot;</code>）。451社という母数がある以上、窓口の無い1社に労力を割く合理性はありません。</p>
 <hr>
 <h2>⑤ 全社共通の遵守事項（打診を実行する前に必ず読むこと）</h2>
-<table><thead><tr><th>#</th><th>事項</th><th>根拠</th></tr></thead><tbody><tr><td>1</td><td><strong>メール本文・署名に URL を一切貼らない</strong>（Amazonストア・自社サイト・SNS すべて）</td><td>①1-1。貼った瞬間に特定電子メールに転化し、「営業お断り」表示が法的効力を持つ</td></tr><tr><td>2</td><td><strong>1社1通。返信がなくても追送しない</strong></td><td>法7条の「一時に多数の者に対してする送信」の外に留まる</td></tr><tr><td>3</td><td><strong>断られたら即終了。</strong>謝意を述べて再接触しない</td><td>法3条3項（拒否後の送信禁止）の趣旨。反復は威力業務妨害の評価に近づく</td></tr><tr><td>4</td><td><strong>屋号・氏名・住所・電話・メールを明記。</strong>身元を隠さない</td><td>法4条の趣旨。適用がなくても実務上の信頼要件</td></tr><tr><td>5</td><td><strong>実績ゼロを正直に書く。</strong>販売実績・取引社数を誇張しない</td><td>虚偽の申告は取引開始後の契約解除・信用毀損の直接原因</td></tr><tr><td>6</td><td><strong>一斉送信ツール（BCC一括・配信サービス）を使わない。</strong>1通ずつ個別送信</td><td>一斉送信は法7条の要件に近づき、かつスパム判定を受けやすい</td></tr><tr><td>7</td><td><strong>拒絶反応があったドメインは送信除外リストへ即登録</strong></td><td>②2-3 #3 の予防</td></tr><tr><td>8</td><td><strong>判定は窓口単位。</strong>会社単位でまとめない</td><td>③3-5 #3</td></tr></tbody></table>
+<table><thead><tr><th>#</th><th>事項</th><th>根拠</th></tr></thead><tbody>
+<tr><td>1</td><td><strong>メール本文・署名に URL を一切貼らない</strong>（Amazonストア・自社サイト・SNS すべて）</td><td>①1-1。貼った瞬間に特定電子メールに転化し、「営業お断り」表示が法的効力を持つ</td></tr>
+<tr><td>2</td><td><strong>1社1通。返信がなくても追送しない</strong></td><td>法7条の「一時に多数の者に対してする送信」の外に留まる</td></tr>
+<tr><td>3</td><td><strong>断られたら即終了。</strong>謝意を述べて再接触しない</td><td>法3条3項（拒否後の送信禁止）の趣旨。反復は威力業務妨害の評価に近づく</td></tr>
+<tr><td>4</td><td><strong>屋号・氏名・住所・電話・メールを明記。</strong>身元を隠さない</td><td>法4条の趣旨。適用がなくても実務上の信頼要件</td></tr>
+<tr><td>5</td><td><strong>実績ゼロを正直に書く。</strong>販売実績・取引社数を誇張しない</td><td>虚偽の申告は取引開始後の契約解除・信用毀損の直接原因</td></tr>
+<tr><td>6</td><td><strong>一斉送信ツール（BCC一括・配信サービス）を使わない。</strong>1通ずつ個別送信</td><td>一斉送信は法7条の要件に近づき、かつスパム判定を受けやすい</td></tr>
+<tr><td>7</td><td><strong>拒絶反応があったドメインは送信除外リストへ即登録</strong></td><td>②2-3 #3 の予防</td></tr>
+<tr><td>8</td><td><strong>判定は窓口単位。</strong>会社単位でまとめない</td><td>③3-5 #3</td></tr>
+</tbody></table>
 <hr>
 <h2>⑥ 未確定事項・限界（推測と事実の分離）</h2>
-<table><thead><tr><th>#</th><th>内容</th><th>区分</th></tr></thead><tbody><tr><td>1</td><td>リッチェルの表示が法人フォームに存在すること</td><td><strong>事実</strong>（2026-09-04 当該URL確認）</td></tr><tr><td>2</td><td>リッチェルの表示意図が「B2Bの一方的接触の抑制」であること</td><td><strong>推測</strong>。相手に確認する術がない</td></tr><tr><td>3</td><td>愛知電線・すごろくや・カプコン・ストームレーベルズの文言</td><td><strong>依頼文の記載に基づく</strong>。当職は原典未確認。実装前にタカシの <code>optout_source_url</code> で原文を確認すること</td></tr><tr><td>4</td><td>カプコンに卸取引の窓口が存在しないこと</td><td><strong>推測</strong>。未確認</td></tr><tr><td>5</td><td>判例</td><td>「営業お断り表示に反する営業メール送信」を直接扱った公表裁判例は<strong>確認できませんでした</strong>。本判定は条文・省令・所轄官庁ガイドラインに基づきます</td></tr><tr><td>6</td><td>「取引関係に係る通知」の例示が新規取引先を含むか</td><td><strong>グレー</strong>。①1-1 に明記。定義該当性で外れるため結論は変わらない</td></tr></tbody></table>
+<table><thead><tr><th>#</th><th>内容</th><th>区分</th></tr></thead><tbody>
+<tr><td>1</td><td>リッチェルの表示が法人フォームに存在すること</td><td><strong>事実</strong>（2026-09-04 当該URL確認）</td></tr>
+<tr><td>2</td><td>リッチェルの表示意図が「B2Bの一方的接触の抑制」であること</td><td><strong>推測</strong>。相手に確認する術がない</td></tr>
+<tr><td>3</td><td>愛知電線・すごろくや・カプコン・ストームレーベルズの文言</td><td><strong>依頼文の記載に基づく</strong>。当職は原典未確認。実装前にタカシの <code>optout_source_url</code> で原文を確認すること</td></tr>
+<tr><td>4</td><td>カプコンに卸取引の窓口が存在しないこと</td><td><strong>推測</strong>。未確認</td></tr>
+<tr><td>5</td><td>判例</td><td>「営業お断り表示に反する営業メール送信」を直接扱った公表裁判例は<strong>確認できませんでした</strong>。本判定は条文・省令・所轄官庁ガイドラインに基づきます</td></tr>
+<tr><td>6</td><td>「取引関係に係る通知」の例示が新規取引先を含むか</td><td><strong>グレー</strong>。①1-1 に明記。定義該当性で外れるため結論は変わらない</td></tr>
+</tbody></table>
 <hr>
 <h2>出典一覧（すべて 2026-09-04 確認）</h2>
-<table><thead><tr><th>資料</th><th>URL</th></tr></thead><tbody><tr><td>特定電子メールの送信の適正化等に関する法律（平成14年法律第26号）</td><td><a href="https://laws.e-gov.go.jp/law/414AC0100000026">https://laws.e-gov.go.jp/law/414AC0100000026</a></td></tr><tr><td>同 施行規則（平成14年総務省令第66号）</td><td><a href="https://laws.e-gov.go.jp/law/414M60000008066">https://laws.e-gov.go.jp/law/414M60000008066</a></td></tr><tr><td>同 第2条第1号の通信方式を定める省令（平成21年総務省令第85号）</td><td><a href="https://laws.e-gov.go.jp/law/421M60000008085">https://laws.e-gov.go.jp/law/421M60000008085</a></td></tr><tr><td>特定電子メールの送信等に関するガイドライン（総務省総合通信基盤局消費者行政課・消費者庁取引対策課）</td><td><a href="https://www.soumu.go.jp/main_sosiki/joho_tsusin/d_syohi/pdf/m_mail_081114_1.pdf">https://www.soumu.go.jp/main_sosiki/joho_tsusin/d_syohi/pdf/m_mail_081114_1.pdf</a></td></tr><tr><td>特定商取引に関する法律（昭和51年法律第57号）</td><td><a href="https://laws.e-gov.go.jp/law/351AC0000000057">https://laws.e-gov.go.jp/law/351AC0000000057</a></td></tr><tr><td>消費者庁 特定電子メール法 案内ページ</td><td><a href="https://www.caa.go.jp/policies/policy/consumer_transaction/specifed_email">https://www.caa.go.jp/policies/policy/consumer_transaction/specifed_email</a></td></tr><tr><td>リッチェル 法人のお客様向けお問い合わせフォーム</td><td><a href="https://www.richell.co.jp/form/business/contact.php">https://www.richell.co.jp/form/business/contact.php</a></td></tr></tbody></table>
+<table><thead><tr><th>資料</th><th>URL</th></tr></thead><tbody>
+<tr><td>特定電子メールの送信の適正化等に関する法律（平成14年法律第26号）</td><td>https://laws.e-gov.go.jp/law/414AC0100000026</td></tr>
+<tr><td>同 施行規則（平成14年総務省令第66号）</td><td>https://laws.e-gov.go.jp/law/414M60000008066</td></tr>
+<tr><td>同 第2条第1号の通信方式を定める省令（平成21年総務省令第85号）</td><td>https://laws.e-gov.go.jp/law/421M60000008085</td></tr>
+<tr><td>特定電子メールの送信等に関するガイドライン（総務省総合通信基盤局消費者行政課・消費者庁取引対策課）</td><td>https://www.soumu.go.jp/main_sosiki/joho_tsusin/d_syohi/pdf/m_mail_081114_1.pdf</td></tr>
+<tr><td>特定商取引に関する法律（昭和51年法律第57号）</td><td>https://laws.e-gov.go.jp/law/351AC0000000057</td></tr>
+<tr><td>消費者庁 特定電子メール法 案内ページ</td><td>https://www.caa.go.jp/policies/policy/consumer_transaction/specifed_email</td></tr>
+<tr><td>リッチェル 法人のお客様向けお問い合わせフォーム</td><td>https://www.richell.co.jp/form/business/contact.php</td></tr>
+</tbody></table>
 <hr>
-<p>*法務ハルオ / T-20260904-004 / 2026-09-04*</p></body></html>
+<p>*法務ハルオ / T-20260904-004 / 2026-09-04*</p>
+<hr>
+<h1>⑦ 追補（v1.1 / 2026-09-04）— 構造的欠陥の是正・新類型4件・実データ399社の再検査</h1>
+<blockquote>本節は追補です。①〜⑥（v1.0 本文）は変更していません。ルールファイルは <code>B1L_optout_rules.json</code> <strong>v1.1</strong> に更新済み。<br>発端：IT タカシから「<code>A1_trade_window</code> に否定の右辺が無く、『新規お取引は<strong>行っておりません</strong>』が <strong>A_PLUS（最優先で打診）</strong> に化ける」との指摘。<strong>誤りの向きが最悪</strong>（打診してはいけない相手が最優先候補として社長の手元に届く）であり、直ちに是正しました。</blockquote>
+<h2>7-0. 要旨（3行）</h2>
+<ol><li><strong>構造的な穴は1類型・実装上91パターン。すべて塞ぎました</strong>（合成テストで v1.0 は 91/91 が A_PLUS に化け、v1.1 は 0 件。うち77件を D、14件を A へ）。肯定形39パターンで A_PLUS を失う過剰是正は 0 件。</li><li><strong>実データ399社で判定が変わるのは 5行（4社）。</strong>うち4行は「打診キューから外れる」方向、1行は経路制限。<strong>打診可能社が増える方向の変更はありません。</strong></li><li>新類型4件は <strong>ハイメス＝E／BUNDOK＝E／SBクリエイティブ＝E／パール金属＝A</strong>。カズヨの見立てのうち <strong>SBクリエイティブだけは結論が異なります</strong>（打診可ではなく E）。</li></ol>
+<h2>7-1. 構造的な穴</h2>
+<h3>何が起きていたか</h3>
+<table><thead><tr><th></th><th>内容</th></tr></thead><tbody>
+<tr><td>欠陥箇所</td><td><code>A1_trade_window</code>（<code>match: &quot;any&quot;</code>、肯定語のみ13語。否定の右辺なし）</td></tr>
+<tr><td>症状</td><td>「お取引希望の方は下記フォームへ／…<strong>新規お取引は行っておりません</strong>」→ 前半だけ拾って <strong>A_PLUS＝優先度1</strong></td></tr>
+<tr><td>防波堤</td><td><code>D4_no_new_supplier</code> の<strong>完全一致リスト6語</strong>のみ。「新規<strong>の</strong>お取引は行っておりません」は載っていたが「新規お取引は行っておりません」（「の」なし）は載っておらず素通り</td></tr>
+<tr><td>実害</td><td>実データで1社（ハイメス）。タカシの暫定検知器 <code>detect_negated_trade_window</code> が捕捉済みで、<strong>実際の連絡は発生していません</strong></td></tr>
+</tbody></table>
+<h3>なぜ v1.0 で見落としたか（原因は3つ。いずれも設計の誤り）</h3>
+<table><thead><tr><th>#</th><th>原因</th><th>v1.1 での是正</th></tr></thead><tbody>
+<tr><td>1</td><td><strong>A 系だけ「加点語」として設計した。</strong> D/E/B/C は「拒絶語 × 対象語」の共起で組んだのに、A_PLUS だけ単語一致にした。肯定語は否定と結合して意味が反転する語であり、単語一致で扱ってはいけない</td><td><code>A1</code> に <code>negation_terms</code> ＋ <code>negation_lookahead_chars</code>（直後25文字）を追加。否定が続く出現は A_PLUS として数えない</td></tr>
+<tr><td>2</td><td><strong>拒絶側の防波堤を「完全一致リスト」に置いた。</strong>日本語の丁寧表現は語尾のゆれが大きく、完全一致は原理的に穴が開く</td><td><code>D6_trade_window_negated</code> を新設。取引窓口語25語 × 否定語35語の<strong>方向性のある近接判定</strong>（<code>suffix_negation</code>）。D4 は補助に降格</td></tr>
+<tr><td>3</td><td><strong>「取りこぼし（A→D）」と「化け（D→A_PLUS）」を同じ重さで見ていた。</strong>後者だけが不可逆（ドメイン評判は399社への到達を支える共有資産）</td><td>非対称であることを <code>class_boundaries.A_PLUS_vs_D6</code> に明文化。判定に迷う語は A_PLUS に入れず A に落とす設計へ</td></tr>
+</tbody></table>
+<h3>v1.1 の三層防御</h3>
+<ol><li><strong>D6</strong>（本体）— 取引窓口語の直後が否定なら D。</li><li><strong>A1 の否定フィルタ</strong>（保険）— D6 をすり抜けても A_PLUS には昇格させない。</li><li><strong><code>engine_requirements</code></strong>（再発防止）— 実装が<strong>未知の <code>match</code> 種別を黙って読み飛ばさず異常終了する</strong>ことを要件化。読み飛ばしを許すと、法務が塞いだ穴が実装側で黙って開き直る。</li></ol>
+<h3>網羅検査（<code>agent_output/T-20260904-004/B1L_v11/matrix.py</code>）</h3>
+<p><code>A1</code> の13語 × 否定7類型＝91パターンを機械生成して両版に通しました。</p>
+<table><thead><tr><th></th><th>v1.0</th><th>v1.1</th></tr></thead><tbody>
+<tr><td>A_PLUS（最優先で打診）に化ける</td><td><strong>91 / 91</strong></td><td><strong>0 / 91</strong></td></tr>
+<tr><td>D（除外）に落ちる</td><td>0</td><td>77</td></tr>
+<tr><td>A（通常打診）に落ちる</td><td>0</td><td>14</td></tr>
+<tr><td>肯定形39パターンで A_PLUS を失う（過剰是正）</td><td>—</td><td><strong>0</strong></td></tr>
+</tbody></table>
+<blockquote>A に留まる14件は <code>営業部</code> <code>営業本部</code> の2語。この2語は <code>D6</code> の left に<strong>入れていません</strong>。「営業部へのお電話はご遠慮ください」（＝経路の話＝B）まで D に落ちるためです。代わりに A1 の否定フィルタで A_PLUS → A へ降格させ、優先度を下げる扱いにしました。</blockquote>
+<h2>7-2. 実データ399社の再検査</h2>
+<table><thead><tr><th>対象</th><th>件数</th></tr></thead><tbody>
+<tr><td>全行</td><td>399</td></tr>
+<tr><td><code>form_optout_notice</code> に原文がある行</td><td>66</td></tr>
+<tr><td><strong>v1.0 → v1.1 で判定が変わる行</strong></td><td><strong>5行（4社）</strong></td></tr>
+<tr><td>根拠だけが変わり判定は同じ行（事業判断 → 法務規則）</td><td>2行（ハイメス・扶桑社）</td></tr>
+<tr><td><code>review_triggers</code>（「〜のみ」系）該当</td><td>0</td></tr>
+</tbody></table>
+<table><thead><tr><th>メーカー</th><th>v1.0</th><th>v1.1</th><th>向き</th><th>根拠</th></tr></thead><tbody>
+<tr><td>SBクリエイティブ</td><td>A</td><td><strong>E</strong></td><td>除外</td><td><code>E3_corporate_only</code>（個人のお客様と直接の取引をしない）</td></tr>
+<tr><td>BUNDOK（カワセ）</td><td>A</td><td><strong>E</strong></td><td>除外</td><td><code>E3_corporate_only</code>（法人様以外のお取引を控える）</td></tr>
+<tr><td>株式会社ストームレーベルズ</td><td>A</td><td><strong>D</strong></td><td>除外</td><td>個別判断の <code>aliases</code> 追加（下記）</td></tr>
+<tr><td>株式会社ストームレーベルズ/イーラブ・レーベル</td><td>A</td><td><strong>D</strong></td><td>除外</td><td>同上</td></tr>
+<tr><td>マーナ</td><td>A</td><td><strong>B</strong></td><td>経路制限</td><td><code>B2_no_phone</code> に「お電話でのご案内は中止」を追加。電話を経路から除外</td></tr>
+</tbody></table>
+<p><strong>打診可能社が増える方向の変更は1件もありません。</strong> 母数への影響は 399 → 実質 395（打診対象から4行減）。</p>
+<h3>副産物：同一法人が3表記で重複登録され、除外が1行にしか効いていなかった</h3>
+<p>v1.0 の個別判断「ストームレーベルズ＝D」は、キュー上の <strong>「ジェイストーム」1行にしか適用されていませんでした</strong>。同社は 2024-01-01 に ジェイ・ストーム → ストームレーベルズ へ商号変更した<strong>同一法人</strong>で、キューには3表記で登録されています。残り2行は <strong>A のまま打診候補に残っていた</strong>＝除外したはずの相手に連絡が飛ぶ状態でした。</p>
+<p>対策として個別判断に <code>aliases</code> を持たせ、<code>engine_requirements</code> に「<strong>個別判断は company だけでなく aliases・正式商号・法人番号でも突き合わせること</strong>」を追加しました。これは今回の否定形の穴と<strong>同じ向きの誤り</strong>（除外対象が打診キューに残る）であり、放置できません。</p>
+<h3>限界（事実と推測の分離）</h3>
+<ul><li><strong>事実</strong>：上記の再検査は、CSV の <code>form_optout_notice</code> 列に<strong>原文が入っている66行</strong>に対する検査です。</li><li><strong>推測ではなく、限界の明示</strong>：残る333行は原文が空欄で、<strong>「表示がない」ことの確認ではありません</strong>（未取得と表示なしが区別できていない）。ここは打診の直前に窓口URLを開いて確認する運用でしか埋まりません。母数を過大評価しないでください。</li></ul>
+<h2>7-3. 新類型4件の判定</h2>
+<table><thead><tr><th>社（実体）</th><th>表示</th><th><strong>判定</strong></th><th>打診</th><th>再評価条件</th><th>根拠</th></tr></thead><tbody>
+<tr><td><strong>ハイメス</strong>（ブラザー・ジョルダン社）</td><td>「WEBでの販売のみの企業様…との新規お取引は行っておりません」</td><td><strong>E</strong>（<code>web_only_refused</code>）</td><td>不可</td><td>WEB以外の販売チャネルを持ったとき</td><td>取引窓口はあるが、当社（Amazon専業）が<strong>名指しの欠格事由</strong>に該当。すごろくや（E1）と同型で、要件の書き方が裏返し（実店舗必須 ⇔ WEB専売お断り）。D ではない — 全方位の拒絶でも通報示唆でもなく、条件を満たす相手には窓口を開いている</td></tr>
+<tr><td><strong>BUNDOK</strong>（カワセ）</td><td>「法人様以外のお取引を控えさせて頂いております」</td><td><strong>E</strong>（<code>corporate_only</code>）</td><td>不可</td><td>法人化時</td><td>個人事業主は法人格を持たず、明文上「法人様以外」に含まれる。<strong>明文主義で E</strong></td></tr>
+<tr><td><strong>SBクリエイティブ</strong></td><td>「個人のお客様と直接のお取引は行っておりません」「書店さま専用の受注センター」</td><td><strong>E</strong>（<code>corporate_only</code>）</td><td><strong>不可</strong></td><td>法人化し、かつ取次口座または出版社の書店口座を取得したとき</td><td>①当社は個人事業主＝「個人」で明文に直撃する。②「ネット書店」に<strong>当たらない</strong>と判断する（下記）</td></tr>
+<tr><td><strong>パール金属</strong></td><td>「アイデアのご提案等につきましてはお断りさせて頂いております」</td><td><strong>A</strong></td><td><strong>可</strong>（文面に条件あり）</td><td>—</td><td>断っているのは<strong>アイデアの持ち込み</strong>であって取引ではない。リッチェル（C）との違いは「売り込み」の語の有無</td></tr>
+</tbody></table>
+<h3>SBクリエイティブ — 「ネット書店に当たれば打診可」への回答は <strong>NO</strong></h3>
+<ul><li>表示は2段構えです。<strong>(a) 個人とは直接取引しない／(b) 書店・ネット書店とは取引する。</strong>当社は (a) に該当し、(b) に該当しません。</li><li>出版社の直取引口座は、取次（日販・トーハン等）の口座または出版社が付与する書店口座を前提とするのが通例で、当社はいずれも持ちません。<strong>持たないまま「ネット書店です」と名乗って口座を求めるのは事実と異なる申告</strong>であり、発覚時に取引解除・信用毀損の直接原因になります（③3-4 の「実績ゼロを正直に書く」と同じ理由で不可）。</li><li><strong>グレーの明示</strong>：「ネット書店」に法令上の定義はありません。また新刊書籍は再販売価格維持契約（独占禁止法23条4項の著作物再販）により値引き販売が制限されるのが通例で、Amazon での価格差益モデルとも噛み合いません。ここは推測を含むため断定しません。<strong>ただし (a) の一点だけで打診不可の結論は動きません。</strong></li></ul>
+<h3>パール金属 — リッチェル（C）と同型だが <strong>C ではなく A</strong></h3>
+<ul><li>当該条項は製造業に定型的な<strong>未承諾アイデア受領の拒否</strong>（＝将来「アイデアを盗まれた」と言われる紛争の予防）であり、<strong>取引・購入の打診の拒絶ではありません</strong>。</li><li>リッチェルは「商品やサービスの<strong>売り込み</strong>、製品アイデア等のご提案はご遠慮ください」と<strong>売り込みを明示的に断っている</strong>ため C。パール金属は断っていません。<strong>この一語が境界です。</strong></li><li><strong>グレーの明示</strong>：「等」の射程が売り込みまで及ぶ解釈は否定できません。ただし誤って踏んでも生じるのは無視か「提案はお断り」の返信までで、通報に至る蓋然性は低く<strong>不可逆性が低い</strong>類型です。よってグレーですが GO とします。</li><li><strong>文面の条件（<code>non_optout_patterns.N1.message_constraints</code>。厳守）</strong></li></ul>
+<ol><li>冒頭で「<strong>購入（仕入れ）の相談であり、商品企画やアイデアの提案ではない</strong>」と明記する</li><li>商品改良案・新商品の提案・共同企画の打診を<strong>一切書かない</strong>（書いた瞬間に相手の表示の対象になる）</li><li>経路は法人／取引窓口に限定する</li></ol>
+<blockquote>カズヨの見立て（ハイメス・BUNDOK＝すごろくや型／SBクリエイティブ＝打診可の可能性／パール金属＝リッチェル型）のうち、<strong>一致は3件、相違は2件</strong>です。SBクリエイティブは「該当すれば打診可」ではなく <strong>E（不可）</strong>。パール金属は「リッチェル型（C）」ではなく <strong>A（可）</strong>。いずれも追認ではなく原文から判定しました。</blockquote>
+<h2>7-4. クラス境界（v1.1 で追加・<code>class_boundaries</code> に格納済み）</h2>
+<table><thead><tr><th>境界</th><th>判定基準</th></tr></thead><tbody>
+<tr><td><strong>D か E か</strong></td><td>拒絶が<strong>当社の属性と無関係に全方位</strong>なら <strong>D</strong>（営業お断り／通報／新規取引を一切受けない）。<strong>条件付きで、当社がその条件を満たさないために引っかかる</strong>なら <strong>E</strong>（実店舗必須・法人のみ・WEB専売お断り）。E は <code>recheck_condition</code> を必ず持つ。D は原則復活させない</td></tr>
+<tr><td><strong>C か A か</strong></td><td>拒絶の対象に<strong>売り込み・営業・セールス・勧誘</strong>の語を含むなら <strong>C</strong>。<strong>アイデア・企画・製品提案の持ち込みだけ</strong>を断り、これらの語を含まないなら <strong>A</strong></td></tr>
+<tr><td><strong>E か A か（消費者向け表示）</strong></td><td>「<strong>一般</strong>のお客様／一般消費者／エンドユーザーへの直販はしていない」＝販路の説明。小売事業者は排除されていない → <strong>A</strong>。「<strong>個人</strong>のお客様／個人の方／法人様以外とは取引しない」＝当社が個人事業主である限り直撃する → <strong>E</strong></td></tr>
+<tr><td><strong>A_PLUS か D6 か</strong></td><td>取引窓口を示す語は、<strong>直後が否定なら A_PLUS ではなく D6</strong>（本節7-1）</td></tr>
+</tbody></table>
+<blockquote><code>C1_pitch_refusal</code> には <code>prohibited_additions: [&quot;アイデア&quot;, &quot;ご提案&quot;, &quot;提案&quot;]</code> を置きました。<strong>この3語を C の左辺に足してはいけません。</strong>足すとパール金属型（知財防衛条項）まで C に落ち、購入打診が可能な相手を失います。</blockquote>
+<h3>「一般消費者への直販なし」は法務判定としては A です（ただし事業判断の E は覆しません）</h3>
+<p>ブリヂストン・Hikari は「一般のお客様への直販なし」を理由に E（カズヨの事業判断）です。<strong>法務としての表示判定は A</strong>（拒絶ではなく販路の説明）ですが、「メーカー直取引が成立しない」という事業判断は法務の領分ではないため<strong>覆しません</strong>。ルール再走行で A に戻る回帰を防ぐため、両社を <code>individual_decisions</code> に <code>decision_type: &quot;business&quot;</code> として明記しました。<strong>判定を変えたい場合はカズヨの判断です。</strong></p>
+<h2>7-5. タカシへの申し送り（実装要件）</h2>
+<table><thead><tr><th>#</th><th>要件</th><th>理由</th></tr></thead><tbody>
+<tr><td>1</td><td><strong>未知の <code>match</code> 種別は読み飛ばさず異常終了</strong>する</td><td>読み飛ばすと、法務が塞いだ穴が実装側で黙って開き直る。今回の事故と同じ構図</td></tr>
+<tr><td>2</td><td><code>suffix_negation</code> は<strong>方向性のある近接判定</strong>（left の直後 N 文字以内のみ）。<code>cooccur</code>（無方向・同一文可）で代用しない</td><td>代用すると「新規お取引はこちらから。なお電話はお受けしておりません」が誤って D になる</td></tr>
+<tr><td>3</td><td><code>left_context_guard</code> は left 語の<strong>直前</strong> M 文字以内で判定</td><td>「一般のお客様への直販なし」を D に落とさないため</td></tr>
+<tr><td>4</td><td><code>needs_review: true</code> の規則でヒットしたら <code>optout_needs_review</code> を立てる</td><td>自動除外はするが、人が読み返せる状態を残す</td></tr>
+<tr><td>5</td><td><code>individual_decisions</code> の突き合わせは <strong><code>company</code> ＋ <code>aliases</code> ＋ 正式商号 ＋ 法人番号</strong></td><td>7-2 の重複表記の穴</td></tr>
+<tr><td>6</td><td><code>review_triggers</code> は判定を変えない（<code>needs_review</code> のみ）</td><td>「〜のみ」は文脈で正反対（「卸売のみ」は有利、「既存取引先のみ」は実質拒否）</td></tr>
+</tbody></table>
+<blockquote>暫定検知器 <code>detect_negated_trade_window</code> は、上記1〜3が実装されるまでの安全網として<strong>残してください</strong>。二重に検知して困ることはありません。</blockquote>
+<h2>7-6. 未確定・グレー（v1.1 分）</h2>
+<table><thead><tr><th>#</th><th>内容</th><th>区分</th></tr></thead><tbody>
+<tr><td>1</td><td>4社の表示文言</td><td><strong>事実</strong>（CSV <code>form_optout_notice</code> の原文に基づく）。ただし当職は各社サイト原典を直接は開いていない。打診直前に <code>optout_source_url</code> で再確認すること</td></tr>
+<tr><td>2</td><td>BUNDOK が個人事業主と実際に取引しないこと</td><td><strong>推測</strong>。開業届・古物商許可を示せば応じる卸元は現実に存在する。ただし相手が明文で線を引いている以上、当社から例外を求めに行く実益は薄い</td></tr>
+<tr><td>3</td><td>SBクリエイティブの「ネット書店」の外延</td><td><strong>グレー</strong>。法令上の定義なし。ただし「個人とは取引しない」の一点で結論は動かない</td></tr>
+<tr><td>4</td><td>パール金属の「等」の射程</td><td><strong>グレー</strong>。GO とするが 7-3 の文面条件を厳守</td></tr>
+<tr><td>5</td><td>原文が空欄の333行に表示が無いこと</td><td><strong>未確認</strong>。未取得と表示なしを区別できていない</td></tr>
+</tbody></table>
+<hr>
+<p>*法務ハルオ / T-20260904-004 / v1.1 追補 / 2026-09-04*</p></div></body></html>
