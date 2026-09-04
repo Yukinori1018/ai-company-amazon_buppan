@@ -60,13 +60,65 @@ RESIDENCE_HINTS = re.compile(r"マンション|ハイツ|アパート|コーポ|
 #   （2026-09-04 / 旭化成ワッカーシリコンの所在地で発火）
 ROOM_NUMBER = re.compile(r"[0-9０-９]+号室")
 
+#: 成果物CSVで伏せた欄に入る印の先頭。これは連絡先の実データではない。
+REDACTED_MARK_PREFIX = "【非掲載】"
+
+
+class GateCannotRead(Exception):
+    """検査対象を読めなかった。**「抵触0件」と区別するために例外にしている。**
+
+    2026-09-04、B1_打診候補_全社_優先度順.csv に対してゲートが
+    「連絡先が1つ以上ある行: 0 / 抵触0件 → commit してよい」と**緑を返した**。
+    実際には同ファイルは全行が連絡先の一覧である。原因は先頭にある `#` の注記行を
+    csv.DictReader がヘッダ行として食っていたこと（列名が1つも一致しなくなる）。
+
+    「読めなかった」が「問題なし」に化けるのは、このゲートで**最も危険な壊れ方**。
+    entity_type 列が存在せず個人事業主が素通りしていた事故と同じ型で、これで2件目。
+    したがって黙って 0 件を返さず、必ず落とす。
+    """
+
+
+def _read_rows(path: str):
+    """CSV を読む。先頭の `#` 注記行は読み飛ばす。
+
+    B1_打診候補_全社_優先度順.csv は打診文の禁止事項をヘッダ行の前に `#` で書いている
+    （ファイルを開けば必ず目に入るように、という意図的な設計）。ゲートはそれを飛ばす。
+    """
+    with io.open(path, encoding="utf-8-sig") as fp:
+        lines = fp.read().splitlines(True)
+    while lines and lines[0].lstrip("﻿").startswith("#"):
+        lines.pop(0)
+    if not lines:
+        raise GateCannotRead("%s: 注記行を除くと中身が無い" % path)
+    return list(csv.DictReader(io.StringIO("".join(lines))))
+
 
 def check(path: str):
-    with io.open(path, encoding="utf-8-sig") as fp:
-        rows = list(csv.DictReader(fp))
+    rows = _read_rows(path)
+
+    # ★読めたことを先に確かめる。列名が1つも無ければ「問題なし」ではなく「読めていない」。
+    if rows:
+        cols = set(rows[0].keys())
+        if not (cols & set(CONTACT_COLS)):
+            raise GateCannotRead(
+                "%s: 連絡先の列（%s）が1つも見つからない。ヘッダ行の取り違えを疑うこと。"
+                "検出した列: %s" % (path, "/".join(CONTACT_COLS),
+                                  ", ".join(list(cols)[:8])))
 
     entity_types = load_entity_types()
-    filled = [r for r in rows if any((r.get(c) or "").strip() for c in CONTACT_COLS)]
+
+    def _contact(r, c):
+        """連絡先の実データだけを返す。伏せ字は連絡先として数えない。
+
+        成果物CSVでは、伏せた欄を空にせず「【非掲載】…」と書いている
+        （空欄だと『調べたが取れなかった』と区別がつかないため）。
+        この印を連絡先とみなすと、伏せたはずの社が延々とゲートに引っかかり続け、
+        本当に見るべきヒットが埋もれる。**印は連絡先ではない。**
+        """
+        v = (r.get(c) or "").strip()
+        return "" if v.startswith(REDACTED_MARK_PREFIX) else v
+
+    filled = [r for r in rows if any(_contact(r, c) for c in CONTACT_COLS)]
     hits = []
 
     for r in filled:
@@ -80,7 +132,7 @@ def check(path: str):
             hits.append(("ノーブランド・個人らしきに連絡先", name, ""))
 
         # 3) メールのローカル部が姓名パターン
-        mail = (r.get("メール") or "").strip()
+        mail = _contact(r, "メール")
         if mail and is_personal_local_part(mail):
             hits.append(("個人名らしいメール", name, mail))
 
@@ -102,7 +154,13 @@ def check(path: str):
 def main():
     path = sys.argv[1] if len(sys.argv) > 1 else os.path.join(
         os.path.dirname(os.path.abspath(__file__)), "contacts_v1.csv")
-    rows, filled, hits = check(path)
+    try:
+        rows, filled, hits = check(path)
+    except GateCannotRead as e:
+        # **緑にしない。** 読めないゲートは、通っていないゲートと同じ。
+        print("commit 前ゲート: 検査できませんでした → commit しない")
+        print("  %s" % e)
+        return 2
     print("対象: %s" % path)
     print("行数: %d / 連絡先が1つ以上ある行: %d" % (len(rows), len(filled)))
     if not hits:

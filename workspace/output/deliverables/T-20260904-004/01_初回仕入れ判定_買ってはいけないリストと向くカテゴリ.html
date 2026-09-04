@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>初回仕入れ判定 — 買ってはいけないリスト／初回に向くカテゴリ</title>
+<meta name="robots" content="noindex, nofollow">
+<style>
+:root{
+  color-scheme: light dark;
+  --bg:#ffffff; --surface:#f5f7f9; --surface2:#eceff3;
+  --text:#1b1f24; --muted:#525b66; --faint:#6c7681;
+  --border:#d5dae1; --border-strong:#b8c0ca;
+  --accent:#1c5b86; --accent-bg:#eef5fa;
+  --warn:#8a4b00; --warn-bg:#fdf1df; --warn-border:#dd9a3c;
+  --alert:#7d2b2b; --alert-bg:#fbeeee; --alert-border:#d08b8b;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#15181c; --surface:#1d2126; --surface2:#252a31;
+    --text:#e4e8ec; --muted:#aab4bf; --faint:#949eaa;
+    --border:#333a43; --border-strong:#48515c;
+    --accent:#79b4dc; --accent-bg:#1a2a36;
+    --warn:#f0b866; --warn-bg:#332616; --warn-border:#7a5a2a;
+    --alert:#e79a9a; --alert-bg:#331e1e; --alert-border:#6e4040;
+  }
+}
+*{box-sizing:border-box;}
+html{ -webkit-text-size-adjust:100%; }
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic Medium","Yu Gothic",
+              "Noto Sans JP","Meiryo",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:16px; line-height:1.85;
+  font-feature-settings:"palt" 1;
+  text-align:left;
+}
+.wrap{max-width:900px; margin:0 auto; padding:32px 20px 96px;}
+
+/* ---------- header ---------- */
+.kicker{
+  font-size:12px; letter-spacing:.14em; color:var(--faint);
+  margin:0 0 10px; font-variant-numeric:tabular-nums;
+}
+h1{
+  font-size:27px; line-height:1.5; margin:0 0 20px;
+  letter-spacing:.01em; font-weight:700; text-wrap:balance;
+}
+.lead{
+  margin:0; color:var(--muted); font-size:15px; line-height:1.8;
+  border-left:3px solid var(--border-strong); padding:2px 0 2px 14px;
+}
+
+/* ---------- toc ---------- */
+.toc{
+  margin:30px 0 8px; padding:18px 22px 20px;
+  background:var(--surface); border:1px solid var(--border); border-radius:10px;
+}
+.toc-h{
+  margin:0 0 10px; font-size:13px; font-weight:700;
+  letter-spacing:.1em; color:var(--muted);
+}
+.toc ul.toc-list{margin:0; padding:0; list-style:none;}
+.toc li{margin:.26em 0; line-height:1.65;}
+.toc li.toc-lv1{margin:.85em 0 .3em; font-weight:700;}
+.toc li.toc-lv1:first-child{margin-top:0;}
+.toc li.toc-lv2{padding-left:1.1em;}
+.toc li.toc-lv3{padding-left:2.5em; font-size:14.5px; color:var(--muted); margin:.16em 0;}
+.toc li.toc-lv3::before{content:"–"; color:var(--faint); margin-right:.45em;}
+.toc a{color:var(--accent); text-decoration:none; border-bottom:1px solid transparent;}
+.toc a:hover{border-bottom-color:currentColor;}
+
+/* ---------- part ---------- */
+h1.part{
+  font-size:24px; line-height:1.5; font-weight:700; letter-spacing:.02em;
+  margin:64px 0 8px; padding:14px 0 0; border-top:4px solid var(--text);
+  scroll-margin-top:16px;
+}
+
+/* ---------- sections ---------- */
+.sec{margin:0;}
+.sec>*:last-child{margin-bottom:0;}
+h2{
+  font-size:21px; line-height:1.5; margin:46px 0 16px; padding-bottom:9px;
+  border-bottom:2px solid var(--border-strong); font-weight:700;
+  scroll-margin-top:16px;
+}
+h3{
+  font-size:17px; line-height:1.6; margin:32px 0 12px; font-weight:700;
+  color:var(--text); scroll-margin-top:16px;
+}
+h3::before{content:""; display:inline-block; width:4px; height:1em;
+  background:var(--accent); margin-right:9px; vertical-align:-.13em; border-radius:2px;}
+p{margin:0 0 1.1em;}
+ul,ol{margin:0 0 1.2em; padding-left:1.6em;}
+li{margin:.4em 0;}
+li>ul{margin:.45em 0 .2em;}
+blockquote{
+  margin:0 0 1.2em; padding:14px 18px;
+  background:var(--surface); border-left:4px solid var(--accent); border-radius:0 8px 8px 0;
+}
+blockquote p{margin:0;}
+hr.rule{
+  border:0; border-top:1px solid var(--border);
+  margin:40px 0 0; opacity:.55;
+}
+hr.rule:has(+ .sec-box),hr.rule:has(+ h1.part){display:none;}
+
+/* ---------- tables ---------- */
+.tw{
+  overflow-x:auto; -webkit-overflow-scrolling:touch;
+  margin:0 0 1.4em; border:1px solid var(--border); border-radius:9px;
+  background:
+    linear-gradient(to right, var(--bg) 30%, rgba(0,0,0,0)) left / 28px 100% no-repeat local,
+    linear-gradient(to left,  var(--bg) 30%, rgba(0,0,0,0)) right / 28px 100% no-repeat local,
+    radial-gradient(farthest-side at 0 50%, rgba(90,110,130,.28), rgba(0,0,0,0)) left / 12px 100% no-repeat scroll,
+    radial-gradient(farthest-side at 100% 50%, rgba(90,110,130,.28), rgba(0,0,0,0)) right / 12px 100% no-repeat scroll;
+}
+.tw:focus{outline:2px solid var(--accent); outline-offset:2px;}
+table{border-collapse:collapse; width:100%; font-size:14.5px; line-height:1.72;}
+thead th{
+  background:var(--surface2); text-align:left; font-weight:700;
+  padding:11px 14px; border-bottom:2px solid var(--border-strong);
+  white-space:nowrap; vertical-align:bottom;
+}
+tbody td{padding:11px 14px; border-bottom:1px solid var(--border); vertical-align:top;}
+tbody tr:last-child td{border-bottom:0;}
+tbody tr:nth-child(even){background:color-mix(in srgb, var(--surface) 55%, transparent);}
+tbody td:first-child{font-weight:600;}
+thead th:first-child,tbody td:first-child{min-width:7.5em;}
+thead th:last-child,tbody td:last-child{white-space:normal;}
+
+/* ---------- inline markers ---------- */
+.ref{
+  font-size:.75em; color:var(--faint); margin-left:.15em;
+  white-space:nowrap; font-variant-numeric:tabular-nums;
+  letter-spacing:.01em; vertical-align:.06em;
+}
+.chk{
+  display:inline-block; font-size:.75em; line-height:1.5;
+  padding:0 .5em; margin:0 .12em; border-radius:4px;
+  background:var(--warn-bg); color:var(--warn);
+  border:1px solid var(--warn-border); font-weight:700;
+  white-space:nowrap; vertical-align:.09em;
+}
+
+/* ---------- inline emphasis ---------- */
+strong{font-weight:700; color:var(--text);}
+td strong,th strong{font-weight:700;}
+code{
+  font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+  font-size:.9em; padding:.05em .35em; border-radius:4px;
+  background:var(--surface2); border:1px solid var(--border);
+}
+code .chk{font-family:inherit;}
+
+/* ---------- 表セル内の語ハイライト ---------- */
+.pill{
+  display:inline-block; padding:0 .45em; border-radius:4px;
+  font-weight:700; white-space:nowrap;
+}
+.pill-danger{background:var(--alert); color:#fff; border:1px solid var(--alert);}
+.pill-warn{background:var(--warn-bg); color:var(--warn); border:1px solid var(--warn-border);}
+tbody tr.row-danger td:first-child{box-shadow:inset 4px 0 0 var(--alert);}
+tbody tr.row-danger td{background:color-mix(in srgb, var(--alert-bg) 70%, transparent);}
+
+/* ---------- emphasised sections ---------- */
+.sec-box{
+  margin:28px 0 0; padding:6px 26px 20px;
+  border:1px solid var(--border-strong); border-radius:10px;
+}
+.sec-box h2{margin-top:26px;}
+.sec-box .tw{background-color:var(--bg);}
+.sec-conclusion{background:var(--accent-bg); border-left:6px solid var(--accent);}
+.sec-conclusion h2{border-bottom-color:var(--accent);}
+.sec-alert{background:var(--alert-bg); border-color:var(--alert-border);
+  border-left:6px solid var(--alert);}
+.sec-alert h2{border-bottom-color:var(--alert-border);}
+.sec-danger{background:var(--alert-bg); border:2px solid var(--alert);
+  border-left:10px solid var(--alert);}
+.sec-danger h2{border-bottom-color:var(--alert);}
+.sec-warn{background:var(--warn-bg); border-color:var(--warn-border);
+  border-left:6px solid var(--warn-border);}
+.sec-warn h2{border-bottom-color:var(--warn-border);}
+.sec-checklist{background:var(--surface); border:2px solid var(--border-strong);
+  border-left:10px solid var(--accent);}
+.sec-checklist h2{border-bottom-color:var(--accent);}
+/* チェックリストは印刷して手元で使う。番号は原稿どおり残し、記入欄だけ CSS で足す */
+.sec-checklist ol{list-style:decimal; padding-left:1.9em;}
+.sec-checklist ol>li{margin:.7em 0; padding-left:2.1em; position:relative;}
+.sec-checklist ol>li::before{
+  content:""; position:absolute; left:0; top:.25em;
+  width:1.15em; height:1.15em; border:1.5px solid var(--border-strong);
+  border-radius:3px; background:var(--bg);
+}
+
+/* ---------- toc: 囲み枠の節は目次でも色を付ける ---------- */
+.toc a.toc-danger,.toc a.toc-alert{color:var(--alert); font-weight:700;}
+.toc a.toc-warn{color:var(--warn); font-weight:700;}
+.toc a.toc-checklist{color:var(--accent); font-weight:700;}
+
+/* ---------- footer / nav ---------- */
+.prov{
+  margin:56px 0 0; padding-top:16px; border-top:1px solid var(--border);
+  font-size:12.5px; line-height:1.8; color:var(--faint); word-break:break-all;
+}
+.top{
+  position:fixed; right:18px; bottom:18px; z-index:5;
+  display:block; width:42px; height:42px; line-height:40px; text-align:center;
+  border-radius:50%; text-decoration:none; font-size:17px;
+  background:var(--surface); color:var(--muted);
+  border:1px solid var(--border-strong);
+  box-shadow:0 2px 8px rgba(0,0,0,.14);
+}
+.top:hover{color:var(--accent); border-color:var(--accent);}
+
+/* ---------- narrow screens ---------- */
+@media (max-width:640px){
+  body{font-size:15.5px;}
+  .wrap{padding:22px 14px 88px;}
+  h1{font-size:22px;}
+  h1.part{font-size:20px; margin-top:46px;}
+  h2{font-size:19px;}
+  h3{font-size:16.5px;}
+  .toc{padding:14px 16px 16px;}
+  .sec-box{padding:4px 14px 14px;}
+  table{font-size:14px;}
+  thead th,tbody td{padding:9px 11px;}
+}
+
+/* ---------- print ---------- */
+@media print{
+  :root{
+    --bg:#fff; --surface:#fff; --surface2:#fff; --text:#000; --muted:#333; --faint:#555;
+    --border:#999; --border-strong:#555; --accent:#000; --accent-bg:#fff;
+    --warn:#000; --warn-bg:#fff; --warn-border:#000;
+    --alert:#000; --alert-bg:#fff; --alert-border:#000;
+  }
+  body{background:#fff; color:#000; font-size:10.5pt; line-height:1.7;}
+  .wrap{max-width:none; padding:0;}
+  a{color:#000; text-decoration:none;}
+  .top{display:none;}
+  .tw{overflow:visible; background:none; border:1px solid #999;}
+  table{font-size:9pt;}
+  thead th{background:#fff; border-bottom:1.5pt solid #000;}
+  tbody tr:nth-child(even){background:#fff;}
+  .sec-box{background:#fff; border:1.5pt solid #000;}
+  .sec-danger{border:2.5pt solid #000; border-left:2.5pt solid #000;}
+  .chk{background:#fff; color:#000; border:1pt solid #000;}
+  code{background:#fff; border:1px solid #999;}
+  .pill{background:#fff!important; color:#000!important; border:1.2pt solid #000!important;}
+  tbody tr.row-danger td{background:#fff;}
+  tbody tr.row-danger td:first-child{box-shadow:inset 3pt 0 0 #000;}
+  /* チェックリストは1枚で手元に置けるよう独立ページにする */
+  .sec-checklist{break-before:page; page-break-before:always;
+    border:1.5pt solid #000; border-left:1.5pt solid #000;}
+  .sec-checklist ol>li::before{border:1.2pt solid #000;}
+  .ref{color:#555; opacity:1;}
+  blockquote{background:#fff; border-left:3pt solid #000;}
+  h1.part{break-before:page; page-break-before:always; border-top:2.5pt solid #000;
+    font-size:15pt; margin-top:0;}
+  h1.part,h2,h3{break-after:avoid; page-break-after:avoid;}
+  .tw,blockquote,tr{break-inside:avoid; page-break-inside:avoid;}
+  .toc{border:1px solid #999; background:#fff;}
+}
+</style>
+</head>
+<body id="top">
+<div class="wrap">
+<p class="kicker">T-20260904-004 ／ 初回仕入れ判定資料 ／ 2026-09-04</p>
+<h1>初回仕入れ判定資料 — 買ってはいけないリスト／初回に向くカテゴリ</h1>
+<p class="lead">チケット: T-20260904-004 / 執筆フェーズ<br>作成: 2026-09-04<br>根拠: 同ディレクトリの <code>notes.md</code>（行番号を <code>[#n]</code> で参照）／裁定は <code>escalation.md</code>／検証結果は <code>verification.md</code></p>
+<nav class="toc" aria-label="目次"><p class="toc-h">目次</p><ul class="toc-list"><li class="toc-lv2"><a href="#s1" class="toc-conclusion">結論</a></li><li class="toc-lv2"><a href="#s2">前提（この資料が成立する条件）</a></li><li class="toc-lv1"><a href="#p1">第1部 買ってはいけないリスト</a></li><li class="toc-lv2"><a href="#s3">1-A. 一覧（先に結論）</a></li><li class="toc-lv2"><a href="#s4" class="toc-danger">1-B. 例外なく買わない（致命的）</a></li><li class="toc-lv3"><a href="#s4-1">1. 電池内蔵品・モバイルバッテリー・ACアダプター等の電気用品</a></li><li class="toc-lv3"><a href="#s4-2">2. ブランドが付いた商品全般</a></li><li class="toc-lv3"><a href="#s4-3">3. 化粧品・コスメ・医薬部外品</a></li><li class="toc-lv3"><a href="#s4-4">4. 中古・USED・消費者返品の再販品・開封済アウトレット</a></li><li class="toc-lv2"><a href="#s5">1-C. 今回は買わない（1周が完走しない／矛盾が未解決）</a></li><li class="toc-lv3"><a href="#s5-1">5. 並行輸入品・海外ブランド品</a></li><li class="toc-lv3"><a href="#s5-2">6. 中国輸入ノーブランド品（グッズステーション等の上海倉庫商材）</a></li><li class="toc-lv3"><a href="#s5-3">7. 互換品・「〜対応」「〜風」「ジェネリック」表記の商品</a></li><li class="toc-lv3"><a href="#s5-4">8. 食品・飲料</a></li><li class="toc-lv3"><a href="#s5-5">9. 書籍・CD・DVD等メディア系</a></li><li class="toc-lv3"><a href="#s5-6">10〜15. その他の除外（簡潔に）</a></li><li class="toc-lv2"><a href="#s6">1-D. 商材ではなく「行為」の禁止事項</a></li><li class="toc-lv1"><a href="#p2">第2部 初回に向くカテゴリ</a></li><li class="toc-lv2"><a href="#s7">2-A. 4軸チェック</a></li><li class="toc-lv2"><a href="#s8">2-B. 初回に向く4群</a></li><li class="toc-lv2"><a href="#s9">2-C. 判定に入れなかったカテゴリ（保留）</a></li><li class="toc-lv2"><a href="#s10" class="toc-checklist">2-D. 仕入れ確定前チェックリスト（実務手順）</a></li><li class="toc-lv1"><a href="#p3">第3部 反証・限界・要確認</a></li><li class="toc-lv2"><a href="#s11">3-A. 反証 — 「制限は実は緩い」という側の主張</a></li><li class="toc-lv2"><a href="#s12" class="toc-warn">3-B. 単一ソースにしか依存していない主張</a></li><li class="toc-lv2"><a href="#s13">3-C. <code>[要確認]</code> 一覧</a></li><li class="toc-lv3"><a href="#s13-1"><code><span class="chk">要確認 #4</span></code> について — 本資料の最大の未解決点</a></li><li class="toc-lv2"><a href="#s14" class="toc-alert">3-D. この資料の限界</a></li></ul></nav>
+<section id="s1" class="sec sec-box sec-conclusion">
+<h2>結論</h2>
+<ol><li>初回5〜10SKUは、<strong>電気を使わない・電池を含まない・ブランドが付いていない・期限がない・割れない・国内卸から新品で買える雑貨</strong>に限定する。</li><li>具体的には <strong>文房具・オフィス用品／ホーム&amp;キッチンの非電気消耗品／DIYの非電動パーツ／電池を含まない季節雑貨</strong> の4群。</li><li>除外は「危ないから慎重に」ではなく<strong>買わない</strong>で運用する。1周を完走することが目的であり、利益を取りに行かない以上、リスクのある商材を選ぶ理由がない。</li><li><strong>カテゴリ判定だけでは足りない。</strong>最終判定はセラーセントラルの出品制限表示（実機）で行う。承認不要カテゴリを明示したAmazon公式ページは本調査では発見できず、公式は「一部カテゴリーは事前承認が必要」と案内するだけである <span class="ref">[#10]</span><span class="ref">[#13]</span>。</li></ol>
+</section>
+<hr class="rule">
+<section id="s2" class="sec">
+<h2>前提（この資料が成立する条件）</h2>
+<div class="tw" tabindex="0"><table><thead><tr><th>項目</th><th>状況</th></tr></thead><tbody><tr><td>事業者</td><td>個人事業主（屋号 Satoy Select／開業届提出済）</td></tr><tr><td>古物商許可</td><td>なし。<strong>新品のみなら不要</strong>（裁定 escalation #3）</td></tr><tr><td>Amazon</td><td>3か国とも出品停止中・復旧待ち。復帰直後に違反を1件も出せない</td></tr><tr><td>出品プラン</td><td>小口。カートボックス獲得不可・広告不可</td></tr><tr><td>仕入れ元</td><td>国内ネット卸（NETSEA / グッズステーション＝上海倉庫 / 卸問屋.com / 国分ネット卸）</td></tr><tr><td>予算</td><td>総額5万円。1点あたり約160円の固定費が売価に関係なく乗る</td></tr><tr><td>目的</td><td>利益ではなく1周の完走（仕入れ→出品→FBA納品→販売→入金）</td></tr></tbody></table></div>
+<p>「復帰直後に違反を出せない」という保守運用は維持する。ただしその根拠は「復帰後90〜180日は厳格監視（probation）」説ではない。同説は数値の算出根拠が示されず、出典3件がいずれも自社サービス誘導の記事であり、<strong>採用しない</strong>（裁定 escalation #2）<span class="ref">[#136]</span><span class="ref">[#137]</span><span class="ref">[#138]</span>。同時に、この説を否定する情報源も1件も見つかっていない（反証0件）。つまり「厳しい証拠も緩い証拠もない」状態であり、保守運用は<strong>説の真偽と独立に</strong>、社長のアカウントが実際に停止した事実だけを理由に維持する。</p>
+</section>
+<hr class="rule">
+<h1 class="part" id="p1">第1部 買ってはいけないリスト</h1>
+<section id="s3" class="sec">
+<h2>1-A. 一覧（先に結論）</h2>
+<div class="tw" tabindex="0"><table><thead><tr><th>#</th><th>避けるもの</th><th>主な理由</th><th>根拠の確度</th><th>致命度</th></tr></thead><tbody><tr class="row-danger"><td>1</td><td>電池内蔵品・モバイルバッテリー・ACアダプター等の電気用品</td><td>PSE表示なしの販売は違法／FBA危険物審査／小口は危険物申請不可の疑い</td><td>一次（法令）＋二次</td><td><strong><span class="pill pill-danger">致命的</span></strong></td></tr><tr class="row-danger"><td>2</td><td>ブランドが付いた商品全般（NIKE・Apple等の有名ブランド、ノーブランドでない雑貨も含む）</td><td>ゲート要件が満たしても却下・ブランドごとに基準が割れる</td><td><strong>一次（フォーラム証言・複数独立）</strong></td><td><strong><span class="pill pill-danger">致命的</span></strong></td></tr><tr class="row-danger"><td>3</td><td>化粧品・コスメ・医薬部外品</td><td>ゲート厳格＋真贋クレームの主戦場</td><td>一次（法令）＋二次</td><td><strong><span class="pill pill-danger">致命的</span></strong></td></tr><tr class="row-danger"><td>4</td><td>中古・USED・消費者返品の再販品・開封済アウトレット</td><td>古物商許可がない（許可なしで扱えるのは新品のみ）</td><td>一次（警察庁解釈基準）</td><td><strong><span class="pill pill-danger">致命的</span></strong></td></tr><tr><td>5</td><td>並行輸入品・海外ブランド品</td><td>正規ルート証明を求められ、海外小売の請求書は通らないことが多い</td><td>二次（複数）</td><td>高</td></tr><tr><td>6</td><td>中国輸入ノーブランド品（グッズステーション等の上海倉庫商材）</td><td>PSE/技適の最終責任・知財地雷・国内卸経由でも免責されない</td><td>二次（複数独立）＋一次実体験</td><td>高</td></tr><tr><td>7</td><td>互換品・「〜対応」「〜風」「ジェネリック」表記の商品</td><td>権利者からの偽造品通報が定型的に発生</td><td>一次実体験＋二次</td><td>高</td></tr><tr><td>8</td><td>食品・飲料</td><td>難易度評価が矛盾したまま解けていない（裁定で除外）</td><td>矛盾・未解決</td><td>中〜高</td></tr><tr><td>9</td><td>書籍・CD・DVD等メディア系</td><td>小口でカートが取れず最安値合わせ環境で1周が完走しない（裁定で除外）</td><td><span class="pill pill-warn">単一ソース</span>＋制約からの帰結</td><td>中（今回は除外）</td></tr><tr><td>10</td><td>賞味期限・消費期限のある商品、ヘルス&amp;ビューティー品</td><td>要期限管理・FC納品時点で期限70日以内は不可</td><td>二次・要検証</td><td>中</td></tr><tr><td>11</td><td>大型・重量物（3辺合計170cm超／30kg超）</td><td>FBA取扱不可・返品コスト</td><td>一次（ただし古いPDF）＋二次</td><td>中</td></tr><tr><td>12</td><td>割れ物（ガラス・陶器等）</td><td>破損クレーム・返品</td><td>二次・<span class="pill pill-warn">単一ソース</span></td><td>中</td></tr><tr><td>13</td><td>医療機器・コンタクトレンズ・サプリメント</td><td>許認可・第三者ラボ要件、FBA不可の可能性</td><td>二次</td><td>高</td></tr><tr><td>14</td><td>酒類・金券・武器・化学物質など制限品リスト該当品</td><td>制限カテゴリとして複数ソース一致</td><td>二次</td><td>高</td></tr><tr><td>15</td><td>トレンド品・特許が絡む可能性のある商品</td><td>IP申立てで一発アウト</td><td>米国二次＋実体験</td><td>中</td></tr></tbody></table></div>
+<p>以下、各項目の詳細。</p>
+</section>
+<hr class="rule">
+<section id="s4" class="sec sec-box sec-danger">
+<h2>1-B. 例外なく買わない（致命的）</h2>
+<h3 id="s4-1">1. 電池内蔵品・モバイルバッテリー・ACアダプター等の電気用品</h3>
+<p><strong>避けるもの:</strong> 電源につなぐ／電池が入っている／充電する商品すべて。モバイルバッテリー、ACアダプター、LED照明、Bluetooth機器、USB機器、電動工具。</p>
+<p><strong>理由:</strong> 3段構えで詰む。</p>
+<p>第一に法令。電気用品457品目はポジティブリスト方式で政令指定され、うち116品目が特定電気用品（菱形PSE）、341品目が特定電気用品以外（丸形PSE）である <span class="ref">[#85]</span>。販売のみを行う事業者に事業届出・技術基準適合・検査の義務はなく、義務は「表示の確認」に限定される <span class="ref">[#81]</span><span class="ref">[#82]</span>。しかし電気用品安全法第27条により、<strong>PSE表示のない電気用品を販売すること自体が違法</strong>であり、販売専業でも違反になる <span class="ref">[#83]</span><span class="ref">[#84]</span>。モバイルバッテリーは2019年2月1日以降、PSEマークのないものは流通在庫を含め販売禁止 <span class="ref">[#86]</span>。ACアダプターは特定電気用品（菱形）で、本体とセット販売する場合はアダプター部分に規制がかかる <span class="ref">[#87]</span>。</p>
+<p>第二にFBA。FBA新規出品時、電池情報および危険物規制対象製品としての情報提供が必須で、情報不十分なら<strong>出品登録自体が作成できない</strong>。SDSまたは適用除外シートの提出が必要で、既納品在庫が危険物疑いと特定された場合は通知から14営業日以内に書類提出、なければ出品者負担で廃棄となる <span class="ref">[#49]</span>。2026年1月1日以降、ワット時定格量2.7Wh超のリチウムイオン電池同梱商品は充電状態30%以下でなければ航空便出荷不可 <span class="ref">[#50]</span>。</p>
+<p>第三にプラン。<strong>FBA危険物納品プログラムへの申請は大口出品者のみ対象で、小口出品者は申請できない</strong>という記述がある <span class="ref">[#51]</span>。社長は小口プランであり、これが正しければ電池商材は初回に選択肢として存在しない。</p>
+<p><strong>根拠の確度:</strong> PSE部分は経済産業省・e-Gov の<strong>一次情報</strong>で、<code>verification.md</code> でも本文一致を確認済み <span class="ref">[#81]</span><span class="ref">[#82]</span><span class="ref">[#84]</span>。FBA危険物要件はAmazon公式PDF・公式フォーラムアナウンスの<strong>一次</strong>（ただし#48#49は米国/グローバル版で日本版との異同は未検証）<span class="ref">[#48]</span><span class="ref">[#49]</span><span class="ref">[#50]</span>。<strong>「小口は危険物申請不可」は force-r.co.jp の単一の二次ソースであり、要検証</strong> <span class="ref">[#51]</span>。</p>
+<p><strong>致命度: 最大。</strong>PSE表示なしの販売は法27条違反＝違法であり、Amazonの規約以前の問題 <span class="ref">[#83]</span><span class="ref">[#84]</span>。</p>
+</section>
+<hr class="rule">
+<h3 id="s4-2">2. ブランドが付いた商品全般</h3>
+<p><strong>避けるもの:</strong> 有名ブランド品（NIKE、Apple、Panasonic、Canon等 <span class="ref">[#155]</span>）だけでなく、<strong>ブランド名が商品ページに登録されているものすべて</strong>。</p>
+<p><strong>理由:</strong> 「請求書を整えれば通る」という前提が、Amazon公式セラーフォーラムの一次証言で崩れている。</p>
+<p>メーカーから直接10点購入して請求書を得ても却下された（却下理由は「オンライン注文確認書、納品書、販売注文、見積請求書、販売見積書は受け付けない」）<span class="ref">[#14]</span>。正規卸売業者の請求書に自社名称住所・仕入先名称住所が両方記載されていても「仕入先情報を確認できない」の定型文で却下され、再申請してもケースが一方的にクローズされた <span class="ref">[#15]</span>。NIKE申請では案内どおり「10点以上」で再申請したところ後日「30点以上」に要件が変更され、ナイキジャパン発行の領収書でも却下。Amazon担当者自身が「各ブランドの具体的な数量基準値をフォーラムで確認することはできない。要件は社内審査チームが管理し異なる場合がある」と回答している <span class="ref">[#17]</span>。さらに<strong>同一の請求書・同一セラーで、別ブランドは解除できたのに1ブランドだけ通らなかった</strong>事例がある <span class="ref">[#19]</span>。大文字小文字の表記違いだけでシステム上「別ブランド」として扱われ、許可済みブランドでも表記違いの商品には再申請が必要になった例もある <span class="ref">[#28]</span>。</p>
+<p>制限対象ブランドの一覧はAmazon公式には公開されていない <span class="ref">[#7]</span>。一部の高級ブランドはメーカー意向で新規出品者を認めておらず、どのような書類でも解除できないケースがある <span class="ref">[#8]</span>。</p>
+<p><strong>この結論は escalation #1 の裁定次第で変わる</strong> <code><span class="chk">要確認 #1</span></code>。#1は「請求書4要件を満たしても却下されるのか、却下例は書類不備の少数例なのか」の論点で、社長のセラーセントラルへのログイン1手による公式ヘルプ確認で解ける。ただし裁定がどちらに転んでも、<strong>初回5〜10SKUでブランド品を選ばない</strong>という判断自体は変わらない。裁定が「要件は機能する」側だったとしても、ブランド品を選ぶ必要が今回はないためである。</p>
+<p><strong>根拠の確度:</strong> <strong>一次（Amazon公式フォーラムの複数の独立投稿者による実体験）</strong>。<code>verification.md</code> で #14 #15 #17 #19 の4件すべて原文一致を確認済み。却下メッセージ文言、10点→30点の日付付きやり取り、Amazon担当者の回答文言まで確認できている。一方、請求書4要件そのもの（180日以内・名前住所一致・仕入先名住所記載・10点以上）は<strong>二次情報の収束であり一次未確認</strong> <span class="ref">[#1]</span>。</p>
+<p><strong>致命度: 最大。</strong>真贋調査に発展すると売上金が最大90日凍結される <span class="ref">[#129]</span>。実例では偽物クレーム1件で在庫80個が停止 <span class="ref">[#36]</span>、国内正規卸から仕入れていても書類の記載形式不備で停止＋約150万円凍結・復活まで45日 <span class="ref">[#38]</span>。</p>
+<hr class="rule">
+<h3 id="s4-3">3. 化粧品・コスメ・医薬部外品</h3>
+<p><strong>避けるもの:</strong> 化粧品全般、医薬部外品。</p>
+<p><strong>理由:</strong> 法令上は、国内の化粧品製造販売業者から仕入れて<strong>表示・包装を一切変更せずに販売する</strong>なら薬機法上の許可は不要である <span class="ref">[#101]</span><span class="ref">[#106]</span>。つまり国内正規品の転売という形なら法令はクリアできる。問題はAmazon側で、コスメは申請必要カテゴリで難易度★★★（薬事法関連知識が必要）、ドラッグストアは★★★★★（指定ブランドのみ）と評価される <span class="ref">[#57]</span>。加えてブランド品・化粧品は「真贋クレームの主戦場」として危険視されている <span class="ref">[#61]</span>。</p>
+<p>一方、<strong>輸入して売る場合</strong>は話が全く変わる。化粧品製造販売業許可と化粧品製造業許可（包装・表示・保管）の両方が必要になり <span class="ref">[#102]</span>、PMDA経由の外国製造販売業者届書も要る <span class="ref">[#103]</span>。許可要件には総括製造販売責任者（薬剤師または薬学・化学の専門課程修了者等）の設置が含まれ <span class="ref">[#104]</span>、手数料は都道府県により異なる（茨城県57,400円の例）<span class="ref">[#105]</span>。社長が輸入者になる形は初回では成立しない。</p>
+<p><strong>根拠の確度:</strong> 法令部分は都道府県薬務課の<strong>一次相当</strong>（神奈川県・茨城県）<span class="ref">[#101]</span>〜<span class="ref">[#106]</span>。Amazon側の難易度評価は<strong>単一ソースの二次情報（著者主観の★評価）</strong> <span class="ref">[#57]</span>。真贋リスクの指摘は二次・単一ソース <span class="ref">[#61]</span>（<code>notes.md</code> <span class="ref">[#59]</span> は同趣旨だが <code>verification.md</code> で引用誤りが判明しており本資料では使用しない）。</p>
+<p><strong>致命度: 高。</strong></p>
+<hr class="rule">
+<h3 id="s4-4">4. 中古・USED・消費者返品の再販品・開封済アウトレット</h3>
+<p><strong>避けるもの:</strong> 「中古」「USED」「未使用に近い」「アウトレット（開封済）」「返品戻り品」の表記があるものすべて。<strong>新品と明記されているものだけを買う。</strong></p>
+<p><strong>理由:</strong> 古物営業法上の「古物」とは、一度使用された物品、使用されない物品で使用のために取引されたもの（新古品を含む）、これらに幾分の手入れをした物品をいう <span class="ref">[#121]</span>。裁定（escalation #3）により、社長の仕入れ形態（国内ネット卸から新品を仕入れる）では<strong>古物商許可は不要</strong>と確定している。判定基準は警察庁「古物営業法等の解釈運用基準」第2 1(2)の「一般消費者の手に渡ったか」であり、卸の在庫は流通過程にあるため非該当である <span class="ref">[#122]</span>。</p>
+<p><strong>ただしこの結論には反転条件が3つある。</strong></p>
+<div class="tw" tabindex="0"><table><thead><tr><th>#</th><th>反転条件</th><th>内容</th></tr></thead><tbody><tr><td>①</td><td>中古を1点も扱わないこと</td><td>中古・USED・消費者返品の再販品・開封済アウトレットを1点でも仕入れた瞬間に許可が必要になる <span class="ref">[#121]</span></td></tr><tr><td>②</td><td>C2C仕入れをしないこと</td><td>メルカリ・ヤフオク等、一般消費者から買う経路を使わない <span class="ref">[#121]</span><span class="ref">[#122]</span></td></tr><tr><td>③</td><td><strong>NETSEA には中古品が実在する</strong></td><td>2026-08-31 実測で212件。卸サイトだから全部新品、という前提は成り立たない</td></tr></tbody></table></div>
+<p>③が最も危険である。仕入れ元が卸サイトであることは、そこで売られている個々の商品が新品であることを意味しない。</p>
+<p><strong>実務手順として明記する: 仕入れ確定前に、全SKUの商品ページを開き、「中古」「USED」「未使用に近い」「アウトレット」「返品」「開封済」の表記がないことを1点ずつ確認する。</strong>1点でも該当したら、そのSKUを外す（カート全体を止めるのではなく、そのSKUだけ外す）。</p>
+<p>なお、他者が輸入した商品を国内で買って売る場合の扱いについては、県警の見解が割れている。新潟県警は「他の輸入業者が輸入したものを国内で買って売る行為」を許可不要のケースに含めないとし <span class="ref">[#123]</span>、愛知県警は「他の業者が輸入したものを日本国内で買い取って売る場合は、国内の盗品等が混在する可能性があるため許可が必要」と明記している <span class="ref">[#124]</span>。<strong>ただし裁定 #3 は、これらの記述は中古品の流通を前提としたものであり、新品には及ばないと整理している。</strong><code>verification.md</code> は #123 について、「メーカー・卸・小売から直接仕入れた新品は許可不要」という記述が新潟県警ページに<strong>存在しない</strong>ことを確認しており、この行の後半は使用できない。愛知県警 #124 の文言自体は原文一致が確認されている。</p>
+<p><strong>根拠の確度:</strong> <strong>一次</strong>（古物営業法条文、警察庁解釈運用基準）<span class="ref">[#121]</span><span class="ref">[#122]</span>。県警の記述は一次相当だが、#123は<code>verification.md</code>で部分一致（後半が原文に不在）と判定済み。</p>
+<p><strong>致命度: 最大。</strong>無許可営業は拘禁刑を含む罰則の対象。ただし①②③を守れば発生しない。</p>
+<hr class="rule">
+<section id="s5" class="sec">
+<h2>1-C. 今回は買わない（1周が完走しない／矛盾が未解決）</h2>
+<h3 id="s5-1">5. 並行輸入品・海外ブランド品</h3>
+<p>並行輸入品はAmazon上で「並行輸入品」と明示すれば出品可能だが、商品名末尾の［並行輸入品］表記は出品者側で消せず、Amazonサポート対象外（購入者への保証・修理対応なし）となる <span class="ref">[#31]</span>。メーカーが選定した正規代理店以外を通じた輸入品であり、仕様が正規品と異なる場合や国内使用制限がある場合がある <span class="ref">[#30]</span>。正規ルートの証明が要求され、<strong>海外ネットショップや現地量販店の請求書はAmazonでは認められないことが多く</strong>、アカウント停止や商品削除につながるとの記述がある <span class="ref">[#61]</span>。米国側でも「小売店のレシートは正規調達の証明にならない」が却下理由として繰り返し指摘されている <span class="ref">[#80]</span>。</p>
+<p><strong>根拠の確度:</strong> #30 #31 はAmazon公式ヘルプの一次／二次。#61 は二次。<strong>#80 は <code>verification.md</code> で部分一致判定</strong>であり、引用された "retail receipts are not proof of authorised sourcing" というフレーズ自体は取得できた記事前半に見当たらなかった（後半にある可能性は残る）。ただし同記事の「AI主導の強制措置」「誤検知が起きる」「パニック上訴は低品質と自動判定される」という周辺主張は原文一致が確認されている。<strong>#80 を単独の根拠として使わないこと。</strong></p>
+<p><strong>致命度: 高。</strong></p>
+</section>
+<hr class="rule">
+<h3 id="s5-2">6. 中国輸入ノーブランド品（グッズステーション等の上海倉庫商材）</h3>
+<p><strong>避けるもの:</strong> 上海倉庫から出る商材、中国製ノーブランド品全般。<strong>仕入れ先として、初回はグッズステーションを使わない。</strong></p>
+<p><strong>理由:</strong> PSE法上、輸入者は製造者と並んで規定され義務内容もほぼ同一で、海外メーカーに代わり製品を日本に持ち込む者が国内での安全性の最終責任を負う。輸入者は①電気用品輸入事業届出書の提出（事業開始30日以内）②技術基準適合の確認③ロットごとの検査記録作成・保存（3年間）④PSEマーク等の表示、の4義務を負い、PL法上も無過失責任を負う <span class="ref">[#66]</span>。中国工場が「PSE対応済み」と主張しても、日本の輸入事業者としての届出・技術基準適合確認・自主検査を意味しない。偽のPSEマーク印刷、CCC認証を「PSE対応」と偽る、他社取得証明書の不正流用の実例が指摘されている <span class="ref">[#67]</span>。Bluetooth製品には技適・PSE・Bluetooth SIG認証の3重規制がかかる <span class="ref">[#70]</span>。</p>
+<p>「中国輸入ではノーブランド品を扱うのが基本」であり、「風」「同型」等の表現でも権利侵害の判断は変わらない。電源につないで使う電気製品はPSE表示がなければ日本で販売できず、中国輸入品には表示がないものが含まれるため「初心者が避けたほうが安全な領域」と明言されている <span class="ref">[#71]</span>。米国では、Alibabaから「ジェネリック品」と思って仕入れた商品が実は商標登録済みデザインで、2025-11-04にアカウントが停止された実体験がある <span class="ref">[#73]</span>。</p>
+<p><strong>「国内卸経由なら責任が卸に移る」という主張は、本調査では1件も見つかっていない</strong>（反証情報の不在そのものを事実として記録）[#90の総括メモ]。米国税関法の一般論でも、第三者物流業者・卸業者・小売業者も不正輸入品と知りながら（または意図的に知ろうとしなかった状態で）取り扱えば責任を問われうるとされ、国内卸から購入した事実だけではリスクを免れないとされる <span class="ref">[#75]</span>。</p>
+<p><strong>根拠の確度:</strong> PSE法の構造は二次だが複数の独立した専門家発信（弁護士・PSE取得代行・品質管理経験者）が一致 <span class="ref">[#66]</span><span class="ref">[#67]</span><span class="ref">[#68]</span><span class="ref">[#69]</span>。#73 #74 は米国セラーの一次実体験。#75 は米国税関法の一般論であり<strong>Amazonセラー限定の話ではない</strong>点に注意。</p>
+<p><strong>致命度: 高。</strong>ただし非電気の雑貨に限れば PSE の論点は消える。初回に外すのは「電気を使う中国輸入品」だけでなく仕入れ先ごと外す判断であり、これは「1周を完走する」目的に対して確認コストが見合わないことが理由である。</p>
+<hr class="rule">
+<h3 id="s5-3">7. 互換品・「〜対応」「〜風」「ジェネリック」表記の商品</h3>
+<p>浄水器カートリッジの「互換品」を正規品ページで販売して真贋調査が始まり、改善計画書が2回却下され3回目提出中（結論未確定）という進行中の事例がある <span class="ref">[#39]</span>。「風」「同型」等の表現でも権利侵害の判断は変わらない <span class="ref">[#71]</span>。米国では「ブランド品をジェネリックとして出品するな。一時的にうまくいっても最終的にはdelistされる、たとえ本物の請求書があっても証明できない」「Amazon AIはジェネリック出品を全て偽造品として分類し資金が保留される」との複数セラーの警告がある <span class="ref">[#74]</span>。</p>
+<p><strong>根拠の確度:</strong> #39 は一次実体験だが<strong>発信者の信用度が低いと社内メモで扱われており、かつ結論未確定</strong>。#74 は米国版の一次実体験（複数投稿混合）で日本版未検証。#71 は二次。</p>
+<p><strong>致命度: 高（ただし根拠は日本の一次情報ではない）。</strong></p>
+<hr class="rule">
+<h3 id="s5-4">8. 食品・飲料</h3>
+<p><strong>裁定により初回から外す（escalation #5）。</strong></p>
+<p>理由は「食品が難しいから」ではなく、<strong>難易度の評価が矛盾したまま解けていないから</strong>である。一方の記事は食品&amp;飲料を難易度★★★★（5段階中4）と評価し <span class="ref">[#57]</span>、他方のコンサル会社は「食品は一般に思われているほど厳しくない」と明言する <span class="ref">[#58]</span>。両方とも <code>verification.md</code> で原文一致が確認されており、<strong>矛盾はソース間に実在する</strong>。そして「食品は厳しくない」側は<strong>単一ソース（自社支援実感）</strong>である <span class="ref">[#58]</span>。</p>
+<p>制度面では、常温保存可能な包装済みの食品または添加物を販売する営業は営業届出の対象外である <span class="ref">[#93]</span>。ただし通信販売による販売業は届出対象業種に明記されており <span class="ref">[#92]</span>、届出不要と判定されるかは扱う食品の性質に依存する。届出の要否にかかわらず、原則すべての食品等事業者はHACCPに沿った衛生管理の実施義務を負う <span class="ref">[#94]</span>。</p>
+<p>実務面では、食品サブカテゴリで6回にわたり書類を変更提出したが「改ざん疑い」または「購買者情報の不一致」で却下され続けた一次証言がある <span class="ref">[#18]</span>。</p>
+<p><strong>矛盾が解けていないカテゴリを、1周回すためだけに選ぶ理由がない。</strong></p>
+<p><strong>根拠の確度:</strong> 制度面は厚労省・自治体の<strong>一次</strong>。難易度評価は矛盾したままの二次。</p>
+<p><strong>致命度: 中〜高（判定不能）。</strong></p>
+<hr class="rule">
+<h3 id="s5-5">9. 書籍・CD・DVD等メディア系</h3>
+<p><strong>裁定により初回から外す（escalation #6）。理由は真贋リスクではない。</strong></p>
+<p>書籍はゲート・危険物・知財の3軸ではリスクが低い。真贋クレームの主戦場ではなく、PSE対象外で、危険物でもない。問題は第4の軸である。</p>
+<p>「本の出品でライバル100人以上も珍しくなく最安値合わせが必須」「大手セラーや中国系セラーが既に大量仕入れで価格を限界まで下げている」という指摘がある <span class="ref">[#60]</span>。社長は小口プランでカートボックスを獲得できないため、<strong>最安値合わせが必須の環境では出品してもカートを取れず、「販売→入金」まで到達しない＝1周が完走しない。</strong>利益度外視という今回の目的においても、売れないという結果は目的の不達成である。</p>
+<p>加えて手数料面でも不利になった。2026年4月1日より、メディア系カテゴリー（本/DVD/ミュージック/PCソフト/ビデオ）は金額を問わず販売手数料率が0.4%引き上げられ、長期在庫追加手数料の最低単価もメディア商品は10円→20円に倍増している <span class="ref">[#143]</span>。</p>
+<p><strong>根拠の確度:</strong> <strong>#60 は単一ソース</strong>（note.com/ebi_marketing）である。加えて <code>verification.md</code> の最重要の発見として、<strong>逆方向の主張である <code>notes.md <span class="ref">[#59]</span></code>（「本は初心者向け」）の裏付けに同じURLが誤って引用されており、その記事に本を推奨する記述は存在しない</strong>ことが判明している。すなわちこの記事は #60 の立場のみを支持する。結果として「本は初心者向け」側は3ソース一致ではなく実質2ソース <span class="ref">[#59]</span>。<strong><code>#59</code> は本資料では使用しない。</strong>#143 はAmazon公式アナウンスの一次で、数値・日付とも原文確認済み。</p>
+<p><strong>致命度: 中（今回の制約下では除外が妥当。制約が変われば再評価の余地あり）。</strong></p>
+<hr class="rule">
+<h3 id="s5-6">10〜15. その他の除外（簡潔に）</h3>
+<div class="tw" tabindex="0"><table><thead><tr><th>#</th><th>避けるもの</th><th>理由</th><th>根拠の確度</th><th>致命度</th></tr></thead><tbody><tr><td>10</td><td>賞味期限・消費期限のある商品、ヘルス&amp;ビューティー品</td><td>賞味期限・消費期限がFC納品時点から70日以内の商品は取扱不可、期限未記載品も不可。アルコール類（度数1%未満除く）とヘルス&amp;ビューティー品は要期限管理対象 <span class="ref">[#55]</span></td><td>二次・要検証（<span class="pill pill-warn">単一ソース</span>）</td><td>中</td></tr><tr><td>11</td><td>大型・重量物</td><td>3辺合計170cm超または30kg超はFBA取扱不可 <span class="ref">[#53]</span>。大型商品は返品コスト増との指摘 <span class="ref">[#61]</span></td><td>#53は一次だが<strong>2011年版PDFで現行性未検証</strong>／#61は二次・<span class="pill pill-warn">単一ソース</span></td><td>中</td></tr><tr><td>12</td><td>割れ物</td><td>破損・返品トラブルとして危険商品パターンに挙がる <span class="ref">[#61]</span></td><td>二次・<span class="pill pill-warn">単一ソース</span></td><td>中</td></tr><tr><td>13</td><td>医療機器・視力補正用コンタクトレンズ・サプリメント</td><td>視力補正用コンタクトレンズは高度管理医療機器で「食品より実務上手強い」<span class="ref">[#58]</span>。FBAで取り扱えない商品として医療機器・医薬品が挙がる <span class="ref">[#54]</span><span class="ref">[#56]</span>。米国では2026年にサプリ・OTC外用薬・医療機器のゲート承認に14〜90日 <span class="ref">[#79]</span></td><td>#58は<span class="pill pill-warn">単一ソース</span>／#54#56は二次・要検証／#79は米国二次・未読</td><td>高</td></tr><tr><td>14</td><td>酒類・金券・武器・化学物質・タバコ関連・家電リサイクル法対象品等</td><td>制限対象商品として二次情報が一致して列挙 <span class="ref">[#12]</span>。FBAでも金券類・大麻由来品（CBD含む）は取扱不可 <span class="ref">[#54]</span></td><td>二次（単一整理記事＋別記事）</td><td>高</td></tr><tr><td>15</td><td>トレンド商品・特許が絡む可能性のある商品</td><td>IP申立てで一発アウト <span class="ref">[#62]</span>。特許取得済み商品と気づかず販売しリスティング削除・在庫が売れ残った実体験 <span class="ref">[#65]</span></td><td>米国版・日本未検証</td><td>中</td></tr></tbody></table></div>
+<hr class="rule">
+<section id="s6" class="sec">
+<h2>1-D. 商材ではなく「行為」の禁止事項</h2>
+<p>これは何を買うかではなく、どう買うかの話であり、上の全カテゴリに優先して守る。</p>
+<div class="tw" tabindex="0"><table><thead><tr><th>禁止行為</th><th>理由</th><th>根拠</th></tr></thead><tbody><tr><td>ゲート解除代行サービスの利用</td><td>代行業者は典型的に偽造請求書を捏造して提出する。あるサービスの顧客数百件が一斉停止された事例が確認されている。サードパーティへのログイン共有により同一サービス利用者全員が停止リスクに晒される。Amazon Business Solutions Agreement違反になりうる</td><td><span class="ref">[#46]</span>（二次だが<code>verification.md</code>で原文確認済み。"typically falsify invoices" "Hundreds of its customers were suspended"）</td></tr><tr><td>領収書への宛名の手書き・書類の加工</td><td>手書き請求書やレシートへの手書き宛名書き込みは却下されやすく、偽造・改ざんは「警告解除どころかアカウント停止につながる」と明記</td><td><span class="ref">[#26]</span>（二次・複数ソース一致）</td></tr><tr><td>要件を満たさない書類での解除申請（いわゆる0円解除）</td><td>数量1点の領収書で解除に成功したという報告は実在するが、Amazonの正規要件（10点以上）を満たさない書類での通過であり規約リスクがある</td><td><span class="ref">[#21]</span>（一次実体験だが有料コンテンツ誘導の疑いあり）</td></tr><tr><td>複数枚の書類を分けて提出</td><td>複数枚提出は不備方向に働くとの他セラー助言。1枚にまとめるべき</td><td><span class="ref">[#16]</span>（一次実体験）</td></tr><tr><td>停止から24時間以内の即時上訴</td><td>パニック上訴は低品質と自動判定されうる</td><td><span class="ref">[#80]</span>（<strong>部分一致判定。単独の根拠にしない</strong>）</td></tr></tbody></table></div>
+</section>
+<hr class="rule">
+<h1 class="part" id="p2">第2部 初回に向くカテゴリ</h1>
+<section id="s7" class="sec">
+<h2>2-A. 4軸チェック</h2>
+<p>「ゲート・許認可・危険物・知財の4軸すべてで安全」を、次の4問すべてに No で答えられることと定義する。</p>
+<div class="tw" tabindex="0"><table><thead><tr><th>軸</th><th>質問</th><th>該当したら買わない</th></tr></thead><tbody><tr><td>ゲート</td><td>セラーセントラルで出品制限・要承認の表示が出るか</td><td>Yes → 除外</td></tr><tr><td>許認可</td><td>電気用品・食品・化粧品・医療機器・酒類のいずれかに当たるか</td><td>Yes → 除外</td></tr><tr><td>危険物</td><td>電池・スプレー・可燃物・液体・磁石を含むか</td><td>Yes → 除外</td></tr><tr><td>知財</td><td>ブランド名が付いているか。互換品・「〜対応」表記か</td><td>Yes → 除外</td></tr></tbody></table></div>
+<p><strong>この4軸に加えて、今回の制約から3問を足す。</strong></p>
+<div class="tw" tabindex="0"><table><thead><tr><th>追加軸</th><th>質問</th><th>該当したら買わない</th></tr></thead><tbody><tr><td>古物</td><td>商品ページに「中古」「USED」「アウトレット」「返品」「開封済」の表記があるか</td><td>Yes → そのSKUを除外</td></tr><tr><td>完走</td><td>出品者100人規模の最安値合わせ市場か（小口はカートを取れない）</td><td>Yes → 除外</td></tr><tr><td>期限・サイズ</td><td>賞味期限があるか／3辺170cm・30kgを超えるか／割れ物か</td><td>Yes → 除外</td></tr></tbody></table></div>
+</section>
+<hr class="rule">
+<section id="s8" class="sec">
+<h2>2-B. 初回に向く4群</h2>
+<div class="tw" tabindex="0"><table><thead><tr><th>群</th><th>具体例</th><th>ゲート</th><th>許認可</th><th>危険物</th><th>知財</th><th>根拠</th></tr></thead><tbody><tr><td>① 文房具・オフィス用品</td><td>ノーブランドのペン・ノート・ファイル・事務用品</td><td>申請不要カテゴリ <span class="ref">[#57]</span></td><td>該当法令なし</td><td>非該当</td><td>ノーブランド前提</td><td><span class="ref">[#57]</span><span class="ref">[#61]</span></td></tr><tr><td>② ホーム&amp;キッチンの非電気消耗品</td><td>プラスチック容器、キッチン雑貨、清掃用品</td><td>申請不要カテゴリ <span class="ref">[#57]</span></td><td>家表法の表示確認のみ <span class="ref">[#111]</span></td><td>非該当</td><td>ノーブランド前提</td><td><span class="ref">[#57]</span><span class="ref">[#61]</span></td></tr><tr><td>③ DIYパーツ・非電動工具</td><td>金具、ネジ類、手工具、補修材</td><td>記載なし（実機確認）</td><td>該当法令なし</td><td>非該当</td><td>ノーブランド前提</td><td><span class="ref">[#61]</span></td></tr><tr><td>④ 季節雑貨（電気を使わないもの）</td><td>非電飾の季節用品、収納、行事用小物</td><td>記載なし（実機確認）</td><td>家表法の表示確認 <span class="ref">[#110]</span></td><td>非該当</td><td>ノーブランド前提</td><td><span class="ref">[#61]</span></td></tr></tbody></table></div>
+<p><strong>根拠の確度について、はっきり書いておく。</strong></p>
+<ul><li><strong>「申請不要カテゴリの一覧」は単一ソースの二次情報</strong>（note記事、著者主観）である <span class="ref">[#57]</span>。<code>verification.md</code> で原文一致は確認されているが、それは「その記事にそう書いてある」ことの確認であって、Amazonがそう運用していることの確認ではない。</li><li><strong>承認不要カテゴリを明示したAmazon公式ページは、本調査では発見できなかった</strong> <span class="ref">[#13]</span>。Amazon出品大学FAQは「一部カテゴリーの出品には事前承認が必要な場合がある」と案内するのみで、承認不要カテゴリの一覧はない <span class="ref">[#10]</span>。</li><li><strong><code>notes.md</code> <span class="ref">[#59]</span>（「初心者向けリスク低カテゴリ」の複数ソース一致）は本資料では一切使用していない。</strong><code>verification.md</code> が3ソースのうち1本を誤引用と判定したためである。第2部は <span class="ref">[#57]</span>（申請不要カテゴリ）と <span class="ref">[#61]</span>（初心者向け推奨ジャンル：文房具・キッチン消耗品・DIYパーツ・季節雑貨）の<strong>重複部分だけ</strong>を根拠にしている。<strong>両方とも単一ソースであり、2本が偶然重なっただけである。</strong></li><li>出品制限は「特定のカテゴリー」「特定のブランド」「特定のASIN」の3階層で、1つの承認が他をカバーしない <span class="ref">[#5]</span><span class="ref">[#78]</span>。<strong>つまりカテゴリが安全でも個別ASINが制限されている可能性は消えない。</strong></li></ul>
+<p>したがって<strong>カテゴリ選定は候補の絞り込みにしか使えない。最終判定は必ずセラーセントラルの実機で行う。</strong></p>
+</section>
+<hr class="rule">
+<section id="s9" class="sec">
+<h2>2-C. 判定に入れなかったカテゴリ（保留）</h2>
+<div class="tw" tabindex="0"><table><thead><tr><th>カテゴリ</th><th>保留の理由</th></tr></thead><tbody><tr><td>おもちゃ&amp;ホビー</td><td>申請不要カテゴリに挙がる <span class="ref">[#57]</span> が、キャラクター物は知財、電池内蔵品は危険物に当たる。<strong>「電池なし・キャラクターなし」に限れば可</strong>だが、初回で条件付き判定を増やす価値がない</td></tr><tr><td>スポーツ&amp;アウトドア</td><td>同上 <span class="ref">[#57]</span>。ブランド品比率が高く、絞り込みコストが見合わない</td></tr><tr><td>ベビー&amp;マタニティ</td><td><strong>ソースが矛盾している。</strong><span class="ref">[#57]</span> は申請不要カテゴリに挙げるが、<span class="ref">[#61]</span> は「ベビー用品は出品許可が必要」と分類する。矛盾を解かずに初回に入れない</td></tr><tr><td>エレクトロニクス</td><td><span class="ref">[#57]</span> は申請不要に挙げるが、電気用品＝PSE・危険物の論点に直行する <span class="ref">[#83]</span><span class="ref">[#49]</span>。第1部1と衝突するため除外</td></tr><tr><td>DVD・ビデオ</td><td><span class="ref">[#57]</span> は申請不要に挙げるが、メディア系として escalation #6 の裁定で除外済み</td></tr></tbody></table></div>
+</section>
+<hr class="rule">
+<section id="s10" class="sec sec-box sec-checklist">
+<h2>2-D. 仕入れ確定前チェックリスト（実務手順）</h2>
+<p>上から順に、SKUごとに実行する。1つでも Yes が出たらそのSKUを外す。</p>
+<ol><li>商品ページに「中古」「USED」「未使用に近い」「アウトレット」「返品」「開封済」の表記があるか → <strong>全SKU必須。NETSEA には中古品が実在する（2026-08-31 実測212件）</strong></li><li>電源につなぐ／電池が入っている／充電する商品か <span class="ref">[#83]</span><span class="ref">[#49]</span></li><li>ブランド名が商品ページに登録されているか <span class="ref">[#17]</span><span class="ref">[#19]</span></li><li>互換品・「〜対応」「〜風」「ジェネリック」表記か <span class="ref">[#39]</span><span class="ref">[#74]</span></li><li>賞味期限・消費期限があるか <span class="ref">[#55]</span></li><li>3辺合計170cm超または30kg超か <span class="ref">[#53]</span></li><li>割れ物か <span class="ref">[#61]</span></li><li>食品・化粧品・医薬部外品・医療機器・酒類か <span class="ref">[#57]</span><span class="ref">[#101]</span><span class="ref">[#54]</span></li><li>セラーセントラルで出品制限・要承認の表示が出るか <span class="ref">[#5]</span><span class="ref">[#78]</span></li><li>家庭用品品質表示法の対象品目（繊維製品38品目／合成樹脂加工品8品目／電気機械器具17品目／雑貨工業品30品目）なら、<strong>一般消費者への販売時点で表示が付いているか</strong> <span class="ref">[#110]</span><span class="ref">[#111]</span></li><li>出品者が100人規模の最安値合わせ市場か（小口はカートを取れない）<span class="ref">[#60]</span></li></ol>
+<p>9の実機確認は、社長のセラーセントラルへのログイン後でなければできない。</p>
+</section>
+<hr class="rule">
+<h1 class="part" id="p3">第3部 反証・限界・要確認</h1>
+<section id="s11" class="sec">
+<h2>3-A. 反証 — 「制限は実は緩い」という側の主張</h2>
+<p>本資料は全体として保守側に振っているが、逆方向の情報も実在する。公平に置く。</p>
+<p>2026年時点の実務解説複数が、「以前は請求書必須のイメージだったが、現在は納品書・領収書でも受理されるケースが増えている」「書類の通りやすさの序列は請求書＞納品書＞領収書だが絶対条件ではない」「一部消耗品カテゴリやFBA納品実績の蓄積で請求書不要の自動解除パターンも増えている」と、緩和方向を主張している <span class="ref">[#25]</span>。2023年7月頃に追加されたとされる「動画視聴＋テスト合格で書類提出なしに出品許可を得られる」いわゆる1クリック解除の存在も指摘されている <span class="ref">[#9]</span>。真贋調査についても「2024年現在、ランダムチェックの真贋調査はほとんど無くなった」との実務者所感がある <span class="ref">[#34]</span><span class="ref">[#156]</span>。NETSEA等ネット卸の請求書についても「ネット系問屋の請求書提出でアカウントが停止・閉鎖された情報は一切ない」「2022年9月以降、ネット系問屋の請求書は無効というルールは撤廃されているようだ」との主張がある <span class="ref">[#23]</span>。</p>
+<p><strong>ただしこれらは全て二次情報で、根拠データ・出典が示されていない。</strong><code>verification.md</code> は #23 について「両フレーズとも原文に存在するが、著者の個人的経験・伝聞のみで実証データなし」と確認している。#34/#156 も一次資料なしと確認済み。そして<strong>まさに同時期（2025年下半期〜2026年）に、Amazon公式フォーラムには #14〜#19 のような厳格な却下報告が継続して投稿されている</strong> <span class="ref">[#25]</span>。</p>
+<p><strong>この論点は escalation #7 として未裁定である</strong> <code><span class="chk">要確認 #7</span></code>。<strong>この段落の結論は #7 の裁定次第で変わる。</strong>現時点で確定しているのは運用方針のみ——<strong>緩和方向の主張を計画のベースにしない。</strong>逆に言えば、#7 が「実態は緩和方向」と裁定されれば、第1部の項目2（ブランド品）と第2部の保留カテゴリの一部は再評価の対象になる。</p>
+<p>なお、もう一つの反証の不在も記録しておく。「復帰後は通常運用で問題ない」と明示する情報源は、今回の調査で<strong>1件も見つかっていない</strong>（<code>verification.md</code>「反証0件の論点」）。probation説を採用しないという裁定は、「反対証拠があるから」ではなく「賛成証拠の質が低いから」下されたものである。</p>
+</section>
+<hr class="rule">
+<section id="s12" class="sec sec-box sec-warn">
+<h2>3-B. 単一ソースにしか依存していない主張</h2>
+<p>本資料で使用した主張のうち、単一ソースに依存するものを明示する。これらは<strong>それ単独で仕入れ判断を左右させない。</strong></p>
+<div class="tw" tabindex="0"><table><thead><tr><th>主張</th><th>本資料での使用箇所</th><th>ソース</th></tr></thead><tbody><tr><td>「食品は一般に思われているほど厳しくない」<span class="ref">[#58]</span></td><td>第1部8（矛盾の一方として）</td><td>link-ecconsulting.co.jp 1本のみ。notes自身が「<span class="pill pill-warn">単一ソース</span>（自社支援実感）」と明記</td></tr><tr><td>「本・CD・DVDが魔の5大ジャンル」<span class="ref">[#60]</span></td><td>第1部9</td><td>note.com/ebi_marketing 1本のみ</td></tr><tr><td>「復帰後probation 90〜180日」<span class="ref">[#136]</span><span class="ref">[#137]</span><span class="ref">[#138]</span></td><td><strong>採用せず</strong>（前提の節で否定的に言及）</td><td>米国のアカウント健全性コンサル3社の自社ブログ。相互に独立した一次データを持たない同質のソース群</td></tr><tr><td>「申請不要カテゴリ一覧」<span class="ref">[#57]</span></td><td><strong>第2部の骨格</strong></td><td>note記事1本（著者主観の★評価を含む）</td></tr><tr><td>「小口出品者は危険物納品プログラムに申請不可」<span class="ref">[#51]</span></td><td>第1部1</td><td>force-r.co.jp 1本のみ・要検証</td></tr><tr><td>「要期限管理は納品時点70日以内不可」<span class="ref">[#55]</span></td><td>第1部10</td><td>sobani.co.jp 1本のみ・要検証</td></tr></tbody></table></div>
+<p>うち <strong><span class="ref">[#57]</span> は第2部全体の骨格を支えており、単一ソース依存の影響が最も大きい。</strong>このため第2部は「カテゴリで確定する」ではなく「候補を絞り、実機で確定する」構造にしてある。</p>
+</section>
+<hr class="rule">
+<section id="s13" class="sec">
+<h2>3-C. <code>[要確認]</code> 一覧</h2>
+<p>未裁定3論点。いずれも<strong>社長のセラーセントラルへのログイン1手</strong>で解ける（Amazon公式ヘルプ本体がJS＋ログイン必須で取得できていないことが唯一の原因）<span class="ref">[#11]</span>。</p>
+<div class="tw" tabindex="0"><table><thead><tr><th>#</th><th>論点</th><th>本資料での該当箇所</th><th>裁定で何が変わるか</th></tr></thead><tbody><tr><td><code><span class="chk">要確認 #1</span></code></td><td>請求書4要件を満たしても却下されるのか</td><td>第1部・項目2（ブランド品）</td><td>「請求書を整えれば安全」という前提の強度。ただし初回でブランド品を選ばない判断自体は変わらない</td></tr><tr><td><code><span class="chk">要確認 #4</span></code></td><td>NETSEA等ネット卸の請求書がAmazon審査で有効か</td><td>第2部・2-D（仕入れ元の前提）</td><td><strong>社長の主要仕入れルートの根幹。</strong>下記参照</td></tr><tr><td><code><span class="chk">要確認 #7</span></code></td><td>書類要件は緩和されたか厳格なままか</td><td>第3部・3-A（反証）</td><td>第1部項目2と第2部保留カテゴリの再評価可否</td></tr></tbody></table></div>
+<h3 id="s13-1"><code><span class="chk">要確認 #4</span></code> について — 本資料の最大の未解決点</h3>
+<p>Amazon公式フォーラム上の実務助言（一次寄り）は「Amazonは検証可能なサプライヤーからの請求書のみを受け付け、<strong>小売店やeコマースの領収書は受け付けない</strong>」と明記している <span class="ref">[#20]</span>。<code>verification.md</code> はこの文言が原文どおり存在することを確認した上で、<strong>「eコマース」が何を指すのか原文自体に定義がない</strong>ことを指摘している（部分一致判定）。これがNETSEA等のオンライン卸サイトを指すのか、Amazon等のECモールでの購入を指すのかは、原文からは判別できない。</p>
+<p>前者なら、社長の主要仕入れ先であるNETSEA自体が審査で不利になる。NETSEA仕入れでの成功報告は存在するが<strong>単一ソースかつ情報商材からの抜粋</strong>である <span class="ref">[#22]</span>。NETSEA公式メディア自身の主張 <span class="ref">[#24]</span> は自社サービスのポジショントークである。</p>
+<p><strong>この結論は #4 の裁定次第で変わる。</strong>現時点で言えることは、<strong>NETSEA仕入れの請求書が確実に通ると前提しないこと</strong>のみである。第2部が「ゲートのかからないカテゴリだけを選ぶ」設計になっているのは、この不確実性を回避するためでもある——<strong>ゲートがかからなければ、請求書が通るかどうかを問われる場面自体が発生しない。</strong></p>
+</section>
+<hr class="rule">
+<section id="s14" class="sec sec-box sec-alert">
+<h2>3-D. この資料の限界</h2>
+<ul><li><code>notes.md</code> 全156行のうち、<code>verification.md</code> が実地検証したのは約38行（約24%）。<strong>未検証の行は「一致」ではなく「検証未実施」である。</strong></li><li>Amazon公式ヘルプ本体（出品許可申請カテゴリー一覧 G200333160、請求書要件 GDQ9K277NYP6WNEW、並行輸入品 G200936440、FBA禁止商品 201730840、出品許可FAQ G84EFS4CKK43USMF）は<strong>全ページ実在確認済みだが本文未取得</strong> <span class="ref">[#11]</span>。本資料のゲート関連の記述は、この一次情報を欠いたまま書かれている。</li><li>FBA危険物要件 <span class="ref">[#48]</span><span class="ref">[#49]</span> は米国/グローバル版であり、日本版との異同は未検証。</li><li>米国セラー由来の情報 <span class="ref">[#62]</span><span class="ref">[#63]</span><span class="ref">[#64]</span><span class="ref">[#65]</span><span class="ref">[#73]</span><span class="ref">[#74]</span><span class="ref">[#75]</span><span class="ref">[#78]</span><span class="ref">[#79]</span><span class="ref">[#80]</span> は日本（amazon.co.jp）にそのまま当てはまるか未検証。</li><li>グッズステーション（上海倉庫）固有の出品制限・真贋トラブルの実例は<strong>見つからなかった</strong>。第1部6は同社固有の事故事例ではなく、中国輸入品一般のリスクからの推論である。</li><li>「国内の卸経由で中国製品を仕入れた場合の責任の所在」を現場セラー自身が明言している一次情報は<strong>見つからなかった</strong>（専門家の解説記事のみ）。</li><li>FBAの寸法・重量上限 <span class="ref">[#53]</span> の出典は2011年版PDFであり、現行性は未検証。</li></ul>
+</section>
+<p class="prov">HTML版。内容の唯一の正は workspace/output/deliverables/T-20260904-004/research/draft.md です。本ファイルは原稿を機械変換したもので、加筆・削除・言い換えはありません。</p>
+</div>
+<a class="top" href="#top" aria-label="先頭へ戻る">&#8593;</a>
+</body>
+</html>

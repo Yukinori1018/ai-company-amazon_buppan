@@ -270,3 +270,50 @@ def is_personal_local_part(email: str) -> bool:
     if re.fullmatch(r"[a-z]\.[a-z]{2,}", local):
         return True
     return False
+
+
+#: A1_trade_window の否定形誤爆を検知するための表現。
+#: **これは判定基準ではなく、判定基準の穴を見つけるための検査器。**
+#: 法務ルール（B1L_optout_rules.json）は法務ハルオの所有物なので触らない。
+NEGATION_SUFFIXES = (
+    "行っておりません", "行っていません", "お受けしておりません",
+    "受け付けておりません", "しておりません", "お断り", "できません",
+    "ご遠慮", "対象外", "限らせて", "のみ",
+)
+
+#: ヒット語の直後どれだけを否定表現の探索範囲にするか（文字数）。
+#: 前方は別の文である可能性が高いので見ない。
+NEGATION_LOOKAHEAD = 25
+
+
+def detect_negated_trade_window(notice: str, hit_terms: str,
+                                lookahead: int = NEGATION_LOOKAHEAD):
+    """「取引窓口あり」と読めた語の直後が否定だったら、その事実を返す。
+
+    A1_trade_window は「新規お取引」「卸売」「代理店」等を**肯定のシグナル**として拾うが、
+    規則に右辺（否定語）が無い。そのため次のように**意味が正反対に転ぶ**。
+
+        「新規お取引は行っておりません」        → A_PLUS（最優先で打診）
+        「海外代理店への販売のみ」（＝直販しない）→ A_PLUS
+
+    どちらも「打診してはいけない相手が、最優先で打診すべき相手に化ける」方向の誤りで、
+    間違った相手に連絡してしまう。**取れなかったより悪い。**
+
+    返り値は (ヒット語, 否定語, 原文の該当箇所) のタプル。該当なしなら None。
+    **クラスを決めない。**呼び出し側が needs_review を立てて人に回すこと。
+
+    >>> detect_negated_trade_window("新規お取引は行っておりません", "新規お取引")[1]
+    '行っておりません'
+    >>> detect_negated_trade_window("新規お取引はこちらのフォームから", "新規お取引") is None
+    True
+    """
+    if not notice or not hit_terms:
+        return None
+    flat = re.sub(r"\s+", "", notice)
+    for term in [t.strip() for t in hit_terms.split(";") if t.strip()]:
+        for m in re.finditer(re.escape(term), flat):
+            tail = flat[m.end():m.end() + lookahead]
+            for ng in NEGATION_SUFFIXES:
+                if ng in tail:
+                    return (term, ng, flat[m.start():m.end() + lookahead])
+    return None

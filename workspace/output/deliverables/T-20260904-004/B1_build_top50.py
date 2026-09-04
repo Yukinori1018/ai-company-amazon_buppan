@@ -101,6 +101,56 @@ def build_all_rows(lookups, v14, contacts_cls):
     return rows
 
 
+#: PUBLIC リポに実データを出さない列。個人事業主の疑いがある社に適用する。
+REDACTED_COLS = ("正式商号", "所在地", "公式HP", "電話", "問い合わせフォームURL", "メール", "出典URL")
+
+#: 伏せた旨の表示。空欄だと「調べたが取れなかった」と区別がつかないので必ず書く。
+REDACTED_MARK = "【非掲載】個人事業主の疑いのため PUBLIC リポには掲載しない（実データは agent_output 側）"
+
+#: 伏せた実データの退避先（.gitignore 配下＝Git 追跡外）
+HELD_BACK = os.path.join(DELIV, "..", "agent_output", "T-20260904-004", "B1",
+                         "HELD_BACK_個人事業主疑い.jsonl")
+
+
+def redact_sole_proprietors(rows, lookups):
+    """個人事業主の疑いがある社の連絡先を、成果物CSVから外す。
+
+    **このリポジトリは PUBLIC で30分ごとに自動 push される。**
+    法人の代表電話は事業者情報だが、個人事業主の電話・住所は個人情報になりうる。
+    法務B §8-5 に従い、掲載可否の判断が出るまで実データを出さない。
+
+    **手作業で消さないこと。** CSV を手で編集しても次のビルドで復活する。
+    ここで落とすから再現性がある。伏せた実データは agent_output 側の JSONL に退避し、
+    社長の掲載可否判断が出たら復活させられるようにしておく。
+    """
+    held = []
+    for r in rows:
+        e = lookups.get(r.get("メーカー名", "")) or {}
+        if not (e.get("entity_type") or "").startswith("個人事業主"):
+            continue
+        held.append({k: e.get(k, "") for k in
+                     ("メーカー名", "entity_type", "正式商号", "所在地", "公式HP",
+                      "電話", "問い合わせフォームURL", "メール", "出典URL", "備考")})
+        for c in REDACTED_COLS:
+            if r.get(c):
+                r[c] = REDACTED_MARK
+        r["取引可否シグナル"] = "保留(個人事業主の疑い・掲載可否は社長判断)"
+    if held:
+        os.makedirs(os.path.dirname(os.path.abspath(HELD_BACK)), exist_ok=True)
+        existing = {}
+        if os.path.exists(HELD_BACK):
+            for line in io.open(HELD_BACK, encoding="utf-8"):
+                if line.strip():
+                    h = json.loads(line)
+                    existing[h.get("メーカー名", "")] = h
+        for h in held:                      # 後勝ちで上書き（冪等）
+            existing[h["メーカー名"]] = h
+        with io.open(HELD_BACK, "w", encoding="utf-8") as fp:
+            for h in existing.values():
+                fp.write(json.dumps(h, ensure_ascii=False) + "\n")
+    return held
+
+
 def _int(v):
     try:
         return int(float(str(v).replace(",", "")))
@@ -131,6 +181,9 @@ def main():
             row[k] = e.get(k, "")
         row["取引可否シグナル"] = signal(e if e else None, note)
         rows.append(row)
+
+    # ★PUBLIC リポに出す前に、個人事業主の疑いがある社の連絡先を落とす
+    held = redact_sole_proprietors(rows, lookups)
 
     # 打診優先度順（法務の contact_priority 昇順）にも並べ替えた版を作る
     with io.open(OUT, "w", encoding="utf-8-sig", newline="") as fp:
@@ -175,6 +228,7 @@ def main():
     with io.open(V14, encoding="utf-8-sig") as fp:
         v14 = {r["メーカー/ブランド"]: r for r in csv.DictReader(fp)}
     all_rows = build_all_rows(lookups, v14, None)
+    held_all = redact_sole_proprietors(all_rows, lookups)
     ALL = os.path.join(HERE, "B1_打診候補_全社_優先度順.csv")
     with io.open(ALL, "w", encoding="utf-8-sig", newline="") as fp:
         fp.write(HEADER_NOTE + "\n")
@@ -189,6 +243,12 @@ def main():
                 if r["optout_class"] not in ("D", "E")
                 and any(r[k].strip() for k in CONTACT))
     print("  → **打診可能（D/E以外 かつ 連絡手段あり）: %d社**" % reach)
+    if held_all:
+        print("\n=== PUBLIC リポから連絡先を伏せた社（個人事業主の疑い）: %d社 ===" % len(held_all))
+        for h in held_all:
+            print("  - %s（%s）" % (h["メーカー名"], h["entity_type"]))
+        print("  実データ: agent_output/T-20260904-004/B1/HELD_BACK_個人事業主疑い.jsonl")
+        print("  → 掲載可否は社長判断。判断が出るまで CSV には出しません。")
     print("\nwrote", OUT)
     print("wrote", ALL)
 

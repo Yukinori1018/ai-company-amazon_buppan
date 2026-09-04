@@ -10,7 +10,7 @@ Markdown -> 単一自己完結HTML コンバータ（コンテンツ制作ヒデ
 
 対応する Markdown サブセット:
   h1 / h2 / h3, 段落, 表, 箇条書き(2階層), 番号付きリスト, 引用, 水平線
-  インライン: [#n] 根拠マーカー, [要確認 #n] 注意バッジ
+  インライン: **強調**, `コード`, [#n] 根拠マーカー, [要確認 #n] 注意バッジ
 
 出力の性質:
   - 外部CSS/JS/フォント/画像を一切読み込まない（オフラインで開ける）
@@ -24,8 +24,9 @@ Markdown -> 単一自己完結HTML コンバータ（コンテンツ制作ヒデ
       --box "1. 結論=conclusion" --box "わからなかったこと=alert" --box "信頼度=alert" \
       --note "HTML版。内容の唯一の正は ... です。"
 
-  --box は「見出しに含まれる文字列=スタイル」。スタイルは conclusion / alert の2種。
-  該当する h2 節を囲み枠にして視覚的に強調する。
+  --box は「見出しの完全一致 or 前方一致=スタイル」。該当する h2 節を囲み枠にして強調する。
+  スタイルは conclusion / alert / danger / warn / checklist の5種。
+  --cellmark は「語=danger|warn」。表セル内のその語だけを色付きピルにする（本文は触らない）。
 
 注意（実際に踏んだ失敗）:
   - 段落判定でリスト記号を「記号のみ」で弾くと `**強調で始まる段落**` が消える。
@@ -44,17 +45,51 @@ from pathlib import Path
 
 RE_CHECK = re.compile(r"\[要確認\s*#(\d+)\]")
 RE_REF = re.compile(r"\[#(\d+)\]")
+RE_CODE = re.compile(r"`([^`]+)`")
+RE_BOLD = re.compile(r"\*\*(.+?)\*\*")
+RE_PH = re.compile(r"\x00C(\d+)\x00")
+
+# 表セル内だけで働く語ハイライト。[(語, "danger"|"warn")]
+CELLMARKS = []
+
+
+def _markers(s: str) -> str:
+    # 順序重要: [要確認 #n] を先に処理しないと [#n] 側に食われる
+    s = RE_CHECK.sub(lambda m: f'<span class="chk">要確認 #{m.group(1)}</span>', s)
+    return RE_REF.sub(lambda m: f'<span class="ref">[#{m.group(1)}]</span>', s)
 
 
 def inline(text: str) -> str:
-    """インライン変換。エスケープ後に根拠マーカーだけをマークアップする。"""
+    """インライン変換。エスケープ後に記法と根拠マーカーだけをマークアップする。
+
+    処理順は コード → 強調 → マーカー。コードは先に退避し、中では強調をかけない
+    （原稿の `[要確認 #1]` はコード内でもバッジにしたいのでマーカーだけ通す）。
+    """
     out = html.escape(text, quote=False)
-    # 順序重要: [要確認 #n] を先に処理しないと [#n] 側に食われる
-    out = RE_CHECK.sub(
-        lambda m: f'<span class="chk">要確認 #{m.group(1)}</span>', out
-    )
-    out = RE_REF.sub(lambda m: f'<span class="ref">[#{m.group(1)}]</span>', out)
-    return out
+    codes = []
+
+    def _stash(m):
+        codes.append(m.group(1))
+        return f"\x00C{len(codes) - 1}\x00"
+
+    out = RE_CODE.sub(_stash, out)
+    out = RE_BOLD.sub(lambda m: f"<strong>{m.group(1)}</strong>", out)
+    out = _markers(out)
+    return RE_PH.sub(lambda m: f"<code>{_markers(codes[int(m.group(1))])}</code>", out)
+
+
+def cell(text: str):
+    """表セル用。inline に加えて CELLMARKS の語を色付きピルにする。
+
+    戻り値は (HTML, 付与したスタイルの集合)。呼び出し側が行の強調に使う。
+    """
+    out = inline(text)
+    hits = set()
+    for word, style in CELLMARKS:
+        if word in out:
+            hits.add(style)
+            out = out.replace(word, f'<span class="pill pill-{style}">{word}</span>')
+    return out, hits
 
 
 # ---------------------------------------------------------------- block
@@ -78,6 +113,7 @@ class Builder:
         self.h1 = ""
         self.h2n = 0
         self.h3n = 0
+        self.partn = 0
 
     # -- helpers
     def peek(self):
@@ -89,8 +125,16 @@ class Builder:
             self.sec_open = False
 
     def sec_class(self, title: str) -> str:
+        """--box の照合は 完全一致 → 前方一致 の順。部分一致は取らない。
+
+        部分一致にすると "結論" が「1-A. 一覧（先に結論）」まで巻き込み、
+        意図しない節が囲み枠になる（実際に踏んだ）。
+        """
         for needle, style in self.boxes:
-            if needle in title:
+            if needle == title:
+                return " sec-box sec-" + style
+        for needle, style in self.boxes:
+            if title.startswith(needle):
                 return " sec-box sec-" + style
         return ""
 
@@ -112,7 +156,16 @@ class Builder:
                 continue
 
             if line.startswith("# "):
-                self.h1 = line[2:].strip()
+                title = line[2:].strip()
+                if not self.h1:
+                    self.h1 = title           # 最初の h1 だけが文書タイトル
+                else:
+                    # 2つ目以降の h1 は「部」の区切り。捨てると本文が消える
+                    self.partn += 1
+                    hid = f"p{self.partn}"
+                    self.close_section()
+                    self.out.append(f'<h1 class="part" id="{hid}">{inline(title)}</h1>')
+                    self.toc.append((1, hid, title, "part"))
                 self.i += 1
                 continue
 
@@ -122,10 +175,11 @@ class Builder:
                 self.h3n = 0
                 hid = f"s{self.h2n}"
                 self.close_section()
-                self.out.append(f'<section id="{hid}" class="sec{self.sec_class(title)}">')
+                scls = self.sec_class(title)
+                self.out.append(f'<section id="{hid}" class="sec{scls}">')
                 self.sec_open = True
                 self.out.append(f"<h2>{inline(title)}</h2>")
-                self.toc.append((2, hid, title))
+                self.toc.append((2, hid, title, scls.replace(" sec-box sec-", "")))
                 self.i += 1
                 continue
 
@@ -134,7 +188,7 @@ class Builder:
                 self.h3n += 1
                 hid = f"s{self.h2n}-{self.h3n}"
                 self.out.append(f'<h3 id="{hid}">{inline(title)}</h3>')
-                self.toc.append((3, hid, title))
+                self.toc.append((3, hid, title, ""))
                 self.i += 1
                 continue
 
@@ -169,7 +223,13 @@ class Builder:
         t += [f"<th>{inline(c)}</th>" for c in head]
         t.append("</tr></thead><tbody>")
         for r in body:
-            t.append("<tr>" + "".join(f"<td>{inline(c)}</td>" for c in r) + "</tr>")
+            tds, hits = [], set()
+            for c in r:
+                h, hit = cell(c)
+                tds.append(f"<td>{h}</td>")
+                hits |= hit
+            cls = ' class="row-danger"' if "danger" in hits else ""
+            t.append(f"<tr{cls}>" + "".join(tds) + "</tr>")
         t.append("</tbody></table></div>")
         self.out.append("".join(t))
 
@@ -230,28 +290,13 @@ class Builder:
 
 
 def render_toc(toc):
-    buf = ['<nav class="toc" aria-label="目次"><p class="toc-h">目次</p><ol class="toc-l1">']
-    open_sub = False
-    first = True
-    for lv, hid, title in toc:
-        if lv == 2:
-            if open_sub:
-                buf.append("</ul>")
-                open_sub = False
-            if not first:
-                buf.append("</li>")
-            buf.append(f'<li><a href="#{hid}">{inline(title)}</a>')
-            first = False
-        else:
-            if not open_sub:
-                buf.append('<ul class="toc-l2">')
-                open_sub = True
-            buf.append(f'<li><a href="#{hid}">{inline(title)}</a></li>')
-    if open_sub:
-        buf.append("</ul>")
-    if not first:
-        buf.append("</li>")
-    buf.append("</ol></nav>")
+    """見出しは自前で採番されているので ol は使わない（二重採番の事故を避ける）。"""
+    buf = ['<nav class="toc" aria-label="目次"><p class="toc-h">目次</p><ul class="toc-list">']
+    for lv, hid, title, style in toc:
+        cls = f"toc-lv{lv}"
+        acls = f' class="toc-{style}"' if style and style != "part" else ""
+        buf.append(f'<li class="{cls}"><a href="#{hid}"{acls}>{inline(title)}</a></li>')
+    buf.append("</ul></nav>")
     return "".join(buf)
 
 
@@ -310,14 +355,22 @@ h1{
   margin:0 0 10px; font-size:13px; font-weight:700;
   letter-spacing:.1em; color:var(--muted);
 }
-.toc ol,.toc ul{margin:0; padding:0; list-style:none;}
+.toc ul.toc-list{margin:0; padding:0; list-style:none;}
 .toc li{margin:.26em 0; line-height:1.65;}
-/* .toc ul より詳細度を上げないと padding:0 に負ける */
-.toc ul.toc-l2{padding-left:1.6em; margin:.25em 0 .6em;}
-.toc ul.toc-l2 li{font-size:14.5px; color:var(--muted); margin:.16em 0;}
-.toc ul.toc-l2 li::before{content:"–"; color:var(--faint); margin-right:.45em;}
+.toc li.toc-lv1{margin:.85em 0 .3em; font-weight:700;}
+.toc li.toc-lv1:first-child{margin-top:0;}
+.toc li.toc-lv2{padding-left:1.1em;}
+.toc li.toc-lv3{padding-left:2.5em; font-size:14.5px; color:var(--muted); margin:.16em 0;}
+.toc li.toc-lv3::before{content:"–"; color:var(--faint); margin-right:.45em;}
 .toc a{color:var(--accent); text-decoration:none; border-bottom:1px solid transparent;}
 .toc a:hover{border-bottom-color:currentColor;}
+
+/* ---------- part ---------- */
+h1.part{
+  font-size:24px; line-height:1.5; font-weight:700; letter-spacing:.02em;
+  margin:64px 0 8px; padding:14px 0 0; border-top:4px solid var(--text);
+  scroll-margin-top:16px;
+}
 
 /* ---------- sections ---------- */
 .sec{margin:0;}
@@ -346,7 +399,7 @@ hr.rule{
   border:0; border-top:1px solid var(--border);
   margin:40px 0 0; opacity:.55;
 }
-hr.rule:has(+ .sec-box){display:none;}
+hr.rule:has(+ .sec-box),hr.rule:has(+ h1.part){display:none;}
 
 /* ---------- tables ---------- */
 .tw{
@@ -386,6 +439,26 @@ thead th:last-child,tbody td:last-child{white-space:normal;}
   white-space:nowrap; vertical-align:.09em;
 }
 
+/* ---------- inline emphasis ---------- */
+strong{font-weight:700; color:var(--text);}
+td strong,th strong{font-weight:700;}
+code{
+  font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+  font-size:.9em; padding:.05em .35em; border-radius:4px;
+  background:var(--surface2); border:1px solid var(--border);
+}
+code .chk{font-family:inherit;}
+
+/* ---------- 表セル内の語ハイライト ---------- */
+.pill{
+  display:inline-block; padding:0 .45em; border-radius:4px;
+  font-weight:700; white-space:nowrap;
+}
+.pill-danger{background:var(--alert); color:#fff; border:1px solid var(--alert);}
+.pill-warn{background:var(--warn-bg); color:var(--warn); border:1px solid var(--warn-border);}
+tbody tr.row-danger td:first-child{box-shadow:inset 4px 0 0 var(--alert);}
+tbody tr.row-danger td{background:color-mix(in srgb, var(--alert-bg) 70%, transparent);}
+
 /* ---------- emphasised sections ---------- */
 .sec-box{
   margin:28px 0 0; padding:6px 26px 20px;
@@ -398,6 +471,28 @@ thead th:last-child,tbody td:last-child{white-space:normal;}
 .sec-alert{background:var(--alert-bg); border-color:var(--alert-border);
   border-left:6px solid var(--alert);}
 .sec-alert h2{border-bottom-color:var(--alert-border);}
+.sec-danger{background:var(--alert-bg); border:2px solid var(--alert);
+  border-left:10px solid var(--alert);}
+.sec-danger h2{border-bottom-color:var(--alert);}
+.sec-warn{background:var(--warn-bg); border-color:var(--warn-border);
+  border-left:6px solid var(--warn-border);}
+.sec-warn h2{border-bottom-color:var(--warn-border);}
+.sec-checklist{background:var(--surface); border:2px solid var(--border-strong);
+  border-left:10px solid var(--accent);}
+.sec-checklist h2{border-bottom-color:var(--accent);}
+/* チェックリストは印刷して手元で使う。番号は原稿どおり残し、記入欄だけ CSS で足す */
+.sec-checklist ol{list-style:decimal; padding-left:1.9em;}
+.sec-checklist ol>li{margin:.7em 0; padding-left:2.1em; position:relative;}
+.sec-checklist ol>li::before{
+  content:""; position:absolute; left:0; top:.25em;
+  width:1.15em; height:1.15em; border:1.5px solid var(--border-strong);
+  border-radius:3px; background:var(--bg);
+}
+
+/* ---------- toc: 囲み枠の節は目次でも色を付ける ---------- */
+.toc a.toc-danger,.toc a.toc-alert{color:var(--alert); font-weight:700;}
+.toc a.toc-warn{color:var(--warn); font-weight:700;}
+.toc a.toc-checklist{color:var(--accent); font-weight:700;}
 
 /* ---------- footer / nav ---------- */
 .prov{
@@ -419,6 +514,7 @@ thead th:last-child,tbody td:last-child{white-space:normal;}
   body{font-size:15.5px;}
   .wrap{padding:22px 14px 88px;}
   h1{font-size:22px;}
+  h1.part{font-size:20px; margin-top:46px;}
   h2{font-size:19px;}
   h3{font-size:16.5px;}
   .toc{padding:14px 16px 16px;}
@@ -444,10 +540,21 @@ thead th:last-child,tbody td:last-child{white-space:normal;}
   thead th{background:#fff; border-bottom:1.5pt solid #000;}
   tbody tr:nth-child(even){background:#fff;}
   .sec-box{background:#fff; border:1.5pt solid #000;}
+  .sec-danger{border:2.5pt solid #000; border-left:2.5pt solid #000;}
   .chk{background:#fff; color:#000; border:1pt solid #000;}
+  code{background:#fff; border:1px solid #999;}
+  .pill{background:#fff!important; color:#000!important; border:1.2pt solid #000!important;}
+  tbody tr.row-danger td{background:#fff;}
+  tbody tr.row-danger td:first-child{box-shadow:inset 3pt 0 0 #000;}
+  /* チェックリストは1枚で手元に置けるよう独立ページにする */
+  .sec-checklist{break-before:page; page-break-before:always;
+    border:1.5pt solid #000; border-left:1.5pt solid #000;}
+  .sec-checklist ol>li::before{border:1.2pt solid #000;}
   .ref{color:#555; opacity:1;}
   blockquote{background:#fff; border-left:3pt solid #000;}
-  h2,h3{break-after:avoid; page-break-after:avoid;}
+  h1.part{break-before:page; page-break-before:always; border-top:2.5pt solid #000;
+    font-size:15pt; margin-top:0;}
+  h1.part,h2,h3{break-after:avoid; page-break-after:avoid;}
   .tw,blockquote,tr{break-inside:avoid; page-break-inside:avoid;}
   .toc{border:1px solid #999; background:#fff;}
 }
@@ -456,11 +563,23 @@ thead th:last-child,tbody td:last-child{white-space:normal;}
 
 def parse_box(v):
     if "=" not in v:
-        raise argparse.ArgumentTypeError('--box は "見出しの一部=conclusion|alert" 形式')
+        raise argparse.ArgumentTypeError('--box は "見出しの一部=スタイル" 形式')
     needle, style = v.rsplit("=", 1)
-    if style not in ("conclusion", "alert"):
-        raise argparse.ArgumentTypeError("スタイルは conclusion か alert")
+    if style not in BOX_STYLES:
+        raise argparse.ArgumentTypeError("スタイルは " + " / ".join(BOX_STYLES))
     return (needle.strip(), style)
+
+
+BOX_STYLES = ("conclusion", "alert", "danger", "warn", "checklist")
+
+
+def parse_cellmark(v):
+    if "=" not in v:
+        raise argparse.ArgumentTypeError('--cellmark は "語=danger|warn" 形式')
+    word, style = v.rsplit("=", 1)
+    if style not in ("danger", "warn"):
+        raise argparse.ArgumentTypeError("cellmark のスタイルは danger か warn")
+    return (word.strip(), style)
 
 
 def main():
@@ -472,8 +591,12 @@ def main():
     ap.add_argument("--kicker", default="", help="H1 の上に出す小見出し（チケットID等）")
     ap.add_argument("--box", action="append", type=parse_box, default=[],
                     metavar="見出し=conclusion|alert", help="囲み枠で強調する h2 節")
+    ap.add_argument("--cellmark", action="append", type=parse_cellmark, default=[],
+                    metavar="語=danger|warn", help="表セル内でハイライトする語")
     ap.add_argument("--note", default="", help="末尾に置く出所注記（任意）")
     a = ap.parse_args()
+
+    CELLMARKS[:] = a.cellmark
 
     b = Builder(a.src.read_text(encoding="utf-8").split("\n"), a.box).run()
     body = b.out
