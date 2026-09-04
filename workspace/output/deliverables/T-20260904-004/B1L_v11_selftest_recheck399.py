@@ -21,11 +21,22 @@ def _flat(t):
     return re.sub(r"\s+", "", t or "")
 
 
+def _delims(defaults):
+    return defaults.get("sentence_delimiters",
+                        ["。", "．", "！", "？", "!", "?", "\n", "\r", "／", "｜", "|"])
+
+
+def _same_sentence(seg, defaults):
+    """left 終端から negation 開始までの区間に文区切りが無いか（v1.2 の (b) 条件）。"""
+    return not any(d in seg for d in _delims(defaults))
+
+
 def _suffix_negation(text, rule, defaults):
-    """left 語の直後 N 文字以内に negation 語 → ヒット。直前に guard 語 → 無効。"""
+    """v1.2: (a) left の直後 N 文字以内 **かつ** (b) 同一文内。直前に guard 語 → 無効。"""
     flat = _flat(text)
     look = rule.get("negation_lookahead_chars", defaults.get("negation_lookahead_chars", 25))
     back = rule.get("left_context_window_chars", defaults.get("left_context_window_chars", 20))
+    same = rule.get("require_same_sentence", defaults.get("require_same_sentence", True))
     guards = rule.get("left_context_guard", [])
     hits = []
     for lt in rule.get("left", []):
@@ -35,10 +46,14 @@ def _suffix_negation(text, rule, defaults):
                 continue
             tail = flat[m.end():m.end() + look]
             for ng in rule.get("negation", []):
-                if ng in tail:
-                    p = "%s+%s" % (lt, ng)
-                    if p not in hits:
-                        hits.append(p)
+                k = tail.find(ng)
+                if k < 0:
+                    continue
+                if same and not _same_sentence(tail[:k], defaults):
+                    continue          # 句点・／ をまたいだ → 別の文。ヒットさせない
+                p = "%s+%s" % (lt, ng)
+                if p not in hits:
+                    hits.append(p)
     return hits
 
 
@@ -47,11 +62,18 @@ def _negation_filtered_any(text, rule, defaults):
     flat = _flat(text)
     look = rule.get("negation_lookahead_chars", defaults.get("negation_lookahead_chars", 25))
     negs = rule.get("negation_terms", [])
+    same = rule.get("require_same_sentence", defaults.get("require_same_sentence", True))
     hits = []
     for t in rule.get("terms", []):
         for m in re.finditer(re.escape(t), flat):
             tail = flat[m.end():m.end() + look]
-            if any(ng in tail for ng in negs):
+            negated = False
+            for ng in negs:
+                k = tail.find(ng)
+                if k >= 0 and (not same or _same_sentence(tail[:k], defaults)):
+                    negated = True
+                    break
+            if negated:
                 continue
             if t not in hits:
                 hits.append(t)

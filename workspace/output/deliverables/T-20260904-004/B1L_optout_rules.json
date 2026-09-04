@@ -1,6 +1,6 @@
 {
   "$comment": "T-20260904-004 / 法務ハルオ / 『営業お断り』表示の機械判定ルール。判定根拠は B1L_営業お断り表示への打診可否_法務判定.md（v1.1 の変更点は同ファイル §⑦ 追補）を参照。このファイルは法務の所有物であり、語彙とクラス境界の変更は法務のみが行う。マッチャ（実装）は IT の所有物。",
-  "version": "1.1",
+  "version": "1.2",
   "created_at": "2026-09-04",
   "updated_at": "2026-09-04",
   "author": "legal_haruo",
@@ -18,15 +18,27 @@
       "reviewed_by": "legal_haruo",
       "raised_by": "it_engineer_takashi（A1 の否定欠落を検出・暫定検知器 detect_negated_trade_window で仮塞ぎ）"
     }
+    ,{
+      "version": "1.2",
+      "date": "2026-09-04",
+      "summary": "仕様の自己矛盾の是正と、フラグ消失の構造修正。(1) suffix_negation の成立条件に『**同一文内**』を追加（v1.1 は『直後25文字以内』としか書かず、自分が『D にしてはならない』と名指しした例文が12文字＝条件を満たしてしまい、仕様と要求が矛盾していた）。(2) 同じ欠陥が A1_trade_window の negation_terms にもあったため同時に是正（v1.1 では正当な A_PLUS が誤って A に降格しうる状態だった。IT からの指摘対象外・法務が自主検出）。(3) needs_review を『勝ったクラスの規則』ではなく『**発火した全規則**』から立てる要件へ変更。適用順の変更で E4 が D6 に勝った結果、ハイメスの needs_review が静かに消えた事象への対処。E4 に needs_review は足さない。(4) output_schema に optout_other_rule_hits を追加（勝たなかったクラスの証跡を残す）。",
+      "changed_rules": ["D6_trade_window_negated", "A1_trade_window"],
+      "reviewed_by": "legal_haruo",
+      "raised_by": "it_engineer_takashi 経由 秘書カズヨ（①lookahead の仕様矛盾 ②E4 が D6 に勝ち needs_review が消える）",
+      "$note": "①はタカシの実装（句点をまたがせない）が正しく、法務の仕様の書き方が誤っていた。実装ではなく仕様を直した。"
+    }
   ],
   "apply_order": ["E", "D", "B", "C", "A_PLUS", "A"],
   "$apply_order_note_v1_1": "v1.0 は D → E だった。v1.1 で **E を先**にする。理由：(1) D6 が『お取引＋否定』を広く拾うため、D 先だと条件付き拒絶（実店舗必須・法人のみ・WEB専売お断り）まで D に吸われ、class_boundaries の定義と機械の挙動が食い違う。(2) D と E はどちらも action=exclude・priority=99 であり、**順序を入れ替えても『打診してしまう』方向の事故は原理的に起きない**（両方とも打診しない）。(3) E は recheck_condition を持つため、条件が変わったときに再判定できる。再判定は同じ本文に対して分類をやり直すので、E の条件が解消された社に通報示唆（D3）があれば、その時点で D として再び浮上する。取りこぼしにならない。",
   "scope_note": "判定は『窓口単位』。会社単位でまとめない。同一社に複数窓口がある場合は窓口ごとに判定し、最も緩い有効な窓口を採用する。ただし E は会社単位で固定する（E は窓口の作法ではなく会社の取引条件であるため。窓口単位にすると すごろくや が A に化ける。実装 optout.py の E_IS_COMPANY_WIDE=True を法務として承認する / 2026-09-04）。抽出範囲はフォーム周辺／問い合わせ窓口の注記ブロックに限定し、ページ全文検索はしない。",
   "engine_requirements": [
     "未知の match 種別を検出したら、その規則を黙って読み飛ばさず**異常終了する**こと。読み飛ばすと、法務が塞いだはずの穴が実装側で黙って開いたままになる（v1.0 の A1 欠落と同じ事故が再発する）。",
-    "suffix_negation は**方向性のある近接判定**である。left 語の出現位置の**直後** negation_lookahead_chars 文字以内に negation 語がある場合のみヒット。前方は見ない。cooccur（無方向・同一文可）で代用してはならない。代用すると『新規お取引はこちらから。なお電話はお受けしておりません』が誤って D になる。",
+    "suffix_negation は**方向性のある近接判定**である。ヒットの成立条件は次の**2つを同時に**満たすこと。(a) left 語の出現位置の**直後** negation_lookahead_chars 文字以内に negation 語がある（前方は見ない）。(b) left 語と negation 語が **同一文内**にある（sentence_delimiters をまたがない）。**(a) だけでは足りない** — 『新規お取引はこちらから。なお電話はお受けしておりません』は12文字差で (a) を満たすが、D にしてはならない文である。v1.1 は (a) しか書いておらず、自分が挙げた反例と矛盾していた。無方向の cooccur で代用してはならないのも同じ理由。",
+    "A1_trade_window の negation_terms（否定が続く出現を A_PLUS として数えない仕組み）にも、suffix_negation と**同一の (a)+(b) 条件**を適用すること。v1.1 は (a) しか課しておらず、『新規お取引はこちらから。なお電話はお受けしておりません』のような文で**正当な A_PLUS を誤って A に降格**させる状態だった（母数を減らす方向の誤り）。",
+    "sentence_delimiters は文の区切りとして扱う文字の集合。**『／』『｜』も区切りに含める** — 収集した注記原文は複数の窓口ブロックを『／』で連結しているため、これをまたぐ判定は別窓口の文言を混ぜることになる。『、』『・』は区切りに**含めない**（『企業・店舗様との新規お取引は行っておりません』のような正当な D を落とすため）。",
     "left_context_guard は left 語の出現位置の**直前** left_context_window_chars 文字以内にガード語がある場合、その出現を無効化する。",
-    "needs_review: true の規則でヒットした行は optout_needs_review 列を true にし、optout_review_reason に規則の reason を格納すること（自動除外はするが、人が読み返せる状態にする）。",
+    "needs_review は**発火した全規則**から立てること。**『勝ったクラスの規則』だけを見てはならない。** apply_order で先に確定したクラスの規則しか見ないと、順序の変更や新規則の追加という**判定と無関係な理由で、レビュー対象が静かにフラグを失う**（v1.1 で E→D の順序変更により、ハイメスが E4（needs_review なし）で確定し、同時に発火していた D6（needs_review あり）のフラグを落とした。結論は E で変わらないが、フラグだけが消えた）。実装は全クラス・全規則を評価し、いずれかに needs_review: true があれば optout_needs_review を true、optout_review_reason にその規則の reason を格納する。",
+    "class を確定させたクラス以外で発火した規則の ID を optout_other_rule_hits に記録すること。E が先に当たった社に D3（通報明示）も当たっていた、といった事実が失われないようにするため（監査証跡）。",
     "review_triggers は判定を変えない。ヒットしても class は変えず、optout_needs_review だけを立てる。",
     "individual_decisions の突き合わせは company だけでなく aliases・正式商号・法人番号でも行うこと。表記ゆれの重複行に個別判断が乗らず、**除外したはずの会社が別表記で打診キューに残る**事故が実際に起きている（ストームレーベルズが3表記で登録され、D が付いたのは1行だけだった / 2026-09-04 検出）。"
   ],
@@ -49,6 +61,9 @@
   "proximity_window_chars": 30,
   "negation_lookahead_chars": 25,
   "left_context_window_chars": 20,
+  "require_same_sentence": true,
+  "sentence_delimiters": ["。", "．", "！", "？", "!", "?", "\n", "\r", "／", "｜", "|"],
+  "$sentence_note": "suffix_negation と A1 の否定フィルタは、lookahead 文字数と**同一文内**の両方を満たしたときにのみ成立する。片方だけでは成立しない。",
   "rules": [
     {
       "class": "D",
@@ -112,6 +127,8 @@
         "停止しております", "終了しました", "終了いたしました", "休止しております"
       ],
       "negation_lookahead_chars": 25,
+      "require_same_sentence": true,
+      "$same_sentence_note_v1_2": "**25文字以内かつ同一文内**の両方が必要。文字数だけで判定してはならない。『新規お取引はこちらから。なお電話はお受けしておりません』は12文字差だが句点をまたぐので**ヒットさせない**。",
       "left_context_guard": ["一般のお客様", "一般消費者", "消費者", "エンドユーザー", "一般の方", "個人のお客様への", "一般ユーザー"],
       "left_context_window_chars": 20,
       "needs_review": true,
@@ -162,6 +179,8 @@
       "match": "cooccur",
       "left": ["WEBでの販売のみ", "WEB販売のみ", "ウェブ販売のみ", "web販売のみ", "ネット販売のみ", "インターネット販売のみ", "通信販売のみ", "オンライン販売のみ", "EC販売のみ", "ネット通販のみ", "無店舗"],
       "right": ["新規お取引は行っておりません", "お取引は行っておりません", "お取引はお受けし", "お断り", "対象外", "お受けし", "控え", "不可", "除きます", "除く"],
+      "needs_review": false,
+      "$needs_review_answer_v1_2": "**不要。**（v1.2 でカズヨ経由の照会に回答）語彙が『WEB販売のみ』等に限定され原文の読み違いリスクが低く、条件変化への手当ては recheck_condition が担うため、E4 自体に needs_review は足さない。ハイメスのフラグが消えた件は E4 の問題ではなく『needs_review を勝ったクラスの規則からしか立てていない』実装要件の問題であり、engine_requirements 側を直した（発火した全規則から立てる）。この修正により、ハイメスは E4 で確定しても同時発火する D6 の needs_review を保持する。",
       "reason": "『WEB販売のみの事業者とは取引しない』は当社（Amazon専業）に直撃する。E1（実店舗必須）と同じ構造だが、E1 は『実店舗があること』を要件として書くのに対し、E4 は『WEB専売であること』を欠格事由として書く。表現が裏返しなので E1 の語彙では拾えない。",
       "recheck_condition": "当社がWEB以外の販売チャネル（実店舗・卸・催事等）を持ったとき"
     },
@@ -219,6 +238,8 @@
         "終了しました", "終了いたしました", "停止しております", "休止しております", "設けておりません"
       ],
       "negation_lookahead_chars": 25,
+      "require_same_sentence": true,
+      "$same_sentence_note_v1_2": "D6 と同一条件（25文字以内**かつ**同一文内）。v1.1 は文字数だけだったため、『新規お取引はこちらから。なお電話はお受けしておりません』で正当な A_PLUS を A に落としていた。母数を減らす方向の誤りで、IT の指摘対象外だが同じ欠陥なので同時に是正した。",
       "reason": "相手が取引打診を受け付けると明示している窓口。最優先。",
       "$note_v1_1": "**v1.0 の構造的欠陥はここ。** 否定の右辺が無かったため『新規お取引は行っておりません』が A_PLUS（最優先で打診）に化けた。v1.1 では negation_terms を持たせ、ヒット語の直後25文字以内に否定語がある出現は A_PLUS のヒットとして数えない。D6 が先に発火するので二重の防御になる（apply_order で D が A_PLUS より先）。"
     }
@@ -266,7 +287,8 @@
     "recheck_condition": "text / 再評価の条件（該当時のみ）",
     "optout_e_subclass": "text / E のときの下位分類（store_required|mall_prohibited|corporate_only|web_only_refused）",
     "optout_needs_review": "bool / 人の確認が必要（needs_review 規則 または review_triggers に該当）",
-    "optout_review_reason": "text / 確認が必要な理由"
+    "optout_review_reason": "text / 確認が必要な理由",
+    "optout_other_rule_hits": "text / class を確定させたクラス以外で発火した規則IDを ; 区切り（監査証跡。E が勝った社に D3 も当たっていた等の事実を残す）"
   },
   "mandatory_message_rules": [
     "メール本文・署名にURLを一切貼らない（AmazonストアURL・自社サイト・SNSすべて）。貼ると特定電子メール法2条2号の『広告宣伝ウェブサイトへの誘導』に該当し、相手の『営業お断り』表示が法的効力を持つ。",

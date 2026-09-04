@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>「営業お断り」表示企業への仕入れ打診 — 法務判定 v1.1</title><style>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>「営業お断り」表示企業への仕入れ打診 — 法務判定 v1.2</title><style>
 :root{--fg:#1b1f23;--mut:#5b6570;--line:#e3e7eb;--acc:#0b5fff;--warn:#b45309;--bad:#b91c1c;--ok:#047857;}
 *{box-sizing:border-box}
 body{margin:0;background:#f6f7f9;color:var(--fg);
@@ -376,4 +376,85 @@ a{color:var(--acc)}
 <tr><td>5</td><td>原文が空欄の333行に表示が無いこと</td><td><strong>未確認</strong>。未取得と表示なしを区別できていない</td></tr>
 </tbody></table>
 <hr>
-<p>*法務ハルオ / T-20260904-004 / v1.1 追補 / 2026-09-04*</p></div></body></html>
+<p>*法務ハルオ / T-20260904-004 / v1.1 追補 / 2026-09-04*</p>
+<hr>
+<h1>⑧ 追補（v1.2 / 2026-09-04）— 仕様の自己矛盾の是正・フラグ消失の構造修正</h1>
+<blockquote>本節は追補です。①〜⑦は変更していません。ルールファイルは <strong>v1.2</strong>。<br>発端：IT タカシから2点の差し戻し（カズヨ経由）。<strong>①は法務の仕様が誤っており、タカシの実装が正しい。</strong>実装ではなく仕様を直しました。</blockquote>
+<h2>8-0. 要旨（3行）</h2>
+<ol><li><strong><code>D6</code> の lookahead 仕様は自己矛盾していました。</strong>「直後25文字以内」としか書かず、自分が「D にしてはならない」と名指しした例文が<strong>12文字＝条件を満たして</strong>いました。<strong>同一文内</strong>を追加条件として明文化します。</li><li><strong>同じ欠陥が <code>A1</code> の否定フィルタにもありました</strong>（指摘の対象外・法務が自主検出）。同時に是正しました。</li><li><strong><code>E4</code> に <code>needs_review</code> は足しません（不要）。</strong>直すべきはフラグが順序の副作用で消える<strong>実装要件</strong>の側です。</li></ol>
+<h2>8-1. ① lookahead の仕様矛盾 — タカシの判断が正しい</h2>
+<h3>何が矛盾していたか</h3>
+<table><thead><tr><th></th><th>内容</th></tr></thead><tbody>
+<tr><td>v1.1 の規定</td><td><code>suffix_negation</code> は「left 語の<strong>直後25文字以内</strong>に negation 語があればヒット」</td></tr>
+<tr><td>同じ文書の反例</td><td>「新規お取引はこちらから。<strong>なお電話はお受けしておりません</strong>」は D にしてはならない</td></tr>
+<tr><td>実測</td><td>left 終端から negation 開始まで <strong>12文字</strong>。25文字以内に収まる</td></tr>
+<tr><td>帰結</td><td><strong>規定どおり実装すると、規定が禁じた結果になる。</strong>要求と仕様が矛盾</td></tr>
+</tbody></table>
+<p>タカシは「<strong>要求文（D にしてはならない）が上位</strong>」と判断し、句点をまたがせない実装にしました。<strong>この判断は妥当です。</strong>仕様の文言よりも、仕様が示した具体例のほうが意図を正確に表しています。実装を直させるのではなく、<strong>仕様を実装に合わせて明文化</strong>します。</p>
+<h3>v1.2 の規定（<code>engine_requirements</code> に格納）</h3>
+<p><code>suffix_negation</code> のヒットは、次の<strong>2つを同時に</strong>満たすときにのみ成立する。</p>
+<table><thead><tr><th>条件</th><th>内容</th></tr></thead><tbody>
+<tr><td><strong>(a) 距離</strong></td><td>left 語の<strong>直後</strong> <code>negation_lookahead_chars</code>（25）文字以内に negation 語がある。前方は見ない</td></tr>
+<tr><td><strong>(b) 同一文</strong></td><td>left 語と negation 語のあいだに <code>sentence_delimiters</code> が無い</td></tr>
+</tbody></table>
+<p><strong>(a) だけでは足りません。</strong> <code>sentence_delimiters</code> は <code>。．！？!? 改行 ／ ｜ |</code>。</p>
+<ul><li><strong><code>／</code> <code>｜</code> を区切りに含める理由</strong>：収集した注記原文は<strong>複数の窓口ブロックを <code>／</code> で連結</strong>しています。これをまたぐ判定は、別窓口の文言を混ぜることになります（③3-5 #3「窓口単位で判定」に反する）。</li><li><strong><code>、</code> <code>・</code> は含めない理由</strong>：「企業<strong>・</strong>店舗様との新規お取引は行っておりません」のような<strong>正当な D を落とす</strong>ためです。</li></ul>
+<h3>検証（4ケース）</h3>
+<table><thead><tr><th>入力</th><th>期待</th><th>v1.2 の結果</th></tr></thead><tbody>
+<tr><td>新規お取引はこちらから。なお電話はお受けしておりません</td><td>D にしない</td><td><strong>A_PLUS</strong> ✓</td></tr>
+<tr><td>新規お取引は行っておりません</td><td>D</td><td><strong>D</strong> ✓</td></tr>
+<tr><td>お取引に関するお問い合わせ／お電話でのお問い合わせはお受けしておりません</td><td>D にしない</td><td><strong>B</strong>（経路制限）✓</td></tr>
+<tr><td>以下の業種、業態の企業・店舗様との新規お取引は行っておりません</td><td>D</td><td><strong>D</strong> ✓</td></tr>
+</tbody></table>
+<h2>8-2. 同じ欠陥が <code>A1</code> にもあった（指摘対象外・自主検出）</h2>
+<p><code>A1_trade_window</code> の <code>negation_terms</code>（否定が続く出現を A_PLUS として数えない仕組み）も、v1.1 では<strong>距離条件しか課していませんでした</strong>。</p>
+<table><thead><tr><th>反例文の扱い</th><th>v1.1</th><th>v1.2</th></tr></thead><tbody>
+<tr><td>D 群を含む通常判定</td><td><strong>D</strong>（除外）</td><td><strong>A_PLUS</strong></td></tr>
+<tr><td><code>A1</code> 単独で見た場合</td><td><strong>A</strong>（A_PLUS から降格）</td><td><strong>A_PLUS</strong></td></tr>
+</tbody></table>
+<p><strong>害の向きは「母数を減らす」方向</strong>でした。取引窓口を明示していて電話を断っているだけの会社が、除外または降格されます。⑦7-1 で「取りこぼしと化けを同じ重さで見ていた」と書いた直後に、<strong>私自身が逆向きの誤りを1つ残していた</strong>ことになります。片方の規則だけ直して満足した結果で、v1.2 で両方に同一条件を適用しました。</p>
+<h2>8-3. ② <code>E4</code> の <code>needs_review</code> — <strong>不要</strong>。直すのは実装要件の側</h2>
+<h3>回答</h3>
+<p><strong><code>E4</code> に <code>needs_review</code> は足しません。</strong>理由は2つです。</p>
+<ol><li><code>E4</code> の語彙は「WEB販売のみ」等に限定され、<strong>原文の読み違いリスクが低い</strong>（<code>D6</code> が <code>needs_review</code> を持つのは、取引窓口語×否定という広い網で<strong>窓口の取り違え</strong>が残るため。性質が違います）</li><li>E クラスの「条件が変われば復活する」性質は、<strong><code>recheck_condition</code> が担う</strong>べきもので、<code>needs_review</code> の役目ではない</li></ol>
+<h3>ただし、指摘された事象は放置しません（構造の問題です）</h3>
+<p>タカシが見つけたのは「E4 にフラグが無い」ことではなく、<strong>「判定と無関係な理由でフラグが静かに消える」</strong>構造です。</p>
+<blockquote>v1.1 で適用順を E→D に変えた結果、ハイメスは <code>E4</code>（フラグなし）で確定し、<strong>同時に発火していた <code>D6</code>（フラグあり）のフラグを落とした。</strong>結論は E で変わらないが、フラグだけが消えた。</blockquote>
+<p>これは E4 固有の問題ではなく、<strong>順序変更・規則追加のたびに再発します。</strong>よって v1.2 では実装要件を変えます。</p>
+<table><thead><tr><th>#</th><th>v1.2 の要件</th></tr></thead><tbody>
+<tr><td>1</td><td><strong><code>needs_review</code> は発火した全規則から立てる。</strong>「勝ったクラスの規則」だけを見てはならない</td></tr>
+<tr><td>2</td><td>勝ったクラス以外で発火した規則IDを <strong><code>optout_other_rule_hits</code></strong> に記録する（監査証跡）</td></tr>
+</tbody></table>
+<p>要件2は、E 優先化のもう一つの副作用（E が勝った社に <code>D3</code>＝通報明示 も当たっていた事実が消える）への手当てでもあります。</p>
+<h3>実機確認（ハイメス）</h3>
+<table><thead><tr><th>発火した規則</th><th>クラス</th><th>needs_review</th></tr></thead><tbody>
+<tr><td><code>D6_trade_window_negated</code></td><td>D</td><td><strong>true</strong></td></tr>
+<tr><td><code>E4_web_only_refused</code></td><td>E</td><td>false</td></tr>
+<tr><td><code>A1_trade_window</code></td><td>A_PLUS</td><td>false</td></tr>
+</tbody></table>
+<p><strong>勝ちクラス = E（変化なし）／ 全規則から見た needs_review = true（復活）／ <code>optout_other_rule_hits</code> = <code>D6;A1</code>。</strong></p>
+<h2>8-4. 実データ399社への影響</h2>
+<table><thead><tr><th></th><th>件数</th></tr></thead><tbody>
+<tr><td><strong>v1.1 → v1.2 で判定が変わる社</strong></td><td><strong>0社</strong></td></tr>
+<tr><td>91パターン網羅検査</td><td>v1.2 でも <strong>A_PLUS への化けは 0</strong>（退行なし）</td></tr>
+<tr><td>肯定形39パターンの喪失</td><td><strong>0</strong></td></tr>
+</tbody></table>
+<p><strong>実データ上は無害でした。</strong>それでも直すのは、⑧8-1 の矛盾が<strong>次に読む人が確実に踏む</strong>類のものだからです（同種の「書いてあることと実際が違う」事故が本日この会社で5件出ています）。</p>
+<h2>8-5. ③ 母数の3値化について（カズヨからの共有への応答）</h2>
+<p>⑦7-2 で申し上げた限界に、実測が付きました。</p>
+<table><thead><tr><th>状態</th><th>社数</th></tr></thead><tbody>
+<tr><td>注記あり（原文取得）</td><td>66</td></tr>
+<tr><td>確認済み・表示なし</td><td>34</td></tr>
+<tr><td><strong>未取得</strong></td><td><strong>299</strong></td></tr>
+</tbody></table>
+<p><strong>実際に確認できたのは100社、未確認率75%です。</strong>⑦7-2 で私が「実質395社」と書いたのは、<strong>打診可能社数として読まれうる不適切な書き方</strong>でした。訂正します。<strong>表示を確認した上で打診してよいと言えるのは、現時点で100社のうちの該当分だけです。</strong>残り299社は、打診の直前に窓口URLを開いて確認する運用でしか埋まりません。CSV ヘッダに3値を明記する対応で妥当です。</p>
+<h2>8-6. ④ ブリヂストン・Hikari（カズヨの判断への応答）</h2>
+<p><strong>了解しました。異議ありません。</strong>法務としての表示判定が A であることと、事業判断として E に置くことは両立します。<code>decision_type: &quot;business&quot;</code> で固定され、再走行で A に戻らないことも確認済みとのことで、こちらから追加の手当ては不要です。<strong>この2社の判定を動かすのはカズヨの領分</strong>であり、法務は覆しません。</p>
+<h2>8-7. 未確定・グレー（v1.2 分）</h2>
+<table><thead><tr><th>#</th><th>内容</th><th>区分</th></tr></thead><tbody>
+<tr><td>1</td><td><code>／</code> を文区切りに含める妥当性</td><td><strong>収集形式に依存する事実</strong>。現在の <code>form_optout_notice</code> が複数窓口を <code>／</code> で連結しているという実装事実に基づく。収集形式が変わったら見直しが要る</td></tr>
+<tr><td>2</td><td><code>、</code> <code>・</code> を区切りに含めない判断</td><td><strong>トレードオフ</strong>。「〜、しかしお取引はしておりません」型の長文で取りこぼす可能性は残る。ただし含めると正当な D を落とすため、取りこぼし側を選んだ</td></tr>
+<tr><td>3</td><td>25文字という距離</td><td><strong>経験則</strong>。根拠のある数字ではない。同一文条件が入ったことで距離の重要度は下がった</td></tr>
+</tbody></table>
+<hr>
+<p>*法務ハルオ / T-20260904-004 / v1.2 追補 / 2026-09-04*</p></div></body></html>
