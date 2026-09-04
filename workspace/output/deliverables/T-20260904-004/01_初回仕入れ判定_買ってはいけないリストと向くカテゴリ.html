@@ -177,7 +177,8 @@ tbody tr.row-danger td:first-child{box-shadow:inset 4px 0 0 var(--alert);}
 tbody tr.row-danger td{background:color-mix(in srgb, var(--alert-bg) 70%, transparent);}
 
 /* ---------- 出典一覧（--reftable） ---------- */
-table.reftable:has(colgroup){table-layout:fixed;}
+table.reftable:has(colgroup){table-layout:fixed; min-width:600px;}
+/* 狭い画面で列が1〜2文字幅に潰れるのを防ぐ。溢れは .tw の横スクロールが受ける */
 table.reftable td:first-child{
   min-width:2.6em; width:2.6em; text-align:right; white-space:nowrap;
   font-variant-numeric:tabular-nums; color:var(--muted);
