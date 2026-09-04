@@ -51,6 +51,17 @@ class ProfitInput:
     wholesale_price_is_tax_included: bool = True  # 卸価格が税込か
     tax_rate: float = fees.CONSUMPTION_TAX_RATE   # 税抜→税込換算に使う税率
 
+    # 販売手数料に掛かる消費税率。**Amazon の販売手数料は税抜表示**で、請求は×1.1です
+    # （FBA配送代行手数料・在庫保管手数料は税込表示なので、そちらに二重に掛けないこと）。
+    # 経理ハジメ実測 2026-09-04 / T-20260904-004 `referral_fee_tax_multiplier`。
+    #
+    # ⚠️ 既定を 0.0（＝掛けない）にしているのは**互換のため**であって、
+    #    0.0 が正しいからではありません。この engine は他のツール（app.py・discovery）
+    #    からも呼ばれており、既定値を変えると走行中の他ジョブの数字が黙って動きます。
+    #    **新しく呼ぶ側は 0.10 を明示的に渡してください。**
+    #    既存の呼び出し側を 0.10 に寄せる作業は別チケットで（秘書へ差し戻し済み）。
+    referral_fee_tax_rate: float = 0.0
+
     # 閾値はインスタンス単位でも上書き可能（A/Bテストや社長の気分調整用）
     threshold_margin_rate: float = THRESHOLD_MARGIN_RATE
     threshold_net_profit_yen: float = THRESHOLD_NET_PROFIT_YEN
@@ -128,6 +139,13 @@ def calculate(data: ProfitInput) -> ProfitResult:
     cfg = fees.get_referral_rate(data.category_key)
     if referral_fee == cfg["min_fee_yen"] and cfg["min_fee_yen"] > 0:
         notes.append(f"最低手数料{cfg['min_fee_yen']:.0f}円が適用されました")
+    if data.referral_fee_tax_rate:
+        tax = referral_fee * data.referral_fee_tax_rate
+        notes.append(
+            f"販売手数料の消費税{data.referral_fee_tax_rate*100:.0f}%を加算"
+            f"（{referral_fee:.0f}円→{referral_fee + tax:.0f}円）"
+        )
+        referral_fee += tax
 
     # 3. FBA 手数料（サイズ区分別固定額）
     fba_cfg = fees.get_fba_fee(data.size_key)

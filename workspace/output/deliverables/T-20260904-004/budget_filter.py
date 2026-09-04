@@ -46,6 +46,18 @@ SKU_SPEND_MAX_YEN = 10_000       # 1SKU あたりの仕入れ額の上限（＝1
 MIN_MARGIN_RATE_PCT = 5.0        # 利益率の下限（社長決定。赤字は当然不可）
 EXCLUDE_FBA_SIZES = {"大型"}      # 5万円の枠に大型は見合わない（送料・保管料）
 
+# 売れるたびに1点あたり必ず乗る固定費（売価に関係しない）。経理ハジメ実測 2026-09-04。
+#   小口プラン基本成約料 110円 ＋ 納品代行 12円 ＋ FBA納品送料 37.5円 ＝ 159.5円
+# ⚠️ **これが低単価品を食い潰します。** 仕入単価500円の商品なら、単価の32%が
+#    売れた瞬間に消えます。だから予算5万円は「安いものを多数」ではなく
+#    「単価の高いものを少数」に寄せるべき、というのが経理の逆算結果です。
+#    （販売手数料の消費税は売価連動なのでここには入れず、利益計算側で乗せています）
+FIXED_COST_PER_UNIT_YEN = 110 + 12 + 37.5
+
+# 仕入単価に対して固定費が占める割合。これを超えたら「低単価すぎる」と警告する。
+# 除外はしません（判定材料として残す・社長が線を引けるように）。
+FIXED_COST_RATIO_WARN = 0.20
+
 # 消費税。NETSEA の set[].price は税抜、set_price は税込（公式スキーマ）。
 TAX = 1.10
 
@@ -211,6 +223,26 @@ def read_tariff(tariff: dict, prefecture: str = TARIFF_REFERENCE_PREFECTURE) -> 
     return out
 
 
+def order_shipping(tariff: dict, order_total_yen: int,
+                   prefecture: str = TARIFF_REFERENCE_PREFECTURE):
+    """この注文額のとき、実際にいくら送料が掛かるか。取れなければ **None**（空欄）。
+
+    段階設定があるなら、注文額が切り替え金額**以上**なら price2、未満なら price1。
+    推測はしません。設定が取れなければ None を返し、呼び出し側で空欄にします。
+    """
+    if not tariff:
+        return None
+    hit = next((p for p in (tariff.get("prices") or [])
+                if p.get("prefecture") == prefecture), None)
+    if hit is None:
+        return None
+    p1, p2 = hit.get("price1"), hit.get("price2")
+    border = tariff.get("gradual_border_price")
+    if not tariff.get("gradual_flag") or border is None or p2 is None:
+        return p1
+    return p2 if order_total_yen >= int(border) else p1
+
+
 # =============================================================================
 # 本体
 # =============================================================================
@@ -227,6 +259,7 @@ KEEP_COLUMNS = [
 OUT_COLUMNS = KEEP_COLUMNS + [
     "★仕入れ額(税込)", "★仕入れ口数", "★仕入れ個数(NETSEA単位)", "★出品可能数(Amazon単位)",
     "★仕入れ額の出所", "★見込み粗利(この仕入れ額ぶん)",
+    "★仕入れ単価(税込)", "★1点あたり固定費", "★固定費が仕入れ単価に占める割合%", "★単価帯の警告",
     "★1ヶ月で捌ける見込み(個)", "★回転の根拠", "★予算内で買える理由",
 ]
 
@@ -273,8 +306,23 @@ def filter_rows(rows: list) -> tuple:
 
         cap, cap_note = velocity_cap(row, plan)
         profit_per_unit = _float(row.get("純利益"), 0) or 0
+
+        # 1点あたり固定費が仕入単価をどれだけ食うか。**低単価品の足切りではなく警告**。
+        unit_incl = plan["spend"] / max(plan["qty_amazon"], 1)
+        ratio = FIXED_COST_PER_UNIT_YEN / unit_incl if unit_incl else 0
+        if ratio >= FIXED_COST_RATIO_WARN:
+            warn = (f"低単価。1点あたり固定費{FIXED_COST_PER_UNIT_YEN:.0f}円が"
+                    f"仕入単価{unit_incl:.0f}円の{ratio*100:.0f}%を食います"
+                    f"（経理ハジメ: 予算5万円は単価の高いものを少数に寄せるべき）")
+        else:
+            warn = ""
+
         out = {k: row.get(k, "") for k in KEEP_COLUMNS}
         out.update({
+            "★仕入れ単価(税込)": round(unit_incl),
+            "★1点あたり固定費": round(FIXED_COST_PER_UNIT_YEN),
+            "★固定費が仕入れ単価に占める割合%": round(ratio * 100, 1),
+            "★単価帯の警告": warn,
             "★仕入れ額(税込)": plan["spend"],
             "★仕入れ口数": plan["lots"],
             "★仕入れ個数(NETSEA単位)": plan["qty_netsea"],
@@ -290,7 +338,12 @@ def filter_rows(rows: list) -> tuple:
         })
         kept.append(out)
 
-    kept.sort(key=lambda r: -(_float(r.get("★見込み粗利(この仕入れ額ぶん)"), 0) or 0))
+    # 粗利の降順。ただし**低単価警告のある行は下げる**（経理ハジメ 2026-09-04）。
+    # 1点160円の固定費に対して単価が薄い組み合わせは、少し数字がぶれるだけで赤字に落ちます。
+    kept.sort(key=lambda r: (
+        1 if r.get("★単価帯の警告") else 0,
+        -(_float(r.get("★見込み粗利(この仕入れ額ぶん)"), 0) or 0),
+    ))
     return kept, reasons
 
 
@@ -328,6 +381,21 @@ def supplier_summary(kept: list, tariffs: dict, supplier_ids: dict) -> list:
         else:
             s["集約可能性"] = "× 1SKUのみ。この社のためだけに送料を払うことになります"
 
+        # ── NETSEA送料を「注文単位」で実額計上する ─────────────────────
+        # ⚠️ **利益計算に入っていなかった最大の穴です。**
+        #    `/items` の ship_fee に値があるのは 257,067件中951件（0.37%）だけで、
+        #    99.6%の商品は「送料ゼロ」で利益が出ていました（経理ハジメ実測 2026-09-04）。
+        #    送料は**商品ではなく注文**に掛かるので、按分できるのはここだけです。
+        total = s["合計仕入れ額(税込)"]
+        ship = order_shipping(tariffs.get(int(sid)) if sid else None, total)
+        s["この注文の送料(実費)"] = "" if ship is None else ship
+        s["送料込みの見込み粗利"] = (
+            "" if ship is None else s["合計見込み粗利"] - ship)
+        # NETSEA は初回注文送料無料特集を開催中（〜2026/10/1 12:00・コメント欄に
+        # 「送料無料」入力が必須）。**発注は §4.1 かつアカウント停止中なので実行しません。**
+        # 社長判断のためのシナリオとしてだけ持ちます。
+        s["初回送料無料を使えた場合の粗利"] = s["合計見込み粗利"]
+
         # 送料無料ラインに届くか。**届かない場合、いくら足りないかまで出す。**
         line = s["送料無料ライン"]
         if line == "":
@@ -337,7 +405,6 @@ def supplier_summary(kept: list, tariffs: dict, supplier_ids: dict) -> list:
                 else "送料設定を取得できていません"
             )
         else:
-            total = s["合計仕入れ額(税込)"]
             if total >= line:
                 s["送料無料ラインに届くか"] = (
                     f"○ 届きます（{total:,}円 ≧ {line:,}円）")
@@ -354,6 +421,7 @@ def supplier_summary(kept: list, tariffs: dict, supplier_ids: dict) -> list:
 SUPPLIER_COLUMNS = [
     "サプライヤー名", "supplier_id", "業態", "候補SKU数", "集約可能性",
     "合計仕入れ額(税込)", "合計見込み粗利",
+    "この注文の送料(実費)", "送料込みの見込み粗利", "初回送料無料を使えた場合の粗利",
     "送料無料ライン", "送料無料ラインに届くか", "送料の段階", "送料(下段)", "送料(上段)",
     "送料の出所", "最小の仕入れ額", "最安SKUのJAN",
 ]

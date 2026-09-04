@@ -113,34 +113,82 @@ SUSPICIOUS_PRICE_RATIO = 4.0
 class CostAssumptions:
     """利益計算に入る「NETSEA にも Keepa にも載っていない値」。
 
-    ⚠️ ここに並ぶのは **すべて推定** です。卸値と Amazon 売値だけが実額です。
+    出所は経理ハジメの実測版（2026-09-04 / T-20260904-004）:
+        workspace/output/deliverables/T-20260904-004/C1_cost_assumptions.json
+    確度（実測／二次情報／推定）は上記 JSON が持ちます。ここは**計算に使う値**だけ。
+
+    ⚠️ 卸値と Amazon 売値だけが実額です。それ以外は推定が混じります。
        CSV には内訳を列で出すので、社長が自分の実績値で置き換えられます。
     """
 
-    # FBA 倉庫への納品送料（1個あたり）。
-    # 段ボール1箱(160サイズ)1,500円前後 / 1箱15個 と仮定した粗い按分。
-    fba_inbound_yen: float = 100.0
+    # ── 売れるたびに1点あたり必ず乗る固定費（売価に関係しない）─────────────
+    # ⚠️ **この3つが 2026-09-04 まで丸ごと抜けていました。** 合計 約122〜139円/点。
+    #    低単価品ほど効きます（500円の商品なら売価の3割が消える）。
 
-    # NETSEA → 自宅の送料を何個で按分するか（初回ロットの想定発注数）。
+    # 小口プランの基本成約料。売れた1点ごと。大口（月4,900円税抜）には無い。
+    # 社長は小口プラン（memory: project_amazon_plan_koguchi）なので**必ず発生**します。
+    closing_fee_yen: float = 110.0
+
+    # Amazon 販売手数料に掛かる消費税。販売手数料は**税抜表示**で請求は×1.1。
+    # FBA配送代行・保管料は税込表示なので、そちらには掛けないこと。
+    referral_fee_tax_rate: float = 0.10
+
+    # FBA 納品代行の作業費（検品・ラベル貼付・資材込）。e-fba.com 単品12円/点。
+    # 社長方針は物理作業の外注前提（memory: owner_pc_complete_outsourcing）。
+    prep_service_yen: float = 12.0
+
+    # ── 納品送料 ────────────────────────────────────────────────
+    # 納品代行 → FBA の配送料 750円/箱(140サイズ) ÷ 20点。
+    # 旧値100円は「1箱1,500円 ÷ 15点」という根拠の無い概算でした。
+    fba_inbound_yen: float = 37.5
+
+    # NETSEA → 納品代行 の送料を何個で按分するか（初回ロットの想定発注数）。
+    # ⚠️ ここは**ほぼ効きません**。`/items` の ship_fee に値があるのは
+    #    257,067件中951件（0.37%）だけで、99.6%は 0 のまま計算されます。
+    #    NETSEA 送料の実額は `GET /tariffs` にあり、**発注単位**（商品単位ではない）で
+    #    掛かるため、budget_filter.py 側でサプライヤーごとに按分します。
     netsea_ship_amortize_qty: int = 10
 
-    # FBA 在庫保管月数。回転の悪い商品を甘く見ないよう保守側（繁忙期レート）で計算する。
-    storage_months: float = 2.0
+    # ── 保管 ────────────────────────────────────────────────────
+    # 保管料は月次の平均在庫に課される。3ヶ月で線形に売り切る前提なら
+    # 平均在庫は初期数量の1/2＝実効1.5ヶ月分。旧値2.0は二重に保守的でした。
+    # 初回納品は9〜10月想定で保管が10〜12月に重なるため、レートは繁忙期（保守側）。
+    storage_months: float = 1.5
     storage_peak_season: bool = True
 
-    # 梱包資材・ラベル・返品引当のざっくり。売値の何%か。
-    misc_cost_rate: float = 0.03
+    # ── 返品引当（旧「雑費 売価の3%」を置換）──────────────────────────
+    # 旧実装は売価×3%でしたが、**返品コストは売価では決まりません**（手数料と原価で決まる）。
+    #     返品引当 = 返品率 × ( FBA配送代行手数料 + 返金処理手数料 + 仕入原価 × 50% )
+    #     返金処理手数料 = min(500円, 販売手数料の10%)
+    #     仕入原価×50% = 返品品の半分は再販不可という仮定
+    # 返品率は **自社実績ゼロ**（社長の販売実績が無い）。初回販売後に実績へ差し替えること。
+    return_rate: float = 0.03
+    return_unsellable_rate: float = 0.50
+    refund_admin_fee_cap_yen: float = 500.0
+    refund_admin_fee_rate: float = 0.10
 
     # 卸価格が税抜表記であることの明示（NETSEA set[].price は税抜）。
+    # 社長は免税事業者・インボイス未登録のため仕入税額控除ができず、**税込が実コスト**。
     wholesale_is_tax_included: bool = False
+
+    def return_provision(self, fba_fee: float, referral_fee: float,
+                         wholesale_incl_tax: float) -> float:
+        """1点あたりの返品引当。**売価には連動させません。**"""
+        refund_admin = min(self.refund_admin_fee_cap_yen,
+                           referral_fee * self.refund_admin_fee_rate)
+        loss = fba_fee + refund_admin + wholesale_incl_tax * self.return_unsellable_rate
+        return self.return_rate * loss
 
     def as_note(self) -> str:
         """CSV / README に「何を仮定したか」を1行で残すための文字列。"""
         return (
-            f"FBA納品送料{self.fba_inbound_yen:.0f}円/個・"
-            f"NETSEA送料は{self.netsea_ship_amortize_qty}個按分・"
+            f"基本成約料{self.closing_fee_yen:.0f}円/点・"
+            f"販売手数料の消費税{self.referral_fee_tax_rate*100:.0f}%・"
+            f"納品代行{self.prep_service_yen:.0f}円/点・"
+            f"FBA納品送料{self.fba_inbound_yen:.1f}円/点・"
             f"保管{self.storage_months}ヶ月({'繁忙期' if self.storage_peak_season else '通常期'}レート)・"
-            f"雑費{self.misc_cost_rate*100:.0f}%"
+            f"返品率{self.return_rate*100:.0f}%引当"
+            f"（経理ハジメ実測版 2026-09-04 / C1_cost_assumptions.json）"
         )
 
 

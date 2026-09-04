@@ -43,7 +43,11 @@ class Evaluation:
     size_key: str = "unknown"
     size_label: str = ""
     storage_fee: float = 0.0
-    misc_cost: float = 0.0
+    # 旧「雑費（売価の3%）」を置換。売価には連動させない（経理ハジメ 2026-09-04）。
+    return_provision: float = 0.0
+    # 小口プランの基本成約料。売れた1点ごとに必ず乗る（売価に関係しない）。
+    closing_fee: float = 0.0
+    # FBA納品送料 ＋ 納品代行の作業費 ＋ NETSEA送料の按分。
     inbound_shipping: float = 0.0
     # NETSEA 1単位に対して Amazon 1出品が何単位ぶんか。卸値をこの数だけ掛ける。
     pack_size: int = 1
@@ -143,7 +147,11 @@ def evaluate(
         if candidate.ship_fee
         else 0.0
     )
-    ev.inbound_shipping = costs.fba_inbound_yen + netsea_ship_per_unit
+    # 納品代行の作業費は「物理作業は外注」という社長方針の実費。
+    # 2026-09-04 まで1円も入っていませんでした（owner_pc_complete_outsourcing に反する）。
+    ev.inbound_shipping = (
+        costs.fba_inbound_yen + costs.prep_service_yen + netsea_ship_per_unit)
+    ev.closing_fee = costs.closing_fee_yen
 
     # 保管手数料は体積が要る。寸法不明なら 0 にせず、標準1の代表体積で仮置きすると
     # 嘘になるので **0 のまま「不明」を status に残す**方針にした（過小評価は明示する）。
@@ -159,8 +167,6 @@ def evaluate(
             peak_season=costs.storage_peak_season,
         )
 
-    ev.misc_cost = facts.price_yen * costs.misc_cost_rate
-
     # ⚠️ まとめ売り出品への対応。**ここを忘れると利益が数倍に膨らんで出ます。**
     # 入数は **Amazon 側の商品名にしか書かれていないことが多い**（NETSEA 側は単品名）。
     # 事故2回とも、Amazon のタイトルを読まなかったこと（読めなかったこと）が原因でした。
@@ -172,19 +178,31 @@ def evaluate(
     wholesale_for_listing = candidate.wholesale_ex_tax * ev.pack_size
 
     size_key_for_fee = "standard_2" if ev.size_key == "unknown" else ev.size_key
-    ev.result = profit.calculate(
-        profit.ProfitInput(
-            wholesale_price=wholesale_for_listing,
-            wholesale_price_is_tax_included=costs.wholesale_is_tax_included,
-            amazon_price=facts.price_yen,
-            category_key=ev.category_key,
-            size_key=size_key_for_fee,
-            inbound_shipping=ev.inbound_shipping,
-            other_costs=ev.storage_fee + ev.misc_cost,
-            threshold_margin_rate=cfg.min_margin_rate,
-            threshold_net_profit_yen=cfg.min_net_profit,
+
+    def run(other_costs: float):
+        return profit.calculate(
+            profit.ProfitInput(
+                wholesale_price=wholesale_for_listing,
+                wholesale_price_is_tax_included=costs.wholesale_is_tax_included,
+                amazon_price=facts.price_yen,
+                category_key=ev.category_key,
+                size_key=size_key_for_fee,
+                inbound_shipping=ev.inbound_shipping,
+                other_costs=other_costs,
+                # 販売手数料は税抜表示。請求は×1.1（経理ハジメ実測 2026-09-04）。
+                referral_fee_tax_rate=costs.referral_fee_tax_rate,
+                threshold_margin_rate=cfg.min_margin_rate,
+                threshold_net_profit_yen=cfg.min_net_profit,
+            )
         )
-    )
+
+    # 返品引当は「FBA配送料と販売手数料と仕入原価」から決まるので、
+    # 手数料が確定してからでないと出せません。calculate は純関数なので2回呼びます
+    # （返品引当を売価×3%で済ませていた旧実装の、経理的な根拠の無さを直すため）。
+    first = run(ev.storage_fee + ev.closing_fee)
+    ev.return_provision = costs.return_provision(
+        first.fba_fee, first.referral_fee, first.wholesale_price_incl_tax)
+    ev.result = run(ev.storage_fee + ev.closing_fee + ev.return_provision)
     # 機械的な異常値ガード。人の注意力に頼らず、ここで捕まえる。
     ratio = facts.price_yen / max(wholesale_for_listing * (1 + fees.CONSUMPTION_TAX_RATE), 1)
     if ratio >= config.SUSPICIOUS_PRICE_RATIO and not ev.review_reason:
@@ -211,7 +229,7 @@ COLUMNS = [
     "Amazon価格", "価格の出所", "純利益", "利益率%", "利益率区分", "ROI%",
     "月間販売数(30日ランク下落数)", "月間販売数(90日ドロップ÷3)",
     "出品者数", "出品者数の出所", "Amazon本体の有無", "ランキング",
-    "FBAサイズ", "手数料内訳", "販売手数料", "FBA配送料", "保管料", "納品送料", "雑費",
+    "FBAサイズ", "手数料内訳", "販売手数料(消費税込)", "FBA配送料", "保管料", "納品送料(FBA+納品代行)", "基本成約料", "返品引当",
     "出品の入数", "入数の根拠", "要確認理由", "最小発注数", "最小発注額(税込)", "他サプライヤー数", "同一JANのASIN数", "ネット販売可否",
     "総合判定", "利益判定", "法令要確認", "発注前に必ず確認",
     "状態", "Amazonページ", "Keepaリンク", "NETSEA商品ページ", "備考",
@@ -254,10 +272,11 @@ def to_row(ev: Evaluation) -> dict:
         ),
         "ランキング": f.sales_rank if f.sales_rank is not None else "",
         "FBAサイズ": ev.size_label,
-        "手数料内訳": "", "販売手数料": "", "FBA配送料": "",
+        "手数料内訳": "", "販売手数料(消費税込)": "", "FBA配送料": "",
         "保管料": round(ev.storage_fee) if ev.storage_fee else "",
-        "納品送料": round(ev.inbound_shipping) if ev.inbound_shipping else "",
-        "雑費": round(ev.misc_cost) if ev.misc_cost else "",
+        "納品送料(FBA+納品代行)": round(ev.inbound_shipping) if ev.inbound_shipping else "",
+        "基本成約料": round(ev.closing_fee) if ev.closing_fee else "",
+        "返品引当": round(ev.return_provision) if ev.return_provision else "",
         "出品の入数": ev.pack_size,
         "入数の根拠": ev.pack_reason,
         "要確認理由": ev.review_reason,
@@ -282,15 +301,16 @@ def to_row(ev: Evaluation) -> dict:
             "利益率%": round(r.margin_rate * 100, 1),
             "利益率区分": margin_band(r.margin_rate),
             "ROI%": round(r.roi * 100, 1),
-            "販売手数料": round(r.referral_fee),
+            "販売手数料(消費税込)": round(r.referral_fee),
             "FBA配送料": round(r.fba_fee),
             "利益判定": r.verdict,
             "手数料内訳": (
-                f"販売{round(r.referral_fee)}({r.referral_rate*100:.1f}%)"
+                f"販売{round(r.referral_fee)}({r.referral_rate*100:.1f}%・消費税込)"
                 f"+FBA{round(r.fba_fee)}"
+                f"+成約料{round(ev.closing_fee)}"
                 f"+保管{round(ev.storage_fee)}"
                 f"+納品{round(ev.inbound_shipping)}"
-                f"+雑費{round(ev.misc_cost)}"
+                f"+返品引当{round(ev.return_provision)}"
             ),
         })
     return row

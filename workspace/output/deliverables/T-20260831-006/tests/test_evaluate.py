@@ -93,15 +93,41 @@ def test_寸法も重量も無ければ不明として標準2で仮置きしそ�
 
 def test_保管料は体積と月数から計算され純利益に反映される():
     ev = evaluate.evaluate(_cand(), _facts(package_mm=(300, 200, 100)), CFG)
-    # 30×20×10cm = 6,000cm³ / 繁忙期 10.087円 per 1,000cm³ / 2ヶ月
-    assert abs(ev.storage_fee - 6.0 * 10.087 * 2) < 0.01
+    # 30×20×10cm = 6,000cm³ / 繁忙期 10.087円 per 1,000cm³ / 1.5ヶ月
+    # （2.0→1.5 は経理ハジメ実測版 2026-09-04。3ヶ月線形消化なら平均在庫は1/2）
+    assert abs(ev.storage_fee - 6.0 * 10.087 * 1.5) < 0.01
     assert ev.result.other_costs >= ev.storage_fee
 
 
-def test_納品送料はFBA納品分とNETSEA送料の按分の合計():
+def test_納品送料はFBA納品分と納品代行費とNETSEA送料の按分の合計():
     ev = evaluate.evaluate(_cand(ship_fee=800), _facts(), CFG)
-    # FBA納品100円 + NETSEA送料800円 ÷ 10個
-    assert abs(ev.inbound_shipping - 180) < 0.01
+    # FBA納品37.5円 + 納品代行12円 + NETSEA送料800円 ÷ 10個 = 129.5円
+    # 旧値は「FBA納品100円 + 80円」で、**納品代行の作業費が1円も入っていなかった**。
+    # 社長方針は物理作業の外注前提なので、これは費目の欠落だった（2026-09-04 修正）。
+    assert abs(ev.inbound_shipping - (37.5 + 12 + 80)) < 0.01
+
+
+def test_売れるたび乗る固定費が計上される():
+    """2026-09-04 まで丸ごと抜けていた3費目の回帰テスト。
+
+    小口プランの基本成約料・販売手数料の消費税・納品代行の作業費は、
+    **売価に関係なく1点あたり必ず乗ります**。低単価品ほど効きます。
+    """
+    ev = evaluate.evaluate(_cand(), _facts(), CFG)
+    assert ev.closing_fee == 110                      # 小口プラン基本成約料(税込)
+    assert ev.inbound_shipping >= 12                  # 納品代行の作業費が入っている
+    assert ev.return_provision > 0                    # 返品引当（旧「雑費」の置換）
+    # 販売手数料は税抜表示。請求は×1.1。
+    bare = ev.result.amazon_price * ev.result.referral_rate
+    assert abs(ev.result.referral_fee - bare * 1.1) < 0.01
+
+
+def test_返品引当は売価に連動しない():
+    """旧実装は売価×3%だった。返品コストは手数料と仕入原価で決まる。"""
+    cheap = evaluate.evaluate(_cand(), _facts(price_yen=3000), CFG)
+    rich = evaluate.evaluate(_cand(), _facts(price_yen=30000), CFG)
+    # 売価が10倍でも引当は10倍にならない（返金処理手数料の上限500円が効くため）
+    assert rich.return_provision < cheap.return_provision * 10
 
 
 def test_赤字でもはずれとして必ず評価が返る():
@@ -125,7 +151,8 @@ def test_計算できない行でも列は揃い数値欄は空欄になる():
 def test_手数料内訳は各費目の合計と一致する():
     ev = evaluate.evaluate(_cand(), _facts(), CFG)
     row = evaluate.to_row(ev)
-    parts = row["販売手数料"] + row["FBA配送料"] + row["保管料"] + row["納品送料"] + row["雑費"]
+    parts = (row["販売手数料(消費税込)"] + row["FBA配送料"] + row["保管料"]
+             + row["納品送料(FBA+納品代行)"] + row["基本成約料"] + row["返品引当"])
     total = row["Amazon価格"] - row["純利益"] - row["NETSEA卸値(税込)"]
     assert abs(parts - total) <= 3  # 表示丸めぶんの誤差だけ許容
 
