@@ -50,13 +50,37 @@ def personal(r):
     return "個人事業主の疑い" in r["備考"]
 
 
+def signal_cell(r):
+    v = r["取引可否シグナル"]
+    if not v:
+        return '<span class="na">—</span>'
+    cls = "sig-out" if v.startswith("対象外") else ("sig-go" if "有望" in v else "sig")
+    return f'<span class="{cls}">{inline(v)}</span>'
+
+
+def hide(r, v):
+    """個人事業主の疑いがある社の実データだけを伏せる。
+
+    CSV 側が既に【非掲載】等の注記に置き換えている場合は、その注記をそのまま出す
+    （こちらで二重に隠すと、なぜ空欄なのかが読み手に伝わらなくなる）。
+    """
+    if not v:
+        return ""
+    if personal(r) and "非掲載" not in v and "除外" not in v:
+        return MASK
+    return H.escape(v)
+
+
 def txt(s):
     return inline(s or "")
 
 
 def link(u):
+    """URL でない値（CSV 側の【非掲載】注記など）をリンクにしない。"""
     if not u:
         return '<span class="na">—</span>'
+    if not u.lower().startswith(("http://", "https://")):
+        return f'<span class="na">{H.escape(u)}</span>'
     return f'<a class="url" href="{H.escape(u, quote=True)}">{H.escape(u)}</a>'
 
 
@@ -85,10 +109,10 @@ def card(r, highlight=False):
     body = [
         kv("取引可否シグナル", txt(r["取引可否シグナル"]) or '<span class="na">—</span>'),
         kv("使ってよい連絡手段", channels(r)),
-        kv("電話", MASK if (personal(r) and r["電話"]) else (H.escape(r["電話"]) or '<span class="na">—</span>')),
+        kv("電話", hide(r, r["電話"]) or '<span class="na">—</span>'),
         kv("問い合わせフォーム", link(r["問い合わせフォームURL"])),
         kv("メール", H.escape(r["メール"]) or '<span class="na">—</span>'),
-        kv("所在地", MASK if (personal(r) and r["所在地"]) else (H.escape(r["所在地"]) or '<span class="na">—</span>')),
+        kv("所在地", hide(r, r["所在地"]) or '<span class="na">—</span>'),
         kv("法人番号", H.escape(r["法人番号"]) or '<span class="na">—</span>'),
         kv("公式HP", link(r["公式HP"])),
         kv("Amazon で当社が見つけた商品", f'{H.escape(r["該当商品数"])}件 ／ 代表: {txt(r["代表商品名"])}'),
@@ -114,8 +138,7 @@ def list_rows(rs):
         if r["公式HP"]:
             contact.append(f'<span class="ct">公式HP</span> {link(r["公式HP"])}')
         if r["電話"]:
-            contact.append(f'<span class="ct">電話</span> '
-                           + (MASK if personal(r) else H.escape(r["電話"])))
+            contact.append(f'<span class="ct">電話</span> ' + hide(r, r["電話"]))
         if r["問い合わせフォームURL"]:
             contact.append(f'<span class="ct">フォーム</span> {link(r["問い合わせフォームURL"])}')
         if r["メール"]:
@@ -123,14 +146,12 @@ def list_rows(rs):
         if not contact:
             contact = ['<span class="na">連絡先なし（下段の備考を読むこと）</span>']
         note = []
-        if personal(r):
-            note.append(H.escape(r["正式商号"]) + " ／ 所在地は " + MASK)
+        if personal(r) and r["所在地"]:
+            note.append(H.escape(r["正式商号"]) + " ／ " + hide(r, r["所在地"]))
         elif r["正式商号"] or r["所在地"]:
             note.append(H.escape(" ".join(x for x in [r["正式商号"], r["所在地"]] if x)))
         if r["法人番号"]:
             note.append("法人番号 " + H.escape(r["法人番号"]))
-        if r["取引可否シグナル"]:
-            note.append("シグナル: " + txt(r["取引可否シグナル"]))
         if r["form_optout_notice"]:
             note.append("公式サイトの表示: " + txt(r["form_optout_notice"]))
         note.append("Amazon で見つけた商品の代表: " + txt(r["代表商品名"]))
@@ -149,8 +170,9 @@ def list_rows(rs):
             f'<td class="num">{H.escape(r["該当商品数"])}</td>'
             f'<td class="num">{yen(r["想定仕入れ金額の中央値"])}<br>⇢ {yen(r["Amazon価格の中央値"])}</td>'
             f'<td>{H.escape(r["確度"])}</td>'
+            f'<td class="sigcell">{signal_cell(r)}</td>'
             f'<td class="ctcell">{"<br>".join(contact)}</td></tr>'
-            f'<tr class="noterow"><td></td><td colspan="6">{" ／ ".join(note)}'
+            f'<tr class="noterow"><td></td><td colspan="7">{" ／ ".join(note)}'
             f'<div class="src">出典: {urls(r["出典URL"])}</div></td></tr>')
     return "".join(out)
 
@@ -170,23 +192,25 @@ def stop_rows(rs):
         hard = r["optout_class"] in ("D", "E")
         note = []
         if r["所在地"]:
-            note.append(MASK if personal(r) else H.escape(r["所在地"]))
+            note.append(hide(r, r["所在地"]))
         if r["法人番号"]:
             note.append("法人番号 " + H.escape(r["法人番号"]))
         if r["公式HP"]:
             note.append("公式HP: " + link(r["公式HP"]))
         if r["電話"]:
-            note.append("電話 " + (MASK if personal(r) else H.escape(r["電話"])))
+            note.append("電話 " + hide(r, r["電話"]))
         if r["問い合わせフォームURL"]:
             note.append("フォーム: " + link(r["問い合わせフォームURL"]))
         if r["メール"]:
             note.append("メール " + H.escape(r["メール"]))
-        note.append(f'確度 {H.escape(r["確度"])} ／ シグナル: ' + txt(r["取引可否シグナル"]))
+        note.append(f'確度 {H.escape(r["確度"])}')
         note.append(f'Amazon で見つけた商品 {H.escape(r["該当商品数"])}件（{H.escape(r["主なカテゴリ"])}） '
                     f'／ 代表: ' + txt(r["代表商品名"])
                     + f' ／ 仕入れ {yen(r["想定仕入れ金額の中央値"])} ⇢ Amazon {yen(r["Amazon価格の中央値"])}')
         if r["optout_source_url"]:
             note.append("表示を確認したページ: " + link(r["optout_source_url"]))
+        if r["optout_needs_review"].strip().lower() == "true":
+            note.append("<strong>要確認の理由: " + txt(r["optout_review_reason"]) + "</strong>")
         if hard:
             note.append("<strong>この社には連絡しません。上の連絡先は照合用で、使うためのものではありません。</strong>")
         out.append(
@@ -250,8 +274,32 @@ table.kv tr:last-child th,table.kv tr:last-child td{border-bottom:0;}
 .num{text-align:right; white-space:nowrap; font-variant-numeric:tabular-nums;}
 .ct{font-size:11.5px; color:var(--faint); border:1px solid var(--border); border-radius:3px;
   padding:0 .35em; margin-right:.35em;}
-.ctcell{min-width:20em; font-size:13.5px;}
-tbody tr.noterow td{
+.ctcell{min-width:15em; max-width:22em; font-size:13px;}
+.ctcell .url{font-size:12.5px;}
+.sigcell{font-size:13px;}
+table.list{table-layout:fixed;}
+table.list th:nth-child(1),table.list td:nth-child(1){width:4.2em;}
+table.list th:nth-child(2),table.list td:nth-child(2){width:12em;}
+table.list th:nth-child(3),table.list td:nth-child(3){width:6.2em;}
+table.list th:nth-child(4),table.list td:nth-child(4){width:4em;}
+table.list th:nth-child(5),table.list td:nth-child(5){width:7.5em;}
+table.list th:nth-child(6),table.list td:nth-child(6){width:4.6em;}
+table.list th:nth-child(7),table.list td:nth-child(7){width:9.5em;}
+table.list tr.noterow td:nth-child(2){width:auto;}
+table.list thead th{white-space:normal;}
+table.stoptbl{table-layout:fixed;}
+table.stoptbl thead th{white-space:normal;}
+table.stoptbl th:nth-child(1),table.stoptbl td:nth-child(1){width:4.2em;}
+table.stoptbl th:nth-child(2),table.stoptbl td:nth-child(2){width:11em;}
+table.stoptbl th:nth-child(3),table.stoptbl td:nth-child(3){width:9em;}
+table.stoptbl th:nth-child(6),table.stoptbl td:nth-child(6){width:8.5em;}
+table.stoptbl tr.noterow td:nth-child(2){width:auto;}
+.sig-out{color:var(--alert); font-weight:700;}
+.sig-go{color:var(--accent); font-weight:700;}
+.tw table td,.tw table th{word-break:break-word;}
+thead th:first-child,tbody td:first-child{min-width:0;}
+tbody tr.noterow td{word-break:break-word;
+  
   font-size:13px; line-height:1.7; color:var(--muted); padding-top:0;
   border-bottom:2px solid var(--border-strong);
 }
@@ -272,7 +320,8 @@ tbody tr.noterow{background:transparent!important;}
 # ---------------------------------------------------------------- 動的な文言
 N = len(rows)
 SNAP = datetime.fromtimestamp(SRC.stat().st_mtime).strftime("%Y-%m-%d %H:%M")
-review = [r for r in rows if r["optout_needs_review"].strip().lower() == "true"]
+review = [r for r in rows if r["optout_needs_review"].strip().lower() == "true"
+          and r["optout_class"] in ("A", "A_PLUS")]
 review_txt = ""
 if review:
     names = "、".join(f'{r["順位"]}位 {r["メーカー名"]}' for r in review)
@@ -334,8 +383,8 @@ doc = f"""<!DOCTYPE html>
 <h1 class="part" id="p2">A ─ 打診してよい{len(plain)}社（優先度順）</h1>
 <section class="sec">
 <p>公式サイトに営業お断りの表示が見つからなかった社です。上の行から順に当たります。各社の下段は、調査時のメモと出典です。</p>
-<div class="tw" tabindex="0"><table><thead><tr>
-<th>順位</th><th>メーカー名</th><th>カテゴリ</th><th>商品数</th><th>仕入れ ⇢ Amazon<br>（中央値）</th><th>確度</th><th>連絡先</th>
+<div class="tw" tabindex="0"><table class="list"><thead><tr>
+<th>順位</th><th>メーカー名</th><th>カテゴリ</th><th>商品数</th><th>仕入れ ⇢ Amazon<br>（中央値）</th><th>確度</th><th>取引可否シグナル</th><th>連絡先</th>
 </tr></thead><tbody>
 {list_rows(plain)}
 </tbody></table></div>
@@ -344,7 +393,7 @@ doc = f"""<!DOCTYPE html>
 <h1 class="part" id="p3">B・C・D・E ─ 打診しない／条件付きの{len(stop)}社</h1>
 <section class="sec">
 <p><strong>D・E は連絡しません。</strong>とくに <strong>愛知電線</strong>はフォームに「セールス・勧誘等があった場合、迷惑メール相談センターに通報します」と通報を明示しています。<strong>すごろくや</strong>は「実店舗をお持ちでないオンライン専売業者さまとのお取引は一律お断り」「Amazon・楽天市場・Yahoo!ショッピング・メルカリなど大手ECモールへの出品をご遠慮いただいております」と明記しており、Amazon 専業・実店舗なしの当社は<strong>構造的に対象外</strong>です。</p>
-<div class="tw" tabindex="0"><table><thead><tr>
+<div class="tw" tabindex="0"><table class="stoptbl"><thead><tr>
 <th>順位</th><th>メーカー名</th><th>判定</th><th>公式サイトの表示（原文）</th><th>備考（調査時のメモ・原文）</th><th>再打診できる条件</th>
 </tr></thead><tbody>
 {stop_rows(stop)}
