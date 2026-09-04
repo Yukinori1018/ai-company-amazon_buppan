@@ -1,0 +1,20 @@
+{
+  "input_rows": 200,
+  "kept": 1,
+  "drop_reasons": {
+    "要確認（入数など未確定のため利益を保証できない）": 4,
+    "利益率が 5.0% 未満": 2,
+    "赤字": 110,
+    "利益率が計算できていない（Amazon未出品・価格なし等）": 83
+  },
+  "suppliers_with_candidate": 1,
+  "suppliers_with_5plus_sku": 0,
+  "tariffs_fetched": 1,
+  "tariff_targets": 1,
+  "budget": {
+    "total": 50000,
+    "sku_min": 5000,
+    "sku_max": 10000,
+    "min_margin_pct": 5.0
+  }
+}

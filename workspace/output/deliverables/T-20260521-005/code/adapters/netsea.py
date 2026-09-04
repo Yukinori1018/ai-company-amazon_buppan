@@ -130,6 +130,7 @@ NETSEA_BASE_URL = "https://api.netsea.jp/buyer/v1"
 NETSEA_ITEMS_ENDPOINT = NETSEA_BASE_URL + "/items"
 NETSEA_STOCK_ENDPOINT = NETSEA_BASE_URL + "/items/stock"
 NETSEA_SUPPLIERS_ENDPOINT = NETSEA_BASE_URL + "/suppliers"
+NETSEA_TARIFFS_ENDPOINT = NETSEA_BASE_URL + "/tariffs"
 
 # /items は supplier_ids をカンマ区切りで最大10件まで受け付ける（仕様）。
 _MAX_SUPPLIER_IDS_PER_REQUEST = 10
@@ -480,6 +481,72 @@ class NetseaClient:
             )
             out.append({"id": int(sid), "name": str(name)})
         self.last_error = None
+        return out
+
+    def list_tariffs(self, supplier_ids: list) -> dict:
+        """GET /tariffs — サプライヤーの送料設定を取る。**送料無料ラインの唯一の一次情報**。
+
+        なぜ要るか:
+            卸は「◯円以上で送料無料」が標準です。5社に分けて買うと送料が5回掛かり、
+            初回5万円のような小さな枠では利益が丸ごと消えます。
+            どこまで積めば送料が変わるかは、**商品側の ship_fee には出てきません**。
+
+        公式スキーマ（2026-09-04 タカシが openapi 実取得で確認）:
+            supplier_id          … サプライヤーID
+            description          … 説明文（自由記述）
+            apply_type           … higher / lower（送料の違う商品を混ぜたときどちらを適用するか）
+            gradual_flag         … 段階設定を使うか（true/false）
+            gradual_border_price … 段階の切り替え金額。**未満なら price1・以上なら price2**
+                                   段階設定を使わない場合は null
+            prices[]             … 都道府県別 {prefecture, price1, price2}
+                                   price2 は段階設定を使わない場合 null
+
+        ⚠️ **「gradual_border_price = 送料無料ライン」ではありません。**
+           price2 が 0 のときだけ「その金額以上で送料無料」です。
+           price2 が正の値なら「その金額以上で送料が安くなる」であって無料ではありません。
+           この読み違えは初回仕入れの採算を直接壊すので、判定は呼び出し側で
+           price2 を見て行うこと。ここは**取ってきた値をそのまま返します**。
+
+        戻り値: {supplier_id: tariff_dict}。取れなかった社は**入りません**（空欄にするため）。
+        1リクエスト最大10社（公式仕様）。
+        """
+        if not self.is_live:
+            self.last_error = self._why_not_live()
+            return {}
+
+        import time
+
+        import requests  # 遅延 import
+
+        out: dict = {}
+        ids = [int(i) for i in supplier_ids if i]
+        for i in range(0, len(ids), _MAX_SUPPLIER_IDS_PER_REQUEST):
+            chunk = ids[i : i + _MAX_SUPPLIER_IDS_PER_REQUEST]
+            try:
+                resp = requests.get(
+                    NETSEA_TARIFFS_ENDPOINT,
+                    headers=self._headers(),
+                    params={"supplier_id": ",".join(str(c) for c in chunk)},
+                    timeout=30,
+                )
+            except requests.RequestException as e:
+                self.last_error = f"NETSEA /tariffs 通信失敗: {e}"
+                continue
+            if resp.status_code != 200:
+                self.last_error = self._explain_http_error(resp)
+                continue
+            try:
+                payload = resp.json()
+            except ValueError:
+                self.last_error = "NETSEA /tariffs が非JSONを返却"
+                continue
+            # ヒット0件が素の [] で返るのは NETSEA 共通の癖（/items で実測済み）。
+            rows = payload.get("data", []) if isinstance(payload, dict) else (payload or [])
+            for row in rows:
+                sid = row.get("supplier_id")
+                if sid is not None:
+                    out[int(sid)] = row
+            time.sleep(0.3)
         return out
 
     def list_supplier_items(

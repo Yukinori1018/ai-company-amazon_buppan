@@ -1,5 +1,5 @@
 {
-  "started_at": "2026-08-31T16:05:16.196313+09:00",
+  "started_at": "2026-09-04T11:46:22.480579+09:00",
   "assumptions": "FBA納品送料100円/個・NETSEA送料は10個按分・保管2.0ヶ月(繁忙期レート)・雑費3%",
   "profile_rows": 480,
   "screen": {
@@ -7,7 +7,7 @@
     "candidates_expanded": 1714571,
     "passed_screen": 42074,
     "deduped_by_jan": 15132,
-    "to_keepa": 1200,
+    "to_keepa": 26942,
     "screen_reasons": {
       "JANなし": 1591152,
       "JAN形式不正": 60233,
@@ -21,31 +21,33 @@
     "suppliers_without_business_type": 5
   },
   "keepa": {
-    "keepa_requests": 10,
-    "keepa_codes_sent": 600,
-    "keepa_products_returned": 1233,
-    "keepa_tokens_consumed": 1233,
-    "keepa_tokens_before": 142,
-    "keepa_tokens_left": 75,
-    "keepa_cost_per_candidate": 1.989
+    "candidates_total": 26942,
+    "verified_cumulative": 200,
+    "unverified_remaining": 26742,
+    "coverage_pct": 0.7,
+    "keepa_requests": 2,
+    "keepa_codes_sent": 200,
+    "keepa_products_returned": 445,
+    "keepa_tokens_consumed": 445,
+    "keepa_tokens_before": 1200,
+    "keepa_tokens_left": 755,
+    "keepa_cost_per_candidate": 2.225
   },
   "result": {
-    "evaluated": 1200,
+    "evaluated": 200,
     "margin_bands": {
-      "10〜20%": 6,
-      "20%以上": 20,
-      "5%未満": 15,
-      "5〜10%": 18,
-      "赤字": 931
+      "20%以上": 5,
+      "5%未満": 2,
+      "赤字": 110
     },
-    "suppliers_with_profitable_item": 4,
+    "suppliers_with_profitable_item": 3,
     "suppliers_listed": 210,
-    "profitable_with_sales": 23,
-    "amazon_found": 1008,
-    "not_on_amazon": 192,
-    "profitable": 59,
-    "gems": 14,
-    "hit_rate_vs_evaluated": 4.9
+    "profitable_with_sales": 3,
+    "amazon_found": 128,
+    "not_on_amazon": 72,
+    "profitable": 7,
+    "gems": 2,
+    "hit_rate_vs_evaluated": 3.5
   },
-  "elapsed_sec": 4085.3
+  "elapsed_sec": 107.1
 }

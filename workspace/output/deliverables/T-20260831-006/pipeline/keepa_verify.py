@@ -158,8 +158,18 @@ class TokenBudget:
         if "tokensLeft" in payload:
             self.left = payload.get("tokensLeft")
         self.refill_in_ms = payload.get("refillIn") or 0
-        self.consumed_total += payload.get("tokensConsumed") or 0
+        consumed = payload.get("tokensConsumed") or 0
+        self.consumed_total += consumed
         self.codes_total += codes
+        if consumed > 0:
+            # ⚠️ 枯渇タイマーの意味は「**仕事が1つも進まないまま**60分経った」。
+            #    「残高がしきい値を下回っている」ではありません。
+            #    長時間ジョブでは、待つ → 撃つ → また待つ、が正常な定常状態で、
+            #    残高はほぼ常にしきい値を下回ります。ここを取り違えていたため、
+            #    2026-08-31 の実走は **620件を正常に処理しながら**「回復しません」と
+            #    誤って自己停止しました（15,132件中1,200件で打ち切り）。
+            #    トークンを実際に消費できた＝生きている、でタイマーを解除します。
+            self.starved_since = None
 
     @property
     def tokens_per_code(self) -> float:
@@ -192,7 +202,9 @@ class TokenBudget:
         if self.left is None or self.left >= threshold:
             self.starved_since = None
             return True
-        self.min_before_batch = threshold
+        # ⚠️ ここで self.min_before_batch を threshold に書き換えてはいけません（旧実装）。
+        #    しきい値は実測レートから毎回出し直すのが正で、書き換えると**下がらなくなり**、
+        #    一度スパイクしたレートの分だけ以後ずっと余計に待ちます（28時間走ると効きます）。
         if self.starved_since is None:
             self.starved_since = time.time()
         elif time.time() - self.starved_since > config.KEEPA_STARVATION_MINUTES * 60:

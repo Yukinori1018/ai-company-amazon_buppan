@@ -80,3 +80,41 @@ def test_回復したら枯渇タイマーは解除される():
     b.note({"tokensLeft": 1200, "tokensConsumed": 0}, codes=0)
     b.wait_if_needed(log=lambda m: None, batch_size=100)
     assert b.starved_since is None
+
+
+def test_バッチを撃てているうちは枯渇と判定しない():
+    """2026-08-31 の実走を1,200件で止めた欠陥の回帰テスト。
+
+    残高がしきい値を下回るのは、長時間ジョブでは**正常な定常状態**です
+    （待つ → 撃つ → また待つ）。それを「回復しない」と読んで自己停止したため、
+    620件を正常に処理しながら「トークンが60分回復しません」と誤報告しました。
+    枯渇の定義は「**1件も進まないまま**時間が過ぎた」でなければなりません。
+    """
+    b = _budget()
+    keepa_verify.time.sleep = lambda s: None
+    b.note({"tokensLeft": 0, "tokensConsumed": 0, "refillIn": 0}, codes=0)
+    b.wait_if_needed(log=lambda m: None, batch_size=100)
+    assert b.starved_since is not None
+    # 回復を待ったあとバッチが通り、トークンを実際に消費した＝生きている
+    b.note({"tokensLeft": 30, "tokensConsumed": 190}, codes=100)
+    assert b.starved_since is None
+    # 残高は依然しきい値以下だが、進んでいるので止めてはいけない
+    b.wait_if_needed(log=lambda m: None, batch_size=100)
+    b.starved_since -= keepa_verify.config.KEEPA_STARVATION_MINUTES * 60 + 1
+    b.note({"tokensLeft": 30, "tokensConsumed": 190}, codes=100)
+    assert b.wait_if_needed(log=lambda m: None, batch_size=100) is True
+
+
+def test_しきい値は下がる_一度スパイクしても固定されない():
+    """旧実装は min_before_batch を書き換えており、しきい値が**下がりませんでした**。
+
+    1回コストが跳ねただけで、以後ずっと余計に待ち続けます（28時間走ると効きます）。
+    """
+    b = _budget()
+    keepa_verify.time.sleep = lambda s: None
+    b.note({"tokensLeft": 100, "tokensConsumed": 400, "refillIn": 0}, codes=100)
+    high = b.required_for(100)
+    b.wait_if_needed(log=lambda m: None, batch_size=100)
+    # 以後のバッチが安く済んだら、要求トークンも下がるべき
+    b.note({"tokensLeft": 100, "tokensConsumed": 20}, codes=900)
+    assert b.required_for(100) < high

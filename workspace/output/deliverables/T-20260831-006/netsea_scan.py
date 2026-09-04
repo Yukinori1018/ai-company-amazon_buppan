@@ -172,7 +172,7 @@ def build_candidates(cfg: config.ScanConfig, profiles=None) -> tuple:
     passed = [c for c in all_c if c.verdict == screen.PASS]
 
     deduped, dropped = screen.dedupe_by_jan(passed)
-    log(f"  通過 {len(passed)}件 → 同一JAN重複を{dropped}件まとめて {len(deduped)}件")
+    log(f"  通過 {len(passed)}件 → 同一JAN重複 {dropped}件 を潰して 残り {len(deduped)}件（これが Keepa の母数）")
 
     BEAT.beat("段2 前段フィルタ", done=len(deduped), total=len(all_c),
               note="判定完了")
@@ -184,7 +184,12 @@ def build_candidates(cfg: config.ScanConfig, profiles=None) -> tuple:
         "netsea_products": len(raw),
         "candidates_expanded": len(all_c),
         "passed_screen": len(passed),
-        "deduped_by_jan": dropped,
+        # ⚠️ 2026-09-04 改名。旧キー名は `deduped_by_jan` で、**潰した重複の数**でしたが、
+        #    「重複を除いた後の件数」と読まれ、母数を 26,942 → 15,132 と
+        #    1万件以上少なく見積もる誤読を実際に生みました（T-20260904-004）。
+        #    数を出す列は「何を数えたか」が名前で分かる形にすること。
+        "dropped_as_duplicate_jan": dropped,
+        "unique_jan_candidates": len(deduped),
         "to_keepa": len(deduped),
         "screen_reasons": reasons,
         "suppliers_without_business_type": len(unmatched),
@@ -195,7 +200,8 @@ def build_candidates(cfg: config.ScanConfig, profiles=None) -> tuple:
 # =============================================================================
 # 段3: Keepa で検証（1トークン/件・ヒットしなければ0）
 # =============================================================================
-def verify(candidates: list, cfg: config.ScanConfig, verify_sellers: bool) -> tuple:
+def verify(candidates: list, cfg: config.ScanConfig, verify_sellers: bool,
+           new_limit: int = 0) -> tuple:
     factstore = store.JsonlStore(FACTS_JSONL, key="jan")
     cached = factstore.load()
     todo = [c.jan for c in candidates if c.jan not in cached]
@@ -203,6 +209,12 @@ def verify(candidates: list, cfg: config.ScanConfig, verify_sellers: bool) -> tu
         f"段3: Keepa 検証 対象{len(candidates)}件 "
         f"（うち取得済み{len(candidates) - len(todo)}件・今回{len(todo)}件）"
     )
+    if new_limit and len(todo) > new_limit:
+        # 1回の実行で新規に検証する件数の上限。**キャッシュ済みは数えません。**
+        # これを付けると、長時間ジョブを「何度でも足せる短いジョブ」に割れます
+        # （毎回 candidates.csv が最新まで書き直され、途中で落ちても損は1周分だけ）。
+        todo = todo[:new_limit]
+        log(f"  --new-limit により今回は新規{len(todo)}件だけ検証します")
 
     verifier = keepa_verify.KeepaVerifier(log=log)
     status = verifier.token_status()
@@ -227,10 +239,17 @@ def verify(candidates: list, cfg: config.ScanConfig, verify_sellers: bool) -> tu
     cached = factstore.load()
     facts_by_jan = {jan: _dict_to_facts(row) for jan, row in cached.items()}
 
-    evaluations = [
-        evaluate.evaluate(c, facts_by_jan.get(c.jan, keepa_verify.AmazonFacts(jan=c.jan)), cfg)
-        for c in candidates
-    ]
+    # ⚠️ **未検証を「Amazon未出品」として出さない。**
+    #    evaluate() に空の AmazonFacts を渡すと「Amazon未出品(同一JANのASINなし)」になります。
+    #    それは「Keepa に聞いて無かった」という意味で、「まだ聞いていない」ではありません。
+    #    キャッシュに found=False の行がある JAN だけが「本当に無い」です。
+    #    無人ジョブが一番やってはいけないのが、この取り違え（未着手を結果として書くこと）。
+    verified = [c for c in candidates if c.jan in facts_by_jan]
+    unverified = len(candidates) - len(verified)
+    if unverified:
+        log(f"  ⚠ 未検証 {unverified}件 は CSV に出しません（Amazon未出品と区別できないため）")
+
+    evaluations = [evaluate.evaluate(c, facts_by_jan[c.jan], cfg) for c in verified]
 
     # 利益ラインを超えた行だけ、実セラー数を確定する（6.5トークン/件と高い）。
     if verify_sellers:
@@ -246,6 +265,12 @@ def verify(candidates: list, cfg: config.ScanConfig, verify_sellers: bool) -> tu
 
     consumed = verifier.budget.consumed_total
     stats = {
+        "candidates_total": len(candidates),
+        "verified_cumulative": len(verified),
+        "unverified_remaining": unverified,
+        "coverage_pct": (
+            round(len(verified) / len(candidates) * 100, 1) if candidates else 0
+        ),
         "keepa_requests": verifier.requests_made,
         "keepa_codes_sent": verifier.codes_sent,
         "keepa_products_returned": verifier.products_returned,
@@ -353,6 +378,9 @@ def main() -> None:
     ap.add_argument("--keepa-batch", type=int, default=config.KEEPA_CODE_BATCH)
     ap.add_argument("--keepa-limit", type=int, default=0,
                     help="Keepa に投げる件数の上限（0＝制限なし）。トークンを守るための安全弁")
+    ap.add_argument("--new-limit", type=int, default=0,
+                    help="1回の実行で**新規に**検証する件数の上限（0＝制限なし）。"
+                         "キャッシュ済みは数えない。長時間ジョブを短く割るために使う")
     ap.add_argument("--verify-sellers", action="store_true",
                     help="利益ライン超えの行だけ実セラー数を確定（6.5トークン/件）")
     ap.add_argument("--allow-regulated", action="store_true",
@@ -416,13 +444,18 @@ def main() -> None:
         stats["screen"]["to_keepa"] = len(candidates)
 
     if args.stage in ("all", "verify"):
-        evaluations, keepa_stats = verify(candidates, cfg, args.verify_sellers)
+        evaluations, keepa_stats = verify(candidates, cfg, args.verify_sellers,
+                                          new_limit=args.new_limit)
         stats["keepa"] = keepa_stats
         stats["result"] = report(evaluations, all_candidates, cfg)
         log("── 実測 ────────────────────────────────")
         log(f"  NETSEA 商品          : {stats['screen']['netsea_products']}件")
         log(f"  規格展開             : {stats['screen']['candidates_expanded']}件")
         log(f"  段2 通過             : {stats['screen']['to_keepa']}件")
+        log(f"  Keepa 検証済み(累計) : {keepa_stats['verified_cumulative']}"
+            f" / {keepa_stats['candidates_total']}件"
+            f"（{keepa_stats['coverage_pct']}%）"
+            f"  ← 残り未検証 {keepa_stats['unverified_remaining']}件")
         log(f"  Keepa 消費トークン   : {keepa_stats['keepa_tokens_consumed']}")
         log(f"  1件あたり実効コスト  : {keepa_stats['keepa_cost_per_candidate']} トークン")
         log(f"  Amazon に存在        : {stats['result']['amazon_found']}件")
