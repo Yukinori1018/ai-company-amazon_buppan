@@ -142,3 +142,22 @@ class TestRecheckCondition(unittest.TestCase):
 
     def test_E1は実店舗取得を再評価条件に持つ(self):
         self.assertIn("実店舗", classify_window(SUGOROKUYA)["recheck_condition"])
+
+
+class TestBusinessDecisionSubclass(unittest.TestCase):
+    """「そもそも直販しない」= E の下位区分（2026-09-04 カズヨ判断）。
+
+    **法務ルールJSON（ハルオの所有物）は変更していない。**
+    クラスは既存の E のまま、下位区分と決定者を別列で持たせて所有者を明示している。
+    その適用は apply_optout.py 側の責務なので、ここでは
+    「JSONにこの類型のクラスが増えていないこと」を守る回帰テストにする。
+    """
+
+    def test_法務ルールにクラスを勝手に増やしていない(self):
+        from pipeline.optout import load_rules
+        self.assertEqual(set(load_rules()["classes"]), {"A_PLUS", "A", "B", "C", "D", "E"})
+
+    def test_直販なしの文言は法務ルール単体ではAのまま(self):
+        # 事業判断で E に落とすのは適用側。判定器は法務ルールに忠実であること。
+        r = classify_window("弊社は一般のお客様への直接の販売は致しておりません。")
+        self.assertEqual(r["optout_class"], "A")
