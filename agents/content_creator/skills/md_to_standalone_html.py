@@ -49,14 +49,25 @@ RE_CODE = re.compile(r"`([^`]+)`")
 RE_BOLD = re.compile(r"\*\*(.+?)\*\*")
 RE_PH = re.compile(r"\x00C(\d+)\x00")
 
-# 表セル内だけで働く語ハイライト。[(語, "danger"|"warn")]
+# 表セル内だけで働く語ハイライト。[(語, スタイル, 先頭限定か)]
 CELLMARKS = []
+
+# --reftable で拾った出典番号。[#n] をこの表の行へリンクするために使う
+REFIDS = set()
 
 
 def _markers(s: str) -> str:
     # 順序重要: [要確認 #n] を先に処理しないと [#n] 側に食われる
     s = RE_CHECK.sub(lambda m: f'<span class="chk">要確認 #{m.group(1)}</span>', s)
-    return RE_REF.sub(lambda m: f'<span class="ref">[#{m.group(1)}]</span>', s)
+
+    def _ref(m):
+        n = m.group(1)
+        # 出典表に該当行があるときだけリンクにする。無い番号を飛ばすと迷子になる
+        if int(n) in REFIDS:
+            return f'<a class="ref" href="#src-{n}">[#{n}]</a>'
+        return f'<span class="ref">[#{n}]</span>'
+
+    return RE_REF.sub(_ref, s)
 
 
 def inline(text: str) -> str:
@@ -78,15 +89,28 @@ def inline(text: str) -> str:
     return RE_PH.sub(lambda m: f"<code>{_markers(codes[int(m.group(1))])}</code>", out)
 
 
+RE_TAG = re.compile(r"<[^>]+>")
+
+
 def cell(text: str):
     """表セル用。inline に加えて CELLMARKS の語を色付きピルにする。
 
     戻り値は (HTML, 付与したスタイルの集合)。呼び出し側が行の強調に使う。
+
+    語の先頭に `^` を付けると「セルの文頭にある時だけ」1個目を置換する（先頭限定）。
+    判定語（一致/不一致/未実施 等）は他のセルの文中にも出るため、
+    素の部分一致だと無関係な行を塗ってしまう（実際に「購買者情報の不一致」で踏んだ）。
     """
     out = inline(text)
     hits = set()
-    for word, style in CELLMARKS:
-        if word in out:
+    for word, style, head_only in CELLMARKS:
+        if head_only:
+            plain = RE_TAG.sub("", out).lstrip()
+            if not plain.startswith(word):
+                continue
+            hits.add(style)
+            out = out.replace(word, f'<span class="pill pill-{style}">{word}</span>', 1)
+        elif word in out:
             hits.add(style)
             out = out.replace(word, f'<span class="pill pill-{style}">{word}</span>')
     return out, hits
@@ -103,8 +127,11 @@ def is_sep_row(line: str) -> bool:
 
 
 class Builder:
-    def __init__(self, lines, boxes=()):
+    def __init__(self, lines, boxes=(), reftable="", refwidths=()):
         self.boxes = list(boxes)   # [(見出しに含まれる文字列, "conclusion"|"alert")]
+        self.reftable = reftable   # この h2 節の表を「出典一覧」として扱う
+        self.refwidths = list(refwidths)
+        self.in_reftable = False
         self.lines = lines
         self.i = 0
         self.out = []
@@ -163,6 +190,7 @@ class Builder:
                     # 2つ目以降の h1 は「部」の区切り。捨てると本文が消える
                     self.partn += 1
                     hid = f"p{self.partn}"
+                    self.in_reftable = False
                     self.close_section()
                     self.out.append(f'<h1 class="part" id="{hid}">{inline(title)}</h1>')
                     self.toc.append((1, hid, title, "part"))
@@ -174,6 +202,7 @@ class Builder:
                 self.h2n += 1
                 self.h3n = 0
                 hid = f"s{self.h2n}"
+                self.in_reftable = bool(self.reftable) and title == self.reftable
                 self.close_section()
                 scls = self.sec_class(title)
                 self.out.append(f'<section id="{hid}" class="sec{scls}">')
@@ -219,7 +248,15 @@ class Builder:
             self.i += 1
         head = split_row(rows[0])
         body = [split_row(r) for r in rows[1:] if not is_sep_row(r)]
-        t = ['<div class="tw" tabindex="0"><table>', "<thead><tr>"]
+        ref = self.in_reftable
+        t = ['<div class="tw" tabindex="0"><table' + (' class="reftable"' if ref else "") + ">"]
+        if ref and len(self.refwidths) == len(head):
+            # 列幅を指定しないと、自動計算が URL 列に幅を持っていかれて
+            # 要旨の列が縦長の1文字帯になる（実際にそうなった）
+            t.append("<colgroup>"
+                     + "".join(f'<col style="width:{w}">' for w in self.refwidths)
+                     + "</colgroup>")
+        t.append("<thead><tr>")
         t += [f"<th>{inline(c)}</th>" for c in head]
         t.append("</tr></thead><tbody>")
         for r in body:
@@ -228,8 +265,11 @@ class Builder:
                 h, hit = cell(c)
                 tds.append(f"<td>{h}</td>")
                 hits |= hit
-            cls = ' class="row-danger"' if "danger" in hits else ""
-            t.append(f"<tr{cls}>" + "".join(tds) + "</tr>")
+            attr = ' class="row-danger"' if "danger" in hits else ""
+            # 出典表は1列目の番号を id にして、本文の [#n] から飛べるようにする
+            if ref and r and r[0].strip().isdigit():
+                attr += f' id="src-{r[0].strip()}"'
+            t.append(f"<tr{attr}>" + "".join(tds) + "</tr>")
         t.append("</tbody></table></div>")
         self.out.append("".join(t))
 
@@ -309,6 +349,7 @@ CSS = """
   --accent:#1c5b86; --accent-bg:#eef5fa;
   --warn:#8a4b00; --warn-bg:#fdf1df; --warn-border:#dd9a3c;
   --alert:#7d2b2b; --alert-bg:#fbeeee; --alert-border:#d08b8b;
+  --ok:#1b6144; --ok-bg:#eaf4ef; --ok-border:#8ab9a3;
 }
 @media (prefers-color-scheme: dark){
   :root{
@@ -318,6 +359,7 @@ CSS = """
     --accent:#79b4dc; --accent-bg:#1a2a36;
     --warn:#f0b866; --warn-bg:#332616; --warn-border:#7a5a2a;
     --alert:#e79a9a; --alert-bg:#331e1e; --alert-border:#6e4040;
+    --ok:#84cfa9; --ok-bg:#17281f; --ok-border:#3c6450;
   }
 }
 *{box-sizing:border-box;}
@@ -418,7 +460,8 @@ thead th{
   padding:11px 14px; border-bottom:2px solid var(--border-strong);
   white-space:nowrap; vertical-align:bottom;
 }
-tbody td{padding:11px 14px; border-bottom:1px solid var(--border); vertical-align:top;}
+tbody td{padding:11px 14px; border-bottom:1px solid var(--border); vertical-align:top;
+  overflow-wrap:anywhere;}
 tbody tr:last-child td{border-bottom:0;}
 tbody tr:nth-child(even){background:color-mix(in srgb, var(--surface) 55%, transparent);}
 tbody td:first-child{font-weight:600;}
@@ -431,6 +474,10 @@ thead th:last-child,tbody td:last-child{white-space:normal;}
   white-space:nowrap; font-variant-numeric:tabular-nums;
   letter-spacing:.01em; vertical-align:.06em;
 }
+/* [#n] は出典表に行がある時だけリンクになる。見た目は span と同じにして
+   本文の印象を変えない（追加したのは移動手段だけで、文字は足していない） */
+a.ref{text-decoration:none;}
+a.ref:hover,a.ref:focus{color:var(--accent); text-decoration:underline;}
 .chk{
   display:inline-block; font-size:.75em; line-height:1.5;
   padding:0 .5em; margin:0 .12em; border-radius:4px;
@@ -456,8 +503,24 @@ code .chk{font-family:inherit;}
 }
 .pill-danger{background:var(--alert); color:#fff; border:1px solid var(--alert);}
 .pill-warn{background:var(--warn-bg); color:var(--warn); border:1px solid var(--warn-border);}
+.pill-ok{background:var(--ok-bg); color:var(--ok); border:1px solid var(--ok-border);}
+.pill-info{background:var(--accent-bg); color:var(--accent); border:1px solid var(--accent);}
+/* muted は「検証していない」を表す。塗らず・破線で、済んだものと視覚的に別系統にする */
+.pill-muted{background:transparent; color:var(--faint);
+  border:1px dashed var(--border-strong); font-weight:600;}
 tbody tr.row-danger td:first-child{box-shadow:inset 4px 0 0 var(--alert);}
 tbody tr.row-danger td{background:color-mix(in srgb, var(--alert-bg) 70%, transparent);}
+
+/* ---------- 出典一覧（--reftable） ---------- */
+table.reftable:has(colgroup){table-layout:fixed;}
+table.reftable td:first-child{
+  min-width:2.6em; width:2.6em; text-align:right; white-space:nowrap;
+  font-variant-numeric:tabular-nums; color:var(--muted);
+}
+table.reftable th:first-child{min-width:2.6em; width:2.6em; text-align:right;}
+tbody tr[id]{scroll-margin-top:14px;}
+tbody tr[id]:target td{background:var(--accent-bg);}
+tbody tr[id]:target td:first-child{box-shadow:inset 4px 0 0 var(--accent); color:var(--accent);}
 
 /* ---------- emphasised sections ---------- */
 .sec-box{
@@ -544,6 +607,17 @@ tbody tr.row-danger td{background:color-mix(in srgb, var(--alert-bg) 70%, transp
   .chk{background:#fff; color:#000; border:1pt solid #000;}
   code{background:#fff; border:1px solid #999;}
   .pill{background:#fff!important; color:#000!important; border:1.2pt solid #000!important;}
+  /* 未検証は印刷でも「済んだもの」と別に見えなければ意味がない。
+     モノクロでは色が消えるので、破線と濃度で差を残す */
+  .pill-muted{border:1pt dashed #666!important; color:#555!important; font-weight:400!important;}
+  /* 長いURLは印刷で紙幅を超える。折り返しを許可して溢れを止める */
+  .tw{overflow:hidden;}
+  table{table-layout:auto; width:100%;}
+  tbody td{overflow-wrap:anywhere; word-break:break-word;}
+  thead th{white-space:normal;}
+  table.reftable{font-size:7.6pt; line-height:1.5;}
+  table.reftable thead th,table.reftable tbody td{padding:5px 6px;}
+  tbody tr[id]:target td{background:#fff;}
   tbody tr.row-danger td{background:#fff;}
   tbody tr.row-danger td:first-child{box-shadow:inset 3pt 0 0 #000;}
   /* チェックリストは1枚で手元に置けるよう独立ページにする */
@@ -573,13 +647,49 @@ def parse_box(v):
 BOX_STYLES = ("conclusion", "alert", "danger", "warn", "checklist")
 
 
+CELL_STYLES = ("danger", "warn", "ok", "muted", "info")
+
+
 def parse_cellmark(v):
     if "=" not in v:
-        raise argparse.ArgumentTypeError('--cellmark は "語=danger|warn" 形式')
+        raise argparse.ArgumentTypeError('--cellmark は "語=' + "|".join(CELL_STYLES) + '" 形式')
     word, style = v.rsplit("=", 1)
-    if style not in ("danger", "warn"):
-        raise argparse.ArgumentTypeError("cellmark のスタイルは danger か warn")
-    return (word.strip(), style)
+    if style not in CELL_STYLES:
+        raise argparse.ArgumentTypeError("cellmark のスタイルは " + " / ".join(CELL_STYLES))
+    word = word.strip()
+    head_only = word.startswith("^")
+    return (word.lstrip("^"), style, head_only)
+
+
+def scan_reftable(lines, title):
+    """--reftable で指定した h2 節の表から、1列目の番号を集める。
+
+    本文の [#n] をリンクにしてよいかは「行が実在するか」でしか判定できない。
+    存在しない番号にリンクを張ると、押しても何も起きない死んだリンクになる。
+    """
+    ids, inside, intable = set(), False, False
+    for line in lines:
+        if line.startswith("## "):
+            inside = line[3:].strip() == title
+            intable = False
+            continue
+        if line.startswith("# "):
+            inside = False
+            continue
+        if not inside:
+            continue
+        s = line.strip()
+        if s.startswith("|"):
+            if is_sep_row(s):
+                intable = True
+                continue
+            if intable:
+                c = split_row(s)[0]
+                if c.isdigit():
+                    ids.add(int(c))
+        else:
+            intable = False
+    return ids
 
 
 def main():
@@ -592,13 +702,24 @@ def main():
     ap.add_argument("--box", action="append", type=parse_box, default=[],
                     metavar="見出し=conclusion|alert", help="囲み枠で強調する h2 節")
     ap.add_argument("--cellmark", action="append", type=parse_cellmark, default=[],
-                    metavar="語=danger|warn", help="表セル内でハイライトする語")
+                    metavar="語=danger|warn|ok|muted|info",
+                    help="表セル内でハイライトする語（先頭に ^ でセル文頭限定）")
+    ap.add_argument("--reftable", default="",
+                    help="出典一覧として扱う h2 見出し（本文の [#n] が該当行へリンクする）")
+    ap.add_argument("--reftable-widths", default="",
+                    help="出典表の列幅をカンマ区切りで指定（例 3em,28%,22%,15%,8%,23%）")
     ap.add_argument("--note", default="", help="末尾に置く出所注記（任意）")
     a = ap.parse_args()
 
     CELLMARKS[:] = a.cellmark
 
-    b = Builder(a.src.read_text(encoding="utf-8").split("\n"), a.box).run()
+    lines = a.src.read_text(encoding="utf-8").split("\n")
+    REFIDS.clear()
+    if a.reftable:
+        REFIDS.update(scan_reftable(lines, a.reftable))
+
+    widths = [w.strip() for w in a.reftable_widths.split(",") if w.strip()]
+    b = Builder(lines, a.box, a.reftable, widths).run()
     body = b.out
 
     # 先頭の1段落を lead に格上げし、H1 直下（目次の前）へ移す
@@ -643,7 +764,8 @@ def main():
 """
     a.dst.parent.mkdir(parents=True, exist_ok=True)
     a.dst.write_text(doc, encoding="utf-8")
-    print(f"OK: {a.dst}  ({len(doc.encode('utf-8')):,} bytes) / 見出し {len(b.toc)}")
+    print(f"OK: {a.dst}  ({len(doc.encode('utf-8')):,} bytes) / 見出し {len(b.toc)}"
+          + (f" / 出典 {len(REFIDS)} 行" if REFIDS else ""))
 
 
 if __name__ == "__main__":
