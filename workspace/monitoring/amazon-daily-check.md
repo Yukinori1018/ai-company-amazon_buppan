@@ -19,6 +19,29 @@ Amazon アカウント停止（T-20260826-004）の対応中、通知・返信�
 
 ---
 
+## 2026-09-04
+
+**承認の翌朝。3点とも変化なし。ただし申し立て導線の不具合を立証。**
+
+| 項目 | 結果 | 前日比 |
+|---|---|---|
+| CA 違反件数 | 1件（Policy violation / Aug 26, 2026 / Status: **Your submission is required**） | 変化なし |
+| CA AHR | 0 | 変化なし |
+| CA ヘッダー | Suspended | 変化なし |
+| CA KYC 画面 | **Verification Failed**（読み取り専用・提出フォームなし） | 変化なし |
+| JP ストア | **停止中**（モーダル「出品アカウントが停止されました」） | 変化なし |
+| Gmail(satoyukinori1018) | 新着なし | — |
+| satoyselect@gmail.com | 9/3 20:38 の承認通知以降、新着なし | — |
+
+**新たに判明した事実（DOM を直接読んで確認）**
+- 「Submit appeal」ボタンのリンク先 href ＝ **`/mario/seller-verification/soa-coc/regional?ref=sc_ahd_sahl`**
+- 遷移先は「Verification Failed」を表示する読み取り専用ページで、**提出フォーム・アップロード欄・送信ボタンが存在しない**
+- → **Amazon は「あなたの提出が必要」と表示しながら、提出できない画面にしかリンクしていない**
+
+**変化：** 状態は動いていないが、**待ちではなく能動的に動くべき局面**と判明。`seller-reactivation@amazon.ca` 宛の連絡文を法務ハルオに発注（成果物07）。送信は社長の操作（§4.1）。
+
+---
+
 ## 2026-09-03
 
 **ビデオ面談を実施し、本人確認が承認された日。**
