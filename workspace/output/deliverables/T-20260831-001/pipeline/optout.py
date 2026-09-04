@@ -147,7 +147,23 @@ def _left_guarded(text: str, li: int, guards: Sequence[str], win: int) -> bool:
     return any(g in head for g in guards or ())
 
 
-def _suffix_negation(text: str, rule: dict) -> List[str]:
+def _sentence_re(rules: dict):
+    """文の区切り。**実装で決め打ちしない。** ルールファイルが持つ。
+
+    収集した注記原文は複数の窓口ブロックを『／』で連結しているため、
+    そこをまたぐ判定は**別窓口の文言を混ぜる**ことになる（法務 v1.2）。
+    逆に『、』『・』は区切りに含めない。含めると
+    『企業・店舗様との新規お取引は行っておりません』という正当な D を落とす。
+    """
+    delims = rules.get("sentence_delimiters") or ["。", "．", "！", "？", "!", "?", "\n", "\r"]
+    return re.compile("[" + re.escape("".join(delims)) + "]+")
+
+
+def _first_sentence(text: str, sent_re) -> str:
+    return sent_re.split(text)[0] if sent_re else text
+
+
+def _suffix_negation(text: str, rule: dict, sent_re=None) -> List[str]:
     """left 語の**直後** lookahead 文字以内に否定語があるときだけヒット。
 
     ★方向を持つこと自体が要求である。無方向の共起で代用してはならない。
@@ -163,7 +179,7 @@ def _suffix_negation(text: str, rule: dict) -> List[str]:
             li = m.start()
             if _left_guarded(text, li, guards, gwin):
                 continue
-            # ★文の境界で打ち切る。
+            # ★(a) lookahead 文字数 かつ (b) 同一文内 の**両方**が要る（法務 v1.2）。
             #   法務の要求文は lookahead を「直後25文字以内」としか書いていないが、
             #   同じ engine_requirements が
             #   『新規お取引はこちらから。なお電話はお受けしておりません』を
@@ -173,7 +189,7 @@ def _suffix_negation(text: str, rule: dict) -> List[str]:
             #   要求（この文を D にしない）が上位なので、句点をまたがせない。
             #   ※文字数だけで足りないことは法務ルール側にも書かれていないので、
             #     v1.2 で明文化してもらうよう差し戻す。ここでクラスは変えていない。
-            tail = _SENTENCE_SPLIT.split(text[m.end():m.end() + look])[0]
+            tail = _first_sentence(text[m.end():m.end() + look], sent_re)
             for ng in rule.get("negation", ()):
                 if ng in tail:
                     pair = "%s+%s" % (lt, ng)
@@ -183,7 +199,7 @@ def _suffix_negation(text: str, rule: dict) -> List[str]:
     return hits
 
 
-def _drop_negated(text: str, terms: List[str], rule: dict) -> List[str]:
+def _drop_negated(text: str, terms: List[str], rule: dict, sent_re=None) -> List[str]:
     """`any` のヒットのうち、直後が否定のものを落とす。
 
     A1（取引窓口＝A_PLUS）用。『新規お取引は行っておりません』を
@@ -197,7 +213,10 @@ def _drop_negated(text: str, terms: List[str], rule: dict) -> List[str]:
     for t in terms:
         alive = False
         for m in re.finditer(re.escape(t), text):
-            tail = text[m.end():m.end() + look]
+            # ★D6 と同一条件（文字数かつ同一文内）。
+            #   v1.1 は文字数だけで、句点をまたぐ否定で
+            #   **正当な A_PLUS を A に降格**させていた（母数を減らす方向の誤り）。
+            tail = _first_sentence(text[m.end():m.end() + look], sent_re)
             if not any(ng in tail for ng in ngs):
                 alive = True
                 break
@@ -206,7 +225,7 @@ def _drop_negated(text: str, terms: List[str], rule: dict) -> List[str]:
     return kept
 
 
-def _rule_hits(text: str, rule: dict, window: int) -> List[str]:
+def _rule_hits(text: str, rule: dict, window: int, sent_re=None) -> List[str]:
     kind = rule.get("match")
     hits = []
     if kind == "cooccur":
@@ -215,12 +234,12 @@ def _rule_hits(text: str, rule: dict, window: int) -> List[str]:
         if not hits and rule.get("alt_terms"):
             hits = _any_term(text, rule["alt_terms"])
     elif kind == "any":
-        hits = _drop_negated(text, _any_term(text, rule.get("terms")), rule)
+        hits = _drop_negated(text, _any_term(text, rule.get("terms")), rule, sent_re)
         alt = rule.get("cooccur_alt")
         if not hits and alt:
             hits = _cooccur(text, alt.get("left"), alt.get("right"), window)
     elif kind == "suffix_negation":
-        hits = _suffix_negation(text, rule)
+        hits = _suffix_negation(text, rule, sent_re)
     else:
         raise UnknownMatchKind(
             "規則 %s の match 種別 %r を実装が知らない。"
@@ -240,44 +259,59 @@ def classify_window(text: str, source_url: str = "", rules: dict = None) -> dict
     classes = rules["classes"]
     text = text or ""
 
-    matched_class = None
+    sent_re = _sentence_re(rules)
+
+    # ★まず**全クラス・全規則**を評価する。勝者を決めるのはその後。
+    #
+    #   v1.1 は apply_order の先頭から回して、最初に当たったクラスで break していた。
+    #   そのため「勝たなかったクラスの規則」が一度も見られず、
+    #   **判定と無関係な理由でフラグと証跡が静かに消えた。**
+    #   実例: 適用順を E→D にしたら、ハイメスが E4（needs_review なし）で確定し、
+    #   同時に発火していた D6（needs_review あり）のフラグを落とした。
+    #   結論は E で変わらないのに、レビュー対象から外れた（法務 v1.2）。
+    fired = []                       # [(class, rule, hits)]
+    for rule in rules["rules"]:
+        hits = _rule_hits(text, rule, window, sent_re)
+        if hits:
+            fired.append((rule["class"], rule, hits))
+
+    order = list(rules["apply_order"])
+    matched_class = next((c for c in order if any(fc == c for fc, _r, _h in fired)), None)
+
     matched_ids = []
     hit_terms = []
     allowed = None
     remove = []
-    rechecks = []          # ★取りこぼさないよう全部ためる（後で ／ で連結）
+    rechecks = []
     e_subclass = ""
     needs_review = False
     review_reasons = []
+    other_hits = []
 
-    for cls in rules["apply_order"]:
-        for rule in rules["rules"]:
-            if rule["class"] != cls:
-                continue
-            hits = _rule_hits(text, rule, window)
-            if not hits:
-                continue
-            if matched_class is None:
-                matched_class = cls
-            if cls != matched_class:
-                continue                        # 先に確定したクラスの証跡だけ集める
-            matched_ids.append(rule["id"])
-            hit_terms.extend(hits)
-            if rule.get("set_allowed_channels"):
-                allowed = list(rule["set_allowed_channels"])
-            remove.extend(rule.get("remove_channels", []))
-            if rule.get("recheck_condition"):
-                # ★1つしか残さないと、片方の条件が解消されても再評価されない。
-                #   E1（実店舗が要る）と E2（モール禁止）に同時に当たる社は実在する。
-                rechecks.append(rule["recheck_condition"])
-            if rule.get("e_subclass") and not e_subclass:
-                e_subclass = rule["e_subclass"]
-            if rule.get("needs_review"):
-                needs_review = True
-                if rule.get("reason"):
-                    review_reasons.append(rule["reason"])
-        if matched_class:
-            break
+    # 走査順は rules の並び順そのまま。JSON の並びが D → A_PLUS になっており、
+    # apply_order で並べ替えても結果が変わらないことを確認したので、
+    # **並べ替えは持たない。**テストで守れない処理は置かない。
+    for cls, rule, hits in fired:
+        # needs_review は**発火した全規則**から立てる（勝敗と無関係）。
+        if rule.get("needs_review"):
+            needs_review = True
+            if rule.get("reason"):
+                review_reasons.append(rule["reason"])
+        if cls != matched_class:
+            # 勝たなかった規則は証跡として残す。
+            # E が勝った社に D3（通報明示）も当たっていた、という事実を失わない。
+            # 判定が正しくても**なぜ除外したのかが分からなくなる**のを防ぐ。
+            other_hits.append(rule["id"])
+            continue
+        matched_ids.append(rule["id"])
+        hit_terms.extend(hits)
+        if rule.get("set_allowed_channels"):
+            allowed = list(rule["set_allowed_channels"])
+        remove.extend(rule.get("remove_channels", []))
+        if rule.get("recheck_condition"):
+            rechecks.append(rule["recheck_condition"])
+        if rule.get("e_subclass") and not e_subclass:
+            e_subclass = rule["e_subclass"]
 
     if matched_class is None:
         matched_class = "A"
@@ -315,6 +349,7 @@ def classify_window(text: str, source_url: str = "", rules: dict = None) -> dict
         "recheck_condition": " ／ ".join(dict.fromkeys(rechecks)),
         "optout_e_subclass": e_subclass,
         "optout_needs_review": needs_review,
+        "optout_other_rule_hits": ";".join(dict.fromkeys(other_hits)),
         "optout_review_reason": " ／ ".join(dict.fromkeys(review_reasons)),
     }
 

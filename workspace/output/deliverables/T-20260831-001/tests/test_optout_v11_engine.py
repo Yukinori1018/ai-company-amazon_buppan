@@ -161,3 +161,106 @@ def test_A1の否定右辺は単独でも効く():
     assert classify_window("新規お取引は行っておりません。",
                            rules=only_a1)["optout_class"] == "A", \
         "A1 の否定右辺が効いていない。取引を断っている社が最優先候補に化ける"
+
+
+# =====================================================================
+# 法務ルール v1.2 の追加要求
+# =====================================================================
+
+def test_区切り文字はルールファイルが持つ():
+    """実装が句点だけを決め打ちしていないこと。
+    収集した注記原文は複数の窓口ブロックを『／』で連結しているので、
+    そこをまたいで判定すると**別窓口の文言を混ぜる。**"""
+    d = RULES["sentence_delimiters"]
+    assert "／" in d and "｜" in d, "窓口の連結記号が区切りに入っていない"
+    assert "、" not in d and "・" not in d, \
+        "『、』『・』を区切りにすると『企業・店舗様との新規お取引は行っておりません』を落とす"
+
+
+def test_スラッシュ区切りをまたいだ否定は拾わない():
+    """『／』は別窓口の境目。またぐと他窓口の断り文句を持ち込む。"""
+    # ★最初この文を長く書いていたら、変異（区切りを句点だけにする）でも通った。
+    #   否定語が lookahead 25文字の外に出ていて、**区切りではなく長さで落ちていた**。
+    #   区切りだけが効く長さにする。
+    r = classify_window("新規お取引はこちら／お受けしておりません")
+    assert "D6_trade_window_negated" not in r["optout_rule_ids"], r
+    # 同じ長さで区切りが無ければヒットすること（＝長さで落ちていない証明）
+    r2 = classify_window("新規お取引はこちらお受けしておりません")
+    assert "D6_trade_window_negated" in r2["optout_rule_ids"], r2
+
+
+def test_読点や中黒はまたいでよい():
+    """『企業・店舗様との新規お取引は行っておりません』は正当な D。
+    ここを区切ると**打ってはいけない相手を打ってしまう。**"""
+    r = classify_window("以下の企業・店舗様との新規お取引は行っておりません。")
+    assert r["optout_class"] == "D", r
+
+
+def test_A1の否定フィルタも同一文条件を課す():
+    """v1.1 は文字数だけだったため、**正当な A_PLUS を A に降格**させていた。
+    母数を減らす方向の誤り（法務が自主検出）。"""
+    only_a1 = json.loads(json.dumps(RULES))
+    only_a1["rules"] = [r for r in RULES["rules"] if r["id"] == "A1_trade_window"]
+    only_a1["apply_order"] = ["A_PLUS", "A"]
+    r = classify_window("新規お取引はこちらから。なお、お電話はお受けしておりません。",
+                        rules=only_a1)
+    assert r["optout_class"] == "A_PLUS", \
+        "句点をまたぐ否定で A_PLUS を落としている（母数を減らす方向の誤り）"
+
+
+def test_needs_reviewは勝たなかった規則からも立つ():
+    """★v1.2 の本丸。
+
+    『勝ったクラスの規則』だけを見ると、**判定と無関係な理由でフラグが静かに消える。**
+    v1.1 で適用順を E→D にした結果、ハイメスが E4（needs_review なし）で確定し、
+    同時に発火していた D6（needs_review あり）のフラグを落とした。
+    結論は E で変わらないのに、レビュー対象から外れた。
+    """
+    txt = ("以下の業種、業態の企業・店舗様との新規お取引は行っておりません。"
+           "・WEBでの販売のみの企業様")
+    r = classify_window(txt)
+    assert r["optout_class"] == "E", r          # 判定は E のまま
+    assert r["optout_needs_review"] is True, \
+        "勝たなかった D6 の needs_review が落ちている"
+    assert r["optout_review_reason"]
+
+
+#: ハイメス（＝株式会社ブラザー・ジョルダン社）の窓口原文。法務が実機確認した社。
+HEIMES = ("お取引希望の方は下記フォームに必要事項をご記入の上、送信下さい。"
+          "尚、誠に勝手ながら以下の業種、業態の企業・店舗様との新規お取引は"
+          "行っておりません。ご了承のほどお願い申し上げます。"
+          "・WEBでの販売のみの企業様・小売以外のスタイルで店舗展開をされている企業様")
+
+
+def test_勝たなかった規則IDを証跡として残す():
+    """E が勝った社に D3（通報明示）も当たっていた、という事実を失わない。
+    判定は正しくても**なぜ除外したのかが分からなくなる。**
+
+    法務が実機確認した期待値そのもの:
+      D6(needs_review あり) / E4(なし) / A1(なし) が発火し、
+      勝ちクラス = E のまま needs_review = true、other = D6;A1。
+    A1 は1文目の『お取引希望』で発火する（否定はされていない）。
+    2文目の『新規お取引は行っておりません』は同一文内の否定なので数えない。
+    """
+    r = classify_window(HEIMES)
+    assert r["optout_class"] == "E"
+    assert r["optout_rule_ids"] == "E4_web_only_refused"
+    assert r["optout_needs_review"] is True
+    assert r["optout_other_rule_hits"] == "D6_trade_window_negated;A1_trade_window", \
+        r["optout_other_rule_hits"]
+
+
+def test_通報明示の証跡はEが勝っても残る():
+    """愛知電線型。踏むと実害が出る社の根拠が、判定順の副作用で消えてはならない。"""
+    txt = ("実店舗をお持ちでない事業者様とのお取引はお断りしております。"
+           "無断の営業メールは特定電子メール法に基づき通報いたします。")
+    r = classify_window(txt)
+    assert r["optout_class"] == "E"
+    assert "D3_report_threat" in r["optout_other_rule_hits"], r["optout_other_rule_hits"]
+
+
+def test_other_rule_hitsの順序が安定している():
+    """監査証跡は差分を取るので、実行のたびに並びが変わっては困る。"""
+    a = classify_window(HEIMES)["optout_other_rule_hits"]
+    b = classify_window(HEIMES)["optout_other_rule_hits"]
+    assert a == b and a

@@ -1,12 +1,13 @@
 {
-  "started_at": "2026-09-04T11:46:22.480579+09:00",
-  "assumptions": "FBA納品送料100円/個・NETSEA送料は10個按分・保管2.0ヶ月(繁忙期レート)・雑費3%",
+  "started_at": "2026-09-04T12:14:03.476113+09:00",
+  "assumptions": "基本成約料110円/点・販売手数料の消費税10%・納品代行12円/点・FBA納品送料37.5円/点・保管1.5ヶ月(繁忙期レート)・返品率3%引当（経理ハジメ実測版 2026-09-04 / C1_cost_assumptions.json）",
   "profile_rows": 480,
   "screen": {
     "netsea_products": 257067,
     "candidates_expanded": 1714571,
     "passed_screen": 42074,
-    "deduped_by_jan": 15132,
+    "dropped_as_duplicate_jan": 15132,
+    "unique_jan_candidates": 26942,
     "to_keepa": 26942,
     "screen_reasons": {
       "JANなし": 1591152,
@@ -22,32 +23,34 @@
   },
   "keepa": {
     "candidates_total": 26942,
-    "verified_cumulative": 200,
-    "unverified_remaining": 26742,
-    "coverage_pct": 0.7,
-    "keepa_requests": 2,
-    "keepa_codes_sent": 200,
-    "keepa_products_returned": 445,
-    "keepa_tokens_consumed": 445,
-    "keepa_tokens_before": 1200,
-    "keepa_tokens_left": 755,
-    "keepa_cost_per_candidate": 2.225
+    "verified_cumulative": 3100,
+    "unverified_remaining": 23842,
+    "coverage_pct": 11.5,
+    "keepa_requests": 25,
+    "keepa_codes_sent": 2500,
+    "keepa_products_returned": 3605,
+    "keepa_tokens_consumed": 3605,
+    "keepa_tokens_before": 289,
+    "keepa_tokens_left": 102,
+    "keepa_cost_per_candidate": 1.442
   },
   "result": {
-    "evaluated": 200,
+    "evaluated": 3100,
     "margin_bands": {
-      "20%以上": 5,
-      "5%未満": 2,
-      "赤字": 110
+      "10〜20%": 27,
+      "20%以上": 38,
+      "5%未満": 29,
+      "5〜10%": 8,
+      "赤字": 2144
     },
-    "suppliers_with_profitable_item": 3,
+    "suppliers_with_profitable_item": 10,
     "suppliers_listed": 210,
-    "profitable_with_sales": 3,
-    "amazon_found": 128,
-    "not_on_amazon": 72,
-    "profitable": 7,
-    "gems": 2,
-    "hit_rate_vs_evaluated": 3.5
+    "profitable_with_sales": 20,
+    "amazon_found": 2269,
+    "not_on_amazon": 831,
+    "profitable": 102,
+    "gems": 45,
+    "hit_rate_vs_evaluated": 3.3
   },
-  "elapsed_sec": 107.1
+  "elapsed_sec": 10955.5
 }

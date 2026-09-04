@@ -25,7 +25,7 @@ COLS = ["順位","スコア","メーカー名", "宛名の注意",
         # --- 法務ハルオの A〜E 判定（B1L_optout_rules.json v1.0）---
         "optout_class","optout_notice_status","contact_priority","action","allowed_channels",
         "optout_hit_terms","optout_rule_ids","form_optout_notice","optout_source_url",
-        "optout_checked_at","recheck_condition","optout_e_subclass","optout_decided_by","optout_needs_review","optout_review_reason",
+        "optout_checked_at","recheck_condition","optout_e_subclass","optout_decided_by","optout_needs_review","optout_review_reason","optout_other_rule_hits",
         # --- 連絡先 ---
         "正式商号","法人番号","所在地","公式HP","電話","問い合わせフォームURL","メール","確度",
         "取引可否シグナル","備考","出典URL",
@@ -97,7 +97,7 @@ def build_all_rows(lookups, v14, contacts_cls):
                   "allowed_channels","optout_hit_terms","optout_rule_ids","form_optout_notice",
                   "optout_source_url","optout_checked_at","recheck_condition",
                   "optout_e_subclass","optout_decided_by",
-                  "optout_needs_review","optout_review_reason"):
+                  "optout_needs_review","optout_review_reason","optout_other_rule_hits"):
             row[k] = e.get(k, "")
         for k, src in (("該当商品数","該当商品数"), ("主なカテゴリ","主なカテゴリ"),
                        ("想定仕入れ金額の中央値","想定仕入れ金額の中央値"),
@@ -237,7 +237,7 @@ def main():
                   "optout_hit_terms","optout_rule_ids","form_optout_notice",
                   "optout_source_url","optout_checked_at","recheck_condition",
                   "optout_e_subclass","optout_decided_by",
-                  "optout_needs_review","optout_review_reason"):
+                  "optout_needs_review","optout_review_reason","optout_other_rule_hits"):
             row[k] = e.get(k, "")
         row["取引可否シグナル"] = signal(e if e else None, note)
         rows.append(row)
