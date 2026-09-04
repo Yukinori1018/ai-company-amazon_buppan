@@ -1,21 +1,18 @@
 {
   "_comment": "ソースが決まったら enabled と throttle を足す。秒数はハルオ(法務)の指定に合わせる。",
-
   "input_csv": "../T-20260817-005/v14/03_メーカー名寄せ.csv",
   "input_name_column": "メーカー/ブランド",
   "output_csv": "contacts_v1.csv",
-
   "enabled": [
-    "既取得55社(T-20260804-001)"
+    "既取得55社(T-20260804-001)",
+    "Exa検索(エージェント取得)"
   ],
-
   "default_throttle_sec": 3.0,
   "throttle": {
-    "既取得55社(T-20260804-001)": 0.0
+    "既取得55社(T-20260804-001)": 0.0,
+    "Exa検索(エージェント取得)": 0.0
   },
-
   "allow_network": false,
   "_allow_network_note": "ハルオ(法務)の適法性判定が出るまで false。needs_network=True の resolver は runner が拒否する。",
-
   "status_every": 25
 }
