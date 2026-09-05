@@ -1,5 +1,5 @@
 {
-  "started_at": "2026-09-05T20:41:30.355632+09:00",
+  "started_at": "2026-09-05T22:19:59.370379+09:00",
   "assumptions": "基本成約料110円/点・販売手数料の消費税10%・納品代行12円/点・FBA納品送料37.5円/点・保管1.5ヶ月(繁忙期レート)・返品率3%引当（経理ハジメ実測版 2026-09-04 / C1_cost_assumptions.json）",
   "profile_rows": 480,
   "screen": {
@@ -23,34 +23,34 @@
   },
   "keepa": {
     "candidates_total": 26942,
-    "verified_cumulative": 20600,
-    "unverified_remaining": 6342,
-    "coverage_pct": 76.5,
+    "verified_cumulative": 23100,
+    "unverified_remaining": 3842,
+    "coverage_pct": 85.7,
     "keepa_requests": 25,
     "keepa_codes_sent": 2500,
-    "keepa_products_returned": 1988,
-    "keepa_tokens_consumed": 1988,
-    "keepa_tokens_before": 101,
-    "keepa_tokens_left": 33,
-    "keepa_cost_per_candidate": 0.795
+    "keepa_products_returned": 1909,
+    "keepa_tokens_consumed": 1909,
+    "keepa_tokens_before": 73,
+    "keepa_tokens_left": 64,
+    "keepa_cost_per_candidate": 0.764
   },
   "result": {
-    "evaluated": 20600,
+    "evaluated": 23100,
     "margin_bands": {
-      "10〜20%": 463,
-      "20%以上": 573,
-      "5%未満": 535,
-      "5〜10%": 323,
-      "赤字": 12043
+      "10〜20%": 518,
+      "20%以上": 623,
+      "5%未満": 607,
+      "5〜10%": 371,
+      "赤字": 13187
     },
-    "suppliers_with_profitable_item": 48,
+    "suppliers_with_profitable_item": 53,
     "suppliers_listed": 210,
-    "profitable_with_sales": 450,
-    "amazon_found": 14836,
-    "not_on_amazon": 5764,
-    "profitable": 1894,
-    "gems": 608,
+    "profitable_with_sales": 495,
+    "amazon_found": 16387,
+    "not_on_amazon": 6713,
+    "profitable": 2119,
+    "gems": 637,
     "hit_rate_vs_evaluated": 9.2
   },
-  "elapsed_sec": 5906.2
+  "elapsed_sec": 5826.0
 }
