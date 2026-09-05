@@ -11,3 +11,8 @@ A_初回仕入れ候補_卸レーン.csv
 A_サプライヤー別サマリ.csv
 _tariffs_cache.json
 __pycache__/
+
+# D（2026-09-06 / A-2 本番適用）の行データ。上と同じ理由で Git には載せません。
+D_初回仕入れ_発注候補セット.csv
+D_サプライヤー別サマリ.csv
+_netsea_desc_cache.json
