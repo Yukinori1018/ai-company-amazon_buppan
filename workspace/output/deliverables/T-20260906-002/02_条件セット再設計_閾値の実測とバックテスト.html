@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>条件セットの再設計 — 閾値の実測とバックテスト</title><style>
+:root{--fg:#1b1f23;--mut:#5b6570;--line:#e3e7eb;--acc:#0b5fff;--warn:#b45309;--bad:#b91c1c;--ok:#047857;}
+*{box-sizing:border-box}
+body{margin:0;background:#f6f7f9;color:var(--fg);
+ font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",Meiryo,sans-serif;
+ line-height:1.85;font-size:15.5px;-webkit-text-size-adjust:100%;}
+.wrap{max-width:1000px;margin:0 auto;padding:32px 22px 96px;background:#fff;
+ box-shadow:0 1px 3px rgba(0,0,0,.06);}
+h1{font-size:1.75rem;line-height:1.4;margin:.2em 0 .6em;padding-bottom:.4em;border-bottom:3px solid var(--acc);}
+h2{font-size:1.3rem;margin:2.2em 0 .7em;padding:.35em .6em;background:#eef3ff;border-left:5px solid var(--acc);border-radius:3px;}
+h3{font-size:1.1rem;margin:1.8em 0 .5em;padding-bottom:.25em;border-bottom:1px solid var(--line);}
+p{margin:.7em 0}
+hr{border:0;border-top:1px solid var(--line);margin:2.2em 0}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:.92em;display:block;overflow-x:auto;}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top;}
+th{background:#f0f3f7;font-weight:600;white-space:nowrap;}
+tbody tr:nth-child(even){background:#fafbfc}
+blockquote{margin:1.1em 0;padding:.8em 1em;background:#fffbeb;border-left:5px solid var(--warn);border-radius:3px;color:#463a1a;}
+code{background:#f1f3f5;padding:.12em .4em;border-radius:3px;font-size:.9em;
+ font-family:"SFMono-Regular",Menlo,Consolas,monospace;}
+pre{background:#1e2430;color:#e6edf3;padding:14px 16px;border-radius:6px;overflow-x:auto;font-size:.86em;line-height:1.6;}
+pre code{background:none;color:inherit;padding:0}
+ul,ol{margin:.7em 0;padding-left:1.6em}
+li{margin:.3em 0}
+a{color:var(--acc)}
+@media print{body{background:#fff}.wrap{box-shadow:none;max-width:none}}
+</style></head><body><div class="wrap"><h1>条件セットの再設計 — 閾値 X の実測、BuyBox 条件の可否、32SKU バックテスト</h1>
+<p>チケット: T-20260906-002（追補） / 担当: タカシ（IT） / 2026-09-06<br>前提: 社長判断により <strong>ドロップ数は捨てず、下限（足切り）として使う</strong>。01 の A 案（抽出軸をランクへ付け替え）は不採用。</p>
+<blockquote>本ファイルにも Keepa 固有の加工値の<strong>個別 ASIN 行データは書いていません</strong>。<br>分布・閾値・件数・手法のみです。</blockquote>
+<hr>
+<h2>結論（先に4行）</h2>
+<ol><li><strong>X = 10。</strong> ただし単独では使えず、<strong>「Keepa が30日で20回以上観測している」条件とセット</strong>でのみ意味を持ちます。</li></ol>
+<p>   観測が少ない商品はドロップ数がゼロでも売れています（月4万点売れていて 0 の実例あり）。</p>
+<ol><li><strong>① だけでは今回の失敗を防げませんでした。</strong> 失敗SKUのドロップ数は 14 で、<strong>X=10 を超えています。</strong></li></ol>
+<p>   これを落としたのは <strong>② カート最終獲得日</strong>です。<strong>②が主役で、①は補助</strong>です。</p>
+<ol><li><strong>②③④はすべて Keepa API で取れます。</strong> <code>offers=20&amp;buybox=1</code> が必要で単価は 1 → 約6トークン。<strong>2段構えが正解</strong>です。</li><li><strong>32SKU バックテスト: 新条件で残るのは 5 件。</strong> 失敗SKUは確実に落ちます（②③の両方で）。</li></ol>
+<p><strong>そして社長のご判断のほうが、私の A 案より正しかったことをデータで確認しました。</strong><br>理由は §4-3 に書きます。A 案が使えない実証的な根拠が出ています。</p>
+<hr>
+<h2>1. ① の閾値 X を実測で決める</h2>
+<h3>1-1. 方法</h3>
+<p>文房具・オフィス用品から<strong>ドロップ数で絞らずに</strong>ランク帯6段階 × 60件 = 360件を層化抽出。<br>正解ラベルは <strong>Amazon 公表の月間販売数</strong>（Keepa の推定ではなく Amazon 自身の一次情報）。<br>今回は前回と違い、<strong>ランキング履歴から「30日の観測回数」も数えました</strong>。ここが決定的でした。</p>
+<h3>1-2. まず判明した前提条件 — 観測回数を見ないと閾値は無意味</h3>
+<table><thead><tr><th>30日の観測回数</th><th>件数</th><th>ドロップ数の中央値</th><th>実際に売れている率</th></tr></thead><tbody>
+<tr><td>1〜3回</td><td>116</td><td>0</td><td>9%</td></tr>
+<tr><td>4〜9回</td><td>35</td><td>1</td><td>3%</td></tr>
+<tr><td>10〜19回</td><td>25</td><td>4</td><td>28%</td></tr>
+<tr><td><strong>20〜29回</strong></td><td>57</td><td>10</td><td>40%</td></tr>
+<tr><td>30〜44回</td><td>43</td><td>11</td><td>21%</td></tr>
+<tr><td><strong>45回以上</strong></td><td>84</td><td>15</td><td>43%</td></tr>
+</tbody></table>
+<p><strong>ドロップ数の中央値が、売れ行きではなく観測回数にきれいに追随しています。</strong></p>
+<p>さらに決定的な実例が標本の中に出ました。<br><strong>ドロップ数 0 でありながら Amazon が販売数を公表している商品が 11 件</strong>あり、<br>そのすべてが <strong>30日の観測回数が 2〜5 回</strong>、公表販売数の中央値は <strong>1,000 点/月</strong>、最大は <strong>月4万点</strong>でした。</p>
+<blockquote><strong>月に4万点売れている商品のドロップ数が 0 になります。Keepa が2回しか見ていないからです。</strong></blockquote>
+<p><strong>したがって「ドロップ数が少ない＝売れていない」は、Keepa が十分な回数見ている商品にしか成り立ちません。</strong><br>観測回数を見ずに足切りすると、<strong>カテゴリ最上位の商品から先に削れます。</strong> これが ①-a が必要な理由です。</p>
+<h3>1-3. 十分に観測されている群に限った閾値（n=184、うち販売数公表 68 件）</h3>
+<table><thead><tr><th>X</th><th>通過数</th><th>売れている商品の取りこぼし</th><th>通過分の売れている率</th><th><strong>落とした分の売れている率</strong></th></tr></thead><tbody>
+<tr><td>1</td><td>178</td><td>0%</td><td>38%</td><td><strong>0%</strong></td></tr>
+<tr><td>5</td><td>170</td><td>0%</td><td>40%</td><td><strong>0%</strong></td></tr>
+<tr><td>8</td><td>156</td><td>1%</td><td>43%</td><td>4%</td></tr>
+<tr><td><strong>10</strong></td><td><strong>136</strong></td><td><strong>3%</strong></td><td><strong>49%</strong></td><td><strong>4%</strong></td></tr>
+<tr><td>12</td><td>89</td><td>31%</td><td>53%</td><td>22%</td></tr>
+<tr><td>15</td><td>60</td><td>43%</td><td>65%</td><td>23%</td></tr>
+<tr><td>18</td><td>29</td><td>63%</td><td>86%</td><td>28%</td></tr>
+</tbody></table>
+<p><strong>X = 10 が折れ目です。</strong> 10 未満で落とした群は <strong>4% しか売れていない</strong>＝ほぼ本当に死んでいます。<br>一方 12 以上にすると、取りこぼしが 3% → 31% へ跳ね上がります。<strong>純度の伸びに対して代償が急に大きくなります。</strong></p>
+<h3>1-4. 社長の飽和仮説について</h3>
+<blockquote>「14〜15 は1日1回観測の商品の飽和値＝情報ゼロのゾーンではないか」</blockquote>
+<p><strong>仮説の方向は正しく、値は少しずれています。</strong> 実測では、<br>1日1回前後（26〜34回）の群のドロップ数の中央値は <strong>9</strong>、1日2回以上（45回以上）の群で <strong>15</strong> でした。<br>つまり <strong>15 は「1日2回見られている商品」の飽和値</strong>です。1日1回なら 9 前後に落ちます。</p>
+<p><strong>より重要なのは、この事実が「飽和値の1点」ではなく「連続的なずれ」を意味することです。</strong><br>観測頻度が違えば飽和値も違うので、<strong>14 や 15 という特定の数字を避けても解決しません。</strong><br>避けるべきは値ではなく、<strong>観測回数を見ずに絶対値を比較すること</strong>そのものです。</p>
+<h3>1-5. 充填率（観測回数で正規化した指標）は使えるか</h3>
+<p>ご指示にあった「充填率を条件に使えないか」を検証しました。<strong>答えは「閾値としては不可、ゲートとしては必須」です。</strong></p>
+<p>十分に観測されている群で、充填率を足切りに使うと:</p>
+<table><thead><tr><th>充填率の閾値</th><th>通過数</th><th>売れている商品の取りこぼし</th><th>通過分の売れている率</th></tr></thead><tbody>
+<tr><td>0.20</td><td>155</td><td>3%</td><td>43%</td></tr>
+<tr><td>0.30</td><td>89</td><td><strong>41%</strong></td><td>45%</td></tr>
+<tr><td>0.45</td><td>40</td><td>59%</td><td>70%</td></tr>
+</tbody></table>
+<p><strong>同じ取りこぼし率（3%）で比べると、生ドロップ数の X=10（純度 49%）のほうが充填率 0.20（純度 43%）より上でした。</strong><br>充填率は全個体で 0.3〜0.5 に集まるため、閾値としての分解能がありません（01 で示したとおり、これはコイン投げの確率だからです）。</p>
+<p><strong>使い道は別にあります。</strong> 充填率の分母である<strong>観測回数そのもの</strong>が、①-a のゲートとして必須です。<br>正規化した値ではなく、<strong>分母を見て「この数字を信じてよいか」を判定する</strong>のが正しい使い方でした。</p>
+<h3>1-6. 価格帯・ランク帯への依存</h3>
+<table><thead><tr><th>価格帯</th><th>件数</th><th>売れている群のドロップ数中央値</th><th>売れていない群</th></tr></thead><tbody>
+<tr><td>〜1,000円</td><td>78</td><td>16</td><td>11</td></tr>
+<tr><td>1,000〜3,000円</td><td>63</td><td>15</td><td>10</td></tr>
+<tr><td>3,000〜10,000円</td><td>30</td><td>13</td><td>11</td></tr>
+</tbody></table>
+<p><strong>価格帯による差はほぼありません。単一の X で足ります。</strong>（ランク帯には差がありますが、観測回数のゲートを噛ませると解消します。）</p>
+<hr>
+<h2>2. ②③ は Keepa API で取れるか — 取れます</h2>
+<p><code>offers=20&amp;buybox=1</code> を付けた実地確認の結果です。</p>
+<table><thead><tr><th>必要なもの</th><th>フィールド</th><th>状態</th></tr></thead><tbody>
+<tr><td>② カート最終獲得日</td><td><code>buyBoxSellerIdHistory</code>（時刻とセラーIDの対の履歴）</td><td><strong>取得可</strong>。実測で 684 要素</td></tr>
+<tr><td>③ カート不在率</td><td>同上を日次で走査。<code>-1</code>＝カート無し / <code>-2</code>＝資格なし</td><td><strong>算出可</strong></td></tr>
+<tr><td>補助</td><td><code>stats.buyBoxIsUnqualified</code> / <code>buyBoxIsAmazon</code> / <code>buyBoxStats</code> / <code>totalOfferCount</code></td><td>すべて取得可</td></tr>
+<tr><td>④ 親子判定</td><td><code>parentAsin</code> / <code>variationCount</code></td><td>取得可（<strong>ただし §4-2 の注意</strong>）</td></tr>
+</tbody></table>
+<p><strong><code>lastBuyBoxUpdate</code> というフィールドは存在しません。</strong> 履歴から自分で計算します（実装済み・スクリプト同梱）。</p>
+<h3>コスト（2段構えの見積り）</h3>
+<p>実測で <strong>32 ASIN = 191 トークン（約6/ASIN）</strong>。<code>offers</code> なしの 1 トークンに対して <strong>6倍</strong>です。</p>
+<table><thead><tr><th>段</th><th>対象</th><th>条件</th><th>単価</th><th>26,942件に当てた場合</th></tr></thead><tbody>
+<tr><td>1段目</td><td>全件</td><td>①（ドロップ数＋観測回数）</td><td>1</td><td>約 27,000 トークン（<strong>約22時間</strong>）</td></tr>
+<tr><td>2段目</td><td>1段目の通過分のみ</td><td>②③④</td><td>6</td><td>通過 1,000 件なら 6,000（<strong>約5時間</strong>）</td></tr>
+</tbody></table>
+<p><strong>①を先に当てる2段構えが必須</strong>です。全件に <code>offers</code> を当てると 16万トークン・6日かかります。<br>（回復レートは 20/分 ＝ 1,200/時。現在の残高は約 640。）</p>
+<hr>
+<h2>3. 32SKU バックテスト</h2>
+<h3>3-1. 適用した条件</h3>
+<table><thead><tr><th>#</th><th>条件</th><th>実装</th></tr></thead><tbody>
+<tr><td>①-a</td><td>30日の観測回数 ≧ 20</td><td>未満は「判定不能」。落とすのでも通すのでもなく<strong>保留</strong></td></tr>
+<tr><td>①-b</td><td>ドロップ数 ≧ 10</td><td>§1 で実測</td></tr>
+<tr><td>②</td><td>カート最終獲得が30日以内</td><td>セラーID履歴から算出</td></tr>
+<tr><td>③</td><td>直近30日のカート不在率 ≦ 0.30</td><td>同上を日次走査</td></tr>
+<tr><td>④</td><td>子ASINは子単位の根拠を要求</td><td>§4-1 のとおり<strong>再定義しました</strong></td></tr>
+</tbody></table>
+<h3>3-2. 結果</h3>
+<p><strong>S5 通過 32 件 → 新条件で 5 件。失敗SKUは確実に落ちます。</strong></p>
+<p>失敗SKU（B0015L0RGK）の落ち方:</p>
+<ul><li>② <strong>カートの最終獲得は 70 日前</strong>（30日以内ではない）→ 落ちる</li><li>③ <strong>直近30日のカート不在率 100%</strong> → 落ちる</li><li>④ 子ASINで子単位の販売根拠なし → 落ちる</li><li>① <strong>通ってしまう</strong>（観測回数46回・ドロップ数は X=10 を超える）</li></ul>
+<blockquote><strong>①だけでは防げませんでした。防いだのは②です。</strong> ここは強調させてください。<br>「ドロップ数を足切りに使う」という方針は妥当ですが、<strong>今回の失敗の再発防止は②が担っています。</strong></blockquote>
+<h3>3-3. 落ち方の内訳（重複あり）</h3>
+<table><thead><tr><th>条件</th><th>落とした件数</th><th>単独で当てたときの生存数</th></tr></thead><tbody>
+<tr><td>① ドロップ数の足切り（観測回数込み）</td><td>24</td><td>8</td></tr>
+<tr><td>② カート最終獲得日</td><td>11</td><td>21</td></tr>
+<tr><td>③ カート不在率</td><td>5</td><td>27</td></tr>
+<tr><td>④ 子ASIN（再定義後）</td><td>0</td><td>32</td></tr>
+</tbody></table>
+<p>内訳の詳細: ①-b で 19 件、①-a（観測不足＝判定不能）で 5 件、② で 11 件、③ で 5 件。</p>
+<p><strong>ご質問「①だけで大半が落ちるなら②③は後回しにできるか」への回答: できません。</strong><br>①だけなら 8 件残りますが、<strong>その 8 件には失敗SKUが含まれます。</strong><br>②③の実装コストは、まさにこの1件を落とすために払う価値があります。</p>
+<h3>3-4. X を動かしたときの生存数（②③④と併用）</h3>
+<table><thead><tr><th>X</th><th>生存数</th></tr></thead><tbody>
+<tr><td>1</td><td>16</td></tr>
+<tr><td>3</td><td>10</td></tr>
+<tr><td>5</td><td>7</td></tr>
+<tr><td><strong>10（推奨）</strong></td><td><strong>5</strong></td></tr>
+<tr><td>12</td><td>2</td></tr>
+<tr><td>14</td><td>1</td></tr>
+</tbody></table>
+<hr>
+<h2>4. 設計上の指摘（ご指示への回答）</h2>
+<h3>4-1. ④ は独立した条件になりません — ②に吸収されます</h3>
+<p>最初、④を「子ASINは Amazon 公表の販売数がなければ落とす」と厳しく実装したところ、<br><strong>32件中 0 件しか残りませんでした。</strong> 公表販売数はこの価格・ランク帯では<strong>1件も取れない</strong>ためです（§4-3）。</p>
+<p>正しい定義は「<strong>子ASINは、ランク由来でない子単位の根拠を持つこと</strong>」です。<br>そして<strong>②③がまさにその根拠</strong>なので、②③を必須にした時点で④は自動的に満たされます。</p>
+<blockquote><strong>④は独立したフィルタではなく、「②を必須にする理由」です。</strong> 実装は②③のみで足ります。<br>④は「ランク・ドロップ数・レビュー件数を単独の根拠にしない」という<strong>運用上の禁止事項</strong>として残してください。</blockquote>
+<h3>4-2. 「BuyBox が唯一の軸」は、少し違います（ご指摘の確認依頼への回答）</h3>
+<p><strong>バリエーション家族で共有されるのはランク由来の指標です。子ASIN単位で独立している軸は、BuyBox 以外にもあります。</strong><br>01 の対照実験で、同じ親を持つ3兄弟が次のように<strong>異なる値</strong>を持っていました。</p>
+<table><thead><tr><th>軸</th><th>家族で共有か</th><th>根拠</th></tr></thead><tbody>
+<tr><td>ランク / ドロップ数 / レビュー件数</td><td><strong>共有される</strong></td><td>3兄弟で履歴の値が文字どおり同一</td></tr>
+<tr><td>BuyBox 履歴</td><td><strong>子ごとに独立</strong></td><td>兄弟でカート保持者も期間も別</td></tr>
+<tr><td><strong>オファー数</strong></td><td><strong>子ごとに独立</strong></td><td>3兄弟で 12件 / 0件 / 0件</td></tr>
+<tr><td><strong>在庫切れ率</strong></td><td><strong>子ごとに独立</strong></td><td>3兄弟で推移が別物</td></tr>
+<tr><td><strong>Amazon 公表の月間販売数</strong></td><td><strong>子ごとに独立</strong></td><td>生きている1件にだけ値があった</td></tr>
+</tbody></table>
+<p><strong>つまり親子問題を破れる軸は4つあります。</strong> ただし実務上は、<strong>この候補プールで使える軸が BuyBox しかない</strong>ため、<br>結論としてのご判断は正しいです。理由が違うだけです（オファー数・在庫切れ率は BuyBox と強く相関するので情報が重複し、<br>公表販売数はこの帯で取得率が 0% です）。</p>
+<h3>4-3. 私の A 案（抽出軸をランクへ付け替え）が不採用で正しかった実証</h3>
+<p>②③を通った 19 件のうち、<strong>Amazon 公表の月間販売数が取れたものは 0 件</strong>でした。<br>01 で測った被覆率（#1万位以内で 58〜76%、#3万位以下で 2%、#10万位以下で 0%）のとおり、<br><strong>この候補プールは公表販売数がまったく存在しない帯に丸ごと入っています。</strong></p>
+<p><strong>A 案は、この事業の候補プールでは実装しても動きません。</strong> ご判断が正しかったです。</p>
+<h3>4-4. 5件という結果について（申し送り）</h3>
+<p>社長は「数より確度」とのことですので 5 件でも要件は満たしますが、事実として申し添えます。</p>
+<p><strong>5 件は、既存の発注セット（A1 9SKU / A2 6SKU / B1 8SKU）をどれも組み直せない件数です。</strong><br>条件セットの問題ではなく、<strong>上流の母数 26,942 件を新条件で引き直す必要がある</strong>ということです。<br>ドロップ数降順で取られた既存プールは、01 §3-2 のとおり飽和領域に偏っています。</p>
+<p><strong>X を 5 に緩めれば 7 件、3 なら 10 件です。</strong><br>②③が「ページが生きているか」の判定を担っている以上、<strong>①は緩めても失敗SKUは落ちます</strong>（②で落ちるため）。<br>初回は X=10（確度優先）、母数を引き直したあとに X を再較正する、が私の推奨です。</p>
+<h3>4-5. X=10 の較正には限界があります（確度の申告）</h3>
+<p>X=10 は、<strong>Amazon が販売数を公表している帯</strong>（＝正解ラベルが存在する帯）で較正しました。<br>しかし §4-3 のとおり、<strong>実際の候補プールはその帯の下にあります。</strong><br>実測でも、②③で「生きている」と確認できた 19 件のうち <strong>14 件が X=10 で落ちています。</strong></p>
+<p><strong>つまり X=10 は、この候補プールでは「厳しすぎる」可能性があります。</strong><br>較正データが存在しない帯へ外挿しているので、ここは推測です。事実と分けて申告します。<br><strong>初回の1周を回して実売が取れたら、その実績で X を測り直すのが唯一の正攻法です。</strong></p>
+<hr>
+<h2>5. 実装スコープ（着手前の宣言）</h2>
+<p><strong>作る</strong></p>
+<ul><li><code>velocity.py</code> — ①の判定（観測回数のゲート ＋ ドロップ数の足切り）。ランキング履歴から観測回数を数える</li><li><code>buybox.py</code> — ②③の判定（セラーID履歴 → 最終獲得日・不在率）</li><li><code>scan</code> の2段構え化 — 1段目は <code>offers</code> なし全件、2段目は通過分のみ <code>offers</code> 付き</li></ul>
+<p><strong>作らない</strong></p>
+<ul><li><strong>Amazon の「残り◯点」の日次スナップショット</strong>（社長判断で不採用。この方向は検討していません）</li><li>販売数の推定モデル。正解ラベルがこの帯に存在せず、<strong>当てはめても検証できない</strong>ため</li><li>充填率を閾値に使う仕組み（§1-5 のとおり分解能がない）</li></ul>
+<hr>
+<h2>6. 再現方法</h2>
+<p><code>scripts/</code> に追加した4本です。</p>
+<table><thead><tr><th>ファイル</th><th>役割</th><th>トークン</th></tr></thead><tbody>
+<tr><td><code>sample_labeled.py</code></td><td>層化抽出＋観測回数の取得（閾値の較正用）</td><td>約 420</td></tr>
+<tr><td><code>threshold.py</code></td><td>§1 の表を出す</td><td>0</td></tr>
+<tr><td><code>dump_s5.py</code></td><td>親パイプラインを書き換えずに S5 通過32件を取り出す</td><td>0</td></tr>
+<tr><td><code>backtest_32.py</code> / <code>apply_conditions.py</code></td><td>§2 のフィールド確認と §3 のバックテスト</td><td>約 191</td></tr>
+</tbody></table></div></body></html>
