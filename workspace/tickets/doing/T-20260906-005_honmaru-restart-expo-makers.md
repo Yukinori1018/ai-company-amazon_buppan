@@ -81,6 +81,7 @@ gBizINFO による母数976社の全件法人特定はバックグラウンド�
 - 2026-09-06 gBizINFO 照合開始（1.15秒/リクエストのスロットリング遵守）。150社時点で法人特定率41.3%。
 - 2026-09-06 深掘り24社について公式サイトから TEL・フォームURLを実測。Keepa で20社を検証（20クエリ・約220トークン）。
 - 2026-09-06 第一陣20社を deliverables に直納し commit（7bd85af）。メーカーへの連絡は §4.1 のため未実施。
+- 2026-09-06 マリエ：成果物カタログへ8行を追記（第一陣20社リスト／調査レポートmd・html／落選4社／母数原本2353件／実測ログ3本／再現スクリプト5本／README）。`sync_catalog_to_sheet.py` で HTTP 200・225行×13列を同期。シート https://docs.google.com/spreadsheets/d/1xXfKbgbbiRUns-U40sgWNUWzwvu1s2aS3Gr1Ouy5MQY/edit
 
 ## 成果物
 
