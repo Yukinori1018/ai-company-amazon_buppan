@@ -1,26 +1,18 @@
-<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>SNS情報取得と食品販売の適法性判定 | T-20260906-006</title>
-<style>
-:root{--ink:#1a1a1a;--sub:#5a5a5a;--line:#d8d8d8;--ng:#b3261e;--ok:#1b5e20;--bg:#fff;}
-body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",sans-serif;line-height:1.85;color:var(--ink);background:var(--bg);max-width:1000px;margin:0 auto;padding:40px 24px 120px;font-size:15.5px;}
+<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SNS情報取得と食品販売の適法性判定 | T-20260906-006</title><style>
+:root{--ink:#1a1a1a;--sub:#5a5a5a;--line:#d8d8d8;}
+body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",sans-serif;line-height:1.85;color:var(--ink);background:#fff;max-width:1000px;margin:0 auto;padding:40px 24px 120px;font-size:15.5px;}
 h1{font-size:1.85em;border-bottom:4px solid var(--ink);padding-bottom:.4em;margin-top:0;}
 h2{font-size:1.4em;margin-top:2.4em;border-left:7px solid var(--ink);padding-left:.6em;}
-h3{font-size:1.15em;margin-top:2em;color:#000;border-bottom:1px solid var(--line);padding-bottom:.3em;}
+h3{font-size:1.15em;margin-top:2em;border-bottom:1px solid var(--line);padding-bottom:.3em;}
 h4{font-size:1.02em;margin-top:1.6em;color:var(--sub);}
 table{border-collapse:collapse;width:100%;margin:1.2em 0;font-size:.9em;}
 th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top;}
-th{background:#f2f2f2;font-weight:700;}
-tr:nth-child(even) td{background:#fafafa;}
-blockquote{border-left:5px solid #999;background:#f7f7f7;margin:1.1em 0;padding:.8em 1.1em;color:#333;font-size:.94em;}
+th{background:#f2f2f2;font-weight:700;} tr:nth-child(even) td{background:#fafafa;}
+blockquote{border-left:5px solid #999;background:#f7f7f7;margin:1.1em 0;padding:.8em 1.1em;font-size:.94em;}
 code{background:#f0f0f0;padding:1px 5px;border-radius:3px;font-size:.88em;font-family:ui-monospace,Menlo,monospace;word-break:break-all;}
-pre{background:#f5f5f5;padding:1em;border-radius:5px;overflow-x:auto;border:1px solid var(--line);}
-pre code{background:none;padding:0;}
-strong{font-weight:700;}
+pre{background:#f5f5f5;padding:1em;border-radius:5px;overflow-x:auto;border:1px solid var(--line);} pre code{background:none;padding:0;}
 hr{border:none;border-top:1px solid var(--line);margin:2.4em 0;}
-ul,ol{padding-left:1.6em;}
-li{margin:.3em 0;}
-.meta{background:#f7f7f7;border:1px solid var(--line);padding:14px 18px;border-radius:6px;font-size:.9em;}
+ul,ol{padding-left:1.6em;} li{margin:.3em 0;}
 </style></head><body>
 <h1>SNS 情報取得と食品販売の適法性判定</h1>
 
@@ -63,6 +55,8 @@ li{margin:.3em 0;}
 
 <p><strong>今すぐ動かしてよい3本：経路1・2（人が見る）、経路5（RSS/記事）、経路7の CAMPFIRE（社内リスト化のみ）。</strong></p>
 <p><strong>着手前に社長判断が要る4点は §III にまとめました。</strong></p>
+
+<blockquote><strong>【依頼範囲外の重大な指摘】</strong> サトルの Phase 1 推奨1位「楽天市場ランキングAPI」は、本判定で<strong>不可</strong>です。さらに、既存ツール Sato-Scope（T-20260521-005）の楽天・Yahoo アダプタが同じ規約に抵触する疑いがあります。<strong>§V を必ず読んでください。</strong></blockquote>
 
 <hr>
 
@@ -782,6 +776,68 @@ Disallow: /trends/explore?
 <li>☐ 商品ページに健康効果・効能を書いていない（薬機法68条・健康増進法65条）</li>
 <li>☐ 商品ページの訴求（産地・無添加・受賞歴等）について、<strong>書面の裏付けをメーカーから取得した</strong>（景表法8条3項）</li>
 </ul>
+
+<hr>
+
+<h1>第V部　【重要・依頼範囲外】既存の稼働物と本判定が衝突しています</h1>
+
+<p><strong>依頼された範囲だけを見て終わらせない</strong>（memory <code>knowledge_scraping_and_public_db_2026</code> §4-5）。Keepa の時と同じ構図です。<strong>新しい経路は白でも、既存の運用が黒だった</strong>というパターンが、これで3回目になります。</p>
+
+<h2>V-1. サトルの Phase 1 推奨1位が、本判定で不可になりました</h2>
+
+<p>同フォルダの <code>01_SNSトレンド起点の商品発見_経路27本の列挙.md</code> §まとめで、サトルは実測すべき経路の<strong>1位に「A7 楽天市場ランキングAPI（既存App ID・費用ゼロ）」</strong>を挙げ、「<strong>API規約の壁が最も低い</strong>」と評価しています。</p>
+
+<p><strong>本判定の結論は逆です。壁は最も低くではなく、最も高い部類です。</strong></p>
+
+<p><strong>楽天ウェブサービス規約 第10条（Forbidden Actions）1項</strong></p>
+<blockquote>(4) To gain income by using the Web Services <strong>in ways other than Rakuten Affiliate</strong>（会社が明示的に許可した場合を除く）<br>(6) To provide services using Web Services that <strong>competes or may compete against the Group</strong><br>(9) Storing information obtained through the Web Services … <strong>in a place that enables the sharing of information with unspecified and/or many people.</strong></blockquote>
+
+<ul>
+<li>楽天ランキング API で見つけた商品を <strong>Amazon で売って利益を得る</strong>＝ <strong>(4) 直撃</strong></li>
+<li>Amazon での販売は<strong>楽天市場と競合</strong>＝ <strong>(6) 直撃</strong></li>
+<li>結果を <strong>PUBLIC リポに commit</strong> ＝ <strong>(9) 直撃</strong></li>
+</ul>
+
+<p><strong>「公式APIだから安全」は成り立ちません。</strong>公式APIほど、利用目的を条項で縛っています。<strong>サトルの評価「F群のSNS系APIとは性質が違う／規約の壁が最も低い」は、条文を読む前の推測です。</strong></p>
+
+<p><strong>→ Phase 2 の実測対象から A7 を外してください。</strong> 同じ理由で <strong>D3（楽天ROOM）</strong>、および Amazon 側（Amazonインフルエンサー）も外れます。</p>
+
+<h2>V-2. さらに深刻：<strong>既存ツール「Sato-Scope」が同じ API を仕入れ元探索に使っています</strong></h2>
+
+<p><code>workspace/output/deliverables/T-20260521-005/code/adapters/</code> を確認したところ、<strong>楽天・Yahoo の両アダプタが実装済み</strong>です。</p>
+
+<ul>
+<li><code>rakuten_shopping.py</code> — 楽天ウェブサービス（<strong>既に App ID を取得済み＝規約に同意済み</strong>）</li>
+<li><code>yahoo_shopping.py</code> — Yahoo!ショッピング商品検索API v3。ヘッダのコメント：「<strong>仕入れ元起点 = 電脳せどりの入口</strong>」</li>
+<li>IT エンジニアのメモ <code>agents/it_engineer/memory/rakuten_new_api_referer_gatekeeper.md</code>（2026-06-05）に「<strong>Yahoo は実APIで稼働中</strong>」の記載</li>
+</ul>
+
+<p><strong>「Yahoo/楽天で安く仕入れて Amazon で売る商品を探す」という用途は、まさに楽天規約 10条(4)(6) が禁じている行為です。</strong></p>
+
+<h3>判定と、今すぐ取るべき措置</h3>
+
+<table><thead><tr><th>対象</th><th>判定</th><th>根拠</th></tr></thead><tbody>
+<tr><td><strong>楽天ウェブサービス（Sato-Scope の rakuten_shopping.py）</strong></td><td><strong>規約違反の疑いが濃厚。稼働停止を推奨</strong></td><td>規約10条(1)(4)(6)(9)。原文取得済み・2026-09-06</td></tr>
+<tr><td><strong>Yahoo!ショッピング API（yahoo_shopping.py）</strong></td><td><strong>要確認・優先度高</strong></td><td><strong>Yahoo!デベロッパーネットワークの API 利用ガイドライン本文を取得できていません</strong>（<code>developer.yahoo.co.jp/terms/</code> は 404、他ページは JS レンダリング）。<strong>共通利用規約 §14 が API にも及ぶのか、API 固有のガイドラインが商用利用を許諾しているのかを、条文で確認するまで判定できません</strong></td></tr>
+</tbody></table>
+
+<p><strong>幸いなことに、緊急度は下がっています。</strong></p>
+<p>memory <code>project_strategy_multitrack_2026-08</code>（2026-08-10 社長指示）により、<strong>①電脳せどりは停止中</strong>です。したがってこのアダプタが今も定期実行されているとは限りません。</p>
+
+<p><strong>それでも、以下は今日中に確認してください（秘書へのタスク）。</strong></p>
+
+<ol>
+<li><strong><code>rakuten_shopping.py</code> / <code>yahoo_shopping.py</code> を呼び出す定期実行（cron・launchd・nohup 等）が生きていないか。</strong>T-20260805-001 / T-20260812-004 の自動同期系が該当し得ます。</li>
+<li><strong>生きていた場合、停止してください。</strong>停止はコードの削除ではなくスケジュールの解除で足ります（<strong>削除は §4.1「不可逆な削除」。法務は実行しませんし、秘書も社長承認なしに実行しないでください</strong>）。</li>
+<li><strong>楽天の App ID を削除するかどうかは、社長判断です。</strong>保有しているだけでは違反になりません（規約違反になるのは「使い方」）。</li>
+</ol>
+
+<h3>なぜこれを本書に書いたか</h3>
+
+<p><strong>当社は、規約レビューの依頼範囲を狭く取って既存運用を見逃す事故を、既に2回起こしています</strong>（Keepa MCP／NETSEA）。</p>
+<p><strong>3回目を出さないために、依頼にない範囲でも、衝突を見つけたらその場で書きます。</strong></p>
+
+<p><strong>なお、私はいかなる停止・削除も実行していません。</strong>判定と推奨のみです（CLAUDE.md §4.1）。</p>
 
 <hr>
 
