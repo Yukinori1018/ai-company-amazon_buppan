@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>日次チェックの実行漏れ対策（2026-09-06）</title><style>
+:root{color-scheme:light}
+body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",sans-serif;line-height:1.85;max-width:960px;margin:0 auto;padding:32px 20px 80px;color:#1a1a1a;background:#fff}
+h1{font-size:1.7rem;border-bottom:3px solid #232f3e;padding-bottom:.5rem;margin-top:0}
+h2{font-size:1.3rem;margin-top:2.4rem;border-left:6px solid #ff9900;padding-left:.6rem}
+h3{font-size:1.1rem;margin-top:1.8rem;color:#232f3e}
+table{border-collapse:collapse;width:100%;margin:1rem 0;font-size:.92rem}
+th,td{border:1px solid #d5d9d9;padding:.55rem .7rem;vertical-align:top;text-align:left}
+th{background:#f2f3f3;font-weight:600}
+tr:nth-child(even) td{background:#fafafa}
+blockquote{border-left:5px solid #ff9900;background:#fff8ec;margin:1.2rem 0;padding:.8rem 1rem}
+code{background:#f0f0f0;padding:.12em .4em;border-radius:3px;font-size:.9em}
+pre{background:#1e2530;color:#e8e8e8;padding:.9rem 1rem;border-radius:5px;overflow-x:auto;font-size:.88rem;line-height:1.6}
+pre code{background:none;color:inherit;padding:0}
+a{color:#0066c0}
+hr{border:0;border-top:1px solid #e3e3e3;margin:2.4rem 0}
+li{margin:.3rem 0}
+strong{color:#111}
+@media print{a{color:#000;text-decoration:none}body{max-width:none}}
+</style></head><body>
+<h1>日次チェックの実行漏れ対策（2026-09-06）</h1>
+<p>T-20260826-004 / 担当: IT エンジニア タカシ</p>
+<p>2026-09-05（金）の Amazon 日次チェックが実行されませんでした。その原因と、打った手をまとめます。</p>
+<hr>
+<h2>1. 結論</h2>
+<table><thead><tr><th>問い</th><th>答え</th></tr></thead><tbody>
+<tr><td>なぜ飛んだか</td><td><strong>Claude アプリが起動していなかった</strong>ため。裏取り済み（§2）</td></tr>
+<tr><td>巡回の完全自動化はできるか</td><td><strong>できません。</strong>2FA があるため、社長のログイン済み Chrome が要ります</td></tr>
+<tr><td>では何を直したか</td><td><strong>「気づかないまま何日も過ぎる」ほうをゼロにしました</strong>（§3）</td></tr>
+<tr><td>社長がやることは増えるか</td><td>増えません。通知が出たら <code>/amazon-check</code> と打つだけです</td></tr>
+</tbody></table>
+<hr>
+<h2>2. 原因（裏取りの結果）</h2>
+<p>スケジュールタスクの実行履歴そのものは残っていませんでした。代わりに<strong>別系統の記録</strong>で裏を取りました。</p>
+<table><thead><tr><th>記録</th><th>9/5 の状況</th></tr></thead><tbody>
+<tr><td><code>git log</code>（監視ログの更新）</td><td>9/4 11:17 の次が 9/6 10:45。<strong>9/5 は1件も無し</strong></td></tr>
+<tr><td>launchd の github-sync（30分ごと）</td><td>9/5 の 07:03 / 13:03 / 15:33 / 18:33 / 21:03 / 22:33 に<strong>正常稼働</strong></td></tr>
+<tr><td>Claude のセッション記録（<code>~/.claude/session-env/</code>）</td><td>9/4 14:21 が最後。次は <strong>9/6 10:33</strong>。9/5 は<strong>ゼロ件</strong></td></tr>
+</tbody></table>
+<p>読み取れること。<strong>Mac は一日中起動していました。launchd も動いていました。落ちていたのは Claude だけです。</strong></p>
+<p>スケジュールタスクは Claude アプリが起動している間しか発火しません。9/5 は Claude を一度も開かなかったため、12:00 に何も起きませんでした。推定ではなく、3つの記録が一致した事実です。</p>
+<p><strong>もう1つ見つかった不具合。</strong> 9/6 に手で書いた「## 2026-09-05 未実行」の行が、<strong>検知の仕組みを黙らせていました。</strong></p>
+<p>旧リマインダー⑤は「ログの先頭にある日付」を最新とみなす作りでした。手で足した 9/5 の行が先頭に来た結果、「最新は 9/5 = 昨日 = 正常」と判定し、9/6 のセッションで<strong>警告を出しませんでした</strong>。欠測を記録した行が、欠測の検知を殺していたことになります。</p>
+<hr>
+<h2>3. 直したもの</h2>
+<p><strong>部品は増やさない方針で、既存の3つ（スケジュールタスク／ログ／SessionStart フック）を強くしました。</strong>追加したのは launchd の番犬1つだけです。理由は §4 に書きます。</p>
+<h3>3-1. 判定ロジックを1箇所に集約（新規 <code>.claude/scripts/amazon_check_log.py</code>）</h3>
+<p>「実行された日／されなかった日」を決めるコードを1ファイルにまとめました。フックと番犬の両方がここを呼びます。判定を2箇所に書くと必ずズレるためです。</p>
+<p>直した判定は3点です。</p>
+<ol>
+<li><strong>最新日を「先頭の見出し」ではなく「全見出しの最大値」で採る。</strong>並び順は人が手で書くので、いつか必ず崩れます（実際 9/5 が 9/6 の上にありました）。</li>
+<li><strong>本文に「未実行」とある日は、見出しがあっても実行されていないと数える。</strong>§2 の不具合の修正です。</li>
+<li><strong>閾値を「2日以上前」から「1日でも欠けたら」に。</strong></li>
+</ol>
+<h3>3-2. SessionStart リマインダー⑤の強化</h3>
+<ul>
+<li>欠測が1日でもあれば警告します。<strong>欠測した日付を具体的に列挙</strong>します。</li>
+<li>今日ぶんは <strong>12:00 を過ぎるまで鳴らしません</strong>。巡回は12:00予定なので、朝のセッションで毎日鳴ると警告そのものが無価値になります。</li>
+<li>番犬（§3-3）の最終実行時刻も一緒に出します。<strong>検知する側が死ぬと、静かに元に戻る</strong>ためです。</li>
+<li>平常日は1行も出ません（従来どおり）。</li>
+</ul>
+<h3>3-3. アプリ非依存の通知（新規 launchd <code>com.aicompany.amazon-buppan.amazon-check-watchdog</code>）</h3>
+<p>毎日 <strong>12:30 と 19:00</strong> に走ります。やることは3つだけです。</p>
+<ol>
+<li>過去の欠測日に「未実行」の行を<strong>ログへ自動挿入</strong>する</li>
+<li>今日ぶんが 12:30 を過ぎても無ければ、<strong>macOS の通知センターに出す</strong></li>
+<li>自分が走った時刻を <code>workspace/monitoring/watchdog-last-run.txt</code> に残す</li>
+</ol>
+<p><strong>Amazon には一切アクセスしません。</strong>ログを読んで通知を出すだけです。パスワードも 2FA も扱いません。</p>
+<p><strong>今日ぶんを先回りして「未実行」と書くことはしません。</strong>12:00 に遅れて走る場合があり、先に書くと嘘になります。嘘をつくログは価値がゼロになります。</p>
+<h3>3-4. 1コマンドでの復旧（新規 <code>/amazon-check</code>）</h3>
+<p>欠測に気づいたら、Claude で <code>/amazon-check</code> と打つだけで巡回が回ります。手順は既存の SKILL.md を参照する形にしてあり、二重には書いていません。</p>
+<hr>
+<h2>4. なぜ launchd を足したか（部品を増やした理由）</h2>
+<p>指示は「部品を増やさず既存3つを強くせよ」でした。それでも launchd を1つ足しました。理由は1点です。</p>
+<p><strong>SessionStart フックは、Claude を開いた時にしか鳴りません。今回の故障は「Claude を開かなかったこと」そのものです。壊れている時にだけ鳴らない仕組みでは、検知になりません。</strong></p>
+<p>そして §2 のとおり、<strong>9/5 に launchd は6回正常に走っていました。</strong>落ちるのは Claude であって launchd ではないことが、実測で分かっています。同じ日に動いていた層に乗せるのが、いちばん確実です。</p>
+<p>代わりに、番犬の役割は<strong>通知だけ</strong>に絞りました。巡回・ログイン・Amazon アクセスは一切させていません。増えた面倒は「通知が出たら <code>/amazon-check</code> と打つ」だけです。</p>
+<hr>
+<h2>5. 直せないもの（正直に）</h2>
+<table><thead><tr><th>できないこと</th><th>理由</th></tr></thead><tbody>
+<tr><td><strong>巡回の完全自動化</strong></td><td>セラーセントラルは 2FA 付きです。cron から headless では入れません。社長のログイン済み Chrome が必須で、それは Claude 経由でしか触れません</td></tr>
+<tr><td><strong>Claude が閉じている日に巡回すること</strong></td><td>上と同じ。<strong>通知はできますが、巡回はできません</strong></td></tr>
+<tr><td><strong>飛んだ日を後から取り返すこと</strong></td><td>Amazon の画面は「今の状態」しか見せません。9/5 に何があったかは、もう確認できません。分かるのは「9/4 と 9/6 で変化が無かった」ことだけです</td></tr>
+<tr><td><strong><code>satoyselect@gmail.com</code> をコネクタで読むこと</strong></td><td>従来どおりの穴です。ブラウザ経由でのみ読めます</td></tr>
+<tr><td><strong>通知が確実に見えることの保証</strong></td><td>macOS の通知許可が off だと出ません。§6-3 で必ず1回確認してください</td></tr>
+</tbody></table>
+<p><strong>「毎日必ず動きます」とは書きません。</strong>書いた瞬間に、止まった時の信用ごと失うためです。</p>
+<hr>
+<h2>6. 社長が「動いているか」を自分で確認する手順</h2>
+<h3>6-1. いま欠測があるかを見る（5秒）</h3>
+<p>ターミナルでリポジトリのフォルダに移動して、次を打ちます。</p>
+<pre><code>
+bash .claude/scripts/amazon-check-watchdog.sh --status
+</code></pre>
+<p>こう出れば正常です。</p>
+<pre><code>
+最後に実行できた日=2026-09-06 / 今日は済 / 欠測1日: 2026-09-05
+番犬の最終実行: 2026-09-06 11:04 実行 / 今日=済 / 欠測=1日 / 最終成功=2026-09-06
+</code></pre>
+<p>「番犬の最終実行」が<strong>昨日以前</strong>なら、番犬自身が止まっています。</p>
+<h3>6-2. 番犬が登録されているかを見る（5秒）</h3>
+<pre><code>
+launchctl list | grep amazon-check-watchdog
+</code></pre>
+<p><code>-	0	com.aicompany.amazon-buppan.amazon-check-watchdog</code> と出れば正常です。真ん中の数字が最後の終了コードで、<strong>0 以外なら異常</strong>です（127 = ファイルが無い、126 = 実行権が無い）。1行も出なければ登録されていません。</p>
+<h3>6-3. 通知が本当に届くかを1回だけ確認する（最重要・30秒）</h3>
+<pre><code>
+bash .claude/scripts/amazon-check-watchdog.sh --test-notify
+</code></pre>
+<p><strong>画面右上に通知が出るか見てください。</strong>出なければ、システム設定 &gt; 通知 &gt; <strong>スクリプトエディタ</strong> を許可してください。ここが off だと、番犬は動いていても社長には何も届きません。<strong>この確認だけは必ず1回やってください。</strong></p>
+<h3>6-4. 改ざんの効かない確認（<code>git log</code>）</h3>
+<pre><code>
+git log --format=&#x27;%ad %s&#x27; --date=short -- workspace/monitoring/amazon-daily-check.md | head
+</code></pre>
+<p>日付が1日ずつ並んでいれば動いています。飛んでいる日が、飛んだ日です。</p>
+<h3>6-5. 復旧</h3>
+<p>欠測に気づいたら、Claude で次を打つだけです。</p>
+<pre><code>
+/amazon-check
+</code></pre>
+<hr>
+<h2>7. 検証した内容（実測）</h2>
+<table><thead><tr><th>項目</th><th>結果</th></tr></thead><tbody>
+<tr><td>判定ロジックの網羅テスト</td><td>7パターン（今日あり／今日なし12時前／今日なし12時後／1日欠測／見出しはあるが未実行／見出し0件／ファイル無し）すべて期待どおり</td></tr>
+<tr><td>欠測行の挿入位置</td><td>新しい順を保って正しい位置に挿入。<strong>2回流しても重複しない</strong>（冪等）</td></tr>
+<tr><td>launchd の実走</td><td><code>launchctl kickstart</code> で実行。<strong>終了コード 0</strong>、stderr 空、生存記録の書き込みを確認</td></tr>
+<tr><td>通知</td><td><code>--test-notify</code> が osascript エラーなしで完了。<strong>画面表示は社長側での確認が必要</strong>（§6-3）</td></tr>
+<tr><td>既存リマインダー①②③④⑥</td><td>変更前の出力と<strong>完全一致</strong>（差分は list-builder の心拍の経過分のみ）</td></tr>
+<tr><td>フックの構文</td><td><code>bash -n</code> で確認。終了コード 0</td></tr>
+</tbody></table>
+<hr>
+<h2>8. 変更したファイル</h2>
+<table><thead><tr><th>ファイル</th><th>変更</th></tr></thead><tbody>
+<tr><td><code>.claude/scripts/amazon_check_log.py</code></td><td>新規。判定ロジック本体</td></tr>
+<tr><td><code>.claude/scripts/amazon-check-watchdog.sh</code></td><td>新規。launchd から走る番犬</td></tr>
+<tr><td><code>.claude/commands/amazon-check.md</code></td><td>新規。復旧用スラッシュコマンド</td></tr>
+<tr><td><code>.claude/hooks/session-start.sh</code></td><td>リマインダー⑤のみ差し替え。他は無変更</td></tr>
+<tr><td><code>workspace/monitoring/amazon-daily-check.md</code></td><td>並び順の修正（9/6 を 9/5 の上へ）と、読み方の追記</td></tr>
+<tr><td><code>workspace/output/deliverables/T-20260826-004/com.aicompany.amazon-buppan.amazon-check-watchdog.plist</code></td><td>新規。<code>~/Library/LaunchAgents/</code> の控え（Mac 入れ替え時の復元用）</td></tr>
+</tbody></table>
+<p><strong>番犬を止めたいとき</strong>は次の1行です。</p>
+<pre><code>
+launchctl bootout gui/$(id -u)/com.aicompany.amazon-buppan.amazon-check-watchdog
+</code></pre>
+<p><strong>復元したいとき</strong>は、上の plist を <code>~/Library/LaunchAgents/</code> にコピーして次を打ちます。</p>
+<pre><code>
+launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.aicompany.amazon-buppan.amazon-check-watchdog.plist
+</code></pre>
+</body></html>

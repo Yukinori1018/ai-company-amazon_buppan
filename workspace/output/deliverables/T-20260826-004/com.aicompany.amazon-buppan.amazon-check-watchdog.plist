@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.aicompany.amazon-buppan.amazon-check-watchdog</string>
+
+    <!--
+      Amazon 日次チェックの「実行漏れ」を、Claude が起動していなくても知らせる番犬。
+      巡回そのものはしない（2FA のため Claude + ログイン済み Chrome が要る）。
+      launchd に置く理由: 2026-09-05 は Mac が起動していて launchd の github-sync は
+      6回走ったのに、Claude のセッションは1件も無かった。落ちるのは Claude 側。
+    -->
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>/Users/yukinori/Claude Code/ai-company-amazon_buppan/.claude/scripts/amazon-check-watchdog.sh</string>
+    </array>
+
+    <!-- 巡回予定は12:00。30分の猶予を置いた12:30に見る。夕方にもう一度だけ念押しする。
+         スリープ中は発火せず、復帰時に1回だけまとめて走る（github-sync と同じ挙動）。 -->
+    <key>StartCalendarInterval</key>
+    <array>
+        <dict>
+            <key>Hour</key><integer>12</integer>
+            <key>Minute</key><integer>30</integer>
+        </dict>
+        <dict>
+            <key>Hour</key><integer>19</integer>
+            <key>Minute</key><integer>0</integer>
+        </dict>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>/Users/yukinori/Claude Code/ai-company-amazon_buppan</string>
+
+    <!-- スクリプト自身は workspace/monitoring/watchdog-last-run.txt に生存記録を残す。
+         こちらは launchd レベルの異常（起動失敗・PATH 不備など）専用。 -->
+    <key>StandardOutPath</key>
+    <string>/Users/yukinori/Claude Code/ai-company-amazon_buppan/workspace/.sync/watchdog.out.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/yukinori/Claude Code/ai-company-amazon_buppan/workspace/.sync/watchdog.err.log</string>
+
+    <key>ProcessType</key>
+    <string>Background</string>
+</dict>
+</plist>

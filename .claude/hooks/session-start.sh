@@ -231,71 +231,87 @@ ${LB_LINE}
 - 運用書: workspace/output/deliverables/T-20260831-002/README.md"
 fi
 
-# --- リマインダー⑤: Amazon セラーセントラル日次チェックの実行漏れ検知（2026-08-31 / T-20260826-004）---
+# --- リマインダー⑤: Amazon セラーセントラル日次チェックの実行漏れ検知 ---
+#     （2026-08-31 / T-20260826-004 で新設、2026-09-06 に強化）
 #
 # 背景: 日本店が 2026-08-01 に停止したことに約4週間気づきませんでした。再発防止として
 #       毎日12:00のスケジュールタスク（~/.claude/scheduled-tasks/amazon-seller-central-daily-check/）
 #       を組みましたが、**「タスクを登録した」ことと「実際に動いている」ことは別**です。
-#       アプリが閉じていれば発火せず、Chrome が落ちていれば画面確認が失敗します。
-#       そして止まっていても誰も気づきません（night-shift.plist は814回死に続けました）。
+#       実際 9/5（金）は Claude アプリが起動しておらず、丸1日飛びました。
 #
-# だから判定材料はログの最新見出し（`## YYYY-MM-DD`）**だけ**にします。
-# スケジューラの内部状態は見ません。見えたとしても「実行したが何も確認できなかった」を
-# 成功と区別できないためです。**ログに行が増えたことだけが、動いた証拠です。**
+# 2026-09-06 の強化で直した3点:
+#   1. 閾値「2日以上前」→ **1日でも欠けたら警告**。ただし今日ぶんは12:00前なら鳴らさない
+#      （巡回は12:00予定。朝のセッションで毎日誤検知するのは、警告そのものを無価値にする）
+#   2. 最新日を「ファイル先頭の見出し」→ **全見出しの最大値**。並び順は人が手で書くので崩れる
+#      （実際 9/5 の見出しが 9/6 の上にあった）
+#   3. 「## 9/5」と見出しだけあって本文が「未実行」の日を、**実行済みと数えない**
+#      （手で足した欠測行が検知を黙らせていた。旧実装はこれで今日も無言でした）
+#
+# 判定ロジックは .claude/scripts/amazon_check_log.py に1本化しています（番犬と共用）。
+# ここに if 文を足さないでください。判定を2箇所に書くと必ずズレます。
 
 MON_LOG="$REPO/workspace/monitoring/amazon-daily-check.md"
+MON_LOGIC="$REPO/.claude/scripts/amazon_check_log.py"
 MON_MSG=""
-MON_HOWTO="確認先: ~/.claude/scheduled-tasks/amazon-seller-central-daily-check/
-- アプリのサイドバー「Scheduled」に amazon-seller-central-daily-check があるか、enabled か
-- 無い／無効なら再登録が必要。スケジュールは毎日12:00（cron \`0 12 * * *\`）
+MON_HOWTO="復旧のしかた（どれか1つ）:
+- **Claude でいますぐ回す: \`/amazon-check\`**（これが一番速い）
+- スケジュールタスクの点検: アプリのサイドバー「Scheduled」に amazon-seller-central-daily-check があるか・enabled か
+  （無い／無効なら再登録。スケジュールは毎日12:00 = cron \`0 12 * * *\`）
+- 番犬の状態: \`bash .claude/scripts/amazon-check-watchdog.sh --status\`
 - ログ本体: workspace/monitoring/amazon-daily-check.md
-- 手順書: workspace/output/deliverables/T-20260826-004/03_日次モニタリングの仕組みと確認手順_20260831.md"
-
-# 「2日以上前」の閾値＝昨日。昨日より古ければ警告する（今日・昨日は正常）。
-MON_THRESHOLD="$(date -v-1d +%Y-%m-%d 2>/dev/null || date -d 'yesterday' +%Y-%m-%d 2>/dev/null || echo "$TODAY")"
+- 手順書: workspace/output/deliverables/T-20260826-004/09_日次チェックの実行漏れ対策_20260906.md"
 
 if [ ! -f "$MON_LOG" ]; then
   MON_MSG="
 
 【SessionStart リマインダー⑤：Amazon 日次チェックのログが存在しません】
 \`workspace/monitoring/amazon-daily-check.md\` が見つかりません。**日次チェックが一度も実行されていないか、ログが消えています。**
-スケジュールタスクが止まっている可能性があります。
 
 ${MON_HOWTO}"
-else
-  # 最新の日付見出しを1件だけ取る。ログは新しい順なので先頭が最新。
-  MON_LAST="$(grep -m1 -oE '^## [0-9]{4}-[0-9]{2}-[0-9]{2}' "$MON_LOG" 2>/dev/null | awk '{print $2}' || true)"
+elif command -v python3 >/dev/null 2>&1 && [ -f "$MON_LOGIC" ]; then
+  MON_STATE="$(python3 "$MON_LOGIC" status --json 2>/dev/null || true)"
 
-  if [ -z "$MON_LAST" ]; then
-    MON_MSG="
-
-【SessionStart リマインダー⑤：Amazon 日次チェックの記録が0件です】
-\`workspace/monitoring/amazon-daily-check.md\` に \`## YYYY-MM-DD\` の見出しが1件もありません。**日次チェックが一度も記録されていません。**
-スケジュールタスクが止まっている可能性があります。
-
-${MON_HOWTO}"
-  elif [[ "$MON_LAST" < "$MON_THRESHOLD" ]]; then
-    MON_DAYS="?"
-    if command -v python3 >/dev/null 2>&1; then
-      MON_DAYS="$(python3 -c "
-import datetime
+  if [ -n "$MON_STATE" ]; then
+    # 警告文の組み立ては python 側に寄せる（bash で JSON を切り貼りしない）。
+    # 何も問題が無ければ空文字を返す＝平常日は1行も出ない。
+    MON_BODY="$(printf '%s' "$MON_STATE" | python3 -c "
+import json,sys
 try:
-    d = datetime.date.fromisoformat('$MON_LAST')
-    print((datetime.date.today() - d).days)
+    s = json.load(sys.stdin)
 except Exception:
-    print('?')
-" 2>/dev/null || echo '?')"
-    fi
+    sys.exit(0)
+if not s.get('log_exists', True):
+    sys.exit(0)
+missing = s.get('missing') or []
+today_pending = (not s.get('today_done')) and (not s.get('before_deadline'))
+if not missing and not today_pending:
+    sys.exit(0)   # 平常。無風時は完全に静か
+out = []
+if missing:
+    out.append(f\"**実行されなかった日が {len(missing)} 日あります: {', '.join(missing)}**\")
+if today_pending:
+    out.append(f\"**今日（{s['today']}）の巡回がまだです**（12:00 予定を過ぎています）。\")
+last = s.get('last_ok')
+out.append(f\"最後に巡回できたのは {last} です。\" if last else \"**一度も巡回できていません。**\")
+print('\n'.join(out))
+" 2>/dev/null || true)"
 
-    MON_MSG="
+    if [ -n "$MON_BODY" ]; then
+      # 番犬（launchd）の生存も一緒に出す。検知する側が死ぬと、静かに元に戻るため。
+      MON_BEAT="$(cat "$REPO/workspace/monitoring/watchdog-last-run.txt" 2>/dev/null || echo '記録なし（番犬が一度も走っていない可能性）')"
 
-【SessionStart リマインダー⑤：Amazon 日次チェックが ${MON_DAYS} 日間実行されていません】
-最後の記録は **${MON_LAST}**（今日=${TODAY}）。**日次チェックが ${MON_DAYS} 日間実行されていません。スケジュールタスクが止まっている可能性があります。**
+      MON_MSG="
+
+【SessionStart リマインダー⑤：Amazon 日次チェックに欠測があります】
+${MON_BODY}
 
 Amazon の通知・申し立てステータス・サポート返信を見落とすと復旧が止まります（2026-08-01 の日本店停止に約4週間気づかなかった前例あり）。
-まず今この turn で手動確認を回し、そのうえで下記を点検してください。
+まず今この turn で巡回を回し、そのうえで下記を点検してください。
+
+番犬の最終実行: ${MON_BEAT}
 
 ${MON_HOWTO}"
+    fi
   fi
 fi
 
