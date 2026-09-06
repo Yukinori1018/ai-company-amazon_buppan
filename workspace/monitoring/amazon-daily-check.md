@@ -42,7 +42,7 @@ Amazon アカウント停止（T-20260826-004）の対応中、通知・返信�
 
 **【同日 16:56 送信完了】ケースID 21912948521**（状態＝作業中／ストア＝カナダ／言語＝日本語／主題＝アカウントの停止に関する問題）
 添付2件＝社長が Gmail の印刷ビューから PDF 化した **9/4 の完了メール**と **9/3 の承認通知**の実物。
-**返信先は `satoyselect@gmail.com`**（Cc 空）＝**コネクタでは自動検知できない**。以後の日次チェックは **ケース画面**と **`mail.google.com/mail/u/1/`** の両方を見ること。
+**返信先は `satoyselect@gmail.com`**（Cc 空）。以後の日次チェックは **ケース画面**と、**Chrome で開く `mail.google.com/mail/u/1/`** の両方を見ること（カズヨが自分で開く）。
 **撤退条件 2026-09-10（水）17:00。**成果物 `07`・`08`・カズヨ作成の転記版PDFはいずれも不使用。
 
 **【同日 16:56 受付の自動返信】** `Amazon Seller Support CA <seller.support06@amazon.ca>` / 件名 `Thank you for creating a new Case: 21912948521` が **`satoyselect@gmail.com`** へ着信。
