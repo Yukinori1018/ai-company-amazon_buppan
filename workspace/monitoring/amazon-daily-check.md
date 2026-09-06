@@ -50,6 +50,14 @@ Amazon アカウント停止（T-20260826-004）の対応中、通知・返信�
 ケース画面は Status = Work in progress、投稿本文も残存で正常受理を確認済み。
 → **Amazonの自動返信は本文が別部署のテンプレートになることがある。件名のケースID・差出人・ケース画面Statusの3点で照合すること。**
 
+**【同日 17:30 着信・要確認】銀行口座情報の変更通知**
+`Amazon.com.mx <donotreply@amazon.com>` / 件名 `La información de tu cuenta bancaria de Amazon se actualizó correctamente` が **`satoyukinori1018@gmail.com`** へ着信（17:30 JST）。
+本文＝「出品用アカウントに紐づく**銀行口座情報が変更された**。追加なら今後の振込は新口座へ、削除なら既存口座へ。**3日間の強制セキュリティ保留**あり。**心当たりがなければセラーサポートへ連絡を。**」
+**真正性は確認済み**（本文中のリンクはすべて `sellercentral.amazon.com.mx`、通知種別 `NK_ACCOUNT_CHANGES`）。フィッシングではない。
+**メキシコ1通のみ**で US/CA には同種通知なし。Gmail 両アドレスの過去2日間に他の Amazon メールなし。
+入金方法ページ（`sellercentral.amazon.ca/sw/AccountInfo/DepositMethodView`）は**パスワード再認証が必要**で未確認。
+→ 社長に「変更した覚えがあるか」を確認中。**無ければ不正アクセス扱いで即対応**。
+
 ---
 
 ## 2026-09-05
@@ -175,6 +183,6 @@ Amazon アカウント停止（T-20260826-004）の対応中、通知・返信�
 | JP AHR | —（未算出）。全問題0件、違反1件（他ストア起因） |
 | サポートケース | 3498857863／ステータス「回答済み」＝Amazon 側が 8/29 00:44 JST に自動クローズ済み |
 | Gmail(satoyukinori1018) | Amazon からの新着は 2026/08/26 が最後 |
-| 未確認の項目 | `satoyselect@gmail.com` の受信箱（カズヨからは読めない） |
+| 未確認の項目 | `satoyselect@gmail.com` の受信箱（この日は未確認。以後は Chrome で `mail.google.com/mail/u/1/` を開いて読む） |
 
 **変化：** —（ベースラインのため）
