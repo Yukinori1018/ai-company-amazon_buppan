@@ -1,0 +1,829 @@
+<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SNS情報取得と食品販売の適法性判定 | T-20260906-006</title>
+<style>
+:root{--ink:#1a1a1a;--sub:#5a5a5a;--line:#d8d8d8;--ng:#b3261e;--ok:#1b5e20;--bg:#fff;}
+body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",sans-serif;line-height:1.85;color:var(--ink);background:var(--bg);max-width:1000px;margin:0 auto;padding:40px 24px 120px;font-size:15.5px;}
+h1{font-size:1.85em;border-bottom:4px solid var(--ink);padding-bottom:.4em;margin-top:0;}
+h2{font-size:1.4em;margin-top:2.4em;border-left:7px solid var(--ink);padding-left:.6em;}
+h3{font-size:1.15em;margin-top:2em;color:#000;border-bottom:1px solid var(--line);padding-bottom:.3em;}
+h4{font-size:1.02em;margin-top:1.6em;color:var(--sub);}
+table{border-collapse:collapse;width:100%;margin:1.2em 0;font-size:.9em;}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top;}
+th{background:#f2f2f2;font-weight:700;}
+tr:nth-child(even) td{background:#fafafa;}
+blockquote{border-left:5px solid #999;background:#f7f7f7;margin:1.1em 0;padding:.8em 1.1em;color:#333;font-size:.94em;}
+code{background:#f0f0f0;padding:1px 5px;border-radius:3px;font-size:.88em;font-family:ui-monospace,Menlo,monospace;word-break:break-all;}
+pre{background:#f5f5f5;padding:1em;border-radius:5px;overflow-x:auto;border:1px solid var(--line);}
+pre code{background:none;padding:0;}
+strong{font-weight:700;}
+hr{border:none;border-top:1px solid var(--line);margin:2.4em 0;}
+ul,ol{padding-left:1.6em;}
+li{margin:.3em 0;}
+.meta{background:#f7f7f7;border:1px solid var(--line);padding:14px 18px;border-radius:6px;font-size:.9em;}
+</style></head><body>
+<h1>SNS 情報取得と食品販売の適法性判定</h1>
+
+<ul>
+<li>チケット: T-20260906-006（旧採番 T-20260906-004）</li>
+<li>判定: 法務 ハルオ</li>
+<li><strong>判定日: 2026-09-06</strong>（本書の URL・条文はすべて同日に実取得。日付の記載がないものは 2026-09-06 取得）</li>
+<li>前提資料: <code>T-20260831-005/07_本丸経路と卸サービスの適法性判定.md</code>（2026-08-31 の自判定）、memory <code>knowledge_platform_api_data_retention</code> / <code>knowledge_scraping_and_public_db_2026</code> / <code>knowledge_public_repo_exposure</code> / <code>knowledge_amazon_section3_kyc_suspension</code></li>
+</ul>
+
+<hr>
+
+<h2>0. 結論（先に表で）</h2>
+
+<h3>第I部：SNS/トレンド情報の取得経路</h3>
+
+<table><thead><tr><th>#</th><th>経路</th><th>判定</th><th>保存してよい範囲</th><th>PUBLIC リポ</th><th>一行理由</th></tr></thead><tbody>
+<tr><td><strong>1</strong></td><td>人が手動閲覧してメモ</td><td><strong>可（条件付き）</strong></td><td>事実のみ（商品名・メーカー名・観測日・自分の観察）</td><td><strong>可</strong>（投稿者名・投稿URLは除く）</td><td>各社の禁止条項は「自動化された手段」が名宛人。人の閲覧を禁じる条項は無い</td></tr>
+<tr><td><strong>2</strong></td><td>公開トレンド表示を人が見て記録</td><td><strong>可（条件付き）</strong></td><td>同上＋順位・タグ名</td><td><strong>可</strong>（同条件）</td><td>#1 と同じ。robots.txt はクローラ宛であり人の閲覧を規律しない</td></tr>
+<tr><td><strong>3</strong></td><td>自動で定期取得して蓄積（スクレイピング）</td><td><strong>全 SNS で不可。例外なし</strong></td><td>—</td><td>論外</td><td>X は robots.txt が <code>User-agent: * / Disallow: /</code>、ToS が &quot;for any purpose&quot; で明文禁止。YT/TikTok/IG も同旨</td></tr>
+<tr><td><strong>4</strong></td><td>第三者集計サービス・Google トレンド</td><td><strong>人が見る＝可／自動取得＝不可／有料契約＝§4.1</strong></td><td>出力の数値・キーワードのみ</td><td><strong>不可（社内限定）</strong></td><td>trends.google.com の robots.txt が <code>/trends/explore?</code> を Disallow。Google 利用規約が robots 違反の自動アクセスを禁止＝<strong>Google アカウント単位の制裁</strong></td></tr>
+<tr><td><strong>5</strong></td><td>RSS・検索エンジン経由の記事から拾う</td><td><strong>条件付き可。最も筋がよい</strong></td><td>記事タイトル・URL・日付・抽出した商品名/社名</td><td><strong>可</strong>（本文の転載は不可）</td><td>RSS は配信者が機械可読で公開した形式。ただし Google 検索結果のスクレイピングは既判定 NO</td></tr>
+<tr><td><strong>6-a</strong></td><td><strong>Amazon の公開ランキング自動取得</strong></td><td><strong>絶対不可（議論の余地なし）</strong></td><td>—</td><td>論外</td><td>利用規約が「非商業的および個人的」＋「製品リスト・価格などの収集」「ロボット等の使用」を許諾から明示除外。<strong>かつ BSA §3 で出品用アカウントの即時停止事由。日本店は現に停止・審査中</strong></td></tr>
+<tr><td><strong>6-b</strong></td><td>楽天（サイト・楽天ウェブサービス API とも）</td><td><strong>不可</strong></td><td>—</td><td>論外</td><td>楽天ウェブサービス規約 第10条(1)(4)「楽天アフィリエイト以外の方法で収益を得る行為」禁止、(6) 競合サービス禁止、(9) 不特定多数と共有できる場所への保存禁止</td></tr>
+<tr><td><strong>6-c</strong></td><td>Yahoo!ショッピング</td><td><strong>不可</strong></td><td>—</td><td>論外</td><td>LINEヤフー共通利用規約 §14「当社サービスやそれらを構成するデータを、その提供目的を超えて利用することができません」。§2.1・2.2 により<strong>非会員の閲覧者にも及ぶ</strong></td></tr>
+<tr><td><strong>7</strong></td><td>クラウドファンディング</td><td><strong>条件付き可（本件で最も筋がよい経路）</strong></td><td>プロジェクト名・実行者名・公開URL・金額・期間・カテゴリ</td><td><strong>CAMPFIRE 由来は不可</strong>／Makuake は自動取得そのものが保留</td><td>CAMPFIRE は禁止行為条項に自動収集の禁止が無く、robots.txt も許可。ただし第34条3項ただし書で<strong>告知以外の目的での媒体掲載は事前承諾が必要</strong>。Makuake は規約本文を機械取得できず着手不可</td></tr>
+<tr><td><strong>8</strong></td><td>ふるさと納税ポータル・道の駅・アンテナショップ</td><td><strong>ポータルの自動取得は不可／事業者の自社サイトへ辿るのは可</strong></td><td>事業者名・自治体名・商品名（＝取り直した先の事実）</td><td><strong>取り直した先なら可</strong></td><td>ふるさとチョイス 利用規約 第12条1項(12) が「自動化された手段を用いた情報収集（スクレイピングおよびクローリングを含みます）」を<strong>明文で禁止</strong></td></tr>
+</tbody></table>
+
+<h3>第II部：食品を Amazon で販売する場合の法的要件</h3>
+
+<table><thead><tr><th>論点</th><th>結論</th></tr></thead><tbody>
+<tr><td><strong>営業許可</strong></td><td><strong>不要</strong>（自分で製造・加工・小分けしない限り）。許可が要るのは施行令35条の32業種</td></tr>
+<tr><td><strong>営業の届出</strong></td><td><strong>常温保存の包装済み食品のみ → 不要</strong>（施行令35条の2第3号）。<strong>要冷蔵・要冷凍を扱うなら必要</strong>（法57条1項）。<strong>無届＝50万円以下の罰金</strong>（法85条3号）</td></tr>
+<tr><td><strong>表示責任</strong></td><td><strong>仕入れ販売者にも直接及ぶ。</strong>法2条3項1号で「食品の販売を業とする者」は食品関連事業者。法5条「食品表示基準に従った表示がされていない食品の販売をしてはならない」</td></tr>
+<tr><td><strong>表示を作り直す義務</strong></td><td><strong>なし。</strong>適法な表示付きの包装のまま売れば足りる。ただし<strong>確認義務</strong>と<strong>覆わない義務</strong>は負う</td></tr>
+<tr><td><strong>最大の実務地雷</strong></td><td><strong>FNSKU ラベル等で一括表示を覆うと即違反</strong>（基準8条2号）。<strong>セット組み・小分けをすると自分が製造者になり、許可と表示責任を引き受ける</strong></td></tr>
+<tr><td><strong>罰則</strong></td><td>アレルゲン・消費期限等の不表示食品の<strong>販売</strong>：2年以下の拘禁刑または200万円以下の罰金（法18条）。原産地虚偽：同（法19条）。<strong>主語は「販売をした者」であり製造者に限定されていない</strong></td></tr>
+</tbody></table>
+
+<p><strong>今すぐ動かしてよい3本：経路1・2（人が見る）、経路5（RSS/記事）、経路7の CAMPFIRE（社内リスト化のみ）。</strong></p>
+<p><strong>着手前に社長判断が要る4点は §III にまとめました。</strong></p>
+
+<hr>
+
+<h1>第I部　2026-08-31 判定の射程を確定する</h1>
+
+<h2>I-0. まず「あの NO は何に対する NO だったか」</h2>
+
+<p>8/31 の判定（<code>07_本丸経路と卸サービスの適法性判定.md</code> 表 #5・#6-d）は、次の3つを決定打にしていました。</p>
+
+<table><thead><tr><th>決定打</th><th>原文の名宛人</th></tr></thead><tbody>
+<tr><td>YouTube Developer Policies III.E &quot;<strong>Do not aggregate API Data</strong>&quot;</td><td><strong>API Data</strong></td></tr>
+<tr><td>同 III.E.4.c/d 非認可データの保存は <strong>30 calendar days</strong> まで</td><td><strong>An API Client</strong></td></tr>
+<tr><td>同 III.D &quot;Prohibited Access&quot;（認証停止後の新規 Google アカウント作成も禁止）</td><td><strong>認証情報を持つ者</strong></td></tr>
+</tbody></table>
+
+<p><strong>3つとも、API または自動化アクセスを名宛人にした条項です。</strong></p>
+<p><strong>したがって、あの NO の射程は「API または自動化された手段でデータを取得し、社内に蓄積する行為」に限られます。人が画面を見て事実をメモする行為には及びません。</strong></p>
+
+<p>これは 8/31 の本文で私自身が既に書いていたことでもあります（同書「残した使い方」の表：「人が画面で見て1社を個別に調べる＝可」）。<strong>射程は当時から変わっていません。</strong></p>
+
+<p>以下、経路ごとに条文で確定させます。</p>
+
+<hr>
+
+<h2>I-1. 人が手動でSNSを閲覧し、気づいた商品名をメモする　→ <strong>可（条件付き）</strong></h2>
+
+<h3>根拠（各社の禁止条項は「自動化」を要件にしている）</h3>
+
+<p><strong>YouTube 利用規約「許可と制限事項」</strong>（<code>https://www.youtube.com/static?template=terms&amp;gl=JP&amp;hl=ja</code>）</p>
+<blockquote><strong>自動化された手段（ロボット、ボットネット、スクレーパなど）を使用して本サービスにアクセスすること。</strong>ただし、（a）公開されている検索エンジンを YouTube の robots.txt ファイルに従って使用する場合、または（b）YouTube が事前に書面で許可している場合を除きます。</blockquote>
+
+<p><strong>X 利用規約 §Using the Services「Misuse of the Services」(iii)</strong>（<code>https://x.com/en/tos</code>／Effective: April 10, 2026）</p>
+<blockquote>(iii) access or search or attempt to access or search the Services <strong>by any means (automated or otherwise) other than through our currently available, published interfaces</strong>…(NOTE: <strong>crawling or scraping the Services in any form, for any purpose without our prior written consent is expressly prohibited</strong>)</blockquote>
+
+<p>※「published interfaces」＝ x.com の通常のWeb画面・公式アプリ。<strong>人がブラウザで見るのはこれに当たる。</strong></p>
+
+<p><strong>TikTok 利用規約 §5 &quot;Your Access to and Use of Our Services&quot;</strong>（<code>https://www.tiktok.com/legal/page/row/terms-of-service/en</code>）</p>
+<blockquote>You may not: … <strong>use automated scripts to collect information from or otherwise interact with the Services</strong>;</blockquote>
+
+<p><strong>Instagram robots.txt 冒頭の Notice</strong>（<code>https://www.instagram.com/robots.txt</code>）</p>
+<blockquote>Collection of data on Instagram <strong>through automated means</strong> is prohibited unless you have express written permission from Instagram</blockquote>
+
+<p><strong>4社とも、禁止の要件は「自動化された手段」です。人の閲覧を禁じる条項は存在しません。</strong></p>
+
+<h3>保存してよい範囲</h3>
+
+<table><thead><tr><th>保存してよい</th><th>保存してはならない</th></tr></thead><tbody>
+<tr><td>商品名・ブランド名・メーカー名</td><td>投稿本文のコピー＆ペースト</td></tr>
+<tr><td>観測日・自分の観察（例：「9/5 時点でこのタグの動画が伸びている」）</td><td>スクリーンショット・画像・動画ファイル</td></tr>
+<tr><td>そこから自分で調べたメーカー公式サイトのURL</td><td>投稿者のアカウント名・表示名・顔写真・プロフィール</td></tr>
+<tr><td>—</td><td>投稿URL（社内メモ＝<code>agent_output/</code> に限る）</td></tr>
+</tbody></table>
+
+<p><strong>投稿者の個人情報を集めない</strong>のは、YouTube 利用規約の明文（「個人を特定できる可能性のある情報（例えば、ユーザー名、顔の映像や画像など）を収集または取得すること」を禁止）と、個人情報保護法20条1項・27条の両方が理由です。</p>
+
+<h3>PUBLIC リポへの commit</h3>
+
+<p><strong>事実のみなら可。ただし投稿者名・投稿URLを含む一覧は不可。</strong></p>
+<p>本リポは PUBLIC ＋30分ごと自動 push（memory <code>knowledge_public_repo_exposure</code>）。<strong>「バズった投稿のURL一覧」は、実質的にクリエイターの活動情報のデータベースであり、第三者提供の問題が立ちます。URL は <code>agent_output/</code> に置いてください。</strong></p>
+
+<h3>1点だけ、正直にグレーだと言っておくこと</h3>
+
+<p>TikTok 利用規約 §5 には次の条項もあります。</p>
+
+<blockquote>use the Services, <strong>without our express written consent, for any commercial or unauthorized purpose</strong>, including communicating or facilitating any commercial advertisement or solicitation or spamming;</blockquote>
+
+<p>文言だけを読むと「商品リサーチ目的の視聴」も捕捉され得ます。ただし列挙されている例が「商業広告・勧誘・スパム」であり、<strong>プラットフォーム上での商業的勧誘を禁じる条項</strong>と読むのが条文構造上自然です。「視聴して得た知識を自分の商売に使う」ことまで禁じる趣旨とは読めません。</p>
+
+<ul>
+<li>発生確率：<strong>極めて低い</strong>（この条項を根拠に一般視聴者が処分された例は確認できず）</li>
+<li>影響度：TikTok アカウントの停止のみ</li>
+<li><strong>不可逆性：低い</strong>（TikTok アカウントは当社の事業インフラではない。8/31 に YouTube API を NO にした決定打＝「Google アカウントに成果物カタログが乗っている」が、ここには存在しない）</li>
+</ul>
+
+<p><strong>→ 3軸評価の結果、可とします。ただし条件を1つ付けます。</strong></p>
+
+<blockquote><strong>SNS の閲覧用アカウントは、事業用 Google アカウント・Amazon 出品用アカウントと同一のメールアドレスで作らないこと。</strong><br>8/31 の判定が NO になった真の理由は「制裁がアカウント単位で連鎖する」ことでした。<strong>アカウントを分けておけば、この理由自体が消えます。</strong></blockquote>
+
+<hr>
+
+<h2>I-2. 各SNSの公開トレンド表示を人が見て記録する　→ <strong>可（I-1 と同条件）</strong></h2>
+
+<p>X のトレンド、TikTok の人気タグ（<code>/tag/...</code>）、YouTube の急上昇。<strong>人が見る限り I-1 と同じです。</strong></p>
+
+<p>補足として、robots.txt の位置づけを明確にしておきます。</p>
+
+<ul>
+<li><strong>robots.txt はクローラ（自動化されたエージェント）に対する指示であり、人の閲覧を規律するものではありません。</strong></li>
+<li>したがって x.com の <code>User-agent: * / Disallow: /</code> も、TikTok の <code>Disallow: /discover/trending/detail/</code> も、<strong>人が見ることの障害にはなりません。</strong></li>
+<li>逆に言えば、<strong>これらは「自動で取ってはいけない」ことの決定的証拠です</strong>（→ I-3）。</li>
+</ul>
+
+<p><strong>保存してよい範囲・PUBLIC リポの扱いは I-1 と同じ。</strong>追加でトレンドの順位・タグ名・観測日時を記録して構いません（数値の事実であり著作物ではない）。</p>
+
+<hr>
+
+<h2>I-3. 同上を自動で定期取得して蓄積する（スクレイピング。API不使用）　→ <strong>全 SNS で不可。例外なし</strong></h2>
+
+<h3>X — 二重に不可</h3>
+
+<p><strong>① robots.txt（<code>https://x.com/robots.txt</code>）</strong></p>
+<blockquote><code># Every bot that might possibly read and respect this file</code><br><code>User-agent: *</code><br><code>Disallow: /</code></blockquote>
+
+<p>**当社のスクレイパは <code>User-agent: *</code> に該当します。全パスが Disallow です。**</p>
+
+<p><strong>② 利用規約（前掲 §Misuse (iii)）</strong></p>
+<blockquote>crawling or scraping the Services <strong>in any form, for any purpose</strong> without our prior written consent <strong>is expressly prohibited</strong></blockquote>
+
+<p><strong>&quot;for any purpose&quot;。目的による例外を条文自身が塞いでいます。逃げ道はありません。</strong></p>
+
+<h3>YouTube — 不可</h3>
+
+<p>前掲「許可と制限事項」の自動化手段禁止条項。例外は「公開されている検索エンジンを robots.txt に従って使用する場合」のみで、当社は検索エンジンではありません。</p>
+<p>加えて Developer Policies III.E の scraping 禁止（8/31 記録済み）。</p>
+
+<h3>TikTok — 不可</h3>
+
+<p>ToS §5「use automated scripts to collect information from … the Services」。</p>
+<p>robots.txt も <code>Disallow: /search?</code> <code>Disallow: /discover/trending/detail/</code> <code>Disallow: /search/video?</code> と、<strong>まさに取りたい場所を名指しで塞いでいます。</strong></p>
+
+<h3>Instagram — 不可（最も明瞭）</h3>
+
+<p>robots.txt の冒頭コメントが規約の宣言そのものになっています。</p>
+<blockquote>Collection of data on Instagram through automated means is prohibited unless you have <strong>express written permission</strong> from Instagram</blockquote>
+
+<p>さらに <code>User-agent: Scrapy / Disallow: /</code> と、<strong>スクレイピングフレームワークを名指しでブロック</strong>しています。</p>
+
+<h3>加えて、規約以前に刑法の問題がある</h3>
+
+<p>memory <code>knowledge_scraping_and_public_db_2026</code> §5（岡崎市立中央図書館事件・2010）。</p>
+<p><strong>1秒に1回・1日1時間のアクセスで逮捕・21日勾留・起訴猶予</strong>という前例があります。真因は相手側システムの不具合でしたが、<strong>それでも身柄は拘束されました。</strong></p>
+<p>「技術的に穏当な速度なら大丈夫」という設計思想を、当社は採りません。</p>
+
+<h3>判定</h3>
+
+<p><strong>不可。PUBLIC リポへの commit は論外。</strong></p>
+<p><strong>この経路は、代替を探すのではなく「捨てる」判断をしてください。</strong>I-1・I-2・I-5 で同じ情報の大半が取れます。</p>
+
+<hr>
+
+<h2>I-4. 第三者の公開トレンド集計サービス・Googleトレンド等　→ <strong>人が見る＝可／自動取得＝不可／有料契約＝§4.1</strong></h2>
+
+<h3>Google トレンド — ここは 8/31 の NO と同じ構造をしている</h3>
+
+<p><strong>robots.txt（<code>https://trends.google.com/robots.txt</code>）</strong></p>
+<pre><code>
+User-agent: *
+Disallow: /explore?
+Disallow: /trends/explore?
+</code></pre>
+<p><strong>取りたいデータのエンドポイントが、まさに Disallow されています。</strong></p>
+
+<p><strong>Google 利用規約 §サービスの不正使用の禁止</strong>（<code>https://policies.google.com/terms?hl=ja</code>）</p>
+<blockquote>Google のウェブページの機械可読な指示（クロール、トレーニングなどのアクティビティを禁止する <strong>robots.txt</strong> ファイルなど）に<strong>違反する、Google のいずれかのサービスのコンテンツにアクセスすることを目的とした自動化された手段の使用</strong></blockquote>
+
+<p>→ <strong>pytrends 等による自動取得は、Google 利用規約違反です。</strong></p>
+
+<p><strong>そして制裁は Google アカウント単位で及びます。</strong>社長の Google アカウントには成果物カタログのスプレッドシート（Drive file id <code>1xXfKb...</code>）が乗っており、<strong>事業インフラです。</strong></p>
+<p><strong>8/31 に YouTube Data API を NO にしたのと、まったく同じ理由でここも NO です。</strong></p>
+
+<table><thead><tr><th>行為</th><th>判定</th></tr></thead><tbody>
+<tr><td>人がブラウザで Google トレンドを見る／画面上の CSV ダウンロードボタンを押す</td><td><strong>可</strong></td></tr>
+<tr><td>pytrends・独自スクリプトで定期取得する</td><td><strong>不可</strong></td></tr>
+<tr><td>取得したデータを PUBLIC リポに commit する</td><td><strong>不可</strong>。Google がトレンドデータの再公開を明文で許諾している文書を<strong>本日確認できなかった</strong>（<code>support.google.com/trends/answer/...</code> は JS レンダリングで本文取得不能）。<strong>許諾を確認できない以上、社内限定（<code>agent_output/</code>）とする</strong></td></tr>
+</tbody></table>
+
+<h3>有料/無料の第三者 SNS 分析ツール</h3>
+
+<p><strong>個別の規約を読まずに判定はできません。</strong>ただし、<strong>読むべき条項の順番</strong>は 8/31 に型として確立してあります（memory <code>knowledge_platform_api_data_retention</code> §1）。<strong>サトルが候補を出したら、この順で私に回してください。</strong></p>
+
+<ol>
+<li><strong>保持期間の上限条項</strong>（&quot;retention&quot; / &quot;store&quot; / &quot;◯days&quot; / &quot;delete or refresh&quot;）</li>
+<li><strong>集約禁止条項</strong>（&quot;aggregate&quot; / &quot;Data Aggregation&quot;）</li>
+<li><strong>表示先の限定条項</strong>（&quot;your website, systems or other media&quot; に<strong>主語の修飾語</strong>が付いていないか）</li>
+<li><strong>再配布・開示の禁止</strong>（→ <strong>PUBLIC リポへの commit がここに当たる</strong>）</li>
+<li>その後に一般禁止事項</li>
+</ol>
+
+<p><strong>そして、無料/有料を問わず「会員登録」は利用規約への同意＝CLAUDE.md §4.1「法的拘束」です。課金の有無にかかわらず、私も秘書も自分では実行しません。</strong></p>
+<p><strong>規約が公開ページに存在しない、または機械可読な形で読めないサービスは、8/31 のザッカネットと同じく現時点 NO とします。</strong>（規約を読まずに登録＝白紙で法的拘束を受ける行為）</p>
+
+<hr>
+
+<h2>I-5. RSS・検索エンジン経由でSNS外の記事から拾う　→ <strong>条件付き可。本件で最も筋がよい経路</strong></h2>
+
+<h3>なぜ筋がよいか</h3>
+
+<p><strong>RSS/Atom フィードは、配信者が「機械に読ませるため」に自ら公開した形式です。</strong>自動取得を予定していない画面を機械で叩くスクレイピングとは、法的な位置づけが根本的に違います。</p>
+
+<h3>条件（4つ。1つでも外すと判定が反転します）</h3>
+
+<ol>
+<li><strong>RSS フィードが公開されている媒体に限る。</strong>フィードが無い媒体を HTML から掻き取るのは、経路3と同じ扱いになります。</li>
+<li><strong>保存してよいのは事実だけ。</strong></li>
+</ol>
+
+<table><thead><tr><th>保存してよい</th><th>保存してはならない</th></tr></thead><tbody>
+<tr><td>記事タイトル・URL・配信日時・媒体名</td><td>記事本文・リード文の全文または実質的部分</td></tr>
+<tr><td>そこから抽出した商品名・メーカー名・カテゴリ</td><td>記事の写真・図表</td></tr>
+<tr><td>自分の要約・評価</td><td>見出しの一括コピーによるデータベース化</td></tr>
+</tbody></table>
+
+<p><strong>根拠：著作権法21条（複製権）。</strong>引用（32条1項）が成立するのは「自社の評価が主・引用が従」の場合に限られます。<strong>「記事を集めて並べただけ」は引用になりません。</strong></p>
+
+<ol>
+<li><strong>Google 検索結果のスクレイピングは既判定 NO。</strong>（<code>https://www.google.com/robots.txt</code> の <code>Disallow: /search</code> ＋ Google 利用規約。memory <code>knowledge_scraping_and_public_db_2026</code> §1）</li>
+</ol>
+<p>   <strong>検索エンジン経由で拾う＝人が検索して記事に辿り着く、という意味です。</strong>検索結果ページ自体を自動で取ることは含みません。</p>
+<ol>
+<li><strong>まとめサイトを出典にしない。</strong>まとめ記事の多くは、それ自体が他媒体からの無断転載です。<strong>転載元の違法状態を当社が引き継ぐことになります。必ず一次記事まで辿ってください。</strong></li>
+</ol>
+
+<h3>PUBLIC リポ</h3>
+
+<p><strong>「商品名・メーカー名・記事URL・日付」の一覧なら可。</strong>（事実データの列挙であり著作物ではない）</p>
+<p><strong>記事本文・リード文・見出しの一括転載を含む形は不可。</strong></p>
+
+<hr>
+
+<h2>I-6. Amazon/楽天/Yahoo の公開ランキング・急上昇を自動取得して蓄積する　→ <strong>3社とも不可</strong></h2>
+
+<h3>6-a. Amazon — <strong>絶対不可。当社にとって最も危険な選択肢です</strong></h3>
+
+<p><strong>① 利用規約「利用許可およびサイトへのアクセス」</strong>（<code>https://www.amazon.co.jp/gp/help/customer/display.html?nodeId=643006</code>／<strong>2026-09-06 実取得</strong>）</p>
+
+<blockquote>本規約およびサービス規約の遵守を条件とし、アマゾンまたはコンテンツ提供者は、アマゾンサービスを<strong>限定的、非独占的、非商業的および個人的に利用する権利</strong>をお客様に許諾します（譲渡およびサブライセンス不可）。この利用許可には、アマゾンサービスまたはそのコンテンツの<strong>転売および商業目的での利用、製品リスト、解説、価格などの収集と利用</strong>、アマゾンサービスまたはそのコンテンツの二次的利用、…<strong>データマイニング、ロボットなどのデータ収集・抽出ツールの使用は、一切含まれません。</strong></blockquote>
+
+<p><strong>「非商業的および個人的」と書いた時点で、商用目的の利用はすべて許諾の外です。</strong>さらに「製品リスト・価格などの収集」「ロボット等のデータ収集ツール」が名指しで除外されています。<strong>この1文で議論は終わりです。</strong></p>
+
+<p><strong>② そして当社は出品者である — ここが今回の照会の核心です</strong></p>
+
+<p>Amazon Services Business Solutions Agreement <strong>Section 3（Term and Termination）</strong>（原文取得：2026-08-28 / memory <code>knowledge_amazon_section3_kyc_suspension</code>）</p>
+
+<blockquote>We may suspend or terminate your account or this Agreement immediately if we determine that <strong>(a) you have materially breached the Agreement</strong>…; (b) your account has been, or our controls identify that it may be used for deceptive or fraudulent, or illegal activity; <strong>(c) your use of the Services has harmed, or our controls identify that it might harm, other sellers, customers, or Amazon&#x27;s legitimate interests</strong>;…</blockquote>
+
+<ul>
+<li>利用規約違反のスクレイピングは <strong>(a) の &quot;materially breached&quot;</strong> に当たり得ます。</li>
+<li>大量アクセスは <strong>(c) の &quot;might harm ... Amazon&#x27;s legitimate interests&quot;</strong> に当たり得ます。</li>
+<li><strong>判定基準は &quot;if we determine&quot; ＝ Amazon の一存です。</strong>当社に反論の機会はほぼありません（準拠法ワシントン州法・AAA 仲裁・クラスアクション放棄）。</li>
+</ul>
+
+<p><strong>さらに、当社の日本店（Satoy Select）は現に停止中で、ケース 21912948521 が審査中です（T-20260826-004・2026-09-06 時点）。</strong></p>
+
+<table><thead><tr><th>3軸</th><th>評価</th></tr></thead><tbody>
+<tr><td>発生確率</td><td><strong>中</strong>。Amazon の bot 検知は業界最高水準で、IP・UA・アクセスパターンで即座に識別される</td></tr>
+<tr><td>影響度</td><td><strong>事業の全損</strong>。出品用アカウントの停止＝この会社の事業そのものの消滅</td></tr>
+<tr><td>不可逆性</td><td><strong>極大</strong>。しかも<strong>復活審査の最中に自動アクセスのログを積む</strong>という、最悪のタイミング</td></tr>
+</tbody></table>
+
+<p><strong>行動原則1（発生確率 × 影響度 × 不可逆性）に照らし、議論の余地なく NO です。</strong></p>
+
+<p><strong>③ そもそも必要がない — これを先に言うべきでした</strong></p>
+
+<p>当社は <strong>Keepa を契約済み</strong>で、API 規約の下で運用しています（memory <code>knowledge_keepa_tos</code> / <code>reference_keepa_api_capabilities</code>）。</p>
+<p><strong>売れ筋ランキング・急上昇・カテゴリ別ベストセラーは、すべて Keepa の BSR データで取れます。</strong></p>
+<p><strong>上位互換の取得口が手元にあるのに、事業を賭ける理由はゼロです。</strong>（8/31 と同じ結論の3回目。memory <code>knowledge_scraping_and_public_db_2026</code> §4-4）</p>
+
+<p><strong>人が Amazon の急上昇ランキングページをブラウザで見て、気になった商品をメモするのは可です。</strong>ただし<strong>短時間の大量ページ遷移は自動化と区別が付きません。</strong>人力でも「1商品ずつ、間を空けて」を守ってください。</p>
+
+<h3>6-b. 楽天 — 不可（サイト・API とも）</h3>
+
+<p><strong>楽天ウェブサービス規約 第10条（禁止行為）</strong>（<code>https://webservice.rakuten.co.jp/guide/rule</code>）</p>
+
+<blockquote>(4) To gain income by using the Web Services <strong>in ways other than Rakuten Affiliate</strong> (excludes the cases where the Company explicitly grants permission)<br>(6) To provide services using Web Services that <strong>competes or may compete against the Group</strong><br>(7) Regarding the information obtained through the Web Services…<strong>using them for purposes other than those determined separately by the Company</strong><br>(9) <strong>Storing information obtained through the Web Services or the Applications in a place that enables the sharing of information with unspecified and/or many people.</strong></blockquote>
+
+<ul>
+<li><strong>(4)</strong>：楽天市場ランキング API で見つけた商品を Amazon で売って利益を得る＝「楽天アフィリエイト以外の方法で Web Services を使って収益を得る」。<strong>真正面から当たります。</strong></li>
+<li><strong>(6)</strong>：Amazon での販売は楽天グループと競合します。</li>
+<li><strong>(9)</strong>：<strong>PUBLIC リポへの commit がそのままここに当たります。</strong></li>
+</ul>
+
+<p><strong>→ 楽天ウェブサービス API は NO。</strong>（開発者登録＝規約同意で §4.1 でもありますが、そこに至る前に実体が NO です）</p>
+
+<p><strong>スクレイピングについて：</strong> <code>ranking.rakuten.co.jp/robots.txt</code> は本日「アクセスが集中しております」のエラーページが返り、<strong>robots.txt を取得できませんでした。</strong></p>
+<p>memory <code>knowledge_scraping_and_public_db_2026</code> §4-1 の型（robots.txt を先に取る／取れないうちは判定しない）に従い、<strong>未確認のまま着手不可</strong>とします。もっとも、API 経路が規約で塞がれている以上、スクレイピングで迂回するのは<strong>規約回避目的の自動アクセス</strong>であり、いずれにせよ不可です。</p>
+
+<h3>6-c. Yahoo!ショッピング — 不可</h3>
+
+<p><strong>LINEヤフー共通利用規約 §14「当社サービス等の再利用の禁止」</strong>（<code>https://www.lycorp.co.jp/ja/company/terms/</code>）</p>
+
+<blockquote>お客様は、別途当社が定める場合を除き、<strong>当社サービスやそれらを構成するデータを、その提供目的を超えて利用することができません。</strong>この場合、当社は、それらの行為を差し止める権利ならびに<strong>それらの行為によってお客様が得た利益相当額を請求する権利</strong>を有します。</blockquote>
+
+<p><strong>「提供目的」＝一般消費者が Yahoo!ショッピングで買い物をすること。</strong>他社モールで転売する商品を発掘するのは、明らかに目的の外です。</p>
+<p><strong>しかも「利益相当額の請求権」まで書き込まれています。</strong>差止だけでなく金銭請求を明文で予定した条項であり、軽く見るべきではありません。</p>
+
+<p><strong>そしてこの規約は非会員にも及びます。</strong></p>
+<blockquote>§2.1 <strong>代金の有無、アカウント登録の要否にかかわらず</strong>、当社サービスをご利用いただくためには、本利用規約にご同意いただくことが必要です。<br>§2.2 無料で提供している当社サービス（アカウント登録いただかなくても利用できるサービスに限ります。）につきましては、<strong>実際にご利用いただくことにより本利用規約にご同意いただいたものとします。</strong></blockquote>
+
+<p>「ログインしていないから規約の外」は通りません。</p>
+
+<p><strong>Yahoo!ショッピング API（Yahoo!デベロッパーネットワーク）について：</strong> <code>developer.yahoo.co.jp/terms/</code> は 404、ガイドページは JS レンダリングで本文を取得できませんでした（2026-09-06）。</p>
+<p><strong>規約本文が読めない以上、着手不可</strong>とします（8/31 の #6-b Amazon ドロップシッピングポリシーと同じ扱い）。</p>
+
+<h3>6 全体のまとめ</h3>
+
+<table><thead><tr><th>行為</th><th>Amazon</th><th>楽天</th><th>Yahoo</th></tr></thead><tbody>
+<tr><td>人が見てメモする</td><td>可（緩速で）</td><td>可</td><td>可</td></tr>
+<tr><td>自動取得・蓄積</td><td><strong>絶対不可</strong></td><td><strong>不可</strong></td><td><strong>不可</strong></td></tr>
+<tr><td>公式 API</td><td>Keepa で代替済み・新規は不要</td><td><strong>不可</strong>（規約10条(4)(6)）</td><td><strong>未確認＝着手不可</strong></td></tr>
+<tr><td>PUBLIC リポへの commit</td><td>論外</td><td><strong>明文で禁止</strong>（10条(9)）</td><td>論外</td></tr>
+</tbody></table>
+
+<hr>
+
+<h2>I-7. クラウドファンディングの公開プロジェクト情報　→ <strong>条件付き可。本件で最も筋がよい経路</strong></h2>
+
+<p>社長のご要望（「SNSで有名になりかけている商品」）に対し、<strong>一般販売前の商品を、実行者本人と直接交渉できる</strong>という点で、この経路が最も価値が高いと考えます。以下、CAMPFIRE と Makuake で判定が分かれます。</p>
+
+<h3>7-a. CAMPFIRE — <strong>社内リスト化は可。PUBLIC リポへの掲載は不可</strong></h3>
+
+<p><strong>① robots.txt（<code>https://camp-fire.jp/robots.txt</code>）</strong></p>
+
+<p><code>User-agent: <em></code> に対する Disallow は <code>/mypage</code> <code>/projects/</em>/backers/</code> <code>/projects/start_creating</code> 等のみで、<strong><code>/projects/{id}</code> 本体は許可されています。</strong></p>
+<p>注目すべきは、GPTBot・ClaudeBot・Amazonbot・CCBot 等の AI クローラだけを別グループで名指しブロックしている点です。<strong>運営はクローラを意識的に選別しており、その上で汎用クローラを塞いでいません。</strong></p>
+
+<p><strong>② 利用規約 第27条（禁止行為）</strong>（<code>https://camp-fire.jp/term</code>・全文取得済み）</p>
+
+<p>全11号を確認しましたが、<strong>自動収集・スクレイピング・クローリングを禁じる号は存在しません。</strong>関係し得るのは次の2号のみです。</p>
+<blockquote>(7) CAMPFIRE、他のユーザー、その他の第三者の設備を<strong>不正に利用し、またはその運営に支障を与える行為</strong><br>(9) 本サービスの<strong>運営を妨害する行為</strong></blockquote>
+
+<p>→ <strong>アクセス速度を抑えれば、この2号には当たりません。</strong></p>
+
+<p><strong>③ 第34条（権利帰属）3項 — 明文の許諾がある</strong></p>
+
+<blockquote>ユーザーは、プロジェクト内容について、…CAMPFIREの定めるプロジェクトのURLおよび埋め込みコード、<strong>プロジェクトタイトル、プロジェクト概要のテキストおよび画像、プロジェクトオーナーのプロフィールをインターネットおよび外部SNSサービス上で転載することができる</strong>ものとします。<strong>ただし、プロジェクトの告知以外の目的での紙面またはウェブ媒体等への掲載は、事前にCAMPFIREの承諾を得るものとします。</strong></blockquote>
+
+<p><strong>前段は当社に有利な条項です。</strong>しかし<strong>ただし書が PUBLIC リポを直撃します。</strong></p>
+<p>当社が GitHub の公開リポジトリに「仕入れ候補一覧」として掲載するのは、<strong>プロジェクトの告知ではなく仕入れ目的＝「告知以外の目的でのウェブ媒体等への掲載」</strong>です。<strong>事前承諾なしには不可。</strong></p>
+
+<p><strong>④ 非会員にも規約は及ぶ</strong>（第7条1項：ゲストユーザーも本規約を遵守することに同意した場合に限り利用できる）</p>
+
+<p><strong>判定：条件付き可</strong></p>
+
+<table><thead><tr><th>項目</th><th>内容</th></tr></thead><tbody>
+<tr><td>取得してよい</td><td>プロジェクト名・実行者名（法人名/屋号）・公開URL・支援金額・支援者数・実施期間・カテゴリ・公開されている自社サイトURL</td></tr>
+<tr><td>取得してはならない</td><td>支援者の情報（<code>/projects/*/backers/</code> は robots で Disallow）、プロジェクト本文の全文コピー、画像ファイルの保存</td></tr>
+<tr><td>保存場所</td><td><strong><code>agent_output/</code> のみ。<code>deliverables/</code> への commit は不可</strong>（第34条3項ただし書）</td></tr>
+<tr><td>アクセス設計</td><td><strong>同一ホスト3秒間隔・同時接続1・403/429 で即時永久打ち切り</strong>（当社採用値。memory <code>knowledge_scraping_and_public_db_2026</code> §5）</td></tr>
+<tr><td>UA</td><td>自社を名乗る（詐称は個人情報保護法20条1項「偽りその他不正の手段」に寄る）</td></tr>
+</tbody></table>
+
+<h3>7-b. Makuake — <strong>自動取得は着手不可（規約本文を読めていない）。人が見るのは可</strong></h3>
+
+<p><strong>利用規約の本文を機械的に取得できませんでした。</strong></p>
+<p><code>https://www.makuake.com/static/rule/</code> <code>/static/terms/</code> <code>/static/rule/user/</code> <code>/static/policy/</code> の4 URL を試しましたが、<strong>いずれも同一の 122,857 バイトのスタブ</strong>（JS レンダリング前のシェル）が返り、<code>第1条</code> も <code>禁止</code> も1件もヒットしません。WebFetch も本文を取得できませんでした（2026-09-06）。</p>
+
+<p><strong>規約を読まずに自動取得を始めることは、法務として承認できません。</strong>（ザッカネットを 8/31 に NO にしたのと同じ理由）</p>
+
+<p><strong>→ 秘書へのタスク：</strong> ブラウザで <code>https://www.makuake.com/static/rule/</code> を開き、<strong>禁止行為条項の全文</strong>（特に自動収集・スクレイピング・複製・転載の有無）と<strong>最終改定日</strong>を取得して私に戻してください。それまでは自動取得を行いません。</p>
+
+<h3>7-c. 実行者（メーカー）への商談 — <strong>ここが一番重要です。条件を外すと信用を失います</strong></h3>
+
+<p>Zendesk Help Center API 経由でヘルプ本文を取得しました（<code>https://mkhelp.makuake.com/api/v2/help_center/ja/articles/&lt;id&gt;.json</code>・2026-09-06）。</p>
+
+<p><strong>① Makuake のメッセージ機能を使った営業は明文で禁止</strong>（記事 ID 22738462608409／該当規約：<strong>利用規約 第16条第1項第8号</strong>）</p>
+<blockquote>Makuakeメッセージを利用し<strong>営業や勧誘の案内を送付することなど、商業目的で利用する行為は禁止</strong>しております。<br>事務局が禁止行為に該当すると合理的な理由に基づき判断した場合は、<strong>退会などの措置</strong>を取る場合があります。</blockquote>
+
+<p><strong>→ プラットフォーム内の連絡機能を使ってはいけません。連絡は実行者の自社サイト等、公開された連絡先経由に限ります。</strong></p>
+
+<p><strong>② プロジェクト実施期間中の接触は避けること</strong>（記事 ID 22736505436953／同 第16条第1項第8号）</p>
+<blockquote>■どのようなものが違反になりますか？<br>・<strong>プロジェクト実施期間中に、Makuake以外のサイトへ誘導し購入させる行為</strong></blockquote>
+
+<p>これは実行者側に課された禁止事項です。<strong>実施期間中に「Amazon でも売りませんか」と持ちかければ、相手の規約違反を誘発することになります。</strong>当社が処分を受けるわけではありませんが、<strong>相手を退会リスクに晒す提案をする会社</strong>という評価を受けます。本丸（独占仕入れ）を狙う上で、これは致命的です。</p>
+
+<p><strong>→ 接触は必ず「プロジェクト終了後」。実施中の実行者はリストに載せても、連絡はしない。</strong></p>
+
+<p><strong>③ 連絡自体が §4.1（第三者連絡）</strong></p>
+<p>CLAUDE.md §4.1 により、<strong>下書きまでで止めます。</strong>送信は社長承認後です。</p>
+
+<p><strong>④ 特定電子メール法</strong>（memory <code>knowledge_scraping_and_public_db_2026</code> §2）</p>
+<ul>
+<li>法3条1項4号：自らメールアドレスを公表している<strong>営業を営む個人・団体</strong>には同意なく送れる。</li>
+<li><strong>施行規則3条ただし書</strong>：ただし<strong>「営業メールお断り」の趣旨の記載がサイトにある場合は送れない。</strong></li>
+<li><strong>→ 収集の時点で <code>email_optout_notice</code> フラグを判定して記録すること。</strong>後から遡れません（立証責任は送信者側）。</li>
+<li>措置命令違反＝1年以下の拘禁刑／100万円以下の罰金（法34条2号）、<strong>法人両罰3,000万円以下</strong>（法37条1号）。</li>
+</ul>
+
+<hr>
+
+<h2>I-8. ふるさと納税ポータル・道の駅・アンテナショップの公開商品情報　→ <strong>ポータルの自動取得は不可／事業者の自社サイトへ辿るのは可</strong></h2>
+
+<h3>8-a. ふるさとチョイス — <strong>明文で不可</strong></h3>
+
+<p><strong>利用規約 第12条（禁止事項）1項(12)</strong>（<code>https://www.furusato-tax.jp/agreement/terms</code>）</p>
+<blockquote><strong>自動化された手段（自動寄付ツール、ロボットおよびRPAツールならびにこれらに準ずる手段を含みます）を用いた情報収集（スクレイピングおよびクローリングを含みます）</strong>、データの加工（登録、修正及び削除を含みます）および寄付行為（当社の事前承諾を得たRPAツールの利用を除きます。）</blockquote>
+
+<p><strong>「情報収集（スクレイピングおよびクローリングを含みます）」と明記されています。解釈の余地はありません。</strong></p>
+
+<p><strong>第11条（知的財産権）1項</strong></p>
+<blockquote>本サイト等を通じて当社が発信する情報、本サイト等を構成するすべてのコンテンツ<strong>および利用者が本サイト等を利用することにより取得した情報</strong>に関する著作権等の知的財産権…は、当社または当該権利を有する第三者…に帰属し、利用者は、当社および権利者の<strong>許可なく転載等を行ってはならない</strong>ものとします。</blockquote>
+
+<p><strong>→ 自動取得は不可。取得した情報の転載（PUBLIC リポへの掲載を含む）も不可。</strong></p>
+
+<h3>8-b. さとふる — <strong>未確認＝着手不可</strong></h3>
+
+<ul>
+<li><code>https://www.satofull.jp/robots.txt</code> は<strong>空のレスポンス</strong>（制限記述なし）</li>
+<li>利用規約ページは curl で応答なし（HTTP 000・2026-09-06）</li>
+</ul>
+
+<p><strong>規約本文を確認できていないため、着手不可</strong>とします。人が見るのは当然可です。</p>
+
+<h3>8-c. 楽天ふるさと納税 — <strong>不可</strong>（I-6-b と同じ。楽天ウェブサービス規約 第10条(4)(6)(9)）</h3>
+
+<h3>8-d. 道の駅・アンテナショップ・自治体の特産品ページ</h3>
+
+<p><strong>運営者を確認してから判定してください。ここは 8/31 に一度踏んだ地雷です。</strong></p>
+
+<p>memory の記録（<code>07_本丸経路と卸サービスの適法性判定.md</code> §1-1）：</p>
+<blockquote><strong>指定しているのが国であることと、サイトを運営しているのが誰かは別の話です。</strong><br>kougeihin.jp は「経産省指定の伝統的工芸品」を扱うが、運営者は<strong>一般財団法人＝民間法人</strong>。政府標準利用規約2.0 も公共データ利用規約1.0 も適用されない。</blockquote>
+
+<table><thead><tr><th>運営者</th><th>適用される規約</th><th>判定</th></tr></thead><tbody>
+<tr><td>自治体そのもの（<code>*.lg.jp</code> 等）</td><td><strong>政府標準利用規約2.0（CC BY 互換）が適用されることが多い</strong></td><td>出典明示すれば<strong>商用利用・改変・再配布まで可</strong>。ただしサイトごとに要確認</td></tr>
+<tr><td>第三セクター・観光協会・一般財団法人</td><td><strong>各社の独自規約</strong></td><td><strong>kougeihin.jp と同じく、複製・転載を禁じている可能性が高い。個別確認が必須</strong></td></tr>
+<tr><td>道の駅の運営会社</td><td>独自規約</td><td>同上</td></tr>
+</tbody></table>
+
+<h3>8-e. <strong>推奨：3段階の型を使う</strong>（これが最も安全かつ、成果物の自由度も最大）</h3>
+
+<p>memory <code>knowledge_thirdparty_list_reuse_3steps</code> の型をそのまま当てます。</p>
+
+<pre><code>
+段階1  ポータル・特産品サイトを【人が見る】       ← 規約の制約下
+段階2  そこで知った「事業者名」だけを手がかりにする ← 事実は著作物ではない
+段階3  事業者の自社サイト・国税庁 法人番号 Web-API・gBizINFO から【取り直す】
+        ↑ ここで取り直したデータは、当社が自由に扱える
+</code></pre>
+
+<p><strong>段階3で取り直した先のデータは、ポータルの規約の外にあります。</strong></p>
+<ul>
+<li>国税庁 法人番号 Web-API：公共データ利用規約1.0（CC BY 互換・<strong>商用可</strong>）／出典明示（規約第6条）・大量アクセス禁止（第9条1項3号）</li>
+<li>gBizINFO REST API：政府標準利用規約2.0（CC BY 互換）／<strong>申請時に申告した目的の範囲内</strong>に限られる（API規約2）</li>
+</ul>
+
+<p><strong>PUBLIC リポへの commit：段階3で取り直した事実データなら可。</strong></p>
+<p><strong>ただし個人事業主（屋号のみ）が混じる点に注意してください。</strong>個人事業主の事業情報は個人情報保護法上の個人情報です（法人そのものの情報は個人情報ではない）。<strong>commit 前に「個人名・個人宅住所・携帯番号が混じっていないか」のスクリーニングを必ず通すこと。</strong></p>
+
+<hr>
+
+<h2>I-9. PUBLIC リポジトリ判定の一覧（この表だけ切り出して運用してください）</h2>
+
+<p><strong>本リポは PUBLIC ＋ 30分ごとに自動 <code>git add -A</code> → push。commit した瞬間に世界に公開されます。</strong></p>
+
+<table><thead><tr><th>データ</th><th><code>deliverables/</code>（PUBLIC）</th><th><code>agent_output/</code>（Git 除外）</th></tr></thead><tbody>
+<tr><td>手動観察のメモ（商品名・メーカー名・観測日）</td><td><strong>可</strong></td><td>可</td></tr>
+<tr><td>SNS 投稿の URL・投稿者名</td><td><strong>不可</strong></td><td>可</td></tr>
+<tr><td>SNS 投稿本文・スクショ・画像</td><td><strong>不可</strong></td><td><strong>不可</strong>（そもそも保存しない）</td></tr>
+<tr><td>Google トレンドの出力</td><td><strong>不可</strong>（許諾を確認できず）</td><td>可</td></tr>
+<tr><td>RSS/記事から抽出した商品名・社名・記事URL・日付</td><td><strong>可</strong></td><td>可</td></tr>
+<tr><td>記事本文・リード文</td><td><strong>不可</strong></td><td>引用の範囲で可</td></tr>
+<tr><td>Amazon / 楽天 / Yahoo 由来のデータ</td><td><strong>不可</strong></td><td><strong>不可</strong>（そもそも取得しない）</td></tr>
+<tr><td>CAMPFIRE 由来のプロジェクト情報</td><td><strong>不可</strong>（第34条3項ただし書）</td><td>可</td></tr>
+<tr><td>Makuake 由来</td><td><strong>不可</strong></td><td>規約確認まで取得しない</td></tr>
+<tr><td>ふるさとチョイス由来</td><td><strong>不可</strong></td><td><strong>不可</strong>（第12条1項(12)）</td></tr>
+<tr><td>段階3で取り直した事実（自社サイト・法人番号API・gBizINFO）</td><td><strong>可</strong>（個人情報スクリーニング後）</td><td>可</td></tr>
+<tr><td>取引先候補の氏名・個人宅住所・携帯番号</td><td><strong>不可</strong>（個情法27条）</td><td>可（要管理）</td></tr>
+</tbody></table>
+
+<hr>
+
+<h1>第II部　食品を Amazon で販売する場合の法的要件</h1>
+
+<p><strong>前提：個人事業主が、国産の加工食品を仕入れて（＝自分では作らず）、包装のまま Amazon で販売する。</strong></p>
+
+<h2>II-1. 食品衛生法 — 営業許可・届出の要否</h2>
+
+<h3>結論①：<strong>自分で製造・加工・小分けしない限り、営業許可は不要です</strong></h3>
+
+<p>営業許可が必要なのは、<strong>食品衛生法施行令 第35条</strong>が列挙する32業種のみです（法54条・55条1項）。</p>
+<p>飲食店営業、菓子製造業、そうざい製造業、密封包装食品製造業、漬物製造業、水産製品製造業…<strong>いずれも「製造する営業」「調理する営業」であり、仕入れて売るだけの営業は含まれません。</strong></p>
+
+<p><strong>生鮮の食肉・魚介についても、明文で除外されています。</strong></p>
+<blockquote>施行令35条3号 <strong>食肉販売業（食肉を専ら容器包装に入れられた状態で仕入れ、そのままの状態で販売する営業を除く。）</strong><br>同4号 <strong>魚介類販売業（…鮮魚介類を専ら容器包装に入れられた状態で仕入れ、そのままの状態で販売するもの…を除く。）</strong></blockquote>
+
+<p><strong>無許可営業の罰則は 2年以下の拘禁刑または200万円以下の罰金（法82条1項）</strong>なので、ここを間違えるわけにはいきません。上記の除外規定は覚えておいてください。</p>
+
+<h3>結論②：<strong>常温保存の包装済み食品だけを扱うなら、届出も不要です</strong></h3>
+
+<p><strong>食品衛生法 第57条1項</strong></p>
+<blockquote>営業（第五十四条に規定する営業、<strong>公衆衛生に与える影響が少ない営業で政令で定めるもの</strong>及び食鳥処理の事業を除く。）を営もうとする者は、…<strong>あらかじめ</strong>、その営業所の名称及び所在地その他厚生労働省令で定める事項を<strong>都道府県知事に届け出なければならない。</strong></blockquote>
+
+<p>その除外を定める <strong>食品衛生法施行令 第35条の2（公衆衛生に与える影響が少ない営業）</strong></p>
+<blockquote><strong>三 容器包装に入れられ、又は容器包装で包まれた食品又は添加物のうち、冷凍又は冷蔵によらない方法により保存した場合において、腐敗、変敗その他の品質の劣化により食品衛生上の危害の発生のおそれがないものの販売をする営業</strong><br>二 食品又は添加物の<strong>貯蔵のみをし、又は運搬のみをする営業</strong>（食品の冷凍又は冷蔵業を除く。）</blockquote>
+
+<p><strong>→ 常温保存可能な包装済み食品（乾物・菓子・調味料・レトルト・缶詰・瓶詰・茶 等）の販売のみ ＝ 許可も届出も不要。</strong></p>
+<p><strong>→ 自宅やレンタル倉庫に在庫を置くだけの行為も、2号により届出不要。</strong></p>
+
+<h3>結論③：<strong>要冷蔵・要冷凍を扱うなら、届出が必要です</strong></h3>
+
+<p>35条の2第3号の要件は「<strong>冷凍又は冷蔵によらない方法により保存した場合において</strong>…危害の発生のおそれがないもの」です。</p>
+<p><strong>要冷蔵・要冷凍の食品はこの要件を満たさないため、除外に当たらず、法57条1項の届出義務が生じます。</strong></p>
+
+<table><thead><tr><th>項目</th><th>内容</th></tr></thead><tbody>
+<tr><td>届出先</td><td>営業所所在地の<strong>保健所</strong>（都道府県知事宛）。厚労省「食品衛生申請等システム」でオンライン申請可</td></tr>
+<tr><td>手数料</td><td><strong>無料</strong></td></tr>
+<tr><td>タイミング</td><td><strong>「あらかじめ」＝営業開始前</strong>（法57条1項）</td></tr>
+<tr><td><strong>罰則</strong></td><td><strong>無届または虚偽の届出 ＝ 50万円以下の罰金</strong>（法85条3号）</td></tr>
+</tbody></table>
+
+<h3>HACCP（法51条2項）</h3>
+
+<p><strong>「包装済み食品の貯蔵・運搬・販売のみ」の営業者は、施行令34条の2第3号の「小規模な営業者等」に該当します。</strong></p>
+<p>法51条1項2号括弧書きにより、求められるのは「<strong>その取り扱う食品の特性に応じた取組</strong>」＝業界団体の手引書に沿った簡易な衛生管理で足ります。</p>
+
+<p><strong>ただし「やらなくてよい」ではありません。</strong>法51条2項は「営業者は、…公衆衛生上必要な措置を定め、これを遵守しなければならない」と義務として書いています。<strong>温度管理・賞味期限管理・保管場所の清潔保持を記録する簡易な様式を1枚作っておいてください。</strong></p>
+
+<h3><strong>物販で最も踏みやすい地雷：セット組みと小分け</strong></h3>
+
+<p><strong>施行令 第34条の2第4号</strong>は「<strong>食品を分割して容器包装に入れ、又は容器包装で包み、小売販売する営業者</strong>」を明示的に想定しています。</p>
+
+<table><thead><tr><th>やること</th><th>帰結</th></tr></thead><tbody>
+<tr><td>仕入れた商品を、包装のまま1個ずつ売る</td><td>許可・届出不要（結論①②のとおり）</td></tr>
+<tr><td><strong>複数商品を自分で詰め合わせて「セット品」として売る</strong></td><td><strong>外装を新たに作る＝表示責任者が当社になる</strong>（→ II-2）。品目によっては<strong>製造業の許可が必要</strong>になり得る</td></tr>
+<tr><td><strong>大袋から小分けして再包装して売る</strong></td><td><strong>同上。加えて「分割して容器包装に入れる営業」に該当</strong></td></tr>
+<tr><td>開封して中身を詰め替える</td><td><strong>明確に製造・加工。許可業種に該当する可能性が高い</strong></td></tr>
+</tbody></table>
+
+<p><strong>Amazon 物販では「セット販売で相乗りを避ける」が定石ですが、食品でこれをやると法的な立場が変わります。</strong></p>
+<p><strong>セット販売を検討する段階になったら、必ず私に戻してください。</strong>品目ごとに判定が変わります。</p>
+
+<h3>FBA との接続（法令とは別のルール）</h3>
+
+<p>Amazon の要期限管理商品ルール（<strong>賞味期限60日以上／残45日で販売不可</strong>。memory <code>knowledge_fba_shipment_playbook</code>）は Amazon の契約上のルールであり、法令とは別系統です。<strong>両方を満たす必要があります。</strong></p>
+<p><strong>常温・包装済み・賞味期限が長い＝法令上も Amazon 上も最も楽な組み合わせです。</strong></p>
+
+<hr>
+
+<h2>II-2. 食品表示法 — 表示責任はどこまで及ぶか</h2>
+
+<h3>結論：<strong>仕入れ販売者にも、表示義務は直接及びます。「自分は作っていないから関係ない」は通りません</strong></h3>
+
+<p><strong>食品表示法 第2条3項1号（定義）</strong></p>
+<blockquote>この法律において「食品関連事業者等」とは、次の各号のいずれかに該当する者をいう。<br>一 食品の製造、加工（調整及び選別を含む。）若しくは輸入を業とする者（当該食品の販売をしない者を除く。）<strong>又は食品の販売を業とする者</strong>（以下「<strong>食品関連事業者</strong>」という。）</blockquote>
+
+<p><strong>「食品の販売を業とする者」— 社長はここに入ります。</strong></p>
+
+<p><strong>食品表示法 第5条（食品表示基準の遵守）</strong></p>
+<blockquote><strong>食品関連事業者等は、食品表示基準に従った表示がされていない食品の販売をしてはならない。</strong></blockquote>
+
+<p><strong>これが結論です。</strong>「表示を作れ」ではなく「<strong>表示のない食品を売るな</strong>」という義務が、販売者に直接かかっています。</p>
+
+<h3>ただし、表示を作り直す義務はありません</h3>
+
+<p>適法な表示が付いた包装のまま販売するのであれば、<strong>既存の表示で足ります。</strong></p>
+<p>食品表示基準3条1項は「…表示事項が…<strong>表示されなければならない</strong>」と受動態で書かれており、表示主体を1者に固定していません。実務上は、容器包装に「製造者」または「販売者」として記載された者が表示責任者です。<strong>包装を変えない限り、その地位は移りません。</strong></p>
+
+<h3><strong>仕入れ販売者が現実に負う3つの義務</strong></h3>
+
+<h4>① 仕入れ時に表示を確認する義務</h4>
+
+<p><strong>食品表示基準 第3条・第8条3号（別記様式一）</strong>が求める一括表示の項目：</p>
+
+<table><thead><tr><th>確認項目</th><th>根拠</th></tr></thead><tbody>
+<tr><td>名称</td><td>基準3条1項</td></tr>
+<tr><td><strong>保存の方法</strong></td><td>同</td></tr>
+<tr><td><strong>消費期限または賞味期限</strong></td><td>同（品質が急速に劣化しやすい食品は「消費期限」、それ以外は「賞味期限」）</td></tr>
+<tr><td>原材料名</td><td>同（重量順）</td></tr>
+<tr><td>添加物</td><td>同</td></tr>
+<tr><td>内容量／固形量および内容総量</td><td>同</td></tr>
+<tr><td><strong>栄養成分の量および熱量</strong></td><td>同</td></tr>
+<tr><td>原料原産地名</td><td>同3条2項</td></tr>
+<tr><td><strong>アレルゲン</strong></td><td>同3条1項</td></tr>
+<tr><td><strong>食品関連事業者の氏名または名称および住所</strong></td><td>同</td></tr>
+<tr><td><strong>製造所または加工所の所在地および製造者または加工者の氏名または名称</strong></td><td>基準8条5号</td></tr>
+</tbody></table>
+
+<p><strong>1つでも欠けている商品は、仕入れてはいけません。</strong></p>
+
+<p><strong>そして、これは本件の企画にとって現実的な壁です。</strong></p>
+<p>社長が狙う「<strong>地元で有名な商品</strong>」「<strong>道の駅・アンテナショップの商品</strong>」は、<strong>小規模事業者が作っているため、栄養成分表示や原料原産地表示が欠けていることが実際にあります。</strong>（栄養成分表示は小規模事業者に省略が認められる場合がありますが、<strong>その省略の可否を判断する責任は、それを売る当社が負います。</strong>）</p>
+
+<p><strong>→ 仕入れ判定フローの最初に「一括表示の写真を必ず取り寄せる」を入れてください。</strong>これは商談の最初の質問に組み込むべき項目です。</p>
+
+<h4>② 表示を覆わない義務 — <strong>FBA 実務の最大の地雷</strong></h4>
+
+<p><strong>食品表示基準 第8条2号</strong></p>
+<blockquote><strong>容器包装（容器包装が小売のために包装されている場合は、当該包装）を開かないでも容易に見ることができるように当該容器包装の見やすい箇所</strong>（…）<strong>に表示する。</strong></blockquote>
+
+<p><strong>FNSKU ラベル・値札・自社シールを一括表示の上に貼った瞬間、この条項に違反します。</strong></p>
+
+<p>memory <code>knowledge_fba_label_service</code>（Amazon のラベル貼付サービス／22円・51円）および <code>knowledge_fba_shipment_playbook</code>（外注納品）に直結します。</p>
+
+<p><strong>→ 納品作業を外注する場合、作業指示書に次の1行を必ず入れてください。</strong></p>
+<blockquote><strong>「一括表示（名称・原材料名・消費期限/賞味期限・保存方法・製造者等が枠で囲まれた表示）の上には、いかなるラベル・シールも貼らないこと。貼る場所が無い場合は貼らずに差し戻すこと。」</strong></blockquote>
+
+<p><strong>Amazon のラベル貼付サービスに委託する場合も同じです。</strong>貼付位置を当社が指定できないなら、そのサービスは食品には使えません。</p>
+
+<h4>③ 自分で包装したら、自分が表示責任者になる義務</h4>
+
+<p>II-1 で述べたセット組み・小分けをすると、<strong>新しい容器包装の表示は当社が作らなければなりません。</strong>原材料名・アレルゲン・栄養成分・原料原産地をすべて自分で調べて表示する義務を引き受けます。<strong>現実的ではありません。避けてください。</strong></p>
+
+<h3>罰則 — <strong>主語が「販売をした者」であることを見てください</strong></h3>
+
+<table><thead><tr><th>条文</th><th>行為</th><th>罰則</th><th>法人重科（法22条）</th></tr></thead><tbody>
+<tr><td><strong>法18条</strong></td><td><strong>第6条8項の内閣府令で定める事項</strong>（<strong>アレルゲン・消費期限・加熱の要否</strong>等、安全性に重要な影響を及ぼす事項）<strong>について食品表示基準に従った表示がされていない食品の販売をした者</strong></td><td><strong>2年以下の拘禁刑もしくは200万円以下の罰金／併科</strong></td><td><strong>1億円以下</strong></td></tr>
+<tr><td><strong>法19条</strong></td><td><strong>原産地について虚偽の表示がされた食品の販売をした者</strong></td><td><strong>2年以下の拘禁刑または200万円以下の罰金</strong></td><td><strong>1億円以下</strong></td></tr>
+<tr><td>法17条</td><td>回収命令（法6条8項）違反</td><td>3年以下の拘禁刑もしくは300万円以下の罰金／併科</td><td><strong>3億円以下</strong></td></tr>
+<tr><td>法20条</td><td>表示措置命令（法6条5項）違反</td><td>1年以下の拘禁刑または100万円以下の罰金</td><td>—</td></tr>
+</tbody></table>
+
+<p><strong>法18条・19条の主語は「販売をした者」です。製造者に限定されていません。</strong></p>
+<p><strong>アレルゲン表示が欠けた商品を、それと知らずに仕入れて Amazon で売った — これだけで刑事罰の構成要件に該当し得ます。</strong></p>
+<p>これが「食品は難度が一段上がる」の実体です。</p>
+
+<h3>併せて必ず見る3法（Amazon の商品ページ表現に直撃します）</h3>
+
+<p>食品表示基準の規律対象は<strong>容器包装への表示</strong>であり、Amazon の商品ページではありません。<strong>しかしページの表現には別の3法が来ます。</strong></p>
+
+<p><strong>① 景品表示法 第5条（不当な表示の禁止）</strong></p>
+<blockquote>事業者は、自己の供給する商品又は役務の取引について、次の各号のいずれかに該当する表示をしてはならない。<br>一 商品…の<strong>品質、規格その他の内容</strong>について、一般消費者に対し、<strong>実際のものよりも著しく優良であると示し</strong>…（優良誤認）<br>二 …<strong>取引条件</strong>について…<strong>著しく有利であると一般消費者に誤認される表示</strong>…（有利誤認）</blockquote>
+
+<p><strong>「◯◯産」「無添加」「限定」「テレビで話題」等を商品ページに書くなら、書いた当社が裏付け資料を持っていなければなりません。</strong>（不実証広告規制・法8条3項により、消費者庁は15日以内の資料提出を求められます）</p>
+<p><strong>「メーカーがそう言っていた」は裏付けになりません。書面で取ってください。</strong></p>
+
+<p><strong>② 健康増進法 第65条1項（誇大表示の禁止）</strong></p>
+<blockquote><strong>何人も</strong>、食品として販売に供する物に関して広告その他の表示をするときは、<strong>健康の保持増進の効果</strong>その他内閣府令で定める事項…について、<strong>著しく事実に相違する表示をし、又は著しく人を誤認させるような表示をしてはならない。</strong></blockquote>
+
+<p><strong>主語が「何人も」です。転売者も直撃します。</strong></p>
+
+<p><strong>③ 医薬品医療機器等法（薬機法）68条</strong></p>
+<p>未承認の医薬品について効能効果を広告することの禁止。</p>
+<p><strong>「疲れが取れる」「血圧を下げる」「免疫力が上がる」等を食品の販売ページに書くと、その食品が未承認医薬品と評価されます。</strong></p>
+
+<p><strong>→ SNS でバズる食材は、健康効果を訴求する文脈でバズることが非常に多い。ここが本企画で最も危険な接点です。</strong></p>
+<p><strong>「バズった動画で言われていた効能をそのまま商品ページに書く」は、絶対にやらないでください。</strong></p>
+
+<h3>参考：本照会の範囲外だが線を引いておくもの</h3>
+
+<ul>
+<li><strong>輸入食品</strong>：食品衛生法27条により、<strong>輸入のつど検疫所へ食品等輸入届出</strong>が必要です（施行令35条の2第1号で「輸入をする営業」自体の届出は不要ですが、これとは別物）。<strong>「食材も含む」が海外品に及ぶなら、別途照会してください。</strong></li>
+<li><strong>自主回収</strong>：食品衛生法58条・食品表示法10条の2により、<strong>自主回収した場合は行政への届出義務があります。</strong>販売者にも及びます（食品表示法21条3号：無届は50万円以下の罰金）。</li>
+<li><strong>古物営業法</strong>：新品のメーカー仕入れ・卸仕入れであれば許可不要（memory <code>knowledge_kobutsusho_license</code>）。<strong>一度消費者の手に渡った食品を扱う場面は想定しないでください</strong>（法的にも衛生的にも論外）。</li>
+</ul>
+
+<hr>
+
+<h1>第III部　社長判断が必要な論点（A/B/C ＋ 推奨）</h1>
+
+<h2>論点1：食品を扱うか。扱うなら、どこまで扱うか</h2>
+
+<table><thead><tr><th>案</th><th>内容</th><th>手続</th><th>難度</th></tr></thead><tbody>
+<tr><td><strong>A（推奨）</strong></td><td><strong>常温保存の包装済み加工食品に限定</strong></td><td><strong>許可も届出も不要</strong></td><td>低。仕入れ時に一括表示を確認するだけ</td></tr>
+<tr><td>B</td><td>要冷蔵・要冷凍まで広げる</td><td><strong>保健所への届出が必要</strong>（無料・営業前）。FBA のクール便対応・温度管理も別途</td><td>中〜高。無届＝50万円以下の罰金</td></tr>
+<tr><td>C</td><td>セット組み・小分けを行う</td><td><strong>製造業の許可が必要になり得る</strong>＋<strong>表示責任者が当社になる</strong></td><td><strong>高。現時点では推奨しない</strong></td></tr>
+</tbody></table>
+
+<p><strong>推奨は A。</strong>社長は物販実績ゼロで、日本店も停止中です。<strong>手続がゼロで済む範囲から始めるのが合理的です。</strong></p>
+<p><strong>Bへ広げるのは、Aで1周回してからで遅くありません。</strong></p>
+
+<h2>論点2：SNS 閲覧用アカウントを作るか</h2>
+
+<p><strong>作る場合、事業用 Google アカウント・Amazon 出品用アカウントと同一のメールアドレスを使わないでください。</strong></p>
+<p>これは 8/31 の NO の根拠（制裁のアカウント単位連鎖）を、そのまま回避する設計です。</p>
+<p><strong>新規メールアドレスの作成自体は §4.1 に該当しません</strong>（無料・可逆・法的拘束なし）。ただし各SNSの規約同意を伴うため、<strong>アカウント作成そのものは §4.1「法的拘束（利用規約への同意）」として社長にお願いします。</strong></p>
+
+<h2>論点3：有料の SNS/トレンド分析ツールを検討するか</h2>
+
+<p><strong>課金は §4.1。かつ会員登録＝規約同意も §4.1。</strong></p>
+<p><strong>順番を守ってください：① サトルが候補を出す → ② 私が規約を §I-4 の5項目で審査 → ③ 秘書が A/B/C にまとめる → ④ 社長が承認 → ⑤ 社長が申込。</strong></p>
+<p><strong>規約が公開ページに存在しない、または本文を読めないサービスは、この時点で落とします。</strong></p>
+
+<h2>論点4：規約本文が読めなかった3件を、秘書のブラウザで取りに行くか</h2>
+
+<table><thead><tr><th>対象</th><th>URL</th><th>取りたいもの</th></tr></thead><tbody>
+<tr><td><strong>Makuake 利用規約</strong></td><td><code>https://www.makuake.com/static/rule/</code></td><td>禁止行為条項の全文（自動収集・スクレイピング・複製・転載の有無）、第16条1項8号の原文、最終改定日</td></tr>
+<tr><td>さとふる 利用規約</td><td><code>https://www.satofull.jp/</code>（規約ページへのリンクから）</td><td>同上</td></tr>
+<tr><td>Yahoo!ショッピング API 規約</td><td><code>https://developer.yahoo.co.jp/</code></td><td>商用利用の可否、データ保持・再配布の条項</td></tr>
+</tbody></table>
+
+<p><strong>いずれも「取れないから諦める」ではなく「取れるまで着手しない」という扱いです。</strong></p>
+<p>CLAUDE.md §4.4 により、<strong>ブラウザ操作は秘書が実行します。</strong>社長にお願いする一手はありません（ログイン不要のページです）。</p>
+
+<hr>
+
+<h1>第IV部　実装チェックリスト（サトルの Phase 2 へ引き渡す条件）</h1>
+
+<p>Phase 2 で設計する経路は、<strong>以下をすべて満たすものに限ってください。</strong>1つでも満たさないものは、私に戻してください。</p>
+
+<h2>収集フェーズ</h2>
+
+<ul>
+<li>☐ 情報源が <strong>経路1・2・5・7-a（CAMPFIRE）・8-e（3段階の型）</strong> のいずれかである</li>
+<li>☐ 自動アクセスを行う場合、<strong>robots.txt を取得済み</strong>で、対象パスが Allow である（<strong>証拠として robots.txt を <code>agent_output/</code> に保存</strong>）</li>
+<li>☐ 自動アクセスを行う場合、<strong>利用規約の本文を取得済み</strong>で、自動収集の禁止条項が無いことを確認済み</li>
+<li>☐ アクセス設計：<strong>同一ホスト3秒間隔・同時接続1・403/429 で即時永久打ち切り</strong></li>
+<li>☐ User-Agent を詐称していない／CAPTCHA・ログイン制限を回避していない（個情法20条1項）</li>
+<li>☐ 取得するのは<strong>事実データのみ</strong>（説明文・画像・動画は取得しない）</li>
+<li>☐ 連絡先を収集する場合、<strong><code>email_optout_notice</code>（営業メールお断り表記の有無）を同時に判定して記録</strong>している</li>
+</ul>
+
+<h2>保存フェーズ</h2>
+
+<ul>
+<li>☐ §I-9 の表に照らして、<code>deliverables/</code>（PUBLIC）に置いてよいものだけを置いている</li>
+<li>☐ 個人名・個人宅住所・携帯番号のスクリーニングを通している（個情法27条）</li>
+<li>☐ 保持期間の上限がある情報源を使っていない（使うなら削除/更新の仕組みを実装している）</li>
+</ul>
+
+<h2>商談フェーズ</h2>
+
+<ul>
+<li>☐ <strong>プラットフォーム内のメッセージ機能を使っていない</strong>（Makuake 第16条1項8号）</li>
+<li>☐ <strong>クラウドファンディングの実施期間中の実行者に接触していない</strong></li>
+<li>☐ 連絡先は<strong>相手が自社サイト等で公表しているもの</strong>である（法3条1項4号）</li>
+<li>☐ <strong>「営業メールお断り」表記のあるアドレスを除外している</strong>（施行規則3条ただし書）</li>
+<li>☐ <strong>送信は §4.1。下書きまでで止め、社長承認を取っている</strong></li>
+</ul>
+
+<h2>食品を扱う場合の追加</h2>
+
+<ul>
+<li>☐ 常温保存の包装済み食品である（論点1の A）</li>
+<li>☐ <strong>一括表示の写真を仕入れ前に取り寄せ、11項目すべての記載を確認した</strong></li>
+<li>☐ 賞味期限が Amazon の要期限管理ルール（60日以上／残45日で販売不可）を満たす</li>
+<li>☐ <strong>納品作業の指示書に「一括表示の上にラベルを貼らない」を明記した</strong></li>
+<li>☐ セット組み・小分けをしていない</li>
+<li>☐ 商品ページに健康効果・効能を書いていない（薬機法68条・健康増進法65条）</li>
+<li>☐ 商品ページの訴求（産地・無添加・受賞歴等）について、<strong>書面の裏付けをメーカーから取得した</strong>（景表法8条3項）</li>
+</ul>
+
+<hr>
+
+<h2>付録：本書で参照した一次情報（すべて 2026-09-06 実取得）</h2>
+
+<table><thead><tr><th>#</th><th>対象</th><th>URL</th><th>取得可否</th></tr></thead><tbody>
+<tr><td>1</td><td>X robots.txt</td><td><code>https://x.com/robots.txt</code></td><td>○</td></tr>
+<tr><td>2</td><td>X Terms of Service（Effective: April 10, 2026）</td><td><code>https://x.com/en/tos</code></td><td>○</td></tr>
+<tr><td>3</td><td>TikTok Terms of Service (ROW)</td><td><code>https://www.tiktok.com/legal/page/row/terms-of-service/en</code></td><td>○</td></tr>
+<tr><td>4</td><td>TikTok robots.txt</td><td><code>https://www.tiktok.com/robots.txt</code></td><td>○</td></tr>
+<tr><td>5</td><td>Instagram robots.txt</td><td><code>https://www.instagram.com/robots.txt</code></td><td>○</td></tr>
+<tr><td>6</td><td>YouTube 利用規約（日本語）</td><td><code>https://www.youtube.com/static?template=terms&amp;gl=JP&amp;hl=ja</code></td><td>○</td></tr>
+<tr><td>7</td><td>Google 利用規約（日本語）</td><td><code>https://policies.google.com/terms?hl=ja</code></td><td>○</td></tr>
+<tr><td>8</td><td>Google トレンド robots.txt</td><td><code>https://trends.google.com/robots.txt</code></td><td>○</td></tr>
+<tr><td>9</td><td>Amazon.co.jp 利用規約</td><td><code>https://www.amazon.co.jp/gp/help/customer/display.html?nodeId=643006</code></td><td>○</td></tr>
+<tr><td>10</td><td>Amazon.co.jp robots.txt（491行）</td><td><code>https://www.amazon.co.jp/robots.txt</code></td><td>○</td></tr>
+<tr><td>11</td><td>楽天ウェブサービス Terms of service</td><td><code>https://webservice.rakuten.co.jp/guide/rule</code></td><td>○</td></tr>
+<tr><td>12</td><td>楽天市場ランキング robots.txt</td><td><code>https://ranking.rakuten.co.jp/robots.txt</code></td><td><strong>×</strong>（アクセス集中エラー）</td></tr>
+<tr><td>13</td><td>LINEヤフー共通利用規約</td><td><code>https://www.lycorp.co.jp/ja/company/terms/</code></td><td>○</td></tr>
+<tr><td>14</td><td>Yahoo!ショッピング robots.txt（273行）</td><td><code>https://shopping.yahoo.co.jp/robots.txt</code></td><td>○</td></tr>
+<tr><td>15</td><td>Yahoo!デベロッパーネットワーク規約</td><td><code>https://developer.yahoo.co.jp/terms/</code></td><td><strong>×</strong>（404 ／ガイドは JS レンダリング）</td></tr>
+<tr><td>16</td><td>CAMPFIRE 利用規約（全38条）</td><td><code>https://camp-fire.jp/term</code></td><td>○</td></tr>
+<tr><td>17</td><td>CAMPFIRE robots.txt</td><td><code>https://camp-fire.jp/robots.txt</code></td><td>○</td></tr>
+<tr><td>18</td><td>Makuake 利用規約</td><td><code>https://www.makuake.com/static/rule/</code> 他3URL</td><td><strong>×</strong>（4URL とも同一スタブ 122,857 bytes）</td></tr>
+<tr><td>19</td><td>Makuake ヘルプ「営業メッセージ送付」（規約第16条1項8号）</td><td><code>https://mkhelp.makuake.com/api/v2/help_center/ja/articles/22738462608409.json</code></td><td>○</td></tr>
+<tr><td>20</td><td>Makuake ヘルプ「直接売買を行う行為」（同上）</td><td><code>.../articles/22736505436953.json</code></td><td>○</td></tr>
+<tr><td>21</td><td>Makuake robots.txt</td><td><code>https://www.makuake.com/robots.txt</code></td><td>○</td></tr>
+<tr><td>22</td><td>ふるさとチョイス 利用規約</td><td><code>https://www.furusato-tax.jp/agreement/terms</code></td><td>○</td></tr>
+<tr><td>23</td><td>さとふる 利用規約</td><td><code>https://www.satofull.jp/</code></td><td><strong>×</strong>（robots.txt は空・規約ページ応答なし）</td></tr>
+<tr><td>24</td><td>食品衛生法（昭和22年法律第233号）</td><td>e-Gov API <code>322AC0000000233</code></td><td>○</td></tr>
+<tr><td>25</td><td>食品衛生法施行令（昭和28年政令第229号）</td><td>e-Gov API <code>328CO0000000229</code></td><td>○</td></tr>
+<tr><td>26</td><td>食品表示法（平成25年法律第70号）</td><td>e-Gov API <code>425AC0000000070</code></td><td>○</td></tr>
+<tr><td>27</td><td>食品表示基準（平成27年内閣府令第10号）</td><td>e-Gov API <code>427M60000002010</code></td><td>○</td></tr>
+<tr><td>28</td><td>健康増進法（平成14年法律第103号）65条</td><td>e-Gov API <code>414AC0000000103</code></td><td>○</td></tr>
+<tr><td>29</td><td>景品表示法（昭和37年法律第134号）5条</td><td>e-Gov API <code>337AC0000000134</code></td><td>○</td></tr>
+</tbody></table>
+
+<p><strong>取得できなかった 12・15・18・23 の4件は、いずれも「不可」ではなく「未確認＝着手不可」です。</strong></p>
+<p><strong>規約を読まずに始めることを、法務は承認しません。</strong></p>
+
+<hr>
+
+<p><em>判定：法務 ハルオ ／ 2026-09-06</em></p>
+
+</body></html>
