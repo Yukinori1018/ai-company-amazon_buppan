@@ -65,3 +65,4 @@ related_tickets: [T-20260831-004, T-20260831-005, T-20260906-004, T-20260906-003
 ## ログ
 
 - 2026-09-06 起票。A案承認により本丸側を再起動。
+- 2026-09-06 マリエ：Notion カンバンへ同期（カード作成・Status=doing）。https://app.notion.com/p/3d3b0a4044fa81ffae2cc827827f9a95 ／ 新規ラベル `honmaru` `expo` `list-quality` を選択肢に追加。`workspace/owner-tasks.md` の ℹ️「自動で進みます」欄へ追記（社長タスクは ±0。メーカー連絡＝§4.1 第三者連絡が控えている旨を備考に明記）。
