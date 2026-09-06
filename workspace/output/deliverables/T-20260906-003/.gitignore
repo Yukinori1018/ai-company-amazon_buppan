@@ -1,0 +1,12 @@
+# ★ディレクトリを作る前にこのファイルを書くこと（過去に 23MB の生データを履歴へ混入させた）。
+# 追跡するのは「スクリプト」と「集計」と「解説」だけ。商品行・Keepa 固有の加工値は出さない。
+out/
+*.jsonl
+*.csv
+!stats_*.csv
+.env
+__pycache__/
+*.pid
+STOP
+FINISHED
+supervisor.pid

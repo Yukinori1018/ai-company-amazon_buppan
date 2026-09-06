@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.aicompany.pool-verify</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>/Users/yukinori/Claude Code/ai-company-amazon_buppan/workspace/output/deliverables/T-20260906-003/run_overnight.sh</string>
+  </array>
+  <key>WorkingDirectory</key>
+  <string>/Users/yukinori/Claude Code/ai-company-amazon_buppan/workspace/output/deliverables/T-20260906-003</string>
+  <key>RunAtLoad</key><true/>
+  <!-- 正常終了（STOP / FINISHED / 通算上限）では起こし直さない。
+       異常終了のときだけ launchd に拾わせる。復帰はチェックポイントから。 -->
+  <key>KeepAlive</key>
+  <dict><key>SuccessfulExit</key><false/></dict>
+  <key>ThrottleInterval</key><integer>60</integer>
+  <key>StandardOutPath</key>
+  <string>/Users/yukinori/Claude Code/ai-company-amazon_buppan/workspace/output/deliverables/T-20260906-003/out/launchd.out.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/yukinori/Claude Code/ai-company-amazon_buppan/workspace/output/deliverables/T-20260906-003/out/launchd.err.log</string>
+</dict>
+</plist>
