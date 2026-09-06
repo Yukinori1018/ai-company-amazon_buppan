@@ -28,6 +28,18 @@ TICKETS_DIRS=(
 )
 TODAY="$(date +%Y-%m-%d)"
 
+# --- pre-commit ゲートの有効化（2026-09-06 / T-20260904-004）-------------------
+# .githooks/pre-commit が卸値（NETSEA 会員限定情報）の PUBLIC リポ混入を止める。
+# core.hooksPath は **ローカル設定**なので、新しい clone・worktree・クラウド
+# セッションでは未設定のまま＝ゲートが効かない。毎セッション冪等に張り直す。
+# 「フックを置いた」は「フックが動いた」の証拠にならないので、ここで担保する。
+if [ -x "$REPO/.githooks/pre-commit" ]; then
+  if [ "$(git -C "$REPO" config --get core.hooksPath 2>/dev/null)" != ".githooks" ]; then
+    git -C "$REPO" config core.hooksPath .githooks >/dev/null 2>&1 || true
+  fi
+fi
+
+
 REMINDERS=""
 
 for TICKETS_DIR in "${TICKETS_DIRS[@]}"; do

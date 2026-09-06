@@ -1,0 +1,140 @@
+#!/bin/bash
+#
+# pre-commit — 卸値（NETSEA 会員限定の取引条件）の PUBLIC リポへの混入を止める
+#
+# 背景（2度起きた事故）
+#   2026-08-31 卸価格227行 / 2026-09-06 03 の HTML。いずれも意図的な公開ではなく、
+#   別セッションの `git add -A` に巻き込まれたもの。
+#   .claude/scripts/github-sync.sh も 30分ごとに `git add -A` → `git commit` を
+#   呼ぶので、commit を止めればこの経路もまとめて塞げる。
+#
+# 根拠条文（法務ハルオ 2026-09-06 / T-20260904-004 E_ 判定）
+#   - NETSEA API 利用規約 第15条1項（秘密保持）
+#   - NETSEA バイヤー会員規約 第7条2項3号（権利の行使の範囲を超えた情報利用）
+#   制裁は金銭賠償ではなくアカウント停止（催告なし）。
+#   ※ 黒いのは「卸値」だけ。サプライヤー社名・商品名・JAN・商品URLは公開情報。
+#
+# 設計方針
+#   - 誤検知で正当な作業を止めない。**新規に追跡対象へ追加されるファイルだけ**を見る。
+#     既に追跡済みのファイルの編集は対象外（`.md` の解説文を書き換えるたびに
+#     止まるようでは運用が壊れる）。
+#   - 走査するのは「行データが載りうる拡張子」だけ。`.py` / `.sh` などのコードは見ない。
+#   - `.md` は解説文中に条文や URL を引用するのが正当なので、しきい値を高くしてある。
+#   - **フック自身が壊れても commit は通す**（fail-open）。検知したときだけ止める。
+#     ゲートが落ちて全社の commit が不能になる方が被害が大きい。
+#
+# バイパス（正当なケースは必ず出ます）
+#   1回だけ通す:   git commit --no-verify
+#   環境変数で通す: ALLOW_WHOLESALE_DATA=1 git commit -m "..."
+#   恒久的に外す:   git config --unset core.hooksPath
+#
+set -uo pipefail
+
+[ "${ALLOW_WHOLESALE_DATA:-0}" = "1" ] && exit 0
+
+# --- fail-open ガード ---------------------------------------------------------
+# 想定外のエラーで commit を止めないため、本体はサブシェルで動かして
+# 「検知(=2)」だけを不合格として扱う。それ以外の終了コードは通す。
+main() {
+  # 走査対象: 今回の commit で **新規に** index へ入るファイル（追加・コピー）
+  # NUL 区切りは $(...) では失われる（bash が NUL を捨てる）ため一時ファイルを経由する。
+  local list
+  list="$(mktemp -t precommit-wholesale)" || return 1
+  git diff --cached --name-only --diff-filter=AC -z >"$list" 2>/dev/null || { rm -f "$list"; return 1; }
+  if [ ! -s "$list" ]; then rm -f "$list"; return 0; fi
+
+  # 検知語。fixed string で数える。
+  local patterns=(
+    'netsea.jp/shop/'
+    '卸値'
+    '卸価格'
+    '卸価'
+    '仕入れ先:'
+    '仕入れ先：'
+    '仕入値'
+    '仕入れ値'
+  )
+
+  local hits=""
+  local f ext threshold pat n content
+
+  while IFS= read -r -d '' f; do
+    [ "$(basename "$f")" = ".gitignore" ] && continue
+    ext="$(printf '%s' "${f##*.}" | tr 'A-Z' 'a-z')"
+    case "$ext" in
+      csv|tsv|json|html|htm|xml|txt) threshold=1 ;;   # 行データ・その表示版。1件でも止める
+      md)                            threshold=6 ;;   # 解説文は見ない（下で行データ行だけに絞る）+ 表の引用も許す
+      *)                             continue    ;;   # コード・バイナリ等は見ない
+    esac
+
+    # ステージ済みの中身を読む（作業ツリーではなく index を見るのが正しい）。
+    # 巨大ファイルで固まらないよう先頭 4MB だけ。
+    content="$(git show ":$f" </dev/null 2>/dev/null | head -c 4194304)" || continue
+
+    # .md は「解説文」と「貼り付けた行データ」を区別する。
+    # この判定を入れないと、今回のような再発防止メモ（本文で「卸値」を10回書く）
+    # まで止まってしまい、運用が壊れる。行データらしい行だけに絞ってから数える。
+    #   行データらしい行 = Markdown 表の行（| で始まる）／カンマ区切りが3つ以上
+    # しきい値6は実測で決めた。既存の法務判定 E_ は「行データらしい行」に卸値が
+    # 5行出るが、これは正当な引用なので通す必要がある（実測値: E_=5, 他の .md=0）。
+    # 逆に .md へ行データを貼れば6行はすぐ超える。
+    # 限界: 5行以下の小さな貼り付けは .md では素通りする。.md は二次的な網であり、
+    # 一次防御は成果物フォルダのホワイトリスト .gitignore の方。
+    if [ "$ext" = "md" ]; then
+      content="$(printf '%s' "$content" | grep -E '^[[:space:]]*\||(,[^,]*){3,}' || true)"
+      [ -z "$content" ] && continue
+    fi
+
+    for pat in "${patterns[@]}"; do
+      n="$(printf '%s' "$content" | grep -F -c -- "$pat" 2>/dev/null || true)"
+      n="${n:-0}"
+      if [ "$n" -ge "$threshold" ]; then
+        hits="${hits}  - ${f}  … 「${pat}」を ${n} 行で検知（この拡張子のしきい値: ${threshold}）
+"
+        break
+      fi
+    done
+  done <"$list"
+  rm -f "$list"
+
+  [ -z "$hits" ] && return 0
+
+  cat >&2 <<'MSG1'
+
+╔══════════════════════════════════════════════════════════════════════════╗
+║  commit を中止しました — 卸値が PUBLIC リポに載ろうとしています          ║
+╚══════════════════════════════════════════════════════════════════════════╝
+
+新規に追跡対象へ追加されるファイルから、卸値らしい記載を検知しました。
+
+MSG1
+  printf '%s\n' "$hits" >&2
+  cat >&2 <<'MSG2'
+このリポジトリは PUBLIC で、30分ごとに自動 push されます（CLAUDE.md §6）。
+卸値は NETSEA の会員限定情報であり、公開は
+  ・NETSEA API 利用規約 第15条1項（秘密保持）
+  ・NETSEA バイヤー会員規約 第7条2項3号
+に抵触します。制裁は催告なしのアカウント停止です（仕入れ導線が消えます）。
+詳細: workspace/output/deliverables/T-20260904-004/E_NETSEAサプライヤー名の公開_法務判定.md
+
+【対処】
+  (a) そのファイルを追跡しない … 成果物フォルダの .gitignore はホワイトリスト
+      方式です。「!ファイル名」の行を足さなければ追跡されません。
+        git restore --staged "<ファイル>"
+  (b) 卸値の列を落としてから載せる（社名・商品名・JAN・URL は公開情報なのでOK）
+  (c) 誤検知だった場合はバイパスしてください:
+        git commit --no-verify
+        ALLOW_WHOLESALE_DATA=1 git commit -m "..."
+
+MSG2
+  return 2
+}
+
+main
+rc=$?
+if [ "$rc" -eq 2 ]; then
+  exit 1            # 検知 → commit 中止
+elif [ "$rc" -ne 0 ]; then
+  echo "pre-commit: 検査を完了できませんでした（rc=$rc）。commit は続行します。" >&2
+fi
+exit 0
