@@ -45,6 +45,11 @@ Amazon アカウント停止（T-20260826-004）の対応中、通知・返信�
 **返信先は `satoyselect@gmail.com`**（Cc 空）＝**コネクタでは自動検知できない**。以後の日次チェックは **ケース画面**と **`mail.google.com/mail/u/1/`** の両方を見ること。
 **撤退条件 2026-09-10（水）17:00。**成果物 `07`・`08`・カズヨ作成の転記版PDFはいずれも不使用。
 
+**【同日 16:56 受付の自動返信】** `Amazon Seller Support CA <seller.support06@amazon.ca>` / 件名 `Thank you for creating a new Case: 21912948521` が **`satoyselect@gmail.com`** へ着信。
+**本文だけが Amazon Business の売掛金（Pay by Invoice）定型文に化けている＝Amazon側のテンプレート取り違え。実害なし・返信しない。**
+ケース画面は Status = Work in progress、投稿本文も残存で正常受理を確認済み。
+→ **Amazonの自動返信は本文が別部署のテンプレートになることがある。件名のケースID・差出人・ケース画面Statusの3点で照合すること。**
+
 ---
 
 ## 2026-09-05

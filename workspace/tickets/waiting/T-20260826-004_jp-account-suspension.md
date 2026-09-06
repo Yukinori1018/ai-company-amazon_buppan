@@ -1525,3 +1525,26 @@ bash .claude/scripts/amazon-check-watchdog.sh --test-notify
 - ケース画面の「編集」から Cc に `satoyukinori1018@gmail.com` を追加すれば自動追跡が可能になる。**社長の可否確認中**
 
 **次の一手**：返信待ち。`next_check_at` を 2026-09-07 に設定。**撤退条件 2026-09-10（水）17:00**（無回答ならエスカレーション）。
+
+### 2026-09-06 16:56 ケース受付の自動返信あり。**本文はAmazon側のテンプレート取り違え（実害なし）**
+
+社長から「以下の文面のメールが来た」と共有。カズヨが Gmail（`satoyselect`）とケース画面の両方で実測確認。
+
+| 項目 | 実際の値 |
+|---|---|
+| 差出人 | **Amazon Seller Support CA `<seller.support06@amazon.ca>`** |
+| 件名 | **Thank you for creating a new Case: 21912948521** |
+| 受信 | 2026-09-06 16:56 → **`satoyselect@gmail.com`** |
+| 本文 | Amazon Business **Accounts Receivable / Pay by Invoice（請求書払いの入金明細）** の定型文（英仏併記） |
+| 末尾ID | `SPC-USAmazon-1372192758204160` |
+
+**判定：Amazon 側の自動返信テンプレートの取り違え。実害なし。**
+- **件名にケースID 21912948521 が入り、差出人が Seller Support CA** ＝ 我々のケースの受付通知で間違いない
+- ケース画面（`case-dashboard/view-case?caseID=21912948521`）も同時に確認 → **Status = Work in progress／本文は投稿した日本語のまま残存／Reply・Close this case ボタンあり**
+- したがって **却下でも管轄違いのたらい回しでもない。正常に受理されている**
+
+**対応：このメールには返信しない。**返信すると売掛金担当（`ca-ar-businessworkbench@email.amazon.com` 系）の窓口に流れ、本件と無関係な導線で滞留する。Amazon の実回答はケース画面と同アドレスに別途届く。
+
+**副産物：返信の宛先が `satoyselect@gmail.com` であることが実証された。**Gmail コネクタ（`satoyukinori1018` のみ）では自動検知できない。日次チェックは**ケース画面**と **`mail.google.com/mail/u/1/`** の両方を見ること（前項の運用注意を裏付け）。
+
+**教訓：Amazon の自動返信は本文が別部署のテンプレートに化けることがある。本文だけで「部署違い」「却下」と判断しない。件名のケースID・差出人ドメイン・ケース画面の Status の3点で照合する。**
