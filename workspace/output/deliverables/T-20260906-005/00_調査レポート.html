@@ -1,0 +1,116 @@
+<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>本丸メーカー第一陣20社 — T-20260906-005</title><style>
+body{font-family:-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif;line-height:1.75;
+max-width:1180px;margin:0 auto;padding:32px 20px;color:#1f2328;}
+h1{font-size:1.7em;border-bottom:3px solid #2f6f4f;padding-bottom:.3em}
+h2{font-size:1.25em;margin-top:2em;border-left:6px solid #2f6f4f;padding-left:.5em}
+h3{font-size:1.05em;color:#2f6f4f}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:.88em}
+th,td{border:1px solid #d0d7de;padding:7px 9px;vertical-align:top;text-align:left}
+th{background:#eef4f0;font-weight:600}
+tr:nth-child(even) td{background:#fafbfc}
+code{background:#f3f4f6;padding:1px 5px;border-radius:4px;font-size:.9em}
+a{color:#0969da;word-break:break-all}
+.wide table{font-size:.78em}
+hr{border:0;border-top:1px solid #d0d7de;margin:2em 0}
+ul,ol{margin:.2em 0 .2em 1.2em}
+</style></head><body><h1>本丸メーカー第一陣20社 — 調査レポート</h1>
+<p>T-20260906-005 / リサーチャー サトル / 2026-09-06</p>
+<p>対象：東京インターナショナル・ギフト・ショー 第102回 出展社リスト（2,353社・T-20260831-005 取得済み）</p>
+<hr>
+<h2>0. イシュー</h2>
+<p><strong>「ネット販売に疎い中小メーカー」のうち、社長が今週そのまま電話・フォームで連絡できるのは誰か。</strong></p>
+<p>Keepa は発見に使っていません。メーカーを先に確定させ、そのブランドが Amazon.co.jp に実在するかの<strong>検証</strong>だけに使いました（社長指示・2026-08-31）。</p>
+<h2>1. 結論</h2>
+<table><thead><tr><th>#</th><th>結論</th></tr></thead><tbody>
+<tr><td>1</td><td><strong>20社が通過しました。</strong>全社に TEL または問い合わせフォームの実URLが付いています。</td></tr>
+<tr><td>2</td><td><strong>深掘りした24社のうち4社を落としました。</strong>理由は個別に記載しています（水増しはしていません）。</td></tr>
+<tr><td>3</td><td><strong>20社中17社は、Amazon 上に自社ブランド名の商品が実在します</strong>（Keepa 実測・2026-09-06）。需要の裏取りが済んでいる状態です。</td></tr>
+<tr><td>4</td><td><strong>Amazon に不在なのは2社</strong>（側島製罐・本野はきもの工業）。本丸純度は最も高い一方、需要の裏取りができていません。</td></tr>
+<tr><td>5</td><td><strong>従業員数を一次情報で確認できたのは12社</strong>。残り8社は gBizINFO が欠測で「未取得」です。<strong>確認できた12社はすべて125人以下</strong>で、社長の目安300人を超える社は1社もありません。</td></tr>
+</tbody></table>
+<h2>2. 絞り込みの内訳（2,353社 → 20社）</h2>
+<h3>2-1. 機械分類（全件・スクリプト実行）</h3>
+<table><thead><tr><th>段階</th><th>件数</th><th>対2,353</th></tr></thead><tbody>
+<tr><td>出展社リスト（重複なし）</td><td>2,353</td><td>100%</td></tr>
+<tr><td>海外表記のため除外（国内から仕入れられない）</td><td>1,224</td><td>52.0%</td></tr>
+<tr><td>団体・商工会・自治体・教育機関のため除外（メーカーでない）</td><td>117</td><td>5.0%</td></tr>
+<tr><td>商社・代理店・デザイン事務所のため除外（メーカー直でない）</td><td>35</td><td>1.5%</td></tr>
+<tr><td>除外カテゴリ（版元／音楽／ゲーム）</td><td>1</td><td>0.0%</td></tr>
+<tr><td><strong>国内メーカー候補として残った母数</strong></td><td><strong>976</strong></td><td><strong>41.5%</strong></td></tr>
+</tbody></table>
+<p>再現：<code>workspace/output/agent_output/T-20260906-005/12_pool_classify.py</code> → <code>13_pool_class.csv</code></p>
+<h3>2-2. 法人特定（gBizINFO・実行中）</h3>
+<table><thead><tr><th>項目</th><th>実測</th></tr></thead><tbody>
+<tr><td>処理済（本レポート時点）</td><td>150社 / 1,211社</td></tr>
+<tr><td>商号が完全一致で1社に決まった</td><td>62社（41.3%）</td></tr>
+<tr><td>完全一致が複数（同名企業）</td><td>43社（28.7%）</td></tr>
+<tr><td>部分一致のみ／該当なし</td><td>45社（30.0%）</td></tr>
+</tbody></table>
+<p><strong>参考：</strong> 同じ手法を Amazon の manufacturer 名に当てた T-20260831-004 では法人特定率28.6%でした。出展社リストは<strong>商号そのもの</strong>が入っているため、<strong>41.3% と1.4倍</strong>に上がっています。展示会リストが Amazon 側データより名寄せに強いことの実測値です。</p>
+<h3>2-3. 深掘り24社の内訳</h3>
+<table><thead><tr><th>判定</th><th>社数</th></tr></thead><tbody>
+<tr><td>通過（20社リストへ）</td><td>20</td></tr>
+<tr><td>落選</td><td>4</td></tr>
+</tbody></table>
+<p>落選4社の理由は <code>02_落選メーカーと理由.csv</code> に社名・理由・参照URL付きで記載しています。</p>
+<h2>3. Amazon 取扱状況（Keepa 実測・2026-09-06）</h2>
+<table><thead><tr><th>判定</th><th>社数</th><th>意味</th></tr></thead><tbody>
+<tr><td>ブランド／製造元が一致（Amazon に実在）</td><td>17</td><td>需要の裏取り済み。ただし<strong>売っているのがメーカー本人か転売かは未調査</strong></td></tr>
+<tr><td>ヒット0件（Amazon 不在）</td><td>2</td><td>側島製罐・本野はきもの工業</td></tr>
+<tr><td>ヒットはあるがブランド一致なし</td><td>1</td><td>清水硝子（generic な「江戸切子」に当たっただけ。要目視）</td></tr>
+</tbody></table>
+<p>方法：Keepa <code>/search</code>（domain=5・type=product）に社名またはブランド名を1社1クエリ（10トークン）。</p>
+<p>消費トークン <strong>約220</strong>。T-20260906-003 の夜間ジョブと競合しないよう、全件照会は行っていません。</p>
+<p>再現：<code>workspace/output/agent_output/T-20260906-005/20_keepa_verify.py</code> → <code>21_keepa_verify.csv</code></p>
+<p><strong>この検証で言えないこと（未調査）</strong></p>
+<ul><li>出品者がメーカー本人か転売セラーか（<code>offers</code> パラメータが必要。トークン消費が跳ねるため今回は取得せず）</li></ul>
+<ul><li>T-20260906-002 の確定判定セット（観測回数ゲート → ドロップ数≧5 → BuyBox最終獲得日30日以内 → BuyBox不在率）は、<strong>SKU が決まってから</strong>でないと適用できません。今回はメーカー単位の調査のため未適用です。</li></ul>
+<h2>4. 事実と推測の分離</h2>
+<table><thead><tr><th>種別</th><th>内容</th></tr></thead><tbody>
+<tr><td><strong>事実（実測）</strong></td><td>20社の所在地・法人番号・TEL・フォームURL・Amazon ヒット数。すべて公式サイトまたは gBizINFO を直接取得して確認しました。</td></tr>
+<tr><td><strong>事実（実測）</strong></td><td>従業員数12社分。出典は gBizINFO の法人番号別ページか、公式会社概要ページのURLを列に記載しています。</td></tr>
+<tr><td><strong>未取得（推測でも該当なしでもない）</strong></td><td>従業員数8社分。gBizINFO の <code>employee_number</code> が欠測です。<strong>欠測は「小さい」という意味ではなく「分からない」です。</strong></td></tr>
+<tr><td><strong>推測</strong></td><td>「この社なら仕入れられそう」の判断そのもの。根拠列に書いたのは<strong>公開された取引導線の存在</strong>という事実であり、実際に取引に応じるかは接触するまで分かりません。確度は中。</td></tr>
+</tbody></table>
+<h2>5. 社長の判断が要る論点（ここから先はタケシ／社長の領分）</h2>
+<ol><li><strong>Amazon 不在2社（側島製罐・本野はきもの工業）を1件目に選ぶか。</strong>「競合ゼロ」と「需要ゼロ」は同じ数字に見えます（memory <code>owner_honmaru_ec_weak_makers</code>）。社長は「1件目は成功する気でやる」と明言済み（memory <code>feedback_first_purchase_must_expect_success</code>）ですので、この2社は<strong>独占の狙い目だが1件目には向かない</strong>という整理になります。</li></ol>
+<ol><li><strong>北尾化粧品部（化粧品）は薬機法と Amazon 出品制限の対象。</strong>着手するならハルオ（法務）の確認を先に入れる必要があります。</li></ol>
+<ol><li><strong>既に Amazon に転売セラーが乗っている社（北陸製菓など）</strong>は独占が取りにくい前提になります。</li></ol>
+<h2>6. 制約の遵守</h2>
+<ul><li><strong>メーカーへの連絡は一切行っていません。</strong>§4.1（第三者連絡）に該当するため、リスト化までで停止しています。</li></ul>
+<ul><li>産地組合データ（社内限定）は本成果物に含めていません。</li></ul>
+<h2>7. ファイル</h2>
+<table><thead><tr><th>ファイル</th><th>内容</th></tr></thead><tbody>
+<tr><td><code>01_第一陣20社リスト.csv</code></td><td>本体。1社1行・12列</td></tr>
+<tr><td><code>02_落選メーカーと理由.csv</code></td><td>落とした4社と理由</td></tr>
+<tr><td><code>00_調査レポート.md</code> / <code>.html</code></td><td>本レポート</td></tr>
+</tbody></table>
+<h2>付表A. 第一陣20社（本体）</h2>
+<div class="wide"><table><thead><tr><th>No</th><th>社名</th><th>所在地</th><th>従業員数</th><th>従業員数の出典URL</th><th>取扱カテゴリ</th><th>Amazon取扱状況(Keepa実測)</th><th>TEL</th><th>問い合わせ/取引フォームURL</th><th>仕入れられそうと言える根拠(1行)</th><th>根拠の出典URL</th><th>注意点</th></tr></thead><tbody>
+<tr><td>1</td><td>有限会社大橋量器（枡工房ますや）</td><td>岐阜県大垣市西外側町2-8</td><td>25名（公式・実測）</td><td><a href="https://www.masukoubou.jp/corporate.html" target="_blank">https://www.masukoubou.jp/corporate.html</a></td><td>木製枡・木製食器</td><td>自社ブランド「大橋量器」で14件ヒット・brand一致（2026-09-06）</td><td>0584-78-5468</td><td><a href="https://www.masukoubou.jp/contact/" target="_blank">https://www.masukoubou.jp/contact/</a></td><td>公式に法人向けノベルティ・名入れ記念品の受注窓口があり、見積り相談を公開フォームで受けている</td><td><a href="https://www.masukoubou.jp/corporate.html" target="_blank">https://www.masukoubou.jp/corporate.html</a></td><td>有限会社（＝小規模）。国産桧の枡は全国シェア上位の産地企業</td></tr>
+<tr><td>2</td><td>株式会社木村硝子店</td><td>東京都文京区湯島3-10-7</td><td>20名（公式）／18人（gBizINFO）</td><td><a href="https://info.gbiz.go.jp/hojin/ichiran?hojinBango=3010001002090" target="_blank">https://info.gbiz.go.jp/hojin/ichiran?hojinBango=3010001002090</a></td><td>業務用グラス・テーブルウェア</td><td>brand「木村硝子店」で20件ヒット・brand一致（2026-09-06）</td><td>03-3834-1781</td><td><a href="https://zizi.kimuraglass.jp/pages/company" target="_blank">https://zizi.kimuraglass.jp/pages/company</a></td><td>公式に「飲食店卸」の会員登録制度があり、卸取引の入口が制度として存在する</td><td><a href="https://zizi.kimuraglass.jp/pages/company" target="_blank">https://zizi.kimuraglass.jp/pages/company</a></td><td>卸会員の資格要件（法人/店舗限定か）は未確認。個人事業主可否は要問い合わせ</td></tr>
+<tr><td>3</td><td>楠橋紋織株式会社</td><td>愛媛県今治市宅間甲319</td><td>90名（公式）／87人（gBizINFO）</td><td><a href="https://info.gbiz.go.jp/hojin/ichiran?hojinBango=9500001011482" target="_blank">https://info.gbiz.go.jp/hojin/ichiran?hojinBango=9500001011482</a></td><td>今治タオル（タオルケット・バスタオル等）</td><td>brand「楠橋紋織(Kusubashi Mon Ori)」で20件ヒット・brand一致（2026-09-06）</td><td>未取得（公式会社概要にTEL記載なし）</td><td><a href="https://www.kusubashi.jp/pages/oem" target="_blank">https://www.kusubashi.jp/pages/oem</a></td><td>OEM・法人相談の専用ページを公式に設けており、他社ブランド製造が事業の主軸</td><td><a href="https://www.kusubashi.jp/pages/company" target="_blank">https://www.kusubashi.jp/pages/company</a></td><td>TELが公式に出ていない。初回接触はフォーム一択</td></tr>
+<tr><td>4</td><td>七福タオル株式会社</td><td>愛媛県今治市富田新港1-2-2</td><td>69人（gBizINFO）／74名（二次）</td><td><a href="https://info.gbiz.go.jp/hojin/ichiran?hojinBango=1500001012199" target="_blank">https://info.gbiz.go.jp/hojin/ichiran?hojinBango=1500001012199</a></td><td>今治タオル</td><td>brand「七福タオル」で20件ヒット・brand一致（2026-09-06）</td><td>0898-36-6020</td><td><a href="https://oem.shichifuku-towel.co.jp/" target="_blank">https://oem.shichifuku-towel.co.jp/</a></td><td>OEM受注専用サイトを別ドメインで運営しており、小口の別注を受ける体制が公開されている</td><td><a href="https://oem.shichifuku-towel.co.jp/" target="_blank">https://oem.shichifuku-towel.co.jp/</a></td><td>自社ブランド直販へ移行中との報道あり。卸条件は要確認</td></tr>
+<tr><td>5</td><td>金野タオル株式会社</td><td>大阪府泉佐野市羽倉崎1-5-31</td><td>未取得（gBizINFO 欠測）</td><td><a href="https://info.gbiz.go.jp/hojin/ichiran?hojinBango=6120101039548" target="_blank">https://info.gbiz.go.jp/hojin/ichiran?hojinBango=6120101039548</a></td><td>泉州タオル</td><td>brand「金野タオル」で20件ヒット・brand一致（2026-09-06）</td><td>072-462-3801</td><td><a href="https://www.kinno.co.jp/contact.html" target="_blank">https://www.kinno.co.jp/contact.html</a></td><td>公式に「OEM承ります」ページがあり、織機36台・インクジェット3台の自社設備を明示している</td><td><a href="https://www.kinno.co.jp/oem.html" target="_blank">https://www.kinno.co.jp/oem.html</a></td><td>従業員数を一次情報で取れていない（gBizINFO 欠測）</td></tr>
+<tr><td>6</td><td>株式会社北尾化粧品部</td><td>大阪府大阪市生野区中川西1-2-20</td><td>21人（gBizINFO）／25人（二次）</td><td><a href="https://info.gbiz.go.jp/hojin/ichiran?hojinBango=8120001017255" target="_blank">https://info.gbiz.go.jp/hojin/ichiran?hojinBango=8120001017255</a></td><td>化粧品（製造・卸）</td><td>brand「北尾化粧品部」で4件ヒット・brand一致（2026-09-06）</td><td>06-6717-0881</td><td><a href="http://kitao.co.jp/contact/" target="_blank">http://kitao.co.jp/contact/</a></td><td>会社名のとおり化粧品の製造かつ卸が本業で、OEMの記載もある＝卸取引が前提の会社</td><td><a href="http://kitao.co.jp/company/about/" target="_blank">http://kitao.co.jp/company/about/</a></td><td>化粧品は薬機法と Amazon の出品制限（要ゲート解除）の対象。着手前に法務確認が要る</td></tr>
+<tr><td>7</td><td>株式会社高柳製茶</td><td>静岡県牧之原市勝田2310-4</td><td>25人（gBizINFO）</td><td><a href="https://info.gbiz.go.jp/hojin/ichiran?hojinBango=4080001013832" target="_blank">https://info.gbiz.go.jp/hojin/ichiran?hojinBango=4080001013832</a></td><td>日本茶（製造・販売）</td><td>brand「株式会社 高柳製茶」で20件ヒット・brand一致（2026-09-06）</td><td>0548-27-2324</td><td><a href="https://www.makinohara-cha.com/inquiry/" target="_blank">https://www.makinohara-cha.com/inquiry/</a></td><td>公式サイトに「法人のお客様」向けの記載があり、問い合わせフォームが独立して用意されている</td><td><a href="https://www.makinohara-cha.com/c_6/" target="_blank">https://www.makinohara-cha.com/c_6/</a></td><td>茶葉は賞味期限管理あり。FBA 納品時の期限規定に注意</td></tr>
+<tr><td>8</td><td>北陸製菓株式会社（hokka）</td><td>石川県金沢市押野2-290-1</td><td>125人（gBizINFO）</td><td><a href="https://info.gbiz.go.jp/hojin/ichiran?hojinBango=5220001006317" target="_blank">https://info.gbiz.go.jp/hojin/ichiran?hojinBango=5220001006317</a></td><td>菓子（ビスケット・かんぱん・あられ）</td><td>brand「北陸製菓」で20件ヒット・brand一致。上位に他セラーのブランド表記（スナッチー）も混在（2026-09-06）</td><td>未取得（本社代表番号を一次情報で確認できず）</td><td><a href="https://oem.hokka.jp/" target="_blank">https://oem.hokka.jp/</a></td><td>OEM製造の専用サイトを公式に運営しており、少量のノベルティ菓子まで受ける旨を公開している</td><td><a href="https://oem.hokka.jp/" target="_blank">https://oem.hokka.jp/</a></td><td>Amazon 上に既に転売系セラーの出品が混在。独占は取りにくい前提で見る必要あり</td></tr>
+<tr><td>9</td><td>株式会社宇野刷毛ブラシ製作所</td><td>東京都墨田区向島3-1-5</td><td>未取得（gBizINFO 欠測・公式非掲載）</td><td><a href="https://info.gbiz.go.jp/hojin/ichiran?hojinBango=6010601047549" target="_blank">https://info.gbiz.go.jp/hojin/ichiran?hojinBango=6010601047549</a></td><td>刷毛・ブラシ（東京手植ブラシ）</td><td>manufacturer「株式会社　宇野刷毛ブラシ製作所」で20件ヒット・製造元一致（2026-09-06）</td><td>03-3622-9078</td><td><a href="https://unobrush.jp/contact" target="_blank">https://unobrush.jp/contact</a></td><td>公式に「企画・設計から製造まで一貫して引き受ける」と明記し、産業用まで受注している＝受注生産の窓口が開いている</td><td><a href="https://unobrush.jp/about/" target="_blank">https://unobrush.jp/about/</a></td><td>従業員数が一次情報で取れない。報道では三代目母子中心の小規模工房</td></tr>
+<tr><td>10</td><td>廣田硝子株式会社</td><td>東京都墨田区錦糸2-6-5</td><td>未取得（gBizINFO 欠測）</td><td><a href="https://info.gbiz.go.jp/hojin/ichiran?hojinBango=8010601014308" target="_blank">https://info.gbiz.go.jp/hojin/ichiran?hojinBango=8010601014308</a></td><td>江戸切子・吹き硝子などのガラス器</td><td>brand「廣田硝子(Hirota Glass)」で20件ヒット・brand一致（2026-09-06）</td><td>03-3623-4145</td><td><a href="https://hirota-glass.co.jp/contact/" target="_blank">https://hirota-glass.co.jp/contact/</a></td><td>日本金属ハウスウェア工業組合に「陶磁器・ガラス器卸売業」として登録されており、取扱品目800点規模＝卸が本業</td><td><a href="https://houseware.jp/company/35/" target="_blank">https://houseware.jp/company/35/</a></td><td>従業員数が一次情報で取れない</td></tr>
+<tr><td>11</td><td>守田漆器株式会社</td><td>石川県加賀市山中温泉上原町ワ528</td><td>未取得（gBizINFO 欠測）</td><td><a href="https://info.gbiz.go.jp/hojin/ichiran?hojinBango=8220001013599" target="_blank">https://info.gbiz.go.jp/hojin/ichiran?hojinBango=8220001013599</a></td><td>山中漆器（漆器・漆塗商品）</td><td>manufacturer「守田漆器」で20件ヒット・製造元一致（2026-09-06）</td><td>0761-78-0106</td><td><a href="https://urusi.jp/contact/" target="_blank">https://urusi.jp/contact/</a></td><td>公式サイトに「法人のお客様」「お取引」の導線があり、事業内容に卸売が明記されている</td><td><a href="https://urusi.jp/contact/" target="_blank">https://urusi.jp/contact/</a></td><td>検索結果には 0761-87-0106 とあるが、公式サイト実測は 0761-78-0106。公式を採用</td></tr>
+<tr><td>12</td><td>池本刷子工業株式会社</td><td>大阪府東大阪市玉串町西1-3-27</td><td>未取得（gBizINFO 欠測）／55人（二次）</td><td><a href="https://info.gbiz.go.jp/hojin/ichiran?hojinBango=7122001000274" target="_blank">https://info.gbiz.go.jp/hojin/ichiran?hojinBango=7122001000274</a></td><td>ヘアブラシ・化粧用具</td><td>brand「池本刷子工業(Ikemoto Brush)」で20件ヒット・brand一致（2026-09-06）</td><td>072-964-2331（本社工場）／03-3664-5330（東京）</td><td><a href="http://www.ikemoto-brush.co.jp/contact/" target="_blank">http://www.ikemoto-brush.co.jp/contact/</a></td><td>公式サイト内に卸の記載があり、東京にも営業拠点を置いて取引先を持つ体制がある</td><td><a href="http://www.ikemoto-brush.co.jp/about/" target="_blank">http://www.ikemoto-brush.co.jp/about/</a></td><td>従業員数は転職媒体（二次）のみ。一次情報では未取得</td></tr>
+<tr><td>13</td><td>木内籐材工業株式会社</td><td>東京都文京区千石4-40-24</td><td>未取得（gBizINFO 欠測）</td><td><a href="https://info.gbiz.go.jp/hojin/ichiran?hojinBango=4010001001991" target="_blank">https://info.gbiz.go.jp/hojin/ichiran?hojinBango=4010001001991</a></td><td>籐（ラタン）製品・籐うちわ・敷物</td><td>manufacturer「木内籐材工業株式会社」で14件ヒット・製造元一致（2026-09-06）</td><td>03-3941-4484</td><td><a href="https://www.kiuchi-tohzai.co.jp/original8.html" target="_blank">https://www.kiuchi-tohzai.co.jp/original8.html</a></td><td>公式に「籐製品の製造および卸」と事業内容を明記し、旅館・ゴルフ場へ納入実績がある</td><td><a href="https://www.kiuchi-tohzai.co.jp/original8.html" target="_blank">https://www.kiuchi-tohzai.co.jp/original8.html</a></td><td>問い合わせがログイン方式のフォーム。電話が実質の入口</td></tr>
+<tr><td>14</td><td>朝倉染布株式会社</td><td>群馬県桐生市浜松町1-13-24</td><td>95人（gBizINFO）</td><td><a href="https://info.gbiz.go.jp/hojin/ichiran?hojinBango=1070001015535" target="_blank">https://info.gbiz.go.jp/hojin/ichiran?hojinBango=1070001015535</a></td><td>超撥水加工品（風呂敷等）・合成繊維の染色整理加工</td><td>brand「朝倉染布」で20件ヒット・brand一致（2026-09-06）</td><td>0277-44-3171（二次）</td><td><a href="https://www.asakura-senpu.co.jp/qa-contact/" target="_blank">https://www.asakura-senpu.co.jp/qa-contact/</a></td><td>自社ブランド商品（スーパーはっ水風呂敷）を持ちつつ本業が受託加工＝BtoB取引が日常業務</td><td><a href="https://www.asakura-senpu.co.jp/company/company-profile/" target="_blank">https://www.asakura-senpu.co.jp/company/company-profile/</a></td><td>TELは公式ページから機械抽出できず二次情報。フォームが確実</td></tr>
+<tr><td>15</td><td>河野製紙株式会社</td><td>高知県高知市下島町71</td><td>123人（gBizINFO）</td><td><a href="https://info.gbiz.go.jp/hojin/ichiran?hojinBango=9490001001015" target="_blank">https://info.gbiz.go.jp/hojin/ichiran?hojinBango=9490001001015</a></td><td>ティッシュ・トイレットペーパー・保湿ペーパー</td><td>brand「河野製紙」で20件ヒット・brand一致（2026-09-06）</td><td>088-822-3107</td><td><a href="https://www.kawano-p.co.jp/contact/" target="_blank">https://www.kawano-p.co.jp/contact/</a></td><td>公式サイトに別注の記載があり、保湿ティッシュの特許を持つ自社ブランドメーカー</td><td><a href="https://www.kawano-p.co.jp/about/profile/" target="_blank">https://www.kawano-p.co.jp/about/profile/</a></td><td>20社中で最大規模。直接取引の通りやすさは他より低い可能性</td></tr>
+<tr><td>16</td><td>株式会社清水硝子</td><td>東京都葛飾区堀切4-64-7</td><td>6人（gBizINFO）</td><td><a href="https://info.gbiz.go.jp/hojin/ichiran?hojinBango=9011801002134" target="_blank">https://info.gbiz.go.jp/hojin/ichiran?hojinBango=9011801002134</a></td><td>江戸切子・カットグラス</td><td>「清水硝子 江戸切子」で20件ヒットだが一致は generic な brand「江戸切子」。自社ブランドの存在は要目視（2026-09-06）</td><td>未取得</td><td><a href="https://shimizuglass.com/contact_corp/" target="_blank">https://shimizuglass.com/contact_corp/</a></td><td>公式サイトに法人専用の問い合わせフォーム（contact_corp）が個人用と別に用意されている</td><td><a href="https://shimizuglass.com/contact_corp/" target="_blank">https://shimizuglass.com/contact_corp/</a></td><td>Amazon 上の取扱いが未確定。需要の裏取りが 20社中もっとも弱い</td></tr>
+<tr><td>17</td><td>小野甚味噌醤油醸造株式会社</td><td>京都府京丹後市峰山町杉谷300</td><td>未取得（gBizINFO 欠測）</td><td><a href="https://info.gbiz.go.jp/hojin/ichiran?hojinBango=2130001042654" target="_blank">https://info.gbiz.go.jp/hojin/ichiran?hojinBango=2130001042654</a></td><td>醤油・味噌（天然醸造）</td><td>brand「小野甚味噌醤油醸造」で20件ヒット・brand一致（2026-09-06）</td><td>0772-62-0476</td><td>公式サイト未特定（日本醤油協会・京丹後ナビの掲載で連絡先を確認）</td><td>既に Amazon に自社ブランド名の商品が並んでおり、卸経由の流通が現に成立している</td><td><a href="https://www.soysauce.or.jp/manuf/%E5%B0%8F%E9%87%8E%E7%94%9A%E5%91%B3%E5%99%8C%E9%86%A4%E6%B2%B9%E9%86%B8%E9%80%A0%E6%A0%AA%E5%BC%8F%E4%BC%9A%E7%A4%BE" target="_blank">https://www.soysauce.or.jp/manuf/%E5%B0%8F%E9%87%8E%E7%94%9A%E5%91%B3%E5%99%8C%E9%86%A4%E6%B2%B9%E9%86%B8%E9%80%A0%E6%A0%AA%E5%BC%8F%E4%BC%9A%E7%A4%BE</a></td><td>公式サイトを特定できず。TELは二次情報2件が一致（要一次確認）</td></tr>
+<tr><td>18</td><td>側島製罐株式会社</td><td>愛知県名古屋市中村区名駅南2-13-18（登記）／工場：海部郡大治町</td><td>40人（gBizINFO）／45名（公式・2024-09）</td><td><a href="https://info.gbiz.go.jp/hojin/ichiran?hojinBango=3180001030950" target="_blank">https://info.gbiz.go.jp/hojin/ichiran?hojinBango=3180001030950</a></td><td>ブリキ缶・スチール缶（自社D2Cブランドあり）</td><td>「側島製罐」「SOBAJIMA 缶」の2クエリともブランド一致0件＝Amazon 不在（2026-09-06）</td><td>052-442-5111</td><td><a href="https://sobajima.jp/sobajima-contact" target="_blank">https://sobajima.jp/sobajima-contact</a></td><td>自社 EC（BASE）で D2C 商品を直販しているのに Amazon には出ていない＝販路として空いている</td><td><a href="https://sobajima.jp/company/" target="_blank">https://sobajima.jp/company/</a></td><td>Amazon 不在は「独占余地」と「需要ゼロ」の両方に見える。1件目に選ぶなら需要検証が別途必要</td></tr>
+<tr><td>19</td><td>本野はきもの工業</td><td>大分県日田市</td><td>4人（二次・公式紹介記事）</td><td><a href="https://motono-hakimono.com/about" target="_blank">https://motono-hakimono.com/about</a></td><td>下駄（日田下駄）</td><td>「本野はきもの」でヒット0件＝Amazon 不在（2026-09-06）</td><td>0973-22-4460</td><td><a href="https://motono-hakimono.com/contact" target="_blank">https://motono-hakimono.com/contact</a></td><td>生産から販売まで自社工房で一貫、直売所も持つ＝仲介なしで直接話せる相手</td><td><a href="https://motono-hakimono.com/about" target="_blank">https://motono-hakimono.com/about</a></td><td>gBizINFO に該当法人なし＝個人事業の可能性。『相手が個人事業』であって『当方が個人事業主だから不可』ではない</td></tr>
+<tr><td>20</td><td>田中帽子店（窓口：有限会社ビスポーク）</td><td>埼玉県春日部市（製造）／さいたま市西区（窓口）</td><td>未取得</td><td><a href="https://tanaka-hat.jp/fs/tanakahat/c/company" target="_blank">https://tanaka-hat.jp/fs/tanakahat/c/company</a></td><td>麦わら帽子・天然素材帽子</td><td>brand「田中帽子店」で20件ヒット・brand一致（2026-09-06）</td><td>048-940-8829</td><td><a href="https://tanaka-hat.jp/fs/tanakahat/c/company" target="_blank">https://tanaka-hat.jp/fs/tanakahat/c/company</a></td><td>公式サイトが問い合わせ窓口を代理店（有）ビスポークと明記＝取次の窓口が公開されている</td><td><a href="https://tanaka-hat.jp/fs/tanakahat/c/company" target="_blank">https://tanaka-hat.jp/fs/tanakahat/c/company</a></td><td>メーカー直ではなく代理店経由。独占交渉の相手としては一段遠い</td></tr>
+</tbody></table></div>
+<h2>付表B. 落選4社と理由</h2><table><thead><tr><th>社名</th><th>所在地</th><th>落とした理由</th><th>参照URL</th></tr></thead><tbody>
+<tr><td>森井紙器工業株式会社</td><td>新潟県燕市</td><td>段ボール・パッケージのBtoB資材。Amazon で売る完成品がない</td><td><a href="https://www.morii-group.co.jp/company/outline/" target="_blank">https://www.morii-group.co.jp/company/outline/</a></td></tr>
+<tr><td>亀﨑染工有限会社</td><td>鹿児島県いちき串木野市</td><td>のぼり・大漁旗の受注生産。Keepa 6件ヒットもブランド一致なしで、Amazon 向け完成品を確認できない</td><td><a href="https://kamesome.co.jp/" target="_blank">https://kamesome.co.jp/</a></td></tr>
+<tr><td>株式会社松尾陶器</td><td>長崎県（推定）</td><td>商号を gBizINFO でも公式サイトでも特定できず、連絡先が書けない</td><td></td></tr>
+<tr><td>敷島産業株式会社</td><td>不明</td><td>検索で一次情報に到達できず（同名多数）。所在地も連絡先も確定できない</td><td></td></tr>
+</tbody></table></body></html>
