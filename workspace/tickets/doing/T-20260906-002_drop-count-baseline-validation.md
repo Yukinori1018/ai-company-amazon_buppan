@@ -2,7 +2,7 @@
 ticket_id: T-20260906-002
 title: ドロップ数は実売を測れているか — ランク帯別ベースラインの実測と S5 フィルタの再設計
 status: doing
-assignee: it-engineer
+assignee: it_engineer
 priority: high
 created_at: 2026-09-06
 updated_at: 2026-09-06

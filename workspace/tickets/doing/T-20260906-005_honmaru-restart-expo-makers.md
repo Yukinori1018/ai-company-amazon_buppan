@@ -9,7 +9,7 @@ updated_at: 2026-09-06
 next_check_at: 2026-09-07
 requires_approval: false
 labels: [maker-shiire, honmaru, expo, list-quality]
-related_tickets: [T-20260831-004, T-20260831-005, T-20260906-004, T-20260906-003]
+related_tickets: [T-20260831-004, T-20260831-005, T-20260906-006, T-20260906-003]
 ---
 
 ## 背景（社長・2026-09-06）

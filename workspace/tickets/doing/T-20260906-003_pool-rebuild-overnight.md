@@ -2,7 +2,7 @@
 ticket_id: T-20260906-003
 title: 母数26,942件を新条件で引き直す（夜間自走・中断復帰前提）
 status: doing
-assignee: it-engineer
+assignee: it_engineer
 priority: high
 created_at: 2026-09-06
 updated_at: 2026-09-06
