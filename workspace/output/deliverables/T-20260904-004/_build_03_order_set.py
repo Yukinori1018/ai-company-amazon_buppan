@@ -138,6 +138,14 @@ CHECKS = [
 for label, got, want in CHECKS:
     if got != want:
         raise SystemExit(f"検算に失敗: {label} = {got}（社長決定の値は {want}）。CSV が入れ替わっている可能性があります")
+def asins(rs):
+    return [r["ASIN"] for r in rs]
+
+
+TOPN = len(B1) // 2
+if asins(B1)[0::2] != asins(A1)[:TOPN] or asins(B1)[1::2] != asins(A2)[:TOPN]:
+    raise SystemExit("検算に失敗: B1 の構成が『A1 の上位%d + A2 の上位%d』ではありません" % (TOPN, TOPN))
+
 used = sorted({r["★中古品表記の有無"] for r in rows})
 if used != ["該当なし"]:
     raise SystemExit(f"検算に失敗: 中古品表記の値が『該当なし』以外を含みます: {used}")
@@ -169,8 +177,8 @@ def sku_rows(rs, n0=1):
             f'<span class="sub">{esc(r["★仕入れ口数"])}口 / {esc(r["★出品可能数(Amazon単位)"])}個</span></td>'
             f'<td class="num"><strong>{yen(r["★このSKUの見込み粗利"])}</strong></td></tr>'
             f'<tr class="noterow"><td></td><td colspan="6">{" ／ ".join(note)}'
-            f'<div class="chk">リスク判定: {esc(r["★リスク判定"])}</div>'
-            f'<div class="chk"><strong>発注前に必ず確認: {esc(r["発注前に必ず確認"])}</strong></div>'
+            f'<div class="nk">リスク判定: {esc(r["★リスク判定"])}</div>'
+            f'<div class="nk"><strong>発注前に必ず確認: {esc(r["発注前に必ず確認"])}</strong></div>'
             f'<div class="src">発注 {link(r["発注先URL"])} ／ '
             f'{link(r["Amazonページ"], "Amazon")} ／ {link(r["Keepaリンク"], "Keepa")}</div>'
             f'</td></tr>')
@@ -184,12 +192,12 @@ SKU_HEAD = """<thead><tr>
 
 
 def supplier_block(name, amount, fee, line, s, rs, start):
-    freeline = f'{int(line):,}円以上で無料' if line.isdigit() else "段階設定なし"
     return f"""
 <h3>{esc(name)} ─ {len(rs)}SKU / {amount:,}円（送料 {fee:,}円）</h3>
 <table class="kv"><tbody>
 <tr><th>NETSEA 店舗ページ</th><td>{link(s["NETSEA店舗ページ"])}</td></tr>
-<tr><th>送料の段階</th><td>{esc(s["送料の段階"])}（{freeline}）</td></tr>
+<tr><th>この社への注文額</th><td>{amount:,}円 → <strong>送料 {fee:,}円</strong></td></tr>
+<tr><th>送料の段階</th><td>{esc(s["送料の段階"])}</td></tr>
 <tr><th>送料の出所</th><td>{esc(s["送料の出所"])}</td></tr>
 </tbody></table>
 <div class="tw" tabindex="0"><table class="skutbl">{SKU_HEAD}<tbody>
@@ -309,7 +317,8 @@ table.slim thead th{white-space:normal;}
 tbody tr.noterow td{word-break:break-word; font-size:13px; line-height:1.75; color:var(--muted);
   padding-top:0; border-bottom:2px solid var(--border-strong);}
 tbody tr.noterow{background:transparent!important;}
-tbody tr.noterow .chk{margin-top:.3em;}
+/* .chk は基本CSSの「nowrap のバッジ」。段落に使うと紙幅を超えるので独自クラスにする */
+tbody tr.noterow .nk{margin-top:.35em;}
 tbody tr.totalrow td{font-weight:700; background:var(--surface2); border-top:2px solid var(--border-strong);}
 tbody tr.adopted td{background:var(--ok-bg);}
 tbody tr.adopted td:first-child{box-shadow:inset 4px 0 0 var(--ok);}
@@ -319,24 +328,30 @@ tbody tr.adopted td:first-child{box-shadow:inset 4px 0 0 var(--ok);}
 .grand td{padding:6px 0; border:0;}
 .grand td:last-child{text-align:right; font-weight:700; font-variant-numeric:tabular-nums;}
 .grand .big td{font-size:20px; padding-top:12px; border-top:2px solid var(--accent);}
-.chk{font-size:13px;}
+.nk{font-size:13px; line-height:1.7;}
 h1.part{scroll-margin-top:10px;}
 @media print{
-  /* 印刷は table-layout:auto に戻るので min-width を残すと紙幅を超え、
-     .tw{overflow:hidden} で黙って切れる（画面では気づけない） */
-  table.skutbl,table.slim{min-width:0; table-layout:auto;}
-  table.skutbl th:nth-child(n),table.skutbl td:nth-child(n),
-  table.slim th:nth-child(n),table.slim td:nth-child(n){width:auto;}
-  /* .num の nowrap が7列ぶん積み上がると紙幅を超える。印刷では折り返しを許す */
+  /* 印刷は table-layout:auto に戻る。auto のままだと最小内容幅が紙幅を超え、
+     .tw{overflow:hidden} で右端が黙って切れる（画面では気づけない）。
+     fixed + 百分率に固定すると、表幅は必ず紙幅に一致する */
+  table.skutbl,table.slim{table-layout:fixed; width:100%; min-width:0;}
+  table.skutbl th:first-child,table.skutbl td:first-child,
+  table.slim th:first-child,table.slim td:first-child{min-width:0;}
+  table.skutbl th:nth-child(1),table.skutbl td:nth-child(1){width:4%;}
+  table.skutbl th:nth-child(2),table.skutbl td:nth-child(2){width:34%;}
+  table.skutbl th:nth-child(3),table.skutbl td:nth-child(3){width:13%;}
+  table.skutbl th:nth-child(4),table.skutbl td:nth-child(4){width:12%;}
+  table.skutbl th:nth-child(5),table.skutbl td:nth-child(5){width:12%;}
+  table.skutbl th:nth-child(6),table.skutbl td:nth-child(6){width:13%;}
+  table.skutbl th:nth-child(7),table.skutbl td:nth-child(7){width:12%;}
+  table.slim th:nth-child(1),table.slim td:nth-child(1){width:40%;}
+  table.slim th:nth-child(n+2),table.slim td:nth-child(n+2){width:15%;}
   table.skutbl .num,table.slim .num{white-space:normal;}
   table.skutbl{font-size:7.8pt;}
   table.skutbl thead th{overflow-wrap:anywhere;}
   table.skutbl .ct{border:0; padding:0 .2em 0 0;}
-  /* 基本CSSの td:first-child{min-width:7.5em} が「#」列に効いて紙幅を押し広げる */
-  table.skutbl th:first-child,table.skutbl td:first-child,
-  table.slim th:first-child,table.slim td:first-child{min-width:0;}
-  table.skutbl .sub,table.slim .sub{overflow-wrap:anywhere;}
   table.skutbl tbody td,table.skutbl thead th{padding:5px 4px;}
+  table.skutbl .sub,table.slim .sub{overflow-wrap:anywhere;}
   .warnbox{border:3pt solid #000; border-left:6pt solid #000; background:#fff;}
   .note,.grand{background:#fff; border-color:#000;}
   .grand{border:2pt solid #000;}
@@ -418,9 +433,8 @@ B1 は2社2系統に割れているので、片方が出品できなくても片
 {compare}
 </tbody></table></div>
 <p class="note"><strong>A1 を蹴った理由は粗利ではありません。</strong>{len(A1)}SKU が同一ブランド1社に集中しているためです。
-<strong>A2 を蹴った理由も粗利ではありません。</strong>1社完結で、同じく分散が効きません
-（結果として粗利も {isum(A2, "★このSKUの見込み粗利"):,}円と最も小さくなります）。
-なお B1 の {len(B1)}SKU は A1・A2 から選び直したものではなく、同じ32SKUの母集団から2社に割り付け直したものです。</p>
+A2 も1社完結で、同じく分散が効きません（粗利も {isum(A2, "★このSKUの見込み粗利"):,}円と3案で最小です）。
+<strong>B1 は、A1 の上位{TOPN}SKU と A2 の上位{TOPN}SKU を組み合わせたものです</strong>（この対応はデータ上で確認しています）。</p>
 
 <h3>A1 ─ 1社完結・{len(A1)}SKU・{isum(A1, "★仕入れ額(税込)"):,}円</h3>
 <div class="tw" tabindex="0"><table class="slim">{SLIM_HEAD}<tbody>{slim_rows(A1)}</tbody></table></div>
@@ -439,8 +453,9 @@ B1 は2社2系統に割れているので、片方が出品できなくても片
 <h3>1. 出品制限（ゲート）が1件も確認できていない</h3>
 <p>セラーセントラルにログインできないためです（アカウントは3か国とも停止中 / T-20260826-004）。
 リスク判定の4軸のうち、許認可・危険物・知財の3軸は当てましたが、<strong>ゲート軸だけが未判定</strong>です。</p>
-<p><strong>復旧後、発注前に、候補{len(rows)}行すべてをセラーセントラルの「商品登録」で実機確認してください。</strong>
-出品できないブランドを仕入れると、在庫が1点も売れないまま残ります。</p>
+<p><strong>復旧後、発注前に、まず発注する{len(B1)}SKU をセラーセントラルの「商品登録」で実機確認してください。</strong>
+出品できないブランドを仕入れると、在庫が1点も売れないまま残ります。
+閉じていた時に差し替えられるよう、候補{len(rows)}行すべてを見ておくのが安全です。</p>
 <p class="why">候補は全行が<strong>ブランド判定 B（要実機確認）</strong>です。ブランド名は Amazon 側に登録済みで、
 ゲートが開いているかどうかだけが不明という状態です。</p>
 
@@ -536,7 +551,7 @@ Tier B（それ以外）は残し、全SKUに「ゲート未確認」の印を�
 <h1 class="part" id="p6">第6部 この資料の限界</h1>
 
 <section class="sec sec-box sec-alert">
-<h2>信じてよい範囲</h2>
+<h2>まだ確定していない6点</h2>
 <ol>
 <li><strong>出品制限（ゲート）は未確認です。</strong>セラーセントラルにログインできないためで、ログイン後に埋まります（第2部）</li>
 <li><strong>中古かどうかの判定は、機械によるテキスト判定までです。</strong>画像と「販売条件」タブは読んでいません（第2部）</li>

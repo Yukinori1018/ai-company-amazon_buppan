@@ -50,6 +50,13 @@ def personal(r):
     return "個人事業主の疑い" in r["備考"]
 
 
+def notice_cell(r):
+    """optout_notice_status をそのまま出す。『未取得』は未確認であって『表示なし』ではない。"""
+    v = r["optout_notice_status"]
+    cls = {"注記あり": "pill-warn", "確認済み_表示なし": "pill-ok", "未取得": "pill-muted"}.get(v, "pill-info")
+    return f'<span class="pill {cls}">{H.escape(v or "（記録なし）")}</span>' if v else '<span class="na">—</span>'
+
+
 def signal_cell(r):
     v = r["取引可否シグナル"]
     if not v:
@@ -117,6 +124,7 @@ def card(r, highlight=False):
         kv("公式HP", link(r["公式HP"])),
         kv("Amazon で当社が見つけた商品", f'{H.escape(r["該当商品数"])}件 ／ 代表: {txt(r["代表商品名"])}'),
         kv("想定仕入れ ⇢ Amazon（中央値）", f'{yen(r["想定仕入れ金額の中央値"])} ⇢ {yen(r["Amazon価格の中央値"])}'),
+        kv("お断り表示の確認", notice_cell(r)),
         kv("公式サイトの表示（判定の根拠）", txt(r["form_optout_notice"]) or '<span class="na">—</span>'),
         kv("表示を確認したページ", link(r["optout_source_url"])),
         kv("備考（調査時のメモ・原文）", txt(r["備考"])),
@@ -152,6 +160,7 @@ def list_rows(rs):
             note.append(H.escape(" ".join(x for x in [r["正式商号"], r["所在地"]] if x)))
         if r["法人番号"]:
             note.append("法人番号 " + H.escape(r["法人番号"]))
+        note.append("お断り表示の確認: " + notice_cell(r))
         if r["form_optout_notice"]:
             note.append("公式サイトの表示: " + txt(r["form_optout_notice"]))
         note.append("Amazon で見つけた商品の代表: " + txt(r["代表商品名"]))
@@ -335,6 +344,12 @@ if masked:
     masked_txt = (f"個人事業主の疑いがあると記録された社（{H.escape(names)}）の電話・所在地は、"
                   f"本リポジトリが公開であるため本ページでは伏せています（CSV 側には値が残っています）。")
 
+# お断り表示を「実際に確認したか」の内訳。
+# 打診可能社数を単独で読ませないため、区分表とセットで必ず出す（CSV 1行目の法務注記の指示）。
+ok_rows = aplus + plain
+checked = [r for r in ok_rows if r["optout_notice_status"] in ("注記あり", "確認済み_表示なし")]
+unknown = [r for r in ok_rows if r["optout_notice_status"] == "未取得"]
+
 count_tbl = f"""<div class="tw" tabindex="0"><table><thead><tr>
 <th>区分</th><th>社数</th><th>この資料での扱い</th></tr></thead><tbody>
 <tr><td>A_PLUS</td><td class="num">{len(aplus)}</td><td>OEM・小ロット・B2B窓口のいずれかを公式サイトに明示している社。先頭にカードで置いた。ここから打診する</td></tr>
@@ -363,13 +378,16 @@ doc = f"""<!DOCTYPE html>
 <p class="why">貼った瞬間に特定電子メール法2条2号の「広告宣伝ウェブサイトへの誘導」に該当し、相手の「営業お断り」表示が法的効力を持ちます。白が黒に転ぶ唯一の分岐点です。<br>
 （特定電子メール法＝広告・宣伝目的のメールを規制する法律。URL を貼ると「広告メール」に分類され、相手が拒否している場合は違法になり得ます）</p>
 <p><strong>そのほかの絶対条件:</strong> 1社1通・追送しない・断られたら即終了・一斉送信ツール禁止・実績ゼロを正直に書く。</p>
-<p class="why">上記は CSV 1行目の法務注記（打診文の絶対条件・法務判定 v1.0）の原文です:<br>{H.escape(HEADER_NOTE)}</p>
+<p class="why">上記は CSV 1行目の法務注記の原文です（版はこの注記の中に書かれています）:<br>{H.escape(HEADER_NOTE)}</p>
 </section>
 
 <section class="sec">
 <h2>この {N} 社の内訳</h2>
 {count_tbl}
 {review_txt}
+<p class="note"><strong>「打診可能 {len(ok_rows)}社」を単独で読まないこと。</strong>このうち<strong>お断り表示の有無を実際に確認したのは {len(checked)}社</strong>で、
+残り <strong>{len(unknown)}社は未取得</strong>＝窓口ページを検分した記録が無いだけであり、<strong>「表示が無いと確認した」という意味ではありません</strong>。
+各社の <code>optout_notice_status</code> は下の一覧の該当行にあります。<strong>打診の直前に、その社の窓口ページを必ず自分の目で開いてください。</strong></p>
 <p class="note">打診の順番は <strong>A_PLUS {len(aplus)}社 → A {len(plain)}社（優先度順）</strong>。C は A・A_PLUS・B を全件消化した後、フォームのみ・1回限り。D・E には連絡しない。</p>
 </section>
 
