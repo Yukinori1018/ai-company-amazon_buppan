@@ -1,7 +1,7 @@
 ---
 ticket_id: T-20260520-002
 title: 主力商品カテゴリと想定顧客像を確定する
-status: doing
+status: done
 assignee: secretary
 priority: high
 created_at: 2026-05-20

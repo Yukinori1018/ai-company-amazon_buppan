@@ -1,7 +1,7 @@
 ---
 ticket_id: T-20260521-004
 title: 【社長タスク】Ama-Jack 公式 URL / カズさん YouTube URL を秘書へ共有
-status: doing
+status: done
 assignee: owner
 priority: high
 created_at: 2026-05-21

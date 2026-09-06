@@ -1,7 +1,7 @@
 ---
 ticket_id: T-20260603-002
 title: 価格差リサーチ実践ガイド（ツールで仕入れ可否を判断する練習用）
-status: waiting
+status: done
 assignee: researcher
 priority: high
 created_at: 2026-06-03

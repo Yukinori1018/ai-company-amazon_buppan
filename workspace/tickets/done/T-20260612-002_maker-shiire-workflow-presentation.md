@@ -1,7 +1,7 @@
 ---
 ticket_id: T-20260612-002
 title: メーカー仕入れ式シンプル物販ワークフロー詳細まとめ＋プレゼン台本＋プレゼン資料制作
-status: waiting
+status: done
 next_check_at: 2026-06-13
 assignee: content_creator
 priority: high

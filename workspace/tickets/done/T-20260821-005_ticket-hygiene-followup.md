@@ -1,7 +1,7 @@
 ---
 ticket_id: T-20260821-005
 title: チケット衛生の残課題（next_check_at 欠落8枚／related 表記ゆれ12枚／Notionタイトル再同期）
-status: doing
+status: done
 assignee: general_affairs
 priority: medium
 created_at: 2026-08-21

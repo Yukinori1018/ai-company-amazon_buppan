@@ -1,7 +1,7 @@
 ---
 ticket_id: T-20260531-001
 title: ローカル⇄GitHub⇄Notion 同期の破綻復旧と再発防止ワークフロー確立
-status: doing
+status: done
 assignee: secretary
 priority: high
 created_at: 2026-05-31

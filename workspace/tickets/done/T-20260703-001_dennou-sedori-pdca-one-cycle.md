@@ -1,7 +1,7 @@
 ---
 ticket_id: T-20260703-001
 title: 電脳せどり PDCA 一周（Do=仮想購入・実物販売想定）＋A4実績サマリ
-status: waiting
+status: done
 assignee: secretary
 priority: high
 created_at: 2026-07-03

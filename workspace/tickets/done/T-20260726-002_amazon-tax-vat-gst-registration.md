@@ -1,7 +1,7 @@
 ---
 ticket_id: T-20260726-002
 title: Amazon納税情報（VAT/GST登録番号＝インボイス番号）ページの整備
-status: waiting
+status: done
 assignee: accounting
 priority: high
 created_at: 2026-07-26

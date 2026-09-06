@@ -1,7 +1,7 @@
 ---
 ticket_id: T-20260705-001
 title: 原石密度の実測PDCA（Yahoo/NETSEA×Keepa）＝電脳せどりは事業になるか
-status: waiting
+status: done
 assignee: secretary
 priority: high
 created_at: 2026-07-05

@@ -1,7 +1,7 @@
 ---
 ticket_id: T-20260612-003
 title: 実物販オペレーションフロー1枚スライド（Googleスライド用・超具体）
-status: waiting
+status: done
 next_check_at: 2026-06-13
 assignee: content_creator
 priority: high
