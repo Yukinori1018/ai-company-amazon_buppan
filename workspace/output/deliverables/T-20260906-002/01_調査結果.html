@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ドロップ数は実売を測れているか — 実測による判定</title><style>
+:root{--fg:#1b1f23;--mut:#5b6570;--line:#e3e7eb;--acc:#0b5fff;--warn:#b45309;--bad:#b91c1c;--ok:#047857;}
+*{box-sizing:border-box}
+body{margin:0;background:#f6f7f9;color:var(--fg);
+ font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",Meiryo,sans-serif;
+ line-height:1.85;font-size:15.5px;-webkit-text-size-adjust:100%;}
+.wrap{max-width:1000px;margin:0 auto;padding:32px 22px 96px;background:#fff;
+ box-shadow:0 1px 3px rgba(0,0,0,.06);}
+h1{font-size:1.75rem;line-height:1.4;margin:.2em 0 .6em;padding-bottom:.4em;border-bottom:3px solid var(--acc);}
+h2{font-size:1.3rem;margin:2.2em 0 .7em;padding:.35em .6em;background:#eef3ff;border-left:5px solid var(--acc);border-radius:3px;}
+h3{font-size:1.1rem;margin:1.8em 0 .5em;padding-bottom:.25em;border-bottom:1px solid var(--line);}
+p{margin:.7em 0}
+hr{border:0;border-top:1px solid var(--line);margin:2.2em 0}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:.92em;display:block;overflow-x:auto;}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top;}
+th{background:#f0f3f7;font-weight:600;white-space:nowrap;}
+tbody tr:nth-child(even){background:#fafbfc}
+blockquote{margin:1.1em 0;padding:.8em 1em;background:#fffbeb;border-left:5px solid var(--warn);border-radius:3px;color:#463a1a;}
+code{background:#f1f3f5;padding:.12em .4em;border-radius:3px;font-size:.9em;
+ font-family:"SFMono-Regular",Menlo,Consolas,monospace;}
+pre{background:#1e2430;color:#e6edf3;padding:14px 16px;border-radius:6px;overflow-x:auto;font-size:.86em;line-height:1.6;}
+pre code{background:none;color:inherit;padding:0}
+ul,ol{margin:.7em 0;padding-left:1.6em}
+li{margin:.3em 0}
+a{color:var(--acc)}
+@media print{body{background:#fff}.wrap{box-shadow:none;max-width:none}}
+</style></head><body><div class="wrap"><h1>ドロップ数は実売を測れているか — 実測による判定</h1>
+<p>チケット: T-20260906-002 / 担当: タカシ（IT） / 2026-09-06<br>親チケット: T-20260904-004</p>
+<blockquote>本ファイルには Keepa 固有の加工値（個別 ASIN のドロップ数・最安値・販売数・実セラー数）を<br>書いていません。書いてあるのは <strong>分布・比率・相関・閾値・手法・結論</strong> だけです。<br>個別値は各自の Keepa 画面、または末尾の再現スクリプトで確認してください。</blockquote>
+<hr>
+<h2>結論</h2>
+<p><strong>社長の指摘は正しい。<code>salesRankDrops30</code> は販売を測っていない。</strong></p>
+<p>決定的な証拠は相関係数ひとつです。</p>
+<blockquote><strong>Keepa が 30 日間にランクを見に行った回数と、ドロップ数の相関 = 0.991</strong><br><strong>上限に対する充填率の中央値 = 0.48</strong>（文房具・オフィス用品 50 件で実測）</blockquote>
+<p>つまり <code>salesRankDrops30 ≒ 0.5 × (Keepa がその商品を観測した回数)</code> です。<br>0.5 という値は、**上下にランダムに揺れる系列を離散サンプリングしたときに「前回より下がっていた」<br>割合そのもの**、要するにコイン投げの表が出る確率です。売れ行きの情報ではありません。</p>
+<p>裏づけとして、同じサンプルで <strong>平均して月 2,500 点規模が売れている商品群の平均ドロップ数は 1 桁</strong>でした。<br>販売数が 3 桁動いてもドロップ数は動きません。</p>
+<p><strong>ただし「完全な無意味」ではありません。</strong> Keepa は人気商品ほど頻繁に観測するため、<br>ドロップ数は間接的に「注目度」を映します。その結果、**「生きているか死んでいるか」の粗い判別には効きますが、<br>「どれだけ売れるか」の推定と順位づけには一切使えません。**</p>
+<p>そして現行パイプラインは、よりによって<strong>使えない側の用途にだけ使っています</strong>。</p>
+<hr>
+<h2>1. 対照実験（最優先タスク）</h2>
+<p>同一メーカーの3商品を Keepa API から取得しました。</p>
+<table><thead><tr><th>検体</th><th>状態</th></tr></thead><tbody>
+<tr><td>A</td><td>生産終了・新品オファー 0・Amazon 本体不在</td></tr>
+<tr><td>B</td><td>現行・Amazon 本体が在庫あり・オファー十数件・<strong>Amazon が販売実績を公表している</strong></td></tr>
+<tr><td>C</td><td>B の2個セット・新品オファー 0</td></tr>
+</tbody></table>
+<p><strong>結果: A（誰も買えない）と B（現に売れている）の月あたりドロップ率は、ほぼ同じでした。</strong><br>4つの窓（30/90/180/365日）すべてで、A の月率は B と同水準か、むしろわずかに上でした。<br>社長がグラフから読み取ったとおりです。</p>
+<h3>なぜ同じになるのか — 原因は2つあり、どちらも構造的</h3>
+<p><strong>原因①: バリエーション親子でランキングが共有されている</strong></p>
+<p>3検体は<strong>同じ親 ASIN にぶら下がる兄弟</strong>でした。取得した<strong>ランキング履歴の値が文字どおり同一</strong>で、<br>レビュー件数も3件とも同じでした。Amazon はバリエーションファミリーに<strong>1本の売れ筋ランキング</strong>しか<br>publish しないため、Keepa は同じ系列を全ての子に付け替えて記録します。</p>
+<blockquote><strong>死んだ子 ASIN は、生きている兄弟の売上でドロップします。</strong><br>これはドロップ数の閾値をいくら上げても検出できません。<strong>閾値の問題ではなく、指標の定義の問題です。</strong></blockquote>
+<p><strong>原因②: ドロップ数は観測回数の関数</strong></p>
+<p>同一のランキング系列を共有しているにもかかわらず、C のドロップ数は A・B の約 1/3 でした。<br>差は売れ行きではなく <strong>Keepa の観測密度</strong>です。C は追跡開始が新しく、履歴サンプル数が<br>A・B の 1〜2% しかありません。観測回数が少ない → 数えられる下降回数も少ない。それだけです。</p>
+<hr>
+<h2>2. 機構の特定（ここが本丸）</h2>
+<p>原因②を 50 件で定量化しました（文房具・オフィス用品・ランク 3万位以内・ドロップ数で絞らずに抽出）。</p>
+<table><thead><tr><th>測定項目</th><th>実測値</th></tr></thead><tbody>
+<tr><td>30日の観測サンプル数 と ドロップ数 の相関</td><td><strong>0.991</strong></td></tr>
+<tr><td>充填率 <code>drops30 ÷ (サンプル数-1)</code> の中央値</td><td><strong>0.48</strong></td></tr>
+<tr><td>同 最大値</td><td>0.59</td></tr>
+</tbody></table>
+<p>相関 0.99 は「ほぼ同じものを2回測っている」水準です。<br>そして充填率が全個体で 0.5 付近に張り付くということは、**Keepa が見に行くたびに、前回より下がっているか<br>上がっているかが五分五分**ということです。売れれば必ず下がる、という関係にはなっていません。</p>
+<h3>ここから導かれる致命的な性質</h3>
+<ol><li><strong>右側打ち切り（censoring）がある。</strong> 観測が月 40 回なら、ドロップ数は原理的に 39 を超えられません。</li></ol>
+<p>   実測でも上限は 20 程度でした。月に 10 個売れる商品と 3,000 個売れる商品が、<strong>同じ数字になります。</strong></p>
+<ol><li><strong>ドロップ数の大小は、Keepa の人気度（＝ユーザーがその ASIN を何回照会したか）を映す。</strong></li></ol>
+<p>   Keepa は照会の多い商品を高頻度で更新します。よって「よく追跡されている商品」が上位に来ます。</p>
+<ol><li><strong>したがって <code>salesRankDrops30</code> の降順ソートは、売れ筋順ではなく「Keepa 内での注目度順」です。</strong></li></ol>
+<hr>
+<h2>3. ランク帯別ベースライン（タスク2）</h2>
+<h3>3-1. 素の分布</h3>
+<p>文房具・オフィス用品から<strong>ドロップ数を条件に入れず</strong>、ランク帯ごとに 50 件ずつ層化抽出しました。</p>
+<table><thead><tr><th>ランク帯</th><th>ドロップ数 中央値の水準</th><th><code>&gt;= 1</code> の割合</th><th>Amazon が販売数を公表</th></tr></thead><tbody>
+<tr><td>#1千未満</td><td>中</td><td>78%</td><td>76%</td></tr>
+<tr><td>#1千〜1万</td><td><strong>最大</strong></td><td>96%</td><td>58%</td></tr>
+<tr><td>#1万〜3万</td><td>低</td><td>100%</td><td>6%</td></tr>
+<tr><td>#3万〜10万</td><td>低</td><td>100%</td><td>2%</td></tr>
+<tr><td>#10万〜50万</td><td>ほぼゼロ</td><td>64%</td><td>0%</td></tr>
+<tr><td>#50万超</td><td>ゼロ</td><td>4%</td><td>0%</td></tr>
+</tbody></table>
+<p><strong>注目すべき異常</strong>: ドロップ数の中央値が最大になるのは <strong>#1千〜1万 の帯であって、#1千未満ではありません。</strong><br>一番売れているはずの帯が一番ではない。観測密度と、上位帯ほどランクが安定して動きにくいことの合成です。</p>
+<h3>3-2. 現行パイプラインが立っている場所</h3>
+<p>親チケットの候補プール（3,625件）を再集計しました。このプールは<br><code>salesRankDrops30_gte</code>（実効下限 17）で足切りし、<strong>ドロップ数の降順</strong>で取得されています。</p>
+<table><thead><tr><th>ランク帯</th><th>プール内のドロップ数 中央値</th></tr></thead><tbody>
+<tr><td>#1千未満</td><td>27</td></tr>
+<tr><td>#1千〜1万</td><td>29</td></tr>
+<tr><td>#1万〜3万</td><td>27</td></tr>
+<tr><td>#3万〜10万</td><td>26</td></tr>
+<tr><td>#10万〜50万</td><td>27</td></tr>
+</tbody></table>
+<p><strong>ランクが 500 倍違っても中央値がほぼ一定です。</strong><br>実売を測っているなら、#500 位の商品は #30万位の商品の 100 倍以上売れているはずで、この表は成立しません。</p>
+<p><strong>プールは、ドロップ数が販売と完全に無関係になる飽和領域だけを切り出しています。</strong><br>足切り 17 と降順ソートによって、意図せずそこだけを選んでいました。</p>
+<h3>3-3. 「いくつ以上なら実売と言えるか」への回答</h3>
+<p><strong>単一閾値では言えません。</strong> ただし粗い生死判定としてなら、実測から次が言えます。</p>
+<p>「生きている」＝ Amazon が販売数を公表している群、「死んでいる疑い」＝ 公表なし かつ 新品オファー 0〜1 として、<br>閾値ごとの通過率を測りました。</p>
+<table><thead><tr><th>閾値</th><th>生きている群の通過率</th><th>死んでいる疑い群の通過率</th><th>差</th></tr></thead><tbody>
+<tr><td><strong>1（現行 S5）</strong></td><td>85%</td><td><strong>65%</strong></td><td>19pt</td></tr>
+<tr><td>3</td><td>83%</td><td>34%</td><td>49pt</td></tr>
+<tr><td>5</td><td>83%</td><td>27%</td><td>56pt</td></tr>
+<tr><td><strong>10</strong></td><td>73%</td><td><strong>11%</strong></td><td><strong>62pt</strong></td></tr>
+<tr><td>15</td><td>45%</td><td>4%</td><td>41pt</td></tr>
+<tr><td>20</td><td>18%</td><td>1%</td><td>17pt</td></tr>
+<tr><td>25 以上</td><td>0%</td><td>0%</td><td>0pt</td></tr>
+</tbody></table>
+<ul><li><strong>現行の <code>&gt;= 1</code> は、死んでいる疑いのある商品の 65% を通します。</strong> 事実上フィルタとして機能していません。</li><li>弁別力が最大になるのは <strong>10 前後</strong>。ただしこれは「生死」の判定であって、<strong>売れ行きの量ではありません。</strong></li><li><strong>25 以上は誰も通りません</strong>（打ち切りの上限）。閾値を上げれば精度が上がる、という話ではないことがここに出ています。</li><li><strong>そして 3-2 のとおり、この閾値はカテゴリと Keepa の観測密度に依存します。全カテゴリ共通の定数にはできません。</strong></li></ul>
+<hr>
+<h2>4. 交差検証に使える独立指標（タスク3）</h2>
+<p>同じサンプルで、Amazon が公表する月間販売数に対する順位相関を測りました。</p>
+<table><thead><tr><th>指標</th><th>順位相関</th><th>取得コスト</th><th>評価</th></tr></thead><tbody>
+<tr><td><strong>売れ筋ランキング（現在値）</strong></td><td><strong>-0.519</strong>（符号は正しい）</td><td>1 token / ASIN</td><td><strong>最良。無料同然で、ドロップ数より強い</strong></td></tr>
+<tr><td><strong>Amazon 公表の月間販売数</strong></td><td>— （これが正解データ）</td><td>1 token / ASIN</td><td><strong>一次情報。あるときは最強</strong></td></tr>
+<tr><td><code>salesRankDrops30</code></td><td><strong>-0.334</strong>（<strong>符号が逆</strong>）</td><td>同上</td><td><strong>使えない。多いほど売れていない方向に出る</strong></td></tr>
+<tr><td>レビュー件数</td><td>測定不能</td><td><code>offers</code> or <code>rating</code> 必須</td><td>下記参照</td></tr>
+</tbody></table>
+<h3>4-1. Amazon 公表の月間販売数（最優先で使うべき）</h3>
+<p>「過去1か月で〇点購入されました」の値です。Amazon 自身が出している一次情報で、Keepa の推定ではありません。<br>ただし<strong>全商品にあるわけではありません</strong>。被覆率は帯によって激変します。</p>
+<table><thead><tr><th>ランク帯</th><th>販売数が取れる割合</th></tr></thead><tbody>
+<tr><td>#1千未満</td><td>76%</td></tr>
+<tr><td>#1千〜1万</td><td>58%</td></tr>
+<tr><td>#1万〜3万</td><td>6%</td></tr>
+<tr><td>#3万〜10万</td><td>2%</td></tr>
+<tr><td>#10万位以下</td><td>0%</td></tr>
+</tbody></table>
+<p><strong>この被覆率の落ち方自体が情報です。</strong> Amazon はある程度の量が出ている商品にしかこのバッジを出しません。<br><strong>#1万位より下では「値が無い」が既定であり、無いこと自体は死んでいる証拠になりません。</strong><br>一方 <strong>#1万位以内で値が無いなら、それは弱いマイナス材料です。</strong></p>
+<h3>4-2. 在庫切れ率の推移</h3>
+<p>「売れたから在庫が切れる」ので、在庫切れ率が動いていることは実売の証拠になります。<br>逆に、<strong>在庫切れ率が長期 100% に張り付いていれば、その期間の売上はゼロと断定できます。</strong><br>今回の対照実験でも、生産終了検体は 100% 側に張り付いていました。<strong>これはドロップ数より信頼できます。</strong></p>
+<h3>4-3. レビュー件数の増分 — 使えるが、罠がある</h3>
+<p><strong>今回の取得では、レビュー件数が 300 件中 0 件しか埋まりませんでした。</strong><br>既知のとおり <code>offers</code> または <code>rating</code> パラメータを付けないと更新されないためです。<br><strong>付けると 1 ASIN あたりのトークン単価が 1 → 7 に跳ね上がります。</strong> 全件には使えません。<br>最終候補の絞り込み段階でだけ使う指標です。</p>
+<p>なお対照実験では、<strong>兄弟 ASIN のレビュー件数が完全に同一</strong>でした。<br>バリエーションはレビューも共有します。<strong>レビュー増分も、親子問題の影響を受けます。</strong></p>
+<h3>4-4. 使うべきでないもの</h3>
+<p><code>想定月販 = ドロップ数 ÷ (実セラー数 + 1)</code> は、<strong>分子が販売量を表していない以上、販売量の推定になりません。</strong><br>親チケットの「消化月数」もこの値から作られており、同じ欠陥を受け継いでいます。</p>
+<hr>
+<h2>5. S5 フィルタの再設計案（タスク4）</h2>
+<p><strong>「直さない」は選べません。</strong> 現行 S5 は死んでいる疑いのある商品の 65% を通しており、<br>かつ「売れ行き」を測っていると誤って信じられているためです。</p>
+<h3>案A（推奨）— 回転の判定を「ドロップ数」から降ろす</h3>
+<p>S5 を、<strong>独立指標による段階ゲート</strong>に置き換えます。ドロップ数は生死のふるいとしてだけ残し、<br><strong>量の推定からは完全に外します。</strong></p>
+<table><thead><tr><th>段</th><th>条件</th><th>根拠</th></tr></thead><tbody>
+<tr><td><strong>S5-a 除外</strong></td><td>在庫切れ率が長期 100% に張り付いている</td><td>売上ゼロが確定する（4-2）</td></tr>
+<tr><td><strong>S5-b 除外</strong></td><td><strong>バリエーションの子で、親と同一のランキング系列を共有している</strong></td><td>兄弟の売上を自分の売上と誤認する（1-①）。<strong>最重要</strong></td></tr>
+<tr><td><strong>S5-c 通過</strong></td><td>Amazon 公表の月間販売数が閾値以上</td><td>一次情報。#1万位以内なら過半で取れる（4-1）</td></tr>
+<tr><td><strong>S5-d 保留</strong></td><td>販売数が無い場合は、<strong>ランク帯</strong>で判定（例: #3万位以内）</td><td>ランクの相関 -0.52 はドロップ数より強い（4）</td></tr>
+<tr><td><strong>S5-e 参考</strong></td><td>ドロップ数はランク帯ごとの相対順位でのみ見る（絶対値で比較しない）</td><td>観測密度に依存するため（2）</td></tr>
+</tbody></table>
+<p><strong>ランク帯の閾値は暫定です。</strong> 帯ごとの被覆率（3-1・4-1）から #1万位付近に折れ目があるのは見えていますが、<br>カテゴリ横断で確定させるには追加サンプルが要ります（下記）。</p>
+<h3>案B（最小の応急処置）— 今日の発注セットを守るためだけの措置</h3>
+<p>パイプライン全体を触らず、<strong>すでに通過した 32 SKU の再検査</strong>だけ行う。<br>S5-a と S5-b をチェックリストとして手で当てる。<strong>32 件なら 30 分で終わります。</strong></p>
+<h3>案C（不可）— ドロップ数の閾値を 1 から 10 へ上げる</h3>
+<p>一見効きます（死に通過 65% → 11%）が、<strong>バリエーション親子問題（1-①）に無力</strong>で、<br><strong>カテゴリと観測密度に依存する定数</strong>を1個埋め込むことになります。<br>そして何より、<strong>通した後に「これは月に何個売れる」と言えるようにはなりません。</strong> 推奨しません。</p>
+<h3>スコープ宣言（案A を実装する場合）</h3>
+<ul><li><strong>やる</strong>: <code>scan_v14</code> の抽出軸をランク＋公表販売数に付け替える。バリエーション親子の検出を入れる。</li></ul>
+<p>  在庫切れ率の判定を入れる。<code>想定月販</code> の列名を「<strong>推定不能</strong>」と明示するか、公表販売数がある行にだけ出す。</p>
+<ul><li><strong>やらない</strong>: 新しい推定モデルを作ること。回帰を当てて販売数を予測すること。</li></ul>
+<p>  正解データ（公表販売数）が #1万位以下でほぼ取れない以上、<strong>当てはめても検証できません。</strong><br>  取れるものだけを正直に出し、取れないものは空欄にします。</p>
+<h3>追加調査が要る点（トークン見積り）</h3>
+<p>現在の残トークンは約 700、回復 20/分（≒1,200/時）です。</p>
+<ul><li>ランク帯の折れ目をカテゴリ横断で確定する: <strong>3カテゴリ × 6帯 × 50件 ≒ 1,000 トークン（約1時間）</strong></li><li>32 SKU の再検査（<code>offers</code> 付き・レビュー増分まで見る）: <strong>約 250 トークン（即時）</strong></li></ul>
+<hr>
+<h2>6. 影響範囲</h2>
+<table><thead><tr><th>対象</th><th>影響</th></tr></thead><tbody>
+<tr><td>S5（回転フィルタ）</td><td><strong>機能していない。</strong> 死んでいる疑いのある商品の 65% を通す</td></tr>
+<tr><td>通過した 32 SKU</td><td><strong>全件が再検査対象。</strong> 生死の裏取りが取れていない</td></tr>
+<tr><td>候補プール 3,625 件</td><td><strong>ドロップ数の飽和領域だけを切り出している</strong>（3-2）。母数の代表性に疑いあり</td></tr>
+<tr><td><code>想定月販</code> 列</td><td><strong>販売数の推定になっていない</strong>（4-4）</td></tr>
+<tr><td><code>消化月数</code> 列</td><td>上を分母に使っているため同じ欠陥を継承</td></tr>
+<tr><td>生産終了 ASIN の検出</td><td><strong>ドロップ数では原理的に不可能</strong>（バリエーション親子・1-①）</td></tr>
+</tbody></table>
+<hr>
+<h2>7. 再現方法</h2>
+<p><code>scripts/</code> に4本置いてあります。<code>KEEPA_API_KEY</code> を環境変数に入れて実行してください。</p>
+<table><thead><tr><th>ファイル</th><th>役割</th><th>トークン</th></tr></thead><tbody>
+<tr><td><code>fetch_keepa.py</code></td><td>Keepa の薄いラッパー。gzip 解凍まで面倒を見る</td><td>—</td></tr>
+<tr><td><code>sample_baseline.py</code></td><td>ランク帯ごとの層化抽出。<strong>ドロップ数で絞らない</strong>のが要点</td><td>約 360</td></tr>
+<tr><td><code>analyze_baseline.py</code></td><td>3章の分布・閾値表を出す</td><td>0</td></tr>
+<tr><td><code>density_test.py</code></td><td><strong>2章の相関 0.991 を出す。この調査の中核</strong></td><td>約 60</td></tr>
+</tbody></table>
+<p>生レスポンスと個別値はリポジトリに残していません（PUBLIC・Keepa T&amp;C §11(1)）。<br>再実行すれば同じ結論が出ます。</p></div></body></html>
