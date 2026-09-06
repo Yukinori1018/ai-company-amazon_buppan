@@ -1,25 +1,41 @@
 #!/bin/bash
 #
-# pre-commit — 卸値（NETSEA 会員限定の取引条件）の PUBLIC リポへの混入を止める
+# pre-commit — 第三者の会員限定データが PUBLIC リポへ混入するのを止める
 #
-# 背景（2度起きた事故）
-#   2026-08-31 卸価格227行 / 2026-09-06 03 の HTML。いずれも意図的な公開ではなく、
-#   別セッションの `git add -A` に巻き込まれたもの。
+#   グループA: NETSEA 卸値（会員限定の取引条件）
+#   グループB: Keepa 固有の加工値（履歴 DB を通らないと出せない値）
+#   グループC: 認証情報・API 生レスポンス
+#   グループD: ASIN の大量掲載 → **警告のみ**（社長判断。下記参照）
+#
+# 背景（3度起きた事故）
+#   2026-08-31 卸価格227行 / 2026-09-06 03 の HTML / 同日 過去2ヶ月分の CSV 21本。
+#   いずれも意図的な公開ではなく、別セッションの `git add -A` に巻き込まれたもの。
 #   .claude/scripts/github-sync.sh も 30分ごとに `git add -A` → `git commit` を
 #   呼ぶので、commit を止めればこの経路もまとめて塞げる。
 #
-# 根拠条文（法務ハルオ 2026-09-06 / T-20260904-004 E_ 判定）
-#   - NETSEA API 利用規約 第15条1項（秘密保持）
-#   - NETSEA バイヤー会員規約 第7条2項3号（権利の行使の範囲を超えた情報利用）
-#   制裁は金銭賠償ではなくアカウント停止（催告なし）。
-#   ※ 黒いのは「卸値」だけ。サプライヤー社名・商品名・JAN・商品URLは公開情報。
+# 根拠条文（法務ハルオ 2026-09-06 / T-20260904-004）
+#   A: NETSEA API 利用規約 第15条1項（秘密保持）
+#      NETSEA バイヤー会員規約 第7条2項3号
+#      → 制裁は金銭賠償ではなくアカウント停止（催告なし）
+#      ※ 黒いのは「卸値」だけ。サプライヤー社名・商品名・JAN・商品URLは公開情報
+#   B: Keepa Price Data API T&C §11(1)「reproduce 禁止」
+#      → 制裁は §13 の API 遮断。金銭は §14(3) で年額の2倍が上限
+#      判定: E2_Keepa由来データの公開_法務判定.md
+#
+# 社長判断（2026-09-06）
+#   リポジトリは Private 化しない。GitHub からは機密列を抜き、完全版はリポ外
+#   （~/Documents/AI Company 素材/…/keepa-netsea-full-20260906/）に置く。
+#   **ASIN・商品名・現在価格・ランク・オファー数は「残す」と明示的に決定された**ため、
+#   法務が推奨した「ユニーク ASIN 20件以上でブロック」は **警告のみ** に落としてある。
+#   ブロックに戻したい場合は BLOCK_ASIN_BULK=1 を付けて commit すること。
 #
 # 設計方針
 #   - 誤検知で正当な作業を止めない。**新規に追跡対象へ追加されるファイルだけ**を見る。
-#     既に追跡済みのファイルの編集は対象外（`.md` の解説文を書き換えるたびに
-#     止まるようでは運用が壊れる）。
-#   - 走査するのは「行データが載りうる拡張子」だけ。`.py` / `.sh` などのコードは見ない。
-#   - `.md` は解説文中に条文や URL を引用するのが正当なので、しきい値を高くしてある。
+#     既に追跡済みのファイルの編集は対象外（解説文を書き換えるたびに止まる作りに
+#     したら、翌日には --no-verify が常態化して無意味になる）。
+#   - 「散文」と「行データ」を区別する。
+#     .md は表行・カンマ区切り行だけ、.html はテーブルのセル（<td>/<th>）だけを見る。
+#     用語集・利用ガイドが Keepa の列名を説明するのは正当なので、通す必要がある。
 #   - **フック自身が壊れても commit は通す**（fail-open）。検知したときだけ止める。
 #     ゲートが落ちて全社の commit が不能になる方が被害が大きい。
 #
@@ -43,9 +59,15 @@ main() {
   git diff --cached --name-only --diff-filter=AC -z >"$list" 2>/dev/null || { rm -f "$list"; return 1; }
   if [ ! -s "$list" ]; then rm -f "$list"; return 0; fi
 
-  # 検知語。fixed string で数える。
-  local patterns=(
+  # --- グループA: NETSEA 卸値。行データ拡張子では1件でも止める ------------------
+  # 散文には出ない「強い」印。拡張子を問わず1件で止める。
+  local pat_netsea_strong=(
     'netsea.jp/shop/'
+    'netsea_wholesale'
+    'wholesale_price'
+  )
+  # 日本語の語。散文にも普通に出るので、散文と行データを区別してから数える。
+  local pat_netsea_words=(
     '卸値'
     '卸価格'
     '卸価'
@@ -53,75 +75,215 @@ main() {
     '仕入れ先：'
     '仕入値'
     '仕入れ値'
+    '仕入最安'
   )
 
-  local hits=""
-  local f ext threshold pat n content
+  # --- グループB: Keepa 固有の加工値（法務 E2 判定 §6-3 レベル1 をそのまま） -----
+  # 「Amazon の商品ページを見れば分かる値」は入れない（ASIN・現在価格・ランク・
+  # オファー数は社長判断で公開継続）。ここに並ぶのは Keepa の履歴 DB を
+  # 通らないと出せない値だけ。
+  local pat_keepa=(
+    '月間ドロップ数'
+    'ドロップ数'
+    '過去最安値'
+    '365日最安'
+    '価格履歴'
+    '月間販売数'
+    '想定月販'
+    'monthly_sales'
+    'monthlySold'
+    'monthly_sold'
+    'monthly_sold_real'
+    'sum_monthly'
+    'msales'
+    'drop_count'
+    'dropsN'
+    '実セラー数'
+    'rival_sellers'
+    '消化月数'
+  )
+
+  # --- グループC: 認証情報・API 生レスポンス。拡張子を問わず1件で止める ---------
+  # 「値が付いている」ものだけを見る。コード中の変数名 KEEPA_KEY や
+  # URL の api.keepa.com で止めると、正当な実装が commit できなくなる。
+  local pat_secret=(
+    'KEEPA_(API_)?KEY[[:space:]]*[=:][[:space:]]*["'"'"']?[0-9a-z]{32,}'
+    'accesskey=[0-9a-z]{32,}'
+    '"csv":\[\[-?[0-9]'
+  )
+
+  local hits="" warns=""
+  local f ext pat n content cells asin
 
   while IFS= read -r -d '' f; do
     [ "$(basename "$f")" = ".gitignore" ] && continue
     ext="$(printf '%s' "${f##*.}" | tr 'A-Z' 'a-z')"
-    case "$ext" in
-      csv|tsv|json|html|htm|xml|txt) threshold=1 ;;   # 行データ・その表示版。1件でも止める
-      md)                            threshold=6 ;;   # 解説文は見ない（下で行データ行だけに絞る）+ 表の引用も許す
-      *)                             continue    ;;   # コード・バイナリ等は見ない
-    esac
 
     # ステージ済みの中身を読む（作業ツリーではなく index を見るのが正しい）。
     # 巨大ファイルで固まらないよう先頭 4MB だけ。
     content="$(git show ":$f" </dev/null 2>/dev/null | head -c 4194304)" || continue
+    [ -z "$content" ] && continue
 
-    # .md は「解説文」と「貼り付けた行データ」を区別する。
-    # この判定を入れないと、今回のような再発防止メモ（本文で「卸値」を10回書く）
-    # まで止まってしまい、運用が壊れる。行データらしい行だけに絞ってから数える。
-    #   行データらしい行 = Markdown 表の行（| で始まる）／カンマ区切りが3つ以上
-    # しきい値6は実測で決めた。既存の法務判定 E_ は「行データらしい行」に卸値が
-    # 5行出るが、これは正当な引用なので通す必要がある（実測値: E_=5, 他の .md=0）。
-    # 逆に .md へ行データを貼れば6行はすぐ超える。
-    # 限界: 5行以下の小さな貼り付けは .md では素通りする。.md は二次的な網であり、
-    # 一次防御は成果物フォルダのホワイトリスト .gitignore の方。
-    if [ "$ext" = "md" ]; then
-      content="$(printf '%s' "$content" | grep -E '^[[:space:]]*\||(,[^,]*){3,}' || true)"
-      [ -z "$content" ] && continue
-    fi
-
-    for pat in "${patterns[@]}"; do
-      n="$(printf '%s' "$content" | grep -F -c -- "$pat" 2>/dev/null || true)"
-      n="${n:-0}"
-      if [ "$n" -ge "$threshold" ]; then
-        hits="${hits}  - ${f}  … 「${pat}」を ${n} 行で検知（この拡張子のしきい値: ${threshold}）
+    # ---- グループC は拡張子を問わず先に見る --------------------------------
+    for pat in "${pat_secret[@]}"; do
+      n="$(printf '%s' "$content" | grep -E -c -- "$pat" 2>/dev/null || true)"
+      if [ "${n:-0}" -ge 1 ]; then
+        hits="${hits}  - ${f}  … 【認証情報/生レスポンス】を ${n} 行で検知
 "
-        break
+        continue 2
       fi
     done
+
+    case "$ext" in
+      csv|tsv|json|xml|txt|html|htm|md) : ;;
+      *) continue ;;   # コード・バイナリ等は行データを持たないので見ない
+    esac
+
+    # ---- 「除外済み」注記の行は数えない -------------------------------------
+    # 列を落としたファイルのヘッダに、落とした列名を並べた注記を入れてある。
+    # その注記で自分のゲートが発火しては本末転倒。
+    content="$(printf '%s' "$content" | grep -vF '規約上の理由でリポジトリから除外' || true)"
+    [ -z "$content" ] && continue
+
+    # ---- 「行データらしい部分」を先に切り出しておく -------------------------
+    # 散文と行データを分ける決め手は「列名がどこに出るか」であって出現回数ではない。
+    # データ本体では列名は1度（ヘッダ）しか出ないので、回数で数えても捕まらない。
+    #   csv/tsv/json/xml/txt … 中身そのものが行データ
+    #   html/htm            … テーブルの見出し <th>（本文6行以上のときだけ）
+    #   md                  … 表のヘッダ行（|---| の直上・5列以上）＋ 貼り付けた CSV 行
+    local rowdata="" where="内容"
+    case "$ext" in
+      html|htm)
+        # 6行以上の表の、**5列以上のヘッダ行**だけを見る。
+        # 2〜4列の小さな表は解説用（用語集の「用語 | 意味」等）とみなして通す。
+        if [ "$(printf '%s' "$content" | grep -o '<tr' | wc -l | tr -d ' ')" -ge 6 ]; then
+          rowdata="$(printf '%s' "$content" | tr '\n' ' ' | sed 's/<tr/\n<tr/g' \
+            | awk 'gsub(/<th/,"<th")>=5' | grep -oE '<th[^>]*>[^<]*' || true)"
+          where="テーブル見出し(<th>・5列以上)"
+        fi
+        ;;
+      md)
+        # 2〜4列の小さな表は解説用とみなす（用語集の「| 対象 | 実セラー数<2 の割合 |」等）。
+        # 実データを貼れば列数はすぐ5を超える。
+        rowdata="$(printf '%s' "$content" \
+          | grep -B1 -E '^[[:space:]]*\|[-:| ]+\|[[:space:]]*$' \
+          | grep -E '^[[:space:]]*\|' \
+          | awk -F'|' 'NF>=7' || true)"
+        # 貼り付けた CSV の行（Markdown 表の行は上の規則で見ているので除く。
+        # 表の中の「7,834」「monthly_sales, rival_sellers」のような書き方まで
+        # カンマ区切り行と誤認すると、法務判定の .md が止まってしまう）。
+        rowdata="${rowdata}
+$(printf '%s' "$content" | grep -E '(,[^,]*){3,}' | grep -v '^[[:space:]]*|' || true)"
+        where="表のヘッダ行(5列以上) / カンマ区切り行"
+        ;;
+      *)
+        rowdata="$content"
+        ;;
+    esac
+
+    # ---- グループA（NETSEA 卸値）------------------------------------------
+    # 強い印（URL・英語の列名）は散文にはまず出ないので、全文を1件で見る。
+    # ただし .md だけは例外。法務判定やこの再発防止メモが検知語そのものを引用するため、
+    # 行データらしい部分に限る。
+    local strong_scope="$content"
+    [ "$ext" = "md" ] && strong_scope="$rowdata"
+    for pat in "${pat_netsea_strong[@]}"; do
+      n="$(printf '%s' "$strong_scope" | grep -F -c -- "$pat" 2>/dev/null || true)"
+      if [ "${n:-0}" -ge 1 ]; then
+        hits="${hits}  - ${f}  … 【NETSEA 卸値】「${pat}」を ${n} 行で検知
+"
+        continue 2
+      fi
+    done
+    # 日本語の語は行データらしい部分だけを見る（解説文で「卸値」を書くのは正当）。
+    if [ -n "$rowdata" ]; then
+      for pat in "${pat_netsea_words[@]}"; do
+        n="$(printf '%s' "$rowdata" | grep -F -c -- "$pat" 2>/dev/null || true)"
+        if [ "${n:-0}" -ge 1 ]; then
+          hits="${hits}  - ${f}  … 【NETSEA 卸値】「${pat}」を ${where} で検知
+"
+          continue 2
+        fi
+      done
+    fi
+
+    # ---- グループB（Keepa 固有の加工値）------------------------------------
+    # 用語集・利用ガイド・法務判定が Keepa の列名を「説明する」のは正当なので通す。
+    # 「〜の中央値」は統計値であり原データを復元できない（法務 E2 §6-1-3）ので、
+    # 列名ごと落としてから数える（接尾辞だけ消すと素の列名が残ってしまう）。
+    local b_content
+    b_content="$(printf '%s' "$rowdata" | sed -E 's/[^,|<>"]*の中央値//g')"
+    if [ -n "$b_content" ]; then
+      for pat in "${pat_keepa[@]}"; do
+        n="$(printf '%s' "$b_content" | grep -F -c -- "$pat" 2>/dev/null || true)"
+        if [ "${n:-0}" -ge 1 ]; then
+          hits="${hits}  - ${f}  … 【Keepa 固有の加工値】「${pat}」を ${where} で検知
+"
+          continue 2
+        fi
+      done
+    fi
+
+    # ---- グループD（ASIN の大量掲載）: 既定は警告のみ -----------------------
+    # 法務推奨は20件以上でブロックだが、社長が「ASIN は残す」と明示決定した。
+    # BLOCK_ASIN_BULK=1 でブロックに戻せる。
+    asin="$(printf '%s' "$content" | grep -aoE 'B0[0-9A-Z]{8}' | sort -u | wc -l | tr -d ' ')"
+    if [ "${asin:-0}" -ge 20 ]; then
+      if [ "${BLOCK_ASIN_BULK:-0}" = "1" ]; then
+        hits="${hits}  - ${f}  … 【ASIN 大量掲載】ユニーク ${asin} 件（BLOCK_ASIN_BULK=1）
+"
+      else
+        warns="${warns}  - ${f}  … ユニーク ASIN ${asin} 件
+"
+      fi
+    fi
   done <"$list"
   rm -f "$list"
+
+  if [ -n "$warns" ]; then
+    echo "" >&2
+    echo "pre-commit【警告・commit は続行します】ASIN を大量に含むファイルが新規追加されます:" >&2
+    printf '%s' "$warns" >&2
+    echo "  社長判断（2026-09-06）により ASIN の掲載は継続します。Keepa 固有の加工値" >&2
+    echo "  （月間ドロップ数・過去最安値・月間販売数・実セラー数 等）が混ざっていないか" >&2
+    echo "  だけ、目で確かめてください。ブロックに戻すなら BLOCK_ASIN_BULK=1。" >&2
+    echo "" >&2
+  fi
 
   [ -z "$hits" ] && return 0
 
   cat >&2 <<'MSG1'
 
 ╔══════════════════════════════════════════════════════════════════════════╗
-║  commit を中止しました — 卸値が PUBLIC リポに載ろうとしています          ║
+║  commit を中止しました — 第三者の会員限定データが PUBLIC リポに載ります  ║
 ╚══════════════════════════════════════════════════════════════════════════╝
 
-新規に追跡対象へ追加されるファイルから、卸値らしい記載を検知しました。
+新規に追跡対象へ追加されるファイルから、公開できないデータを検知しました。
 
 MSG1
   printf '%s\n' "$hits" >&2
   cat >&2 <<'MSG2'
 このリポジトリは PUBLIC で、30分ごとに自動 push されます（CLAUDE.md §6）。
-卸値は NETSEA の会員限定情報であり、公開は
-  ・NETSEA API 利用規約 第15条1項（秘密保持）
-  ・NETSEA バイヤー会員規約 第7条2項3号
-に抵触します。制裁は催告なしのアカウント停止です（仕入れ導線が消えます）。
-詳細: workspace/output/deliverables/T-20260904-004/E_NETSEAサプライヤー名の公開_法務判定.md
+
+  ・NETSEA 卸値 … API 利用規約 第15条1項／会員規約 第7条2項3号
+                   制裁は催告なしのアカウント停止（仕入れ導線が消えます）
+  ・Keepa 固有の加工値 … Price Data API T&C §11(1)「reproduce 禁止」
+                   制裁は §13 の API 遮断（リサーチ基盤が止まります）
+  ・認証情報 … 漏れたら即時ローテーションが必要になります
+
+詳細:
+  workspace/output/deliverables/T-20260904-004/E_NETSEAサプライヤー名の公開_法務判定.md
+  workspace/output/deliverables/T-20260904-004/E2_Keepa由来データの公開_法務判定.md
 
 【対処】
   (a) そのファイルを追跡しない … 成果物フォルダの .gitignore はホワイトリスト
       方式です。「!ファイル名」の行を足さなければ追跡されません。
         git restore --staged "<ファイル>"
-  (b) 卸値の列を落としてから載せる（社名・商品名・JAN・URL は公開情報なのでOK）
+      完全版の置き場はリポ外です:
+        ~/Documents/AI Company 素材/Amazon物販事業/keepa-netsea-full-20260906/
+  (b) 該当する「列」を落としてから載せる
+      残してよい: ASIN・商品名・現在価格・ランク・オファー数・サプライヤー社名・JAN
+      落とすもの: 月間ドロップ数／過去最安値／365日最安／月間販売数／実セラー数／卸値
   (c) 誤検知だった場合はバイパスしてください:
         git commit --no-verify
         ALLOW_WHOLESALE_DATA=1 git commit -m "..."
