@@ -7,7 +7,7 @@ priority: high
 created_at: 2026-08-31
 updated_at: 2026-08-31
 requires_approval: false
-labels: [maker-shiire, keepa, automation, launchd, always-on]
+labels: [maker-shiire, keepa, overnight, infra]
 next_check_at: 2026-09-01
 related_tickets: [T-20260817-005, T-20260804-001, T-20260803-001, T-20260831-001]
 ---
@@ -186,3 +186,4 @@ M1/M2/M4/M6/M7 ＋ 停止条件 S2/S3/S5/S6/S7/S8/S9/S10/W4 を実装済み。
   - **データは全部残っている**：候補プール3,625行 / 候補リスト2,654件 / メーカー名寄せ1,255社。
   - launchd 常駐（`com.aicompany.amazon-buppan.list-builder`）は**外していない**。STOP ファイルがある限り走らないので、再開は `list-builder.sh start` の1コマンドで足りる。
   - **再開の条件＝T-20260831-004（抽出の再設計）が確定し、`scan_v14.py` の Finder 条件を入れ替えてから。** 現行条件のまま回すとノイズを積むだけなので、それまで再開しない。
+- 2026-09-07 マリエ：Notion カンバンに取りこぼしを検知し、カードを遡って作成。labels は Notion の選択肢に合わせて調整（`automation`/`launchd`/`always-on` → Notion 既存の `overnight` `infra` へ寄せた）。リポジトリ側の frontmatter も同じ値に揃えた

@@ -7,7 +7,7 @@ priority: high
 created_at: 2026-08-31
 updated_at: 2026-08-31
 requires_approval: false
-labels: [netsea, sourcing, keepa, profit, pipeline]
+labels: [netsea, sourcing, keepa, pipeline]
 next_check_at: 2026-09-01
 related_tickets: [T-20260831-004, T-20260831-005, T-20260606-001, T-20260705-001]
 ---
@@ -264,3 +264,4 @@ cd workspace/output/deliverables/T-20260831-006 && python3 netsea_scan.py --stat
 
 `ps` でプロセスを探さないでください（PIDは使い回されるので嘘をつきます）。
 心拍はトークン回復待ちの間も30秒ごとに打たれます。
+- 2026-09-07 マリエ：Notion カンバンに取りこぼしを検知し、カードを遡って作成。labels は Notion の選択肢に合わせて調整（`profit` は既存に無く、`sourcing`+`pipeline` で表現できるため削除）。リポジトリ側の frontmatter も同じ値に揃えた

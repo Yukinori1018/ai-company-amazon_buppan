@@ -8,7 +8,7 @@ created_at: 2026-09-06
 updated_at: 2026-09-06
 next_check_at: 2026-09-08
 requires_approval: false
-labels: [guardrail, legal, adapters]
+labels: [guardrail, legal, dev]
 related_tickets: [T-20260906-006, T-20260521-005, T-20260831-002]
 ---
 
@@ -57,3 +57,4 @@ Keepa・NETSEA に続く「**新機能は白だが既存運用が黒**」の3例
 ## ログ
 
 - 2026-09-06 起票。ハルオの §V 指摘を受け、秘書が稼働状況を実測。不稼働を確認したうえで todo に置いた。
+- 2026-09-07 マリエ：Notion カンバンに取りこぼしを検知し、カードを遡って作成。labels は Notion の選択肢に合わせて調整（`adapters` → 既存の `dev` へ寄せた）。リポジトリ側の frontmatter も同じ値に揃えた

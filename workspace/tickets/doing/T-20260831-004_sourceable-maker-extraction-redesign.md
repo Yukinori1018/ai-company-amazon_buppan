@@ -7,7 +7,7 @@ priority: high
 created_at: 2026-08-31
 updated_at: 2026-08-31
 requires_approval: false
-labels: [maker-shiire, keepa, list-quality, redesign]
+labels: [maker-shiire, keepa, list-quality, strategy]
 next_check_at: 2026-09-01
 related_tickets: [T-20260817-005, T-20260831-001, T-20260831-002, T-20260804-001]
 ---
@@ -332,3 +332,4 @@ A メインレーン345社は「gBizINFO の入力データ」であり、まだ
 ### ログ
 
 - 2026-08-31 15:20 タカシ完了。走査は網羅済み。**「見つからなかった」が結論です。**
+- 2026-09-07 マリエ：Notion カンバンに取りこぼしを検知し、カードを遡って作成。labels は Notion の選択肢に合わせて調整（`redesign` → 既存の `strategy` へ寄せた）。リポジトリ側の frontmatter も同じ値に揃えた

@@ -7,7 +7,7 @@ priority: high
 created_at: 2026-08-31
 updated_at: 2026-08-31
 requires_approval: false
-labels: [maker-shiire, research-method, discovery, survey]
+labels: [maker-shiire, research, discovery]
 next_check_at: 2026-09-01
 related_tickets: [T-20260831-004, T-20260831-001, T-20260817-005, T-20260520-012]
 ---
@@ -303,3 +303,4 @@ D. orosy `help.orosy.com`（HTTP 403。**第30条により契約内容を構成�
   - アカウント識別子（お客様番号・バイヤーID）は `workspace/output/agent_output/T-20260831-005/accounts.md`（**Git追跡外**）に記録。
   - ⚠️ **既存の指摘**：NETSEA のバイヤーID 961668 と氏名を T-20260831-006 のチケット（Git追跡対象・PUBLICリポ）に記載済み。本人特定情報の扱いとして見直しの要否を検討すること。
   - 承認後の宿題：**Amazon 再販が可の出展者が何社いるかを数える**（法務判定＝出展者ごとに販路制限を課せる／規約第6条・ログイン後にしか読めない）。これで初めて「使える母数」が確定する。会員になると規約第17条で **SD由来データの公開リポ掲載も不可**になる。
+- 2026-09-07 マリエ：Notion カンバンに取りこぼしを検知し、カードを遡って作成。labels は Notion の選択肢に合わせて調整（`research-method`/`survey` → 既存の `research` へ統合）。リポジトリ側の frontmatter も同じ値に揃えた
