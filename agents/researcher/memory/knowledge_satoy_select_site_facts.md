@@ -19,8 +19,27 @@
 
 Search Console の「インデックス未登録の新しい要因」通知を調べて確定した挙動。**同じ通知が再び来ても、この2つなら実害なし。**
 
-- **`www.satoy-select.com` は 301 せず 200 で実体を返す**（apex と両方が生きている）。ただし www 側8ページの canonical はすべて apex を指すので、Google は www を「適切な canonical のある代替ページ」と判定する＝通知の要因①。消したければ Cloudflare の Redirect Rules で hostname 単位の 301 を張る（Pages の `_redirects` ではホスト分岐できない）
-- **`.html` 付きURLは Cloudflare Pages が 308 で拡張子なしへ正規化**（`/about.html`→`/about`、`/index.html`→`/`）。`http://`→`https://` は 301 ＝通知の要因②。Google が `.html` を拾った出所は旧版（`site_backup_20260820/`）の canonical が `.html` 付きだった名残で、**現行版は canonical・sitemap・内部リンクとも拡張子なしに統一済み**（公開用の `href="*.html"` は0件）
+**Search Console の実データ（推測ではなく実物）：未登録4件は全部 www ホストだった。`.html` 付きURLは1件も含まれていない。**
+
+| 区分 | 件数 | 実際のURL |
+|---|---|---|
+| 登録済み | 9 | 公開ページは正常に索引済み |
+| 代替ページ（canonical あり） | 3 | `https://www.satoy-select.com/contact` `/business` `/` |
+| ページにリダイレクトがあります | 1 | `http://www.satoy-select.com/` |
+
+- **原因**：`www.satoy-select.com` が 301 せず 200 で実体を返していた（apex と両方が生きていた）。canonical は apex を指していたので Google は www を「適切な canonical のある代替ページ」と判定していた
+- **対処（2026-09-07 実施済み）**：Cloudflare の Redirect Rules テンプレート「WWWからルートへのリダイレクト」で Single Redirect を1本デプロイ。`https://www.*` → `https://${1}` の **301**、**クエリ文字列を保持するにチェック**。Pages の `_redirects` ではホスト単位の分岐ができないのでダッシュボード設定になる。デプロイ時に「DNS が www をプロキシしていない可能性」警告が出るが *Ignore and deploy* で問題なく動く（実測確認済み）
+- **`.html` 付きURLは Cloudflare Pages が 308 で拡張子なしへ正規化**（`/about.html`→`/about`）。現行版は canonical・sitemap・内部リンクとも拡張子なしに統一済み（公開用の `href="*.html"` は0件）
 - `robots.txt` は `Allow: /` ＋ sitemap 宣言あり。ブロックなし
 
 **教訓：Search Console の通知は「エラー」ではなく「分類の報告」。慌てて直す前に curl でステータスと canonical を実測する。**
+
+### 「未登録」はゼロにならない — そういうものだと知っておく
+
+www の4URLは 301 を張った後、「代替ページ」から「**ページにリダイレクトがあります**」へ分類が移るだけで、**未登録カウントには残り続ける**。これが正しい最終形であってエラーではない。「未登録が消えない」を理由に設定をいじり直さないこと。
+
+### この件でやらかしたこと（再発防止）
+
+初報で「`.html` 付き旧URLの名残」と原因を断定して社長に報告したが、**Search Console の実データを見たら `.html` は1件も無かった**。curl でサイト側の挙動を測っただけで、Google が何を拾っているかは見ていなかった。
+
+**教訓：外部サービスが「何を見ているか」は、そのサービスの画面を開くまで分からない。自分の側を測って原因を断定しない。**

@@ -1,13 +1,13 @@
 ---
 ticket_id: T-20260907-001
 title: Search Console「インデックス未登録の新しい要因」通知（satoy-select.com）の原因特定と対応
-status: waiting
+status: done
 assignee: secretary
 priority: low
 created_at: 2026-09-07
 updated_at: 2026-09-07
-next_check_at: 2026-09-10
-requires_approval: true
+next_check_at: 2026-09-14
+requires_approval: false
 labels: [website, seo, satoy-select]
 related_tickets: [T-20260817-006, T-20260825-001]
 ---
@@ -64,3 +64,55 @@ Cloudflare Pages が拡張子付きURLを拡張子なしURLへ正規化してい
 
 - 2026-09-07 カズヨ：メール受領 → 原因特定（curl による実測）→ 「実害なし」と判定。www 301 の可否のみ社長判断待ちとして waiting へ
 - 2026-09-07 マリエ：Notion カンバンへ新規カード作成（waiting 列 / page 3d4b0a40-44fa-8110-86e3-e5be348bcbe9）。labels は Notion の選択肢に合わせて `homepage`→`website`、`search-console`→`seo` へ統合し、`website` `seo` `satoy-select` の3オプションを新設（既存44件を全保持して47件へ）。owner-tasks.md に社長タスク1件（www→apex 301 の Go/NoGo）を追記
+
+---
+
+## 対応完了（2026-09-07・社長ログイン → カズヨが設定）
+
+### Search Console の実データ（当初の見立てを訂正）
+
+`.html` 付き旧URLは**1件も含まれていなかった**。未登録4件は**すべて www ホスト**。
+
+| 区分 | 件数 | 実際のURL |
+|---|---|---|
+| 登録済み | 9 | 公開ページは正常に索引済み |
+| 代替ページ（canonical あり） | 3 | `https://www.satoy-select.com/contact` `/business` `/` |
+| ページにリダイレクトがあります | 1 | `http://www.satoy-select.com/` |
+
+→ 当初「`.html` の名残」と推測して報告したが、**実データと違った。推測を事実として書いた誤り。**
+
+### 実施したこと
+
+Cloudflare ダッシュボード → satoy-select.com → Rules → Redirect Rules で、テンプレート「WWWからルートへのリダイレクト」から Single Redirect を1本デプロイ。
+
+- ルール名: `WWWからルートへのリダイレクト [テンプレート]`
+- リクエストURL: `https://www.*`（ワイルドカードパターン）
+- 対象URL: `https://${1}` / ステータスコード **301**
+- **「クエリ文字列を保持する」にチェック**（utm 等のパラメータを落とさないため）
+- デプロイ時に「DNS が www をプロキシしていない可能性がある」警告が出たが、www は実際に応答していたため *Ignore and deploy rule anyway* を選択 → **実測で正常動作を確認済み**
+
+### 検証（デプロイ15秒後・curl 実測）
+
+| URL | 結果 |
+|---|---|
+| `https://www.satoy-select.com/` | 301 → `https://satoy-select.com/` |
+| `https://www.satoy-select.com/contact` | 301 → `https://satoy-select.com/contact` |
+| `https://www.satoy-select.com/business` | 301 → `https://satoy-select.com/business` |
+| `https://www.satoy-select.com/guides?utm_source=test` | 301 → `…/guides?utm_source=test`（**クエリ保持 OK**） |
+| `http://www.satoy-select.com/` | 301 → `https://www.satoy-select.com/`（→ さらに apex へ。2ホップ） |
+| `https://satoy-select.com/` `/contact` | **200**（apex は影響なし） |
+
+Search Console 側では「代替ページ（適切な canonical タグあり）」の**修正の検証を開始**（2026-09-07 開始）。
+
+### 残る注意点（誤解しないための記録）
+
+**「未登録4件」は今後もゼロにはならない。** www の4URLは「代替ページ」から「**ページにリダイレクトがあります**」へ分類が移るだけで、未登録カウントには残り続ける。これは**正しい最終形**であってエラーではない。リダイレクト先の apex が索引されていれば目的は達成されている。
+
+→ 「未登録が消えない」を理由に再度いじらないこと。
+
+## ログ
+
+- 2026-09-07 カズヨ：メール受領 → curl で原因特定 → 「実害なし」と判定。www 301 の可否のみ社長判断待ちとして waiting へ
+- 2026-09-07 カズヨ：Search Console 実データで当初の見立てを訂正（`.html` 由来はゼロ、全4件が www）
+- 2026-09-07 社長：Cloudflare へログイン（本人にしかできない一手）
+- 2026-09-07 カズヨ：Redirect Rule をデプロイ → curl 6パターンで動作確認 → GSC で修正の検証を開始 → **done**
