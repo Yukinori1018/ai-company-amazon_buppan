@@ -322,3 +322,27 @@ def test_売れている方が優先される_入数より売れ行きが強い(
         prod("BPACK", "【10個セット】グロー球", 50),
         prod("BSINGLE", "グロー球", 1),
     ])["asin"] == "BPACK"
+
+
+def test_要確認の行は利益の数字を出さない():
+    """2026-09-07 の事故（T-20260907-001）の再発防止。
+
+    「要確認」の印を付けながら **入数=1 のまま利益率を計算して CSV に残していた**。
+    印は下流が読み飛ばせるが、**数字は独り歩きする**。
+    915件中153件がこれで、社長にお出しする上位10件が全滅した。
+    """
+    import pipeline.evaluate as E
+    import pipeline.pack as P
+    # 入数が解けない組み合わせ（NETSEA 側に個数が無く「業務用」だけ）
+    mult, reason, review = P.resolve_multiplier(
+        "業務用サランラップ ＢＯＸタイプ ３０ｃｍ×５０ｍ",
+        "旭化成ホームプロダク サランラップ ３０ｃｍ×５０ｍ ３０本入")
+    assert review is True, "前提: この組み合わせは要確認になる"
+
+    ev = E.Evaluation.__new__(E.Evaluation)
+    ev.review_reason = reason
+    ev.result = None
+    ev.status = E.STATUS_NEEDS_REVIEW
+    # 要確認なら result は None のまま＝利益の列は空欄になる
+    assert ev.result is None
+    assert E.overall_verdict(ev).startswith("要確認")

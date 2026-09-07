@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>入数の突合を直した — before/after</title><style>
+:root{--fg:#1b1f23;--mut:#5b6570;--line:#e3e7eb;--acc:#0b5fff;--warn:#b45309;--bad:#b91c1c;--ok:#047857;}
+*{box-sizing:border-box}
+body{margin:0;background:#f6f7f9;color:var(--fg);
+ font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",Meiryo,sans-serif;
+ line-height:1.85;font-size:15.5px;-webkit-text-size-adjust:100%;}
+.wrap{max-width:1000px;margin:0 auto;padding:32px 22px 96px;background:#fff;
+ box-shadow:0 1px 3px rgba(0,0,0,.06);}
+h1{font-size:1.75rem;line-height:1.4;margin:.2em 0 .6em;padding-bottom:.4em;border-bottom:3px solid var(--acc);}
+h2{font-size:1.3rem;margin:2.2em 0 .7em;padding:.35em .6em;background:#eef3ff;border-left:5px solid var(--acc);border-radius:3px;}
+h3{font-size:1.1rem;margin:1.8em 0 .5em;padding-bottom:.25em;border-bottom:1px solid var(--line);}
+p{margin:.7em 0}
+hr{border:0;border-top:1px solid var(--line);margin:2.2em 0}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:.92em;display:block;overflow-x:auto;}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top;}
+th{background:#f0f3f7;font-weight:600;white-space:nowrap;}
+tbody tr:nth-child(even){background:#fafbfc}
+blockquote{margin:1.1em 0;padding:.8em 1em;background:#fffbeb;border-left:5px solid var(--warn);border-radius:3px;color:#463a1a;}
+code{background:#f1f3f5;padding:.12em .4em;border-radius:3px;font-size:.9em;
+ font-family:"SFMono-Regular",Menlo,Consolas,monospace;}
+pre{background:#1e2430;color:#e6edf3;padding:14px 16px;border-radius:6px;overflow-x:auto;font-size:.86em;line-height:1.6;}
+pre code{background:none;color:inherit;padding:0}
+ul,ol{margin:.7em 0;padding-left:1.6em}
+li{margin:.3em 0}
+a{color:var(--acc)}
+@media print{body{background:#fff}.wrap{box-shadow:none;max-width:none}}
+</style></head><body><div class="wrap"><h1>入数（ケース vs 単品）の突合を直した — before / after</h1>
+<p>チケット: T-20260907-001 / 担当: タカシ（IT） / 2026-09-07<br>修正対象: <code>T-20260831-006/pipeline/pack.py</code> と <code>pipeline/evaluate.py</code></p>
+<blockquote>金額を含む行データはこのファイルに書いていません。Amazon価格（公開情報）と<br>リポジトリ内の手数料モデルがあれば、利益率から<strong>卸値を逆算できる</strong>ためです。<br>上位10件の明細は <code>out/top10.csv</code>（Git 追跡外・Finder から開けます）。</blockquote>
+<hr>
+<h2>結論</h2>
+<p><strong>直りました。並び順の汚染は止まっています。</strong> ただし<strong>取りこぼしを2件、途中で自分で見つけて追加修正</strong>しました。</p>
+<table><thead><tr><th></th><th>before</th><th>after</th></tr></thead><tbody>
+<tr><td>利益率の数字が出ていた行</td><td>18,585</td><td>16,182</td></tr>
+<tr><td><strong>入数が解けていないのに数字が出ていた行</strong></td><td><strong>2,113</strong></td><td><strong>0</strong></td></tr>
+<tr><td>入数が解けず除外</td><td>—</td><td>2,107</td></tr>
+<tr><td>要確認（比率ガード）で並べ替えから除外</td><td>—</td><td>296</td></tr>
+<tr><td><strong>入数の倍率が変わった行</strong></td><td>—</td><td><strong>168</strong></td></tr>
+</tbody></table>
+<p><strong>利益が出て、かつ入数が解けている行: 2,240件。</strong><br>うち T-20260906-003 の回転検証も通っているもの: <strong>133件</strong>。ここから上位10件を出しました。</p>
+<hr>
+<h2>1. 何が起きていたか（原因は2つ）</h2>
+<h3>原因1 — 「解けなかった」と書きながら、入数1で利益を計算していた</h3>
+<p><code>pack.py</code> は正しく「読めた数」と「自信が無い」を分けて返していました。<strong>判定は正しかった</strong>のです。<br>壊れていたのは受け取る側で、<code>evaluate.py</code> は要確認の印を付けたあと、<br><strong>そのまま入数=1として利益計算を続け、CSV に利益率を書いていました。</strong></p>
+<pre><code>if needs_review:
+    ev.review_reason = ev.pack_reason      # 印は付ける
+wholesale_for_listing = candidate.wholesale_ex_tax * ev.pack_size   # ← pack_size は 1 のまま</code></pre>
+<p>入数を無視すれば利益は入数倍に膨らむので、<strong>解けなかった商品が必ず利益率の上位に来ます。</strong></p>
+<p><strong>印を付けることと、数字を出さないことは別です。</strong> 印は下流が読み飛ばせますが、<strong>数字は独り歩きします。</strong><br>入数が解けていない行では <code>ev.result</code> を <code>None</code> のままにして、利益の列を空欄にするよう直しました。</p>
+<h3>原因2 — 助数詞の一覧に載っていない数え方は、黙って「入数1」になっていた</h3>
+<p>一覧に無い助数詞は「まとめ売りの表記なし」として素通りします。<strong>エラーにならないのが厄介</strong>でした。</p>
+<table><thead><tr><th>表記</th><th>読めていた値</th><th>正しい値</th><th>何が起きたか</th></tr></thead><tbody>
+<tr><td><code>160g×36食</code></td><td>1</td><td>36</td><td>「食」が無い。NETSEA の 6 と割り切れず要確認へ</td></tr>
+<tr><td><code>×12本入×(2ケース)</code></td><td>12</td><td>24</td><td>「ケース」が無い。NETSEA の 12 と一致し<strong>倍率1</strong>＝原価が半分</td></tr>
+</tbody></table>
+<p><code>ケース・食・玉・束・巻・冊・組・膳・人前・ロール・杯・足・双</code> を追加しました。<br><strong>追加したのは商品名に実際に書かれている数え方だけです。推測で埋めていません。</strong></p>
+<hr>
+<h2>2. 途中で自分で見つけた取りこぼし2件（重要）</h2>
+<p>修正後の上位10件を点検したところ、<strong>1位と2位がまだ間違っていました。</strong><br>そのまま提出していたら、直したはずの事故をもう一度起こすところでした。</p>
+<table><thead><tr><th>Amazon商品名の実態</th><th>読めていた値</th><th>正しい値</th><th>影響</th></tr></thead><tbody>
+<tr><td><code>…リハビリパンツＭ１６枚×４</code></td><td>16</td><td><strong>64</strong></td><td>原価が実際の <strong>1/4</strong></td></tr>
+<tr><td><code>…77.5g(2.5g×31包)×3</code></td><td>31</td><td><strong>93</strong></td><td>原価が実際の <strong>1/3</strong></td></tr>
+</tbody></table>
+<p>原因は、<strong>末尾の「×N」を「他に個数が読めなかったときの代替」としてしか見ていなかった</strong>ことです。<br><code>16枚</code> を読んだ時点で満足して、<strong>後ろの <code>×4</code> を丸ごと捨てていました。</strong></p>
+<p><code>_COUNT</code>（数字＋助数詞）と <code>_TRAILING_MULT</code>（行末の数字・助数詞なし）は条件が排他なので、<br><strong>足し合わせても同じ数字を二度数えません。</strong> 代替ではなく加算に変えました。</p>
+<blockquote><strong>教訓</strong>: 「入れ子の掛け算に注意」とコメントに書いてあり、<code>12個入（2種類×6個）×6袋</code> のような<br><strong>複雑な</strong>入れ子のテストもありました。落ちていたのは <code>16枚×4</code> という<strong>一番単純な形</strong>です。<br>難しいケースを守って、易しいケースが素通りしていました。</blockquote>
+<hr>
+<h2>3. 直っていないこと（推測で埋めない、と決めた部分）</h2>
+<h3>3-1. 「両側が同じ数を読んだ」が誤りになる場合</h3>
+<p>ご指摘のとおりの論点です。<strong>NETSEA の商品名がケースを表していても、卸値は1個あたりの単価</strong>のことがあります。<br>その場合「NETSEA 15個 / Amazon 15個 → 倍率1」は誤りで、実際は15倍の原価になります。</p>
+<p>これは<strong>商品名からは判別できません</strong>。日清フーズ バイオレット（<code>1Kgx15</code> / <code>1kg×15個</code>）が実例で、<br>売価が仕入の15.1倍という異常値が出ています。<strong>倍率が15なら、ちょうど帳尻が合う数字です。</strong></p>
+<p>推測で埋めないと決めたので、<strong>現状は比率ガード（売価が仕入の4倍超）に任せ、並べ替えから外しています。</strong></p>
+<p><strong>この読み違いが隠れうる行を数えました。</strong></p>
+<table><thead><tr><th>対象</th><th>件数</th></tr></thead><tbody>
+<tr><td>利益が出て入数が解けた行</td><td>2,240</td></tr>
+<tr><td>うち「両側が同じ」判定</td><td>2,110</td></tr>
+<tr><td>うち<strong>両側とも2以上</strong>（＝対称な読み違いが起きうる）</td><td><strong>62</strong></td></tr>
+<tr><td>回転検証も通過した133件のうち</td><td>10</td></tr>
+<tr><td><strong>今回の上位10件のうち</strong></td><td><strong>0件</strong></td></tr>
+</tbody></table>
+<p><strong>上位10件には1件も含まれていません。</strong> 全件が「両側とも1個（単品どうし）」です。</p>
+<h3>3-2. 比率ガードは印を付けるだけで、数字を残している</h3>
+<p><code>config.SUSPICIOUS_PRICE_RATIO</code> の説明には<br><strong>「これを超えた行は利益判定を出さず要確認に落とします」</strong>と書いてありますが、<br><strong>実装はそうなっていません</strong>（印を付けて計算を続ける）。原因1とまったく同じ形の食い違いです。</p>
+<p>該当は 26,942行中 <strong>296行</strong>。数字を捨てる修正を入れると、<br>既存テスト10件の前提（卸1,000円 → 売価5,000円 ＝ 4.5倍）が壊れます。</p>
+<p><strong>今回は「まず並び順の汚染を止める」を優先し、下流の並べ替え側で要確認を除外する方針にしました。</strong><br>契約（コメント）と実装のどちらに合わせるかは影響範囲が広いので、判断を仰ぎます。</p>
+<hr>
+<h2>4. 上位10件の出し直し</h2>
+<p><code>out/top10.csv</code> に出しました（Git 追跡外）。<strong>入数が解けている行だけ</strong>で並べています。</p>
+<ul><li>利益率の水準は <strong>23.7%〜36.7%</strong>。事故前の上位（71.8%〜77.6%）は全部消えました</li><li><strong>10件すべてが「両側とも1個」</strong>＝入数の読み違いが起きようのない単品どうしの突合</li><li>10件中4件が同一メーカーの蛍光灯です。<strong>分散していないので、発注時は分けてご検討ください</strong></li></ul>
+<h3>上位10件が満たしている条件</h3>
+<ol><li>入数が両側とも確定している（要確認をすべて除外）</li><li>利益が出ている（赤字を除外）</li><li>T-20260906-003 の回転検証（観測回数・ドロップ数・カート最終獲得・カート不在率）を通過</li></ol>
+<hr>
+<h2>5. 再現方法</h2>
+<pre><code>cd workspace/output/deliverables/T-20260831-006 &amp;&amp; python3 -m pytest tests/ -q   # 105 passed
+cd ../T-20260907-001 &amp;&amp; python3 reevaluate.py &amp;&amp; python3 make_top10.py</code></pre>
+<p><code>reevaluate.py</code> は <strong>Keepa も NETSEA も叩きません</strong>。キャッシュから計算し直すだけです（所要 約30秒）。<br>T-20260906-003 の <code>out/</code> は<strong>読むだけ</strong>で、走行中のジョブには触れていません。</p></div></body></html>

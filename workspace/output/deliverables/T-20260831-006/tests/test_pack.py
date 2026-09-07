@@ -123,3 +123,79 @@ def test_割り切れない食い違いは要確認にする():
 def test_どちらかが不明なら要確認にする():
     mult, reason, review = pack.resolve_multiplier("テスト商品", "テスト商品 S351722F_set")
     assert review and mult == 1
+
+
+# ============================================================================
+# 2026-09-07 の事故（T-20260907-001）から起こしたテスト。
+# 社長にお出しする上位10件が、全件この不具合で埋まっていた。
+# ============================================================================
+
+def test_ケースという助数詞を読む():
+    """「×12本入×(2ケース)」は 24。
+
+    これを 12 と読むと、NETSEA 側の 12 と一致して「入数は同じ・倍率1」になり、
+    **実際の半分の原価**で利益率76%が出る。実在の行（サントリー黒烏龍茶）。
+    """
+    r = pack.detect_pack("サントリー 黒烏龍茶 1.05Lペットボトル×12本入×(2ケース)")
+    assert r.size == 24
+    assert not r.uncertain
+
+
+def test_食という助数詞を読む():
+    """「160g×36食」は 36。
+
+    助数詞の一覧に「食」が無かったため 1 と読み、NETSEA の 6 と割り切れず
+    「入数が食い違います」になっていた。**要確認に落ちるのは正しいが、
+    そもそも読めるべき表記**（実在の行：アイズ 国産18雑穀ごはん）。
+    """
+    r = pack.detect_pack("アイズ 国産18雑穀ごはん 160g×36食")
+    assert r.size == 36
+    assert not r.uncertain
+
+
+def test_黒烏龍茶_NETSEAとAmazonの倍率が2になる():
+    mult, reason, review = pack.resolve_multiplier(
+        "サントリー 黒烏龍茶 OTPP ペット 1.05Lx12",
+        "サントリー 黒烏龍茶【特定保健用食品 特保】 1.05Lペットボトル×12本入×(2ケース)")
+    assert mult == 2, reason
+    assert not review
+
+
+def test_雑穀ごはん_NETSEAとAmazonの倍率が6になる():
+    mult, reason, review = pack.resolve_multiplier(
+        "アイズ 国産１８雑穀ごはん 160gx6",
+        "アイズ 国産18雑穀ごはん 160g×36食")
+    assert mult == 6, reason
+    assert not review
+
+
+def test_片側が読めないままなら要確認のまま():
+    """サランラップ。NETSEA 側は「業務用」とあるだけで個数が無い。
+
+    **読めないものを読めたことにしない。** ここは要確認のままが正しい。
+    """
+    mult, reason, review = pack.resolve_multiplier(
+        "業務用サランラップ ＢＯＸタイプ ３０ｃｍ×５０ｍ",
+        "旭化成ホームプロダク サランラップ ３０ｃｍ×５０ｍ ３０本入")
+    assert review is True
+    assert "確定できません" in reason
+
+
+def test_助数詞つきの個数の後ろに続く末尾の掛け算も拾う():
+    """「16枚×4」は 64。「(2.5g×31包)×3」は 93。
+
+    末尾の「×N」を **counts が空のときの代替** としてしか見ていなかったため、
+    助数詞つきの個数が先にあると **後ろの ×N を丸ごと落としていた**。
+    実在の2行（ライフリー リハビリパンツ／万田酵素）で、どちらも
+    **原価が実際の 1/4・1/3** になり、社長にお出しする上位10件の1位と2位に来ていた。
+    """
+    assert pack.detect_pack("ユニチャーム ライフリーリハビリパンツＭ１６枚×４").size == 64
+    assert pack.detect_pack("万田酵素 GINGER 77.5g(2.5g×31包)×3").size == 93
+
+
+def test_ライフリー_NETSEAとAmazonの倍率が4になる():
+    mult, reason, review = pack.resolve_multiplier(
+        "ライフリー リハビリパンツM 16枚",
+        "ユニチャーム ライフリーリハビリパンツＭ１６枚×４")
+    assert mult == 4, reason
+    assert not review

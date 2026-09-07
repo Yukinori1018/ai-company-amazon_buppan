@@ -175,6 +175,18 @@ def evaluate(
         candidate.product_name, facts.title)
     if needs_review:
         ev.review_reason = ev.pack_reason
+        # ★入数が解けていない行では、**利益を一切計算しない**。
+        #
+        #   2026-09-07 の事故。ここで「要確認」の印だけ付けて、
+        #   **入数=1 のまま利益計算を続けていた**。CSV には利益率77.6%・ROI1,121% と
+        #   いう数字が残り、下流はそれを見て並べ替える。入数を無視すれば利益は入数倍に
+        #   膨らむので、**解けなかった商品が必ず利益率の上位に来る**。
+        #   915件中153件がこれで、社長にお出しする上位10件が全滅した。
+        #
+        #   印を付けることと、数字を出さないことは**別**。印は下流が読み飛ばせるが、
+        #   数字は独り歩きする。ev.result を None のままにして列を空欄にする。
+        ev.status = STATUS_NEEDS_REVIEW
+        return ev
     wholesale_for_listing = candidate.wholesale_ex_tax * ev.pack_size
 
     size_key_for_fee = "standard_2" if ev.size_key == "unknown" else ev.size_key
@@ -209,6 +221,13 @@ def evaluate(
         ev.review_reason = (
             f"売価が仕入の{ratio:.1f}倍。入数の読み落としの疑い"
             f"（Amazon商品名を確認してください）")
+        # ⚠️ **ここは印を付けるだけで、利益の数字は残したままです。**
+        #   config.SUSPICIOUS_PRICE_RATIO の説明は「これを超えた行は利益判定を出さず
+        #   要確認に落とします」と書いてありますが、実装はそうなっていません。
+        #   実データで 280行/26,942行 が該当します（T-20260907-001 で計測）。
+        #   数字を捨てる変更は既存テスト10件の前提（卸1,000円→売価5,000円＝4.5倍）を
+        #   壊すため、**下流の並べ替え側で「要確認」を除外する**方針にしました。
+        #   契約と実装のどちらを直すかは、影響範囲が広いので判断を仰ぎます。
 
     ev.status = STATUS_NEEDS_REVIEW if ev.review_reason else STATUS_OK
     if ev.pack_size > 1:

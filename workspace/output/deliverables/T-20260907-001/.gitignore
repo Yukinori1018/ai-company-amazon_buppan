@@ -1,0 +1,10 @@
+# ★ディレクトリを作る前に書くこと。
+# 利益率・純利益は Amazon価格（公開情報）と当リポジトリ内の手数料モデルを使うと
+# **NETSEA 卸値を逆算できる**（memory: knowledge_column_level_redaction_public_repo
+# 「逆算できる列も落とす」）。したがって金額を含む行データは追跡しない。
+# 社長は Finder のブックマークから out/ 配下をそのまま開けます（symlink 先は実体）。
+out/
+*.jsonl
+reevaluated.json
+*.csv
+!stats_*.csv
