@@ -14,3 +14,13 @@
 
 - 「自社サイトがあるから販売サイトとして通る」は**成り立たない**。卸プラットフォームが見るのは「販売ページ」であって会社案内ではない
 - 住所が全ページのフッターに載っている＝**このリポジトリは PUBLIC なので、成果物に住所を書くときは伏せる**（今回は `〒146-00xx 東京都大田区（以下略）` とした）
+
+## 配信まわりの実測（2026-09-07 / T-20260907-001）
+
+Search Console の「インデックス未登録の新しい要因」通知を調べて確定した挙動。**同じ通知が再び来ても、この2つなら実害なし。**
+
+- **`www.satoy-select.com` は 301 せず 200 で実体を返す**（apex と両方が生きている）。ただし www 側8ページの canonical はすべて apex を指すので、Google は www を「適切な canonical のある代替ページ」と判定する＝通知の要因①。消したければ Cloudflare の Redirect Rules で hostname 単位の 301 を張る（Pages の `_redirects` ではホスト分岐できない）
+- **`.html` 付きURLは Cloudflare Pages が 308 で拡張子なしへ正規化**（`/about.html`→`/about`、`/index.html`→`/`）。`http://`→`https://` は 301 ＝通知の要因②。Google が `.html` を拾った出所は旧版（`site_backup_20260820/`）の canonical が `.html` 付きだった名残で、**現行版は canonical・sitemap・内部リンクとも拡張子なしに統一済み**（公開用の `href="*.html"` は0件）
+- `robots.txt` は `Allow: /` ＋ sitemap 宣言あり。ブロックなし
+
+**教訓：Search Console の通知は「エラー」ではなく「分類の報告」。慌てて直す前に curl でステータスと canonical を実測する。**
