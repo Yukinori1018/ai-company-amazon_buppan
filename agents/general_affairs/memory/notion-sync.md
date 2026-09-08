@@ -542,3 +542,12 @@ todo → doing → waiting の途中経過をカードで再現する必要は�
 
 **教訓**: ラベルの不一致は Status の不一致と違って**エラーにならず静かに通る**（今回も HTTP 成功）。
 静かに通る差異ほど、記録しないと消える。
+
+## 2026-09-09 — T-20260826-004 done / T-20260909-001 新規（マリエ）
+
+- 004: page `3c8b0a40-44fa-8118-853f-db403231379a` を Status=done / UpdatedAt=2026-09-09 / Description 更新 ＋ 本文に `## 結果要約（2026-09-09 done）` を追記。
+- 009-001: 新規カード作成 `3d5b0a40-44fa-81f1-83e9-d4bba719c1e5`（doing / secretary / high / labels=[compliance, ops]）。
+- **全件突合で同期漏れ2件を発見し遡って作成**: T-20260908-001（`3d5b0a40-44fa-8153-b7a7-c6c833c1f59b`）、T-20260908-002（`3d5b0a40-44fa-8157-b21e-f30db1fcc955`）。labels は未定義オプションの可能性があったため付けず（Priority/Assignee/Parent は frontmatter どおり）。
+- **未解消のドリフト（非破壊のため手を付けず・社長/カズヨ確認事項）**
+  - `T-20260907-001` が**ローカルで重複ID**（`done/…gsc-index-coverage` と `doing/…pack-size-resolution`）。Notion は done 側1枚のみで、pack-size 側は板に出せない。**採番のやり直しが要る**。
+  - Notion 専用カード4枚（リポジトリに実体なし）: `T-20260806-001`(done) / `T-20260806-002`(waiting) / `T-20260806-003`(done) / `T-20260809-001`(done。同IDのwaitingカードと二重)。削除は §4.1 のため報告のみ。
