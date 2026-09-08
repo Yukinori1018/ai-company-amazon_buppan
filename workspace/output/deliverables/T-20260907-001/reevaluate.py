@@ -17,6 +17,9 @@ sys.path.insert(0, str(SCAN))
 
 from pipeline import config, evaluate, keepa_verify, screen, pack  # noqa: E402
 
+sys.path.insert(0, str(HERE))
+import selection_rules as SEL  # noqa: E402
+
 CFG = config.ScanConfig()
 csv.field_size_limit(10 ** 9)
 
@@ -69,7 +72,12 @@ def main():
     rows = list(csv.DictReader((SCAN / "out/candidates.csv").open(encoding="utf-8-sig")))
     print(f"母数 {len(rows):,} 行を再評価します")
 
-    # T-20260906-003 の通過 ASIN（回転の検証を通ったもの）。**読むだけ**。
+    # T-20260906-003 の通過 ASIN（回転の検証を通ったもの）。**読むだけ。書かない。**
+    #
+    # ★ passed.jsonl を直接読む。summarize.py が作る candidates.csv は
+    #   「最後に summarize を打った時点」のスナップショットなので、
+    #   走行中はすぐ古くなる（915件時点のデータで作ったリストを出してしまった前科あり）。
+    #   append-only なので重複しうる。asin で潰す。
     passed = set()
     pj = RUN / "out/passed.jsonl"
     if pj.exists():
@@ -77,10 +85,16 @@ def main():
             try:
                 r = json.loads(line)
             except Exception:
-                continue
-            if r.get("ok"):
+                continue          # 走行中に読むので、最終行が千切れていることがある
+            if r.get("ok") and r.get("asin"):
                 passed.add(r["asin"])
-    print(f"T-20260906-003 の通過 ASIN: {len(passed):,} 件（読み取りのみ）")
+    print(f"T-20260906-003 の通過 ASIN: {len(passed):,} 件（読み取りのみ・最新）")
+
+    # ★②③通過（回転検証済み）だけを見た歩留まり。社長への報告はこちらが本筋。
+    funnel = {}
+    def drop(asin, why):
+        if asin in passed:
+            funnel[why] = funnel.get(why, 0) + 1
 
     before = {"利益率あり": 0, "入数未解決なのに数字が出ていた": 0}
     after = {"利益率あり": 0, "入数未解決で除外": 0, "要確認で除外": 0,
@@ -106,13 +120,32 @@ def main():
         if ev.result is None:
             if ev.review_reason:
                 after["入数未解決で除外"] += 1
+                drop(asin, "入数が解けない")
             else:
                 after["Amazon未出品/価格なし"] += 1
+                drop(asin, "Amazon未出品/価格なし")
             continue
         if ev.review_reason:            # 比率ガード等（数字は残るが並べ替えからは外す）
             after["要確認で除外"] += 1
+            drop(asin, "要確認（売価が仕入の4倍超など）")
             continue
         after["利益率あり"] += 1
+
+        # ── 選定条件（蛍光灯/Amazon本体/知財フラグ/PSE v2）────────────────
+        sel = SEL.judge(
+            netsea_name=row.get("商品名") or "",
+            amazon_title=f.get("title") or "",
+            brand=f.get("brand") or "",
+            category_names=f.get("category_names") or [],
+            supplier_name=row.get("サプライヤー名") or "",
+            availability_amazon=f.get("availability_amazon"),
+        )
+        if sel.excluded:
+            for why in sel.exclude_reasons:
+                key = "選定除外: " + why.split("（")[0]
+                after[key] = after.get(key, 0) + 1
+            drop(asin, "選定除外: " + sel.exclude_reasons[0].split("（")[0])
+            continue
         try:
             old_pack = int(float(row.get("出品の入数") or 1))
         except Exception:
@@ -121,6 +154,7 @@ def main():
             after["倍率が変わった"] += 1
         if ev.result.net_profit <= 0:
             after["赤字"] += 1
+            drop(asin, "赤字")
             continue
         out.append({
             "asin": asin, "jan": row.get("JAN") or "",
@@ -131,6 +165,12 @@ def main():
             "verdict": verdict, "supplier": row.get("サプライヤー名") or "",
             "url": row.get("Amazonページ") or "",
             "in_run": asin in passed,
+            "flags": sel.flags,
+            "pse_verdict": sel.pse_verdict,
+            "pse_rule_id": sel.pse_rule_id,
+            "pse_review_note": sel.pse_review_note,
+            # ★通過＝発注可ではない。書類が揃うまで発注しない印。
+            "requires_document_check": sel.requires_document_check,
         })
 
     print("\n■ before（既存 candidates.csv）")
@@ -139,6 +179,14 @@ def main():
     print("\n■ after（入数の修正後）")
     for k, v in after.items():
         print(f"  {k}: {v:,}")
+
+    print(f"\n■ ②③通過 {len(passed):,} 件の歩留まり（社長報告はこちら）")
+    tot = 0
+    for k, v in sorted(funnel.items(), key=lambda x: -x[1]):
+        print(f"  除外 {v:6,d}  {k}")
+        tot += v
+    print(f"  ---- 除外合計 {tot:,} / 母数に無い(Keepa未取得) "
+          f"{len(passed) - tot - sum(1 for r in out if r['in_run']):,}")
 
     out.sort(key=lambda r: -r["margin"])
     json.dump(out, (HERE / "out/reevaluated.json").open("w"), ensure_ascii=False)

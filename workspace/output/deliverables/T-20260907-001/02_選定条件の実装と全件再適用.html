@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>選定条件の実装と全件再適用</title><style>
+:root{--fg:#1b1f23;--mut:#5b6570;--line:#e3e7eb;--acc:#0b5fff;--warn:#b45309;--bad:#b91c1c;--ok:#047857;}
+*{box-sizing:border-box}
+body{margin:0;background:#f6f7f9;color:var(--fg);
+ font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",Meiryo,sans-serif;
+ line-height:1.85;font-size:15.5px;-webkit-text-size-adjust:100%;}
+.wrap{max-width:1000px;margin:0 auto;padding:32px 22px 96px;background:#fff;
+ box-shadow:0 1px 3px rgba(0,0,0,.06);}
+h1{font-size:1.75rem;line-height:1.4;margin:.2em 0 .6em;padding-bottom:.4em;border-bottom:3px solid var(--acc);}
+h2{font-size:1.3rem;margin:2.2em 0 .7em;padding:.35em .6em;background:#eef3ff;border-left:5px solid var(--acc);border-radius:3px;}
+h3{font-size:1.1rem;margin:1.8em 0 .5em;padding-bottom:.25em;border-bottom:1px solid var(--line);}
+p{margin:.7em 0}
+hr{border:0;border-top:1px solid var(--line);margin:2.2em 0}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:.92em;display:block;overflow-x:auto;}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top;}
+th{background:#f0f3f7;font-weight:600;white-space:nowrap;}
+tbody tr:nth-child(even){background:#fafbfc}
+blockquote{margin:1.1em 0;padding:.8em 1em;background:#fffbeb;border-left:5px solid var(--warn);border-radius:3px;color:#463a1a;}
+code{background:#f1f3f5;padding:.12em .4em;border-radius:3px;font-size:.9em;
+ font-family:"SFMono-Regular",Menlo,Consolas,monospace;}
+pre{background:#1e2430;color:#e6edf3;padding:14px 16px;border-radius:6px;overflow-x:auto;font-size:.86em;line-height:1.6;}
+pre code{background:none;color:inherit;padding:0}
+ul,ol{margin:.7em 0;padding-left:1.6em}
+li{margin:.3em 0}
+a{color:var(--acc)}
+@media print{body{background:#fff}.wrap{box-shadow:none;max-width:none}}
+</style></head><body><div class="wrap"><h1>選定条件の実装と、②③通過 全件への再適用</h1>
+<p>チケット: T-20260907-001（続き） / 担当: タカシ（IT） / 2026-09-08</p>
+<blockquote>金額を含む行データはこのファイルに書いていません（Amazon価格と手数料モデルから<br>卸値を逆算できるため）。明細は <code>out/top10.csv</code> / <code>out/all_candidates.csv</code>（Git 追跡外・Finder から開けます）。</blockquote>
+<hr>
+<h2>結論</h2>
+<p><strong>②③通過の全件（2,981件・実行時点の最新）に再適用しました。</strong> 133件しか無かったのは、<br>915件時点のスナップショットを見ていたためです。<strong>走行が進むたびに <code>./refresh.sh</code> 1つで最新化されます。</strong></p>
+<p>そのうえで選定条件を実装したところ、<strong>社長にお出しできるのは 50件</strong>になりました。<br>減ったのは母数が足りないからではなく、<strong>条件が効いているから</strong>です。</p>
+<h3>②③通過 2,981件の歩留まり</h3>
+<table><thead><tr><th>除外理由</th><th>件数</th></tr></thead><tbody>
+<tr><td><strong>Amazon本体が出品している</strong></td><td><strong>1,594</strong></td></tr>
+<tr><td>赤字</td><td>767</td></tr>
+<tr><td>入数が解けない</td><td>349</td></tr>
+<tr><td>#1 電気用品 1E（家電本体）</td><td>72</td></tr>
+<tr><td>要確認（売価が仕入の4倍超など）</td><td>61</td></tr>
+<tr><td><strong>蛍光灯（LED表記なし）</strong></td><td><strong>43</strong></td></tr>
+<tr><td>#1 電気用品 1A（特定電気用品）</td><td>25</td></tr>
+<tr><td>#1 電気用品 1B（電池・充電）</td><td>17</td></tr>
+<tr><td>#1 電気用品 1C（輸入経路）</td><td>3</td></tr>
+<tr><td><strong>残り＝社長にお出しできる候補</strong></td><td><strong>50</strong></td></tr>
+</tbody></table>
+<p>除外合計 2,931 ＋ 残り 50 ＝ 2,981。<strong>検算が合っています。</strong></p>
+<p><strong>いちばん効いているのは Amazon 本体の除外（53%）です。</strong> 母数を積んでも、<br>本体が出している棚は半分あります。ここは条件の問題ではなく市場の形です。</p>
+<hr>
+<h2>実装した条件</h2>
+<p><code>selection_rules.py</code>（テスト11件つき）。パイプラインに入っていなかったものを1箇所にまとめました。</p>
+<h3>1. 蛍光灯を除外。ただし LED を含むものは残す</h3>
+<p><strong>順番が命なので、先に LED かどうかを見てから蛍光灯を判定しています。</strong></p>
+<pre><code>if not is_led(text):            # ★先に LED を見る
+    for k in (&quot;蛍光灯&quot;, &quot;蛍光ランプ&quot;, &quot;蛍光管&quot;, &quot;グロー球&quot;, &quot;点灯管&quot;, &quot;安定器&quot;):
+        ...除外</code></pre>
+<p><strong><code>直管</code> を無条件に落とす条件は書いていません。</strong> テストで固定してあります<br>（<code>test_直管を無条件に落とす条件を書いていない</code>）。ご指摘のとおり、<br>それを書くと残すと決めた LED 蛍光灯まで消えます。</p>
+<h3>2. Amazon 本体ありを除外</h3>
+<p>Keepa の <code>availability_amazon</code> を使いました。<strong>列名から意味を推測せず、実データで確認しています。</strong></p>
+<table><thead><tr><th>availability_amazon</th><th>パイプラインの「Amazon本体の有無」</th><th>件数</th></tr></thead><tbody>
+<tr><td>-1</td><td>なし</td><td>10,292</td></tr>
+<tr><td>0 / 2 / 3 / 4</td><td>あり</td><td>9,572</td></tr>
+</tbody></table>
+<p><strong>-1 だけが「本体なし」で、それ以外は全部「あり」</strong>という対応が全行で一致しました。</p>
+<h3>3. 知財ブランドはフラグのみ（除外しない）</h3>
+<p>ポケモン・サンリオ・ディズニー等。<strong>除外していません。</strong>「ゲート確認の対象」という印だけです。<br>50件中1件に付いています。</p>
+<h3>4. #1 電気用品を法務 v2 に置き換え</h3>
+<p><strong>語彙をこちらに写経していません。</strong> <code>T-20260908-001/04_pse_rule_v2.py</code> を読み込んで動かしています<br>（写経すると、法務が仕様を直したときに実装だけ古いまま黙って動き続けるため）。<br>テストで固定してあります（<code>test_法務の語彙を写経していない</code>）。</p>
+<ul><li><strong>HARD</strong> → 除外（1A/1B/1C/1D/1E）</li><li><strong>REVIEW</strong> → <strong>除外しない。「PSE要書類確認」の印を立てて候補に残す</strong></li><li><strong>PASS</strong> → 何もしない（乾電池駆動など。v1 が誤って落としていた類型）</li></ul>
+<p><strong>「通過＝発注可」にはしていません。</strong> <code>requires_document_check</code> を立て、<br>CSV に「要書類確認(通過≠発注可)」列と法務の確認文（<code>review_note</code>）を出しています。<br>50件中3件が該当です。</p>
+<p><strong>直管形LEDを機械で判定していません。</strong> 電安法の対象/対象外が同じ商品名に混在して<br>判別できない、という法務の申し送りどおり、REVIEW で候補に残し、判断は人間の現物確認に委ねています。</p>
+<hr>
+<h2>法務ハルオへの申し送り 2件（こちらでは直していません）</h2>
+<p>仕様の正は法務の JSON なので、<strong>実装側で勝手に緩めていません。</strong> 事実だけ報告します。</p>
+<h3>申し送り1: 1F の「ライト」「スタンド」が光源以外を大量に拾っています</h3>
+<p>REVIEW 72件のうち、<strong>59件（82%）は商品名に光源らしい語が1つもありません。</strong></p>
+<table><thead><tr><th>拾われ方</th><th>件数</th><th>実例</th></tr></thead><tbody>
+<tr><td>「ライト」</td><td>27</td><td>テーブルランナー <strong>ライト</strong>ベージュ（色名）／シンガーニトリル<strong>ライト</strong>（ニトリル手袋）</td></tr>
+<tr><td>「スタンド」</td><td>23</td><td>アンブレラ<strong>スタンド</strong>（傘立て）／スマホ<strong>スタンド</strong>付き電卓</td></tr>
+</tbody></table>
+<p><strong>除外はされないので実害は小さい</strong>ですが、確認作業が5倍に増え、<br>本当に確認が要る13件が埋もれます。語を絞るか、前後の語との組み合わせにするかのご判断をお願いします。</p>
+<h3>申し送り2: 1E の「電源」が直管形LEDを HARD にしています</h3>
+<p><code>直管LEDランプ 電源内蔵型</code> は 1E（家電本体）の語「電源」に当たり <strong>HARD＝自動除外</strong>になります。<br>一方 <code>human_gate</code> は、電源内蔵の直管形LEDを「丸PSEマークと届出事業者名があれば販売可」としています。<br><strong>judgment と rules で扱いが食い違って見えます。</strong></p>
+<p>実装は JSON に従っています（テストで現状の挙動を固定済み）。どちらが正かご判断ください。</p>
+<hr>
+<h2>使い方（走行が進むたび）</h2>
+<pre><code>cd workspace/output/deliverables/T-20260907-001 &amp;&amp; ./refresh.sh</code></pre>
+<p>テスト → 再評価 → 上位10件の順に走ります（所要 約40秒）。Keepa も NETSEA も叩きません。</p>
+<p><strong>T-20260906-003 の <code>out/</code> は読むだけです。</strong> <code>passed.jsonl</code> を直接読むようにしました<br>（<code>summarize.py</code> が作る <code>candidates.csv</code> は「最後に打った時点」のスナップショットで、<br>走行中はすぐ古くなります。<strong>915件時点のデータを見ていた原因がこれです</strong>）。</p>
+<p>出力:</p>
+<table><thead><tr><th>ファイル</th><th>中身</th></tr></thead><tbody>
+<tr><td><code>out/top10.csv</code></td><td>上位10件の明細（PSE判定・要書類確認・確認事項つき）</td></tr>
+<tr><td><code>out/all_candidates.csv</code></td><td>候補1,305件の全件</td></tr>
+</tbody></table></div></body></html>
