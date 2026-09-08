@@ -1,5 +1,5 @@
 ---
-ticket_id: T-20260907-001
+ticket_id: T-20260907-002
 title: Search Console「インデックス未登録の新しい要因」通知（satoy-select.com）の原因特定と対応
 status: done
 assignee: secretary
@@ -116,3 +116,10 @@ Search Console 側では「代替ページ（適切な canonical タグあり）
 - 2026-09-07 カズヨ：Search Console 実データで当初の見立てを訂正（`.html` 由来はゼロ、全4件が www）
 - 2026-09-07 社長：Cloudflare へログイン（本人にしかできない一手）
 - 2026-09-07 カズヨ：Redirect Rule をデプロイ → curl 6パターンで動作確認 → GSC で修正の検証を開始 → **done**
+
+
+## 2026-09-09 採番の訂正
+
+本チケットは起票時に **T-20260907-001** を名乗っていたが、同 ID が `doing/T-20260907-001_pack-size-resolution.md`（入数突合）と重複していた。Notion は 1 ID につき 1 枚しか持てないため、**稼働中の pack-size 側がボードに出せない**状態になっていた。
+
+**本チケット（完了済み・成果物フォルダなし）を T-20260907-002 へ振り直す。** pack-size 側は `workspace/output/deliverables/T-20260907-001/` を保有しているため動かさない。
