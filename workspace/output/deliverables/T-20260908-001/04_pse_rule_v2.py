@@ -13,6 +13,14 @@ T-20260908-001 / 法務ハルオ / 2026-09-08
     REVIEW … 除外しない。「PSE要確認」の印を立てて候補に残す（発注は不可）
     PASS   … 電気用品安全法の電気用品に当たらない
 
+━━ 評価順（v2.1。順序そのものが仕様です）━━━━━━━━━━━━━━━━━━━━━
+    1A〜1D  真の危険類型（特定電気用品・電池・輸入経路・海外電圧）→ 常に最優先
+    1F_PRE  曖昧さのない照明製品 → 1E より前。判定 §4-4 の human_gate と扱いを揃える
+    1G      照明系だがメーカー不明
+    1E      家電本体
+    1F      光源系の弱い語（照明の文脈語との共起が必要）
+    1H      乾電池駆動（電安法の電気用品ではない）
+
 ━━ 呼び出し側への要求 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     verdict == "HARD"   → 従来どおり除外する
     verdict == "REVIEW" → 除外しない。CSV に review_note を出し、発注は保留する
@@ -31,7 +39,7 @@ from pathlib import Path
 SPEC_PATH = Path(__file__).resolve().parent / "03_pse_rules_v2.json"
 
 _VALID_VERDICTS = {"HARD", "REVIEW", "PASS"}
-_VALID_MATCH = {"any_substring"}
+_VALID_MATCH = {"any_substring", "any_substring_with_context"}
 
 
 class SpecError(RuntimeError):
@@ -59,12 +67,46 @@ def _n(t) -> str:
     return unicodedata.normalize("NFKC", str(t or ""))
 
 
-def _hit(text: str, terms) -> str:
+def _hit(text: str, terms, negation_terms=(), lookahead: int = 0) -> str:
+    """一致語を返す。**直後 lookahead 文字に否定語があれば一致とみなさない。**
+
+    否定の穴（T-20260904-004 で作った前科）を塞ぐための仕掛けです。
+    「電池**不要**」「ライト**ベージュ**」を素通しさせないために、距離条件を持たせます。
+    """
+    negs = [_n(x) for x in (negation_terms or []) if _n(x)]
     for k in terms:
         nk = _n(k)
-        if nk and nk in text:
-            return k
+        if not nk:
+            continue
+        start = 0
+        while True:
+            i = text.find(nk, start)
+            if i < 0:
+                break
+            tail = text[i + len(nk): i + len(nk) + max(lookahead, 0)]
+            if not any(tail.startswith(ng) for ng in negs):
+                return k
+            start = i + 1          # 否定された出現は飛ばし、次の出現を探す
     return ""
+
+
+def _rule_hit(r: dict, text: str) -> str:
+    """1規則ぶんの照合。match 種別ごとの違いはここに閉じ込める。"""
+    negs = r.get("negation_terms", [])
+    look = r.get("negation_lookahead_chars", 0)
+    if r.get("match") == "any_substring_with_context":
+        # 複合語なら文脈は要求しない（「デスクランプ」は単体で光源）
+        h = _hit(text, r.get("compound_terms", []), negs, look)
+        if h:
+            return h
+        h = _hit(text, r.get("terms", []), negs, look)
+        if not h:
+            return ""
+        # 弱い語は、照明の文脈語と共起したときにだけ発火させる
+        if _hit(text, r.get("context_terms", [])):
+            return h
+        return ""
+    return _hit(text, r.get("terms", []), negs, look)
 
 
 @dataclass
@@ -106,15 +148,15 @@ def judge_pse(
         r = _RULES[rid]
 
         if rid == "1G":
-            # 光源系（1F の語）に当たり、かつ brand が空 → メーカー不明で HARD
-            h = _hit(text, _RULES["1F"]["terms"])
+            # 照明系（1F_PRE または 1F）に当たり、かつ brand が空 → メーカー不明で HARD
+            h = _rule_hit(_RULES["1F_PRE"], text) or _rule_hit(_RULES["1F"], text)
             if h and not has_brand:
                 fired.append((rid, "brand欠落"))
                 if not v.rule_id:
                     v.verdict, v.rule_id, v.hit = "HARD", rid, "brand欠落"
             continue
 
-        h = _hit(text, r.get("terms", []))
+        h = _rule_hit(r, text)
         if not h:
             continue
         fired.append((rid, h))
