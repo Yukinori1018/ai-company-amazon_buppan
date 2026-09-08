@@ -48,19 +48,55 @@ def test_直管形LEDは機械で判定せず要確認で残す():
         assert r.requires_document_check, name
 
 
-def test_商品名に電源の語があるとPSE_1Eで自動除外される_法務へ申し送り():
-    """**これは仕様どおりの挙動であって、こちらで勝手に緩めない。**
+def test_電源内蔵の直管形LEDは除外せず要書類確認で残す():
+    """PSE v2.1 で HARD → REVIEW に変わった（法務ハルオ 2026-09-08）。
 
-    「直管LEDランプ 電源内蔵型」は 1E（家電本体）の語「電源」に当たり HARD になる。
-    法務判定 §human_gate は、電源内蔵の直管形LED を『丸PSEマークと届出事業者名が
-    あれば販売可』としているので、**judgment と rules で扱いが食い違って見える**。
-    仕様の正は JSON 側なので実装は JSON に従い、食い違いは法務へ申し送る。
-    ここを実装側で握りつぶすと、法務が塞いだ穴が黙って開き直る。
+    v2.0 では 1E（家電本体）の bare「電源」に当たって自動除外されており、
+    human_gate（丸PSE表示があれば販売可）と矛盾していた。**仕様側の誤り**で、
+    実装は仕様どおりに動いていたと法務から回答があった。
+    v2.1 で bare「電源」「電気」を 1E から削除し、危険な形は複合語で書く方針に変更
+    （電源コード等は 1A で捕捉済み）。
+
+    このテストは「申し送り中の挙動の固定」から「**修正後の正しい挙動の固定**」に役目が変わった。
     """
     r = S.judge(netsea_name="直管LEDランプ 電源内蔵型", brand="テスト社",
                 availability_amazon=-1)
-    assert r.excluded
-    assert r.pse_rule_id == "1E"
+    assert not r.excluded, f"除外してはいけない: {r.exclude_reasons}"
+    assert r.pse_verdict == "REVIEW"
+    assert r.pse_rule_id == "1F_PRE", "曖昧さのない照明製品名として 1E より先に拾われる"
+    assert r.requires_document_check
+
+
+def test_照明の文脈がない弱い語では発火しない():
+    """PSE v2.1 の申し送り1への対応（法務ハルオ 2026-09-08）。
+
+    v2.0 では bare「ライト」「スタンド」が光源以外を拾い、REVIEW 72件中59件（82%）が
+    商品名に光源語を1つも持たなかった。v2.1 で弱い語を分離し、
+    **複合語または照明の文脈語との共起でのみ発火**するようになった。
+
+    ここが落ちたら、空振りの確認作業がまた増えている。
+    """
+    for name, why in (
+            ("宇都宮製作所 シンガーニトリルライト パウダーフリー SS 100枚", "ニトリル手袋"),
+            ("かわ畑 テーブルランナー ライトベージュ 約180×33cm", "色名の『ライト』"),
+            ("アンブレラスタンド アイアン製 傘立て", "傘立て"),
+    ):
+        r = S.judge(netsea_name=name, brand="テスト社", availability_amazon=-1)
+        assert r.pse_verdict == "PASS", f"{why} は PSE の対象ではない: {r.pse_rule_id}"
+        assert not r.requires_document_check
+
+
+def test_センサーライトは1Eより先に照明として拾われる():
+    """PSE v2.1 の自主検出A（法務ハルオ）。
+
+    1E が 1F より先に評価されるため、明確な照明製品が「センサー」で HARD に
+    なっていた（実測18件）。1F_PRE を 1E より前に置いて解消。
+    **評価順そのものが仕様**なので、順序を変えたら法務のテストを必ず回すこと。
+    """
+    r = S.judge(netsea_name="センサーライト 人感 屋外 LED", brand="テスト社",
+                availability_amazon=-1)
+    assert not r.excluded
+    assert r.pse_rule_id == "1F_PRE"
 
 
 # ── 2. Amazon 本体 ────────────────────────────────────────────────────
