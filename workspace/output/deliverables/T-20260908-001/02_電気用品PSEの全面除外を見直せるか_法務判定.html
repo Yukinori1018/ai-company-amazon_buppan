@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>電気用品（PSE）の全面除外を見直せるか — 法務判定 / T-20260908-001</title><style>
+:root{--fg:#1b1f23;--mut:#5b6570;--line:#e3e7eb;--acc:#0b5fff;--warn:#b45309;--bad:#b91c1c;--ok:#047857;}
+*{box-sizing:border-box}
+body{margin:0;background:#f6f7f9;color:var(--fg);
+ font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",Meiryo,sans-serif;
+ line-height:1.85;font-size:15.5px;-webkit-text-size-adjust:100%;}
+.wrap{max-width:1000px;margin:0 auto;padding:32px 22px 96px;background:#fff;
+ box-shadow:0 1px 3px rgba(0,0,0,.06);}
+h1{font-size:1.75rem;line-height:1.4;margin:.2em 0 .6em;padding-bottom:.4em;border-bottom:3px solid var(--acc);}
+h2{font-size:1.3rem;margin:2.2em 0 .7em;padding:.35em .6em;background:#eef3ff;border-left:5px solid var(--acc);border-radius:3px;}
+h3{font-size:1.1rem;margin:1.8em 0 .5em;padding-bottom:.25em;border-bottom:1px solid var(--line);}
+p{margin:.7em 0}
+hr{border:0;border-top:1px solid var(--line);margin:2.2em 0}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:.92em;display:block;overflow-x:auto;}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top;}
+th{background:#f0f3f7;font-weight:600;white-space:nowrap;}
+tbody tr:nth-child(even){background:#fafbfc}
+blockquote{margin:1.1em 0;padding:.8em 1em;background:#fffbeb;border-left:5px solid var(--warn);border-radius:3px;color:#463a1a;}
+code{background:#f1f3f5;padding:.12em .4em;border-radius:3px;font-size:.9em;
+ font-family:"SFMono-Regular",Menlo,Consolas,monospace;}
+pre{background:#1e2430;color:#e6edf3;padding:14px 16px;border-radius:6px;overflow-x:auto;font-size:.86em;line-height:1.6;}
+pre code{background:none;color:inherit;padding:0}
+ul,ol{margin:.7em 0;padding-left:1.6em}
+li{margin:.3em 0}
+a{color:var(--acc)}
+@media print{body{background:#fff}.wrap{box-shadow:none;max-width:none}}
+</style></head><body><div class="wrap"><h1>電気用品（PSE）の全面除外を見直せるか — 法務判定</h1>
+<p>法務ハルオ／2026-09-08／T-20260908-001（親: T-20260904-004）<br>一次情報（法令・政令・経産省解釈例）は当職が e-Gov および経済産業省サイトから自分で取得。取得日はいずれも <strong>2026-09-08</strong>。</p>
+<hr>
+<h2>0. 結論（先に3行）</h2>
+<ol><li><strong>法律だけを見れば緩められます。</strong> 当社は「販売の事業を行う者」であり、届出（法3条）・技術基準適合（法8条）・検査（法8条2項）・表示（法10条）の義務は<strong>一切かかりません</strong>。かかるのは <strong>法27条1項の1つだけ</strong>＝「表示が付いているものでなければ売るな・陳列するな」です。</li><li><strong>しかし全面解除はしません。</strong> 2025-12-25 施行の改正法で、<strong>販売事業者への回収命令（42条の5）／経産大臣から Amazon への「利用停止要請」（42条の7）／違反者の氏名公表（42条の8）</strong> が入りました。停止中のアカウントに対して、この3つは致命的です。</li><li><strong>答えは「3レーンに割る」です。</strong> 自動除外は維持しつつ範囲を絞り、<strong>LED照明のような光源系は「除外」から「PSE要確認フラグを立てて候補に残す」に変えます。</strong> 実測で、この書き換えにより <strong>発注候補まで戻る SKU は 42件</strong>（現行の発注候補セット 32件に対して十分に意味のある量）。ただし<strong>42件はすべて「社長の書類確認を通るまで発注不可」</strong>であり、通過ではなく保留レーンです。</li></ol>
+<blockquote>前回いただいた指摘「保守側に倒すとは印を増やすことではなく、印を当たりに行かせること」を、そのまま設計に落としました。<strong>v1 は電気に関係する語を1つでも含めば落とす作りで、発火した 5,136件のうち 3,431件は他のルールでも落ちていました</strong>（＝#1 が無くても落ちる＝働いていなかった）。実際に #1 だけが支えていたのは 1,705件、うち光源系 702件です。ここに印を当てます。</blockquote>
+<hr>
+<h2>1. 当社は法律上どの立場か — 義務の名宛人を条文で切る</h2>
+<h3>1-1. 電気用品安全法の義務は「誰に」かかるか</h3>
+<table><thead><tr><th>条</th><th>義務の内容</th><th>名宛人</th><th>当社に<strong>かかるか</strong></th></tr></thead><tbody>
+<tr><td>3条</td><td>事業開始30日以内の届出</td><td>電気用品の<strong>製造又は輸入</strong>の事業を行う者</td><td><strong>かからない</strong></td></tr>
+<tr><td>8条1項</td><td>技術基準への適合</td><td><strong>届出事業者</strong></td><td><strong>かからない</strong></td></tr>
+<tr><td>8条2項</td><td>検査の実施・検査記録の作成保存</td><td><strong>届出事業者</strong></td><td><strong>かからない</strong></td></tr>
+<tr><td>9条</td><td>特定電気用品の適合性検査（登録検査機関）</td><td><strong>届出事業者</strong></td><td><strong>かからない</strong></td></tr>
+<tr><td>10条1項</td><td>PSE表示を付す</td><td><strong>届出事業者</strong></td><td><strong>かからない</strong>（付す権限すらない）</td></tr>
+<tr><td><strong>27条1項</strong></td><td><strong>表示が付されているものでなければ販売・陳列してはならない</strong></td><td><strong>製造、輸入又は販売の事業を行う者</strong></td><td><strong>★かかる</strong></td></tr>
+<tr><td>45条1項</td><td>報告徴収（販売した電気用品の種類・数量・保管/販売の場所・<strong>購入先</strong>・主たる販売先）</td><td>販売の事業を行う者（施行令7条2項）</td><td><strong>かかる</strong>（求められたら答える）</td></tr>
+<tr><td><strong>42条の5第1号</strong></td><td><strong>27条1項違反で販売した者に対する回収命令</strong></td><td>製造、輸入又は<strong>販売</strong>の事業を行う者</td><td><strong>★かかる</strong></td></tr>
+<tr><td>42条の8</td><td>法令等違反行為を行った者の<strong>氏名の公表</strong></td><td>違反行為者</td><td><strong>★かかる</strong></td></tr>
+</tbody></table>
+<p><strong>27条1項（原文・e-Gov 2026-09-08 取得）</strong></p>
+<blockquote>電気用品の製造、輸入又は販売の事業を行う者は、第十条第一項の表示が付されているものでなければ、電気用品を販売し、又は販売の目的で陳列してはならない。</blockquote>
+<p><strong>罰則（57条3号）</strong></p>
+<blockquote>第二十七条第一項の規定に違反して電気用品を販売し、又は販売の目的で陳列したとき。<br>→ 「一年以下の<strong>拘禁刑</strong>若しくは百万円以下の罰金に処し、又はこれを併科する」（57条柱書）</blockquote>
+<p>27条2項の適用除外は ①特定用途向けで経産大臣の承認を受けたとき ②8条1項1号の承認に係るもの の2つだけで、<strong>当社には縁がありません</strong>。輸出目的の販売は施行令8条2項で27条1項が適用されませんが、これも当社の話ではありません。</p>
+<h3>1-2. だから「電気用品だから危ない」は誤りです</h3>
+<p>当社が負うのは <strong>「表示の確認」1本</strong>です。表示のある国内正規品を国内卸から仕入れて売る行為は、電安法上<strong>適法</strong>です。ここは根拠を持って「問題ありません」と言えます（法3条・8条・9条・10条の名宛人がいずれも製造・輸入事業者／届出事業者であることによる）。</p>
+<p><strong>危ないのは「電気用品であること」ではなく、次の3つが重なる条件です。</strong></p>
+<ul><li>① <strong>表示（PSEマーク）が現物に無い</strong>、または<strong>あるか確認していない</strong></li><li>② その商品が <strong>特定電気用品</strong>（菱形PSE。ACアダプタ・コード類・直流電源装置など）または<strong>リチウムイオン蓄電池</strong>である</li><li>③ 供給の上流に<strong>輸入者が居る／居るか分からない</strong>（並行輸入・海外直販・海外ノーブランド）</li></ul>
+<hr>
+<h2>2. 2025-12-25 施行の改正で、転売者のリスクが上がっています ★新規</h2>
+<p>現行の電気用品安全法は <strong>令和6年法律第67号「消費生活用製品安全法等の一部を改正する法律」により 2025-12-25 に改正施行</strong>されています（e-Gov の現行版メタデータで確認）。転売者に直撃する新設が3本あります。</p>
+<h3>(1) 42条の5第1号 — 販売しただけで回収命令が出る</h3>
+<blockquote>経済産業大臣は、…当該危険又は障害の拡大を防止するため特に必要があると認めるときは、当該各号に規定する者に対し、<strong>販売した当該電気用品の回収</strong>を図ること…を命ずることができる。<br>一 電気用品の製造、輸入又は<strong>販売</strong>の事業を行う者が<strong>第二十七条第一項の規定に違反して電気用品を販売したこと</strong>。</blockquote>
+<p>命令違反は 57条6号でやはり <strong>1年以下の拘禁刑／100万円以下の罰金</strong>。<strong>購入者を特定して回収する義務</strong>を、個人事業主の当社が負います。FBA で全国に出荷済みの在庫を回収する事態は、<strong>金銭では戻せません（不可逆）</strong>。</p>
+<h3>(2) 42条の7 — 経産大臣が Amazon に「あなたを止めろ」と要請できる</h3>
+<p>法2条3項・4項で <strong>「取引デジタルプラットフォーム提供者」</strong> が新たに定義されました。Amazon.co.jp のマーケットプレイスはこの定義に真正面から当たります。</p>
+<blockquote>経済産業大臣は、…当該取引デジタルプラットフォーム提供者に対し、当該各号に規定する者による<strong>当該電気用品の販売に係る当該取引デジタルプラットフォームの利用の停止</strong>その他の必要な措置をとるべきことを<strong>要請することができる</strong>。<br>3 取引デジタルプラットフォーム提供者は、…当該措置により製造、輸入又は販売の事業を行う者に生じた<strong>損害については、賠償の責任を負わない</strong>。</blockquote>
+<p><strong>行政の要請1本でプラットフォーム利用を止められ、止めた側は賠償責任を負わない</strong>という構造が明文で入りました。<strong>アカウント停止中の当社にとって、これは事業の終了を意味します。</strong></p>
+<h3>(3) 42条の8 — 氏名の公表</h3>
+<blockquote>経済産業大臣は、…<strong>法令等違反行為を行つた者の氏名又は名称</strong>その他…を公表することができる。</blockquote>
+<p>個人事業主は屋号ではなく<strong>個人名</strong>が公表され得ます。削除できません。</p>
+<blockquote><strong>この3本があるため、当職は「全面解除」を選びません。</strong>同時に、この3本はすべて<strong>27条1項違反を起点</strong>にしています。<strong>表示の確認さえ確実に行えば、起点が立ちません。</strong>だから「確認を必須にした上で通す」という設計が、法の構造と一致します。</blockquote>
+<hr>
+<h2>3. 危ない条件の類型分け — 5段階</h2>
+<table><thead><tr><th>段</th><th>類型</th><th>何が危ないか</th><th>判定</th></tr></thead><tbody>
+<tr><td><strong>S（絶対に扱わない）</strong></td><td>モバイルバッテリー／リチウムイオン蓄電池内蔵品／充電式製品</td><td>施行令別表第二 一二「リチウムイオン蓄電池（体積エネルギー密度400Wh/L以上…）」で電気用品。加えて <strong>FBA 危険物納品プログラムは大口出品者のみ</strong>で、<strong>小口の当社は申請すらできない</strong>（社長のプランは小口＝memory <code>project_amazon_plan_koguchi</code>）。FBA で1周を完走できない</td><td><strong>自動除外</strong></td></tr>
+<tr><td><strong>S</strong></td><td>ACアダプタ・電源コード・延長コード・テーブルタップ・差込プラグ・ソケット・変圧器・直流電源装置</td><td><strong>特定電気用品（菱形PSE・施行令別表第一）</strong>。事故時の危険度が最も高い類型で、Amazon の書類審査も最も厳しい（セラーフォーラムで「ACアダプターは審査が特に厳しい」との複数証言）</td><td><strong>自動除外</strong></td></tr>
+<tr><td><strong>A（扱わない）</strong></td><td>並行輸入品・海外直販・海外ノーブランド・海外電圧表記（110V/220V/230V/240V）</td><td>上流に<strong>日本の届出事業者が存在しない</strong>ことが構造的にあり得る。表示があっても<strong>偽の PSE マーク・CCC認証をPSEと偽る・他社証明書の流用</strong>が実例として指摘されている。真贋クレームとも重なる</td><td><strong>自動除外</strong></td></tr>
+<tr><td><strong>A</strong></td><td>中国輸入系サプライヤー（グッズステーション等）</td><td>同上。仕入れ先ごと外す既存判断を維持</td><td><strong>自動除外</strong></td></tr>
+<tr><td><strong>B（条件付き）</strong></td><td><strong>AC100V の LED 照明・照明器具・電球（電池を含まないもの）</strong></td><td>施行令別表第二 一〇/一二 の電気用品。<strong>丸PSE</strong>。法27条は「表示の確認」だけ。<strong>現物確認が可能なら適法に扱える</strong></td><td><strong>★除外しない。PSE要確認フラグを立てて残す</strong></td></tr>
+<tr><td><strong>C（対象外）</strong></td><td>乾電池のみで動く小物（時計・電卓・体重計・温湿度計など）</td><td>法2条1項1号の電気用品は「<strong>一般用電気工作物等の部分となり、又はこれに接続して用いられる</strong>」もの。コンセントにつながない乾電池機器は<strong>そもそも電気用品ではない</strong>。v1 はここを誤って落としていた</td><td><strong>除外しない</strong>（ただし FBA の電池情報提供は別途必要）</td></tr>
+<tr><td><strong>D（解けない）</strong></td><td><strong>直管形 LED ランプ（いわゆる LED 蛍光灯）</strong></td><td>§4 で詳述。<strong>同じ「LED蛍光灯」の名前で、電安法の対象と対象外が混在</strong>する</td><td><strong>除外しない／ただし単独では発注不可</strong>（§4-3 の2問テストを通した個体だけ）</td></tr>
+</tbody></table>
+<hr>
+<h2>4. LED 照明の個別判定 — ここが社長のご指示の本丸</h2>
+<h3>4-1. 何が電気用品か（施行令別表第二・原文）</h3>
+<blockquote>（一〇） <strong>エル・イー・ディー・ランプ</strong>（定格消費電力が一ワット以上のものであつて、<strong>一の口金を有するもの</strong>に限る。）<br>（一二） <strong>エル・イー・ディー・電灯器具</strong>（定格消費電力が一ワット以上のものに限り、防爆型のものを除く。）</blockquote>
+<p>いずれも <strong>別表第二＝特定電気用品以外の電気用品（丸PSE）</strong> です。菱形ではありません。2012-07-01 施行の改正で追加されました。</p>
+<p>したがって：</p>
+<ul><li><strong>LED電球（E26 / E17 等の口金を1つ持つもの、1W以上）</strong> → 電気用品。<strong>丸PSE表示があれば、確認のうえ販売できる</strong></li><li><strong>LED電灯器具（シーリング・デスクスタンド・投光器・LED付き照明器具、1W以上）</strong> → 電気用品。同上</li><li><strong>定格消費電力1W未満のもの</strong> → <strong>対象外</strong>（経産省解釈例「LED照明器具」平成26年11月12日に「『エル・イー・ディー・電灯器具』は定格消費電力が1W未満のものであれば対象外である」と明記）</li></ul>
+<h3>4-2. LED 蛍光灯（直管形）は、条文上ふつうは電気用品<strong>ではありません</strong></h3>
+<p>条文の「<strong>一の口金を有するもの</strong>」が効きます。直管形 LED は両端に口金（G13 等）を持つため、<strong>「エル・イー・ディー・ランプ」に当たりません</strong>。そして口金から給電を受ける以上、独立した「電灯器具」でもありません。<strong>結果、PSE マークが付いていなくても 27条違反にならない</strong>のが原則です。日本照明工業会が業界自主規格 JLMA301（AC直結G13口金直管LED光源の安全規格）を別途作ったのは、この法の空白を埋めるためです。</p>
+<h3>4-3. ただし例外があり、<strong>名前では見分けられません</strong></h3>
+<p>経済産業省の対象非対象解釈例「<strong>口出し線式直管形ＬＥＤランプ</strong>」（平成28年11月15日・製品安全課）は、こう判断しています（原文）。</p>
+<blockquote>特定電気用品以外の電気用品のうち、光源及び光源応用機械器具の「<strong>エル・イー・ディー・電灯器具</strong>」として取り扱う。<br>（理由）本製品は、直管形の「蛍光ランプ」に類似した外観をもつが、両端のＧ１３口金形状のピンは<strong>機械的に支持するためだけに使用され通電される口金として使用していない</strong>ことから、「エル・イー・ディー・ランプ」とは言えない。…<strong>単独で使用することのできる構造であり電気用品として完成している</strong>ことから、「エル・イー・ディー・電灯器具」として取り扱うことが妥当と判断する。</blockquote>
+<p><strong>つまり、同じ「直管形LED / LED蛍光灯」という商品名の中に、</strong></p>
+<ul><li>① <strong>口金給電型</strong>（両端のピンから通電。工事不要タイプ／バイパス工事タイプ）→ <strong>電安法対象外。PSEマーク無しで適法</strong></li><li>② <strong>口出し線式・電源内蔵で単独使用できる型</strong> → <strong>LED電灯器具として電気用品。PSEマーク必須</strong></li></ul>
+<p><strong>の2種類が混在します。①と②は商品名・JAN・カテゴリのいずれからも機械判別できません。</strong> ②をマーク無しで売れば27条1項違反（＝§2 の回収命令・利用停止要請・氏名公表の起点）です。</p>
+<h3>4-4. だから「2問テスト」を人間が当てます（機械には出せない）</h3>
+<p>発注前に、NETSEA の商品ページ（および到着後の現物）で順に見ます。<strong>上から順に、最初に Yes になったところで確定</strong>。</p>
+<table><thead><tr><th>#</th><th>問い</th><th>Yes のとき</th></tr></thead><tbody>
+<tr><td>1</td><td>本体または銘板に <strong>丸PSEマーク＋届出事業者名</strong> があるか</td><td><strong>販売可</strong>（27条1項を充足）</td></tr>
+<tr><td>2</td><td>直管形で、<strong>給電が両端のピンのみ</strong>か（口出し線・電源コード・ACアダプタ・電源ボックスが一切無い）</td><td><strong>電安法対象外＝販売可</strong>。ただし §5 の Amazon 側で止まる可能性が残る</td></tr>
+<tr><td>3</td><td>上のどちらでもない</td><td><strong>NO。買わない</strong></td></tr>
+</tbody></table>
+<p><strong>問2で通した個体は、Amazon 側に「PSE表示が無い理由」を説明する必要が出ます。</strong>当社は届出書を持たない（対象外だから存在しない）ので、証明手段は「メーカーの対象外である旨の書面」だけです。<strong>これを事前に取れないなら、問2の個体は買わない</strong>というのが当職の推奨です（理由は §5）。</p>
+<hr>
+<h2>5. Amazon 側 — 適法でも出品できない、という論点は<strong>実在します</strong></h2>
+<p>これはご依頼の中で最も重要な発見です。<strong>法律をクリアしても、Amazon の書類審査で止まります。</strong></p>
+<h3>5-1. Amazon が求める書類は、転売者が原理的に持っていないもの</h3>
+<p>複数の独立ソース（Amazon 公式セラーフォーラムの実体験投稿、支援事業者の解説）が<strong>同じ4点</strong>を挙げています。</p>
+<table><thead><tr><th>求められる書類</th><th>誰が持っているか</th></tr></thead><tbody>
+<tr><td><strong>電気用品製造事業届出書 または 電気用品輸入事業届出書の写し（経済産業省の受領印付き）</strong></td><td><strong>届出事業者（＝製造者・輸入者）だけ</strong>。販売事業者は届出をしていないので存在しない</td></tr>
+<tr><td>型式の区分表</td><td>同上</td></tr>
+<tr><td>定格銘板の写真（PSEマーク・定格電圧・届出事業者名が読めるもの）</td><td>現物があれば当社でも撮れる</td></tr>
+<tr><td><strong>完成品の自主検査記録</strong></td><td>届出事業者だけ（法8条2項の義務者）</td></tr>
+<tr><td><strong>適合性検査証明書</strong>（特定電気用品の場合。登録検査機関発行の原本相当）</td><td>届出事業者だけ（法9条）</td></tr>
+</tbody></table>
+<p><strong>当社が自力で用意できるのは4つのうち1つ（銘板写真）だけです。</strong>残りは<strong>メーカーまたは卸から取り寄せる交渉が必須</strong>になります。NETSEA のサプライヤーがこれに応じる保証はありません。</p>
+<h3>5-2. 審査は「新規登録時」だけでなく「事後」にも来る</h3>
+<ul><li>支援事業者の解説：<strong>「商品登録時に、配送方法にかかわらず」審査が発生する</strong>（FBA・自己発送を問わない）</li><li>Amazon 公式フォーラム：<strong>購入者からの申告を契機に既存 ASIN が販売停止</strong>になり、そこから届出書の提出を求められた実例。投稿者は「届出の控えの保管は法律上の義務ではなく、行政も再発行できない」ため提出できず詰んでいる</li><li>別スレッド：<strong>「書類提出で復活 → また停止」の繰り返し</strong>を報告</li><li>Amazon の回答は<strong>可否だけで、どこが不備かを示さない</strong>という証言が複数</li></ul>
+<p><strong>→ 「今は通っている」は安全の根拠になりません。</strong> 相乗り出品でも、購入者の申告1件でいつでも来ます。</p>
+<h3>5-3. これがアカウント健全性に直結します（本件で最も重い論点）</h3>
+<ul><li>「制限対象商品」ポリシー違反は、<strong>180日以内に2件でアカウント停止</strong>（知的財産は5件）。健全性スコアの色に関係なく停止します</li><li><strong>社長のアカウントは既にポリシー違反1件を抱えて停止中</strong>（T-20260826-004）</li><li><strong>虚偽・不正な書類の提出はアカウント停止措置</strong>と明記されている（メーカーからもらった書類を内容確認せず転送する行為が、ここに触れ得ます）</li></ul>
+<blockquote><strong>結論：Amazon 側のリスクは「法律より重い」。</strong>法の側は表示確認で閉じられますが、Amazon 側は<strong>当社が持っていない書類を要求され、不備の内容も教えられず、失敗のカウントは2で停止</strong>です。したがって当職は、<strong>PSE該当品を「発注可」にはしません。「書類が先に揃った個体だけ発注可」にします。</strong></blockquote>
+<hr>
+<h2>6. #1 をどう書き換えるか — 3レーン</h2>
+<p><strong>判定は次の順で当てます。上から順に、最初に該当したところで確定。</strong></p>
+<pre><code>入力: NETSEA商品名 / Amazon商品名 / Keepaブランド / Keepaカテゴリ名 / サプライヤー名
+
+  ① HARD（自動除外・緩めない）
+     1A 特定電気用品   : ACアダプタ/アダプター/電源コード/延長コード/テーブルタップ/
+                         電源タップ/コンセント/差込プラグ/プラグ/配線器具/ソケット/
+                         変圧器/トランス/安定器/直流電源装置/電源ユニット
+     1B 電池           : 電池/乾電池/充電/充電式/充電器/バッテリー/モバイルバッテリー/
+                         リチウム/蓄電/ポータブル電源/コードレス/ワイヤレス充電/USB充電
+     1C 輸入経路       : 並行輸入/並行品/海外正規/逆輸入/直輸入/海外版/輸入品/海外仕様
+     1D 海外電圧       : 110V/220V/230V/240V/海外電圧
+     1E 家電本体       : 電子レンジ/オーブン/炊飯/IH/ミキサー/シェーバー/アイロン/
+                         ドライヤー/扇風機/加湿器/除湿/空気清浄/掃除機/ヒーター/電動/
+                         モーター/ポンプ/プリンタ/モニター/スピーカー/イヤホン/カメラ/
+                         Bluetooth/Wi-Fi/無線/リモコン/センサー/プロジェクター/ラジオ/
+                         電気/電源/USB ほか（v1 の語彙をそのまま踏襲）
+     1G メーカー不明   : 光源系なのに Keepa の brand が空 → 除外（届出事業者を追えない）
+
+  ② REVIEW（除外しない。「PSE要確認」フラグを立てて候補に残す）
+     1F 光源系         : LED/照明/ライト/ランプ/電球/蛍光灯/蛍光ランプ/イルミネーション/
+                         電飾/スタンド/シーリング/ペンダントライト/ダウンライト/投光器/
+                         作業灯/常夜灯/間接照明
+                         ※ ①のどれにも当たらず、かつ brand が取れている場合のみ
+
+  ③ PASS（電安法の電気用品ではない）
+     1H 乾電池駆動     : 時計/クロック/ウォッチ/目覚まし/アラーム/ブザー/電卓/温湿度/
+                         湿度計/体重計/体組成/歩数計/タイマー
+                         ※ ①のどれにも当たらないことが前提（「充電」があれば 1B で落ちる）</code></pre>
+<p><strong>設計上の決まりごと（memory <code>knowledge_optout_rules_negation_hole</code> の再発防止をそのまま適用）</strong></p>
+<ul><li><strong>HARD を先に、REVIEW を後に評価する。</strong> 「LED付き扇風機」は 1E（HARD）に落ちる。順序を入れ替えると光源系が勝って通ってしまう＝<strong>危険側の化け</strong></li><li><strong>フラグは勝った規則からではなく、発火した全規則から立てる。</strong> REVIEW 判定でも、同時発火した HARD 規則 ID を <code>pse_other_rule_hits</code> に必ず残す</li><li><strong>未知の verdict 値が来たら実装は黙って読み飛ばさず異常終了する</strong>こと</li><li><strong>1G（brand 空欄で除外）は「母数を減らす」方向の規則</strong>である。届出事業者を辿る起点が無い以上、当職は残す判断をしたが、<strong>将来 NETSEA のメーカー名フィールドを見に行けるようになったら真っ先に緩めるべき箇所</strong>として申し送る</li></ul>
+<h3>6-1. REVIEW フラグが立った SKU に、CSV へ出す文言</h3>
+<pre><code>★PSE要確認: 発注前に3点。① NETSEA商品ページに丸PSEマークの記載/画像があるか
+② メーカー（届出事業者）名が特定できるか ③ 届出書の写し・自主検査記録をメーカー
+から取り寄せられるか。③が「否」なら発注しない（Amazonの書類審査で止まるため）。
+直管形LED（LED蛍光灯）は §4-3 の2問テストを別途当てること。</code></pre>
+<hr>
+<h2>7. 実測 — この書き換えで母数はどれだけ戻るか</h2>
+<p>母数 26,942件（T-20260831-006 の検証済みスキャン結果）に、v1 と v2 の両方を当てて数えました。再現コード: <code>04_pse_rule_v2.py</code> ＋ <code>05_measure_v2.py</code>。</p>
+<h3>7-1. v1（現行）が実際に何をしていたか</h3>
+<table><thead><tr><th>指標</th><th>件数</th></tr></thead><tbody>
+<tr><td>#1 が発火した行（重複あり）</td><td>5,136</td></tr>
+<tr><td>#1 が「最初に触れた項目」だった行</td><td><strong>5,133</strong></td></tr>
+<tr><td>うち <strong>#1 だけで落ちた</strong>行（他のルールに一切触れていない）</td><td><strong>1,705</strong></td></tr>
+<tr><td>うち 他のルールでも落ちていた行（#1 が無くても落ちる）</td><td><strong>3,431</strong></td></tr>
+</tbody></table>
+<p><strong>現行 #1 の発火のうち 67%（3,431/5,136）は仕事をしていません。</strong>「最大の除外項目」という見かけは、判定順が早いことによる見かけです（カテゴリ除外は最後に評価されるため少なく見える）。<strong>実際に #1 だけが支えていたのは 1,705件、うち光源系が 702件です。</strong></p>
+<h3>7-2. v2 に置き換えた結果</h3>
+<table><thead><tr><th>レーン</th><th>#1 だけで落ちていた 1,705件 の行き先</th></tr></thead><tbody>
+<tr><td>HARD（引き続き自動除外）</td><td><strong>1,005</strong></td></tr>
+<tr><td><strong>REVIEW（候補に戻す・要確認フラグ）</strong></td><td><strong>509</strong>（すべて 1F 光源系）</td></tr>
+<tr><td>PASS（電安法対象外）</td><td><strong>191</strong>（うち 1H 乾電池駆動 181）</td></tr>
+</tbody></table>
+<h3>7-3. 発注候補まで実際に戻る数</h3>
+<p>REVIEW / PASS に回した 700件に、既存の後段フィルタ（利益率5%以上・1SKU 5,000〜10,000円・直近30日に1個以上の販売実績）をそのまま当てました。</p>
+<table><thead><tr><th>段階</th><th>件数</th></tr></thead><tbody>
+<tr><td>採算と単価帯を通過</td><td>59</td></tr>
+<tr><td><strong>回転も通過（＝発注候補に戻る）</strong></td><td><strong>42</strong></td></tr>
+<tr><td>うち 1F 光源系</td><td><strong>42</strong></td></tr>
+<tr><td>うち 1H 乾電池駆動</td><td><strong>0</strong></td></tr>
+</tbody></table>
+<p><strong>戻るのは 42件。すべて光源系です。</strong> 現行の発注候補 32SKU と比べて十分に意味のある量で、社長のご方針（LED照明を扱う）は<strong>実行可能になります</strong>。</p>
+<p>一方、<strong>1H（乾電池駆動＝電安法対象外）を緩めても発注候補は1件も増えません</strong>（181件が採算・回転で全滅）。<strong>それでも 1H は緩めます。</strong> 理由は母数ではなく正確性です。<strong>電気用品でないものを「電安法違反になる」と書いて落とすのは、根拠のない除外</strong>であり、次に別の商材群を見るときに同じ誤りを繰り返すからです。</p>
+<hr>
+<h2>8. グレーを進める以上、3点セットを置きます</h2>
+<p>当職の原則は「グレーは原則 NO」です。<strong>§4-3 の直管形LEDは正真正銘のグレー</strong>なので、進めるなら以下を必須条件とします。</p>
+<h3>リスクシナリオ</h3>
+<table><thead><tr><th>#</th><th>何が起きるか</th><th>発生確率</th><th>影響度</th><th>不可逆性</th></tr></thead><tbody>
+<tr><td>R1</td><td>購入者の申告で ASIN が販売停止、届出書の提出を求められ、メーカーが応じず在庫が死ぬ</td><td><strong>中</strong>（フォーラムに複数実例）</td><td>中（在庫損）</td><td>低（在庫は他販路で処分可）</td></tr>
+<tr><td>R2</td><td>R1 が「制限対象商品ポリシー違反」としてカウントされ、<strong>180日2件ルール</strong>の1件目になる</td><td>中</td><td><strong>大</strong></td><td><strong>高</strong>（既に1件保有・停止中）</td></tr>
+<tr><td>R3</td><td>表示の無い②型（口出し線式）を売っており、42条の5の<strong>回収命令</strong>が出る</td><td>低</td><td><strong>大</strong></td><td><strong>最高</strong>（購入者特定・回収・氏名公表）</td></tr>
+<tr><td>R4</td><td>42条の7 により経産大臣が Amazon に<strong>利用停止を要請</strong>。Amazon は賠償責任を負わない</td><td>極低</td><td><strong>致命</strong></td><td><strong>最高</strong></td></tr>
+</tbody></table>
+<p>R3・R4 は確率が低くても<strong>不可逆性が最高</strong>なので、当職の3軸基準ではアラート対象です。</p>
+<h3>発生時の対応策</h3>
+<ul><li>R1/R2：<strong>発注前にメーカーから届出書の写し・自主検査記録を取得しておく</strong>。取れない個体は買わない。取得できた書類は <code>agent_output/&lt;ticket&gt;/pse/</code> に保管し、<strong>内容を自分で読んでから</strong>提出する（他人の書類を無検証で転送しない＝虚偽書類提出によるアカウント停止を避ける）</li><li>R3：仕入れ先・型番・入荷日・数量・<strong>購入先</strong>を SKU 単位で記録（法45条1項・施行令7条2項の報告事項そのもの）。回収命令が出た場合に即答できる状態を維持する</li><li>R4：予防のみ。R3 を起こさないことがそのまま対策</li></ul>
+<h3>撤退条件（どれか1つでも起きたら、電気用品レーンを即時全面停止）</h3>
+<ol><li><strong>PSE 関連で ASIN 停止または書類提出要求が 1件でも来たら、電気用品の新規発注を停止</strong>（2件目でアカウントが飛ぶため、1件目で止める）</li><li>メーカー／卸から届出書の写しが<strong>2社連続で入手できなかった</strong>時点で、当面このレーンを閉じる</li><li>アカウントが停止中の間は、<strong>電気用品の実発注を行わない</strong>（候補リストの作成と書類取り寄せまでは進めてよい）</li></ol>
+<blockquote><strong>③は当職の推奨として明記します。</strong> 復活交渉中のアカウントに、書類審査で止まる商材を新規投入するのは、交渉材料を自分から悪くする行為です。<strong>42件は「復活後の最初の弾」として温めるのが合理的</strong>です。</blockquote>
+<hr>
+<h2>9. ご依頼の5問への直接回答</h2>
+<table><thead><tr><th>#</th><th>問い</th><th>回答</th></tr></thead><tbody>
+<tr><td>1</td><td>当社は製造・輸入・販売のどれか。義務は誰に</td><td><strong>販売事業者</strong>。届出（3条）・適合（8条1項）・検査（8条2項）・適合性検査（9条）・表示（10条）は<strong>すべて製造/輸入事業者＝届出事業者</strong>の義務で、当社には<strong>かからない</strong>。当社にかかるのは <strong>27条1項（表示の確認）</strong> と 45条1項（報告徴収）、および違反時の 42条の5（回収命令）・42条の8（氏名公表）</td></tr>
+<tr><td>2</td><td>国内卸から国内メーカー品を仕入れて再販するリスクは</td><td><strong>法令上のリスクは「表示を確認しないこと」だけ</strong>。表示のある完成品を売る行為自体は適法。<strong>実務上の本丸は Amazon の書類審査</strong>で、要求される届出書・自主検査記録・適合性検査証明書は<strong>当社が原理的に持っていない</strong>（§5-1）</td></tr>
+<tr><td>3</td><td>どこからが危険か</td><td><strong>§3 の5段階</strong>。危険を作るのは「電気であること」ではなく、<strong>①表示未確認 ②特定電気用品/リチウムイオン蓄電池 ③上流に輸入者がいる</strong>の3条件</td></tr>
+<tr><td>4</td><td>Amazon 側の出品要件</td><td><strong>実在する。</strong>登録時にも事後にも来る。配送方法を問わない。不備の内容は開示されない。<strong>制限対象商品違反は180日2件で停止</strong>。虚偽書類はアカウント停止。→ <strong>「適法でも出品できない」は本件の主要な除外理由になる</strong></td></tr>
+<tr><td>5</td><td>#1 を条件付き通過に緩められるか</td><td><strong>緩められます。ただし「通過＝発注可」ではなく「通過＝書類確認レーン行き」</strong>。機械判定条件は §6 と <code>03_pse_rules_v2.json</code>。<strong>直管形LED（LED蛍光灯）だけは機械では割り切れず、§4-4 の2問テストを人間が当てる</strong>必要があります</td></tr>
+</tbody></table>
+<hr>
+<h2>10. 出典（すべて 2026-09-08 に当職が取得）</h2>
+<table><thead><tr><th>#</th><th>内容</th><th>出典</th></tr></thead><tbody>
+<tr><td>L1</td><td>電気用品安全法 全条文（2条・3条・8条・9条・10条・27条・42条の5〜8・57条）</td><td>e-Gov 法令API <code>https://laws.e-gov.go.jp/api/2/law_data/336AC0000000234</code>（現行版: 令和6年法律第67号「消費生活用製品安全法等の一部を改正する法律」／施行 2025-12-25）</td></tr>
+<tr><td>L2</td><td>電気用品安全法施行令 別表第一（特定電気用品）・別表第二（一〇 LEDランプ／一二 LED電灯器具／一二 リチウムイオン蓄電池）、7条2項（販売事業者への報告事項）</td><td>e-Gov 法令API <code>https://laws.e-gov.go.jp/api/2/law_data/337CO0000000324</code></td></tr>
+<tr><td>L3</td><td>対象非対象解釈例「<strong>口出し線式直管形ＬＥＤランプ</strong>」（平成28年11月15日 製品安全課）</td><td><code>https://www.meti.go.jp/policy/consumer/seian/denan/file/08_subject/16_oam/kuchidashisenshiki_chokkangata_LED_Lamp.pdf</code></td></tr>
+<tr><td>L4</td><td>対象非対象解釈例「<strong>ＬＥＤ照明器具</strong>」（平成26年11月12日 製品安全課。1W未満は対象外）</td><td><code>https://www.meti.go.jp/policy/consumer/seian/denan/kaishaku/taishou_hitaishou/20141112/lighting_equipment.pdf</code></td></tr>
+<tr><td>L5</td><td>対象非対象解釈例一覧（種類別）— 光源及び光源応用機械器具関係</td><td><code>https://www.meti.go.jp/policy/consumer/seian/denan/subject02.html</code></td></tr>
+<tr><td>A1</td><td>LED照明器具・ランプのPSE（丸PSEの対象口金 E11/E12/E14/E17/E26/GX53/B22d、E39は対象外、電源別置形は対象外）</td><td>岩崎電気 FAQ <code>https://www.iwasaki.co.jp/contact/faq/products/lighting/25.html</code></td></tr>
+<tr><td>A2</td><td>直管形G13口金LED光源の業界自主規格（法の空白を業界が埋めている事実）</td><td>JLMA301 <code>https://www.jlma.or.jp/siryo/pdf/kokai/JLMA301-2024.pdf</code></td></tr>
+<tr><td>B1</td><td>Amazon の PSE 書類審査（必要書類4点・登録時に発生・配送方法を問わない・不備内容は非開示・UL/CEは代替にならない）</td><td>アグザルファ <code>https://www.axalpha.com/blog/amazon%E3%81%AB%E3%81%8A%E3%81%91%E3%82%8Bpse%E5%AF%A9%E6%9F%BB/</code> ／ 株式会社そばに <code>https://sobani.co.jp/columnlist/amazon_pse</code></td></tr>
+<tr><td>B2</td><td>実体験：ポータブル電源で届出書・銘板写真・適合性検査証明書・自主検査記録を出しても通らない。ACアダプタは特に厳しい</td><td>Amazon セラーフォーラム <code>https://sellercentral-japan.amazon.com/seller-forums/discussions/t/da9c118e86d53a8a1584b8ddff1e68b1</code></td></tr>
+<tr><td>B3</td><td>実体験：<strong>購入者の申告で既存ASINが販売停止</strong>→届出書の写しを要求→行政は再発行不可で詰む</td><td>Amazon セラーフォーラム <code>https://sellercentral-japan.amazon.com/seller-forums/discussions/t/5fb35ce6336733ac3daa64cf72be9373</code></td></tr>
+<tr><td>B4</td><td>Amazon 公式回答：文書は<strong>出品時にも出品後にも</strong>求められる。<strong>虚偽書類はアカウント停止</strong>。電気製品は「PSE関連文書、PSEマークの写真など」</td><td>Amazon セラーフォーラム <code>https://sellercentral-japan.amazon.com/seller-forums/discussions/t/a5bc90f743e3d9d3e1c7668e16daf218</code></td></tr>
+<tr><td>B5</td><td><strong>制限対象商品ポリシー違反は180日以内2件でアカウント停止</strong>（知的財産は5件）。健全性スコアの色に関係なく停止</td><td>アグザルファ <code>https://www.axalpha.com/blog/%E3%82%A2%E3%82%AB%E3%82%A6%E3%83%B3%E3%83%88%E5%81%A5%E5%85%A8%E6%80%A7%E8%A9%95%E4%BE%A1%E3%81%AE%E4%BB%95%E7%B5%84%E3%81%BF/</code></td></tr>
+<tr><td>B6</td><td><strong>FBA 危険物納品プログラムは大口出品者のみ</strong>（小口は申請不可）。SDS はメーカーしか持たず転売では対応困難</td><td>EC STARs Lab. <code>https://ecstarslab.com/blog/fba-kikenbutsu/</code></td></tr>
+</tbody></table>
+<h3>確度の区別（事実と推測を混ぜない）</h3>
+<ul><li><strong>一次情報（当職が原文を取得して確認）</strong>: L1・L2・L3・L4・L5。条文と経産省解釈例の引用は原文一致</li><li><strong>メーカー一次相当</strong>: A1・A2</li><li><strong>Amazon 側の一次実体験（複数の独立投稿）</strong>: B2・B3・B4</li><li><strong>二次情報（支援事業者の解説。複数ソースが一致）</strong>: B1・B5・B6</li><li><strong>当職の推測（事実ではない）</strong>:</li><li>「2025-12-25 の改正法（42条の7）が Amazon の PSE 審査強化の背景にある」→ <strong>因果関係の裏付けは取れていません。</strong>時系列が整合するというだけです。判断には使っていません</li><li>「B5 の180日2件ルールが PSE 書類審査の不合格にも適用される」→ <strong>Amazon の公式ヘルプ原文では未確認</strong>（セラーセントラルへのログインが必要）。<strong>保守側に倒して適用されるものとして扱っています</strong></li><li>「口金給電型の直管形LEDが電安法対象外」→ 条文（「一の口金」）と L3 の反対解釈からの帰結であり、<strong>これを正面から述べた経産省の解釈例は見つけていません</strong>。だから §4-4 の2問テストで人間が当てる設計にしています</li></ul>
+<hr>
+<h2>11. 秘書カズヨへの申し送り（次のアクション）</h2>
+<ol><li><strong>実装（IT タカシ）</strong>: <code>risk_rules.py</code> の <code>#1 電気用品</code> を <code>03_pse_rules_v2.json</code> / <code>04_pse_rule_v2.py</code> で置き換え。<code>tests_risk_rules.py</code> に §6 の順序規則（HARD 優先）の反例テストを追加すること。<strong>「LED付き扇風機」が REVIEW に化けないこと</strong>を必ずテストに入れる</li><li><strong>社長判断が要る点</strong>: 戻る42件を「いつ」買うか。<strong>当職の推奨は「アカウント復活後」</strong>（§8 撤退条件③）。復活前に進めるなら、書類の取り寄せまでに留める</li><li><strong>未確認で残した1点</strong>: Amazon 公式ヘルプ上の「制限対象商品」ポリシーに PSE がどう位置づけられているかは、<strong>セラーセントラルにログインしないと読めません</strong>。復活後に社長の1手で確認いただきたい項目です（保守側で扱っているので、判断は変わりません）</li></ol></div></body></html>
