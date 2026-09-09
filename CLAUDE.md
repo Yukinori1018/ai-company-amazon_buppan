@@ -266,8 +266,7 @@ todo → doing → waiting → done
 
 **運用の要点**
 
-- **成果物は ① に直納し、その場で `git commit` したうえで、チケット末尾の `## 成果物` 節から必ずリンクする**（2026-09-09 社長指示）。置いただけではチケットから辿れない。形式は [agents/secretary/skills/ticket-management.md](agents/secretary/skills/ticket-management.md) §`## 成果物` 節の運用。
-- **成果物は ① に直納し、その場で `git commit` する。** ② は `.gitignore` 対象で、worktree が消えると成果物ごと消失します（実際に消失させた前例あり）。「あとでコピーする」は必ず忘れます。
+- **成果物は ① に直納し、その場で `git commit` し、チケット末尾の `## 成果物` 節からリンクする。** ② は `.gitignore` 対象で、worktree が消えると成果物ごと消失します（実際に消失させた前例あり）。「あとでコピーする」は必ず忘れます。置いただけではチケットから辿れないので、リンクまでが1セットです（2026-09-09 社長指示。形式は [agents/secretary/skills/ticket-management.md](agents/secretary/skills/ticket-management.md) §`## 成果物` 節の運用）。
 - **社長の閲覧口は ① へのシンボリックリンク。** `~/Documents/AI Company Outputs/Amazon物販事業` → `workspace/output/deliverables` を張ってあるので、Finder のブックマークは従来どおり使えます。**リンクの先は①そのもの**であり、コピーではありません。手でファイルを置きに行く作業はもう不要です。
 - **③ には README.md を必ず添える。** 何が入っているか・なぜリポ外なのか・どのチケット由来かを書きます。③ は Git 管理外＝バックアップされません。
 - ③ を使う判定は **1ファイル50MB超**、または**第三者著作物**（有料セミナーの録画・スライド等）。GitHub の1ファイル100MB上限を超えると push が失敗し、30分ごとの自動同期が丸ごと止まります。**サイズ判断は拡張子ではなく実サイズで行うこと** — `.mp4` や `.zip` は Web 成果物の小さな素材として正当に登場します（`.gitignore` で一律除外しているのは `.mov` `.dmg` `.iso` `.tar` `.tgz` だけ）。
