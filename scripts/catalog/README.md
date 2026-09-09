@@ -81,13 +81,45 @@ HTML はブラウザで描画、`.md` `.py` などはテキスト表示、
 `.csv` `.xlsx` などは `Content-Disposition: attachment` でダウンロードされます。
 日本語ファイル名はパーセントエンコードで正しく解決します（14 URL で実測確認済み）。
 
-### Mac ログイン時の自動起動（launchd）— **未設置。社長の承認待ち**
+### Mac ログイン時の自動起動（launchd）— **設置済み（2026-09-09 / 社長承認済み）**
 
-雛形だけ用意してあります。**まだシステムには何も入れていません。**
+社長の Mac に設置済みです。ログインすれば自動で起動し、落ちても KeepAlive が起こし直します。
+**社長が手で起動する操作はありません。**
 
-- 雛形: `scripts/catalog/com.aicompany.catalog-server.plist.example`
+- 設置先: `~/Library/LaunchAgents/com.aicompany.catalog-server.plist`
+- 雛形（リポ内の正）: `scripts/catalog/com.aicompany.catalog-server.plist.example`
+- ラベル: `com.aicompany.catalog-server` / ポート 17325 / bind は 127.0.0.1 のみ
+- ログ: `/tmp/catalog-server.out.log`（起動バナー。バッファされるため通常は空）
+  `/tmp/catalog-server.err.log`（アクセスログ・例外。実質こちらを見る）
 
-導入する場合の手順（3コマンド）:
+日常の確認:
+
+```bash
+python3 scripts/catalog/serve_deliverables.py --status     # 起動しているか
+launchctl print gui/$(id -u)/com.aicompany.catalog-server  # ロード状態・pid・最終終了コード
+```
+
+操作:
+
+```bash
+# 再起動（コードを直したあと）
+launchctl kickstart -k gui/$(id -u)/com.aicompany.catalog-server
+
+# 停止（plist は残す。次回ログインで戻る）
+launchctl bootout gui/$(id -u)/com.aicompany.catalog-server
+
+# 入れ直し
+launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.aicompany.catalog-server.plist
+```
+
+完全に撤去するときは bootout のあと plist を削除します（削除は §4.1 なので社長承認のうえで）。
+
+**注意: 手で `nohup python3 serve_deliverables.py &` を起動しないこと。**
+ポート 17325 を先に取られると launchd 側が `Address already in use` で起動できず、
+KeepAlive が 10 秒おきに失敗し続けます（2026-09-09 に実際に発生）。
+動作確認は上の `--status` で行い、起動は launchd に任せてください。
+
+再設置する場合の手順（雛形からの3コマンド）:
 
 ```bash
 REPO="/Users/yukinori/Claude Code/ai-company-amazon_buppan"
@@ -96,17 +128,13 @@ sed "s|__REPO_ROOT__|$REPO|g" "$REPO/scripts/catalog/com.aicompany.catalog-serve
 launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.aicompany.catalog-server.plist
 ```
 
-確認は `python3 scripts/catalog/serve_deliverables.py --status`。
-外すときは `launchctl bootout gui/$(id -u)/com.aicompany.catalog-server` のあと
-plist を削除します（削除は §4.1 なので社長承認のうえで）。
-
 ## 構成ファイル
 
 | ファイル | 役割 |
 |---|---|
 | `build_catalog.py` | deliverables を走査してマスター CSV を生成する（HTML は `--html` 時のみ） |
 | `serve_deliverables.py` | deliverables を 127.0.0.1 限定で配信する HTTP サーバ（シートのリンク先） |
-| `com.aicompany.catalog-server.plist.example` | 上記をログイン時に自動起動する launchd 雛形（**未設置**） |
+| `com.aicompany.catalog-server.plist.example` | 上記をログイン時に自動起動する launchd 雛形（**2026-09-09 設置済み**） |
 | `catalog_sync.gs` | シート側に貼る Apps Script。POST を受けてシートを全置換する |
 | `sync_catalog_to_sheet.py` | ローカルから CSV を読んで POST するヘルパー（標準ライブラリのみ） |
 | `.catalog_sync.env.example` | 設定見本。これをコピーして `.catalog_sync.env` を作る |

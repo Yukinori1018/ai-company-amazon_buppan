@@ -3,11 +3,12 @@
 <!--
   com.aicompany.catalog-server.plist — 成果物配信サーバを Mac ログイン時に自動起動する。
 
-  ★これは雛形です。まだどこにも設置していません。★
-  設置するかどうかは社長の判断です。手順は scripts/catalog/README.md の
-  「Mac ログイン時の自動起動（launchd）」を参照してください。
+  ★これは雛形（リポ内の正）です。実物は 2026-09-09 に社長承認のうえ
+    ~/Library/LaunchAgents/com.aicompany.catalog-server.plist へ設置済み。★
+  この雛形を直したら、下の手順で実物へ入れ直してください。
+  運用手順は scripts/catalog/README.md の「Mac ログイン時の自動起動（launchd）」。
 
-  設置するとき:
+  設置／再設置するとき:
     1. このファイルを ~/Library/LaunchAgents/com.aicompany.catalog-server.plist へコピー
     2. コピー先の __REPO_ROOT__ を実際のリポジトリ絶対パスに置換
        （現時点では /Users/yukinori/Claude Code/ai-company-amazon_buppan）
