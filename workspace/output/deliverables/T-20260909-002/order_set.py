@@ -54,6 +54,29 @@ TOTAL_BUDGET_YEN = 50_000
 STOCK_MONTHS_CAP = 6.0
 PREF = "東京都"
 
+# ── 1点あたりの納品コストの内訳（経理ハジメ C1_費目一覧.csv / T-20260904-004）──
+# 元データ candidates.csv の列「納品送料(FBA+納品代行)」＝ 50円 は、この3つの合計です。
+#   ・納品代行 作業費   12.0円/点 … 検品・ラベル貼付・**梱包資材込み**（e-fba 公開料金）
+#   ・FBA 納品送料      37.5円/点 … 納品代行 → FBA 750円/箱(140サイズ) ÷ 20点
+#   ・NETSEA 送料の按分  ほぼ0円   … /items の ship_fee は 257,067件中 99.6% が 0
+#
+# ⚠️ **作業費は 2026-09-04（commit bf44b59）から純利益に入っています。**
+#    経理の CSV に残る「【現行モデルに欠落】」は、その修正より前に書かれた注記です。
+#    ここでやるのは**表示を分けることだけ**で、純利益は1円も動きません。
+#    もう一度引くと二重計上になります（資材費 materials_cost=0 も同じ理由）。
+PREP_SERVICE_YEN = 12.0
+FBA_INBOUND_YEN = 37.5
+
+# 社長が案から外すと決めた SKU。**候補から消さずに、外した理由ごと残す**
+# （消すと「なぜ無いのか」が半年後に読めなくなる）。
+EXCLUDED_ASINS = {
+    # ⚠️ 金額はここに書きません（このファイルは Git 追跡対象・PUBLIC リポ）。
+    #    実額は元データから引いて out/ の HTML に出します。
+    "B00HHIGOU8": ("社長判断 2026-09-09。利益率が薄く、送料や資材が数十円ずれるだけで赤字になる。"
+                   "FBAサイズが「不明（寸法・重量なし）」で、実サイズ次第では FBA配送代行手数料が"
+                   "上振れする。案Eの粗利に対する寄与も小さい"),
+}
+
 
 # ── 入力 ───────────────────────────────────────────────────────────────
 def load_pool(path: Path) -> list[dict]:
@@ -238,6 +261,18 @@ def sensitivity(sku: dict, months: float | None) -> dict:
     return out
 
 
+def inbound_parts(sku: dict) -> tuple[int, int, int]:
+    """「納品送料(FBA+納品代行)」を、社長が読める3つに割り戻す。
+
+    足し直すと元の列と必ず一致します（`その他` は丸めと NETSEA 送料按分の残り）。
+    **割り戻すだけで、純利益からもう一度引いてはいけません。**
+    """
+    total = sku["納品送料"]
+    prep = round(PREP_SERVICE_YEN)
+    fba = round(FBA_INBOUND_YEN)
+    return prep, fba, total - prep - fba
+
+
 def order_line(sku: dict, units: int) -> dict:
     listings = units // sku["入数"]
     cost = round(sku["単価"] * units)
@@ -284,11 +319,12 @@ def price_set(lines: list[dict], tariffs: dict, sup_ids: dict) -> dict:
     }
 
 
-def topup(lines: list[dict], skus: dict, tariffs: dict, sup_ids: dict) -> list[dict]:
+def topup(lines: list[dict], skus: dict, tariffs: dict, sup_ids: dict,
+          cap: float = STOCK_MONTHS_CAP) -> list[dict]:
     """予算の余りを、回転が速い SKU から順に積み増す。
 
     積む条件は2つだけ。
-      1. 在庫が STOCK_MONTHS_CAP ヶ月分を超えない（最小発注数で既に超えている SKU は積まない）
+      1. 在庫が cap ヶ月分を超えない（最小発注数で既に超えている SKU は積まない）
       2. 総額が予算を超えない
     送料無料ラインをまたげるなら、そのぶん実質の単価が下がるので優先する。
     """
@@ -301,7 +337,7 @@ def topup(lines: list[dict], skus: dict, tariffs: dict, sup_ids: dict) -> list[d
                 continue
             nxt = ln["口数"] + sku["入数"]
             months = (nxt // sku["入数"]) / sku["月販見込"]
-            if months > STOCK_MONTHS_CAP:
+            if months > cap:
                 continue
             trial = list(lines)
             trial[i] = order_line(sku, nxt)
@@ -320,12 +356,13 @@ def topup(lines: list[dict], skus: dict, tariffs: dict, sup_ids: dict) -> list[d
     return lines
 
 
-def enumerate_sets(skus: dict, tariffs: dict, sup_ids: dict) -> list[dict]:
+def enumerate_sets(skus: dict, tariffs: dict, sup_ids: dict,
+                   cap: float = STOCK_MONTHS_CAP, skip: set | None = None) -> list[dict]:
     """全部の組み合わせを最小発注数で試し、予算に入るものだけ残して積み増す。
 
     SKU が十数件の世界なので総当たりで十分（YAGNI）。50件を超えたら考え直す。
     """
-    keys = list(skus)
+    keys = [k for k in skus if k not in (skip or set())]
     out = []
     for n in range(1, len(keys) + 1):
         for combo in itertools.combinations(keys, n):
@@ -333,7 +370,7 @@ def enumerate_sets(skus: dict, tariffs: dict, sup_ids: dict) -> list[dict]:
             priced = price_set(base, tariffs, sup_ids)
             if priced["総額"] > TOTAL_BUDGET_YEN:
                 continue
-            out.append(price_set(topup(base, skus, tariffs, sup_ids), tariffs, sup_ids))
+            out.append(price_set(topup(base, skus, tariffs, sup_ids, cap), tariffs, sup_ids))
     return out
 
 
@@ -395,6 +432,39 @@ def pick_plans(sets: list[dict]) -> list[tuple[str, str, dict]]:
         add("案E", "1年で捌ける見込みの SKU だけを2本以上",
             max(fresh, key=lambda s: s["手残り"]))
     return plans
+
+
+def _best(sets: list[dict], *, min_sku: int = 2, min_sup: int = 1,
+          cap: float | None = None) -> dict | None:
+    ok = [s for s in sets
+          if s["SKU数"] >= min_sku and s["サプライヤー数"] >= min_sup
+          and (cap is None or s["最長回転月数"] <= cap)]
+    return max(ok, key=lambda s: s["手残り"]) if ok else None
+
+
+def build_e2(skus: dict, tariffs: dict, sup_ids: dict, cap: float) -> tuple[dict | None, dict]:
+    """E-2 ＝ 除外SKUを外し／2社以上／全SKUの回転が cap ヶ月以内／予算内。
+
+    **組めなければ None を返します。** 条件を緩めた案で埋め合わせません。
+    代わりに「どちらの条件を捨てるといくら変わるか」を一緒に返します。
+    """
+    skip = set(EXCLUDED_ASINS)
+    sets = enumerate_sets(skus, tariffs, sup_ids, cap=cap, skip=skip)
+    inside = {k: v for k, v in skus.items()
+              if k not in skip and (min_lot_months(v) or 1e9) <= cap}
+    # 回転が速くても、卸の最小ロット1回で予算を超える SKU は**買えません**。
+    # 社数を数えるときにこれを混ぜると「2社ある」と嘘をつくことになります。
+    usable = {k: v for k, v in inside.items()
+              if round(v["単価"] * v["最小口数"]) <= TOTAL_BUDGET_YEN}
+    return _best(sets, min_sup=2, cap=cap), {
+        "cap": cap,
+        "組み合わせ数": len(sets),
+        "分散を捨てる": _best(sets, min_sup=1, cap=cap),
+        "回転を捨てる": _best(sets, min_sup=2, cap=None),
+        "cap内SKU": inside,
+        "cap内で買えるSKU": usable,
+        "cap内サプライヤー": sorted({v["仕入先"] for v in usable.values()}),
+    }
 
 
 HTML_CSS = """
@@ -608,6 +678,7 @@ def sku_card(i: int, s: dict) -> str:
     # ── 利益の内訳 ──────────────────────────────────────────────
     p.append("<h4 >1個売れたときの利益（引き算の全部）</h4>")
     price = s["Amazon価格"]
+    prep_in, fba_in, other_in = inbound_parts(s)
     rows = [("Amazon 販売価格", price, f'＋ {h(s["価格の出所"])}'),
             ("仕入原価（卸値・税込）", -s["卸値税込"],
              f'− 税抜 {s["卸値税抜"]:,}円 ×1.1。免税事業者なので税込が実コスト'),
@@ -617,12 +688,24 @@ def sku_card(i: int, s: dict) -> str:
             ("基本成約料", -s["基本成約料"], "− 小口プランのため1点ごとに発生（大口には無い）"),
             ("保管料", -s["保管料"],
              "− 3ヶ月で売り切る前提＝実効1.5ヶ月分" if s["保管料"] else "− 寸法が取れず未計上"),
-            ("納品送料（FBA＋納品代行）", -s["納品送料"], "− 750円/箱÷20点 ＋ 検品ラベル12円/点"),
+            ("FBA 納品送料", -fba_in,
+             "− 納品代行 → FBA 750円/箱(140サイズ) ÷ 20点 ＝ 37.5円（表示は四捨五入）。実測（e-fba 公開料金）"),
+            ("納品代行 作業費", -prep_in,
+             "− <b>検品・ラベル貼付・梱包資材込み</b>で12円/点（e-fba 公開料金・実測）。"
+             "社長は物理作業を外注する方針なので、必ず掛かります。"
+             "<b>資材費はここに入っているので別立てしません</b>（二重計上になります）"),
+            ("納品まわりのその他", -other_in,
+             "− NETSEA 送料の按分と丸めの残り。ship_fee は99.6%が0で入っているため、ほぼ0円")
+            if other_in else None,
             ("返品引当", -s["返品引当"], "− 返品率3%×(FBA手数料＋返金処理＋原価の50%)")]
+    rows = [r for r in rows if r]
     p.append('<div class="tw"><table><thead><tr><th>項目</th><th>金額</th><th>内訳・根拠</th>'
              "</tr></thead><tbody>")
     for label, v, why in rows:
-        p.append(f'<tr><td>{h(label)}</td><td class="num">{v:+,}円</td><td>{why}</td></tr>')
+        em = "納品代行" in label
+        p.append(f'<tr><td>{"<b>" if em else ""}{h(label)}{"</b>" if em else ""}</td>'
+                 f'<td class="num">{"<b>" if em else ""}{v:+,}円{"</b>" if em else ""}</td>'
+                 f"<td>{why}</td></tr>")
     p.append(f'<tr class="sum"><td>＝ 実費込み純利益</td><td class="num">{s["純利益"]:+,.0f}円</td>'
              f'<td>利益率 {s["利益率%"]:.1f}%（売価に対して） ／ '
              f'ROI {s["ROI%"]:.1f}%（仕入原価に対して）</td></tr>')
@@ -632,6 +715,8 @@ def sku_card(i: int, s: dict) -> str:
     p.append(f'<p class="note">検算: {price:,} − {s["卸値税込"]:,} − {s["販売手数料"]:,} − '
              f'{s["FBA配送料"]:,} − {s["基本成約料"]:,} − {s["保管料"]:,} − {s["納品送料"]:,} − '
              f'{s["返品引当"]:,} ＝ <b>{checksum:,}円</b>'
+             f'（納品 {s["納品送料"]:,}円 ＝ FBA納品送料 {fba_in}円 ＋ 納品代行 作業費 {prep_in}円'
+             + (f' ＋ その他 {other_in}円）' if other_in else "）")
              + (f'（表の純利益 {s["純利益"]:,.0f}円 と {checksum - s["純利益"]:+,.0f}円。'
                 "各項目を円未満で丸めた分の差です）" if checksum != s["純利益"]
                 else "（表の純利益と一致）")
@@ -693,7 +778,180 @@ def sku_card(i: int, s: dict) -> str:
     return "\n".join(p)
 
 
-def write_html(plans, skus, dropped):
+def _mini_lines(sv: dict | None) -> str:
+    """案の中身を1行で。口数がどう削られたかが読めるように、口数と回転を必ず出す。"""
+    if not sv:
+        return '<span class="na">該当なし</span>'
+    return "<br>".join(
+        f'{h(l["商品名"][:22])}｜{l["口数"]}口＝{l["出品数"]}点｜{l["仕入額"]:,}円'
+        f'｜回転{l["回転月数"]:.1f}ヶ月｜{h(l["仕入先"])}'
+        for l in sorted(sv["明細"], key=lambda x: -x["仕入額"]))
+
+
+def _sum_cell(sv: dict | None) -> str:
+    if not sv:
+        return '<td class="na" colspan="5">—</td>'
+    return (f'<td class="num">{sv["SKU数"]} / {sv["サプライヤー数"]}社</td>'
+            f'<td class="num">{sv["総額"]:,}円</td>'
+            f'<td class="num"><b>{sv["手残り"]:,}円</b></td>'
+            f'<td class="num">{sv["最長回転月数"]:.1f}ヶ月</td>'
+            f'<td class="num">{sv["出品数"]}点</td>')
+
+
+def e2_section(e2_report, skus: dict, plans=()) -> list[str]:
+    """案E-2 を「組めた／組めなかった」まで含めて正直に書く。
+
+    社長の3条件（除外SKUを外す・2社以上・回転上限）が両立しない場合は、
+    **両立しないと書く**。そのうえで、どちらを捨てるといくら変わるかを数字で出す。
+    """
+    _plans_for_note = list(plans)
+    p = ['<h1 class="part" id="p1b">第1部B 案E-2 ─ 社長の3条件で組み直した結果</h1>']
+
+    for asin, why in EXCLUDED_ASINS.items():
+        v = skus.get(asin)
+        p.append(f'<p><b>外した SKU: {h(v["商品名"] if v else asin)}（{h(asin)}）</b><br>'
+                 f'<span class="sub">{h(why)}</span></p>')
+        if v:
+            # 実額はここで元データから引く（コード側には金額を持たせない）。
+            in_e = [(lbl, l) for lbl, _, sv in _plans_for_note for l in sv["明細"]
+                    if l["ASIN"] == asin]
+            p.append('<table class="kv"><tbody>'
+                     f'<tr><th>1点の純利益 / 利益率</th><td>{v["純利益"]:,.0f}円 / '
+                     f'{v["利益率%"]:.1f}%（売価 {v["Amazon価格"]:,}円）</td></tr>'
+                     f'<tr><th>FBAサイズ</th><td>{h(v["FBAサイズ"])}'
+                     f'（FBA配送代行手数料 {v["FBA配送料"]:,}円で計算）</td></tr>'
+                     f'<tr><th>納品コスト</th><td>納品代行 作業費 {inbound_parts(v)[0]}円 ＋ '
+                     f'FBA納品送料 {inbound_parts(v)[1]}円 ＝ {v["納品送料"]}円/点</td></tr>'
+                     + "".join(
+                         f'<tr><th>{h(lbl)} での寄与</th><td>粗利 {l["粗利"]:,}円</td></tr>'
+                         for lbl, l in in_e)
+                     + "</tbody></table>")
+
+    ok = [c for c, plan, _ in e2_report if plan]
+    ng = [c for c, plan, _ in e2_report if not plan]
+    if ng:
+        p.append('<div class="alertbox"><b>先に結論です。</b><br>'
+                 + "・".join(f"回転{c:.0f}ヶ月版は<b>組めました</b>" for c in ok)
+                 + ("。" if ok else "")
+                 + "".join(f'回転{c:.0f}ヶ月版は<b>両立しません</b>。'
+                           for c in ng)
+                 + "無理に組んで見せかけの案を作ることはしませんでした。"
+                 "下に、何と何がぶつかっているのかと、"
+                 "どちらの条件を捨てるといくら変わるのかを出します。</div>")
+    else:
+        p.append('<div class="est"><b>先に結論です。</b>'
+                 + "・".join(f"回転{c:.0f}ヶ月版" for c in ok)
+                 + " とも組めました。</div>")
+
+    for cap, plan, diag in e2_report:
+        inside = diag["cap内SKU"]
+        sups = diag["cap内サプライヤー"]
+        p.append(f'<h2 id="e2-{cap:.0f}">回転 {cap:.0f}ヶ月以内 ─ '
+                 + ("<b>組めます</b>" if plan else "<b>組めません</b>") + "</h2>")
+
+        # 何が使えるのか（ここが両立可否の全部）
+        usable = diag["cap内で買えるSKU"]
+        p.append(f'<h4 >この条件を満たす SKU は {len(inside)}件。'
+                 f'そのうち<b>予算内で買えるのは {len(usable)}件・{len(sups)}社</b>だけです</h4>')
+        p.append('<div class="tw"><table><thead><tr><th>商品名 / ASIN</th><th>仕入先</th>'
+                 "<th>最小ロット</th><th>＝出品数</th><th>最小ロットの実額</th>"
+                 "<th>それが何ヶ月分か</th><th>1点の純利益</th><th>予算内か</th>"
+                 "</tr></thead><tbody>")
+        for k, v in sorted(inside.items(), key=lambda kv: min_lot_months(kv[1]) or 0):
+            lst = v["最小口数"] // v["入数"]
+            low = round(v["単価"] * v["最小口数"])
+            ok_budget = (_pill("買える", "ok") if k in usable else
+                         _pill(f"最小ロット1回で予算超過（{low:,}円）", "danger"))
+            p.append(f'<tr><td><b>{h(v["商品名"])}</b><div class="sub">{h(k)}</div></td>'
+                     f'<td>{h(v["仕入先"])}</td><td class="num">{v["最小口数"]}口</td>'
+                     f'<td class="num">{lst}点</td>'
+                     f'<td class="num">{low:,}円</td>'
+                     f'<td class="num"><b>{min_lot_months(v):.1f}ヶ月</b></td>'
+                     f'<td class="num">{v["純利益"]:,.0f}円</td><td>{ok_budget}</td></tr>')
+        p.append("</tbody></table></div>")
+        if len(sups) < 2:
+            p.append('<div class="wipe"><b>これが両立しない理由です。</b><br>'
+                     f'回転{cap:.0f}ヶ月以内かつ予算内で買える SKU が '
+                     f'<b>{h(sups[0]) if sups else "—"} 1社ぶんしかありません</b>'
+                     f'（{len(usable)}件とも同じ社）。'
+                     "2社に分散するには、2社目から必ず1SKU 買う必要がありますが、"
+                     f'その候補が存在しません。<b>予算の問題ではなく、候補プールの問題です。</b>'
+                     "</div>")
+
+        # 3つの選択肢を並べる
+        p.append("<h4 >どの条件を捨てるといくら変わるか</h4>")
+        p.append('<div class="tw"><table><thead><tr><th>選択肢</th><th>中身</th>'
+                 "<th>SKU/社数</th><th>総額</th><th>手残り</th><th>最長回転</th><th>出品数</th>"
+                 "<th>失うもの</th></tr></thead><tbody>")
+        rows = [
+            (f"<b>案E-2</b>（3条件すべて満たす）", plan,
+             "なし（条件どおり）" if plan else "<b>成立しません</b>"),
+            ("「2社分散」を諦める（1社でよい）", diag["分散を捨てる"],
+             "出品制限・出荷停止が1回起きると<b>全SKUが同時に止まります</b>。"
+             "初回で在庫を1社にぶら下げると、そこが閉じた時点で打つ手がありません"),
+            (f"「回転{cap:.0f}ヶ月」を諦める（2社は守る）", diag["回転を捨てる"],
+             "在庫が長く寝ます。保管料は寝るほど膨らみ、"
+             "365日を超えると長期在庫最低手数料20円/点/月が別途乗ります"),
+        ]
+        for label, sv, lose in rows:
+            p.append(f'<tr><td>{label}</td><td class="sub">{_mini_lines(sv)}</td>'
+                     + _sum_cell(sv) + f"<td>{lose}</td></tr>")
+        p.append("</tbody></table></div>")
+
+        base = plan or diag["分散を捨てる"]
+        alt = diag["回転を捨てる"]
+        if base and alt and alt["手残り"] != base["手残り"]:
+            d = alt["手残り"] - base["手残り"]
+            p.append(f'<p class="note"><b>差額は {d:+,}円です。</b>'
+                     f'（回転を諦めた場合 {alt["手残り"]:,}円 − 上段 {base["手残り"]:,}円）'
+                     f'その代わり在庫が {base["最長回転月数"]:.1f}ヶ月 → '
+                     f'{alt["最長回転月数"]:.1f}ヶ月分 寝ます。'
+                     "手残りは<b>全部売れた場合の数字</b>なので、"
+                     "回転が長い側ほどこの金額は実際より楽観です。</p>")
+
+    # 候補プールに何が足りないのか
+    p.append("<h2>候補プールに足りていないもの</h2>")
+    p.append("<p>今回の行き詰まりは、予算でも計算方法でもありません。"
+             "<b>「最小ロットが小さくて、回転が速くて、オリヒロ以外の会社」という候補が"
+             "1件も無い</b>ことが原因です。</p>")
+    p.append('<div class="tw"><table><thead><tr><th>仕入先</th><th>現行と確認できた SKU</th>'
+             "<th>最小ロットが何ヶ月分か</th><th>使えない理由</th></tr></thead><tbody>")
+    by_sup: dict[str, list[dict]] = {}
+    for v in skus.values():
+        by_sup.setdefault(v["仕入先"], []).append(v)
+    for sup, vs in sorted(by_sup.items(), key=lambda kv: min(min_lot_months(v) or 1e9 for v in kv[1])):
+        ms = sorted((min_lot_months(v) or 0) for v in vs)
+        cheap = min(round(v["単価"] * v["最小口数"]) for v in vs)
+        # 「使えるか」は、予算内・除外なし・回転の3つを全部通ったものだけで判定する。
+        live = [v for v in vs if v["ASIN"] not in EXCLUDED_ASINS
+                and round(v["単価"] * v["最小口数"]) <= TOTAL_BUDGET_YEN]
+        m0 = min((min_lot_months(v) or 1e9) for v in live) if live else None
+        excl = [v for v in vs if v["ASIN"] in EXCLUDED_ASINS]
+        if not live:
+            why = (f"最小ロットが単独で予算超過（最安 {cheap:,}円 > {TOTAL_BUDGET_YEN:,}円）"
+                   if cheap > TOTAL_BUDGET_YEN else "予算内で買える SKU が残っていない")
+        elif m0 > 12:
+            why = f"最短でも {m0:.0f}ヶ月分。卸の最小ロットが大きすぎて12ヶ月版にも入らない"
+        elif m0 > 6:
+            why = f"12ヶ月版でのみ使える（最短 {m0:.1f}ヶ月）。6ヶ月版には入らない"
+        else:
+            why = f"6ヶ月版・12ヶ月版とも使える（最短 {m0:.1f}ヶ月）"
+        if excl:
+            why += f"／社長が外した SKU が{len(excl)}件（{excl[0]['商品名'][:14]}）"
+        p.append(f'<tr><td><b>{h(sup)}</b></td><td class="num">{len(vs)}件</td>'
+                 f'<td class="num">{" / ".join(f"{m:.1f}" for m in ms)}ヶ月</td>'
+                 f"<td>{h(why)}</td></tr>")
+    p.append("</tbody></table></div>")
+    p.append("<p><b>上流（T-20260907-001 の選定条件）に足すべき条件はこれです。</b>"
+             "いまの条件は「売れているか」しか見ておらず、"
+             "<code>最小ロット ÷ 月販見込 ≦ N ヶ月</code> を見ていません。"
+             "これを入れると候補は激減しますが、"
+             "<b>減った先に残るのが本当に買える候補</b>です。"
+             "N の値は社長がお決めになる数字なので、こちらでは実装していません。</p>")
+    return p
+
+
+def write_html(plans, skus, dropped, e2_report=()):
     """社長がこの1枚だけ開けば発注できる状態にする。
 
     「どういう計算をしたのか分からない」と言われたので、**式と引き算を画面に出す**。
@@ -717,11 +975,25 @@ def write_html(plans, skus, dropped):
          "<b>この資料は組んだだけで、発注は一切していません（CLAUDE.md §4.1）。</b></p>",
          '<nav class="toc"><p class="toc-h">目次</p><ul>'
          '<li><a href="#p1">第1部 案の比較</a></li>'
+         '<li><a href="#p1b">第1部B 案E-2 ─ 社長の3条件で組み直した結果</a></li>'
          '<li><a href="#p2">第2部 案ごとの中身と全滅シナリオ</a></li>'
          '<li><a href="#p3">第3部 1SKUずつの全数字（計算はここで追えます）</a></li>'
          '<li><a href="#p4">第4部 最小ロットの実額と、それが何ヶ月分か（全SKU）</a></li>'
          '<li><a href="#p5">第5部 この資料の限界</a></li>'
          "</ul></nav>"]
+
+    p.append('<div class="est"><b>納品代行の作業費について（コストモデルの確認結果）。</b><br>'
+             f'1点あたり <b>{PREP_SERVICE_YEN:.0f}円</b>（検品・ラベル貼付・<b>梱包資材込み</b>／'
+             'e-fba 公開料金・実測）。社長は物理作業を外注される方針なので、必ず掛かる費用です。<br>'
+             '<b>この12円は、すでに純利益に入っていました。</b>'
+             '元データの列「納品送料(FBA+納品代行)」＝50円が '
+             f'FBA納品送料 {FBA_INBOUND_YEN:.0f}円 ＋ 納品代行 作業費 {PREP_SERVICE_YEN:.0f}円 の合計で、'
+             '2026-09-04 の修正（経理ハジメの実測コスト反映）から計算に入っています。'
+             '経理の費目一覧に残る「【現行モデルに欠落】」の注記は、その修正より前に書かれたものです。<br>'
+             '<b>したがって、この資料の純利益はどれも変わっていません。</b>'
+             '今回やったのは<b>引き算を1行に分けて見えるようにしたこと</b>だけです（第3部）。'
+             'もう一度引くと二重計上になるので、引いていません。'
+             '梱包資材費も12円に含まれるため別立てしていません。</div>')
 
     slow = [s for s in skus.values() if (min_lot_months(s) or 0) > 12]
     if slow:
@@ -756,6 +1028,10 @@ def write_html(plans, skus, dropped):
              "<b>どちらも在庫が全部売れた場合の数字</b>で、売れ残りは考慮していません。"
              "回転月数が長い案ほど、この数字は実際より楽観になります。</p>")
 
+    # ── 第1部B ─────────────────────────────────────────────────
+    if e2_report:
+        p += e2_section(e2_report, skus, plans)
+
     # ── 第2部 ───────────────────────────────────────────────────
     p.append('<h1 class="part" id="p2">第2部 案ごとの中身と全滅シナリオ</h1>')
     for lbl, aim, s in plans:
@@ -765,7 +1041,9 @@ def write_html(plans, skus, dropped):
                  f'<span>粗利 <b>{s["粗利"]:,}円</b></span>'
                  f'<span>手残り <b>{s["手残り"]:,}円</b></span>'
                  f'<span>{s["SKU数"]}SKU / {s["サプライヤー数"]}社 / 出品{s["出品数"]}点</span>'
-                 f'<span>予算の残り {TOTAL_BUDGET_YEN - s["総額"]:,}円</span></div>')
+                 f'<span>予算の残り {TOTAL_BUDGET_YEN - s["総額"]:,}円</span>'
+                 f'<span>納品代行 作業費 <b>{round(s["出品数"] * PREP_SERVICE_YEN):,}円</b>'
+                 f'（{s["出品数"]}点 × {PREP_SERVICE_YEN:.0f}円・粗利に反映済み）</span></div>')
 
         by_sup: dict[str, list[dict]] = {}
         for ln in s["明細"]:
@@ -839,7 +1117,9 @@ def write_html(plans, skus, dropped):
         lst = s["最小口数"] // s["入数"]
         m = min_lot_months(s)
         low = round(s["単価"] * s["最小口数"])
-        if low > TOTAL_BUDGET_YEN:
+        if s["ASIN"] in EXCLUDED_ASINS:
+            verdict = _pill("社長判断で案E-2から除外", "warn")
+        elif low > TOTAL_BUDGET_YEN:
             verdict = _pill(f"最小ロット単独で予算超過（{low:,}円 > {TOTAL_BUDGET_YEN:,}円）", "danger")
         elif s["ASIN"] in used:
             verdict = _pill("案に採用", "ok")
@@ -897,7 +1177,7 @@ def write_html(plans, skus, dropped):
     (OUT / "03_発注セット.html").write_text("\n".join(p), encoding="utf-8")
 
 
-def write_outputs(plans, skus, tariffs, sup_ids, dropped):
+def write_outputs(plans, skus, tariffs, sup_ids, dropped, e2_report=()):
     OUT.mkdir(exist_ok=True)
 
     with open(OUT / "01_発注セット_案別.csv", "w", encoding="utf-8-sig", newline="") as f:
@@ -907,7 +1187,8 @@ def write_outputs(plans, skus, tariffs, sup_ids, dropped):
                     "利益率%", "ROI%", "この行の粗利",
                     "30日ドロップ数", "出品者数", "月販見込(推定)", "回転月数(推定)",
                     "ランク", "Amazon価格", "卸値(税込)", "販売手数料", "FBA配送料",
-                    "基本成約料", "保管料", "納品送料", "返品引当",
+                    "基本成約料", "保管料", "納品送料計", "うちFBA納品送料", "うち納品代行作業費",
+                    "返品引当",
                     "FBAサイズ", "PSE判定", "Amazon本体", "発注前に確認すること"])
         for lbl, aim, s in plans:
             for l in sorted(s["明細"], key=lambda x: (x["仕入先"], -x["仕入額"])):
@@ -919,6 +1200,7 @@ def write_outputs(plans, skus, tariffs, sup_ids, dropped):
                             f"{l['回転月数']:.1f}" if l["回転月数"] else "",
                             l["ランク"], l["Amazon価格"], l["卸値税込"], l["販売手数料"],
                             l["FBA配送料"], l["基本成約料"], l["保管料"], l["納品送料"],
+                            inbound_parts(l)[1], inbound_parts(l)[0],
                             l["返品引当"], l["FBAサイズ"], l["PSE判定"], l["Amazon本体"],
                             l["要確認"]])
             w.writerow([lbl, "＝合計＝", f"{s['サプライヤー数']}社", "", "", "", "",
@@ -937,7 +1219,7 @@ def write_outputs(plans, skus, tariffs, sup_ids, dropped):
                         f"{s['最大社シェア']:.0%}", f"{s['最長回転月数']:.1f}",
                         wipeout_note(s), " ｜ ".join(s["送料の内訳"])])
 
-    write_html(plans, skus, dropped)
+    write_html(plans, skus, dropped, e2_report)
 
     json.dump({"予算": TOTAL_BUDGET_YEN, "在庫上限月数": STOCK_MONTHS_CAP,
                "届け先": PREF, "除外": dropped,
@@ -972,7 +1254,22 @@ def main():
         print("⚠ 予算5万円に収まる組み合わせがありません。最小発注数を見直してください")
         return
     plans = pick_plans(sets)
-    write_outputs(plans, skus, tariffs, sup_ids, dropped)
+
+    # ── 案E-2（社長指示 2026-09-09）──────────────────────────────
+    # 除外SKUを外し、2社以上に分散し、全SKUの回転が上限以内。6ヶ月版と12ヶ月版。
+    # **組めなければ組めないと出す。** 条件を緩めた案を E-2 と名乗らせない。
+    e2_report = []
+    for cap in (12.0, 6.0):
+        plan, diag = build_e2(skus, tariffs, sup_ids, cap)
+        e2_report.append((cap, plan, diag))
+        if plan:
+            plans.append((f"案E-2（{cap:.0f}ヶ月）",
+                          f"{', '.join(EXCLUDED_ASINS)} を外し、2社以上・全SKUの回転{cap:.0f}ヶ月以内",
+                          plan))
+        else:
+            print(f"⚠ 案E-2（{cap:.0f}ヶ月）は組めません（2社分散と回転{cap:.0f}ヶ月が両立しない）")
+
+    write_outputs(plans, skus, tariffs, sup_ids, dropped, e2_report)
     for lbl, aim, s in plans:
         print(f"\n{lbl} {aim}")
         print(f"  {s['SKU数']}SKU / {s['サプライヤー数']}社 / 出品{s['出品数']}点"
