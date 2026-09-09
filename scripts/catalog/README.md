@@ -10,10 +10,31 @@
 
 ---
 
+## カタログの作り方（2026-09-09 / T-20260909-003 で機械生成に変更）
+
+手で1行ずつ追記する運用は廃止しました（積み残しが 248 件になったため）。
+`deliverables/` を走査して CSV と HTML を生成します。
+
+```bash
+python3 scripts/catalog/build_catalog.py            # CSV と HTML を再生成
+python3 scripts/catalog/build_catalog.py --dry-run  # 書かずに件数だけ確認
+python3 scripts/catalog/build_catalog.py --check-untracked  # 追跡漏れの検知
+```
+
+- 既存の 内容（要約）/ 暫定結果 / 備考 / 種別 / 担当 は、リポジトリ相対パスをキーに
+  **必ず引き継ぎます**。新規行の要約は `要記入`。
+- **社長の入口は HTML 版**: `workspace/output/deliverables/T-20260601-001/00_成果物カタログ.html`。
+  成果物名が `file://` リンクになっており、クリックで開きます。
+- 走査対象はファイルシステムであって git ではありません。卸値を含むため追跡していない
+  成果物も「ローカルのみ」として載ります（社長のローカルには実在するため）。
+- スプレッドシートは `file://` を開けないので、一覧用途で併存させます。
+  順番は **build_catalog.py → （マリエが要約を記入）→ sync_catalog_to_sheet.py**。
+
 ## 構成ファイル
 
 | ファイル | 役割 |
 |---|---|
+| `build_catalog.py` | deliverables を走査してマスター CSV と HTML 版カタログを生成する |
 | `catalog_sync.gs` | シート側に貼る Apps Script。POST を受けてシートを全置換する |
 | `sync_catalog_to_sheet.py` | ローカルから CSV を読んで POST するヘルパー（標準ライブラリのみ） |
 | `.catalog_sync.env.example` | 設定見本。これをコピーして `.catalog_sync.env` を作る |

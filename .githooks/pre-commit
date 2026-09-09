@@ -308,6 +308,18 @@ MSG2
   return 2
 }
 
+# --- 追跡漏れの警告（2026-09-09 / T-20260909-003）------------------------------
+# ホワイトリスト方式の .gitignore（先頭が `*`）は、書き忘れたファイルを
+# **黙って**追跡外にする。漏えいには強いが、成果物がカタログから消える。
+# ここでは catch-all `*` で落ちているファイルだけを警告する。**commit は止めない**
+# （公開してよいかの判断は社長・法務の領分であり、機械が決めてよいものではない）。
+warn_untracked() {
+  command -v python3 >/dev/null 2>&1 || return 0
+  [ -f scripts/catalog/build_catalog.py ] || return 0
+  python3 scripts/catalog/build_catalog.py --warn-untracked-for-commit 2>/dev/null >&2 || true
+}
+warn_untracked
+
 main
 rc=$?
 if [ "$rc" -eq 2 ]; then

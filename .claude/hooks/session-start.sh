@@ -465,6 +465,28 @@ ${MIRROR_BODY}
   fi
 fi
 
+# --- リマインダー⑦: 成果物の追跡漏れ検知（2026-09-09 / T-20260909-003）---------
+#
+# ホワイトリスト方式の .gitignore（先頭が `*`）は、書き忘れたファイルを**黙って**
+# 追跡外にします。2026-09-09、社長が T-20260904-004 の資料をカタログから
+# 見つけられない事故が起きました。catch-all で落ちているファイルだけを警告します。
+#
+# **検知だけ**です。自動で git add はしません（公開可否は社長・法務の判断）。
+CATALOG_MSG=""
+CATALOG_BUILDER="${REPO}/scripts/catalog/build_catalog.py"
+if [ -f "$CATALOG_BUILDER" ] && command -v python3 >/dev/null 2>&1; then
+  CATALOG_OUT="$(cd "$REPO" && python3 "$CATALOG_BUILDER" --warn-untracked-for-commit 2>/dev/null || true)"
+  if [ -n "$CATALOG_OUT" ]; then
+    CATALOG_MSG="
+
+【SessionStart リマインダー⑦：成果物が catch-all の * で追跡外になっています】
+${CATALOG_OUT}
+成果物カタログにも載らないため、社長からは存在しないのと同じになります。
+一覧: \`python3 scripts/catalog/build_catalog.py --check-untracked\`
+公開してよいかの判断は社長・法務の領分です。**勝手に git add しないこと。**"
+  fi
+fi
+
 # --- 掲出順（2026-08-31 / T-20260831-003 で変更）---
 #
 # 旧: ① → ②(next_check_at) → ③(inbox) → ④
@@ -478,7 +500,7 @@ fi
 # ⑤ は 2026-08-31 に追加。⑥ は 2026-09-02 に追加。掲出は ① → ⑤ → ⑥ → ③ → ④ → ②。
 # 番号は作成順、掲出順とは別です（③④② が既にそうなっています）。
 # ⑤⑥ はいずれも「異常な時だけ」出るため、平常日は1行も増えません。だから最前列に置けます。
-MESSAGE="${SYNC_MSG}${MON_MSG}${MIRROR_MSG}${INBOX_MSG}${LIST_MSG}${REMINDER_MSG}"
+MESSAGE="${SYNC_MSG}${MON_MSG}${MIRROR_MSG}${CATALOG_MSG}${INBOX_MSG}${LIST_MSG}${REMINDER_MSG}"
 
 # JSON エスケープ（python が無い環境を考慮し、jq があれば使う）
 if command -v jq >/dev/null 2>&1; then
