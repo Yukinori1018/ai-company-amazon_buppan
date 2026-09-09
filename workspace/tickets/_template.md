@@ -61,3 +61,37 @@ related_tickets: []
 ## ログ
 
 - YYYY-MM-DD todo 起票
+
+## 成果物
+
+> **この節は必須です。空欄にしない・節ごと消さない。** 位置は本文の**末尾**（`## ログ` の後）、1チケットに1つだけ。
+> 形式の正は [agents/secretary/skills/ticket-management.md](../../agents/secretary/skills/ticket-management.md) §`## 成果物` 節の運用。
+> **相対パスの基準は配置後のチケット（`workspace/tickets/<todo|doing|waiting|done>/`）** なので `../../output/deliverables/...` と書きます。
+> この雛形は `workspace/tickets/` 直下にあるため、**この記入例のリンクは雛形の状態では解決しません**（`todo/` 等へコピーした時点で正しく解決します）。
+> 書いたら**必ず実パスが解決するか確かめること**（リンク切れを作らない）。
+> 成果物を `deliverables/<ticket_id>/` に置いて commit したら、**同じ turn でこの節に行を追加**します。「後でまとめて」は必ず忘れます。
+
+**記入例（成果物があるとき）** — 下の3点セットで書く。
+
+- 📁 **[T-YYYYMMDD-NNN/](../../output/deliverables/T-YYYYMMDD-NNN/)** — 成果物フォルダ（N件）
+  - [`01_◯◯.html`](../../output/deliverables/T-YYYYMMDD-NNN/01_◯◯.html) — 1行説明（社長はまずこれ）
+  - [`01_◯◯.md`](../../output/deliverables/T-YYYYMMDD-NNN/01_◯◯.md) — 同内容のテキスト版
+  - [`README.md`](../../output/deliverables/T-YYYYMMDD-NNN/README.md) — 索引
+  - [`out/`](../../output/deliverables/T-YYYYMMDD-NNN/out/) — 金額明細など 〔Git除外・ローカルのみ〕
+  - ほか N 件（上記フォルダを参照）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-YYYYMMDD-NNN/`
+
+補足:
+- 主要ファイルが多いときは、上位数件＋`ほか N 件（上記フォルダを参照）`にとどめる。
+- `.gitignore` で除外している成果物には `〔Git除外・ローカルのみ〕` を添える（GitHub 上ではリンクが 404 になるため）。
+- 社長の閲覧口は symlink 先なので**リンクにはせず**、バッククォートのテキスト表記にする。
+
+**記入例（成果物が無いとき）** — 節を消さず、理由を1行で書く。
+
+```
+## 成果物
+
+（なし — 社長判断のチケットのため成果物ファイルなし）
+```
+
+理由の例：`社長判断のチケットのため` / `リポジトリ側の更新そのものが成果のため` / `外部での手続き・作業が成果のため` / 単に `成果物ファイルなし`。**無理に断定しない**（分からなければ `成果物ファイルなし` でよい）。
