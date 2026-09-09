@@ -68,7 +68,9 @@ def load_env(path):
 def read_csv_text(csv_path):
     if not os.path.exists(csv_path):
         sys.exit(f"[ERROR] マスター CSV が見つかりません: {csv_path}")
-    with open(csv_path, "r", encoding="utf-8") as f:
+    # utf-8-sig: マスター CSV は BOM つきで書かれる。BOM を残すとシートの
+    # 見出しが「﻿チケットID」になり、列名で絞り込めなくなる。
+    with open(csv_path, "r", encoding="utf-8-sig") as f:
         text = f.read()
     return text
 

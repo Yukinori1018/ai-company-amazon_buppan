@@ -292,3 +292,19 @@ open(p, "wb").write(raw.replace(b"\n", b"\r\n"))   # 内容は触らない
 ```bash
 python3 -c "raw=open('<CSV>','rb').read(); print('CRLF',raw.count(b'\r\n'),'lone LF',raw.count(b'\n')-raw.count(b'\r\n'))"
 ```
+
+---
+
+## 2026-09-09 追記 — 追記運用の廃止と、シートからローカルを開く経路
+
+- **手でCSVに1行足す運用は廃止**。`python3 scripts/catalog/build_catalog.py` が
+  `deliverables/` を走査して機械生成する。順番は
+  **build_catalog.py →（要約を人が記入）→ sync_catalog_to_sheet.py**。
+- 人が書いた要約はリポジトリ相対パスをキーに引き継がれる。再生成で消えない。
+- **シートの「ローカルリンク」列は `=HYPERLINK("http://localhost:17325/…")` の数式**。
+  クリックするとローカルの実ファイルが開く。開かないときは配信サーバが止まっている:
+  `python3 scripts/catalog/serve_deliverables.py --status` → 停止中なら起動する。
+- `sync_catalog_to_sheet.py` は CSV を **utf-8-sig** で読む（2026-09-09 修正）。
+  utf-8 で読むとシート見出しが `﻿チケットID` になり、列名で絞り込めなくなる。
+- HTML 版カタログ（`00_成果物カタログ.html`）は社長の入口ではない。
+  既定で生成しない。ファイルは残置（削除は §4.1）。

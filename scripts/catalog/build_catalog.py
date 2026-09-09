@@ -115,8 +115,33 @@ EXCLUDE_EXT = {
 EXCLUDE_NAMES = {
     ".DS_Store", ".gitignore", "STOP", "FINISHED", "CACHEDIR.TAG",
     "seen_asins.txt", "heartbeat.json", "shard_cursors.json", ".env",
+    "robots.txt", "sitemap.xml", "requirements.txt",
 }
 EXCLUDE_NAME_RE = re.compile(r"(_cache\.json$|\.csv\.tmp$|^\.)")
+
+# ── 成果物ではないもの（マリエの棚卸し・2026-09-09 / T-20260909-003 タスクC）────
+# 社長がカタログで探すのは「読む資料」と「使うデータ」。
+# 成果物を作るための道具（テスト・雛形・内部ビルド用）と、Web 資材の部品は載せない。
+# 判断がつかないものは載せる側に倒す（社長が探せない方が損失が大きい）。
+#
+# ここを緩めると一覧の意味が消え、締めると社長の資料が消える。変更は必ず件数で確認すること。
+EXCLUDE_DIR_RE = re.compile(
+    r"^(tests?"          # tests/ … 単体テスト一式
+    r"|assets"           # site/assets, mockup_v1/assets … CSS/SVG/JS/画像の部品
+    r"|sample_data"      # テスト用のサンプル JSON
+    r"|\.wrangler"       # Cloudflare のキャッシュ
+    r")$"
+    r"|_backup_\d{8}$"   # site_backup_20260820 … 旧版まるごと退避
+)
+EXCLUDE_FILE_RE = re.compile(
+    r"^_"                # _build_02_maker_list.py … 内部用の生成スクリプト
+    r"|(^|_)tests?_"     # tests_risk_rules.py / test_profit.py / 06_tests_pse_rule_v2.py
+    r"|_tests?\.py$"
+    r"|selftest"         # B1L_v11_selftest_matrix.py … 自己診断
+    r"|_snapshot\.json$" # 中間スナップショット
+    r"|^__init__\.py$"   # 中身のないパッケージ宣言
+    r"|^progress\.json$" # 実行途中の進捗
+)
 
 # 拡張子 → 種別の既定値（人が種別を書いていない新規行の初期値）
 KIND_BY_EXT = {
@@ -225,12 +250,14 @@ def scan_files() -> list[str]:
         dirnames[:] = [
             d for d in dirnames
             if d not in EXCLUDE_DIR_NAMES
+            and not EXCLUDE_DIR_RE.search(d)
             and os.path.join(rel_dir, d) not in EXCLUDE_DIR_PATHS
         ]
         dirnames.sort(key=natural_key)
         for fn in sorted(filenames, key=natural_key):
             ext = os.path.splitext(fn)[1].lower()
-            if fn in EXCLUDE_NAMES or ext in EXCLUDE_EXT or EXCLUDE_NAME_RE.search(fn):
+            if (fn in EXCLUDE_NAMES or ext in EXCLUDE_EXT
+                    or EXCLUDE_NAME_RE.search(fn) or EXCLUDE_FILE_RE.search(fn)):
                 continue
             rel = os.path.join(rel_dir, fn)
             # カタログ自身は載せない（自己参照で毎回1行増えて冪等でなくなる）。
