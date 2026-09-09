@@ -7,6 +7,14 @@ sync_catalog_to_sheet.py — 成果物カタログ CSV を Google スプレッ�
   JSON で POST する。Web App 側がシートを全クリア → 全行書き込み（ミラー更新）する。
   シートの URL は変わらない。
 
+ローカルリンク列について（2026-09-09 / T-20260909-003）:
+  「ローカルリンク」列には `=HYPERLINK("http://localhost:17325/…","<ファイル名>")` が
+  入っている。Apps Script の Range#setValues は **`=` で始まる文字列を数式として解釈する**
+  ので、値ではなくリンクとしてセルに入る。クリックすると社長の Mac 上の実ファイルが開く
+  （配信サーバ serve_deliverables.py が 127.0.0.1 で待ち受けている前提）。
+  ここが「文字列のまま」に見えたら、catalog_sync.gs の setValues を setFormulas に
+  差し替えるのではなく、まず該当セルの先頭が `=` になっているかを確認すること。
+
 設定:
   scripts/catalog/.catalog_sync.env（gitignore 対象）に KEY=VALUE 形式で記述:
       WEBAPP_URL=https://script.google.com/macros/s/XXXX/exec
@@ -65,6 +73,11 @@ def read_csv_text(csv_path):
     return text
 
 
+def count_formulas(csv_text):
+    """ローカルリンク列に数式（=HYPERLINK）が何個入っているかを数える。"""
+    return csv_text.count('"=HYPERLINK(')
+
+
 def summarize(csv_text):
     """送信予定の行数・先頭2行をプレビュー用に整形する。"""
     lines = [ln for ln in csv_text.splitlines() if ln.strip() != ""]
@@ -92,6 +105,14 @@ def main():
     print(f"[INFO] 総行数（ヘッダー込み）: {total}  / データ行: {data_rows}")
     print(f"[INFO] ヘッダー: {header[:120]}")
     print(f"[INFO] 先頭データ行: {first_data[:120]}")
+    n_formula = count_formulas(csv_text)
+    print(f"[INFO] ローカルリンク（=HYPERLINK 数式）: {n_formula} セル")
+    if n_formula == 0:
+        print("[WARN] 数式が1つもありません。先に build_catalog.py を実行してください。")
+    else:
+        print("[INFO] 数式は Apps Script の setValues がリンクとして解釈します。"
+              "クリックで開くには配信サーバが必要:")
+        print("       python3 scripts/catalog/serve_deliverables.py --status")
 
     env = load_env(ENV_PATH)
     webapp_url = env.get("WEBAPP_URL", "").strip()
@@ -166,6 +187,8 @@ def _print_result(body, expected_total):
             f"[OK] 同期成功: シート='{result.get('sheetName')}', "
             f"書き込み {result.get('rowsWritten')} 行 x {result.get('colsWritten')} 列"
         )
+        print("[確認] シートの「ローカルリンク」列がリンク表示（青字）になっているか、"
+              "1セルだけクリックして開くか見てください。")
         if result.get("rowsWritten") != expected_total:
             print(
                 f"[WARN] 送信予定 {expected_total} 行と書き込み行数が一致しません。"

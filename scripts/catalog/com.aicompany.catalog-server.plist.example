@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  com.aicompany.catalog-server.plist — 成果物配信サーバを Mac ログイン時に自動起動する。
+
+  ★これは雛形です。まだどこにも設置していません。★
+  設置するかどうかは社長の判断です。手順は scripts/catalog/README.md の
+  「Mac ログイン時の自動起動（launchd）」を参照してください。
+
+  設置するとき:
+    1. このファイルを ~/Library/LaunchAgents/com.aicompany.catalog-server.plist へコピー
+    2. コピー先の __REPO_ROOT__ を実際のリポジトリ絶対パスに置換
+       （現時点では /Users/yukinori/Claude Code/ai-company-amazon_buppan）
+    3. launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.aicompany.catalog-server.plist
+
+  やっていること:
+    ログイン中つねに serve_deliverables.py を 127.0.0.1:17325 で走らせる。
+    落ちたら KeepAlive が起こし直す。ネットワークには出ない（127.0.0.1 バインド）。
+-->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.aicompany.catalog-server</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/usr/bin/python3</string>
+    <string>__REPO_ROOT__/scripts/catalog/serve_deliverables.py</string>
+    <string>--port</string>
+    <string>17325</string>
+  </array>
+
+  <!-- ログイン直後に起動し、落ちたら起こし直す -->
+  <key>RunAtLoad</key>
+  <true/>
+  <key>KeepAlive</key>
+  <true/>
+
+  <!-- 起動ループ防止（異常時に1秒間隔で無限再起動しないように） -->
+  <key>ThrottleInterval</key>
+  <integer>10</integer>
+
+  <key>WorkingDirectory</key>
+  <string>__REPO_ROOT__</string>
+
+  <!-- ログ。肥大化したら手で消してよい（サーバは自動で作り直す） -->
+  <key>StandardOutPath</key>
+  <string>/tmp/catalog-server.out.log</string>
+  <key>StandardErrorPath</key>
+  <string>/tmp/catalog-server.err.log</string>
+
+  <key>ProcessType</key>
+  <string>Background</string>
+</dict>
+</plist>

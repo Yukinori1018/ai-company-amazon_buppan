@@ -3,8 +3,9 @@
 build_catalog.py — 成果物カタログを deliverables/ の実体から機械生成する。
 
 これは何か（1行）:
-    `workspace/output/deliverables/` を走査し、マスター CSV と HTML 版カタログを
-    再生成する。手で1行ずつ追記する運用（積み残し 248 件）を廃止するためのもの。
+    `workspace/output/deliverables/` を走査してマスター CSV を再生成する。
+    手で1行ずつ追記する運用（積み残し 248 件）を廃止するためのもの。
+    社長の入口は Google スプレッドシート（sync_catalog_to_sheet.py が反映する）。
 
 設計の柱（T-20260909-003 / 2026-09-09）:
   1. **真実はファイルシステム**。git 追跡の有無ではない。
@@ -16,18 +17,26 @@ build_catalog.py — 成果物カタログを deliverables/ の実体から機�
      リポジトリ相対パスをキーに引き継ぐ。新規行の要約は「要記入」で出す。
   3. **タイトルにファイル名の付番を必ず含める**（`03_` `A3_` `B1L_` など）。
      社長が「03 の資料」と言えるようにするため。
+  5. **シートのセルからローカルの実ファイルが開ける**（2026-09-09 社長指示）。
+     スプレッドシートは `file://` を開けないので、ローカル配信サーバ
+     （serve_deliverables.py / 127.0.0.1:17325）を経由する `=HYPERLINK(...)` を
+     ローカルリンク列に埋める。値ではなく**数式**として入る必要がある。
   4. **冪等**。同じ入力なら同じ出力。再実行しても差分は増えない。
 
 使い方:
-    python3 scripts/catalog/build_catalog.py              # CSV と HTML を再生成
+    python3 scripts/catalog/build_catalog.py              # マスター CSV を再生成
     python3 scripts/catalog/build_catalog.py --dry-run    # 書かずに件数だけ出す
     python3 scripts/catalog/build_catalog.py --check-untracked   # 追跡漏れの検知
     python3 scripts/catalog/build_catalog.py --warn-untracked-for-commit
         （pre-commit から呼ばれる。今回の commit が触ったフォルダだけを見る）
+    python3 scripts/catalog/build_catalog.py --html       # 旧 HTML 版も併せて出す（既定オフ）
 
 出力:
-    workspace/output/deliverables/T-20260601-001/deliverables-catalog.csv  … マスター
-    workspace/output/deliverables/T-20260601-001/00_成果物カタログ.html     … 社長の入口
+    workspace/output/deliverables/T-20260601-001/deliverables-catalog.csv  … マスター（唯一の正）
+
+    HTML 版（00_成果物カタログ.html）は 2026-09-09 の社長指示で**既定の生成対象から外した**。
+    運用は従来どおりスプレッドシート。既存ファイルは削除せず残置してある（§4.1 不可逆な削除）。
+    `--html` を付けたときだけ再生成する。
 
 Google スプレッドシートへの反映は `sync_catalog_to_sheet.py` が別途行う。
 このスクリプトは外部へ一切送信しない。
@@ -43,6 +52,7 @@ import re
 import subprocess
 import sys
 from datetime import date, datetime
+from urllib.parse import quote
 
 # ── パス定数 ────────────────────────────────────────────────────────────────
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -52,12 +62,18 @@ CATALOG_DIR = os.path.join(DELIVERABLES, "T-20260601-001")
 CSV_PATH = os.path.join(CATALOG_DIR, "deliverables-catalog.csv")
 HTML_PATH = os.path.join(CATALOG_DIR, "00_成果物カタログ.html")
 
-# 社長の Finder 側の入口（deliverables へのシンボリックリンク）。
-# 環境変数で差し替え可能にしてある（クラウドセッションでは別パスになるため）。
+# 社長の Finder 側の入口（deliverables へのシンボリックリンク）。HTML 版でのみ使う。
 LOCAL_BASE = os.environ.get(
     "CATALOG_LOCAL_BASE",
     os.path.expanduser("~/Documents/AI Company Outputs/Amazon物販事業"),
 )
+
+# ── スプレッドシートからローカル実ファイルを開くための配信元 ──────────────
+# Google スプレッドシートのハイパーリンクは file:// を開けない（無効扱い or ブラウザが遮断）。
+# そこで serve_deliverables.py を 127.0.0.1 で常駐させ、その URL を貼る。
+# ポートを変えるときは serve_deliverables.py の DEFAULT_PORT と必ず揃えること。
+CATALOG_PORT = os.environ.get("CATALOG_PORT", "17325")
+SERVE_BASE = f"http://localhost:{CATALOG_PORT}"
 
 COLUMNS = [
     "チケットID",
@@ -139,6 +155,26 @@ def current_branch() -> str:
     return (run_git(["rev-parse", "--abbrev-ref", "HEAD"]).strip() or "main")
 
 
+def serve_url(rel_under_deliverables: str) -> str:
+    """deliverables 配下の相対パス → ローカル配信サーバの URL。日本語はパーセントエンコード。"""
+    parts = [p for p in rel_under_deliverables.replace(os.sep, "/").split("/") if p]
+    return SERVE_BASE + "/" + "/".join(quote(p) for p in parts)
+
+
+def hyperlink_formula(url: str, label: str) -> str:
+    """
+    スプレッドシートのセルに入れる `=HYPERLINK(...)` を組み立てる。
+
+    値ではなく**数式**として入る必要がある。Apps Script の Range#setValues は
+    `=` で始まる文字列を数式として解釈するので、CSV に素直に書けばよい
+    （CSV のクォートは csv.DictWriter が面倒を見る）。
+    数式内の二重引用符は Sheets の流儀に従って `""` で重ねてエスケープする。
+    """
+    esc_url = url.replace('"', '""')
+    esc_label = (label or url).replace('"', '""')
+    return f'=HYPERLINK("{esc_url}","{esc_label}")'
+
+
 def natural_key(name: str):
     """`01_` `02_` `10_` を人間の期待どおりに並べる。数字は数値として比較する。"""
     parts = re.split(r"(\d+)", name)
@@ -158,7 +194,13 @@ def make_title(filename: str, curated: str) -> str:
     """
     stem = os.path.splitext(filename)[0]
     prefix = number_prefix(stem)
-    base = curated.strip() if curated else stem[len(prefix) + 1:].replace("_", " ")
+    if curated.strip():
+        base = curated.strip()
+    else:
+        # 付番が無いのに先頭1文字を削ると README → EADME になる（2026-09-09 に踏んだ）。
+        # 付番があるときだけ「付番 + アンダースコア」を落とす。
+        body = stem[len(prefix) + 1:] if prefix else stem
+        base = body.replace("_", " ").strip()
     if not base:
         base = stem
     if prefix and not base.startswith(prefix + "_") and not base.startswith(prefix + " "):
@@ -283,7 +325,10 @@ def build_rows(files: list[str], existing: dict[str, dict], all_existing: list[d
             "暫定結果": carried(prev, "暫定結果"),
             "種別": carried(prev, "種別") or "フォルダ",
             "公開状態": "フォルダ",
-            "ローカルリンク": f"{LOCAL_BASE}/{ticket}/{sub}".rstrip("/").replace(os.sep, "/"),
+            "ローカルリンク": hyperlink_formula(
+                serve_url(f"{ticket}/{sub}") + "/",
+                (sub or ticket).replace(os.sep, "/") + "/（フォルダ）",
+            ),
             "GitHubリンク": carried(prev, "GitHubリンク"),
             "リポジトリ相対パス": rel,
             "担当": carried(prev, "担当"),
@@ -304,7 +349,8 @@ def build_rows(files: list[str], existing: dict[str, dict], all_existing: list[d
         row["リポジトリ相対パス"] = rel
         row["チケットID"] = prev.get("チケットID") or prev.get("﻿チケットID") or ""
         row["公開状態"] = "GitHub公開" if rel in tracked else "ローカルのみ"
-        row["ローカルリンク"] = row["ローカルリンク"] or ""
+        # 配信ルートは deliverables なので、その外（docs/reference 等）は URL を出せない。
+        row["ローカルリンク"] = ""
         row["内容（要約）"] = row["内容（要約）"] or NEEDS_INPUT
         rows.append(row)
 
@@ -325,7 +371,9 @@ def build_rows(files: list[str], existing: dict[str, dict], all_existing: list[d
             "暫定結果": carried(prev, "暫定結果") or fallback.get("暫定結果", ""),
             "種別": carried(prev, "種別") or KIND_BY_EXT.get(ext, "その他"),
             "公開状態": "GitHub公開" if is_tracked else "ローカルのみ",
-            "ローカルリンク": f"{LOCAL_BASE}/{ticket}/{sub}".replace(os.sep, "/"),
+            "ローカルリンク": hyperlink_formula(
+                serve_url(f"{ticket}/{sub}"), sub.replace(os.sep, "/")
+            ),
             "GitHubリンク": (
                 "https://github.com/Yukinori1018/ai-company-amazon_buppan/blob/"
                 f"{branch}/{rel}".replace(os.sep, "/") if is_tracked else ""
@@ -422,6 +470,9 @@ details.sum summary{cursor:pointer;color:var(--accent);}
 
 HTML_TAIL = """
 <div class="note">
+<p><b>この HTML 版は既定では再生成されません。</b>2026-09-09 の社長指示により、
+運用は Google スプレッドシートに一本化しました。再生成は
+<code>python3 scripts/catalog/build_catalog.py --html</code>。</p>
 <p>リンクはローカルのファイルを直接開きます（<code>file://</code>）。ブラウザで表示されない形式（CSV・xlsx など）はダウンロードされます。</p>
 <p><b>公開状態</b>：「GitHub公開」はリポジトリに載っているもの。「ローカルのみ」は NETSEA の卸値など公開できないデータを含むため Git 追跡していないものです。どちらもこのカタログから開けます。</p>
 <p>このページは <code>python3 scripts/catalog/build_catalog.py</code> で再生成します。要約が「要記入」の行は、まだ人の手が入っていません。</p>
@@ -496,7 +547,10 @@ def write_html(path: str, rows: list[dict]) -> bool:
                 r["内容（要約）"], r["ToDo/タスク名"], r["リポジトリ相対パス"],
             ]).lower()
             pub_cls = "pub-gh" if r["公開状態"] == "GitHub公開" else "pub-local"
-            href = "file://" + r["ローカルリンク"].replace(" ", "%20")
+            # ローカルリンク列はシート用の数式になったので、href は相対パスから作り直す。
+            rel = r["リポジトリ相対パス"]
+            sub_rel = rel.split(DELIVERABLES.replace(os.sep, "/") + "/", 1)[-1]
+            href = ("file://" + LOCAL_BASE + "/" + sub_rel).replace(" ", "%20")
             parts.append(
                 f'<div class="row" data-kind="{esc(r["種別"])}" data-k="{esc(key)}">'
                 f'<a class="t" href="{esc(href)}">{esc(r["成果物タイトル"])}</a>'
@@ -592,6 +646,8 @@ def main() -> int:
     ap.add_argument("--check-untracked", action="store_true", help="追跡漏れを検知して一覧する")
     ap.add_argument("--warn-untracked-for-commit", action="store_true",
                     help="pre-commit 用。catch-all 除外だけを警告する（常に成功で終わる）")
+    ap.add_argument("--html", action="store_true",
+                    help="旧 HTML 版カタログも生成する（既定オフ。社長の入口はスプレッドシート）")
     args = ap.parse_args()
 
     os.chdir(REPO_ROOT)
@@ -627,9 +683,14 @@ def main() -> int:
         return 0
 
     changed_csv = write_csv(CSV_PATH, rows)
-    changed_html = write_html(HTML_PATH, rows)
     print(f"CSV : {CSV_PATH} … {'更新' if changed_csv else '差分なし'}")
-    print(f"HTML: {HTML_PATH} … {'更新' if changed_html else '差分なし'}")
+    if args.html:
+        changed_html = write_html(HTML_PATH, rows)
+        print(f"HTML: {HTML_PATH} … {'更新' if changed_html else '差分なし'}")
+    else:
+        print("HTML: 生成しません（社長の入口はスプレッドシート。必要なら --html）")
+    print(f"リンク: {SERVE_BASE}/ 経由。配信サーバの起動は "
+          "python3 scripts/catalog/serve_deliverables.py")
     return 0
 
 
