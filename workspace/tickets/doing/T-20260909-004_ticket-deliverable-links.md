@@ -59,6 +59,15 @@ related_tickets: [T-20260909-003, T-20260826-001]
 
 - 2026-09-09 マリエ：**社長の「Notion に反映されていない」指摘を受け、DB を実照会して監査**。結論＝**カードは実在していた**（作成 `01:15:01Z`＝10:15:01 JST／commit `7a52f84` の30秒後。同一 turn 内同期は守られていた）。見えなかった構造要因は **Kanban のグループ内が手動ソート**で、新規カードが28枚ある `doing` 列の最下部に積まれること。あわせてローカル138枚 × Notion 全142行を突合し、実ドリフト3件を非破壊で修復（`T-20260907-001` のカードの中身が `T-20260907-002` だった付番ミスの是正／欠落していた `T-20260907-001` の新規作成／`T-20260909-004` の空 Labels 補填）。書き込み後は `notion-fetch` で全件読み返して検証済み。教訓は `agents/general_affairs/memory/knowledge_notion_sync_verification.md`。
 
+- 2026-09-09 マリエ：**社長の「カードに成果物の欄がない」指摘を受け、Notion カード本文へ成果物ブロックを反映**。138枚すべてに `## 成果物` を末尾追記（＋ TicketID 重複カード1枚）。リンクは T-20260909-003 の配信サーバ URL（`http://localhost:17325/<ticket_id>/...`）に変換し、生成した614本すべてが HTTP 200 で開けることを実測。既存本文は `insert_content` で追記のみ（削除・上書きゼロ）。恒久ルールを `notion-ticket-sync.md` §9 に新設し、変換器を `scripts/notion/build_deliverable_blocks.py` として残した。
+
 ## 成果物
 
-（なし — 運用ルールの是正チケット。成果物はリポ内の雛形・ドキュメント・既存チケットの更新そのもの）
+- 📁 **[T-20260909-004/](../../output/deliverables/T-20260909-004/)** — 成果物フォルダ（2件）
+  - [`README.md`](../../output/deliverables/T-20260909-004/README.md) — 成果物インデックス（是正の背景・リンク仕様・実績）
+  - [`01_notion反映の手順.md`](../../output/deliverables/T-20260909-004/01_notion反映の手順.md) — Notion カード本文へ成果物欄を入れる手順（再実行手順・落とし穴つき）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260909-004/`
+
+実装本体（リポジトリ内・deliverables 外）:
+- `scripts/notion/build_deliverable_blocks.py` — 成果物節 → Notion 本文用 Markdown の変換器（リンク検証つき）
+- `agents/general_affairs/skills/notion-ticket-sync.md` §9 — 恒久ルール

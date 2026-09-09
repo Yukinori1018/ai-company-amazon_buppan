@@ -116,3 +116,54 @@ properties: {
 - リコンサイル時の差分傾向（ブランチ分岐由来か、同期漏れか）
 
 → `agents/general_affairs/memory/` に蓄積。
+
+## 9. 成果物節の Notion 反映（2026-09-09 新設・T-20260909-004）
+
+> 社長の指摘：「タスクのカードは作られていたけど、肝心のそのタスクが実行されていないよ。
+> 実際、このカードにも"成果物"の欄がないでしょ」
+> ローカルの `.md` に `## 成果物` 節を書いただけでは**やっていないのと同じ**です。
+> 社長が実際に見るのは Notion のカードです。
+
+### 9-1. 恒久ルール
+
+**チケットの `## 成果物` 節を新規作成・更新したら、同じ turn で Notion カード本文も更新する。**
+状態遷移と同じ即時性で扱います（§4 のイベント表に準じる）。
+
+- 置き場所は**カード本文の末尾**、見出しは `## 成果物`。
+- 成果物が無いチケットも `（なし — 理由）` の1行を置く。**欄ごと省略しない。**
+- 既存本文は**追記のみ**。削除・上書きはしない。
+
+### 9-2. 載せる3点
+
+| # | 内容 | 形式 |
+|---|---|---|
+| 1 | 成果物フォルダ | `http://localhost:17325/<ticket_id>/` |
+| 2 | 主要ファイル | `[ファイル名](http://localhost:17325/<ticket_id>/<file>)` ＋ 1行説明 |
+| 3 | Finder の場所 | `~/Documents/AI Company Outputs/Amazon物販事業/<ticket_id>/`（**リンクにしない**・テキスト表記） |
+
+**Notion からは相対パスも `file://` も開けません。** 必ず配信サーバの URL を使います
+（T-20260909-003 / `scripts/catalog/serve_deliverables.py`）。ルートは `workspace/output/deliverables/`、
+日本語ファイル名はパスセグメントごとに percent-encode。ポートは `CATALOG_PORT`（既定 17325）で
+`scripts/catalog/build_catalog.py` と揃えること。
+
+リンクを含むカードには、末尾に**1行だけ**注記を添えます（長い注意書きを毎カード繰り返さない）：
+`※ 上のリンクはローカル配信サーバ起動中のみ開けます（`python3 scripts/catalog/serve_deliverables.py`）。`
+
+### 9-3. 実行手順
+
+1. 配信サーバ起動：`python3 scripts/catalog/serve_deliverables.py`
+2. 変換＋リンク検証：`python3 scripts/notion/build_deliverable_blocks.py --check-links`
+   → non-200 が1本でも出たら**止めて直す**（リンク切れのまま貼らない）
+3. `--json` で本文を書き出し、`notion-update-page`（`command: "insert_content"` / `position: {"type":"end"}`）で投入
+4. **`notion-fetch` で読み返して検証**する
+
+詳細な手順書：`workspace/output/deliverables/T-20260909-004/01_notion反映の手順.md`
+
+### 9-4. 落とし穴
+
+| 落とし穴 | 対処 |
+|---|---|
+| **`insert_content` は重複する** | 既に `## 成果物` があるカードは `notion-fetch` → `update_content`（old_str/new_str）で置換 |
+| **`replace_content` は既存本文を消す** | 使わない。追記は必ず `insert_content` |
+| **SQL モードの照会は利用上限に当たる** | 全件列挙は **view モード**（Table view URL・上限なし）。1ページ100行なので `next_cursor` で継続 |
+| **書き込み成功レスポンス ≠ 完了** | 必ず `notion-fetch` で実物を読み返す。件数を数えて報告する |
