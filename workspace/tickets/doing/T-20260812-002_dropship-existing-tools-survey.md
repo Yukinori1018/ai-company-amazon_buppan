@@ -42,3 +42,10 @@ next_check_at: 2026-09-08
 
 - 2026-08-12: 起票。サトルへ発注（WebSearch中心）。無在庫の進捗サマリはカズヨが社長へ即時提示。
 - 2026-08-21 棚卸し（マリエ／T-20260821-007）: next_check_at 2026-08-13 → 2026-09-08 に再設定。仕分け=A。理由: ④無在庫の探索。自作前に既存を調べる工程（feedback_research_existing_before_build）でAutoSync開発より前に置く
+
+## 成果物
+
+- 📁 **[T-20260812-002/](../../output/deliverables/T-20260812-002/)** — 成果物フォルダ（2件）
+  - [`dropship-existing-tools-survey.md`](../../output/deliverables/T-20260812-002/dropship-existing-tools-survey.md) — 無在庫（FBM）物販 — 進捗サマリ＋既製ツール/サービス網羅調査（10.5KB）
+  - [`無在庫_既存ツール調査_2026-08-12.html`](../../output/deliverables/T-20260812-002/無在庫_既存ツール調査_2026-08-12.html) — 無在庫物販 進捗＋既存ツール調査 2026-08-12（12.8KB）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260812-002/`

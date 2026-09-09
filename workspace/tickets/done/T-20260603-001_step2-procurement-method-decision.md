@@ -44,3 +44,10 @@ T-20260520-004（体験仕入れ1周）の Step1 アカウント開設が 2026-0
 ## 決定事項
 
 仕入れ手法は **B（国内卸）→ C（電脳せどり）** で確定（社長決定 2026-06-03）。
+
+## 成果物
+
+- 📁 **[T-20260603-001/](../../output/deliverables/T-20260603-001/)** — 成果物フォルダ（2件）
+  - [`step2-procurement-decision.html`](../../output/deliverables/T-20260603-001/step2-procurement-decision.html) — Step2 仕入れ手法の決定 — 意思決定資料（体験仕入れ1周 / 軸B）（19.5KB）
+  - [`step2-procurement-decision.md`](../../output/deliverables/T-20260603-001/step2-procurement-decision.md) — Step2 仕入れ手法の決定 — 意思決定資料（体験仕入れ1周 / 軸B）（15.1KB）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260603-001/`

@@ -31,3 +31,10 @@ source: 社長決定（2026-08-14「セラースプライトを契約してみ�
 - ⚠️要確認（申込画面の実表示が最終の正）: 無料トライアル日数(EN3日/JP記事7日)・クーポン有効性・JP/US月額差。
 - 2026-08-21 frontmatter修復（マリエ）: assignee=owner を補完（`id:`→`ticket_id:` / `owner:`→`assignee:` へテンプレ準拠に統一）
 - 2026-08-21 assignee 判断メモ（マリエ）: 調査/ガイド作成部分は researcher 完了済み。残作業は社長本人の申込・決済のみのため、`owner` を維持（notion-ticket-sync.md の Assignee 許容値）。
+
+## 成果物
+
+- 📁 **[T-20260814-001/](../../output/deliverables/T-20260814-001/)** — 成果物フォルダ（2件）
+  - [`sellersprite-signup-guide.html`](../../output/deliverables/T-20260814-001/sellersprite-signup-guide.html) — セラースプライト申込ガイド｜T-20260814-001（16.7KB）
+  - [`sellersprite-signup-guide.md`](../../output/deliverables/T-20260814-001/sellersprite-signup-guide.md) — セラースプライト（SellerSprite）申込ガイド（14.0KB）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260814-001/`

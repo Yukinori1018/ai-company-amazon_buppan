@@ -47,14 +47,6 @@ next_check_at: 2026-08-24
 
 2026-08-23 完了。4文書への明文化をすべて反映し commit 済み。§4.1 の範囲は未変更（「誰が操作するか」だけを定義）。社長アクションは不要のため owner-tasks.md の増減なし。
 
-## 成果物
-
-- /Users/yukinori/Claude Code/ai-company-amazon_buppan/CLAUDE.md（§3-9 追加、§4.4 新設）
-- /Users/yukinori/Claude Code/ai-company-amazon_buppan/agents/secretary/skills/browser-operation.md（新設）
-- /Users/yukinori/Claude Code/ai-company-amazon_buppan/docs/owner-playbook.md（社長視点の節を追記）
-
-> 本チケットはリポジトリのルール文書そのものが成果物のため、`deliverables/<ticket_id>/` への複製は行いません（二重管理を避けるため。正本はリポジトリ本体）。同理由で成果物カタログへの登録も行いません。
-
 ## ログ
 
 - 2026-08-23 マリエ着手。CLAUDE.md §3 に鉄則9、§4.3 直後に §4.4 を新設。既存 §4.1〜§4.3 は無改変。
@@ -76,3 +68,13 @@ next_check_at: 2026-08-24
 - 「在席確認」の運用は 8/23 の実例1件が根拠です。何分以上を対象にするかの閾値は決めていません（運用しながら詰める想定）。
 
 **残課題** — なし。社長判断が必要な論点もありません。
+
+## 成果物
+
+（なし — リポジトリ／外部サービス側の更新そのものが成果のため、成果物ファイルなし）
+
+補足（従前の記載）:
+- /Users/yukinori/Claude Code/ai-company-amazon_buppan/CLAUDE.md（§3-9 追加、§4.4 新設）
+- /Users/yukinori/Claude Code/ai-company-amazon_buppan/agents/secretary/skills/browser-operation.md（新設）
+- /Users/yukinori/Claude Code/ai-company-amazon_buppan/docs/owner-playbook.md（社長視点の節を追記）
+> 本チケットはリポジトリのルール文書そのものが成果物のため、`deliverables/<ticket_id>/` への複製は行いません（二重管理を避けるため。正本はリポジトリ本体）。同理由で成果物カタログへの登録も行いません。

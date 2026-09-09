@@ -61,22 +61,6 @@ A メインレーン345社は「gBizINFO の入力データ」であり、まだ
 - 同 最終形：**A メインレーン396社（本命38.8%／要注意なし342社は48.1%）・B 英字レーン354社（本命11.3%）・除外504社（本命0%＝再現率100%）**
 - 同 秘書経由で社長回答（従業員300人以下／メディアは今は外す・法人化区分は保存）を受領し設計に反映
 
-## 成果物
-
-- workspace/output/deliverables/T-20260831-004/README.md
-- workspace/output/deliverables/T-20260831-004/01_仕入れ可能メーカー抽出の再設計.md
-- workspace/output/deliverables/T-20260831-004/01_仕入れ可能メーカー抽出の再設計.html
-- workspace/output/deliverables/T-20260831-004/03_rules.py
-- workspace/output/deliverables/T-20260831-004/04_メーカーリスト_Aメインレーン.csv（345社）
-- workspace/output/deliverables/T-20260831-004/05_メーカーリスト_B英字レーン.csv（201社）
-- workspace/output/deliverables/T-20260831-004/06_除外ログ_全件.csv（708社・理由コード付き）
-- workspace/output/deliverables/T-20260831-004/07_apply_v15.py
-- workspace/output/deliverables/T-20260831-004/08_eval_ルール実測.py
-- workspace/output/deliverables/T-20260831-004/09_funnel_段階別内訳.py
-- workspace/output/deliverables/T-20260831-004/10_wholesale_卸の証拠検証.py
-- workspace/output/deliverables/T-20260831-004/11_手作業ラベル200社.json
-- workspace/output/deliverables/T-20260831-004/12_実測ログ_ルール別精度.txt
-
 ## 完了報告（カズヨ宛）
 
 完了しました。確認をお願いします。
@@ -115,18 +99,6 @@ A メインレーン345社は「gBizINFO の入力データ」であり、まだ
 ## ログ
 
 - 2026-08-31 12:15 タケシ（実装・検証レーン）完了。既存2,635行へ遡及適用（Keepaトークン0）。連絡候補262社を確定。設計レーンの手作業ラベル200社を独立検証セットとして使い、適合率72.1%／再現率96.9%を実測。初版の再現率59.4%から3つの欠陥（規模の手判定をゲート化・セラー名未解決を直営と誤認・国内セラー判定がかな限定）を潰して改善。commit `b772f00`。
-
-## 成果物
-
-- workspace/output/deliverables/T-20260831-004/14_連絡すべきメーカー抽出の再設計_実装検証レーン.md
-- workspace/output/deliverables/T-20260831-004/14_連絡すべきメーカー抽出の再設計_実装検証レーン.html
-- workspace/output/deliverables/T-20260831-004/10_連絡候補メーカー.csv（262社・**社長が今日使うのはこれ**）
-- workspace/output/deliverables/T-20260831-004/11_条件付き候補_再販版元カテゴリ.csv（333社）
-- workspace/output/deliverables/T-20260831-004/12_全メーカー判定台帳.csv（全1,247社＋判定理由）
-- workspace/output/deliverables/T-20260831-004/13_集計.json
-- workspace/output/deliverables/T-20260831-004/20_rules_v2.py / 24_build_v4.py / 25_size_strict.py / 22_hand_labels.py / 21_apply_and_build.py
-- workspace/output/deliverables/T-20260831-004/23_検証ログ.txt
-- workspace/output/deliverables/T-20260831-004/README.md（2レーンの突き合わせ表を追記）
 
 ## 完了報告
 
@@ -333,3 +305,64 @@ A メインレーン345社は「gBizINFO の入力データ」であり、まだ
 
 - 2026-08-31 15:20 タカシ完了。走査は網羅済み。**「見つからなかった」が結論です。**
 - 2026-09-07 マリエ：Notion カンバンに取りこぼしを検知し、カードを遡って作成。labels は Notion の選択肢に合わせて調整（`redesign` → 既存の `strategy` へ寄せた）。リポジトリ側の frontmatter も同じ値に揃えた
+
+## 成果物
+
+- 📁 **[T-20260831-004/](../../output/deliverables/T-20260831-004/)** — 成果物フォルダ（56件）
+  - [`01_仕入れ可能メーカー抽出の再設計.html`](../../output/deliverables/T-20260831-004/01_仕入れ可能メーカー抽出の再設計.html) — 仕入れ可能メーカー抽出の再設計（v15） — T-20260831-004（41.6KB）
+  - [`01_仕入れ可能メーカー抽出の再設計.md`](../../output/deliverables/T-20260831-004/01_仕入れ可能メーカー抽出の再設計.md) — 仕入れ可能メーカー抽出の再設計（v15）（33.6KB）
+  - [`03_rules.py`](../../output/deliverables/T-20260831-004/03_rules.py) — 中国語ピンイン音節（日本語ローマ字に無い綴りを優先）（5.4KB）
+  - [`04_メーカーリスト_Aメインレーン.csv`](../../output/deliverables/T-20260831-004/04_メーカーリスト_Aメインレーン.csv) — （345社）
+  - [`05_メーカーリスト_B英字レーン.csv`](../../output/deliverables/T-20260831-004/05_メーカーリスト_B英字レーン.csv) — （201社）
+  - [`06_除外ログ_全件.csv`](../../output/deliverables/T-20260831-004/06_除外ログ_全件.csv) — （708社・理由コード付き）
+  - [`07_apply_v15.py`](../../output/deliverables/T-20260831-004/07_apply_v15.py) — スクリプト（5.7KB）
+  - [`08_eval_ルール実測.py`](../../output/deliverables/T-20260831-004/08_eval_ルール実測.py) — スクリプト（2.5KB）
+  - [`09_funnel_段階別内訳.py`](../../output/deliverables/T-20260831-004/09_funnel_段階別内訳.py) — スクリプト（1.6KB）
+  - [`10_wholesale_卸の証拠検証.py`](../../output/deliverables/T-20260831-004/10_wholesale_卸の証拠検証.py) — 参考: 中国系レーンとの対比（3.0KB）
+  - [`10_連絡候補メーカー.csv`](../../output/deliverables/T-20260831-004/10_連絡候補メーカー.csv) — （262社・**社長が今日使うのはこれ**）
+  - [`11_手作業ラベル200社.json`](../../output/deliverables/T-20260831-004/11_手作業ラベル200社.json) — JSONデータ（94.4KB）
+  - [`11_条件付き候補_再販版元カテゴリ.csv`](../../output/deliverables/T-20260831-004/11_条件付き候補_再販版元カテゴリ.csv) — （333社）
+  - [`12_全メーカー判定台帳.csv`](../../output/deliverables/T-20260831-004/12_全メーカー判定台帳.csv) — （全1,247社＋判定理由）
+  - [`12_実測ログ_ルール別精度.txt`](../../output/deliverables/T-20260831-004/12_実測ログ_ルール別精度.txt) — テキスト（6.5KB）
+  - [`13_集計.json`](../../output/deliverables/T-20260831-004/13_集計.json) — JSONデータ（1.0KB）
+  - [`14_連絡すべきメーカー抽出の再設計_実装検証レーン.html`](../../output/deliverables/T-20260831-004/14_連絡すべきメーカー抽出の再設計_実装検証レーン.html) — 連絡すべきメーカー抽出の再設計（実装・検証レーン）（45.6KB）
+  - [`14_連絡すべきメーカー抽出の再設計_実装検証レーン.md`](../../output/deliverables/T-20260831-004/14_連絡すべきメーカー抽出の再設計_実装検証レーン.md) — 連絡すべきメーカー抽出の再設計（実装・検証レーン）（34.5KB）
+  - [`20_rules_v2.py`](../../output/deliverables/T-20260831-004/20_rules_v2.py) — 24_build_v4.py / 25_size_strict.py / 22_hand_labels.py / 21_apply_and_build.py
+  - [`21_apply_and_build.py`](../../output/deliverables/T-20260831-004/21_apply_and_build.py) — ---- 判定 ----（5.5KB）
+  - [`22_hand_labels.py`](../../output/deliverables/T-20260831-004/22_hand_labels.py) — --- N: 会社名ではない ---（11.1KB）
+  - [`23_検証ログ.txt`](../../output/deliverables/T-20260831-004/23_検証ログ.txt) — テキスト（42.0KB）
+  - [`24_build_v4.py`](../../output/deliverables/T-20260831-004/24_build_v4.py) — スクリプト（7.3KB）
+  - [`25_size_strict.py`](../../output/deliverables/T-20260831-004/25_size_strict.py) — 国内・グローバルの誰でも知る大企業（3.4KB）
+  - [`30_gbizinfo.py`](../../output/deliverables/T-20260831-004/30_gbizinfo.py) — gBizINFO API アダプタ（T-20260831-004 / タカシ）. 経済産業省 gBizINFO の法人基本情報を引くための薄いラッパー。 差し替（5.9KB）
+  - [`31_name_match.py`](../../output/deliverables/T-20260831-004/31_name_match.py) — Amazon ブランド名 → gBizINFO 商号 の照合ロジック（T-20260831-004 / タカシ）. UI にも API 呼び出しにも依存しない純（5.4KB）
+  - [`32_resolve_size.py`](../../output/deliverables/T-20260831-004/32_resolve_size.py) — 連絡候補メーカーに gBizINFO の規模情報を付ける（T-20260831-004 / タカシ）. python3 32_resolve_size.py [（14.5KB）
+  - [`33_連絡候補_規模情報つき.csv`](../../output/deliverables/T-20260831-004/33_連絡候補_規模情報つき.csv) — 262行 × 39列（﻿メーカー・直接交渉の目安・規模区分・資本金区分 ほか）（278.6KB）
+  - [`33b_規模が大きいと分かった社.csv`](../../output/deliverables/T-20260831-004/33b_規模が大きいと分かった社.csv) — 9行 × 39列（﻿メーカー・直接交渉の目安・規模区分・資本金区分 ほか）（10.6KB）
+  - [`33d_集計_規模判定.json`](../../output/deliverables/T-20260831-004/33d_集計_規模判定.json) — JSONデータ（2.1KB）
+  - [`34_verify.py`](../../output/deliverables/T-20260831-004/34_verify.py) — 規模判定の検算（T-20260831-004 / タカシ）. python3 34_verify.py **社長の訂正（2026-08-31）で期待値が変わった（3.6KB）
+  - [`35_merge_ledger.py`](../../output/deliverables/T-20260831-004/35_merge_ledger.py) — タケシの全メーカー台帳1,247社に、規模判定の結果を合流させる（T-20260831-004 / タカシ）. python3 35_merge_ledger.（2.7KB）
+  - [`35_全メーカー台帳_規模判定込み.csv`](../../output/deliverables/T-20260831-004/35_全メーカー台帳_規模判定込み.csv) — 1247行 × 34列（﻿メーカー・該当商品数・主なカテゴリ・判定 ほか）（1007.6KB）
+  - [`35b_集計_台帳.json`](../../output/deliverables/T-20260831-004/35b_集計_台帳.json) — JSONデータ（202B）
+  - [`36_規模判定レポート.html`](../../output/deliverables/T-20260831-004/36_規模判定レポート.html) — 連絡候補メーカーの規模情報（gBizINFO 実測）（19.8KB）
+  - [`36_規模判定レポート.md`](../../output/deliverables/T-20260831-004/36_規模判定レポート.md) — 連絡候補メーカーの規模情報（gBizINFO 実測）（13.8KB）
+  - [`37_render.py`](../../output/deliverables/T-20260831-004/37_render.py) — Markdown → HTML の簡易レンダラ（T-20260831-004 / タカシ）. python3 37_render.py 36_規模判定レポート.（5.6KB）
+  - [`40_両起点の統合設計.html`](../../output/deliverables/T-20260831-004/40_両起点の統合設計.html) — 両起点の統合設計 — Amazon起点／非Amazon起点（43.8KB）
+  - [`40_両起点の統合設計.md`](../../output/deliverables/T-20260831-004/40_両起点の統合設計.md) — 両起点の統合設計 — Amazon起点をセミナーに戻し、「困っている度合い」で並べ替える（34.2KB）
+  - [`41_困り度_特徴量抽出.py`](../../output/deliverables/T-20260831-004/41_困り度_特徴量抽出.py) — 基準日 = データ全体の最終更新（6.8KB）
+  - [`42_困り度_スコアと検証.py`](../../output/deliverables/T-20260831-004/42_困り度_スコアと検証.py) — ---- 検証1: ラベル別の困り度（中国系OEMに偏っていないか） ----（4.3KB）
+  - [`42b_成分別のラベル検証.py`](../../output/deliverables/T-20260831-004/42b_成分別のラベル検証.py) — スクリプト（2.4KB）
+  - [`42c_262社への適用.py`](../../output/deliverables/T-20260831-004/42c_262社への適用.py) — スクリプト（5.0KB）
+  - [`43_連絡候補_困り度2軸つき.csv`](../../output/deliverables/T-20260831-004/43_連絡候補_困り度2軸つき.csv) — 262行 × 29列（﻿優先順位・象限・メーカー・困り度 ほか）（163.5KB）
+  - [`44_ランク帯検証.py`](../../output/deliverables/T-20260831-004/44_ランク帯検証.py) — --- 商品レベル：メーカーのラベルを継承 ---（4.5KB）
+  - [`44b_ランク帯_細分.py`](../../output/deliverables/T-20260831-004/44b_ランク帯_細分.py) — メーカー単位（メーカーのランク中央値）（2.6KB）
+  - [`45_類似商品コホート.py`](../../output/deliverables/T-20260831-004/45_類似商品コホート.py) — 参考: ランクを使えたらどれだけ説明できるか（＝Amazonに既にある商品の場合）（4.9KB）
+  - [`45b_コホート交差検証.py`](../../output/deliverables/T-20260831-004/45b_コホート交差検証.py) — キーワード一致が効くか（同じ中カテゴリ内で、タイトル語の重なりと販売数の近さ）（4.3KB）
+  - [`46_納品CSV生成.py`](../../output/deliverables/T-20260831-004/46_納品CSV生成.py) — スクリプト（2.9KB）
+  - [`47_ランク帯_実採取プローブ.py`](../../output/deliverables/T-20260831-004/47_ランク帯_実採取プローブ.py) — スクリプト（3.8KB）
+  - [`48_検証ログ_実測値まとめ.txt`](../../output/deliverables/T-20260831-004/48_検証ログ_実測値まとめ.txt) — テキスト（12.6KB）
+  - [`50_セミナー録画のランク条件探索.md`](../../output/deliverables/T-20260831-004/50_セミナー録画のランク条件探索.md) — セミナー画面収録から「リサーチ基準のランキング条件」を探す（8.8KB）
+  - [`51_ocr.swift`](../../output/deliverables/T-20260831-004/51_ocr.swift) — ファイル（1.7KB）
+  - [`52_video_scan.sh`](../../output/deliverables/T-20260831-004/52_video_scan.sh) — シェルスクリプト（2.9KB）
+  - [`53_search.py`](../../output/deliverables/T-20260831-004/53_search.py) — スクリプト（2.8KB）
+  - [`README.md`](../../output/deliverables/T-20260831-004/README.md) — （2レーンの突き合わせ表を追記）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260831-004/`

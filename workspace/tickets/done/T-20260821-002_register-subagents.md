@@ -40,31 +40,6 @@ next_check_at: 2026-08-22
 - 2026-08-21 ticket-notion-sync-reminder.sh に frontmatter 契約検証を追加。全85枚に通し `related:` 誤用12枚を発見
 - 2026-08-21 動作確認完了。完了報告を追記
 
-## 成果物
-
-すべてリポ内（Git 追跡対象）。設定ファイルの直接更新が本チケットの成果のため deliverables への複製は行わない。
-
-**新規（サブエージェント定義8体）**
-- `/Users/yukinori/Claude Code/ai-company-amazon_buppan/.claude/agents/researcher.md`
-- `/Users/yukinori/Claude Code/ai-company-amazon_buppan/.claude/agents/planner.md`
-- `/Users/yukinori/Claude Code/ai-company-amazon_buppan/.claude/agents/simulator.md`
-- `/Users/yukinori/Claude Code/ai-company-amazon_buppan/.claude/agents/accounting.md`
-- `/Users/yukinori/Claude Code/ai-company-amazon_buppan/.claude/agents/legal.md`
-- `/Users/yukinori/Claude Code/ai-company-amazon_buppan/.claude/agents/general-affairs.md`
-- `/Users/yukinori/Claude Code/ai-company-amazon_buppan/.claude/agents/content-creator.md`
-- `/Users/yukinori/Claude Code/ai-company-amazon_buppan/.claude/agents/it-engineer.md`
-
-**新規（フック）**
-- `/Users/yukinori/Claude Code/ai-company-amazon_buppan/.claude/hooks/delegation-check.sh`
-
-**修正**
-- `/Users/yukinori/Claude Code/ai-company-amazon_buppan/.claude/settings.json`（UserPromptSubmit 登録。バックアップ `.claude/settings.json.bak.20260821-121217`）
-- `/Users/yukinori/Claude Code/ai-company-amazon_buppan/.claude/hooks/session-start.sh`（空白入りパスの単語分割バグ修正）
-- `/Users/yukinori/Claude Code/ai-company-amazon_buppan/.claude/hooks/ticket-notion-sync-reminder.sh`（frontmatter 契約検証を追加）
-
-**メモリ**
-- `/Users/yukinori/Claude Code/ai-company-amazon_buppan/agents/it_engineer/memory/knowledge_claude_code_subagents_and_hooks.md`
-
 ## 完了報告
 
 カズヨさん、タカシです。3項目＋追加2項目、すべて完了しました。
@@ -122,3 +97,27 @@ next_check_at: 2026-08-22
 **検証**: 実リポで警告消滅を確認／隔離環境で意図的な重複を作り確実に検知することを確認／
 既存チェック（エイリアス誤用・語彙外・テンプレ除外・チケット以外は無音）の回帰も確認済み。
 `workspace/tickets/` 配下のファイル本体には一切触れていません。
+
+## 成果物
+
+（なし — 外部での手続き・作業が成果のため、成果物ファイルなし）
+
+補足（従前の記載）:
+- すべてリポ内（Git 追跡対象）。設定ファイルの直接更新が本チケットの成果のため deliverables への複製は行わない。
+**新規（サブエージェント定義8体）**
+- `/Users/yukinori/Claude Code/ai-company-amazon_buppan/.claude/agents/researcher.md`
+- `/Users/yukinori/Claude Code/ai-company-amazon_buppan/.claude/agents/planner.md`
+- `/Users/yukinori/Claude Code/ai-company-amazon_buppan/.claude/agents/simulator.md`
+- `/Users/yukinori/Claude Code/ai-company-amazon_buppan/.claude/agents/accounting.md`
+- `/Users/yukinori/Claude Code/ai-company-amazon_buppan/.claude/agents/legal.md`
+- `/Users/yukinori/Claude Code/ai-company-amazon_buppan/.claude/agents/general-affairs.md`
+- `/Users/yukinori/Claude Code/ai-company-amazon_buppan/.claude/agents/content-creator.md`
+- `/Users/yukinori/Claude Code/ai-company-amazon_buppan/.claude/agents/it-engineer.md`
+**新規（フック）**
+- `/Users/yukinori/Claude Code/ai-company-amazon_buppan/.claude/hooks/delegation-check.sh`
+**修正**
+- `/Users/yukinori/Claude Code/ai-company-amazon_buppan/.claude/settings.json`（UserPromptSubmit 登録。バックアップ `.claude/settings.json.bak.20260821-121217`）
+- `/Users/yukinori/Claude Code/ai-company-amazon_buppan/.claude/hooks/session-start.sh`（空白入りパスの単語分割バグ修正）
+- `/Users/yukinori/Claude Code/ai-company-amazon_buppan/.claude/hooks/ticket-notion-sync-reminder.sh`（frontmatter 契約検証を追加）
+**メモリ**
+- `/Users/yukinori/Claude Code/ai-company-amazon_buppan/agents/it_engineer/memory/knowledge_claude_code_subagents_and_hooks.md`

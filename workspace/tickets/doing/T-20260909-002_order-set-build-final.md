@@ -50,10 +50,6 @@ parent_ticket: T-20260904-004
 - **§4.1 該当（発注そのもの）は絶対に実行しない。**組むところまで
 - 走行ジョブ（T-20260906-003）は 81.4% で停止済み。触ってよいが再開は不要
 
-## 成果物
-
-`workspace/output/deliverables/T-20260909-002/`（手法・歩留まり・案の比較は追跡ファイル、金額明細は `out/`）
-
 ## ログ
 
 - 2026-09-09 起票（カズヨ）。社長「早く成果物がほしい」。日本ストア再開で出品可能になったため発注組成へ進む。
@@ -74,15 +70,6 @@ parent_ticket: T-20260904-004
 選定条件に `最小ロット ÷ 月販見込 ≦ N ヶ月` を足すべきだが、**N は社長が決める数字**なので実装せず論点として残した。
 
 続報（13〜25位）は `pool.csv` に「現行」の行を足して `python3 order_set.py` を再実行するだけで組み直せる。コードは触らない。
-
-## 成果物
-
-- workspace/output/deliverables/T-20260909-002/README.md（索引）
-- workspace/output/deliverables/T-20260909-002/01_発注セットの組み方と案の比較.md / .html
-- workspace/output/deliverables/T-20260909-002/order_set.py（本体・金額を持たない）
-- workspace/output/deliverables/T-20260909-002/pool.csv（供給が生きている ASIN の名簿。**続報はここに足す**）
-- workspace/output/deliverables/T-20260909-002/out/03_発注セット.html（**社長はこれ1枚**・金額入り・Git 追跡外）
-- workspace/output/deliverables/T-20260909-002/out/01_発注セット_案別.csv / 02_案の比較.csv / plans.json（Git 追跡外）
 
 ## 完了報告
 
@@ -131,3 +118,17 @@ parent_ticket: T-20260904-004
 **秘匿の扱い**: 追跡ファイル（`01_....md` / `order_set.py` / `pool.csv`）には金額・Keepa 加工値を一切書いていない。
 `git check-ignore` で `out/` 配下が除外対象であることを確認済み。pre-commit はバイパスしていない。
 **§4.1 該当（発注・購入確定）は実行していない。**
+
+## 成果物
+
+- 📁 **[T-20260909-002/](../../output/deliverables/T-20260909-002/)** — 成果物フォルダ（6件）
+  - [`01_発注セットの組み方と案の比較.html`](../../output/deliverables/T-20260909-002/01_発注セットの組み方と案の比較.html) — 初回発注セットの組み方と5案の比較（11.8KB）
+  - [`01_発注セットの組み方と案の比較.md`](../../output/deliverables/T-20260909-002/01_発注セットの組み方と案の比較.md) — .html
+  - [`README.md`](../../output/deliverables/T-20260909-002/README.md) — （索引）
+  - [`order_set.py`](../../output/deliverables/T-20260909-002/order_set.py) — （本体・金額を持たない）
+  - [`out`](../../output/deliverables/T-20260909-002/out/) — 03_発注セット.html（**社長はこれ1枚**・金額入り・Git 追跡外） 〔Git除外・ローカルのみ〕
+  - [`pool.csv`](../../output/deliverables/T-20260909-002/pool.csv) — （供給が生きている ASIN の名簿。**続報はここに足す**）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260909-002/`
+
+補足（従前の記載）:
+- `workspace/output/deliverables/T-20260909-002/`（手法・歩留まり・案の比較は追跡ファイル、金額明細は `out/`）

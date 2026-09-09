@@ -39,3 +39,7 @@ parent_ticket: ""
 - 2026-05-20 Notion Assignee に researcher/planner/simulator 追加、ParentTicket 列追加
 - 2026-05-20 T-005／T-006／T-007〜T-011 を Notion に新規作成、T-003 を waiting に更新
 - 2026-05-20 done として完了
+
+## 成果物
+
+（なし — リポジトリ／外部サービス側の更新そのものが成果のため、成果物ファイルなし）

@@ -37,3 +37,12 @@ EC STARs Lab.（中西恒太）式「メーカー直仕入れ→Amazon販売」�
 - 2026-06-12: 納品完了→waiting。台本23スライド構成（ナレーション全文＋付録数値早見表、md/HTML）＋PPTX23枚（全スライドにスピーカーノート収録、Trade Navy & Amberデザイン、ビジュアルQA2巡パス）＋PDF版。納品先=deliverables/T-20260612-002/ と ~/Documents/AI Company Outputs/Amazon物販事業/T-20260612-002/。カタログCSV2行追記・シート同期済（70行）。Notionカード作成済（waiting）。
 - 社長の次アクション: ①台本md（またはHTML）をNotebookLMへ投入してプレゼン生成 ②当社PPTX/PDFと見比べて最終判断をカズヨへ一言。
 - 2026-08-21 **done へ移動**（カズヨ判定）。T-20260821-007 の棚卸しでマリエが「成果物は納品済みで waiting の札が外れていないだけ」と判定、根拠を確認のうえ受け入れ。社長レビューが必要なら差し戻し可。
+
+## 成果物
+
+- 📁 **[T-20260612-002/](../../output/deliverables/T-20260612-002/)** — 成果物フォルダ（4件）
+  - [`maker-shiire-workflow-script.html`](../../output/deliverables/T-20260612-002/maker-shiire-workflow-script.html) — メーカー仕入れ式シンプル物販 完全ワークフロー — プレゼン台本（36.6KB）
+  - [`maker-shiire-workflow-script.md`](../../output/deliverables/T-20260612-002/maker-shiire-workflow-script.md) — メーカー仕入れ式シンプル物販 完全ワークフロー — プレゼンテーション台本（31.7KB）
+  - [`maker-shiire-workflow.pdf`](../../output/deliverables/T-20260612-002/maker-shiire-workflow.pdf) — PDF（1.9MB）
+  - [`maker-shiire-workflow.pptx`](../../output/deliverables/T-20260612-002/maker-shiire-workflow.pptx) — ファイル（642.2KB）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260612-002/`

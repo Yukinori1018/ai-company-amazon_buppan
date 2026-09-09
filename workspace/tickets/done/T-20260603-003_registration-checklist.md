@@ -39,3 +39,10 @@ next_check_at: 2026-06-04
 
 登録チェックリスト（`deliverables/T-20260603-003/registration-checklist.html`）を確認し、上から登録を進めてください。最初の一手は**セラーセントラルで売上の受取口座が登録済みかの確認**。
 - 2026-08-21 **done へ移動**（カズヨ判定・マリエ実施）。T-20260821-007 の棚卸しで「成果物納品済み・開業届の期限訂正も反映済み」と判定。**ID衝突（T-20260603-003 が2枚存在）のため一度移動が外れていた**もの。衝突相手は T-20260603-006 へ改番済みで、本チケットが T-20260603-003 を保持する（`deliverables/T-20260603-003/` の所有者のため）。
+
+## 成果物
+
+- 📁 **[T-20260603-003/](../../output/deliverables/T-20260603-003/)** — 成果物フォルダ（2件）
+  - [`registration-checklist.html`](../../output/deliverables/T-20260603-003/registration-checklist.html) — 登録・手続きチェックリスト — Satoy Select（15.2KB）
+  - [`registration-checklist.md`](../../output/deliverables/T-20260603-003/registration-checklist.md) — 登録・手続き チェックリスト — 「私が登録しないといけないのはどこか」一覧（13.0KB）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260603-003/`

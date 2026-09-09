@@ -23,12 +23,19 @@ related_tickets: [T-20260814-002, T-20260814-003]
 - B: 別プラットフォーム（eBay/専門越境EC/Shopify DtoC等）のアダルト越境の可否・実態・規約
 - C: 実行可能性の壁＝各国輸入規制・税関・決済(アダルト与信)・年齢認証・法規制のリアリティチェック
 
-## 成果物
-`workspace/output/deliverables/T-20260814-004/` に統合レポート。
-
 ## 社長決定（2026-08-14）＝C案（見送り）で確定・クローズ
 - 追加検討：社長仮説「日本製(TENGA等)は海外で入手困難→越境で売れるのでは」を実データ検証。
   - 価格差は実在（amazon.co.jp スピナー¥1,800 vs amazon.com 約¥4,142/≈$28＝約2.3倍）＝社長の直感は正しい。
   - しかしTENGAは海外で入手困難ではない（amazon.comで月1,000点以上・レビュー1.1〜1.9K・Made in Japan正規流通）。価格差は既存正規流通が取り切っており、後発は価格競争＋レビューの壁＋ブランドロック＋アダルト決済/広告の壁で不利。
 - **結論：アダルト路線は一旦中止。本線＝メーカー仕入れ〔T-20260804-001〕に集中。**
 - 残した発想の芽：「日本製で海外未展開・価格差あり・ブランド非ロックの**非アダルト**ニッチ良品を越境(輸出)」は決済/広告の壁を回避でき有望。将来やるなら別チケットで起票（今回は起票せず棚上げ）。
+
+## 成果物
+
+- 📁 **[T-20260814-004/](../../output/deliverables/T-20260814-004/)** — 成果物フォルダ（2件）
+  - [`adult-niche-cross-border-report.html`](../../output/deliverables/T-20260814-004/adult-niche-cross-border-report.html) — アダルト「穴」＋越境 実行可能性レポート — T-20260814-004（10.9KB）
+  - [`adult-niche-cross-border-report.md`](../../output/deliverables/T-20260814-004/adult-niche-cross-border-report.md) — アダルトカテゴリの「穴」＋越境（外国向け販売）実行可能性レポート（9.9KB）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260814-004/`
+
+補足（従前の記載）:
+- `workspace/output/deliverables/T-20260814-004/` に統合レポート。

@@ -30,20 +30,6 @@ next_check_at: 2026-08-22
 
 **マリエの作業は完了。カズヨのレビュー待ち（done 判定は秘書の責務のため doing に留置）。**
 
-## 成果物
-
-成果物は「納品ファイル」ではなくリポジトリ本体の修復。差分は git で追跡可能。
-
-| 対象 | 内容 |
-|---|---|
-| `workspace/tickets/*/*.md`（13枚） | frontmatter 修復（`ticket_id` / `assignee` / `updated_at`）＋各チケットのログに修復記録 |
-| `workspace/tickets/_template.md` | `next_check_at` / `related_tickets` を追加。frontmatter 直下に**キー名変更禁止の警告ブロック**を追加 |
-| `docs/notion-board-schema.md` | Assignee の選択肢表に `it_engineer` / `owner` を追加（スキル側と乖離していた） |
-| Notion「Amazon物販事業 Tickets」 | 未登録9枚のカード新規作成＋既存6枚の Assignee/UpdatedAt 更新。**対象17枚すべて整合確認済み** |
-| `workspace/owner-tasks.md` | 最終更新の要約に「委譲ルールの是正に着手」を追記＋自動進行セクションに T-20260821 系の1項目を追加 |
-| `agents/general_affairs/memory/ticket-frontmatter-contract.md` | 新規。frontmatter＝機械契約であること、ドリフト検知コマンド |
-| `agents/general_affairs/memory/notion-sync.md` | リコンサイル前のドリフト検査手順を追記 |
-
 ## 修復した13枚の assignee 一覧
 
 | ticket_id | 修復後 assignee | 根拠 |
@@ -121,3 +107,19 @@ T-20260821-002 で IT エンジニアが委譲チェックフックを作る際�
 - 2026-08-21 `_template.md` に `next_check_at` / `related_tickets` を追加、キー名変更禁止の警告を追記。`docs/notion-board-schema.md` の Assignee 表に `it_engineer` / `owner` を追加。
 - 2026-08-21 Notion 同期完了。未登録9枚を新規作成＋既存6枚を更新し、対象17枚すべて整合を確認。
 - 2026-08-21 `workspace/owner-tasks.md` 更新、メモリ2件（新規1・追記1）を記録。マリエ作業完了・カズヨのレビュー待ち。
+
+## 成果物
+
+（なし — リポジトリ／外部サービス側の更新そのものが成果のため、成果物ファイルなし）
+
+補足（従前の記載）:
+- 成果物は「納品ファイル」ではなくリポジトリ本体の修復。差分は git で追跡可能。
+| 対象 | 内容 |
+|---|---|
+| `workspace/tickets/*/*.md`（13枚） | frontmatter 修復（`ticket_id` / `assignee` / `updated_at`）＋各チケットのログに修復記録 |
+| `workspace/tickets/_template.md` | `next_check_at` / `related_tickets` を追加。frontmatter 直下に**キー名変更禁止の警告ブロック**を追加 |
+| `docs/notion-board-schema.md` | Assignee の選択肢表に `it_engineer` / `owner` を追加（スキル側と乖離していた） |
+| Notion「Amazon物販事業 Tickets」 | 未登録9枚のカード新規作成＋既存6枚の Assignee/UpdatedAt 更新。**対象17枚すべて整合確認済み** |
+| `workspace/owner-tasks.md` | 最終更新の要約に「委譲ルールの是正に着手」を追記＋自動進行セクションに T-20260821 系の1項目を追加 |
+| `agents/general_affairs/memory/ticket-frontmatter-contract.md` | 新規。frontmatter＝機械契約であること、ドリフト検知コマンド |
+| `agents/general_affairs/memory/notion-sync.md` | リコンサイル前のドリフト検査手順を追記 |

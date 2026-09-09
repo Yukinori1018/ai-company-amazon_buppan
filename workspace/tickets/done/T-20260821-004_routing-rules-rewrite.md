@@ -39,16 +39,6 @@ next_check_at: 2026-08-22
 - 2026-08-21 カズヨより §5 冒頭段落を差し戻し。「社長が言っていないことを社長の意思として書いていた」ため訂正
 - 2026-08-21 §5 冒頭を「サブエージェントへの発注を既定とする」に書き直し（事実＋可変性＋§4.1 非干渉）。routing.md の参照文も追随。メモリ2件に訂正の経緯を記録
 
-## 成果物
-
-いずれもリポジトリ内の運用文書（別途 deliverables への複製は不要な性質の改訂）。
-
-- `/Users/yukinori/Claude Code/ai-company-amazon_buppan/CLAUDE.md` §5 — 「サブエージェント常時発注の許可」新設＋「振り分けの原則（例外4つ列挙式）」に改訂
-- `/Users/yukinori/Claude Code/ai-company-amazon_buppan/agents/secretary/skills/routing.md` — 「§振り分けの原則」に改題・全面書き換え、「§発注テンプレ」新設、抜け道3箇所を修正
-- `/Users/yukinori/Claude Code/ai-company-amazon_buppan/agents/secretary/memory/owner-routing-discipline.md` — 3度目の追記（原因・対策・教訓）
-- `/Users/yukinori/Claude Code/ai-company-amazon_buppan/agents/content_creator/memory/owner-writing-preferences.md` — 新規（ヒデアキのメモリ1件目）
-- `/Users/yukinori/Claude Code/ai-company-amazon_buppan/agents/content_creator/memory/source-fidelity-in-rule-writing.md` — 新規（一次ソース忠実性の原則。差し戻しの教訓）
-
 ## 完了報告
 
 カズヨさんへ。
@@ -105,3 +95,15 @@ CLAUDE.md は毎セッション読まれる憲法なので、総量を増やさ�
 - `agents/secretary/memory/owner-routing-discipline.md`（追記）— 訂正の経緯と、カズヨ側の再発防止作法（社長の原文をそのまま渡す／自分の権限を広げる記述は社長確認を経る）
 
 **所見:** カズヨさんは「原因は自分の依頼文」と言われましたが、**私の側でも止められた箇所**でした。原文を読める立場にありながら「常時許可を明文化せよ」という指示語をそのまま文章に写したのは、制作者としての詰めが甘かったです。今後は依頼文と一次ソースを突き合わせ、導けない部分は書かずに確認として返します。
+
+## 成果物
+
+（なし — リポジトリ／外部サービス側の更新そのものが成果のため、成果物ファイルなし）
+
+補足（従前の記載）:
+- いずれもリポジトリ内の運用文書（別途 deliverables への複製は不要な性質の改訂）。
+- `/Users/yukinori/Claude Code/ai-company-amazon_buppan/CLAUDE.md` §5 — 「サブエージェント常時発注の許可」新設＋「振り分けの原則（例外4つ列挙式）」に改訂
+- `/Users/yukinori/Claude Code/ai-company-amazon_buppan/agents/secretary/skills/routing.md` — 「§振り分けの原則」に改題・全面書き換え、「§発注テンプレ」新設、抜け道3箇所を修正
+- `/Users/yukinori/Claude Code/ai-company-amazon_buppan/agents/secretary/memory/owner-routing-discipline.md` — 3度目の追記（原因・対策・教訓）
+- `/Users/yukinori/Claude Code/ai-company-amazon_buppan/agents/content_creator/memory/owner-writing-preferences.md` — 新規（ヒデアキのメモリ1件目）
+- `/Users/yukinori/Claude Code/ai-company-amazon_buppan/agents/content_creator/memory/source-fidelity-in-rule-writing.md` — 新規（一次ソース忠実性の原則。差し戻しの教訓）

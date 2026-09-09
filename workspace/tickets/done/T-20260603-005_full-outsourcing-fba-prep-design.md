@@ -45,3 +45,10 @@ next_check_at: 2026-06-04
 初回フル外注の実務設計を確認のうえ、**「少量でも割高を許容してフル外注を貫く」か「フル外注を活かすため初回からある程度の数量で小さく本番にする(大口切替も視野)」か**を判断。詳細フロー＝`deliverables/T-20260603-005/full-outsourcing-design.html`。
 
 - 2026-06-03 **社長判断：案②（小さく本番で数量確保）を採用**。本チケットは判断材料として役目完了 → **done**。実行は親 T-20260520-004 で継続（ERESA試用・NETSEA登録・代行業者相見積り・最初の商品選定）。
+
+## 成果物
+
+- 📁 **[T-20260603-005/](../../output/deliverables/T-20260603-005/)** — 成果物フォルダ（2件）
+  - [`full-outsourcing-design.html`](../../output/deliverables/T-20260603-005/full-outsourcing-design.html) — フル外注で回すAmazon物販 — 卸 → FBA納品代行業者 → FBA 実務設計（23.6KB）
+  - [`full-outsourcing-design.md`](../../output/deliverables/T-20260603-005/full-outsourcing-design.md) — フル外注で回すAmazon物販 — 卸 → FBA納品代行業者 → FBA 実務設計（24.3KB）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260603-005/`

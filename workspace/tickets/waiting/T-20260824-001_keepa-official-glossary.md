@@ -84,15 +84,6 @@ source: 社長依頼（2026-08-24）
 - 2026-08-24 サトル追加対応（カズヨ依頼1件）。`keepa-glossary.md` に **§0.6「【運用結論】法則3をどう扱うか — 安全側の誤りは、受動的な運用では永久に残る」** を §0.5 の法則3直後に新設。①COUNT_NEW（危険側）と D1（安全側）の発見経緯を対比した構造説明 ②結論「安全側の誤りは日常運用では自力で発見できない。能力ではなく構造の問題」 ③歯止め4点（**T-20260824-002 として四半期突合を起票済み・担当サトル・次回 2026-11-24**／`changelog.html` 起点／§0.5 の4列表を更新基点・「なし」を空欄にしない／Keepa 固有ではなく外部API依存の判定ロジック全般に適用） ④次回突合の視点「おかしな結果が出ていないかではなく、厳しすぎて取りこぼしていないかを探す」。本チケット末尾の正文と整合。README にも §0.6 への導線を追加し `.html` を再生成。**コードには触れていない。**
 - 2026-08-24 サトル最終対応（カズヨ依頼6件・タカシの実測結果を反映）。**①D11 を全面差し替え**（「古いデータで動いていた」は前提から誤り。raw 4,002件で `csv[17]` 0件・`current[17]` 全件 -1・`csv[15]` 0件＝**そもそも値が返っていない**。**D区分→A区分へ格上げ**）。**②D1 追加検証でカズヨの推論が実測否定された記録を §3 と D1 に明記**（FBM無し群 59.1% 対 FBMあり群 58.5%＝ほぼ差なし・不採用。「FBMが無いことは何の保証にもならない」）。**③§0.5 に法則4「取り違えた定義がアダプタ層に入ると全判定に伝播する」を追加**（根本原因 `adapters/amazon_data.py::_pick_offer_count` の docstring。同一欠陥が T-20260817-005 と T-20260804-001 に別々に実装されていた事例つき）。**④§5.1 を事実訂正**（`B0DWMPV656` は v1.3 候補リストではなく **T-20260804-001 メーカー台帳**が出所。訂正自体が法則4の証拠になった）。**⑤D8 を D区分→C区分（解決）へ**（33トークンで決着。`variationCount 0〜0` が 97,484件 > 現行帯 93,574件）。**⑥2026-08-24 の方針転換（厳選top100 → 母数最大化）に合わせ、`top100` 系の数字を「旧前提」と注記**（数字は消さず、順位づけの妥当性ではなく**汚染率の指標**として読む旨を明記。D8 は重み格上げ・D11 は新方針と整合・D1〜D4 と用語定義は方針非依存と明記）。要確認区分は**0件**になり、`.html` 再生成・memory 追記2節（追記4・追記5）まで完了。**コードには触れていない。**
 
-## 成果物
-
-- workspace/output/deliverables/T-20260824-001/README.md（インデックス）
-- workspace/output/deliverables/T-20260824-001/keepa-glossary.html（**社長閲覧用・本編**）
-- workspace/output/deliverables/T-20260824-001/keepa-glossary.md（用語定義集）
-- workspace/output/deliverables/T-20260824-001/discrepancies.md（**当社ナレッジ・スクリプトの誤り指摘リスト**）
-- workspace/output/deliverables/T-20260824-001/keepa-official-docs-map.md（公式ドキュメント所在マップ＋カズヨへのブラウザ依頼リスト）
-- workspace/output/agent_output/T-20260824-001/sources/（出典HTML 30ページの保全）
-
 ## 完了報告
 
 カズヨさん、サトルです。調査完了しました。
@@ -260,3 +251,22 @@ source: 社長依頼（2026-08-24）
 **社長判断が必要な点**：案C（推奨）か案A（1行で終わるがキーが平文でディスクに残る）かの選択です。比較表は設計書 §4.2 にあります。**どちらでもリポジトリの外に出るので、案A も許容範囲**である点は付記しました。
 
 **引き継ぎ**：導入後、Keepa MCP は**トークンを消費します**（新規課金なし）。夜間自走やループから無制限に呼ばせると既存の夜間スキャンと食い合うので、「対話中の単発調査に限定」という運用ルールを設計書 §8.4 に書きました。**運用ルールとしてチケット化するかはカズヨさんの判断でお願いします。**
+
+## 成果物
+
+- 📁 **[T-20260824-001/](../../output/deliverables/T-20260824-001/)** — 成果物フォルダ（11件）
+  - [`README.md`](../../output/deliverables/T-20260824-001/README.md) — （インデックス）
+  - [`_raw-capture-kazuyo`](../../output/deliverables/T-20260824-001/_raw-capture-kazuyo/) — フォルダ（3件）
+  - [`discrepancies.md`](../../output/deliverables/T-20260824-001/discrepancies.md) — （**当社ナレッジ・スクリプトの誤り指摘リスト**）
+  - [`keepa-auth.sh.template`](../../output/deliverables/T-20260824-001/keepa-auth.sh.template) — ファイル（2.0KB）
+  - [`keepa-glossary.html`](../../output/deliverables/T-20260824-001/keepa-glossary.html) — （**社長閲覧用・本編**）
+  - [`keepa-glossary.md`](../../output/deliverables/T-20260824-001/keepa-glossary.md) — （用語定義集）
+  - [`keepa-mcp-setup.html`](../../output/deliverables/T-20260824-001/keepa-mcp-setup.html) — Keepa 公式 MCP サーバ 導入設計書 — T-20260824-001（32.3KB）
+  - [`keepa-mcp-setup.md`](../../output/deliverables/T-20260824-001/keepa-mcp-setup.md) — Keepa 公式 MCP サーバ 導入設計書（22.1KB）
+  - [`keepa-official-docs-map.md`](../../output/deliverables/T-20260824-001/keepa-official-docs-map.md) — （公式ドキュメント所在マップ＋カズヨへのブラウザ依頼リスト）
+  - [`legal-review-keepa-mcp.html`](../../output/deliverables/T-20260824-001/legal-review-keepa-mcp.html) — 法務レビュー：Keepa 公式 MCP サーバ導入 — T-20260824-001（57.6KB）
+  - [`legal-review-keepa-mcp.md`](../../output/deliverables/T-20260824-001/legal-review-keepa-mcp.md) — 法務レビュー：Keepa 公式 MCP サーバ導入と、当社の Keepa データ運用（44.5KB）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260824-001/`
+
+補足（従前の記載）:
+- workspace/output/agent_output/T-20260824-001/sources/（出典HTML 30ページの保全）

@@ -90,17 +90,6 @@ README に更新義務を書いたが、文書だけの約束は風化する（`
 
 テスト用の一時ファイル（`fakehome` / `fakerepo` / `emptyhome`）は削除済み。
 
-## 成果物
-
-- `.claude/hooks/session-start.sh`（リマインダー⑥を追加。①〜⑤は無改変、掲出順の行のみ更新）
-- `docs/reference/claude-research-skill/README.md`（「忘れても検知はされます」節を追記）
-- `agents/it_engineer/memory/knowledge_mirror_drift_detection_hook.md`
-
-> `workspace/output/deliverables/` への納品は**なし**。成果はフック本体の改修であり、
-> `.claude/hooks/` に置かれて初めて機能する。deliverables へ複製すると
-> 「正が2つある」状態を作ることになり、**本チケットが防ごうとしている事故そのもの**になる。
-> （T-20260902-003 と同じ判断。成果物カタログへの追記も不要）
-
 ## 完了報告
 
 **カズヨさんへ。** SessionStart フックにリマインダー⑥を追加しました。検知だけです。同期は1行も書いていません。
@@ -118,3 +107,16 @@ README に更新義務を書いたが、文書だけの約束は風化する（`
 対象ファイルを増減させたときは、フック内の `RESEARCH_MIRROR_PATHS`（対応表・1箇所）と
 `docs/reference/claude-research-skill/README.md` の対応表の**両方**を直してください。
 相対パスを1行足すだけで対象が増えます。README にもその旨を書いてあります。
+
+## 成果物
+
+（なし — 成果物ファイルなし）
+
+補足（従前の記載）:
+- `.claude/hooks/session-start.sh`（リマインダー⑥を追加。①〜⑤は無改変、掲出順の行のみ更新）
+- `docs/reference/claude-research-skill/README.md`（「忘れても検知はされます」節を追記）
+- `agents/it_engineer/memory/knowledge_mirror_drift_detection_hook.md`
+> `workspace/output/deliverables/` への納品は**なし**。成果はフック本体の改修であり、
+> `.claude/hooks/` に置かれて初めて機能する。deliverables へ複製すると
+> 「正が2つある」状態を作ることになり、**本チケットが防ごうとしている事故そのもの**になる。
+> （T-20260902-003 と同じ判断。成果物カタログへの追記も不要）

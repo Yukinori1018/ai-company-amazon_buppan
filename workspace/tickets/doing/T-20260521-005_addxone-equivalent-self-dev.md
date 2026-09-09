@@ -131,3 +131,17 @@ A/B/C 判断後に Phase 1（API 接続検証）着手。Phase 1 時点で Keepa
 - 起動: `cd workspace/output/agent_output/T-20260521-005/code && python3 -m streamlit run app_discovery.py` →(い)モードで「水筒」等を検索→実利益ランキング確認。
 - 次の発展候補（社長の感触次第・要相談）: (あ)Amazon起点モード実装／楽天API追加（無料）／プリセット調整／NETSEA卸の手動投入対応。
 - 2026-08-21 棚卸し（マリエ／T-20260821-007）: next_check_at 2026-06-10 → 2026-09-10 に再設定。仕分け=A。理由: Sato-Scope の親。子は生きているが、実利はKeepa API直運用で出ており優先度は下がる
+
+## 成果物
+
+- 📁 **[T-20260521-005/](../../output/deliverables/T-20260521-005/)** — 成果物フォルダ（9件）
+  - [`01_tool-overview.md`](../../output/deliverables/T-20260521-005/01_tool-overview.md) — 社長専用 Amazon物販リサーチツール — 概要（11.7KB）
+  - [`02_mockup.html`](../../output/deliverables/T-20260521-005/02_mockup.html) — Sato-Scope v0.2 — 社長専用 物販リサーチツール（Discovery 型モック）（23.1KB）
+  - [`03_research-and-strategy.md`](../../output/deliverables/T-20260521-005/03_research-and-strategy.md) — Sato-Scope — リサーチ＆戦略立案ログ（14.2KB）
+  - [`04_api-key-setup-guide.md`](../../output/deliverables/T-20260521-005/04_api-key-setup-guide.md) — Sato-Scope Phase 2 — API キー取得・設定 手順書（6.0KB）
+  - [`05_fee-verification-by-accounting.md`](../../output/deliverables/T-20260521-005/05_fee-verification-by-accounting.md) — fees.py 手数料定数 検証レポート（経理ハジメ）（14.2KB）
+  - [`06_research-methods-to-encode.md`](../../output/deliverables/T-20260521-005/06_research-methods-to-encode.md) — 06_実プレイヤーのリサーチ手法 → ツール実装ロジック変換（21.1KB）
+  - [`07_owner-action-list-data-sources.md`](../../output/deliverables/T-20260521-005/07_owner-action-list-data-sources.md) — 📋 社長アクション一覧｜リサーチツールのデータ源準備（3.5KB）
+  - [`README.md`](../../output/deliverables/T-20260521-005/README.md) — T-20260521-005 — Sato-Scope（社長専用 Amazon物販リサーチツール）Phase 0 成果物（1.5KB）
+  - [`code`](../../output/deliverables/T-20260521-005/code/) — フォルダ（10件）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260521-005/`

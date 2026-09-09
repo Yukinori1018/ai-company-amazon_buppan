@@ -51,3 +51,7 @@ Sato-Scope の仕入元に **NETSEA（卸）を Yahoo・楽天に次ぐ第3の�
 - 2026-06-06 タカシがOpenAPI仕様を直接取得して確定（baseURL https://api.netsea.jp/buyer/v1/ ・認証 Authorization: Bearer ・POST /items は supplier_ids/direct_item_ids 必須・JAN/卸価格/在庫/送料あり・フリーワード検索なし）。adapters/netsea.py 先行実装＋multi_supplier合流（同一JAN最安採用）。pytest 137件パス。
 - 2026-06-06 **社長がトークン取得→Notion保存。カズヨが.envに設定→タカシが本番接続確認＝成功**。GET /suppliers で承認サプライヤー**100社**取得（社長申請は10社以上→実際100社）。POST /items で実商品取得（例: オリヒロ しじみ牡蠣ウコン肝臓エキス JAN4971493904310 卸253円 在庫あり）。実機で致命バグ3件発見・即修正（/itemsはjan_code単独だと400→承認supplier_idsを10件ずつ同送／0件は素の[]配列で返る→ガード追加／token scopes空でも200）。全130テストgreen。**3仕入れ先 ['Yahoo','楽天','NETSEA'] 本番稼働をカズヨも live_sources で確認**。トークン期限 2026-12-03（180日）。
 - 2026-06-06 **完了→done**。次の発展候補（別チケットで提案予定）: NETSEA 100社の全商品を supplier_ids 起点で棚卸し→Amazon突合する「卸起点の自動原石探索」。卸価格ゆえ黒字率が高い本丸。
+
+## 成果物
+
+（なし — 成果物ファイルなし）

@@ -40,3 +40,10 @@ Step2 で仕入れ手法は B（国内卸）→ C（電脳せどり）に決定�
 
 ガイドに沿って **ERESA 7日無料試用（T-20260527-001・§4.1承認済方針）を開始 → 日用品/文具で10商品をチェックリスト判定する練習**。試用開始の一言をもらえれば、最初の数商品を一緒にリサーチします。
 - 2026-08-21 **done へ移動**（カズヨ判定）。T-20260821-007 の棚卸しでマリエが「成果物は納品済みで waiting の札が外れていないだけ」と判定、根拠を確認のうえ受け入れ。社長レビューが必要なら差し戻し可。
+
+## 成果物
+
+- 📁 **[T-20260603-002/](../../output/deliverables/T-20260603-002/)** — 成果物フォルダ（2件）
+  - [`price-diff-research-guide.html`](../../output/deliverables/T-20260603-002/price-diff-research-guide.html) — 価格差リサーチ実践ガイド — ERESA PRO で「仕入れる/見送る」を判断する（24.0KB）
+  - [`price-diff-research-guide.md`](../../output/deliverables/T-20260603-002/price-diff-research-guide.md) — 価格差リサーチ実践ガイド — ERESA PRO で「仕入れる/見送る」を自分で判断する（21.9KB）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260603-002/`

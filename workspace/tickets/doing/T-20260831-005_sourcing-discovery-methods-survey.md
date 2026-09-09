@@ -57,17 +57,6 @@ related_tickets: [T-20260831-004, T-20260831-001, T-20260817-005, T-20260520-012
   - ②NETSEA：発見経路から外す。**第19条3項＋第27条4項（違約金200万円＋代金50%）をサトルが見落としていたため追記**
   - ③展示会：**招待状請求は既に終了**（実測）。入場は当日登録（名刺持参・無料）。Gift Net 規約第5条が当社計画と衝突するため**登録しない方が有利**＝§4.1 の承認案件は消滅
 
-## 成果物
-
-- workspace/output/deliverables/T-20260831-005/04_出展社リストとNETSEAの適法性判定.md（法務ハルオ）
-- workspace/output/deliverables/T-20260831-005/04_出展社リストとNETSEAの適法性判定.html（法務ハルオ）
-- workspace/output/deliverables/T-20260831-005/01_仕入れ先の発見方法_全方位調査.md
-- workspace/output/deliverables/T-20260831-005/01_仕入れ先の発見方法_全方位調査.html
-- workspace/output/deliverables/T-20260831-005/02_出展社リスト抽出.py
-- workspace/output/deliverables/T-20260831-005/03_keepa検証_ギフトショー出展社サンプル.csv
-- workspace/output/deliverables/T-20260831-005/README.md
-- （Git除外）workspace/output/agent_output/T-20260831-005/tigs102_出展社リスト_全件.csv ＋ 原本PDF
-
 ## 完了報告
 
 Phase A（発見方法の全方位調査）完了。カズヨさんへ引き渡します。
@@ -304,3 +293,23 @@ D. orosy `help.orosy.com`（HTTP 403。**第30条により契約内容を構成�
   - ⚠️ **既存の指摘**：NETSEA のバイヤーID 961668 と氏名を T-20260831-006 のチケット（Git追跡対象・PUBLICリポ）に記載済み。本人特定情報の扱いとして見直しの要否を検討すること。
   - 承認後の宿題：**Amazon 再販が可の出展者が何社いるかを数える**（法務判定＝出展者ごとに販路制限を課せる／規約第6条・ログイン後にしか読めない）。これで初めて「使える母数」が確定する。会員になると規約第17条で **SD由来データの公開リポ掲載も不可**になる。
 - 2026-09-07 マリエ：Notion カンバンに取りこぼしを検知し、カードを遡って作成。labels は Notion の選択肢に合わせて調整（`research-method`/`survey` → 既存の `research` へ統合）。リポジトリ側の frontmatter も同じ値に揃えた
+
+## 成果物
+
+- 📁 **[T-20260831-005/](../../output/deliverables/T-20260831-005/)** — 成果物フォルダ（12件）
+  - [`01_仕入れ先の発見方法_全方位調査.html`](../../output/deliverables/T-20260831-005/01_仕入れ先の発見方法_全方位調査.html) — 仕入れ先の発見方法 — 全方位調査（Amazon起点以外）（47.9KB）
+  - [`01_仕入れ先の発見方法_全方位調査.md`](../../output/deliverables/T-20260831-005/01_仕入れ先の発見方法_全方位調査.md) — 仕入れ先の発見方法 — 全方位調査（Amazon起点以外）（35.2KB）
+  - [`02_出展社リスト抽出.py`](../../output/deliverables/T-20260831-005/02_出展社リスト抽出.py) — 東京ビッグサイトのホール表記 + 特設ゾーンの小間番号（3.8KB）
+  - [`03_keepa検証_ギフトショー出展社サンプル.csv`](../../output/deliverables/T-20260831-005/03_keepa検証_ギフトショー出展社サンプル.csv) — 26行 × 5列（n・exhibitor・hits・strict ほか）（882B）
+  - [`04_出展社リストとNETSEAの適法性判定.html`](../../output/deliverables/T-20260831-005/04_出展社リストとNETSEAの適法性判定.html) — （法務ハルオ）
+  - [`04_出展社リストとNETSEAの適法性判定.md`](../../output/deliverables/T-20260831-005/04_出展社リストとNETSEAの適法性判定.md) — （法務ハルオ）
+  - [`05_NETSEA用途限定の実装.md`](../../output/deliverables/T-20260831-005/05_NETSEA用途限定の実装.md) — NETSEA 用途限定の実装 — 変更内容の要約（11.5KB）
+  - [`06_仕入れ経路の横展開調査.html`](../../output/deliverables/T-20260831-005/06_仕入れ経路の横展開調査.html) — 仕入れ経路の横展開調査 — 二段構え（本丸／数を打つ）（74.8KB）
+  - [`06_仕入れ経路の横展開調査.md`](../../output/deliverables/T-20260831-005/06_仕入れ経路の横展開調査.md) — 仕入れ経路の横展開調査 — 二段構え（本丸／数を打つ）（57.6KB）
+  - [`07_本丸経路と卸サービスの適法性判定.html`](../../output/deliverables/T-20260831-005/07_本丸経路と卸サービスの適法性判定.html) — 本丸経路と卸サービスの適法性判定 — T-20260831-005（74.0KB）
+  - [`07_本丸経路と卸サービスの適法性判定.md`](../../output/deliverables/T-20260831-005/07_本丸経路と卸サービスの適法性判定.md) — 本丸経路と卸サービスの適法性判定（57.8KB）
+  - [`README.md`](../../output/deliverables/T-20260831-005/README.md) — T-20260831-005 — 仕入れ先の発見方法 全方位調査（Phase A）（2.8KB）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260831-005/`
+
+補足（従前の記載）:
+- （Git除外）workspace/output/agent_output/T-20260831-005/tigs102_出展社リスト_全件.csv ＋ 原本PDF

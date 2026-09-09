@@ -31,20 +31,6 @@ T-20260821-002/003 の検証で出た取りこぼし。放置するとリマイ�
 
 **マリエの作業は完了。カズヨのレビュー待ち（done 判定は秘書の責務のため doing に留置）。**
 
-## 成果物
-
-| 対象 | 内容 |
-|---|---|
-| doing/waiting 8枚 | `next_check_at` を **2026-08-22〜09-08 に分散**して付与（一律翌日にしない理由は下記） |
-| チケット12枚 | `related:` → `related_tickets:` |
-| チケット4枚 | `parent:` → `parent_ticket:`（`null` → `""`） |
-| `workspace/tickets/_template.md` | `parent_ticket`（`parent` ではない）の表記ゆれ注意＋**snake_case / ハイフンの別系統**注記 |
-| `docs/notion-board-schema.md` | §Assignee に記法二系統の対照表を追加 |
-| Notion Labels | 選択肢を **1種 → 29種**（「まとめ」保持＋実用28種） |
-| Notion カード | 6枚の Status/Name を同期。T-20260821-001 に社長判断の内容を本文追記 |
-| `workspace/owner-tasks.md` | 🟡社長の番 に「委譲の是正・2枚を振り直すか」を追加＋最終更新を更新 |
-| 庶務メモリ2件 | `ticket-frontmatter-contract.md` / `notion-sync.md` に追記 |
-
 ## 付与した next_check_at（一律翌日にしなかった理由）
 
 一律 2026-08-22 にすると**次回セッションで35件のリマインダーが一斉に出て、フックごと無視される**。
@@ -118,3 +104,20 @@ T-20260821-002/003 の検証で出た取りこぼし。放置するとリマイ�
 - 2026-08-21 `_template.md` / `notion-board-schema.md` に記法二系統（snake_case ⇄ ハイフン）の注記を追加。
 - 2026-08-21 `owner-tasks.md` に社長判断1件（T-20260821-001 waiting）を反映。庶務メモリ2件に追記。
 - 2026-08-21 フック実走で29件・全件ID入りを確認。**延滞30日超が13件**あることを発見し棚卸しを提案。マリエ作業完了・カズヨのレビュー待ち。
+
+## 成果物
+
+（なし — リポジトリ／外部サービス側の更新そのものが成果のため、成果物ファイルなし）
+
+補足（従前の記載）:
+| 対象 | 内容 |
+|---|---|
+| doing/waiting 8枚 | `next_check_at` を **2026-08-22〜09-08 に分散**して付与（一律翌日にしない理由は下記） |
+| チケット12枚 | `related:` → `related_tickets:` |
+| チケット4枚 | `parent:` → `parent_ticket:`（`null` → `""`） |
+| `workspace/tickets/_template.md` | `parent_ticket`（`parent` ではない）の表記ゆれ注意＋**snake_case / ハイフンの別系統**注記 |
+| `docs/notion-board-schema.md` | §Assignee に記法二系統の対照表を追加 |
+| Notion Labels | 選択肢を **1種 → 29種**（「まとめ」保持＋実用28種） |
+| Notion カード | 6枚の Status/Name を同期。T-20260821-001 に社長判断の内容を本文追記 |
+| `workspace/owner-tasks.md` | 🟡社長の番 に「委譲の是正・2枚を振り直すか」を追加＋最終更新を更新 |
+| 庶務メモリ2件 | `ticket-frontmatter-contract.md` / `notion-sync.md` に追記 |

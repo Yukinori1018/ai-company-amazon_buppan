@@ -51,12 +51,6 @@ related_tickets: []
   スクリプト/フックのパス依存を除去 → CLAUDE.md/README.md/SETUP.md 執筆 → 全検証通過。
   コピー元リポは読み取りのみ（1ファイルも変更していない）。
 
-## 成果物
-
-- **本体:** `/Users/yukinori/Claude Code/ai-company-homepage/`（163ファイル。**本リポ外**。`git init` 未実施）
-- **引き継ぎメモ:** `/Users/yukinori/Claude Code/ai-company-homepage/SETUP.md`
-- **作業ログ:** `workspace/output/deliverables/T-20260904-002/README.md`
-
 ## 完了報告
 
 雛形を生成しました。**本リポの外**に置いてあります（本リポは PUBLIC で30分ごとに `git add -A` push するため、
@@ -144,3 +138,13 @@ JSON が返ることまで確認しました。相対リンク切れ0件、秘�
   `.claude/agents/general-affairs.md` / `agents/secretary/skills/notion-ticket-sync.md`（§新設）/
   `.claude/hooks/delegation-check.sh`（§着手前の可視化 → §振り分けの原則）。
 - なお、元リポの `workspace/owner-tasks.md` に未コミットの変更がありますが、**私の作業ではありません**（カズヨの担当領域のため触っていません）。
+
+## 成果物
+
+- 📁 **[T-20260904-002/](../../output/deliverables/T-20260904-002/)** — 成果物フォルダ（1件）
+  - [`README.md`](../../output/deliverables/T-20260904-002/README.md) — T-20260904-002 — ホームページ制作事業リポジトリの雛形生成 / 作業ログ（12.9KB）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260904-002/`
+
+補足（従前の記載）:
+- **本体:** `/Users/yukinori/Claude Code/ai-company-homepage/`（163ファイル。**本リポ外**。`git init` 未実施）
+- **引き継ぎメモ:** `/Users/yukinori/Claude Code/ai-company-homepage/SETUP.md`

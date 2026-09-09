@@ -44,13 +44,6 @@ T-20260824-001 の `keepa-glossary.md`（62KB / HTML 145KB・40表）は、**調
 - 載せるのは「**その語が何を意味するか**」と「**間違えやすい点**」だけ
 - **既存成果物は削除しない。**T-20260824-001 は調査記録として保全する（経緯を追いたい人はそちらを見る）
 
-## 成果物
-
-`workspace/output/deliverables/T-20260824-005/`
-- `keepa-glossary-official.md`
-- `keepa-glossary-official.html`（社長閲覧用・本編）
-- `README.md`（索引・版歴・T-20260824-001 との関係）
-
 ## ログ
 
 - 2026-08-24 起票（カズヨ）。社長レビューを受け、ヒデアキへ発注。
@@ -67,13 +60,6 @@ deliverables へ直納・commit 済み（`e76dc44`）。T-20260824-001 は一切
 - 2026-08-24 第2稿（表現）：主語を「当社」から「用語」へ書き換え。公式HTMLで再確認し **Domain ID の記載ゆれ1件を是正**（11止まりは Seller Object ではなく product-object）。`variationCount` `parentAsin` `variations` を追補。
 - 2026-08-24 第3稿（受け手視点）：headless Chrome で描画確認 → **`**` で始まる段落が HTML から丸ごと欠落するコンバータのバグを発見・修正**（索引の見出し・リード文など10箇所以上）。索引の「読み」列は誤字に見えるため削除。索引のグループ見出しにスタイル付与。
 - 2026-08-24 機械チェック：禁止語 grep 0件／異言語文字 0件／HTMLタグ開閉一致／md↔HTML 主要22語の出現数一致（差分1件はナビの既知分）／md 全段落の HTML 存在照合 0欠落。
-
-## 成果物
-
-- workspace/output/deliverables/T-20260824-005/keepa-glossary-official.html （本編・社長閲覧用）
-- workspace/output/deliverables/T-20260824-005/keepa-glossary-official.md
-- workspace/output/deliverables/T-20260824-005/README.md
-- （中間物・ビルダー）workspace/output/agent_output/T-20260824-005/
 
 ## 完了報告
 
@@ -114,3 +100,18 @@ deliverables へ直納・commit 済み（`e76dc44`）。T-20260824-001 は一切
 - **日本語UIラベルの一部は「推定」のまま。**実画面で確定しているのは §3.5（出品者概要）のみ。
   確定手段は公式にあり、Product Finder の結果表上部「**Show API query**」を1回押せば
   設定中の条件のAPIフィールド名がそのまま読める。**ブラウザ操作＝カズヨの領分**（§4.4）。別チケット化は社長判断。
+
+## 成果物
+
+- 📁 **[T-20260824-005/](../../output/deliverables/T-20260824-005/)** — 成果物フォルダ（3件）
+  - [`README.md`](../../output/deliverables/T-20260824-005/README.md) — T-20260824-005 ｜ Keepa 用語集（正式版）（3.9KB）
+  - [`keepa-glossary-official.html`](../../output/deliverables/T-20260824-005/keepa-glossary-official.html) — （本編・社長閲覧用）
+  - [`keepa-glossary-official.md`](../../output/deliverables/T-20260824-005/keepa-glossary-official.md) — Keepa 用語集（正式版）（66.2KB）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260824-005/`
+
+補足（従前の記載）:
+- `workspace/output/deliverables/T-20260824-005/`
+- `keepa-glossary-official.md`
+- `keepa-glossary-official.html`（社長閲覧用・本編）
+- `README.md`（索引・版歴・T-20260824-001 との関係）
+- （中間物・ビルダー）workspace/output/agent_output/T-20260824-005/

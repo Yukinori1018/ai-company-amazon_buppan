@@ -46,3 +46,10 @@ related_tickets: [T-20260804-001, T-20260803-001, T-20260705-002, T-20260612-002
 - 2026-08-09 todo 起票 →（同turn）doing：プランナー・タケシへ発注
 - 2026-08-09 タケシ立案完了（三手法比較/SKU配分/finder_niche_oem接続設計/PL試算/撤退条件/30-60-90日/A/B/C＋推奨B）→ waiting（社長レビュー＋最初の一手Go待ち）。Notion=waiting同期・owner-tasks反映・カタログ追記
 - 2026-08-21 棚卸し（マリエ／T-20260821-007）: next_check_at 2026-08-10 → 2026-08-23 に再設定。仕分け=B。理由: ③OEM。タケシがA/B/C＋推奨Bまで出し「最初の一手」のGo待ち＝社長判断が明確に必要
+
+## 成果物
+
+- 📁 **[T-20260809-001/](../../output/deliverables/T-20260809-001/)** — 成果物フォルダ（2件）
+  - [`niche-oem-sku-strategy.html`](../../output/deliverables/T-20260809-001/niche-oem-sku-strategy.html) — 国内ニッチ簡易OEM SKU積み上げ戦略ドラフト｜Amazon物販事業（33.2KB）
+  - [`niche-oem-sku-strategy.md`](../../output/deliverables/T-20260809-001/niche-oem-sku-strategy.md) — 国内ニッチ簡易OEM SKU積み上げ戦略ドラフト（26.2KB）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260809-001/`

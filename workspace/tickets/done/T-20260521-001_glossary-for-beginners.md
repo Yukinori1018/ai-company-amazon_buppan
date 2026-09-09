@@ -36,3 +36,10 @@ labels: [glossary, content, foundation, learning]
 - 2026-05-20 todo 起票 → 即 doing（ヒデアキへ発注、承認不要 §4.2）
 - 2026-05-20 ヒデアキ納品（150語10カテゴリ・CSV+MD）→ 社長レビュー待ち
 - 2026-05-22 社長レビュー OK → doing → done
+
+## 成果物
+
+- 📁 **[T-20260521-001/](../../output/deliverables/T-20260521-001/)** — 成果物フォルダ（2件）
+  - [`glossary.csv`](../../output/deliverables/T-20260521-001/glossary.csv) — 150行 × 6列（﻿カテゴリ・用語・よみ・1行定義 ほか）（30.2KB）
+  - [`glossary.md`](../../output/deliverables/T-20260521-001/glossary.md) — Amazon物販・副業 用語集（初心者向け完全版）（36.0KB）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260521-001/`

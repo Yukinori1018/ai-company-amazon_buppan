@@ -57,10 +57,6 @@ T-20260906-003 の通過915件から利益率の上位10件を取り出したと
 - pre-commit をバイパスしない
 - §4.1 該当操作は実行しない
 
-## 成果物
-
-`workspace/output/deliverables/T-20260907-001/`（修正の説明・解決率の before/after・再現スクリプト）
-
 ## ログ
 
 - 2026-09-07 起票（カズヨ）。社長へ上位10件を提出する過程で発覚。社長判断で発注。
@@ -68,13 +64,6 @@ T-20260906-003 の通過915件から利益率の上位10件を取り出したと
 ## 現在地
 
 修正・テスト・再適用・上位10件の出し直しまで完了。判断を仰ぐ論点が1つ（比率ガードの契約と実装の食い違い）。
-
-## 成果物
-
-- workspace/output/deliverables/T-20260907-001/01_入数の突合を直した.md（+ .html）
-- workspace/output/deliverables/T-20260907-001/out/top10.csv（**上位10件の明細**・Git追跡外・Finderから開けます）
-- workspace/output/deliverables/T-20260907-001/reevaluate.py / make_top10.py（再現用）
-- 修正: T-20260831-006/pipeline/pack.py, pipeline/evaluate.py, tests/（105 passed）
 
 ## 完了報告
 
@@ -246,3 +235,22 @@ NETSEA の商品名がケースを表していても、**卸値は1個あたり�
 
 ②③通過は実行時点で 2,992件。歩留まりは Amazon本体1,602 / 赤字770 / 入数未解決349 /
 PSE 1E 72 / 要確認61 / 蛍光灯43 / 1A 25 / 1B 17 / 1C 3 → **残り50**（除外2,942＋50＝2,992・検算一致）。
+
+## 成果物
+
+- 📁 **[T-20260907-001/](../../output/deliverables/T-20260907-001/)** — 成果物フォルダ（10件）
+  - [`01_入数の突合を直した.html`](../../output/deliverables/T-20260907-001/01_入数の突合を直した.html) — 入数の突合を直した — before/after（11.6KB）
+  - [`01_入数の突合を直した.md`](../../output/deliverables/T-20260907-001/01_入数の突合を直した.md) — （+ .html）
+  - [`02_選定条件の実装と全件再適用.html`](../../output/deliverables/T-20260907-001/02_選定条件の実装と全件再適用.html) — 選定条件の実装と全件再適用（11.9KB）
+  - [`02_選定条件の実装と全件再適用.md`](../../output/deliverables/T-20260907-001/02_選定条件の実装と全件再適用.md) — 選定条件の実装と、②③通過 全件への再適用（8.0KB）
+  - [`make_top10.py`](../../output/deliverables/T-20260907-001/make_top10.py) — 全件版も出す（社長が母数を見たいと仰ることがあるため）（3.4KB）
+  - [`out`](../../output/deliverables/T-20260907-001/out/) — top10.csv（**上位10件の明細**・Git追跡外・Finderから開けます） 〔Git除外・ローカルのみ〕
+  - [`reevaluate.py`](../../output/deliverables/T-20260907-001/reevaluate.py) — make_top10.py（再現用）
+  - [`refresh.sh`](../../output/deliverables/T-20260907-001/refresh.sh) — シェルスクリプト（457B）
+  - [`selection_rules.py`](../../output/deliverables/T-20260907-001/selection_rules.py) — LED を表す書き方。NFKC 正規化すると「ＬＥＤ」は "LED" になる。（7.6KB）
+  - [`tests`](../../output/deliverables/T-20260907-001/tests/) — フォルダ（1件）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260907-001/`
+
+補足（従前の記載）:
+- `workspace/output/deliverables/T-20260907-001/`（修正の説明・解決率の before/after・再現スクリプト）
+- 修正: T-20260831-006/pipeline/pack.py, pipeline/evaluate.py, tests/（105 passed）

@@ -65,14 +65,6 @@ parent_ticket: ""
   - 重要訂正: ERESA と Sato-Scope は代替でなく補完（`05_issues-for-decision.md` に訂正ボックス追記済）。
   - 残課題は法務 ToS 確認（T-22-005/003）に引き継ぎ。
 
-## 成果物
-
-- `workspace/output/deliverables/T-20260520-003/README.md` — 個票インデックス
-- `workspace/output/deliverables/T-20260520-003/01_keepa.md`
-- `workspace/output/deliverables/T-20260520-003/02_sellersprite.md`
-- `workspace/output/deliverables/T-20260520-003/03_amasearch.md`
-- `workspace/output/deliverables/T-20260520-003/04_fba-calculator.md`
-
 ## 次の手
 
 1. 社長レビュー（粒度・項目過不足）
@@ -88,3 +80,16 @@ parent_ticket: ""
 - **シナリオC：当面アマサーチ無料版＋ FBA計算機のみ** — 初期コストゼロ、ただし市場分析の解像度が低い
 
 撤退条件のヒント：「導入後3ヶ月で売上に貢献するSKU発見ゼロなら撤退」など。
+
+## 成果物
+
+- 📁 **[T-20260520-003/](../../output/deliverables/T-20260520-003/)** — 成果物フォルダ（8件）
+  - [`01_keepa.md`](../../output/deliverables/T-20260520-003/01_keepa.md) — 01. Keepa（キーパ）（4.8KB）
+  - [`02_sellersprite.md`](../../output/deliverables/T-20260520-003/02_sellersprite.md) — 02. SellerSprite（セラースプライト）（4.9KB）
+  - [`03_amasearch.md`](../../output/deliverables/T-20260520-003/03_amasearch.md) — 03. アマサーチ（Amasearch）（4.0KB）
+  - [`04_fba-calculator.md`](../../output/deliverables/T-20260520-003/04_fba-calculator.md) — 04. FBA計算機（Amazon Revenue Calculator）（3.5KB）
+  - [`README.md`](../../output/deliverables/T-20260520-003/README.md) — 個票インデックス
+  - [`report_v1_20260520.html`](../../output/deliverables/T-20260520-003/report_v1_20260520.html) — Amazon物販「利益 × 販売確度」ツール 比較レポート（22.0KB）
+  - [`report_v1_20260520.md`](../../output/deliverables/T-20260520-003/report_v1_20260520.md) — Amazon物販「利益 × 販売確度」ツール 比較レポート（15.4KB）
+  - [`v2_ai-integration`](../../output/deliverables/T-20260520-003/v2_ai-integration/) — フォルダ（6件）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260520-003/`

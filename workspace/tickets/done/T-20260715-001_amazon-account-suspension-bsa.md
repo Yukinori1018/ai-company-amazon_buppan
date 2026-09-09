@@ -171,3 +171,13 @@ BSA違反＋銀行口座/納税情報の同時要求という組み合わせか�
 
 ## 次アクション（社長）
 STEP1〜2＝「異議申し立てを提出する」を開き、ページ内＋📣パフォーマンス通知に面接予約リンクがあるか確認。あれば予約→カズヨへ一声。なければスクショ共有→アカウント健全性サポート連絡を組む。
+
+## 成果物
+
+- 📁 **[T-20260715-001/](../../output/deliverables/T-20260715-001/)** — 成果物フォルダ（5件）
+  - [`muninka-recovery-guide.html`](../../output/deliverables/T-20260715-001/muninka-recovery-guide.html) — Amazon「無認可」ログインエラー 復旧ガイド／電話スクリプト（9.8KB）
+  - [`reactivation-steps.html`](../../output/deliverables/T-20260715-001/reactivation-steps.html) — Amazonアカウント 再有効化 手順ガイド｜Satoy Select（6.4KB）
+  - [`seller-support-case-deposit-muninka.html`](../../output/deliverables/T-20260715-001/seller-support-case-deposit-muninka.html) — セラーサポート 問い合わせ文（銀行画面の無認可エラー）（6.1KB）
+  - [`video-verification-checklist.html`](../../output/deliverables/T-20260715-001/video-verification-checklist.html) — Amazon 本人確認ビデオ通話 事前準備チェックリスト｜Satoy Select（7.2KB）
+  - [`video-verification-checklist.md`](../../output/deliverables/T-20260715-001/video-verification-checklist.md) — Amazon 本人確認ビデオ通話 事前準備チェックリスト（4.0KB）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260715-001/`

@@ -53,3 +53,10 @@ pytest 12/12 PASS、サンプル CSV で CLI 実動作確認済み（Sony 警告
 - 2026-05-27 起票・即着手・done（タカシ、pytest 12/12 PASS）
 - 2026-06-01 Notion からリポジトリへ復元（同期破綻の復旧）。コード本体の取り込みは要確認として明記
 - 2026-08-21 frontmatter統一（マリエ／T-20260821-005）: `parent:`→`parent_ticket:` に統一（Notion の ParentTicket 列にマップされる正式キー。`null` はテンプレ準拠で `""` に）
+
+## 成果物
+
+- 📁 **[T-20260527-002/](../../output/deliverables/T-20260527-002/)** — 成果物フォルダ（2件）
+  - [`sato-scope-lite`](../../output/deliverables/T-20260527-002/sato-scope-lite/) — フォルダ（0件）
+  - [`usage-guide.md`](../../output/deliverables/T-20260527-002/usage-guide.md) — Sato-Scope Lite 使い方ガイド（社長向け）（7.1KB）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260527-002/`

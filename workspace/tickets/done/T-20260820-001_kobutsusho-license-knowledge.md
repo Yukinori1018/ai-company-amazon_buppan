@@ -58,3 +58,7 @@ related_tickets:
 - 2026-08-20 doing 起票・着手（社長からの動画要約受領）
 - 2026-08-20 一次情報で裏どり完了 → 原本保全 `docs/reference/kobutsusho/README.md`、メモリ `knowledge_kobutsusho_license.md` ＋ MEMORY.md 索引追加。done へ移動
 - 2026-08-21 frontmatter修復（マリエ）: assignee=legal を補完（`id:`→`ticket_id:` / `owner:`→`assignee:` へテンプレ準拠に統一）
+
+## 成果物
+
+（なし — 成果物ファイルなし）

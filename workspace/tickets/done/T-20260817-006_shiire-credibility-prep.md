@@ -89,12 +89,6 @@ related_tickets:
 - **顔写真**＝`assets/portrait.jpg` を置いてコメントを外すだけの状態にしてある（本家は「顔写真＋想い」を推奨）
 - **Amazonストアへのリンク**＝ストアURL確定後に追加
 
-## 成果物
-
-- `workspace/output/deliverables/T-20260817-006/shiire-credibility-prep.md` / `.html`（準備リスト本体）
-- `workspace/output/deliverables/T-20260817-006/公開手順書.html`
-- `workspace/output/deliverables/T-20260817-006/site/`（HP一式＋fill.py＋profile.html）
-
 ## 社長の次アクション（waiting の理由）
 
 1. **開業届＋青色申告承認申請を e-Tax で提出**（30分・§4.1非該当だが社長本人の手続き）
@@ -841,3 +835,20 @@ Pages のカスタムドメインとして追加（CNAME `www → satoy-select.p
 
 ## ログ追記
 - 2026-08-23 別セッションで本番公開完了。チケットを done へ。積み残しは T-20260823-001 に引き継ぎ。
+
+## 成果物
+
+- 📁 **[T-20260817-006/](../../output/deliverables/T-20260817-006/)** — 成果物フォルダ（12件）
+  - [`HPメモ_スマホ用_メール本文.txt`](../../output/deliverables/T-20260817-006/HPメモ_スマホ用_メール本文.txt) — テキスト（4.6KB）
+  - [`check_form.py`](../../output/deliverables/T-20260817-006/check_form.py) — スクリプト（1.6KB）
+  - [`deploy.sh`](../../output/deliverables/T-20260817-006/deploy.sh) — シェルスクリプト（3.5KB）
+  - [`mockup_v1`](../../output/deliverables/T-20260817-006/mockup_v1/) — フォルダ（11件）
+  - [`shiire-credibility-prep.html`](../../output/deliverables/T-20260817-006/shiire-credibility-prep.html) — メーカー仕入れ 信用構築の事前準備リスト（49.7KB）
+  - [`shiire-credibility-prep.md`](../../output/deliverables/T-20260817-006/shiire-credibility-prep.md) — .html`（準備リスト本体）
+  - [`site`](../../output/deliverables/T-20260817-006/site/) — （HP一式＋fill.py＋profile.html）
+  - [`site_backup_20260820`](../../output/deliverables/T-20260817-006/site_backup_20260820/) — フォルダ（10件）
+  - [`会社概要_配布用`](../../output/deliverables/T-20260817-006/会社概要_配布用/) — フォルダ（2件）
+  - [`公開手順書.html`](../../output/deliverables/T-20260817-006/公開手順書.html) — Satoy Select ホームページ 公開手順書（26.1KB）
+  - [`公開用`](../../output/deliverables/T-20260817-006/公開用/) — フォルダ（12件）
+  - [`画像とロゴの取り扱いルール.md`](../../output/deliverables/T-20260817-006/画像とロゴの取り扱いルール.md) — 画像・ロゴ・リンクの取り扱いルール（社内基準）（5.4KB）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260817-006/`

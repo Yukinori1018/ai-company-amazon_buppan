@@ -45,15 +45,6 @@ S5通過32件からは5〜7件しか残らないことが分かった。**上流
 - [ ] API エラーはリトライ＋指数バックオフ。**1件の失敗で全体を落とさない。**
 - [ ] 途中結果でも使えるよう、**通過分は逐次書き出す**。朝の時点で完走していなくても、そこまでの通過分で候補を組めること。
 
-## 成果物
-
-`workspace/output/deliverables/T-20260906-003/`
-
-- 新条件で通過した候補リスト（逐次更新）
-- 段階ごとの歩留まりログ（各段で落とした件数の検算付き）
-- 再現スクリプト
-- 朝の報告用サマリ（何件通過／どこまで進んだ／残り時間の見込み）
-
 ## 制約
 
 - 本リポジトリは **PUBLIC**。Keepa 固有の加工値（ドロップ数・最安値・販売数・実セラー数）と NETSEA 卸値を成果物に書かない。分布・閾値・手法・結論は書いてよい。
@@ -75,15 +66,6 @@ S5通過32件からは5〜7件しか残らないことが分かった。**上流
   - 実効 **約164件/h**（トークン補充20/分で律速）。完走には約55時間、11時間で上位約1,800件
   - 利益率の高い順に処理。ブロック単位で①→②③まで通し切るので、未完走でも上位は完全検証済み
   - 試走で 60件処理し、②③の通過率は約55%
-
-## 成果物
-
-- workspace/output/deliverables/T-20260906-003/README.md
-- workspace/output/deliverables/T-20260906-003/verify_pool.py（本体）
-- workspace/output/deliverables/T-20260906-003/run_overnight.sh（監督ループ）
-- workspace/output/deliverables/T-20260906-003/summarize.py（朝の報告用）
-- workspace/output/deliverables/T-20260906-003/stats_進捗.csv（集計値のみ）
-- workspace/output/deliverables/T-20260906-003/com.aicompany.pool-verify.plist（**未導入**）
 
 ## 完了報告（中間）
 
@@ -116,3 +98,23 @@ S5通過32件からは5〜7件しか残らないことが分かった。**上流
 - **事実**: 1件あたり実測7.3トークン。補充20/分は貯められない（上限1,200）
 - **事実**: 試走60件で②③の通過率 約55%
 - **推測**: 11時間で上位約1,800件。通過はそのうち半分前後
+
+## 成果物
+
+- 📁 **[T-20260906-003/](../../output/deliverables/T-20260906-003/)** — 成果物フォルダ（8件）
+  - [`README.md`](../../output/deliverables/T-20260906-003/README.md) — T-20260906-003 — 母数を新条件で引き直す（夜間自走）（3.8KB）
+  - [`com.aicompany.pool-verify.plist`](../../output/deliverables/T-20260906-003/com.aicompany.pool-verify.plist) — （**未導入**）
+  - [`out`](../../output/deliverables/T-20260906-003/out/) — フォルダ（8件） 〔Git除外・ローカルのみ〕
+  - [`run_overnight.sh`](../../output/deliverables/T-20260906-003/run_overnight.sh) — （監督ループ）
+  - [`stats_進捗.csv`](../../output/deliverables/T-20260906-003/stats_進捗.csv) — （集計値のみ）
+  - [`summarize.py`](../../output/deliverables/T-20260906-003/summarize.py) — （朝の報告用）
+  - [`supervisor.pid`](../../output/deliverables/T-20260906-003/supervisor.pid) — ファイル（6B） 〔Git除外・ローカルのみ〕
+  - [`verify_pool.py`](../../output/deliverables/T-20260906-003/verify_pool.py) — （本体）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260906-003/`
+
+補足（従前の記載）:
+- `workspace/output/deliverables/T-20260906-003/`
+- 新条件で通過した候補リスト（逐次更新）
+- 段階ごとの歩留まりログ（各段で落とした件数の検算付き）
+- 再現スクリプト
+- 朝の報告用サマリ（何件通過／どこまで進んだ／残り時間の見込み）

@@ -44,13 +44,6 @@ next_check_at: 2026-08-23
 - 2026-08-21 todo 起票（マリエの構造指摘を受けて秘書が起票）
 - 2026-08-21 **社長承認取得**。requires_approval を false に、status を doing へ。ヒデアキ（content_creator）へ実装を発注。
 
-
-## 成果物
-
-- `/Users/yukinori/Claude Code/ai-company-amazon_buppan/CLAUDE.md` §6 — waiting の定義に「レビュー待ちの期限」と「期限が適用されないもの」を追記、done の定義を更新
-- `/Users/yukinori/Claude Code/ai-company-amazon_buppan/agents/secretary/skills/ticket-management.md` — 「§レビュー待ちの期限判定」を新設（対象／対象外／判定手順／記録の型）
-- `/Users/yukinori/Claude Code/ai-company-amazon_buppan/agents/content_creator/memory/source-fidelity-in-rule-writing.md` — 追記（承認がある場合の書き方）
-
 ## 完了報告
 
 ### CLAUDE.md §6 に書いたこと
@@ -91,3 +84,12 @@ CLAUDE.md は正味8行増。waiting の末尾にあった注記2行（判定の
 
 ## ログ追記
 - 2026-08-21 ヒデアキが実装。CLAUDE.md §6 に「レビュー待ちの期限」と対象外2種を追記（正味8行増・注記の圧縮で相殺）。ticket-management.md に §レビュー待ちの期限判定 を新設（対象／対象外3種／判定手順5項目／記録の型）。逃げ道表現の混入0件を grep で確認。- 2026-08-21 **done**（カズヨ判定）。CLAUDE.md §6・ticket-management.md への反映を実機確認：§4.1 除外の明記あり／逃げ道表現の混入0件／「自動では done にならない・判定主体は秘書」を明示。
+
+## 成果物
+
+（なし — リポジトリ／外部サービス側の更新そのものが成果のため、成果物ファイルなし）
+
+補足（従前の記載）:
+- `/Users/yukinori/Claude Code/ai-company-amazon_buppan/CLAUDE.md` §6 — waiting の定義に「レビュー待ちの期限」と「期限が適用されないもの」を追記、done の定義を更新
+- `/Users/yukinori/Claude Code/ai-company-amazon_buppan/agents/secretary/skills/ticket-management.md` — 「§レビュー待ちの期限判定」を新設（対象／対象外／判定手順／記録の型）
+- `/Users/yukinori/Claude Code/ai-company-amazon_buppan/agents/content_creator/memory/source-fidelity-in-rule-writing.md` — 追記（承認がある場合の書き方）

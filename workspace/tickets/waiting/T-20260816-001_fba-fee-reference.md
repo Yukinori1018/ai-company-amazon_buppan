@@ -34,3 +34,10 @@ related_tickets:
 ## ログ
 
 - 2026-08-21 frontmatter修復（マリエ）: assignee=researcher を補完（`id:`→`ticket_id:` / `owner:`→`assignee:` へテンプレ準拠に統一）
+
+## 成果物
+
+- 📁 **[T-20260816-001/](../../output/deliverables/T-20260816-001/)** — 成果物フォルダ（2件）
+  - [`fba-fee-reference.html`](../../output/deliverables/T-20260816-001/fba-fee-reference.html) — FBA料金 完全リファレンス＋早見表＋商品シミュレーション（15.0KB）
+  - [`storage-fee-risk.html`](../../output/deliverables/T-20260816-001/storage-fee-risk.html) — FBA保管料リスク・シミュレーション（売れ残り期間別）（11.0KB）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260816-001/`

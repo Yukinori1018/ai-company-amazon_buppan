@@ -48,11 +48,6 @@ parent_ticket: T-20260904-004
 - ただし「念のため全部除外」も害がある。**最大の除外項目を根拠なく維持すると、母数が回復しない。**
   危険な条件を特定して、そこだけ落とす形を目指すこと。
 
-## 成果物
-
-`workspace/output/deliverables/T-20260908-001/` に md + HTML。
-機械判定できる条件は、そのまま実装に渡せる形（判定式・キーワード・例外）で書くこと。
-
 ## ログ
 
 - 2026-09-08 起票（カズヨ）。社長が A（法務判定を取る）を選択。
@@ -68,16 +63,6 @@ parent_ticket: T-20260904-004
 - 2026-09-08 Amazon 側を調査。**求められる書類（届出書の写し・自主検査記録・適合性検査証明書）は転売者が原理的に持っていない**。登録時にも事後にも来る。制限対象商品違反は180日2件で停止。→「適法でも出品できない」は実在の除外理由と認定。
 - 2026-09-08 現行 #1 を母数26,942件に当てて実測。**5,136件の発火のうち3,431件（67%）は他ルールでも落ちており、#1 が支えていたのは1,705件**だった。v2（3レーン）に置き換えると発注候補まで戻るのは **42件（すべて照明系）**。乾電池駆動レーンは母数181件が戻るが発注候補は0件。
 - 2026-09-08 反例テスト（06）全通過。「LED付き扇風機」が REVIEW に化けないことを含む。
-
-## 成果物
-
-- workspace/output/deliverables/T-20260908-001/README.md
-- workspace/output/deliverables/T-20260908-001/01_電気用品PSEの全面除外を見直せるか_法務判定.md
-- workspace/output/deliverables/T-20260908-001/02_電気用品PSEの全面除外を見直せるか_法務判定.html
-- workspace/output/deliverables/T-20260908-001/03_pse_rules_v2.json
-- workspace/output/deliverables/T-20260908-001/04_pse_rule_v2.py
-- workspace/output/deliverables/T-20260908-001/05_measure_v2_impact.py
-- workspace/output/deliverables/T-20260908-001/06_tests_pse_rule_v2.py
 
 ## 完了報告
 
@@ -113,3 +98,19 @@ parent_ticket: T-20260904-004
 **当職が自主的に見つけた欠陥が3件あり、指摘より多い**ことは正直に書いておきます。特にCは「新しい規則を1本足したせいで、既存の判断が静かに失われた」という、T-20260904-004 でも一度やった**同じ形の失敗**です。テストが無ければ気づけていません。
 
 **社長判断が要る点は変わりません**（42件をいつ買うか。推奨はアカウント復活後）。今回の修正は判定精度の話に限られ、**発注可否の結論は動いていません。**
+
+## 成果物
+
+- 📁 **[T-20260908-001/](../../output/deliverables/T-20260908-001/)** — 成果物フォルダ（7件）
+  - [`01_電気用品PSEの全面除外を見直せるか_法務判定.md`](../../output/deliverables/T-20260908-001/01_電気用品PSEの全面除外を見直せるか_法務判定.md) — 電気用品（PSE）の全面除外を見直せるか — 法務判定（40.6KB）
+  - [`02_電気用品PSEの全面除外を見直せるか_法務判定.html`](../../output/deliverables/T-20260908-001/02_電気用品PSEの全面除外を見直せるか_法務判定.html) — 電気用品（PSE）の全面除外を見直せるか — 法務判定 / T-20260908-001（49.5KB）
+  - [`03_pse_rules_v2.json`](../../output/deliverables/T-20260908-001/03_pse_rules_v2.json) — JSONデータ（19.8KB）
+  - [`04_pse_rule_v2.py`](../../output/deliverables/T-20260908-001/04_pse_rule_v2.py) — 複合語なら文脈は要求しない（「デスクランプ」は単体で光源）（7.0KB）
+  - [`05_measure_v2_impact.py`](../../output/deliverables/T-20260908-001/05_measure_v2_impact.py) — 後段フィルタの閾値。T-20260904-004 の budget_filter / build_order_sets と同じ値（4.8KB）
+  - [`06_tests_pse_rule_v2.py`](../../output/deliverables/T-20260908-001/06_tests_pse_rule_v2.py) — dataclass は cls.__module__ を sys.modules から引くため、exec 前に登録しておく（8.8KB）
+  - [`README.md`](../../output/deliverables/T-20260908-001/README.md) — T-20260908-001 成果物インデックス（2.8KB）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260908-001/`
+
+補足（従前の記載）:
+- `workspace/output/deliverables/T-20260908-001/` に md + HTML。
+- 機械判定できる条件は、そのまま実装に渡せる形（判定式・キーワード・例外）で書くこと。

@@ -96,3 +96,12 @@ related_tickets:
 - 2026-08-21 社長の確認3点を回答受領（副業／カードあり／開業日8-20）→ 確定版ワークシートを納品。マネーフォワード公式サポートで画面遷移を確認。**青色の締切=2026-10-20**を明示。カタログ追記・Notion更新済
 - 2026-08-21 **社長が提出完了**。生成PDFを全ページ実物確認しチェック7項目合格 → done へ移動。受信通知の保存は T-20260821-011 へ引き継ぎ
 - 2026-08-22 社長より**e-Taxへの送信完了**の報告。受信通知の確認はe-Taxが土日とも終日メンテのため8/24(月)8:30以降へ持ち越し。マネーフォワードのログインは satoyselect@gmail.com（メモリ `reference_business_accounts` に記録）
+
+## 成果物
+
+- 📁 **[T-20260820-002/](../../output/deliverables/T-20260820-002/)** — 成果物フォルダ（4件）
+  - [`kaigyo-todoke-guide.html`](../../output/deliverables/T-20260820-002/kaigyo-todoke-guide.html) — 開業届の提出 実務ガイド（Satoy Select）（25.2KB）
+  - [`kaigyo-todoke-guide.md`](../../output/deliverables/T-20260820-002/kaigyo-todoke-guide.md) — 開業届の提出 実務ガイド（Satoy Select）（20.3KB）
+  - [`kaigyo-todoke-worksheet.html`](../../output/deliverables/T-20260820-002/kaigyo-todoke-worksheet.html) — 開業届 提出ワークシート（Satoy Select）（14.9KB）
+  - [`kaigyo-todoke-worksheet.md`](../../output/deliverables/T-20260820-002/kaigyo-todoke-worksheet.md) — 開業届 提出ワークシート（この1枚を見ながら入力してください）（9.3KB）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260820-002/`

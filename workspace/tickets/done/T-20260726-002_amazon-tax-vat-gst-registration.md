@@ -40,11 +40,6 @@ related_tickets: [T-20260715-001, T-20260603-003]
 ## ログ
 - 2026-07-26 経理ハジメ: 確認シート作成完了（md + html）。WebSearchで2026時点の最新（令和8年度税制改正: 個人は2割特例が令和8年分で終了→令和9・10年は3割特例に移行、免税事業者からの仕入経過措置は2026/10から80%→50%）を反映。事実/推測を区別し、要現物確認項目を明示。税理士確認推奨を全体に明記。
 
-## 成果物
-- workspace/output/deliverables/T-20260726-002/tax-info-setup-checklist.md
-- workspace/output/deliverables/T-20260726-002/tax-info-setup-checklist.html
-- （ローカルセッションのため、社長確認用に `~/Documents/AI Company Outputs/Amazon物販事業/T-20260726-002/` への移し替えはカズヨ判断で。deliverables 直納済み）
-
 ## 完了報告
 経理ハジメより。免税事業者の日本セラー視点で「納税情報セットアップ確認シート」を作成しました。要件5論点すべてカバー済み。
 - 核心: VAT/GST登録番号ページは**空欄でOK**（番号未保有・任意・罰則なし）。手数料消費税の控除メリットは免税では発生しない=控除可否は課税事業者化後の話、と正確に整理。
@@ -54,3 +49,13 @@ related_tickets: [T-20260715-001, T-20260603-003]
 - 制約遵守: 税理士確認推奨を全体明記、フォーム入力は社長本人前提の画面ガイド形式、断定的税額助言は回避。
 - 妥協点/引き継ぎ: Seller Central のログイン必須画面（割賦販売法遵守・消費税表示設定・源泉欄の有無）は「要現物確認」とし断定回避。社長が実物を見て確定する運用。カズヨへ: A/B/C＋推奨は下記要約参照。完了しました。確認お願いします（done への移動はカズヨ）。
 - 2026-08-21 **done へ移動**（カズヨ判定）。T-20260821-007 の棚卸しでマリエが「成果物は納品済みで waiting の札が外れていないだけ」と判定、根拠を確認のうえ受け入れ。社長レビューが必要なら差し戻し可。
+
+## 成果物
+
+- 📁 **[T-20260726-002/](../../output/deliverables/T-20260726-002/)** — 成果物フォルダ（2件）
+  - [`tax-info-setup-checklist.html`](../../output/deliverables/T-20260726-002/tax-info-setup-checklist.html) — Amazon 納税情報セットアップ確認シート（免税事業者・日本セラー向け）（18.7KB）
+  - [`tax-info-setup-checklist.md`](../../output/deliverables/T-20260726-002/tax-info-setup-checklist.md) — Amazon 納税情報セットアップ確認シート（免税事業者・日本セラー向け）（14.2KB）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260726-002/`
+
+補足（従前の記載）:
+- （ローカルセッションのため、社長確認用に `~/Documents/AI Company Outputs/Amazon物販事業/T-20260726-002/` への移し替えはカズヨ判断で。deliverables 直納済み）

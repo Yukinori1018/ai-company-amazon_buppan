@@ -63,3 +63,37 @@ related_tickets: [T-20260703-001, T-20260521-005, T-20260606-001]
 - 2026-07-05 密度実測PDCA一周完遂（1周目・235件）。Yahoo/NETSEA×Keepaで実スキャン→検証で罠を除去→A4納品。waiting経由後、社長FBで2周目へ。
 - 2026-07-06 2周目完遂（2,000件・逆順サンプリング）。クリーン流動性原石47件/対突合5.3%。前回のBuy Box測定ミスを訂正。新規スプレッドシート＋A4訂正版納品。**waiting=社長レビュー待ち**へ。§4.1該当なし（調査のみ）。
 - 2026-08-21 **done へ移動**（カズヨ判定）。T-20260821-007 の棚卸しでマリエが「成果物は納品済みで waiting の札が外れていないだけ」と判定、根拠を確認のうえ受け入れ。社長レビューが必要なら差し戻し可。
+
+## 成果物
+
+- 📁 **[T-20260705-001/](../../output/deliverables/T-20260705-001/)** — 成果物フォルダ（29件）
+  - [`README.md`](../../output/deliverables/T-20260705-001/README.md) — T-20260705-001 — 原石密度の実測（インデックス）（3.4KB）
+  - [`SOURCE.md`](../../output/deliverables/T-20260705-001/SOURCE.md) — 出所カード — T-20260705-001（原石密度の実測）（2.8KB）
+  - [`build_research_gsheet.py`](../../output/deliverables/T-20260705-001/build_research_gsheet.py) — エクセル(原石密度_リサーチデータ_2000件.xlsx)の全タブをそのまま新規Googleスプレッドシートへ。 サービスアカウント(セッションシート用の既存鍵（3.3KB）
+  - [`build_spreadsheet.py`](../../output/deliverables/T-20260705-001/build_spreadsheet.py) — リサーチデータ(density_v2)を新規スプレッドシート(.xlsx)に表形式でまとめる。 タブ構成: 1. 全データ : スキャン全行（Amazon条件抽（10.1KB）
+  - [`buy_shortlist.csv`](../../output/deliverables/T-20260705-001/buy_shortlist.csv) — 47行 × 13列（採否・除外理由・商品名(Amazon)・asin ほか）（13.8KB）
+  - [`buy_shortlist_amazon.csv`](../../output/deliverables/T-20260705-001/buy_shortlist_amazon.csv) — 47行 × 14列（採否・除外理由・商品名(Amazon)・asin ほか）（15.6KB）
+  - [`density_scan.py`](../../output/deliverables/T-20260705-001/density_scan.py) — 原石密度の実測ハーネス（T-20260705-001）。 問い: 電脳せどりは事業になるか＝「仕入れ値とAmazon価格の差で稼げる商品(原石)」が 母集団のう（8.3KB）
+  - [`density_scan_results.csv`](../../output/deliverables/T-20260705-001/density_scan_results.csv) — 235行 × 16列（jan・name・source・amazon ほか）（49.2KB）
+  - [`density_scan_v2.py`](../../output/deliverables/T-20260705-001/density_scan_v2.py) — 原石密度の実測ハーネス v2（T-20260705-001・2周目）。 サトルのナレッジ精査で判明した「プロの逆順」で測り直す： Amazon側でPoiPoi標（12.8KB）
+  - [`density_summary.json`](../../output/deliverables/T-20260705-001/density_summary.json) — JSONデータ（187B）
+  - [`density_v2_gems_liquidity.csv`](../../output/deliverables/T-20260705-001/density_v2_gems_liquidity.csv) — 188行 × 17列（asin・category・jan・amazon_price ほか）（32.2KB）
+  - [`density_v2_results.csv`](../../output/deliverables/T-20260705-001/density_v2_results.csv) — 1999行 × 15列（asin・category・jan・amazon_price ほか）（311.0KB）
+  - [`density_v2_summary.json`](../../output/deliverables/T-20260705-001/density_v2_summary.json) — JSONデータ（1.4KB）
+  - [`netsea_run.log`](../../output/deliverables/T-20260705-001/netsea_run.log) — 実行ログ（2.3KB）
+  - [`netsea_scan.py`](../../output/deliverables/T-20260705-001/netsea_scan.py) — NETSEA卸起点の原石密度＋JAN網羅率の実測（T-20260705-001 二本目）。 卸(NETSEA)は「構造的な差」が出やすいと言われる本命経路。ただ（5.7KB）
+  - [`netsea_scan_results.csv`](../../output/deliverables/T-20260705-001/netsea_scan_results.csv) — 269行 × 10列（jan・name・amazon・asin ほか）（31.2KB）
+  - [`netsea_summary.json`](../../output/deliverables/T-20260705-001/netsea_summary.json) — JSONデータ（194B）
+  - [`populate_research_gsheet.py`](../../output/deliverables/T-20260705-001/populate_research_gsheet.py) — 社長が共有済みの空Googleシートへ、エクセルの全タブ（全2,000行）をそのまま投入する。 各データタブに「Amazonページ」リンク列（https://w（3.0KB）
+  - [`scan_run.log`](../../output/deliverables/T-20260705-001/scan_run.log) — 実行ログ（5.4KB）
+  - [`scan_v2_progress.log`](../../output/deliverables/T-20260705-001/scan_v2_progress.log) — 実行ログ（13.8KB）
+  - [`scan_v2_run.log`](../../output/deliverables/T-20260705-001/scan_v2_run.log) — 実行ログ（14.0KB）
+  - [`vetting_filter.py`](../../output/deliverables/T-20260705-001/vetting_filter.py) — 罠フィルタ本番リサーチ（T-20260706-001）。 原石密度2周目のクリーン原石を入口に、Act①の罠フィルタを実装して精査し、 "小さく本番投入できる買（7.5KB）
+  - [`原石密度_リサーチデータ_2000件.xlsx`](../../output/deliverables/T-20260705-001/原石密度_リサーチデータ_2000件.xlsx) — Excel（229.4KB）
+  - [`原石密度_実測PDCA_サマリ.html`](../../output/deliverables/T-20260705-001/原石密度_実測PDCA_サマリ.html) — 原石密度の実測PDCA（7.9KB）
+  - [`原石密度_実測PDCA_サマリ.md`](../../output/deliverables/T-20260705-001/原石密度_実測PDCA_サマリ.md) — 電脳せどりは事業になるか — 原石密度の実測PDCA（A4一枚）（5.3KB）
+  - [`原石密度_実測PDCA_サマリ.pdf`](../../output/deliverables/T-20260705-001/原石密度_実測PDCA_サマリ.pdf) — PDF（785.7KB）
+  - [`原石密度_実測PDCA_サマリ_v2_2000件.html`](../../output/deliverables/T-20260705-001/原石密度_実測PDCA_サマリ_v2_2000件.html) — 原石密度の実測PDCA v2（2,000件）（7.7KB）
+  - [`原石密度_実測PDCA_サマリ_v2_2000件.md`](../../output/deliverables/T-20260705-001/原石密度_実測PDCA_サマリ_v2_2000件.md) — 電脳せどりは事業になるか — 原石密度の実測PDCA【v2・2,000件・訂正版】（5.9KB）
+  - [`原石密度_実測PDCA_サマリ_v2_2000件.pdf`](../../output/deliverables/T-20260705-001/原石密度_実測PDCA_サマリ_v2_2000件.pdf) — PDF（849.7KB）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260705-001/`

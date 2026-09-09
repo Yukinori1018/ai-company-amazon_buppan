@@ -18,12 +18,6 @@ next_check_at: 2026-06-02
 T-20260601-003 で整備した書き込み連携（Apps Script Web App）が、**新しい成果物が出たときに
 カタログへ行を追加 → 同一URLのシートへ反映**まで一気通貫で回ることを、実際の成果物で実証する。
 
-## 成果物
-
-- **連携方法まとめ**（このテストの題材かつ実際のドキュメント）:
-  `workspace/output/deliverables/T-20260601-004/sheets-integration-summary.md`（＋ `.html`）
-  - 内容＝今回の Google スプレッドシート連携の仕組み・構成・運用・トラブルシュートのまとめ。
-
 ## テスト手順（実証）
 
 1. 上記まとめ（md/html）を作成。
@@ -48,3 +42,14 @@ T-20260601-003 で整備した書き込み連携（Apps Script Web App）が、*
 ## ログ
 
 - 2026-06-01 起票。社長依頼で連携の実地テストを実施 → 上記手順で実証し合格。**done**。
+
+## 成果物
+
+- 📁 **[T-20260601-004/](../../output/deliverables/T-20260601-004/)** — 成果物フォルダ（2件）
+  - [`sheets-integration-summary.html`](../../output/deliverables/T-20260601-004/sheets-integration-summary.html) — 成果物カタログ × Google スプレッドシート連携方法まとめ（6.9KB）
+  - [`sheets-integration-summary.md`](../../output/deliverables/T-20260601-004/sheets-integration-summary.md) — （＋ `.html`）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260601-004/`
+
+補足（従前の記載）:
+- **連携方法まとめ**（このテストの題材かつ実際のドキュメント）:
+- 内容＝今回の Google スプレッドシート連携の仕組み・構成・運用・トラブルシュートのまとめ。

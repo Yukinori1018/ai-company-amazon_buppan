@@ -73,16 +73,6 @@ related_tickets: [T-20260821-001, T-20260821-004, T-20260811-001, T-20260812-001
 秘書の仮説5点は同格ではなく、**真因2（#2 ルール不在・#3 プル型依存）＋ 増幅要因3（#1 gitignore・#4 責務未登録・#5 受け皿未定義）**に分かれます。
 特に #1 を単独原因と誤認しないこと（Git 追跡下でも、片付けルールが無ければ「差分に出るが誰も片付けないファイル」になるだけ）。
 
-## 成果物
-
-- workspace/output/deliverables/T-20260821-009/README.md（インデックス・30秒サマリ）
-- workspace/output/deliverables/T-20260821-009/01_原因究明レポート.md
-- workspace/output/deliverables/T-20260821-009/02_棚卸し結果一覧.md
-- workspace/output/deliverables/T-20260821-009/03_レポート.html（**社長はこれ1本でOK**）
-- docs/reference/fba-prep-center/（発掘した比較表：原本xlsx＋テキスト版＋索引README）
-- agents/general_affairs/skills/inbox-intake.md（新設・手順書）
-- agents/general_affairs/memory/knowledge_inbox_operation.md（新設・事故の記録）
-
 ## 秘書への引き継ぎ事項
 
 ### Notion 同期（カズヨ担当）
@@ -142,3 +132,17 @@ related_tickets: [T-20260821-001, T-20260821-004, T-20260811-001, T-20260812-001
 - 削除はゼロです。社長の体感する「片付いた感」は容量では出ませんが、今回の問題は「重い」ことではなく「行き先が決まっていない」ことでした。指標を Before/After の件数側に寄せています。
 
 **引き継ぎ**: 上記の Notion 同期3件と社長判断3件。特に **T-20260817-006 の③評価は事実関係が変わっています**ので、社長報告の際に触れていただくのが良いと思います。
+
+## 成果物
+
+- 📁 **[T-20260821-009/](../../output/deliverables/T-20260821-009/)** — 成果物フォルダ（4件）
+  - [`01_原因究明レポート.md`](../../output/deliverables/T-20260821-009/01_原因究明レポート.md) — `_inbox_社長共有` 運用崩れ — 原因究明レポート（16.3KB）
+  - [`02_棚卸し結果一覧.md`](../../output/deliverables/T-20260821-009/02_棚卸し結果一覧.md) — `_inbox_社長共有` 棚卸し結果一覧（全21件）（7.9KB）
+  - [`03_レポート.html`](../../output/deliverables/T-20260821-009/03_レポート.html) — （**社長はこれ1本でOK**）
+  - [`README.md`](../../output/deliverables/T-20260821-009/README.md) — （インデックス・30秒サマリ）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260821-009/`
+
+補足（従前の記載）:
+- docs/reference/fba-prep-center/（発掘した比較表：原本xlsx＋テキスト版＋索引README）
+- agents/general_affairs/skills/inbox-intake.md（新設・手順書）
+- agents/general_affairs/memory/knowledge_inbox_operation.md（新設・事故の記録）

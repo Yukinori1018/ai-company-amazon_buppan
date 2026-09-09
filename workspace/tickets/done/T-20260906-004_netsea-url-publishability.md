@@ -35,10 +35,6 @@ parent_ticket: T-20260904-004
 **現行ガードの評価: 保護効果ゼロ。**同一URLを含む md 版は既に公開済み（99593dc）で、片方を止めても公開状態は変わらない。
 誤検知が続けばバイパスが常態化するため、法務としては**危険側**と評価。
 
-## 成果物
-
-`workspace/output/deliverables/T-20260906-004/`（commit `dabc15c`）
-
 ## 未了（社長判断待ち → owner-tasks.md）
 
 - ガードの印の差し替え（A 勧告どおり／B 現状維持／C 全部黒）。実装は IT エンジニア案件
@@ -50,3 +46,13 @@ parent_ticket: T-20260904-004
 - 2026-09-06 ハルオの走行に対しセキュリティ警告が1件出た。カズヨが commit 内容を監査し、
   **フックは改変されておらず、成果物に卸値の数値は0件**であることを確認済み。
   非ログインでの NETSEA ページ多数取得（実機確認）が原因と見られる。
+
+## 成果物
+
+- 📁 **[T-20260906-004/](../../output/deliverables/T-20260906-004/)** — 成果物フォルダ（2件）
+  - [`01_NETSEA商品URLの公開可否_法務判定.html`](../../output/deliverables/T-20260906-004/01_NETSEA商品URLの公開可否_法務判定.html) — NETSEA 商品URLの公開可否 — 法務判定（T-20260906-004）（23.7KB）
+  - [`01_NETSEA商品URLの公開可否_法務判定.md`](../../output/deliverables/T-20260906-004/01_NETSEA商品URLの公開可否_法務判定.md) — NETSEA 商品URL を PUBLIC リポに載せてよいか — 法務判定（19.0KB）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260906-004/`
+
+補足（従前の記載）:
+- `workspace/output/deliverables/T-20260906-004/`（commit `dabc15c`）

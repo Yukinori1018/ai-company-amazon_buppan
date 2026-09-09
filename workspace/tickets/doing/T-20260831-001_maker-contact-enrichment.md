@@ -71,15 +71,6 @@ Phase C の骨格が完成し、動く状態です。**外部アクセスは1回
 
 - 2026-08-31 タカシ: Phase C 骨格実装。正規化/分類・共通スキーマ・resolver プラグイン・優先順位マージ・スロットリング・冪等/再開・逐次保存を実装。テスト65件 green。`contacts_v1.csv` 初版（822行）出力。名寄せ取りこぼし12ペアを検出（実体810社）。行は畳まず報告のみ。
 
-## 成果物
-
-- workspace/output/deliverables/T-20260831-001/README.md
-- workspace/output/deliverables/T-20260831-001/contacts_v1.csv （822行 × 15列・初期版）
-- workspace/output/deliverables/T-20260831-001/run.py
-- workspace/output/deliverables/T-20260831-001/pipeline/ （正規化・スキーマ・マージ・スロットル・保管・runner・resolvers）
-- workspace/output/deliverables/T-20260831-001/tests/ （65件）
-- workspace/output/deliverables/T-20260831-001/state/ （records.jsonl / STATUS.json）
-
 ## 完了報告（Phase C 骨格分・タカシ → カズヨ）
 
 **完成度**: 依頼された骨格は全部入っています。今日から `python3 run.py` で動き、再実行しても処理済みは飛ばします。テスト65件 green。
@@ -106,11 +97,6 @@ Phase C の骨格が完成し、動く状態です。**外部アクセスは1回
 
 - 2026-08-31 法務ハルオ: Phase B 完了。一次情報を WebFetch/curl/e-Gov API で取得（Amazon利用規約 nodeId=643006、amazon.co.jp robots.txt 全491行、Google robots.txt、Google利用規約、国税庁Web-API規約、gBizINFO本体規約＋API規約、Musubu利用規約、著作権法30条の4/47条の5、個人情報保護法2/17/18/20/21/27条、特定電子メール法3/4/7/34/35/37条＋施行規則3条、刑法233/234条の2）。
 - 2026-08-31 法務ハルオ: Phase C が commit 1e1840e で納品済みの `contacts_v1.csv`（822行）を全数実査。**埋まっているのは14行のみ・すべて法人の公表窓口・個人名メール0件・代表者氏名0件のため、現状の PUBLIC リポ commit は個人情報保護法上の問題なし。取り下げ不要**と判定（判定書 §8-5）。ただし埋まり始めた時点で書き出しゲートが必要。
-
-## 成果物
-
-- workspace/output/deliverables/T-20260831-001/B_連絡先収集の適法性判定.md
-- workspace/output/deliverables/T-20260831-001/B_連絡先収集の適法性判定.html
 
 ## 完了報告（Phase B / 法務ハルオ → 秘書カズヨ）
 
@@ -218,3 +204,20 @@ gBizINFO の `company_url` 充足率・利用料の公式明記・日次上限�
   - API の叩き方は総当たりで否定済み：v1 / v1beta / v1alpha、12モデル × ツール名3変種＝**39通り全滅**。
   - 開通監視は継続中（PID 26989・15分間隔・最大8時間）。開通したら `grounding_watch.log.OPEN` を作る。
 - 2026-08-31 17:33 **約束の中間確認（cron 自動起動）。Gemini の検索グラウンディングは未開通。** 監視16回・全て HTTP 429、その場の実測も 429。監視プロセス（PID 31182）は稼働中で、**9/1 22:00 まで30分間隔で継続**。月次リセットは日本時間 9/1 17:00 想定のため、判断は明日まで持ち越し（社長は既に「待つ」と決定済み）。
+
+## 成果物
+
+- 📁 **[T-20260831-001/](../../output/deliverables/T-20260831-001/)** — 成果物フォルダ（12件）
+  - [`A_data`](../../output/deliverables/T-20260831-001/A_data/) — フォルダ（4件）
+  - [`A_連絡先取得手段の棚卸し.html`](../../output/deliverables/T-20260831-001/A_連絡先取得手段の棚卸し.html) — A：メーカー連絡先の取得手段 棚卸し（T-20260831-001）（42.1KB）
+  - [`A_連絡先取得手段の棚卸し.md`](../../output/deliverables/T-20260831-001/A_連絡先取得手段の棚卸し.md) — A：メーカー連絡先の取得手段 棚卸し（30.2KB）
+  - [`B_連絡先収集の適法性判定.html`](../../output/deliverables/T-20260831-001/B_連絡先収集の適法性判定.html) — B. メーカー822社 連絡先収集 — 手段別 適法性判定 | T-20260831-001（59.9KB）
+  - [`B_連絡先収集の適法性判定.md`](../../output/deliverables/T-20260831-001/B_連絡先収集の適法性判定.md) — B. メーカー822社 連絡先収集 — 手段別 適法性判定（47.6KB）
+  - [`README.md`](../../output/deliverables/T-20260831-001/README.md) — T-20260831-001 成果物インデックス（6.5KB）
+  - [`commit_gate.py`](../../output/deliverables/T-20260831-001/commit_gate.py) — : **重要な穴だった点。** contacts_v1.csv には entity_type 列が無い（schema.ContactFields に（8.0KB）
+  - [`contacts_v1.csv`](../../output/deliverables/T-20260831-001/contacts_v1.csv) — （822行 × 15列・初期版）
+  - [`pipeline`](../../output/deliverables/T-20260831-001/pipeline/) — （正規化・スキーマ・マージ・スロットル・保管・runner・resolvers）
+  - [`run.py`](../../output/deliverables/T-20260831-001/run.py) — スクリプト（2.2KB）
+  - [`state`](../../output/deliverables/T-20260831-001/state/) — （records.jsonl / STATUS.json）
+  - [`tests`](../../output/deliverables/T-20260831-001/tests/) — （65件）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260831-001/`

@@ -44,3 +44,18 @@ labels: [research, simulation, foundation, learning]
 
 **納品済みのシミュレーション資料（playbook-final）に目を通し、一言フィードバックをください。** 問題なければ done にします。
 - 2026-08-21 next_check_at=2026-08-24 を付与（マリエ／T-20260821-005）: 納品済・社長レビュー待ち。初回FBA納品が近づき再浮上する内容のため今週中
+
+## 成果物
+
+- 📁 **[T-20260521-002/](../../output/deliverables/T-20260521-002/)** — 成果物フォルダ（10件）
+  - [`SOURCE.md`](../../output/deliverables/T-20260521-002/SOURCE.md) — 出所カード — 仕入れ先一覧（サトルの手集め）（1.5KB）
+  - [`accounting-simulation.md`](../../output/deliverables/T-20260521-002/accounting-simulation.md) — 仕入れ〜販売シミュレーション（経理ハジメ担当範囲）（23.6KB）
+  - [`legal-fba-compliance.md`](../../output/deliverables/T-20260521-002/legal-fba-compliance.md) — Amazon FBA 出品 — 法務コンプライアンス・マトリクス（26.8KB）
+  - [`playbook-final.html`](../../output/deliverables/T-20260521-002/playbook-final.html) — Amazon物販 仕入れ〜販売 完全プレイブック（FBA・小口・予算10万円） — T-20260520-008（49.9KB）
+  - [`playbook-final.md`](../../output/deliverables/T-20260521-002/playbook-final.md) — Amazon物販 仕入れ〜販売 完全プレイブック（FBA・小口・予算10万円）（37.3KB）
+  - [`purchase-log-template.csv`](../../output/deliverables/T-20260521-002/purchase-log-template.csv) — 1行 × 17列（﻿仕入れ日・仕入れ先名・カテゴリ番号・商品名 ほか）（495B）
+  - [`restricted-categories.csv`](../../output/deliverables/T-20260521-002/restricted-categories.csv) — 25行 × 6列（﻿カテゴリ・制限内容・必要免許・申請・関連法令 ほか）（6.7KB）
+  - [`simulation-numbers.csv`](../../output/deliverables/T-20260521-002/simulation-numbers.csv) — 10行 × 20列（﻿商品・ジャンル・シナリオ・仕入単価_円 ほか）（1.8KB）
+  - [`suppliers-list.csv`](../../output/deliverables/T-20260521-002/suppliers-list.csv) — 30行 × 11列（﻿カテゴリ番号・カテゴリ名・仕入れ先名・URL ほか）（6.7KB）
+  - [`suppliers-list.md`](../../output/deliverables/T-20260521-002/suppliers-list.md) — Amazon物販 — 仕入れ先カタログ「ときめき仕入れ帳」（20.5KB）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260521-002/`

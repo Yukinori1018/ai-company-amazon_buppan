@@ -76,16 +76,6 @@ related_tickets: [T-20260531-002, T-20260603-003, T-20260826-001]
 - **既存メモリを1件訂正**: VTR のしきい値は「1,000円超」ではなく**「2,000円以上の注文」**。auto-memory の `knowledge_account_health_suspension` を修正済み。
 - **戦略判断は入れていません**。実行順序・優先度・小口/大口の切替タイミング・FBM混在の可否は、末尾「ここから先はタケシの領分です」に論点4件として整理しました。
 
-## 成果物
-
-- workspace/output/deliverables/T-20260826-002/README.md
-- workspace/output/deliverables/T-20260826-002/01_master-todo.md
-- workspace/output/deliverables/T-20260826-002/01_master-todo.html
-- workspace/output/deliverables/T-20260826-002/02_lifecycle-checklist.md（サトル分）
-- workspace/output/deliverables/T-20260826-002/03_process-board.html（Mermaid図3枚 / Artifact: https://claude.ai/code/artifact/094cf3f3-c334-40e6-9dc0-271149b99160）
-
-Notion カード: https://app.notion.com/p/3c8b0a4044fa81d6a93af47227aab304
-
 ## 完了報告（ヒデアキ → カズヨ）
 
 サトルの標準チェックリスト（8大項目 / 42中項目 / 208小項目）を骨格に、マリエのチケット台帳103枚を突き合わせ、進捗マーク付きのマスターToDoリストを納品しました。
@@ -133,3 +123,16 @@ Notion カード: https://app.notion.com/p/3c8b0a4044fa81d6a93af47227aab304
   - **判定基準の明文化**: 「根拠IDはチケット本文に記述があることを確認してから書く。無ければ `〔memory: …〕`」「集計を書き換えたら awk の出力をそのまま貼る（今回チケット本文だけ 49/43/116 が残った）」を `judgement.md` へ。
 - 2026-08-31 タカシ: **既存成果物への影響ゼロを確認**。実装後に prepare → build を通し、`01_master-todo.html` と `03_process-board.html` が更新前と**バイト一致**（diff 差分なし）。Mermaid の線の描き分け・ズームボタン・縦積みレイアウトは無変更。検算は 7項目すべて OK、警告 9件（NG なし）＝**今の成果物は新しい検算を通る**。
 - 2026-08-31 タカシ: わざと壊した入力6通り（実在しないID／存在しない memory／日付凍結／`更新:` 行の欠落／ハッシュ不一致／索引なし）で NG が出ることを確認済み。
+
+## 成果物
+
+- 📁 **[T-20260826-002/](../../output/deliverables/T-20260826-002/)** — 成果物フォルダ（5件）
+  - [`01_master-todo.html`](../../output/deliverables/T-20260826-002/01_master-todo.html) — Amazon物販 マスターToDoリスト｜T-20260826-002（316.5KB）
+  - [`01_master-todo.md`](../../output/deliverables/T-20260826-002/01_master-todo.md) — Amazon物販 マスターToDoリスト（登録 → 仕入れ → 出品 → 納品 → 販売 → クレーム対応）（77.0KB）
+  - [`02_lifecycle-checklist.md`](../../output/deliverables/T-20260826-002/02_lifecycle-checklist.md) — （サトル分）
+  - [`03_process-board.html`](../../output/deliverables/T-20260826-002/03_process-board.html) — （Mermaid図3枚 / Artifact: https://claude.ai/code/artifact/094cf3f3-c334-40e6-9dc0-271149b99160）
+  - [`README.md`](../../output/deliverables/T-20260826-002/README.md) — T-20260826-002 成果物インデックス（2.3KB）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260826-002/`
+
+補足（従前の記載）:
+- Notion カード: https://app.notion.com/p/3c8b0a4044fa81d6a93af47227aab304

@@ -266,6 +266,7 @@ todo → doing → waiting → done
 
 **運用の要点**
 
+- **成果物は ① に直納し、その場で `git commit` したうえで、チケット末尾の `## 成果物` 節から必ずリンクする**（2026-09-09 社長指示）。置いただけではチケットから辿れない。形式は [agents/secretary/skills/ticket-management.md](agents/secretary/skills/ticket-management.md) §`## 成果物` 節の運用。
 - **成果物は ① に直納し、その場で `git commit` する。** ② は `.gitignore` 対象で、worktree が消えると成果物ごと消失します（実際に消失させた前例あり）。「あとでコピーする」は必ず忘れます。
 - **社長の閲覧口は ① へのシンボリックリンク。** `~/Documents/AI Company Outputs/Amazon物販事業` → `workspace/output/deliverables` を張ってあるので、Finder のブックマークは従来どおり使えます。**リンクの先は①そのもの**であり、コピーではありません。手でファイルを置きに行く作業はもう不要です。
 - **③ には README.md を必ず添える。** 何が入っているか・なぜリポ外なのか・どのチケット由来かを書きます。③ は Git 管理外＝バックアップされません。

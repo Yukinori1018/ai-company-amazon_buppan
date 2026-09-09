@@ -61,3 +61,13 @@ deadline: 2026-05-23
 - 2026-05-21 社長提供 YouTube 情報: カズくん = 物販ONE @kazu-keio（慶應卒・年商10億円）→ Amazak（株式会社JACKALL）とは **別組織** の可能性高
 - 2026-05-21 **社長最終判断: アマジャック（Amazak）に一度無料入会する**。金銭発生時点で即退会の方針。秘書側は防御策の徹底＋30日/60日後の再点検チケット起票で対応 → 本チケットは社長判断完了で **モニタリング相** へ移行
 - 2026-05-25 社長判断完了済・再点検チケット（T-20260521-006 30日後／T-20260521-007 60日後）起票済のため、本チケットは doing → done。以後の監視は再点検チケットで継続。
+
+## 成果物
+
+- 📁 **[T-20260521-003/](../../output/deliverables/T-20260521-003/)** — 成果物フォルダ（5件）
+  - [`accounting-amajack-review.md`](../../output/deliverables/T-20260521-003/accounting-amajack-review.md) — Ama-Jack 無料コミュニティ 経理票（17.5KB）
+  - [`general-affairs-amajack-review.md`](../../output/deliverables/T-20260521-003/general-affairs-amajack-review.md) — Ama-Jack（アマジャック）コミュニティ ときめき判定レポート（13.8KB）
+  - [`integrated-summary.md`](../../output/deliverables/T-20260521-003/integrated-summary.md) — T-20260520-006 統合レポート（Ama-Jack 評価・3軸統合）（4.4KB）
+  - [`legal-amajack-review.md`](../../output/deliverables/T-20260521-003/legal-amajack-review.md) — 法務評価書 — Ama-Jack アプリ + 0円コミュニティ 入会リスク評価（18.2KB）
+  - [`owner-supplementary-info.md`](../../output/deliverables/T-20260521-003/owner-supplementary-info.md) — T-006 社長提供情報メモ（2026-05-21）（5.6KB）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260521-003/`

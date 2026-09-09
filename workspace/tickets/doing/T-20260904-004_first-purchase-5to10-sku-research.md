@@ -206,15 +206,6 @@ touch out/STOP                    # 止めたいとき（次の周の頭で停�
 
 - 2026-09-04 C-1〔経理ハジメ〕完了。4前提を実測化。**欠落費目3件を発見**（小口基本成約料110円/点・販売手数料の消費税10%・納品代行12円/点）。逆に納品送料100円/点・雑費3%・保管2.0ヶ月は過大。差し引きの向きは売価5,000円で逆転する。NETSEA送料は `/items` の ship_fee が99.6%空で、実額は `/tariffs`（ITタカシ取得中）。
 
-## 成果物
-
-- workspace/output/deliverables/T-20260904-004/C1_コスト前提_実測版.md
-- workspace/output/deliverables/T-20260904-004/C1_コスト前提_実測版.html
-- workspace/output/deliverables/T-20260904-004/C1_cost_assumptions.json
-- workspace/output/deliverables/T-20260904-004/C1_費目一覧.csv
-- workspace/output/deliverables/T-20260904-004/C1_損益シミュレーション.csv
-- workspace/output/deliverables/T-20260904-004/C1_損益分岐シミュレータ_初回仕入れ.xlsx
-
 ## 完了報告（C-1 / 経理ハジメ → 秘書カズヨ）
 
 **完成度:** 依頼の①②③はすべて実施しました。費目30件のうち〔実測〕11・〔二次情報〕11・〔推定〕6・〔未確認〕2。未確認2件は値を空欄にしています（推測で埋めていません）。
@@ -434,11 +425,6 @@ touch out/STOP                    # 止めたいとき（次の周の頭で停�
 2. **抽出範囲**：フォーム周辺・問い合わせ窓口の注記ブロックに限定。ページ全文検索はしない
 3. **窓口単位で判定**し、`optout_source_url` は窓口URLで記録。最も緩い有効な窓口を採用（リッチェルで実証）
 
-## 成果物
-- workspace/output/deliverables/T-20260904-004/B1L_営業お断り表示への打診可否_法務判定.md
-- workspace/output/deliverables/T-20260904-004/B1L_営業お断り表示への打診可否_法務判定.html
-- workspace/output/deliverables/T-20260904-004/B1L_optout_rules.json
-
 ## 完了報告（B-1L / 法務ハルオ）
 「営業お断り」表示への打診可否について、451社に機械適用できる5段階の判定ルールを納品しました。完成度は高いと考えます。条文（特定電子メール法2条2号・3条・7条・34条、施行規則3条・6条、平成21年総務省令85号、特商法2条3項・26条1項1号・58条の17）と総務省/消費者庁ガイドラインの該当ページを一次情報として引き、すべて 2026-09-04 に e-Gov API／公式PDF から実取得しています。判定ルールは `B1L_optout_rules.json` に機械可読で出しました。散文の表からタカシが読み取る手間を省くためです。
 
@@ -630,11 +616,6 @@ C-2（判定資料の HTML 化）完了。2ファイルを deliverables に直�
 - 「致命的4項目を開いた瞬間に」は、**本文を足さずに実現できる位置が目次しかなかった**ため、目次の該当項目を赤字にする形にした。ファーストビューに要約ボックスは置いていない（置くと本文の言い換えになる）
 - 02 の分類定義（A_PLUS/A/B/C/D/E の意味）は CSV 1行目の注記と各行の値だけから書いた。**法務の定義文書は参照していない**ので、齟齬があれば指摘してほしい
 
-## 成果物
-- workspace/output/deliverables/T-20260904-004/01_初回仕入れ判定_買ってはいけないリストと向くカテゴリ.html
-- workspace/output/deliverables/T-20260904-004/02_メーカー打診候補リスト.html
-- workspace/output/deliverables/T-20260904-004/_build_02_maker_list.py（02 の再生成用。CSV が増えたらこれ1本で最新化）
-
 ## 完了報告
 タスク C-2 完了。01 は draft.md を改変ゼロで機械変換（双方向照合で欠落0・混入0）、02 は CSV 195社を全セル照合（未掲載0）で表示化しました。
 妥協点は2つ。(1)「致命的4項目を開いた瞬間に」は本文追加を避けたため、ファーストビューでは目次の赤字表示にとどめています。
@@ -660,9 +641,6 @@ C-2（判定資料の HTML 化）完了。2ファイルを deliverables に直�
 - 使用番号集合と表の行番号集合が完全一致（欠落0・余分0・昇順）
 
 **未了（担当外）:** `01_初回仕入れ判定_...html` は追記前の draft.md から生成されているため、**HTML の再生成が必要**。HTML はヒデアキ（コンテンツ制作）の担当のため触っていない。
-
-## 成果物
-- workspace/output/deliverables/T-20260904-004/research/draft.md（末尾に「## 出典一覧」88行を追記。既存373行は無変更）
 
 ## 完了報告
 `draft.md` の `[#n]` 出典一覧を末尾に追記しました。88番すべてを1表に収め、本文は無変更（diff で検算済み）。
@@ -712,17 +690,6 @@ C-2（判定資料の HTML 化）完了。2ファイルを deliverables に直�
 - Notion: T-20260904-006 のカードが未作成だったので新規作成（page id `3d1b0a40-44fa-81de-a037-c3854c76045e` / Status=todo / Assignee=it_engineer / ParentTicket=T-20260904-004）
 
 ---
-
-## 成果物
-
-- `workspace/output/deliverables/T-20260904-004/B1_打診候補_全社_優先度順.csv`（399社・全件）
-- `workspace/output/deliverables/T-20260904-004/B1_contacts_top50.csv`（上位50社・D/E除外済み）
-- `workspace/output/deliverables/T-20260904-004/B1_build_top50.py`（ビルド。伏せ字と自己検算を内蔵）
-- `workspace/output/deliverables/T-20260831-001/commit_gate.py`（PUBLIC リポ用ゲート。2件のバグ修正）
-- `workspace/output/deliverables/T-20260831-001/tests/test_commit_gate.py`（新規15件）
-- `workspace/output/deliverables/T-20260831-001/tests/test_negated_trade_window.py`（新規9件）
-- `workspace/output/deliverables/T-20260831-001/pipeline/data/exa_lookups.jsonl`（399エントリ・追記専用）
-- 非公開分: `workspace/output/agent_output/T-20260904-004/B1/HELD_BACK_個人事業主疑い.jsonl`（Git 追跡外）
 
 ## 完了報告
 
@@ -1289,3 +1256,69 @@ Private 化は**しません**。「機密列を GitHub から抜き、完全版
 完了しました。確認をお願いします。
 **妥協点**：①`origin/main` からの消滅はマージ待ちで、私は main を触っていません。②履歴は残ります。③上表の6項目は判断がつかないので残しました。④`.xlsx` は**ゲートで見ていません**（zip 圧縮のため grep が効かない）。今回は手作業で3本を検査し、2本から列を削除しました。
 **§4.1 の確認**：force push・履歴書き換え・ブランチ削除・Private 化・ファイル削除は一切していません。
+
+## 成果物
+
+- 📁 **[T-20260904-004/](../../output/deliverables/T-20260904-004/)** — 成果物フォルダ（54件）
+  - [`01_初回仕入れ判定_買ってはいけないリストと向くカテゴリ.html`](../../output/deliverables/T-20260904-004/01_初回仕入れ判定_買ってはいけないリストと向くカテゴリ.html) — 初回仕入れ判定 — 買ってはいけないリスト／初回に向くカテゴリ（108.9KB）
+  - [`02_メーカー打診候補リスト.html`](../../output/deliverables/T-20260904-004/02_メーカー打診候補リスト.html) — メーカー打診候補リスト（399社・優先度順）（861.7KB）
+  - [`03_初回仕入れ_発注セットと全体まとめ.html`](../../output/deliverables/T-20260904-004/03_初回仕入れ_発注セットと全体まとめ.html) — 初回仕入れ 発注セット B1 と全体まとめ（56.0KB）
+  - [`A3_ネット卸業者_登録可能先リスト.html`](../../output/deliverables/T-20260904-004/A3_ネット卸業者_登録可能先リスト.html) — A-3 ネット卸業者 いま登録できる先のリスト | T-20260904-004（47.8KB）
+  - [`A3_ネット卸業者_登録可能先リスト.md`](../../output/deliverables/T-20260904-004/A3_ネット卸業者_登録可能先リスト.md) — A-3 ネット卸業者 — いま登録できる先のリスト（34.5KB）
+  - [`A4L_古物商許可_輸入卸経由の判定.md`](../../output/deliverables/T-20260904-004/A4L_古物商許可_輸入卸経由の判定.md) — 判定：古物商許可は不要（A案）。初回仕入れ前に19,000円と40日を費やす必要はありません（13.1KB）
+  - [`A5_小口プランとカートボックス_一次情報確認.md`](../../output/deliverables/T-20260904-004/A5_小口プランとカートボックス_一次情報確認.md) — A-5 小口出品プランとカートボックス（おすすめ出品）— 一次情報確認（9.3KB）
+  - [`A_filter_stats.json`](../../output/deliverables/T-20260904-004/A_filter_stats.json) — JSONデータ（505B）
+  - [`A_コスト反映インパクト.md`](../../output/deliverables/T-20260904-004/A_コスト反映インパクト.md) — 経理ハジメの実測コストを反映した結果（IT タカシ / T-20260904-004 A-1・A-2）（8.0KB）
+  - [`A_サプライヤー別サマリ.csv`](../../output/deliverables/T-20260904-004/A_サプライヤー別サマリ.csv) — 1行 × 18列（﻿サプライヤー名・supplier_id・業態・候補SKU数 ほか）（753B）
+  - [`A_初回仕入れ候補_卸レーン.csv`](../../output/deliverables/T-20260904-004/A_初回仕入れ候補_卸レーン.csv) — 1行 × 42列（﻿商品名・Amazon商品名・JAN・ASIN ほか）（1.9KB）
+  - [`A_実測ログ.md`](../../output/deliverables/T-20260904-004/A_実測ログ.md) — A-1 / A-2 実測ログ（IT タカシ）（11.8KB）
+  - [`B1L_optout_rules.json`](../../output/deliverables/T-20260904-004/B1L_optout_rules.json) — JSONデータ（40.9KB）
+  - [`B1L_optout_rules_v1.0_snapshot.json`](../../output/deliverables/T-20260904-004/B1L_optout_rules_v1.0_snapshot.json) — JSONデータ（9.8KB）
+  - [`B1L_v11_selftest_matrix.py`](../../output/deliverables/T-20260904-004/B1L_v11_selftest_matrix.py) — 肯定形が A_PLUS のまま保たれるか（過剰是正の確認）（2.8KB）
+  - [`B1L_v11_selftest_recheck399.py`](../../output/deliverables/T-20260904-004/B1L_v11_selftest_recheck399.py) — スクリプト（6.1KB）
+  - [`B1L_営業お断り表示への打診可否_法務判定.html`](../../output/deliverables/T-20260904-004/B1L_営業お断り表示への打診可否_法務判定.html) — 「営業お断り」表示企業への仕入れ打診 — 法務判定 v1.2（77.9KB）
+  - [`B1L_営業お断り表示への打診可否_法務判定.md`](../../output/deliverables/T-20260904-004/B1L_営業お断り表示への打診可否_法務判定.md) — 「営業・売り込みお断り」表示企業への仕入れ打診 — 法務判定（一般則）（60.6KB）
+  - [`B1_Exa精度測定レポート.md`](../../output/deliverables/T-20260904-004/B1_Exa精度測定レポート.md) — B-1. Exa によるメーカー連絡先エンリッチメント — 精度測定レポート（20.0KB）
+  - [`B1_apply_optout.py`](../../output/deliverables/T-20260904-004/B1_apply_optout.py) — : 窓口ごとの注記原文。{メーカー名: [(窓口名, 原文, 出典URL), ...]}（24.7KB）
+  - [`B1_build_top50.py`](../../output/deliverables/T-20260904-004/B1_build_top50.py) — （ビルド。伏せ字と自己検算を内蔵）
+  - [`B1_contacts_sample20.csv`](../../output/deliverables/T-20260904-004/B1_contacts_sample20.csv) — 20行 × 23列（﻿メーカー名・分類・正式商号・法人番号 ほか）（13.9KB）
+  - [`B1_contacts_top50.csv`](../../output/deliverables/T-20260904-004/B1_contacts_top50.csv) — （上位50社・D/E除外済み）
+  - [`B1_rank_makers.py`](../../output/deliverables/T-20260904-004/B1_rank_makers.py) — v1 からの変更（2026-09-04 / カズヨ承認 A案）（12.7KB）
+  - [`B1_work_queue.csv`](../../output/deliverables/T-20260904-004/B1_work_queue.csv) — 272行 × 12列（﻿順位・メーカー名・スコア・カテゴリ係数 ほか）（51.1KB）
+  - [`B1_中間報告2_再抽出後50社と法務判定の実装.md`](../../output/deliverables/T-20260904-004/B1_中間報告2_再抽出後50社と法務判定の実装.md) — B-1 中間報告② — 再抽出後の上位50社 ＋ 法務 A〜E 判定の実装（16.6KB）
+  - [`B1_打診候補_全社_優先度順.csv`](../../output/deliverables/T-20260904-004/B1_打診候補_全社_優先度順.csv) — （399社・全件）
+  - [`B1_本走行_中間報告_上位50社.md`](../../output/deliverables/T-20260904-004/B1_本走行_中間報告_上位50社.md) — B-1 本走行 中間報告 — 和名メーカー 上位50社（13.5KB）
+  - [`C1_cost_assumptions.json`](../../output/deliverables/T-20260904-004/C1_cost_assumptions.json) — JSONデータ（18.0KB）
+  - [`C1_コスト前提_実測版.html`](../../output/deliverables/T-20260904-004/C1_コスト前提_実測版.html) — C-1 コスト前提の実測版｜初回仕入れ5〜10SKU｜T-20260904-004（34.1KB）
+  - [`C1_コスト前提_実測版.md`](../../output/deliverables/T-20260904-004/C1_コスト前提_実測版.md) — C-1 コスト前提の実測版（初回仕入れ5〜10SKU・予算5万円）（25.3KB）
+  - [`C1_損益シミュレーション.csv`](../../output/deliverables/T-20260904-004/C1_損益シミュレーション.csv) — 108行 × 18列（﻿SKU仕入れ予算・仕入れ個数・仕入れ単価税込・シナリオ ほか）（8.9KB）
+  - [`C1_損益分岐シミュレータ_初回仕入れ.xlsx`](../../output/deliverables/T-20260904-004/C1_損益分岐シミュレータ_初回仕入れ.xlsx) — Excel（14.7KB）
+  - [`C1_費目一覧.csv`](../../output/deliverables/T-20260904-004/C1_費目一覧.csv) — 30行 × 9列（﻿id・費目・値・単位 ほか）（9.8KB）
+  - [`D_filter_stats.json`](../../output/deliverables/T-20260904-004/D_filter_stats.json) — JSONデータ（2.0KB）
+  - [`D_サプライヤー別サマリ.csv`](../../output/deliverables/T-20260904-004/D_サプライヤー別サマリ.csv) — 12行 × 13列（﻿サプライヤー名・supplier_id・候補SKU数・セットに組んだSKU数 ほか）（3.0KB）
+  - [`D_初回仕入れ_発注候補セット.csv`](../../output/deliverables/T-20260904-004/D_初回仕入れ_発注候補セット.csv) — 23行 × 29列（﻿セットID・セットの説明・商品名・ASIN ほか）（18.8KB）
+  - [`D_絞り込みログ.md`](../../output/deliverables/T-20260904-004/D_絞り込みログ.md) — D 絞り込みログ — 26,942件 → 発注候補セット（13.9KB）
+  - [`E2_Keepa由来データの公開_法務判定.md`](../../output/deliverables/T-20260904-004/E2_Keepa由来データの公開_法務判定.md) — E2. Keepa 由来データの PUBLIC リポ公開 — 法務判定（28.4KB）
+  - [`E_NETSEAサプライヤー名の公開_法務判定.md`](../../output/deliverables/T-20260904-004/E_NETSEAサプライヤー名の公開_法務判定.md) — E. NETSEA サプライヤー名の公開 — 法務判定（15.0KB）
+  - [`F_再発防止_gitignore反転とpre-commitゲート.md`](../../output/deliverables/T-20260904-004/F_再発防止_gitignore反転とpre-commitゲート.md) — F. 再発防止 — `.gitignore` の反転 と pre-commit ゲート（6.1KB）
+  - [`README.md`](../../output/deliverables/T-20260904-004/README.md) — T-20260904-004 成果物インデックス（10.8KB）
+  - [`_build_01_judgment_sheet.sh`](../../output/deliverables/T-20260904-004/_build_01_judgment_sheet.sh) — シェルスクリプト（1.8KB）
+  - [`_build_02_maker_list.py`](../../output/deliverables/T-20260904-004/_build_02_maker_list.py) — （02 の再生成用。CSV が増えたらこれ1本で最新化）
+  - [`_build_03_order_set.py`](../../output/deliverables/T-20260904-004/_build_03_order_set.py) — ---------------------------------------------------------------- 小道具（35.7KB）
+  - [`_netsea_desc_cache.json`](../../output/deliverables/T-20260904-004/_netsea_desc_cache.json) — JSONデータ（63.6KB） 〔Git除外・ローカルのみ〕
+  - [`_tariffs_cache.json`](../../output/deliverables/T-20260904-004/_tariffs_cache.json) — JSONデータ（78.4KB） 〔Git除外・ローカルのみ〕
+  - [`budget_filter.py`](../../output/deliverables/T-20260904-004/budget_filter.py) — =============================================================================（24.9KB）
+  - [`build_order_sets.py`](../../output/deliverables/T-20260904-004/build_order_sets.py) — 発注セットの形（社長決定 2026-09-04）（30.1KB）
+  - [`cost_impact_check.py`](../../output/deliverables/T-20260904-004/cost_impact_check.py) — 送料は注文単位（7.0KB）
+  - [`research`](../../output/deliverables/T-20260904-004/research/) — draft.md（末尾に「## 出典一覧」88行を追記。既存373行は無変更）
+  - [`risk_rules.py`](../../output/deliverables/T-20260904-004/risk_rules.py) — =============================================================================（21.5KB）
+  - [`tests_order_sets.py`](../../output/deliverables/T-20260904-004/tests_order_sets.py) — スクリプト（7.5KB）
+  - [`tests_risk_rules.py`](../../output/deliverables/T-20260904-004/tests_risk_rules.py) — スクリプト（7.4KB）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260904-004/`
+
+補足（従前の記載）:
+- `workspace/output/deliverables/T-20260831-001/commit_gate.py`（PUBLIC リポ用ゲート。2件のバグ修正）
+- `workspace/output/deliverables/T-20260831-001/tests/test_commit_gate.py`（新規15件）
+- `workspace/output/deliverables/T-20260831-001/tests/test_negated_trade_window.py`（新規9件）
+- `workspace/output/deliverables/T-20260831-001/pipeline/data/exa_lookups.jsonl`（399エントリ・追記専用）
+- 非公開分: `workspace/output/agent_output/T-20260904-004/B1/HELD_BACK_個人事業主疑い.jsonl`（Git 追跡外）

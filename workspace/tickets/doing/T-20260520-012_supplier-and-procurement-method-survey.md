@@ -44,3 +44,13 @@ todo 起票。次セッション冒頭でサトル（リサーチャー）に発
 - 2026-05-20 todo 起票（社長依頼受領後、ただちに起票＝CLAUDE.md §3 鉄則 #2 遵守）
 - 2026-05-25 社長「承認不要なものは全て進めて」＋軸B 最優先方針 → todo → doing。サトル発注（§4.2）
 - 2026-08-21 next_check_at=2026-08-26 を付与（マリエ／T-20260821-005）: ②メーカー仕入れの周辺調査。3ヶ月滞留のため今週中に生死判定
+
+## 成果物
+
+- 📁 **[T-20260520-012/](../../output/deliverables/T-20260520-012/)** — 成果物フォルダ（5件）
+  - [`01_procurement-methods-comparison.md`](../../output/deliverables/T-20260520-012/01_procurement-methods-comparison.md) — 01. 仕入れ“方法”12分類 比較表（13.9KB）
+  - [`02_beginner-10man-shortlist.md`](../../output/deliverables/T-20260520-012/02_beginner-10man-shortlist.md) — 02. 初心者×予算10万円 現実的な3案（事実ベースの絞り込み材料）（7.5KB）
+  - [`03_suppliers-by-method.md`](../../output/deliverables/T-20260520-012/03_suppliers-by-method.md) — 03. 方法別の主要仕入れ先と実務情報（既存リストとの差分マップ）（7.9KB）
+  - [`04_issues-for-planner.md`](../../output/deliverables/T-20260520-012/04_issues-for-planner.md) — 04. 論点シート — タケシ（プランナー）への引き継ぎ（5.5KB）
+  - [`README.md`](../../output/deliverables/T-20260520-012/README.md) — T-20260520-012 仕入れ“方法”の網羅調査（軸B 先行調査）（5.7KB）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260520-012/`

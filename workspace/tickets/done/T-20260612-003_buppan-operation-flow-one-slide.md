@@ -33,3 +33,11 @@ parent_ticket: T-20260612-002
 - 2026-06-12: 1枚フロー図完成→waiting。16:9ワイド。5レーン（社長/メーカー/就労支援施設/Amazon FBA/顧客）×11ステップ（①品物リサーチ→②仕入れ先選定→③問い合わせ→④見積回答→⑤利益判定→⑥初回発注→⑦商品出荷→⑧ラベル貼り・梱包→⑨FBA販売→⑩顧客受取→⑪入金）＋リピートループ。モノ=実線/お金=オレンジ点線。お金の数値（経費35%・5〜10円/個・2週間入金等）を各ボックス内に明記。納品=deliverables/T-20260612-003/ ＋ ~/Documents/AI Company Outputs/Amazon物販事業/T-20260612-003/（pptx/pdf/jpg）。
 - 2026-06-12: Googleスライド化＝Driveコネクタへのバイナリ・インライン投入は容量過大（base64≈145Kトークン）で非現実的と判明。**PPTXをGoogle Driveにドラッグ→ダブルクリックでGoogleスライドとして無劣化で開ける**手順を社長に案内（最も確実）。内容確認後、必要なら別途アップロード支援。
 - 2026-08-21 **done へ移動**（カズヨ判定）。T-20260821-007 の棚卸しでマリエが「成果物は納品済みで waiting の札が外れていないだけ」と判定、根拠を確認のうえ受け入れ。社長レビューが必要なら差し戻し可。
+
+## 成果物
+
+- 📁 **[T-20260612-003/](../../output/deliverables/T-20260612-003/)** — 成果物フォルダ（3件）
+  - [`buppan-operation-flow-preview.jpg`](../../output/deliverables/T-20260612-003/buppan-operation-flow-preview.jpg) — 画像（159.7KB）
+  - [`buppan-operation-flow.pdf`](../../output/deliverables/T-20260612-003/buppan-operation-flow.pdf) — PDF（97.6KB）
+  - [`buppan-operation-flow.pptx`](../../output/deliverables/T-20260612-003/buppan-operation-flow.pptx) — ファイル（93.1KB）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260612-003/`

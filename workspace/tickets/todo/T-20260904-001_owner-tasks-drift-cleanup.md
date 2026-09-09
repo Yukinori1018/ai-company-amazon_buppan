@@ -36,3 +36,7 @@ related_tickets: [T-20260822-001]
 
 - 2026-09-04 todo 起票（マリエの3回目の報告を受けて、提案ではなく起票に切り替え）
 - 2026-09-04 labels を [maintenance, notion-sync] → [ops, notion] に修正。Notion の Labels に該当オプションが無く、既存の ops/notion に読み替えて同期されていたため、リポジトリ側を寄せた（同義ラベルの増殖を避ける。既に infrastructure/infra の重複あり）
+
+## 成果物
+
+（なし — 未着手のため成果物ファイルなし）

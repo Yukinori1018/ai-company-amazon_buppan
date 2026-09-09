@@ -95,3 +95,10 @@ related_tickets:
 ## ログ
 
 - 2026-08-21 frontmatter修復（マリエ）: assignee=researcher を補完（`id:`→`ticket_id:` / `owner:`→`assignee:` へテンプレ準拠に統一）
+
+## 成果物
+
+- 📁 **[T-20260817-003/](../../output/deliverables/T-20260817-003/)** — 成果物フォルダ（2件）
+  - [`listing-restrictions-guide.html`](../../output/deliverables/T-20260817-003/listing-restrictions-guide.html) — Amazon 出品制限（ゲート）完全ガイド（25.0KB）
+  - [`listing-restrictions-guide.md`](../../output/deliverables/T-20260817-003/listing-restrictions-guide.md) — Amazon 出品制限（ゲート）完全ガイド v1.1 — ルール・確認方法・解除・当社フローへの組み込み（17.8KB）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260817-003/`

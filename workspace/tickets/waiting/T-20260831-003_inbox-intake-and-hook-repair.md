@@ -44,11 +44,6 @@ related_tickets: [T-20260821-009, T-20260820-002, T-20260821-011, T-20260826-004
 - 2026-08-31 inbox 6件を棚卸し。e-Tax 関連PDF 4件＋パスポート画像2件をいずれもリポ外（`~/Documents/AI Company 素材/`）へ退避。inbox 直下は健全化
 - 2026-08-31 `.claude/hooks/session-start.sh` のリマインダー③を修正（発注を既定化・掲出順を繰り上げ・滞留日数を明示）。新規に `.claude/hooks/inbox-intake-check.sh` を追加し UserPromptSubmit に登録（セッション中の投函を検知できるようにした）
 
-## 成果物
-
-- workspace/output/deliverables/T-20260831-003/01_inbox運用停止_原因究明と再発防止.md
-- workspace/output/deliverables/T-20260831-003/01_inbox運用停止_原因究明と再発防止.html
-
 ## 完了報告
 
 （本文は成果物レポートに集約。秘書カズヨへの引き渡し内容は最終報告を参照）
@@ -78,3 +73,10 @@ CLAUDE.md は会社の憲法のためマリエの判断では書き換えてい�
 
 - 2026-08-31 マリエの作業完了を受け **doing → waiting** へ。実作業（inbox 6件→0件・PII のリポ外退避・フック増設 `inbox-intake-check.sh` の settings.json 登録）はカズヨが実物確認済み。
 - waiting の理由＝**社長のご判断1件**。CLAUDE.md §6「成果物の保管ルール（3層）」の③を「大容量バイナリ素材」から「**リポジトリに置けないもの**」へ改め、判定基準に **PII を含む** を追加してよいか。CLAUDE.md は会社の憲法のため、秘書判断では書き換えない。
+
+## 成果物
+
+- 📁 **[T-20260831-003/](../../output/deliverables/T-20260831-003/)** — 成果物フォルダ（2件）
+  - [`01_inbox運用停止_原因究明と再発防止.html`](../../output/deliverables/T-20260831-003/01_inbox運用停止_原因究明と再発防止.html) — inbox運用停止 原因究明と再発防止 — T-20260831-003（19.8KB）
+  - [`01_inbox運用停止_原因究明と再発防止.md`](../../output/deliverables/T-20260831-003/01_inbox運用停止_原因究明と再発防止.md) — `_inbox_社長共有` の「共有 → 退避」運用はなぜ止まったのか（14.0KB）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260831-003/`

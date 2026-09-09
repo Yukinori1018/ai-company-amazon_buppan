@@ -99,3 +99,12 @@ NG になるのは (a) データや機能の外販、(b) Keepa 由来データ�
 - 2026-08-24 ハルオ：Keepa API の ToS 確認を完了（一次情報：API T&C 2026-07-28版）。詳細レビューは
   `workspace/output/deliverables/T-20260824-001/legal-review-keepa-mcp.md`、規約の要点は
   `agents/legal/memory/knowledge_keepa_tos.md` に恒久記録。楽天・Yahoo! は未着手のため本チケットは doing のまま。
+
+## 成果物
+
+- 📁 **[T-20260522-005/](../../output/deliverables/T-20260522-005/)** — 成果物フォルダ（4件）
+  - [`01_official-api-tos.md`](../../output/deliverables/T-20260522-005/01_official-api-tos.md) — 公式 API 利用規約 判定（T-20260522-005）（20.2KB）
+  - [`02_affiliate-asp-tos.md`](../../output/deliverables/T-20260522-005/02_affiliate-asp-tos.md) — アフィリエイト ASP 商品データ 二次利用 ToS 判定（T-20260522-003）（11.8KB）
+  - [`03_implementation-requirements.md`](../../output/deliverables/T-20260522-005/03_implementation-requirements.md) — Phase 2 実装要件チェックリスト（タカシ＝IT エンジニア向け）（8.2KB）
+  - [`README.md`](../../output/deliverables/T-20260522-005/README.md) — Sato-Scope ToS 最終確認 — 総括（T-20260522-005 ＋ T-20260522-003）（6.0KB）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260522-005/`

@@ -107,3 +107,10 @@ FBA配送料が定額のため単価が下がると経費率が跳ね上がる�
 ## ログ
 
 - 2026-08-21 frontmatter修復（マリエ）: assignee=planner を補完（`id:`→`ticket_id:` / `owner:`→`assignee:` へテンプレ準拠に統一）
+
+## 成果物
+
+- 📁 **[T-20260817-002/](../../output/deliverables/T-20260817-002/)** — 成果物フォルダ（2件）
+  - [`maker-shiire-criteria-v1.html`](../../output/deliverables/T-20260817-002/maker-shiire-criteria-v1.html) — メーカー仕入れ 仕入れ方針v1.1｜Keepa設定と4段ふるい（43.4KB）
+  - [`maker-shiire-criteria-v1.md`](../../output/deliverables/T-20260817-002/maker-shiire-criteria-v1.md) — メーカー仕入れ 仕入れ方針 v1.3【確定】＋ Keepa 具体設定 ＋ 4段ふるい（33.5KB）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260817-002/`

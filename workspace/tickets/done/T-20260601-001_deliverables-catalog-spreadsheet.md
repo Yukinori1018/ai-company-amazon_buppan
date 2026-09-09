@@ -101,3 +101,12 @@ environment: local-only
 
 - 2026-06-01 起票。社長依頼を受領。クラウドでは Google Sheets 不可のため local-only と判定、社長が「ローカルでGoogleスプレッドシート」を選択。ローカル再開用に要件・列設計・棚卸し・分担を整備して waiting（社長のローカル再依頼＋OAuth待ち）
 - 2026-06-01 ローカルセッションで実施。**社長は Drive コネクタで認証済み → OAuthクリックすら不要**だった。マリエが deliverables を棚卸ししマスターCSV（55行）を生成 → タカシが Drive MCP `create_file`（text/csv→Sheets自動変換）で社長Driveにスプレッドシート生成 → メタデータで変換・所有者を検証。運用ルールを CLAUDE.md＋庶務スキルに恒久化。**done**（follow-up は上記2点）。
+
+## 成果物
+
+- 📁 **[T-20260601-001/](../../output/deliverables/T-20260601-001/)** — 成果物フォルダ（4件）
+  - [`00_成果物カタログ.html`](../../output/deliverables/T-20260601-001/00_成果物カタログ.html) — 成果物カタログ — Amazon物販事業（863.7KB）
+  - [`deliverables-catalog.csv`](../../output/deliverables/T-20260601-001/deliverables-catalog.csv) — 736行 × 15列（﻿チケットID・ToDo/タスク名・成果物タイトル・内容（要約） ほか）（719.6KB）
+  - [`deliverables-catalog.md`](../../output/deliverables/T-20260601-001/deliverables-catalog.md) — 成果物カタログ（Amazon物販事業）（20.8KB）
+  - [`事業サマリ_方向性と進捗_2026-08-11.html`](../../output/deliverables/T-20260601-001/事業サマリ_方向性と進捗_2026-08-11.html) — Amazon物販事業｜方向性と進捗サマリ 2026-08-11（7.9KB）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260601-001/`

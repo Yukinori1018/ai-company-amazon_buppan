@@ -58,16 +58,6 @@ T-20260817-006 ③は「先に契約すると月額固定費 2,000〜4,000円が
 - 2026-08-21 ほっこりーな博多が2025年10月に FBA専門サイト「Hakata B-Logi」を開設済みであることを発見（AI表は未把握）。掲載の料金PDFは「表示確認用サンプル」明示かつユニストック公式の表と完全一致＝ダミー流用と判断し、実勢価格として採用せず
 - 2026-08-21 成果物4点を deliverables へ直納、memory 2件を記録、完了報告
 
-
-## 成果物
-
-- workspace/output/deliverables/T-20260821-010/README.md
-- workspace/output/deliverables/T-20260821-010/01_公式裏取りファクトシート.md
-- workspace/output/deliverables/T-20260821-010/01_公式裏取りファクトシート.html
-- workspace/output/deliverables/T-20260821-010/02_論点シート_プランナー引き渡し.md
-- workspace/output/deliverables/T-20260821-010/02_論点シート_プランナー引き渡し.html
-- （監査用）workspace/output/agent_output/T-20260821-010/sources/ … 取得HTML原本15ファイル
-
 ## 完了報告
 
 カズヨさん、サトルです。完了しました。確認をお願いします。
@@ -171,13 +161,6 @@ T-20260817-006 ③は「先に契約すると月額固定費 2,000〜4,000円が
 | 3 | 各社への見積り依頼 | **該当（第三者連絡）** | **現時点では不要**（判断が「急がない」で維持されるため） |
 | 4 | **小口→大口の切替** | 課金＝該当 | 経理ハジメ＋戦略タケシの合議事項。**別途論点化** |
 
-## 成果物
-
-- `workspace/output/deliverables/T-20260821-010/README.md`
-- `workspace/output/deliverables/T-20260821-010/01_公式裏取りファクトシート.md` / `.html`
-- `workspace/output/deliverables/T-20260821-010/02_論点シート_プランナー引き渡し.md` / `.html`
-- 監査用スナップショット（取得HTML原本15点）: `workspace/output/agent_output/T-20260821-010/sources/`
-
 ## 現在地
 
 サトル完遂。`doing → waiting`（社長タスク2件＋レビュー待ち）。
@@ -188,3 +171,17 @@ T-20260817-006 ③は「先に契約すると月額固定費 2,000〜4,000円が
 
 - 2026-08-21 起票、サトルへ発注（社長判断A）
 - 2026-08-21 サトル完了。判断は維持・論拠は差し替え。AI表の誤り18件を特定。`doing → waiting`（カズヨ）
+
+## 成果物
+
+- 📁 **[T-20260821-010/](../../output/deliverables/T-20260821-010/)** — 成果物フォルダ（5件）
+  - [`01_公式裏取りファクトシート.html`](../../output/deliverables/T-20260821-010/01_公式裏取りファクトシート.html) — FBA納品代行9社 公式裏取りファクトシート｜T-20260821-010（44.2KB）
+  - [`01_公式裏取りファクトシート.md`](../../output/deliverables/T-20260821-010/01_公式裏取りファクトシート.md) — .html
+  - [`02_論点シート_プランナー引き渡し.html`](../../output/deliverables/T-20260821-010/02_論点シート_プランナー引き渡し.html) — 論点シート FBA納品外注｜T-20260821-010（8.1KB）
+  - [`02_論点シート_プランナー引き渡し.md`](../../output/deliverables/T-20260821-010/02_論点シート_プランナー引き渡し.md) — .html
+  - [`README.md`](../../output/deliverables/T-20260821-010/README.md) — T-20260821-010 成果物インデックス（2.6KB）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260821-010/`
+
+補足（従前の記載）:
+- （監査用）workspace/output/agent_output/T-20260821-010/sources/ … 取得HTML原本15ファイル
+- 監査用スナップショット（取得HTML原本15点）: `workspace/output/agent_output/T-20260821-010/sources/`

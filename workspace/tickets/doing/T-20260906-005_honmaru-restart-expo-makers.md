@@ -83,15 +83,6 @@ gBizINFO による母数976社の全件法人特定はバックグラウンド�
 - 2026-09-06 第一陣20社を deliverables に直納し commit（7bd85af）。メーカーへの連絡は §4.1 のため未実施。
 - 2026-09-06 マリエ：成果物カタログへ8行を追記（第一陣20社リスト／調査レポートmd・html／落選4社／母数原本2353件／実測ログ3本／再現スクリプト5本／README）。`sync_catalog_to_sheet.py` で HTTP 200・225行×13列を同期。シート https://docs.google.com/spreadsheets/d/1xXfKbgbbiRUns-U40sgWNUWzwvu1s2aS3Gr1Ouy5MQY/edit
 
-## 成果物
-
-- workspace/output/deliverables/T-20260906-005/README.md
-- workspace/output/deliverables/T-20260906-005/00_調査レポート.md / .html
-- workspace/output/deliverables/T-20260906-005/01_第一陣20社リスト.csv
-- workspace/output/deliverables/T-20260906-005/02_落選メーカーと理由.csv
-- workspace/output/deliverables/T-20260906-005/20〜23_*.csv（実測ログ）
-- workspace/output/deliverables/T-20260906-005/10〜14_*.py（再現スクリプト）
-
 ## 完了報告
 
 カズヨさんへ。第一陣20社、完成しました。
@@ -116,3 +107,26 @@ gBizINFO による母数976社の全件法人特定はバックグラウンド�
 - メーカーへの連絡は §4.1（第三者連絡）のため一切行っていません。リストまでで停止しています。
 
 完了しました。確認をお願いします。
+
+## 成果物
+
+- 📁 **[T-20260906-005/](../../output/deliverables/T-20260906-005/)** — 成果物フォルダ（14件）
+  - [`00_調査レポート.html`](../../output/deliverables/T-20260906-005/00_調査レポート.html) — 本丸メーカー第一陣20社 — T-20260906-005（29.4KB）
+  - [`00_調査レポート.md`](../../output/deliverables/T-20260906-005/00_調査レポート.md) — .html
+  - [`01_第一陣20社リスト.csv`](../../output/deliverables/T-20260906-005/01_第一陣20社リスト.csv) — 20行 × 12列（﻿No・社名・所在地・従業員数 ほか）（12.3KB）
+  - [`02_落選メーカーと理由.csv`](../../output/deliverables/T-20260906-005/02_落選メーカーと理由.csv) — 4行 × 4列（﻿社名・所在地・落とした理由・参照URL）（720B）
+  - [`10_pool_classify.py`](../../output/deliverables/T-20260906-005/10_pool_classify.py) — 団体・支援機関・自治体・教育機関＝メーカーではない（連絡先としては無効）（2.9KB）
+  - [`11_gbiz_enrich.py`](../../output/deliverables/T-20260906-005/11_gbiz_enrich.py) — 出展社名に法人格が書いてある場合は、同じ法人格の法人を優先する（5.0KB）
+  - [`12_gbiz_targeted.py`](../../output/deliverables/T-20260906-005/12_gbiz_targeted.py) — (表示名, 検索語, 期待する所在地キーワード) 期待地で同名企業を切り分ける（3.2KB）
+  - [`13_keepa_verify.py`](../../output/deliverables/T-20260906-005/13_keepa_verify.py) — 検証対象: (社名, Keepaに投げる検索語) — 検索語はブランド/商品名寄りにする（3.7KB）
+  - [`14_contact_scrape.py`](../../output/deliverables/T-20260906-005/14_contact_scrape.py) — スクリプト（3.5KB）
+  - [`20_出展社2353件の機械分類.csv`](../../output/deliverables/T-20260906-005/20_出展社2353件の機械分類.csv) — 2353行 × 3列（exhibitor・booth・class）（158.2KB）
+  - [`21_keepa検証ログ.csv`](../../output/deliverables/T-20260906-005/21_keepa検証ログ.csv) — 20行 × 8列（company・term・hits・brand_match ほか）（3.8KB）
+  - [`22_gbizinfo照合ログ.csv`](../../output/deliverables/T-20260906-005/22_gbizinfo照合ログ.csv) — 20行 × 10列（display・term・n_hits・corporate_number ほか）（3.9KB）
+  - [`23_連絡先スクレイプログ.csv`](../../output/deliverables/T-20260906-005/23_連絡先スクレイプログ.csv) — 21行 × 6列（company・url・tel_found・contact_urls ほか）（3.8KB）
+  - [`README.md`](../../output/deliverables/T-20260906-005/README.md) — T-20260906-005 成果物インデックス（1.9KB）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260906-005/`
+
+補足（従前の記載）:
+- workspace/output/deliverables/T-20260906-005/20〜23_*.csv（実測ログ）
+- workspace/output/deliverables/T-20260906-005/10〜14_*.py（再現スクリプト）

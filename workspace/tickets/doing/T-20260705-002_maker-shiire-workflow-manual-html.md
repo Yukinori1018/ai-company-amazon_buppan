@@ -50,3 +50,11 @@ related_tickets: [T-20260612-002, T-20260610-001, T-20260520-012]
 - 申し送り(IT): 既存 _product_to_amazon() が brand/manufacturer を捨てる→恒久化は AmazonProduct に列追加が筋。.env 実在は agent_output/T-20260521-005/code/.env。
 - 次: 法務ハルオにNGカテゴリ正式レビュー／社長がどのメーカーに問い合わせるか選定→論点2（問い合わせ）へ。
 - 2026-08-21 棚卸し（マリエ／T-20260821-007）: next_check_at 2026-07-06 → 2026-08-27 に再設定。仕分け=A。理由: ②メーカー仕入れの本線ど真ん中。3点納品済だが doing のまま滞留
+
+## 成果物
+
+- 📁 **[T-20260705-002/](../../output/deliverables/T-20260705-002/)** — 成果物フォルダ（3件）
+  - [`keepa-research-howto.html`](../../output/deliverables/T-20260705-002/keepa-research-howto.html) — Keepaで「狙う商品→メーカー」を探す手順書｜社長用（26.1KB）
+  - [`maker-shiire-workflow-manual.html`](../../output/deliverables/T-20260705-002/maker-shiire-workflow-manual.html) — メーカー仕入れ式 物販 業務フロー｜社長用マニュアル（20.2KB）
+  - [`research`](../../output/deliverables/T-20260705-002/research/) — フォルダ（4件）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260705-002/`

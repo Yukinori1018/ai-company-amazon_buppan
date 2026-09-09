@@ -105,10 +105,6 @@ NETSEA 公式ガイド「卸価格は会員様にのみ公開」／会員規約7
 - 2026-08-31 一次情報を自取得（バイヤー規約・サプライヤー規約・API規約 openapi.json・公式ヘルプ7本・商品ページ実測・robots.txt）。原本は `agent_output/T-20260831-006/legal/`。
 - 2026-08-31 判定書を md/html で納品。メモリ2本を記録。
 
-## 成果物
-- workspace/output/deliverables/T-20260831-006/01_NETSEA仕入れの適法性判定.md
-- workspace/output/deliverables/T-20260831-006/01_NETSEA仕入れの適法性判定.html
-
 ## 完了報告
 法務パート完了しました。確認お願いします。
 
@@ -135,17 +131,6 @@ NETSEA 公式ガイド「卸価格は会員様にのみ公開」／会員規約7
 Keepa検証は先頭250件ぶんが完了。残り（通過26,942件）はバックグラウンドで継続中で、
 一晩回せば全件終わる見込み（実効2.95〜3.17トークン/件 × 26,942 ≒ 約66〜70時間、
 メーカー帯以外は単価が下がるためもっと短くなる見込み）。
-
-## 成果物
-
-- workspace/output/deliverables/T-20260831-006/README.md
-- workspace/output/deliverables/T-20260831-006/netsea_scan.py
-- workspace/output/deliverables/T-20260831-006/pipeline/（config / screen / keepa_verify / evaluate / store / supplier_profile / paths）
-- workspace/output/deliverables/T-20260831-006/tests/（71件）
-- workspace/output/deliverables/T-20260831-006/run_stats.json（統計・Git追跡）
-- workspace/output/deliverables/T-20260831-006/out/candidates.csv（商品行・Git追跡外）
-- workspace/output/deliverables/T-20260831-006/out/suppliers.csv（取引先行・Git追跡外）
-- workspace/output/deliverables/T-20260521-005/code/adapters/netsea.py（欠陥2件を修正）
 
 ## 完了報告
 
@@ -265,3 +250,20 @@ cd workspace/output/deliverables/T-20260831-006 && python3 netsea_scan.py --stat
 `ps` でプロセスを探さないでください（PIDは使い回されるので嘘をつきます）。
 心拍はトークン回復待ちの間も30秒ごとに打たれます。
 - 2026-09-07 マリエ：Notion カンバンに取りこぼしを検知し、カードを遡って作成。labels は Notion の選択肢に合わせて調整（`profit` は既存に無く、`sourcing`+`pipeline` で表現できるため削除）。リポジトリ側の frontmatter も同じ値に揃えた
+
+## 成果物
+
+- 📁 **[T-20260831-006/](../../output/deliverables/T-20260831-006/)** — 成果物フォルダ（9件）
+  - [`01_NETSEA仕入れの適法性判定.html`](../../output/deliverables/T-20260831-006/01_NETSEA仕入れの適法性判定.html) — NETSEA 仕入れ → Amazon 販売の適法性判定 — T-20260831-006（48.2KB）
+  - [`01_NETSEA仕入れの適法性判定.md`](../../output/deliverables/T-20260831-006/01_NETSEA仕入れの適法性判定.md) — NETSEA 仕入れ → Amazon 販売の適法性判定（35.9KB）
+  - [`README.md`](../../output/deliverables/T-20260831-006/README.md) — NETSEA 仕入れ起点 × Keepa 検証 — 利益が取れる商品を抽出する（16.9KB）
+  - [`netsea_scan.py`](../../output/deliverables/T-20260831-006/netsea_scan.py) — まず小さく回す（サプライヤー5社ぶん）（23.9KB）
+  - [`out`](../../output/deliverables/T-20260831-006/out/) — candidates.csv（商品行・Git追跡外） 〔Git除外・ローカルのみ〕
+  - [`pipeline`](../../output/deliverables/T-20260831-006/pipeline/) — （config / screen / keepa_verify / evaluate / store / supplier_profile / paths）
+  - [`run_stats.json`](../../output/deliverables/T-20260831-006/run_stats.json) — （統計・Git追跡）
+  - [`run_verify_loop.sh`](../../output/deliverables/T-20260831-006/run_verify_loop.sh) — シェルスクリプト（2.7KB）
+  - [`tests`](../../output/deliverables/T-20260831-006/tests/) — （71件）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260831-006/`
+
+補足（従前の記載）:
+- workspace/output/deliverables/T-20260521-005/code/adapters/netsea.py（欠陥2件を修正）

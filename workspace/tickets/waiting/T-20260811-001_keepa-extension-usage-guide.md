@@ -26,12 +26,6 @@ source: 社長依頼（_inbox_社長共有 のKeepaスクショ5枚をもとに�
 - 025: 「設定」タブ
 - **026: keepa.com「出品者概要」（2026-08-12 追加受領・2026-08-21 反映）**
 
-## 成果物
-- workspace/output/deliverables/T-20260811-001/keepa-usage-guide.html（本編・**現行は第3版**）
-- workspace/output/deliverables/T-20260811-001/keepa-usage-guide.md（テキスト版・**現行は第3版**）
-- workspace/output/deliverables/T-20260811-001/README.md（索引・版歴・未確認事項）
-> ※ 版ごとの差分は README「版歴」と、本チケット末尾の「第3版（2026-08-24・ヒデアキ）」節を参照。
-
 ## ログ
 - 2026-08-11 起票。スクショ5枚を全読了・拡大確認。5タブ構成を実画面から確定。HTML納品予定。
 - 2026-08-21 frontmatter修復（マリエ）: assignee=content_creator を補完（`id:`→`ticket_id:` / `owner:`→`assignee:` へテンプレ準拠に統一）
@@ -158,3 +152,14 @@ Keepa の「出品者概要」画面が **無料プランでも開けるか**の
 **社長タスクも減らない** — 「無料プランで出品者概要が開けるか」の実機1クリックは引き続き社長の番。
 
 - 2026-08-24 上記をカズヨの判断として記録。Notion カードにも同内容を反映。マリエ。
+
+## 成果物
+
+- 📁 **[T-20260811-001/](../../output/deliverables/T-20260811-001/)** — 成果物フォルダ（3件）
+  - [`README.md`](../../output/deliverables/T-20260811-001/README.md) — （索引・版歴・未確認事項）
+  - [`keepa-usage-guide.html`](../../output/deliverables/T-20260811-001/keepa-usage-guide.html) — （本編・**現行は第3版**）
+  - [`keepa-usage-guide.md`](../../output/deliverables/T-20260811-001/keepa-usage-guide.md) — （テキスト版・**現行は第3版**）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260811-001/`
+
+補足（従前の記載）:
+> ※ 版ごとの差分は README「版歴」と、本チケット末尾の「第3版（2026-08-24・ヒデアキ）」節を参照。

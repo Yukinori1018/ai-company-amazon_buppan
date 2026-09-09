@@ -88,10 +88,6 @@ Phase A（プレモーテム）完了。Phase B（実装）は**そのまま着�
 
 あわせて、社長判断が要る論点3件（P1 ゴールを「毎朝10社」へ再定義 / P2 PUBLICリポへの仕入れ台帳公開の可否を取り直す / P3 店舗停止・連絡先未取得の現状で稼働を始めるか）を秘書へ。
 
-## 成果物
-- workspace/output/deliverables/T-20260831-002/A_プレモーテム_常駐スキャナ.md
-- workspace/output/deliverables/T-20260831-002/A_プレモーテム_常駐スキャナ.html
-
 ## 完了報告
 
 Phase A を完了しました（マサル）。
@@ -129,19 +125,6 @@ M1/M2/M4/M6/M7 ＋ 停止条件 S2/S3/S5/S6/S7/S8/S9/S10/W4 を実装済み。
 - 2026-08-31 02:3x マサルのプレモーテムを受領。M1〜M12 と S1〜S10 を実装計画へ取り込み。
 - 2026-08-31 02:4x 社長判断 P1〜P3 を受領。巡回モードを不採用に変更、行データを Git 追跡外へ。
 - 2026-08-31 02:52 launchd bootstrap。実取得を確認して稼働開始。
-
-## 成果物
-
-- workspace/output/deliverables/T-20260831-002/README.md — 社長向け運用書（止め方が最上部）
-- workspace/output/deliverables/T-20260831-002/always_on.py — 常駐ループ（ガード・心拍監視）
-- workspace/output/deliverables/T-20260831-002/cycle_state.py — 周回と停止判定の純ロジック
-- workspace/output/deliverables/T-20260831-002/daily_rollup.py — 日次ロールアップ（0トークン）
-- workspace/output/deliverables/T-20260831-002/test_cycle_state.py / test_always_on.py — 26本
-- workspace/output/deliverables/T-20260831-002/com.aicompany.amazon-buppan.list-builder.plist
-- .claude/scripts/list-builder.sh — launchd の入口 + stop/start/status/resume-research
-- .claude/hooks/session-start.sh — リマインダー④（稼働状態・増分・最終心拍）を追加
-- workspace/output/deliverables/T-20260817-005/scan_v14.py — M2/M3/M7/M8/M9/F8 を修正
-- workspace/output/deliverables/T-20260817-005/test_scan_v14_loop.py — 32本（10本追加）
 
 ## 完了報告（カズヨ宛）
 
@@ -187,3 +170,25 @@ M1/M2/M4/M6/M7 ＋ 停止条件 S2/S3/S5/S6/S7/S8/S9/S10/W4 を実装済み。
   - launchd 常駐（`com.aicompany.amazon-buppan.list-builder`）は**外していない**。STOP ファイルがある限り走らないので、再開は `list-builder.sh start` の1コマンドで足りる。
   - **再開の条件＝T-20260831-004（抽出の再設計）が確定し、`scan_v14.py` の Finder 条件を入れ替えてから。** 現行条件のまま回すとノイズを積むだけなので、それまで再開しない。
 - 2026-09-07 マリエ：Notion カンバンに取りこぼしを検知し、カードを遡って作成。labels は Notion の選択肢に合わせて調整（`automation`/`launchd`/`always-on` → Notion 既存の `overnight` `infra` へ寄せた）。リポジトリ側の frontmatter も同じ値に揃えた
+
+## 成果物
+
+- 📁 **[T-20260831-002/](../../output/deliverables/T-20260831-002/)** — 成果物フォルダ（11件）
+  - [`A_プレモーテム_常駐スキャナ.html`](../../output/deliverables/T-20260831-002/A_プレモーテム_常駐スキャナ.html) — プレモーテム — 無人常駐スキャナ（T-20260831-002 Phase A）（37.9KB）
+  - [`A_プレモーテム_常駐スキャナ.md`](../../output/deliverables/T-20260831-002/A_プレモーテム_常駐スキャナ.md) — A. プレモーテム — 無人常駐スキャナ（T-20260831-002 / Phase A）（28.3KB）
+  - [`README.md`](../../output/deliverables/T-20260831-002/README.md) — 社長向け運用書（止め方が最上部）
+  - [`always_on.py`](../../output/deliverables/T-20260831-002/always_on.py) — 常駐ループ（ガード・心拍監視）
+  - [`com.aicompany.amazon-buppan.list-builder.plist`](../../output/deliverables/T-20260831-002/com.aicompany.amazon-buppan.list-builder.plist) — ファイル（2.3KB）
+  - [`cycle_state.py`](../../output/deliverables/T-20260831-002/cycle_state.py) — 周回と停止判定の純ロジック
+  - [`daily`](../../output/deliverables/T-20260831-002/daily/) — フォルダ（2件）
+  - [`daily_rollup.py`](../../output/deliverables/T-20260831-002/daily_rollup.py) — 日次ロールアップ（0トークン）
+  - [`state`](../../output/deliverables/T-20260831-002/state/) — フォルダ（4件） 〔Git除外・ローカルのみ〕
+  - [`test_always_on.py`](../../output/deliverables/T-20260831-002/test_always_on.py) — 常駐ジョブのガード条件のテスト（T-20260831-002）。 **「暴走しない」は口約束ではなく、ここで固定します。** 実際の Keepa は一切叩きませ（8.1KB）
+  - [`test_cycle_state.py`](../../output/deliverables/T-20260831-002/test_cycle_state.py) — test_always_on.py — 26本
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260831-002/`
+
+補足（従前の記載）:
+- .claude/scripts/list-builder.sh — launchd の入口 + stop/start/status/resume-research
+- .claude/hooks/session-start.sh — リマインダー④（稼働状態・増分・最終心拍）を追加
+- workspace/output/deliverables/T-20260817-005/scan_v14.py — M2/M3/M7/M8/M9/F8 を修正
+- workspace/output/deliverables/T-20260817-005/test_scan_v14_loop.py — 32本（10本追加）

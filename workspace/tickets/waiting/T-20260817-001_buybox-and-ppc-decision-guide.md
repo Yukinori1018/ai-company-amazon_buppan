@@ -62,3 +62,10 @@ related_tickets:
 ## ログ
 
 - 2026-08-21 frontmatter修復（マリエ）: assignee=researcher を補完（`id:`→`ticket_id:` / `owner:`→`assignee:` へテンプレ準拠に統一）
+
+## 成果物
+
+- 📁 **[T-20260817-001/](../../output/deliverables/T-20260817-001/)** — 成果物フォルダ（2件）
+  - [`buybox-and-ppc-guide.html`](../../output/deliverables/T-20260817-001/buybox-and-ppc-guide.html) — カート獲得（おすすめ出品）と PPC 広告｜ルールの全体像と必要額（24.1KB）
+  - [`buybox-and-ppc-guide.md`](../../output/deliverables/T-20260817-001/buybox-and-ppc-guide.md) — カート獲得（おすすめ出品）と PPC 広告 — ルールの全体像と、いくら要るのか（16.8KB）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260817-001/`

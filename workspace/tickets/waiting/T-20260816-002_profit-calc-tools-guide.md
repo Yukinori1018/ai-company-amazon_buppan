@@ -34,3 +34,9 @@ related_tickets:
 ## ログ
 
 - 2026-08-21 frontmatter修復（マリエ）: assignee=content_creator を補完（`id:`→`ticket_id:` / `owner:`→`assignee:` へテンプレ準拠に統一）
+
+## 成果物
+
+- 📁 **[T-20260816-002/](../../output/deliverables/T-20260816-002/)** — 成果物フォルダ（1件）
+  - [`profit-calc-tools-guide.html`](../../output/deliverables/T-20260816-002/profit-calc-tools-guide.html) — 利益計算ツール実践ガイド｜FBA料金シミュレーター × Keepa（14.9KB）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260816-002/`

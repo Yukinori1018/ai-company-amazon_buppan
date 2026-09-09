@@ -76,3 +76,10 @@ related_tickets:
 - 2026-08-17: 起票 → 原本保全 → 裏どり（keepa.com実機／当社FBA料金表 T-20260816-001 と突合）→ メモリ2件更新 → 検証レポート納品 → waiting。
 - 2026-08-17: 社長回答で確認3点すべてクローズ → 成果物 v1.1 へ改訂（クォータの誤りを訂正・スクショで3段構成を確定）→ done。
 - 2026-08-21 frontmatter修復（マリエ）: assignee=researcher を補完（`id:`→`ticket_id:` / `owner:`→`assignee:` へテンプレ準拠に統一）
+
+## 成果物
+
+- 📁 **[T-20260817-004/](../../output/deliverables/T-20260817-004/)** — 成果物フォルダ（2件）
+  - [`keepa-knowledge-factcheck.html`](../../output/deliverables/T-20260817-004/keepa-knowledge-factcheck.html) — Keepa実務ナレッジ 裏どり結果（28.2KB）
+  - [`keepa-knowledge-factcheck.md`](../../output/deliverables/T-20260817-004/keepa-knowledge-factcheck.md) — Keepa実務ナレッジ（うみぞう動画）— 裏どり結果と当社への適用 v1.2（20.0KB）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260817-004/`

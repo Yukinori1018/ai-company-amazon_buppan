@@ -25,11 +25,6 @@ related_tickets: [T-20260715-001, T-20260603-003]
 3. せどり/物販リサーチ実務（利益計算・損益分岐・Keepa指標・価格改定・出品制限/危険物・資金繰り）
 4. 商品ページ最適化・集客・広告・レビュー（SEO/スポンサー広告/レビュー適法境界）
 
-## 成果物
-- `memory/` に新規ナレッジファイル（knowledge_*.md）
-- MEMORY.md 索引更新
-- 社長向け一覧（新規＋既存）
-
 ## 経過
 - 2026-07-26 起票。サトルへ4領域並行発注。
 - 2026-07-26 完了。4領域すべて収集完了→メモリ4ファイル新規作成＋MEMORY.md索引更新（漏れていた knowledge_maker_extraction_keepa も索引追加）。社長へ新規＋既存の一覧提示。done クローズ。
@@ -40,3 +35,15 @@ related_tickets: [T-20260715-001, T-20260603-003]
   - カテゴリ別販売手数料の全表・FBA保管料の正確な式・登録要件・IPI・FBA手数料全種・FNSKU/危険物SDS・新規出品者特典の具体額 等を確認 → メモリ knowledge_seller_operations_basics 更新＋新規 knowledge_seller_official_operations 作成。
   - 副次確認: アカウント固有ページ(健全性ダッシュボード等)は「無認可(NCID: A1XUKPMRY27SCQ)」が再現＝同一メール2アカウント問題(電話番号2FA=本物/Authenticator=無認可)が銀行登録後も未解決。ログイン必須ページの原文は社長から資料で受領予定。
   - 巡回メモ原本: scratchpad/official_pages_notes.md（作業用）。
+
+## 成果物
+
+- 📁 **[T-20260726-001/](../../output/deliverables/T-20260726-001/)** — 成果物フォルダ（2件）
+  - [`amazon-seller-knowledge-notes.md`](../../output/deliverables/T-20260726-001/amazon-seller-knowledge-notes.md) — Amazon公式ページ巡回メモ（sell.amazon.co.jp）— T-20260726-001（29.7KB）
+  - [`amazon-seller-knowledge-official.html`](../../output/deliverables/T-20260726-001/amazon-seller-knowledge-official.html) — Amazonセラー運用ナレッジ集（公式一次情報）（20.4KB）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260726-001/`
+
+補足（従前の記載）:
+- `memory/` に新規ナレッジファイル（knowledge_*.md）
+- MEMORY.md 索引更新
+- 社長向け一覧（新規＋既存）

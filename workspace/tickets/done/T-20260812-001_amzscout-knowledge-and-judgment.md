@@ -44,3 +44,10 @@ related_tickets: [T-20260520-003, T-20260527-001, T-20260803-001]
 - 2026-08-12 社長判断＝**A案で確定**（今は契約せず、③簡易OEM〔T-20260809-001〕を具体検討する局面で無料トライアル16回だけ「サプライヤー逆引き＋AIリスティング」を検証。費用ゼロ・§4.1非該当）。→ done。将来の無料トライアル検証は③OEMの実行フェーズに紐づけて起動する。
 </content>
 </invoke>
+
+## 成果物
+
+- 📁 **[T-20260812-001/](../../output/deliverables/T-20260812-001/)** — 成果物フォルダ（2件）
+  - [`AMZScout_使い方と採否判断_2026-08-12.html`](../../output/deliverables/T-20260812-001/AMZScout_使い方と採否判断_2026-08-12.html) — AMZScout PRO AI 使い方ナレッジ＋採否判断（8.1KB）
+  - [`AMZScout_使い方と採否判断_2026-08-12.md`](../../output/deliverables/T-20260812-001/AMZScout_使い方と採否判断_2026-08-12.md) — AMZScout PRO AI｜使い方ナレッジ＋採否判断（3.7KB）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260812-001/`

@@ -41,15 +41,6 @@ IT エンジニア タカシの memory `agents/it_engineer/memory/knowledge_keep
 - 2026-08-24 `monthlySoldHistory` に 10/20/30/40 と `-1`（欠測マーカー）が実在することを発見 → 「50未満は出ない」は誤りと判定
 - 2026-08-24 memory `knowledge_keepa_product_finder_fields.md` を修正・成果物を deliverables に直納・commit
 
-## 成果物
-
-- workspace/output/deliverables/T-20260824-003/README.md
-- workspace/output/deliverables/T-20260824-003/monthly-sold-distribution.md
-- workspace/output/deliverables/T-20260824-003/monthly-sold-distribution.html
-- workspace/output/deliverables/T-20260824-003/analyze_monthly_sold.py
-- workspace/output/deliverables/T-20260824-003/analyze_output.md
-- agents/it_engineer/memory/knowledge_keepa_product_finder_fields.md（更新）
-
 ## 完了報告
 
 カズヨさん、完了しました。**Keepa API の消費トークンは 0** です（保存済み raw JSON のみ）。
@@ -87,3 +78,16 @@ T-20260824-001 の `keepa-glossary.md` は「`min` は**全期間**の最安値�
   母集団全体では 33.5% に修正。memory に経緯を残す形で反映。commit 2ccba5e。
   カズヨが同じ raw JSON を独立集計して数値一致を確認。
 - 2026-08-24 申し送り: `stats.min` の期間解釈の取り違え疑いを T-20260824-004 として分離起票。
+
+## 成果物
+
+- 📁 **[T-20260824-003/](../../output/deliverables/T-20260824-003/)** — 成果物フォルダ（5件）
+  - [`README.md`](../../output/deliverables/T-20260824-003/README.md) — T-20260824-003 — Keepa `monthlySold` のメモリ記述を公式定義＋保存済み実データで突合（1.4KB）
+  - [`analyze_monthly_sold.py`](../../output/deliverables/T-20260824-003/analyze_monthly_sold.py) — Keepa 時刻（分）→ UTC datetime。Keepa 分 = int(unixtime/60) - 21564000（7.5KB）
+  - [`analyze_output.md`](../../output/deliverables/T-20260824-003/analyze_output.md) — workspace/output/deliverables/T-20260817-005/raw（3.5KB）
+  - [`monthly-sold-distribution.html`](../../output/deliverables/T-20260824-003/monthly-sold-distribution.html) — Keepa monthlySold の実データ分布 — T-20260824-003（13.0KB）
+  - [`monthly-sold-distribution.md`](../../output/deliverables/T-20260824-003/monthly-sold-distribution.md) — Keepa `monthlySold` の実データ分布 — 「月50個以上にしか出ない」の再検証（8.1KB）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260824-003/`
+
+補足（従前の記載）:
+- agents/it_engineer/memory/knowledge_keepa_product_finder_fields.md（更新）

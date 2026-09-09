@@ -65,3 +65,22 @@ Amazon売れ筋商品をリサーチし、**商品＋仕入れ先のリスト**�
 2. 試しに仕入れる1〜数SKUを選ぶ → カズヨへ一言（**実購入は§4.1金銭＝承認必須**、勝手に買いません）。
 3. 選定後、Amazon実ページ×仕入先ページで同一商品を目視確認 → 小さく本番。
 - 2026-08-21 棚卸し（マリエ／T-20260821-007）: next_check_at 2026-08-04 → 2026-11-01 に再設定。仕分け=A。理由: ①電脳せどりは社長指示でホールド中。再開指示まで着手しないため、四半期レビューの位置まで送る
+
+## 成果物
+
+- 📁 **[T-20260803-001/](../../output/deliverables/T-20260803-001/)** — 成果物フォルダ（14件）
+  - [`build_gsheet_append_tabs.py`](../../output/deliverables/T-20260803-001/build_gsheet_append_tabs.py) — SA編集権のあるオーナー所有シート(1AAWGWaj…)へ、仕入れせどりリストを【新規タブとして非破壊追記】。 既存タブは一切触らない。追加タブ: SS4446（4.7KB）
+  - [`build_gsheet_into.py`](../../output/deliverables/T-20260803-001/build_gsheet_into.py) — 既存のオーナー所有Googleシート(SHEET_ID)へ、仕入れせどりリストを書き込む。 Drive複製で作った owner所有＋SA編集権のシートを対象にす（5.7KB）
+  - [`build_sheet_v3.py`](../../output/deliverables/T-20260803-001/build_sheet_v3.py) — shiire_list_3000.csv → 新規Googleスプレッドシート（社長閲覧用）。 タブ構成: 1) サマリ・前提 … 手法/仕入れ条件/件数サマリ（5.4KB）
+  - [`build_xlsx.py`](../../output/deliverables/T-20260803-001/build_xlsx.py) — shiire_list_3000.csv → ローカル .xlsx（サービスアカウント不要の確実な納品物）。 タブ: サマリ・前提 / 仕入れ条件合致(原石) （4.8KB）
+  - [`scan_v3_progress.log`](../../output/deliverables/T-20260803-001/scan_v3_progress.log) — 実行ログ（19.0KB）
+  - [`scan_v3_run.log`](../../output/deliverables/T-20260803-001/scan_v3_run.log) — 実行ログ（19.2KB）
+  - [`sheet_url.txt`](../../output/deliverables/T-20260803-001/sheet_url.txt) — テキスト（83B）
+  - [`shiire_list_3000.csv`](../../output/deliverables/T-20260803-001/shiire_list_3000.csv) — 4446行 × 17列（rank_no・asin・category・jan ほか）（1.1MB）
+  - [`shiire_scan_v3.py`](../../output/deliverables/T-20260803-001/shiire_scan_v3.py) — 仕入れせどり用｜Amazon売れ筋 × 仕入れ先 3000件リスト生成ハーネス v3。 T-20260803-001（社長: 電脳せどり→仕入れせどりへスイッチ（12.2KB）
+  - [`shiire_summary.json`](../../output/deliverables/T-20260803-001/shiire_summary.json) — JSONデータ（1.8KB）
+  - [`watch.log`](../../output/deliverables/T-20260803-001/watch.log) — 実行ログ（9.1KB）
+  - [`watch_and_build.py`](../../output/deliverables/T-20260803-001/watch_and_build.py) — 夜間無人フロー: スキャン完了(または締切)を検知して自動でGoogleシートを生成する。 判定: - shiire_summary.json が出現 → スキ（2.2KB）
+  - [`watch_run.log`](../../output/deliverables/T-20260803-001/watch_run.log) — 実行ログ（9.1KB）
+  - [`仕入れせどり_売れ筋x仕入れ先リスト_4446件.xlsx`](../../output/deliverables/T-20260803-001/仕入れせどり_売れ筋x仕入れ先リスト_4446件.xlsx) — Excel（505.4KB）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260803-001/`

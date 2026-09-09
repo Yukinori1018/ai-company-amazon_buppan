@@ -56,3 +56,32 @@ Amazon売れ筋商品の**メーカー**をナレッジ基準で選別し、連�
 3. **メーカーへの実送信は§4.1（第三者連絡）＝社長承認必須**。承認後に送信。
 4. 連絡先の追加取得が必要なら、次バッチ（中小61位以下）を続行可能。
 - 2026-08-21 棚卸し（マリエ／T-20260821-007）: next_check_at 2026-08-05 → 2026-08-27 に再設定。仕分け=A。理由: 本線。55社台帳は T-20260817-005 が消化月数順に再ソート中。単独レビューでなく合流後に出すのが筋
+
+## 成果物
+
+- 📁 **[T-20260804-001/](../../output/deliverables/T-20260804-001/)** — 成果物フォルダ（24件）
+  - [`SOURCE.md`](../../output/deliverables/T-20260804-001/SOURCE.md) — 出所カード — T-20260804-001（卸価格プローブ）（1.8KB）
+  - [`asin_map.json`](../../output/deliverables/T-20260804-001/asin_map.json) — JSONデータ（185.9KB）
+  - [`build_maker_sheet.py`](../../output/deliverables/T-20260804-001/build_maker_sheet.py) — メーカー台帳 → 社長所有の共有Googleシート(1y1e15…)へ流し込み。 タブ: サマリ・前提 / メーカー台帳 / 売れ筋商品。連絡先はPhase B（5.6KB）
+  - [`contacts_batch1.json`](../../output/deliverables/T-20260804-001/contacts_batch1.json) — JSONデータ（5.2KB）
+  - [`contacts_batch2.json`](../../output/deliverables/T-20260804-001/contacts_batch2.json) — JSONデータ（5.3KB）
+  - [`contacts_batch3.json`](../../output/deliverables/T-20260804-001/contacts_batch3.json) — JSONデータ（4.8KB）
+  - [`contacts_batch4.json`](../../output/deliverables/T-20260804-001/contacts_batch4.json) — JSONデータ（5.0KB）
+  - [`maker_contact_shortlist.csv`](../../output/deliverables/T-20260804-001/maker_contact_shortlist.csv) — 100行 × 5列（maker・brands・top_asin・n_products ほか）（6.2KB）
+  - [`maker_ledger.csv`](../../output/deliverables/T-20260804-001/maker_ledger.csv) — 3282行 × 14列（maker・brands・n_products・n_criteria_ok ほか）（362.1KB）
+  - [`maker_products.csv`](../../output/deliverables/T-20260804-001/maker_products.csv) — 7840行 × 20列（asin・name・category・amazon_price ほか）（2.2MB）
+  - [`maker_scan.py`](../../output/deliverables/T-20260804-001/maker_scan.py) — メーカー仕入れせどり｜Amazon売れ筋メーカー抽出ハーネス（Phase A・T-20260804-001）。 ナレッジ3基準（EC STARs/中西）: ①A（16.6KB）
+  - [`maker_scan_progress.log`](../../output/deliverables/T-20260804-001/maker_scan_progress.log) — 実行ログ（11.7KB）
+  - [`maker_scan_run.log`](../../output/deliverables/T-20260804-001/maker_scan_run.log) — 実行ログ（22.3KB）
+  - [`maker_summary.json`](../../output/deliverables/T-20260804-001/maker_summary.json) — JSONデータ（611B）
+  - [`monthlysold.csv`](../../output/deliverables/T-20260804-001/monthlysold.csv) — 7840行 × 3列（asin・main_rank・※Keepa固有の加工値(月間ドロップ数/過去最安値/365日最安/月間販売数/実セラー数)と卸値の列は規約上の理由でリポジトリから除外。完全版は ~/Docume…
+  - [`monthlysold_progress.log`](../../output/deliverables/T-20260804-001/monthlysold_progress.log) — 実行ログ（10.5KB）
+  - [`monthlysold_refetch.py`](../../output/deliverables/T-20260804-001/monthlysold_refetch.py) — 実測月販(Keepa monthlySold=Amazon"◯◯+個購入")を全商品ぶん取り直す。 出力: monthlysold.csv (asin, mon（3.5KB）
+  - [`monthlysold_run.log`](../../output/deliverables/T-20260804-001/monthlysold_run.log) — 実行ログ（10.7KB）
+  - [`target_sheet_id.txt`](../../output/deliverables/T-20260804-001/target_sheet_id.txt) — テキスト（134B）
+  - [`wholesale_probe.csv`](../../output/deliverables/T-20260804-001/wholesale_probe.csv) — 55行 × 8列（maker・asin・jan・amazon_price ほか）（6.5KB）
+  - [`wholesale_probe.log`](../../output/deliverables/T-20260804-001/wholesale_probe.log) — 実行ログ（331B）
+  - [`wholesale_probe.py`](../../output/deliverables/T-20260804-001/wholesale_probe.py) — 実仕入値の実態調査（Phase C）。 優先55社の代表商品について、Keepaで JAN と 参考価格(listPrice/定価) を取り直し、 NETSEA（4.6KB）
+  - [`wholesale_probe_run.log`](../../output/deliverables/T-20260804-001/wholesale_probe_run.log) — 実行ログ（606B）
+  - [`損益分岐シミュレータ_メーカー仕入れ.xlsx`](../../output/deliverables/T-20260804-001/損益分岐シミュレータ_メーカー仕入れ.xlsx) — Excel（14.8KB）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260804-001/`

@@ -67,3 +67,33 @@ renamed_from: T-20260529-001
 - 2026-06-03 **残フロー2点を作成し作図を全段階完成**（社長依頼「タスクを完成・精緻に」）。⑩入金・会計（`10_accounting-flow.png` ＋ `10_accounting-todo.md` ／ `draw_accounting.py`）＝売上回収→手数料控除→14日サイクル入金→記帳→確定申告（リザーブ・棚卸し・課税事業者化の注意込み）。⑫アフターフォロー（`12_afterfollow-flow.png` ＋ `12_afterfollow-todo.md` ／ `draw_afterfollow.py`）＝メッセージ/返品返金/評価レビュー/真贋A-to-Zの4並走レーン→アカウントヘルス（ODR<1%）監視。あわせて **精緻化**: (1) `flow_lib.py`・`draw_overview.py` のフォント指定を **OS横断自動選択**（macOS=ヒラギノ角ゴW3／Linux=IPAGothic）に改修し、**全7図を同一フォントで再生成して統一感を確保**、(2) 全7フローを1枚で見渡せる **統合HTML索引 `00_index.html`**（要点・事故ポイント・凡例・レビュー状況表・社長への確認依頼つき）を新規作成。Claude Preview で全7画像の読み込み・レイアウトを目視検証済（broken 0件）。**作図タスクは完了**。社長レビュー待ちのため status を doing→**waiting** に変更、next_check_at=2026-06-04
 - 2026-06-03 **① 全体像の確認ゲート通過**（社長「全体像はあっています。詳細に移ってください」）。詳細レビューフェーズへ移行。社長の最重要関心に沿い **仕入れ周り②③から**ウォークスルー開始。フェーズ表の①を✅レビュー済に、②③を🔄詳細レビュー中に更新
 - 2026-08-21 棚卸し（マリエ／T-20260821-007）: next_check_at 2026-06-04 → 2026-09-14 に再設定。仕分け=A。理由: 全体像は社長ゲート通過済み・詳細レビュー段階。本線フローは T-20260612-002/003 が上書きしており急がない
+
+## 成果物
+
+- 📁 **[T-20260531-002/](../../output/deliverables/T-20260531-002/)** — 成果物フォルダ（25件）
+  - [`00_index.html`](../../output/deliverables/T-20260531-002/00_index.html) — Amazon物販 業務フロー図 完全版（全体像＋6詳細フロー）（16.6KB）
+  - [`01_overview-flow.html`](../../output/deliverables/T-20260531-002/01_overview-flow.html) — Amazon物販 業務フロー ① 大きな流れ（6.7KB）
+  - [`01_overview-flow.md`](../../output/deliverables/T-20260531-002/01_overview-flow.md) — Amazon物販 業務フロー ── ① 大きな流れ（全体像）（8.0KB）
+  - [`01_overview-flow.png`](../../output/deliverables/T-20260531-002/01_overview-flow.png) — 画像（349.9KB）
+  - [`02_sourcing-flow.png`](../../output/deliverables/T-20260531-002/02_sourcing-flow.png) — 画像（298.6KB）
+  - [`02_sourcing-todo.md`](../../output/deliverables/T-20260531-002/02_sourcing-todo.md) — ② 仕入れ周り ToDo チェックリスト（出品可否→解除→発注）（6.0KB）
+  - [`03_restriction-release-flow.png`](../../output/deliverables/T-20260531-002/03_restriction-release-flow.png) — 画像（383.6KB）
+  - [`04_listing-fba-flow.png`](../../output/deliverables/T-20260531-002/04_listing-fba-flow.png) — 画像（391.4KB）
+  - [`04_listing-fba-todo.md`](../../output/deliverables/T-20260531-002/04_listing-fba-todo.md) — ④ 出品〜FBA納品 ToDo チェックリスト（3.6KB）
+  - [`05_setup-flow.png`](../../output/deliverables/T-20260531-002/05_setup-flow.png) — 画像（452.2KB）
+  - [`05_setup-todo.md`](../../output/deliverables/T-20260531-002/05_setup-todo.md) — ⑤ 事業準備・初期登録 ToDo チェックリスト（4.8KB）
+  - [`10_accounting-flow.png`](../../output/deliverables/T-20260531-002/10_accounting-flow.png) — 画像（425.7KB）
+  - [`10_accounting-todo.md`](../../output/deliverables/T-20260531-002/10_accounting-todo.md) — ⑩ 入金・会計 ToDo チェックリスト（売上回収 → 利益確定 → 記帳 → 申告）（4.7KB）
+  - [`12_afterfollow-flow.png`](../../output/deliverables/T-20260531-002/12_afterfollow-flow.png) — 画像（414.9KB）
+  - [`12_afterfollow-todo.md`](../../output/deliverables/T-20260531-002/12_afterfollow-todo.md) — ⑫ アフターフォロー ToDo チェックリスト（並走・イベント駆動／アカウントを守る）（4.6KB）
+  - [`99_reference_listing-restriction-release-manual.md`](../../output/deliverables/T-20260531-002/99_reference_listing-restriction-release-manual.md) — Amazon物販（せどり） 出品制限解除マニュアル（9.6KB）
+  - [`__pycache__`](../../output/deliverables/T-20260531-002/__pycache__/) — フォルダ（1件）
+  - [`draw_accounting.py`](../../output/deliverables/T-20260531-002/draw_accounting.py) — spine x=5.2（4.2KB）
+  - [`draw_afterfollow.py`](../../output/deliverables/T-20260531-002/draw_afterfollow.py) — トリガ（最上段）（5.0KB）
+  - [`draw_listing_fba.py`](../../output/deliverables/T-20260531-002/draw_listing_fba.py) — spine x=5.0（3.5KB）
+  - [`draw_overview.py`](../../output/deliverables/T-20260531-002/draw_overview.py) — OS 横断で日本語フォントを自動選択（macOS=ヒラギノ W3 / Linux=IPAGothic）（8.7KB）
+  - [`draw_release.py`](../../output/deliverables/T-20260531-002/draw_release.py) — category branch（3.7KB）
+  - [`draw_setup.py`](../../output/deliverables/T-20260531-002/draw_setup.py) — spine x=5.2（4.5KB）
+  - [`draw_sourcing.py`](../../output/deliverables/T-20260531-002/draw_sourcing.py) — main spine x=5.2（3.1KB）
+  - [`flow_lib.py`](../../output/deliverables/T-20260531-002/flow_lib.py) — OS 横断でゴシック系日本語フォントを自動選択（macOS=ヒラギノ W3 / Linux=IPAGothic）（3.6KB）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260531-002/`

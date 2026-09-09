@@ -215,28 +215,6 @@ Keepa の**トークン上限は1,200・補充20/分**で、貯め込めませ�
   **事前走査で数式0件・名前付き範囲0件・保護範囲0件・基本フィルタ0件を確認**してから行挿入を実行。実行前後の全タブ突合で**既存セルの差分0**。再実行して冪等も確認。
   スクリプト＝`replace_sheet_v13_clean.py`。成果物カタログへ5行追記しシート同期済み（136行）。
 
-
-## 成果物
-- workspace/output/deliverables/T-20260817-005/candidates_v13_top100.csv （★本命・GO上位100件）
-- workspace/output/deliverables/T-20260817-005/candidates_v13.csv （全4,002行・見送り理由つき）
-- workspace/output/deliverables/T-20260817-005/summary.json
-- workspace/output/deliverables/T-20260817-005/finder_selections.json
-- workspace/output/deliverables/T-20260817-005/scan_v13.py
-- workspace/output/deliverables/T-20260817-005/README.md
-- workspace/output/deliverables/T-20260817-005/scan_v13.log / scan_v13_run.log
-- workspace/output/deliverables/T-20260817-005/build_gsheet_v13.py （★シート化スクリプト・2026-08-23 マリエ）
-- workspace/output/deliverables/T-20260817-005/add_amazon_url_columns.py （★既存タブへのAmazonページURL列 非破壊追加・冪等・2026-08-23 マリエ）
-- workspace/output/deliverables/T-20260817-005/add_keepa_link_columns.py （★ASIN列を持つ全5タブへ Keepaリンク列を非破壊追加・冪等・2026-08-23 マリエ）
-- workspace/output/deliverables/T-20260817-005/sheet_url_v13.txt
-- Googleスプレッドシート「メーカー仕入れ台帳」タブ `v13_候補100件` / `v13_サマリ・前提`
-  https://docs.google.com/spreadsheets/d/1y1e15tdhm_o5-RfZxKIer96CWpijVPFUfIbK-W7q7X4
-- workspace/output/deliverables/T-20260817-005/pricing-formula-explainer.md （★2026-08-23 ハジメ・計算式の解説＋B0DWMPV656 損益内訳）
-- workspace/output/deliverables/T-20260817-005/pricing-formula-explainer.html （同・HTML版）
-- ~/Documents/AI Company Outputs/Amazon物販事業/T-20260817-005/pricing-formula-explainer.html （社長確認用）
-- 同ブック 既存タブ `⭐月販実測あり(60商品)` L列 / `連絡先取得済(優先)` N列 に `Amazonページ` 列を追加（2026-08-23 マリエ）
-- workspace/output/deliverables/T-20260817-005/rename_url_columns.py （★URL列ヘッダー名を `Amazonページ` に統一・冪等・安全弁3種・2026-08-23 マリエ）
-- 同ブック `⭐月販実測あり(60商品)` M列 / `⭐︎売れ筋商品` W列 / `連絡先取得済(優先)` O列 / `メーカー台帳` P列 / `v13_候補100件` AD列 に `Keepaリンク` 列を追加（計11,337行・2026-08-23 マリエ）
-
 ## 完了報告
 
 カズヨさん、v1.3 の Keepa 実走が完了しました。**GO 2,479件から消化月数の昇順で上位100件を確定**、水増しはありません。
@@ -344,16 +322,6 @@ Keepa の**トークン上限は1,200・補充20/分**で、貯め込めませ�
   D3（`availabilityAmazon != -1` を除外条件に追加 → **20件が新たに除外**）。D4（想定月販の分母を実セラー数に。`分母の根拠` 列で未検証行と区別）。
   範囲外の D8（**当たり。variationCount=0 が97,484件あり丸ごと落としていた**）と D11（**レビュー件数は offers 無しでは一切返らず検証不能**）も確認して報告に添付。
   消費トークン **約2,962**（うち0トークンで済んだのは D1追加検証・D11測定・全行再集計）。**Googleシートへの書き込みは未実施**。
-
-## 成果物
-- workspace/output/deliverables/T-20260817-005/seller-count-defect-report.md
-- workspace/output/deliverables/T-20260817-005/seller-count-defect-report.html
-- workspace/output/deliverables/T-20260817-005/candidates_v13_top100_clean.csv
-- workspace/output/deliverables/T-20260817-005/seller_count.py
-- workspace/output/deliverables/T-20260817-005/scan_v13.py
-- workspace/output/deliverables/T-20260817-005/candidates_v13.csv（全4,002行を再評価）
-- ~/Documents/AI Company Outputs/Amazon物販事業/T-20260817-005/seller-count-defect-report.html
-- ~/Documents/AI Company Outputs/Amazon物販事業/T-20260817-005/candidates_v13_top100_clean.csv
 
 ## 完了報告
 COUNT_NEW 問題の原因究明・定量・対策と、D1〜D4 の折り込みを1本で完了しました。
@@ -476,19 +444,53 @@ COUNT_NEW 問題の原因究明・定量・対策と、D1〜D4 の折り込み�
 **テスト**: calc/配下191件・procure_limit&scan_v14配下19件（新規追加1件含む）、全パス。
 
 ## 成果物
-- workspace/output/deliverables/T-20260817-005/fee-rates-2026-08.md（★第1段・本体）
-- workspace/output/deliverables/T-20260817-005/fee-rates-2026-08.html
-- workspace/output/deliverables/T-20260817-005/fee-update-before-after-comparison.md（★第3段）
-- workspace/output/deliverables/T-20260817-005/fee-update-before-after-comparison.html
-- workspace/output/deliverables/T-20260817-005/fee-update-sample-comparison.csv（サンプル30件生データ）
-- workspace/output/deliverables/T-20260817-005/recalc_procure_limit.py（★第4段・冪等・Keepa不使用）
+
+- 📁 **[T-20260817-005/](../../output/deliverables/T-20260817-005/)** — 成果物フォルダ（37件）
+  - [`README.md`](../../output/deliverables/T-20260817-005/README.md) — T-20260817-005 メーカー仕入れ v1.3 実走 — 候補リスト（10.8KB）
+  - [`add_amazon_url_columns.py`](../../output/deliverables/T-20260817-005/add_amazon_url_columns.py) — （★既存タブへのAmazonページURL列 非破壊追加・冪等・2026-08-23 マリエ）
+  - [`add_keepa_link_columns.py`](../../output/deliverables/T-20260817-005/add_keepa_link_columns.py) — （★ASIN列を持つ全5タブへ Keepaリンク列を非破壊追加・冪等・2026-08-23 マリエ）
+  - [`build_gsheet_v13.py`](../../output/deliverables/T-20260817-005/build_gsheet_v13.py) — （★シート化スクリプト・2026-08-23 マリエ）
+  - [`build_report_v14.py`](../../output/deliverables/T-20260817-005/build_report_v14.py) — scan_v14 の CSV から、社長がそのまま使える成果物を作る（トークン消費0）。 出力（`v14/` 配下）: 00_サマリ.md … 何件取れたか・何（12.5KB）
+  - [`candidates_v13.csv`](../../output/deliverables/T-20260817-005/candidates_v13.csv) — （全4,002行・見送り理由つき）
+  - [`candidates_v13_top100.csv`](../../output/deliverables/T-20260817-005/candidates_v13_top100.csv) — （★本命・GO上位100件）
+  - [`candidates_v13_top100_clean.csv`](../../output/deliverables/T-20260817-005/candidates_v13_top100_clean.csv) — 100行 × 25列（﻿preset・ASIN・商品名・ブランド ほか）（45.5KB）
+  - [`fee-rates-2026-08.html`](../../output/deliverables/T-20260817-005/fee-rates-2026-08.html) — Amazon手数料表(2026-08時点) — T-20260817-005（19.7KB）
+  - [`fee-rates-2026-08.md`](../../output/deliverables/T-20260817-005/fee-rates-2026-08.md) — （★第1段・本体）
+  - [`fee-update-before-after-comparison.html`](../../output/deliverables/T-20260817-005/fee-update-before-after-comparison.html) — 手数料更新 前後比較 — T-20260817-005（9.0KB）
+  - [`fee-update-before-after-comparison.md`](../../output/deliverables/T-20260817-005/fee-update-before-after-comparison.md) — （★第3段）
+  - [`fee-update-sample-comparison.csv`](../../output/deliverables/T-20260817-005/fee-update-sample-comparison.csv) — （サンプル30件生データ）
+  - [`finder_selections.json`](../../output/deliverables/T-20260817-005/finder_selections.json) — JSONデータ（1.6KB）
+  - [`pricing-formula-explainer.html`](../../output/deliverables/T-20260817-005/pricing-formula-explainer.html) — （同・HTML版）
+  - [`pricing-formula-explainer.md`](../../output/deliverables/T-20260817-005/pricing-formula-explainer.md) — （★2026-08-23 ハジメ・計算式の解説＋B0DWMPV656 損益内訳）
+  - [`procure_limit.py`](../../output/deliverables/T-20260817-005/procure_limit.py) — （バッファ0.0・保管料率補正）
+  - [`raw`](../../output/deliverables/T-20260817-005/raw/) — フォルダ（41件） 〔Git除外・ローカルのみ〕
+  - [`raw_offers`](../../output/deliverables/T-20260817-005/raw_offers/) — フォルダ（37件） 〔Git除外・ローカルのみ〕
+  - [`recalc_procure_limit.py`](../../output/deliverables/T-20260817-005/recalc_procure_limit.py) — （★第4段・冪等・Keepa不使用）
+  - [`rename_url_columns.py`](../../output/deliverables/T-20260817-005/rename_url_columns.py) — （★URL列ヘッダー名を `Amazonページ` に統一・冪等・安全弁3種・2026-08-23 マリエ）
+  - [`replace_sheet_v13_clean.py`](../../output/deliverables/T-20260817-005/replace_sheet_v13_clean.py) — T-20260817-005 / v1.3 候補100件を【クリーン版】へ差し替える（非破壊・冪等）。 2026-08-24 社長判断①「差し替えて」を受けた作（20.1KB）
+  - [`run_v14.sh`](../../output/deliverables/T-20260817-005/run_v14.sh) — シェルスクリプト（1.6KB）
+  - [`scan_v13.log`](../../output/deliverables/T-20260817-005/scan_v13.log) — scan_v13_run.log
+  - [`scan_v13.py`](../../output/deliverables/T-20260817-005/scan_v13.py) — メーカー仕入れ 方針v1.3 実走スキャナ（T-20260817-005）。 社長依頼: 「売れている かつ 仕入れられる商品を100個ほどピックアップ」。 抽（48.5KB）
+  - [`scan_v13.py.bak`](../../output/deliverables/T-20260817-005/scan_v13.py.bak) — ファイル（26.3KB） 〔Git除外・ローカルのみ〕
+  - [`scan_v13_run.log`](../../output/deliverables/T-20260817-005/scan_v13_run.log) — 実行ログ（7.2KB）
+  - [`scan_v14.py`](../../output/deliverables/T-20260817-005/scan_v14.py) — メーカー仕入れ 候補プール継続スキャナ v14（T-20260817-005）。 ## v13 と何が違うか — 社長の方針転換（2026-08-24）を実装し（66.6KB）
+  - [`seller-count-defect-report.html`](../../output/deliverables/T-20260817-005/seller-count-defect-report.html) — 候補リスト欠陥の原因究明と対策（T-20260817-005）（37.4KB）
+  - [`seller-count-defect-report.md`](../../output/deliverables/T-20260817-005/seller-count-defect-report.md) — 候補リスト欠陥の原因究明と対策 — COUNT_NEW 問題 ＋ Keepa 公式定義との差分 D1〜D4（27.1KB）
+  - [`seller_count.py`](../../output/deliverables/T-20260817-005/seller_count.py) — Keepa の「実セラー数（distinct seller）」を数える小さなモジュール（T-20260817-005）。 ## なぜ必要か（2026-08-24（3.9KB）
+  - [`sheet_url_v13.txt`](../../output/deliverables/T-20260817-005/sheet_url_v13.txt) — テキスト（83B）
+  - [`summary.json`](../../output/deliverables/T-20260817-005/summary.json) — JSONデータ（3.5KB）
+  - [`test_procure_limit.py`](../../output/deliverables/T-20260817-005/test_procure_limit.py) — （バッファ性質テストを修正・ガード追加）
+  - [`test_scan_v14_loop.py`](../../output/deliverables/T-20260817-005/test_scan_v14_loop.py) — scan_v14 のハーネス（ラウンドロビン・自動停止・再開）を **API を叩かずに** 検証する。 実行: このディレクトリで `python3 -m p（16.9KB）
+  - [`v14`](../../output/deliverables/T-20260817-005/v14/) — フォルダ（21件）
+  - [`watch_v14.py`](../../output/deliverables/T-20260817-005/watch_v14.py) — scan_v14 の見張り役（無人2段フローの2段目）。Keepa は一切叩かない。 やること3つだけ: 1. `v14/STATUS.md` を定期更新する（（5.7KB）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260817-005/`
+
+補足（従前の記載）:
+- Googleスプレッドシート「メーカー仕入れ台帳」タブ `v13_候補100件` / `v13_サマリ・前提`
+- https://docs.google.com/spreadsheets/d/1y1e15tdhm_o5-RfZxKIer96CWpijVPFUfIbK-W7q7X4
+- 同ブック 既存タブ `⭐月販実測あり(60商品)` L列 / `連絡先取得済(優先)` N列 に `Amazonページ` 列を追加（2026-08-23 マリエ）
+- 同ブック `⭐月販実測あり(60商品)` M列 / `⭐︎売れ筋商品` W列 / `連絡先取得済(優先)` O列 / `メーカー台帳` P列 / `v13_候補100件` AD列 に `Keepaリンク` 列を追加（計11,337行・2026-08-23 マリエ）
 - workspace/output/deliverables/T-20260521-005/code/calc/fees.py（更新。agent_output側も同期済み）
 - workspace/output/deliverables/T-20260521-005/code/calc/test_profit.py（期待値を新料率へ更新。agent_output側も同期済み）
-- workspace/output/deliverables/T-20260817-005/procure_limit.py（バッファ0.0・保管料率補正）
-- workspace/output/deliverables/T-20260817-005/test_procure_limit.py（バッファ性質テストを修正・ガード追加）
 - workspace/output/deliverables/T-20260804-001/maker_scan.py（目標利益率20%統一・保管料新設。agent_output側も同期済み）
-- ~/Documents/AI Company Outputs/Amazon物販事業/T-20260817-005/fee-rates-2026-08.md / .html
-- ~/Documents/AI Company Outputs/Amazon物販事業/T-20260817-005/fee-update-before-after-comparison.md / .html
-- ~/Documents/AI Company Outputs/Amazon物販事業/T-20260817-005/fee-update-sample-comparison.csv
-
-確認をお願いします。次回のスキャン再起動（または次回走行）から新しい手数料表が自動的に反映されます。
+- 確認をお願いします。次回のスキャン再起動（または次回走行）から新しい手数料表が自動的に反映されます。

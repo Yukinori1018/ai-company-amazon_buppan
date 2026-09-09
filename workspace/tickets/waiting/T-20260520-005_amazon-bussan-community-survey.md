@@ -34,3 +34,10 @@ parent_ticket: ""
 - 2026-05-20 役割再編に伴い assignee を secretary → researcher（サトル）に変更
 - 2026-05-20 doing → waiting に移動。レポート完了、社長レビュー待ち
 - 2026-08-21 next_check_at=2026-09-01 を付与（マリエ／T-20260821-005）: レポート納品済・レビュー待ちで3ヶ月停止。月初にまとめて棚卸し
+
+## 成果物
+
+- 📁 **[T-20260520-005/](../../output/deliverables/T-20260520-005/)** — 成果物フォルダ（2件）
+  - [`report.html`](../../output/deliverables/T-20260520-005/report.html) — Amazon物販 界隈調査レポート — 基本・応用・勝ち筋（20.2KB）
+  - [`report.md`](../../output/deliverables/T-20260520-005/report.md) — Amazon物販の界隈調査レポート（X / YouTube）— 基本・応用・勝ち筋（19.1KB）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260520-005/`

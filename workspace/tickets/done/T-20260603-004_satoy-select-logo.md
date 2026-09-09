@@ -39,3 +39,14 @@ Amazon店舗名「Satoy Select」が確定（2026-06-01）。ブランド資産�
   - PNG書き出し9点（フル1280/640×透過/白、アイコン512/256/128透過・navy512/256）
   - 使い分けガイド README_logo-usage.md 添付。Amazonプロフィール用は icon_navy_512.png 推奨
   - PNG化は headless Chrome が不安定（プロセス未終了・tmp枯渇）→ 透過縮小は sips、紺アイコンは qlmanage で確実生成
+
+## 成果物
+
+- 📁 **[T-20260603-004/](../../output/deliverables/T-20260603-004/)** — 成果物フォルダ（6件）
+  - [`final`](../../output/deliverables/T-20260603-004/final/) — フォルダ（6件）
+  - [`logo-preview.html`](../../output/deliverables/T-20260603-004/logo-preview.html) — Satoy Select ロゴ案 一覧（3.5KB）
+  - [`logo_A_seal.svg`](../../output/deliverables/T-20260603-004/logo_A_seal.svg) — 画像（1.1KB）
+  - [`logo_B_gem.svg`](../../output/deliverables/T-20260603-004/logo_B_gem.svg) — 画像（1.1KB）
+  - [`logo_C_monogram.svg`](../../output/deliverables/T-20260603-004/logo_C_monogram.svg) — 画像（899B）
+  - [`logo_D_tag.svg`](../../output/deliverables/T-20260603-004/logo_D_tag.svg) — 画像（991B）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260603-004/`

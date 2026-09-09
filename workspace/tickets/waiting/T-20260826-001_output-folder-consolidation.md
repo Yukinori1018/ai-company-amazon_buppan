@@ -76,18 +76,6 @@ related_tickets: [T-20260821-009, T-20260601-001]
   - **`.gitignore`**: 当初 `*.mp4` を一律禁止にしたが、T-20260817-006 のモック用 92KB 動画まで除外してしまうことに気づき、**`.mov` `.dmg` `.iso` `.tar` `.tgz` のみ**に絞り込み。サイズ判断は拡張子でなく実サイズで行う旨を明文化。
   - **横展開**: CLAUDE.md だけでなく、サブエージェントの保存先を直接規定する `workspace/SUBAGENT_PROTOCOL.md` と `.claude/agents/*.md` 8本の旧パス記述も同時に改訂（放置すると次の発注で即再発するため）。
 
-## 成果物
-
-- workspace/output/deliverables/T-20260520-005/report.md ／ report.html（D から移送・新規チケットフォルダ）
-- workspace/output/deliverables/T-20260520-003/report_v1_20260520.md ／ .html（D から移送・初版）
-- workspace/output/deliverables/T-20260527-002/usage-guide.md（D から移送）
-- workspace/output/deliverables/T-20260703-001/PDCA実績サマリ_電脳せどり一周.pdf（D から移送）
-- workspace/output/deliverables/T-20260715-001/reactivation-steps.html ／ video-verification-checklist.html（C から救出）
-- workspace/output/deliverables/T-20260812-002/無在庫_既存ツール調査_2026-08-12.html（C から救出）
-- workspace/output/deliverables/T-20260601-001/deliverables-catalog.csv（+9行・シート同期済み）
-- CLAUDE.md §3/§5/§6 ／ workspace/SUBAGENT_PROTOCOL.md ／ .claude/agents/*.md 8本 ／ .gitignore（ルール改訂）
-- ~/Documents/AI Company 素材/Amazon物販事業/README.md（素材置き場を新設・リポ外）
-
 ## 完了報告
 
 カズヨさん、成果物の置き場を deliverables 1箇所にまとめ終えました。**失われたファイルは0件**です（作業前に1,128ファイルのハッシュ台帳を取り、作業後に全件突合しました）。
@@ -317,3 +305,23 @@ related_tickets: [T-20260821-009, T-20260601-001]
 ## ログ（追記）
 
 - 2026-08-26 庶務マリエ。社長ご判断②-b（PDF のみ非公開）を受け、PDF 1ファイルを `git rm --cached` → 素材置き場へ移動（SHA-1 一致確認）、`.gitignore` に方針明記、README 2本を整備、セミナー記録のリンク切れを解消。**履歴書き換えは未実行**（§4.1）。影響範囲リストを deliverables へ納品。／社長ご判断「訂正して。」を受け、`docs/reference/fba-prep-center/` の比較表 `.md`・`.xlsx` 双方から誤り13箇所を削除し `【未確認】` に置換、README に訂正の記録を追加。**推測による書き換えはしていません。**
+
+## 成果物
+
+- 📁 **[T-20260826-001/](../../output/deliverables/T-20260826-001/)** — 成果物フォルダ（4件）
+  - [`README.md`](../../output/deliverables/T-20260826-001/README.md) — T-20260826-001 成果物インデックス（882B）
+  - [`history-rewrite-impact.md`](../../output/deliverables/T-20260826-001/history-rewrite-impact.md) — Git 履歴書き換えの影響範囲リスト（T-20260826-001 / 2026-08-26・庶務マリエ）（7.1KB）
+  - [`legal-thirdparty-copyright-review.html`](../../output/deliverables/T-20260826-001/legal-thirdparty-copyright-review.html) — 第三者著作物の公開に関する法務レビュー（T-20260826-001）（43.3KB）
+  - [`legal-thirdparty-copyright-review.md`](../../output/deliverables/T-20260826-001/legal-thirdparty-copyright-review.md) — 第三者著作物の公開に関する法務レビュー（34.2KB）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260826-001/`
+
+補足（従前の記載）:
+- workspace/output/deliverables/T-20260520-005/report.md ／ report.html（D から移送・新規チケットフォルダ）
+- workspace/output/deliverables/T-20260520-003/report_v1_20260520.md ／ .html（D から移送・初版）
+- workspace/output/deliverables/T-20260527-002/usage-guide.md（D から移送）
+- workspace/output/deliverables/T-20260703-001/PDCA実績サマリ_電脳せどり一周.pdf（D から移送）
+- workspace/output/deliverables/T-20260715-001/reactivation-steps.html ／ video-verification-checklist.html（C から救出）
+- workspace/output/deliverables/T-20260812-002/無在庫_既存ツール調査_2026-08-12.html（C から救出）
+- workspace/output/deliverables/T-20260601-001/deliverables-catalog.csv（+9行・シート同期済み）
+- CLAUDE.md §3/§5/§6 ／ workspace/SUBAGENT_PROTOCOL.md ／ .claude/agents/*.md 8本 ／ .gitignore（ルール改訂）
+- ~/Documents/AI Company 素材/Amazon物販事業/README.md（素材置き場を新設・リポ外）
