@@ -551,3 +551,9 @@ todo → doing → waiting の途中経過をカードで再現する必要は�
 - **未解消のドリフト（非破壊のため手を付けず・社長/カズヨ確認事項）**
   - `T-20260907-001` が**ローカルで重複ID**（`done/…gsc-index-coverage` と `doing/…pack-size-resolution`）。Notion は done 側1枚のみで、pack-size 側は板に出せない。**採番のやり直しが要る**。
   - Notion 専用カード4枚（リポジトリに実体なし）: `T-20260806-001`(done) / `T-20260806-002`(waiting) / `T-20260806-003`(done) / `T-20260809-001`(done。同IDのwaitingカードと二重)。削除は §4.1 のため報告のみ。
+
+## 2026-09-11 T-20260909-001 doing→waiting 同期（更新⑫）
+- 手順: ①ローカル waiting 28件と Notion Status=waiting を SQL 1本で突合 ②カード props（Status/Assignee=owner/UpdatedAt/Description）＋本文先頭に A/B/C 表を update_content で挿入 ③owner-tasks.md は python で「新⑫を挿入→旧⑪を <details> に畳む（畳む前に `[ ]` 無しを assert）→最終更新行に前置」を1スクリプトで実施。
+- 突合のついでに拾ったドリフト: T-20260521-002 の Assignee（Notion=content_creator / ローカル=secretary）→ Notion を secretary に修正。
+- T-20260806-002（Notion 専用 waiting カード・リポ実体なし）は既知の孤児。今回も削除せず要確認として報告のみ。waiting 列の件数が Notion 29 / ローカル 28 でずれるのはこの1枚が原因。
+- 学び: 事実（タスクではない）を owner-tasks に書くときは、社長の懸念（「健全なのに停止」）に対する一言の答え（別系統で両立）を必ず添える。
