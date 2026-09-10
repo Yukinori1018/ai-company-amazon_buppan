@@ -1,0 +1,1 @@
+- [時刻つき期限は予約通知を併設](knowledge_timed_deadline_needs_scheduled_reminder.md) — next_check_at はセッション開始時しか効かない。9/10期限のリマインドが1日遅れた（2026-09-11）
