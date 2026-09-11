@@ -5,9 +5,9 @@ status: waiting
 assignee: secretary
 priority: medium
 created_at: 2026-07-26
-updated_at: 2026-07-26
+updated_at: 2026-09-12
 requires_approval: false
-next_check_at: 2026-09-01
+next_check_at: 2026-09-13
 labels: [seller-central, payment, credit-card, setup, blocked-external]
 related_tickets: [T-20260603-003, T-20260715-001]
 ---

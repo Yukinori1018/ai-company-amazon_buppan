@@ -5,11 +5,11 @@ status: waiting
 assignee: owner
 priority: high
 created_at: 2026-09-09
-updated_at: 2026-09-11
+updated_at: 2026-09-12
 requires_approval: false
 labels: [compliance, ops]
 parent_ticket: ""
-next_check_at: 2026-09-12
+next_check_at: 2026-09-13
 related_tickets: [T-20260826-004, T-20260726-003, T-20260904-005]
 ---
 
