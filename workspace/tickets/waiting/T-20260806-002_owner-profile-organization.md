@@ -30,3 +30,7 @@ next_check_at: 2026-08-13
 ## 成果物
 
 - Google ドキュメント「之則の情報（社長プロファイル）」（社長マイドライブ・私的ファイル。リポには置かない）。
+
+## ログ
+
+- 2026-09-12（マリエ）古いブランチ `claude/employment-support-outsourcing-20p283` の取り込み（マージ 56abdd5）で本ファイルがリポジトリに入り、Notion にだけあった「孤児カード」が実体を持った。Notion カード（waiting / general_affairs / low）と frontmatter は一致。owner-tasks.md 更新⑮に社長タスク（優先度・低、今も必要か確認中・不要なら done）として掲載。

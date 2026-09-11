@@ -308,3 +308,11 @@ python3 -c "raw=open('<CSV>','rb').read(); print('CRLF',raw.count(b'\r\n'),'lone
   utf-8 で読むとシート見出しが `﻿チケットID` になり、列名で絞り込めなくなる。
 - HTML 版カタログ（`00_成果物カタログ.html`）は社長の入口ではない。
   既定で生成しない。ファイルは残置（削除は §4.1）。
+
+## 2026-09-12 追記 — build_catalog.py は改行を LF で書く（CSV 全行の差分に見える）
+
+- 既存の CSV は CRLF。`build_catalog.py` を回すと LF で書き直され、`git diff --stat` が 1289 行の変更に見える（中身の差分は +11 行だけ。`git diff --ignore-cr-at-eol` で確認）。
+- 対処：要約を埋める Python で `csv.writer(..., lineterminator='\r\n')`・`encoding='utf-8-sig'` で書き戻すと CRLF に戻り、差分は純増行だけになる。**commit 前に CRLF/LF をバイトで数えること。**
+- 手順（今回）：build_catalog.py → 要記入の行を Python で埋める（ローカル実ファイルの冒頭を読んで1文要約）→ CRLF 検算 → sync_catalog_to_sheet.py（650行×15列・HTTP 200）。
+- 要記入には自分の依頼分以外（別チケットの新成果物）も混ざる。定常責務なのでまとめて埋める（今回は T-20260909-004 の2件、T-20260908-002 の1件）。
+- 追跡状態の確認：`git ls-files <dir>` に出れば追跡済み。`--check-untracked` の既知3件（T-20260904-004 の卸値CSV）は `*.csv` による意図的な除外なので触らない。
