@@ -59,7 +59,7 @@ Keepa の契約文書は3本あります（当職が T-20260824-001 で確定済
 | §13 | 違反の "concrete indications" があれば **temporarily or permanently block** できる | **制裁の本体はここ**（§4） |
 | §12(3) | extraordinary termination は "**intentionally** violated… or gross negligence" が要件 | 本件は自動 `git add -A` による非意図的混入。**intentional ではない**と主張できる |
 | §14(3) | 各当事者の総責任は 12ヶ月間の支払額の **2倍が上限**（Liability Cap） | **金銭上限は €49×12×2 ＝ €1,176（約20万円／1€=170円換算）** |
-| — | **penalty / liquidated damages / 監査権 / 違約金条項は存在しない**（全文検索で該当0） | NETSEA 会員規約27条4項のような 200万円条項に相当するものは **Keepa には無い** |
+| — | **penalty / liquidated damages / 監査権 / 違約金条項は存在しない**（全文検索で該当0） | NETSEA 会員規約27条3項（2026-09-12 訂正：旧記載27条4項は誤り）のような 200万円条項に相当するものは **Keepa には無い** |
 | §20(1)(2) | ドイツ法・Keepa 所在地（Kemnath）の専属管轄 | 提訴のハードルは高い |
 
 **→ 禁止されているのは「再配布」「販売」ではなく、"reproduce"（複製）です。**無償公開でも複製は複製なので、無償だから白、にはなりません。
