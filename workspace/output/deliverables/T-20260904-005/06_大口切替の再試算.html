@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>大口切替（A案）の再試算｜T-20260904-005</title><style>
+:root{--fg:#1b1f23;--mut:#5b6570;--line:#e3e7eb;--acc:#0b5fff;--warn:#b45309;--bad:#b91c1c;--ok:#047857;}
+*{box-sizing:border-box}
+body{margin:0;background:#f6f7f9;color:var(--fg);
+ font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",Meiryo,sans-serif;
+ line-height:1.85;font-size:15.5px;-webkit-text-size-adjust:100%;}
+.wrap{max-width:1000px;margin:0 auto;padding:32px 22px 96px;background:#fff;
+ box-shadow:0 1px 3px rgba(0,0,0,.06);}
+h1{font-size:1.75rem;line-height:1.4;margin:.2em 0 .6em;padding-bottom:.4em;border-bottom:3px solid var(--acc);}
+h2{font-size:1.3rem;margin:2.2em 0 .7em;padding:.35em .6em;background:#eef3ff;border-left:5px solid var(--acc);border-radius:3px;}
+h3{font-size:1.1rem;margin:1.8em 0 .5em;padding-bottom:.25em;border-bottom:1px solid var(--line);}
+p{margin:.7em 0}
+hr{border:0;border-top:1px solid var(--line);margin:2.2em 0}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:.92em;display:block;overflow-x:auto;}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top;}
+th{background:#f0f3f7;font-weight:600;white-space:nowrap;}
+tbody tr:nth-child(even){background:#fafbfc}
+blockquote{margin:1.1em 0;padding:.8em 1em;background:#fffbeb;border-left:5px solid var(--warn);border-radius:3px;color:#463a1a;}
+code{background:#f1f3f5;padding:.12em .4em;border-radius:3px;font-size:.9em;
+ font-family:"SFMono-Regular",Menlo,Consolas,monospace;}
+pre{background:#1e2430;color:#e6edf3;padding:14px 16px;border-radius:6px;overflow-x:auto;font-size:.86em;line-height:1.6;}
+pre code{background:none;color:inherit;padding:0}
+ul,ol{margin:.7em 0;padding-left:1.6em}
+li{margin:.3em 0}
+a{color:var(--acc)}
+@media print{body{background:#fff}.wrap{box-shadow:none;max-width:none}}
+</style></head><body><div class="wrap"><h1>大口切替（A案）の再試算 — 日本ストア再開後</h1>
+<p>T-20260904-005／2026-09-12／経理 ハジメ　宛先：秘書カズヨ（社長判断 9/16 の材料）<br>前回：9/4 試算「A案は3シナリオすべて赤字（A−D 中央 −26,200円）」</p>
+<hr>
+<h2>結論</h2>
+<p><strong>先に：サトルの 05（書いている途中で届きました）では、ケース1の可能性が高いです。</strong> Amazon 公式の比較表と案内では、<strong>カートの利用資格は大口の機能</strong>で、<strong>カテゴリーの出品許可は小口では申請できません</strong>。ブランドの出品許可は公式の明文がなく、二次情報では大口が前提です。1周目は、取引が成立すれば必ずカートで売るので、大口は1周目の途中で必ず要ります。ケース2の表は参考として残します。</p>
+<ol><li><strong>ケース1（1周目にどのみち大口が必要）でも、A案の追加費用は「ほぼ0円」になりません。</strong> 大口が本当に要るのは最初の発注の後（中央 11月前半）なので、9/16 に切り替えると約2か月分、<strong>10,780円</strong>の前払いになります（中央）。さらに、1周目で取引が成立しない確率が60〜76%（推測・マサル／タケシ）あり、その場合は1周目のうちに大口を使う場面がありません。確率で重み付けすると、A−D は <strong>約 −17,000〜−19,000円</strong>です。</li><li><strong>ケース2（小口のままで回せる）では、9/4 の結論（A案は赤字）は変わりませんが、金額は変わります。</strong> 前提だった「Amazon の復旧待ち」が無くなったので、A−D は中央 <strong>−18,960円</strong>（9/4 は −26,200円）です。</li><li><strong>どちらのケースでも順位は C ＞ D ＞ A・B′ です。</strong> 1周目はメーカー直一本で、SD（スーパーデリバリー）を使う予定がありません。そのため、A案で SD を早く使えるようにしても、1周目の中では得になりません。</li><li><strong>大口に切り替える時期は「最初の発注を確定する直前」です（ケース1）。</strong> ゲートの無いメーカーだけで取引が成立した場合は「初回 FBA 納品プランの直前」です。いずれもカナダの本人確認が片付いていることを条件にします（タケシ O-4）。</li><li><strong>大口の月額は10万円の枠に入れず、1周目の損益報告には必ず入れる</strong>のを推奨します。1社だけの成立（中央）なら、枠に入れても入れなくても発注額は変わりません。</li></ol>
+<hr>
+<h2>0. 前提（事実と仮定を分けています）</h2>
+<table><thead><tr><th>項目</th><th>値</th><th>確度</th></tr></thead><tbody>
+<tr><td>大口 月額登録料</td><td>4,900円（税抜）＝<strong>5,390円（税込）/月</strong></td><td>実測：<code>sell.amazon.co.jp/pricing</code> 2026-09-12 再取得で変更なし。税込額は 2026-06-03 の実請求</td></tr>
+<tr><td>小口 基本成約料</td><td>100円（税抜）＝110円（税込）/1点</td><td>実測：同上</td></tr>
+<tr><td>課金のタイミング</td><td>切り替えた日に1回、以後は毎月</td><td><strong>仮定</strong>：公式ページに日割りの記載なし。6/3 は切替日に請求された</td></tr>
+<tr><td>日本ストア</td><td>出品中。北米3か国は停止中</td><td>実測（2026-09-12 実画面・カズヨ）</td></tr>
+<tr><td>日本の現行プラン</td><td>小口</td><td><strong>推定</strong>：月額の請求が 6/3 の1件だけ</td></tr>
+<tr><td>1周目の経路</td><td>メーカー直のみ（10社・3波・9/17〜10/9 送信）</td><td>タケシ改訂版（T-20260912-001/05）。確定前</td></tr>
+<tr><td>取引の成立確率（1社以上）</td><td>24%（マサル補正）〜40%（タケシ）</td><td><strong>推測</strong></td></tr>
+<tr><td>発注日の中央値</td><td>10/20。ゲート申請と大口切替は 11月前半</td><td>タケシ改訂版 §5・§6</td></tr>
+<tr><td>1周目の締め</td><td>2027-01-15（撤退判定）</td><td>タケシ改訂版</td></tr>
+<tr><td>1周目の予算</td><td>1社5万円・合計10万円。手残りは目的にしない</td><td>社長方針（2026-09-12）</td></tr>
+</tbody></table>
+<p><strong>ケース1とケース2の判定材料（サトル 05・2026-09-12 取得）：</strong></p>
+<table><thead><tr><th>機能</th><th>小口</th><th>根拠の格</th></tr></thead><tbody>
+<tr><td>カートの利用資格</td><td>不可（大口の機能として公式に列挙）</td><td>公式</td></tr>
+<tr><td>カテゴリーの出品許可の申請（北陸製菓の食品が該当）</td><td>不可</td><td>公式の比較表</td></tr>
+<tr><td>ブランドの出品許可の申請（北陸・北尾・池本が該当）</td><td>不明（二次情報では大口が前提）</td><td>二次情報のみ</td></tr>
+<tr><td>FBA</td><td>可（ただし在庫の容積に上限あり・現行値は未確認）</td><td>公式</td></tr>
+</tbody></table>
+<p>→ <strong>カートが公式に大口の機能なので、1周目で1点でも売るならケース1です（確度高）。</strong> ケース2が当てはまるのは、1周目に何も売らない場合だけです。</p>
+<hr>
+<h2>1. 計算の考え方（9/4 と同じ）</h2>
+<p>A案とD案（今回の SD 登録はキャンセルし、後で申し込み直す）は、どちらも最終的には SD を使えます。違いは次の2つだけです。</p>
+<ul><li><strong>増分コスト</strong>：大口が本当に必要になる日（下の「本来の切替日」）より前に払う月額</li><li><strong>増分便益</strong>：SD を何週間早く使えるか</li></ul>
+<p>期間は1周目の締め（2027-01-15）までで区切ります。</p>
+<hr>
+<h2>2. ケース1：ゲート申請やカートに大口が必要な場合</h2>
+<h3>2-1. 本来の切替日</h3>
+<p>ゲートの解除申請にはメーカーの請求書が要ります（公式要件：180日以内・10点以上）。請求書は<strong>発注した後</strong>に出るので、「どのみち大口が要る」としても、必要になるのは<strong>早くても発注の時点</strong>です。今ではありません。</p>
+<table><thead><tr><th>シナリオ</th><th>事業の状況</th><th>本来の切替日</th><th>9/16 に切り替えた場合の前払い</th></tr></thead><tbody>
+<tr><td>楽観</td><td>波1の社と早く成立し、10月上旬に発注</td><td>10月中旬</td><td>1回 <strong>5,390円</strong>（9/16分）</td></tr>
+<tr><td><strong>中央</strong></td><td>成立し、発注は中央値の 10/20</td><td>11月前半（タケシの日程）</td><td>2回 <strong>10,780円</strong>（9/16・10/16分）</td></tr>
+<tr><td>悲観</td><td>1周目は不成立（W-7 の第2陣を含む）</td><td>1周目の中では来ない</td><td>4回 <strong>21,560円</strong>（9/16〜12/16分）。解約しなければ以後も毎月</td></tr>
+</tbody></table>
+<p>⚠️ <strong>ここで使う「悲観」は、いちばん起こりやすい結果です。</strong> 不成立の確率は60〜76%（推測）あります。</p>
+<h3>2-2. A−D（ケース1）</h3>
+<table><thead><tr><th>シナリオ</th><th>増分コスト</th><th>増分便益（仮定）</th><th><strong>A−D</strong></th></tr></thead><tbody>
+<tr><td>楽観</td><td>−5,390円</td><td>+6,000円</td><td><strong>+610円</strong></td></tr>
+<tr><td><strong>中央</strong></td><td><strong>−10,780円</strong></td><td><strong>+1,500円</strong></td><td><strong>−9,280円</strong></td></tr>
+<tr><td>悲観</td><td>−21,560円</td><td>0円</td><td><strong>−21,560円</strong></td></tr>
+<tr><td>確率で重み付け（成立 24〜40%。成立した場合は中央の値）</td><td></td><td></td><td><strong>約 −16,600〜−18,600円</strong></td></tr>
+</tbody></table>
+<p>増分便益は仮定です。9/4 の計算方法を予算10万円に置き換えました（2周目の SD を2〜4週間早く使えることの価値＝1周の利益 × SD でしか買えない割合30%（仮定）× 0.5〜1周）。<strong>1周目の中での便益は0円です</strong>（1周目の経路に SD が入っていないため）。</p>
+<p>→ <strong>A案が黒字になるのは、楽観シナリオだけで +610円、ほぼトントンです。</strong> 「追加費用はほぼ0円」という見立ては、「ゲート申請を今すぐ出す運用」の場合にしか成り立ちません。タケシの現行案では申請は 11月前半なので、この場合には当たりません。</p>
+<h3>2-3. ケース1での A・B′・C・D の並び</h3>
+<table><thead><tr><th>順位</th><th>案</th><th>1周目の現金</th><th>コメント</th></tr></thead><tbody>
+<tr><td>1</td><td><strong>C</strong>（SD に期限延長を依頼。<strong>大口に切り替えた時点で #1 の画面を出す</strong>）</td><td>0円</td><td>延長が認められれば、大口を自然な時期に切り替えたうえで SD を維持できます。A案の良い面だけが残ります。送信は §4.1</td></tr>
+<tr><td>2</td><td><strong>D</strong>（今回はキャンセルし、販売を始めてから申し込み直す）</td><td>0円</td><td>SD は「オープン前」を入会不可にしているので、実際に売れているストアで申し込み直すほうが通りやすい（推測・確度中）</td></tr>
+<tr><td>3</td><td><strong>A</strong>（9/16 に大口へ切り替え）</td><td>−5,390〜−21,560円</td><td>中央 −10,780円。お金よりも、§3 の本人確認リスクのほうが重い</td></tr>
+<tr><td>4</td><td><strong>B′</strong>（BASE にカートを置く）</td><td>0円</td><td>1周目は在庫が 11月以降にしか入らず、SD の 11/30「サイトオープン」条件を BASE で満たせません。電話番号の公開と規約への同意（§4.1）も要ります。日本ストアが再開した今は、B′ を選ぶ理由がありません</td></tr>
+</tbody></table>
+<hr>
+<h2>3. お金に換算できないリスク（どちらのケースでも A案だけに付くもの）</h2>
+<table><thead><tr><th>#</th><th>リスク</th><th>重み</th></tr></thead><tbody>
+<tr><td>1</td><td><strong>カナダの本人確認が片付く前にプランを変えることになる。</strong> タケシの入口条件 O-4（「大口に切り替える時点で、カナダの本人確認が悪化していない」）を 9/16 時点では満たせません。本人確認が始まれば Z-2 に当たり、<strong>メーカー10社への送信と発注が全部止まります</strong>（8%・30〜90日の遅れ、推測・タケシ）</td><td><strong>最大。</strong> SD のためのリスクが、1周目の本線まで止めてしまう</td></tr>
+<tr><td>2</td><td><strong>日本ストアに実際に商品が出ているか未確認。</strong> SD は「オープン後のサイト内容を審査する」と明言しています。出品が0件なら、大口の画面を出しても審査に落ちる可能性があります（<strong>未確認</strong>。カズヨが在庫管理画面を開けば、閲覧だけで確認できます）</td><td>大</td></tr>
+<tr><td>3</td><td><strong>SD の 11/30「サイトオープン」条件。</strong> 1周目が不成立（悲観）なら、11/30 の時点でストアに商品がありません</td><td>大</td></tr>
+</tbody></table>
+<p><strong>考えたうえで外した案：「9/16 に大口へ切り替え、画面を撮ってすぐ小口に戻す」。</strong> 前払いは1回 5,390円で済みます。ただし、SD の「小口では使わないでほしい」という条件を、形の上だけで満たすことになります。プラン変更も2回になり、リスク1が2倍になります。推奨しません。</p>
+<hr>
+<h2>4. ケース2：1周目は小口のままで回せる場合</h2>
+<h3>4-1. 9/4 の試算はそのまま使えるか</h3>
+<p><strong>結論（A案は赤字）は使えます。金額は使えません。</strong> 9/4 の3シナリオは「Amazon がいつ復旧するか」で分けていましたが、日本ストアの再開でその前提が無くなりました。今回は、1周目の中で大口を使う場面が無い前提で計算し直します。</p>
+<h3>4-2. A−D（ケース2）</h3>
+<table><thead><tr><th>シナリオ</th><th>大口の月額（9/16〜12/16 の4回）</th><th>払わずに済む小口の成約料（仮定：1/15 までの販売数）</th><th>増分便益（仮定）</th><th><strong>A−D</strong></th><th>参考：9/4</th></tr></thead><tbody>
+<tr><td>楽観</td><td>−21,560円</td><td>+3,300円（30点）</td><td>+6,000円</td><td><strong>−12,260円</strong></td><td>−13,170円</td></tr>
+<tr><td><strong>中央</strong></td><td>−21,560円</td><td>+1,100円（10点）</td><td>+1,500円</td><td><strong>−18,960円</strong></td><td>−26,200円</td></tr>
+<tr><td>悲観</td><td>−21,560円</td><td>0円（0点）</td><td>0円</td><td><strong>−21,560円</strong></td><td>−43,120円</td></tr>
+</tbody></table>
+<p>1/15 以降も大口を続ければ、毎月 5,390円ずつ差が広がります。</p>
+<p><strong>ケース2の中にも、大口が必要になる道が1つあります。</strong> 使う納品代行業者が大口しか受け付けない場合です（実測：一部の業者は小口では契約できない）。その場合、切替日は「初回 FBA 納品プランの直前」になり、数字はケース1の中央・楽観とほぼ同じになります。どちらになるかは、納品代行の業者選び（T-20260826-003 の続き）で決まります。</p>
+<h3>4-3. ケース2での並び</h3>
+<p><strong>C ＞ D ＞ B′ ≒ A。</strong> A案は4回分 21,560円を払っても、1周目の中で使い道がありません。B′ は0円ですが、11/30 の条件を満たせず、効果が出ません。</p>
+<hr>
+<h2>5. 大口に切り替えるのに最適な時期</h2>
+<table><thead><tr><th>条件</th><th>最適な時期</th><th>理由</th></tr></thead><tbody>
+<tr><td>ケース1で、ゲートのある社（北陸製菓・北尾化粧品部・池本刷子工業）と成立した</td><td><strong>最初の発注を確定する直前</strong>（見積もりで O-1〜O-3 がそろった時点）</td><td>5万円を払う前に、ゲート申請の画面と必要書類を自分で確かめられます。「ゲート申請の直前」（着荷の後）より数日から数週間早いだけで、差は最大でも1回 5,390円です。守れる金額は初回の最大 50,000円です</td></tr>
+<tr><td>ケース1で、ゲートの無い社（朝倉染布・河野製紙）とだけ成立した</td><td><strong>初回 FBA 納品プランの直前</strong></td><td>ゲート申請が要らないので、大口が必要になるのはカートを取るときだけです</td></tr>
+<tr><td>ケース2</td><td>1周目の中では切り替えない（納品代行が大口を必須にしている場合だけ、FBA 納品プランの直前）</td><td>小口の成約料 110円 × 月49点が、大口の月額と釣り合う点です</td></tr>
+<tr><td><strong>どのケースでも</strong></td><td><strong>カナダの本人確認が片付いた後</strong>（O-4）</td><td>片付く前に変えると、リスク1（§3）で1周目の本線が止まります</td></tr>
+<tr><td><strong>どのケースでも</strong></td><td><strong>9/16（SD の都合）には合わせない</strong></td><td>SD の期限は、1周目の本線より優先する理由になりません</td></tr>
+</tbody></table>
+<p><strong>「ゲート申請の直前」と「FBA 納品の直前」の二択への答え：</strong> ケース1では「ゲート申請の直前」、さらに言えば「最初の発注を確定する直前」です。ゲート申請は FBA 納品より前に来るので、FBA 納品まで待つことはできません。</p>
+<hr>
+<h2>6. 大口の月額 5,390円を、1周目の予算10万円に含めるか</h2>
+<p><strong>推奨：枠（10万円）には含めない。1周目の損益には必ず含めて報告する。</strong> タケシの推奨A（含めない）と、枠についての結論は同じです。</p>
+<table><thead><tr><th>論点</th><th>数字</th></tr></thead><tbody>
+<tr><td>1周目に大口を払う回数（ケース1で成立・中央）</td><td>11月前半に切替 → 11月・12月・1月初めの <strong>3回 16,170円</strong>（1/15 まで）</td></tr>
+<tr><td>1社だけ成立（中央）の場合</td><td>発注5万円＋大口 16,170円＝66,170円。<strong>10万円に入れても入れなくても、発注額は変わらない</strong></td></tr>
+<tr><td>2社成立（楽観）の場合</td><td>発注10万円＋大口 16,170円＝<strong>現金の最大 116,170円</strong>。枠に含めると、2社目の発注を約 83,800円 − 5万円 ＝ 33,800円に削ることになる</td></tr>
+<tr><td>大口の月額を1点あたりに割り振った場合</td><td>16,170円 ÷ 仕入れ25〜50点 ＝ 1点あたり 323〜647円（推定）。<strong>SKU ごとの利益率5% の判定に混ぜると、ほぼ全件が赤字に見えます</strong></td></tr>
+</tbody></table>
+<p>理由：</p>
+<ol><li><strong>10万円は「在庫にいくらまで賭けるか」の上限です。</strong> 大口の月額は、特定の商品ではなく事業に付く固定費です。枠に入れると、効いてくるのが2社目の発注を削る場面（楽観）だけになります。測れる SKU の数が減り、1周目の目的（成立率 p を実際に測ること）を損ないます。</li><li><strong>ただし、1円もごまかしません。</strong> 1周目の締め（1/15）の報告には、次の2段を並べます。</li></ol>
+<ul><li><strong>SKU の損益</strong>：販売手数料・FBA 配送代行手数料・保管手数料・納品代行費・送料を差し引いたもの（利益率5% の判定に使う）</li><li><strong>1周目の事業損益</strong>：SKU の損益から大口の月額（最大 16,170円）を差し引いたもの</li></ul>
+<ol><li>社長に「最悪いくら出ていくか」をお伝えするときは、<strong>最大 116,170円</strong>（2社成立・大口3回）とお伝えしてください。</li></ol>
+<hr>
+<h2>7. 残っている確認事項（どれも0円）</h2>
+<table><thead><tr><th>#</th><th>確認すること</th><th>これで決まること</th><th>担当</th></tr></thead><tbody>
+<tr><td>1</td><td>ブランドの出品許可の申請が小口でできるか（セラーセントラルのヘルプ G200333160 を読む。<strong>読むだけなら申請にはならない</strong>）</td><td>切替時期を「ゲート申請の直前」まで早める必要があるか（ブランドゲートのある社の場合）</td><td>社長のログイン1手＋カズヨ</td></tr>
+<tr><td>2</td><td>日本ストアの出品数が0件かどうか（在庫管理画面を開くだけ）</td><td>A案が SD の審査を通る見込み（§3 リスク2）</td><td>カズヨ（閲覧のみ）</td></tr>
+<tr><td>3</td><td>納品代行の候補が小口でも契約できるか</td><td>ケース2でも大口が要るか</td><td>サトル（T-20260826-003）</td></tr>
+<tr><td>4</td><td>SD に期限の延長を依頼できるか</td><td>C案が成り立つか</td><td>文面はヒデアキ、<strong>送信は社長</strong>（§4.1）</td></tr>
+</tbody></table>
+<h2>8. 社長の決定との関係（事実だけ）</h2>
+<p>9/4 の社長決定は「A案。<strong>大口切替の実行トリガー＝カナダの違反1件が解消され、出品ステータスが『出品中』に戻ること</strong>」です。9/12 時点で、<strong>日本は出品中ですが、カナダは停止中のまま</strong>です。つまり、決定の文言どおりなら、トリガーはまだ引かれていません。9/12 の予備判定（未復旧なら C案の文面を用意）が生きています。本書の数字も同じ向き（C を先に）を示しています。</p>
+<hr>
+<p>§4.1 に当たる操作（大口への切り替え、SD への返信、BASE への登録）は、いずれも行っていません。</p></div></body></html>
