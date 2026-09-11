@@ -22,6 +22,29 @@ Amazon アカウント停止（T-20260826-004）の対応中、通知・返信�
 
 ---
 
+## 2026-09-12
+
+### カナダの画面が変化：**「無効な課金方法」で全アクセス制限**（社長の申告 → カズヨ確認）
+
+| 観測 | 内容 |
+|---|---|
+| 課金方法ページ（`/sw/AccountInfo/ChargeMethod/step/View`） | 赤枠「**充電できません**」（= Unable to charge の機械翻訳）／「お客様のアカウントへの請求ができません。販売者アカウントへの完全なアクセスを復元するには、有効な支払い方法を設定してください」 |
+| 登録カード | VISA 1枚、有効期限 2031年5月、割当 **Amazon.com.mx / Amazon.com / Amazon.ca**（北米3ストア共通）。カード番号下4桁・名義・請求先住所は**記録しない（PUBLIC リポ）** |
+| 再開ページ（`/performance/account/health/reactivate-your-account`） | **`/authorization/failed/invalid-credit-card` に強制転送**。「Invalid Charge Method — Your access is restricted because of an invalid charge method… It can take up to 48 hours for changes to take effect」＋「Update Charge Method」ボタンのみ |
+| ヘッダー | 「一時停止中」の健全性バッジが**表示されなくなった**（課金ゲートが前面に出たため） |
+
+**対応するメール（本物）**：`donotreply@amazon.com` → satoyukinori1018、2026-09-11 10:59 JST、件名「Credit card update required to resume Amazon seller account payments」、通知種別 **`CREDIT_CARD_INVALID`**、リンクは全て `sellercentral.amazon.ca`。
+本文「We were unable to verify the charge method… Payments will be suspended until you update your account with a valid charge method」。失敗理由の候補7つ（番号/期限/CVV誤り、名義・請求先住所・郵便番号の不一致、プリペイド、**請求不能**、未割当、多要素認証未完了、チャージバック通知）。
+
+**重要な再解釈：**カナダの通知には **2026-06-03・04・05 に同件名「Credit card update required…」が3通**来ていた（T-20260826-004 の原因節に記録済み）。**課金方法の不備は6月から一貫して未解決**で、今回それが最上位のゲートとして表に出た。
+→ 8月末以降の「申し立て導線が行き止まり」「認証に失敗しました」も、**この課金ゲートの手前で詰まっていた可能性**がある（未確定）。
+
+**ケース 21912948521：**処理中のまま、9/7 以降 Amazon の投稿なし。satoyselect の新着は 9/10 の US 休眠通知のみ。
+
+**方針：**カードの更新は**社長本人の操作**（カード情報の入力はカズヨは行わない）。Amazon 自身がアクセス制限を掛けて更新を要求しているため、「アカウント設定を勝手に変えない」既定の例外（MX の銀行口座＝分類 C と同型）。**ケースへの催促（9/11 の A 案）は、カード更新の後に「更新済み」を添えて出す方が筋が良い → 保留。**
+
+---
+
 ## 2026-09-11
 
 ### 08:50 **US店「休眠アカウント」停止通知**（社長の問い合わせで確認）
