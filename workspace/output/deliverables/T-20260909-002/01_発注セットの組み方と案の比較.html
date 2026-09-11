@@ -27,60 +27,26 @@ a{color:var(--acc)}
 @media print{body{background:#fff}.wrap{box-shadow:none;max-width:none}}
 </style></head><body><div class="wrap">
 <h1>初回発注セットの組み方と、案の比較</h1>
-<p>T-20260909-002 / 2026-09-09（案E-2 追記） / タカシ（IT エンジニア）</p>
-<p><strong>⛔ 組んだだけです。発注も購入確定もしていません</strong>（CLAUDE.md §4.1）。</p>
-<p>金額の入った明細は <code>out/</code> にあります（PUBLIC リポなので追跡していません）。 社長は Finder のブックマーク <code>~/Documents/AI Company Outputs/Amazon物販事業/T-20260909-002/out/</code> から <strong><code>03_発注セット.html</code></strong> を開いてください。この1枚で足ります。</p>
+<p>T-20260909-002 / 2026-09-12 版（回転上限6ヶ月・予算10万円） / タカシ（IT エンジニア）</p>
+<p><strong>組んだだけです。発注も購入確定もしていません</strong>（CLAUDE.md §4.1）。</p>
+<p>金額の入った明細は <code>out/</code> にあります（PUBLIC リポなので追跡していません）。 社長は <code>~/Documents/AI Company Outputs/Amazon物販事業/T-20260909-002/out/03_発注セット.html</code> を開いてください。この1枚で足ります。</p>
 <hr>
-<h2>結論を先に</h2>
-<ol><li><strong>5万円では最大3SKU までしか組めません。</strong> 使える5件のうち最も安く始められる4件を 最小ロットで買うだけで予算を超えます。「5〜10SKU」は今の候補では成立しません。</li><li><strong>アイオロスの3SKU 同時発注は予算に入りません。</strong> 3件の最小ロットを足すと 予算の1.5倍になります。アイオロスから買えるのは同時に<strong>最大2SKU</strong>です。</li><li><strong>アイオロスに寄せても送料は安くなりません。</strong> この社は送料が定額で、 いくら積んでも変わらない設定でした（後述）。1社集中の見返りは 「発注を1回にまとめられる」だけで、金額上の利得はごくわずかです。</li><li><strong>本当の論点は送料ではなく回転です。</strong> 5件中3件は、卸の最小ロットがそのまま <strong>2年〜4年分の在庫</strong>になります。売れないのではなく、卸が小さく売ってくれません。</li></ol>
-<hr>
-<h2>0. 2026-09-09 追記 — 納品代行の作業費と、案E-2</h2>
-<h3>0-1. 納品代行の作業費（12円/点）は、すでに利益に入っていました</h3>
-<p>「利益計算に1円も入っていない」という指摘を受けて確認しました。<strong>入っています。</strong></p>
-<ul><li>経理ハジメの <code>C1_費目一覧.csv</code> にある「【現行モデルに欠落】」の注記は、 <strong>2026-09-04 の修正より前</strong>に書かれたものです。同日の commit <code>bf44b59</code> （経理の実測コストを反映）で <code>pipeline/config.py</code> に <code>prep_service_yen = 12.0</code> が入り、 以後の利益計算にはすべて乗っています。</li><li>元データの列「納品送料(FBA+納品代行)」は、<strong>FBA納品送料 ＋ 納品代行 作業費 ＋ NETSEA送料の按分</strong>の合計です。1本の列にまとめてあったため、 作業費が入っているように見えなかった、というのが実態です。</li><li><strong>したがって、これまでお見せした純利益は1円も変わりません。</strong> 今回やったのは<strong>引き算を独立した1行に分けて表示すること</strong>だけです （<code>out/03_発注セット.html</code> 第3部の各SKUカード）。 もう一度引くと二重計上になるので、引いていません。</li><li><strong>梱包資材費も別立てしません。</strong>12円/点に資材が含まれます（<code>materials_cost</code> は 0円）。</li></ul>
-<blockquote><p>教訓: 「入っているか」を注記の文言で判断せず、<strong>生成されたデータの列を見て確かめる</strong>。 注記はコードより古くなります。</p></blockquote>
-<h3>0-2. 案E-2 — ファブリーズを外し、2社以上に分散し、回転上限を掛ける</h3>
-<p>社長のご指示どおり、<code>B00HHIGOU8</code>（クルマ用置き型ファブリーズ）を外して組み直しました。 回転上限は<strong>6ヶ月版と12ヶ月版の両方</strong>を試しています。</p>
-<table><thead><tr><th>版</th><th>結果</th><th>中身</th></tr></thead><tbody><tr><td><strong>12ヶ月版</strong></td><td><strong>組めます</strong></td><td>2SKU / 2社（アイオロス＋オリヒロ）／ 最長回転 6.9ヶ月</td></tr><tr><td><strong>6ヶ月版</strong></td><td><strong>組めません</strong></td><td>2社分散と回転6ヶ月が<strong>両立しません</strong></td></tr></tbody></table>
-<p><strong>6ヶ月版が組めない理由は、予算でも計算方法でもありません。候補プールです。</strong></p>
-<ul><li>回転6ヶ月以内で、かつ<strong>卸の最小ロット1回が予算内に収まる</strong>SKU は、 <strong>オリヒロ1社ぶんの2件しかありません</strong>。2社目から買える候補が存在しないので、 「2社に分散する」という条件を物理的に満たせません。</li><li>アットアロマ（プレザント）は回転2.2〜2.5ヶ月と速いのですが、 <strong>最小ロット1回で予算の2倍以上</strong>になり買えません。</li><li>アイオロスで最も回転が速いソフティモが<strong>6.9ヶ月</strong>で、6ヶ月の線をわずかに超えます。 最小ロットは減らせないので、この0.9ヶ月は詰められません。</li></ul>
-<p><strong>無理に条件を緩めた案を「案E-2」と名乗らせることはしませんでした。</strong> 代わりに、<code>out/03_発注セット.html</code> の<strong>第1部B</strong>に次を数字入りで出しています。</p>
-<ol><li>ファブリーズを外すと<strong>MOST の口数を削ることになる</strong>という連鎖 （2社目のソフティモが枠を大きく食うため）。何点減って手残りがどう動くかを実額で比較</li><li>「2社分散を諦める」場合と「回転上限を諦める」場合の、<strong>それぞれ何を失うか</strong></li><li><strong>候補プールに何が足りないのか</strong>（仕入先ごとの最短回転月数と、使えない理由）</li></ol>
-<h3>0-3. 上流への差し戻し（変わらず）</h3>
-<p>選定条件に <code>最小ロット ÷ 月販見込 ≦ N ヶ月</code> を足すべきです。 今回の行き詰まりは、この条件が無いまま候補を作ったことの帰結です。 N は社長がお決めになる数字なので、こちらでは実装していません（T-20260907-001 の領分）。</p>
-<hr>
-<h2>1. 使ってよい5件（T-20260908-002 の結論をそのまま使用）</h2>
-<table><thead><tr><th>ASIN</th><th>商品</th><th>メーカー</th><th>仕入先</th></tr></thead><tbody><tr><td>B00JX5EF1I</td><td>馬油リンスインシャンプー 600ml</td><td>熊野油脂</td><td>アイオロス</td></tr><tr><td>B0BKZFXC4P</td><td>MOSTチュアブル カルシウム 180粒</td><td>オリヒロ</td><td>オリヒロ</td></tr><tr><td>B015IZDFI0</td><td>シンガーニトリルライト PF SS 100枚</td><td>宇都宮製作所</td><td>アイオロス</td></tr><tr><td>B00HL55RQO</td><td>トイレの消臭元 ラベンダー 400mL ×2</td><td>小林製薬</td><td>NETSEA Direct</td></tr><tr><td>B08W8DCGN2</td><td>ソフティモ クレンジングジェル 210g ×6</td><td>コーセーコスメポート</td><td>アイオロス</td></tr></tbody></table>
-<p>除外したもの（名簿 <code>pool.csv</code> に理由つきで残してあります）: キングジム4件は<strong>メーカー販売終了</strong>、ウルトラエッグ・アミノボディ粒・納豆キナーゼは<strong>判別不能</strong>。</p>
-<p>3社とも NETSEA 上の取引状態は<strong>承認済み（今すぐ発注できる）</strong>です。</p>
-<hr>
-<h2>2. 送料は推定していません（<code>/tariffs</code> の実額・届け先 東京都）</h2>
-<table><thead><tr><th>仕入先</th><th>送料の設定</th><th>まとめ買いの効き方</th></tr></thead><tbody><tr><td>アイオロス</td><td><strong>定額。段階設定なし</strong></td><td><strong>積んでも変わらない</strong>。集約しても金額の得は無い</td></tr><tr><td>NETSEA Direct</td><td><strong>常に無料</strong></td><td>まとめる意味は無い（元から無料）</td></tr><tr><td>オリヒロ</td><td>一定額以上で<strong>無料になる</strong></td><td>積む価値あり。案A・案C はこの線を越えています</td></tr></tbody></table>
-<blockquote><p><code>gradual_border_price</code> は送料無料ラインではありません。<strong><code>price2 == 0</code> のときだけ</strong> 「その金額以上で無料」です（memory: <code>knowledge_netsea_tariffs_api</code>）。 今回もこの読み方で判定しています。届け先が変われば実額は変わるので、 <strong>発注画面で必ず実額を確認してください。</strong></p></blockquote>
-<hr>
-<h2>3. 案の比較</h2>
-<p>金額は <code>out/02_案の比較.csv</code> と <code>out/03_発注セット.html</code> にあります。 ここには構造だけ書きます。</p>
-<table><thead><tr><th>案</th><th>ねらい</th><th>SKU</th><th>社数</th><th>最長回転月数</th></tr></thead><tbody><tr><td>A</td><td>SKU 数を最大に（分散優先）</td><td>5</td><td>3</td><td>46.7ヶ月</td></tr><tr><td>B</td><td>手残りを最大に</td><td>4</td><td>3</td><td>46.7ヶ月</td></tr><tr><td>C</td><td>在庫を寝かせない</td><td>1</td><td>1</td><td>3.2ヶ月</td></tr><tr><td>D</td><td>1社集中（アイオロス）</td><td>2</td><td>1</td><td>46.7ヶ月</td></tr><tr><td>E</td><td>1年で捌ける SKU だけ2本</td><td>2</td><td>2</td><td>6.0ヶ月</td></tr><tr><td><strong>E-2（12ヶ月）</strong></td><td>ファブリーズを外し2社以上・回転12ヶ月以内</td><td>2</td><td>2</td><td>6.9ヶ月</td></tr><tr><td><s>E-2（6ヶ月）</s></td><td>同上・回転6ヶ月以内</td><td>—</td><td>—</td><td><strong>組めません</strong>（§0-2）</td></tr></tbody></table>
-<h3>全滅シナリオ</h3>
-<ul><li><strong>案A</strong> — 1社1SKU に分かれているので、1社止まっても失うのは1SKU（仕入額の約半分）。 代わりに<strong>馬油が34ヶ月分</strong>。3年近く在庫を持つことになり、長期保管手数料と 値下げ競争を丸ごと被ります。</li><li><strong>案B</strong> — アイオロスに2SKU・仕入額の約9割。<strong>この社が止まれば2SKU が同時に死にます。</strong> さらにニトリル手袋が<strong>47ヶ月分</strong>。この案の最大リスクは供給元ではなく在庫です。</li><li><strong>案C</strong> — 1SKU・1社。<strong>出品制限に1回当たった時点で在庫全部が動かせません。</strong> ただし在庫は6ヶ月で捌ける見込みで、回転だけを見れば最も健全です。</li><li><strong>案D</strong> — 全額アイオロス。取引停止・出荷遅延・ブランドのゲート、どれか1つで <strong>2SKU が同時に死にます。</strong>しかも送料は1回にまとまるだけで安くはなりません。</li><li><strong>案E</strong> — 2社に分かれ、どちらも1年以内に捌ける見込み。<strong>構造的な弱点が一番少ない案</strong>ですが、 手残りは案A・案B の約半分です。</li></ul>
-<h3>3案以上を出した理由</h3>
-<p>「粗利が最大の案」と「全滅しにくい案」と「在庫が寝ない案」は、今回<strong>すべて別の案</strong>になりました。 1つに絞ると、絞った時点で他の2つを捨てたことが見えなくなります。決めるのは社長です。</p>
-<hr>
-<h2>4. 一番の発見 — 卸の最小ロットが回転を大きく超えています</h2>
-<p>5件のうち3件は、<strong>最小ロットを1回買っただけで2年〜4年分の在庫</strong>になります。</p>
-<ul><li>回転が遅い商品を選んでしまったのではありません。<strong>卸が小さく売ってくれない</strong>だけです。</li><li>Amazon の長期保管手数料は1年を境に効いてきます。<strong>2年以上の在庫は、 利益計算に載っていないコストを後から乗せてきます。</strong></li><li>ここは「回転検証＝通過」のフィルタでは落ちません。通過判定は 「売れているか」を見ていて、<strong>「最小ロットが何ヶ月分か」は見ていない</strong>からです。</li></ul>
-<p><strong>選定条件に「最小ロット ÷ 月販見込 ≦ N ヶ月」を足すべきです。</strong> これは T-20260907-001 の <code>selection_rules.py</code> 側の話なので、本チケットでは 実装せず論点として置きます（社長が N を決めてから入れるのが順序として正しい）。</p>
-<hr>
-<h2>5. 続報が届いたら</h2>
-<p>T-20260908-002 の 13〜25位のチェックが返ってきたら、</p>
-<pre><code>pool.csv に「現行」の行を足す
-cd workspace/output/deliverables/T-20260909-002 &amp;&amp; python3 order_set.py</code></pre>
-<p>これだけです。<strong>コードは触りません。</strong> <code>order_set.py</code> は <code>pool.csv</code> の <code>供給ステータス == 現行</code> の行だけを使い、 送料は毎回 <code>/tariffs</code> から取り直し、全組み合わせを総当たりして案を選び直します。</p>
-<p>SKU が十数件のうちは総当たりで足ります。50件を超えたらそこで考え直してください（YAGNI）。</p>
-<hr>
-<h2>6. 発注前に社長が確認すること</h2>
-<ol><li><strong>届け先の送料</strong>（この資料は東京都基準）</li><li><strong>シンガーニトリルライトの書類確認</strong> — 元データに「発注前にメーカー書類」の印が付いています</li><li><strong>健康食品の残存期限</strong> — オリヒロのカルシウムは食品です。FBA は残存期限の短い在庫を受けません</li><li><strong>ソフティモのFBAサイズ</strong> — 元データで寸法・重量が取れておらず、標準2で仮置きしています。 実サイズが大きければ利益が減ります</li><li><strong>回転月数</strong> — 上の第4節。ここを飲めるかどうかが案の選択そのものです</li></ol>
-<hr>
+<h2>固定ルール（社長指示 2026-09-12）</h2>
+<div class="tw"><table><thead><tr><th>#</th><th>ルール</th><th>コード上の置き場</th></tr></thead><tbody><tr><td>1</td><td>最小ロットで買って回転が6ヶ月を超える SKU は、案に入れない・生成しない・参考としても出さない</td><td><code>TURNOVER_CAP_MONTHS</code> と <code>assert_rules()</code></td></tr><tr><td>2</td><td>予算は10万円（送料込み）。旧5万円</td><td><code>TOTAL_BUDGET_YEN</code></td></tr><tr><td>3</td><td>手残り・粗利で案を順位付けしない。軸は「6ヶ月以内に確実に捌けるか」と「全滅しにくいか」</td><td><code>_safety_key()</code>（利益をキーに持たない）</td></tr><tr><td>4</td><td>2社以上への分散は望ましいが、ルール1より下位。両立しなければ1社にし、全滅シナリオに明記</td><td><code>wipeout_note()</code></td></tr></tbody></table></div>
+<p>前の版は、回転が数十ヶ月に及ぶ案を「手残り最大」という理由で案A/B/D として出していました。 この版で削除し、同じ案が二度と生成されないよう、ルールを破る案は作った時点で例外にしています。</p>
+<h2>結論</h2>
+<ol><li><strong>回転検証を通過した50件のうち、ルール1・2を満たすのは24件。</strong> 残り26件は、ほぼすべて「卸の最小ロットを1回買うだけで6ヶ月を超える」ことで落ちています。</li><li><strong>24件のうち、生産終了チェックで「現行」と確認済みなのは3件。</strong> うち1件は社長判断で除外済みなので、 <strong>いま案に使えるのは2件（どちらもオリヒロ）</strong> です。</li><li><strong>案は2つだけ出しました。</strong> どちらも1社・2SKU です（ルール4により1社を許容）。<br>・案1: 最小ロットだけで1周を回す<br>・案2: 同じ2SKU を各3ヶ月分まで積む（月販見込が2倍外れても6ヶ月で捌ける量）</li><li><strong>予算の大半が残ります。</strong> 使える SKU が少ないためで、予算を埋めるために回転の遅い SKU を足すことはしません。</li><li><strong>残る24件のうち12件は、生産終了チェックが未実施です。</strong> これが済めば案が厚くなります（サトルへ回す対象）。 ほかに、チェックはしたが「判別不能」「保留」のままの SKU が7件あります。</li></ol>
+<h2>ふるいの順番</h2>
+<ol><li><code>T-20260907-001/out/all_candidates.csv</code> の「回転検証＝通過」全件を読む（生産終了チェックの有無は問わない）</li><li>最小ロット（NETSEA の最小発注口数を入数の倍数に切り上げ）で買ったときの <strong>回転月数 ＝ 出品数 ÷ 月販見込</strong> と <strong>最小ロット金額</strong> を出す</li><li>回転6ヶ月以内・最小ロット10万円以内の両方を満たすものだけ残す</li><li>残ったうち <code>pool.csv</code> に無いものを「生産終了チェック待ち」として列挙する</li><li><code>pool.csv</code> で「現行」、かつ社長の除外リストに無いものだけで案を組む</li></ol>
+<p>機械で落とせるものを先に落とすことで、生産終了チェック（人手）を24件→12件に絞っています。</p>
+<h2>案の選び方</h2>
+<ul><li>予算内に収まる組み合わせを最小ロットで総当たりし、<strong>SKU 数 → 仕入先数 → 最長回転の短さ</strong> の順で1つ選ぶ（案1）</li><li>案2は案1と同じ SKU に、在庫の薄い SKU から1出品ずつ積み、各 SKU が3ヶ月分に達したら止める</li><li>手残り・粗利は選ぶ基準に入れていません。HTML では参考列として置いているだけです</li></ul>
+<h2>全滅シナリオ（両案共通）</h2>
+<ul><li>1社（オリヒロ）に全額。この社の取引停止・欠品・出荷遅れで2SKU が同時に止まる</li><li>出品制限（ゲート）は未確認。2SKU とも同じ種類の商品なので、1つのゲートで両方が同時に止まりうる</li></ul>
+<h2>発注前に確認すること</h2>
+<ul><li>セラーセントラルで2SKU の出品制限（実機確認）</li><li>NETSEA 商品ページの「販売条件」タブ（Amazon 不可・売価厳守の有無）</li><li>送料は東京都宛で計算しています。実額は発注画面で確定</li></ul>
+<h2>続報が届いたら</h2>
+<p><code>pool.csv</code> に「現行」の行を足して <code>python3 order_set.py</code> を再実行するだけです。 ふるい・案の生成・ルールのガードはすべてコード側で毎回やり直します。</p>
 <h2>付記 — この資料に金額が無い理由</h2>
-<p>NETSEA の卸値は会員限定の取引条件で、API 利用規約 第15条1項・会員規約 第7条2項3号に かかります。本リポジトリは PUBLIC で30分ごとに自動 push されるため、 <strong>卸値そのものだけでなく、口数で割れば卸値が復元できる総額も</strong>追跡対象から外しました。 <code>out/</code> は <code>.gitignore</code> 済みです。社長の Finder からは従来どおり読めます。</p>
+<p>金額は NETSEA の卸値そのもので会員限定の取引条件です。本リポジトリは PUBLIC なので、 金額と Keepa 由来の加工値は <code>out/</code>（Git 追跡外）にだけ書いています。</p>
 </div></body></html>
