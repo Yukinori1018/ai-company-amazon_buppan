@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>1周目の仕入れ経路（最終版）</title><style>
+:root{--fg:#1b1f23;--mut:#5b6570;--line:#e3e7eb;--acc:#0b5fff;--warn:#b45309;--bad:#b91c1c;--ok:#047857;}
+*{box-sizing:border-box}
+body{margin:0;background:#f6f7f9;color:var(--fg);
+ font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",Meiryo,sans-serif;
+ line-height:1.85;font-size:15.5px;-webkit-text-size-adjust:100%;}
+.wrap{max-width:1000px;margin:0 auto;padding:32px 22px 96px;background:#fff;
+ box-shadow:0 1px 3px rgba(0,0,0,.06);}
+h1{font-size:1.75rem;line-height:1.4;margin:.2em 0 .6em;padding-bottom:.4em;border-bottom:3px solid var(--acc);}
+h2{font-size:1.3rem;margin:2.2em 0 .7em;padding:.35em .6em;background:#eef3ff;border-left:5px solid var(--acc);border-radius:3px;}
+h3{font-size:1.1rem;margin:1.8em 0 .5em;padding-bottom:.25em;border-bottom:1px solid var(--line);}
+p{margin:.7em 0}
+hr{border:0;border-top:1px solid var(--line);margin:2.2em 0}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:.92em;display:block;overflow-x:auto;}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top;}
+th{background:#f0f3f7;font-weight:600;white-space:nowrap;}
+tbody tr:nth-child(even){background:#fafbfc}
+blockquote{margin:1.1em 0;padding:.8em 1em;background:#fffbeb;border-left:5px solid var(--warn);border-radius:3px;color:#463a1a;}
+code{background:#f1f3f5;padding:.12em .4em;border-radius:3px;font-size:.9em;
+ font-family:"SFMono-Regular",Menlo,Consolas,monospace;}
+pre{background:#1e2430;color:#e6edf3;padding:14px 16px;border-radius:6px;overflow-x:auto;font-size:.86em;line-height:1.6;}
+pre code{background:none;color:inherit;padding:0}
+ul,ol{margin:.7em 0;padding-left:1.6em}
+li{margin:.3em 0}
+a{color:var(--acc)}
+@media print{body{background:#fff}.wrap{box-shadow:none;max-width:none}}
+</style></head>
+<body><div class="wrap">
+<h1>1周目の仕入れ経路（最終版）</h1>
+<p>T-20260912-001／2026-09-12／プランナー タケシ（3周目の仮想 Act）<br>入力: 改訂版 <code>05</code>、マサル2周目 <code>06</code>（差し戻し4点）、カズヨのゲート実機確認（9/12・閲覧のみ）<br>計算: <code>07_mc_最終版.py</code>（マサル <code>06_mc_感応度.py</code> と同じ段。送信先だけ差し替え・乱数固定）</p>
+<blockquote>送信・申請・発注はしていません（§4.1）。PUBLIC リポのため、ASIN と数値は社単位の件数だけ書きます。確率はすべて推測です。</blockquote>
+<hr>
+<h2>0. 結論</h2>
+<ol>
+<li>1周目は本丸メーカー直の一本で、送る相手は4社です（北尾化粧品部・池本刷子工業・朝倉染布・河野製紙）。</li>
+<li>北陸製菓は外しました。食品は「初回から外す」と裁定済みです（T-20260904-004 #8）。</li>
+<li>この計画でまず分かるのは、10月中旬の「返信と見積もり」です。売上は早くて11月末、多くは12月以降になります。</li>
+<li>第2陣は今は作れません。976社のうち販売データがあるのは、第一陣の24社だけです。10/9 までに作る依頼を §9 に書きました。</li>
+</ol>
+<table><thead><tr><th>見込み（推測）</th><th>4社</th><th>幅（成立率×0.5〜×2）</th></tr></thead><tbody>
+<tr><td>前向きな返信が1社以上</td><td>67%</td><td>42〜88%</td></tr>
+<tr><td>1社以上と取引成立</td><td>19%</td><td>10〜36%</td></tr>
+<tr><td>初回販売 ≤ 12/31</td><td>18%</td><td>9〜33%</td></tr>
+<tr><td>初回入金 ≤ 12/31</td><td>17%</td><td>9〜31%</td></tr>
+<tr><td>成立した場合の初回入金の中央値</td><td>12/14</td><td>—</td></tr>
+</tbody></table>
+<p>マサルの見込み（前向き返信90%・成立24%・入金20%）は、10社・5社に送る前提です。4社にしたので下がりました。第2陣（10社）を10月末までに送れれば、前向き返信1社以上は約94%に上がります。</p>
+<hr>
+<h2>1. 社長に判断していただくこと（3つ）</h2>
+<table><thead><tr><th>#</th><th>論点</th><th>推奨</th><th>推奨しない場合</th></tr></thead><tbody>
+<tr><td>1</td><td>1周目を「メーカー直・4社」で進めるか</td><td>進める</td><td>年内に1周目は回りません。ルールの範囲で組める経路が他に無いためです（§3）</td></tr>
+<tr><td>2</td><td>大口の月額（月5,390円）を1周目の10万円に含めるか</td><td>含めない（固定費として別枠）</td><td>含める場合、在庫予算は約9万円（11月に切替）〜約7.8万円（9月に切替）に減ります</td></tr>
+<tr><td>3</td><td>河野製紙に平日9〜17時に電話できるか（9/24〜10/2のどこかで1回・約15分）</td><td>電話する</td><td>3社になります。成立14%・12/31入金12%に下がります</td></tr>
+</tbody></table>
+<ul>
+<li>論点2は、スーパーデリバリーの判断（T-20260904-005・9/16期限）と同じお金です。そちらで大口に切り替える場合、9月から月額がかかります。9/16に一緒に決めてください。</li>
+<li>スーパーデリバリーの判断そのものは、本書では決め直しません。</li>
+</ul>
+<hr>
+<h2>2. テストの目的（二段）</h2>
+<table><thead><tr><th>段</th><th>分かること</th><th>いつ</th><th>確率</th></tr></thead><tbody>
+<tr><td>① 仕入れ先の開拓</td><td>前向きな返信率、断られた理由（法人・実店舗・Amazon 不可・ロット・卸店経由）、初めての実額の卸値</td><td>10/16 頃</td><td>67%（返信1社以上）。第2陣込みで約94%</td></tr>
+<tr><td>② 販売の一周</td><td>納品、カートの取り方、回転、入金</td><td>12月</td><td>約18%（販売）</td></tr>
+</tbody></table>
+<ul>
+<li>12/31 は目安で、目標ではありません。撤退判定は 2027-01-15 のままです。</li>
+<li>②が0でも、①の結果は法人化の判断と、第3陣の選び方の材料になります。</li>
+<li>1社あたりの成立率は、4〜14社では測れません。KPI は返信率・見積もり到達率・断られた理由に置きます（§7）。</li>
+</ul>
+<hr>
+<h2>3. 経路の比較</h2>
+<table><thead><tr><th>経路</th><th>状態</th><th>理由</th></tr></thead><tbody>
+<tr><td>NETSEA のゲート解除</td><td>組めない</td><td>候補0件（改訂版 §3）</td></tr>
+<tr><td><strong>本丸メーカー直</strong></td><td><strong>推奨</strong></td><td>本書</td></tr>
+<tr><td>別のネット卸で母数を作り直す</td><td>やらない</td><td>ゲートはブランドに付くので、同じ漏斗になる</td></tr>
+</tbody></table>
+<hr>
+<h2>4. 送る相手（4社）</h2>
+<p>「買う」足切り（自分の取り分の中央値 ≥ ロット÷1.8、子の値は根拠にしない）を、10点ロットで通る ASIN がある社だけに送ります。</p>
+<table><thead><tr><th>波</th><th>送信日</th><th>社</th><th>足切りを通る ASIN（10点）</th><th>ゲート（代表1件）</th><th>窓口</th><th>注意</th></tr></thead><tbody>
+<tr><td>1</td><td>9/17（木）〜18（金）</td><td>北尾化粧品部</td><td>1</td><td>ブランド許可が必要</td><td>フォーム</td><td>請求書記載の書面確約が要る（O-3）</td></tr>
+<tr><td>1</td><td>同上</td><td>池本刷子工業</td><td>2</td><td>ブランド許可が必要</td><td>フォーム</td><td>販売先は大手卸店。卸店経由を指定されうる</td></tr>
+<tr><td>1</td><td>同上</td><td>朝倉染布</td><td>1</td><td>なし</td><td>フォーム</td><td>公開ロットは20個〜。10点を頼む</td></tr>
+<tr><td>2</td><td>9/24（木）〜25（金）</td><td>河野製紙</td><td>3</td><td>なし</td><td>電話のみ（平日9〜17時）</td><td>論点3</td></tr>
+</tbody></table>
+<ul>
+<li>河野製紙を波1に入れないのは、9/14の週に本書の承認とスーパーデリバリーの期限（9/17）が重なるためです。波1に入れても入金の中央値は1日しか早まりません。</li>
+<li>ゲートは ASIN 単位です。代表以外の ASIN では結果が変わることがあります。</li>
+<li>文面は法務の打診ルール（T-20260904-004）に従い、カズヨが送信ボタンの手前まで作ります。</li>
+</ul>
+<h3>外した社</h3>
+<table><thead><tr><th>社</th><th>理由</th></tr></thead><tbody>
+<tr><td>北陸製菓</td><td>食品。「初回から外す」と裁定済み（下記）</td></tr>
+<tr><td>廣田硝子・楠橋紋織・田中帽子店・大橋量器・金野タオル</td><td>10点で足切りを通る ASIN が0件。ほぼ全部がバリエーションの子</td></tr>
+</tbody></table>
+<p><strong>北陸製菓（食品）を外す根拠</strong></p>
+<table><thead><tr><th>根拠</th><th>中身</th></tr></thead><tbody>
+<tr><td>決まったこと</td><td>T-20260904-004 の #8 は「初回から外す」（escalation #5 の裁定）。1周目は初回にあたる</td></tr>
+<tr><td>裁定の理由が今回そのまま当たる</td><td>除外の理由は、食品カテゴリの審査の難しさの評価が矛盾したまま、というもの。北陸製菓は、まさにその食品カテゴリの許可とブランド許可の二重ゲート</td></tr>
+<tr><td>代わりに失うもの</td><td>成立 24%→19%、12/31入金 21%→17%</td></tr>
+</tbody></table>
+<p>2周目で食品を開くかは、#8 の矛盾が解けてから別に判断します。</p>
+<p><strong>区分3の5社を戻す計算（子の需要を兄弟数で割った下限）はしません。</strong><br>5社の取り分の最大値は1社あたり3.0〜4.67個です。この値は子の ASIN の上限にあたり、兄弟数で割ればさらに下がります。10点の閾値5.6個には、どう割っても届きません。</p>
+<hr>
+<h2>5. 発注の条件（そろったときだけ発注する）</h2>
+<table><thead><tr><th>#</th><th>条件</th></tr></thead><tbody>
+<tr><td>O-1</td><td>見積もりのロットで「買う」足切りを通る（閾値＝ロット÷1.8。10点なら5.6個、5点なら2.8個）</td></tr>
+<tr><td>O-2</td><td>1社の初回5万円以内・合計10万円以内・実額で利益率5%以上・赤字なし</td></tr>
+<tr><td>O-3</td><td>ゲートありの社（北尾・池本）は、メーカーが宛名・住所・請求書番号入りの請求書を出すと書面で確約。数量10点以上</td></tr>
+<tr><td>O-4</td><td>大口に切り替える時点で、カナダの本人確認が悪化していない</td></tr>
+<tr><td>O-5</td><td>着荷から FBA までの経路が決まっている。社長の物理作業は0</td></tr>
+</tbody></table>
+<hr>
+<h2>6. 日程と社長の §4.1</h2>
+<p>休日: 9/19〜23（5連休）、10/12。</p>
+<table><thead><tr><th>週</th><th>社内（0円）</th><th>社長の一手</th><th>件数・時間</th></tr></thead><tbody>
+<tr><td>9/14〜18</td><td>波1の下書き</td><td>本書の承認（9/16まで・§4.1外）／スーパーデリバリーの判断（9/16）と提出（9/17期限・T-20260904-005）／波1を3通</td><td>4件・約45分（推測）</td></tr>
+<tr><td>9/21〜25</td><td>河野製紙の電話メモ</td><td>河野製紙に電話</td><td>1件・約15分</td></tr>
+<tr><td>9/28〜10/2</td><td>返信の記録</td><td>波1への返信</td><td>0〜2件・約20分</td></tr>
+<tr><td>10/5〜9</td><td>O-1〜O-3 を実額で計算。第2陣リストの完成（10/9）</td><td>返信・見積もり依頼</td><td>1〜3件・約30分</td></tr>
+<tr><td>10/12〜16</td><td>10/16 に W-7 を判定</td><td>条件交渉・口座開設の書類</td><td>2〜3件・約50分</td></tr>
+<tr><td>10/19〜23</td><td>—</td><td>発注・決済（条件がそろえば）／第2陣5通（W-7該当時）</td><td>1〜6件・15〜55分</td></tr>
+<tr><td>10/26〜30</td><td>—</td><td>第2陣5通（W-7該当時）</td><td>0〜5件・0〜40分</td></tr>
+<tr><td>11月前半</td><td>納品プラン</td><td>大口切替（初回の納品プランの直前）・納品代行の申込・ゲート申請（北尾・池本の場合）</td><td>2〜3件・約50分</td></tr>
+<tr><td>12月</td><td>販売・価格の監視</td><td>—</td><td>—</td></tr>
+</tbody></table>
+<p>4社に送っても、10/16時点で前向きな返信が2社以上ある確率は約31%です。W-7 は約7割の確率で発動します。第2陣はほぼ本線と見て、先に作ります。</p>
+<hr>
+<h2>7. KPI（3階層）</h2>
+<table><thead><tr><th>階層</th><th>指標</th><th>置き値</th></tr></thead><tbody>
+<tr><td>北極星</td><td>1周目の初回入金日</td><td>目安 12/31・撤退判定 2027-01-15</td></tr>
+<tr><td>北極星（従）</td><td>在庫が売り切れるまでの月数</td><td>6ヶ月以内（固定ルール）</td></tr>
+<tr><td>先行</td><td>前向き返信率／見積もり到達率／断られた理由の内訳／実額の卸値を得た件数</td><td>10/16 までに前向き返信1社・見積もり1社</td></tr>
+<tr><td>行動</td><td>下書きの完成（送信日の前日まで）／社長の §4.1（週あたり）／返信への一次対応</td><td>100%／5件・50分以内／24時間以内</td></tr>
+</tbody></table>
+<hr>
+<h2>8. 撤退条件</h2>
+<table><thead><tr><th>局面</th><th>#</th><th>条件</th><th>起きたら</th></tr></thead><tbody>
+<tr><td>送信前</td><td>W-2</td><td>10点・5点のどちらのロットでも、足切りを通る ASIN が0件</td><td>送らない（今回5社を外した根拠）</td></tr>
+<tr><td>発注前</td><td>W-3</td><td>取り分の中央値 &lt; ロット÷1.8、または回転が6ヶ月超</td><td>発注しない</td></tr>
+<tr><td>発注前</td><td>W-4</td><td>1社5万円超・合計10万円超・利益率5%未満・赤字</td><td>発注しない</td></tr>
+<tr><td>発注前</td><td>W-5</td><td>ゲートありで、請求書記載の書面確約が無い</td><td>発注しない</td></tr>
+<tr><td>返信</td><td>W-7</td><td>10/16 に前向きな返信が2社未満</td><td>第2陣10社を送る（足切り済みのリストがある場合だけ・1回まで）</td></tr>
+<tr><td>返信</td><td>W-8</td><td>累計14社で見積もり到達0</td><td>止めない。断られた理由を集計して社長へ。上位が法人・実績なら法人化の判断材料、ロット・Amazon 不可なら第3陣の選び方を変える</td></tr>
+<tr><td>返信</td><td>W-9</td><td>11/30 に発注0</td><td>1周目は未完走として締め、2周目の設計へ</td></tr>
+<tr><td>販売後</td><td>W-10</td><td>30日で取り分の中央値の1/3未満</td><td>追加仕入れしない</td></tr>
+<tr><td>販売後</td><td>W-11</td><td>60日で取り分の中央値×2の1/3未満</td><td>値下げは1回まで</td></tr>
+<tr><td>販売後</td><td>W-12</td><td>6ヶ月で在庫が残る</td><td>処分する</td></tr>
+<tr><td>全体</td><td>Z-1</td><td>社長の §4.1 が週6件または60分超の週が2週続く</td><td>次の波を1週ずらす</td></tr>
+<tr><td>全体</td><td>Z-2</td><td>大口切替で本人確認が始まる、またはカナダが再停止</td><td>送信・発注を止め、アカウントを先に直す</td></tr>
+<tr><td>全体</td><td>Z-3</td><td>2027-01-15 に初回入金0</td><td>1周目を締める</td></tr>
+</tbody></table>
+<hr>
+<h2>9. 第2陣10社（今は作れない）</h2>
+<table><thead><tr><th>項目</th><th>中身</th></tr></thead><tbody>
+<tr><td>事実</td><td>976社（PASS）のうち、Keepa の販売データがあるのは深掘りした24社だけ。残り952社は Amazon での販売を一度も確かめていない</td></tr>
+<tr><td>必要な調査</td><td><strong>タカシに</strong>、952社から第一陣と同じ手順（ブランド確認 → 3つの物差し → 「買う」足切り）で10社を作る依頼。<strong>サトルに</strong>、その10社の窓口と取引条件の確認（公開情報のみ）。食品は外す</td></tr>
+<tr><td>規模（推測）</td><td>第一陣の歩留まりは約17%（24社を深掘りして、足切りを通ったのは食品を除いて4社）。10社を得るには約60社を深掘りする。Keepa は約20 token/社で約1,200 token（定額・§4.1外）</td></tr>
+<tr><td>期限</td><td>10/9。10/16 の W-7 判定後、10/19 から送れる</td></tr>
+<tr><td>作れなかった場合</td><td>第2陣は送らない。W-8 のとおり、14社ではなく4社の結果で社長へ上げる</td></tr>
+</tbody></table>
+<hr>
+<h2>10. やらないこと</h2>
+<table><thead><tr><th>やらないこと</th><th>理由</th></tr></thead><tbody>
+<tr><td>北陸製菓・区分3の5社への送信</td><td>食品は裁定で除外／買えない相手に社長の手を使う</td></tr>
+<tr><td>区分3を戻すための「兄弟数で割った下限」の計算</td><td>上限の時点で閾値に届かない</td></tr>
+<tr><td>NETSEA のゲート解除・試し買い</td><td>候補0件／検証の発注になる</td></tr>
+<tr><td>別のネット卸での母数の作り直し</td><td>同じ漏斗になる</td></tr>
+<tr><td>初回の連絡での独占・限定の提案</td><td>実績0では通らない。実績ができてから</td></tr>
+<tr><td>SP-API など新しい観測系</td><td>既存画面で足りる</td></tr>
+</tbody></table>
+<hr>
+<h2>11. 会社の最重要KPIへの接続</h2>
+<table><thead><tr><th>KPI</th><th>効き方</th></tr></thead><tbody>
+<tr><td>SKU数100</td><td>1周目の期待値は約0.4 SKU（成立19%×1〜3 SKU）。本当の効果は、返信率と断られた理由の実測。これで第3陣以降の送り先の選び方が決まる</td></tr>
+<tr><td>月商800万円</td><td>相乗りの取り分（1 SKU で月数個〜十数個）では届かない。届くのは、メーカーの需要をまるごと取れる独占・限定の棚だけ。1周目の実績は、それを提案するための入場券</td></tr>
+<tr><td>利益率20%以上</td><td>1周目の下限は5%（社長決定）。20%はメーカー直の卸値でしか狙えない。見積もりの実額が最初の実測になる</td></tr>
+</tbody></table>
+<hr>
+<h2>12. 事実待ち</h2>
+<table><thead><tr><th>事実</th><th>担当</th><th>確定したら</th></tr></thead><tbody>
+<tr><td>第2陣10社</td><td>タカシ・サトル（10/9まで）</td><td>W-7 の実行可否</td></tr>
+<tr><td>スーパーデリバリーの判断</td><td>社長（9/16・T-20260904-005）</td><td>大口の切替時期と論点2</td></tr>
+<tr><td>北尾・池本の代表以外の ASIN のゲート</td><td>カズヨ（見るだけ）</td><td>O-3 がかかる ASIN の範囲</td></tr>
+<tr><td>ゲート申請の10点は、ブランド内で合算できるか</td><td>カズヨ（申請画面を見るだけ）</td><td>10点を1 ASIN に積むか分けるか</td></tr>
+<tr><td>カナダの本人確認</td><td>カズヨ（T-20260909-001）</td><td>O-4・Z-2</td></tr>
+<tr><td>納品代行の料金</td><td>サトル（T-20260826-003）</td><td>O-5 と実額の利益計算</td></tr>
+<tr><td>各社のロット・個人事業主可否・Amazon 可否</td><td>返信でしか分からない</td><td>O-1 の閾値と、断られた理由</td></tr>
+</tbody></table>
+<hr>
+<h2>13. 答え合わせ（2027-01-15）</h2>
+<table><thead><tr><th>予測</th><th>値</th></tr></thead><tbody>
+<tr><td>4社で前向き返信1社以上</td><td>67%</td></tr>
+<tr><td>4社で1社以上成立</td><td>19%</td></tr>
+<tr><td>初回入金 ≤ 12/31</td><td>17%</td></tr>
+<tr><td>10/16 に前向き返信2社以上（W-7 不発）</td><td>31%</td></tr>
+<tr><td>取引に応じたメーカーが請求書記載を書面で確約</td><td>80%（マサル）</td></tr>
+</tbody></table>
+</div></body></html>
