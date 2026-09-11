@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>訪問チェックリスト＋テスト梱包 評価シート — 梱包外注</title>
+<style>
+  :root { --ink:#1a2233; --muted:#5b6675; --line:#d9dee6; --accent:#1f6f5c; --accent-bg:#eaf5f0; --warn-bg:#fff6e6; --warn-line:#e6c877; --card:#f7faf9; }
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic", Meiryo, sans-serif; color: var(--ink); line-height: 1.7; margin: 0; background:#fff; }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 32px 22px 80px; }
+  h1 { font-size: 1.45rem; border-bottom: 3px solid var(--accent); padding-bottom: 12px; }
+  h2 { font-size: 1.2rem; margin-top: 38px; padding-left: 12px; border-left: 5px solid var(--accent); }
+  h3 { font-size: 1rem; margin-top: 22px; color: var(--accent); background:var(--accent-bg); padding:6px 10px; border-radius:6px; }
+  .meta { color: var(--muted); font-size: 0.86rem; }
+  ul.chk { list-style:none; padding-left: 4px; }
+  ul.chk li { margin-bottom: 8px; padding-left: 30px; position: relative; }
+  ul.chk li::before { content:"☐"; position:absolute; left:2px; top:-1px; font-size:1.25rem; color:var(--accent); }
+  .slot { background:#fff2cc; padding:0 4px; border-radius:3px; font-weight:600; }
+  .rate { font-weight:700; letter-spacing:2px; color:var(--muted); }
+  .card { background: var(--card); border:1px solid #cfe3db; border-radius: 10px; padding: 14px 18px; margin: 14px 0; }
+  .flow { background:#f5f7fa; border:1px solid var(--line); border-radius:8px; padding:16px 18px; white-space:pre; font-size:0.85rem; overflow-x:auto; line-height:1.5; }
+  table { border-collapse: collapse; width: 100%; margin: 14px 0; font-size: 0.9rem; }
+  th, td { border: 1px solid var(--line); padding: 9px 10px; text-align: left; }
+  th { background:#f2f5f8; }
+  .callout { background: var(--warn-bg); border:1px solid var(--warn-line); border-radius: 10px; padding: 14px 18px; margin: 18px 0; font-size: 0.92rem; }
+  .small { font-size:0.86rem; color:var(--muted); }
+  strong { color:#12352b; }
+  @media print { .wrap{max-width:none;} ul.chk li::before{content:"☐";} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>訪問チェックリスト＋テスト梱包 評価シート<br><span style="font-size:0.9rem;font-weight:400;color:var(--muted);">就労支援施設への梱包・ラベル貼り外注</span></h1>
+<div class="meta">作成: サトル（リサーチャー） / 2026-08-06 / チケット T-20260806-001</div>
+<div class="meta">準拠: セミナー第2章①外注化・§8.5。動線「①訪問して作業説明（受取→保管→梱包→ラベル貼り→引き渡し）→ ②約1ヶ月テスト梱包（置き場所・スピード・品質・ミス頻度）」。印刷して持参してください。</div>
+
+<h2>Part 1. 訪問時の作業説明チェックリスト</h2>
+<p class="small">5工程「受取 → 保管 → 梱包 → ラベル貼り → 引き渡し」の順に施設側と認識を合わせます。</p>
+
+<h3>① 受取（商品の受け取り）</h3>
+<ul class="chk">
+<li>商品はどうやって施設に届くか（こちらから納品／宅配便着／施設が引き取り）</li>
+<li>受け取り可能な曜日・時間帯（施設の営業日：土日祝の扱い）</li>
+<li>1回あたり受け入れられる数量・箱数の上限</li>
+<li>到着時の<strong>個数チェック（検品）</strong>を誰がやるか、数量差異の連絡ルール</li>
+<li>破損・不良品を見つけたときの取り扱い（よけておく／連絡する）</li>
+<li>納品書・指示書の渡し方（紙／メール／管理表）</li>
+</ul>
+
+<h3>② 保管（作業前後の置き場所）</h3>
+<ul class="chk">
+<li>作業前の商品を置くスペースが確保できるか（<strong>置き場所＝§8.5の要チェック項目</strong>）</li>
+<li>作業済み（梱包完了）商品の一時保管スペース</li>
+<li>保管期間の目安（何日分まで置けるか）</li>
+<li>資材（OPP袋・緩衝材・ラベル）の保管場所</li>
+<li>湿気・直射日光・汚れなど、商品品質を損なわない環境か</li>
+<li>保管に追加料金がかかるか</li>
+</ul>
+
+<h3>③ 梱包（袋詰め・緩衝材）</h3>
+<ul class="chk">
+<li>梱包手順を<strong>手順書（写真つき）</strong>で説明（こちらで用意）</li>
+<li>使用資材の支給方法（袋・緩衝材はこちら支給か施設調達か）</li>
+<li>1個あたりの標準作業（検品→袋入れ→緩衝材→封）を実演して見せる</li>
+<li>Amazon FBA/配送の<strong>梱包要件</strong>（袋の口を閉じる・商品が動かない等）を共有</li>
+<li>商品ごとの注意点（割れ物・型崩れ・におい移り等）</li>
+<li>見本（完成イメージの現物）を1つ渡せるか</li>
+</ul>
+
+<h3>④ ラベル貼り（バーコード／商品ラベル）</h3>
+<ul class="chk">
+<li>貼るラベルの種類（Amazonの商品ラベル＝FNSKUバーコード等）を説明</li>
+<li><strong>貼る位置・向き</strong>の指定（既存バーコードを隠す等のルール）</li>
+<li>ラベルの支給方法（こちらで印刷して支給／データ渡し）</li>
+<li>1商品に複数ラベルがある場合の貼り分け</li>
+<li>貼り間違い・剥がれ時の対処</li>
+<li>スキャン確認（バーコードが読めるか）を施設側で行えるか</li>
+</ul>
+
+<h3>⑤ 引き渡し（完成品の返送・出荷）</h3>
+<ul class="chk">
+<li>完成品の受け渡し方法（こちらが引き取り／施設が発送／宅配便手配）</li>
+<li>引き渡しの頻度（週1回まとめて／◯個たまったら 等）</li>
+<li>完成数の報告方法（数量・作業日）</li>
+<li>送り先（自宅／FBA代行倉庫／Amazon倉庫 等）の指定</li>
+<li>出荷書類（納品書・送り状）の扱い</li>
+</ul>
+
+<h3>⑥ 全体の取り決め（契約前の確認）</h3>
+<ul class="chk">
+<li><strong>単価（1個あたり）</strong>と 最低ロット（セミナー相場観：1商品5〜10円）</li>
+<li>支払い方法・締め日・支払サイト</li>
+<li>連絡窓口（担当者名・電話・メール）と、日々のやり取り手段</li>
+<li>数量が増減したときの対応余地（キャパの上限）</li>
+<li>情報の取り扱い（商品情報・数量などの守秘）</li>
+<li>トラブル時（ミス・破損・遅延）の連絡と補償の考え方</li>
+</ul>
+
+<h2>Part 2. 約1ヶ月のテスト梱包 評価シート</h2>
+<p class="small">§8.5の4軸「置き場所・スピード・品質・ミス頻度」を1ヶ月で実測。本採用の可否はこのシートで判断。</p>
+
+<div class="card">
+<strong>テスト概要</strong><br>
+テスト施設名：<span class="slot">［　　　　　］</span>（種別 A / B）　テスト期間：<span class="slot">［　年　月　日］</span>〜<span class="slot">［　年　月　日］</span>（約4週間）<br>
+対象商品：<span class="slot">［　　　］</span>　テスト数量：<span class="slot">［　　個］</span>　単価（テスト時）：<span class="slot">［　円／個］</span>
+</div>
+
+<h3>評価軸① 置き場所（保管・スペース）</h3>
+<ul class="chk">
+<li>商品・資材・完成品を置くスペースが足りていたか</li>
+<li>商品が汚れ・破損・紛失なく保管されていたか</li>
+</ul>
+<p>5段階評価：<span class="rate">1 ・ 2 ・ 3 ・ 4 ・ 5</span>　メモ：<span class="slot">［　　　　　　　　］</span></p>
+
+<h3>評価軸② スピード（作業速度・納期）</h3>
+<ul class="chk">
+<li>依頼数を納期内に仕上げられたか</li>
+<li>週あたりの処理数：実績<span class="slot">［　個／週］</span>（想定 <span class="slot">［　個／週］</span>に対して）</li>
+<li>数量が増えたときに対応できそうか</li>
+</ul>
+<p>5段階評価：<span class="rate">1 ・ 2 ・ 3 ・ 4 ・ 5</span>　メモ：<span class="slot">［　　　　　　　　］</span></p>
+
+<h3>評価軸③ 品質（仕上がり精度）</h3>
+<ul class="chk">
+<li>梱包の仕上がり（袋・緩衝材・封）が指示通りか</li>
+<li>ラベルの位置・向きが正確か、バーコードが読めるか</li>
+<li>Amazonの受領拒否・顧客クレームにつながる不備がなかったか</li>
+</ul>
+<p>5段階評価：<span class="rate">1 ・ 2 ・ 3 ・ 4 ・ 5</span>　メモ：<span class="slot">［　　　　　　　　］</span></p>
+
+<h3>評価軸④ ミス頻度（不良・間違いの発生率）</h3>
+<ul class="chk">
+<li>梱包ミス・ラベル貼り間違い・数量違いの件数：<span class="slot">［　件 ／ 　個中］</span></li>
+<li>ミス発生時の連絡・リカバリはスムーズだったか</li>
+<li>同じミスが繰り返されなかったか（改善が効くか）</li>
+</ul>
+<p>不良率：<span class="slot">［　％］</span>　5段階評価：<span class="rate">1 ・ 2 ・ 3 ・ 4 ・ 5</span>　メモ：<span class="slot">［　　　　］</span></p>
+
+<h3>追加で見ておくと良い軸（任意）</h3>
+<ul class="chk">
+<li>意思疎通のしやすさ（指示が伝わるか・質問が来るか）</li>
+<li>柔軟性（急な数量変更・仕様変更への対応）</li>
+<li>コスト妥当性（単価×品質のバランス。代行業者との比較）</li>
+</ul>
+
+<h2>Part 3. 本採用の判定（1ヶ月後に記入）</h2>
+<table>
+<tr><th>評価軸</th><th>5段階</th><th>判定コメント</th></tr>
+<tr><td>① 置き場所</td><td></td><td></td></tr>
+<tr><td>② スピード</td><td></td><td></td></tr>
+<tr><td>③ 品質</td><td></td><td></td></tr>
+<tr><td>④ ミス頻度</td><td></td><td></td></tr>
+<tr><td><strong>（総合）</strong></td><td></td><td></td></tr>
+</table>
+<ul class="chk">
+<li><strong>継続委託する / しない / 条件付きで継続</strong>：<span class="slot">［　　　　　］</span></li>
+<li>続ける場合の条件（数量・単価・納期の合意）：<span class="slot">［　　　　　　　］</span></li>
+<li>A型・B型を複数テストした場合の比較メモ：<span class="slot">［　　　　　　　］</span></li>
+</ul>
+
+<div class="callout">
+<strong>セミナーの流儀:</strong> A型・B型の両方を試して比較し、「安さ（B型）」と「安定性（A型）」のどちらが自事業の商品・数量に合うかを実地で見極める。代行業者は高コスト・融通が利かない・紛失リスクがあるため、施設委託が回り出せば単位コストで有利。<br>
+成功事例（池田さん）は委託マニュアルを自作・配布して品質を安定させた。テストで見えた注意点を<strong>手順書に反映</strong>すると本採用後の品質が上がる。
+</div>
+
+<h2>参考: 進め方の全体フロー</h2>
+<div class="flow">共同受注窓口に1本 ─┬─▶ 近い2〜3施設に直接打診（A型・B型混ぜる）
+                    │        │
+                    │        ▼
+                    │   作業可否OK → 見学アポ
+                    ▼        ▼
+                 見学・作業説明（Part 1 チェックリスト）
+                          │
+                          ▼
+                 約1ヶ月テスト梱包（Part 2 評価シート）
+                          │
+                          ▼
+                 本採用判定（Part 3）→ 継続委託／手順書に反映</div>
+
+</div>
+</body>
+</html>
+</content>
