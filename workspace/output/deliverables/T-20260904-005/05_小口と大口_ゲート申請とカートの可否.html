@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>小口と大口：出品許可の申請・カート・FBA の可否（Amazon 公式で再確認）</title><style>
+:root{--fg:#1b1f23;--mut:#5b6570;--line:#e3e7eb;--acc:#0b5fff;--warn:#b45309;--bad:#b91c1c;--ok:#047857;}
+*{box-sizing:border-box}
+body{margin:0;background:#f6f7f9;color:var(--fg);
+ font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",Meiryo,sans-serif;
+ line-height:1.85;font-size:15.5px;-webkit-text-size-adjust:100%;}
+.wrap{max-width:1000px;margin:0 auto;padding:32px 22px 96px;background:#fff;
+ box-shadow:0 1px 3px rgba(0,0,0,.06);}
+h1{font-size:1.75rem;line-height:1.4;margin:.2em 0 .6em;padding-bottom:.4em;border-bottom:3px solid var(--acc);}
+h2{font-size:1.3rem;margin:2.2em 0 .7em;padding:.35em .6em;background:#eef3ff;border-left:5px solid var(--acc);border-radius:3px;}
+h3{font-size:1.1rem;margin:1.8em 0 .5em;padding-bottom:.25em;border-bottom:1px solid var(--line);}
+p{margin:.7em 0}
+hr{border:0;border-top:1px solid var(--line);margin:2.2em 0}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:.92em;display:block;overflow-x:auto;}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top;}
+th{background:#f0f3f7;font-weight:600;white-space:nowrap;}
+tbody tr:nth-child(even){background:#fafbfc}
+blockquote{margin:1.1em 0;padding:.8em 1em;background:#fffbeb;border-left:5px solid var(--warn);border-radius:3px;color:#463a1a;}
+code{background:#f1f3f5;padding:.12em .4em;border-radius:3px;font-size:.9em;
+ font-family:"SFMono-Regular",Menlo,Consolas,monospace;}
+pre{background:#1e2430;color:#e6edf3;padding:14px 16px;border-radius:6px;overflow-x:auto;font-size:.86em;line-height:1.6;}
+pre code{background:none;color:inherit;padding:0}
+ul,ol{margin:.7em 0;padding-left:1.6em}
+li{margin:.3em 0}
+a{color:var(--acc)}
+@media print{body{background:#fff}.wrap{box-shadow:none;max-width:none}}
+</style></head><body><div class="wrap">
+<h1>小口と大口：出品許可の申請・カート・FBA の可否（Amazon 公式で再確認）</h1>
+<ul>
+<li>チケット：T-20260904-005（関連 T-20260912-001）</li>
+<li>調査：リサーチャー サトル／取得日 2026-09-12</li>
+<li>イシュー：<strong>小口のままでは1周目（ゲート付きブランド中心）を回せないのか。</strong> これを公式の記載だけで確かめる</li>
+<li>スコープと打ち切り：非ログインで読める Amazon 公式ページ（sell.amazon.co.jp／amazon.co.jp／m.media-amazon.com の公式 PDF）を主な出典にする。セラーセントラルのヘルプ本文はログイン必須で読めないため、フォーラムに引用された文面は二次情報として扱う。ログインページ・申請ボタンには触れていない</li>
+</ul>
+<h2>結論</h2>
+<table><thead><tr><th>#</th><th>問い</th><th>結論</th><th>根拠の格</th></tr></thead><tbody>
+<tr><td>1a</td><td>小口で<strong>カテゴリー</strong>の出品許可を申請できるか</td><td><strong>不可</strong></td><td>公式（2026-09-12 時点で表示中の比較表）</td></tr>
+<tr><td>1b</td><td>小口で<strong>ブランド</strong>の出品許可を申請できるか</td><td><strong>不明</strong>（公式の明文なし。二次情報は「大口が前提」）</td><td>二次情報のみ</td></tr>
+<tr><td>2</td><td>小口でカートボックスを獲得できるか</td><td><strong>不可</strong></td><td>公式（2026-09-12 時点で表示中の案内ページ）</td></tr>
+<tr><td>3</td><td>小口のまま FBA 納品・FBA 出荷を使えるか</td><td><strong>可</strong></td><td>公式（2026-09-12 時点で表示中の比較表）</td></tr>
+</tbody></table>
+<p>「小口ではカート獲得不可」とする当社 memory の判定（T-20260817-001）は、2026-09-12 時点の公式ページでも変わっていません。</p>
+<hr>
+<h2>1. 出品許可（ゲート解除）の申請</h2>
+<h3>事実</h3>
+<ul>
+<li><strong>公式の比較表（sell.amazon.co.jp/pricing）</strong>：「出品プランの機能」の行「<strong>追加のカテゴリーへの出品を申請する</strong>」は、小口の列にチェックが無く、大口の列にだけチェックがあります。</li>
+<li>確認方法：ページの HTML を1行ずつ読みました。小口のセルにはテキストもチェック画像もなく、大口のセルにだけ <code>icon-check-blue-thick.svg</code> が入っています。公式 PDF の比較表も画像で目視し、同じ結果でした。</li>
+<li>同じ表の「このプランが適しているケース」では、<strong>大口の欄にだけ「制限が課せられるカテゴリーの商品を販売したい」</strong>と書かれています。</li>
+<li><strong>ブランド単位の出品許可</strong>：公式ページのうち非ログインで読めるものには、プランとの関係を書いた記載が見つかりませんでした。探したのは pricing、出品形態変更のご案内、プラン PDF の3つです。</li>
+<li><strong>二次情報</strong>：サイバーレコード（2022-12-19 公開）に「Amazonで出品許可が必要な商品を出品するには、大口出品であることが前提条件となっています」とあります。この記事が根拠として挙げるヘルプ（G200333160 ほか）はログイン必須で、原文まで遡れませんでした。マサルが拾った情報もこの系統です。</li>
+</ul>
+<h3>推測</h3>
+<ul>
+<li>ブランド単位の申請も、実務上は大口が要る可能性が高いと見ます（確度：中）。根拠は、申請の入口が同じ「出品制限の解除申請」画面であることと、二次情報がそろって大口前提と書いていることです。ただし公式の明文は取れていません。</li>
+<li>確定させるには、社長にログインしてもらい、セラーセントラルのヘルプ G200333160（出品制限）を読むのが最短です。<strong>読むだけなら申請にはなりません。</strong></li>
+</ul>
+<h2>2. カートボックス（おすすめ出品）</h2>
+<h3>事実</h3>
+<ul>
+<li><strong>公式案内「出品形態変更のご案内」（amazon.co.jp の node=8485743051）</strong>：見出し「◆大口出品プランで利用いただける機能について」の2番目が「<strong>ショッピングカートボックスの利用資格の獲得</strong>」です。本文は「ショッピングカートボックス（おすすめ出品）とは、購入者が商品をカートに追加するのに使用する『カートに入れるボタン』の利用資格を含みます」。リンク先はヘルプ G200418100（おすすめ出品の利用資格）です。</li>
+<li><strong>公式の比較表</strong>：「検索結果の上位や商品詳細ページに商品を掲載する」の行も、チェックは大口の列にだけあります。</li>
+<li><strong>二次情報</strong>：セラーフォーラム（2019年ごろ投稿）に、ヘルプの文面を引用した投稿があります。引用されているのは「ショッピングカートボックス　大口出品：対応／小口出品：非対応」（G64491）と「ショッピングカートボックス獲得資格　１、出品形態：大口出品である必要があります」（G200418100）です。ヘルプ本文はログイン必須で、2026年版の原文は読めていません。</li>
+</ul>
+<h3>補足</h3>
+<ul>
+<li>公式は「大口の機能である」と肯定形で書いているだけで、「小口は不可」という否定形の明文はありません。ただ「利用資格」を大口の機能として挙げている以上、小口には資格が無いと読むのが素直です（確度：高）。</li>
+<li>US 版の pricing には、現在「Professional が必須」という文言がありません。国によって書き方が違うので、判断には JP の記載を使います。</li>
+</ul>
+<h2>3. FBA（納品と出荷）</h2>
+<h3>事実</h3>
+<ul>
+<li><strong>公式の比較表</strong>：「<strong>フルフィルメント by Amazonでビジネスを拡大する</strong>」は小口・大口の両方にチェックがあります。HTML と PDF の両方で確認しました。</li>
+<li><strong>セラーフォーラム（2020年ごろ）</strong>：ヘルプを引用した投稿に「小口出品アカウントでは、0.28立方メートルの在庫保管制限が設定されています。小口出品アカウントには、在庫保管制限の引き上げは適用されません」とあります。</li>
+<li>Amazon 公式 PDF「FBA在庫保管制限」（2019年8月版・2020年6月版）には、小口についての記載がありません。<strong>0.28㎥が現行の値かどうかは未確認です。</strong></li>
+<li><strong>納品代行側の制約</strong>（Amazon ではなく代行業者の規約）：FBA代行センターは小口では契約できません（当社の既存調査で実測）。糸星はサイト内の記載が矛盾しています。<strong>「納品代行を使う前提」なら、小口では使える業者が絞られます。</strong></li>
+</ul>
+<h3>推測</h3>
+<ul>
+<li>0.28㎥がいまも有効なら、FBA に置ける在庫は 60cm×60cm×78cm 程度の容積が上限です。1周目の数十個規模なら収まる可能性が高いと見ます（確度：低。商品サイズが未確定のため）。</li>
+</ul>
+<hr>
+<h2>比較表（機能 × プラン、公式の比較表と案内ページ。2026-09-12 取得）</h2>
+<table><thead><tr><th>機能</th><th>小口</th><th>大口</th><th>出典</th></tr></thead><tbody>
+<tr><td>FBA を使う</td><td>○</td><td>○</td><td>pricing・PDF</td></tr>
+<tr><td>カタログに新商品を追加</td><td>○</td><td>○</td><td>pricing・PDF</td></tr>
+<tr><td>追加のカテゴリーへの出品を申請</td><td>×（チェックなし）</td><td>○</td><td>pricing・PDF</td></tr>
+<tr><td>ブランドの出品許可を申請</td><td>公式の記載なし</td><td>公式の記載なし</td><td>二次情報では大口が前提</td></tr>
+<tr><td>カートボックスの利用資格</td><td>記載なし（大口の機能として列挙）</td><td>○</td><td>出品形態変更のご案内</td></tr>
+<tr><td>検索上位・詳細ページへの掲載</td><td>×（チェックなし）</td><td>○</td><td>pricing・PDF</td></tr>
+<tr><td>広告ツール</td><td>×（チェックなし）</td><td>○</td><td>pricing・PDF</td></tr>
+<tr><td>FBA 在庫保管の上限</td><td>0.28㎥（未確認）</td><td>在庫パフォーマンス指標で決まる</td><td>フォーラム／公式 PDF</td></tr>
+</tbody></table>
+<p>※「×（チェックなし）」は、公式の表で当該セルが空欄になっていることを指します。</p>
+<h2>経理試算の前提への影響（事実のみ。判断はハジメ・タケシの領分です）</h2>
+<ul>
+<li>事実：経理の試算は「大口に切り替えるべき時期＝初回 FBA 納品プランの直前」を前提にしています。</li>
+<li>事実：カテゴリーの出品許可は、<strong>申請する時点で大口であること</strong>が公式の表から読み取れます。カートも大口の機能です。</li>
+<li>したがって、1周目にゲート付きのカテゴリーを含むなら、大口にすべき時期は「FBA 納品の直前」ではなく「<strong>最初のゲート申請の直前</strong>」に前倒しになります。ブランドのゲートも同じ扱いである可能性が高い（推測・確度：中）。</li>
+<li>「スーパーデリバリーのために大口にする追加費用がほぼ0円になるか」は、ゲート申請とスーパーデリバリーの提出期限（9/17）のどちらを先に迎えるかという、時期の重なりで決まります。<strong>ここから先はタケシ（プランナー）とハジメ（経理）の領分です。</strong></li>
+</ul>
+<h2>出典（すべて 2026-09-12 取得）</h2>
+<table><thead><tr><th>#</th><th>種別</th><th>タイトル</th><th>URL</th></tr></thead><tbody>
+<tr><td>1</td><td>公式</td><td>出品プランと費用（比較表）</td><td>https://sell.amazon.co.jp/pricing</td></tr>
+<tr><td>2</td><td>公式</td><td>出品プラン PDF（1ページ・比較表）</td><td>https://m.media-amazon.com/images/G/09/sell/pdf/selling-plans_JP.pdf</td></tr>
+<tr><td>3</td><td>公式</td><td>Amazon.co.jp: 出品形態変更のご案内</td><td>https://www.amazon.co.jp/b?ie=UTF8&amp;node=8485743051</td></tr>
+<tr><td>4</td><td>公式</td><td>FBA在庫保管制限の主な変更点について（2019年8月版）</td><td>https://m.media-amazon.com/images/G/09/rainier/help/fba/Docs1_Storage_Limits_JP.pdf</td></tr>
+<tr><td>5</td><td>公式</td><td>FBA在庫保管制限（2020年6月版）</td><td>https://m.media-amazon.com/images/G/09/rainier/help/fba/SMS/Docs1_Storage_Limits_JP.pdf</td></tr>
+<tr><td>6</td><td>公式（US・参考）</td><td>How much does it cost to sell on Amazon?</td><td>https://sell.amazon.com/pricing</td></tr>
+<tr><td>7</td><td>二次（セラーフォーラム）</td><td>小口出品のカート取得率について</td><td>https://sellercentral.amazon.co.jp/seller-forums/discussions/t/8f5326e5bb0c5f0847fb9a07fb25fdb9</td></tr>
+<tr><td>8</td><td>二次（セラーフォーラム）</td><td>小口出品者でもFBAシステムを使うことできますか？</td><td>https://sellercentral.amazon.co.jp/seller-forums/discussions/t/03f4da8e9ab66b2692b60b8172729a2c</td></tr>
+<tr><td>9</td><td>二次（業者ブログ・2022-12-19）</td><td>Amazonの出品許可申請｜出品制限ありのカテゴリー＆解除のやり方（サイバーレコード）</td><td>https://www.cyber-records.co.jp/amazon-application-for-exhibition-permission/</td></tr>
+<tr><td>—</td><td>読めず</td><td>セラーセントラルのヘルプ G200418100／G64491／G200333160（JP・US とも本文 0件・ログイン必須）</td><td>—</td></tr>
+</tbody></table>
+<p>取得した HTML・PDF・画像は、Git 追跡外の <code>workspace/output/agent_output/T-20260904-005/sources_20260912/</code> に保存しています。</p>
+</div></body></html>
