@@ -175,6 +175,10 @@ class Builder:
                 self.i += 1
                 continue
 
+            if s.startswith("```"):
+                self.code()
+                continue
+
             if s == "---":
                 # 区切り線は節の「間」に置く。閉じずに出すと囲み枠の内側に線が引かれる
                 self.close_section()
@@ -315,12 +319,24 @@ class Builder:
         buf.append("</ol>")
         self.out.append("".join(buf))
 
+    def code(self):
+        """フェンス付きコードブロック。中身は1字も変えず、改行・全角空白も保持する。
+        メール文案など「そのままコピーして使う」本文のため（T-20260904-005 で追加）。"""
+        import html as _h
+        self.i += 1  # 開きフェンス
+        buf = []
+        while self.i < len(self.lines) and not self.lines[self.i].strip().startswith("```"):
+            buf.append(self.lines[self.i])
+            self.i += 1
+        self.i += 1  # 閉じフェンス
+        self.out.append('<pre class="codeblock"><code>' + _h.escape("\n".join(buf)) + "</code></pre>")
+
     def para(self):
         parts = []
         while self.i < len(self.lines):
             line = self.lines[self.i]
             s = line.strip()
-            if (not s) or s == "---" or s.startswith(("#", "|", ">")) \
+            if (not s) or s == "---" or s.startswith(("#", "|", ">", "```")) \
                or re.match(r"^\s*-\s", line) or re.match(r"^\d+\.\s", line):
                 break
             parts.append(s)
@@ -489,6 +505,8 @@ a.ref:hover,a.ref:focus{color:var(--accent); text-decoration:underline;}
 /* ---------- inline emphasis ---------- */
 strong{font-weight:700; color:var(--text);}
 td strong,th strong{font-weight:700;}
+pre.codeblock{white-space:pre-wrap; word-break:break-all; background:rgba(127,127,127,.10); border:1px solid rgba(127,127,127,.35); border-radius:6px; padding:14px 16px; line-height:1.7; font-size:14px; overflow-x:auto;}
+pre.codeblock code{background:none; border:0; padding:0; font-size:inherit;}
 code{
   font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
   font-size:.9em; padding:.05em .35em; border-radius:4px;
@@ -606,6 +624,7 @@ tbody tr[id]:target td:first-child{box-shadow:inset 4px 0 0 var(--accent); color
   .sec-box{background:#fff; border:1.5pt solid #000;}
   .sec-danger{border:2.5pt solid #000; border-left:2.5pt solid #000;}
   .chk{background:#fff; color:#000; border:1pt solid #000;}
+  pre.codeblock{background:#fff; border:1px solid #999; break-inside:avoid;}
   code{background:#fff; border:1px solid #999;}
   .pill{background:#fff!important; color:#000!important; border:1.2pt solid #000!important;}
   /* 未検証は印刷でも「済んだもの」と別に見えなければ意味がない。

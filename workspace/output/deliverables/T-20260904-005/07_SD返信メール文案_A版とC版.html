@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SD返信メール文案 A版・C版（T-20260904-005）</title>
+<meta name="robots" content="noindex, nofollow">
+<style>
+:root{
+  color-scheme: light dark;
+  --bg:#ffffff; --surface:#f5f7f9; --surface2:#eceff3;
+  --text:#1b1f24; --muted:#525b66; --faint:#6c7681;
+  --border:#d5dae1; --border-strong:#b8c0ca;
+  --accent:#1c5b86; --accent-bg:#eef5fa;
+  --warn:#8a4b00; --warn-bg:#fdf1df; --warn-border:#dd9a3c;
+  --alert:#7d2b2b; --alert-bg:#fbeeee; --alert-border:#d08b8b;
+  --ok:#1b6144; --ok-bg:#eaf4ef; --ok-border:#8ab9a3;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#15181c; --surface:#1d2126; --surface2:#252a31;
+    --text:#e4e8ec; --muted:#aab4bf; --faint:#949eaa;
+    --border:#333a43; --border-strong:#48515c;
+    --accent:#79b4dc; --accent-bg:#1a2a36;
+    --warn:#f0b866; --warn-bg:#332616; --warn-border:#7a5a2a;
+    --alert:#e79a9a; --alert-bg:#331e1e; --alert-border:#6e4040;
+    --ok:#84cfa9; --ok-bg:#17281f; --ok-border:#3c6450;
+  }
+}
+*{box-sizing:border-box;}
+html{ -webkit-text-size-adjust:100%; }
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic Medium","Yu Gothic",
+              "Noto Sans JP","Meiryo",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:16px; line-height:1.85;
+  font-feature-settings:"palt" 1;
+  text-align:left;
+}
+.wrap{max-width:900px; margin:0 auto; padding:32px 20px 96px;}
+
+/* ---------- header ---------- */
+.kicker{
+  font-size:12px; letter-spacing:.14em; color:var(--faint);
+  margin:0 0 10px; font-variant-numeric:tabular-nums;
+}
+h1{
+  font-size:27px; line-height:1.5; margin:0 0 20px;
+  letter-spacing:.01em; font-weight:700; text-wrap:balance;
+}
+.lead{
+  margin:0; color:var(--muted); font-size:15px; line-height:1.8;
+  border-left:3px solid var(--border-strong); padding:2px 0 2px 14px;
+}
+
+/* ---------- toc ---------- */
+.toc{
+  margin:30px 0 8px; padding:18px 22px 20px;
+  background:var(--surface); border:1px solid var(--border); border-radius:10px;
+}
+.toc-h{
+  margin:0 0 10px; font-size:13px; font-weight:700;
+  letter-spacing:.1em; color:var(--muted);
+}
+.toc ul.toc-list{margin:0; padding:0; list-style:none;}
+.toc li{margin:.26em 0; line-height:1.65;}
+.toc li.toc-lv1{margin:.85em 0 .3em; font-weight:700;}
+.toc li.toc-lv1:first-child{margin-top:0;}
+.toc li.toc-lv2{padding-left:1.1em;}
+.toc li.toc-lv3{padding-left:2.5em; font-size:14.5px; color:var(--muted); margin:.16em 0;}
+.toc li.toc-lv3::before{content:"–"; color:var(--faint); margin-right:.45em;}
+.toc a{color:var(--accent); text-decoration:none; border-bottom:1px solid transparent;}
+.toc a:hover{border-bottom-color:currentColor;}
+
+/* ---------- part ---------- */
+h1.part{
+  font-size:24px; line-height:1.5; font-weight:700; letter-spacing:.02em;
+  margin:64px 0 8px; padding:14px 0 0; border-top:4px solid var(--text);
+  scroll-margin-top:16px;
+}
+
+/* ---------- sections ---------- */
+.sec{margin:0;}
+.sec>*:last-child{margin-bottom:0;}
+h2{
+  font-size:21px; line-height:1.5; margin:46px 0 16px; padding-bottom:9px;
+  border-bottom:2px solid var(--border-strong); font-weight:700;
+  scroll-margin-top:16px;
+}
+h3{
+  font-size:17px; line-height:1.6; margin:32px 0 12px; font-weight:700;
+  color:var(--text); scroll-margin-top:16px;
+}
+h3::before{content:""; display:inline-block; width:4px; height:1em;
+  background:var(--accent); margin-right:9px; vertical-align:-.13em; border-radius:2px;}
+p{margin:0 0 1.1em;}
+ul,ol{margin:0 0 1.2em; padding-left:1.6em;}
+li{margin:.4em 0;}
+li>ul{margin:.45em 0 .2em;}
+blockquote{
+  margin:0 0 1.2em; padding:14px 18px;
+  background:var(--surface); border-left:4px solid var(--accent); border-radius:0 8px 8px 0;
+}
+blockquote p{margin:0;}
+hr.rule{
+  border:0; border-top:1px solid var(--border);
+  margin:40px 0 0; opacity:.55;
+}
+hr.rule:has(+ .sec-box),hr.rule:has(+ h1.part){display:none;}
+
+/* ---------- tables ---------- */
+.tw{
+  overflow-x:auto; -webkit-overflow-scrolling:touch;
+  margin:0 0 1.4em; border:1px solid var(--border); border-radius:9px;
+  background:
+    linear-gradient(to right, var(--bg) 30%, rgba(0,0,0,0)) left / 28px 100% no-repeat local,
+    linear-gradient(to left,  var(--bg) 30%, rgba(0,0,0,0)) right / 28px 100% no-repeat local,
+    radial-gradient(farthest-side at 0 50%, rgba(90,110,130,.28), rgba(0,0,0,0)) left / 12px 100% no-repeat scroll,
+    radial-gradient(farthest-side at 100% 50%, rgba(90,110,130,.28), rgba(0,0,0,0)) right / 12px 100% no-repeat scroll;
+}
+.tw:focus{outline:2px solid var(--accent); outline-offset:2px;}
+table{border-collapse:collapse; width:100%; font-size:14.5px; line-height:1.72;}
+thead th{
+  background:var(--surface2); text-align:left; font-weight:700;
+  padding:11px 14px; border-bottom:2px solid var(--border-strong);
+  white-space:nowrap; vertical-align:bottom;
+}
+tbody td{padding:11px 14px; border-bottom:1px solid var(--border); vertical-align:top;
+  overflow-wrap:anywhere;}
+tbody tr:last-child td{border-bottom:0;}
+tbody tr:nth-child(even){background:color-mix(in srgb, var(--surface) 55%, transparent);}
+tbody td:first-child{font-weight:600;}
+thead th:first-child,tbody td:first-child{min-width:7.5em;}
+thead th:last-child,tbody td:last-child{white-space:normal;}
+
+/* ---------- inline markers ---------- */
+.ref{
+  font-size:.75em; color:var(--faint); margin-left:.15em;
+  white-space:nowrap; font-variant-numeric:tabular-nums;
+  letter-spacing:.01em; vertical-align:.06em;
+}
+/* [#n] は出典表に行がある時だけリンクになる。見た目は span と同じにして
+   本文の印象を変えない（追加したのは移動手段だけで、文字は足していない） */
+a.ref{text-decoration:none;}
+a.ref:hover,a.ref:focus{color:var(--accent); text-decoration:underline;}
+.chk{
+  display:inline-block; font-size:.75em; line-height:1.5;
+  padding:0 .5em; margin:0 .12em; border-radius:4px;
+  background:var(--warn-bg); color:var(--warn);
+  border:1px solid var(--warn-border); font-weight:700;
+  white-space:nowrap; vertical-align:.09em;
+}
+
+/* ---------- inline emphasis ---------- */
+strong{font-weight:700; color:var(--text);}
+td strong,th strong{font-weight:700;}
+pre.codeblock{white-space:pre-wrap; word-break:break-all; background:rgba(127,127,127,.10); border:1px solid rgba(127,127,127,.35); border-radius:6px; padding:14px 16px; line-height:1.7; font-size:14px; overflow-x:auto;}
+pre.codeblock code{background:none; border:0; padding:0; font-size:inherit;}
+code{
+  font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+  font-size:.9em; padding:.05em .35em; border-radius:4px;
+  background:var(--surface2); border:1px solid var(--border);
+}
+code .chk{font-family:inherit;}
+
+/* ---------- 表セル内の語ハイライト ---------- */
+.pill{
+  display:inline-block; padding:0 .45em; border-radius:4px;
+  font-weight:700; white-space:nowrap;
+}
+.pill-danger{background:var(--alert); color:#fff; border:1px solid var(--alert);}
+.pill-warn{background:var(--warn-bg); color:var(--warn); border:1px solid var(--warn-border);}
+.pill-ok{background:var(--ok-bg); color:var(--ok); border:1px solid var(--ok-border);}
+.pill-info{background:var(--accent-bg); color:var(--accent); border:1px solid var(--accent);}
+/* muted は「検証していない」を表す。塗らず・破線で、済んだものと視覚的に別系統にする */
+.pill-muted{background:transparent; color:var(--faint);
+  border:1px dashed var(--border-strong); font-weight:600;}
+tbody tr.row-danger td:first-child{box-shadow:inset 4px 0 0 var(--alert);}
+tbody tr.row-danger td{background:color-mix(in srgb, var(--alert-bg) 70%, transparent);}
+
+/* ---------- 出典一覧（--reftable） ---------- */
+table.reftable:has(colgroup){table-layout:fixed; min-width:600px;}
+/* 狭い画面で列が1〜2文字幅に潰れるのを防ぐ。溢れは .tw の横スクロールが受ける */
+table.reftable td:first-child{
+  min-width:2.6em; width:2.6em; text-align:right; white-space:nowrap;
+  font-variant-numeric:tabular-nums; color:var(--muted);
+}
+table.reftable th:first-child{min-width:2.6em; width:2.6em; text-align:right;}
+tbody tr[id]{scroll-margin-top:14px;}
+tbody tr[id]:target td{background:var(--accent-bg);}
+tbody tr[id]:target td:first-child{box-shadow:inset 4px 0 0 var(--accent); color:var(--accent);}
+
+/* ---------- emphasised sections ---------- */
+.sec-box{
+  margin:28px 0 0; padding:6px 26px 20px;
+  border:1px solid var(--border-strong); border-radius:10px;
+}
+.sec-box h2{margin-top:26px;}
+.sec-box .tw{background-color:var(--bg);}
+.sec-conclusion{background:var(--accent-bg); border-left:6px solid var(--accent);}
+.sec-conclusion h2{border-bottom-color:var(--accent);}
+.sec-alert{background:var(--alert-bg); border-color:var(--alert-border);
+  border-left:6px solid var(--alert);}
+.sec-alert h2{border-bottom-color:var(--alert-border);}
+.sec-danger{background:var(--alert-bg); border:2px solid var(--alert);
+  border-left:10px solid var(--alert);}
+.sec-danger h2{border-bottom-color:var(--alert);}
+.sec-warn{background:var(--warn-bg); border-color:var(--warn-border);
+  border-left:6px solid var(--warn-border);}
+.sec-warn h2{border-bottom-color:var(--warn-border);}
+.sec-checklist{background:var(--surface); border:2px solid var(--border-strong);
+  border-left:10px solid var(--accent);}
+.sec-checklist h2{border-bottom-color:var(--accent);}
+/* チェックリストは印刷して手元で使う。番号は原稿どおり残し、記入欄だけ CSS で足す */
+.sec-checklist ol{list-style:decimal; padding-left:1.9em;}
+.sec-checklist ol>li{margin:.7em 0; padding-left:2.1em; position:relative;}
+.sec-checklist ol>li::before{
+  content:""; position:absolute; left:0; top:.25em;
+  width:1.15em; height:1.15em; border:1.5px solid var(--border-strong);
+  border-radius:3px; background:var(--bg);
+}
+
+/* ---------- toc: 囲み枠の節は目次でも色を付ける ---------- */
+.toc a.toc-danger,.toc a.toc-alert{color:var(--alert); font-weight:700;}
+.toc a.toc-warn{color:var(--warn); font-weight:700;}
+.toc a.toc-checklist{color:var(--accent); font-weight:700;}
+
+/* ---------- footer / nav ---------- */
+.prov{
+  margin:56px 0 0; padding-top:16px; border-top:1px solid var(--border);
+  font-size:12.5px; line-height:1.8; color:var(--faint); word-break:break-all;
+}
+.top{
+  position:fixed; right:18px; bottom:18px; z-index:5;
+  display:block; width:42px; height:42px; line-height:40px; text-align:center;
+  border-radius:50%; text-decoration:none; font-size:17px;
+  background:var(--surface); color:var(--muted);
+  border:1px solid var(--border-strong);
+  box-shadow:0 2px 8px rgba(0,0,0,.14);
+}
+.top:hover{color:var(--accent); border-color:var(--accent);}
+
+/* ---------- narrow screens ---------- */
+@media (max-width:640px){
+  body{font-size:15.5px;}
+  .wrap{padding:22px 14px 88px;}
+  h1{font-size:22px;}
+  h1.part{font-size:20px; margin-top:46px;}
+  h2{font-size:19px;}
+  h3{font-size:16.5px;}
+  .toc{padding:14px 16px 16px;}
+  .sec-box{padding:4px 14px 14px;}
+  table{font-size:14px;}
+  thead th,tbody td{padding:9px 11px;}
+}
+
+/* ---------- print ---------- */
+@media print{
+  :root{
+    --bg:#fff; --surface:#fff; --surface2:#fff; --text:#000; --muted:#333; --faint:#555;
+    --border:#999; --border-strong:#555; --accent:#000; --accent-bg:#fff;
+    --warn:#000; --warn-bg:#fff; --warn-border:#000;
+    --alert:#000; --alert-bg:#fff; --alert-border:#000;
+  }
+  body{background:#fff; color:#000; font-size:10.5pt; line-height:1.7;}
+  .wrap{max-width:none; padding:0;}
+  a{color:#000; text-decoration:none;}
+  .top{display:none;}
+  .tw{overflow:visible; background:none; border:1px solid #999;}
+  table{font-size:9pt;}
+  thead th{background:#fff; border-bottom:1.5pt solid #000;}
+  tbody tr:nth-child(even){background:#fff;}
+  .sec-box{background:#fff; border:1.5pt solid #000;}
+  .sec-danger{border:2.5pt solid #000; border-left:2.5pt solid #000;}
+  .chk{background:#fff; color:#000; border:1pt solid #000;}
+  pre.codeblock{background:#fff; border:1px solid #999; break-inside:avoid;}
+  code{background:#fff; border:1px solid #999;}
+  .pill{background:#fff!important; color:#000!important; border:1.2pt solid #000!important;}
+  /* 未検証は印刷でも「済んだもの」と別に見えなければ意味がない。
+     モノクロでは色が消えるので、破線と濃度で差を残す */
+  .pill-muted{border:1pt dashed #666!important; color:#555!important; font-weight:400!important;}
+  /* 長いURLは印刷で紙幅を超える。折り返しを許可して溢れを止める */
+  .tw{overflow:hidden;}
+  table{table-layout:auto; width:100%;}
+  tbody td{overflow-wrap:anywhere; word-break:break-word;}
+  thead th{white-space:normal;}
+  table.reftable{font-size:7.6pt; line-height:1.5;}
+  table.reftable thead th,table.reftable tbody td{padding:5px 6px;}
+  tbody tr[id]:target td{background:#fff;}
+  tbody tr.row-danger td{background:#fff;}
+  tbody tr.row-danger td:first-child{box-shadow:inset 3pt 0 0 #000;}
+  /* チェックリストは1枚で手元に置けるよう独立ページにする */
+  .sec-checklist{break-before:page; page-break-before:always;
+    border:1.5pt solid #000; border-left:1.5pt solid #000;}
+  .sec-checklist ol>li::before{border:1.2pt solid #000;}
+  .ref{color:#555; opacity:1;}
+  blockquote{background:#fff; border-left:3pt solid #000;}
+  h1.part{break-before:page; page-break-before:always; border-top:2.5pt solid #000;
+    font-size:15pt; margin-top:0;}
+  h1.part,h2,h3{break-after:avoid; page-break-after:avoid;}
+  .tw,blockquote,tr{break-inside:avoid; page-break-inside:avoid;}
+  .toc{border:1px solid #999; background:#fff;}
+}
+</style>
+</head>
+<body id="top">
+<div class="wrap">
+<p class="kicker">T-20260904-005</p>
+<h1>スーパーデリバリー返信メール文案（A版・C版）</h1>
+<p class="lead">T-20260904-005 ／ 作成 2026-09-12 コンテンツ制作ヒデアキ ／ 提出期限 2026-09-17（木）。期限までに返信しないと登録はキャンセルされます</p>
+<nav class="toc" aria-label="目次"><p class="toc-h">目次</p><ul class="toc-list"><li class="toc-lv2"><a href="#s1" class="toc-conclusion">1. 使い分けと共通設定</a></li><li class="toc-lv2"><a href="#s2">2. A版（追加書類3点を提出）</a></li><li class="toc-lv3"><a href="#s2-1">本文</a></li><li class="toc-lv3"><a href="#s2-2">添付ファイル</a></li><li class="toc-lv3"><a href="#s2-3">送る前の確認</a></li><li class="toc-lv2"><a href="#s3">3. C版（期限の延長または一時保留を依頼）</a></li><li class="toc-lv3"><a href="#s3-1">本文</a></li><li class="toc-lv3"><a href="#s3-2">差し込み（任意）：#2 と #3 を先に出す場合</a></li><li class="toc-lv3"><a href="#s3-3">送る前の確認</a></li><li class="toc-lv2"><a href="#s4">4. 表現の意図</a></li><li class="toc-lv2"><a href="#s5" class="toc-warn">5. 妥協点・未確認</a></li></ul></nav>
+<section id="s1" class="sec sec-box sec-conclusion">
+<h2>1. 使い分けと共通設定</h2>
+<div class="tw" tabindex="0"><table><thead><tr><th>項目</th><th>内容</th></tr></thead><tbody><tr><td>A版</td><td>追加書類3点を出す。<strong>大口へ切り替えた後でないと送れない</strong>（#1 で大口の画面が要るため）</td></tr><tr><td>C版</td><td>期限の延長か一時保留を頼む。大口に切り替えないまま 9/17 を迎える場合に使う</td></tr><tr><td>送信元</td><td><code>satoyselect@gmail.com</code>（SD の元メールはこのアドレスに届いている。1018 からは送らない）</td></tr><tr><td>宛先</td><td><code>touroku@superdelivery.com</code></td></tr><tr><td>件名</td><td><code>Re: ＜SD＞【重要】書類提出のお願い</code>（元メールに「返信」すると自動で付く）</td></tr><tr><td>送り方</td><td>9/2 13:09 着の元メールを開いて「返信」する。新規作成にはしない</td></tr></tbody></table></div>
+<ul><li>［　］の部分は送る前に差し替えます。</li><li>お客様番号の 3166793 は SD が照合に使う番号です。そのまま残します。</li></ul>
+</section>
+<hr class="rule">
+<section id="s2" class="sec">
+<h2>2. A版（追加書類3点を提出）</h2>
+<h3 id="s2-1">本文</h3>
+<pre class="codeblock"><code>スーパーデリバリー サポートデスク 御中
+
+お世話になっております。
+お客様番号 3166793、Satoy Select の［社長の氏名］です。
+
+9月2日にご案内いただいた書類3点を添付にてお送りします。
+
+1. 販売サイト申込書類（Amazon）
+　・出品用アカウントの登録情報画面（屋号・申込者名・住所）
+　・出品プラン画面（大口出品）
+　・販売ページ：［AmazonストアフロントのURL］
+2. 事業確認書類
+　・開業届出書の控え（マイナンバーは塗りつぶし済み）
+　・電子申請等証明データシート（e-Taxで提出したため）
+3. 代表者の本人確認書類
+　・［運転免許証（表・裏）］
+
+ご確認のほど、よろしくお願いいたします。
+
+Satoy Select
+［社長の氏名］
+お客様番号：3166793</code></pre>
+<h3 id="s2-2">添付ファイル</h3>
+<p>ファイル名の先頭にお客様番号と本文の項目番号を付けます。SD の担当者が自分のチェックリストと突き合わせやすくするためです。</p>
+<div class="tw" tabindex="0"><table><thead><tr><th>#</th><th>ファイル名</th><th>中身</th><th>条件</th></tr></thead><tbody><tr><td>1-1</td><td><code>3166793_1-1_Amazon_登録情報.png</code></td><td>セラーセントラルの登録情報画面</td><td>屋号・申込者名・住所の3つが1枚に写っていること</td></tr><tr><td>1-2</td><td><code>3166793_1-2_Amazon_出品プラン_大口.png</code></td><td>出品プラン画面</td><td>「大口出品」の文字が写っていること</td></tr><tr><td>2-1</td><td><code>3166793_2-1_開業届出書_控え.pdf</code></td><td>e-Tax で出した開業届の控え</td><td>マイナンバーを塗りつぶす。屋号・業種・住所が読めること</td></tr><tr><td>2-2</td><td><code>3166793_2-2_受信通知.pdf</code></td><td>電子申請等証明データシート</td><td>受付日時と受付番号が読めること</td></tr><tr><td>3</td><td>下の表から1つ選ぶ</td><td>代表者の本人確認書類</td><td>本人名義で、現住所が載っていること</td></tr></tbody></table></div>
+<p>本人確認書類（#3）はどれを出すかで枚数が変わります。本文の 3. の行も、選んだものに合わせて書き換えます。</p>
+<div class="tw" tabindex="0"><table><thead><tr><th>出すもの</th><th>添付ファイル</th><th>本文 3. の書き方</th></tr></thead><tbody><tr><td>運転免許証（持っていれば推奨。1点で済む）</td><td><code>3166793_3-1_運転免許証_表.jpg</code>、<code>3166793_3-2_運転免許証_裏.jpg</code></td><td><code>・運転免許証（表・裏）</code></td></tr><tr><td>マイナンバーカード</td><td><code>3166793_3-1_マイナンバーカード_表.jpg</code>、<code>3166793_3-2_マイナンバーカード_裏.jpg</code></td><td><code>・マイナンバーカード（表・裏／裏面の番号は塗りつぶし済み）</code></td></tr><tr><td>パスポート</td><td><code>3166793_3-1_パスポート.jpg</code>、<code>3166793_3-2_公共料金明細書.jpg</code></td><td><code>・パスポート、公共料金明細書（本人名義・3ヵ月以内発行）</code></td></tr></tbody></table></div>
+<ul><li>パスポートだけでは受け付けてもらえません。本人名義で3ヵ月以内に発行された公共料金明細書と2点セットで出します。</li><li>在留カードは使えません。</li><li>住民票や印鑑証明も使えますが、発行から6ヵ月以内のものに限ります。</li></ul>
+<h3 id="s2-3">送る前の確認</h3>
+<ul><li>[ ] 大口への切り替えが済んでいる（切り替えは §4.1＝お金が動く操作なので、社長の承認が別に要ります）</li><li>[ ] 1-1 と 1-2 のスクリーンショットを、切り替えた後に撮っている</li><li>[ ] 開業届の控えに「業種」が書かれている（まだ誰も実物を見ていません）</li><li>[ ] 添付の合計が 20MB 以下。Gmail は 25MB を超えると、添付をやめて Google ドライブのリンクに置き換えてしまいます。スマホ写真は1枚 3〜5MB あるので、7枚で上限に近づきます</li><li>[ ] 添付ファイルをリポジトリに保存していない（この文案の置き場は PUBLIC です）</li></ul>
+</section>
+<hr class="rule">
+<section id="s3" class="sec">
+<h2>3. C版（期限の延長または一時保留を依頼）</h2>
+<h3 id="s3-1">本文</h3>
+<pre class="codeblock"><code>スーパーデリバリー サポートデスク 御中
+
+お世話になっております。
+お客様番号 3166793、Satoy Select の［社長の氏名］です。
+
+9月2日にご案内いただいた書類提出の件で、ご相談があります。
+
+販売サイトとして登録しているAmazonのアカウントで、現在、一部のマーケットプレイスの本人確認手続きを進めております。
+完了までは出品プランの変更を控えているため、大口出品を示す画面を9月17日までにご用意できません。
+
+つきましては、提出期限を［2026年10月16日（金）］まで延長いただくか、審査を一時保留としていただくことは可能でしょうか。
+難しい場合は、今後の進め方をご教示いただけますと幸いです。
+
+お手数をおかけしますが、よろしくお願いいたします。
+
+Satoy Select
+［社長の氏名］
+お客様番号：3166793</code></pre>
+<h3 id="s3-2">差し込み（任意）：#2 と #3 を先に出す場合</h3>
+<p>「難しい場合は〜」の行の次に、次の1文を入れます。添付は A版の 2-1・2-2・3 と同じです。</p>
+<pre class="codeblock"><code>なお、事業確認書類と代表者の本人確認書類は、先に本メールに添付いたします。</code></pre>
+<p><strong>推奨は差し込みあり（書類がそろっていれば）。</strong>先に出しておくと、書類の不備（開業届に業種が無い、など）が 9/17 より前に分かります。SD は受け取ってから2営業日以内に連絡すると書いています。書類が送信までにそろわなければ、差し込みなしで送ります。延長のお願いを先に届けることを優先します。</p>
+<h3 id="s3-3">送る前の確認</h3>
+<ul><li>[ ] 希望期限の日付を決めた（下の「表現の意図」を参照）</li><li>[ ] 差し込みを入れる場合は、A版「送る前の確認」の3〜5項目目も確認した</li></ul>
+</section>
+<hr class="rule">
+<section id="s4" class="sec">
+<h2>4. 表現の意図</h2>
+<div class="tw" tabindex="0"><table><thead><tr><th>箇所</th><th>そうした理由</th></tr></thead><tbody><tr><td>冒頭の2行目に番号・屋号・名前を並べた</td><td>SD はお客様番号で照合します。担当者が1行目で本人を特定できる順番にしました</td></tr><tr><td>挨拶と結びを1文ずつにした</td><td>事務の窓口に宛てたメールです。定型の丁寧語を重ねても、担当者の処理が早くなるわけではありません</td></tr><tr><td>A版に販売ページの URL を入れた</td><td>#1 の目的は「登録した販売サイトの販売ページを確認すること」だと SD が書いています。画像だけでは担当者がページを開けません</td></tr><tr><td>A版で「大口出品」を本文と添付名の両方に書いた</td><td>SD が一番見たいのは「小口ではない」という点です。担当者が画像の中を探さなくても分かるようにしました</td></tr><tr><td>C版の事情は「本人確認手続き中」「プラン変更を控えている」の2点だけ</td><td>依頼どおりです。停止の経緯を書くと、SD 側で別の審査論点（販売サイトが動いていない、など）を立てさせるおそれがあります</td></tr><tr><td>C版で小口であることを暗に認めた</td><td>延長を頼む理由がそれしかないからです。隠して頼むと、あとで説明が食い違います</td></tr><tr><td>C版に具体的な日付を入れた</td><td>期限の無い保留は、受ける側が可否を判断しにくいと考えました（推測です）。候補の 10/16 は、9/17 から約1ヵ月後です。SD には別途「11/30 までにサイトがオープンしていないと利用停止」という条件があるので、それより十分前に置きました</td></tr><tr><td>C版の「難しい場合は進め方を教えてください」</td><td>延長を断られても、それが確定したキャンセルにならないようにする一文です。次にとれる手（再申込の条件など）を SD から引き出します</td></tr></tbody></table></div>
+</section>
+<section id="s5" class="sec sec-box sec-warn">
+<h2>5. 妥協点・未確認</h2>
+<div class="tw" tabindex="0"><table><thead><tr><th>項目</th><th>状態</th></tr></thead><tbody><tr><td>セラーセントラルの画面名（「登録情報」「出品プラン」）</td><td>推測です。実画面では確認していません。撮影するときに合わせて直してください。本文の書き方は画面名がどちらでも通じます</td></tr><tr><td>開業届の「業種」欄</td><td>未確認です。SD の合格条件に入っています</td></tr><tr><td>A版で Amazon ストアに商品が並んでいるか</td><td>未確認です。SD は「オープン前の EC サイト」を入会不可にしています。出品数が0件なら、大口の画面を出しても落ちるおそれがあります（サトルの 04 を参照）</td></tr><tr><td>希望期限 10/16</td><td>私の仮置きです。カナダの件が片付く見込みが立っていないため、根拠のある日付は置けていません</td></tr><tr><td>元メールの逐語引用</td><td>していません。返信すれば Gmail が元メールを自動で引用するので、本文にも添付にも重ねていません</td></tr></tbody></table></div>
+</section>
+<p class="prov">HTML版。内容の唯一の正は 07_SD返信メール文案_A版とC版.md です。</p>
+</div>
+<a class="top" href="#top" aria-label="先頭へ戻る">&#8593;</a>
+</body>
+</html>
