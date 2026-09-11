@@ -2,10 +2,10 @@
 ticket_id: T-20260909-002
 title: 初回発注セットの組成（生産終了チェック済みSKUから・サプライヤー集約＋送料最適）
 status: doing
-assignee: it-engineer
+assignee: it_engineer
 priority: high
 created_at: 2026-09-09
-updated_at: 2026-09-09
+updated_at: 2026-09-12
 next_check_at: 2026-09-10
 requires_approval: false
 labels: [pipeline, sourcing, order-set]

@@ -5,7 +5,7 @@ status: doing
 assignee: researcher
 priority: high
 created_at: 2026-09-08
-updated_at: 2026-09-08
+updated_at: 2026-09-12
 next_check_at: 2026-09-09
 requires_approval: false
 labels: [research, sourcing, discontinued]
@@ -172,3 +172,5 @@ Bは #13 馬油スタイリングウォーター1件（卸サイトの商品名�
 ## 成果物（第3弾）
 - workspace/output/deliverables/T-20260908-002/03_回転6ヶ月以内_生産終了チェック.md
 - workspace/output/deliverables/T-20260909-002/pool.csv（12行追記）
+
+- 2026-09-12 追記（カズヨ）: 第1弾の HTML 版 `01_上位12件_生産終了チェック.html` は、pre-commit ガードの誤検知で他の commit を繰り返し止めていたため、カズヨが `~/Documents/AI Company 素材/Amazon物販事業/pre-commit-guard-pending/` へ README 付きで待避した（消失ではない）。ガードの印の差し替えが社長承認されたら戻す。

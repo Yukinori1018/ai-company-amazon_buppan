@@ -2,7 +2,7 @@
 ticket_id: T-20260907-001
 title: 入数（ケース vs 単品）の突合を直す — 利益率の並び順が信用できない
 status: doing
-assignee: it-engineer
+assignee: it_engineer
 priority: high
 created_at: 2026-09-07
 updated_at: 2026-09-07
