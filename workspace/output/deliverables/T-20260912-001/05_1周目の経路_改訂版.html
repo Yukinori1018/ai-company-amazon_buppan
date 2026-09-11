@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>1周目の仕入れ経路（改訂版・仮想 Act）</title><style>
+:root{--fg:#1b1f23;--mut:#5b6570;--line:#e3e7eb;--acc:#0b5fff;--warn:#b45309;--bad:#b91c1c;--ok:#047857;}
+*{box-sizing:border-box}
+body{margin:0;background:#f6f7f9;color:var(--fg);
+ font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",Meiryo,sans-serif;
+ line-height:1.85;font-size:15.5px;-webkit-text-size-adjust:100%;}
+.wrap{max-width:1000px;margin:0 auto;padding:32px 22px 96px;background:#fff;
+ box-shadow:0 1px 3px rgba(0,0,0,.06);}
+h1{font-size:1.75rem;line-height:1.4;margin:.2em 0 .6em;padding-bottom:.4em;border-bottom:3px solid var(--acc);}
+h2{font-size:1.3rem;margin:2.2em 0 .7em;padding:.35em .6em;background:#eef3ff;border-left:5px solid var(--acc);border-radius:3px;}
+h3{font-size:1.1rem;margin:1.8em 0 .5em;padding-bottom:.25em;border-bottom:1px solid var(--line);}
+p{margin:.7em 0}
+hr{border:0;border-top:1px solid var(--line);margin:2.2em 0}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:.92em;display:block;overflow-x:auto;}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top;}
+th{background:#f0f3f7;font-weight:600;white-space:nowrap;}
+tbody tr:nth-child(even){background:#fafbfc}
+blockquote{margin:1.1em 0;padding:.8em 1em;background:#fffbeb;border-left:5px solid var(--warn);border-radius:3px;color:#463a1a;}
+code{background:#f1f3f5;padding:.12em .4em;border-radius:3px;font-size:.9em;
+ font-family:"SFMono-Regular",Menlo,Consolas,monospace;}
+pre{background:#1e2430;color:#e6edf3;padding:14px 16px;border-radius:6px;overflow-x:auto;font-size:.86em;line-height:1.6;}
+pre code{background:none;color:inherit;padding:0}
+ul,ol{margin:.7em 0;padding-left:1.6em}
+li{margin:.3em 0}
+a{color:var(--acc)}
+@media print{body{background:#fff}.wrap{box-shadow:none;max-width:none}}
+</style></head><body><div class="wrap">
+<h1>1周目の仕入れ経路（改訂版・仮想 Act）</h1>
+<p>T-20260912-001／2026-09-12／プランナー タケシ<br>入力: 叩き台 <code>T-20260909-002/05</code>、マサルの差し戻し <code>T-20260909-002/06</code>、事実確認 S1・S1-A・S3（ゲート12件・第一陣17社）・S4・ハルオの法務判定</p>
+<blockquote>発注・申請・送信・契約は一切していません（CLAUDE.md §4.1）。<br>PUBLIC リポのため、ASIN ごとの Keepa 値と NETSEA の卸値は載せていません。会社ごとの分類だけを書きます。<br>確率は推測です。所要日数は <code>05_mc_B一本_3波.py</code>（乱数固定・再現可）で計算しました。</blockquote>
+<hr>
+<h2>0. 結論</h2>
+<ol>
+<li><strong>1周目は B（本丸・第一陣のメーカー直）一本で行きます。</strong> A（NETSEA のゲート解除）は、物差しを公表値に替えた時点で候補が0件になりました。組めません。</li>
+<li><strong>マサルの推奨「1周目は A で締め、B は2周目の本線」は組めません。</strong> A に残る候補が無いためです。</li>
+<li><strong>9週（11/15）以内の完走は0%です。</strong> 1周目の締めを「初回入金 2026-12-31 目標、2027-01-15 撤退判定」に置き直します。この期限は叩き台で私が置いた値で、社長ルールではありません。</li>
+<li><strong>送る相手は10社。3波に分けて送り、社長の §4.1 は1週あたり最大5件・50分に収めます</strong>（叩き台は1週に最大25件・3〜4時間でした）。</li>
+<li>見通し（推測）: 1社以上と取引が成立する確率は約40%（悲観18%〜楽観64%）。成立した場合、初回入金の中央値は12/15です。12/31までに初回入金が出る確率は約34%です。</li>
+</ol>
+<table><thead><tr><th></th><th>叩き台</th><th>マサル</th><th>改訂版</th></tr></thead><tbody>
+<tr><td>9週（11/15）以内に初回入金</td><td>58%</td><td>11%</td><td><strong>0%</strong>（どの経路でも組めない）</td></tr>
+<tr><td>12/31までに初回入金</td><td>—</td><td>—</td><td><strong>約34%</strong></td></tr>
+<tr><td>2027-01-15までに初回入金（第2陣込み）</td><td>—</td><td>—</td><td><strong>約39%</strong></td></tr>
+<tr><td>1社以上と成立</td><td>62%（20社）</td><td>—</td><td><strong>約40%</strong>（10社）／約44%（第2陣込み）</td></tr>
+</tbody></table>
+<hr>
+<h2>1. 叩き台から何が変わったか</h2>
+<table><thead><tr><th>論点</th><th>叩き台</th><th>改訂版</th><th>根拠</th></tr></thead><tbody>
+<tr><td>A の候補</td><td>12件</td><td><strong>0件</strong></td><td>9件に減ったうえ（Amazon販売NG 2件・直送専門1件）、公表値の物差しで通るものが無い（§3）</td></tr>
+<tr><td>A の書類</td><td>NETSEA の請求書で申請</td><td>1周目では使わない</td><td>8社とも自社の請求書は出さないと読める。標準 PDF の中身は未確認（S1・S1-A）</td></tr>
+<tr><td>経路</td><td>A と B の同時進行</td><td><strong>B 一本</strong></td><td>A が0件</td></tr>
+<tr><td>A と B の確率</td><td>独立として掛け算</td><td>掛け算しない</td><td>大口・納品代行・社長の手を共有している（マサル）。A が消えたので、共有要因は B の単一障害点として扱う</td></tr>
+<tr><td>支払い保留</td><td>—</td><td>影響なし</td><td>6/3 の月額登録料1件のみ・支払済み（カズヨ実画面）</td></tr>
+<tr><td>B の送信先</td><td>20社に一律</td><td><strong>10社に絞り、3波に分ける</strong></td><td>取り分を当てた結果（§4-1）</td></tr>
+<tr><td>足切り</td><td>取り分 月6個以上</td><td><strong>送る相手は②で、発注は自分の取り分で切る</strong>（2段）</td><td>§4-2</td></tr>
+<tr><td>期限</td><td>11/15（9週）</td><td>初回入金 12/31 目標・1/15 撤退判定</td><td>所要日数の中央値が9週を超える</td></tr>
+<tr><td>母数</td><td>22件</td><td>24件</td><td>タカシ S6。「22件」はどの CSV にも無い</td></tr>
+<tr><td>違約金の条番号</td><td>27条4項</td><td>27条3項</td><td>ハルオ</td></tr>
+</tbody></table>
+<hr>
+<h2>2. お客様の Preference 構造</h2>
+<table><thead><tr><th>問い</th><th>答え（第一陣の商材）</th></tr></thead><tbody>
+<tr><td>誰が</td><td>日用品・ギフトを Amazon で買う一般消費者（刷毛・ティッシュ・焼き菓子・風呂敷・硝子・タオル等）</td></tr>
+<tr><td>なぜ</td><td>指名買い（ブランド名で検索）と、ギフトの失敗を避けるため</td></tr>
+<tr><td>いつ</td><td>消耗品は使い切り時。ギフトは季節（年末・母の日）</td></tr>
+<tr><td>どれだけ</td><td>ASIN ごとに決まっている。売り手は増やせない</td></tr>
+<tr><td>誰から買うか</td><td>選んでいない（購入の約8割がカート経由）</td></tr>
+</tbody></table>
+<p>1周目で当社が動かせるのは「棚に立てるか（ゲート）」「カートに乗れるか（大口・FBA・価格）」「取り分」の3つだけです。叩き台と同じです。<br>加えて、年末のギフト需要は12月前半に来ます。<strong>11月中に FBA に入っていれば年末の需要に間に合います。</strong> 12/15 の入金中央値はここと重なります。</p>
+<hr>
+<h2>3. 案 A／B／C</h2>
+<h3>案A: NETSEA のゲート解除 → <strong>組めません</strong></h3>
+<table><thead><tr><th>段</th><th>残り</th><th>落ちた理由</th></tr></thead><tbody>
+<tr><td>ゲートで落ちた12件</td><td>12</td><td>—</td></tr>
+<tr><td>Amazon 販売NG・直送専門を除く</td><td>9</td><td>ドクターランドリー2件（商品ページに「Amazon販売NG」）、超立体マスク（仕入先が消費者直送専門・Amazon 側も申請受付停止）</td></tr>
+<tr><td>物差し＝Amazon 公表の「過去1か月で◯点購入」</td><td><strong>1</strong></td><td>公表値が付いているのは Brighte ELEKI BRUSH+ だけ。残り8件は公表値が無く、ドロップ数は兄弟と共有の子ばかり＝裏付けにならない</td></tr>
+<tr><td>10点で1周目の予算に収まる</td><td><strong>0</strong></td><td>ELEKI は10点で10万円を超える（タカシ S3）</td></tr>
+</tbody></table>
+<ul>
+<li>足切りを下げて A を生かす案は並べません。悲観側（中央値の0.3倍）で回転6ヶ月を破るので、社長ルールに反します。</li>
+<li>仮に候補が残っても、8社とも自社の請求書は出さないと読めます。書類は NETSEA 標準 PDF の実物を見るまで決まりません（S1-A）。</li>
+<li><strong>確かめるための試し買いはしません</strong>（検証の発注）。NETSEA サポートへの問い合わせも、1周目では不要になりました。</li>
+</ul>
+<h3>案B: 本丸・第一陣のメーカー直 → <strong>推奨</strong></h3>
+<p>中身は §4。</p>
+<h3>案C: 別のネット卸で母数を作り直す → <strong>やりません</strong></h3>
+<p>叩き台 §3 のとおりです。ゲートは卸ではなくブランドに付くので、国内ブランド主体の卸では同じ結果になります。<br><strong>ただし例外が1つあります。</strong> スーパーデリバリーの審査（9/2申込）が通っていれば、仕入先にメーカーが多い点が NETSEA と違います（マサル）。審査結果が出たら再評価します（§11）。</p>
+<hr>
+<h2>4. 推奨: B 一本の中身</h2>
+<h3>4-1. 送る相手（10社・3波）</h3>
+<p>第一陣20社から次の社を外しました。</p>
+<table><thead><tr><th>外した社</th><th>理由</th></tr></thead><tbody>
+<tr><td>Amazon でブランドが見当たらない3社</td><td>取り分の根拠が無い（2周目へ）</td></tr>
+<tr><td>宇野刷毛・守田漆器</td><td>Amazon で販売の形跡なし</td></tr>
+<tr><td>木村硝子店</td><td>卸の入口が飲食店・ホテル専用（公式に明記）</td></tr>
+<tr><td>七福タオル・高柳製茶・木内籐材・小野甚</td><td>② 月販総量で月6個に届く ASIN が無い</td></tr>
+</tbody></table>
+<p>残り10社を、裏付けの強さで3区分に分けました。</p>
+<table><thead><tr><th>区分</th><th>中身</th></tr></thead><tbody>
+<tr><td>1</td><td>単体の ASIN に Amazon 公表値がある（親子の共有問題が無い）</td></tr>
+<tr><td>2</td><td>単体の ASIN はあるが公表値が無く、①取り分で判定</td></tr>
+<tr><td>3</td><td>子の ASIN しか無い（数字は兄弟合計の上限としてしか使えない）</td></tr>
+</tbody></table>
+<table><thead><tr><th>波</th><th>送信日</th><th>社</th><th>区分</th><th>窓口</th></tr></thead><tbody>
+<tr><td>1</td><td>9/17（木）〜18（金）</td><td>北陸製菓</td><td>1</td><td>フォーム／TEL（OEM サイト記載。完成品の卸の窓口は要確認）</td></tr>
+<tr><td>1</td><td>同上</td><td>北尾化粧品部</td><td>1</td><td>フォーム</td></tr>
+<tr><td>1</td><td>同上</td><td>池本刷子工業</td><td>1</td><td>フォーム</td></tr>
+<tr><td>1</td><td>同上</td><td>朝倉染布</td><td>2</td><td>フォーム（「商品の仕入れ」種別あり・ロット20個〜の記載あり）</td></tr>
+<tr><td>2</td><td>9/24（木）〜25（金）</td><td>廣田硝子</td><td>3（公表値あり）</td><td>フォーム／メール</td></tr>
+<tr><td>2</td><td>同上</td><td>楠橋紋織</td><td>3（公表値あり）</td><td>OEM 相談フォームのみ</td></tr>
+<tr><td>2</td><td>同上</td><td>田中帽子店</td><td>3</td><td>業務取引ページ</td></tr>
+<tr><td>3</td><td>9/29（火）〜10/2（金）</td><td>大橋量器</td><td>3</td><td>フォーム</td></tr>
+<tr><td>3</td><td>同上</td><td>金野タオル</td><td>3</td><td>フォーム</td></tr>
+<tr><td>3</td><td>10/6（火）〜9（金）</td><td>河野製紙</td><td>1</td><td><strong>電話のみ（平日9〜17時）</strong>。社長が平日昼に出られなければ外す</td></tr>
+</tbody></table>
+<ul>
+<li>波1を連休の前（9/17〜18）に置くのは、返信の待ち時間を連休と重ねるためです。連休中に社長の手は要りません。</li>
+<li>文面は法務の打診ルール（URLを貼らない等・T-20260904-004）に従い、カズヨが送信ボタンの手前まで作ります。</li>
+</ul>
+<h3>4-2. 足切りは2段（送る判断と、買う判断を分ける）</h3>
+<table><thead><tr><th>段</th><th>物差し</th><th>閾値</th><th>理由</th></tr></thead><tbody>
+<tr><td><strong>送る</strong>（0円）</td><td>② 月販総量（割らない）</td><td>月6個以上の ASIN が1件以上</td><td>送信は0円で、メーカーの市場があるかだけを見ればよい。①で切ると残りが3社で、送る相手が足りない（マサルの B-X0 に抵触）</td></tr>
+<tr><td><strong>買う</strong>（§4.1）</td><td>自分の取り分。単体で公表値あり→公表値÷(新品オファー数+1)。無ければ①。<strong>子の値は上限なので根拠にしない</strong></td><td>取り分の中央値 ≥ <strong>ロット÷1.8</strong></td><td>悲観側（中央値の0.3倍）でも回転6ヶ月に収まる線。10点なら5.6個、5点なら2.8個。社長ルール「市場は自分の取り分で見る」はこの段で守る</td></tr>
+</tbody></table>
+<ul>
+<li>叩き台の「月6個以上」は、10点ロット専用の値でした。<strong>ロットが決まってから閾値が決まる</strong>形に直しました。メーカーに小ロットを頼む理由にもなります。</li>
+<li>送る相手を②で選ぶので、「送ったが買えない」社が出ます。これは損失ではありません。断られた理由と同じく、成立率を測るデータになります。</li>
+</ul>
+<h3>4-3. 発注の条件（全部そろったときだけ発注する）</h3>
+<table><thead><tr><th>#</th><th>条件</th><th>確かめ方</th></tr></thead><tbody>
+<tr><td>O-1</td><td>§4-2 の「買う」足切りを通る ASIN がある</td><td>見積もりのロットで再計算（既存データ・0円）</td></tr>
+<tr><td>O-2</td><td>1社の初回が5万円以内、1周目の合計が10万円以内、実額の見積もりで利益率5%以上・赤字なし</td><td>見積もりの実額（推定値は使わない）</td></tr>
+<tr><td>O-3</td><td>ブランドにゲートがあれば、<strong>メーカーが宛名・住所・請求書番号入りの請求書を出すと書面（メールまたは見積書）で確約</strong>している。数量は10点以上</td><td>見積もり時に一緒に聞く。実際と違う数量・日付の記載は頼まない（ハルオ：私文書偽造・Amazon 即停止）</td></tr>
+<tr><td>O-4</td><td>大口への切り替えの時点で、カナダの本人確認が悪化していない</td><td>カズヨが実画面で確認（T-20260909-001）</td></tr>
+<tr><td>O-5</td><td>着荷から FBA までの経路が決まっている（メーカーから FBA 直送、または納品代行）。社長の物理作業は0</td><td>見積もり時に確認</td></tr>
+</tbody></table>
+<hr>
+<h2>5. 想定リターン（確率と期待値）</h2>
+<table><thead><tr><th>項目</th><th>楽観（20%）</th><th>中央（60%）</th><th>悲観（20%）</th><th>期待値</th></tr></thead><tbody>
+<tr><td>1社あたりの成立率（区分1）</td><td>12%</td><td>6%</td><td>2.4%</td><td>約6%</td></tr>
+<tr><td>1社あたりの成立率（区分2・3）</td><td>8%</td><td>4%</td><td>1.6%</td><td>約4%</td></tr>
+<tr><td>10社で1社以上成立</td><td>64%</td><td>39%</td><td>18%</td><td><strong>約40%</strong></td></tr>
+<tr><td>第2陣込みで1社以上成立</td><td>—</td><td>—</td><td>—</td><td>約44%</td></tr>
+</tbody></table>
+<table><thead><tr><th>時期（成立した場合）</th><th>値</th></tr></thead><tbody>
+<tr><td>発注日の中央値</td><td>10/20</td></tr>
+<tr><td>初回入金の中央値</td><td>12/15（80%区間 11/30〜1/7、最短 11/6）</td></tr>
+</tbody></table>
+<table><thead><tr><th>期日</th><th>初回入金まで到達している確率（全体）</th></tr></thead><tbody>
+<tr><td>11/15</td><td>0%</td></tr>
+<tr><td>11/30</td><td>3%</td></tr>
+<tr><td>12/13</td><td>17%</td></tr>
+<tr><td><strong>12/31</strong></td><td><strong>34%</strong></td></tr>
+<tr><td>2027-01-15（第2陣込み）</td><td>39%</td></tr>
+</tbody></table>
+<p><strong>置いた前提</strong></p>
+<ul>
+<li>成立率は、叩き台の中央5%を区分で上下に振った推測です。一次情報の裏付けはありません（サトル S4）。20社とも個人事業主可・Amazon可を公開しておらず、上げる根拠も下げる根拠もありません。</li>
+<li>楽観・悲観は全社に同じ倍率で掛けました（個人事業主・実績0という共通要因）。独立試行として掛け算すると、楽観側に振れます。</li>
+<li>アカウント側の事故（大口切替での再認証・カナダ連動）を8%とし、起きれば全社同時に30〜90日遅れる、と置きました。支払い保留は誤読だったので、マサルの15%から下げています。</li>
+<li>1周目に売れるのは1社・1〜3 SKU・合計10〜20点の規模です。1 SKU の月販は、発注条件によって中央でロット÷1.8 以上になります。</li>
+</ul>
+<p><strong>失敗しても学べること</strong>: 1社あたりの成立率 p の初めての実測値と、断られた理由の分布（法人／実店舗／Amazon 不可／ロット）。後者は、社長が挙げた「法人になったら卸すなら法人化を考える」の判断材料になります。</p>
+<hr>
+<h2>6. 日程（9/14〜10/31、その後の見通し）</h2>
+<p>休日: 9/19（土）〜23（水）の5連休、10/12（月）スポーツの日。</p>
+<table><thead><tr><th>週</th><th>社内（0円・§4.2）</th><th>社長の一手（§4.1）</th><th>期待する状態</th></tr></thead><tbody>
+<tr><td>9/14〜18</td><td>9/14〜16: 10社の ASIN のゲートをカズヨがブラウザで確認（開くだけ・申請しない）。波1の下書き完成。本書の承認をいただく</td><td>9/17〜18: 波1を4通送信</td><td>送信4</td></tr>
+<tr><td>9/21〜25</td><td>波2の下書き</td><td>9/24〜25: 波2を3通送信</td><td>送信7</td></tr>
+<tr><td>9/28〜10/2</td><td>波3の下書き。波1の返信を記録</td><td>9/29〜10/2: 波3を2通送信。波1への返信 0〜2件</td><td>送信9・前向き返信1〜2</td></tr>
+<tr><td>10/5〜9</td><td>見積もり依頼の文面。O-1〜O-3 を実額で計算</td><td>河野製紙に電話1件（在席できれば）。返信・見積もり依頼 1〜3件</td><td>送信10・見積もり依頼1〜2</td></tr>
+<tr><td>10/12〜16</td><td>10/16: 撤退条件 W-7 の判定（前向き返信2社未満なら第2陣を準備。Keepa 約200 token・定額）</td><td>返信・条件交渉 1〜2件。口座開設の書類 1件</td><td>見積もり到達1</td></tr>
+<tr><td>10/19〜23</td><td>第2陣の下書き（W-7 該当時）</td><td>発注・決済 1件（O-1〜O-5 がそろった場合）。第2陣5通（W-7 該当時）</td><td>発注1（中央値10/20）</td></tr>
+<tr><td>10/26〜30</td><td>出荷待ち</td><td>第2陣5通（W-7 該当時）</td><td>出荷</td></tr>
+<tr><td>11月</td><td>納品プラン作成</td><td>大口切り替え（初回の FBA 納品プランの直前）・納品代行の申込・ゲート申請（該当時）</td><td>FBA 受領</td></tr>
+<tr><td>12月</td><td>販売・価格の監視</td><td>—</td><td>初回販売・初回入金（中央値12/15）</td></tr>
+<tr><td>2027-01-15</td><td>1周目の撤退判定</td><td>—</td><td>—</td></tr>
+</tbody></table>
+<hr>
+<h2>7. 社長の §4.1 の一手（集中させない）</h2>
+<table><thead><tr><th>週</th><th>一手</th><th>件数</th><th>時間</th></tr></thead><tbody>
+<tr><td>9/14〜18</td><td>波1送信（フォーム4）</td><td>4</td><td>約30分</td></tr>
+<tr><td>9/21〜25</td><td>波2送信（フォーム・メール3）</td><td>3</td><td>約25分</td></tr>
+<tr><td>9/28〜10/2</td><td>波3送信（フォーム2）＋波1への返信</td><td>2〜4</td><td>約35分</td></tr>
+<tr><td>10/5〜9</td><td>電話1（河野製紙・平日昼）＋返信・見積もり依頼</td><td>1〜4</td><td>約45分</td></tr>
+<tr><td>10/12〜16</td><td>返信・条件交渉＋口座開設の書類</td><td>2〜3</td><td>約50分</td></tr>
+<tr><td>10/19〜23</td><td>発注・決済（成立時）＋第2陣5通（W-7 該当時）</td><td>1〜6</td><td>約15〜55分</td></tr>
+<tr><td>10/26〜30</td><td>第2陣5通（W-7 該当時）</td><td>0〜5</td><td>0〜40分</td></tr>
+<tr><td>11月前半</td><td>大口切り替え・納品代行の申込・ゲート申請（該当時）</td><td>2〜3</td><td>約50分</td></tr>
+</tbody></table>
+<ul>
+<li>最大の週でも6件・55分です（第2陣と発注が重なった場合）。叩き台は9/14の週に最大25件・3〜4時間でした。</li>
+<li>9/14の週から消えた一手: 即時承認の試し押し、NETSEA サプライヤーへの書類確認、A の発注、A のための納品代行契約、A のための大口切り替え（A が組めないため）。</li>
+<li>送信は、カズヨが送信ボタンの手前まで作り、社長が押す形です（CLAUDE.md §4.4）。</li>
+<li>本書の承認（足切り・予算の扱い）は §4.1 ではありませんが、9/16 までに約15分いただきます。</li>
+</ul>
+<hr>
+<h2>8. 撤退条件（マサル・ハルオの条件を統合）</h2>
+<h3>送信前</h3>
+<table><thead><tr><th>#</th><th>条件</th><th>起きたら</th></tr></thead><tbody>
+<tr><td>W-1</td><td>②で月6個以上の ASIN が無い、窓口が無い、または当社の形態が不可と公開されている</td><td>送らない（10社はこれで選定済み）</td></tr>
+<tr><td>W-2</td><td>ゲート確認で、ブランドにゲートがあり、10点で「買う」足切りを通る ASIN が無い</td><td>その社は1周目から外す。繰り上げはしない（第2陣で補充）</td></tr>
+</tbody></table>
+<h3>発注前</h3>
+<table><thead><tr><th>#</th><th>条件</th><th>起きたら</th></tr></thead><tbody>
+<tr><td>W-3</td><td>取り分の中央値 &lt; ロット÷1.8、または回転が6ヶ月超</td><td>その社・その SKU は発注しない</td></tr>
+<tr><td>W-4</td><td>1社の初回が5万円超、または1周目の合計が10万円超、または実額で利益率5%未満・赤字</td><td>発注しない</td></tr>
+<tr><td>W-5</td><td>ゲートありなのに、メーカーが請求書の記載（宛名・住所・請求書番号）を書面で確約しない</td><td>発注しない</td></tr>
+</tbody></table>
+<h3>返信</h3>
+<table><thead><tr><th>#</th><th>条件</th><th>起きたら</th></tr></thead><tbody>
+<tr><td>W-7</td><td>10/16 時点で前向きな返信が2社未満</td><td>第2陣10社を 10/19〜30 に送る（1回まで）</td></tr>
+<tr><td>W-8</td><td>累計20社（第1陣10＋第2陣10）で見積もりまで進んだ社が0</td><td>個人事業主の直接連絡を止める。断られた理由を法人化の判断材料として社長へ</td></tr>
+<tr><td>W-9</td><td>11/30 に発注が0</td><td>1周目を「未完走」として締め、2周目の設計に移る</td></tr>
+</tbody></table>
+<h3>販売後</h3>
+<table><thead><tr><th>#</th><th>条件</th><th>起きたら</th></tr></thead><tbody>
+<tr><td>W-10</td><td>販売開始30日で、取り分の中央値の1/3未満しか売れていない</td><td>追加仕入れはしない</td></tr>
+<tr><td>W-11</td><td>60日で、取り分の中央値×2の1/3未満</td><td>値下げは1回まで</td></tr>
+<tr><td>W-12</td><td>販売開始から6ヶ月で在庫が残る</td><td>処分する（回転上限）</td></tr>
+</tbody></table>
+<h3>全体</h3>
+<table><thead><tr><th>#</th><th>条件</th><th>起きたら</th></tr></thead><tbody>
+<tr><td>Z-1</td><td>社長の §4.1 が週6件または60分を超える週が2週続く</td><td>次の波を1週後ろへずらす</td></tr>
+<tr><td>Z-2</td><td>大口切り替えで本人確認が始まる、またはカナダが再停止する</td><td>発注と送信を全部止め、アカウントの復旧を先にする</td></tr>
+<tr><td>Z-3</td><td>2027-01-15 に初回入金が0</td><td>1周目を締める</td></tr>
+<tr><td>Z-4</td><td>（2周目で NETSEA のゲート解除を開く場合のみ）ハルオの3条件: サプライヤーが問合せ機能での PDF 添付に応じない／NETSEA から27条4項の照会が来る／同じ書類で2回却下</td><td>NETSEA 経由のゲート解除を打ち切る</td></tr>
+</tbody></table>
+<hr>
+<h2>9. やらないこと</h2>
+<table><thead><tr><th>やらないこと</th><th>理由</th></tr></thead><tbody>
+<tr><td>1周目の NETSEA ゲート解除（A）</td><td>候補0件</td></tr>
+<tr><td>NETSEA 請求書を確かめるための試し買い</td><td>検証の発注（社長ルール「成功する気でやる」）</td></tr>
+<tr><td>NETSEA の外でサプライヤーに連絡すること（書類の依頼だけでも）</td><td>規約7条2項5号・催告なしの登録取消（ハルオ）</td></tr>
+<tr><td>足切りを下げて A を生かすこと</td><td>悲観側で回転6ヶ月を破る</td></tr>
+<tr><td>20社への一律送信・1週への集中送信</td><td>取り分の根拠が無い社がある／社長の手が詰まる</td></tr>
+<tr><td>別のネット卸での母数の作り直し（案C）</td><td>ゲートはブランドに付く。スーパーデリバリーの審査結果が出るまでは再評価もしない</td></tr>
+<tr><td>初回の連絡での独占・限定の提案</td><td>出品実績0の店舗では通らない（マサル）。1周目は通常の卸取引まで。独占の提案は実績ができてから</td></tr>
+<tr><td>1周目のための SP-API 構築</td><td>新しい観測系の作り込みにあたる</td></tr>
+</tbody></table>
+<hr>
+<h2>10. KPI（3階層）</h2>
+<table><thead><tr><th>階層</th><th>指標</th><th>目標</th></tr></thead><tbody>
+<tr><td>北極星</td><td>1周目の初回入金日</td><td>2026-12-31（撤退判定 2027-01-15）</td></tr>
+<tr><td>北極星（従）</td><td>1周目の在庫が売り切れるまでの月数</td><td>6ヶ月以内（固定ルール）</td></tr>
+<tr><td>先行</td><td>送信数／前向き返信数／見積もり到達数／発注数</td><td>10通（10/9まで）／2社（10/16まで）／1社（10/16まで）／1件（11/30まで）</td></tr>
+<tr><td>行動</td><td>下書きの完成（送信日の前日まで）／社長の週あたり §4.1 件数・時間／返信への一次対応</td><td>100%／5件・50分以内／24時間以内</td></tr>
+</tbody></table>
+<hr>
+<h2>11. 会社の最重要KPIへの接続</h2>
+<table><thead><tr><th>KPI</th><th>効き方</th></tr></thead><tbody>
+<tr><td>SKU数100</td><td>1周目で増えるのは1〜3 SKU。本当の効果は成立率 p の実測。12ヶ月で100 SKU なら月8.3 SKU が必要で、1社2 SKU・p=5% なら月83社への連絡が要る。<strong>B の10社は、この p を測る最初の標本</strong>。NETSEA ゲートの経路は、1周目では0 SKU で確定</td></tr>
+<tr><td>月商800万円</td><td>1 SKU あたり月8万円、売価3,000円なら月27個が要る。第一陣の「自分の取り分」は1 SKU 月数個〜十数個の水準で、相乗りでは届かない。届くのは、メーカーの需要をまるごと取れる独占・限定の棚（② 月販総量の水準）だけ。1周目の実績は、独占を提案するための入場券</td></tr>
+<tr><td>利益率20%以上</td><td>1周目の下限は5%（社長決定 9/4「1周回すこと優先」）。20%はメーカー直の卸値でしか狙えない。見積もりの実額が最初の実測になる</td></tr>
+</tbody></table>
+<hr>
+<h2>12. 事実待ちと、確定したら何が変わるか</h2>
+<table><thead><tr><th>事実</th><th>誰が</th><th>確定したら</th></tr></thead><tbody>
+<tr><td>10社のブランドのゲート（S2 の B 版）</td><td>カズヨ（ブラウザ・開くだけ）</td><td>W-2 で1周目から外す社が決まる。ゲートがある社は10点・請求書の確約（O-3）が条件に加わる</td></tr>
+<tr><td>スーパーデリバリーの審査結果（9/2申込）</td><td>カズヨ（S5）</td><td>通っていれば、<strong>サトルに「スーパーデリバリーの仕入先の請求書発行・Amazon 販売可否」の調査が必要</strong>。結果次第で、2本目の経路として再設計する</td></tr>
+<tr><td>開業届の控えの有無</td><td>カズヨ（S5）</td><td>口座開設の書類がそろうか。無ければ 10/12 の週の一手が遅れる</td></tr>
+<tr><td>カナダの本人確認の見通し</td><td>カズヨ（T-20260909-001）</td><td>O-4・Z-2。未解決なら大口切り替えの時期を後ろへ</td></tr>
+<tr><td>納品代行の料金・転送費</td><td>サトル（T-20260826-003 の続き）</td><td>O-5 と実額の利益計算</td></tr>
+<tr><td>各社の最小ロット・個人事業主可否・Amazon 可否</td><td>送信への返信でしか分からない</td><td>§4-2 の閾値（ロット÷1.8）と成立率 p</td></tr>
+<tr><td>大口の月額を10万円に含めるか</td><td>社長</td><td>O-2 の合計の計算</td></tr>
+<tr><td>NETSEA 標準 PDF の記載</td><td>1周目では不要</td><td>2周目で NETSEA を開くときに、サポートへの問い合わせ（§4.1）で確かめる</td></tr>
+</tbody></table>
+<hr>
+<h2>13. マサルへの引き渡し（再シミュレーション用）</h2>
+<table><thead><tr><th>パラメータ</th><th>値（中央／楽観／悲観）</th><th>出所</th></tr></thead><tbody>
+<tr><td>送信</td><td>10社・3波（9/17〜18：4、9/24〜25：3、9/29〜10/9：3）</td><td>本書 §4-1</td></tr>
+<tr><td>1社あたり成立率</td><td>区分1: 6%／12%／2.4%。区分2・3: 4%／8%／1.6%。倍率は全社共通</td><td>推測</td></tr>
+<tr><td>前向き返信率</td><td>25%（倍率同上）</td><td>推測（合格ライン30%・EC STARs）</td></tr>
+<tr><td>所要日数</td><td>マサル 06 §3 の各段と同じ。連休は9/19〜23</td><td>マサル</td></tr>
+<tr><td>ゲートあり</td><td>50%</td><td>推測（S2-B で更新）</td></tr>
+<tr><td>アカウント側の共通事故</td><td>8%・30〜90日の遅れ</td><td>推測（支払い保留は誤読で除外）</td></tr>
+<tr><td>第2陣</td><td>10/16 に前向き返信2社未満なら、10/19〜23 に10社・成立率3%</td><td>本書 W-7</td></tr>
+<tr><td>予算</td><td>1社5万円・合計10万円</td><td>社長</td></tr>
+<tr><td>回転上限</td><td>6ヶ月・閾値は取り分 ≥ ロット÷1.8</td><td>社長／本書</td></tr>
+</tbody></table>
+<p><strong>叩いてほしい点</strong></p>
+<ol>
+<li>②で送り①で買う2段の足切りで、「送ったが買えない」社が何割出るか。多すぎれば送信の手間が無駄になる</li>
+<li>波1の4社の窓口（北陸製菓は OEM サイトの窓口）が、完成品の卸の相談を受けるか</li>
+<li>12月の年末需要に間に合わない場合（FBA 受領が12月中旬以降）の回転</li>
+</ol>
+<hr>
+<h2>14. 社長判断が要る論点</h2>
+<table><thead><tr><th>論点</th><th>選択肢</th><th>推奨</th></tr></thead><tbody>
+<tr><td>1周目の経路</td><td>A: 本書どおり B 一本（10社・3波）／B: 20社に一律送信／C: 1周目を見送り、スーパーデリバリーの結果を待つ</td><td><strong>A</strong>。B は取り分の根拠が無い社に社長の手を使う。C は0円だが、成立率 p の測定が1か月遅れる</td></tr>
+<tr><td>1周目の締め</td><td>A: 初回入金 12/31 目標・1/15 撤退判定／B: 「初回販売」を完走とする／C: 11/15 のまま</td><td><strong>A</strong>。C は0%で組めない。B は入金まで見ないと利益の実測にならない</td></tr>
+<tr><td>足切り</td><td>A: 送る判断は②・買う判断は自分の取り分≥ロット÷1.8（2段）／B: ①だけで送る相手も切る（3社）／C: ②だけで買う</td><td><strong>A</strong>。B は送る相手が足りない。C は社長ルール「市場は自分の取り分で見る」に反する</td></tr>
+<tr><td>大口の月額（月5,390円）</td><td>A: 10万円に含めない（固定費）／B: 含める</td><td><strong>A</strong>。1周目の在庫予算を削らないため。ご判断ください</td></tr>
+<tr><td>河野製紙（電話のみ・平日昼）</td><td>A: 在席できる日があれば10/6〜9に電話／B: 1周目から外す</td><td>社長の平日の都合次第。無理なら B</td></tr>
+</tbody></table>
+</div></body></html>
