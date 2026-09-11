@@ -1,13 +1,13 @@
 ---
 ticket_id: T-20260726-003
 title: Amazon出品サービスのクレジットカード情報を変更（Amazon側内部エラーで保留中）
-status: waiting
+status: done
 assignee: secretary
 priority: medium
 created_at: 2026-07-26
 updated_at: 2026-09-12
 requires_approval: false
-next_check_at: 2026-09-13
+next_check_at: ""
 labels: [seller-central, payment, credit-card, setup, blocked-external]
 related_tickets: [T-20260603-003, T-20260715-001]
 ---
@@ -52,6 +52,8 @@ related_tickets: [T-20260603-003, T-20260715-001]
 - 2026-08-21 棚卸し（マリエ／T-20260821-007）: next_check_at 2026-07-27 → 2026-09-01 に再設定。仕分け=A。理由: Amazon側のページ内部エラーで停止。1ヶ月経過し復旧の可能性が高いので再試行のタイミング
 
 - 2026-09-12 カズヨ: **カナダで「無効な課金方法」によるアクセス制限が発生**（9/11 CREDIT_CARD_INVALID メール、再開ページが invalid-credit-card に転送）。本チケットの「カード変更」が CA 再開の最上位ゲートになった。進行は T-20260909-001 で一元管理。
+
+- 2026-09-12 カズヨ: **完了。**社長がカナダの課金方法を別カードに更新し、請求先住所も正しく設定（課金方法一覧で確認）。7/26 の内部エラーは再現せず。MX/US は従来カードのまま。以後の確認は T-20260909-001。
 
 ## 成果物
 
