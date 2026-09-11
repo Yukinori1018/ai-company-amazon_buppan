@@ -12,7 +12,7 @@ NETSEA 版（`knowledge_netsea_public_repo_leak_judgment.md`）の姉妹編。**
 - **§11(1) の条番号は正しい**（`https://keepa.com/cdn/termsAPI.txt` Version of July 28, 2026 を実取得して目視確認済み）。
 - **§2(2)「Reselling」・§6.1(1)「Resale」は効かない。**動詞が「販売」。無償公開は当たらない。**ここを誤って引くと過剰判定になる。**
 - **§11(2) は「save or print for own business purposes」を明文許諾**。ローカル保存は白。黒いのは公衆送信。
-- **penalty / 違約金 / 監査権の条項は存在しない**（全文検索で該当0）。NETSEA 会員規約27条4項（200万円）のようなものは Keepa には無い。
+- **penalty / 違約金 / 監査権の条項は存在しない**（全文検索で該当0）。NETSEA 会員規約27条3項（200万円。2026-09-12訂正：旧「4項」）のようなものは Keepa には無い。
 - §12(3) 特別解約は "**intentionally** violated or gross negligence" が要件。自動 `git add -A` は非意図的＝防御可能。**ただし「気づいた後の放置」は gross negligence に近づく。**
 - §20 ドイツ法・Kemnath 専属管轄。€1,176 のために提訴する経済合理性は無い。
 
