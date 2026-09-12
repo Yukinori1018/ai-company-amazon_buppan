@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>論点シート｜T-20260912-003</title><style>body{font-family:-apple-system,'Hiragino Sans','Noto Sans JP',sans-serif;max-width:1400px;margin:24px auto;padding:0 20px;line-height:1.6;color:#222;font-size:14px}
+<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>03 論点シート（T-20260912-003）</title><style>body{font-family:-apple-system,'Hiragino Sans','Noto Sans JP',sans-serif;max-width:1400px;margin:24px auto;padding:0 20px;line-height:1.6;color:#222;font-size:14px}
 h1{font-size:1.5em;border-bottom:2px solid #333;padding-bottom:6px}h2{font-size:1.25em;margin-top:2em;border-left:5px solid #2b5;padding-left:8px}h3{font-size:1.05em;margin-top:1.5em}
 table{border-collapse:collapse;margin:10px 0 18px;width:100%;font-size:12.5px}th,td{border:1px solid #bbb;padding:5px 7px;vertical-align:top;text-align:left}th{background:#f0f4f0}tr:nth-child(even) td{background:#fafafa}
 code{background:#f3f3f3;padding:1px 4px;border-radius:3px;font-size:0.92em}hr{border:0;border-top:1px solid #ccc;margin:24px 0}li{margin:2px 0}</style></head><body>
@@ -35,5 +35,16 @@ code{background:#f3f3f3;padding:1px 4px;border-radius:3px;font-size:0.92em}hr{bo
 <tr><td>22</td><td>Makuake 実行者への一般販売代行を本丸の母集団に加えるか</td><td>配送完了まで他販路禁止・3ヶ月は価格制限・代理店は独占契約書の提出義務 [S16][S17]。自動取得は着手不可（法務）。人が見るのは可</td><td>a. 支援1,000万円超の終了案件を人が見てリスト化 b. 展示会母集団に集中</td><td>a は独占契約が規約で「前提」になる珍しい経路。§4.1 の契約が要る</td></tr>
 <tr><td>23</td><td>防災（携帯トイレ等・メーカー分散）をカテゴリとして持つか</td><td>EC防災市場は2023年比約2倍、TOP5メーカーでもシェア5〜10% [S26]。壁は薄い</td><td>a. 数を打つ枠で1〜2SKU試す b. 本丸候補（防災用品の中小メーカー）を展示会母集団から抽出</td><td>需要は災害連動で上下する（在庫リスク両面）</td></tr>
 <tr><td>24</td><td>日本の個人セラーのベースレートが無い前提で、撤退条件をどう置くか</td><td>1年生存率・月商分布・撤退理由の一次情報は日本に無い。海外二次で「12ヶ月以内黒字58〜64%」「黒字化しない22%」（N・年不明）[S11][S12]</td><td>a. 自社の1周目の実測だけを基準にする b. 海外二次を仮置き（仮と明示）</td><td>b を使うなら「仮」タグ必須（社長の既定）</td></tr>
+</tbody></table>
+<h2>サトル③（法務NO再検討）</h2>
+<p>事実の出典は <code>04_法務NO経路の再検討と適法な代替手段.md</code>（[S番号]は同書 §6）。判定はしていない。「要ハルオ」は一次情報を取っただけで法務判定は未実施。</p>
+<table><thead><tr><th>#</th><th>問い</th><th>事実（出典）</th><th>選択肢の素材</th><th>決めると何が動くか</th></tr></thead><tbody>
+<tr><td>25</td><td>SP-API の開発者登録（規約同意 3 本・§4.1）を 1 周目でやるか</td><td>大口要件は充足（9/12 切替）。費用 0 円（第三者開発者向け年 1,400 ドルは 2026-05 に撤回 [S7][S8]）。getItemOffers で出品者数・カート価格、getListingsRestrictions でゲート、getMyFeesEstimateForASIN で手数料が公式に取れる [S3][S46][S47]。既定「新しい観測系を作らない」と衝突。実装はタカシ・数日級</td><td>a. 1 周目は既存画面＋Keepa、2 周目に登録 b. 登録だけ 1 周目に済ませ実装は 2 周目 c. 登録しない</td><td>b は §4.1 が 1 件増えるが審査待ちを並走できる。a/c はゲート判定が目視のまま</td></tr>
+<tr><td>26</td><td>ブランド登録（商標 44,900 円）を「需要データの入口」として前倒しするか</td><td>Brand Analytics の各レポートはブランド登録が要件 [S31]。商品機会エクスプローラーの日本提供・要件は未確認（二次はブランド登録者限定 [S33]）。03 #14 と同じ商標の問い</td><td>a. 03 #14 の判断に従う b. 需要データのためだけには買わず、セラースプライト（月 13,998 円 [S30]）で代替</td><td>a なら検索語データが公式に取れる。b なら月 13,998 円の外部ツール</td></tr>
+<tr><td>27</td><td>X API の従量課金（投稿読取 0.005 ドル/件・月 300 万件上限・無料枠なし [S36]）を §4.1 に出すか</td><td>定額プランは 2026-09 時点で存在しない。月 1 万件読取で約 5 ドル（推測計算）。開発者規約は未読（要ハルオ）</td><td>a. 出さない（人が見る A3 で足りる） b. 月上限を切って出す（例：10 ドル）</td><td>b は SNS 検知の自動化が 1 本開く。X の ID は事業インフラと分離できるので失うのは費用だけ</td></tr>
+<tr><td>28</td><td>本書で一次情報が新たに取れた 4 件（Instagram Graph API は仕様公開済み [S40][S41]／YouTube は「30 日以内・非集約」の設計余地 [S17]／楽天は第3条アフィリエイト目的 [S11]／Google トレンド CSV の出典表記文 [S21]）をハルオに再判定依頼するか</td><td>ハルオ 8/31「Instagram＝仕様非公開」は現時点では事実と異なる。Google トレンドは「再公開の許諾文書を確認できず」だったが公式ヘルプに出典表記の条件がある</td><td>a. 4 件まとめて再判定を発注 b. 使う予定のものだけ c. しない</td><td>a は法務 1 チケット。結果次第で 04 §2-0 の「要ハルオ」が可/不可に確定</td></tr>
+<tr><td>29</td><td>規約本文が読めない 4 件（Yahoo! API ガイドライン [S14]・Makuake 利用規約 [S22]・Amazon ドロップシッピングポリシー・Amazon 公式ヘルプ）を秘書のブラウザで取りに行くか</td><td>いずれも「不可」ではなく「未確認＝着手不可」。ブラウザ操作は秘書の責務（§4.4）</td><td>a. 4 件まとめて取る（1 セッション） b. 使う予定のものだけ</td><td>a で「未確認」6 本のうち 4 本が判定可能になる</td></tr>
+<tr><td>30</td><td>NO 経路のうち「人が見る」で代替するものを、誰が・週何分で回すか</td><td>時間の実測は無い。試算は週 30 分で Amazon 2 カテゴリ＋SNS 2 本（推測・確度低。04 §2-M）。目視の役目は候補発見に限り、数字は Keepa（社内既定）</td><td>a. カズヨが週 30 分 b. 社長が週 15 分 c. 目視をやらず Keepa Product Finder と展示会母集団に絞る</td><td>c は SNS 経路（T-20260906-006）を閉じる判断になる</td></tr>
+<tr><td>31</td><td>「NO のまま使う」を選択肢に残す場合、どの経路までか</td><td>不可逆なのは Amazon 出品アカウントと Google アカウントに紐づく 2 経路（04 §3-3）。他は ID 分離か金銭で終わる。Amazon 自動取得だけは「NO を守って失うものが無い」（履歴は Keepa、時点値・ゲート・手数料は SP-API）</td><td>a. 残さない（現状） b. 不可逆でない経路（X・ふるさとチョイス等）だけ社長判断で残す c. 全部残す</td><td>b/c は §4.1 相当として waiting に出す（親チケットの前提）。サトルは推奨も禁止もしない。材料は 04 §3</td></tr>
 </tbody></table>
 </body></html>

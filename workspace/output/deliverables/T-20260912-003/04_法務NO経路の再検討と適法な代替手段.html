@@ -1,0 +1,332 @@
+<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>04 法務NO経路の再検討と適法な代替手段（T-20260912-003）</title><style>body{font-family:-apple-system,'Hiragino Sans','Noto Sans JP',sans-serif;max-width:1400px;margin:24px auto;padding:0 20px;line-height:1.6;color:#222;font-size:14px}
+h1{font-size:1.5em;border-bottom:2px solid #333;padding-bottom:6px}h2{font-size:1.25em;margin-top:2em;border-left:5px solid #2b5;padding-left:8px}h3{font-size:1.05em;margin-top:1.5em}
+table{border-collapse:collapse;margin:10px 0 18px;width:100%;font-size:12.5px}th,td{border:1px solid #bbb;padding:5px 7px;vertical-align:top;text-align:left}th{background:#f0f4f0}tr:nth-child(even) td{background:#fafafa}
+code{background:#f3f3f3;padding:1px 4px;border-radius:3px;font-size:0.92em}hr{border:0;border-top:1px solid #ccc;margin:24px 0}li{margin:2px 0}</style></head><body>
+<h1>法務NO経路の再検討と適法な代替手段</h1>
+<ul>
+<li>チケット: T-20260912-003（親 T-20260912-002）／担当: サトル③（リサーチャー）／作成日: 2026-09-13</li>
+<li>背景: 社長指示（2026-09-13）「法務NO（Amazon/楽天/Yahoo の機械取得・SNS API）→これに限らない。あらゆる方法を検討」</li>
+<li>イシュー: 法務NOとされた情報取得経路について、NO の射程はどこまでか／同じ目的を適法に達成する手段は何か／NO のまま使った場合の実害の型と公開事例は何か——を事実として並べ、タケシと社長が選べる状態にする</li>
+<li>本書がしないこと: 適法性の判定（ハルオの領分）。本書は条文・料金・要件・事例の事実と論点だけを置く</li>
+<li>出典: 本文中の [S番号] は §6 出典一覧。Web 取得はすべて 2026-09-13。社内判定の引用は判定日を併記。「二次」「推測」「未確認」を明示</li>
+</ul>
+<hr>
+<h2>0. 結論（先に5行）</h2>
+<p>1. 社内で NO とされた経路は 21 本。うち「NO」の決め手が条文で確定しているのは 11 本、「規約本文が読めない＝未確認（着手不可）」が 6 本、「条件付き可・要ハルオ判定」が 4 本。<strong>NO の名宛人は例外なく「自動化された手段」または「API 契約者」</strong>で、人が見る行為を禁じた条文は 1 本も無い（§1）。</p>
+<p>2. Amazon 機械取得 NO の正面の代替は <strong>SP-API（出品者自身の公式 API）</strong>。大口要件は 9/12 の切替で満たしている。出品者数・カート価格・出品制限（ゲート）・手数料見積が公式に取れる。費用 0 円（第三者開発者向けの年 1,400 ドル課金は 2026-05 に撤回）。開発者登録＝規約同意 3 本で §4.1（§2-A）。</p>
+<p>3. 需要の兆し（検索ボリューム）は <strong>ブランド登録が前提</strong>（Brand Analytics／商品機会エクスプローラー）。商標がない当社は、セラースプライト（月 13,998 円・契約決定済み未申込）か Keepa（契約済み）が代替（§2-D）。</p>
+<p>4. SNS API は<strong>費用構造が変わった</strong>。X API は 2026-09 時点で定額プランが消え従量課金（投稿読取 1 件 0.005 ドル・月 300 万件上限）。Instagram Graph API はハルオ判定時「仕様非公開」だったが、公式に仕様が公開されている（ハッシュタグ検索 7 日 30 個まで・ビジネスアカウント要）。YouTube Data API は「30 日超の保存」と「複数チャンネルの集約」が禁止のまま（§2-E〜H）。</p>
+<p>5. NO のまま使った場合の実害は、<strong>訴訟ではなくプラットフォームの一存によるアカウント停止</strong>（Amazon BSA §3 "if we determine"）。米国の公開判例は公開データのスクレイピングで事業者側が負け続けている（X・Meta とも 2024 に敗訴）が、当社の Amazon 出品アカウントの生死は裁判の勝敗と無関係に決まる（§3）。</p>
+<hr>
+<h2>1. NO 判定の棚卸し</h2>
+<h3>1-A. 根拠条文と NO の射程</h3>
+<p>凡例: 判定＝社内判定（判定者・日付）。射程＝「禁止」と「禁止でない」を分ける。条文は社内判定書からの引用（原典 URL は §6）。</p>
+<table><thead><tr><th>#</th><th>経路</th><th>社内判定</th><th>NO の根拠条文（引用）</th><th>禁止されること</th><th>禁止されないこと</th></tr></thead><tbody>
+<tr><td>1</td><td>Amazon.co.jp 公開ページの機械取得（ランキング・商品ページ・検索）</td><td>絶対不可（ハルオ 8/31・9/6）</td><td>利用規約 nodeId=643006「限定的、非独占的、非商業的および個人的に利用する権利…製品リスト、解説、価格などの収集と利用…データマイニング、ロボットなどのデータ収集・抽出ツールの使用は、一切含まれません」＋BSA §3(a)(c)「materially breached」「might harm…Amazon's legitimate interests」→「if we determine」で即時停止 [S1][S2]</td><td>自動取得・蓄積（速度を問わず）。商用目的のデータ収集全般</td><td>人がブラウザで見てメモ（「1 商品ずつ、間を空けて」の条件付き）。<strong>SP-API 経由の取得（§2-A）</strong>。Keepa 等ライセンス済み第三者データ</td></tr>
+<tr><td>2</td><td>Amazon ドロップシッピングポリシー（無在庫）</td><td>未確認→着手不可（ハルオ 8/31）</td><td>本文が SPA で取得不能。判定なし</td><td>条文を読まずに TopSeller 型無在庫を始めること</td><td>秘書のブラウザ（ログイン後）で本文を取って再判定すること</td></tr>
+<tr><td>3</td><td>楽天ウェブサービス API（ランキング・商品検索）</td><td>不可（ハルオ 9/6）</td><td>規約 第10条(4)「To gain income by using the Web Services in ways other than Rakuten Affiliate」(6)「competes or may compete against the Group」(9)「Storing…in a place that enables the sharing…with unspecified and/or many people」[S11]</td><td>API データを Amazon 販売の収益に使うこと。PUBLIC リポ保存</td><td>第3条が許す「楽天アフィリエイトの成果報酬を得る目的」での利用 [S11]（解釈の余地は §2-I）</td></tr>
+<tr><td>4</td><td>楽天市場サイトのスクレイピング</td><td>未確認→着手不可（ハルオ 9/6）</td><td>ranking.rakuten.co.jp の robots.txt が取得不能（アクセス集中エラー）</td><td>自動取得</td><td>人が見る</td></tr>
+<tr><td>5</td><td>Yahoo!ショッピング サイトの自動取得</td><td>不可（ハルオ 9/6）</td><td>LINEヤフー共通利用規約 §14「当社サービスやそれらを構成するデータを、その提供目的を超えて利用することができません…利益相当額を請求する権利」。§2.1/2.2 で非会員にも及ぶ [S13]</td><td>提供目的（買い物）を超えるデータ利用。自動取得</td><td>人が見る</td></tr>
+<tr><td>6</td><td>Yahoo!ショッピング API（Yahoo!デベロッパーネットワーク）</td><td>未確認→着手不可（ハルオ 9/6）</td><td><code>developer.yahoo.co.jp/terms/</code> は 404（2026-09-13 再確認も 404）。ガイドラインは JS で本文不可 [S14][S15]</td><td>規約を読まずに使うこと</td><td>—（読めたら再判定）</td></tr>
+<tr><td>7</td><td>X API／X スクレイピング</td><td>NO（ハルオ 8/31：従量課金＝§4.1）／不可（9/6）</td><td>robots.txt <code>User-agent: * / Disallow: /</code>。ToS「crawling or scraping the Services in any form, for any purpose without our prior written consent is expressly prohibited」[S16]</td><td>スクレイピング（目的を問わず）</td><td>人が x.com の画面で見る（「published interfaces」）。<strong>有料 API は規約上は可・費用が §4.1</strong>（§2-E）</td></tr>
+<tr><td>8</td><td>YouTube Data API／スクレイピング</td><td>NO（ハルオ 8/31）</td><td>Developer Policies III.E「Do not aggregate API Data」＋「must not store…Non-Authorized Data for more than 30 days」＋III.D Prohibited Access [S17]</td><td>複数チャンネルの集約。30 日超の保存。スクレイピング</td><td>人が見る。チャンネル RSS（Data API ではない・ハルオ未判定）。<strong>30 日以内に削除/更新する非集約の利用</strong>（§2-F）</td></tr>
+<tr><td>9</td><td>TikTok Research API／スクレイピング</td><td>NO（ハルオ 8/31：申請＝規約同意で §4.1）／不可（9/6）</td><td>ToS §5「use automated scripts to collect information from…the Services」。robots.txt が <code>/search?</code> <code>/discover/trending/detail/</code> を Disallow [S18]</td><td>自動収集</td><td>人が見る。Creative Center を人が見る（§2-G）</td></tr>
+<tr><td>10</td><td>Instagram Graph API／スクレイピング</td><td>未確認（ハルオ 8/31：仕様非公開）／スクレイピング不可（9/6）</td><td>robots.txt 冒頭「Collection of data on Instagram through automated means is prohibited unless you have express written permission」[S19]</td><td>自動収集</td><td>人が見る。<strong>公式 Graph API の仕様は公開されている</strong>（§2-H。ハルオの「非公開」は現時点では事実と異なる）</td></tr>
+<tr><td>11</td><td>Google トレンド自動取得（pytrends 等）</td><td>不可（ハルオ 9/6）</td><td>robots.txt <code>Disallow: /explore?</code> <code>/trends/explore?</code>（2026-09-13 再確認 [S20]）＋Google 利用規約「robots.txt…に違反する…自動化された手段の使用」</td><td>自動取得。PUBLIC リポ保存（再公開の許諾を確認できず、と当時判定）</td><td>人が見る。画面の「ダウンロード」で CSV [S21]。<strong>公式ヘルプが再利用時の出典表記を明記</strong>（§2-L）。<strong>公式 Trends API（alpha・応募制）</strong>（§2-L）</td></tr>
+<tr><td>12</td><td>ふるさとチョイス自動取得</td><td>不可（ハルオ 9/6）</td><td>利用規約 第12条1項(12)「自動化された手段…を用いた情報収集（スクレイピングおよびクローリングを含みます）」＋第11条1項 転載禁止</td><td>自動取得。転載</td><td>人が見る。そこで知った事業者名で事業者の自社サイトへ辿る（3 段階の型）</td></tr>
+<tr><td>13</td><td>さとふる</td><td>未確認→着手不可（ハルオ 9/6）</td><td>規約ページが応答なし</td><td>自動取得</td><td>人が見る</td></tr>
+<tr><td>14</td><td>Makuake 自動取得</td><td>未確認→着手不可（ハルオ 9/6）</td><td>利用規約本文が JS スタブ（<code>/static/rule/</code> は 2026-09-13 も 302）。ヘルプ（Zendesk API）を「スクレイピング」で検索しても該当記事なし [S22]</td><td>規約を読まずに自動取得すること</td><td>人が見る。終了案件の実行者へ公開連絡先経由で連絡（§4.1）。Makuake メッセージ機能での営業は第16条1項8号で明文禁止</td></tr>
+<tr><td>15</td><td>CAMPFIRE 自動取得</td><td>条件付き可（ハルオ 9/6）</td><td>第27条に自動収集禁止なし。第34条3項ただし書「告知以外の目的での…掲載は事前に承諾」</td><td>PUBLIC リポへの掲載。3 秒間隔・同時 1 を外すこと</td><td>社内リスト化（agent_output 限定）</td></tr>
+<tr><td>16</td><td>NETSEA 外での直接交渉</td><td>明確に違反（ハルオ 8/31）</td><td>バイヤー会員規約 第7条2項5号（当社機能以外での連絡）・第19条3項（NETSEA を利用しない売買契約の禁止）・第27条3項「違約金として、200万円及び売買契約等の代金の50%…氏名又は名称…の公表」</td><td>NETSEA で知ったサプライヤーに外で連絡・契約すること</td><td>NETSEA 内で仕入れること。NETSEA と無関係の経路で同じメーカーに辿り着くこと（ただし「NETSEA で知った」事実が残るため要ハルオ）</td></tr>
+<tr><td>17</td><td>NETSEA サプライヤー情報の発見用途（サイトマップ 622 社等）</td><td>不可（ハルオ 8/31）</td><td>第7条1項3号「本サービスを利用する他の者の情報の収集を目的とする行為」（事前承諾の例外なし）</td><td>サプライヤー一覧を発見リストに使うこと</td><td>仕入れ実務での API 利用</td></tr>
+<tr><td>18</td><td>Gift Net（展示会オンライン事前登録）</td><td>登録しない方が有利（ハルオ 8/31）</td><td>利用規約 第5条「出展社情報を，本サービス利用以外の目的で利用する行為」「他のお客様，出展社に関する個人情報等を収集または蓄積する行為」</td><td>登録した上で出展社情報を営業に使うこと</td><td>当日登録（名刺）で入場し、出展社の公開情報を自分で取ること</td></tr>
+<tr><td>19</td><td>ザッカネット／卸の達人</td><td>NO（ハルオ 8/31）</td><td>ザッカネット＝利用規約が公開ページに無い。卸の達人＝会員規約 第6条「法人のみ」</td><td>白紙で規約同意すること。個人事業主での登録</td><td>—（法人化すれば卸の達人は再判定）</td></tr>
+<tr><td>20</td><td>Amazon 公式ヘルプ（危険物・要期限・Renewed・Vine 等）</td><td>未確認（サトル② 9/12：ログイン必須で本文 0 件）</td><td>判定なし。読めていないだけ</td><td>—</td><td>秘書のブラウザ（ログイン後）で本文を取ること</td></tr>
+<tr><td>21</td><td>有料・無料の SNS 分析ツール（Social Insight 等）</td><td>要ハルオ（9/6：規約未読）。会員登録＝§4.1</td><td>判定なし。読む順番だけ確定（保持期間→集約禁止→表示先→再配布→一般禁止）</td><td>規約を読まずに登録すること</td><td>—（§2-K）</td></tr>
+</tbody></table>
+<h3>1-B. 違反した場合の実害の型と公開事例</h3>
+<table><thead><tr><th>#</th><th>経路</th><th>実害の型（条文上）</th><th>制裁の単位</th><th>不可逆性</th><th>公開されている処分・訴訟事例（URL・日付）</th></tr></thead><tbody>
+<tr><td>1</td><td>Amazon 機械取得</td><td>出品用アカウント停止（BSA §3）。売上金の留保。損害賠償（利用規約）。米国では CFAA 提訴の前例</td><td>Amazon アカウント（関連アカウント含む）</td><td>極大（当社は 9/12 まで停止していた前歴あり）</td><td>Amazon v. Perplexity（2025-11-04 提訴・CFAA／2026-03 仮差止／その後第9巡回区が仮差止を取消）[S23][S24][S25]。<strong>出品者がスクレイピングを理由に停止された公開事例は確認できず</strong>（セラーフォーラムの停止理由は真贋・関連アカウント・レビュー操作が中心 [S26]）</td></tr>
+<tr><td>3</td><td>楽天 API</td><td>アプリ ID 停止・楽天会員 ID 制裁・利益相当額の請求（(9) は差止）</td><td>楽天会員 ID（App ID 取得済み）</td><td>中（楽天は当社の販路ではない）</td><td>App ID 停止の公開事例は確認できず（未確認）</td></tr>
+<tr><td>5</td><td>Yahoo! サイト</td><td>差止＋「得た利益相当額を請求する権利」（§14）</td><td>Yahoo! JAPAN ID</td><td>中</td><td>確認できず（未確認）</td></tr>
+<tr><td>7</td><td>X</td><td>アカウント停止。訴訟の前例あり</td><td>X アカウント（事業インフラではない）</td><td>低〜中</td><td>X Corp v. Bright Data：2024-05-10 却下（X 側敗訴。公開データの複製は著作権法に専占）[S27]</td></tr>
+<tr><td>8</td><td>YouTube Data API</td><td>API 認証停止。III.D で新規 Google アカウント作成による回避も禁止</td><td><strong>Google アカウント</strong>（成果物カタログ・Drive が乗る＝事業インフラ）</td><td>高</td><td>確認できず（未確認）</td></tr>
+<tr><td>10</td><td>Instagram</td><td>アカウント停止。訴訟の前例あり</td><td>Meta アカウント</td><td>低</td><td>Meta v. Bright Data：2024-01-23 略式判決（Meta 側敗訴。ログオフ状態の公開データ収集は規約が禁じていない）[S28]</td></tr>
+<tr><td>11</td><td>Google トレンド</td><td>Google 利用規約違反→アカウント制裁</td><td><strong>Google アカウント</strong>（同上）</td><td>高</td><td>確認できず</td></tr>
+<tr><td>12</td><td>ふるさとチョイス</td><td>規約違反（差止・損害賠償）</td><td>サイト会員 ID</td><td>低</td><td>確認できず</td></tr>
+<tr><td>16</td><td>NETSEA 外交渉</td><td>違約金 200 万円＋代金 50%＋事業者名の公表</td><td>契約上の金銭債務</td><td>高（金額が固定・公表は取り消せない）</td><td>適用事例は未確認</td></tr>
+<tr><td>全経路共通</td><td>高頻度アクセス</td><td>偽計業務妨害（刑法 233 条）での逮捕</td><td>個人（身柄）</td><td>最大</td><td>岡崎市立中央図書館事件（2010）：1 秒 1 回・1 日 1 時間で逮捕・21 日勾留・起訴猶予（社内 memory <code>knowledge_scraping_and_public_db_2026</code> §5）</td></tr>
+</tbody></table>
+<p>読み方の注意。米国 2 判例（X・Meta）は「公開データのスクレイピングを規約違反・不法行為で止めるのは難しい」方向だが、これは<strong>訴えられた側（Bright Data）が勝った</strong>事例であり、<strong>Amazon が出品者を停止する権限（BSA §3）とは別の話</strong>。当社の実害は裁判ではなく「Amazon の一存」で決まる。</p>
+<hr>
+<h2>2. 同じ目的を達成する適法な手段</h2>
+<h3>2-0. 目的別サマリ</h3>
+<p>適法性の状態＝「可」は社内判定済み、「条件付き」は条件付きで社内判定済み、「要ハルオ」は本書で一次情報を取ったが判定が無いもの。費用に § とあるのは §4.1（課金・規約同意）該当。</p>
+<table><thead><tr><th>目的</th><th>手段</th><th>適法性の状態</th><th>費用</th><th>取れるデータ</th><th>取れないデータ</th><th>社長制約との適合</th></tr></thead><tbody>
+<tr><td>需要の兆し検知</td><td>Google トレンドを人が見る＋CSV ダウンロード</td><td>可（社内限定）</td><td>0 円</td><td>検索興味の相対値（0〜100）・関連クエリ・地域</td><td>絶対検索数。商品名までは出ない（実測：芸能/ニュースが多い）</td><td>週◯分の人手枠が要る</td></tr>
+<tr><td>〃</td><td>Google Trends API（alpha・応募制）</td><td>要ハルオ（応募＝規約同意 §4.1）</td><td>0 円（alpha）</td><td>5 年分・日/週/月/年・一貫スケール [S29]</td><td>承認されるかは不明</td><td>「新しい観測系」に当たる</td></tr>
+<tr><td>〃</td><td>セラースプライト（キーワード検索数・月販推定）</td><td>要ハルオ（規約未読）。契約決定済み・未申込（T-20260814-001）</td><td>月 13,998 円 § [S30]</td><td>検索ボリューム・CVR・PPC 単価・トレンド（簡易 OEM の 4 基準）</td><td>実売（推定値）</td><td>予算 10 万円のうち月 1.4 万円</td></tr>
+<tr><td>〃</td><td>Amazon Brand Analytics（検索語レポート等）</td><td>可（公式）。<strong>ブランド登録が前提</strong></td><td>登録 0 円。商標 44,900 円 §</td><td>検索語の順位・クリック/購入シェア・市場バスケット・リピート [S31]</td><td>ブランド登録前は何も取れない</td><td>商標出願が先（03 #14）</td></tr>
+<tr><td>〃</td><td>商品機会エクスプローラー</td><td>未確認（日本の提供有無・要件を公式で確認できず。二次はブランド登録者限定・US/EU5 か国）[S32][S33]</td><td>0 円</td><td>検索ボリューム・ニッチ・クリックシェア（米国）</td><td>—</td><td>社長ログインで 1 手で確認できる穴</td></tr>
+<tr><td>出品者数・価格の実測</td><td><strong>SP-API getItemOffers</strong></td><td>要ハルオ（AUP/DPP 同意 §4.1。用途は自社業務）</td><td>0 円</td><td>NumberOfOffers（コンディション×配送別）・BuyBoxPrices・LowestPrices・SalesRankings・Offers[].IsBuyBoxWinner/IsFulfilledByAmazon [S3]</td><td>履歴（時点値のみ。蓄積は自前）。他社の販売数</td><td>大口要件は 9/12 に充足。開発者登録が必要</td></tr>
+<tr><td>〃</td><td>Keepa API（契約済み €49/月）</td><td>可（API T&amp;C §2(2) 自社業務）</td><td>支払済み</td><td>offer count・BuyBox 履歴・BSR 履歴・Product Finder（社内 <code>reference_keepa_api_capabilities</code>）</td><td>実売数（ドロップ数は観測回数）</td><td>既に使っている</td></tr>
+<tr><td>〃</td><td>ERESA</td><td>要ハルオ（規約未読）。Amazon SPN 公認（社内 memory）</td><td>新規 月 5,980 円／年 59,800 円 §。無料プランは 2025-11-30 終了 [S34][S35]</td><td>価格・ランキング・出品者数の推移（Keepa と重複大）</td><td>Keepa と同じ限界</td><td>Keepa 契約済みなら重複</td></tr>
+<tr><td>〃</td><td>人がブラウザで見る（Amazon 商品ページ・出品者一覧）</td><td>可（緩速）</td><td>0 円</td><td>出品者数・価格・カート取得者（その時点）</td><td>履歴・大量</td><td>03 #19 の a 案</td></tr>
+<tr><td>メーカーの発見</td><td>展示会出展社リスト（社内 CSV）・産地組合・J-GoodTech・gBizINFO・国税庁法人番号</td><td>可（条件付き判定済み）</td><td>0 円</td><td>社名・所在地・連絡先（自社サイト経由）</td><td>NETSEA 由来のリスト（第7条1項3号）</td><td>既存資産（01 §2）</td></tr>
+<tr><td>〃</td><td>Makuake／CAMPFIRE 終了案件を人が見る</td><td>可（Makuake は自動取得のみ未確認）</td><td>0 円</td><td>実行者名・公開 URL・支援額</td><td>Makuake メッセージでの営業（明文禁止）</td><td>連絡は §4.1</td></tr>
+<tr><td>〃</td><td>NETSEA 内で仕入れ（発見ではなく取引）</td><td>可（氏名・住所公開を承知の上で）</td><td>仕入代金 §</td><td>卸値・在庫</td><td>外での交渉</td><td>1 周目の既定経路</td></tr>
+<tr><td>SNS の話題商品の検知</td><td>各 SNS を人が見る（閲覧用アカウントを事業用と分ける）</td><td>可（9/6）</td><td>0 円</td><td>商品名・観測日・タグ順位</td><td>投稿本文・投稿者情報の保存</td><td>人手枠</td></tr>
+<tr><td>〃</td><td>X API（従量課金）</td><td>規約上は可・費用が §4.1（要ハルオ：開発者規約）</td><td>投稿読取 1 件 0.005 ドル・月 300 万件上限。無料枠なし [S36]</td><td>検索（キーワード・ハッシュタグ）・投稿本文・エンゲージメント</td><td>定額プランは 2026-09 時点で存在しない</td><td>月 1 万件読取で約 5 ドル（推測計算）</td></tr>
+<tr><td>〃</td><td>YouTube Data API（30 日以内に削除・非集約）</td><td>要ハルオ（現判定は NO。許容範囲は §2-F）</td><td>0 円（既定 10,000 units/日）[S37]</td><td>動画タイトル・説明・統計（30 日以内）</td><td>永続的な候補リスト。複数チャンネルの集約</td><td>Google アカウントを賭ける構造は変わらない</td></tr>
+<tr><td>〃</td><td>チャンネル RSS を人が見る</td><td>ハルオ未判定（当職の見立てでは Data API 外）</td><td>0 円</td><td>新着タイトル・URL</td><td>統計</td><td>T-20260906-006/01 D2</td></tr>
+<tr><td>〃</td><td>TikTok Creative Center（人が見る）</td><td>可（人が見る）。ログインは TikTok for Business 登録＝§4.1</td><td>0 円</td><td>人気ハッシュタグ・楽曲・クリエイター・「人気上位の商品」（広告出稿の多い商品カテゴリ）[S38][S39]</td><td>商品名（社内実測 0 件・2026-09-06）</td><td>人手枠</td></tr>
+<tr><td>〃</td><td>Instagram Graph API ハッシュタグ検索</td><td>要ハルオ（一次仕様を本書で取得）</td><td>0 円。Meta 開発者登録＝§4.1</td><td>ハッシュタグの上位/最新メディア（7 日 30 個まで）</td><td>投稿者名。30 個超</td><td>Instagram ビジネス/クリエイターアカウント＋Facebook ページが要る [S40][S41]</td></tr>
+<tr><td>〃</td><td>SNS 分析 SaaS（Social Insight 等）</td><td>要ハルオ（規約未読）</td><td>二次：初期 5 万円＋月 5 万円（ビジネス版）[S42][S43]</td><td>43 百万アカウント・X 公式 Enterprise API 対応</td><td>個人事業主の予算外</td><td>10 万円予算と不整合</td></tr>
+<tr><td>〃</td><td>RSS・一次記事から拾う</td><td>条件付き可（最も筋がよい・9/6）</td><td>0 円</td><td>タイトル・URL・日付・商品名</td><td>本文の転載</td><td>既定の推奨経路</td></tr>
+<tr><td>楽天・Yahoo の売れ筋把握</td><td>Nint（3 モール推計）</td><td>要ハルオ（規約未読）。資料請求＝第三者連絡の可能性</td><td>10 商品まで無料。有料は非公開 [S44]</td><td>楽天・Amazon・Yahoo の推計売上・数量・価格・シェア</td><td>実売（推計）</td><td>2,300 社導入は法人中心</td></tr>
+<tr><td>〃</td><td>楽天ウェブサービスをアフィリエイト目的で使う</td><td>要ハルオ（第3条と第10条(4) の解釈）</td><td>0 円。楽天アフィリエイト登録＝§4.1</td><td>ランキング・商品検索</td><td>得た知見を Amazon 仕入れに使ってよいかは条文で決まらない（§2-I）</td><td>楽天アフィリエイトの実運用が要る</td></tr>
+<tr><td>〃</td><td>Yahoo!ショッピング API（YDN）</td><td>未確認（規約 404 継続）</td><td>0 円</td><td>商品検索 v3・高評価トレンドランキング・キーワードランキング v2 等（認証不要・1 query/秒）[S14]</td><td>—</td><td>秘書ブラウザでガイドライン本文を取る穴</td></tr>
+<tr><td>〃</td><td>楽天・Yahoo を人が見る</td><td>可</td><td>0 円</td><td>ランキング上位（その時点）</td><td>大量</td><td>人手枠</td></tr>
+</tbody></table>
+<h3>2-A. Amazon SP-API（Selling Partner API）— Amazon 機械取得 NO の正面の代替</h3>
+<p>事実（すべて 2026-09-13 に公式ドキュメントで確認）</p>
+<table><thead><tr><th>項目</th><th>事実</th><th>出典</th></tr></thead><tbody>
+<tr><td>誰が使えるか</td><td>「you must have a professional selling account to develop SP-API private seller applications」。登録は「primary account user」のみ</td><td>[S4]</td></tr>
+<tr><td>大口要件との関係</td><td>当社は 2026-09-12 に日本を大口へ切替済み（社内 memory <code>project_amazon_plan_koguchi</code>）→ 要件充足</td><td>社内</td></tr>
+<tr><td>登録手順</td><td>Seller Central → Apps and Services → Develop Apps → 「Private Developer」を選び、Roles・ユースケース・Security Controls を記入。Solution Provider Portal Agreement・Acceptable Use Policy・Data Protection Policy に同意</td><td>[S5][S6]</td></tr>
+<tr><td>§4.1 該当</td><td>規約同意 3 本（法的拘束）。審査中の追加照会は「must respond within five days」</td><td>[S5]</td></tr>
+<tr><td>費用</td><td>0 円。2025-11-03 に第三者開発者向け年 1,400 ドル＋従量課金が告知されたが、自社利用の出品者は当初から対象外。2026-05-12（二次 2 本。1 本は 5/14 と記載）に「will not move forward with the SP-API usage and annual fees at this time」で撤回（一次告知ページは本書で特定できず＝二次）</td><td>[S7][S8]</td></tr>
+<tr><td>レート制限</td><td>トークンバケット方式（rate＝毎秒補充、burst＝上限）。超過は 429</td><td>[S9]</td></tr>
+</tbody></table>
+<p>取れるデータ（オペレーション別）</p>
+<table><thead><tr><th>オペレーション</th><th>取れるもの</th><th>レート（rate/burst）</th><th>用途</th><th>出典</th></tr></thead><tbody>
+<tr><td>Catalog Items <code>searchCatalogItems</code> / <code>getCatalogItem</code></td><td>キーワード・ブランド・分類で検索。includedData で <code>salesRanks</code> <code>summaries</code> <code>identifiers</code> <code>attributes</code> <code>relationships</code> 等</td><td>5 rps / 5</td><td>JAN→ASIN 突合、売れ筋ランク（時点）</td><td>[S10]</td></tr>
+<tr><td>Product Pricing v0 <code>getItemOffers</code></td><td><code>NumberOfOffers</code>（コンディション×配送別）、<code>BuyBoxPrices</code>、<code>LowestPrices</code>、<code>SalesRankings</code>、<code>Offers[].IsBuyBoxWinner</code> <code>IsFeaturedMerchant</code> <code>SellerFeedbackRating</code> <code>IsFulfilledByAmazon</code></td><td>0.5 rps / 1</td><td><strong>出品者数・カート価格の実測</strong>（03 #19 の代替）</td><td>[S3]</td></tr>
+<tr><td>Product Pricing v2022-05-01 <code>getCompetitiveSummary</code></td><td>競合価格・参考価格。バッチ 20 ASIN</td><td>未取得</td><td>同上</td><td>[S45]</td></tr>
+<tr><td>Listings Restrictions <code>getListingsRestrictions</code></td><td><code>reasonCode</code>＝<code>APPROVAL_REQUIRED</code> / <code>ASIN_NOT_FOUND</code> / <code>NOT_ELIGIBLE</code>、承認申請 URL</td><td>5 rps / 10</td><td><strong>ゲート（出品制限）の機械判定</strong>（現状は目視）</td><td>[S46]</td></tr>
+<tr><td>Product Fees <code>getMyFeesEstimateForASIN</code></td><td><code>TotalFeesEstimate</code>・<code>FeeDetailList</code>（価格・FBA 有無を入力）</td><td>1 rps / 2</td><td>手数料の実測値（推定→公式値）</td><td>[S47]</td></tr>
+<tr><td>Reports（Brand Analytics 系）</td><td>検索語・検索クエリ性能・市場バスケット・リピート購入</td><td>—</td><td><strong>ブランド登録者のみ</strong></td><td>[S31]</td></tr>
+<tr><td>Sales / Orders</td><td>自社の売上・注文のみ</td><td>—</td><td>販売後の実測</td><td>公式（本書未取得）</td></tr>
+</tbody></table>
+<p>取れないデータ：他社の販売数（Sales API は自社分のみ）。価格・出品者数の<strong>履歴</strong>（時点値。履歴は自前で蓄積するか Keepa）。検索ボリューム（Brand Analytics はブランド登録者限定）。</p>
+<p>利用規約上の制約（AUP・2026-09-13 取得 [S6]）</p>
+<ul>
+<li>「Do not use, offer or promote external (non-Amazon) data services that vend information or data retrieved from Amazon's websites」</li>
+<li>「Do not disclose Information, individually labelled or aggregated, to other Application users, affiliated entities or any outside parties」→ <strong>PUBLIC リポに生データを置けない</strong>（社内の既存パターンと同じ）</li>
+<li>「Do not promote, publish or share insights about Amazon's business. Do not use insights about Amazon's business for your own business purposes」</li>
+<li>「Do not request access to or retrieve Information that is not necessary for your Application's functionality」→ 登録時の Roles・ユースケースの範囲外の取得は不可</li>
+<li>「Do not attempt to circumvent throttling quotas through the creation of multiple Solution Provider accounts or applications」</li>
+</ul>
+<p>社長の制約との整合（事実と論点）</p>
+<ul>
+<li>社内既定「新しい観測系を作り込まない」（<code>feedback_ship_dont_instrument</code>、T-20260909-002/05「1 周目のための SP-API 構築は新しい観測系の作り込みに当たる」）と正面衝突する。<strong>本書は SP-API を推奨しない。事実として「Amazon 機械取得 NO の正面代替はこれ」と置くだけ</strong>。判断は 03 #25。</li>
+<li>既存の SP-API 実装は無い（T-20260521-005 で「設定数日級・初手は非推奨」と評価して見送り）。実装はタカシ（IT）。</li>
+</ul>
+<h3>2-B. Amazon Creators API（旧 Product Advertising API）— 実績ゼロでは入口で落ちる</h3>
+<table><thead><tr><th>項目</th><th>事実</th><th>出典</th></tr></thead><tbody>
+<tr><td>PA-API 5.0</td><td>「has been deprecated」。呼び出しは HTTP 403 になる。後継は Creators API</td><td>[S48]</td></tr>
+<tr><td>対象者</td><td>「for publishers, influencers, and affiliate partners」</td><td>[S48]</td></tr>
+<tr><td>要件</td><td>「Be enrolled in the Amazon Associates program for your target marketplace」「Have at least 10 qualifying sales within the past 30 days」</td><td>[S49]</td></tr>
+<tr><td>アソシエイト参加要件</td><td>開設後 180 日以内に 3 件の適格販売（二次）</td><td>[S50]</td></tr>
+<tr><td>当社との適合</td><td>アソシエイト実績ゼロ。<strong>入口要件を満たさない</strong>。仕入れリサーチ目的は「audience discover products」の趣旨外（要ハルオ）</td><td>—</td></tr>
+</tbody></table>
+<h3>2-C. Keepa（契約済み）— 既に手元にある「ライセンス済み第三者データ」</h3>
+<ul>
+<li>当社は Keepa API（€49/月・API T&amp;C 2026-07-28 版）を契約済み。§2(2) 自社業務目的・§11(2) 保存して自社業務に使う権利あり（社内 memory <code>knowledge_keepa_tos</code>）。</li>
+<li>offer count・BuyBox 履歴・BSR 履歴・Product Finder が取れる（社内 <code>reference_keepa_api_capabilities</code>）。ドロップ数は販売数ではない（<code>knowledge_keepa_dropcount_is_polling</code>）。</li>
+<li>ハルオ 9/6 判定「Amazon ランキングの自動取得は Keepa で代替済み＝そもそも不要」。<strong>Amazon 機械取得の NO で失うデータは、履歴系については Keepa で既に埋まっている。</strong>埋まっていないのは「出品制限（ゲート）」と「公式手数料の見積」で、これは SP-API の領分（§2-A）。</li>
+</ul>
+<h3>2-D. セラースプライト／ERESA／Nint／Brand Analytics — 需要側のデータを合法に出す事業者</h3>
+<table><thead><tr><th>ツール</th><th>料金（2026-09-13 公式）</th><th>主なデータ</th><th>規約の状態</th><th>出典</th></tr></thead><tbody>
+<tr><td>セラースプライト</td><td>無料 0 円／スタンダード 月 13,998 円・年 139,998 円／アドバンス 年 269,831 円／VIP 年 339,998 円</td><td>キーワード検索数・月販推定・競合分析。エクスポート 50 回/日</td><td>規約未読（要ハルオ）。契約は決定済み・未申込（T-20260814-001）</td><td>[S30]</td></tr>
+<tr><td>ERESA</td><td>新規 月 5,980 円／年 59,800 円（税込・2025-08-01〜）。7 日無料。無料プランは 2025-11-30 で終了</td><td>価格・ランキング・出品者数の推移（Keepa 連携）</td><td>Amazon SPN 公認（社内 memory）。規約未読</td><td>[S34][S35]</td></tr>
+<tr><td>Nint</td><td>10 商品まで無料。有料は非公開（資料請求）</td><td>楽天・Amazon・Yahoo の推計売上・数量・価格・シェア。2,300 社導入（2026-04）</td><td>「独自の推計技術」とのみ記載。データ取得方法は非公開</td><td>[S44]</td></tr>
+<tr><td>Amazon Brand Analytics</td><td>0 円（ブランド登録が前提。登録は無料、商標は登録済みか出願中が要件）</td><td>検索語レポート・検索クエリ性能・市場バスケット・リピート購入</td><td>公式。Search Terms Report は「brand representative」も要件</td><td>[S31][S51]</td></tr>
+</tbody></table>
+<p>注意（事実）：セラースプライト・ERESA・Nint が Amazon のデータをどう取得しているかは公開されていない。<strong>ツール事業者側の規約リスクが利用者の Amazon 出品アカウントに及ぶかは未確認</strong>（要ハルオ）。ERESA は Amazon SPN（サービスプロバイダネットワーク）掲載という事実がある。</p>
+<h3>2-E. X API — 定額プランは消え、従量課金に変わった</h3>
+<table><thead><tr><th>項目</th><th>事実（2026-09-13 docs.x.com）</th><th>出典</th></tr></thead><tbody>
+<tr><td>課金</td><td>「pay-per-usage credits」。前払いクレジット。無料枠なし</td><td>[S36]</td></tr>
+<tr><td>読取単価</td><td>Posts 0.005 ドル／Users 0.010 ドル／Likes 0.001 ドル（1 リソースあたり）</td><td>[S36]</td></tr>
+<tr><td>上限</td><td>「capped at 3 million Post reads per monthly billing cycle」</td><td>[S36]</td></tr>
+<tr><td>自分のデータ</td><td>Owned Reads 0.001 ドル</td><td>[S36]</td></tr>
+<tr><td>試算（推測）</td><td>月 1 万投稿の検索読取＝約 5 ドル。月 10 万投稿＝約 50 ドル。※検索エンドポイントの期間（7 日／全期間）は本書で未確認</td><td>—</td></tr>
+<tr><td>§4.1</td><td>課金（前払い）＋開発者規約同意</td><td>—</td></tr>
+</tbody></table>
+<p>ハルオ 8/31 判定の NO は「従量課金＝§4.1」が理由で、規約上の禁止ではない。<strong>費用の桁が分かった今、社長判断の材料になる</strong>（03 #27）。X ToS のスクレイピング禁止（「in any form, for any purpose」）は API 利用には及ばない（API は「currently available, published interfaces」）。開発者規約（Developer Agreement）のデータ保持・再配布条項は本書で未取得（要ハルオ）。</p>
+<h3>2-F. YouTube Data API — 「許容される使い方」の射程</h3>
+<table><thead><tr><th>条項（Developer Policies・2026-06-24 版。社内 memory 経由）</th><th>禁じること</th><th>残る使い方</th></tr></thead><tbody>
+<tr><td>III.E「Do not aggregate API Data」（例外：同一コンテンツオーナー配下）</td><td>複数チャンネルを跨いだ一覧・集計</td><td>1 チャンネルずつ個別に見る</td></tr>
+<tr><td>III.E.4「must not store…Non-Authorized Data for more than 30 days」「delete or refresh」</td><td>30 日超の候補リスト</td><td>30 日以内に削除または再取得する運用</td></tr>
+<tr><td>III.D Prohibited Access</td><td>停止後の新規アカウントでの回避</td><td>—</td></tr>
+<tr><td>クォータ</td><td>既定 10,000 units/日。search.list は別枠 100 回/日（公式 getting-started の記載 [S37]）</td><td>小規模の個別照会</td></tr>
+</tbody></table>
+<p>推測（確度中）：「複数チャンネルの新着を 1 枚の表にする」は aggregate に当たる可能性が高く、API での候補リスト化は現判定どおり不可。代替はチャンネル RSS（配信者が機械可読で公開・Data API 外）を人が見る運用（T-20260906-006/01 D2）。RSS の判定はハルオ未実施。</p>
+<h3>2-G. TikTok Creative Center — 人が見る範囲とログイン後の範囲</h3>
+<ul>
+<li>公式ヘルプ [S38]：「トップ広告」「トレンド（人気ハッシュタグ）」を提供。「すべての機能、データ、インサイトを活用し、確認するためには、ログインすることをお勧めします」。ログイン後に増えるのは「マイコレクション・広告認証管理・素材ライブラリ」（＝トレンドデータの範囲拡大とは書かれていない）。</li>
+<li>二次 [S39]：ログイン無しで一部利用可。「人気上位の商品」タブは広告出稿の多い商品カテゴリを表示。</li>
+<li>期間・地域の選択肢：ヘルプ内の URL パラメータに <code>period=30&amp;region=US</code> があるのみ。7/30/120 日・日本の有無は<strong>未確認</strong>。</li>
+<li>社内実測（2026-09-06）：商品名は 0 件（カテゴリ止まり）。</li>
+<li>ログイン＝TikTok for Business アカウント作成＝規約同意（§4.1）。TikTok ToS §5 に「商業目的での利用は書面同意」の条項があり、ハルオは「プラットフォーム上の勧誘を禁じる趣旨」と読んで人が見るのは可とした（9/6）。</li>
+</ul>
+<h3>2-H. Instagram Graph API — 「仕様非公開」ではなかった</h3>
+<table><thead><tr><th>項目</th><th>事実（2026-09-13 developers.facebook.com）</th><th>出典</th></tr></thead><tbody>
+<tr><td>アカウント要件</td><td>「An Instagram professional account can be for a business or creator」。Facebook Login 経由なら「must be connected to a Facebook Page」</td><td>[S41]</td></tr>
+<tr><td>ハッシュタグ検索</td><td>「Instagram Public Content Access」機能＋<code>instagram_basic</code> 権限。「You can query a maximum of 30 unique hashtags within a 7 day period」。公開メディアのみ・投稿者名は取れない</td><td>[S40]</td></tr>
+<tr><td>App Review</td><td>「Your app must complete Meta App Review to be granted Advanced Access」。Advanced Access が要るのは「serves Instagram professional accounts that you don't own or manage」の場合</td><td>[S41]</td></tr>
+<tr><td>§4.1</td><td>Meta 開発者登録・アプリ作成＝規約同意</td><td>—</td></tr>
+</tbody></table>
+<p>ハルオ 8/31 の「Instagram＝仕様が非公開で未確認」は、少なくとも 2026-09-13 時点では公式仕様が公開されている。再判定の入口（データ保持・再配布条項は Platform Terms を要確認）。</p>
+<h3>2-I. 楽天ウェブサービスを「アフィリエイト目的」で使う場合</h3>
+<ul>
+<li>規約 第3条：楽天アフィリエイトの成果報酬を得る目的での利用を許し、楽天アフィリエイト パートナー規約に従うことを求める [S11]。</li>
+<li>第10条(4)：「楽天アフィリエイト以外の方法で収益を得る行為」を禁止 [S11]。</li>
+<li>楽天アフィリエイト パートナー規約（2022-02-01 改定）：参加資格の個人/法人の別は規約本文に明記なし。第12条は秘密保持（ユーザ IP 等）。目的外利用を直接禁じる条項は本文に無く、ガイドライン側は未取得 [S52]。</li>
+<li>論点（判定はハルオ）：アフィリエイト目的で API を使い、<strong>同じ人が同じデータから得た知見を Amazon 仕入れに使う</strong>ことが第10条(4)(6) に当たるか。条文は「Web Services を使って収益を得る方法」を縛っており、「見て知ったことを別の商売に使う」ことまで縛るかは文言から一義に決まらない。当社が楽天アフィリエイトを実際に運用していなければ第3条の目的自体が成り立たない。</li>
+</ul>
+<h3>2-J. Yahoo!デベロッパーネットワーク（YDN）の現況（2026-09-13）</h3>
+<ul>
+<li><code>https://developer.yahoo.co.jp/terms/</code>：404（ハルオ 9/6 と同じ）[S15]。</li>
+<li>ガイドライン <code>https://developer.yahoo.co.jp/guideline/</code>：HTTP 200 だが 7,755 バイトの JS シェル。抽出できたのは「2023年10月1日制定」「クレジット表示ガイドラインとクレジット配置ルールを順守」「アプリケーション ID 等を付す」のみ。商用利用・保存・競合サービスの条項は<strong>取れていない</strong> [S14]。</li>
+<li>API 一覧ページ [S14]：ショッピング情報取得系（商品検索 v3・高評価トレンドランキング・キーワードランキング v2・商品レビュー検索 等）は「認証不要」。「短時間に同一 URL へ大量アクセスすると一定期間制限（1 query/秒）」。利用規約リンクは LINEヤフー共通利用規約（§14 が API にも及ぶかは未判定）。</li>
+<li>既存実装 <code>yahoo_shopping.py</code> は稼働停止推奨のまま（T-20260906-007）。</li>
+</ul>
+<h3>2-K. SNS 分析 SaaS</h3>
+<table><thead><tr><th>サービス</th><th>料金</th><th>対応 SNS</th><th>データ取得方法の明示</th><th>出典</th></tr></thead><tbody>
+<tr><td>Social Insight（ユーザーローカル）</td><td>公式は非公開（資料請求）。二次：ビジネス版 初期 5 万円＋月 5 万円</td><td>X・Instagram・Facebook・LINE・YouTube・Pinterest・ブログ・TikTok。43 百万アカウント</td><td>「X(Twitter)公式の Enterprise API に対応」と明記</td><td>[S42][S43]</td></tr>
+</tbody></table>
+<p>個人事業主の 1 周目予算（10 万円）と桁が合わない。他社（Brandwatch・Meltwater 等）は未調査。</p>
+<h3>2-L. Google トレンドの手動閲覧＋CSV、および公式 API</h3>
+<ul>
+<li>公式ヘルプ [S21]：「グラフの右上にある【ダウンロード】をクリック」で CSV。埋め込みも可。<strong>「Google トレンドのデータを再利用する場合は、情報が Google に帰属することを引用によって示してください」「データソース: Google トレンド（https://www.google.com/trends）」</strong>。</li>
+<li>ハルオ 9/6 は「再公開を許諾する文書を確認できなかった→社内限定」とした。<strong>上記ヘルプがその文書に当たる可能性がある</strong>（判定はハルオ。PUBLIC リポへの CSV 掲載可否が変わり得る）。</li>
+<li>Google Trends API（alpha）[S29]：「rolling window of the last 5 years」「daily, weekly, monthly, and yearly intervals」「consistently scaled data」。「We're now accepting applications for alpha testers」（応募制・用途が明確な開発者を優先）。応募＝規約同意（§4.1）。承認は不確実。</li>
+<li>robots.txt は 2026-09-13 も <code>Disallow: /explore?</code> <code>/trends/explore?</code>（自動取得 NO は変わらず）[S20]。</li>
+</ul>
+<h3>2-M. 「人が見る」運用の設計値</h3>
+<ul>
+<li>社内に<strong>時間の実測は無い</strong>。T-20260906-006/01 の設計は「登録者 50 万人超の 10〜20 チャンネルを、新着から 24 時間以内に人が見て商品を特定」。社長の §4.1 一手の週上限は「週 5 件・50 分」がタケシの置き値（03 #9）。</li>
+<li>試算（推測・確度低）：Amazon ベストセラー/急上昇の一覧 1 ページ（50 件）を「商品名・価格・出品者数（一覧上の表示のみ）」で流し見＝約 10 分。X/TikTok のトレンド上位 20 タグの確認＝約 5 分。週 30 分で「Amazon 2 カテゴリ＋SNS 2 本」が上限。<strong>数字は Keepa に落とすので、目視の役目は「候補の発見」に限る</strong>のが社内の既定（<code>knowledge_trend_sourcing_routes_jp</code> §5）。</li>
+<li>目視の限界（事実）：出品者数・価格は「その時点」しか取れず、履歴も比較もできない。Amazon の目視は「1 商品ずつ、間を空けて」の条件付き（ハルオ 9/6）。</li>
+</ul>
+<hr>
+<h2>3. NO のまま使う場合の実態（事実のみ。勧めも禁じもしない）</h2>
+<h3>3-1. 「目視＋手入力」と「軽微な自動取得」の境界</h3>
+<table><thead><tr><th>観点</th><th>事実</th></tr></thead><tbody>
+<tr><td>条文の名宛人</td><td>Amazon・X・YouTube・TikTok・Instagram・Google・ふるさとチョイスの禁止条項はすべて「自動化された手段」「ロボット」「automated scripts」「automated means」が要件。速度・件数の閾値は条文に無い（§1-A）</td></tr>
+<tr><td>Amazon 固有</td><td>利用規約は自動化と無関係に「商業目的での利用」「製品リスト…価格などの収集と利用」を許諾から除外している。<strong>人が見て手で写す行為が「収集と利用」に当たるかは条文上決まらない</strong>。ハルオは「人が見てメモ＝可（緩速）」と判定</td></tr>
+<tr><td>検知の手がかり（公開情報）</td><td>Amazon.co.jp robots.txt は 491 行・末尾に 100 UA の <code>Disallow: /</code>（社内実取得）。Amazon v. Perplexity の訴状では、Amazon が Comet の自動セッションを「通常の Chrome トラフィックに偽装した」と主張し、検知系構築に 5,000 ドル超とエンジニア時間を投じたと記載 [S23][S24]。BSA §3 は「our controls identify that it might harm」＝<strong>自動検知で停止し得る</strong>建付け [S2]</td></tr>
+<tr><td>ブラウザ拡張の位置</td><td>Keepa 拡張は Amazon ページの商品情報を Keepa サーバへ送信する（Keepa Privacy Policy。社内 memory <code>knowledge_keepa_tos</code>）。<strong>「人が見ている画面から拡張が自動送信する」形は、規約上グレー</strong>（ハルオ：セラーセントラル用ブラウザプロファイルと分離すれば消える）</td></tr>
+<tr><td>速度の物差し</td><td>岡崎市立中央図書館事件：1 秒 1 回・1 日 1 時間で逮捕。社内採用値は「同一ホスト 3 秒間隔・同時 1・403/429 で即時永久打ち切り」（<code>knowledge_scraping_and_public_db_2026</code> §5）</td></tr>
+<tr><td>ログイン状態</td><td>Meta v. Bright Data は「ログオフ状態の公開データ」の収集を規約が禁じていないと判示 [S28]。<strong>当社は Amazon にログインした出品者であり、非会員の第三者とは立場が違う</strong>（BSA が直接かかる）</td></tr>
+</tbody></table>
+<h3>3-2. 公開されている処分・訴訟事例</h3>
+<table><thead><tr><th>事例</th><th>日付</th><th>事実</th><th>当社への含意（事実として）</th><th>出典</th></tr></thead><tbody>
+<tr><td>Amazon v. Perplexity（Comet）</td><td>2025-11-04 提訴（CFAA・カリフォルニア州法）。2026-03 仮差止（Chesney 判事）。その後第 9 巡回区が仮差止を取消（CFAA 主張が成り立たないとの判断）</td><td>Amazon は「自動セッションの偽装」を理由に提訴。検知系を構築</td><td>Amazon は自動アクセスに対し訴訟・検知の両方を実際に使う。控訴審で覆っても、Amazon が出品者を停止する権限（BSA）は影響を受けない</td><td>[S23][S24][S25]</td></tr>
+<tr><td>X Corp v. Bright Data</td><td>2024-05-10 却下（N.D. Cal. Alsup 判事）</td><td>公開データの複製は著作権法に専占、契約・不法行為の主張は認められず</td><td>「公開データのスクレイピング」を訴訟で止めるのは米国では難しい。ただし X アカウントの停止は別</td><td>[S27]</td></tr>
+<tr><td>Meta v. Bright Data</td><td>2024-01-23 略式判決（N.D. Cal. Chen 判事）</td><td>Facebook/Instagram 規約はログオフ状態の公開データ収集を禁じていない</td><td>同上。Meta は提訴を取り下げ</td><td>[S28]</td></tr>
+<tr><td>岡崎市立中央図書館事件</td><td>2010</td><td>1 秒 1 回で逮捕・21 日勾留・起訴猶予。真因は図書館側の不具合</td><td>日本では民事より先に身柄。速度設計の根拠</td><td>社内 memory</td></tr>
+<tr><td>Amazon 出品者のスクレイピング理由の停止</td><td>—</td><td><strong>公開事例を確認できず</strong>。セラーフォーラムの停止理由は真贋・関連アカウント・レビュー操作・パフォーマンス指標</td><td>「事例が無い」は「起きない」を意味しない。停止理由は通知に明示されないことが多い（推測・確度中）</td><td>[S26]</td></tr>
+<tr><td>楽天 App ID の停止、Yahoo!・ふるさとチョイスの制裁</td><td>—</td><td>公開事例を確認できず</td><td>同上</td><td>未確認</td></tr>
+</tbody></table>
+<h3>3-3. リスクの型（社長判断の材料）</h3>
+<p>発生確率は推測（確度低）。影響度・不可逆性は条文から。</p>
+<table><thead><tr><th>NO 経路をそのまま使う場合</th><th>実害の型</th><th>制裁の単位</th><th>不可逆性</th><th>代替で失うもの（NO を守った場合のコスト）</th></tr></thead><tbody>
+<tr><td>Amazon 公開ページの自動取得</td><td>出品用アカウント停止（一存・即時）。関連アカウントへ波及</td><td>事業の全損</td><td>極大</td><td><strong>無い。</strong>履歴は Keepa、時点値・ゲート・手数料は SP-API で公式に取れる（§2-A/C）</td></tr>
+<tr><td>楽天 API（Amazon 仕入れ目的）</td><td>App ID・楽天会員 ID の制裁。利益相当額の請求</td><td>楽天 ID</td><td>中</td><td>楽天上位 1,000 件の「Amazon に無い商品」の機械抽出。代替は人が見る／Nint（費用不明）</td></tr>
+<tr><td>Yahoo! サイト／API</td><td>差止・利益相当額請求（§14）</td><td>Yahoo! ID</td><td>中</td><td>同上。API は規約が読めていないだけで、読めれば白になり得る</td></tr>
+<tr><td>X スクレイピング</td><td>X アカウント停止</td><td>X ID（分離可）</td><td>低</td><td>代替は有料 API（月数ドル〜）。失うものは費用だけ</td></tr>
+<tr><td>YouTube Data API で永続リスト</td><td>Google アカウント制裁</td><td><strong>Google アカウント（事業インフラ）</strong></td><td>高</td><td>代替は RSS＋人が見る。失うのは自動化の手間</td></tr>
+<tr><td>Google トレンド自動取得</td><td>Google アカウント制裁</td><td>同上</td><td>高</td><td>代替は手動 CSV／公式 API alpha。失うのは自動化の手間</td></tr>
+<tr><td>ふるさとチョイス自動取得</td><td>規約違反</td><td>サイト ID</td><td>低</td><td>代替は人が見る＋事業者サイト。失うのは自動化の手間</td></tr>
+<tr><td>NETSEA 外交渉</td><td>200 万円＋代金 50%＋事業者名公表</td><td>金銭・信用</td><td>高</td><td>NETSEA 内で仕入れる（卸値を NETSEA が取る分）</td></tr>
+</tbody></table>
+<p>読み方：<strong>制裁の単位が「Amazon 出品アカウント」「Google アカウント」の 2 経路だけが不可逆</strong>。他は ID を分けるか金銭で終わる。NO を守った場合に失うものが「無い」のは Amazon 自動取得だけ（公式代替が揃っている）。</p>
+<hr>
+<h2>4. 論点（03_論点シート「サトル③」節に同内容を追記）</h2>
+<table><thead><tr><th>#</th><th>問い</th><th>事実</th><th>選択肢の素材</th><th>決めると何が動くか</th></tr></thead><tbody>
+<tr><td>25</td><td>SP-API の開発者登録（規約同意 3 本・§4.1）を 1 周目でやるか</td><td>大口要件は充足。費用 0 円。出品者数・カート価格・ゲート・手数料が公式に取れる。既定「新しい観測系を作らない」と衝突。実装はタカシ・数日級（T-20260521-005 評価）</td><td>a. 1 周目は既存画面＋Keepa で回し、2 周目に登録 b. 登録だけ 1 周目に済ませ（審査待ちを吸収）、実装は 2 周目 c. 登録しない</td><td>b は §4.1 が 1 件増えるが待ち時間を並走できる。a/c はゲート判定が目視のまま</td></tr>
+<tr><td>26</td><td>ブランド登録（商標 44,900 円）を「需要データの入口」として前倒しするか</td><td>Brand Analytics・（未確認だが）商品機会エクスプローラーはブランド登録が前提。03 #14 と同じ商標の問いを、需要データの観点から再提示</td><td>a. 03 #14 の判断に従う b. 需要データのためだけには買わない（セラースプライトで代替）</td><td>a なら検索語データが公式に取れる。b なら月 13,998 円の外部ツール</td></tr>
+<tr><td>27</td><td>X API の従量課金（月数ドル〜数十ドル）を §4.1 に出すか</td><td>定額プランは消え、投稿読取 0.005 ドル/件。開発者規約は未読（要ハルオ）</td><td>a. 出さない（人が見る A3 で足りる） b. 月上限を切って出す（例：10 ドル）</td><td>b は SNS 検知の自動化が 1 本開く。失うのは費用だけ（ID は事業と分離）</td></tr>
+<tr><td>28</td><td>Instagram Graph API・YouTube「30 日以内・非集約」利用・楽天「アフィリエイト目的」利用・Google トレンド CSV の PUBLIC 可否——本書で一次情報が新たに取れた 4 件をハルオに再判定依頼するか</td><td>Instagram は仕様公開済み。YouTube は 30 日/非集約の設計余地。楽天は第3条の文言。Google はヘルプの出典表記文</td><td>a. 4 件まとめて再判定を発注 b. 使う予定のものだけ c. しない</td><td>a は法務 1 チケット。結果次第で §2-0 の「要ハルオ」が可/不可に確定</td></tr>
+<tr><td>29</td><td>規約本文が読めない 4 件（Yahoo! API ガイドライン・Makuake 利用規約・Amazon ドロップシッピングポリシー・Amazon 公式ヘルプ）を秘書のブラウザで取りに行くか</td><td>いずれも「不可」ではなく「未確認＝着手不可」。ブラウザ操作は秘書の責務（§4.4）</td><td>a. 4 件まとめて取る（1 セッション） b. 使う予定のものだけ</td><td>a で「未確認」6 本のうち 4 本が判定可能になる</td></tr>
+<tr><td>30</td><td>NO 経路のうち「人が見る」で代替するものを、誰が・週何分で回すか</td><td>時間の実測は無い。試算は週 30 分で Amazon 2 カテゴリ＋SNS 2 本（推測・確度低）。目視の役目は候補発見に限る（数字は Keepa）</td><td>a. カズヨが週 30 分 b. 社長が週 15 分 c. 目視をやらず Keepa Product Finder と展示会母集団に絞る</td><td>c は SNS 経路（T-20260906-006）を閉じる判断になる</td></tr>
+<tr><td>31</td><td>「NO のまま使う」を選択肢に残す場合、どの経路までか</td><td>不可逆なのは Amazon 出品アカウントと Google アカウントに紐づく 2 経路。他は ID 分離か金銭で終わる（§3-3）</td><td>a. 残さない（現状） b. 不可逆でない経路（X・ふるさとチョイス・楽天/Yahoo 目視の範囲拡大）だけ社長判断で残す c. 全部残す</td><td>b/c は §4.1 相当として waiting に出す（親チケットの前提どおり）。<strong>当職は推奨しない・禁じない。判断材料は §3</strong></td></tr>
+</tbody></table>
+<hr>
+<h2>5. 取れなかった一次情報（次に埋める穴）</h2>
+<table><thead><tr><th>対象</th><th>状態</th><th>埋め方</th></tr></thead><tbody>
+<tr><td>SP-API 料金撤回の一次告知ページ</td><td>developer.amazonservices.com トップ・changelog 1 ページ目に記載なし。二次 2 本（5/12・5/14 で不一致）</td><td>changelog 後続ページ／Solution Provider Portal ログイン後</td></tr>
+<tr><td>SP-API <code>getCompetitiveSummary</code> のレート</td><td>未取得</td><td>reference ページ</td></tr>
+<tr><td>Amazon 商品機会エクスプローラーの日本提供・要件</td><td>公式 US ページに要件・地域の記載なし。二次はブランド登録者限定</td><td>セラーセントラル（社長ログイン）で「成長」メニューを見る</td></tr>
+<tr><td>Yahoo! API ガイドライン本文</td><td>JS シェル</td><td>秘書ブラウザ</td></tr>
+<tr><td>Makuake 利用規約本文</td><td>302／JS</td><td>秘書ブラウザ</td></tr>
+<tr><td>TikTok Creative Center の期間・地域選択肢</td><td>未確認</td><td>秘書ブラウザ（ログイン不要範囲）</td></tr>
+<tr><td>X 開発者規約（データ保持・再配布）</td><td>未取得</td><td>docs.x.com</td></tr>
+<tr><td>楽天アフィリエイト ガイドライン</td><td>未取得</td><td>affiliate.rakuten.co.jp</td></tr>
+<tr><td>セラースプライト・ERESA・Nint の利用規約</td><td>未読</td><td>各社規約ページ→ハルオの 5 項目順で読む</td></tr>
+<tr><td>Amazon 出品者行動規範（G1801）</td><td>ログイン画面</td><td>秘書ブラウザ</td></tr>
+</tbody></table>
+<hr>
+<h2>6. 出典一覧（Web はすべて 2026-09-13 取得。一次＝当該事業者の公式ページ）</h2>
+<table><thead><tr><th>S</th><th>種別</th><th>内容</th><th>URL</th></tr></thead><tbody>
+<tr><td>S1</td><td>一次（社内再掲）</td><td>Amazon.co.jp 利用規約「利用許可およびサイトへのアクセス」（ハルオ 2026-09-06 取得）</td><td>https://www.amazon.co.jp/gp/help/customer/display.html?nodeId=643006</td></tr>
+<tr><td>S2</td><td>一次（社内再掲）</td><td>Amazon Services Business Solutions Agreement §3（ハルオ 2026-08-28 取得）</td><td>社内 memory <code>knowledge_amazon_section3_kyc_suspension</code></td></tr>
+<tr><td>S3</td><td>一次</td><td>SP-API getItemOffers リファレンス（rate 0.5/burst 1・NumberOfOffers 等）</td><td>https://developer-docs.amazon/sp-api/reference/getitemoffers</td></tr>
+<tr><td>S4</td><td>一次</td><td>SP-API Registering as a developer（大口要件）</td><td>https://developer-docs.amazon/sp-api/docs/registering-as-a-developer</td></tr>
+<tr><td>S5</td><td>一次</td><td>SP-API Register as a private developer（手順・5 日以内返信）</td><td>https://developer-docs.amazon/sp-api/docs/register-as-a-private-developer</td></tr>
+<tr><td>S6</td><td>一次</td><td>Amazon Services API Acceptable Use Policy（en_US）</td><td>https://sellercentral.amazon.com/mws/static/policy?documentType=AUP&amp;locale=en_US</td></tr>
+<tr><td>S7</td><td>二次</td><td>ppc.land「Amazon drops SP-API fees after developer pushback」（撤回 5/14 と記載）</td><td>https://ppc.land/amazon-drops-sp-api-fees-after-developer-pushback/</td></tr>
+<tr><td>S8</td><td>二次</td><td>novadata「Amazon SP-API fees cancelled – full chronology」（告知 2025-11-03・撤回 2026-05-12）</td><td>https://novadata.io/resources/news/amazon-sp-api-subscription-fees-2026</td></tr>
+<tr><td>S9</td><td>一次</td><td>SP-API Usage plans and rate limits（トークンバケット）</td><td>https://developer-docs.amazon/sp-api/docs/usage-plans-and-rate-limits</td></tr>
+<tr><td>S10</td><td>一次</td><td>SP-API Catalog Items API v2022-04-01（5 rps・includedData）</td><td>https://developer-docs.amazon/sp-api/docs/catalog-items-api-v2022-04-01-reference</td></tr>
+<tr><td>S11</td><td>一次</td><td>楽天ウェブサービス Terms of service（第3条・第10条。改定 2012-06-28）</td><td>https://webservice.rakuten.co.jp/guide/rule</td></tr>
+<tr><td>S12</td><td>一次（社内再掲）</td><td>NETSEA バイヤー会員規約（ハルオ 2026-08-31 取得）</td><td>https://www.netsea.jp/agreement/statement</td></tr>
+<tr><td>S13</td><td>一次（社内再掲）</td><td>LINEヤフー共通利用規約 §14（ハルオ 2026-09-06 取得）</td><td>https://www.lycorp.co.jp/ja/company/terms/</td></tr>
+<tr><td>S14</td><td>一次</td><td>Yahoo!デベロッパーネットワーク ショッピング API 一覧／ガイドライン（制定 2023-10-01・本文は JS）</td><td>https://developer.yahoo.co.jp/webapi/shopping/ ／ https://developer.yahoo.co.jp/guideline/</td></tr>
+<tr><td>S15</td><td>一次</td><td>Yahoo!デベロッパーネットワーク 利用規約 URL（404 継続）</td><td>https://developer.yahoo.co.jp/terms/</td></tr>
+<tr><td>S16</td><td>一次（社内再掲）</td><td>X robots.txt／X Terms of Service（Effective 2026-04-10。ハルオ 9/6 取得）</td><td>https://x.com/robots.txt ／ https://x.com/en/tos</td></tr>
+<tr><td>S17</td><td>一次（社内再掲）</td><td>YouTube API Services Developer Policies（2026-06-24 版。ハルオ 8/31 取得）</td><td>https://developers.google.com/youtube/terms/developer-policies</td></tr>
+<tr><td>S18</td><td>一次（社内再掲）</td><td>TikTok Terms of Service（ROW）／robots.txt（ハルオ 9/6 取得）</td><td>https://www.tiktok.com/legal/page/row/terms-of-service/en</td></tr>
+<tr><td>S19</td><td>一次（社内再掲）</td><td>Instagram robots.txt（ハルオ 9/6 取得）</td><td>https://www.instagram.com/robots.txt</td></tr>
+<tr><td>S20</td><td>一次</td><td>Google トレンド robots.txt（2026-09-13 再取得。93 バイト）</td><td>https://trends.google.com/robots.txt</td></tr>
+<tr><td>S21</td><td>一次</td><td>Google トレンド ヘルプ「トレンドのデータのエクスポート、埋め込み、引用を行う」</td><td>https://support.google.com/trends/answer/4365538?hl=ja</td></tr>
+<tr><td>S22</td><td>一次</td><td>Makuake ヘルプセンター Zendesk API 検索（「スクレイピング」該当なし／禁止行為記事一覧）</td><td>https://mkhelp.makuake.com/api/v2/help_center/articles/search.json?query=…</td></tr>
+<tr><td>S23</td><td>二次</td><td>Insurance Journal「Amazon Sues Perplexity Over 'Agentic' Shopping Tool」（2025-11-05）</td><td>https://www.insurancejournal.com/news/national/2025/11/05/846503.htm</td></tr>
+<tr><td>S24</td><td>二次</td><td>CNBC「Amazon wins court order to block Perplexity's AI shopping agent」（2026-03-10）</td><td>https://www.cnbc.com/2026/03/10/amazon-wins-court-order-to-block-perplexitys-ai-shopping-agent.html</td></tr>
+<tr><td>S25</td><td>二次</td><td>Engadget「Perplexity has successfully overturned Amazon's injunction」（第 9 巡回区・日付は本文未確認）</td><td>https://www.engadget.com/2230471/perplexity-has-successfully-overturned-amazon-injunction-on-its-ai-shopping-bot/</td></tr>
+<tr><td>S26</td><td>二次</td><td>Amazon セラーフォーラム（日本）アカウント停止スレッド群（停止理由の実例）</td><td>https://sellercentral-japan.amazon.com/seller-forums/discussions/t/19bce0a92165bfb71ecb334679569d03 ほか</td></tr>
+<tr><td>S27</td><td>二次</td><td>CNBC「Elon Musk's X loses lawsuit against Bright Data over data scraping」（2024-05-10）</td><td>https://www.cnbc.com/2024/05/10/elon-musks-x-loses-lawsuit-against-bright-data-over-data-scraping.html</td></tr>
+<tr><td>S28</td><td>二次</td><td>Farella Braun + Martel「Meta Platforms v. Bright Data」解説（2024-01-23 判決）</td><td>https://www.fbm.com/publications/major-decision-affects-law-of-scraping-and-online-data-collection-meta-platforms-v-bright-data/</td></tr>
+<tr><td>S29</td><td>一次</td><td>Google Trends API（alpha）公式ページ</td><td>https://developers.google.com/search/apis/trends</td></tr>
+<tr><td>S30</td><td>一次</td><td>セラースプライト 料金（日本）</td><td>https://www.sellersprite.com/jp/price</td></tr>
+<tr><td>S31</td><td>一次</td><td>SP-API Report type values: Analytics（Brand Analytics 各レポートの要件）</td><td>https://developer-docs.amazon/sp-api/docs/report-type-values-analytics</td></tr>
+<tr><td>S32</td><td>一次</td><td>Amazon Selling Partners「Product Opportunity Explorer」（米国。要件・地域の記載なし）</td><td>https://sellingpartners.aboutamazon.com/product-opportunity-explorer</td></tr>
+<tr><td>S33</td><td>二次</td><td>AMZ Advisers「Amazonプロダクトオポチュニティエクスプローラーの内側」（ブランド登録者限定・US/EU5 か国）</td><td>https://www.amzadvisers.com/ja/opportunity-explorer/</td></tr>
+<tr><td>S34</td><td>一次</td><td>ERESA PRO 研究所「ERESA.AI 正式公開＆新規会員料金改定（8 月 1 日適用）」</td><td>https://pro.eresa.jp/news/news20250715/</td></tr>
+<tr><td>S35</td><td>一次</td><td>ERESA PRO 研究所「無料プラン提供終了と ERESA.AI への移行」</td><td>https://pro.eresa.jp/news/news20251020/</td></tr>
+<tr><td>S36</td><td>一次</td><td>X API Pricing（pay-per-usage）</td><td>https://docs.x.com/x-api/getting-started/pricing</td></tr>
+<tr><td>S37</td><td>一次</td><td>YouTube Data API Getting started（クォータ）</td><td>https://developers.google.com/youtube/v3/getting-started</td></tr>
+<tr><td>S38</td><td>一次</td><td>TikTok for Business ヘルプ「クリエイティブセンターについて」</td><td>https://ads.tiktok.com/resources/help/article/creative-center?lang=ja</td></tr>
+<tr><td>S39</td><td>二次</td><td>アナグラム「TikTok Creative Center とは」</td><td>https://anagrams.jp/blog/tiktok-creative-center/</td></tr>
+<tr><td>S40</td><td>一次</td><td>Instagram Graph API IG Hashtag Search リファレンス</td><td>https://developers.facebook.com/docs/instagram-platform/instagram-graph-api/reference/ig-hashtag-search</td></tr>
+<tr><td>S41</td><td>一次</td><td>Instagram Platform Overview（アカウント要件・App Review）</td><td>https://developers.facebook.com/docs/instagram-platform/overview</td></tr>
+<tr><td>S42</td><td>一次</td><td>Social Insight 公式（対応 SNS・Enterprise API 対応・料金は資料請求）</td><td>https://sns.userlocal.jp/ ／ https://sns.userlocal.jp/document/price/</td></tr>
+<tr><td>S43</td><td>二次</td><td>ITreview「Social Insight の価格」（ビジネス版 初期 5 万円・月 5 万円）</td><td>https://www.itreview.jp/products/social-insight/price</td></tr>
+<tr><td>S44</td><td>一次</td><td>Nint 公式（3 モール推計・2,300 社・10 商品まで無料）</td><td>https://www.nint.jp/</td></tr>
+<tr><td>S45</td><td>一次</td><td>SP-API Product Pricing API（v2022-05-01 概要・バッチ 20 ASIN）</td><td>https://developer-docs.amazon/sp-api/docs/product-pricing-api</td></tr>
+<tr><td>S46</td><td>一次</td><td>SP-API getListingsRestrictions リファレンス（5 rps/10・reasonCode）</td><td>https://developer-docs.amazon/sp-api/reference/getlistingsrestrictions</td></tr>
+<tr><td>S47</td><td>一次</td><td>SP-API getMyFeesEstimateForASIN リファレンス（1 rps/2）</td><td>https://developer-docs.amazon/sp-api/reference/getmyfeesestimateforasin</td></tr>
+<tr><td>S48</td><td>一次</td><td>Amazon Associates「PA-API 5 deprecation」</td><td>https://affiliate-program.amazon.com/creatorsapi/docs/en-us/paapiv5-deprecation</td></tr>
+<tr><td>S49</td><td>一次</td><td>Amazon Associates Creators API Documentation（10 qualifying sales / 30 days）</td><td>https://affiliate-program.amazon.com/creatorsapi/docs</td></tr>
+<tr><td>S50</td><td>二次</td><td>Velantio「How to get Amazon Creators API access in 2026」（180 日 3 件）</td><td>https://velantio.com/blog/how-to-get-amazon-creators-api-access</td></tr>
+<tr><td>S51</td><td>一次</td><td>Amazon ブランド登録（sell.amazon.co.jp。無料・商標は登録済みか出願中）</td><td>https://sell.amazon.co.jp/brand-registry</td></tr>
+<tr><td>S52</td><td>一次</td><td>楽天アフィリエイト パートナー規約（2022-02-01 改定）／リンク改変ルール</td><td>https://affiliate.rakuten.co.jp/rule/ ／ https://affiliate.rakuten.co.jp/guides/rule/</td></tr>
+<tr><td>S53</td><td>一次（社内再掲）</td><td>SP-API Policies and agreements（DPP・AUP・Solution Provider Portal Agreement の所在）</td><td>https://developer-docs.amazon/sp-api/docs/policies-and-agreements</td></tr>
+<tr><td>S54</td><td>社内</td><td>法務判定 3 本：T-20260906-006/08（2026-09-06）、T-20260831-005/07・04（2026-08-31）。法務 memory <code>knowledge_platform_api_data_retention</code> <code>knowledge_sns_scraping_boundary_2026</code> <code>knowledge_scraping_and_public_db_2026</code> <code>knowledge_keepa_tos</code></td><td>リポ内</td></tr>
+</tbody></table>
+<p>一次 39（社内再掲 10 を含む）・二次 14・社内 1。打ち切り条件（一次 URL 15 本以上）は満たした。</p>
+<hr>
+<p>*作成: サトル③（リサーチャー）／2026-09-13。判定はしていません。「要ハルオ」は一次情報を取っただけで、法務判定は未実施です。§4.1 該当操作（登録・課金・規約同意・外部連絡・大量機械取得）は行っていません。*</p>
+</body></html>
