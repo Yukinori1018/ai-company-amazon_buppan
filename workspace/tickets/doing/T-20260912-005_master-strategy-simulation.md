@@ -5,7 +5,7 @@ status: doing
 assignee: simulator
 priority: high
 created_at: 2026-09-12
-updated_at: 2026-09-12
+updated_at: 2026-09-13
 requires_approval: false
 labels: [simulation, strategy, pdca]
 parent_ticket: T-20260912-002
@@ -25,6 +25,7 @@ T-20260912-004 のタケシ案を仮想実行。月販・価格・競合参入�
 - 2026-09-12 todo 起票（カズヨ）。
 - 2026-09-13 doing へ移動（カズヨ）。タケシ案B（commit d94a75d）を受けマサル1周目を発注。
 - 2026-09-12 マリエ：Notion カード作成（https://app.notion.com/p/3d9b0a4044fa8160ae33dbd73db782cc）
+- 2026-09-13 マリエ：Notion カード Status=doing へ更新。結果要約に「マサル1周目着手（入力＝-004 案B）。サトル③の04は2周目で取り込む」を追記。UpdatedAt=2026-09-13。
 
 ## 成果物
 

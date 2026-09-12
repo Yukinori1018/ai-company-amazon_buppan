@@ -5,7 +5,7 @@ status: doing
 assignee: researcher
 priority: high
 created_at: 2026-09-12
-updated_at: 2026-09-12
+updated_at: 2026-09-13
 requires_approval: false
 labels: [research, strategy, blue-ocean]
 parent_ticket: T-20260912-002
@@ -70,6 +70,7 @@ related_tickets: [T-20260912-002, T-20260912-004, T-20260831-005, T-20260906-006
 - 2026-09-12 doing 起票（カズヨ）。サトル2体を並列発注。
 - 2026-09-12 マリエ：Notion カード作成（https://app.notion.com/p/3d9b0a4044fa81d6b6f1f3ccb05e4085）
 - 2026-09-13 マリエ：Notion カード Status=done へ更新。結果要約と成果物節（README・01〜03 の md/html を配信URLで）を反映。成果物カタログ CSV に7行追記→シート同期。owner-tasks.md 更新⑰（社長タスク増減ゼロ）。
+- 2026-09-13 マリエ：Notion カード Status=doing へ差し戻し。結果要約に「サトル③が 04_法務NO経路の再検討と適法な代替手段 を追加調査中」を追記、Description も同旨に更新、成果物節に 04（未納品）の行を追加。UpdatedAt=2026-09-13。
 
 ### サトル①
 

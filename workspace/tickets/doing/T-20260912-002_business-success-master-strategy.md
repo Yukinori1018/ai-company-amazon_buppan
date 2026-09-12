@@ -5,7 +5,7 @@ status: doing
 assignee: secretary
 priority: high
 created_at: 2026-09-12
-updated_at: 2026-09-12
+updated_at: 2026-09-13
 requires_approval: false
 labels: [strategy, blue-ocean, master-plan, pdca]
 parent_ticket: ""
@@ -72,6 +72,7 @@ related_tickets: [T-20260912-003, T-20260912-004, T-20260912-005, T-20260912-001
 - 2026-09-12 doing 起票（カズヨ）。社長の依頼を整理し、-003/-004/-005 を同時起票。
 - 2026-09-13 社長指示「法務NOに限らない。あらゆる方法を検討」。前提を改訂し、タケシへ範囲拡大を通知、サトルへ追加調査（-003 に 04 を追加）。
 - 2026-09-12 マリエ：Notion カード作成（https://app.notion.com/p/3d9b0a4044fa81408159e55bf4dc835b）
+- 2026-09-13 マリエ：Notion カード更新。結果要約に前提改訂（法務NOを事前フィルタにしない）と子の現在地（-003 追加調査／-004 納品／-005 1周目）を追記、UpdatedAt=2026-09-13。
 
 ## 成果物
 
