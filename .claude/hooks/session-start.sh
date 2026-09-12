@@ -487,6 +487,34 @@ ${CATALOG_OUT}
   fi
 fi
 
+# --- リマインダー⑧: Amazon アカウント台帳の鮮度（2026-09-12 / T-20260912-001）-----
+#
+# 秘書は「報告前に台帳と照合する」ルール（feedback_check_ledger_before_reporting.md）。
+# 台帳が古いまま照合しても意味がないので、更新ログの最新日付が7日より古ければ1行出す。
+# 台帳は auto-memory（リポ外）にある。無い環境（クラウド等）では無音。
+# LEDGER_PATH で差し替え可（テスト用）。
+LEDGER_MSG=""
+MEM_KEY="$(printf '%s' "$REPO" | sed 's/[^A-Za-z0-9]/-/g')"
+LEDGER="${LEDGER_PATH:-$HOME/.claude/projects/${MEM_KEY}/memory/project_amazon_account_ledger.md}"
+if [ -f "$LEDGER" ]; then
+  # 「## 更新ログ」以降に出てくる YYYY-MM-DD の最大値
+  LEDGER_LAST="$(awk '/^## 更新ログ/{f=1;next} /^## /{f=0} f' "$LEDGER" \
+    | grep -oE '20[0-9]{2}-[0-9]{2}-[0-9]{2}' | sort | tail -1 || true)"
+  if [ -z "$LEDGER_LAST" ]; then
+    LEDGER_MSG="
+
+【SessionStart リマインダー⑧：Amazon アカウント台帳の更新ログに日付がありません】 ${LEDGER}"
+  else
+    LEDGER_AGE=$(( ( $(date +%s) - $(date -j -f %Y-%m-%d "$LEDGER_LAST" +%s 2>/dev/null || date -d "$LEDGER_LAST" +%s) ) / 86400 ))
+    if [ "$LEDGER_AGE" -gt 7 ]; then
+      LEDGER_MSG="
+
+【SessionStart リマインダー⑧：Amazon アカウント台帳の最終更新が ${LEDGER_LAST}（${LEDGER_AGE}日前）です】
+セラーセントラルの現状を確かめて台帳を更新してから、アカウント関連の報告をしてください。"
+    fi
+  fi
+fi
+
 # --- 掲出順（2026-08-31 / T-20260831-003 で変更）---
 #
 # 旧: ① → ②(next_check_at) → ③(inbox) → ④
@@ -499,8 +527,8 @@ fi
 #       行動を要する短いものを前に、一覧性の長いものを後ろに置きます。
 # ⑤ は 2026-08-31 に追加。⑥ は 2026-09-02 に追加。掲出は ① → ⑤ → ⑥ → ③ → ④ → ②。
 # 番号は作成順、掲出順とは別です（③④② が既にそうなっています）。
-# ⑤⑥ はいずれも「異常な時だけ」出るため、平常日は1行も増えません。だから最前列に置けます。
-MESSAGE="${SYNC_MSG}${MON_MSG}${MIRROR_MSG}${CATALOG_MSG}${INBOX_MSG}${LIST_MSG}${REMINDER_MSG}"
+# ⑧（2026-09-12）は ① の直後。⑤⑥⑧ はいずれも「異常な時だけ」出るため、平常日は1行も増えません。だから最前列に置けます。
+MESSAGE="${SYNC_MSG}${LEDGER_MSG}${MON_MSG}${MIRROR_MSG}${CATALOG_MSG}${INBOX_MSG}${LIST_MSG}${REMINDER_MSG}"
 
 # JSON エスケープ（python が無い環境を考慮し、jq があれば使う）
 if command -v jq >/dev/null 2>&1; then
