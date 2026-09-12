@@ -1,7 +1,7 @@
 ---
 ticket_id: T-20260912-004
 title: 複合戦略の設計（A/B/C＋推奨・12ヶ月実行計画・KPI・撤退条件）
-status: todo
+status: doing
 assignee: planner
 priority: high
 created_at: 2026-09-12
@@ -18,11 +18,12 @@ T-20260912-003 の事実シート＋論点シートを入力に、**月商800万
 
 ## 現在地
 
--003 の完了待ち。
+2026-09-12 タケシ着手。入力は deliverables/T-20260912-003/（01 棚卸し・02 白地図・03 論点24問）。
 
 ## ログ
 
 - 2026-09-12 todo 起票（カズヨ）。
+- 2026-09-12 doing へ移動（カズヨ）。-003 完了を受けタケシへ発注。
 - 2026-09-12 マリエ：Notion カード作成（https://app.notion.com/p/3d9b0a4044fa81a0ab25cbaa5b4a137f）
 
 ## 成果物
