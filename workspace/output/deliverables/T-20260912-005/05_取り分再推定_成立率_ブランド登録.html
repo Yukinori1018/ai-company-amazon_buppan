@@ -1,0 +1,302 @@
+<!doctype html><html lang='ja'><head><meta charset='utf-8'><title>05 取り分の再推定・成立率の base rate・第一陣20社のブランド登録（T-20260912-005 / サトル / 2026-09-13）</title><style>body{font-family:-apple-system,'Hiragino Sans','Noto Sans JP',sans-serif;max-width:1100px;margin:2em auto;padding:0 1em;line-height:1.6;color:#222}
+table{border-collapse:collapse;margin:.8em 0;font-size:.92em}th,td{border:1px solid #bbb;padding:.35em .6em;vertical-align:top}th{background:#f0f0f0}
+h1{font-size:1.5em;border-bottom:2px solid #444}h2{font-size:1.25em;border-bottom:1px solid #999;margin-top:1.6em}h3{font-size:1.05em}
+blockquote{border-left:4px solid #ccc;margin:.6em 0;padding:.2em .8em;color:#444;background:#fafafa}code{background:#f4f4f4;padding:0 .2em}pre{background:#f4f4f4;padding:.6em;overflow-x:auto}</style></head><body><h1>05 取り分の再推定・成立率の base rate・第一陣20社のブランド登録（T-20260912-005 / サトル / 2026-09-13）</h1>
+<p>マサル1周目 §9 の依頼 S-a・S-c・S-d。Keepa API は叩いていない（0 token）。Amazon ページは1社1ページ（curl・4秒間隔・20ページ）。メーカー・Amazon への問い合わせはしていない。</p>
+<h2>結論</h2>
+<table><thead><tr><th>依頼</th><th>答え</th></tr></thead><tbody>
+<tr><td>S-a 取り分の倍率（対 置き値3万円/SKU）</td><td>ASIN別（n=113）中央 <b>0.74倍</b>・80%区間 0.2〜2.66倍。ファミリー重複除去（n=68）中央 1.05倍・0.2〜3.18倍。Amazon公表値がある実測層だけ（n=24）だと中央 1.11倍・0.17〜3.59倍。置き値1.0倍は分布の中にある。幅が広い（×0.2〜×3）ことのほうが情報</td></tr>
+<tr><td>S-c 成立率の独立した数字</td><td><b>2本</b>（一次1本 N=14：返信3・成立0／二次1本 N=98：返信55・取引OK16）。公的統計は0本。EC STARs の 3〜5% を裏づけも否定もできない標本サイズ</td></tr>
+<tr><td>S-d ブランド登録</td><td>登録済みらしい <b>1社</b>（田中帽子店）・不明 6社・未登録らしい 9社・Amazon上に自社ブランド商品なし 4社。透明性ロゴは17ページとも表示なし</td></tr>
+</tbody></table>
+<hr>
+<h2>S-a 取り分の再推定（0 token）</h2>
+<h3>入力とフィールド定義</h3>
+<table><thead><tr><th>項目</th><th>使ったもの</th><th>出典・定義</th></tr></thead><tbody>
+<tr><td>raw</td><td><code>agent_output/T-20260912-001/raw17/&lt;社&gt;.json</code>（17社・121 ASIN・2026-09-12 取得・Git 追跡外）</td><td>T-20260912-001 S3 <code>fetch17.py</code>。ブランド完全一致 Product Finder → ランク順上位10件</td></tr>
+<tr><td>ランク本体</td><td><code>stats.current[3]</code>（<code>salesRankReference</code>＝ルートカテゴリの順位。121件とも ref＝root を確認）</td><td>keepa-glossary §3.2。30日平均 <code>avg30[3]</code> も併記（現在値は30日平均より中央で17%良い＝現在値は楽観寄り）</td></tr>
+<tr><td>月販（実測層）</td><td><code>monthlySold</code>（Amazon 公表「過去1か月で◯点購入」の<b>階級下限</b>。バリエーション単位）</td><td>glossary §3.2「推定値ではない・下限値・大半のASINは値を持たない」。121件中 <b>24件</b></td></tr>
+<tr><td>月販（推定層）</td><td>公表値なし ⇒ <b>&lt;50 と読み、中央 25 を置く</b>（0〜49 の一様の中央）。上限 49 も併記</td><td>根拠: 公表値の最小階級は 50（社内標本 n=110 の最小値も 50）。<b>25 は置き値であって実測ではない</b></td></tr>
+<tr><td>出品者数</td><td><code>stats.current[11]</code>＝COUNT_NEW（新品<b>オファー数</b>。出品者数の上限）</td><td>glossary §3.3。実セラー数は <code>offers</code> 必須で取っていない。取り分は控えめ側に出る</td></tr>
+<tr><td>Amazon本体</td><td><code>availabilityAmazon != -1</code></td><td>glossary §3.7。121件中 42件にAmazon本体あり</td></tr>
+<tr><td>価格</td><td><code>current[1]</code> NEW（着地価格・2026-02-23 定義変更後）。現在オファーなしは avg90→avg365 NEW</td><td>17件が「現在新品オファーなし」（COUNT_NEW=0）。うち8件は価格も取れず倍率なし</td></tr>
+<tr><td>取り分</td><td>月販 ÷ (COUNT_NEW + 1)</td><td>マサル置き値と同じ式。<b>子ASINは兄弟合計の上限</b>（ランクも monthlySold も家族共有）</td></tr>
+<tr><td>倍率</td><td>取り分 × 価格 ÷ 30,000円</td><td>マサル <code>01_mc_案B.py</code> <code>ainori_rev=3e4</code>（相乗り1 SKU 月商中央値・タケシ3万）に対する比</td></tr>
+<tr><td>足切り</td><td>取り分 ≥ 10 ÷ 1.8 ＝ 5.56 個/月</td><td>依頼文「10点ロット÷1.8」</td></tr>
+</tbody></table>
+<p><b>ランク→月販の換算式は社内に存在しない。</b> T-20260906-002 は「回帰を当てて販売数を予測することはやらない」と明記し、ランクの順位相関 −0.519（文房具 n=300）と帯別の公表率だけを残している。<code>knowledge_sku_screening_playbook</code> も「取れない行は空欄にし、推定で埋めない」。今回は依頼が「推定」なので、実測層（公表値）と推定層（&lt;50 の中央）を<b>層で分けて</b>出した。文房具標本で対数回帰を試したが（log10(月販)=2.87−0.25·log10(ランク)、残差×3.0）、公表値だけの打ち切り標本のため10万位で月42個と出る。使っていない。</p>
+<p>カテゴリ差の証拠: ランク1万〜3万位で公表値がある割合は、文房具標本 9%（7/75）に対し本件 58%（18/31）。ホーム＆キッチン・ドラッグストア等は同じ順位で販売量が大きい。文房具の換算をそのまま持ち込めない。</p>
+<h3>倍率の分布（対 3万円/SKU）</h3>
+<table><thead><tr><th>母集団</th><th>n</th><th>倍率 中央（80%区間）</th><th>上限置き（推定層=49）</th><th>実測層のみ</th><th>推定層のみ</th></tr></thead><tbody>
+<tr><td>ASIN別（121）</td><td>113</td><td>0.74（0.2〜2.66・n=113）</td><td>1.26（0.33〜4.04・n=113）</td><td>1.11（0.17〜3.59・n=24）</td><td>0.68（0.2〜2.1・n=89）</td></tr>
+<tr><td>ファミリー別（親ASINで重複除去・72）</td><td>68</td><td>1.05（0.2〜3.18・n=68）</td><td>1.6（0.39〜4.32・n=68）</td><td>1.41（0.16〜4.38・n=19）</td><td>0.93（0.21〜2.11・n=49）</td></tr>
+<tr><td>ASIN別・Amazon本体なし（79）</td><td>71</td><td>1.05（0.2〜3.66・n=71）</td><td>1.95（0.41〜7.1・n=71）</td><td>1.6（0.77〜6.5・n=11）</td><td>0.97（0.2〜3.55・n=60）</td></tr>
+<tr><td>ファミリー別・Amazon本体なし（45）</td><td>41</td><td>1.17（0.21〜6.46・n=41）</td><td>1.96（0.42〜7.32・n=41）</td><td>1.6（0.77〜6.5・n=11）</td><td>1.02（0.21〜3.94・n=30）</td></tr>
+<tr><td>ASIN別・現在オファーあり（104）</td><td>104</td><td>0.63（0.19〜2.02）</td><td>—</td><td>—</td><td>—</td></tr>
+<tr><td>ファミリー別・現在オファーあり（62）</td><td>62</td><td>0.87（0.20〜2.48）</td><td>1.48（0.36〜3.55）</td><td>1.31（0.16〜3.23・n=18）</td><td>—</td></tr>
+</tbody></table>
+<p>読み方:</p>
+<ul>
+<li>実測層（Amazon 公表値あり・24件）は下限値で中央 1.1倍。公表値が付くのはランク上位に偏る（24件中22件が3万位以内）ので、この層自体が上振れ側の選抜。</li>
+<li>推定層（97件）の倍率は置き値25に比例する。25→10 に置けば 0.68→0.27 倍。<b>推定層の中央は前提の写し</b>で、実測ではない。</li>
+<li>幅が広い理由は価格（p10 750円〜p90 7,700円）。取り分の個数は中央 12個/月（3.6〜25）で、倍率の裾は木村硝子店 9,479円（×15.8）・木内籐材 25,300円（×10.3）など高単価が作る。</li>
+<li>足切り 5.56個/月: 実測層 22/24 通過。推定層 71/97 通過だが、これは 25÷(オファー数+1)≥5.56 ⇔ オファー数≤3 という機械的帰結で、売れる根拠にならない。</li>
+<li>Amazon本体あり42件（楠橋・池本・北陸・朝倉の大半）はカートを Amazon が持つので、実際の取り分は式より小さい。</li>
+</ul>
+<h3>ランク帯別（ASIN別）</h3>
+<table><thead><tr><th>ランク帯（ルート）</th><th>n</th><th>公表値あり</th><th>倍率 中央（80%）</th><th>推定層の倍率 中央</th></tr></thead><tbody>
+<tr><td>〜9,999</td><td>10</td><td>4（40%）</td><td>0.25（0.17〜0.65）</td><td>0.26</td></tr>
+<tr><td>10,000〜29,999</td><td>31</td><td>18（58%）</td><td>0.61（0.17〜3.06）</td><td>0.29</td></tr>
+<tr><td>30,000〜99,999</td><td>51</td><td>2（4%）</td><td>0.74（0.20〜2.78）</td><td>0.74</td></tr>
+<tr><td>100,000〜299,999</td><td>19</td><td>0</td><td>1.24（0.54〜3.65）</td><td>1.24</td></tr>
+<tr><td>300,000〜</td><td>10</td><td>0（価格ありは5）</td><td>0.81（0.58〜1.15）</td><td>0.81</td></tr>
+</tbody></table>
+<p>上位帯ほど倍率が低いのは、上位帯にオファー数が多い（池本 17本・河野 13本）ため。10万位以下の帯の倍率が高く出るのは置き値25と少オファーの掛け算で、<b>この帯の月販が実際に25あるという証拠は無い</b>（文房具標本では10万位以下 116件中 公表値0）。</p>
+<h3>社別集計</h3>
+<table><thead><tr><th>社</th><th>ASIN</th><th>子</th><th>ファミリー</th><th>実測層</th><th>Amazon本体</th><th>ランク中央</th><th>オファー中央</th><th>取り分中央</th><th>取り分最大</th><th>足切り通過（ASIN/ファミリー）</th><th>倍率中央</th><th>倍率最大</th><th>ファミリー取り分月商 合計</th></tr></thead><tbody>
+<tr><td>大橋量器</td><td>4</td><td>4</td><td>1</td><td>0</td><td>0</td><td>91,208</td><td>1.5</td><td>10.21</td><td>12.25</td><td>4/4・1/1</td><td>1.48</td><td>2.02</td><td>60,638円</td></tr>
+<tr><td>木村硝子店</td><td>10</td><td>1</td><td>10</td><td>6</td><td>1</td><td>28,698</td><td>2.0</td><td>20.59</td><td>50.0</td><td>9/10・9/10</td><td>1.6</td><td>15.8</td><td>1,061,707円</td></tr>
+<tr><td>楠橋紋織</td><td>10</td><td>10</td><td>2</td><td>1</td><td>10</td><td>7,520</td><td>6.5</td><td>3.28</td><td>7.14</td><td>2/10・1/2</td><td>0.25</td><td>1.06</td><td>20,947円</td></tr>
+<tr><td>七福タオル</td><td>10</td><td>10</td><td>6</td><td>0</td><td>0</td><td>386,044</td><td>1.0</td><td>12.25</td><td>24.5</td><td>10/10・6/6</td><td>0.58</td><td>1.48</td><td>169,467円</td></tr>
+<tr><td>金野タオル</td><td>10</td><td>10</td><td>2</td><td>0</td><td>0</td><td>34,267</td><td>2.0</td><td>8.17</td><td>12.25</td><td>10/10・2/2</td><td>0.2</td><td>0.36</td><td>13,475円</td></tr>
+<tr><td>北尾化粧品部</td><td>10</td><td>5</td><td>6</td><td>1</td><td>0</td><td>126,154</td><td>1.0</td><td>18.38</td><td>50.0</td><td>10/10・6/6</td><td>1.26</td><td>2.97</td><td>209,122円</td></tr>
+<tr><td>高柳製茶</td><td>2</td><td>0</td><td>2</td><td>0</td><td>0</td><td>169,997</td><td>1.0</td><td>12.25</td><td>12.25</td><td>2/2・2/2</td><td>4.24</td><td>6.46</td><td>254,396円</td></tr>
+<tr><td>北陸製菓</td><td>10</td><td>2</td><td>10</td><td>5</td><td>9</td><td>37,749</td><td>2.0</td><td>18.62</td><td>40.0</td><td>8/10・8/10</td><td>0.47</td><td>1.95</td><td>213,394円</td></tr>
+<tr><td>宇野刷毛ブラシ製作所</td><td>0</td><td>—</td><td>0</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>（ブランド/製造元一致の出品に売れ筋ランクなし＝raw なし）</td></tr>
+<tr><td>廣田硝子</td><td>10</td><td>9</td><td>4</td><td>1</td><td>3</td><td>79,390</td><td>3.5</td><td>5.56</td><td>24.5</td><td>5/10・3/4</td><td>0.63</td><td>10.33</td><td>370,236円</td></tr>
+<tr><td>守田漆器</td><td>0</td><td>—</td><td>0</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>（ブランド/製造元一致の出品に売れ筋ランクなし＝raw なし）</td></tr>
+<tr><td>池本刷子工業</td><td>10</td><td>8</td><td>5</td><td>6</td><td>9</td><td>12,563</td><td>9.5</td><td>6.35</td><td>50.0</td><td>6/10・4/5</td><td>0.23</td><td>2.48</td><td>108,112円</td></tr>
+<tr><td>木内籐材工業</td><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>114,366</td><td>1</td><td>12.25</td><td>12.25</td><td>1/1・1/1</td><td>10.33</td><td>10.33</td><td>309,925円</td></tr>
+<tr><td>朝倉染布</td><td>10</td><td>0</td><td>10</td><td>0</td><td>10</td><td>84,996</td><td>1.0</td><td>12.25</td><td>12.25</td><td>9/10・9/10</td><td>1.25</td><td>1.81</td><td>361,431円</td></tr>
+<tr><td>河野製紙</td><td>10</td><td>2</td><td>9</td><td>4</td><td>0</td><td>29,310</td><td>2.5</td><td>8.17</td><td>50.0</td><td>8/10・7/9</td><td>0.36</td><td>3.85</td><td>282,433円</td></tr>
+<tr><td>小野甚味噌醤油醸造</td><td>4</td><td>3</td><td>2</td><td>0</td><td>0</td><td>785,550</td><td>0.0</td><td>24.5</td><td>24.5</td><td>4/4・2/2</td><td>価格なし</td><td>—</td><td>0円</td></tr>
+<tr><td>田中帽子店</td><td>10</td><td>10</td><td>2</td><td>0</td><td>0</td><td>80,306</td><td>3.5</td><td>5.51</td><td>24.5</td><td>5/10・1/2</td><td>1.26</td><td>6.45</td><td>31,442円</td></tr>
+</tbody></table>
+<p>「ファミリー取り分月商 合計」は親ASINごとにランク最良の1件だけを足した値（子は兄弟合計の上限なので、子を全部足すと同じ需要を二重に数える）。SKU/社の上限の目安。</p>
+<h3>ASIN別（121件）</h3>
+<p>列: 層＝実測（Amazon公表・下限）／推定（公表なし→25・上限49）。子は「子」とだけ書く（値は兄弟合計の上限）。倍率は 取り分×価格÷3万。</p>
+<table><thead><tr><th>社</th><th>ASIN</th><th>親/子</th><th>ルート</th><th>ランク現在</th><th>ランク30日</th><th>公表月販</th><th>層</th><th>月販推定</th><th>オファー</th><th>Amazon本体</th><th>取り分/月</th><th>上限</th><th>足切り</th><th>価格</th><th>倍率</th><th>倍率上限</th><th>備考</th></tr></thead><tbody>
+<tr><td>大橋量器</td><td>B08KVYTSJM</td><td>子</td><td>ホーム＆キッチン</td><td>91,195</td><td>103,042</td><td>—</td><td>推定</td><td>24.5</td><td>1</td><td>なし</td><td>12.25</td><td>24.5</td><td>○</td><td>4950</td><td>2.02</td><td>4.04</td><td></td></tr>
+<tr><td>大橋量器</td><td>B081YSWW4X</td><td>子</td><td>ホーム＆キッチン</td><td>91,195</td><td>106,831</td><td>—</td><td>推定</td><td>24.5</td><td>1</td><td>なし</td><td>12.25</td><td>24.5</td><td>○</td><td>4620</td><td>1.89</td><td>3.77</td><td></td></tr>
+<tr><td>大橋量器</td><td>B081YY6SMR</td><td>子</td><td>ホーム＆キッチン</td><td>91,221</td><td>106,966</td><td>—</td><td>推定</td><td>24.5</td><td>2</td><td>なし</td><td>8.17</td><td>16.33</td><td>○</td><td>3960</td><td>1.08</td><td>2.16</td><td></td></tr>
+<tr><td>大橋量器</td><td>B081YTF84F</td><td>子</td><td>ホーム＆キッチン</td><td>91,221</td><td>107,930</td><td>—</td><td>推定</td><td>24.5</td><td>2</td><td>なし</td><td>8.17</td><td>16.33</td><td>○</td><td>3580</td><td>0.97</td><td>1.95</td><td></td></tr>
+<tr><td>木村硝子店</td><td>B0753DWG67</td><td>単体</td><td>ホーム＆キッチン</td><td>16,299</td><td>14,135</td><td>100</td><td>実測</td><td>100.0</td><td>3</td><td>なし</td><td>25.0</td><td>25.0</td><td>○</td><td>1925</td><td>1.6</td><td>1.6</td><td></td></tr>
+<tr><td>木村硝子店</td><td>B0DR68878X</td><td>単体</td><td>ホーム＆キッチン</td><td>21,010</td><td>23,060</td><td>100</td><td>実測</td><td>100.0</td><td>1</td><td>なし</td><td>50.0</td><td>50.0</td><td>○</td><td>3900</td><td>6.5</td><td>6.5</td><td></td></tr>
+<tr><td>木村硝子店</td><td>B0FY26KFRD</td><td>単体</td><td>ホーム＆キッチン</td><td>21,442</td><td>30,657</td><td>50</td><td>実測</td><td>50.0</td><td>3</td><td>なし</td><td>12.5</td><td>12.5</td><td>○</td><td>3820</td><td>1.59</td><td>1.59</td><td></td></tr>
+<tr><td>木村硝子店</td><td>B0936R8B53</td><td>単体</td><td>ホーム＆キッチン</td><td>24,196</td><td>28,978</td><td>50</td><td>実測</td><td>50.0</td><td>2</td><td>なし</td><td>16.67</td><td>16.67</td><td>○</td><td>2200</td><td>1.22</td><td>1.22</td><td></td></tr>
+<tr><td>木村硝子店</td><td>B0H6S1J179</td><td>単体</td><td>ホーム＆キッチン</td><td>28,620</td><td>40,933</td><td>50</td><td>実測</td><td>50.0</td><td>0</td><td>なし</td><td>50.0</td><td>50.0</td><td>○</td><td>9479</td><td>15.8</td><td>15.8</td><td>現在新品オファーなし・avg90 NEW（現在オファーなし）</td></tr>
+<tr><td>木村硝子店</td><td>B0DR68MZZJ</td><td>単体</td><td>ホーム＆キッチン</td><td>28,776</td><td>56,799</td><td>—</td><td>推定</td><td>24.5</td><td>2</td><td>なし</td><td>8.17</td><td>16.33</td><td>○</td><td>3843</td><td>1.05</td><td>2.09</td><td></td></tr>
+<tr><td>木村硝子店</td><td>B09KL93R8C</td><td>単体</td><td>ホーム＆キッチン</td><td>38,611</td><td>80,121</td><td>—</td><td>推定</td><td>24.5</td><td>4</td><td>なし</td><td>4.9</td><td>9.8</td><td>×</td><td>1250</td><td>0.2</td><td>0.41</td><td></td></tr>
+<tr><td>木村硝子店</td><td>B088KB2WNQ</td><td>子</td><td>ホーム＆キッチン</td><td>68,172</td><td>32,136</td><td>—</td><td>推定</td><td>24.5</td><td>0</td><td>なし</td><td>24.5</td><td>49.0</td><td>○</td><td>4480</td><td>3.66</td><td>7.32</td><td>現在新品オファーなし・avg90 NEW（現在オファーなし）</td></tr>
+<tr><td>木村硝子店</td><td>B09B6SNCN1</td><td>単体</td><td>ホーム＆キッチン</td><td>30,670</td><td>21,933</td><td>100</td><td>実測</td><td>100.0</td><td>2</td><td>あり</td><td>33.33</td><td>33.33</td><td>○</td><td>2420</td><td>2.69</td><td>2.69</td><td></td></tr>
+<tr><td>木村硝子店</td><td>B0D1C43YLM</td><td>単体</td><td>ホーム＆キッチン</td><td>34,099</td><td>73,291</td><td>—</td><td>推定</td><td>24.5</td><td>1</td><td>なし</td><td>12.25</td><td>24.5</td><td>○</td><td>2635</td><td>1.08</td><td>2.15</td><td></td></tr>
+<tr><td>楠橋紋織</td><td>B09TR8BCR9</td><td>子</td><td>ファッション</td><td>7,520</td><td>9,727</td><td>—</td><td>推定</td><td>24.5</td><td>8</td><td>あり</td><td>2.72</td><td>5.44</td><td>×</td><td>2350</td><td>0.21</td><td>0.43</td><td></td></tr>
+<tr><td>楠橋紋織</td><td>B09TR75WZC</td><td>子</td><td>ファッション</td><td>7,520</td><td>9,681</td><td>50</td><td>実測</td><td>50.0</td><td>6</td><td>あり</td><td>7.14</td><td>7.14</td><td>○</td><td>4465</td><td>1.06</td><td>1.06</td><td></td></tr>
+<tr><td>楠橋紋織</td><td>B0943N31HK</td><td>子</td><td>ファッション</td><td>7,519</td><td>9,633</td><td>—</td><td>推定</td><td>24.5</td><td>6</td><td>あり</td><td>3.5</td><td>7.0</td><td>×</td><td>4459</td><td>0.52</td><td>1.04</td><td></td></tr>
+<tr><td>楠橋紋織</td><td>B0943MX2HP</td><td>子</td><td>ファッション</td><td>7,519</td><td>9,644</td><td>—</td><td>推定</td><td>24.5</td><td>5</td><td>あり</td><td>4.08</td><td>8.17</td><td>×</td><td>4459</td><td>0.61</td><td>1.21</td><td></td></tr>
+<tr><td>楠橋紋織</td><td>B09TR6S283</td><td>子</td><td>ファッション</td><td>7,520</td><td>9,748</td><td>—</td><td>推定</td><td>24.5</td><td>7</td><td>あり</td><td>3.06</td><td>6.12</td><td>×</td><td>2410</td><td>0.25</td><td>0.49</td><td></td></tr>
+<tr><td>楠橋紋織</td><td>B08V54825Y</td><td>子</td><td>ファッション</td><td>7,519</td><td>9,751</td><td>—</td><td>推定</td><td>24.5</td><td>7</td><td>あり</td><td>3.06</td><td>6.12</td><td>×</td><td>2480</td><td>0.25</td><td>0.51</td><td></td></tr>
+<tr><td>楠橋紋織</td><td>B08V4873CW</td><td>子</td><td>ファッション</td><td>7,519</td><td>9,810</td><td>—</td><td>推定</td><td>24.5</td><td>7</td><td>あり</td><td>3.06</td><td>6.12</td><td>×</td><td>2550</td><td>0.26</td><td>0.52</td><td></td></tr>
+<tr><td>楠橋紋織</td><td>B0C13DJ8N7</td><td>子</td><td>ホーム＆キッチン</td><td>15,418</td><td>23,380</td><td>—</td><td>推定</td><td>24.5</td><td>3</td><td>あり</td><td>6.12</td><td>12.25</td><td>○</td><td>872</td><td>0.18</td><td>0.36</td><td></td></tr>
+<tr><td>楠橋紋織</td><td>B0C12SP2ZX</td><td>子</td><td>ホーム＆キッチン</td><td>15,418</td><td>23,433</td><td>—</td><td>推定</td><td>24.5</td><td>6</td><td>あり</td><td>3.5</td><td>7.0</td><td>×</td><td>1100</td><td>0.13</td><td>0.26</td><td></td></tr>
+<tr><td>楠橋紋織</td><td>B0C12XV1VC</td><td>子</td><td>ホーム＆キッチン</td><td>15,418</td><td>22,823</td><td>—</td><td>推定</td><td>24.5</td><td>8</td><td>あり</td><td>2.72</td><td>5.44</td><td>×</td><td>872</td><td>0.08</td><td>0.16</td><td></td></tr>
+<tr><td>七福タオル</td><td>B01LW3XLGT</td><td>子</td><td>スポーツ＆アウトドア</td><td>142,744</td><td>290,525</td><td>—</td><td>推定</td><td>24.5</td><td>1</td><td>なし</td><td>12.25</td><td>24.5</td><td>○</td><td>3630</td><td>1.48</td><td>2.96</td><td></td></tr>
+<tr><td>七福タオル</td><td>B0739P6P6H</td><td>子</td><td>ホーム＆キッチン</td><td>162,264</td><td>353,759</td><td>—</td><td>推定</td><td>24.5</td><td>1</td><td>なし</td><td>12.25</td><td>24.5</td><td>○</td><td>1320</td><td>0.54</td><td>1.08</td><td></td></tr>
+<tr><td>七福タオル</td><td>B07VXTX98X</td><td>子</td><td>ホーム＆キッチン</td><td>378,442</td><td>443,697</td><td>—</td><td>推定</td><td>24.5</td><td>1</td><td>なし</td><td>12.25</td><td>24.5</td><td>○</td><td>1980</td><td>0.81</td><td>1.62</td><td></td></tr>
+<tr><td>七福タオル</td><td>B01IEID9SE</td><td>子</td><td>ホーム＆キッチン</td><td>393,647</td><td>297,870</td><td>—</td><td>推定</td><td>24.5</td><td>0</td><td>なし</td><td>24.5</td><td>49.0</td><td>○</td><td>1197</td><td>0.98</td><td>1.96</td><td>現在新品オファーなし・avg365 NEW（現在オファーなし）</td></tr>
+<tr><td>七福タオル</td><td>B01IEID9ZW</td><td>子</td><td>ホーム＆キッチン</td><td>393,647</td><td>299,232</td><td>—</td><td>推定</td><td>24.5</td><td>0</td><td>なし</td><td>24.5</td><td>49.0</td><td>○</td><td>—</td><td>—</td><td>—</td><td>現在新品オファーなし</td></tr>
+<tr><td>七福タオル</td><td>B0739RYMSJ</td><td>子</td><td>ホーム＆キッチン</td><td>162,246</td><td>350,686</td><td>—</td><td>推定</td><td>24.5</td><td>1</td><td>なし</td><td>12.25</td><td>24.5</td><td>○</td><td>1320</td><td>0.54</td><td>1.08</td><td></td></tr>
+<tr><td>七福タオル</td><td>B0739RFY2Y</td><td>子</td><td>ホーム＆キッチン</td><td>162,246</td><td>350,775</td><td>—</td><td>推定</td><td>24.5</td><td>1</td><td>なし</td><td>12.25</td><td>24.5</td><td>○</td><td>1320</td><td>0.54</td><td>1.08</td><td></td></tr>
+<tr><td>七福タオル</td><td>B07W1YLX88</td><td>子</td><td>ホーム＆キッチン</td><td>486,064</td><td>835,381</td><td>—</td><td>推定</td><td>24.5</td><td>1</td><td>なし</td><td>12.25</td><td>24.5</td><td>○</td><td>1430</td><td>0.58</td><td>1.17</td><td></td></tr>
+<tr><td>七福タオル</td><td>B01LWBP6NC</td><td>子</td><td>ホーム＆キッチン</td><td>434,876</td><td>492,587</td><td>—</td><td>推定</td><td>24.5</td><td>1</td><td>なし</td><td>12.25</td><td>24.5</td><td>○</td><td>3080</td><td>1.26</td><td>2.52</td><td></td></tr>
+<tr><td>七福タオル</td><td>B07W129NZK</td><td>子</td><td>ホーム＆キッチン</td><td>486,064</td><td>905,069</td><td>—</td><td>推定</td><td>24.5</td><td>1</td><td>なし</td><td>12.25</td><td>24.5</td><td>○</td><td>1430</td><td>0.58</td><td>1.17</td><td></td></tr>
+<tr><td>金野タオル</td><td>B0FGMNK2ZK</td><td>子</td><td>ホーム＆キッチン</td><td>28,979</td><td>43,196</td><td>—</td><td>推定</td><td>24.5</td><td>2</td><td>なし</td><td>8.17</td><td>16.33</td><td>○</td><td>770</td><td>0.21</td><td>0.42</td><td></td></tr>
+<tr><td>金野タオル</td><td>B0FJG6DHWS</td><td>子</td><td>ホーム＆キッチン</td><td>34,257</td><td>28,118</td><td>—</td><td>推定</td><td>24.5</td><td>2</td><td>なし</td><td>8.17</td><td>16.33</td><td>○</td><td>880</td><td>0.24</td><td>0.48</td><td></td></tr>
+<tr><td>金野タオル</td><td>B0FJG5DVYX</td><td>子</td><td>ホーム＆キッチン</td><td>34,267</td><td>28,335</td><td>—</td><td>推定</td><td>24.5</td><td>3</td><td>なし</td><td>6.12</td><td>12.25</td><td>○</td><td>730</td><td>0.15</td><td>0.3</td><td></td></tr>
+<tr><td>金野タオル</td><td>B0FJG6YNK6</td><td>子</td><td>ホーム＆キッチン</td><td>34,267</td><td>28,216</td><td>—</td><td>推定</td><td>24.5</td><td>2</td><td>なし</td><td>8.17</td><td>16.33</td><td>○</td><td>750</td><td>0.2</td><td>0.41</td><td></td></tr>
+<tr><td>金野タオル</td><td>B0FJGBBVTM</td><td>子</td><td>ホーム＆キッチン</td><td>34,267</td><td>30,185</td><td>—</td><td>推定</td><td>24.5</td><td>1</td><td>なし</td><td>12.25</td><td>24.5</td><td>○</td><td>880</td><td>0.36</td><td>0.72</td><td></td></tr>
+<tr><td>金野タオル</td><td>B0FJG8D7J4</td><td>子</td><td>ホーム＆キッチン</td><td>34,267</td><td>28,324</td><td>—</td><td>推定</td><td>24.5</td><td>2</td><td>なし</td><td>8.17</td><td>16.33</td><td>○</td><td>750</td><td>0.2</td><td>0.41</td><td></td></tr>
+<tr><td>金野タオル</td><td>B0FJG83CTQ</td><td>子</td><td>ホーム＆キッチン</td><td>34,267</td><td>30,511</td><td>—</td><td>推定</td><td>24.5</td><td>1</td><td>なし</td><td>12.25</td><td>24.5</td><td>○</td><td>880</td><td>0.36</td><td>0.72</td><td></td></tr>
+<tr><td>金野タオル</td><td>B0FJG6LB48</td><td>子</td><td>ホーム＆キッチン</td><td>34,267</td><td>28,447</td><td>—</td><td>推定</td><td>24.5</td><td>2</td><td>なし</td><td>8.17</td><td>16.33</td><td>○</td><td>750</td><td>0.2</td><td>0.41</td><td></td></tr>
+<tr><td>金野タオル</td><td>B0FJG882RL</td><td>子</td><td>ホーム＆キッチン</td><td>34,267</td><td>28,505</td><td>—</td><td>推定</td><td>24.5</td><td>2</td><td>なし</td><td>8.17</td><td>16.33</td><td>○</td><td>750</td><td>0.2</td><td>0.41</td><td></td></tr>
+<tr><td>金野タオル</td><td>B0FJG69JZZ</td><td>子</td><td>ホーム＆キッチン</td><td>34,267</td><td>27,789</td><td>—</td><td>推定</td><td>24.5</td><td>2</td><td>なし</td><td>8.17</td><td>16.33</td><td>○</td><td>750</td><td>0.2</td><td>0.41</td><td></td></tr>
+<tr><td>北尾化粧品部</td><td>B01DIHGZV4</td><td>単体</td><td>ビューティー</td><td>14,333</td><td>17,374</td><td>100</td><td>実測</td><td>100.0</td><td>1</td><td>なし</td><td>50.0</td><td>50.0</td><td>○</td><td>1780</td><td>2.97</td><td>2.97</td><td></td></tr>
+<tr><td>北尾化粧品部</td><td>B01DIJX966</td><td>単体</td><td>ビューティー</td><td>37,901</td><td>41,808</td><td>—</td><td>推定</td><td>24.5</td><td>1</td><td>なし</td><td>12.25</td><td>24.5</td><td>○</td><td>1810</td><td>0.74</td><td>1.48</td><td></td></tr>
+<tr><td>北尾化粧品部</td><td>B0891YF1Y2</td><td>単体</td><td>ビューティー</td><td>78,458</td><td>70,602</td><td>—</td><td>推定</td><td>24.5</td><td>1</td><td>なし</td><td>12.25</td><td>24.5</td><td>○</td><td>1810</td><td>0.74</td><td>1.48</td><td></td></tr>
+<tr><td>北尾化粧品部</td><td>B0DKH72MHF</td><td>子</td><td>ビューティー</td><td>126,154</td><td>97,965</td><td>—</td><td>推定</td><td>24.5</td><td>0</td><td>なし</td><td>24.5</td><td>49.0</td><td>○</td><td>—</td><td>—</td><td>—</td><td>現在新品オファーなし</td></tr>
+<tr><td>北尾化粧品部</td><td>B0DKHDHNHM</td><td>子</td><td>ビューティー</td><td>126,154</td><td>111,801</td><td>—</td><td>推定</td><td>24.5</td><td>0</td><td>なし</td><td>24.5</td><td>49.0</td><td>○</td><td>719</td><td>0.59</td><td>1.17</td><td>現在新品オファーなし・avg90 NEW（現在オファーなし）</td></tr>
+<tr><td>北尾化粧品部</td><td>B0DKHD2Q9H</td><td>子</td><td>ビューティー</td><td>126,154</td><td>113,781</td><td>—</td><td>推定</td><td>24.5</td><td>1</td><td>なし</td><td>12.25</td><td>24.5</td><td>○</td><td>2480</td><td>1.01</td><td>2.03</td><td></td></tr>
+<tr><td>北尾化粧品部</td><td>B0DKHGK5XX</td><td>子</td><td>ビューティー</td><td>126,154</td><td>114,089</td><td>—</td><td>推定</td><td>24.5</td><td>1</td><td>なし</td><td>12.25</td><td>24.5</td><td>○</td><td>5980</td><td>2.44</td><td>4.88</td><td></td></tr>
+<tr><td>北尾化粧品部</td><td>B0DKHBFVDN</td><td>子</td><td>ビューティー</td><td>126,154</td><td>112,974</td><td>—</td><td>推定</td><td>24.5</td><td>1</td><td>なし</td><td>12.25</td><td>24.5</td><td>○</td><td>4260</td><td>1.74</td><td>3.48</td><td></td></tr>
+<tr><td>北尾化粧品部</td><td>B08NGSYTTS</td><td>単体</td><td>ビューティー</td><td>151,774</td><td>146,926</td><td>—</td><td>推定</td><td>24.5</td><td>0</td><td>なし</td><td>24.5</td><td>49.0</td><td>○</td><td>1552</td><td>1.27</td><td>2.53</td><td>現在新品オファーなし・avg365 NEW（現在オファーなし）</td></tr>
+<tr><td>北尾化粧品部</td><td>B08YZJ9MS3</td><td>単体</td><td>ビューティー</td><td>168,043</td><td>161,319</td><td>—</td><td>推定</td><td>24.5</td><td>0</td><td>なし</td><td>24.5</td><td>49.0</td><td>○</td><td>1541</td><td>1.26</td><td>2.52</td><td>現在新品オファーなし・avg365 NEW（現在オファーなし）</td></tr>
+<tr><td>高柳製茶</td><td>B082PCT4SP</td><td>単体</td><td>食品・飲料・お酒</td><td>107,521</td><td>187,735</td><td>—</td><td>推定</td><td>24.5</td><td>1</td><td>なし</td><td>12.25</td><td>24.5</td><td>○</td><td>15827</td><td>6.46</td><td>12.93</td><td></td></tr>
+<tr><td>高柳製茶</td><td>B082PCZGKR</td><td>単体</td><td>食品・飲料・お酒</td><td>232,473</td><td>189,070</td><td>—</td><td>推定</td><td>24.5</td><td>1</td><td>なし</td><td>12.25</td><td>24.5</td><td>○</td><td>4940</td><td>2.02</td><td>4.03</td><td></td></tr>
+<tr><td>北陸製菓</td><td>B0D1X85N53</td><td>単体</td><td>食品・飲料・お酒</td><td>12,316</td><td>10,539</td><td>200</td><td>実測</td><td>200.0</td><td>4</td><td>なし</td><td>40.0</td><td>40.0</td><td>○</td><td>879</td><td>1.17</td><td>1.17</td><td></td></tr>
+<tr><td>北陸製菓</td><td>B0D1XKYDRF</td><td>単体</td><td>食品・飲料・お酒</td><td>13,232</td><td>11,270</td><td>200</td><td>実測</td><td>200.0</td><td>6</td><td>あり</td><td>28.57</td><td>28.57</td><td>○</td><td>431</td><td>0.41</td><td>0.41</td><td></td></tr>
+<tr><td>北陸製菓</td><td>B0BZYN72J3</td><td>単体</td><td>食品・飲料・お酒</td><td>29,242</td><td>27,350</td><td>50</td><td>実測</td><td>50.0</td><td>1</td><td>あり</td><td>25.0</td><td>25.0</td><td>○</td><td>2343</td><td>1.95</td><td>1.95</td><td></td></tr>
+<tr><td>北陸製菓</td><td>B0FMXX68CN</td><td>単体</td><td>食品・飲料・お酒</td><td>19,719</td><td>23,015</td><td>100</td><td>実測</td><td>100.0</td><td>2</td><td>あり</td><td>33.33</td><td>33.33</td><td>○</td><td>1273</td><td>1.41</td><td>1.41</td><td></td></tr>
+<tr><td>北陸製菓</td><td>B0BPCDJTWJ</td><td>単体</td><td>食品・飲料・お酒</td><td>38,815</td><td>85,328</td><td>—</td><td>推定</td><td>24.5</td><td>4</td><td>あり</td><td>4.9</td><td>9.8</td><td>×</td><td>1296</td><td>0.21</td><td>0.42</td><td></td></tr>
+<tr><td>北陸製菓</td><td>B00X9TQ39G</td><td>子</td><td>食品・飲料・お酒</td><td>36,684</td><td>23,886</td><td>50</td><td>実測</td><td>50.0</td><td>1</td><td>あり</td><td>25.0</td><td>25.0</td><td>○</td><td>378</td><td>0.32</td><td>0.32</td><td></td></tr>
+<tr><td>北陸製菓</td><td>B0C6WWXPSS</td><td>単体</td><td>食品・飲料・お酒</td><td>63,071</td><td>64,544</td><td>—</td><td>推定</td><td>24.5</td><td>1</td><td>あり</td><td>12.25</td><td>24.5</td><td>○</td><td>1657</td><td>0.68</td><td>1.35</td><td></td></tr>
+<tr><td>北陸製菓</td><td>B0BPCFRZGG</td><td>子</td><td>食品・飲料・お酒</td><td>99,386</td><td>96,359</td><td>—</td><td>推定</td><td>24.5</td><td>2</td><td>あり</td><td>8.17</td><td>16.33</td><td>○</td><td>734</td><td>0.2</td><td>0.4</td><td></td></tr>
+<tr><td>北陸製菓</td><td>B0BPCDXXLY</td><td>単体</td><td>食品・飲料・お酒</td><td>48,987</td><td>62,555</td><td>—</td><td>推定</td><td>24.5</td><td>4</td><td>あり</td><td>4.9</td><td>9.8</td><td>×</td><td>1442</td><td>0.24</td><td>0.47</td><td></td></tr>
+<tr><td>北陸製菓</td><td>B0FMX2R8SS</td><td>単体</td><td>食品・飲料・お酒</td><td>47,369</td><td>70,614</td><td>—</td><td>推定</td><td>24.5</td><td>1</td><td>あり</td><td>12.25</td><td>24.5</td><td>○</td><td>1286</td><td>0.53</td><td>1.05</td><td></td></tr>
+<tr><td>宇野刷毛ブラシ製作所</td><td>raw なし</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>ブランド/製造元一致の出品に売れ筋ランクなし（T-20260912-001 S3）</td></tr>
+<tr><td>廣田硝子</td><td>B01BWGW2UQ</td><td>子</td><td>ホーム＆キッチン</td><td>21,937</td><td>48,678</td><td>—</td><td>推定</td><td>24.5</td><td>5</td><td>あり</td><td>4.08</td><td>8.17</td><td>×</td><td>3350</td><td>0.46</td><td>0.91</td><td></td></tr>
+<tr><td>廣田硝子</td><td>B01BWGW3DM</td><td>子</td><td>ホーム＆キッチン</td><td>21,937</td><td>36,994</td><td>50</td><td>実測</td><td>50.0</td><td>9</td><td>あり</td><td>5.0</td><td>5.0</td><td>×</td><td>2980</td><td>0.5</td><td>0.5</td><td></td></tr>
+<tr><td>廣田硝子</td><td>B07CDPQW5R</td><td>子</td><td>ホーム＆キッチン</td><td>21,942</td><td>77,747</td><td>—</td><td>推定</td><td>24.5</td><td>0</td><td>なし</td><td>24.5</td><td>49.0</td><td>○</td><td>—</td><td>—</td><td>—</td><td>現在新品オファーなし</td></tr>
+<tr><td>廣田硝子</td><td>B07BW7ZMRK</td><td>子</td><td>ホーム＆キッチン</td><td>21,942</td><td>52,607</td><td>—</td><td>推定</td><td>24.5</td><td>6</td><td>あり</td><td>3.5</td><td>7.0</td><td>×</td><td>2750</td><td>0.32</td><td>0.64</td><td></td></tr>
+<tr><td>廣田硝子</td><td>B01HPBDIFU</td><td>単体</td><td>おもちゃ</td><td>65,602</td><td>52,378</td><td>—</td><td>推定</td><td>24.5</td><td>0</td><td>なし</td><td>24.5</td><td>49.0</td><td>○</td><td>12650</td><td>10.33</td><td>20.66</td><td>現在新品オファーなし・avg90 NEW（現在オファーなし）</td></tr>
+<tr><td>廣田硝子</td><td>B01HNW9X1Y</td><td>子</td><td>ホーム＆キッチン</td><td>133,054</td><td>188,294</td><td>—</td><td>推定</td><td>24.5</td><td>2</td><td>なし</td><td>8.17</td><td>16.33</td><td>○</td><td>3400</td><td>0.93</td><td>1.85</td><td></td></tr>
+<tr><td>廣田硝子</td><td>B01HNW9PU8</td><td>子</td><td>ホーム＆キッチン</td><td>133,054</td><td>191,727</td><td>—</td><td>推定</td><td>24.5</td><td>4</td><td>なし</td><td>4.9</td><td>9.8</td><td>×</td><td>7490</td><td>1.22</td><td>2.45</td><td></td></tr>
+<tr><td>廣田硝子</td><td>B00XN17T16</td><td>子</td><td>ホーム＆キッチン</td><td>93,179</td><td>129,069</td><td>—</td><td>推定</td><td>24.5</td><td>3</td><td>なし</td><td>6.12</td><td>12.25</td><td>○</td><td>3080</td><td>0.63</td><td>1.26</td><td></td></tr>
+<tr><td>廣田硝子</td><td>B00XN17QKA</td><td>子</td><td>ホーム＆キッチン</td><td>93,179</td><td>128,401</td><td>—</td><td>推定</td><td>24.5</td><td>3</td><td>なし</td><td>6.12</td><td>12.25</td><td>○</td><td>3080</td><td>0.63</td><td>1.26</td><td></td></tr>
+<tr><td>廣田硝子</td><td>B00XN17VR8</td><td>子</td><td>ホーム＆キッチン</td><td>93,179</td><td>127,728</td><td>—</td><td>推定</td><td>24.5</td><td>4</td><td>なし</td><td>4.9</td><td>9.8</td><td>×</td><td>3080</td><td>0.5</td><td>1.01</td><td></td></tr>
+<tr><td>守田漆器</td><td>raw なし</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>ブランド/製造元一致の出品に売れ筋ランクなし（T-20260912-001 S3）</td></tr>
+<tr><td>池本刷子工業</td><td>B0D25PB4XD</td><td>子</td><td>ビューティー</td><td>7,184</td><td>7,467</td><td>100</td><td>実測</td><td>100.0</td><td>17</td><td>あり</td><td>5.56</td><td>5.56</td><td>○</td><td>760</td><td>0.14</td><td>0.14</td><td></td></tr>
+<tr><td>池本刷子工業</td><td>B0GXV5H3RF</td><td>子</td><td>ビューティー</td><td>7,187</td><td>7,495</td><td>50</td><td>実測</td><td>50.0</td><td>6</td><td>あり</td><td>7.14</td><td>7.14</td><td>○</td><td>722</td><td>0.17</td><td>0.17</td><td></td></tr>
+<tr><td>池本刷子工業</td><td>B0D2573DF5</td><td>子</td><td>ビューティー</td><td>7,187</td><td>7,435</td><td>200</td><td>実測</td><td>200.0</td><td>17</td><td>あり</td><td>11.11</td><td>11.11</td><td>○</td><td>517</td><td>0.19</td><td>0.19</td><td></td></tr>
+<tr><td>池本刷子工業</td><td>B000FP447U</td><td>単体</td><td>ビューティー</td><td>10,036</td><td>15,646</td><td>200</td><td>実測</td><td>200.0</td><td>3</td><td>あり</td><td>50.0</td><td>50.0</td><td>○</td><td>360</td><td>0.6</td><td>0.6</td><td></td></tr>
+<tr><td>池本刷子工業</td><td>B001UMV1QO</td><td>子</td><td>ドラッグストア</td><td>12,563</td><td>20,754</td><td>—</td><td>推定</td><td>24.5</td><td>11</td><td>あり</td><td>2.04</td><td>4.08</td><td>×</td><td>3050</td><td>0.21</td><td>0.42</td><td></td></tr>
+<tr><td>池本刷子工業</td><td>B0013IGK9S</td><td>子</td><td>ドラッグストア</td><td>12,563</td><td>20,753</td><td>—</td><td>推定</td><td>24.5</td><td>13</td><td>あり</td><td>1.75</td><td>3.5</td><td>×</td><td>4478</td><td>0.26</td><td>0.52</td><td></td></tr>
+<tr><td>池本刷子工業</td><td>B0013IEEOG</td><td>子</td><td>ドラッグストア</td><td>12,563</td><td>20,902</td><td>50</td><td>実測</td><td>50.0</td><td>13</td><td>あり</td><td>3.57</td><td>3.57</td><td>×</td><td>2105</td><td>0.25</td><td>0.25</td><td></td></tr>
+<tr><td>池本刷子工業</td><td>B002OPMLS8</td><td>子</td><td>ドラッグストア</td><td>12,567</td><td>20,646</td><td>—</td><td>推定</td><td>24.5</td><td>8</td><td>あり</td><td>2.72</td><td>5.44</td><td>×</td><td>6800</td><td>0.62</td><td>1.23</td><td></td></tr>
+<tr><td>池本刷子工業</td><td>B00H2U11XG</td><td>単体</td><td>スポーツ＆アウトドア</td><td>12,885</td><td>11,092</td><td>50</td><td>実測</td><td>50.0</td><td>6</td><td>あり</td><td>7.14</td><td>7.14</td><td>○</td><td>729</td><td>0.17</td><td>0.17</td><td></td></tr>
+<tr><td>池本刷子工業</td><td>B0G9HP9PRD</td><td>子</td><td>スポーツ＆アウトドア</td><td>15,063</td><td>7,450</td><td>—</td><td>推定</td><td>24.5</td><td>0</td><td>なし</td><td>24.5</td><td>49.0</td><td>○</td><td>3039</td><td>2.48</td><td>4.96</td><td>現在新品オファーなし・avg365 NEW（現在オファーなし）</td></tr>
+<tr><td>木内籐材工業</td><td>B0C135PF5Z</td><td>単体</td><td>ホーム＆キッチン</td><td>114,366</td><td>503,468</td><td>—</td><td>推定</td><td>24.5</td><td>1</td><td>なし</td><td>12.25</td><td>24.5</td><td>○</td><td>25300</td><td>10.33</td><td>20.66</td><td></td></tr>
+<tr><td>朝倉染布</td><td>B097MD6YSF</td><td>単体</td><td>ホーム＆キッチン</td><td>40,326</td><td>64,908</td><td>—</td><td>推定</td><td>24.5</td><td>2</td><td>あり</td><td>8.17</td><td>16.33</td><td>○</td><td>3900</td><td>1.06</td><td>2.12</td><td></td></tr>
+<tr><td>朝倉染布</td><td>B09ZNX2ZJK</td><td>単体</td><td>ホーム＆キッチン</td><td>48,884</td><td>88,471</td><td>—</td><td>推定</td><td>24.5</td><td>1</td><td>あり</td><td>12.25</td><td>24.5</td><td>○</td><td>3244</td><td>1.32</td><td>2.65</td><td></td></tr>
+<tr><td>朝倉染布</td><td>B0CMP6V3C2</td><td>単体</td><td>ホーム＆キッチン</td><td>59,081</td><td>89,066</td><td>—</td><td>推定</td><td>24.5</td><td>1</td><td>あり</td><td>12.25</td><td>24.5</td><td>○</td><td>3235</td><td>1.32</td><td>2.64</td><td></td></tr>
+<tr><td>朝倉染布</td><td>B0D4298P9C</td><td>単体</td><td>ホーム＆キッチン</td><td>51,407</td><td>91,464</td><td>—</td><td>推定</td><td>24.5</td><td>1</td><td>あり</td><td>12.25</td><td>24.5</td><td>○</td><td>3259</td><td>1.33</td><td>2.66</td><td></td></tr>
+<tr><td>朝倉染布</td><td>B0F4R8JHVL</td><td>単体</td><td>ホーム＆キッチン</td><td>80,998</td><td>130,707</td><td>—</td><td>推定</td><td>24.5</td><td>1</td><td>あり</td><td>12.25</td><td>24.5</td><td>○</td><td>3645</td><td>1.49</td><td>2.98</td><td></td></tr>
+<tr><td>朝倉染布</td><td>B078C5X3XS</td><td>単体</td><td>ホーム＆キッチン</td><td>88,994</td><td>343,613</td><td>—</td><td>推定</td><td>24.5</td><td>4</td><td>あり</td><td>4.9</td><td>9.8</td><td>×</td><td>3500</td><td>0.57</td><td>1.14</td><td></td></tr>
+<tr><td>朝倉染布</td><td>B0784WFQ1M</td><td>単体</td><td>ホーム＆キッチン</td><td>97,172</td><td>131,879</td><td>—</td><td>推定</td><td>24.5</td><td>2</td><td>あり</td><td>8.17</td><td>16.33</td><td>○</td><td>4290</td><td>1.17</td><td>2.34</td><td></td></tr>
+<tr><td>朝倉染布</td><td>B077T6BT3J</td><td>単体</td><td>ホーム＆キッチン</td><td>139,478</td><td>256,853</td><td>—</td><td>推定</td><td>24.5</td><td>3</td><td>あり</td><td>6.12</td><td>12.25</td><td>○</td><td>3857</td><td>0.79</td><td>1.57</td><td></td></tr>
+<tr><td>朝倉染布</td><td>B0GY2MJ7FF</td><td>単体</td><td>ホーム＆キッチン</td><td>245,216</td><td>665,927</td><td>—</td><td>推定</td><td>24.5</td><td>1</td><td>あり</td><td>12.25</td><td>24.5</td><td>○</td><td>4423</td><td>1.81</td><td>3.61</td><td></td></tr>
+<tr><td>朝倉染布</td><td>B0FVV135F4</td><td>単体</td><td>ホーム＆キッチン</td><td>160,930</td><td>190,377</td><td>—</td><td>推定</td><td>24.5</td><td>1</td><td>あり</td><td>12.25</td><td>24.5</td><td>○</td><td>2910</td><td>1.19</td><td>2.38</td><td></td></tr>
+<tr><td>河野製紙</td><td>B0818HGM1F</td><td>単体</td><td>ドラッグストア</td><td>17,059</td><td>26,599</td><td>100</td><td>実測</td><td>100.0</td><td>13</td><td>なし</td><td>7.14</td><td>7.14</td><td>○</td><td>598</td><td>0.14</td><td>0.14</td><td></td></tr>
+<tr><td>河野製紙</td><td>B018XEPX74</td><td>単体</td><td>ドラッグストア</td><td>20,866</td><td>16,928</td><td>100</td><td>実測</td><td>100.0</td><td>2</td><td>なし</td><td>33.33</td><td>33.33</td><td>○</td><td>2280</td><td>2.53</td><td>2.53</td><td></td></tr>
+<tr><td>河野製紙</td><td>B086L63R1D</td><td>子</td><td>ドラッグストア</td><td>21,543</td><td>24,428</td><td>50</td><td>実測</td><td>50.0</td><td>4</td><td>なし</td><td>10.0</td><td>10.0</td><td>○</td><td>2298</td><td>0.77</td><td>0.77</td><td></td></tr>
+<tr><td>河野製紙</td><td>B083JPRZK6</td><td>子</td><td>ドラッグストア</td><td>21,543</td><td>24,267</td><td>—</td><td>推定</td><td>24.5</td><td>3</td><td>なし</td><td>6.12</td><td>12.25</td><td>○</td><td>1760</td><td>0.36</td><td>0.72</td><td></td></tr>
+<tr><td>河野製紙</td><td>B0FB7GYLXN</td><td>単体</td><td>ドラッグストア</td><td>18,752</td><td>19,362</td><td>100</td><td>実測</td><td>100.0</td><td>1</td><td>なし</td><td>50.0</td><td>50.0</td><td>○</td><td>2310</td><td>3.85</td><td>3.85</td><td></td></tr>
+<tr><td>河野製紙</td><td>B0GQY7X9Z9</td><td>単体</td><td>ドラッグストア</td><td>37,249</td><td>58,849</td><td>—</td><td>推定</td><td>24.5</td><td>1</td><td>なし</td><td>12.25</td><td>24.5</td><td>○</td><td>3080</td><td>1.26</td><td>2.52</td><td></td></tr>
+<tr><td>河野製紙</td><td>B0B5YSMG94</td><td>単体</td><td>ドラッグストア</td><td>37,078</td><td>69,687</td><td>—</td><td>推定</td><td>24.5</td><td>2</td><td>なし</td><td>8.17</td><td>16.33</td><td>○</td><td>1333</td><td>0.36</td><td>0.73</td><td></td></tr>
+<tr><td>河野製紙</td><td>B0BDCNXX1J</td><td>単体</td><td>ビューティー</td><td>43,529</td><td>108,529</td><td>—</td><td>推定</td><td>24.5</td><td>11</td><td>なし</td><td>2.04</td><td>4.08</td><td>×</td><td>479</td><td>0.03</td><td>0.07</td><td></td></tr>
+<tr><td>河野製紙</td><td>B0BFPHGD6H</td><td>単体</td><td>ドラッグストア</td><td>49,461</td><td>53,198</td><td>—</td><td>推定</td><td>24.5</td><td>5</td><td>なし</td><td>4.08</td><td>8.17</td><td>×</td><td>1050</td><td>0.14</td><td>0.29</td><td></td></tr>
+<tr><td>河野製紙</td><td>B001OGJV90</td><td>単体</td><td>ドラッグストア</td><td>60,560</td><td>82,511</td><td>—</td><td>推定</td><td>24.5</td><td>2</td><td>なし</td><td>8.17</td><td>16.33</td><td>○</td><td>1200</td><td>0.33</td><td>0.65</td><td></td></tr>
+<tr><td>小野甚味噌醤油醸造</td><td>B0DK8ST2WC</td><td>単体</td><td>食品・飲料・お酒</td><td>757,404</td><td>753,086</td><td>—</td><td>推定</td><td>24.5</td><td>0</td><td>なし</td><td>24.5</td><td>49.0</td><td>○</td><td>—</td><td>—</td><td>—</td><td>現在新品オファーなし</td></tr>
+<tr><td>小野甚味噌醤油醸造</td><td>B0DW3X7CLR</td><td>子</td><td>食品・飲料・お酒</td><td>785,550</td><td>781,048</td><td>—</td><td>推定</td><td>24.5</td><td>0</td><td>なし</td><td>24.5</td><td>49.0</td><td>○</td><td>—</td><td>—</td><td>—</td><td>現在新品オファーなし</td></tr>
+<tr><td>小野甚味噌醤油醸造</td><td>B0DW3YSF7W</td><td>子</td><td>食品・飲料・お酒</td><td>785,550</td><td>781,379</td><td>—</td><td>推定</td><td>24.5</td><td>0</td><td>なし</td><td>24.5</td><td>49.0</td><td>○</td><td>—</td><td>—</td><td>—</td><td>現在新品オファーなし</td></tr>
+<tr><td>小野甚味噌醤油醸造</td><td>B0DW3JQRS2</td><td>子</td><td>食品・飲料・お酒</td><td>785,550</td><td>714,925</td><td>—</td><td>推定</td><td>24.5</td><td>0</td><td>なし</td><td>24.5</td><td>49.0</td><td>○</td><td>—</td><td>—</td><td>—</td><td>現在新品オファーなし</td></tr>
+<tr><td>田中帽子店</td><td>B01MUHQVEL</td><td>子</td><td>ファッション</td><td>85,621</td><td>37,946</td><td>—</td><td>推定</td><td>24.5</td><td>0</td><td>なし</td><td>24.5</td><td>49.0</td><td>○</td><td>—</td><td>—</td><td>—</td><td>現在新品オファーなし</td></tr>
+<tr><td>田中帽子店</td><td>B0BJV1ZQCL</td><td>子</td><td>ファッション</td><td>80,306</td><td>47,664</td><td>—</td><td>推定</td><td>24.5</td><td>1</td><td>なし</td><td>12.25</td><td>24.5</td><td>○</td><td>8690</td><td>3.55</td><td>7.1</td><td></td></tr>
+<tr><td>田中帽子店</td><td>B0083RSM1Q</td><td>子</td><td>ファッション</td><td>80,306</td><td>45,236</td><td>—</td><td>推定</td><td>24.5</td><td>4</td><td>なし</td><td>4.9</td><td>9.8</td><td>×</td><td>7700</td><td>1.26</td><td>2.52</td><td></td></tr>
+<tr><td>田中帽子店</td><td>B07KY5YZTJ</td><td>子</td><td>ファッション</td><td>80,306</td><td>38,962</td><td>—</td><td>推定</td><td>24.5</td><td>0</td><td>なし</td><td>24.5</td><td>49.0</td><td>○</td><td>7898</td><td>6.45</td><td>12.9</td><td>現在新品オファーなし・avg90 NEW（現在オファーなし）</td></tr>
+<tr><td>田中帽子店</td><td>B0083RSM2K</td><td>子</td><td>ファッション</td><td>80,306</td><td>42,485</td><td>—</td><td>推定</td><td>24.5</td><td>5</td><td>なし</td><td>4.08</td><td>8.17</td><td>×</td><td>7700</td><td>1.05</td><td>2.1</td><td></td></tr>
+<tr><td>田中帽子店</td><td>B0083RSM16</td><td>子</td><td>ファッション</td><td>80,299</td><td>46,211</td><td>—</td><td>推定</td><td>24.5</td><td>5</td><td>なし</td><td>4.08</td><td>8.17</td><td>×</td><td>7700</td><td>1.05</td><td>2.1</td><td></td></tr>
+<tr><td>田中帽子店</td><td>B00U6RJGSO</td><td>子</td><td>ファッション</td><td>80,299</td><td>43,994</td><td>—</td><td>推定</td><td>24.5</td><td>1</td><td>なし</td><td>12.25</td><td>24.5</td><td>○</td><td>8690</td><td>3.55</td><td>7.1</td><td></td></tr>
+<tr><td>田中帽子店</td><td>B0083RSM4I</td><td>子</td><td>ファッション</td><td>80,299</td><td>46,308</td><td>—</td><td>推定</td><td>24.5</td><td>5</td><td>なし</td><td>4.08</td><td>8.17</td><td>×</td><td>7700</td><td>1.05</td><td>2.1</td><td></td></tr>
+<tr><td>田中帽子店</td><td>B07KY5WH7H</td><td>子</td><td>ファッション</td><td>80,299</td><td>44,593</td><td>—</td><td>推定</td><td>24.5</td><td>3</td><td>なし</td><td>6.12</td><td>12.25</td><td>○</td><td>7700</td><td>1.57</td><td>3.14</td><td></td></tr>
+<tr><td>田中帽子店</td><td>B0083RSM20</td><td>子</td><td>ファッション</td><td>80,306</td><td>43,920</td><td>—</td><td>推定</td><td>24.5</td><td>4</td><td>なし</td><td>4.9</td><td>9.8</td><td>×</td><td>7700</td><td>1.26</td><td>2.52</td><td></td></tr>
+</tbody></table>
+<p>再現: <code>python3 05_sa_share_calc.py</code>（raw は agent_output 側。0 token）。CSV は <code>05_sa_asin別.csv</code> / <code>05_sa_社別.csv</code>。</p>
+<hr>
+<h2>S-c 個人事業主がメーカーに新規取引を打診したときの base rate</h2>
+<p>スコープ: 公的調査（中小企業庁・JETRO・商工会議所）と、EC STARs 以外の実務者の公開実績。WebSearch 17回・WebFetch 9回で打ち切り。取得日はすべて 2026-09-13。</p>
+<table><thead><tr><th>#</th><th>出典</th><th>誰が・母数</th><th>返信率</th><th>見積/取引OK</th><th>成立</th><th>種別</th><th>EC STARs から独立</th></tr></thead><tbody>
+<tr><td>1</td><td>Amazon セラーフォーラム「個人（個人事業主）でのメーカー開拓について」 sellercentral.amazon.co.jp/seller-forums/discussions/t/63a58fce-…（投稿は取得時点で「7か月前」≒2026-02）</td><td>個人事業主。150社をリストアップし厳選14社に問い合わせ</td><td>3/14＝<b>21%</b>（断り2・販売代理店から1「メーカー以外は出品不可」）</td><td>0</td><td><b>0/14</b></td><td>一次（本人投稿）</td><td>独立</td></tr>
+<tr><td>2</td><td>「国内メーカー98社 一斉に取引交渉メールを送ってみたら…」輸入ビジネス de 沖縄移住ライフ okinawanomadlife.com（<b>原典は DNS 不通で未取得。検索結果の要約で確認</b>・公開日不明）</td><td>輸入ビジネス実務者（法人/個人不明）。外注が98社に一斉送信</td><td>55/98＝<b>56%</b>（取引OK16・検討中10・断り29・無返信43）</td><td>取引OK 16/98＝<b>16%</b></td><td>不明（「取引OK」は条件提示の段階。仕入れ成立数は要約に無い）</td><td>二次（要約経由）</td><td>独立</td></tr>
+<tr><td>3</td><td>EC STARs Lab.「【2026年版】Amazonメーカー仕入れは個人でも可能！…7ステップ」ecstarslab.com</td><td>目安（実測の記載なし）</td><td>「最低でも3割以上」</td><td>「累計メール数の5%以上」</td><td>「30〜50社に1社」＝2〜3.3%</td><td>二次（講師の目安）</td><td><b>本体</b>（除外対象）</td></tr>
+<tr><td>4</td><td>EC STARs Lab.「メーカーから直接購入することができる手順」</td><td>目安</td><td>100社→50〜60社</td><td>好条件 20%</td><td>2〜3社/100＝2〜3%</td><td>二次</td><td>同一出典</td></tr>
+<tr><td>5</td><td>HIRAI『Amazon国内メーカー仕入れ 利益最大化入門』技術評論社 2024-07-29（gihyo.jp）第3章09「メールの返信率と成約率の基準」／同氏ブログ hirainet702.com、busoken.com</td><td>別系統のスクール主宰者</td><td>Web上に数字なし（書籍内）</td><td>—</td><td>—</td><td>未取得</td><td>独立だが数字なし</td></tr>
+<tr><td>6</td><td>BtoB コールドメール一般（antoir.jp 2026 ベンチマーク記事が引く Reachoutly 内部データ）</td><td>業種横断・海外</td><td>返信 8.5%（2019）→3〜5%（2026）</td><td>—</td><td>—</td><td>二次（三次に近い）</td><td>独立だが対象が違う</td></tr>
+<tr><td>7</td><td>テレアポ BtoB 一般（scene-live.com ほか営業支援会社）</td><td>業種横断</td><td>アポ率 1〜2%・成功率1%未満</td><td>—</td><td>—</td><td>二次</td><td>対象が違う</td></tr>
+<tr><td>8</td><td>展示会出展者調査（hammock.jp「展示会出展の実態調査」）</td><td>出展者（売り手側）</td><td>—</td><td>商談化後の受注率「10%未満」36.4%・「10〜20%」27.6%</td><td>—</td><td>二次</td><td>方向が逆（メーカーが売る側）</td></tr>
+<tr><td>9</td><td>2026年版 中小企業白書（帝国データバンク調査） meti.go.jp</td><td>中小企業</td><td>—</td><td>—</td><td>新規市場開拓で売上目標達成 約20%（既存市場は50%超）</td><td>一次（指標が違う）</td><td>対象が違う</td></tr>
+<tr><td>10</td><td>JETRO 記者発表（FOODEX 2026: 210社・商談256件／SMTS: 102社・成約見込含1.2億円） jetro.go.jp</td><td>食品メーカー×海外バイヤー</td><td>—</td><td>—</td><td>成約率は非公表</td><td>一次（率なし）</td><td>対象が違う</td></tr>
+<tr><td>11</td><td>中小企業庁 取引条件改善状況調査・下請Gメン chusho.meti.go.jp</td><td>下請取引の条件</td><td>新規打診の返信率・成約率は調査項目に無い</td><td>—</td><td>—</td><td>一次（該当なし）</td><td>—</td></tr>
+<tr><td>12</td><td>東京商工会議所 商談会事例「東商の商談会は、成約率が高いので…」 tokyo-cci.or.jp/page.jsp?id=1203806</td><td>事例1社（飲食）</td><td>—</td><td>—</td><td>「1社成約・3社が前向き」の定性記述のみ。率なし</td><td>一次（率なし）</td><td>—</td></tr>
+</tbody></table>
+<h3>答え</h3>
+<ul>
+<li>「個人/小規模事業者がメーカーに打診したときの返信率・成立率」で、EC STARs 以外の独立した数字は <b>2本</b>（#1 一次 N=14・#2 二次 N=98）。<b>公的統計は0本</b>（中小企業庁・JETRO・商工会議所とも「打診→成立」の率は公表していない）。</li>
+<li>2本の数字はばらつきが大きい: 返信率 21%（N=14）と 56%（N=98）、成立率 0%（N=14）と「取引OK」16%（N=98・成立とは別）。#2 は輸入ビジネスの実務者が外注に送らせたもので、個人事業主の初回打診と条件が同じとは言えない。</li>
+<li>EC STARs の「30社〜50社に1社（2〜3%）」は、#1（0/14）とも #2（16/98 が条件提示まで到達）とも矛盾しない標本サイズ。<b>3〜5% を裏づける独立データは無いが、否定するデータも無い</b>。</li>
+<li>事実として言えるのは「返信率は 20〜56% の範囲で観測例がある」「成立率は N=14 で 0」まで。成立率の置き値をどうするかはタケシ・マサルの領分。</li>
+</ul>
+<hr>
+<h2>S-d 第一陣20社のブランド登録の有無（閲覧のみ）</h2>
+<p>方法: 各社1ページ（T-20260906-005 <code>21_keepa検証ログ</code> の top_asin の商品ページ。Keepa で一致が無かった3社は Amazon 検索1ページ）を curl（ブラウザUA・4秒間隔・2026-09-13 04:43〜04:45）で取得し、HTML から次を読んだ。</p>
+<ul>
+<li>「ブランド:」byline のリンク先 —— <code>/stores/</code>（ブランドストア）／<code>/&lt;ブランド&gt;/b/?node=…</code>（ブランドの browse ノード）／<code>/s?field-keywords=</code>（検索）の3種</li>
+<li>「透明性」「Transparency」の文字列（HTML 全体）</li>
+<li>販売元・出荷元（1ページのカート出品者）</li>
+</ul>
+<p>判定基準（推測を含む・確度は中）: ブランドストアは Amazon 公式がブランド登録の機能として挙げている（sell.amazon.co.jp/brand-registry「Amazonストアに無料のサイトを作成」）ので、<b>ストアあり＝登録済みらしい</b>。browse ノードは Amazon 側が付けるもので登録の直接証拠ではないため<b>不明</b>。検索リンクのみ・「ノーブランド品」は<b>未登録らしい</b>。ブランド登録の有無そのものは公開されない。</p>
+<table><thead><tr><th>No</th><th>社</th><th>確認ページ</th><th>Amazon 上のブランド表示</th><th>ストア</th><th>透明性</th><th>販売元（その1ページ）</th><th>判定</th></tr></thead><tbody>
+<tr><td>1</td><td>有限会社大橋量器</td><td>dp/B08KVYTSJM</td><td>ブランド: 大橋量器（検索リンク）</td><td>なし</td><td>なし</td><td>わくわくらいふ（アマゾン店）・出荷 Amazon</td><td>未登録らしい</td></tr>
+<tr><td>2</td><td>株式会社木村硝子店</td><td>dp/B09B6SNCN1</td><td>ブランド: 木村硝子店（browse ノード）</td><td>なし</td><td>なし</td><td>いだてん・出荷 Amazon</td><td>不明</td></tr>
+<tr><td>3</td><td>楠橋紋織株式会社</td><td>dp/B0943MX2HP</td><td>ブランド: 楠橋紋織(Kusubashi Mon Ori)（browse ノード）</td><td>なし</td><td>なし</td><td>マンツーマン・出荷 Amazon</td><td>不明</td></tr>
+<tr><td>4</td><td>七福タオル株式会社</td><td>dp/B0739P6P6H</td><td>ブランド: 七福タオル（検索リンク）</td><td>なし</td><td>なし</td><td>お風呂のソムリエSHOPバスリエ</td><td>未登録らしい</td></tr>
+<tr><td>5</td><td>金野タオル株式会社</td><td>dp/B0FMQQQH7Z</td><td>ブランド: 金野タオル（検索リンク）</td><td>なし</td><td>なし</td><td>【公式】金野タオルTOWEL（メーカー直販・出荷 Amazon）</td><td>未登録らしい（直販あり）</td></tr>
+<tr><td>6</td><td>株式会社北尾化粧品部</td><td>dp/B01DIHGZV4</td><td>ブランド: 北尾化粧品部（検索リンク）</td><td>なし</td><td>なし</td><td>S.a.s.a.o.k.a.ya・出荷 Amazon</td><td>未登録らしい</td></tr>
+<tr><td>7</td><td>株式会社高柳製茶</td><td>dp/B082PCT4SP</td><td>ブランド: 株式会社 高柳製茶（検索リンク）</td><td>なし</td><td>なし</td><td>産直お取り寄せNセレクト</td><td>未登録らしい</td></tr>
+<tr><td>8</td><td>北陸製菓株式会社</td><td>dp/B0D1X85N53</td><td>ブランド: 北陸製菓（browse ノード）</td><td>なし</td><td>なし</td><td>（HTMLから取れず）</td><td>不明</td></tr>
+<tr><td>9</td><td>株式会社宇野刷毛ブラシ製作所</td><td>dp/B0DKBWCKC9</td><td>SOMOTO（他社ブランド。宇野は製造元表記のみ）</td><td>あり（SOMOTO のストア）</td><td>なし</td><td>SOMOTO【商標登録済】・出荷 Amazon</td><td>該当なし（自社ブランド出品なし。OEM 先ブランドが登録済み）</td></tr>
+<tr><td>10</td><td>廣田硝子株式会社</td><td>dp/B01BWGW3DM</td><td>ブランド: 廣田硝子(Hirota Glass)（browse ノード）</td><td>なし</td><td>なし</td><td>Amazon.co.jp</td><td>不明</td></tr>
+<tr><td>11</td><td>守田漆器株式会社</td><td>dp/B0CLQQ961F</td><td>ブランド: ノーブランド品</td><td>なし</td><td>なし</td><td>想いを繋ぐ百貨店【TSUNAGU】</td><td>未登録らしい</td></tr>
+<tr><td>12</td><td>池本刷子工業株式会社</td><td>dp/B0013IEEOG</td><td>ブランド: 池本刷子工業(Ikemoto Brush)（browse ノード）</td><td>なし</td><td>なし</td><td>Amazon.co.jp</td><td>不明</td></tr>
+<tr><td>13</td><td>木内籐材工業株式会社</td><td>dp/B0C135PF5Z</td><td>ブランド: ノーブランド品</td><td>なし</td><td>なし</td><td>想いを繋ぐ百貨店【TSUNAGU】</td><td>未登録らしい</td></tr>
+<tr><td>14</td><td>朝倉染布株式会社</td><td>dp/B09ZNX2ZJK</td><td>ブランド: 朝倉染布（検索リンク）</td><td>なし</td><td>なし</td><td>Amazon.co.jp</td><td>未登録らしい</td></tr>
+<tr><td>15</td><td>河野製紙株式会社</td><td>dp/B0FB8JQ8ZP</td><td>ブランド: 河野製紙（browse ノード）</td><td>なし</td><td>なし</td><td>河野製紙株式会社（メーカー直販・出荷 Amazon）</td><td>不明（直販あり）</td></tr>
+<tr><td>16</td><td>株式会社清水硝子</td><td>s?k=清水硝子</td><td>検索75件。上位は アデリア・他社の江戸切子。清水硝子ブランドの商品は確認できず</td><td>—</td><td>—</td><td>—</td><td>該当なし（Amazon 上に自社ブランド商品を確認できず）</td></tr>
+<tr><td>17</td><td>小野甚味噌醤油醸造株式会社</td><td>dp/B0DK8ST2WC</td><td>ブランド: 小野甚味噌醤油醸造（検索リンク）</td><td>なし</td><td>なし</td><td>（HTMLから取れず）</td><td>未登録らしい</td></tr>
+<tr><td>18</td><td>側島製罐株式会社</td><td>s?k=側島製罐</td><td>「一致する商品はありません」</td><td>—</td><td>—</td><td>—</td><td>該当なし</td></tr>
+<tr><td>19</td><td>本野はきもの工業</td><td>s?k=本野はきもの</td><td>「一致する商品はありません」</td><td>—</td><td>—</td><td>—</td><td>該当なし</td></tr>
+<tr><td>20</td><td>田中帽子店（窓口: 有限会社ビスポーク）</td><td>dp/B0083RSM2K</td><td>「田中帽子店のストアを表示」</td><td><b>あり</b></td><td>なし</td><td>BESPOKE（＝窓口会社・出荷 Amazon）</td><td><b>登録済みらしい</b></td></tr>
+</tbody></table>
+<p>集計: 登録済みらしい 1／不明 6／未登録らしい 9／該当なし 4。</p>
+<p>補足:</p>
+<ul>
+<li>「透明性」は17ページの HTML 全体に文字列なし（画像 alt も含む）。Keepa raw の brand と社名の一致（T-20260906-005 の検証ログ）で代替した社は無い。</li>
+<li>メーカー自身がカートを持つのは 金野タオル・河野製紙・田中帽子店（窓口会社）の3社。Amazon.co.jp 本体が販売元なのは 廣田硝子・池本刷子・朝倉染布の3社。残りは第三者出品者。</li>
+<li>宇野刷毛は SOMOTO ブランドの製造元として出ているだけで、宇野の名前の商品は無い。独占提案の相手として見るなら「Amazon 上に自社ブランドを持たない」側。</li>
+<li>1社1ページなので、同じ社の別 ASIN でストアが付いている可能性は残る（browse ノードの6社が特にそう）。確度を上げるには各社のブランドノードページを1ページずつ見れば足りる（追加 6 ページ）。</li>
+</ul>
+<hr>
+<h2>事実と推測の仕分け</h2>
+<table><thead><tr><th>区分</th><th>内容</th></tr></thead><tbody>
+<tr><td>事実</td><td>121 ASIN の ランク本体・COUNT_NEW・availabilityAmazon・価格・monthlySold（24件）は raw（2026-09-12）の値そのまま。S-c の各出典の数字は原文どおり（#2 だけ検索要約経由）。S-d の byline リンク種別・販売元は取得 HTML どおり</td></tr>
+<tr><td>推測（確度中）</td><td>推定層の月販「&lt;50 の中央 25」。ストアあり＝ブランド登録済み。browse ノード＝登録の証拠にならない</td></tr>
+<tr><td>推測（確度低）</td><td>10万位以下の帯の月販が 25 前後あること（社内標本では公表値0＝&lt;50 しか言えない）</td></tr>
+<tr><td>分からない</td><td>実セラー数（COUNT_NEW はオファー数）。カート獲得率。#2 の仕入れ成立数。browse ノード6社の登録有無</td></tr>
+</tbody></table>
+<h2>ここから先はタケシ（プランナー）とマサルの領分</h2>
+<ul>
+<li>取り分の置き値を 1.0倍のままにするか、ファミリー別中央 1.05・80%区間 0.2〜3.2 に置き換えるか。推定層の 25 を動かすと中央が動くので、感応度は「置き値25」でなく「実測層のみ」の分布で取るほうが安全。</li>
+<li>成立率 3% の根拠は EC STARs の目安1本のまま。独立データは N=14（0成立）と N=98（条件提示16%）。<b>1周目の送信結果そのものが、この国内で最も良い base rate になる</b>。</li>
+<li>独占提案の相手: ブランド登録済みらしいのは田中帽子店1社。未登録らしい9社は「相手がブランド登録していない＝独占の縛りが Amazon 上で効かない」側で、§3-2 の判定材料。</li>
+</ul>
+<h2>出典（取得日 2026-09-13）</h2>
+<ul>
+<li>Keepa raw: <code>workspace/output/agent_output/T-20260912-001/raw17/</code>（2026-09-12 取得・T-20260912-001 <code>fetch17.py</code>）</li>
+<li>Keepa フィールド定義: <code>workspace/output/agent_output/T-20260824-005/out/keepa-glossary-official.md</code>（§3.2 monthlySold・§3.3 COUNT_NEW・§3.7 availabilityAmazon）</li>
+<li>文房具標本: <code>workspace/output/agent_output/T-20260906-002/labeled_sample.json</code>（n=360・2026-09-06）／<code>workspace/output/deliverables/T-20260906-002/01_調査結果.md</code> §4</li>
+<li>マサル置き値: <code>workspace/output/deliverables/T-20260912-005/01_mc_案B.py</code> <code>ainori_rev=3e4</code></li>
+<li>Amazon 商品ページ: https://www.amazon.co.jp/dp/&lt;ASIN&gt;（表の ASIN・2026-09-13 04:43〜04:45 取得・HTML は scratchpad のみ）</li>
+<li>Amazon Brand Registry | Amazon出品サービス: https://sell.amazon.co.jp/brand-registry</li>
+<li>個人（個人事業主）でのメーカー開拓について（Amazon セラーフォーラム）: https://sellercentral.amazon.co.jp/seller-forums/discussions/t/63a58fce-c70d-4743-ae47-5028f8b43290</li>
+<li>国内メーカー98社 一斉に取引交渉メールを送ってみたら（輸入ビジネス de 沖縄移住ライフ）: http://okinawanomadlife.com/仕入について/国内メーカー98社-一斉に取引交渉メールを送って/（原典未取得・検索要約）</li>
+<li>【2026年版】Amazonメーカー仕入れは個人でも可能！月利50万を達成する最強7ステップ（EC STARs Lab.）: https://ecstarslab.com/blog/amazon-メーカー仕入れ-個人-2/</li>
+<li>メーカーから直接購入することができる手順をかんたん解説（EC STARs Lab.）: https://ecstarslab.com/blog/メーカー-直接-購入-メリット-デメリット/</li>
+<li>Amazon国内メーカー仕入れ 利益最大化入門（技術評論社）: https://gihyo.jp/book/2024/978-4-297-14273-5</li>
+<li>【調査】BtoBメールマーケ業界平均 2026（アントワ）: https://antoir.jp/btob-email-marketing-benchmark-2026/</li>
+<li>テレアポ平均成功率はどれくらい？（Scene Live）: https://scene-live.com/media/column/increased-appointment-rate/2921/</li>
+<li>【展示会出展の実態調査】（hammock.jp）: https://www.hammock.jp/hpr/media/exhibition_research.html</li>
+<li>2026年版 中小企業白書・小規模企業白書の概要（中小企業庁）: https://www.meti.go.jp/press/2026/04/20260424005/20260424005-1r.pdf</li>
+<li>新興国等への輸出を目指す200社以上の日本企業が参加「ジェトロ食品輸出商談会 at FOODEX JAPAN」: https://www.jetro.go.jp/news/releases/2026/52ecdb5ede605121.html</li>
+<li>ジェトロ食品輸出商談会 at SMTS: https://www.smts.jp/jp/organizer/JETRO.html</li>
+<li>「令和7年度取引条件改善状況調査」（中小企業庁）: https://www.chusho.meti.go.jp/keiei/torihiki/2025/251205chousa.html</li>
+<li>東商の商談会は、成約率が高いので毎回チェックしています（東京商工会議所）: https://www.tokyo-cci.or.jp/page.jsp?id=1203806</li>
+</ul></body></html>
