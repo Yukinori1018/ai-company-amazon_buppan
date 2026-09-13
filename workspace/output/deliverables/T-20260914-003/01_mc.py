@@ -135,7 +135,8 @@ def gen(R, P, plan, T):
     LEAD_SCALE = P.get("lead_scale", 1.0)
     orders = [[] for _ in range(T)]
     meta = dict(s_stop=None, s_reason="", fatigue=False, low=False, perm=False, inc=None, n_est=0, w_n=0, gems=0,
-                trial_adopt=0, trial_gate=0, g=None, h=None, early_ratio=None, s_rev_plan=0.0, sends=[], complaint=None, rakuten=None)
+                trial_adopt=0, trial_gate=0, g=None, h=None, early_ratio=None, s_rev_plan=0.0, sends=[], complaint=None, rakuten=None,
+                s_rev_k=[0.0] * T)
     wm = lognorm(R, 1.0, P["wm_sig"])
     harvest, resume = plan.get("harvest"), plan.get("resume")
     hnew = plan.get("harvest_new")     # 新規ロット（初回）だけ、この k 以降は買わない（補充は harvest まで）
@@ -337,7 +338,7 @@ def gen(R, P, plan, T):
                     if R.random() < surv:
                         amt = cost_rate(gm) * rg
                         orders[k].append((mk("S", gm, 1.2), amt))
-                        meta["s_rev_plan"] += rg
+                        meta["s_rev_plan"] += rg; meta["s_rev_k"][k] += rg
                         nxt.append((rg, gm))
                 live = nxt
                 for _ in range(n_new):
@@ -349,7 +350,7 @@ def gen(R, P, plan, T):
                     kb = R.random() < P["s_ek"]            # Keepa 側の需要の誤読 → 実売は読みの2割
                     r_true = rg * (0.2 if kb else 1.0)
                     first_lot(orders, k, "S", P["s_lot"], gm, rg, r_true, dead_rule=kb)
-                    meta["s_rev_plan"] += P["s_lot"] / cost_rate(gm)
+                    meta["s_rev_plan"] += P["s_lot"] / cost_rate(gm); meta["s_rev_k"][k] += P["s_lot"] / cost_rate(gm)
                     if not kb:
                         live.append((r_true, gm))
         else:   # タケシのせどり：定常月商 s_ss × 立ち上がり
@@ -364,12 +365,13 @@ def gen(R, P, plan, T):
                 rev = ss * ramp * lognorm(R, 1.0, 0.25)
                 mm = m0 - P["s_drift"] * k
                 orders[k].append((mk("S", mm, 1.3), cost_rate(mm) * rev))
-                meta["s_rev_plan"] += rev
+                meta["s_rev_plan"] += rev; meta["s_rev_k"][k] += rev
     return orders, meta
 
 
 def run_one(args):
     seed, P, plan, T = args
+    P = dict(P, **plan.get("Pov", {}))
     R = random.Random(seed)
     orders, meta = gen(R, P, plan, T)
     cfg = cf.Config(months=T, fixed_monthly=[P["fixed"]] * T)
@@ -390,7 +392,9 @@ def run_one(args):
     if meta["perm"]:   # 恒久停止：停止時点の在庫は他販路で原価の40%回収（売上として数えた分を差し戻す）
         dinc = cf.nth_month_start(cfg.start, meta["inc"])
         cash -= 0.65 * res["state"].inventory(dinc)
-    out = dict(cash=cash, thin=res["thin_cash"], profit=res["cum_profit"],
+    last = rows[-1]
+    close = last["月末現金"] + last["売掛"] + 0.8 * last["在庫"] - last["未払"] - cfg.cash0   # 手仕舞い値（在庫は原価の8割）
+    out = dict(cash=cash, thin=res["thin_cash"], profit=res["cum_profit"], close=close,
                rev=[r["売上"] for r in rows], prof=[r["利益"] for r in rows], inv=[r["在庫"] for r in rows],
                endcash=[r["月末現金"] for r in rows], ar=[r["売掛"] for r in rows], ap=[r["未払"] for r in rows],
                first_payout=str(res["first_payout"]))
@@ -424,6 +428,7 @@ def summ(res):
                 thin10=q([r["thin"] for r in res], .1), breach=sum(r["thin"] < 250_000 for r in res) / n,
                 rev9=q([r["rev"][8] for r in res], .5), rev12=q([r["rev"][11] for r in res], .5),
                 sstop=sum(1 for r in res if r["meta"]["s_stop"] is not None) / n,
+                pclose=sum(r["close"] > 0 for r in res) / n, close50=q([r["close"] for r in res], .5),
                 mean=sum(c) / n)
 
 
@@ -442,6 +447,9 @@ PLANS = {
     "C_none": dict(lanes="WMS", send="A", rule="none", harvest=H9),
     "C_written": dict(lanes="WMS", send="A", rule="as_written", harvest=H9),
     "C_redesign": dict(lanes="WMS", send="A", rule="redesign", harvest=H9, adopt_min=3),
+    # マサルの推奨形：初回ロット1ヶ月分・新規ロットは月8まで・せどりは「2週で採用0件 or 1件8分超」だけで止める
+    "C_best": dict(lanes="WMS", send="A", rule="redesign", harvest=H9, harvest_new=8, adopt_min=1, Pov=dict(first_hold=1.0)),
+    "B_best": dict(lanes="WM", send="B", rule="none", harvest=H9, harvest_new=8, Pov=dict(first_hold=1.0)),
 }
 
 
@@ -462,7 +470,9 @@ def main():
     P_("## 1. 案の比較（マサルの置き値）")
     P_(HDR)
     for key, lab in (("A", "案A 週10通"), ("B", "案B 週20通"), ("C_none", "案C せどりを1年続ける（撤退条件なし）"),
-                     ("C_written", "案C 撤退条件 S-1/S-2 を書面どおり"), ("C_redesign", "案C 撤退条件を採用率に一本化（2週で3件未満なら停止）")):
+                     ("C_written", "案C 撤退条件 S-1/S-2 を書面どおり"), ("C_redesign", "案C 撤退条件を採用率に一本化（2週で3件未満なら停止）"),
+                     ("B_best", "案B 推奨形（初回ロット1ヶ月分・新規は月8まで）"),
+                     ("C_best", "案C 推奨形（同上＋せどりは2週で採用0件か1件8分超だけで停止）")):
         r = run(MASARU, PLANS[key], N); keep[key] = r
         P_(row(lab, summ(r)))
     P_("")
@@ -493,12 +503,20 @@ def main():
     # ---- 3. せどりの寄与
     P_("## 3. せどりの寄与（pt）")
     sa, sb = summ(keep["A"]), summ(keep["B"])
-    for key, lab in (("C_none", "案C 1年続ける"), ("C_written", "案C 書面どおり"), ("C_redesign", "案C 一本化")):
+    for key, lab in (("C_none", "案C 1年続ける"), ("C_written", "案C 書面どおり"), ("C_redesign", "案C 一本化"), ("C_best", "案C 推奨形（案B 推奨形と比べる）")):
         s = summ(keep[key])
+        if key == "C_best":
+            sbb = summ(keep["B_best"])
+            P_(f"- {lab}: 案B推奨形比 {100 * (s['p'] - sbb['p']):+.0f}pt（中央 {man(s['p50'] - sbb['p50'])}）")
+            continue
         P_(f"- {lab}: 案A比 {100 * (s['p'] - sa['p']):+.0f}pt（中央 {man(s['p50'] - sa['p50'])}）／案B比 {100 * (s['p'] - sb['p']):+.0f}pt（中央 {man(s['p50'] - sb['p50'])}）")
     rc = keep["C_none"]
     sr = [r["meta"]["s_rev_plan"] for r in rc]
     P_(f"- せどりの12ヶ月売上（撤退条件なし）中央 {q(sr, .5) / 1e4:.0f}万（P20 {q(sr, .2) / 1e4:.0f}〜P80 {q(sr, .8) / 1e4:.0f}万）")
+    for kk, lab_ in ((2, "2026-12"), (5, "2027-03"), (8, "2027-06")):
+        xs_ = [r["meta"]["s_rev_k"][kk] for r in rc if r["meta"]["s_stop"] is None or r["meta"]["s_stop"] > kk]
+        if xs_:
+            P_(f"- せどりの月の仕入れ相当売上 {lab_}（続いている経路）: 中央 {q(xs_, .5) / 1e4:.0f}万（P20 {q(xs_, .2) / 1e4:.0f}〜P80 {q(xs_, .8) / 1e4:.0f}万）")
     gm = [r["meta"]["gems"] for r in rc]
     P_(f"- 採用した原石の数（12ヶ月）中央 {q(gm, .5)}（P20 {q(gm, .2)}〜P80 {q(gm, .8)}）")
     w = keep["C_written"]
@@ -533,10 +551,10 @@ def main():
     P_("")
 
     # ---- 5. マサルの感応度（案C 一本化）
-    P_("## 5. 感応度（案C・撤退条件を採用率に一本化・1変数ずつ）")
+    P_("## 5. 感応度（案C 推奨形・1変数ずつ）")
     P_("| 変数 | 悲観側 | 置き値 | 楽観側 |")
     P_("|---|---|---|---|")
-    b0 = summ(keep["C_redesign"])
+    b0 = summ(keep["C_best"])
     sens = [
         ("取り分の実現（0.85倍）", dict(real=0.5), dict(real=1.2)),
         ("メーカー成立率（混合）", dict(m_rate=[(0.015, 1.0)]), dict(m_rate=[(0.05, 1.0)])),
@@ -548,16 +566,18 @@ def main():
         ("値下げ応酬（月2%・−3pt）", dict(pw=0.06), dict(pw=0.0)),
     ]
     for lab, lo, hi in sens:
-        a = summ(run(dict(MASARU, **lo), PLANS["C_redesign"], NS)); c = summ(run(dict(MASARU, **hi), PLANS["C_redesign"], NS))
+        a = summ(run(dict(MASARU, **lo), PLANS["C_best"], NS)); c = summ(run(dict(MASARU, **hi), PLANS["C_best"], NS))
         P_(f"| {lab} | {a['p']:.0%}／{man(a['p50'])} | {b0['p']:.0%}／{man(b0['p50'])} | {c['p']:.0%}／{man(c['p50'])} |")
     P_("")
 
     # ---- 6. 発注停止の月
-    P_("## 6. 発注停止の月（案C 一本化）と、停止しない場合")
-    P_(HDR)
-    for hv, lab in ((8, "月9から停止（k≥8）"), (9, "月10から停止（既定）"), (10, "月11から停止"), (None, "停止しない")):
-        pl = dict(PLANS["C_redesign"], harvest=hv)
-        P_(row(lab, summ(run(MASARU, pl, NS))))
+    P_("## 6. 発注停止の月（案C 推奨形）と、停止しない場合。測り方3つ")
+    P_("| 運用 | P(実質現金>0)（中央） | P(累計損益>0)（中央） | P(手仕舞い値>0)（中央） | 日次最低 P10 | 月12の月商 中央 |")
+    P_("|---|---|---|---|---:|---:|")
+    for hv, hn, lab in ((8, 7, "月9から停止"), (9, 8, "月10から停止（既定）"), (10, 9, "月11から停止"), (None, None, "停止しない")):
+        pl = dict(PLANS["C_best"], harvest=hv, harvest_new=hn)
+        s = summ(run(MASARU, pl, NS))
+        P_(f"| {lab} | {s['p']:.0%}（{man(s['p50'])}） | {s['pp']:.0%}（{man(s['prof50'])}） | {s['pclose']:.0%}（{man(s['close50'])}） | {s['thin10'] / 1e4:.0f}万 | {s['rev12'] / 1e4:.0f}万 |")
     P_("")
 
     # ---- 6b. 設計の改善候補（最悪を避ける側）
@@ -577,7 +597,7 @@ def main():
 
     # ---- 7. 撤退条件の「中央で踏む確率」（案C 書面どおり／一本化）
     P_("## 7. 撤退条件を踏む確率")
-    for key in ("C_written", "C_redesign", "B"):
+    for key in ("C_written", "C_best", "B_best"):
         res = keep[key]; n = len(res)
         pr = lambda f: sum(1 for r in res if f(r)) / n
         cum = lambda r, t: sum(r["prof"][:t])
@@ -602,8 +622,8 @@ def main():
 
     # ---- 8. S-1 はゲートなし10%の世界で発動するか
     P_("## 8. S-1（ゲートなし率）の判定力と、せどりの価値")
-    rw = run(dict(MASARU), PLANS["C_none"], N)
-    rb2 = keep["B"]
+    rw = run(dict(MASARU, first_hold=1.0), dict(PLANS["C_none"], harvest_new=8), N)
+    rb2 = keep["B_best"]
     for gv in (0.10, 0.25, 0.45):
         sub = [r for r in rw if abs(r["meta"]["g"] - gv) < 1e-9]
         if not sub:
@@ -619,8 +639,8 @@ def main():
     P_("")
 
     # ---- 9. 早期の実測で分かれる確度（W8）
-    P_("## 9. W8（11/6）の実測で確度はどう分かれるか（案C 一本化）")
-    res = keep["C_redesign"]
+    P_("## 9. W8（11/6）の実測で確度はどう分かれるか（案C 推奨形）")
+    res = keep["C_best"]
     groups = [("最初の SKU の実現 ≥0.7", lambda r: r["meta"]["early_ratio"] is not None and r["meta"]["early_ratio"] >= 0.7),
               ("最初の SKU の実現 0.4〜0.7", lambda r: r["meta"]["early_ratio"] is not None and 0.4 <= r["meta"]["early_ratio"] < 0.7),
               ("最初の SKU の実現 <0.4", lambda r: r["meta"]["early_ratio"] is not None and r["meta"]["early_ratio"] < 0.4),
@@ -633,9 +653,20 @@ def main():
     sub = [r for r in res if r["meta"]["n_est"] >= 3]
     P_(f"- 参考 成立3社以上（12ヶ月内）: {len(sub) / len(res):.0%}")
     P_("")
+    P_("## 9b. 途中の累計損益で、最後の実質現金はどう分かれるか（撤退条件の較正用・案C 推奨形）")
+    for t, lab in ((4, "2027-01末"), (6, "2027-03末"), (9, "2027-06末")):
+        cums = [(sum(r["prof"][:t]), r["cash"]) for r in res]
+        P_(f"### {lab}（累計損益 中央 {man(q([c for c, _ in cums], .5))}／P20 {man(q([c for c, _ in cums], .2))}）")
+        P_("| 累計損益の帯 | 経路の割合 | P(実質現金>0) | 実質現金 中央 |")
+        P_("|---|---:|---:|---:|")
+        for lo, hi in ((-1e9, -80_000), (-80_000, -50_000), (-50_000, -20_000), (-20_000, 0), (0, 50_000), (50_000, 1e9)):
+            sub = [c2 for c1, c2 in cums if lo <= c1 < hi]
+            if sub:
+                P_(f"| {man(lo) if lo > -1e8 else '〜'}〜{man(hi) if hi < 1e8 else ''} | {len(sub) / len(cums):.0%} | {sum(x > 0 for x in sub) / len(sub):.0%} | {man(q(sub, .5))} |")
+    P_("")
 
     # ---- 10. 失敗した世界の内訳（案C 一本化）
-    P_("## 10. 実質現金がマイナスの世界に、何が起きていたか（案C 一本化）")
+    P_("## 10. 実質現金がマイナスの世界に、何が起きていたか（案C 推奨形）")
     bad = [r for r in res if r["cash"] <= 0]; good = [r for r in res if r["cash"] > 0]
     feats = [("取り分の実現（最初の SKU）<0.5", lambda r: r["meta"]["early_ratio"] is not None and r["meta"]["early_ratio"] < 0.5),
              ("月3までに SKU が立たない", lambda r: r["meta"]["early_ratio"] is None),
@@ -656,12 +687,12 @@ def main():
     P_("")
 
     # ---- 11. 年2（24ヶ月）: 月10停止→月13再開 vs 続ける
-    P_("## 11. 発注停止の年2への損失（24ヶ月・案C 一本化／案B）")
+    P_("## 11. 発注停止の年2への損失（24ヶ月・案C 推奨形／案B 推奨形）")
     P_("| 案 | 運用 | 12ヶ月の実質現金 中央（P） | 年2の月商 中央（月13／月15／月18／月24） | 年2の利益 中央 | 24ヶ月の実質現金 中央 | 24ヶ月の累計損益 中央 |")
     P_("|---|---|---|---|---:|---:|---:|")
-    for key in ("C_redesign", "B"):
+    for key in ("C_best", "B_best"):
         for hv, rs, lab in ((H9, 12, "月10〜12停止→月13再開"), (None, None, "続ける")):
-            pl = dict(PLANS[key], harvest=hv, resume=rs)
+            pl = dict(PLANS[key], harvest=hv, resume=rs, harvest_new=(8 if hv is not None else None))
             r24 = run(MASARU, pl, NS, T=24)
             # 12ヶ月時点の実質現金は 24ヶ月計算の途中値＝月12末の現金−未払−200万
             c12 = [r["endcash"][11] - r["ap"][11] - 2_000_000 for r in r24]
@@ -675,8 +706,8 @@ def main():
     P_("")
 
     # ---- 12. 3シナリオの代表経路（日次）
-    P_("## 12. 3シナリオの代表経路（案C 一本化・実質現金の P20／中央／P80 に最も近い経路を cf_base で表示）")
-    res = keep["C_redesign"]
+    P_("## 12. 3シナリオの代表経路（案C 推奨形・実質現金の P20／中央／P80 に最も近い経路を cf_base で表示）")
+    res = keep["C_best"]
     order = sorted(range(len(res)), key=lambda i: res[i]["cash"])
     reps = {}
     for p, lab in ((0.2, "悲観（P20）"), (0.5, "中央"), (0.8, "楽観（P80）")):
@@ -692,7 +723,7 @@ def main():
             P_(f"| {names[t]} | {r['rev'][t] / 1e4:.1f} | {r['prof'][t] / 1e4:+.1f} | {r['endcash'][t] / 1e4:.1f} | {r['inv'][t] / 1e4:.1f} | {r['ar'][t] / 1e4:.1f} | {r['ap'][t] / 1e4:.1f} |")
         P_("")
     # 4軸×3シナリオ（分位）
-    P_("### 4軸×3シナリオ（案C 一本化・各軸の P20／中央／P80）")
+    P_("### 4軸×3シナリオ（案C 推奨形・各軸の P20／中央／P80）")
     rv = lambda t: [r["rev"][t] for r in res]
     P_(f"- 月商（2027-06＝発注停止前の最大月）: {q(rv(8), .2) / 1e4:.0f}／{q(rv(8), .5) / 1e4:.0f}／{q(rv(8), .8) / 1e4:.0f}万")
     P_(f"- 累計損益: {man(q([r['profit'] for r in res], .2))}／{man(q([r['profit'] for r in res], .5))}／{man(q([r['profit'] for r in res], .8))}")
