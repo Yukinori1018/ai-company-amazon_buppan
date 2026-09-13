@@ -1,0 +1,119 @@
+<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>セット品規約と法人向け梱包 法務判定（T-20260914-001）</title><style>body{font-family:-apple-system,'Hiragino Sans','Noto Sans JP',sans-serif;max-width:1400px;margin:24px auto;padding:0 20px;line-height:1.6;color:#222;font-size:14px}h1{font-size:1.5em;border-bottom:2px solid #333;padding-bottom:6px}h2{font-size:1.25em;margin-top:2em;border-left:5px solid #2b5;padding-left:8px}h3{font-size:1.05em;margin-top:1.5em}table{border-collapse:collapse;margin:10px 0 18px;width:100%;font-size:13px}th,td{border:1px solid #bbb;padding:5px 8px;vertical-align:top;text-align:left}th{background:#f0f4f0}blockquote{border-left:4px solid #ccc;margin:10px 0;padding:4px 12px;color:#555;background:#fafafa}code{background:#f3f3f3;padding:1px 4px;border-radius:3px;font-size:12px}pre{background:#f3f3f3;padding:10px;overflow:auto}hr{border:0;border-top:1px solid #ddd;margin:24px 0}</style></head><body><h1>セット品規約と法人向け梱包 — 法務判定</h1>
+<ul>
+<li>チケット：T-20260914-001（親 T-20260912-002）／担当：法務ハルオ／判定日：2026-09-14</li>
+<li>対象：他 AI 引き継ぎ PDF（<code>docs/reference/amazon-roadmap-handoff-20260914/</code>）p.8「打ち手 A セット販売・大口梱包」「B Amazon Business」、p.10〜11「需要証明4法」</li>
+<li>前提：9/13 判定（<code>T-20260912-002/02</code> §1-6 A1）の「非食品・国産品・個装を開けない」を維持。本書はその「Amazon 規約の一次が未取得」を埋める</li>
+<li>確度の表記：一次＝発行者本人の文書を当職が取得。二次＝第三者の転載・要約。確度は高／中／低</li>
+</ul>
+<h2>0. 結論</h2>
+<p>セット品規約 G201645990 の本文は非ログインでは取れません（6 経路すべて SPA の殻）。代わりに、Amazon 自身の文書 3 点を一次で取りました。(a) Amazon がホストする英語版「Product Bundling Policy」全文（シンガポール店・PDF）、(b) 日本のセラーフォーラムで Amazon モデレーター／News_Amazon が投稿した FAQ・告知 3 本、(c) sell.amazon.co.jp の Amazon ビジネス公式ページ。日本語規約の逐語は出品者の引用 3 文とスニペットのみ（二次）。</p>
+<p>当社のセット組み案に効く条件トップ3：</p>
+<table><thead><tr><th>#</th><th>条件</th><th>根拠</th><th>確度</th></tr></thead><tbody>
+<tr><td>1</td><td>セットに固有の JAN を付ける。構成品の JAN を流用すると出品は即時削除</td><td>SG 規約「The identifier of any product in the bundle may not serve as the identifier for the bundle. Using a UPC from any single product in the bundle to identify the entire bundle may lead to immediate removal of the listing」／JP 引用「セット品の出品には、固有の標準的な製品コードまたはメーカー型番が必要です」</td><td>高</td></tr>
+<tr><td>2</td><td>セットのブランド欄は「最高額の構成品のブランド」。Satoy Select をセットのブランドにしない。バーチャルバンドル・Amazon Bulk Service は「自社ブランド登録済み ASIN」「ブランド認証」が前提で、メーカー品の組み合わせには使えない</td><td>SG 規約「the bundle itself should be branded according to the highest priced item in the bundle」／News_Amazon（日本）「ブランド登録済みASINをまとめて販売」「パッケージヒエラルキーを作成するには、ブランド認証が必要です」</td><td>高（JP 本文は未確認）</td></tr>
+<tr><td>3</td><td>個装を開けない・国産品のみ・外箱は「販売者：Satoy Select／製造者：各社」と書き分け、外箱で隠れる法定表示（化粧品は薬機法 61 条の事項、計量法の内容量、家表法）を外箱に再掲する</td><td>薬機法 62 条→51 条準用・13 条／計量法 13 条／PL 法 2 条 3 項／9/13 判定</td><td>高</td></tr>
+</tbody></table>
+<p>PDF の記述で訂正が要るもの：①「ブランド登録後はバーチャルバンドルが利用可能」→ 当社が登録するブランド（Satoy Select）の ASIN にしか使えない。メーカー品セットには不可。②「法人向け大口梱包は Amazon 自身が推奨」→ 手数料割引の Bulk Service はブランド認証＋構成ごとの固有 GTIN＋3,000 円以上＋（10 点以上 or 23,000cm³ or 16kg）が条件。③「ブランドを混ぜた詰め合わせは規約違反になり得る」→ SG 版はブランド混在を明文で許容。禁止はジェネリック（無ブランド）品の混入。</p>
+<h2>1. 取得結果</h2>
+<table><thead><tr><th>対象</th><th>取得</th><th>経路・結果</th></tr></thead><tbody>
+<tr><td>セット品規約 G201645990（JP）</td><td>本文不可</td><td>co.jp／.com／.ca、<code>/help/hub/reference/external/</code>・<code>/gp/help/external/</code>・<code>help.html?itemID=</code>、<code>?language=ja_JP</code>、<code>?mons_sel_locale=</code>、Googlebot UA：全て 200 だが SPA の殻（<code>&lt;title&gt;Amazon&lt;/title&gt;</code>・本文 0 件）。WebFetch も「ログインポータル」</td></tr>
+<tr><td>Product Bundling Policy（Amazon ホスト・SG 店・英語）</td><td>一次・全文</td><td><code>https://m.media-amazon.com/images/G/65/rainier/help./Product_Bundling_Policy.pdf</code>（3 頁・139KB）。G/09（日本）等の同名 PDF は 404</td></tr>
+<tr><td>JP セラーフォーラム FAQ「同じ商品を2つ以上のセットで販売する」</td><td>一次（Amazon モデレーター投稿）</td><td><code>sellercentral.amazon.co.jp/seller-forums/discussions/t/ed1973cd177c23550ad782a66586a9a8</code>。関連ヘルプ ID：G200492770（複数の商品から成るセット品に関する UPC ガイドライン）／G200494020（まとめ売りの商品パッケージ数 IPQ）／G201645990</td></tr>
+<tr><td>JP 告知「バーチャルバンドルを利用してブランド登録済みASINでセット商品を作成しましょう」</td><td>一次（News_Amazon）</td><td><code>…/discussions/t/037cde38-4dc7-4334-9117-90e0ba976cd6</code>（9 か月前）。ヘルプ「バーチャルセット品」G87HAE6PMKKM23Z7（ログイン後）</td></tr>
+<tr><td>JP 告知「Amazon Bulk Service ヘルプページに関する更新のお知らせ」</td><td>一次（News_Amazon）</td><td><code>…/discussions/t/90192e49-fd21-4c56-95b4-30e2858299a9</code>（2025-01-25 更新の要件）</td></tr>
+<tr><td>Amazon ビジネス（出品者向け）</td><td>一次</td><td><code>https://sell.amazon.co.jp/learn/what-is-amazonbusiness</code>／<code>https://sell.amazon.com/programs/amazon-business</code>／<code>https://sell.amazon.com/blog/case-packs-and-pallets</code>（2025-02-27）</td></tr>
+<tr><td>Business Essentials GVWZ8QXXLY9Y9Z4B</td><td>不可</td><td>.com／.co.jp／.ca とも殻。検索にも痕跡なし</td></tr>
+<tr><td>法令</td><td>一次</td><td>e-Gov 法令 API（<code>laws.e-gov.go.jp/api/1/lawdata/</code>）：薬機法 13・51・61・62 条／計量法 13 条／家表法 3・4 条／PL 法 2 条／景表法 2・5 条</td></tr>
+<tr><td>メルカリ利用規約・ガイド</td><td>一次</td><td><code>static.jp.mercari.com/tos</code>／<code>help.jp.mercari.com/guide/articles/900/</code></td></tr>
+<tr><td>LINE ヤフー共通利用規約</td><td>一次</td><td><code>https://www.lycorp.co.jp/ja/company/terms/</code> §2.1・2.2・14</td></tr>
+</tbody></table>
+<p>ログイン後に秘書ブラウザで取るもの（優先順）：G201645990 → G200494020 → G200492770 → G87HAE6PMKKM23Z7 → Bulk Service ヘルプ 3 本（概要・パッケージヒエラルキーの作成・販売手数料の割引）→ GVWZ8QXXLY9Y9Z4B → 法人限定出品 201740310 → FBA 梱包要件 G200141500。取得したら本書 §2 の「JP 未確認」を消し込みます。</p>
+<h2>2. セット品規約（PDF 打ち手 A・異なる商品の組み合わせ）</h2>
+<p>SG 版全文と JP 断片を突き合わせた結果、構造・文言が一致します（固有コード必須、同一商品複数は「まとめ売り」へ、全構成品が出品規約に準拠、画像・説明も準拠）。JP 版は同じ規約の翻訳と見ます（確度中）。以下、逐語は SG 版、JP 断片は明記。</p>
+<table><thead><tr><th>論点</th><th>規約の文言（逐語）</th><th>当社への判定</th></tr></thead><tbody>
+<tr><td>「相互に補完し合う」の定義</td><td>"Bundles must consist of items that are complementary (this means items in the bundle enable or enhance the use of other items in the bundle or provide convenience to the buyer by purchasing them together)."</td><td>条件付き可。「一緒に買うと便利」まで含む広い定義。同一メーカーの本体＋詰替、洗剤＋スポンジ等は通る。無関係な組み合わせ（偶発的詰め合わせ）はこの要件で落ちる</td></tr>
+<tr><td>同一ブランド要件</td><td>無し。"A bundle can be composed of different branded items, however the bundle itself should be branded according to the highest priced item in the bundle." "Do not include generic products in a bundle, as it may mislead customers into thinking the generic product belongs to the same brand as one of the branded products in the bundle."</td><td>ブランド混在は可（一次）。禁止はジェネリック品の混入。セットのブランド欄＝最高額構成品のブランド。JP フォーラムの実務は「ノーブランド品」で申請（出品者 3 名の報告・二次）。Satoy Select をブランド欄に書く案は SG 規約と衝突。JP 本文で要確認</td></tr>
+<tr><td>構成品の単品販売</td><td>"Bundles consist of multiple single items that can each be identified by a unique ASIN/UPC and are sold together as a single offering. A pre-packaged kit or pack with multiple items that is identified by a single ASIN/UPC is not considered a bundle."</td><td>構成品が単品 ASIN として存在することが前提。PDF の出口条件「構成品が単品でも売れること」は規約要件ではなく事業判断。可</td></tr>
+<tr><td>セット固有の JAN・ASIN</td><td>"The bundle must have its own standard product identifier or manufacturer part number. The identifier of any product in the bundle may not serve as the identifier for the bundle. Using a UPC from any single product in the bundle to identify the entire bundle may lead to immediate removal of the listing. You are responsible for obtaining a UPC for each bundle you create." JP 引用「セット品の出品には、固有の標準的な製品コードまたはメーカー型番が必要です。」「セット品に固有の標準的な製品コードまたはメーカー型番がない場合は、UPCを免除するための申請が必要」</td><td>必須。GS1 事業者コード（1 億円未満：1 年 17,050 円／3 年 27,500 円・9/13 一次）または製品コード免除申請。どちらも §4.1（規約同意・Amazon への申請）</td></tr>
+<tr><td>既存メーカー商品の再包装</td><td>規約は物理包装を規定しない（"sold together as a single offering"）。FBA では一体梱包し構成品の JAN を全て隠す（JP フォーラム実務・二次。FBA 梱包要件 G200141500 は未取得）</td><td>国産・真正品・個装を開けない → 可（商標の消尽・9/13）。輸入品の再包装 → 不可（並行輸入の品質保証機能・9/13）。JAN を隠すのは外箱・シュリンクで足りる。個装への上貼りは法定表示を隠すので不可（§6）</td></tr>
+<tr><td>画像・タイトルの表示規則</td><td>タイトル："Include the word 'Bundle' and the number of items in the bundle in the product title." 型 "[Main Product title] + 'Bundle with' + [Bundle Component Product title(s)]"、多点は "+ '(# Items)'"。箇条書き："Feature Bullet 1 … must state that the product is a bundle of 'X' number of items and must identify the products in the bundle." 説明："must state that the product is a bundle and must also identify the products in the bundle (with appropriate designators, such as model number, color, and size)." 画像："The main image for the bundle must include the specific products in the bundle (and must not include any items that are excluded from the bundle). Images of representative or similar products are not permitted." JP モデレーター FAQ「商品名にパッケージ数/セット数/箱数を明記してください」</td><td>条件付き可。タイトルに「セット」「点数」、箇条書き 1 行目に点数と構成品、説明に型番・色・サイズ、メイン画像は実物のみ。メーカー画像の流用は著作権（9/13）と本条の両方で不可。自分で撮る</td></tr>
+<tr><td>禁止（ブランド混在・偶発的詰め合わせ）</td><td>主商品がビデオゲーム／BMVD は不可。ジェネリック品混入不可。構成品 JAN の流用不可。既存セットへの相乗りは "must be exactly the same"、違えば新規作成、"You may not change the existing listing"。作成後の構成変更不可（"you may not modify the components"）。保証・延長サービス同梱不可。返品は "accept the entire bundle as a return and refund it as a single unit"</td><td>ブランド混在自体は禁止ではない。偶発的詰め合わせは「complementary」要件で落ちる。構成変更は新 JAN・新 ASIN。返品は全部戻り（部分返品不可）＝解体在庫が発生する前提で採算を見る</td></tr>
+<tr><td>手数料</td><td>"The referral fee for the primary product's category … applies to the entire bundle."</td><td>主商品カテゴリの料率。ハジメの試算は主商品カテゴリで計算する</td></tr>
+<tr><td>ノーブランド登録とゲート対象ブランドの構成品（サトルの質問）</td><td>"All products in bundles must comply with Selling Policies and Seller Code of Conduct. More specifically, all products within bundles must adhere to the guidelines for each category." JP 引用「すべてのセット品は、妥当性および適合性の審査対象になります」。JP フォーラム出品者の警告「単品をセット化すると真贋調査の対象になりうる」（二次）</td><td>セットをノーブランドで登録してもゲート対象ブランドの構成品の販売権限は別に要る（構成品の規約準拠が条件・当職の読み・確度中）。ゲート回避を目的にしたノーブランド登録は審査不適合＋真贋調査の入口。順序は「構成品のゲート解除（請求書）→ セット作成」</td></tr>
+<tr><td>審査・違反効果</td><td>JP 引用「すべてのセット品は、妥当性および適合性の審査対象になります」。SG "may result in removal without notice of any bundled product listing, account suspension, or both."</td><td>不可逆性高（アカウント停止）。1 セット目は少量で審査を通してから増やす</td></tr>
+</tbody></table>
+<p>判定：条件付き可（9/13 を維持、条件を規約で確定）。JP 本文未確認の残り：ブランド欄の扱い（最高額品 or ノーブランド）、タイトル文言の日本語版、審査の実務。</p>
+<h2>3. 大口梱包（同一商品 N 個パック・PDF 打ち手 A 後段）</h2>
+<p>同一商品の複数個は「セット品」ではなく「まとめ売り」です（SG "If an item is a multi-pack, such as six pairs of socks, list it as a single product and not as a bundle."）。ルートは 2 本。</p>
+<table><thead><tr><th>ルート</th><th>要件（逐語）</th><th>判定</th></tr></thead><tbody>
+<tr><td>① IPQ（商品パッケージ数）で同一 JAN の N 個 ASIN を作る</td><td>Amazon モデレーター FAQ「Amazonでは、メーカー包装された商品に割り当てられている製品コード（JAN/UPC/EAN ）を使用して、まとめ売りの出品が可能です。単品販売用の製品コードを使用して、同じ商品を2つ以上のセットで販売する場合は、商品パッケージ数（item-package-quantity）を入力し、商品名にパッケージ数/セット数/箱数を明記してください。」二次（G200494020 の検索スニペット）：1 JAN で最大 10 ASIN、全商品タイプで使えるわけではない、既存の N 個 ASIN があればそこに相乗り、無ければ新規</td><td>可。ブランド認証不要（FAQ に要件なし）。新規 ASIN 作成は大口プラン（当社は 9/12 大口へ切替済み）。FBA は一体梱包＋外装バーコード（フォーラム実務）。手数料割引は無い</td></tr>
+<tr><td>② Amazon Bulk Service（パッケージヒエラルキー：ユニット／ケース／パレット）</td><td>News_Amazon（2025-01-25 更新）「パッケージヒエラルキーを作成するには、ブランド認証が必要です。」「商品のパッケージ設定（ユニット、ケース、パレット）には、それぞれ異なる製品コード（GTIN、UPC、またはASINなど）が必要です。」「『服&amp;ファッション小物』、『シューズ』、『バックパック、ハンドバッグ、旅行かばん&amp;トラベル用品』、『ジュエリー』、『腕時計』を除くすべてのカテゴリー」「出品者出荷の商品およびAmazonから出荷される（FBA）商品の両方」。割引対象：「日本で販売」「販売価格が3,000円（税込）以上」「商品点数が10以上／容量が23,000立方センチメートル以上／重量が16kg以上のいずれか」。sell.amazon.co.jp「販売手数料に対して15～25%の割引」。米国ブログ：2〜9 個 15%・10〜23 個 20%・24 個以上 25%、資格 "either internal to or an authorized reseller for a brand enrolled in Brand Registry"（日本の段階値・reseller 可否は未確認）</td><td>条件付き可、ただし当社の本丸（ブランド未登録の中小メーカー）では使えない。使えるのは (a) メーカーがブランド登録済みで当社を認証する場合、(b) 当社ブランド（OEM・独占）の商品。ケースごとに固有 GTIN＝GS1 のコード消費が増える</td></tr>
+<tr><td>Business Essentials（GVWZ8QXXLY9Y9Z4B）</td><td>未取得</td><td>未確認（着手不可）。秘書ブラウザ</td></tr>
+</tbody></table>
+<p>パッケージ表示：外装に構成の固有 GTIN をスキャン可能に（米国ブログ "scannable on the package exterior"）、商品名に数量。個装の JAN は隠す（FBA 誤読防止）。法定表示は §6。</p>
+<h2>4. バーチャルバンドル</h2>
+<table><thead><tr><th>論点</th><th>一次</th><th>判定</th></tr></thead><tbody>
+<tr><td>日本で提供されているか</td><td>あり。News_Amazon（9 か月前）「日本ストアでブランドを管理されている出品者様は、バーチャルバンドルを使用してブランド登録済みASINをまとめて販売できるようになりました」「FBA在庫商品の２～５点の相性の良い商品を、物理的な梱包を必要とすることなく、一つの商品としてまとめて販売」。JP ヘルプ「バーチャルセット品」G87HAE6PMKKM23Z7 が存在</td><td>提供あり（高）</td></tr>
+<tr><td>ブランド登録が前提か</td><td>前提。上記＋米国 Amazon 投稿（Blake_Amazon）"Must be the brand owner registered in Brand Registry"、ASIN は "active FBA inventory in New condition"、"2-5 ASINs"、"price it at or below the price of all of the ASINs together"、デジタル商品・ギフトカード不可</td><td>前提。しかも「ブランド登録済み ASIN」＝自分がブランド所有者である ASIN に限る</td></tr>
+<tr><td>FBA 在庫のまま組めるか</td><td>組める（物理梱包不要。作成無料、通常の販売手数料・FBA 手数料）</td><td>可</td></tr>
+<tr><td>当社の用途（メーカー品の組み合わせ）</td><td>当社は各メーカーのブランド所有者ではない</td><td>不可。当社の商標出願（9/13）で登録できるのは Satoy Select ブランドの ASIN のみ。メーカー品を Satoy Select ブランドの ASIN として登録するのは商標法 4 条・不競法 2 条 1 項 1 号・セット品規約（ブランド＝最高額品）に反する</td></tr>
+<tr><td>射程外（使える場面）</td><td>打ち手 E の独占契約で当社ブランドとして出す商品、③ OEM 品</td><td>その段階で再判定</td></tr>
+</tbody></table>
+<h2>5. Amazon Business（PDF 打ち手 B）</h2>
+<table><thead><tr><th>論点</th><th>一次（sell.amazon.co.jp・2026-09-14）</th><th>判定</th></tr></thead><tbody>
+<tr><td>参加条件・費用</td><td>「大口プランの出品用アカウントがあれば追加費用なしですぐに始められるプログラム」。登録は出品用アカウント情報から「Amazon Businessへの登録」</td><td>可。登録＝プログラム規約への同意＝§4.1。規約本文（Amazon Business 出品プログラム規約）は未取得</td></tr>
+<tr><td>法人価格・数量割引</td><td>「法人価格・数量割引は5％OFF以上が推奨」「年に数回、通常販売価格から5%OFF以上の法人価格または数量割引が設定された商品の特集」。二次：最大 5 段階、在庫管理画面・在庫ファイル・ルールで設定</td><td>可。景表法 5 条 2 号の名宛人は当社。法人価格は事業者向けだが Amazon Business の購買者には個人事業主が含まれる。通常価格を先に吊り上げて「割引」を作る二重価格は不可</td></tr>
+<tr><td>法人限定出品</td><td>二次（ヘルプ 201740310・sobani 2026-04-30 更新）：在庫ファイルからのみ。business_price だけ入れ standard_price を空にする。standard_price を入れると解除</td><td>条件付き可（二次のみ）。ヘルプ本文は未取得</td></tr>
+<tr><td>請求書払い</td><td>「請求書を発行し、請求書による支払い…売掛金管理業務はAmazonが一括しておこなう」</td><td>可。売掛リスクは Amazon 側。入金サイトは経理で確認</td></tr>
+<tr><td>適格請求書</td><td>「適格請求書発行事業者登録番号をセラーセントラルに登録いただいた出品者の登録番号を請求書へ表示し…請求書を発行」</td><td>当社は免税事業者設定・インボイス未登録（memory）。法人購買者は仕入税額控除を取れない＝競争上不利。登録すると納税義務。経理ハジメの論点として送る</td></tr>
+<tr><td>Amazon Bulk Service</td><td>§3 ②</td><td>同上</td></tr>
+</tbody></table>
+<h2>6. 表示責任の移転（食品を除く消耗品）</h2>
+<table><thead><tr><th>法令</th><th>外箱に入れて固有 JAN を貼るだけ（個装を開けない）</th><th>個装を開ける・詰め替える・小分け</th></tr></thead><tbody>
+<tr><td>景表法 5 条・2 条 4 項</td><td>セットの点数・内容・価格の表示は「事業者が自己の供給する商品…について行う…表示」＝当社が名宛人。構成品の効能表示はメーカー表示のままでも、セットページに転記した瞬間に当社の表示</td><td>同左</td></tr>
+<tr><td>PL 法 2 条 3 項</td><td>外箱に「販売者：Satoy Select／製造者：各社」→ 2 号「自ら当該製造物の製造業者として…表示をした者」に当たらない。3 号「実質的な製造業者と認めることができる氏名等の表示」はセットに自社ブランド名を大きく付けるほど上がる</td><td>詰め替えは 1 号「加工」に当たり得る＝製造業者等。不可</td></tr>
+<tr><td>薬機法（化粧品）</td><td>61 条の記載事項（製造販売業者の氏名・住所、名称、製造番号、指定成分、使用期限等）が「外部の容器又は外部の被包を透かして容易に見ることができないときは、その外部の容器又は外部の被包にも、同様の事項が記載されていなければならない」（62 条→51 条準用）。透明外装なら不要、不透明外箱なら外箱に再掲</td><td>13 条「化粧品の製造業の許可を受けた者でなければ…製造をしてはならない」。小分け・詰め替え・表示の貼り替えは製造行為（確度中・通達未取得）。不可</td></tr>
+<tr><td>家表法 3・4 条</td><td>表示事項・遵守事項の義務者に「販売業者」。外箱で隠れるなら外箱にも表示（遵守事項＝告示。本文未取得、確度中）</td><td>同左＋タグ剥離は不可</td></tr>
+<tr><td>計量法 13 条</td><td>「特定商品の販売の事業を行う者は、その特定商品を…密封（…封紙を破棄しなければ…増加し、又は減少することができないようにすること）をするときは…その容器又は包装に…表記しなければならない」「表記する者の氏名又は名称及び住所を付記」。洗剤・シャンプー等の特定商品を外箱に入れて封をすれば密封に当たり得る → 外箱に内容量（各構成品の量）と当社名・住所</td><td>内容量を変える行為＝当社が計量・表記の義務者</td></tr>
+<tr><td>商標法・不競法</td><td>消尽で可（9/13）。輸入品は再包装不可</td><td>国産でも個装を替えれば品質保証機能を害する。不可</td></tr>
+<tr><td>電安法 27 条</td><td>PSE 表示を隠さない（9/13）</td><td>同左</td></tr>
+</tbody></table>
+<p>判定：外箱＋JAN のみ＝条件付き可（表示 4 点：販売者／製造者の書き分け、化粧品 61 条事項の再掲、内容量＋氏名住所、家表法表示）。個装を開ける＝不可（化粧品は許可制、その他も PL 1 号・商標）。</p>
+<h2>7. 需要証明4法（PDF §7）</h2>
+<table><thead><tr><th>方法</th><th>判定</th><th>根拠</th><th>条件</th></tr></thead><tbody>
+<tr><td>① 楽天／Yahoo!ショッピングのレビュー数・価格を人が見て記録</td><td>可（9/6・9/13 維持）</td><td>LINE ヤフー共通利用規約 §14「当社サービスやそれらを構成するデータを、その提供目的を超えて利用することができません」は §2.1・2.2 で非会員にも及ぶが、NO の射程は自動取得・データの再利用。人が閲覧して件数・価格帯を手で記録する行為は「データの利用」に当たらない（当職の読み・確度中）</td><td>人が見る／手で数値のみ記録／社内限定／自動取得・API 不可（楽天 WS 規約 10 条 (4)(6)(9)）／PUBLIC リポ不可</td></tr>
+<tr><td>② メルカリ・ヤフオクの成約履歴を人が見て記録</td><td>条件付き可（新規判定・確度中）</td><td>メルカリ利用規約 8 条「弊社は、本サービスに接したユーザー及び第三者の、ガイドの禁止されている行為に該当する…行為…を禁止します」＝非会員にも及ぶ。ガイド（articles/900）「弊社が提供するインターフェイスとは別の手法を用いてサービスにアクセスすること」「弊社の事前の書面による許可なく、弊社のサービス外のところで、商業目的で、弊社が提供するあらゆるサービス、コンテンツ、情報、システム、機能、プログラムなどの全部または一部を利用すること」。後者は文言が広く、成約価格の転記が「情報の商業目的利用」に読める余地がある。ヤフオクは ① と同じ §14</td><td>①と同条件＋商品説明・画像・出品者名は転記しない（件数・価格帯・日付のみ）。リスクシナリオ：メルカリの利用制限（会員なら垢停止）。対応：通知があれば即中止し記録を廃棄。撤退条件：メルカリ・LINE ヤフーから差止通知</td></tr>
+<tr><td>③ 隣接 ASIN（本体×交換周期）からの推算（Keepa）</td><td>可</td><td>Keepa 規約 §2(2)（自社業務目的）・§11(2)（保存して自社業務で使う権利）</td><td>PUBLIC リポには出さない（ASIN 20 件しきい値・既定）</td></tr>
+<tr><td>④ 問屋・メーカーへの聞き取り</td><td>可（§4.1 第三者連絡）</td><td>法的障害なし。NETSEA の問合せ機能は「利用者の権利の行使の範囲」（9/12）</td><td>下書きは当社が作り、送信は社長</td></tr>
+</tbody></table>
+<h2>8. §4.1 の一手と撤退条件</h2>
+<table><thead><tr><th>一手</th><th>種別</th><th>誰が</th></tr></thead><tbody>
+<tr><td>GS1 事業者コード貸与規約への同意・17,050 円</td><td>規約同意・金銭</td><td>社長</td></tr>
+<tr><td>製品コード免除申請（GS1 を使わない場合）</td><td>Amazon への申請</td><td>社長（フォーム入力は秘書）</td></tr>
+<tr><td>Amazon Business 出品プログラムへの登録</td><td>規約同意</td><td>社長</td></tr>
+<tr><td>Bulk Service／ブランド登録の申請</td><td>規約同意</td><td>社長（当社ブランド品が出る段階）</td></tr>
+<tr><td>問屋・メーカーへの聞き取り</td><td>第三者連絡</td><td>社長送信・当社下書き</td></tr>
+</tbody></table>
+<p>撤退条件：セット品の審査で「妥当性・適合性」不適合が 2 回続く／セット ASIN が削除される／AHR にポリシー違反が 1 件でも付く → セット組みを止め、単品相乗り or IPQ まとめ売りに戻す。</p>
+<h2>9. 不可・未確認の一覧</h2>
+<table><thead><tr><th>区分</th><th>項目</th></tr></thead><tbody>
+<tr><td>不可</td><td>メーカー品のバーチャルバンドル／輸入品の再包装セット／化粧品の個装開封・小分け／ジェネリック品の混入／構成品 JAN の流用／楽天・Yahoo・メルカリの自動取得</td></tr>
+<tr><td>未確認（着手不可・ログイン後に取る）</td><td>JP セット品規約 G201645990 本文／G200492770／G200494020／バーチャルセット品 G87HAE6PMKKM23Z7／Bulk Service ヘルプ 3 本／Business Essentials GVWZ8QXXLY9Y9Z4B／Amazon Business 出品プログラム規約／法人限定出品 201740310／FBA 梱包要件 G200141500／家表法告示の外装表示要件／薬機法の小分け＝製造の通達</td></tr>
+</tbody></table>
+<h2>10. 出典（確認日 2026-09-14）</h2>
+<table><thead><tr><th>#</th><th>文書</th><th>URL</th><th>種別</th></tr></thead><tbody>
+<tr><td>1</td><td>Product Bundling Policy（Amazon・SG 店）</td><td>https://m.media-amazon.com/images/G/65/rainier/help./Product_Bundling_Policy.pdf</td><td>一次</td></tr>
+<tr><td>2</td><td>JP フォーラム FAQ（Forum_Moderator4）</td><td>https://sellercentral.amazon.co.jp/seller-forums/discussions/t/ed1973cd177c23550ad782a66586a9a8</td><td>一次</td></tr>
+<tr><td>3</td><td>JP 告知 バーチャルバンドル（News_Amazon）</td><td>https://sellercentral.amazon.co.jp/seller-forums/discussions/t/037cde38-4dc7-4334-9117-90e0ba976cd6</td><td>一次</td></tr>
+<tr><td>4</td><td>JP 告知 Amazon Bulk Service（News_Amazon）</td><td>https://sellercentral.amazon.co.jp/seller-forums/discussions/t/90192e49-fd21-4c56-95b4-30e2858299a9</td><td>一次</td></tr>
+<tr><td>5</td><td>US 投稿 Learn about Virtual Bundles（Blake_Amazon）</td><td>https://sellercentral.amazon.com/seller-forums/discussions/t/d231bce4-d878-4f01-84c5-ad4d8796fa2b</td><td>一次</td></tr>
+<tr><td>6</td><td>Amazon ビジネス（出品者向け・日本）</td><td>https://sell.amazon.co.jp/learn/what-is-amazonbusiness</td><td>一次</td></tr>
+<tr><td>7</td><td>Amazon Business（US）／Case packs and pallets（2025-02-27）</td><td>https://sell.amazon.com/programs/amazon-business ／ https://sell.amazon.com/blog/case-packs-and-pallets</td><td>一次</td></tr>
+<tr><td>8</td><td>JP フォーラム 出品者による規約引用</td><td>https://sellercentral.amazon.co.jp/seller-forums/discussions/t/8ecd6b4d4b6615b8e405607298298fb7 ほか 4 本</td><td>二次</td></tr>
+<tr><td>9</td><td>axalpha（2026-04-15）／bxo（2026-03-29）バーチャルバンドル記事</td><td>PDF 出典 16 ほか</td><td>二次</td></tr>
+<tr><td>10</td><td>sobani 法人限定出品（2026-04-30 更新）</td><td>https://sobani.co.jp/columnlist/amazon-corporation-restrict-product</td><td>二次</td></tr>
+<tr><td>11</td><td>薬機法・計量法・家表法・PL 法・景表法</td><td>https://laws.e-gov.go.jp/api/1/lawdata/{335AC0000000145, 404AC0000000051, 337AC0000000104, 406AC0000000085, 337AC0000000134}</td><td>一次</td></tr>
+<tr><td>12</td><td>メルカリ利用規約／ガイド</td><td>https://static.jp.mercari.com/tos ／ https://help.jp.mercari.com/guide/articles/900/</td><td>一次</td></tr>
+<tr><td>13</td><td>LINE ヤフー共通利用規約</td><td>https://www.lycorp.co.jp/ja/company/terms/</td><td>一次</td></tr>
+<tr><td>14</td><td>9/13 判定（A1・商標・GS1・SP-API）</td><td>workspace/output/deliverables/T-20260912-002/02_複合戦略_法務判定.md</td><td>社内</td></tr>
+</tbody></table></body></html>
