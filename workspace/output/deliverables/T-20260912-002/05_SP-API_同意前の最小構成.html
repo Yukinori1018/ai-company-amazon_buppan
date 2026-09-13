@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SP-API 同意前の最小構成（設計と雛形）</title>
+<meta name="robots" content="noindex, nofollow">
+<style>
+:root{
+  color-scheme: light dark;
+  --bg:#ffffff; --surface:#f5f7f9; --surface2:#eceff3;
+  --text:#1b1f24; --muted:#525b66; --faint:#6c7681;
+  --border:#d5dae1; --border-strong:#b8c0ca;
+  --accent:#1c5b86; --accent-bg:#eef5fa;
+  --warn:#8a4b00; --warn-bg:#fdf1df; --warn-border:#dd9a3c;
+  --alert:#7d2b2b; --alert-bg:#fbeeee; --alert-border:#d08b8b;
+  --ok:#1b6144; --ok-bg:#eaf4ef; --ok-border:#8ab9a3;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#15181c; --surface:#1d2126; --surface2:#252a31;
+    --text:#e4e8ec; --muted:#aab4bf; --faint:#949eaa;
+    --border:#333a43; --border-strong:#48515c;
+    --accent:#79b4dc; --accent-bg:#1a2a36;
+    --warn:#f0b866; --warn-bg:#332616; --warn-border:#7a5a2a;
+    --alert:#e79a9a; --alert-bg:#331e1e; --alert-border:#6e4040;
+    --ok:#84cfa9; --ok-bg:#17281f; --ok-border:#3c6450;
+  }
+}
+*{box-sizing:border-box;}
+html{ -webkit-text-size-adjust:100%; }
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic Medium","Yu Gothic",
+              "Noto Sans JP","Meiryo",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:16px; line-height:1.85;
+  font-feature-settings:"palt" 1;
+  text-align:left;
+}
+.wrap{max-width:900px; margin:0 auto; padding:32px 20px 96px;}
+
+/* ---------- header ---------- */
+.kicker{
+  font-size:12px; letter-spacing:.14em; color:var(--faint);
+  margin:0 0 10px; font-variant-numeric:tabular-nums;
+}
+h1{
+  font-size:27px; line-height:1.5; margin:0 0 20px;
+  letter-spacing:.01em; font-weight:700; text-wrap:balance;
+}
+.lead{
+  margin:0; color:var(--muted); font-size:15px; line-height:1.8;
+  border-left:3px solid var(--border-strong); padding:2px 0 2px 14px;
+}
+
+/* ---------- toc ---------- */
+.toc{
+  margin:30px 0 8px; padding:18px 22px 20px;
+  background:var(--surface); border:1px solid var(--border); border-radius:10px;
+}
+.toc-h{
+  margin:0 0 10px; font-size:13px; font-weight:700;
+  letter-spacing:.1em; color:var(--muted);
+}
+.toc ul.toc-list{margin:0; padding:0; list-style:none;}
+.toc li{margin:.26em 0; line-height:1.65;}
+.toc li.toc-lv1{margin:.85em 0 .3em; font-weight:700;}
+.toc li.toc-lv1:first-child{margin-top:0;}
+.toc li.toc-lv2{padding-left:1.1em;}
+.toc li.toc-lv3{padding-left:2.5em; font-size:14.5px; color:var(--muted); margin:.16em 0;}
+.toc li.toc-lv3::before{content:"–"; color:var(--faint); margin-right:.45em;}
+.toc a{color:var(--accent); text-decoration:none; border-bottom:1px solid transparent;}
+.toc a:hover{border-bottom-color:currentColor;}
+
+/* ---------- part ---------- */
+h1.part{
+  font-size:24px; line-height:1.5; font-weight:700; letter-spacing:.02em;
+  margin:64px 0 8px; padding:14px 0 0; border-top:4px solid var(--text);
+  scroll-margin-top:16px;
+}
+
+/* ---------- sections ---------- */
+.sec{margin:0;}
+.sec>*:last-child{margin-bottom:0;}
+h2{
+  font-size:21px; line-height:1.5; margin:46px 0 16px; padding-bottom:9px;
+  border-bottom:2px solid var(--border-strong); font-weight:700;
+  scroll-margin-top:16px;
+}
+h3{
+  font-size:17px; line-height:1.6; margin:32px 0 12px; font-weight:700;
+  color:var(--text); scroll-margin-top:16px;
+}
+h3::before{content:""; display:inline-block; width:4px; height:1em;
+  background:var(--accent); margin-right:9px; vertical-align:-.13em; border-radius:2px;}
+p{margin:0 0 1.1em;}
+ul,ol{margin:0 0 1.2em; padding-left:1.6em;}
+li{margin:.4em 0;}
+li>ul{margin:.45em 0 .2em;}
+blockquote{
+  margin:0 0 1.2em; padding:14px 18px;
+  background:var(--surface); border-left:4px solid var(--accent); border-radius:0 8px 8px 0;
+}
+blockquote p{margin:0;}
+hr.rule{
+  border:0; border-top:1px solid var(--border);
+  margin:40px 0 0; opacity:.55;
+}
+hr.rule:has(+ .sec-box),hr.rule:has(+ h1.part){display:none;}
+
+/* ---------- tables ---------- */
+.tw{
+  overflow-x:auto; -webkit-overflow-scrolling:touch;
+  margin:0 0 1.4em; border:1px solid var(--border); border-radius:9px;
+  background:
+    linear-gradient(to right, var(--bg) 30%, rgba(0,0,0,0)) left / 28px 100% no-repeat local,
+    linear-gradient(to left,  var(--bg) 30%, rgba(0,0,0,0)) right / 28px 100% no-repeat local,
+    radial-gradient(farthest-side at 0 50%, rgba(90,110,130,.28), rgba(0,0,0,0)) left / 12px 100% no-repeat scroll,
+    radial-gradient(farthest-side at 100% 50%, rgba(90,110,130,.28), rgba(0,0,0,0)) right / 12px 100% no-repeat scroll;
+}
+.tw:focus{outline:2px solid var(--accent); outline-offset:2px;}
+table{border-collapse:collapse; width:100%; font-size:14.5px; line-height:1.72;}
+thead th{
+  background:var(--surface2); text-align:left; font-weight:700;
+  padding:11px 14px; border-bottom:2px solid var(--border-strong);
+  white-space:nowrap; vertical-align:bottom;
+}
+tbody td{padding:11px 14px; border-bottom:1px solid var(--border); vertical-align:top;
+  overflow-wrap:anywhere;}
+tbody tr:last-child td{border-bottom:0;}
+tbody tr:nth-child(even){background:color-mix(in srgb, var(--surface) 55%, transparent);}
+tbody td:first-child{font-weight:600;}
+thead th:first-child,tbody td:first-child{min-width:7.5em;}
+thead th:last-child,tbody td:last-child{white-space:normal;}
+
+/* ---------- inline markers ---------- */
+.ref{
+  font-size:.75em; color:var(--faint); margin-left:.15em;
+  white-space:nowrap; font-variant-numeric:tabular-nums;
+  letter-spacing:.01em; vertical-align:.06em;
+}
+/* [#n] は出典表に行がある時だけリンクになる。見た目は span と同じにして
+   本文の印象を変えない（追加したのは移動手段だけで、文字は足していない） */
+a.ref{text-decoration:none;}
+a.ref:hover,a.ref:focus{color:var(--accent); text-decoration:underline;}
+.chk{
+  display:inline-block; font-size:.75em; line-height:1.5;
+  padding:0 .5em; margin:0 .12em; border-radius:4px;
+  background:var(--warn-bg); color:var(--warn);
+  border:1px solid var(--warn-border); font-weight:700;
+  white-space:nowrap; vertical-align:.09em;
+}
+
+/* ---------- inline emphasis ---------- */
+strong{font-weight:700; color:var(--text);}
+td strong,th strong{font-weight:700;}
+pre.codeblock{white-space:pre-wrap; word-break:break-all; background:rgba(127,127,127,.10); border:1px solid rgba(127,127,127,.35); border-radius:6px; padding:14px 16px; line-height:1.7; font-size:14px; overflow-x:auto;}
+pre.codeblock code{background:none; border:0; padding:0; font-size:inherit;}
+code{
+  font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+  font-size:.9em; padding:.05em .35em; border-radius:4px;
+  background:var(--surface2); border:1px solid var(--border);
+}
+code .chk{font-family:inherit;}
+
+/* ---------- 表セル内の語ハイライト ---------- */
+.pill{
+  display:inline-block; padding:0 .45em; border-radius:4px;
+  font-weight:700; white-space:nowrap;
+}
+.pill-danger{background:var(--alert); color:#fff; border:1px solid var(--alert);}
+.pill-warn{background:var(--warn-bg); color:var(--warn); border:1px solid var(--warn-border);}
+.pill-ok{background:var(--ok-bg); color:var(--ok); border:1px solid var(--ok-border);}
+.pill-info{background:var(--accent-bg); color:var(--accent); border:1px solid var(--accent);}
+/* muted は「検証していない」を表す。塗らず・破線で、済んだものと視覚的に別系統にする */
+.pill-muted{background:transparent; color:var(--faint);
+  border:1px dashed var(--border-strong); font-weight:600;}
+tbody tr.row-danger td:first-child{box-shadow:inset 4px 0 0 var(--alert);}
+tbody tr.row-danger td{background:color-mix(in srgb, var(--alert-bg) 70%, transparent);}
+
+/* ---------- 出典一覧（--reftable） ---------- */
+table.reftable:has(colgroup){table-layout:fixed; min-width:600px;}
+/* 狭い画面で列が1〜2文字幅に潰れるのを防ぐ。溢れは .tw の横スクロールが受ける */
+table.reftable td:first-child{
+  min-width:2.6em; width:2.6em; text-align:right; white-space:nowrap;
+  font-variant-numeric:tabular-nums; color:var(--muted);
+}
+table.reftable th:first-child{min-width:2.6em; width:2.6em; text-align:right;}
+tbody tr[id]{scroll-margin-top:14px;}
+tbody tr[id]:target td{background:var(--accent-bg);}
+tbody tr[id]:target td:first-child{box-shadow:inset 4px 0 0 var(--accent); color:var(--accent);}
+
+/* ---------- emphasised sections ---------- */
+.sec-box{
+  margin:28px 0 0; padding:6px 26px 20px;
+  border:1px solid var(--border-strong); border-radius:10px;
+}
+.sec-box h2{margin-top:26px;}
+.sec-box .tw{background-color:var(--bg);}
+.sec-conclusion{background:var(--accent-bg); border-left:6px solid var(--accent);}
+.sec-conclusion h2{border-bottom-color:var(--accent);}
+.sec-alert{background:var(--alert-bg); border-color:var(--alert-border);
+  border-left:6px solid var(--alert);}
+.sec-alert h2{border-bottom-color:var(--alert-border);}
+.sec-danger{background:var(--alert-bg); border:2px solid var(--alert);
+  border-left:10px solid var(--alert);}
+.sec-danger h2{border-bottom-color:var(--alert);}
+.sec-warn{background:var(--warn-bg); border-color:var(--warn-border);
+  border-left:6px solid var(--warn-border);}
+.sec-warn h2{border-bottom-color:var(--warn-border);}
+.sec-checklist{background:var(--surface); border:2px solid var(--border-strong);
+  border-left:10px solid var(--accent);}
+.sec-checklist h2{border-bottom-color:var(--accent);}
+/* チェックリストは印刷して手元で使う。番号は原稿どおり残し、記入欄だけ CSS で足す */
+.sec-checklist ol{list-style:decimal; padding-left:1.9em;}
+.sec-checklist ol>li{margin:.7em 0; padding-left:2.1em; position:relative;}
+.sec-checklist ol>li::before{
+  content:""; position:absolute; left:0; top:.25em;
+  width:1.15em; height:1.15em; border:1.5px solid var(--border-strong);
+  border-radius:3px; background:var(--bg);
+}
+
+/* ---------- toc: 囲み枠の節は目次でも色を付ける ---------- */
+.toc a.toc-danger,.toc a.toc-alert{color:var(--alert); font-weight:700;}
+.toc a.toc-warn{color:var(--warn); font-weight:700;}
+.toc a.toc-checklist{color:var(--accent); font-weight:700;}
+
+/* ---------- footer / nav ---------- */
+.prov{
+  margin:56px 0 0; padding-top:16px; border-top:1px solid var(--border);
+  font-size:12.5px; line-height:1.8; color:var(--faint); word-break:break-all;
+}
+.top{
+  position:fixed; right:18px; bottom:18px; z-index:5;
+  display:block; width:42px; height:42px; line-height:40px; text-align:center;
+  border-radius:50%; text-decoration:none; font-size:17px;
+  background:var(--surface); color:var(--muted);
+  border:1px solid var(--border-strong);
+  box-shadow:0 2px 8px rgba(0,0,0,.14);
+}
+.top:hover{color:var(--accent); border-color:var(--accent);}
+
+/* ---------- narrow screens ---------- */
+@media (max-width:640px){
+  body{font-size:15.5px;}
+  .wrap{padding:22px 14px 88px;}
+  h1{font-size:22px;}
+  h1.part{font-size:20px; margin-top:46px;}
+  h2{font-size:19px;}
+  h3{font-size:16.5px;}
+  .toc{padding:14px 16px 16px;}
+  .sec-box{padding:4px 14px 14px;}
+  table{font-size:14px;}
+  thead th,tbody td{padding:9px 11px;}
+}
+
+/* ---------- print ---------- */
+@media print{
+  :root{
+    --bg:#fff; --surface:#fff; --surface2:#fff; --text:#000; --muted:#333; --faint:#555;
+    --border:#999; --border-strong:#555; --accent:#000; --accent-bg:#fff;
+    --warn:#000; --warn-bg:#fff; --warn-border:#000;
+    --alert:#000; --alert-bg:#fff; --alert-border:#000;
+  }
+  body{background:#fff; color:#000; font-size:10.5pt; line-height:1.7;}
+  .wrap{max-width:none; padding:0;}
+  a{color:#000; text-decoration:none;}
+  .top{display:none;}
+  .tw{overflow:visible; background:none; border:1px solid #999;}
+  table{font-size:9pt;}
+  thead th{background:#fff; border-bottom:1.5pt solid #000;}
+  tbody tr:nth-child(even){background:#fff;}
+  .sec-box{background:#fff; border:1.5pt solid #000;}
+  .sec-danger{border:2.5pt solid #000; border-left:2.5pt solid #000;}
+  .chk{background:#fff; color:#000; border:1pt solid #000;}
+  pre.codeblock{background:#fff; border:1px solid #999; break-inside:avoid;}
+  code{background:#fff; border:1px solid #999;}
+  .pill{background:#fff!important; color:#000!important; border:1.2pt solid #000!important;}
+  /* 未検証は印刷でも「済んだもの」と別に見えなければ意味がない。
+     モノクロでは色が消えるので、破線と濃度で差を残す */
+  .pill-muted{border:1pt dashed #666!important; color:#555!important; font-weight:400!important;}
+  /* 長いURLは印刷で紙幅を超える。折り返しを許可して溢れを止める */
+  .tw{overflow:hidden;}
+  table{table-layout:auto; width:100%;}
+  tbody td{overflow-wrap:anywhere; word-break:break-word;}
+  thead th{white-space:normal;}
+  table.reftable{font-size:7.6pt; line-height:1.5;}
+  table.reftable thead th,table.reftable tbody td{padding:5px 6px;}
+  tbody tr[id]:target td{background:#fff;}
+  tbody tr.row-danger td{background:#fff;}
+  tbody tr.row-danger td:first-child{box-shadow:inset 3pt 0 0 #000;}
+  /* チェックリストは1枚で手元に置けるよう独立ページにする */
+  .sec-checklist{break-before:page; page-break-before:always;
+    border:1.5pt solid #000; border-left:1.5pt solid #000;}
+  .sec-checklist ol>li::before{border:1.2pt solid #000;}
+  .ref{color:#555; opacity:1;}
+  blockquote{background:#fff; border-left:3pt solid #000;}
+  h1.part{break-before:page; page-break-before:always; border-top:2.5pt solid #000;
+    font-size:15pt; margin-top:0;}
+  h1.part,h2,h3{break-after:avoid; page-break-after:avoid;}
+  .tw,blockquote,tr{break-inside:avoid; page-break-inside:avoid;}
+  .toc{border:1px solid #999; background:#fff;}
+}
+</style>
+</head>
+<body id="top">
+<div class="wrap">
+<p class="kicker">T-20260912-002 / IT タカシ</p>
+<h1>SP-API 同意前の最小構成（設計と雛形）</h1>
+<p class="lead">IT タカシ／2026-09-13／T-20260912-002（親）</p>
+<nav class="toc" aria-label="目次"><p class="toc-h">目次</p><ul class="toc-list"><li class="toc-lv2"><a href="#s1" class="toc-conclusion">0. 結論</a></li><li class="toc-lv2"><a href="#s2">1. DPP §1 の要件 → 当社の環境への当てはめ</a></li><li class="toc-lv2"><a href="#s3">2. リポジトリ側の境界</a></li><li class="toc-lv3"><a href="#s3-1">2-1. 構成図（1.1.3 用）</a></li><li class="toc-lv3"><a href="#s3-2">2-2. 置き場の原則：<strong>リポの外</strong></a></li><li class="toc-lv3"><a href="#s3-3">2-3. deliverables に書いてよいもの／だめなもの</a></li><li class="toc-lv3"><a href="#s3-4">2-4. <code>.gitignore</code> 追加行案（<strong>まだ適用しない</strong>。社長判断後に秘書経由で）</a></li><li class="toc-lv2"><a href="#s4">3. 雛形コード <code>adapters/spapi_min.py</code></a></li><li class="toc-lv3"><a href="#s4-1">3-1. 作るもの／作らないもの</a></li><li class="toc-lv3"><a href="#s4-2">3-2. データ表</a></li><li class="toc-lv3"><a href="#s4-3">3-3. 工数（社長判断「実装 Go」後・成立 3 社以上で着手）</a></li><li class="toc-lv2"><a href="#s5">4. 登録手順（社長の一手の分解）</a></li><li class="toc-lv3"><a href="#s5-1">4-1. 画面の順番と、誰が何をするか</a></li><li class="toc-lv3"><a href="#s5-2">4-2. 登録フォームに要る情報</a></li><li class="toc-lv3"><a href="#s5-3">4-3. Roles（確度中・要確認）</a></li><li class="toc-lv3"><a href="#s5-4">4-4. 社長のターミナル操作（一手③④の続き。鍵を入れるのは本人だけ）</a></li><li class="toc-lv2"><a href="#s6" class="toc-warn">5. やらないこと</a></li><li class="toc-lv2"><a href="#s7">6. リスク評価（1.6.1・1 枚・年 1 回見直し）</a></li><li class="toc-lv2"><a href="#s8">7. インシデント対応 runbook（1.6.2〜1.6.5）</a></li><li class="toc-lv3"><a href="#s8-1">7-1. 「インシデント」と数えるもの</a></li><li class="toc-lv3"><a href="#s8-2">7-2. 24 時間以内の手順</a></li><li class="toc-lv3"><a href="#s8-3">7-3. 認可取消・鍵ローテの手順（1.2.3・1.4.2 共用）</a></li><li class="toc-lv3"><a href="#s8-4">7-4. 記録票（1.6.4）</a></li><li class="toc-lv2"><a href="#s9">8. 定期作業カレンダー</a></li><li class="toc-lv2"><a href="#s10" class="toc-alert">9. 未確認（推測で埋めていない）</a></li><li class="toc-lv2"><a href="#s11">10. 出典</a></li></ul></nav>
+<p>対象：統合報告 論点⑤（登録だけ1周目・実装は成立3社以上で）と論点⑪（同意前に最小構成を用意してよいか）。<br>本書は<strong>設計と雛形まで</strong>です。開発者登録・規約同意・API キー取得・<code>.gitignore</code> 変更・DB 作成は<strong>していません</strong>（§4.1／社長判断後）。</p>
+<p>法務判定（ハルオ 02 §1-7）の前提を引き継ぎます：DPP §1 は規約同意の時点から全部かかる。PII 不問。SP-API 由来の情報は集計値でも PUBLIC リポに置けない（AUP 4.6）。</p>
+<hr class="rule">
+<section id="s1" class="sec sec-box sec-conclusion">
+<h2>0. 結論</h2>
+<div class="tw" tabindex="0"><table><thead><tr><th>項目</th><th>数字</th></tr></thead><tbody><tr><td>DPP §1 の要件</td><td>18 項目（1.1.1〜1.8 ＋ §3 記録保持）</td></tr><tr><td>うち今の Mac で既に満たす</td><td>6</td></tr><tr><td>うち本書（文書・手順）で満たす</td><td>8</td></tr><tr><td>うち<strong>社長の一手が要る</strong>（設定変更・メール送信）</td><td>3（ファイアウォール ON／ログイン失敗ロック／インシデント時のメール送信）</td></tr><tr><td>うち未達で実装が要る</td><td>1（鍵のローテーション記録＝雛形に含めた）</td></tr><tr><td>実装工数（社長判断「実装 Go」後）</td><td>3〜4 人日。審査待ち（数日〜数週）は別</td></tr><tr><td>登録で社長がクリックする回数</td><td>4 手（§4 参照）。うち §4.1 は 3 手</td></tr><tr><td>費用</td><td>0 円</td></tr></tbody></table></div>
+<p>推奨：論点⑪は「可」で進めて損がありません。0 円・社内作業・不可逆な操作なし。ただし本書 §1 の「社長の一手」2 件（ファイアウォール・ロック）は<strong>規約同意より前</strong>に済ませる順番です。</p>
+</section>
+<hr class="rule">
+<section id="s2" class="sec">
+<h2>1. DPP §1 の要件 → 当社の環境への当てはめ</h2>
+<p>出典：DPP 本文（2026-09-13 取得 <code>sellercentral.amazon.com/mws/static/policy?documentType=DPP</code>）。当社の環境は 2026-09-13 に読み取りコマンドで実測（設定は変えていない）。</p>
+<p>状態の凡例：済＝実測で満たす／文書＝本書に書いて満たす／<strong>一手</strong>＝社長の操作が要る／実装＝コードで満たす（雛形あり）</p>
+<div class="tw" tabindex="0"><table><thead><tr><th>条項</th><th>要件（要旨）</th><th>当社の実装（最小）</th><th>実測・根拠</th><th>状態</th></tr></thead><tbody><tr><td>1.1.1 ネットワーク保護</td><td>ファイアウォール・ACL・ID ベースのアクセス制御</td><td>Mac 1 台・ローカルのみ・待ち受けサーバなし。macOS ファイアウォールを ON</td><td><code>socketfilterfw --getglobalstate</code> → <strong>disabled (State=0)</strong></td><td><strong>一手</strong>（システム設定 → ネットワーク → ファイアウォール ON）</td></tr><tr><td>1.1.2 端末保護</td><td>端末保護ソフトの無効化・改変を防ぐ</td><td>macOS 標準（XProtect・Gatekeeper・SIP）。管理者パスワード無しに無効化できない</td><td><code>csrutil status</code> → enabled</td><td>済</td></tr><tr><td>1.1.3 文書化</td><td>ネットワーク・端末保護の文書と構成図</td><td>本書 §2 の構成図（1 台・1 人・ローカル）</td><td>—</td><td>文書</td></tr><tr><td>1.2.1 アクセス管理プロセス</td><td>申請・承認・付与・棚卸し・剥奪の手順を文書化</td><td>Approved User は社長 1 名。追加は本書改訂＋秘書チケットで承認</td><td>—</td><td>文書</td></tr><tr><td>1.2.2 ロックアウト</td><td>連続 10 回以内の失敗でロック</td><td>macOS ローカルアカウントにロック方針を設定</td><td><code>pwpolicy -getaccountpolicies</code> → <strong>maxFailedLoginAttempts 未設定</strong></td><td><strong>一手</strong>（§4-4 のコマンド。社長のみ実行可）</td></tr><tr><td>1.2.3 退職・役割変更 24 時間以内に剥奪</td><td>—</td><td>1 名運用。該当時＝Keychain の項目削除＋Seller Central で認可取消（§7-3）</td><td>—</td><td>文書</td></tr><tr><td>1.2.4 Approved User のみ・年 1 回の教育</td><td>—</td><td>社長 1 名。年 1 回本書 §1・§7 を読み、日付を §8 の表に記入</td><td>—</td><td>文書</td></tr><tr><td>1.3 最小権限</td><td>必要最小限のアクセス</td><td>Roles は Pricing・Product Listing の 2 つだけ申請（PII 系 Restricted は申請しない）。DB を読むのは <code>spapi_min.py</code> だけ</td><td>3 エンドポイントに必要な Roles（確度中・§4-3）</td><td>文書＋実装</td></tr><tr><td>1.4.1 MFA・12 文字以上</td><td>全ユーザーアカウントに MFA、パスワード 12 文字以上</td><td>Amazon セラー：電話 2FA 済み（memory <code>project_amazon_login_entrypoint</code>）。Mac ログイン：<strong>12 文字以上かは社長確認</strong></td><td>2FA 済みは既知。Mac は未確認</td><td>済（Amazon）／社長確認（Mac）</td></tr><tr><td>1.4.2 API 資格情報の保存時暗号化・12 か月ごとローテ</td><td>—</td><td>client_id／client_secret／refresh_token は <strong>macOS Keychain</strong>（AES-256・FileVault 二重）。平文ファイル・<code>.env</code> に置かない。ローテは年 1 回、§8 の表で管理</td><td>FileVault → <strong>On</strong>。Keychain 方式は Keepa MCP で既定化済み（memory <code>knowledge_mcp_secret_storage_design</code>）</td><td>済（保管）／実装（ローテ記録）</td></tr><tr><td>1.5 通信の暗号化</td><td>TLS 1.2 以上</td><td>雛形で <code>ssl.TLSVersion.TLSv1_2</code> を最低値に固定</td><td>Python 3.9.6／LibreSSL 2.8.3（TLS 1.2 対応）</td><td>実装</td></tr><tr><td>1.6.1 リスク評価（年 1 回・経営層レビュー）</td><td>—</td><td>本書 §6 の 1 枚。年 1 回社長が見直す</td><td>—</td><td>文書</td></tr><tr><td>1.6.2 インシデント対応計画（半年ごと見直し）</td><td>—</td><td>本書 §7 の runbook。半年ごとに §8 へ日付</td><td>—</td><td>文書</td></tr><tr><td>1.6.3 24 時間以内に security@amazon.com へ通知</td><td>—</td><td>秘書が §7-2 の雛形で下書き → <strong>社長が送信</strong>（外部発信＝§4.1）</td><td>—</td><td><strong>一手</strong>（発生時のみ）</td></tr><tr><td>1.6.4 調査と記録</td><td>—</td><td>§7-4 の記録票</td><td>—</td><td>文書</td></tr><tr><td>1.6.5 IMPOC（連絡窓口）</td><td>—</td><td>社長。登録フォームの Contact と同じ</td><td>—</td><td>文書</td></tr><tr><td>1.7 30 日以内の削除</td><td>Amazon の要請・契約終了から 30 日以内</td><td><code>spapi_min.py purge</code>（DB ファイルと WAL を削除）。<strong>削除は §4.1</strong>なので、要請を受けたら秘書が即日 waiting に出し 30 日内に承認を得る</td><td>—</td><td>実装＋文書</td></tr><tr><td>1.8 出所の識別</td><td>専用 DB か出所タグ</td><td><strong>専用 SQLite</strong>（他データと混ぜない）＋全行に <code>source='SP-API'</code>・<code>fetched_at</code></td><td>—</td><td>実装</td></tr><tr><td>§3 記録保持</td><td>契約中＋終了後 12 か月</td><td>アクセスログを DB 内 <code>access_log</code> に保持。データ本体は 18 か月で自動失効（公式ガイダンスの Non-PII 上限）</td><td>—</td><td>実装</td></tr></tbody></table></div>
+<p>Mac の画面ロックは実測 300 秒（5 分）で、ハルオ判定の「15 分ロック」を満たします（<code>sysadminctl -screenLock status</code>）。</p>
+<p>DPP §2（PII）は <strong>Restricted Role を申請しない限りかかりません</strong>。当社の 3 エンドポイントに PII はありません。公式の「Key Security Control Guidance」ページにある月次脆弱性スキャン・年次ペネトレーションテスト等は §1・§2 が混ざった一覧で、拘束するのは DPP 本文です。本書は DPP §1 の文言だけを満たします（余分に作らない）。</p>
+</section>
+<hr class="rule">
+<section id="s3" class="sec">
+<h2>2. リポジトリ側の境界</h2>
+<h3 id="s3-1">2-1. 構成図（1.1.3 用）</h3>
+<pre class="codeblock"><code>[社長の Mac 1 台・FileVault On・ローカルユーザー 1 名]
+   ├─ macOS Keychain ──── client_id / client_secret / refresh_token（暗号化・リポ外）
+   ├─ ~/Library/Application Support/satoy-spapi/spapi.sqlite（専用 DB・リポ外）
+   └─ リポ（PUBLIC・30 分ごと自動 push）
+        ├─ adapters/spapi_min.py（コードのみ。データ・鍵は含まない）
+        └─ deliverables/（可否・件数・当社の決定だけ）
+外部通信：api.amazon.com（LWA）・sellingpartnerapi-fe.amazon.com（JP）のみ。TLS 1.2+。待ち受けポートなし。</code></pre>
+<h3 id="s3-2">2-2. 置き場の原則：<strong>リポの外</strong></h3>
+<p><code>.gitignore</code> を信じる設計にしません（PUBLIC・自動 push・<code>git add -f</code> 一発で公開。memory <code>knowledge_public_repo_leak_prevention</code>）。SP-API 由来のデータはリポの外に置き、<code>.gitignore</code> は二重の保険にとどめます。</p>
+<div class="tw" tabindex="0"><table><thead><tr><th>種類</th><th>置き場</th><th>Git</th></tr></thead><tbody><tr><td>鍵（client_id／secret／refresh_token）</td><td>macOS Keychain（service <code>satoy-spapi</code>）</td><td>外</td></tr><tr><td>生データ・派生集計・利益計算の中間表</td><td><code>~/Library/Application Support/satoy-spapi/spapi.sqlite</code></td><td>外</td></tr><tr><td>一時的な作業 CSV</td><td><code>workspace/output/agent_output/spapi/</code>（既に ignore 対象）</td><td>除外</td></tr><tr><td>コード・本書・手順</td><td><code>adapters/spapi_min.py</code>・<code>deliverables/</code></td><td>追跡</td></tr></tbody></table></div>
+<h3 id="s3-3">2-3. deliverables に書いてよいもの／だめなもの</h3>
+<div class="tw" tabindex="0"><table><thead><tr><th>書いてよい</th><th>書かない（AUP 4.6「individually labelled or aggregated」）</th></tr></thead><tbody><tr><td>当社の決定（発注する／しない、自社の出品価格）</td><td>NumberOfOffers・BuyBox 価格・最安値（ASIN 単位）</td></tr><tr><td>件数（例「候補 27 件中ゲートあり 3 件」）</td><td>ASIN ごとの <code>reasonCode</code>・承認申請 URL</td></tr><tr><td>ゲート判定の<strong>可否</strong>（○／×）を ASIN 20 件未満の表に添える（ハルオのしきい値運用に揃える）</td><td>手数料の金額・料率（ASIN 単位・平均とも）</td></tr><tr><td>「SP-API で確認済み」という事実</td><td>SP-API 値を使った利益額の一覧表（派生集計）</td></tr></tbody></table></div>
+<p>利益額の表は SP-API の手数料を使った瞬間に派生物になります。本書は<strong>載せない側</strong>に倒しました。載せたい場合はハルオに「当社の意思決定の結果」として扱えるか確認してください（未判定）。</p>
+<h3 id="s3-4">2-4. <code>.gitignore</code> 追加行案（<strong>まだ適用しない</strong>。社長判断後に秘書経由で）</h3>
+<pre class="codeblock"><code># ── SP-API 由来データ（AUP 4.6：集計値も外部開示不可）。正は ~/Library/Application Support/satoy-spapi/ ──
+**/spapi*.sqlite
+**/spapi*.sqlite-wal
+**/spapi*.sqlite-shm
+**/spapi_*.csv
+**/spapi_*.json
+workspace/output/**/spapi/</code></pre>
+<p>pre-commit（<code>.githooks/pre-commit</code>）への追加候補：<code>Atzr|</code>・<code>Atza|</code>・<code>amzn1.application-oa2.client.</code> の後に 20 文字以上続く行を「強い印」として止める（値付きだけ検知＝実装コードは通す）。これも案のみ。</p>
+</section>
+<hr class="rule">
+<section id="s4" class="sec">
+<h2>3. 雛形コード <code>adapters/spapi_min.py</code></h2>
+<p>実体は同フォルダの <a href="05_adapters_spapi_min.py"><code>05_adapters_spapi_min.py</code></a>。<strong>実行していません。鍵を要求しません。</strong><code>netsea.py</code> の流儀（docstring 先頭に用途制限・<code>is_live</code>／<code>last_error</code> で正直に・例外を握らない）に揃えています。</p>
+<h3 id="s4-1">3-1. 作るもの／作らないもの</h3>
+<div class="tw" tabindex="0"><table><thead><tr><th>作る</th><th>作らない（YAGNI）</th></tr></thead><tbody><tr><td>LWA refresh_token → access_token（1 時間キャッシュ）</td><td>通知 API・Feeds・Reports・注文</td></tr><tr><td><code>get_item_offers(asin)</code>・<code>get_listing_restrictions(asin)</code>・<code>get_fees_estimate(asin, price)</code> の 3 本</td><td>v2022-05-01 <code>getCompetitiveSummary</code>（バッチ）。件数が増えたら検討</td></tr><tr><td>エンドポイントごとのトークンバケット（0.5／5／1 rps）</td><td>並列・非同期</td></tr><tr><td>専用 SQLite（<code>offers</code>・<code>restrictions</code>・<code>fees</code>・<code>access_log</code>・<code>key_rotation</code>）</td><td>ダッシュボード・UI</td></tr><tr><td><code>purge</code>（1.7）・<code>expire</code>（18 か月）・<code>rotation-status</code>（1.4.2）</td><td>Web サーバ・外部公開</td></tr><tr><td>鍵は Keychain から <code>security find-generic-password</code> で読む</td><td><code>.env</code>・環境変数・設定ファイル</td></tr></tbody></table></div>
+<h3 id="s4-2">3-2. データ表</h3>
+<div class="tw" tabindex="0"><table><thead><tr><th>表</th><th>主キー</th><th>列（抜粋）</th><th>用途</th></tr></thead><tbody><tr><td><code>offers</code></td><td>asin, fetched_at</td><td>number_of_offers_json, buybox_price, lowest_price, sales_rank, source</td><td>出品者数・カート価格の時点値</td></tr><tr><td><code>restrictions</code></td><td>asin, fetched_at</td><td>reason_code, approval_url, source</td><td>ゲート判定</td></tr><tr><td><code>fees</code></td><td>asin, price, is_fba, fetched_at</td><td>total_fees, fee_detail_json, source</td><td>手数料の公式値</td></tr><tr><td><code>access_log</code></td><td>id</td><td>ts, op, asin, http_status, note</td><td>§3 記録保持（12 か月以上）</td></tr><tr><td><code>key_rotation</code></td><td>id</td><td>rotated_at, what, by</td><td>1.4.2 の年次ローテ記録</td></tr></tbody></table></div>
+<h3 id="s4-3">3-3. 工数（社長判断「実装 Go」後・成立 3 社以上で着手）</h3>
+<div class="tw" tabindex="0"><table><thead><tr><th>作業</th><th>人日</th></tr></thead><tbody><tr><td>LWA トークン更新＋Keychain 読み出し＋TLS 固定</td><td>0.5</td></tr><tr><td>3 エンドポイント＋レート制限＋エラーの正直な保存</td><td>1.0</td></tr><tr><td>SQLite スキーマ・purge・expire・access_log</td><td>0.5</td></tr><tr><td>CLI＋録画レスポンスでのテスト（本番を叩かない）</td><td>1.0</td></tr><tr><td>ローテ手順の実機確認・runbook 検証</td><td>0.5</td></tr><tr><td>合計</td><td><strong>3.5（3〜4）</strong></td></tr></tbody></table></div>
+</section>
+<hr class="rule">
+<section id="s5" class="sec">
+<h2>4. 登録手順（社長の一手の分解）</h2>
+<p>出典：公式「Register as a Private SP-API Developer」「Register your Application」「Authorize Private Applications」（2026-09-13 取得）。前提：大口（2026-09-12 切替済み）・Primary User でログイン。</p>
+<h3 id="s5-1">4-1. 画面の順番と、誰が何をするか</h3>
+<div class="tw" tabindex="0"><table><thead><tr><th>#</th><th>画面・操作</th><th>誰が</th><th>§4.1</th><th>備考</th></tr></thead><tbody><tr><td>1</td><td>Seller Central にログイン（memory の正規手順：<code>.com</code> 入口 → 日本切替）</td><td>社長（ログイン＝本人のみ）</td><td>—</td><td>「Solution Provider Portal に移行済み」の案内が出たら<strong>進まず秘書に報告</strong>（未確認の分岐）</td></tr><tr><td>2</td><td>メニュー → Apps and Services → <strong>Develop Apps</strong></td><td>秘書（ブラウザ操作）</td><td>—</td><td><strong>開くだけでは申請にならない</strong>。フォームが表示されるだけ</td></tr><tr><td>3</td><td>Developer Profile の入力：Contact Information／Data Access＝「Private Developer」／Roles／Use Cases／Security Controls</td><td>秘書が下書きを入力。社長は確認</td><td>—</td><td>入力内容は §4-2・§4-3。500 語以内・AUP/DPP の文言をコピーしない（公式の指示）</td></tr><tr><td>4</td><td>同意チェック（Solution Provider Portal Agreement・AUP・DPP）→ <strong>Register</strong></td><td><strong>社長</strong></td><td><strong>該当（法的拘束）</strong></td><td><strong>一手①</strong>。ここで DPP §1 の義務が発生</td></tr><tr><td>5</td><td>審査待ち。追加照会は<strong>5 日以内に返信</strong>（過ぎると案件が閉じる）</td><td>秘書が下書き・社長が送信</td><td>外部発信</td><td>一手②（照会があった場合のみ）</td></tr><tr><td>6</td><td>承認後：Develop Apps → <strong>Add new app client</strong> → フォーム（アプリ名・API type＝SP-API・Roles）</td><td>秘書が入力</td><td>—</td><td>送信すると <strong>client_id／client_secret が発行</strong>される</td></tr><tr><td>7</td><td>フォーム送信（＝API キー取得）</td><td><strong>社長</strong></td><td><strong>該当（API キー取得）</strong></td><td><strong>一手③</strong>。表示された値は秘書が読まない。社長が Keychain へ投入（§4-4）</td></tr><tr><td>8</td><td>同画面の <strong>Authorize app</strong> → refresh_token 表示</td><td><strong>社長</strong></td><td><strong>該当</strong></td><td><strong>一手④</strong>。ボタンを押した瞬間に発行される。<strong>押すまでは何も起きない</strong></td></tr></tbody></table></div>
+<p>「開くだけで申請になる画面」は<strong>ありません</strong>。送信になるのは #4 Register・#6 フォーム送信・#8 Authorize app の 3 つのボタンです。秘書は #2〜#3・#6 の入力までを行い、3 つのボタンは押しません。</p>
+<h3 id="s5-2">4-2. 登録フォームに要る情報</h3>
+<div class="tw" tabindex="0"><table><thead><tr><th>項目</th><th>当社の値</th><th>出所</th></tr></thead><tbody><tr><td>組織名・連絡先</td><td>屋号 Satoy Select／社長の氏名・メール・電話（Seller Central 登録と同じ）</td><td>社長が確認</td></tr><tr><td>Data Access</td><td>Private Developer: I build application(s) that integrate my own company with Amazon Services APIs</td><td>公式手順</td></tr><tr><td>Roles</td><td>Pricing／Product Listing（§4-3）</td><td>確度中</td></tr><tr><td>Use Cases（原文で・500 語以内）</td><td>下書き：「自社の出品候補について、(1) 出品制限の有無 (2) 現在の出品者数とカート価格 (3) 手数料見積を、自社の仕入れ判断のために取得する。取得した情報は自社の Mac 1 台のローカル DB にのみ保存し、第三者に提供・公開しない。PII は取得しない。」（秘書が英訳・整形）</td><td>本書</td></tr><tr><td>Security Controls</td><td>§1 の表をそのまま答える（FileVault・Keychain・TLS1.2・1 名・ローカル DB・24h 通知・30 日削除）</td><td>本書</td></tr><tr><td>PII を扱うか</td><td><strong>扱わない</strong>（Restricted Role を申請しない）</td><td>ハルオ 02 §1-7</td></tr></tbody></table></div>
+<p>Security Controls の設問の<strong>正確な文面は未取得</strong>（画面がログイン後）。W1「SP-API 登録画面の要件確認」で秘書が #2 まで開いて設問を写し、本書 §1 と対応づけてから #4 に進んでください。</p>
+<h3 id="s5-3">4-3. Roles（確度中・要確認）</h3>
+<div class="tw" tabindex="0"><table><thead><tr><th>エンドポイント</th><th>要る Role（当職の理解）</th></tr></thead><tbody><tr><td><code>getItemOffers</code>・<code>getMyFeesEstimateForASIN</code></td><td>Pricing</td></tr><tr><td><code>getListingsRestrictions</code></td><td>Product Listing</td></tr></tbody></table></div>
+<p>公式「Role Mappings for Operations」ページは当職の環境から取得できず（404/403）。#3 の入力前に秘書がブラウザで確認してください。Role が足りないと 403 で、プロフィールの再提出になります。</p>
+<h3 id="s5-4">4-4. 社長のターミナル操作（一手③④の続き。鍵を入れるのは本人だけ）</h3>
+<pre class="codeblock"><code># 値は末尾の -w を空にしてプロンプトで入力（シェル履歴に残らない）。3 回。
+security add-generic-password -s satoy-spapi -a client_id     -U -w
+security add-generic-password -s satoy-spapi -a client_secret -U -w
+security add-generic-password -s satoy-spapi -a refresh_token -U -w</code></pre>
+<p>1.2.2 のロックアウト（規約同意より前に。管理者権限が要るため社長のみ）：</p>
+<pre class="codeblock"><code>pwpolicy -u &quot;$USER&quot; -setpolicy &quot;maxFailedLoginAttempts=10&quot;</code></pre>
+<p>ファイアウォール（1.1.1）はシステム設定 → ネットワーク → ファイアウォール → オン。</p>
+</section>
+<hr class="rule">
+<section id="s6" class="sec sec-box sec-warn">
+<h2>5. やらないこと</h2>
+<div class="tw" tabindex="0"><table><thead><tr><th>やらない</th><th>理由</th></tr></thead><tbody><tr><td>履歴系（BSR・価格・出品者数の推移・ドロップ数）を SP-API で取る</td><td>Keepa で済んでいる（ハルオ 9/6・サトル③ 2-C）。SP-API は時点値しか返さない</td></tr><tr><td>実装に着手する</td><td>成立 3 社以上か SKU 10 件超まで着手しない（論点⑤）。<code>feedback_ship_dont_instrument</code></td></tr><tr><td>Catalog Items・Reports・Orders・Notifications</td><td>3 エンドポイントで用が足りる。Roles も増やさない（1.3）</td></tr><tr><td>取得データを Claude に読ませて判断させる</td><td>BSA 4.2 が未確認（ハルオ）。判定が出るまで<strong>人が SQLite の値を見る</strong>運用</td></tr><tr><td>クラウド／夜間自走セッションから叩く</td><td>鍵が Mac の Keychain にしかない設計。クラウドには秘密の置き場がない（Keepa MCP と同じ割り切り）</td></tr><tr><td>PUBLIC リポに SP-API 由来の数値を置く</td><td>AUP 4.6</td></tr></tbody></table></div>
+</section>
+<hr class="rule">
+<section id="s7" class="sec">
+<h2>6. リスク評価（1.6.1・1 枚・年 1 回見直し）</h2>
+<div class="tw" tabindex="0"><table><thead><tr><th>リスク</th><th>起きたら</th><th>対策</th><th>残余</th></tr></thead><tbody><tr><td>鍵の漏洩（リポ push・ログ出力）</td><td>API 停止・出品アカウントへの波及は明文なし（SPPA 未取得）</td><td>Keychain のみ・平文禁止・pre-commit の値付き検知・ログに鍵を書かない実装</td><td>低</td></tr><tr><td>Mac の紛失・盗難</td><td>DB と鍵が第三者の手に</td><td>FileVault On・5 分ロック・パスワード 12 文字以上</td><td>低</td></tr><tr><td>データの誤公開（deliverables に集計値）</td><td>AUP 4.6 違反</td><td>§2-3 の線引き・DB をリポ外・<code>.gitignore</code> 案・pre-commit 案</td><td>中（人の判断が残る）</td></tr><tr><td>レート超過（429）</td><td>一時停止</td><td>トークンバケット・リトライは 1 回・失敗は <code>access_log</code> に正直に</td><td>低</td></tr><tr><td>規約改定の見落とし</td><td>義務が増える</td><td>年 1 回の見直し日に AUP/DPP の更新日を確認（§8）</td><td>中</td></tr></tbody></table></div>
+</section>
+<section id="s8" class="sec">
+<h2>7. インシデント対応 runbook（1.6.2〜1.6.5）</h2>
+<h3 id="s8-1">7-1. 「インシデント」と数えるもの</h3>
+<p>鍵（client_secret・refresh_token・access_token）の平文露出、DB ファイルの外部流出、Mac の紛失、SP-API 由来データの PUBLIC リポへの commit（push 前でも数える）。</p>
+<h3 id="s8-2">7-2. 24 時間以内の手順</h3>
+<div class="tw" tabindex="0"><table><thead><tr><th>順</th><th>誰が</th><th>何を</th></tr></thead><tbody><tr><td>1</td><td>発見者</td><td>秘書へ即報告。時刻を記録</td></tr><tr><td>2</td><td>社長</td><td>Seller Central → Develop Apps → 当該アプリの認可を取消（refresh_token 失効）。client_secret をローテ</td></tr><tr><td>3</td><td>社長</td><td>Keychain の 3 項目を削除（<code>security delete-generic-password -s satoy-spapi -a &lt;acct&gt;</code>）</td></tr><tr><td>4</td><td>秘書</td><td>下記雛形でメール下書き → <strong>社長が security@amazon.com へ送信</strong>（§4.1）</td></tr><tr><td>5</td><td>秘書</td><td>§7-4 の記録票を起票。チケット化</td></tr></tbody></table></div>
+<p>雛形（英文・秘書が事実で埋める）：<br><code>Subject: Security Incident Notification – Private SP-API developer (Seller ID: &lt;ID&gt;)</code> ／ 本文：発見日時（JST/UTC）・何が露出したか・影響範囲（PII なし）・取った措置（認可取消・鍵ローテ・削除）・IMPOC 氏名と連絡先。</p>
+<h3 id="s8-3">7-3. 認可取消・鍵ローテの手順（1.2.3・1.4.2 共用）</h3>
+<p>Seller Central → Apps and Services → Develop Apps → アプリ → 認可の取消／client_secret のローテ（Solution Provider Portal 側の「View credentials」）。新しい値は §4-4 で Keychain に上書き（<code>-U</code>）。<code>spapi_min.py rotation-status</code> が <code>key_rotation</code> に日付を残す。</p>
+<h3 id="s8-4">7-4. 記録票（1.6.4）</h3>
+<p>日時／発見者／何が／どこまで／原因／措置／再発防止／Amazon 通知日時／クローズ日。<code>docs/security/incidents/YYYY-MM-DD.md</code>（鍵の値は書かない）。</p>
+</section>
+<section id="s9" class="sec">
+<h2>8. 定期作業カレンダー</h2>
+<div class="tw" tabindex="0"><table><thead><tr><th>何を</th><th>周期</th><th>次回</th><th>記録先</th></tr></thead><tbody><tr><td>鍵ローテ（client_secret・refresh_token）</td><td>12 か月</td><td>同意日＋1 年</td><td><code>key_rotation</code> 表</td></tr><tr><td>リスク評価（§6）見直し</td><td>12 か月</td><td>同意日＋1 年</td><td>本書 §8 に日付追記</td></tr><tr><td>runbook（§7）見直し</td><td>6 か月</td><td>同意日＋半年</td><td>同上</td></tr><tr><td>Approved User 棚卸し（1 名の確認）</td><td>四半期</td><td>同意日＋3 か月</td><td>同上</td></tr><tr><td>DB の 18 か月失効（<code>expire</code>）</td><td>月次（自動で可）</td><td>—</td><td><code>access_log</code></td></tr><tr><td>AUP/DPP の更新日確認</td><td>12 か月</td><td>同意日＋1 年</td><td>同上</td></tr></tbody></table></div>
+</section>
+<section id="s10" class="sec sec-box sec-alert">
+<h2>9. 未確認（推測で埋めていない）</h2>
+<div class="tw" tabindex="0"><table><thead><tr><th>項目</th><th>状態</th><th>取得手段</th></tr></thead><tbody><tr><td>Security Controls 設問の文面</td><td>未取得（ログイン後）</td><td>秘書ブラウザ（W1）</td></tr><tr><td>3 エンドポイントの Role 対応</td><td>確度中</td><td>公式 Role Mappings for Operations（当職は 403/404）</td></tr><tr><td>SPPA 本文（制裁の出品アカウントへの波及）</td><td>未取得</td><td>ハルオ §4 と同じ</td></tr><tr><td>BSA 4.2（AI での処理可否）</td><td>未取得</td><td>同上</td></tr><tr><td>Solution Provider Portal への移行案内が当社に出るか</td><td>未確認</td><td>#2 を開いたときに分かる</td></tr><tr><td>Mac ログインパスワードの長さ</td><td>未確認</td><td>社長のみ</td></tr></tbody></table></div>
+</section>
+<section id="s11" class="sec">
+<h2>10. 出典</h2>
+<div class="tw" tabindex="0"><table><thead><tr><th>#</th><th>内容</th><th>URL・取得日</th></tr></thead><tbody><tr><td>1</td><td>Data Protection Policy（§1 1.1〜1.8・§3）</td><td>https://sellercentral.amazon.com/mws/static/policy?documentType=DPP&amp;locale=en_US（2026-09-13）</td></tr><tr><td>2</td><td>Register as a Private SP-API Developer（8 ステップ・5 日以内返信）</td><td>https://developer-docs.amazon/sp-api/docs/register-as-a-private-developer（2026-09-13）</td></tr><tr><td>3</td><td>SP-API Registration Overview（大口要件・500 語・原文で書く）</td><td>https://developer-docs.amazon/sp-api/docs/registering-as-a-developer（2026-09-13）</td></tr><tr><td>4</td><td>Register your Application（Add new app client）</td><td>https://developer-docs.amazon/sp-api/docs/registering-your-application（2026-09-13）</td></tr><tr><td>5</td><td>Authorize Private Applications（Authorize app・refresh_token・Primary User）</td><td>https://developer-docs.amazon/sp-api/docs/self-authorization（2026-09-13）</td></tr><tr><td>6</td><td>Connect to the SP-API（LWA・<code>x-amz-access-token</code>・SigV4 不要）</td><td>https://developer-docs.amazon/sp-api/docs/connecting-to-the-selling-partner-api（2026-09-13）</td></tr><tr><td>7</td><td>Key Security Control Guidance（Non-PII 18 か月・ログ 12 か月）</td><td>https://developer-docs.amazon/sp-api/docs/guidance-to-address-key-security-controls-in-sp-api-integration（2026-09-13）</td></tr><tr><td>8</td><td>SP-API Endpoints・Marketplace IDs（FE・<code>A1VC38T7YXB528</code>）</td><td>https://developer-docs.amazon/sp-api/docs/sp-api-endpoints ／ /marketplace-ids（2026-09-13）</td></tr><tr><td>9</td><td>法務判定 §1-7</td><td><code>02_複合戦略_法務判定.md</code></td></tr><tr><td>10</td><td>サトル③ §2-A（レート・取れるデータ・課金撤回）</td><td><code>T-20260912-003/04_法務NO経路の再検討と適法な代替手段.md</code></td></tr><tr><td>11</td><td>当社 Mac の実測（FileVault・FW・ロック・pwpolicy・SIP・Python/TLS）</td><td>2026-09-13 タカシ・読み取りコマンドのみ</td></tr></tbody></table></div>
+</section>
+<p class="prov">HTML 版。内容の唯一の正は 05_SP-API_同意前の最小構成.md です。雛形コードは 05_adapters_spapi_min.py。</p>
+</div>
+<a class="top" href="#top" aria-label="先頭へ戻る">&#8593;</a>
+</body>
+</html>
