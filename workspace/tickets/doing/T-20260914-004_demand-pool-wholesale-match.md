@@ -57,6 +57,7 @@ related_tickets: [T-20260912-002, T-20260914-002, T-20260914-003]
 
 - 2026-09-14 着手。T-1 out/t1_all.csv から会社単位に寄せ（ブランド⇔メーカーを連結・912グループ）、上位60社を選定。事前除外19社（中国系OEM疑い7・海外ブランド6・大手/上場4・版元1・ブランド不明1）。スクリプト agent_output/T-20260914-004/satoru/s1_group.py・s1_select.py。
 - 2026-09-14 公式サイト閲覧（60社・1社3ページ以内）・Amazon byline（25ページ）完了。TMview は接続リセットで商標は未調査。成果物3点（md・HTML・CSV）＋README を deliverables に直納。memory に knowledge_demand_pool_top60_contactability.md。
+- 2026-09-14 commit 3f30f9e（S-1 納品）。pre-commit フックが NETSEA 店舗 URL と「卸価格」の語で2回停止→バイパスせず文言を差し替えて通過。会社単位の取り分合計は PUBLIC 版から落とし、完全版はローカル（agent_output/…/satoru/recs_full.csv）。
 - 2026-09-14 マリエ：Notion カード作成（https://app.notion.com/p/3dab0a4044fa81ddbc34c04d19bdd91a・doing）。親の結果要約に子の現在地1行、owner-tasks 更新㉘（ℹ️ に追加・社長タスク増減ゼロ）。
 - 2026-09-14 マリエ：T-2 納品の同期。Notion -004 に結果要約（全条件通過0件・12ヶ月で卸から立つ商品数 中央1〜2）と成果物節（01 md/html・README・code/、out/ はローカルのみ・リンクなし）、親に1行。カタログ4行追記＋シート同期。owner-tasks 更新㉙（社長タスク増減ゼロ）。
 
