@@ -1,7 +1,7 @@
 ---
 ticket_id: T-20260914-002
 title: 12ヶ月黒字を設計条件にした計画の組み直し（運転資金200万・リアルオプション型・セット組み優先）
-status: todo
+status: doing
 assignee: planner
 priority: high
 created_at: 2026-09-14
@@ -21,6 +21,8 @@ T-20260914-001 の事実を入力に、**12ヶ月累計キャッシュ＞0（中
 -001 待ち。
 
 ## ログ
+
+- 2026-09-14 doing へ移動（カズヨ）。-001 の3体の事実を入力にタケシへ発注。
 
 - 2026-09-14 todo 起票（カズヨ）。
 - 2026-09-14 マリエ：Notion カード作成（https://app.notion.com/p/3dab0a4044fa81e98ca2e6bd085bc253）。
