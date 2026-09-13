@@ -59,3 +59,12 @@
 - Notion 3枚は `update_content` を並列で3回。アンカーは各カードの**最後の bullet の末尾文**（今回はどれも「社長タスク増減ゼロ。」系で一意だった）＋成果物節の README 行を old_str にして、その前に新ファイル行を足す。本文中の `>` は fetch で `\>` にエスケープされるので、新しく書く文には全角「＞」を使うと old_str 照合で困らない
 - カタログ：CSV は **読み→書きのバイト一致を先に検算**（今回 True・746行・{15}）してから全体書き戻し。これで既存行の「暫定結果」も安全に最新化できる（-002/-003 の既存11行を現在地に更新）。追記は -003 4行（md・html・01_mc・01_mc_final、補助スクリプトは備考に集約）／-002 5行。同期は一発 HTTP 200・755行
 - ログは2枚とも cacheinfo 方式（HEAD＋自分の1行の blob を index へ、working tree は再読込して同じ1行を挿入）。今回は HEAD と同一だったが、タケシ・タカシが並列編集中なので手順は固定
+
+## 追記：発注文の「done／waiting」がファイルに無かった（同日・統合報告 v2 の締め）
+
+- 発注文は「-002・-003 → done、親 -002 → waiting（next_check 9/16）」。実物照合したら **3枚とも `doing/` のまま・frontmatter status: doing・親の next_check_at 9/15・working tree clean**。c2560fd のメッセージは「-002/-003 done」だが、実際に commit したのは 06 md/html と README の3ファイルだけで、チケットの移動は含まれていなかった。他の worktree・ブランチにも移動の commit は無い
+- 判断：真実はファイル状態。状態遷移は秘書の責務で、私はチケットを動かさない。**Notion を done/waiting にするとミラーがリポより先に行く**ので、状態に依存する作業（Notion Status と結果要約・owner-tasks +1・handover・ログの Notion 1行）は保留して差し戻した
+- 状態に依存しない作業は先に済ませた：README の表ヘッダ修正、カタログ5行追記（暫定結果は現状どおり「【進行中】doing」）とシート同期
+- 既存カタログ行の暫定結果の書き換え（-002/-003 を done、親を【社長レビュー待ち】v2 に）は、移動が済んだ後に1回でやる。今書くと2度手間になる上、一時的にカタログがリポより先に行く
+- 教訓：**commit メッセージは「やったつもり」を書く。`ls tickets/*/` と frontmatter の status を見るまで状態を信じない。** 発注文の「→ done」は、秘書がこれからやる予定の意味の場合がある
+- 再開手順：秘書の移動 commit を確認（`ls tickets/done/ tickets/waiting/`・frontmatter・親の next_check_at 9/16）→ Notion 3枚（fetch で実物の Status を読む。SQL は信用しない）→ 既存カタログ行の暫定結果 → owner-tasks 更新㉗ → handover → ログ（-002 は cacheinfo 方式）→ commit
