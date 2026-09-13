@@ -99,7 +99,8 @@ def cost_rate(m):
 def mk(kind, margin, turn, delay=0):
     """発注1回ぶんの Lane。kind: W（卸・カード）/M1（メーカー初回・前払い）/M2（メーカー2回目以降）/S（せどり・カード）"""
     base = {"W": ("卸_カード", 15), "M1": ("メーカー直", 20), "M2": ("メーカー直", 18), "S": ("電脳せどり", 10)}[kind]
-    kw = dict(name=kind, margin=margin, turnover_m=max(0.1, turn), lead_first=base[1] + delay, lead_repeat=base[1] + delay)
+    ld = max(1, int(round(base[1] * LEAD_SCALE)))
+    kw = dict(name=kind, margin=margin, turnover_m=max(0.1, turn), lead_first=ld + delay, lead_repeat=ld + delay)
     if kind == "M1":
         kw.update(pay_first=[(1.0, "order", 0, "cash")], pay_repeat=[(1.0, "order", 0, "cash")])
     if kind == "M2":
@@ -107,6 +108,7 @@ def mk(kind, margin, turn, delay=0):
     return cf.preset(base[0], **kw)
 
 
+LEAD_SCALE = 1.0   # 構造差の確認用（0 に近いほどタケシの月次モデルに近い）
 LIQ_M = -0.35   # 処分：原価の約66%を回収（値下げ販売＋外注・手数料）
 
 
@@ -129,11 +131,14 @@ def first_lot(orders, k, kind, lot, m, e_rev, r_rev, dead_rule=True):
 
 def gen(R, P, plan, T):
     """1経路ぶんの発注列を作る。plan: lanes('WM'|'WMS'), send('A'|'B'), rule('none'|'as_written'|'redesign'), harvest(k: この月index以降は発注しない。None=続ける), resume(k)"""
+    global LEAD_SCALE
+    LEAD_SCALE = P.get("lead_scale", 1.0)
     orders = [[] for _ in range(T)]
     meta = dict(s_stop=None, s_reason="", fatigue=False, low=False, perm=False, inc=None, n_est=0, w_n=0, gems=0,
                 trial_adopt=0, trial_gate=0, g=None, h=None, early_ratio=None, s_rev_plan=0.0, sends=[], complaint=None, rakuten=None)
     wm = lognorm(R, 1.0, P["wm_sig"])
     harvest, resume = plan.get("harvest"), plan.get("resume")
+    hnew = plan.get("harvest_new")     # 新規ロット（初回）だけ、この k 以降は買わない（補充は harvest まで）
     def can_order(k):
         if harvest is None or k < harvest:
             return True
@@ -266,19 +271,19 @@ def gen(R, P, plan, T):
     early = []
     for s in skus:
         kind = s["kind"]
-        h = P["w_h"] if kind == "W" else P["m_h"]
+        hold = P["w_h"] if kind == "W" else P["m_h"]      # 保有月数（せどりの採用率 h とは別の名前にする）
         drift = P["w_drift"] if kind == "W" else P["m_drift"]
         k0 = s["st"]
         if s.get("dead"):
             continue
         # 初回ロット：停止中なら再開月に回す
-        while k0 < T and (not can_order(k0) or halted(k0)):
+        while k0 < T and (not can_order(k0) or halted(k0) or (hnew is not None and hnew <= k0 and (resume is None or k0 < resume))):
             k0 += 1
         if k0 >= T:
             continue
         e_rev = s["e"]; r_rev = s["r"]
         c = cost_rate(s["m"])
-        lot = c * h * e_rev
+        lot = c * (P.get("first_hold") or hold) * e_rev
         if kind == "M":
             lot = max(lot, P["m_minlot"])
         kind1 = "W" if kind == "W" else "M1"
@@ -480,6 +485,8 @@ def main():
         r = run(Pp, PLANS[key], NS)
         P_(row(lab, summ(r)))
     rb = run(TAKESHI, PLANS["B"], NS); P_(row("参考 案B・タケシの置き値", summ(rb)))
+    P_(row("参考 案B・タケシの置き値・リードタイム0（月次モデルに近い）", summ(run(dict(TAKESHI, lead_scale=0.0), PLANS["B"], NS))))
+    P_(row("参考 案C・タケシの置き値・リードタイム0", summ(run(dict(TAKESHI, lead_scale=0.0), PLANS["C_none"], NS))))
     ra = run(TAKESHI, PLANS["A"], NS); P_(row("参考 案A・タケシの置き値", summ(ra)))
     P_("")
 
@@ -551,6 +558,21 @@ def main():
     for hv, lab in ((8, "月9から停止（k≥8）"), (9, "月10から停止（既定）"), (10, "月11から停止"), (None, "停止しない")):
         pl = dict(PLANS["C_redesign"], harvest=hv)
         P_(row(lab, summ(run(MASARU, pl, NS))))
+    P_("")
+
+    # ---- 6b. 設計の改善候補（最悪を避ける側）
+    P_("## 6b. 設計の改善候補（案C 一本化／案B。月10停止）")
+    P_(HDR)
+    for key in ("C_redesign", "B"):
+        for lab, ov, pov in (("基準", {}, {}),
+                             ("初回ロットを1ヶ月分に（補充で追う）", dict(first_hold=1.0), {}),
+                             ("新規ロットは月8（2027-05）まで・補充は月9まで", {}, dict(harvest_new=8)),
+                             ("上の2つを両方", dict(first_hold=1.0), dict(harvest_new=8)),
+                             ("両方＋本体の出品履歴なしの棚（本体参入 年5%→1%）", dict(first_hold=1.0, amz=0.001), dict(harvest_new=8)),
+                             ("両方＋月9から停止", dict(first_hold=1.0), dict(harvest_new=7, harvest=8))):
+            r = run(dict(MASARU, **ov), dict(PLANS[key], **pov), NS)
+            keep[f"d_{key}_{lab}"] = r
+            P_(row(f"{key} {lab}", summ(r)))
     P_("")
 
     # ---- 7. 撤退条件の「中央で踏む確率」（案C 書面どおり／一本化）
