@@ -1,0 +1,231 @@
+<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>S-1 打診母数の上位60社</title><style>body{font-family:-apple-system,'Hiragino Sans','Noto Sans JP',sans-serif;max-width:1400px;margin:24px auto;padding:0 20px;line-height:1.6;color:#222;font-size:14px}
+h1{font-size:1.5em;border-bottom:2px solid #333;padding-bottom:6px}h2{font-size:1.25em;margin-top:2em;border-left:5px solid #2b5;padding-left:8px}h3{font-size:1.05em;margin-top:1.5em}
+table{border-collapse:collapse;margin:10px 0 18px;width:100%;font-size:12.5px}th,td{border:1px solid #bbb;padding:5px 7px;vertical-align:top;text-align:left}th{background:#f0f4f0}tr:nth-child(even) td{background:#fafafa}
+code{background:#f3f3f3;padding:1px 4px;border-radius:3px;font-size:0.92em}hr{border:0;border-top:1px solid #ccc;margin:24px 0}li{margin:2px 0}</style></head><body>
+<h1>S-1 打診母数の上位60社：公開情報の深掘り</h1>
+<p>T-20260914-004 S-1／サトル（リサーチャー）／2026-09-14 取得</p>
+<h2>0. 結論</h2>
+<table><thead><tr><th>分類</th><th>定義</th><th>社数</th></tr></thead><tbody>
+<tr><td>A すぐ送れる</td><td>フォームまたはメールあり・制限の記載なし</td><td>25</td></tr>
+<tr><td>B 条件付き</td><td>代理店・正規販売店制、取引先専用ページ、電話のみ、モール店舗の窓口しかない等</td><td>14</td></tr>
+<tr><td>C 送らない</td><td>EC 専業・大手 EC 出品との取引お断りを明記</td><td>2</td></tr>
+<tr><td>D 対象外</td><td>中小メーカーでない（大手・上場G・海外・他社品の小売）または事業者を特定できない</td><td>18</td></tr>
+<tr><td>N NETSEA 経由</td><td>NETSEA に同じ社が出店。直接連絡は規約第7条2項5号の疑い。打診リストから外す</td><td>1</td></tr>
+</tbody></table>
+<ul>
+<li>A は 25 社で、週20通なら 1.25 週分。2週目の途中で尽きる。</li>
+<li>A のうちメーカー（自社製造・企画）は 22 社で 1.10 週分。残り 3 社は輸入・調達・EC 事業者。</li>
+<li>取引条件（個人事業主の可否・Amazon 可否・ロット・掛け率）を公開していた社は60社中4社。3社の記載は取引を狭める方向（2社は EC 専業お断り、1社は小売の転売目的購入お断り）。掛け率を公開した社は0社。</li>
+<li>代理店・問屋・正規販売店を経由する流通を公式に書いていた社は4社（ARTISAN・ルミカ・イースター・アガツマ）。すべて B。</li>
+<li>Amazon のブランドストアを持つ社は、見た25社中19社。上位の多くは自社で Amazon に出品しているブランド保有者。</li>
+<li>推定と実測：社数・記載の有無は公式サイトの実測。取り分は T-1 の推定（公表下限÷(オファー+1)）。「A なら返信が来る」根拠は無い（成立率の実測は1周目の送信結果を待つ）。</li>
+</ul>
+<h2>1. 選び方</h2>
+<table><thead><tr><th>段</th><th>内容</th><th>結果</th></tr></thead><tbody>
+<tr><td>入力</td><td>T-1 <code>out/t1_all.csv</code> のうち区分=国内・大手空・段6再判定OK（＝打診母数）</td><td>1,394 ASIN</td></tr>
+<tr><td>会社に寄せる</td><td>ブランドとメーカーを連結して1社にまとめる（表記ゆれ・ブランド違いを統合）</td><td>912 グループ（T-1 の 994 はメーカー表記ごとの数）</td></tr>
+<tr><td>終売除外</td><td>終売の兆候2つ以上の ASIN を落とす</td><td>31 ASIN</td></tr>
+<tr><td>並べる</td><td>取り分合計の大きい順</td><td>—</td></tr>
+<tr><td>事前除外</td><td>データや公知の事実で国内中小メーカーでないと言える社（§6）</td><td>上位79位までで 19 社</td></tr>
+<tr><td>統合</td><td>インクのチップスと横トナは同一社（キュリエ）。空いた1枠に80位を繰り上げ</td><td>60社</td></tr>
+</tbody></table>
+<p>ASIN が1件だけの社も含めた。同一ブランドの他 ASIN の有無は、公式サイトに商品一覧があった社のみ本文に書いた（Keepa は使っていない）。</p>
+<h2>2. 事業者の型（60社）</h2>
+<table><thead><tr><th>型</th><th>60社</th><th>うち A</th></tr></thead><tbody>
+<tr><td>自社製造メーカー</td><td>19</td><td>13</td></tr>
+<tr><td>企画メーカー（ファブレス）</td><td>13</td><td>9</td></tr>
+<tr><td>EC小売（自社PB）</td><td>10</td><td>0</td></tr>
+<tr><td>輸入・卸・調達</td><td>5</td><td>3</td></tr>
+<tr><td>大手・上場G</td><td>4</td><td>0</td></tr>
+<tr><td>中国・海外</td><td>2</td><td>0</td></tr>
+<tr><td>特定できず</td><td>7</td><td>0</td></tr>
+</tbody></table>
+<p>D 18 社の内訳：特定できず 7・大手/上場G 4・中国/海外 2・EC小売 4・輸入/代理店 1。</p>
+<h2>3. 60社一覧</h2>
+<p>並びは取り分合計（T-1 の推定値・個/月）の大きい順。数値は Keepa 由来の加工値のため PUBLIC リポには載せない（完全版はローカルの agent_output/T-20260914-004/satoru/recs_full.csv）。窓口・記載はすべて公式サイトの閲覧（1社3ページ以内）。</p>
+<table><thead><tr><th>#</th><th>社名</th><th>ブランド</th><th>型</th><th>分類</th><th>窓口</th><th>根拠1行</th></tr></thead><tbody>
+<tr><td>1</td><td>クリロン化成株式会社</td><td>BOS</td><td>自社製造メーカー</td><td>A</td><td>フォーム＋事業所電話</td><td>問い合わせフォームに「お取引先様は社用電話番号を」の注記。取引の問い合わせを受ける前提</td></tr>
+<tr><td>2</td><td>アセキ（ASEKI）</td><td>アセキ</td><td>中国・海外</td><td>D</td><td>公式サイト未発見</td><td>推測：販売業者は中国湖南省の企業（二次情報2件・Amazon出品者情報の引用。確度中）</td></tr>
+<tr><td>3</td><td>株式会社キュリエ</td><td>インクのチップス／横トナ</td><td>EC小売（自社PB）</td><td>D</td><td>法人向けページ（購入者向け）</td><td>事業=互換インクの輸入・卸売・EC販売（10店舗）。自社がAmazon出品者</td></tr>
+<tr><td>4</td><td>株式会社三輝</td><td>詰め替えそのまま</td><td>自社製造メーカー</td><td>A</td><td>フォーム（区分：製品/資料請求/採用/その他）＋電話</td><td>大田区の樹脂製品・流体継手メーカー。自社製造</td></tr>
+<tr><td>5</td><td>株式会社NEXT（EdisonBrain）</td><td>ひらがじゃん</td><td>企画メーカー（ファブレス）</td><td>A</td><td>「小売店・卸業者の方」専用メール＋フォーム</td><td>公式サイトのフッターに「小売店・卸業者の方」向け窓口を明記</td></tr>
+<tr><td>6</td><td>GORIX株式会社</td><td>GORIX</td><td>EC小売（自社PB）</td><td>B</td><td>電話のみ（会社概要ページにフォームなし）</td><td>事業=自転車小売／自社ブランド製品の開発・製造・輸出入。文面を送る窓口が公式に無い</td></tr>
+<tr><td>7</td><td>株式会社アクセスライン</td><td>うちのこエレクトリック</td><td>企画メーカー（ファブレス）</td><td>A</td><td>卸・代理店申し込みフォーム</td><td>卸・代理店募集ページにオンラインショップ運営者を対象と明記。PDF請求書対応</td></tr>
+<tr><td>8</td><td>KAEI株式会社</td><td>RABLISS</td><td>企画メーカー（ファブレス）</td><td>N</td><td>フォーム（区分に「卸・販売について」）</td><td>NETSEA に出店（サプライヤー ID 704797）。スーパーデリバリーにも出店</td></tr>
+<tr><td>9</td><td>株式会社すごろくや</td><td>すごろくや</td><td>企画メーカー（ファブレス）</td><td>C</td><td>取引申し込みフォーム</td><td>卸取引の注意事項にオンライン専売業者お断り・大手EC出品お断りを明記</td></tr>
+<tr><td>10</td><td>（特定できず）</td><td>AMZTOP</td><td>特定できず</td><td>D</td><td>公式サイト未発見</td><td>メーカー欄が空。ブランド名で検索しても事業者名が出ない</td></tr>
+<tr><td>11</td><td>株式会社カスタムジャパン（国内代理店）</td><td>COMPASS</td><td>輸入・卸・調達</td><td>D</td><td>（代理店）</td><td>COMPASS は海外製タイヤ。国内はカスタムジャパン（自転車部品EC）が正規販売代理店（同社プレスリリース2013）</td></tr>
+<tr><td>12</td><td>シースター株式会社</td><td>ベビースマイル</td><td>企画メーカー（ファブレス）</td><td>A</td><td>お問合せページに「お取引に関するお問い合わせ」</td><td>取引専用の問い合わせ区分あり。医療機器の開発・販売</td></tr>
+<tr><td>13</td><td>株式会社NAGARA</td><td>ながら洗車／BUDDICA PHOENIX BODY</td><td>企画メーカー（ファブレス）</td><td>B</td><td>特商法に電話。取引の窓口は公式に見当たらず（3ページ上限内）</td><td>従業員20名。Amazon 販売事業者アワード3回受賞＝自社が Amazon の主要出品者</td></tr>
+<tr><td>14</td><td>株式会社アート・エム</td><td>アート・エム</td><td>EC小売（自社PB）</td><td>B</td><td>電話（フォームなし）</td><td>製造・梱包・発送を自社で行い、Amazon・楽天・Yahoo で直販。「電話注文・店頭販売は行っておりません」</td></tr>
+<tr><td>15</td><td>株式会社みやこ</td><td>MIYACO</td><td>EC小売（自社PB）</td><td>D</td><td>メール・フリーダイヤル（小売の窓口）</td><td>事業=日用雑貨の通信販売（小売）。メーカーではない</td></tr>
+<tr><td>16</td><td>ペットライン株式会社</td><td>プロフェッショナル・バランス</td><td>自社製造メーカー</td><td>A</td><td>「法人のお客様」メール窓口</td><td>法人向けの問い合わせ窓口を個人用と分けて設置。国内工場で製造</td></tr>
+<tr><td>17</td><td>株式会社プライムダイレクト</td><td>VOLZAC（NONN）</td><td>大手・上場G</td><td>D</td><td>—</td><td>IKホールディングス（上場）の100%子会社。テレビ通販事業者</td></tr>
+<tr><td>18</td><td>株式会社MIC</td><td>ラ・フェアリー</td><td>自社製造メーカー</td><td>A</td><td>フォーム（区分に「商品の購入・販売について」）</td><td>OEM 受託と自社製品のメーカー。問い合わせ区分に販売の項目あり</td></tr>
+<tr><td>19</td><td>HEY!（運営法人名は公式に記載なし）</td><td>sangenya（国旗王）</td><td>企画メーカー（ファブレス）</td><td>A</td><td>フォーム（件名・本文の汎用）</td><td>ボードゲームの企画・販売。ハンズ・ヨドバシ等で流通（検索結果）</td></tr>
+<tr><td>20</td><td>株式会社BTO</td><td>BPRO</td><td>自社製造メーカー</td><td>A</td><td>フォーム（区分：メディア/Amazonで購入された商品/その他）</td><td>事業=カーディテイリング製品の開発・製造・卸売・施工</td></tr>
+<tr><td>21</td><td>株式会社和光ケミカル</td><td>ワコーズ</td><td>大手・上場G</td><td>D</td><td>—</td><td>従業員560名（検索結果の二次情報）＝T-1 大手基準（300人超）</td></tr>
+<tr><td>22</td><td>MRG JAPAN</td><td>MRG</td><td>輸入・卸・調達</td><td>A</td><td>フォーム（区分に「業務に関するお問い合わせ」）</td><td>業務内容=卸・小売業（従業員50名）。国内外から調達し EC で販売</td></tr>
+<tr><td>23</td><td>（特定できず）</td><td>atRise</td><td>特定できず</td><td>D</td><td>公式サイト未発見</td><td>Amazon 出品者名以外に事業者情報が出ない</td></tr>
+<tr><td>24</td><td>グローバルアーク株式会社</td><td>フィットフィンガートレーニング（フロッグハンド）</td><td>企画メーカー（ファブレス）</td><td>A</td><td>フォーム＋メール＋フリーダイヤル</td><td>公式サイトのメニューに「取扱店募集」（本文は未読）</td></tr>
+<tr><td>25</td><td>株式会社ヤマウチ</td><td>鎌倉ライフ</td><td>EC小売（自社PB）</td><td>B</td><td>楽天店舗の会社概要のみ（公式サイト未発見）</td><td>楽天店舗「鎌倉ライフ」を運営する香川県高松市の小売。モールの顧客窓口しかない</td></tr>
+<tr><td>26</td><td>株式会社山谷産業</td><td>エリッゼ（村の鍛冶屋）</td><td>自社製造メーカー</td><td>A</td><td>お問い合わせ（個人／法人の区分あり）</td><td>燕三条の鍛造製品の製造・販売。法人向けの問い合わせ区分あり</td></tr>
+<tr><td>27</td><td>有限会社フィアックアマル</td><td>G.O.K</td><td>自社製造メーカー</td><td>A</td><td>フォーム（通販サイト内・汎用）</td><td>コーティング剤の自社開発・製造・販売（施工店を兼業）</td></tr>
+<tr><td>28</td><td>SACラボ株式会社</td><td>ジアニスト</td><td>自社製造メーカー</td><td>A</td><td>会社概要に電話・メール</td><td>製造から販売まで自社・関連会社（公式）。卸先に法人数社を掲載</td></tr>
+<tr><td>29</td><td>株式会社タイガーゴム</td><td>タイガーゴム</td><td>自社製造メーカー</td><td>A</td><td>フォーム（汎用）＋メール</td><td>大正元年創業のゴム風船メーカー。完全自社工場</td></tr>
+<tr><td>30</td><td>秋山産業株式会社</td><td>PURE</td><td>輸入・卸・調達</td><td>B</td><td>フォーム（汎用）</td><td>事業=たばこ製品の輸出入・販売（従業員26名）。PURE が自社ブランドか輸入品かは公式に記載なし</td></tr>
+<tr><td>31</td><td>（特定できず）</td><td>irokagu</td><td>特定できず</td><td>D</td><td>公式サイトが HTTP 402（閲覧不可・2026-09-14）</td><td>公式サイトが閲覧できず、事業者を特定できない</td></tr>
+<tr><td>32</td><td>株式会社アガツマ</td><td>アガツマ</td><td>自社製造メーカー</td><td>B</td><td>「お取引先様専用ページ」（ID・パスワード制）。新規取引の窓口は3ページ内で確認できず</td><td>玩具の企画開発・製造販売（従業員60名・公式）。主要取引先は赤ちゃん本舗・西松屋・トイザらス（検索結果）</td></tr>
+<tr><td>33</td><td>株式会社リッチェル</td><td>リッチェル</td><td>大手・上場G</td><td>D</td><td>法人のお客様ページあり</td><td>従業員308名（2026-03-31・マイナビ）＝T-1 大手基準（300人超）</td></tr>
+<tr><td>34</td><td>イースター株式会社</td><td>イースター（バニーセレクション）</td><td>自社製造メーカー</td><td>B</td><td>お客様相談窓口（電話）。フォームは3ページ内で確認できず</td><td>ペットフードの製造・販売（1964年設立・自社工場）</td></tr>
+<tr><td>35</td><td>株式会社快適生活（メーカー欄は株式会社一葉）</td><td>快適生活（ヒトデdeでんでん）</td><td>EC小売（自社PB）</td><td>D</td><td>—</td><td>快適生活はラジオ・新聞通販の小売（売上120億円）。製造元とみられる株式会社一葉は特定できず（福岡の同名保育会社とは別と推測）</td></tr>
+<tr><td>36</td><td>ユニバーサルシステムズ株式会社</td><td>PDA工房</td><td>自社製造メーカー</td><td>A</td><td>FAQ ページにフォーム</td><td>日本製保護フィルムの製造販売（倉敷）</td></tr>
+<tr><td>37</td><td>ST-TRADE株式会社</td><td>ST-TRADE</td><td>輸入・卸・調達</td><td>A</td><td>フォーム（区分に「商品の仕入れ(貿易)、代理店契約等」）</td><td>2009年創業の貿易会社（主に中国との取引）。仕入れの問い合わせ区分あり</td></tr>
+<tr><td>38</td><td>ARTISAN</td><td>ARTISAN</td><td>企画メーカー（ファブレス）</td><td>B</td><td>公式ストアのサポート。取引の窓口は3ページ内で確認できず</td><td>国産マウスパッドのメーカー。販売は正規販売店制</td></tr>
+<tr><td>39</td><td>株式会社ピチカートデザイン</td><td>JELLY JELLY GAMES</td><td>企画メーカー（ファブレス）</td><td>A</td><td>フォーム（汎用）</td><td>オリジナルボードゲームの企画・販売（ボードゲームカフェ運営会社）</td></tr>
+<tr><td>40</td><td>株式会社ガリバー（推測：横浜の印刷会社）</td><td>株式会社ガリバー</td><td>自社製造メーカー</td><td>B</td><td>フォーム（印刷の見積り・資料請求）</td><td>同名2社のうち、自社カードゲームを出したと PR TIMES にあるのは横浜の DM・印刷会社。当該 ASIN との一致は推測（確度中）</td></tr>
+<tr><td>41</td><td>株式会社フジテックス</td><td>クロスマーケット</td><td>輸入・卸・調達</td><td>A</td><td>資料請求・お問合せ（JS 描画で項目は未取得）</td><td>販促資材の総合商社。ラミネートフィルム月1,000万枚販売</td></tr>
+<tr><td>42</td><td>株式会社タカギ</td><td>タカギ</td><td>大手・上場G</td><td>D</td><td>—</td><td>従業員1,252〜1,399名（gBizINFO・マイナビ）</td></tr>
+<tr><td>43</td><td>株式会社ライカ</td><td>FORTUNE FIELD</td><td>自社製造メーカー</td><td>B</td><td>電話（通販サイトの会社概要）。フォームは未確認</td><td>昭和3年創業の靴クリームメーカー。OEM 受注から自社ブランドを立ち上げ</td></tr>
+<tr><td>44</td><td>淡路梅薫堂株式会社</td><td>淡路梅薫堂</td><td>自社製造メーカー</td><td>A</td><td>メール（会社概要）</td><td>会社概要に「卸、卸売り・OEM・製造販売元」と明記</td></tr>
+<tr><td>45</td><td>株式会社DETAIL ARTIST</td><td>DETAIL ARTIST</td><td>企画メーカー（ファブレス）</td><td>A</td><td>フォーム（汎用）</td><td>ブランド事業・OEM/PB 事業（従業員8名）。量販店500店舗で取扱</td></tr>
+<tr><td>46</td><td>（特定できず）</td><td>次世代製作所</td><td>特定できず</td><td>D</td><td>公式サイト未発見</td><td>Amazon 出品者名以外に事業者情報が出ない</td></tr>
+<tr><td>47</td><td>ねむりの部屋（名古屋市・運営法人名は未確認）</td><td>ねむりの部屋</td><td>EC小売（自社PB）</td><td>B</td><td>Yahoo 店舗の会社概要のみ（メール・電話）</td><td>寝具・タオルの小売店。公式サイトが無くモールの顧客窓口しかない</td></tr>
+<tr><td>48</td><td>愛知電線株式会社</td><td>愛知電線</td><td>自社製造メーカー</td><td>A</td><td>フォーム（区分：弊社/製品/採用）</td><td>電線メーカー（従業員70名・検索結果）。フォームは個人の問い合わせも受ける</td></tr>
+<tr><td>49</td><td>（特定できず）</td><td>SeatheStars</td><td>特定できず</td><td>D</td><td>公式サイト未発見</td><td>Amazon 出品者名のみ。同音の株式会社シーザスターズ（食のマーケティング）は別会社</td></tr>
+<tr><td>50</td><td>株式会社タツフト</td><td>あしあげ隊</td><td>自社製造メーカー</td><td>C</td><td>フォーム</td><td>問い合わせフォームに EC 専業の新規取引お断りを明記</td></tr>
+<tr><td>51</td><td>ウィキャンテクノ株式会社</td><td>春夏秋冬</td><td>EC小売（自社PB）</td><td>B</td><td>楽天店舗の会社概要のみ（電話）</td><td>大阪の EC 小売。公式サイトが無くモールの顧客窓口しかない</td></tr>
+<tr><td>52</td><td>WADAI PRODUCTS（運営法人名は公式に記載なし）</td><td>WADAI PRODUCTS</td><td>企画メーカー（ファブレス）</td><td>A</td><td>メール（公式リンク集に掲載）</td><td>整備現場発の工具ブランド（大阪）。オートアフターマーケット展示会に出展（2026-09）</td></tr>
+<tr><td>53</td><td>ウェブシステムズ株式会社</td><td>デッドニング・防音工房</td><td>EC小売（自社PB）</td><td>D</td><td>フォーム</td><td>防音材の通信販売店。当該 ASIN は 3M 製品の小売で、メーカーではない</td></tr>
+<tr><td>54</td><td>Matroospet Co., Ltd.（韓国）</td><td>マドロスペット</td><td>中国・海外</td><td>D</td><td>—</td><td>推測：韓国ブランド（検索結果の要約・二次。確度中）</td></tr>
+<tr><td>55</td><td>（特定できず）</td><td>N.Qurio</td><td>特定できず</td><td>D</td><td>公式サイト未発見</td><td>事業者情報が出ない</td></tr>
+<tr><td>56</td><td>（特定できず）</td><td>Basicest</td><td>特定できず</td><td>D</td><td>公式サイト未発見</td><td>Amazon 販売者名（Sanritsu GK）は検索要約の二次情報のみ</td></tr>
+<tr><td>57</td><td>株式会社ルミカ</td><td>ルミカ</td><td>自社製造メーカー</td><td>B</td><td>3ページ内で確認できず</td><td>化学発光体メーカー（社員109名・公式）。流通は問屋・量販店</td></tr>
+<tr><td>58</td><td>株式会社ルイファン・ジャパン</td><td>KING BLADE</td><td>企画メーカー（ファブレス）</td><td>A</td><td>お問い合わせ（法人／個人の区分）</td><td>ペンライトの企画開発。製造は中国の関連工場（公式）。OEM も受託</td></tr>
+<tr><td>59</td><td>ラトックシステム株式会社</td><td>ラトックシステム</td><td>自社製造メーカー</td><td>A</td><td>東京営業部の購入窓口フォーム＋法人窓口</td><td>PC 周辺機器メーカー（従業員48〜57名）。「ご購入に関する全般的なお問い合わせは東京営業部」</td></tr>
+<tr><td>60</td><td>株式会社サンコー商事</td><td>ペットスタジオ</td><td>EC小売（自社PB）</td><td>B</td><td>会員登録制の「ペット用品仕入れサイト」</td><td>サイト名が「ペット用品仕入れサイト」。仕入れには会員登録が要る（§4.1）</td></tr>
+</tbody></table>
+<p>全列（卸経由・個人/ネット・Amazon 制限・ロット・ブランド登録・出典URL）は <code>02_S1_上位60社.csv</code>。</p>
+<h2>4. 取引条件の公開状況（60社）</h2>
+<table><thead><tr><th>項目</th><th>記載あり</th><th>記載のあった社と中身</th></tr></thead><tbody>
+<tr><td>個人事業主・ネット販売事業者との取引</td><td>4</td><td>アクセスライン（対象に「オンラインショップ運営者」）／すごろくや（オンライン専売業者は一律お断り）／タツフト（EC 販売のみ目的の新規取引お断り）／ガリバー（個人との取引不可。印刷受注の FAQ）</td></tr>
+<tr><td>Amazon 販売の制限</td><td>3</td><td>すごろくや（大手 EC モールへの出品ご遠慮）／タツフト（上記）／キュリエ（小売での転売目的購入お控え）</td></tr>
+<tr><td>公開のロット</td><td>1</td><td>アクセスライン（最低注文数量が設定される場合あり）</td></tr>
+<tr><td>公開の掛け率</td><td>0</td><td>—</td></tr>
+<tr><td>卸・代理店募集ページ</td><td>3</td><td>アクセスライン（卸・代理店募集）／すごろくや（卸流通事業）／グローバルアーク（取扱店募集。本文未読）</td></tr>
+<tr><td>取引専用の問い合わせ区分</td><td>7</td><td>EdisonBrain（小売店・卸業者の方）／KAEI（卸・販売）／シースター（お取引）／MIC（購入・販売）／ST-TRADE（仕入れ・代理店契約）／山谷産業（法人）／ラトック（購入全般＝東京営業部）</td></tr>
+</tbody></table>
+<p>前回の展示会20社（T-20260912-001）でも、個人事業主可否・Amazon 可否の公開は0社だった。「公開情報で取引条件を埋める」はほぼ全セル「記載なし」になる、という見通しが今回も当たった。</p>
+<h2>5. Amazon ブランド登録（ストアの有無）</h2>
+<p>A・B の主要25社について、取り分最大の ASIN の商品ページ（byline のリンク）を1社1ページ見た（4秒間隔・閲覧のみ）。ブランドストアは「ブランド登録」の機能（sell.amazon.co.jp/brand-registry）。</p>
+<table><thead><tr><th>結果</th><th>社数</th><th>社</th></tr></thead><tbody>
+<tr><td>ブランドストアあり</td><td>19</td><td>クリロン化成株式会社、株式会社三輝、株式会社NEXT、GORIX株式会社、株式会社アクセスライン、株式会社すごろくや、シースター株式会社、株式会社NAGARA、株式会社アート・エム、株式会社BTO、MRG JAPAN、グローバルアーク株式会社、株式会社山谷産業、有限会社フィアックアマル、SACラボ株式会社、株式会社ピチカートデザイン、淡路梅薫堂株式会社、株式会社DETAIL ARTIST、ラトックシステム株式会社</td></tr>
+<tr><td>ストアなし（browse ノード）</td><td>4</td><td>ペットライン株式会社、HEY!、愛知電線株式会社、株式会社ルイファン・ジャパン</td></tr>
+<tr><td>ストアなし（検索リンク）</td><td>2</td><td>株式会社MIC、株式会社タイガーゴム</td></tr>
+</tbody></table>
+<p>商標（TMview）は未調査。2026-09-14 は TMview の検索 API が接続リセットを返した（前日の S-e では取得できた）。J-PlatPat の手動手順は <code>agents/researcher/memory/knowledge_trademark_lookup_tmview_jplatpat.md</code> §4。</p>
+<h2>6. NETSEA との関係</h2>
+<ul>
+<li>社名での照合（NETSEA 取引申請480社リスト＋承認済み210社）と検索で、同じ社が NETSEA にいたのは KAEI 株式会社（NETSEA サプライヤー ID 704797）の1社。N に分類し、打診リストから外した。</li>
+<li>JAN での照合は T-2（タカシ）の担当。T-2 で NETSEA に同じ商品が見つかった社は、同じく N に移す。</li>
+<li>NETSEA で見つけた社への直接連絡は、規約第7条2項5号（NETSEA を通さない連絡の禁止）の疑い。連絡するなら NETSEA の問い合わせ機能を通す。</li>
+</ul>
+<h2>7. 事前除外した19社（上位79位まで）</h2>
+<table><thead><tr><th>元の順位</th><th>メーカー／ブランド</th><th>区分</th><th>理由</th></tr></thead><tbody>
+<tr><td>6</td><td>LEACCO公式店／Leacco</td><td>中国系OEM疑い</td><td>推測：英字造語ブランド・JAN06(UPC)・「公式店」表記。T-1 7c と同じ型</td></tr>
+<tr><td>11</td><td>株式会社BusinessJ&amp;C／Angashion</td><td>中国系OEM疑い</td><td>推測：英字造語ブランド・JAN07(UPC)</td></tr>
+<tr><td>12</td><td>アニコムパフェ 株式会社／CRYSTAL JOY</td><td>大手グループ</td><td>事実：アニコム ホールディングス（東証プライム 8715）の子会社</td></tr>
+<tr><td>14</td><td>HAGOOGI／HAGOOGI</td><td>中国系OEM疑い</td><td>推測：英字造語ブランド・gBiz 数字なし</td></tr>
+<tr><td>22</td><td>ROUDYBUSH／Generic</td><td>海外ブランド</td><td>事実：Roudybush は米国ブランド（輸入品）</td></tr>
+<tr><td>24</td><td>日本通信株式会社／アイサポモバイル</td><td>大手・非物販</td><td>事実：東証上場（9424）の通信事業者。商品は SIM</td></tr>
+<tr><td>27</td><td>jasonmarkk(ジェイソンマーク)／JASON MARKK(ジェイソンマーク)</td><td>海外ブランド</td><td>事実：Jason Markk は米国ブランド（JAN08）</td></tr>
+<tr><td>34</td><td>ノーブランド／フィード</td><td>ブランド不明</td><td>事実：メーカー欄=ノーブランド</td></tr>
+<tr><td>46</td><td>ホワイトダイヤモンド(WHITE DIAMOND)／Schultz Laboratories</td><td>海外ブランド</td><td>事実：タイトルに「並行輸入品」・JAN06</td></tr>
+<tr><td>48</td><td>SAPHIR(サフィール)</td><td>海外ブランド</td><td>事実：Saphir は仏ブランド（国内は輸入代理店）</td></tr>
+<tr><td>52</td><td>強力ブロワー／Benosu</td><td>中国系OEM疑い</td><td>推測：メーカー欄=「強力ブロワー」(商品名)・JAN07</td></tr>
+<tr><td>60</td><td>マタインク 29J TN29J TN-29J トナー／マタインク</td><td>中国系OEM疑い</td><td>推測：メーカー欄に型番文字列・JAN07</td></tr>
+<tr><td>61</td><td>幻冬舎／幻冬舎</td><td>版元</td><td>事実：出版社（T-1 7a の型）</td></tr>
+<tr><td>64</td><td>hololive／hololive OFFICIAL CARD GAME</td><td>大手</td><td>事実：カバー株式会社（東証グロース 5253）</td></tr>
+<tr><td>65</td><td>矢崎エナジーシステム㈱／ＹＡＺＡＫＩ</td><td>大手グループ</td><td>事実：矢崎グループ</td></tr>
+<tr><td>67</td><td>ブロッキース(Blokees)／ブロッキース(Blokees)</td><td>海外ブランド</td><td>事実：Blokees は中国の玩具ブランド</td></tr>
+<tr><td>73</td><td>LisoLife(理想ライフ)／LisoLife(理想ライフ)</td><td>中国系OEM疑い</td><td>推測：英字造語・JAN なし・gBiz 数字なし</td></tr>
+<tr><td>75</td><td>MENGLI／ＭＥＮＧＬＩ盟励</td><td>中国系OEM</td><td>事実：メーカー欄に「盟励」（中国語社名）</td></tr>
+<tr><td>76</td><td>Santa Maria Novella(サンタマリアノヴェッラ)／Santa Maria Novella</td><td>海外ブランド</td><td>事実：伊ブランド</td></tr>
+</tbody></table>
+<p>T-1 の判定から漏れていた型（調査で判明）：大手4社（ワコーズ560名・リッチェル308名・タカギ1,252名超・プライムダイレクト＝上場 IKHD 子会社）、代理店1社（COMPASS）、他社品の小売2社（3M 製品のデッドニング工房・ラジオ通販の快適生活）、中国系1社（アセキ）。</p>
+<h2>8. 分かっていないこと・妥協点</h2>
+<table><thead><tr><th>項目</th><th>状態</th><th>影響</th></tr></thead><tbody>
+<tr><td>返信率・成立率</td><td>分かりようがない（公開情報では出ない）</td><td>A の数は「送れる数」で「成立する数」ではない</td></tr>
+<tr><td>1社3ページの上限</td><td>窓口を見つけられなかった社がある（アガツマ・イースター・ARTISAN・ルミカ・ライカ・NAGARA）</td><td>B に入れた。4ページ目を見れば A に移る可能性あり</td></tr>
+<tr><td>商標</td><td>未調査（TMview 接続リセット）</td><td>ブランド登録（ストア有無）で代用</td></tr>
+<tr><td>同名の別会社</td><td>EdisonBrain・MIC・グローバルアーク・ガリバー・SeatheStars・一葉で同名別社を確認</td><td>ガリバーは当該 ASIN との一致が推測（確度中）</td></tr>
+<tr><td>二次情報</td><td>従業員数（ワコーズ・リッチェル・タカギ・フジテックス等）、アセキ・マドロスの国籍は検索結果・ブログ</td><td>表の根拠欄に二次と明記</td></tr>
+<tr><td>医療機器</td><td>KAEI（パルスオキシメータ）・シースター（鼻水吸引器）は管理医療機器を含む可能性</td><td>販売業の届出の要否はハルオ判定</td></tr>
+</tbody></table>
+<h2>9. ここから先はタケシ（プランナー）の領分です</h2>
+<p>事実は上のとおりです。次の判断は戦略なので渡します。</p>
+<p>1. A 25社のうち、メーカーでない 3社（輸入・調達・EC 事業者）を打診先に含めるか。含めなければ 22 社・1.10 週分。</p>
+<p>2. 自社で Amazon に出品しブランドストアを持つ社（25社中19社）に「仕入れさせてほしい」と送るか。先方から見ると同じ ASIN の競合出品者になる。</p>
+<p>3. A が約1.25週で尽きる。61位以下（打診母数の残り約850社）を同じ手順で掘るか、B（電話のみ・正規販売店制）の攻め方を先に決めるか。</p>
+<p>4. C の2社（すごろくや・タツフト）は EC 専業お断りを明記。打診しない、で良いか。</p>
+<h2>出典（主なもの・取得日はすべて 2026-09-14）</h2>
+<p>各社の出典URLは CSV の「出典URL」列。本文で使った一次情報の主なもの：</p>
+<ul>
+<li>クリロン化成株式会社：https://www.kurilon.co.jp/contact/</li>
+<li>アセキ（ASEKI）：https://dokonokuni.com/aseki/</li>
+<li>株式会社キュリエ：https://chips-shop.com/pages/business</li>
+<li>株式会社三輝：https://sanki-ota.com/contact</li>
+<li>株式会社NEXT（EdisonBrain）：https://hiragajong.com/pages/about-edisonbrain</li>
+<li>GORIX株式会社：http://www.gottsu-a.com/</li>
+<li>株式会社アクセスライン：https://petelect.jp/pages/wholesale</li>
+<li>KAEI株式会社：https://www.kaei.co.jp/contact/</li>
+<li>株式会社すごろくや：https://sugorokuya.jp/wholesale_guide</li>
+<li>株式会社カスタムジャパン（国内代理店）：https://www.customjapan.jp/press/pdf/press_130124_COMPASStire.pdf</li>
+<li>シースター株式会社：https://www.seastar.co.jp/contact/</li>
+<li>株式会社NAGARA：https://nagaracarwash.com/pages/about-us</li>
+<li>株式会社アート・エム：https://www.art-m.co.jp/</li>
+<li>株式会社みやこ：https://www.miyaco.jp/hpgen/HPB/categories/16550.html</li>
+<li>ペットライン株式会社：https://www.petline.co.jp/consultation/</li>
+<li>株式会社プライムダイレクト：https://prtimes.jp/main/html/rd/p/000000302.000016153.html</li>
+<li>株式会社MIC：https://mic-tech.jp/</li>
+<li>HEY!（運営法人名は公式に記載なし）：https://heyteam.net/contact/</li>
+<li>株式会社BTO：https://bto-ao.co.jp/contact/</li>
+<li>株式会社和光ケミカル：https://www.wako-chemical.co.jp/corporate/profile/</li>
+<li>MRG JAPAN：https://mrg-jp.com/contact/</li>
+<li>グローバルアーク株式会社：https://www.fft2015.com/otoiawase</li>
+<li>株式会社ヤマウチ：https://www.rakuten.co.jp/happylaugh/info.html</li>
+<li>株式会社山谷産業：https://www.yamac.co.jp/</li>
+<li>有限会社フィアックアマル：https://gok-fiac-a.shop/contact</li>
+<li>SACラボ株式会社：https://www.vitaminlabo.com/company/</li>
+<li>株式会社タイガーゴム：https://www.tigergomu.com/contact.html</li>
+<li>秋山産業株式会社：https://www.akiyamasangyo.jp/company03</li>
+<li>（特定できず）：https://irokagu.com/pages/about</li>
+<li>株式会社アガツマ：https://www.agatsuma.co.jp/ecatalog</li>
+<li>株式会社リッチェル：https://www.richell.co.jp/company/outline/</li>
+<li>イースター株式会社：https://www.yeaster.co.jp/faq/</li>
+<li>株式会社快適生活（メーカー欄は株式会社一葉）：https://www.kensei-online.com/companyinfo.php</li>
+<li>ユニバーサルシステムズ株式会社：https://pdakobo.com/faq/</li>
+<li>ST-TRADE株式会社：https://st-trade.jp/form.html</li>
+<li>ARTISAN：https://artisan-jp.com/jp/authorized-resellers</li>
+<li>株式会社ピチカートデザイン：https://jelly2games.com/contact</li>
+<li>株式会社ガリバー（推測：横浜の印刷会社）：https://www.gulliver.co.jp/faq/</li>
+<li>株式会社フジテックス：https://www.fjtex.co.jp/hansoku/company/</li>
+<li>株式会社タカギ：https://www.takagi.co.jp/</li>
+<li>株式会社ライカ：http://www.fortunefield.tokyo/html/company.html</li>
+<li>淡路梅薫堂株式会社：https://www.awaji-baikundo.com/kaishagaiyou.htm</li>
+<li>株式会社DETAIL ARTIST：https://detail-artist.jp/contact/</li>
+<li>ねむりの部屋（名古屋市・運営法人名は未確認）：https://store.shopping.yahoo.co.jp/nemurinoheya/info.html</li>
+<li>愛知電線株式会社：https://www.aichidensen.co.jp/contact/</li>
+<li>株式会社タツフト：https://www.tatsufuto.co.jp/inq/</li>
+<li>ウィキャンテクノ株式会社：https://www.rakuten.co.jp/shunkashuutou-zakka/info.html</li>
+<li>WADAI PRODUCTS（運営法人名は公式に記載なし）：https://lit.link/en/wadaibuzztools</li>
+<li>ウェブシステムズ株式会社：https://www.deadening.net/co.html</li>
+<li>株式会社ルミカ：https://www.lumica.co.jp/aboutus/company</li>
+<li>株式会社ルイファン・ジャパン：https://ruifan.co.jp/contact/</li>
+<li>ラトックシステム株式会社：https://www.ratocsystems.com/mail/</li>
+<li>株式会社サンコー商事：https://www.petstudio.jp/view/company</li>
+<li>T-1 需要先行スキャン：workspace/output/deliverables/T-20260914-002/02_T1_需要先行スキャン.md（out/t1_all.csv）</li>
+<li>Amazon ブランド登録：https://sell.amazon.co.jp/brand-registry</li>
+</ul>
+<p>再現用（agent_output/T-20260914-004/satoru/）：s1_group.py（会社に寄せる）・s1_select.py（選定・事前除外・NETSEA 社名照合）・s1_scrape.py（公式サイト最大3ページ）・s1_byline.py（ブランドストア）・facts.py（1社1行の事実）・gen_02.py／gen_md.py（生成）。</p>
+</body></html>
