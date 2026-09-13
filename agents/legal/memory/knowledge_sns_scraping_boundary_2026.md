@@ -116,3 +116,15 @@ find . -name "*<サービス名>*" | grep -v node_modules
 IT エンジニアの `memory/` は**稼働状況の一次情報**になる（「稼働中」と書いてある）。**必ず読むこと。**
 
 **そして停止・削除は自分でやらない。** スケジュール解除もファイル削除も §4.1。**A/B/C と推奨まで作って秘書に返す。**
+
+---
+
+## 追記（2026-09-13 / T-20260912-002）— §1 の表を3箇所更新
+
+| 対象 | 旧 | 新 | 根拠 |
+|---|---|---|---|
+| Google トレンドを人が見る／CSV DL の **PUBLIC リポ** | 不可（社内限定） | **条件付き可**（手動 DL・出典表記「データソース: Google トレンド（https://www.google.com/trends）」・自動取得は不可のまま） | 公式ヘルプ `support.google.com/trends/answer/4365538` が再利用を出典条件で許容（2026-09-13 取得） |
+| Makuake | 未確認＝着手不可 | **規約本文は取得済み**（`https://www.makuake.com/pages/term/` 末尾スラッシュで 200）。16条1項8号の名宛人は会員。非会員の閲覧・外部連絡は可、会員なら原則 NO | 同上 |
+| RSS フィード経由 | 可（最も筋がよい） | **YouTube のチャンネル RSS は不可**。他サイトの RSS は robots.txt を見てから | `youtube.com/robots.txt` `User-agent: *` に `Disallow: /feeds/videos.xml` |
+
+教訓：**「RSS は配信者が公開した形式だから可」を一般化していた。robots.txt が RSS のパスを Disallow している例がある。RSS も経路ごとに robots.txt を取る。**
