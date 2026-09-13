@@ -5,7 +5,7 @@ HERE = pathlib.Path(__file__).resolve().parent
 spec = importlib.util.spec_from_file_location("mc", HERE / "01_mc.py")
 mc = importlib.util.module_from_spec(spec); sys.modules["mc"] = mc; spec.loader.exec_module(mc)
 if __name__ == "__main__":
-    names = {7: "2027-04", 8: "2027-05", 9: "2027-06", 10: "2027-07", 11: "2027-08"}
+    names = {7: "2027-05", 8: "2027-06", 9: "2027-07", 10: "2027-08"}   # k index → 月（k=0 が 2026-10）
     lines = ["# 01_mc_harvest 出力（n=1500）", "",
              "| 案 | 新規ロットの最終月 | 補充の最終月 | P(実質現金>0)（中央） | P20／P80 | P(累計損益>0)（中央） | P(手仕舞い値>0) | 月12の月商 中央 |",
              "|---|---|---|---|---|---|---:|---:|"]

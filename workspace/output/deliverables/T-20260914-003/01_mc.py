@@ -450,6 +450,10 @@ PLANS = {
     # マサルの推奨形：初回ロット1ヶ月分・新規ロットは月8まで・せどりは「2週で採用0件 or 1件8分超」だけで止める
     "C_best": dict(lanes="WMS", send="A", rule="redesign", harvest=H9, harvest_new=8, adopt_min=1, Pov=dict(first_hold=1.0)),
     "B_best": dict(lanes="WM", send="B", rule="none", harvest=H9, harvest_new=8, Pov=dict(first_hold=1.0)),
+    # 最終形：停止時期の比較（01_mc_harvest.py）で最良だった「新規ロットは2027-06まで・補充は2027-07まで（2027-08から発注停止）」
+    "C_final": dict(lanes="WMS", send="A", rule="redesign", harvest=10, harvest_new=9, adopt_min=1, Pov=dict(first_hold=1.0)),
+    "B_final": dict(lanes="WM", send="B", rule="none", harvest=10, harvest_new=9, Pov=dict(first_hold=1.0)),
+    "A_final": dict(lanes="WM", send="A", rule="none", harvest=10, harvest_new=9, Pov=dict(first_hold=1.0)),
 }
 
 
