@@ -1,0 +1,80 @@
+<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>規約本文の秘書取得</title><style>body{font-family:-apple-system,'Hiragino Sans','Noto Sans JP',sans-serif;max-width:1400px;margin:24px auto;padding:0 20px;line-height:1.6;color:#222;font-size:14px}
+h1{font-size:1.5em;border-bottom:2px solid #333;padding-bottom:6px}h2{font-size:1.25em;margin-top:2em;border-left:5px solid #2b5;padding-left:8px}h3{font-size:1.05em;margin-top:1.5em}
+table{border-collapse:collapse;margin:10px 0 18px;width:100%;font-size:12.5px}th,td{border:1px solid #bbb;padding:5px 7px;vertical-align:top;text-align:left}th{background:#f0f4f0}tr:nth-child(even) td{background:#fafafa}
+code{background:#f3f3f3;padding:1px 4px;border-radius:3px;font-size:0.92em}hr{border:0;border-top:1px solid #ccc;margin:24px 0}li{margin:2px 0}</style></head><body>
+<h1>規約本文の秘書取得（タケシ2周目 §5「秘書ブラウザで規約本文4本を取る」／論点29）</h1>
+<p>T-20260912-002／2026-09-13／秘書カズヨ（§4.4 ブラウザ操作は秘書が実行）</p>
+<h2>結果</h2>
+<table><thead><tr><th>#</th><th>対象</th><th>結果</th><th>備考</th></tr></thead><tbody>
+<tr><td>1</td><td>Yahoo!デベロッパーネットワーク ガイドライン</td><td><strong>取得</strong>（全文・短い）</td><td>実体は「LINEヤフー共通利用規約 第2章＋クレジット表示」への参照。API 自体の可否は共通利用規約 §14（提供目的を超える利用の禁止・ハルオ 9/6 判定）に戻る</td></tr>
+<tr><td>2</td><td>Makuake 利用規約（本文）</td><td><strong>取得済み（ハルオが <code>/pages/term/</code> で逐語取得・2026-09-13）</strong></td><td><code>/static/rule/</code> は 302→トップ、<code>/pages/terms*</code> は 404、ヘルプセンターはブラウザ権限で開けず。Zendesk API で「利用規約」検索→本文記事なし。<strong>代わりに当社の用途（実行者への連絡・直接売買）に直結する禁止行為記事4本を API で全文取得</strong>（下記）</td></tr>
+<tr><td>3</td><td>Amazon ドロップシッピングポリシー</td><td><strong>未取得</strong></td><td>セラーセントラルのログインが要る。社長の一手（ログイン・2FA）が済んだ画面で秘書が取得する</td></tr>
+<tr><td>4</td><td>Amazon 公式ヘルプ（ゲート要件・SP-API 要件）</td><td><strong>未取得</strong></td><td>同上</td></tr>
+</tbody></table>
+<p>→ 2 はハルオが取得済み（<code>02_複合戦略_法務判定.md</code> 参照。「代理店は独占契約書の提出義務」は規約本文に無い）。3・4 は次回セラーセントラルにログインする機会（カナダ確認 9/14 など）に併せて秘書が取得する。社長に新しい手順を増やさない。</p>
+<h2>1. Yahoo!</h2>
+<p>Yahoo!デベロッパーネットワーク ガイドライン（https://developer.yahoo.co.jp/guideline/ ・2023年10月1日制定・ブラウザで全文取得）</p>
+<p>Yahoo!デベロッパーネットワークのご利用に際しては、LINEヤフー共通利用規約（第2章 ソフトウェアに関する規則（ガイドライン）を含みます。）およびプライバシーポリシーに加えて、このYahoo!デベロッパーネットワーク ガイドラインが適用されます。</p>
+<p>Yahoo!デベロッパーネットワークにおいて当社が提供するAPIをご利用になる場合、以下の特約事項が適用されます。</p>
+<ul>
+<li>お客様が、当社が提供するAPIを使用してソフトウェアを開発する場合には、「クレジット表示ガイドライン」と「クレジット配置ルール」を順守しなければなりません。</li>
+<li>お客様は、開発ソフトウェアに、当社が定める開発ソフトウェアを特定するためのアプリケーションID等を付さなければなりません。</li>
+<li>アプリケーションID等の情報は、お客様が開発した開発ソフトウェアの使用に際し当社に送信されることになります。</li>
+</ul>
+<h2>2. Makuake ヘルプ（禁止行為・Zendesk API 全文）</h2>
+<h3>Makuakeサービスを利用して直接売買を行う行為</h3>
+<ul>
+<li>URL: https://mkhelp.makuake.com/hc/ja/articles/31069414466585</li>
+<li>更新日（Zendesk）: 2024-04-11</li>
+</ul>
+<p>■概要</p>
+<p>Makuakeの決済機能を使用せず、Makuakeサービスを利用して個別に売買のやり取りを行うことは禁止しております。トラブルが発生した場合、Makuakeでサポートはできませんのでご了承ください。</p>
+<p>■どのようなものが違反になりますか？</p>
+<p>・終了したプロジェクトの商品をMakuakeメッセージを通して直接売買を行う行為</p>
+<p>・その他、事務局が不適切と判断したもの</p>
+<p>■該当の利用規約</p>
+<p>第16条第1項第8号</p>
+<p>以下ヘルプページもあわせてご確認ください。</p>
+<p>〔サポーター向け〕終了したプロジェクトの商品を購入したい</p>
+<h3>Makuakeメッセージを利用し営業メッセージを送付する行為</h3>
+<ul>
+<li>URL: https://mkhelp.makuake.com/hc/ja/articles/22738462608409</li>
+<li>更新日（Zendesk）: 2026-09-06</li>
+</ul>
+<p>■概要</p>
+<p>Makuakeメッセージを利用し営業や勧誘の案内を送付することなど、商業目的で利用する行為は禁止しております。</p>
+<p>事務局が禁止行為に該当すると合理的な理由に基づき判断した場合は、退会などの措置を取る場合があります。</p>
+<p>■どのようなものが違反になりますか？</p>
+<p>・Makuakeメッセージを使い営業や勧誘のメッセージを送付する行為</p>
+<p>・その他、事務局が不適切と判断したもの</p>
+<p>■該当の利用規約</p>
+<p>第16条第1項第8号</p>
+<p>ご不明点がございましたら、お問い合わせフォームよりMakuakeカスタマーサポート窓口へご連絡ください。</p>
+<h3>メッセージについての同意事項</h3>
+<ul>
+<li>URL: https://mkhelp.makuake.com/hc/ja/articles/14246462723353</li>
+<li>更新日（Zendesk）: 2026-09-12</li>
+</ul>
+<p>Makuakeを運営する株式会社マクアケは、皆様に安心してご利用いただくために、以下に定める事項を目的として、Makuakeメッセージの内容を確認する場合があります 。 ＜目的＞</p>
+<p>法令違反、利用規約違反の有無の確認</p>
+<p>実行者とサポーターの間のトラブルを解決するための事実確認</p>
+<p>※全てのメッセージの確認・巡回を確約するものではありません 。利用規約違反や不正な利用が確認できた場合は、対象メッセージの非表示処置またはアカウントの退会処分等の措置を講じる場合があります 。なお、以下のページに記載の通り、営業や勧誘の案内を送付するなど、商業目的でMakuakeメッセージを利用する行為は禁止しております。また、一度送信されたMakuakeメッセージは、送信後にお客様ご自身で取り消しや削除を行うことはできかねます。送信の際は内容をよくご確認いただきますよう、予めご了承ください 。▼禁止されていること：Makuakeメッセージを利用し営業メッセージを送付する行為https://mkhelp.makuake.com/hc/ja/articles/22738462608409</p>
+<h3>プロジェクトに掲載した画像や動画などを実行者自身の自社ホームページや他サイトで使用しても問題ありませんでしょうか？</h3>
+<ul>
+<li>URL: https://mkhelp.makuake.com/hc/ja/articles/13797762853017</li>
+<li>更新日（Zendesk）: 2024-07-25</li>
+</ul>
+<p>実行者側で作成したコンテンツ素材については、実行者ご自身であれば自社のホームページや他サイトで使用していただいても問題ございません。 詳細に関しましては利用規約「第15条1項」をご参照ください。</p>
+<p>また、弊社から提供したコンテンツ素材又は弊社が加工をしたコンテンツ素材等の権利は弊社に帰属します。弊社の書面での承諾が必要になるため、担当キュレーターにご相談ください。 </p>
+<p>※実行者ではない方がご使用される場合、必ず事前に実行者にお問合せの上、使用許可を取るようお願いいたします。</p>
+<p>※制作会社に依頼をして作成したコンテンツ素材については制作会社との契約をご確認ください。</p>
+<p>利用規約はこちらhttps://www.makuake.com/pages/term/</p>
+<p>Makuakeマークの使用に関しては以下ヘルプ記事をご確認ください。</p>
+<p>Makuakeロゴを使いたいのですが、何に気をつけたらいいですか？</p>
+<p>その他ご不明点がございましたら、お問い合わせフォームよりMakuakeカスタマーサポート窓口へご連絡ください。</p>
+<h2>当社の用途への含意（事実のみ・判定はハルオ）</h2>
+<ul>
+<li>Makuake メッセージ機能での営業・直接売買の勧誘は明文禁止。<strong>実行者への接触は Makuake 外の公開連絡先（自社サイト等）経由に限る</strong>（サトル③ 04 と一致）</li>
+<li>Yahoo! API は「ID付与・クレジット表示」が特約。データ利用の範囲は共通利用規約 §14 が支配</li>
+</ul>
+</body></html>
