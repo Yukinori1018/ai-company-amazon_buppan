@@ -1,13 +1,13 @@
-<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>T-1 需要先行スキャン — token 見積り（実行前に停止）</title><style>body{font-family:-apple-system,'Hiragino Sans','Noto Sans JP',sans-serif;max-width:1400px;margin:24px auto;padding:0 20px;line-height:1.6;color:#222;font-size:14px}
+<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>T-1 需要先行スキャン — 公表≥50 単品 3,385 件の実行結果</title><style>body{font-family:-apple-system,'Hiragino Sans','Noto Sans JP',sans-serif;max-width:1400px;margin:24px auto;padding:0 20px;line-height:1.6;color:#222;font-size:14px}
 h1{font-size:1.5em;border-bottom:2px solid #333;padding-bottom:6px}h2{font-size:1.25em;margin-top:2em;border-left:5px solid #25b;padding-left:8px}h3{font-size:1.05em;margin-top:1.5em}
 table{border-collapse:collapse;margin:10px 0 18px;width:100%;font-size:12.5px}th,td{border:1px solid #bbb;padding:5px 7px;vertical-align:top;text-align:left}th{background:#eef2f8}tr:nth-child(even) td{background:#fafafa}
 code{background:#f3f3f3;padding:1px 4px;border-radius:3px;font-size:0.92em}pre{background:#f6f6f6;padding:10px;overflow:auto}hr{border:0;border-top:1px solid #ccc;margin:24px 0}li{margin:2px 0}blockquote{border-left:4px solid #ccc;margin:10px 0;padding:4px 12px;color:#444}</style></head><body>
-<h1>T-1 需要先行スキャン — token 見積り（実行前に停止）</h1>
+<h1>T-1 需要先行スキャン — 公表≥50 単品 3,385 件の実行結果</h1>
 <p>T-20260914-002 §13 T-1 ／ タカシ ／ 2026-09-14 ／ Keepa domain=5（日本）</p>
 <h2>0. 結論</h2>
-<ul><li>実行案はどれも 1,000 token を超える。ルールどおり、見積りだけで止めた。</li><li>取り分≥6 を推定なしで言える層は「Amazon 公表の月間購入数≥50」。単品 3,385 ASIN、子を含めると約 10,400 ASIN。</li><li>推奨は案A（単品層 3,385 を全件読む）。約 3,400 token・約2時間。T-2 にそのまま渡せる CSV が出る。</li><li>ブランド数・メーカー数はまだ出ていない。brand / manufacturer は 1 token/ASIN の product でしか取れないため。</li></ul>
+<ul><li>取り分≥6 が推定なしで言える「公表の月間購入数≥50・単品」3,385 ASIN を全件読んだ（案A・カズヨ判断で実行）。</li><li>T-2（卸3社との JAN 照合）に渡す行は 3,255 ASIN・メーカー 2,060。うち JAN ありは 1,986（61%）。</li><li>大手・代理店・海外・中国系疑い・ブランド不明を除いたメーカー打診の母数は 1,394 ASIN・メーカー 994。100社を超えたので案B（子を含む夜間1晩）は提案しない。</li><li>終売の兆候は打診母数のうち2つ以上 31 ASIN・1つ 230 ASIN。落とさず CSV の列に入れた。</li><li>消費 token は 3,715（前回のプローブ 176・一覧 154・product 3,385）。</li></ul>
 <h2>1. token の状況</h2>
-<table><thead><tr><th>項目</th><th>値</th></tr></thead><tbody><tr><td>再起動時の残高</td><td>1,200（上限。前回分は回復済み）</td></tr><tr><td>前回の消費</td><td>Finder プローブ 16回＋カテゴリ一覧 1回 ≒ 176 token（raw の記録から集計）</td></tr><tr><td>今回の消費</td><td>ASIN 一覧 2本 = 154 token（単品 44・子含む 110）</td></tr><tr><td>報告時の残高</td><td>1,086</td></tr><tr><td>補充</td><td>20/分（1,200/時）。<code>tokenFlowReduction</code> 0.0</td></tr><tr><td>他ジョブ</td><td>list-builder（T-20260831-002）は STOP ファイルで待機中。消費なし</td></tr></tbody></table>
+<table><thead><tr><th>項目</th><th>値</th></tr></thead><tbody><tr><td>再起動時の残高</td><td>1,200（上限。前回分は回復済み）</td></tr><tr><td>前回の消費</td><td>Finder プローブ 16回＋カテゴリ一覧 1回 ≒ 176 token（raw の記録から集計）</td></tr><tr><td>今回の消費</td><td>ASIN 一覧 2本 = 154 token（単品 44・子含む 110）</td></tr><tr><td>見積り報告時の残高</td><td>1,086（実行後は 41。自然回復）</td></tr><tr><td>補充</td><td>20/分（1,200/時）。<code>tokenFlowReduction</code> 0.0</td></tr><tr><td>他ジョブ</td><td>list-builder（T-20260831-002）は STOP ファイルで待機中。消費なし</td></tr></tbody></table>
 <p>list-builder が再開すると補充を分け合うので、下の所要時間は倍になる。</p>
 <h2>2. 漏斗（Finder の件数。近似値）</h2>
 <p>Finder の件数は百の位で丸めた近似値で、単調にならないこともある。桁として読む。</p>
@@ -42,4 +42,25 @@ code{background:#f3f3f3;padding:1px 4px;border-radius:3px;font-size:0.92em}pre{b
 <p>T-2 から大手・代理店を外さない理由: T-2 は卸との JAN 照合で、卸が扱うのはまさに大手・代理店の商品。社長の 2026-08-31 の訂正（規模は参考。卸経由なら大企業からも仕入れられる）にも沿う。外すのはメーカー打診の母数を数えるときだけ。</p>
 <p>「単品」の定義: 親が無い、または親はあるが子が自分1本だけ。Finder で単品に絞っても product では親ありが約26%出るが、全件が子1本の家族だった。</p>
 <p>実装（agent_output/T-20260914-002/takashi/）: <code>fetch_t1.py</code>（取得・再開可）・<code>t1_classify.py</code>（判定・自己テスト付き）・<code>t1_bigbrands.py</code>（既知の大手）・<code>t1_size.py</code>（gBizINFO・T-20260831-004 の照合を再利用）・<code>t1_build.py</code>（集計・0 token）。</p>
+<h2>9. 結果（案A・単品 3,385 件）</h2>
+<h3>9-0. 途中で決めた2点と理由</h3>
+<table><thead><tr><th>決めたこと</th><th>理由</th></tr></thead><tbody><tr><td>T-2 用 CSV には大手・代理店を残し、列（<code>大手</code>・<code>区分</code>）で印を付ける。除外するのはメーカー打診の母数を数えるときだけ</td><td>T-2 は卸3社との JAN 照合。卸が扱うのは大手・代理店の商品そのもの。先に落とすと卸レーンの候補を自分で消す。社長 2026-08-31「規模は参考。卸経由なら大企業からも仕入れられる」にも沿う</td></tr><tr><td>親 ASIN があっても、子が自分1本だけの家族は単品として扱う（CSV では <code>単品(親1子1)</code>）</td><td>家族の需要＝その ASIN の需要なので、兄弟で需要を二重に数える問題が起きない。Finder で単品に絞っても product では親ありが約26%出たが、全件が子1本の家族だった</td></tr></tbody></table>
+<p>版元と中国系OEM（強）は T-2 からも外す。卸との照合でも仕入れ先にならないため。</p>
+<h3>9-1. 漏斗（段6〜8）</h3>
+<table><thead><tr><th>段</th><th>ASIN</th><th>ブランド</th><th>メーカー</th></tr></thead><tbody><tr><td>段6 公表≥50・単品の一覧（Finder）</td><td>3,385</td><td>—</td><td>—</td></tr><tr><td>うち product 取得済み</td><td>3,385</td><td>1,942</td><td>2,141</td></tr><tr><td>段6&#x27; product の現在値で再判定OK</td><td>3,365</td><td>1,931</td><td>2,127</td></tr><tr><td>段7a −版元</td><td>3,365</td><td>1,931</td><td>2,127</td></tr><tr><td>段7b −中国系OEM（強）＝T-2 に渡す行</td><td>3,255</td><td>1,877</td><td>2,060</td></tr><tr><td>段7c −中国系OEM疑い・海外ブランド・ブランド不明</td><td>2,021</td><td>1,086</td><td>1,213</td></tr><tr><td>段7d −代理店</td><td>1,984</td><td>1,074</td><td>1,200</td></tr><tr><td>段7e −大手＝メーカー打診の母数</td><td>1,394</td><td>920</td><td>994</td></tr><tr><td>段8 　うち終売の兆候2つ以上</td><td>31</td><td>29</td><td>29</td></tr><tr><td>段8 　うち終売の兆候1つ</td><td>230</td><td>201</td><td>210</td></tr></tbody></table>
+<h3>9-2. 区分別の件数（段6&#x27;OK の ASIN）</h3>
+<table><thead><tr><th>区分</th><th>ASIN</th></tr></thead><tbody><tr><td>国内</td><td>1,984</td></tr><tr><td>中国系OEM疑い</td><td>854</td></tr><tr><td>海外ブランド</td><td>323</td></tr><tr><td>中国系OEM</td><td>110</td></tr><tr><td>ブランド不明</td><td>57</td></tr><tr><td>代理店</td><td>37</td></tr></tbody></table>
+<p>大手の印（T-2 の行）: 653 ASIN。根拠の内訳: 既知 504、gBiz既知 83、gBiz 66。</p>
+<h3>9-3. T-2 に渡す CSV の中身</h3>
+<table><thead><tr><th>項目</th><th>件数</th></tr></thead><tbody><tr><td>単品</td><td>2,604</td></tr><tr><td>単品(親1子1)</td><td>651</td></tr><tr><td>JAN あり</td><td>1,986</td></tr><tr><td>うち JAN 45/49（日本）</td><td>1,259</td></tr></tbody></table>
+<h3>9-4. メーカー打診の母数の中身</h3>
+<p>メーカーあたりの ASIN 数: 1件 788 社・2〜4件 187 社・5件以上 19 社。</p>
+<p>取り分の分布（ASIN）: 6〜9 が 195・10〜29 が 901・30以上 が 298。</p>
+<table><thead><tr><th>カテゴリ</th><th>打診母数の ASIN</th></tr></thead><tbody><tr><td>ホーム＆キッチン</td><td>234</td></tr><tr><td>ペット用品</td><td>223</td></tr><tr><td>スポーツ＆アウトドア</td><td>160</td></tr><tr><td>車＆バイク</td><td>152</td></tr><tr><td>おもちゃ</td><td>127</td></tr><tr><td>DIY・工具・ガーデン</td><td>108</td></tr><tr><td>産業・研究開発用品</td><td>71</td></tr><tr><td>パソコン・周辺機器</td><td>69</td></tr><tr><td>ファッション</td><td>64</td></tr><tr><td>ホビー</td><td>55</td></tr><tr><td>文房具・オフィス用品</td><td>52</td></tr><tr><td>家電＆カメラ</td><td>36</td></tr></tbody></table>
+<p>gBizINFO の照合結果（国内・代理店の行・ASIN 単位。L1=従業員300人超・L2=資本金3億円超・M=中小と確認・U1=数字なし・U2=同名複数・U3=特定できず）: U2 744、U3 638、U1 412、L1 125、M2 86、L2 16。</p>
+<h3>9-5. 出力ファイル（out/・Git 追跡外）</h3>
+<table><thead><tr><th>ファイル</th><th>中身</th></tr></thead><tbody><tr><td><code>out/t2_input.csv</code></td><td>T-2 に渡す 3,255 行。ASIN・JAN・ブランド・メーカー・月販推定（公表下限）・取り分・価格・新品オファー数・単品/子・区分・大手・終売の兆候・カテゴリ</td></tr><tr><td><code>out/t1_all.csv</code></td><td>取得した全 3,385 行＋判定の根拠列（gBizINFO の理由コード・従業員数・大手の根拠）</td></tr><tr><td><code>out/t1_brands.csv</code></td><td>ブランド×メーカー別の ASIN 数と取り分合計</td></tr><tr><td><code>out/t1_funnel.json</code></td><td>本節の件数の元データ</td></tr></tbody></table>
+<p>T-2 で打診母数だけを見るときは <code>区分=国内</code> かつ <code>大手</code> が空の行で絞る。</p>
+<h2>10. 妥協点と注意</h2>
+<table><thead><tr><th>項目</th><th>内容</th><th>影響</th></tr></thead><tbody><tr><td>大手の判定</td><td>手書きの既知リスト（約250語）が主。gBizINFO は Amazon のブランド表記と商号が一致せず、大手ほど引けない（同名複数 U2・特定できず U3 が大半）</td><td>打診母数に中堅〜大手が残っている可能性。上位ブランドを目視して足したが網羅ではない</td></tr><tr><td>JAN の欠け</td><td>T-2 に渡す行の JAN ありは 61%（1,986/3,255）</td><td>T-2 の JAN 照合は最大でも6割しか当たらない。残りは型番・商品名での照合が要る</td></tr><tr><td>中国系OEMの判定</td><td>強い印（中国企業表記・簡体字・ピンイン・EAN69）は落とし、弱い印は「疑い」として T-2 に残した。過去の実測で再現率は4割程度</td><td>「国内」に日本語表記の中国系が混ざる</td></tr><tr><td>新品オファー数</td><td>出品者数ではない（同じ出品者の FBA＋FBM で2）。取り分は過小側・過大側どちらにもぶれる</td><td>実セラー数は T-2 で照合できた行だけ offers で取る（+6 token/ASIN）</td></tr><tr><td>公表の月間購入数</td><td>階級値の下限（50 は 50〜99）</td><td>取り分は保守側</td></tr><tr><td>子を含む層</td><td>今回は読んでいない（約7,000 ASIN）</td><td>打診母数は子の分だけ過小</td></tr></tbody></table>
 </body></html>
