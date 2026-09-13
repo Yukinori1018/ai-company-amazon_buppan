@@ -1,0 +1,37 @@
+<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>T-1 需要先行スキャン — token 見積り（実行前に停止）</title><style>body{font-family:-apple-system,'Hiragino Sans','Noto Sans JP',sans-serif;max-width:1400px;margin:24px auto;padding:0 20px;line-height:1.6;color:#222;font-size:14px}
+h1{font-size:1.5em;border-bottom:2px solid #333;padding-bottom:6px}h2{font-size:1.25em;margin-top:2em;border-left:5px solid #25b;padding-left:8px}h3{font-size:1.05em;margin-top:1.5em}
+table{border-collapse:collapse;margin:10px 0 18px;width:100%;font-size:12.5px}th,td{border:1px solid #bbb;padding:5px 7px;vertical-align:top;text-align:left}th{background:#eef2f8}tr:nth-child(even) td{background:#fafafa}
+code{background:#f3f3f3;padding:1px 4px;border-radius:3px;font-size:0.92em}pre{background:#f6f6f6;padding:10px;overflow:auto}hr{border:0;border-top:1px solid #ccc;margin:24px 0}li{margin:2px 0}blockquote{border-left:4px solid #ccc;margin:10px 0;padding:4px 12px;color:#444}</style></head><body>
+<h1>T-1 需要先行スキャン — token 見積り（実行前に停止）</h1>
+<p>T-20260914-002 §13 T-1 ／ タカシ ／ 2026-09-14 ／ Keepa domain=5（日本）</p>
+<h2>0. 結論</h2>
+<ul><li>実行案はどれも 1,000 token を超える。ルールどおり、見積りだけで止めた。</li><li>取り分≥6 を推定なしで言える層は「Amazon 公表の月間購入数≥50」。単品 3,385 ASIN、子を含めると約 10,400 ASIN。</li><li>推奨は案A（単品層 3,385 を全件読む）。約 3,400 token・約2時間。T-2 にそのまま渡せる CSV が出る。</li><li>ブランド数・メーカー数はまだ出ていない。brand / manufacturer は 1 token/ASIN の product でしか取れないため。</li></ul>
+<h2>1. token の状況</h2>
+<table><thead><tr><th>項目</th><th>値</th></tr></thead><tbody><tr><td>再起動時の残高</td><td>1,200（上限。前回分は回復済み）</td></tr><tr><td>前回の消費</td><td>Finder プローブ 16回＋カテゴリ一覧 1回 ≒ 176 token（raw の記録から集計）</td></tr><tr><td>今回の消費</td><td>ASIN 一覧 2本 = 154 token（単品 44・子含む 110）</td></tr><tr><td>報告時の残高</td><td>1,086</td></tr><tr><td>補充</td><td>20/分（1,200/時）。<code>tokenFlowReduction</code> 0.0</td></tr><tr><td>他ジョブ</td><td>list-builder（T-20260831-002）は STOP ファイルで待機中。消費なし</td></tr></tbody></table>
+<p>list-builder が再開すると補充を分け合うので、下の所要時間は倍になる。</p>
+<h2>2. 漏斗（Finder の件数。近似値）</h2>
+<p>Finder の件数は百の位で丸めた近似値で、単調にならないこともある。桁として読む。</p>
+<table><thead><tr><th>段</th><th>条件</th><th>残る件数</th></tr></thead><tbody><tr><td>0</td><td>ランクあり（アダルト除く）</td><td>8,082万</td></tr><tr><td>1</td><td>＋Amazon 本体なし</td><td>7,542万</td></tr><tr><td>2</td><td>＋新品オファー 2〜6</td><td>589万</td></tr><tr><td>3</td><td>＋価格 2,000〜8,000円</td><td>300万</td></tr><tr><td>4</td><td>＋メディア13ルート除外（本・CD・DVD・ゲーム等）</td><td>192万</td></tr><tr><td>5</td><td>＋規制3ルート除外（ドラッグ・ビューティー・食品）</td><td>174万</td></tr><tr><td>6</td><td>＋公表の月間購入数≥50（＝取り分≥6 が確定）</td><td>約1.04万</td></tr><tr><td>6a</td><td>うち単品（variationCount≤1）</td><td>3,385</td></tr><tr><td>6b</td><td>うちバリエーションの子</td><td>約7,000</td></tr><tr><td>7</td><td>大手・代理店・版元・中国系 OEM の除外</td><td>未実施（brand 読みが必要）</td></tr><tr><td>8</td><td>終売の兆候フラグ</td><td>未実施（同上）</td></tr></tbody></table>
+<p>参考: 段5から公表値ではなくランクで絞った場合の件数（取り分はまだ判定できない）。</p>
+<table><thead><tr><th>ランク</th><th>件数</th></tr></thead><tbody><tr><td>≤3万</td><td>13.1万</td></tr><tr><td>≤5万</td><td>19.8万</td></tr><tr><td>≤10万</td><td>32.4万</td></tr></tbody></table>
+<p>段5の規制3を戻すと、段6は約1.93万に増える（約9千件が規制カテゴリ）。除外は前回の既定で、戻すかは判断事項（§5）。</p>
+<h2>3. 取り分≥6 の判定のしかた</h2>
+<p>取り分 ＝ 月販見込 ÷（新品オファー＋1）。オファー2〜6なら、必要な月販は 18〜42個。</p>
+<table><thead><tr><th>層</th><th>月販の根拠</th><th>取り分≥6</th><th>扱い</th></tr></thead><tbody><tr><td>A 単品・公表≥50</td><td>Amazon 公表の実測（下限50）</td><td>確定（50÷7＝7.1）</td><td>そのまま採用</td></tr><tr><td>B 子・公表≥50</td><td>公表値は家族の合算</td><td>家族合計の上限としてのみ確定</td><td>「子」と明記。兄弟で同じ需要を二重に数えない</td></tr><tr><td>C 公表なし・ランクのみ</td><td>ランク→月販の較正（推定）</td><td>推定</td><td>13〜32万件。全件は無理。抽出で比率だけ出す</td></tr></tbody></table>
+<p>ドロップ数は使わない（観測回数であって販売数ではない）。</p>
+<h2>4. 見積り</h2>
+<table><thead><tr><th>案</th><th>対象</th><th>token</th><th>所要時間</th><th>出るもの</th></tr></thead><tbody><tr><td>A（推奨）</td><td>層A 単品 3,385 を全件</td><td>約3,400</td><td>約2時間</td><td>ASIN・ブランド・メーカー・JAN の CSV。除外ルールと終売フラグ込み</td></tr><tr><td>B</td><td>層A＋層B（子 約7,000）</td><td>約8,700</td><td>約6.5時間（夜間1晩）</td><td>A＋子の CSV（家族ごとに1行へ寄せる）</td></tr><tr><td>C</td><td>層Cの抽出（6帯×100件）</td><td>約600</td><td>約30分</td><td>比率だけ。CSV は出ない</td></tr><tr><td>A0</td><td>層Aの先頭 900件だけ</td><td>約900</td><td>即時</td><td>ブランドの偏り・大手の比率の当たり。T-2 の試し照合用</td></tr></tbody></table>
+<p>見積りの根拠:</p>
+<ul><li>product は 1 token/ASIN（offers なし・stats=30）。一覧は取得済みなので Finder の追加は0（案B は1万件の上限を超える分だけ価格帯で割って約30 token）。</li><li>所要時間は（token − 残高1,086）÷ 1,200/時。</li><li>案B の子は、兄弟を1本読めば家族の ASIN が分かるので、残りの兄弟を読み飛ばす。手元の保存データで子876件が659家族に収まった（約25%減）。飛ばさなければ約10,400 token・約8時間。</li><li>手元の保存データ（7,079 ASIN・中央値20日前）と重なるのは単品 521件・全体 1,263件。ブランドとメーカーはそこから読めるが、価格・オファー数・公表値は古い。T-2 に渡す数値は取り直す前提で、見積りにはキャッシュの節約を入れていない。</li></ul>
+<h2>5. 判断してほしいこと</h2>
+<table><thead><tr><th>論点</th><th>選択肢</th><th>推奨</th></tr></thead><tbody><tr><td>実行範囲</td><td>A ／ B ／ A0 ／ A＋C</td><td>A。取り分≥6 が推定なしで言え、T-2 にすぐ渡せる。除外後のメーカー数が足りなければ B を夜間に追加</td></tr><tr><td>規制3（ドラッグ・ビューティー・食品）</td><td>除外のまま ／ 戻す（段6が約1.9倍）</td><td>除外のまま。出品ゲートと表示規制が重い。戻すなら別チケットで</td></tr><tr><td>実セラー数の確認</td><td>全件 ／ T-2 で照合できた行だけ</td><td>照合できた行だけ。offers 付きは +6 token/ASIN。新品オファー数は出品者数ではない（同じ出品者の FBA＋FBM で2になる）</td></tr></tbody></table>
+<h2>6. 実行するときの作り（承認後）</h2>
+<ul><li>取得: 一覧 <code>t1_raw/L_single.json</code>（取得済み）を 100件ずつ product に投げる。1リクエストごとに生レスポンスを <code>agent_output/T-20260914-002/t1_raw/</code> に保存し、途中で止まっても続きから再開できるようにする。</li><li>除外（落とさずに列で持つ。社長が線を引き直せる形）:</li></ul>
+<table><thead><tr><th>区分</th><th>判定</th></tr></thead><tbody><tr><td>大手</td><td>上場・従業員300人超の代理指標。gBizINFO（キャッシュあり）＋既知の大手リスト</td></tr><tr><td>代理店</td><td>brand と manufacturer の不一致、manufacturer に「輸入」「代理店」「販売元」</td></tr><tr><td>版元</td><td>出版社名・書籍系サブカテゴリ</td></tr><tr><td>中国系 OEM</td><td>ラテン大文字の造語ブランド、manufacturer が中国の会社名・ピンイン（T-20260831-004 の失敗の型）</td></tr></tbody></table>
+<ul><li>終売の兆候フラグ: 新品オファー数の急減、価格の急騰、在庫切れの頻度、公表値の低下。落とさず列にする。</li><li>出力: 漏斗表の続き（段7・8）、ブランド別・メーカー別の件数（本文）、T-2 用 CSV は <code>out/</code>（Git 追跡外）。</li></ul>
+<p>T-2 用 CSV の列:</p>
+<table><thead><tr><th>列</th><th>中身</th></tr></thead><tbody><tr><td>ASIN / 親ASIN / 単品・子</td><td>子は家族合計の上限と明記</td></tr><tr><td>JAN</td><td>eanList（複数あれば全部）</td></tr><tr><td>ブランド / メーカー</td><td>brand・manufacturer の直読み</td></tr><tr><td>月販推定</td><td>公表値の下限（50 は「50〜99」の意味）</td></tr><tr><td>取り分</td><td>月販推定 ÷（新品オファー＋1）</td></tr><tr><td>価格 / 新品オファー数</td><td>取得時点の値</td></tr><tr><td>除外区分 / 終売フラグ</td><td>上表</td></tr></tbody></table>
+<h2>7. 注意</h2>
+<ul><li>公表の月間購入数は階級値で、下限50。取り分は保守側の値になる。</li><li>公表値が無い ASIN は「売れていない」とは限らない。層Cは今回の案A では拾わない。</li><li>数値の出典は Keepa API（契約内）。楽天・Yahoo・Amazon の画面は取得していない。</li><li>ASIN ごとの数値はこの文書に書かない（PUBLIC リポ）。</li></ul>
+<p>再現用スクリプト（agent_output）: <code>takashi/probe.py</code>（漏斗の件数）・<code>takashi/t1_lists.py</code>（ASIN 一覧）・<code>takashi/cache_overlap.py</code>（手元データとの重なり・0 token）。</p>
+</body></html>
