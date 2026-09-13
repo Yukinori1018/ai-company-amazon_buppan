@@ -31,3 +31,15 @@
 ## 日付
 
 作業日＝事実日＝2026-09-14。ログ・owner-tasks・handover・memory すべて同日。
+
+## 追記：子の done 同期セット（同日・-001 done／-002 doing・commit e70bd1c の後）
+
+1 turn で閉じた順番（再利用可）：
+1. 実物照合：`ls tickets/*/`・`git ls-files deliverables/<id>/`・チケット直下 `.gitignore` を読む。今回 `out/` と `*.csv`（`!stats_*.csv` 以外）が追跡外。**追跡外は Notion でもカタログでもリンクにしない**。Notion は「ローカルのみ」と1行注記、カタログは 01 本文行の備考へ逃がす
+2. 配信 URL を curl で 11本すべて 200 確認してから Notion に貼る
+3. Notion は `update_properties`（Status・UpdatedAt）と `update_content` を別呼び出し。成果物節は既存の「（作業中 — 納品時に配信URLを追記）」を old_str にして置換（insert_content だと重複）。結果要約は最後の bullet をアンカーに追記。親は「…目安 9/15〜16）。\n## 成果物」をアンカーにすると一意に当たる
+4. fetch で3枚読み返し（Status と本文）
+5. カタログ CSV は **CRLF・15列**（skill の「13列」記載は古い。実物は 公開状態・ローカルリンク を含む15列）。`csv.writer(lineterminator='\r\n')` で追記→列数集合 {15} を検算→同期（今回は一発 HTTP 200・735行）
+6. スクリプト3本は1行に集約（代表 recut.py・備考に同梱2本）
+
+気づき：`deliverables-catalog.md` §2 は「13列」のまま。実物は15列。次に skill を触る機会で直す（今回は発注範囲外なので未修正）。
