@@ -31,6 +31,7 @@ related_tickets: [T-20260912-002, T-20260914-002, T-20260914-005]
 ## ログ
 
 - 2026-09-14 doing 起票（カズヨ）。
+- 2026-09-14 マリエ：Notion カード新規作成（doing・it_engineer・high・labels pipeline/sourcing・ParentTicket T-20260912-002）。owner-tasks の ℹ️ と handover に追加。
 
 ## 成果物
 
