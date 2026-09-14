@@ -34,6 +34,7 @@ related_tickets: [T-20260912-002, T-20260914-002, T-20260914-003, T-20260914-004
 - 2026-09-14 マリエ：Notion カード作成（https://app.notion.com/p/3dbb0a4044fa8182ae4fedfa22eb6cbb・doing・TicketID 在籍ゼロを SQL で確認・ラベル strategy/plan/cashflow は既存）。親の結果要約に訂正1行、owner-tasks 更新㉛（社長タスク件数は据え置き）。
 
 - 2026-09-14 タケシ：検算（マサル S-1 主 31%／−7万を同じ乱数で再現）→案A/B/C（39/43/47%）→フロンティア。固定費0で96%と判明し、固定費の打ち手（Keepa API→Pro）を追加計算（02c〜02e）。本文 §0〜9・HTML・README を納品、memory `feedback_demand_visible_means_competitor.md` を作成。
+- 2026-09-14 マリエ：Notion 更新（-005 の結果要約に再設計の結論＝P2 に寄せても最良 案B＋固定費圧縮 P50%・中央±0・マサル検証中、成果物節に 01 md/html・02 スクリプトと出力・README の配信URL／親 T-20260912-002 に1行）。カタログ4行追記・シート同期776行、owner-tasks 更新㉜（社長タスク増減ゼロ）。
 
 ## 成果物
 
