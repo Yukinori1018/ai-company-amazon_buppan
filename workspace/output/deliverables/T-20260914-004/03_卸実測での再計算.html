@@ -1,0 +1,192 @@
+<!doctype html><html lang='ja'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>卸の実測で12ヶ月の確率を出し直す（マサル再計算）</title><style>body{font-family:-apple-system,'Hiragino Sans','Noto Sans JP',sans-serif;max-width:1150px;margin:2em auto;padding:0 1em;line-height:1.65;color:#222;font-size:14.5px}table{border-collapse:collapse;margin:.8em 0;font-size:.92em}th,td{border:1px solid #bbb;padding:.35em .6em;vertical-align:top}th{background:#eef2f8}tr:nth-child(even) td{background:#fafafa}h1{font-size:1.5em;border-bottom:2px solid #444}h2{font-size:1.25em;border-left:5px solid #25b;padding-left:8px;margin-top:1.8em}h3{font-size:1.05em;margin-top:1.4em}blockquote{border-left:4px solid #ccc;margin:.8em 0;padding:.2em 1em;color:#444}code{background:#f3f3f3;padding:1px 4px;border-radius:3px}hr{border:0;border-top:1px solid #ccc;margin:1.6em 0}</style></head><body>
+<h1>卸の実測で12ヶ月の確率を出し直す（マサル再計算）</h1>
+<p>T-20260914-004 ／ マサル ／ 2026-09-14 ／ 入力: タカシ T-2（<code>01_T2_卸照合.md</code>）・マサル前回モデル（<code>T-20260914-003/01_mc_final.py</code>）</p>
+<blockquote>数字はすべてモデルの推測です。送信・発注・登録はしていません（§4.1）。</blockquote>
+<h2>0. 結論</h2>
+<ol>
+<li style='margin-left:0.0em'>卸の実測（T-2）だけを入れると、案B の P(12ヶ月実質現金&gt;0) は 62%→54%、中央 +6万→+2万。12月末まで売上0 が 36%→53%。</li>
+<li style='margin-left:0.0em'>S-1（上位60社の76%が自社で Amazon 出品）を成立率に入れると、案B は 32%・中央 −7万。案A 22%・案C 42%。中央がプラスの案はありません（推測。成立率は S-1 の構成から組んだ値で、実測はまだ0件）。</li>
+<li style='margin-left:0.0em'>P≥60% に戻る境界は「成立率の平均4%で週20通」か「3%で週30通」。S-1 の世界（約1.5%）では送信を倍にしても39%で、送信数・取り分・卸の母数のどれか1つでは戻りません。戻す筋は打診先の母集団を非出品メーカーに変えることです。</li>
+<li style='margin-left:0.0em'>順位（C＞B＞A）は変わらず、せどりの寄与は +5pt→+10pt に広がりました。案C でも42%で条件に届きません。</li>
+<li style='margin-left:0.0em'>判定: 案B はタケシに差し戻し。9/16 の前に v2 の62%を訂正すべきです。</li>
+</ol>
+<h2>1. 何を差し替えたか</h2>
+<table><thead><tr><th>項目</th><th>旧（統合報告 v2 の62%の前提）</th><th>新（T-2 実測）</th></tr></thead><tbody>
+<tr><td>置き値 <code>w_pool</code></td><td>対数正規の中央4.0・σ0.9</td><td>中央2.0・σ0.7</td></tr>
+<tr><td>SD 登録の通過</td><td>60%（通らなければ×0.5）</td><td>据え置き</td></tr>
+<tr><td>12ヶ月で立つ卸 SKU（P10／中央／P90）</td><td>0／3／11（平均4.8）</td><td>0／1〜2／5（平均2.0）</td></tr>
+<tr><td>0件の確率</td><td>14%</td><td>26%</td></tr>
+<tr><td>根拠</td><td>NETSEA を緩めて2〜4件＋他卸は未照合（推測）</td><td>NETSEA 需要先行 同一品15・全条件0（実測）＋SD 登録後0〜3・他2卸0〜1（推測）</td></tr>
+</tbody></table>
+<ul>
+<li style='margin-left:0.0em'>依頼文の「中央6・悲観2・楽観15」は、タケシ1周目の置き値（6）と感応度の端（2・10）が混ざった数字です。v2 の62%を出したモデルの実際の置き値は中央4でした。</li>
+<li style='margin-left:0.0em'>分布の形は、タカシの「中央1〜2・幅0〜5」を P10〜P90 として合わせました。平均で見ると、卸の寄与は旧の約4割になります。</li>
+<li style='margin-left:0.0em'>他の置き値（メーカー成立率の混合 平均3.05%・取り分の実現0.85倍・送信の低稼働30% など）と構造（日次の計算器・発注停止2027-08）は前回のままです。乱数の種も同じなので、旧の案B は62%をそのまま再現します（§2 で確認）。</li>
+<li style='margin-left:0.0em'>計算: <code>03_mc_卸実測.py</code>（出力 <code>03_mc_卸実測_出力.txt</code>）。本体は <code>T-20260914-003/01_mc.py</code> を読み込みます。</li>
+</ul>
+<h2>2. 新しい確率（案A／B／C）</h2>
+<h3>2-1. 測り方1：実質現金（口座−未払−200万）＋2027-08から発注停止（v2 の62%と同じ測り方）</h3>
+<p>N=3000。旧は同じ乱数で v2 の値をそのまま再現した（案B 62%）。</p>
+<table><thead><tr><th>案</th><th>P(実質現金&gt;0) 旧→新</th><th>中央 旧→新</th><th>P20</th><th>P10</th><th>予備25万割れ</th><th>12月末まで売上0</th><th>初回入金（中央）</th><th>事故（年）</th></tr></thead><tbody>
+<tr><td>案A 週10通</td><td>51%→41%</td><td>+1万→−3万</td><td>−13万</td><td>−16万</td><td>0%</td><td>52%</td><td>2027-02-08</td><td>5%</td></tr>
+<tr><td>案B 週20通</td><td>62%→54%</td><td>+6万→+2万</td><td>−11万</td><td>−14万</td><td>0%</td><td>53%（旧36%）</td><td>2027-02-08（旧 2027-01-11）</td><td>5%</td></tr>
+<tr><td>案C 週10通＋せどり</td><td>67%→59%</td><td>+9万→+4万</td><td>−9万</td><td>−13万</td><td>0%</td><td>8%</td><td>2026-11-02</td><td>12%</td></tr>
+</tbody></table>
+<ul>
+<li style='margin-left:0.0em'>3案とも約8〜10pt下がりました。予備25万円はどの案でも割りません（日次最低現金の P10 は130万円台）。</li>
+<li style='margin-left:0.0em'>案B で最も動いたのは立ち上がりです。12月末まで売上0が36%→53%、初回入金の中央は約1ヶ月遅れて2027-02。卸が「最初に売れる商品」の役を担っていたためです。</li>
+<li style='margin-left:0.0em'>期待値（平均）は案B +12万→+7万。中央の +2万は「ほぼ0」と読むのが妥当です（推測）。</li>
+</ul>
+<h3>2-2. 測り方2：清算価値（口座＋Amazon 未入金＋在庫×0.8−未払−200万）＋発注継続（v2 論点①の推奨）</h3>
+<table><thead><tr><th>案</th><th>P(清算価値&gt;0) 旧→新</th><th>中央</th><th>P20</th><th>P10</th><th>2027-09 の月商 中央</th></tr></thead><tbody>
+<tr><td>案A</td><td>56%→46%</td><td>−2万</td><td>−12万</td><td>−15万</td><td>32万</td></tr>
+<tr><td>案B</td><td>65%→59%</td><td>+4万</td><td>−9万</td><td>−13万</td><td>42万（旧48万）</td></tr>
+<tr><td>案C</td><td>71%→65%</td><td>+7万</td><td>−6万</td><td>−11万</td><td>42万</td></tr>
+</tbody></table>
+<ul>
+<li style='margin-left:0.0em'>発注を続ける運用は、実質現金では3案とも P 0%（在庫と未入金に積み上がるため）。清算価値で測る前提の数字です。</li>
+</ul>
+<h3>2-3. 卸が実際に何件立ったかで分けると（新 案B）</h3>
+<table><thead><tr><th>12ヶ月で立った卸 SKU</th><th>経路の割合</th><th>P(実質現金&gt;0)</th><th>中央</th></tr></thead><tbody>
+<tr><td>0件</td><td>26%</td><td>47%</td><td>−1万</td></tr>
+<tr><td>1〜2件</td><td>44%</td><td>53%</td><td>+1万</td></tr>
+<tr><td>3〜5件</td><td>23%</td><td>59%</td><td>+4万</td></tr>
+<tr><td>6件以上</td><td>7%</td><td>74%</td><td>+15万</td></tr>
+</tbody></table>
+<ul>
+<li style='margin-left:0.0em'>卸が0件の世界でも案B は47%です。卸を完全に外した「メーカー打診専業 週20通」も46%（§4）で一致します。</li>
+<li style='margin-left:0.0em'>卸が3〜5件立っても59%で、60%に届きません。卸の件数だけで v2 の62%に戻る筋は、6件以上（7%）に限られます。</li>
+</ul>
+<h2>3. S-1（上位60社の深掘り）を反映すると</h2>
+<p>サトル S-1（<code>02_S1_上位60社の深掘り.md</code>）が納品前に着いたので取り込みました。変えたのは2つです。</p>
+<table><thead><tr><th>置き値</th><th>旧</th><th>S-1 反映（主）</th><th>根拠</th></tr></thead><tbody>
+<tr><td>送れる母数</td><td>900社</td><td>375社（A のみ）</td><td>上位60の A 25社＋61位以下 約850社×A比率42%≒350（推測）。A+B なら約590（感応度で見る）</td></tr>
+<tr><td>成立率（1通あたり・混合の平均）</td><td>1.5/3/5%（30/45/25%）平均3.05%</td><td>0.8/1.5/2.5%（同）平均1.54%</td><td>A 25社中19社（76%）が Amazon ブランドストア保有＝自社で出品するブランド保有者。旧3%は「Amazon にいない／使いこなせていないメーカー」の二次情報（EC STARs）。自社出品組は約1%・残り24%は旧3.05%のまま、と置いた（推測）。副案としてサトル・秘書の例示 1/2/3%（平均1.95%）も回した</td></tr>
+</tbody></table>
+<ul>
+<li style='margin-left:0.0em'>自社出品組を約1%と置いたのは、当社が同じ商品の競合出品者に見えるためです。ただし A の中には「小売店・卸業者の方」窓口や EC 事業者向けの卸募集を公開している社もあり（#5・#7）、0%ではないと見ました（推測）。</li>
+<li style='margin-left:0.0em'>成立率の実測はまだ0件です。1.54%は S-1 の構成比から組んだ推測で、幅は1%〜2.5%程度と見ます。</li>
+<li style='margin-left:0.0em'>並行して着いたハルオ <code>04_医療機器の該当判定.md</code>（commit 7728a0b）: KAEI は対象外（S-1 でも N）、シースター（A）は一般医療機器・非医療機器の品に絞れば打診可。A の社数25は変わらず、分布への影響は無いと見ました。</li>
+</ul>
+<h3>3-1. 測り方1：実質現金＋発注停止（S-1 主・N=3000）</h3>
+<table><thead><tr><th>案</th><th>T-2 のみ</th><th>S-1 反映</th><th>中央</th><th>P20</th><th>P10</th><th>12月末まで売上0</th><th>初回入金（中央）</th><th>成立（中央）</th><th>事故</th></tr></thead><tbody>
+<tr><td>案A 週10通</td><td>41%</td><td>22%</td><td>−9万</td><td>−16万</td><td>−17万</td><td>56%</td><td>2027-02-08</td><td>3社</td><td>5%</td></tr>
+<tr><td>案B 週20通</td><td>54%</td><td>32%</td><td>−7万</td><td>−14万</td><td>−17万</td><td>57%</td><td>2027-02-08</td><td>3社</td><td>5%</td></tr>
+<tr><td>案C 週10通＋せどり</td><td>59%</td><td>42%</td><td>−3万</td><td>−12万</td><td>−15万</td><td>8%</td><td>2026-11-02</td><td>3社</td><td>12%</td></tr>
+<tr><td>メーカー打診専業 週20通</td><td>46%</td><td>21%</td><td>−11万</td><td>−17万</td><td>−17万</td><td>92%</td><td>2027-03-22</td><td>3社</td><td>5%</td></tr>
+</tbody></table>
+<ul>
+<li style='margin-left:0.0em'>3案とも中央がマイナスになりました。社長の条件「12ヶ月の実質現金&gt;0 を中央で」を満たす案はありません。</li>
+<li style='margin-left:0.0em'>予備25万円はどの案でも割りません。悪い側（P10）は −15〜−17万で、下振れは固定費と処分損の範囲に収まります。</li>
+</ul>
+<h3>3-2. 測り方2：清算価値＋発注継続（S-1 主）</h3>
+<table><thead><tr><th>案</th><th>P(清算価値&gt;0) T-2 のみ→S-1</th><th>中央</th><th>P20</th><th>P10</th><th>2027-09 の月商 中央</th></tr></thead><tbody>
+<tr><td>案A</td><td>46%→24%</td><td>−8万</td><td>−15万</td><td>−17万</td><td>17万</td></tr>
+<tr><td>案B</td><td>59%→36%</td><td>−5万</td><td>−13万</td><td>−16万</td><td>19万</td></tr>
+<tr><td>案C</td><td>65%→46%</td><td>−1万</td><td>−10万</td><td>−14万</td><td>24万</td></tr>
+</tbody></table>
+<h3>3-3. どこで何 pt 落ちたか（案B・測り方1・N=1500）</h3>
+<table><thead><tr><th>段</th><th>P／中央</th><th>成立（中央）</th></tr></thead><tbody>
+<tr><td>v2（卸 旧・母数900・成立率3.05%）</td><td>62%／+6万</td><td>7社</td></tr>
+<tr><td>①卸を T-2 実測に</td><td>53%／+1万</td><td>8社</td></tr>
+<tr><td>②＋送れる母数 375</td><td>54%／+2万</td><td>6社</td></tr>
+<tr><td>③＋成立率 1.54%（母数900のまま）</td><td>31%／−7万</td><td>4社</td></tr>
+<tr><td>②＋③＝S-1 主</td><td>31%／−7万</td><td>3社</td></tr>
+<tr><td>副：成立率 1/2/3%（平均1.95%）・母数375</td><td>39%／−4万</td><td>4社</td></tr>
+<tr><td>主・母数 A+B 590</td><td>31%／−7万</td><td>4社</td></tr>
+</tbody></table>
+<ul>
+<li style='margin-left:0.0em'>落ち幅の大半は成立率（−22pt）です。卸の実測は −9pt、送れる母数は ±0 でした。</li>
+<li style='margin-left:0.0em'>母数375は12ヶ月の P をほぼ動かしません。12ヶ月の現金に効く送信は窓の最初の5ヶ月分（週20で約330通）だけで、375で足ります（前回の知見の再確認）。ただし A は上位60社で25社しか無く、週20通を続けるにはサトルが毎週約50社を掘る必要があります（61位以下の A 比率が同程度として・推測）。これは確率ではなく段取りの制約です。</li>
+</ul>
+<h2>4. 卸が0〜2件の世界で案B を P≥60% に戻すには（逆算）</h2>
+<p>測り方1（実質現金＋発注停止）・案B・N=1500。送信を増やすと下書きの質が落ちると置いた（週20=0.85・週25=0.80・週30=0.75・週40=0.65。推測）。</p>
+<h3>4-1. S-1 を入れない世界（成立率の平均3.05%のまま）</h3>
+<table><thead><tr><th>送信＼成立率の平均</th><th>3.0%</th><th>3.5%</th><th>4.1%</th><th>5.0%</th></tr></thead><tbody>
+<tr><td>週20通</td><td>53%／+1万</td><td>58%／+4万</td><td>62%／+6万</td><td>69%／+13万</td></tr>
+<tr><td>週25通</td><td>58%／+4万</td><td>63%／+7万</td><td>68%／+11万</td><td>74%／+18万</td></tr>
+<tr><td>週30通</td><td>61%／+6万</td><td>67%／+10万</td><td>71%／+13万</td><td>76%／+20万</td></tr>
+<tr><td>週40通</td><td>65%／+8万</td><td>69%／+13万</td><td>74%／+17万</td><td>80%／+25万</td></tr>
+</tbody></table>
+<table><thead><tr><th>週20通・成立率3.0% に1つ足す</th><th>P／中央</th></tr></thead><tbody>
+<tr><td>週30通・質を落とさない</td><td>66%／+10万</td></tr>
+<tr><td>取り分の実現 0.85→1.0</td><td>61%／+5万</td></tr>
+<tr><td>取り分の実現 0.85→1.2</td><td>68%／+10万</td></tr>
+<tr><td>メーカー直の利益率 12%→14%</td><td>61%／+6万</td></tr>
+<tr><td>送信の低稼働 30%→15%（週1ブロックが回る）</td><td>59%／+4万</td></tr>
+<tr><td>送信の低稼働 30%→45%（週20が続かない）</td><td>46%／−2万</td></tr>
+<tr><td>卸の母数 4（旧に戻す・参考）</td><td>60%／+5万</td></tr>
+</tbody></table>
+<ul>
+<li style='margin-left:0.0em'>境界は「週30通」「成立率3.5%で週25通」「成立率4%で週20通」「取り分1.0倍」「メーカー直の利益率14%」のどれか1つです。</li>
+<li style='margin-left:0.0em'>ただし S-1 を入れると、この表の前提（成立率3%）自体が崩れます（§4-2）。</li>
+</ul>
+<h3>4-2. S-1 を入れた世界（成立率の平均1.54%・送れる母数375〜590）</h3>
+<table><thead><tr><th>送信・母数＼成立率の平均</th><th>1.5%（S-1 主）</th><th>2.0%</th><th>3.0%</th><th>4.0%</th><th>5.0%</th></tr></thead><tbody>
+<tr><td>週20・375社</td><td>31%／−7万</td><td>39%／−4万</td><td>53%／+1万</td><td>62%／+6万</td><td>70%／+13万</td></tr>
+<tr><td>週30・375社</td><td>34%／−6万</td><td>44%／−2万</td><td>59%／+4万</td><td>69%／+12万</td><td>76%／+18万</td></tr>
+<tr><td>週30・590社（A+B）</td><td>37%／−5万</td><td>47%／−2万</td><td>61%／+6万</td><td>71%／+13万</td><td>77%／+20万</td></tr>
+<tr><td>週40・590社</td><td>39%／−5万</td><td>48%／−1万</td><td>63%／+7万</td><td>74%／+15万</td><td>80%／+24万</td></tr>
+</tbody></table>
+<table><thead><tr><th>S-1 主・週20通に1つ足す</th><th>P／中央</th></tr></thead><tbody>
+<tr><td>取り分の実現 0.85→1.2</td><td>46%／−2万</td></tr>
+<tr><td>卸の母数 4（v2 に戻す）</td><td>41%／−3万</td></tr>
+<tr><td>卸の母数 8</td><td>55%／+2万</td></tr>
+<tr><td>メーカー直の利益率 16%</td><td>43%／−3万</td></tr>
+</tbody></table>
+<ul>
+<li style='margin-left:0.0em'>P≥60% に戻る境界は「成立率の平均4%で週20通」か「3%で週30通・母数590」です。S-1 から組んだ推測（1.5%）の2〜2.6倍にあたります。</li>
+<li style='margin-left:0.0em'>送信を倍（週40）にしても、成立率1.5%のままなら39%です。<strong>送信数・取り分・卸の母数のどれか1つでは60%に戻りません。</strong></li>
+<li style='margin-left:0.0em'>成立率を3%に戻す筋は、打診先の母集団を変えることだけです（推測）。前回の展示会20社（T-20260912-001）は Amazon ブランド登録が1社のみで、旧の3%の前提に近い母集団でした。需要先行リスト（Keepa 起点）の上位は定義上 Amazon で売れている＝自社出品のブランド保有者が主になります。</li>
+</ul>
+<h2>5. 案の順位は変わるか</h2>
+<table><thead><tr><th>案</th><th>v2</th><th>T-2 のみ</th><th>S-1 主</th><th>S-1 副（1/2/3%）</th><th>事故（年・恒久）</th></tr></thead><tbody>
+<tr><td>案A 週10通</td><td>51%</td><td>41%</td><td>22%</td><td>27%</td><td>5%・1%</td></tr>
+<tr><td>案B 週20通</td><td>62%</td><td>54%</td><td>32%</td><td>39%</td><td>5%・1%</td></tr>
+<tr><td>案C 週10通＋せどり</td><td>67%</td><td>59%</td><td>42%</td><td>46%</td><td>12%・3%</td></tr>
+<tr><td>メーカー打診専業 週20通</td><td>—</td><td>46%</td><td>21%</td><td>—</td><td>5%・1%</td></tr>
+<tr><td>案C−案B</td><td>+5pt</td><td>+4pt</td><td>+10pt</td><td>+7pt</td><td></td></tr>
+<tr><td>案B−専業</td><td>—</td><td>+8pt</td><td>+11pt</td><td>—</td><td></td></tr>
+</tbody></table>
+<ul>
+<li style='margin-left:0.0em'>順位（C＞B＞A）はどの世界でも変わりません。</li>
+<li style='margin-left:0.0em'>せどりの寄与（案C−案B）は +5pt→+10pt に広がりました。メーカーの成立が細るほど、せどりの早い売上（12月末まで売上0が 57%→8%）の比重が上がるためです。ただし案C でも42%・中央−3万で、社長の条件（中央で実質現金&gt;0）には届きません。事故の確率は倍以上（5%→12%）のままです。</li>
+<li style='margin-left:0.0em'>卸が1〜2件しか立たなくても、専業より +8〜11pt あります。卸は「数」より「最初に売れる1商品」として効いています。卸の登録（論点④）の価値は下がっていません。</li>
+</ul>
+<h3>応手の読み（需要先行リストの上位に打診した場合）</h3>
+<table><thead><tr><th>手</th><th>主体</th><th>動き</th><th>確度（推測）</th></tr></thead><tbody>
+<tr><td>1</td><td>うち</td><td>自社で Amazon 出品しているブランド保有者に打診</td><td>—</td></tr>
+<tr><td>2</td><td>先方</td><td>「Amazon は自社で売っている」と断る／既存の卸・代理店へ誘導</td><td>断り 70%・誘導 20%</td></tr>
+<tr><td>3</td><td>うち</td><td>誘導先の卸値で相乗り → 既存出品者（先方を含む）が卸値より安い。T-2 の同一品15件中13件赤字と同じ構造</td><td>赤字 60%</td></tr>
+<tr><td>4</td><td>顧客</td><td>カートはブランド保有者側に残る。取り分は読みより下</td><td>—</td></tr>
+</tbody></table>
+<h2>6. プレモーテム：「2026-12 末、案B は失敗した。なぜか」</h2>
+<table><thead><tr><th>順</th><th>失敗の筋</th><th>確度（推測）</th><th>撤退条件・計画修正への落とし方</th></tr></thead><tbody>
+<tr><td>1</td><td>打診の断りの大半が「自社で出品している」。12月までの約100通で成立0</td><td>30〜35%</td><td>累計50通の時点で断りの理由を数える。半数超が「自社出品」なら、打診先を非出品メーカー（展示会・本丸）へ切り替える</td></tr>
+<tr><td>2</td><td>卸が0件（26%）で、12月末まで売上0（案B 53%）</td><td>50%</td><td>E-1（12/31 出品0）は中央で踏むので撤退条件にしない。「計画修正」と明記。最初の1商品を卸かせどりで立てる</td></tr>
+<tr><td>3</td><td>週20通が続かない（低稼働レジーム30%。その確率を45%に置くと T-2 のみの世界で P 46%）</td><td>30%</td><td>3ヶ月合計の送信が計画の50%未満で週10通に落とし、案A（S-1 主 22%）に縮退することを承知する</td></tr>
+</tbody></table>
+<p>撤退条件を踏む確率（T-2 のみの世界・案B）: E-2（2027-03 累計損益 −8万未満）26%、E-3（2027-06 −5万未満）31%。W8 の実測で分かれる度合いは v2 と同じ形です（最初の商品の実現0.7倍以上なら70%・2027-01 までに商品なしなら32%）。</p>
+<h3>4軸×3シナリオ（T-2 のみの世界・案B・P20／中央／P80）</h3>
+<table><thead><tr><th>軸</th><th>悲観</th><th>中央</th><th>楽観</th></tr></thead><tbody>
+<tr><td>月商（2027-06）</td><td>13万</td><td>33万</td><td>65万</td></tr>
+<tr><td>累計損益</td><td>−9万</td><td>+4万</td><td>+25万</td></tr>
+<tr><td>実質現金（S-1 主の世界）</td><td>−14万</td><td>−7万</td><td>+7万</td></tr>
+<tr><td>日次最低現金</td><td>144万</td><td>163万</td><td>177万</td></tr>
+</tbody></table>
+<p>価格の下落（年−5%相当）・競合の参入（相乗り6ヶ月で+1）の置き値は v2 と同じです。想定外（手数料・規約の改定、KYC の再確認、卸の倒産）で分布が崩れる確率は10〜15%と見ます。</p>
+<h2>7. 判定と社長への一言</h2>
+<ul>
+<li style='margin-left:0.0em'>判定: <strong>案B は、このままでは社長承認に上げられません。タケシに差し戻すべきです。</strong> 社長の条件（12ヶ月の実質現金&gt;0 を中央で）を満たす案が、S-1 主の世界では1つもありません。</li>
+<li style='margin-left:0.0em'>差し戻しの中身: 打診先の母集団を「Amazon で自社出品していないメーカー」に寄せ直すこと。成立率3%の前提が戻れば案B は約53%（週30通で約60%）です。</li>
+<li style='margin-left:0.0em'>9/16 の判断より前に、v2 の62%を訂正して社長に伝えるべきです。</li>
+</ul>
+<blockquote>社長への一言: 統合報告 v2 の「62%」は、卸の実測で54%に、打診先の実態（上位の約4分の3が自社で Amazon 出品）を入れると約3割（32%・置き方次第で31〜54%）に下がりました。中央は−7万円で、12ヶ月で現金が増える案とは言えなくなりました。</blockquote>
+<h2>8. ファイル</h2>
+<table><thead><tr><th>ファイル</th><th>中身</th></tr></thead><tbody>
+<tr><td><code>03_卸実測での再計算.md</code>／<code>.html</code></td><td>本書</td></tr>
+<tr><td><code>03_mc_卸実測.py</code>／<code>_出力.txt</code></td><td>卸の差し替え・案A/B/C・逆算（S-1 なし）。N=3000・所要1,120秒</td></tr>
+<tr><td><code>03_mc_S1反映.py</code>／<code>_出力.txt</code></td><td>S-1 の送れる母数・成立率を反映。N=3000・所要897秒</td></tr>
+</tbody></table>
+<p>本体は <code>T-20260914-003/01_mc.py</code>（日次計算器 <code>00_cf_base.py</code>）。乱数の種は v2 と同じ。</p>
+</body></html>
