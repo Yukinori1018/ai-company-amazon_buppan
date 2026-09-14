@@ -1,0 +1,82 @@
+<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>確度の実態と最良案（統合報告v3）</title><style>body{font-family:-apple-system,'Hiragino Sans','Noto Sans JP',sans-serif;max-width:1400px;margin:24px auto;padding:0 20px;line-height:1.6;color:#222;font-size:14px}
+h1{font-size:1.5em;border-bottom:2px solid #333;padding-bottom:6px}h2{font-size:1.25em;margin-top:2em;border-left:5px solid #2b5;padding-left:8px}h3{font-size:1.05em;margin-top:1.5em}
+table{border-collapse:collapse;margin:10px 0 18px;width:100%;font-size:12.5px}th,td{border:1px solid #bbb;padding:5px 7px;vertical-align:top;text-align:left}th{background:#f0f4f0}tr:nth-child(even) td{background:#fafafa}
+code{background:#f3f3f3;padding:1px 4px;border-radius:3px;font-size:0.92em}hr{border:0;border-top:1px solid #ccc;margin:24px 0}li{margin:2px 0}</style></head><body>
+<h1>確度の実態と最良案（統合報告 v3・社長向け）</h1>
+<p>T-20260912-002／2026-09-14／秘書カズヨ（統合）</p>
+<p>v2（06）の訂正版です。v2 の「確率62%」は、今朝の実測で約32%に下がりました。その後、タケシが案を組み直し、マサルが検証しました。</p>
+<p>&gt; 数字はすべて推測です。送信・発注・契約・解約はしていません（§4.1）。</p>
+<hr>
+<h2>0. 結論</h2>
+<p>1. <strong>既定の中で最良の案でも、12ヶ月後の現金がプラスになる確率は約6割です。</strong> 中央値は+2万円前後です。置き値のまま計算すると72%ですが、根拠の弱い2つの置き値をマサルが割り引くと約57%、悪い世界では43%です。<strong>「確度が高い」とは言えません。</strong></p>
+<p>2. <strong>最良の案は「ブランド未登録のメーカーへの打診」と「固定費の圧縮」の組み合わせです。</strong> Keepa で需要が見えて、しかも自社でブランド登録していないメーカーに打診します。当社が競合にならない相手です。そのうえで、年18万円の固定費のうち最大の Keepa を、必要な月だけの契約にします。</p>
+<p>3. <strong>12ヶ月後の数字を決めているのは固定費です。</strong> 卸とメーカー直から入る手取りは、12ヶ月で中央+13万円です。これに対して固定費は年18万円かかります。固定費が月1,000円変わるごとに、確率は約3.5pt動きます。</p>
+<p>4. <strong>確率を6割より上げるには、前提を変えるしかありません。</strong> 判定を18ヶ月に延ばせば70%です。ただしその場合、12ヶ月時点の現金は中央−23万円で、今回の条件は満たしません（§4）。</p>
+<hr>
+<h2>1. 今日わかったこと（実測）</h2>
+<table><thead><tr><th>実測</th><th>結果</th><th>担当</th></tr></thead><tbody>
+<tr><td>需要が見える商品3,255件を卸と照合</td><td>同じ商品は15件あったが、うち13件はすでに卸値より安く売られていた。仕入れて利益が出る商品は0件</td><td>タカシ</td></tr>
+<tr><td>打診先の上位60社を調査</td><td>すぐ送れる25社のうち19社が、自社で Amazon に出品していた（当社は競合になる）</td><td>サトル</td></tr>
+<tr><td>医療機器を含む2社</td><td>1社は販売許可が要るので対象外。もう1社は許可が要らない2品に限り可</td><td>ハルオ</td></tr>
+<tr><td>Keepa の請求</td><td>毎月 €49 の API 契約1本だけ。Pro は未契約</td><td>秘書（領収書4ヶ月分）</td></tr>
+</tbody></table>
+<p><strong>構造的な矛盾：</strong> Keepa で需要が見えるメーカーは、すでに Amazon で自分で売っています。Amazon にいないメーカーは、需要が見えません。両立するのは「Amazon で売れているが、ブランド登録しておらず、第三者が売っているメーカー」だけです。</p>
+<hr>
+<h2>2. 最良案</h2>
+<table><thead><tr><th>項目</th><th>中身</th></tr></thead><tbody>
+<tr><td>打診先</td><td>① Amazon で売れているが、ブランド未登録のメーカーを先に（約230社・推測）② 足りない分を展示会などの Amazon 不在のメーカーで埋める</td></tr>
+<tr><td>送信数</td><td>週30通（社長の時間は週約4.5時間。送信クリック・返信の一次判断・発注の決済）</td></tr>
+<tr><td>卸</td><td>スーパーデリバリーほか。立つ商品は1〜2件の見込みだが、「最初に売れる1商品」として確率を+8〜11pt 押し上げる</td></tr>
+<tr><td>Keepa</td><td>打診先を抽出し終えたら API を止め、補充の判断が要る月だけ再契約する。Pro は付けない</td></tr>
+<tr><td>12ヶ月でやらないこと</td><td>簡易OEM・商標・セラースプライト（2社目の取引が決まっても12ヶ月内は契約しない。入れると確率24%に落ちる）、電脳せどり、中国輸入</td></tr>
+</tbody></table>
+<h3>数字</h3>
+<table><thead><tr><th>見方</th><th>12ヶ月後の現金がプラスの確率</th><th>中央値</th></tr></thead><tbody>
+<tr><td>置き値のまま</td><td>72%</td><td>+7万</td></tr>
+<tr><td>マサルの読み（弱い置き値を割り引く）</td><td>約57%</td><td>+2万前後</td></tr>
+<tr><td>悪い世界（取引成立率2%・打診先100社）</td><td>43%</td><td>—</td></tr>
+<tr><td>参考：Keepa を今のまま（API 年間）</td><td>44%</td><td>−3万</td></tr>
+</tbody></table>
+<p>予備の25万円は、どの世界でも割りません。</p>
+<hr>
+<h2>3. 確度を上げる手順（最初の8週）</h2>
+<ul>
+<li>打診の最初の約100通で、見積が何件来るかを数えます。4件以下なら、取引成立率が2%以下の世界です。その場合は送信を週10通に落とし、固定費をさらに削ります。</li>
+<li>2027-03-31 に累計損益が−3万円を下回っていたら、計画を修正します（週10通に縮小）。撤退ではなく、計画を変える合図です。</li>
+<li>最初の商品の2週間の売れ方も合わせて見ます。</li>
+</ul>
+<hr>
+<h2>4. 判定期間を18ヶ月に延ばす場合</h2>
+<table><thead><tr><th></th><th>12ヶ月で判定</th><th>18ヶ月で判定</th></tr></thead><tbody>
+<tr><td>現金がプラスの確率</td><td>約57%（最良案）</td><td>約70%</td></tr>
+<tr><td>2027-09-30 時点の現金</td><td>中央+2万前後</td><td>中央−23万（途中で投資を続けるため）</td></tr>
+</tbody></table>
+<p>18ヶ月を選ぶかどうかは、2027-03-31 までに決めれば足ります。それまでの行動は同じです。</p>
+<hr>
+<h2>5. 社長に判断していただくこと</h2>
+<table><thead><tr><th>#</th><th>論点</th><th>推奨</th><th>他の選択肢</th><th>期限</th></tr></thead><tbody>
+<tr><td>①</td><td>打診先を「ブランド未登録のメーカー」に切り替えるか</td><td>切り替える（週30通）</td><td>週20通（社長の時間 週約3時間）</td><td>9/16</td></tr>
+<tr><td>②</td><td>保留中の第一陣4社への送信</td><td>送る（4社ともブランド未登録に当たり、下書き済み）</td><td>保留のまま</td><td>9/16</td></tr>
+<tr><td>③</td><td>Keepa の契約</td><td>A：必要な月だけ API（次回更新 10/4 の前に解約・§4.1）</td><td>B：Pro に乗り換え（€29・確率52%）／C：API を続ける（44%）</td><td>10/3</td></tr>
+<tr><td>④</td><td>スーパーデリバリーの書類</td><td>9/17 に提出</td><td>見送り</td><td>9/17</td></tr>
+<tr><td>⑤</td><td>電脳せどりの再開</td><td>再開しない</td><td>再開する（確率+5〜10pt・アカウント停止が年12%に上がる）</td><td>9/16</td></tr>
+<tr><td>⑥</td><td>判定期間</td><td>今は12ヶ月のまま。18ヶ月にするかは 2027-03-31 までに</td><td>今から18ヶ月</td><td>2027-03-31</td></tr>
+</tbody></table>
+<p>推奨どおりなら「すべて推奨で」の一言で進みます。③の解約クリックと④の書類提出は、社長の一手です。</p>
+<hr>
+<h2>6. 正直にお伝えしたいこと</h2>
+<ul>
+<li>実績ゼロの1年目に、Amazon の卸・メーカー仕入れで「確度の高い黒字」を作る方法は、見つかりませんでした。最良でも五分五分より少し良い程度です。</li>
+<li>確率を最も動かすのは、メーカーとの取引成立率です。これは送ってみるまで分かりません。最初の100通が、この事業の本当の判定材料になります。</li>
+<li>「もっと確度を」とお考えなら、変えられるのは前提です。例えば、社長の物理作業を許して実店舗から仕入れる、Amazon 以外の販路を並べる、別の事業と比べる、などです。どれを検討するかご指示いただければ、同じ手順で確率を出します。</li>
+</ul>
+<hr>
+<h2>7. 成果物</h2>
+<table><thead><tr><th>担当</th><th>ファイル</th></tr></thead><tbody>
+<tr><td>タケシ</td><td><code>T-20260914-005/01_再設計</code></td></tr>
+<tr><td>マサル</td><td><code>T-20260914-005/03_マサル検証</code>・<code>T-20260914-004/03_卸実測での再計算</code></td></tr>
+<tr><td>タカシ・サトル・ハルオ</td><td><code>T-20260914-004/01_T2_卸照合</code>・<code>02_S1_上位60社の深掘り</code>・<code>04_医療機器の該当判定</code></td></tr>
+<tr><td>旧版</td><td><code>06_統合報告v2</code>（確率62%は訂正済み）</td></tr>
+</tbody></table>
+<p>社長の閲覧口：<code>~/Documents/AI Company Outputs/Amazon物販事業/T-20260912-002/</code></p>
+</body></html>
