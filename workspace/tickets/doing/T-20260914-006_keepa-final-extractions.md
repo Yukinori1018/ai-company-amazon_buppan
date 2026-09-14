@@ -28,10 +28,23 @@ related_tickets: [T-20260912-002, T-20260914-002, T-20260914-005]
 
 2026-09-14 起票。T-3 を発注。
 
+### タカシ（T-3）
+
+2026-09-14 着手。スコープ宣言:
+- 入れる: T-1 打診母数 1,394 ASIN・1,006社の P2/P1/判定不能の分類（ブランドストア＝T-1 の raw 流用 0 token、出品者構成＝ストアなし分だけ `buybox=1`＋`/seller`）、メーカー単位の集計、S-1 上位60社との一致率、S-3 の開始可能時刻
+- 入れない: 全オファーの取得（`offers=`・7 token/ASIN）、ストアありの ASIN への `buybox=1`、連絡先の収集、打診文、送信（§4.1）
+- 10:20 S-1 の目視25社と `brandStoreName` が 25/25 一致。ストアなし829 ASIN の `buybox=1` 取得中（`agent_output/T-20260914-006/fetch_t3.py`・再開可）
+
 ## ログ
 
 - 2026-09-14 doing 起票（カズヨ）。
 - 2026-09-14 マリエ：Notion カード新規作成（doing・it_engineer・high・labels pipeline/sourcing・ParentTicket T-20260912-002）。owner-tasks の ℹ️ と handover に追加。
+
+### タカシ（T-3）
+
+- 2026-09-14 着手。Keepa 残高 1,200/1,200・消費0（list-builder は STOP のまま）。T-1 の raw（今朝取得）に `brandStoreName` が入っていたので、ストア判定は 0 token（1,394中 ストアあり565・なし829）。
+- 2026-09-14 10:18 `buybox=1` の試験5件＝15 token（3/ASIN）。`stats.buyBoxStats` に90日のカート獲得者と獲得率が入る。829件の取得を nohup で開始。S-1 との一致 25/25。
+- 2026-09-14 10:30 S-1 と社単位でも矛盾0（25社中 一致21・一部の ASIN だけストア4）。未目視34社の空欄を Keepa で埋めた（out/t3_s1_check.csv）。本文 §1・§2 を書いた。
 
 ## 成果物
 
