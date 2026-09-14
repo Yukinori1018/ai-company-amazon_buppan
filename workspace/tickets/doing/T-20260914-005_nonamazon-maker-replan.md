@@ -30,6 +30,7 @@ related_tickets: [T-20260912-002, T-20260914-002, T-20260914-003, T-20260914-004
 ## ログ
 
 - 2026-09-14 doing 起票（カズヨ）。
+- 2026-09-14 マリエ：Notion カード作成（https://app.notion.com/p/3dbb0a4044fa8182ae4fedfa22eb6cbb・doing・TicketID 在籍ゼロを SQL で確認・ラベル strategy/plan/cashflow は既存）。親の結果要約に訂正1行、owner-tasks 更新㉛（社長タスク件数は据え置き）。
 
 ## 成果物
 
