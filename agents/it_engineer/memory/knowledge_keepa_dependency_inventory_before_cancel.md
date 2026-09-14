@@ -35,3 +35,8 @@ Keepa API（€49/月）を「必要な月だけ」にする社長判断の材�
 - 10/3 までの抽出 T-3＋S-3 は約1.4万〜2.2万 token。供給は19日で約55万 token あり、間に合う。制約は token ではなく「誰がいつ走らせるか」
 
 関連: [[knowledge_keepa_billing_is_flat_rate]] [[knowledge_launchd_always_on_jobs]] [[knowledge_keepa_token_ceiling_and_unattended_scan]] [[knowledge_buybox_price_recalc]]
+
+## commit の落とし穴（この回に踏んだ）
+
+`git add <自分のファイル>` だけにしても、**他の担当が先に index に載せた行は一緒に commit される**。b76fca5 に、マリエが載せていた `done/T-20260914-005` のログ1行が入った（中身は失っていない。マリエ側も 118d1ac で記録）。
+並列作業中は、add の前に `git diff --cached --name-only` を見る。空でなければ、`git commit -- <自分のファイル>`（パス指定の commit は index の他の変更を含めない）を使う。
