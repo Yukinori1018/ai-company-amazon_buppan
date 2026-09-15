@@ -1,11 +1,11 @@
 ---
 ticket_id: T-20260914-006
-title: Keepa 解約前の最終抽出（T-3 ブランド未登録メーカー／S-3 展示会の残り952社）期限 10/2
-status: doing
+title: Keepa の最終抽出（T-3 ブランド未登録メーカー／S-A 型Aの送信先の母数）
+status: done
 assignee: it_engineer
 priority: high
 created_at: 2026-09-14
-updated_at: 2026-09-14
+updated_at: 2026-09-16
 requires_approval: false
 labels: [pipeline, sourcing]
 parent_ticket: T-20260912-002
@@ -44,6 +44,8 @@ related_tickets: [T-20260912-002, T-20260914-002, T-20260914-005]
 - 2026-09-16 03:40 **S-A 完了。** 3基準×国内中小×ストアなし＝約2,400社（80% 1,900〜3,000）。週70通で約35週。消費 4,790 token。秘書の確認待ち（doing のまま）
 
 ## ログ
+
+- 2026-09-16 **done へ移動**（カズヨ判定）。〔根拠：S-A（タカシ・764c2c1/0756b2b）納品。型Aの3基準＋ブランドストアなしの国内中小メーカー 約2,425社（80%区間 1,896〜2,984）・週70通で約35週。1社あたり中央11 ASIN。T-3 は S-A への切り替えで途中停止（出品者名 600/938 件・338 token で再開可）。Keepa は解約しない方針に変わったため、タイトルから「解約前」を外した〕
 
 - 2026-09-14 doing 起票（カズヨ）。
 - 2026-09-14 マリエ：Notion カード新規作成（doing・it_engineer・high・labels pipeline/sourcing・ParentTicket T-20260912-002）。owner-tasks の ℹ️ と handover に追加。
