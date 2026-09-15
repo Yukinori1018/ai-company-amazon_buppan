@@ -105,6 +105,7 @@ related_tickets: [T-20260912-002, T-20260831-005, T-20260809-001]
 ## ログ
 
 - 2026-09-15 マリエ：Notion カードを新規作成（Status=doing / Assignee=researcher / labels research・strategy / ParentTicket T-20260912-002）https://app.notion.com/p/3dcb0a4044fa81c9a841fe6dcd1e75ad
+- 2026-09-15 マリエ：子 T-20260915-003（メーカーの分母）起票を Notion の結果要約に1行追記
 ### サトル④（輸入・輸出）
 
 - 2026-09-15 着手。イシュー・スコープ・打ち切り条件を「現在地」に記載。

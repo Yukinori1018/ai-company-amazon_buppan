@@ -33,6 +33,7 @@ related_tickets: [T-20260915-002, T-20260914-002, T-20260906-005]
 ## ログ
 
 - 2026-09-15 doing 起票（カズヨ）。
+- 2026-09-15 マリエ：Notion カードを新規作成（Status=doing / Assignee=researcher / labels research・sourcing / ParentTicket T-20260915-002）https://app.notion.com/p/3dcb0a4044fa81ee9023dde26ff68f70 ／ owner-tasks 更新㊹（ℹ️ 節に1行・社長タスク増減ゼロ・commit 215c682）
 
 ## 成果物
 
