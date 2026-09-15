@@ -1,6 +1,6 @@
 """T-20260915-003 業界団体9名簿 → メーカー候補の一覧と件数（0 token・Keepa 不使用）。
 入力: agent_output/T-20260915-003/sources_html/members_raw.csv（build.py が名簿HTMLから作成）
-出力: 02_メーカー一覧_業界団体名簿.csv（PUBLIC）／out/02_照合フラグ付き.csv（ギフトショー・T-1 照合。Git 追跡外）
+出力: 01_メーカー一覧_業界団体名簿.csv（PUBLIC）／out/01_照合フラグ付き.csv（ギフトショー・T-1 照合。Git 追跡外）
 """
 import csv,re,unicodedata,collections,importlib.util,json
 from pathlib import Path
@@ -71,9 +71,9 @@ for r in rows:
         '取扱品目（名簿記載）':r['備考'],'EC直販の有無':'未調査','_key':k,'_gift':gift.get(k,''),'_t1':'一致' if k in t1 else ''})
 
 pub=[{c:v for c,v in o.items() if not c.startswith('_')} for o in out]
-with open(HERE/'02_メーカー一覧_業界団体名簿.csv','w',encoding='utf-8-sig',newline='') as f:
+with open(HERE/'01_メーカー一覧_業界団体名簿.csv','w',encoding='utf-8-sig',newline='') as f:
     w=csv.DictWriter(f,fieldnames=list(pub[0])); w.writeheader(); w.writerows(pub)
-with open(HERE/'out'/'02_照合フラグ付き.csv','w',encoding='utf-8-sig',newline='') as f:
+with open(HERE/'out'/'01_照合フラグ付き.csv','w',encoding='utf-8-sig',newline='') as f:
     fl=[c for c in out[0] if c!='_key']; w=csv.DictWriter(f,fieldnames=fl); w.writeheader()
     for o in out: w.writerow({c:o[c] for c in fl})
 
@@ -96,6 +96,6 @@ for c in cats:
 fo=sum(1 for o in allmk.values() if o['外資の日本法人']); bg=sum(1 for o in allmk.values() if o['大手（既知リスト）'] and not o['外資の日本法人'])
 S['5カテゴリ合計（カテゴリ間の重複も除去）']=dict(メーカー候補=len(allmk),うち外資=fo,うち大手=bg,残り国内の中小候補=len(allmk)-fo-bg,
     ギフトショー一致=sum(1 for o in allmk.values() if o['_gift']),T1一致=sum(1 for o in allmk.values() if o['_t1']))
-json.dump(S,open(HERE/'out'/'summary.json','w'),ensure_ascii=False,indent=1)
+json.dump(S,open(HERE/'out'/'01_summary.json','w'),ensure_ascii=False,indent=1)
 for c,v in S.items(): print(c,v)
 print('rows',len(out))
