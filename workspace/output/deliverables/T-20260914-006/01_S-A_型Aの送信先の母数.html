@@ -1,0 +1,118 @@
+<!doctype html><html lang='ja'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>S-A 型A の送信先の母数（3基準×ブランドストアなし×中小メーカー）</title><style>body{font-family:-apple-system,'Hiragino Sans','Noto Sans JP',sans-serif;max-width:1150px;margin:2em auto;padding:0 1em;line-height:1.65;color:#222;font-size:14.5px}table{border-collapse:collapse;margin:.8em 0;font-size:.92em}th,td{border:1px solid #bbb;padding:.35em .6em;vertical-align:top}th{background:#eef2f8}tr:nth-child(even) td{background:#fafafa}h1{font-size:1.5em;border-bottom:2px solid #444}h2{font-size:1.25em;border-left:5px solid #25b;padding-left:8px;margin-top:1.8em}h3{font-size:1.05em;margin-top:1.4em}blockquote{border-left:4px solid #ccc;margin:.8em 0;padding:.2em 1em;color:#444}code{background:#f3f3f3;padding:1px 4px;border-radius:3px}hr{border:0;border-top:1px solid #ccc;margin:1.6em 0}</style></head><body>
+<h1>S-A 型A の送信先の母数（3基準×ブランドストアなし×中小メーカー）</h1>
+<p>T-20260914-006 / タカシ / 2026-09-16。親: T-20260915-002（06 真似する計画 §9 S-A）。</p>
+<h2>結論</h2>
+<table><thead><tr><th>見方</th><th>社数（推定）</th><th>80%区間</th><th>週70通で</th></tr></thead><tbody>
+<tr><td>区分関数のまま（生）</td><td>2,785</td><td>2,252〜3,355</td><td>40週</td></tr>
+<tr><td><strong>明らかな大手・海外を目視で除外（採用）</strong></td><td><strong>2,425</strong></td><td><strong>1,896〜2,984</strong></td><td><strong>35週（27〜43）</strong></td></tr>
+<tr><td>疑いも除外（保守）</td><td>2,118</td><td>1,602〜2,650</td><td>30週（23〜38）</td></tr>
+</tbody></table>
+<ul>
+<li style='margin-left:0.0em'><strong>型A の3基準（本体なし・FBA 2以上・ランク5万以内）を満たし、ブランドストアの無い国内中小メーカーは約2,400社（1,900〜3,000）。週70通で約35週＝8ヶ月分。</strong></li>
+<li style='margin-left:0.0em'>タケシの置き値 2,000社（1,000〜4,000）と合う。「1,000社未満なら週40通に落とす」の条件には当たらない。</li>
+<li style='margin-left:0.0em'>除外前（3基準の一覧 75,574 ASIN の全メーカー）は幅でしか出せない（下限 約4,300・上限 約3.8万）。標本の中では 1,266社 → 国内中小 574社 → ストアなし 320社。</li>
+<li style='margin-left:0.0em'>残ったブランドは一覧の中に中央値11 ASIN を持つ（1件だけは51社中9社）。T-1 の打診母数（8割が1件だけ）と違い、1社への打診で複数の商品を扱える形。</li>
+<li style='margin-left:0.0em'>消費 4,790 token（件数プローブ131・一覧1,274・brand 条件の確認21・標本2,452・ブランド別件数912）。1回の上限 5,000 以内。</li>
+</ul>
+<h2>1. 条件と件数（Product Finder・domain=5）</h2>
+<p>型A の3基準（EC STARs 実践者の選び方）: Amazon 本体が売っていない（<code>current_AMAZON=-1</code>）・FBA の出品者2以上（<code>offerCountFBA≥2</code>）・売れ筋ランク5万位以内（<code>current_SALES≤50000</code>）。T-1 と同じくメディア13ルートとアダルトを除く。</p>
+<table><thead><tr><th>条件</th><th>ASIN</th></tr></thead><tbody>
+<tr><td>本体なし・ランク5万以内（メディア除外）</td><td>546万</td></tr>
+<tr><td>＋規制3（ドラッグ・ビューティー・食品）除外</td><td>493万</td></tr>
+<tr><td>＋新品オファー2以上（参考）</td><td>63.1万</td></tr>
+<tr><td>＋<strong>FBA オファー2以上＝3基準</strong></td><td><strong>7.69万</strong></td></tr>
+<tr><td>└ うち単品（バリエーションなし）</td><td>2.29万</td></tr>
+<tr><td>└ うち2,000〜8,000円（T-1 の価格帯・参考）</td><td>3.12万</td></tr>
+<tr><td>3基準で規制3を戻した場合</td><td>9.59万</td></tr>
+</tbody></table>
+<ul>
+<li style='margin-left:0.0em'>Finder の件数は近似（百の位で丸め）。桁として読む。</li>
+<li style='margin-left:0.0em'>ランク5万以内でも ASIN が数百万あるのは、バリエーションの子が親のランクを共有するため（単品だけなら上限 31ルート×5万）。</li>
+<li style='margin-left:0.0em'><code>offerCountFBA</code> は公式の定義で「FBA オファーの本数」（<code>product-finder.html</code>）。出品者数ではない（同じ出品者が複数出すことは FBA では稀＝推測）。</li>
+<li style='margin-left:0.0em'><code>offerCountFBA_gte=100000</code> で0件になり、フィルタが効いていることを確かめた（綴り違いは無視されるため）。</li>
+<li style='margin-left:0.0em'><code>offerCountFBA</code> の値がある ASIN は 493万中 493万（<code>_gte=0</code>）。値の欠けによる取りこぼしではない。FBA 1以上は168万。ただし各 ASIN の値がいつ時点かは確かめていない。</li>
+</ul>
+<h2>2. 3基準の ASIN 一覧（ルート別）</h2>
+<p>Finder で全件の ASIN を取った（perPage=10,000・1万件超のルートはランク帯で分割）。<strong>計 75,574 ASIN・1,274 token。</strong> raw は agent_output（Git 外）。</p>
+<table><thead><tr><th>ルートカテゴリ</th><th>ASIN</th></tr></thead><tbody>
+<tr><td>ファッション</td><td>15,879</td></tr>
+<tr><td>家電＆カメラ</td><td>12,622</td></tr>
+<tr><td>おもちゃ</td><td>7,750</td></tr>
+<tr><td>パソコン・周辺機器</td><td>6,858</td></tr>
+<tr><td>ホーム＆キッチン</td><td>6,080</td></tr>
+<tr><td>ホビー</td><td>4,731</td></tr>
+<tr><td>文房具・オフィス用品</td><td>4,729</td></tr>
+<tr><td>ペット用品</td><td>4,277</td></tr>
+<tr><td>スポーツ＆アウトドア</td><td>3,258</td></tr>
+<tr><td>DIY・工具・ガーデン</td><td>2,763</td></tr>
+<tr><td>車＆バイク</td><td>2,236</td></tr>
+<tr><td>産業・研究開発用品</td><td>1,513</td></tr>
+<tr><td>楽器・音響機器</td><td>1,444</td></tr>
+<tr><td>ベビー＆マタニティ</td><td>1,095</td></tr>
+<tr><td>大型家電</td><td>339</td></tr>
+</tbody></table>
+<ul>
+<li style='margin-left:0.0em'>§1 の 7.69万（近似）と一覧の 75,574（実数）の差は、Finder の丸めと取得時刻のずれ（推測）。</li>
+<li style='margin-left:0.0em'>ブランドとメーカーは Finder では取れない。全件を product で読むと約76千 token（20/分で約63時間）。1回の上限 5,000 を超えるので、今回は無作為標本で推定する（§3）。</li>
+</ul>
+<h2>3. 標本の取り方と推定の方法</h2>
+<table><thead><tr><th>項目</th><th>内容</th></tr></thead><tbody>
+<tr><td>標本</td><td>一覧 75,574 ASIN からルート別の比例配分で 2,499件（乱数固定 seed=20260916）</td></tr>
+<tr><td>取得</td><td>product（<code>offers</code> なし・1 token/件）。手元の raw でブランドストアまで分かる47件は取り直さない</td></tr>
+<tr><td>区分</td><td>T-1 と同じ関数（<code>t1_classify.row</code> の区分＝国内/海外ブランド/中国系OEM/同疑い/代理店/ブランド不明/版元、大手＝gBiz L1/L2 または既知リスト）</td></tr>
+<tr><td>ストア</td><td><code>brandStoreName</code> の空/非空（T-3 で S-1 の目視と 25/25 一致）</td></tr>
+<tr><td>メーカー単位</td><td>1本でもストアありならストアあり（ブランド登録は社でするため）</td></tr>
+</tbody></table>
+<p>メーカー数は ASIN 数に比例しない（同じ社の ASIN が標本に何本も入る）。そこで2通りで幅を出す。</p>
+<ul>
+<li style='margin-left:0.0em'>上限＝標本の社数 × 一覧 ÷ 標本（ASIN に比例。社の重なりを無視するので多めに出る）</li>
+<li style='margin-left:0.0em'>推定＝標本を 1/4・1/2・全部と間引いて社数の伸び方を測り、その伸び率のまま一覧の大きさまで延ばす（伸びが鈍る分だけ少なく出る）</li>
+</ul>
+<h2>4. 標本の中身（2,499 ASIN・一覧の3.3%）</h2>
+<table><thead><tr><th>判定（T-1 と同じ手順）</th><th>ASIN</th><th>比率</th><th>標本の社数</th></tr></thead><tbody>
+<tr><td>除外：大手</td><td>799</td><td>32%</td><td>159</td></tr>
+<tr><td>除外：中国系OEM疑い</td><td>559</td><td>22%</td><td>348</td></tr>
+<tr><td>除外：海外ブランド</td><td>175</td><td>7%</td><td>139</td></tr>
+<tr><td>除外：中国系OEM・ブランド不明・代理店</td><td>78</td><td>3%</td><td>46</td></tr>
+<tr><td>国内中小・ストアあり（自社で出品）</td><td>439</td><td>18%</td><td>265</td></tr>
+<tr><td><strong>国内中小・ストアなし＝型A の送信先</strong></td><td><strong>449</strong></td><td><strong>18%</strong></td><td><strong>320</strong></td></tr>
+</tbody></table>
+<ul>
+<li style='margin-left:0.0em'>3基準の ASIN の半分以上は大手と中国系。T-1（公表の月販50以上・単品）より大手が多い（32%。T-1 の打診前は2割）。ランク5万以内に絞ると大手の比率が上がる（推測）。</li>
+<li style='margin-left:0.0em'>国内中小の ASIN のうち、ストアなしは約半分（449/888）。T-1 の打診母数（ストアなし59%）と近い。</li>
+<li style='margin-left:0.0em'>ストアなしの ASIN は単品の比率が高い（46%。ストアありは24%）。バリエーションを組むのはブランドを育てている社。</li>
+</ul>
+<h2>5. 社数の推定（国内中小・ストアなし）</h2>
+<table><thead><tr><th>推定</th><th>社数</th><th>読み方</th></tr></thead><tbody>
+<tr><td>Chao1（標本の中の出現回数から）</td><td>1,360</td><td>床。標本率3%で1回だけの社が8割あり、ほとんど伸びない</td></tr>
+<tr><td><strong>社HT（ブランド別の一覧内件数 k から Σ1/k）</strong></td><td><strong>2,785</strong></td><td>不偏。区分の標本449 ASIN から無作為100件のブランドを Finder で数えた（83ブランド・99件で k が取れた）</td></tr>
+<tr><td>家族HT（兄弟数から）</td><td>9,294</td><td>上側。社は家族（親 ASIN）より少ない</td></tr>
+<tr><td>ASIN 比例</td><td>9,677</td><td>上限。社の重なりを無視</td></tr>
+</tbody></table>
+<p>目視での除外（100件中）:</p>
+<table><thead><tr><th>目視</th><th>件数</th><th>例</th></tr></thead><tbody>
+<tr><td>国内中小として残す</td><td>59</td><td>カミオジャパン・デルフォニックス・クツワ・ユニフレーム・ショウワノート・墨運堂</td></tr>
+<tr><td>明らかに送信先でない</td><td>35</td><td>海外大手（TaylorMade・Columbia・PUMA・IKEA）、大手（サンリオ・ポケモン・リンナイ・プラス）、輸入元名義の海外ブランド（Avirex・ZIWI・Mepal）、くじ景品</td></tr>
+<tr><td>疑い</td><td>6</td><td>代理店名義の中国系らしいブランド、大手のグループ会社</td></tr>
+</tbody></table>
+<ul>
+<li style='margin-left:0.0em'>外した ASIN は Σ1/k に0で入れた（分母の件数は変えない）。大手は k が大きい（テーラーメイド等）ので、ASIN で35%を外しても社数は13%しか減らない。</li>
+<li style='margin-left:0.0em'>80%区間は部分標本100件のブートストラップ（2,000回）。標本2,499件そのもののばらつきは入っていない（推測：区間は実際より少し狭い）。</li>
+</ul>
+<h2>6. 注意と、母数を足すなら</h2>
+<table><thead><tr><th>注意</th><th>向き</th></tr></thead><tbody>
+<tr><td>k はブランド名の完全一致で数えた。1社が複数ブランドを持つと社数を多めに、表記揺れがあると k を少なめ＝社数を多めに見る</td><td>多め</td></tr>
+<tr><td>目視は部分標本の100件だけ。区分関数の漏れ（大手リストに無い大手・日本語名義の海外ブランド）は、この率で全体にあると置いた</td><td>幅</td></tr>
+<tr><td>ストアが無くても本人が出品している社がある（T-3 の途中データでストアなし ASIN の約2%）</td><td>少し多め</td></tr>
+<tr><td><code>offerCountFBA</code> は FBA オファーの本数で、各 ASIN の値がいつ時点かは未確認</td><td>不明</td></tr>
+<tr><td>1ブランドだけ Finder で k=0（索引の更新ずれ）。平均から外した</td><td>小</td></tr>
+<tr><td>T-1 の打診母数・展示会・NETSEA との重なりは引いていない（T-1 の打診母数のうち一覧に入るのは299社・うちストアなし196社）</td><td>—</td></tr>
+</tbody></table>
+<p>母数を足す手（件数は Finder の近似）:</p>
+<ul>
+<li style='margin-left:0.0em'>規制3（ドラッグ・ビューティー・食品）を戻す: ASIN 7.69万→9.59万（+25%）。薬機法・食品表示の確認が要る</li>
+<li style='margin-left:0.0em'>ランクを10万位まで広げる: 未計測（推測：ASIN は2倍前後）。型A の「5万以内」から外れる</li>
+<li style='margin-left:0.0em'>区分関数の大手リストに今回の大手を足してから、同じ手順を回し直す（一覧は保存済み。標本の product も保存済みで、再分類は0 token）</li>
+</ul>
+<p>明細（Git 追跡外）: <code>out/sa_sample.csv</code>（標本2,499件の判定）・<code>out/sa_makers.csv</code>（標本の社）・<code>out/sa_summary.json</code>。raw と再現用のコードは <code>agent_output/T-20260914-006/</code>（<code>sa_probe.py</code>・<code>sa_list.py</code>・<code>sa_cache.py</code>・<code>sa_sample.py</code>・<code>sa_brandcount.py</code>・<code>sa_classify.py</code>・<code>sa_leak_review.json</code>）。</p>
+</body></html>
