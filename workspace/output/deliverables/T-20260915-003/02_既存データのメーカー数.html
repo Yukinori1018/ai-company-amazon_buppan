@@ -1,0 +1,146 @@
+<!doctype html><html lang='ja'><head><meta charset='utf-8'><title>既存データで数えたメーカーの分母（T-20260915-003 タカシ分）</title><style>body{font-family:-apple-system,'Hiragino Sans','Noto Sans JP',sans-serif;max-width:1100px;margin:2em auto;padding:0 1em;line-height:1.6;color:#222}
+table{border-collapse:collapse;margin:.8em 0;font-size:.92em}th,td{border:1px solid #bbb;padding:.35em .6em;vertical-align:top}th{background:#f0f0f0}
+h1{font-size:1.5em;border-bottom:2px solid #444}h2{font-size:1.25em;border-bottom:1px solid #999;margin-top:1.6em}h3{font-size:1.05em}
+blockquote{border-left:4px solid #ccc;margin:.6em 0;padding:.2em .8em;color:#444;background:#fafafa}code{background:#f4f4f4;padding:0 .2em}pre{background:#f4f4f4;padding:.6em;overflow-x:auto}</style></head><body><h1>既存データで数えたメーカーの分母（T-20260915-003 タカシ分）</h1>
+<p>2026-09-15 / IT エンジニア タカシ。新たな API 呼び出しはゼロ。手元の3つのデータを数え直しただけです。</p>
+<h2>結論</h2>
+<table><thead><tr><th>見方</th><th>社数</th><th>月300通で一巡</th></tr></thead><tbody>
+<tr><td>3ソースの打診対象（重複除去）</td><td><b>2,331社</b></td><td><b>約7.8ヶ月</b></td></tr>
+<tr><td>展示会の国内判定を緩めた場合</td><td>2,968社</td><td>約9.9ヶ月</td></tr>
+<tr><td>NETSEA を「メーカー」業態だけにした場合</td><td>1,968社</td><td>約6.6ヶ月</td></tr>
+<tr><td>1カテゴリに絞った場合（最大のキッチン・日用品）</td><td>323社</td><td>約1.1ヶ月</td></tr>
+</tbody></table>
+<ul>
+<li>手元のデータだけで、月300通を半年以上続けられる数はあります。</li>
+<li>ただし1カテゴリに絞ると1ヶ月前後で尽きます。</li>
+<li>3ソースの社名の重なりは1〜3%でした。ソースごとにほぼ別の会社です。名簿を足せば、分母はまだ増えます（推測：飽和していない）。</li>
+</ul>
+<h2>1. T-1 需要先行リスト（Amazon で売れている単品）</h2>
+<p>条件は、公表の月間購入数50以上・単品・2,000〜8,000円・Amazon本体なし・新品オファー2〜6です。規制3カテゴリ（ドラッグ・ビューティー・食品）は除いています。Amazon 全体（ランクあり8,080万 ASIN）のごく一部なので、この数は下限です。</p>
+<table><thead><tr><th>区分</th><th>社数</th></tr></thead><tbody>
+<tr><td>全体（3,365 ASIN）</td><td>2,126</td></tr>
+<tr><td>国内・非大手＝打診の母数</td><td>994</td></tr>
+<tr><td>中国系OEM疑い</td><td>583</td></tr>
+<tr><td>大手</td><td>238</td></tr>
+<tr><td>海外ブランド</td><td>234</td></tr>
+<tr><td>中国系OEM</td><td>62</td></tr>
+<tr><td>代理店</td><td>13</td></tr>
+</tbody></table>
+<p>打診の母数994社のうち788社（79%）は ASIN が1件だけです。</p>
+<p>カテゴリ別（Amazon のルートカテゴリ・上位15）:</p>
+<table><thead><tr><th>カテゴリ</th><th>ASIN</th><th>社数</th><th>打診母数 ASIN</th><th>打診母数 社数</th></tr></thead><tbody>
+<tr><td>ホーム＆キッチン</td><td>586</td><td>467</td><td>234</td><td>206</td></tr>
+<tr><td>DIY・工具・ガーデン</td><td>303</td><td>232</td><td>108</td><td>96</td></tr>
+<tr><td>家電＆カメラ</td><td>336</td><td>230</td><td>36</td><td>28</td></tr>
+<tr><td>車＆バイク</td><td>305</td><td>222</td><td>152</td><td>111</td></tr>
+<tr><td>スポーツ＆アウトドア</td><td>299</td><td>212</td><td>160</td><td>113</td></tr>
+<tr><td>ペット用品</td><td>344</td><td>207</td><td>223</td><td>146</td></tr>
+<tr><td>パソコン・周辺機器</td><td>262</td><td>177</td><td>69</td><td>34</td></tr>
+<tr><td>おもちゃ</td><td>224</td><td>154</td><td>127</td><td>93</td></tr>
+<tr><td>ファッション</td><td>182</td><td>113</td><td>64</td><td>54</td></tr>
+<tr><td>産業・研究開発用品</td><td>133</td><td>109</td><td>71</td><td>58</td></tr>
+<tr><td>ホビー</td><td>192</td><td>81</td><td>55</td><td>48</td></tr>
+<tr><td>文房具・オフィス用品</td><td>103</td><td>78</td><td>52</td><td>39</td></tr>
+<tr><td>ベビー＆マタニティ</td><td>53</td><td>38</td><td>35</td><td>29</td></tr>
+<tr><td>楽器・音響機器</td><td>29</td><td>22</td><td>5</td><td>5</td></tr>
+<tr><td>大型家電</td><td>14</td><td>12</td><td>3</td><td>2</td></tr>
+</tbody></table>
+<ul>
+<li>家電・PC は大手と中国系が多く、打診母数に残るのは1〜2割です。</li>
+<li>ペット・車・おもちゃは半分以上が残ります。</li>
+<li>ブランドストアの有無は T-1 で取得していません（不明）。</li>
+</ul>
+<h2>2. 展示会（ギフトショー秋2026・出展社2,353社）</h2>
+<p>元データは社名とブースだけです。品目別の分類はありません。ホール＝併催展でしか分けられません。</p>
+<table><thead><tr><th>ホール（併催展）</th><th>全体</th><th>国内（厳しめ）</th><th>国内（緩め）</th></tr></thead><tbody>
+<tr><td>東1（グルメショー＝食品）</td><td>315</td><td>198</td><td>252</td></tr>
+<tr><td>西1・西3・西4（LxD・L&amp;D＝住まい・インテリア）</td><td>610</td><td>316</td><td>559</td></tr>
+<tr><td>東2・東3・東7・東8・西2（ギフト・生活雑貨）</td><td>1,012</td><td>461</td><td>811</td></tr>
+<tr><td>南1・南2（海外パビリオン）</td><td>416</td><td>1</td><td>0</td></tr>
+<tr><td>合計</td><td>2,353</td><td><b>976</b></td><td><b>1,622</b></td></tr>
+</tbody></table>
+<ul>
+<li>厳しめ＝T-20260906-005 の機械分類で PASS。英字の社名を一律に「海外」として落としています（国内の英字ブランドも落ちる）。</li>
+<li>緩め＝南1・南2と海外法人格（CO., LTD 等）だけを海外として、団体・自治体を除いた数です。</li>
+<li>国内の本当の数は976〜1,622の間にあります。</li>
+<li>商社・代理店と判定したのは35社、団体・自治体は117社でした。</li>
+</ul>
+<h2>3. NETSEA（取引申請済みのサプライヤー）</h2>
+<table><thead><tr><th>業態</th><th>取引中</th><th>うち API で商品が見える</th></tr></thead><tbody>
+<tr><td>卸および小売業</td><td>229</td><td>98</td></tr>
+<tr><td>卸専業</td><td>146</td><td>73</td></tr>
+<tr><td>メーカー</td><td>79</td><td>25</td></tr>
+<tr><td>その他・不明</td><td>14</td><td>14</td></tr>
+<tr><td>合計</td><td><b>468</b></td><td><b>210</b>（257,067商品）</td></tr>
+</tbody></table>
+<ul>
+<li>API で商品が見えるのは取引中の一部だけです（既知の制約。前回の実測は225社＝48%、この raw は8/31時点で210社）。</li>
+<li>メーカー業態は取引中の17%（79社）です。NETSEA は卸の場で、メーカーの名簿としては薄いです。</li>
+<li>母数26,942件（T-20260906-003 の検証対象）は、76社の商品でした（うちメーカー業態14社）。</li>
+</ul>
+<p>カテゴリ別の社数（API で見える210社・NETSEA の大分類）:</p>
+<table><thead><tr><th>カテゴリ</th><th>その分類の商品がある社</th><th>主力（商品数最多）の社</th></tr></thead><tbody>
+<tr><td>日用雑貨</td><td>165</td><td>50</td></tr>
+<tr><td>ファッショングッズ</td><td>151</td><td>50</td></tr>
+<tr><td>ホビー・スポーツ</td><td>145</td><td>31</td></tr>
+<tr><td>美容・健康</td><td>120</td><td>13</td></tr>
+<tr><td>レディースアパレル</td><td>119</td><td>31</td></tr>
+<tr><td>家具・インテリア</td><td>108</td><td>11</td></tr>
+<tr><td>家電・PC・AV機器</td><td>104</td><td>6</td></tr>
+<tr><td>店舗用品・事務用品</td><td>91</td><td>2</td></tr>
+<tr><td>メンズアパレル</td><td>83</td><td>2</td></tr>
+<tr><td>食品・飲料</td><td>42</td><td>13</td></tr>
+<tr><td>中国発ファッション</td><td>12</td><td>1</td></tr>
+</tbody></table>
+<p>1社が平均5分類以上に商品を出しています（延べ1,140÷210社）。卸は品揃えが広いので、「その分類の商品がある社」は大きく出ます。</p>
+<h2>4. 3つの重なり（社名の一致）</h2>
+<p>照合は T-20260831-001 の正規化（法人格・和英併記・記号を落としたキー）で行いました。</p>
+<table><thead><tr><th>組み合わせ</th><th>一致した社</th><th>率</th></tr></thead><tbody>
+<tr><td>T-1 × 展示会</td><td>27</td><td>T-1 の1.3%／展示会の1.1%</td></tr>
+<tr><td>T-1 × NETSEA</td><td>11</td><td>T-1 の0.5%／NETSEA の2.4%</td></tr>
+<tr><td>展示会 × NETSEA</td><td>12</td><td>展示会の0.5%／NETSEA の2.6%</td></tr>
+<tr><td>3つすべて</td><td>4</td><td>—</td></tr>
+</tbody></table>
+<ul>
+<li>一致した約40組には、同名の別会社（ありふれた社名）が数件混じっている可能性があります。1組ずつの確認はしていません。</li>
+<li>前回の実測（展示会の出展社を Keepa で引いて0.1%）より高いのは、今回が「T-1 の約2,000社」という広い名簿との照合だからです。どちらも「ほとんど重ならない」という結論は同じです。</li>
+<li>意味（推測）：売れている単品を持つメーカーは展示会にほとんど出ていません。展示会の出展社は、Amazon で売れ筋を持っていない会社がほとんどです。</li>
+</ul>
+<h2>5. 分母のまとめ（重複を除いたユニーク社数）</h2>
+<p>打診対象の定義は、T-1 の国内・非大手994社＋展示会の国内（厳しめ）976社＋NETSEA の取引中468社です。重複を除くと2,331社です。海外・大手・中国系を含めた全社数は4,752社です。</p>
+<p>カテゴリは3ソースで体系が違うので、粗い共通分類に寄せています。</p>
+<table><thead><tr><th>共通分類</th><th>社数</th><th>月300通で一巡</th></tr></thead><tbody>
+<tr><td>ギフト・生活雑貨（展示会の未分類）</td><td>449</td><td>1.5ヶ月</td></tr>
+<tr><td>キッチン・日用品</td><td>323</td><td>1.1ヶ月</td></tr>
+<tr><td>家具・インテリア</td><td>317</td><td>1.1ヶ月</td></tr>
+<tr><td>スポーツ・ホビー・玩具</td><td>257</td><td>0.9ヶ月</td></tr>
+<tr><td>車・DIY・工具</td><td>240</td><td>0.8ヶ月</td></tr>
+<tr><td>ファッション</td><td>225</td><td>0.8ヶ月</td></tr>
+<tr><td>食品</td><td>218</td><td>0.7ヶ月</td></tr>
+<tr><td>ペット</td><td>134</td><td>0.4ヶ月</td></tr>
+<tr><td>家電・PC</td><td>70</td><td>0.2ヶ月</td></tr>
+<tr><td>文具・事務・店舗用品</td><td>38</td><td>0.1ヶ月</td></tr>
+<tr><td>美容・健康</td><td>33</td><td>0.1ヶ月</td></tr>
+<tr><td>ベビー</td><td>22</td><td>0.1ヶ月</td></tr>
+<tr><td>合計</td><td><b>2,331</b></td><td><b>7.8ヶ月</b></td></tr>
+</tbody></table>
+<ul>
+<li>食品・美容は T-1 で除外しているカテゴリです。数字は展示会と NETSEA だけから来ています。</li>
+<li>ペット・車・おもちゃは T-1 の比重が大きいです。売れている単品から逆引きした会社が多い分類です。</li>
+</ul>
+<h2>6. 読み方の注意</h2>
+<ul>
+<li><b>事実</b>：件数・率はすべて手元ファイルの集計です（再現は <code>02_denominator.py</code>）。</li>
+<li><b>推測</b>：「飽和していない」「展示会の出展社は売れ筋を持たない」は、重なりの低さからの推測です。</li>
+<li>T-1 は Amazon の売れ筋のごく一部です（公表≥50・単品・価格帯・オファー数で絞った3,385 ASIN）。条件を広げれば社数は増えます（子 ASIN を含めると ASIN は約3倍。社数の増え方は未計測）。</li>
+<li>月300通の計算は、1社に1通・再送なしです。</li>
+</ul>
+<h2>ファイル</h2>
+<table><thead><tr><th>ファイル</th><th>中身</th><th>Git</th></tr></thead><tbody>
+<tr><td><code>02_既存データのメーカー数.md</code> / <code>.html</code></td><td>この文書</td><td>追跡</td></tr>
+<tr><td><code>02_denominator.py</code></td><td>集計スクリプト（API 呼び出しなし・約16秒）</td><td>追跡</td></tr>
+<tr><td><code>out/summary.json</code></td><td>集計値</td><td>追跡外</td></tr>
+<tr><td><code>out/overlap_社名一致.csv</code></td><td>一致した社名の組</td><td>追跡外（社名入り）</td></tr>
+<tr><td><code>out/union_ユニーク社.csv</code></td><td>ユニーク社の一覧（ソース・分類つき）</td><td>追跡外（ギフトショー由来の社名を含む）</td></tr>
+<tr><td><code>out/netsea_supplier_カテゴリ.csv</code></td><td>NETSEA サプライヤー別のカテゴリ</td><td>追跡外</td></tr>
+</tbody></table></body></html>
