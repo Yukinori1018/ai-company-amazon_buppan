@@ -73,6 +73,7 @@ related_tickets: [T-20260912-002, T-20260831-005, T-20260809-001]
 
 ## ログ
 
+- 2026-09-15 マリエ：Notion カードを新規作成（Status=doing / Assignee=researcher / labels research・strategy / ParentTicket T-20260912-002）https://app.notion.com/p/3dcb0a4044fa81c9a841fe6dcd1e75ad
 - 2026-09-15 **番号を訂正**（カズヨ）。60b4348 で T-20260915-001 として起票したが、先に起票されていた NETSEA のチケット（T-20260915-001_netsea-success-model-study.md）と重複していたため T-20260915-002 に振り直した（マリエが検出）。成果物の置き場も `deliverables/T-20260915-002/` に変更し、サトル5体に通知済み。
 - 2026-09-15 doing 起票（カズヨ）。T-20260914-006 の T-3（タカシ）は前セッション終了で停止中。方針確定まで再開を保留（Keepa は 10/3 まで使える）。
 

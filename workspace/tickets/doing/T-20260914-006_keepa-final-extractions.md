@@ -39,6 +39,7 @@ related_tickets: [T-20260912-002, T-20260914-002, T-20260914-005]
 
 - 2026-09-14 doing 起票（カズヨ）。
 - 2026-09-14 マリエ：Notion カード新規作成（doing・it_engineer・high・labels pipeline/sourcing・ParentTicket T-20260912-002）。owner-tasks の ℹ️ と handover に追加。
+- 2026-09-15 マリエ：Notion 結果要約に1行（T-3 は停止中・方針確定まで保留）・T-3 の「実行中」を停止中に訂正。UpdatedAt 9/15。
 
 ### タカシ（T-3）
 
