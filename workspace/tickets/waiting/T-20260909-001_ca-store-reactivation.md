@@ -1,15 +1,15 @@
 ---
 ticket_id: T-20260909-001
 title: 【継続】カナダストアの再開申請（日本復活後も緩めない）
-status: doing
+status: waiting
 assignee: secretary
 priority: high
 created_at: 2026-09-09
 updated_at: 2026-09-15
-requires_approval: false
+requires_approval: true
 labels: [compliance, ops]
 parent_ticket: ""
-next_check_at: 2026-09-17
+next_check_at: 2026-09-16
 related_tickets: [T-20260826-004, T-20260726-003, T-20260904-005]
 ---
 
@@ -184,3 +184,17 @@ related_tickets: [T-20260826-004, T-20260726-003, T-20260904-005]
 ## 完了報告（ヒデアキ → カズヨ）
 
 下書きは完成しています。確認をお願いします。送信前チェック3点のどれかで違う結果が出た場合、本文の事実が崩れるので、送らずに差し戻してください。frontmatter の assignee は secretary のままです（今回は明示の発注なので作業しました）。
+
+### 送信前の確認（2026-09-15・読み取りのみ）
+ヒデアキの下書き（`workspace/output/agent_output/T-20260909-001/case_followup_20260915.md`）には、送信前に見るべき点が3つ付いていた。
+1. 9/15 のメールに提出先の案内がないか → **案内はあった**（「Account information の Identity information リンク」）。下書きの「どこにも示されていない」は不正確だったので、カズヨが書き直した。
+2. Submit appeal を押すと → 今も `verification-in-progress/render` に着く。表示は「We have failed to verify … contact Seller Support」で、入力欄はない。
+3. Account information → Identity information のリンクはない。表示は「We are unable to verify your Identity information … contact Seller Support」だけ。
+
+どちらの画面も「Seller Support に連絡を」と案内している → ケースへの催促が正しい窓口。
+付随して確認できたこと：Store status は **Japan Active**／CA・US・MX Inactive。
+
+### 入力済みの本文（英語・ケース返信欄に入力済み・未送信）
+ヒデアキの英語版をもとに、事実2を上記の確認結果に合わせて書き直したもの。社長が送信ボタンを押す（§4.1 外部発信）。
+
+**状態：doing → waiting**（社長の送信クリック待ち）

@@ -300,3 +300,7 @@ Notion は done で正しいので**表示上の実害は出ていない**が、
 - Python で行差し替えする前に `assert` で対象行の先頭一致を確認してから書く。2071行のファイルで行番号ずれ事故を防げる
 - 送信ボタン手前の状態は「社長の一手＝送信ボタンを押す」と1行で書き、添付の中身（種目・受付番号）を表に入れる。社長が送信前に照合できる
 - **Notion の太字の中にメールアドレスを書くと、太字の一文まるごと mailto リンクに化ける**（9/15 夜に実際に発生し、見出し直下の一文が壊れた）。太字にはアドレスを入れず「Gmail（satoyselect）」のように書く。書き込み後は必ず fetch で確かめる
+
+## 追記 2026-09-15（T-20260909-001 doing→waiting・更新㊳）
+- owner-tasks.md の12行目（最終更新行）は1行が数十KBあり Read が上限超過する。**Python で L[11] の先頭に新文言＋「／前: 」を差し込み、L[13]（---）の直後に新セクションを挿入**するのが最短（assert で行位置を確認してから書く）。
+- Notion は update_properties（Status/RequiresApproval/Description/UpdatedAt）＋ insert_content(start) で冒頭に「社長の番」枠、の2コールで足りる。カードIDは data_source 絞りの notion-search「T-XXXX」で1発で出る。
