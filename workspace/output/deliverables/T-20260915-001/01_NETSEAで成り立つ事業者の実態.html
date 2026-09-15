@@ -1,0 +1,119 @@
+<!doctype html><html lang='ja'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>01 NETSEA で成り立つ事業者の実態（公開版）</title><style>body{font-family:-apple-system,'Hiragino Sans','Noto Sans JP',sans-serif;max-width:1150px;margin:2em auto;padding:0 1em;line-height:1.65;color:#222;font-size:14.5px}table{border-collapse:collapse;margin:.8em 0;font-size:.92em}th,td{border:1px solid #bbb;padding:.35em .6em;vertical-align:top}th{background:#eef2f8}tr:nth-child(even) td{background:#fafafa}h1{font-size:1.5em;border-bottom:2px solid #444}h2{font-size:1.25em;border-left:5px solid #25b;padding-left:8px;margin-top:1.8em}h3{font-size:1.05em;margin-top:1.4em}blockquote{border-left:4px solid #ccc;margin:.8em 0;padding:.2em 1em;color:#444}code{background:#f3f3f3;padding:1px 4px;border-radius:3px}hr{border:0;border-top:1px solid #ccc;margin:1.6em 0}</style></head><body>
+<h1>01 NETSEA で成り立つ事業者の実態（公開版）</h1>
+<p>T-20260915-001 / リサーチャー サトル / 2026-09-15。事実の収集だけを扱う。売り方の仮説はタケシの担当。</p>
+<p>卸値・ASIN ごとの値は <code>out/</code>（Git 追跡外）にある。</p>
+<h2>イシュー</h2>
+<p>NETSEA の卸値で利益を出している事業者は、どの売り場とどの売り方で「価格決定権」と「競合の少なさ」を得ているのか。Amazon の既存 ASIN への相乗り以外に何があるのか。</p>
+<h2>結論</h2>
+<table><thead><tr><th>問い</th><th>答え</th><th>確度</th></tr></thead><tbody>
+<tr><td>事業者タイプ別の利益率の一次データはあるか</td><td><strong>無い</strong>。NETSEA 公式も業態別の構成比・利益率を公開していない</td><td>事実（S1〜S4 を探索）</td></tr>
+<tr><td>NETSEA 商品のうち JAN があるのは</td><td><strong>34%</strong>（1,291/3,809件）。アパレル 0〜2%、ホビー 9%、ファッション雑貨 12%。家電 77%、家具・インテリア 72%、食品 65%</td><td>事実（実測 A）</td></tr>
+<tr><td>JAN がある商品のうち Amazon に ASIN が無いのは</td><td><strong>21%</strong>（45/213件）。ただし 33%（15件）は1社に集中しており、承認済みサプライヤーは Amazon 照合で選んだ偏りがある</td><td>事実＋偏りあり（実測 B）</td></tr>
+<tr><td>ASIN はあるが空いている棚は</td><td>新品オファー数の中央値は <strong>3</strong>（N=120）。1〜2本が 45%。ただしランクが取れた117件の中央値は約28.5万位で、monthlySold が表示されるのは 13/168件だけ</td><td>事実（Keepa の値。鮮度の注意あり）</td></tr>
+<tr><td>画像転載可は</td><td><strong>83%</strong>（3,154/3,809件）</td><td>事実（実測 A）</td></tr>
+<tr><td>公式が推す売り方</td><td>相乗りより新規出品のほうが「価格競争がないため利益が出やすい傾向」（NETSEA 公式、数字なし）。ほかに楽天、メルカリ、無在庫（自社サイト）、TikTok Shop</td><td>事実（公式の定性記述）</td></tr>
+<tr><td>無在庫（販売後注文）</td><td>NETSEA 公式の想定は「自社の WEB サイトなど」。楽天とメルカリShops は無在庫を禁止。Amazon は条件付き</td><td>事実（S5・S9・S10）／楽天は二次（S12）</td></tr>
+</tbody></table>
+<p>推測（確度：中）：NETSEA の約3分の2は JAN が無く、Amazon の相乗りの土俵にそもそも乗っていない。当社が T-20260909-002 で見た「出品者の中央値18」の棚は、NETSEA 全体のうち JAN のある3分の1の、さらに売れ筋の部分にあたる。根拠は実測 A のカテゴリ別 JAN 率と、実測 B でオファー数の中央値が3まで下がること。</p>
+<h2>1. 事業者タイプ × 利益構造</h2>
+<table><thead><tr><th>タイプ</th><th>価格決定権</th><th>同一商品の競合</th><th>売り場の手数料</th><th>NETSEA 側の条件</th><th>売り場の規約</th><th>公開された事例</th></tr></thead><tbody>
+<tr><td>Amazon 既存 ASIN に相乗り（当社の既知）</td><td>無い（カート価格に従う）</td><td>T-20260909-002 の売れ筋で中央値18</td><td>販売手数料 8〜15%（S6）＋FBA</td><td>ネット販売可が要る</td><td>ブランドゲート（13件中12件）</td><td>当社の実測：黒字2件・約2万円</td></tr>
+<tr><td>Amazon 新規 ASIN（Amazon に無い商品）</td><td>ある（ページの作成者）</td><td>作成直後は0。相乗りされうる</td><td>同上</td><td>画像転載可 83%</td><td>GTIN 免除は大口のみ・新品のみ・ブランド名が印字された写真2枚以上（S8）</td><td>公式は「利益が出やすい傾向」とだけ書く（S6）。数字の事例は未発見</td></tr>
+<tr><td>セット組み・独自バンドル</td><td>ある</td><td>未調査</td><td>同上</td><td>未確認（セット化の可否を示すフラグは API に無い）</td><td>GTIN 免除の対象例にセット商品（S8、二次）</td><td>未発見</td></tr>
+<tr><td>楽天</td><td>部分的（店舗ごとに価格）</td><td>未調査</td><td>がんばれプラン 月19,500円＋3.5〜7.0%＋ポイント原資1%（S7）</td><td>ネット販売可</td><td>無在庫は禁止・違反35点（S12、二次）</td><td>未発見</td></tr>
+<tr><td>Yahoo!ショッピング</td><td>部分的</td><td>未調査</td><td>2026-09 から月1万円＋2.5%（キャンペーン原資1.5%は廃止）（S11）</td><td>同上</td><td>未調査</td><td>未発見</td></tr>
+<tr><td>メルカリShops</td><td>部分的</td><td>未調査</td><td>10%＋振込200円（S10、公式）</td><td>ネット販売可。オークション不可が 26% ある</td><td>無在庫は禁止。権利の無い画像の転載も禁止（S10）</td><td>ブログの体験談のみ（二次・低）</td></tr>
+<tr><td>自社 EC</td><td>ある</td><td>検索で比較される</td><td>未調査</td><td>画像はモール・自社サイトで使える（S5）</td><td>該当なし（自社の規約）</td><td>ITreview：EC の立ち上げ時の仕入れ（S13）</td></tr>
+<tr><td>無在庫・直送（販売後注文可）</td><td>売り場による</td><td>未調査</td><td>売り場による</td><td>代金引換は不可。クレーム・返品はバイヤーが窓口（S4）</td><td>Amazon：記録上の販売者であることを仕入れ先と契約する義務など（S9）。楽天・メルカリShops は禁止</td><td>未発見</td></tr>
+<tr><td>実店舗・雑貨店</td><td>ある</td><td>商圏内だけ</td><td>該当なし（家賃などは未調査）</td><td>条件の縛りなし（ネット販売の可否は無関係）</td><td>該当なし</td><td>業態別の件数は非公開</td></tr>
+<tr><td>海外輸出</td><td>未調査</td><td>未調査</td><td>未調査</td><td>公式の越境サイトは海外バイヤー専用で、国内バイヤーは使えない（S14）</td><td>未調査</td><td>eBay 無在庫の記述は二次のみ</td></tr>
+<tr><td>EC の販促品（粗品）</td><td>該当なし（原価として使う）</td><td>該当なし</td><td>該当なし</td><td>小ロット</td><td>該当なし</td><td>ITreview：粗品でリピート率が約5%改善（S13、1件）</td></tr>
+</tbody></table>
+<p>「未調査」は今回調べていない。「未発見」は探したが見つからなかった。「該当なし」はその軸が成り立たない。</p>
+<h2>2. 実測（手元のデータ）</h2>
+<h3>実測 A：承認済みサプライヤーの商品の販売条件（2026-09-15 取得）</h3>
+<ul>
+<li style='margin-left:0.0em'>母集団：当社の承認済みサプライヤー 221社。無作為に40社を選び、1社あたり最大100件を取得した（3,809件）。</li>
+<li style='margin-left:0.0em'>定義は NETSEA Buyer API の schemas/items.json による（S15）。</li>
+</ul>
+<table><thead><tr><th>項目</th><th>件数</th><th>比率</th></tr></thead><tbody>
+<tr><td>JAN あり（本体か規格のどちらか）</td><td>1,291</td><td>34%</td></tr>
+<tr><td>画像転載可（<code>image_copy_flag</code>=Y）</td><td>3,154</td><td>83%</td></tr>
+<tr><td>ネット販売可（<code>deal_net_shop_flag</code>=Y）</td><td>3,809</td><td>100%</td></tr>
+<tr><td>ネットオークション可（<code>deal_net_auction_flag</code>=Y）</td><td>2,816</td><td>74%</td></tr>
+<tr><td>商品配送可（<code>direct_send_flag</code>=Y）</td><td>3,809</td><td>100%</td></tr>
+<tr><td>CSV ダイレクト注文可</td><td>400</td><td>11%</td></tr>
+<tr><td>参考上代がオープンプライス</td><td>2,949</td><td>77%</td></tr>
+</tbody></table>
+<ul>
+<li style='margin-left:0.0em'>JAN の有無はサプライヤー単位で分かれる。JAN が0%の社が 24/40、90%以上の社が 12/40。</li>
+<li style='margin-left:0.0em'>注意1：ネット販売可が 100% なのは、承認申請の時点で当社がネット販売可の社を選んだ結果の可能性がある。API が絞っているかどうかは確認していない。</li>
+<li style='margin-left:0.0em'>注意2：<code>direct_send_flag</code> の定義は「商品配送可」。公式ヘルプの「消費者へ直送 対応可／販売後注文可」と同じものかは確認できていない。同一視しない。</li>
+</ul>
+<h3>実測 B：JAN がある商品は Amazon にあるか（Keepa、2026-09-15）</h3>
+<ul>
+<li style='margin-left:0.0em'>対象：実測 A のうち JAN がある商品から、1社最大15件で213件（16社）。Keepa の product API に JAN で照会した。</li>
+</ul>
+<table><thead><tr><th>項目</th><th>値</th></tr></thead><tbody>
+<tr><td>Amazon に ASIN あり</td><td>168（79%）</td></tr>
+<tr><td>Amazon に ASIN なし</td><td>45（21%）。うち15件が1社。カテゴリは家電19・食品12・ホビー6</td></tr>
+<tr><td>ASIN が2つ以上ある JAN</td><td>36</td></tr>
+<tr><td>Amazon 本体が現在出品</td><td>43/168（26%）</td></tr>
+<tr><td>新品オファー数（取れた120件）</td><td>中央値3、1〜2本 54件、3〜9本 43件、10本以上 23件</td></tr>
+<tr><td>monthlySold の表示あり</td><td>13/168（うち100以上が8）</td></tr>
+<tr><td>売れ筋ランク（取れた117件）</td><td>中央値 約28.5万位。30万位以内は60件</td></tr>
+</tbody></table>
+<ul>
+<li style='margin-left:0.0em'>注意1：新品オファー数は Keepa の <code>COUNT_NEW</code> の現在値で、セラーの数ではない。今回はオファーを付けずに照会したので、値が古い可能性がある。48件は値が無かった。</li>
+<li style='margin-left:0.0em'>注意2：「ASIN なし」は「Keepa が JAN を追跡していない」場合を含む。</li>
+<li style='margin-left:0.0em'>注意3：承認済みサプライヤーは、過去のチケットで Amazon と照合して選んだ社が多い。Amazon にある比率は、NETSEA 全体より高く出ていると考える（推測）。</li>
+</ul>
+<h2>3. NETSEA 公式の情報</h2>
+<table><thead><tr><th>事実</th><th>出典</th></tr></thead><tbody>
+<tr><td>登録小売業者は50万社以上、年間取引総額は約100億円（NETSEA 担当者の発言）</td><td>S1（2025-08-02）</td></tr>
+<tr><td>2021年時点で登録バイヤー43万社、流通額約80億円、有料プランの登録は1,000社超</td><td>S2（2021-09-07）</td></tr>
+<tr><td>掲載は230万点以上</td><td>S6</td></tr>
+<tr><td>相乗りは価格競争が激しい。新規出品は「価格競争がないため、利益が出やすい傾向」</td><td>S6（2025-12-17 更新）</td></tr>
+<tr><td>「卸仕入れだから利益が出る」という前提は危険。ブランドゲートを事前に確認すべき</td><td>S3（2026-09-02）</td></tr>
+<tr><td>画像のダウンロード条件：承認済み・画像転載可・予約品でない等。用途は「自社サイトやシステム、もしくは各ご出店のモール出品用」。CSV は「加工したうえでご利用」</td><td>S5</td></tr>
+<tr><td>販売後注文可：「在庫を持たずに自社の WEB サイトなどで販売が可能」。代引き不可。消費者対応はすべてバイヤーが窓口</td><td>S4</td></tr>
+<tr><td>業態別の構成比、成功事例のインタビュー</td><td>見つからず（公式メディアのトップ11記事と公式ヘルプを確認）</td></tr>
+</tbody></table>
+<h2>4. 規約上の論点（ハルオに回す候補）</h2>
+<table><thead><tr><th>#</th><th>論点</th><th>分かっている事実</th><th>分かっていないこと</th></tr></thead><tbody>
+<tr><td>L1</td><td>他社ブランドの NETSEA 商品で新規 ASIN を作れるか</td><td>GTIN 免除は「ブランド名＋カテゴリ」で申請し、ブランド名が印字された写真が要る（S8、二次）</td><td>他社ブランド品で免除を取ることが Amazon のブランド要件に反しないか。Seller Central の公式ヘルプはログインが要り、読めていない</td></tr>
+<tr><td>L2</td><td>ノーブランド品（JAN なし 66%）を Amazon に出せるか</td><td>同上</td><td>「ノーブランド」表記の可否。当社が GS1 の JAN を取って付ける場合の表示の責任</td></tr>
+<tr><td>L3</td><td>画像転載可の画像を Amazon のカタログに使えるか</td><td>用途は「自社サイト…各ご出店のモール出品用」（S5）</td><td>Amazon のカタログは他のセラーも使う共有ページ。これが「自社の出品用」に当たるか。API 規約 第8条2項（情報の加工は書面承諾）と「CSV は加工して使う」（S5）の関係</td></tr>
+<tr><td>L4</td><td>「ネットオークション不可」（26%）は Amazon・メルカリShops を含むか</td><td>フラグの定義は「ネットオークション可」だけ（S15）</td><td>オークションの範囲の定義</td></tr>
+<tr><td>L5</td><td>販売後注文で Amazon の出品者出荷ができるか</td><td>Amazon は「記録上の販売者として特定できる契約を仕入れ先と結ぶこと」を要求（S9）</td><td>NETSEA の機能の範囲でその契約を満たせるか。NETSEA 外での直接の連絡は規約 第7条2項5号で禁止</td></tr>
+<tr><td>L6</td><td>セット組み</td><td>セット商品は GTIN 免除の対象例（S8、二次）</td><td>他社商品を組み合わせたセットの商標・表示の扱い。サプライヤーごとのセット化の可否</td></tr>
+<tr><td>L7</td><td>住所の公開（既知の未了論点）</td><td>会員規約 第24条1項</td><td>社長判断が未了</td></tr>
+</tbody></table>
+<h2>5. 分かっていないこと</h2>
+<ul>
+<li style='margin-left:0.0em'><strong>分かりようがないこと（公開情報では）</strong>：NETSEA 仕入れの事業者の業態別の件数・利益率・生存率。NETSEA が公開していない。</li>
+<li style='margin-left:0.0em'><strong>追加の手間で分かること</strong>：①JAN の無い商品が Amazon に出ているかどうか（商品名で検索する必要がある。Amazon 本体の機械取得は法務 NO なので、人が見るか Keepa の検索になる）②セット化の可否（サプライヤーの注意事項欄を読めば分かる）③楽天・Yahoo の公式の手数料ページ。</li>
+<li style='margin-left:0.0em'><strong>ここから先はタケシ（プランナー）の領分です</strong>：どの売り場・どの売り方で当社が NETSEA を使うか。</li>
+</ul>
+<h2>出典（すべて 2026-09-15 取得）</h2>
+<table><thead><tr><th>#</th><th>種別</th><th>タイトル</th><th>URL</th><th>日付</th></tr></thead><tbody>
+<tr><td>S1</td><td>二次（公式担当者の発言）</td><td>NETSEA（ネッシー）にインタビュー！利用者の評判と仕入れ後の販売戦略を公開（物販総合研究所）</td><td>https://www.busoken.com/blog/stockless_sales/netsea-purchasing</td><td>2025-08-02（更新 2026-07-28）</td></tr>
+<tr><td>S2</td><td>二次（報道）</td><td>卸モール『NETSEA』の有料バイヤーが1,000社を突破（ECのミカタ）</td><td>https://ecnomikata.com/ecnews/31758/</td><td>2021-09-07</td></tr>
+<tr><td>S3</td><td>一次（公式メディア）</td><td>Amazon物販の仕入れ先選び2026（NETSEA仕入れラボ）</td><td>https://www.netsea.jp/media/amazon-hanbai-shiire-anteika-2026/</td><td>2026-09-02</td></tr>
+<tr><td>S4</td><td>一次（公式ヘルプ）</td><td>消費者直送可能商材について（NETSEA）</td><td>https://www.netsea.jp/help/manual/dropshipping.html</td><td>日付なし</td></tr>
+<tr><td>S5</td><td>一次（公式ヘルプ）</td><td>商品データダウンロードについて（NETSEA）</td><td>https://www.netsea.jp/help/manual/material_dl.html</td><td>日付なし</td></tr>
+<tr><td>S6</td><td>一次（公式メディア）</td><td>Amazon物販ガイド（NETSEA仕入れラボ）</td><td>https://www.netsea.jp/media/amazon_hanbai/</td><td>2024-09-04（更新 2025-12-17）</td></tr>
+<tr><td>S7</td><td>一次（公式メディア。楽天の数字は楽天公式で未照合）</td><td>楽天市場の販売攻略法（NETSEA仕入れラボ）</td><td>https://www.netsea.jp/media/rakuten_hanbai/</td><td>2024-02-02（更新 2025-12-17）</td></tr>
+<tr><td>S8</td><td>二次</td><td>Amazon出品「製品コード免除申請」の申請方法と注意点（ECのミカタ）</td><td>https://ecnomikata.com/column/35055/</td><td>2024-12-17</td></tr>
+<tr><td>S9</td><td>一次（Amazon 公式アカウント News_Amazon の投稿）</td><td>ドロップシッピングポリシーに関するお知らせ（セラーフォーラム）</td><td>https://sellercentral.amazon.co.jp/forums/t/topic/76506</td><td>「5年前」と表示（年は推測で2021年頃）</td></tr>
+<tr><td>S10</td><td>一次（メルカリ公式）</td><td>メルカリShopsの禁止事項を徹底解説</td><td>https://jp-news.mercari.com/contents/26790</td><td>2025-12-08</td></tr>
+<tr><td>S11</td><td>一次（公式メディア。Yahoo 公式は未取得）</td><td>Yahoo!ショッピング9月有償化：出店者が確認すべき変更と対応（NETSEA仕入れラボ）</td><td>https://www.netsea.jp/media/yahoo-shopping-fee-change-2026/</td><td>2026-06-26</td></tr>
+<tr><td>S12</td><td>二次</td><td>【2026年最新】楽天の違反点数制度とは？（ジャグー）</td><td>https://jagoo.co.jp/column/rakuten-penalty/</td><td>未確認</td></tr>
+<tr><td>S13</td><td>一次（利用者レビュー、N=3）</td><td>NETSEAの評判・口コミ（ITreview）</td><td>https://www.itreview.jp/products/netsea/reviews</td><td>2022-08-31〜2025-03-03</td></tr>
+<tr><td>S14</td><td>二次（報道）</td><td>「NETSEA Cross-border wholesale」を開設（日本ネット経済新聞）</td><td>https://netkeizai.com/articles/detail/2036</td><td>2020-10-09</td></tr>
+<tr><td>S15</td><td>一次（API 仕様）</td><td>NETSEA Buyer API schemas/items.json・request/items.json</td><td>https://api.netsea.jp/docs/buyer/schemas/items.json</td><td>取得日 2026-09-15</td></tr>
+</tbody></table>
+<p>取れなかった一次情報：Amazon Seller Central のヘルプ（GTIN 免除・ドロップシッピング。日米ともログインが要る）、楽天・Yahoo の公式の料金ページ（未取得）。</p>
+<h2>再現</h2>
+<p><code>sample_netsea_amazon.py</code>（乱数シード 20260915）。出力は <code>out/</code>（Git 追跡外）。Keepa の消費は約255トークン。</p>
+</body></html>
