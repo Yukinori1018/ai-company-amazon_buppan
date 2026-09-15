@@ -47,6 +47,7 @@ related_tickets: [T-20260915-002, T-20260914-002, T-20260906-005]
 
 - 2026-09-15 doing 起票（カズヨ）。
 - 2026-09-15 マリエ：Notion カードを新規作成（Status=doing / Assignee=researcher / labels research・sourcing / ParentTicket T-20260915-002）https://app.notion.com/p/3dcb0a4044fa81ee9023dde26ff68f70 ／ owner-tasks 更新㊹（ℹ️ 節に1行・社長タスク増減ゼロ・commit 215c682）
+- 2026-09-16 マリエ：タカシ 02（8af7d39）を同期。Notion の -003 に結果要約（2,331社・月300通で約7.8ヶ月）と成果物節（02 md/html/py、配信URL 3本とも200・サトル分は作業中と明記）。カタログ3行追記→シート同期。owner-tasks 更新㊺の ℹ️ に現在地（commit ec59aa7）
 - 2026-09-15 サトル着手。イシュー・スコープ・打ち切りを宣言。
 
 ### タカシ
