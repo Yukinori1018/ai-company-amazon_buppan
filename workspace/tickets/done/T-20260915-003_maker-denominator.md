@@ -1,7 +1,7 @@
 ---
 ticket_id: T-20260915-003
 title: 売れている商品の類似品を作るメーカーの一覧（Keepa を使わずに分母感をつかむ）
-status: doing
+status: done
 assignee: researcher
 priority: high
 created_at: 2026-09-15
@@ -45,6 +45,8 @@ related_tickets: [T-20260915-002, T-20260914-002, T-20260906-005]
 - 状態：完了（doing のまま秘書へ引き渡し）。3ソースの打診対象は重複除去で2,331社＝月300通で約7.8ヶ月。1カテゴリでは1〜1.5ヶ月で尽きる。重なりは1〜3%。
 
 ## ログ
+
+- 2026-09-16 **done へ移動**（カズヨ判定）。〔根拠：タカシ 02（既存3データのユニーク2,331社・8af7d39）とサトル 01（統計の上限＝消費財4カテゴリで4,138事業所・業界団体9名簿で909社・合わせて重複除き約3,100社・d8aef3c）が納品・秘書確認済み。社長へ一覧を送付〕
 
 - 2026-09-15 doing 起票（カズヨ）。
 - 2026-09-15 マリエ：Notion カードを新規作成（Status=doing / Assignee=researcher / labels research・sourcing / ParentTicket T-20260915-002）https://app.notion.com/p/3dcb0a4044fa81ee9023dde26ff68f70 ／ owner-tasks 更新㊹（ℹ️ 節に1行・社長タスク増減ゼロ・commit 215c682）
