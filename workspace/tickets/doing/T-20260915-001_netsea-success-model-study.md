@@ -42,6 +42,7 @@ T-20260909-002 で、NETSEA の卸値で Amazon の既存 ASIN に相乗りす�
 - 2026-09-15 サトル着手。イシュー・スコープ・打ち切り条件を「現在地」に記載。
 - 2026-09-15 マリエ：Notion カードを新規作成（Status=doing / Assignee=researcher）https://app.notion.com/p/3dcb0a4044fa8105bdf2cd4646799c99
 - 2026-09-15 サトル：実測 A（承認済み221社から無作為40社・3,809件の販売条件）と実測 B（JAN 213件を Keepa で照合・約255トークン）を実施。出典15本（一次9・二次6）。成果物 01 を納品・commit。サプライヤーへの連絡・NETSEA のログイン画面の閲覧はしていない。
+- 2026-09-15 ハルオ：L1〜L7（L7 は秘書の追加指示）の規約判定を完了。成果物 02 を納品・commit。Seller Central のヘルプ本文はログインが要るため未読で、該当箇所は確度「中」と明示した。サプライヤーへの連絡・NETSEA への照会はしていない（§4.1）。memory に knowledge_netsea_sales_channel_rules_L1-L7.md を追加。
 
 ## 成果物
 
@@ -49,6 +50,7 @@ T-20260909-002 で、NETSEA の卸値で Amazon の既存 ASIN に相乗りす�
 - workspace/output/deliverables/T-20260915-001/01_NETSEAで成り立つ事業者の実態.html
 - workspace/output/deliverables/T-20260915-001/sample_netsea_amazon.py（再現スクリプト）
 - workspace/output/deliverables/T-20260915-001/out/（Git 追跡外：行データ・卸値の集計・Keepa の値）
+- workspace/output/deliverables/T-20260915-001/02_売り方の規約判定.md（法務ハルオ：L1〜L7 の判定）
 
 ## 完了報告
 
