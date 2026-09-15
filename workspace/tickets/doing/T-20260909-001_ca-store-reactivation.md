@@ -1,15 +1,15 @@
 ---
 ticket_id: T-20260909-001
 title: 【継続】カナダストアの再開申請（日本復活後も緩めない）
-status: waiting
+status: doing
 assignee: secretary
 priority: high
 created_at: 2026-09-09
 updated_at: 2026-09-15
-requires_approval: true
+requires_approval: false
 labels: [compliance, ops]
 parent_ticket: ""
-next_check_at: 2026-09-16
+next_check_at: 2026-09-17
 related_tickets: [T-20260826-004, T-20260726-003, T-20260904-005]
 ---
 
@@ -198,3 +198,9 @@ related_tickets: [T-20260826-004, T-20260726-003, T-20260904-005]
 ヒデアキの英語版をもとに、事実2を上記の確認結果に合わせて書き直したもの。社長が送信ボタンを押す（§4.1 外部発信）。
 
 **状態：doing → waiting**（社長の送信クリック待ち）
+
+## 2026-09-15 20:38 JST 催促を送信（社長操作・完了）
+
+社長が送信ボタンを押した。カズヨがケース画面で投稿を確認：「You 2026-09-15 20:38 GMT+9」に本文が載っている。ケースの状態は Work in progress。
+
+**状態：waiting → doing**（Amazon の回答待ち。社長の番ではない）。次回の確認は 2026-09-17。ケース画面と、satoyselect・1018 の両方のメールを見る。
