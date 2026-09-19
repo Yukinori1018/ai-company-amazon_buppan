@@ -1,0 +1,327 @@
+<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>02. メーカーリストの必須項目と絞り方（T-20260920-002 S-B）</title><style>body{font-family:-apple-system,'Hiragino Sans','Noto Sans JP',sans-serif;max-width:1400px;margin:24px auto;padding:0 20px;line-height:1.6;color:#222;font-size:14px}
+h1{font-size:1.5em;border-bottom:2px solid #333;padding-bottom:6px}h2{font-size:1.25em;margin-top:2em;border-left:5px solid #2b5;padding-left:8px}h3{font-size:1.05em;margin-top:1.5em}
+table{border-collapse:collapse;margin:10px 0 18px;width:100%;font-size:12.5px}th,td{border:1px solid #bbb;padding:5px 7px;vertical-align:top;text-align:left}th{background:#f0f4f0}tr:nth-child(even) td{background:#fafafa}
+code{background:#f3f3f3;padding:1px 4px;border-radius:3px;font-size:0.92em}hr{border:0;border-top:1px solid #ccc;margin:24px 0}li{margin:2px 0}</style></head><body>
+<h1>02. メーカーリストの必須項目と絞り方</h1>
+<p>&gt; T-20260920-002 S-B / リサーチャー サトル / 2026-09-20</p>
+<p>&gt; イシュー：<strong>社長が「1行見れば電話をかけられる」リストにするには、何の列が要り、どこまで絞るのか。</strong></p>
+<hr>
+<h2>1. 結論</h2>
+<p>1. <strong>メールは絞らない。電話は絞る。</strong> これは実践者がそうしています（EC STARs Lab. の公開手順＝メール→FAX→電話の順で、無反応な社に次の手段を重ねる。月530通送る実践者もメールは全数）。</p>
+<p>2. <strong>ただし今のリストは「絞る／絞らない」以前に、絞る材料が入っていません。</strong> 電話番号 0行／自社HPリンク 0行／取扱品目 115行（11.4%）／EC有無 0行（全1,006行が「未調査」）。社長の指摘は正しく、原因は「列はあるが埋めていない」ことです。</p>
+<p>3. <strong>4項目は0円・自動で大半埋まります。</strong> 業界団体の名簿ページ自体に自社HP 約89%・電話番号 約36%が載っており（実測）、名簿に無い社は自社HPを4ページまで見れば電話番号が64.1%取れます（実測 N=39）。<strong>「絞るために調べる」のではなく「埋めてから絞る」順序です。</strong></p>
+<table><thead><tr><th>社長の必須4項目</th><th>今</th><th>埋めた後の見込み</th><th>主な出典</th></tr></thead><tbody>
+<tr><td>電話番号</td><td><strong>0 / 1,006（0%）</strong></td><td><strong>約707社（70%）</strong></td><td>業界団体名簿363社＋自社HP344社</td></tr>
+<tr><td>企業規模（小さいか）</td><td>29 / 1,006（2.9%）</td><td>未取得（gBizINFO の申請待ち）</td><td>gBizINFO <code>employee_number</code> / <code>capital_stock</code></td></tr>
+<tr><td>自社HPリンク</td><td><strong>0 / 1,006（0%）</strong>※</td><td><strong>約899社（89%）</strong></td><td>業界団体名簿</td></tr>
+<tr><td>何を作っているか</td><td>115 / 1,006（11.4%）</td><td>約234社は名簿から、残りは自社HPから</td><td>名簿の取扱品目欄＋HP</td></tr>
+<tr><td>EC をやっているか</td><td>0 / 1,006（全行「未調査」）</td><td>約49%に信号あり（実測 N=39・誤検知あり）</td><td>自社HPのカート導線</td></tr>
+</tbody></table>
+<p>※ 既存の「名簿URL」列は<strong>団体の会員一覧ページ</strong>で、1,006行に対し<strong>9種類しかありません</strong>（195行が同一URL）。会社ごとのHPではないため、社長の言う「企業のホームページのリンク」は実質ゼロです。</p>
+<p><strong>ここから先の「週70社をどう配分するか」「絞り込み条件をどこに引くか」は戦略判断で、タケシ（プランナー）の領分です。</strong> 本稿は事実と選択肢までで止めます。</p>
+<hr>
+<h2>2. スコープと打ち切り条件（宣言）</h2>
+<table><thead><tr><th>項目</th><th>内容</th></tr></thead><tbody>
+<tr><td>調べたこと</td><td>①実践者のリスト作成・絞り込みの実例 ②BtoB法人営業の架電リストの定石 ③必須4項目の取得元・カバー率・自動化可否・規約 ④推奨列構成 ⑤段取り</td></tr>
+<tr><td>調べなかったこと</td><td>有料企業DBの実データ品質（契約が §4.1）／メーカー個社の与信・取引条件／メール文面の設計（S-B の範囲外）</td></tr>
+<tr><td>打ち切り条件</td><td>実践者の一次情報は公開ソース8本＋社内一次資料2本で打ち切り。カバー率は<strong>サンプル実測を1本ずつ入れ、残りは推測と明記</strong>。これ以上は推測になるライン＝gBizINFO の項目充足率（APIトークン未取得のため測定不能）</td></tr>
+<tr><td>実施した実測</td><td>業界団体名簿9本を実際に HTTP 取得（全9本 HTTP 200）／メーカー自社HP 40社をランダム抽出して取得（seed=20260920）／gBizINFO 公式 OpenAPI JSON を直接取得してフィールド定義を確認</td></tr>
+<tr><td>§4.1 に触れたので実行しなかったこと</td><td>有料DBの申込／gBizINFO API の利用申請（規約同意）／メーカーへの連絡</td></tr>
+</tbody></table>
+<hr>
+<h2>3. 現状のリストの実測（1,006行を自分で数えた）</h2>
+<p>対象＝<code>workspace/output/deliverables/T-20260915-003/01_メーカー一覧_業界団体名簿.csv</code>（2026-09-20 時点）</p>
+<table><thead><tr><th>指標</th><th>実測値</th></tr></thead><tbody>
+<tr><td>行数</td><td>1,006行（社名ユニーク 984社・<strong>重複22行</strong>）</td></tr>
+<tr><td>うち「メーカー候補」</td><td>942行（ユニーク921社）</td></tr>
+<tr><td>うち型A候補（大手・外資・商社語を除く）</td><td>841行（ユニーク<strong>827社</strong>）</td></tr>
+<tr><td>社名が日本語表記</td><td>942行中 <strong>933行（99.0%）</strong></td></tr>
+<tr><td>法人格表記あり（株式会社等）</td><td>942行中 803行（85.2%）</td></tr>
+</tbody></table>
+<p><strong>列の充足率（社長の指摘の核心）</strong></p>
+<table><thead><tr><th>列</th><th>非空の行数</th><th>率</th><th>実態</th></tr></thead><tbody>
+<tr><td>カテゴリ・社名・名簿・会員種別・名簿URL・区分</td><td>1,006</td><td>100%</td><td>埋まっている</td></tr>
+<tr><td>従業員数（gBizINFO）</td><td>29</td><td>2.9%</td><td>手作業で入れた分のみ</td></tr>
+<tr><td>取扱品目（名簿記載）</td><td>115</td><td>11.4%</td><td>名簿に品目欄がある団体の分のみ</td></tr>
+<tr><td>EC直販の有無</td><td>0</td><td><strong>0%</strong></td><td>1,006行すべて文字列「未調査」</td></tr>
+<tr><td>外資の日本法人 / 大手 / 商社語</td><td>32 / 81 / 22</td><td>—</td><td>除外フラグなので少ないのは正常</td></tr>
+<tr><td>電話番号</td><td><strong>列が存在しない</strong></td><td>—</td><td>—</td></tr>
+<tr><td>自社HP</td><td><strong>列が存在しない</strong></td><td>—</td><td>「名簿URL」は団体の一覧ページ（9種のみ）</td></tr>
+</tbody></table>
+<p><strong>重要な差分（前回の調査と結論が変わる点）</strong></p>
+<p>T-20260831-001 では822社中64%が英字ブランド名で、「商号検索の公的DBは原理的に効かない」が結論でした。<strong>今回のリストは99.0%が日本語商号なので、その制約は当てはまりません。</strong> 国税庁法人番号（全件CSV・無料・申請不要）と gBizINFO の商号検索が効く母集団です。</p>
+<hr>
+<h2>4. 実践者はリストをどう作り、どう絞っているか</h2>
+<h3>4.1. 実例（誰が / 規模 / リストの作り方 / 絞り方 / 歩留まり）</h3>
+<table><thead><tr><th>#</th><th>誰</th><th>手法</th><th>送信・架電の規模</th><th>リストの作り方</th><th>絞り込み条件</th><th>歩留まり</th><th>出典</th></tr></thead><tbody>
+<tr><td>1</td><td>中村裕紀（EC STARs Lab.）</td><td>Amazon国内メーカー仕入れ</td><td><strong>計測単位＝300社</strong>。累計約4,000件</td><td>①カテゴリーリサーチ（Amazonカテゴリ上位から商品→メーカーを引く）②セラーリサーチ（ライバルの他商品からメーカーを引く）。ツールは Keepa</td><td><strong>商品側で絞ってからメーカーを引く</strong>（＝メーカー側の属性では絞らない）</td><td>返信率30%／見積8〜10%／成約3〜5%。<strong>メール→FAX→電話で合計返信率50%超</strong></td><td>[ecstarslab.com（7ステップ）](https://ecstarslab.com/blog/amazon-%E3%83%A1%E3%83%BC%E3%82%AB%E3%83%BC%E4%BB%95%E5%85%A5%E3%82%8C-%E5%80%8B%E4%BA%BA-2/) 2026-09-20取得</td></tr>
+<tr><td>2</td><td>山田氏（同ラボ）</td><td>同</td><td>約4,000件にメール</td><td>記載なし</td><td>記載なし</td><td>返信率約40%（目安30%以上）／見積5〜10%／成約3%</td><td>[ecstarslab.com（メール例文）](https://ecstarslab.com/blog/mail-bargaining-text/) 2026-09-20取得</td></tr>
+<tr><td>3</td><td>稲葉氏（月利150万・受講生）</td><td>同</td><td><strong>月平均530件メール＋返信なし全件にFAX月390件</strong></td><td>同上</td><td>同上</td><td>返信率23.0〜29.6%（合格ライン30%）</td><td>社内一次資料：<code>docs/reference/maker-shiire/seminar-20260610-realtime-notes.md</code> §8.2</td></tr>
+<tr><td>4</td><td>松井健輔（同ラボ講師）</td><td>同</td><td>記載なし</td><td>同上</td><td>同上</td><td>HP作成で<strong>返信率46%→66.5%</strong>。ただし「まずメールを送る作業が優先。HPは応用」</td><td>同上 §8.2</td></tr>
+<tr><td>5</td><td>中西恒太（同ラボ代表）</td><td>同</td><td>外注に<strong>月300通（1通6分＝月30時間）</strong></td><td>Keepa 製品ファインダー</td><td>①Amazon本体が出品していない ②売れ筋5万位以内 ③FBAセラー2人以上</td><td>受講1年後 月利50万以上57.1%（N=77・自社調査）</td><td>同上 §2・§1</td></tr>
+<tr><td>6</td><td>平井修一（差別化物販戦略塾）</td><td>国内ニッチ簡易OEM</td><td><strong>少数（取引1〜6社）・生電話</strong></td><td>セラースプライトでキーワードから商品を探す</td><td>商品5条件（ニッチ／やや高単価／健康／便利／国産）＋検索3,000〜30,000・CVR3%以上・PPC100円以下・トレンド横〜右上。<strong>「サイトにOEM受付と書いていないメーカーほど少ロットに柔軟」</strong></td><td>記載なし</td><td>社内一次資料：<code>docs/reference/kokunai-niche-oem/README.md</code>、memory <code>knowledge_kokunai_niche_oem</code></td></tr>
+<tr><td>7</td><td>BtoB法人営業の定石（テレアポ）</td><td>インサイドセールス</td><td>法人向けは<strong>1日60〜100件が現実的</strong></td><td>名簿・DB購入／四季報／展示会名刺</td><td><strong>最低限＝正確な企業名・電話番号/メール・所在地</strong>。推奨＝企業URL・業種・従業員数・代表者名・部署名。加えて「トークの切り口となる付加情報」（担当者名・接触履歴・WebサイトURL）</td><td>1件4〜5分（履歴入力含む）＝1時間12〜15件</td><td>[Sansan 営業DX Handbook](https://jp.sansan.com/media/make-telemarketer/)／[お名前.com ビジネスコンシェルジュ](https://www.onamae.com/business/article/46673/)／[solutionds1](https://solutionds1.co.jp/column/line-service/tele-appointment-results/) いずれも2026-09-20取得</td></tr>
+<tr><td>8</td><td>フォーム営業（参考・下限値）</td><td>問い合わせフォーム送信</td><td>大量</td><td>—</td><td>絞らない（送信数で稼ぐ）</td><td><strong>反応率0.3〜0.5%</strong></td><td>[ネクスウェイ](https://faxdm.nexway.co.jp/blog/227) 2026-09-20取得</td></tr>
+</tbody></table>
+<h3>4.2. この表から読み取れること</h3>
+<p><strong>事実①：メーカー側の属性（規模・地域・業種）で絞っている実践者は、公開情報の中に1人もいませんでした。</strong> 実践者が絞っているのは<strong>商品側</strong>（Amazonで売れているか／セラー数／ランキング）です。メーカーは「その商品を作っている会社」として後から引かれます。</p>
+<p><strong>事実②：接触手段は絞らず重ねる。</strong> メール全数 → 無反応にFAX（1週間後・同文）→ さらに電話、の順。この順序で合計返信率が30%→50%超に上がると公開されています（出典＝上表#1）。稲葉氏の実数（メール530／FAX390）も「メールは全数、FAXは無反応の全数」で一致します。</p>
+<p><strong>推測（確度：高／根拠は上の2点）：実践者の絞り込み条件は当社のリストにそのまま写せません。</strong> 実践者のリストは Amazon 起点なので「何を作っているか」「それが売れているか」が最初から埋まっています。当社の名簿起点リストは逆で、そこが空です。<strong>社長の「何を作っているのか分からないと電話ができない」という指摘は、実践者の型との構造的な差分を正確に突いています。</strong> 当社は実践者が商品リサーチで済ませている工程を、「品目・HPを埋める工程」で代替する必要があります。</p>
+<p><strong>事実③：BtoB営業側の定石は、社長の必須4項目とほぼ一致します。</strong> 最低限＝企業名・電話番号・所在地、推奨に企業URL・業種・従業員数が入る（上表#7）。社長の指示は営業実務の標準と同じで、発明の必要はありません。</p>
+<hr>
+<h2>5. 「手当たり次第 vs 絞る」の判定（数字で）</h2>
+<h3>5.1. 絞ると母数はどう減るか</h3>
+<table><thead><tr><th>母数</th><th>社数</th><th>週70社で何週</th><th>何ヶ月</th></tr></thead><tbody>
+<tr><td>型A条件の全体（T-20260915-003 の推計）</td><td>2,425社</td><td><strong>34.6週</strong></td><td>8.0ヶ月</td></tr>
+<tr><td>同・半分に絞った場合</td><td>1,213社</td><td>17.3週</td><td>4.0ヶ月</td></tr>
+<tr><td>今回の業界団体名簿リスト（型A候補・ユニーク）</td><td><strong>827社</strong></td><td>11.8週</td><td>2.7ヶ月</td></tr>
+<tr><td>同・電話番号が取れる見込み分（72%）</td><td>約595社</td><td>8.5週</td><td>2.0ヶ月</td></tr>
+</tbody></table>
+<p><strong>事実：絞っても枯れません。</strong>「半分に絞る」を選んでも4ヶ月分の在庫があり、実践者が1社目を取るまでの期間（公開4例はいずれも開始1ヶ月以内／memory <code>knowledge_maker_wholesale_practitioners_2026-09</code>）より長い。<strong>母数の枯渇を理由に「絞らない」を選ぶ必要はない</strong>という判定になります。</p>
+<h3>5.2. 1社あたり何分かけられるか</h3>
+<table><thead><tr><th>項目</th><th>数字</th><th>出典</th></tr></thead><tbody>
+<tr><td>副業実践者の可処分時間</td><td>月60〜90時間（朝1〜2h＋夜2〜3h）＝<strong>週14〜21時間</strong></td><td>社内一次資料 seminar §3（スライド11:39）</td></tr>
+<tr><td>メール1社あたり</td><td><strong>6分</strong>（300通＝月30時間）</td><td>同上</td></tr>
+<tr><td>電話1件あたり</td><td><strong>4〜5分</strong>（履歴入力含む）</td><td>[solutionds1](https://solutionds1.co.jp/column/line-service/tele-appointment-results/)</td></tr>
+<tr><td>週70社をメールだけ</td><td>70×6分＝<strong>7.0時間/週</strong></td><td>上記から算出</td></tr>
+<tr><td>週70社を全部電話も足す</td><td>＋4.7〜5.8時間＝<strong>合計11.7〜12.8時間/週</strong></td><td>同</td></tr>
+</tbody></table>
+<p><strong>判定：週70社を全部電話すると、可処分時間（週14〜21時間）の6〜9割を接触作業だけで使い切ります。</strong> しかも上の見積りには「相手が何を作っているかを調べる時間」が入っていません。1社4分の中で調べる余裕はゼロです。</p>
+<p><strong>したがって「電話をかける前に品目とHPがリストに載っている」ことは、好みではなく前提条件です。</strong> 載っていなければ1社あたりの所要時間が4分から10分以上に膨らみ、週70社は物理的に成立しません。</p>
+<h3>5.3. 二段構えは成立するか</h3>
+<table><thead><tr><th>段</th><th>対象</th><th>絞るか</th><th>根拠</th></tr></thead><tbody>
+<tr><td>①メール／問い合わせフォーム</td><td><strong>全数</strong>（1,006行のうちメーカー候補942行）</td><td><strong>絞らない</strong></td><td>実践者が全員そうしている（4.2 事実②）。1通6分で、AIが下書きを作るなら実質コストは送信操作のみ</td></tr>
+<tr><td>②FAX</td><td>①で1週間無反応の全数</td><td>絞らない</td><td>稲葉氏の実数（メール530→FAX390＝73%に送っている）</td></tr>
+<tr><td>③電話</td><td><strong>絞る</strong></td><td><strong>絞る</strong></td><td>1件4〜5分×社長本人の手しかない。かつ「電話番号が取れた社」に自動的に限定される（約72%）</td></tr>
+</tbody></table>
+<p><strong>事実：二段構えは実践者の型そのもので、当社が発明する部分はありません。</strong> 当社に固有の制約は「①②は AI が下書きできるが、③は社長本人しかできない」点だけです（memory <code>owner_pc_complete_outsourcing</code>）。</p>
+<p><strong>電話の優先順位づけに使える材料（事実として取得可能なもの）</strong></p>
+<table><thead><tr><th>優先度を上げる信号</th><th>理由</th><th>取得可否</th></tr></thead><tbody>
+<tr><td>従業員20人以下（法定の「小規模企業者」）</td><td>社長の仮説「小さい企業は電話しないといけない」に直接対応</td><td>gBizINFO（申請待ち）</td></tr>
+<tr><td>自社EC・モール出店なし</td><td>「ネット販売に疎い」＝本丸の定義（memory <code>owner_honmaru_ec_weak_makers</code>）</td><td>自社HPから機械判定（実測49%に信号あり）</td></tr>
+<tr><td>HPに「OEM受付」「卸売」の記載がない</td><td>平井氏「書いていないメーカーほど少ロットに柔軟」</td><td>自社HPから機械判定</td></tr>
+<tr><td>取扱品目が当社の狙うカテゴリと一致</td><td>電話の切り出しが作れる</td><td>名簿234社＋HP</td></tr>
+</tbody></table>
+<p><strong>ここから先（どの信号を何位に置くか、週70社の配分）はタケシ（プランナー）の領分です。</strong> 本稿は材料までで止めます。</p>
+<hr>
+<h2>6. 必須4項目をどこから取るか（実測つき）</h2>
+<h3>6.1. 最大の発見：業界団体の名簿ページ自体に載っている</h3>
+<p>名簿9本を 2026-09-20 に実際に HTTP 取得しました（<strong>9本すべて HTTP 200</strong>）。既存CSVは社名だけを抜いていましたが、<strong>同じページに電話番号・自社HP・取扱品目が載っている団体があります。</strong></p>
+<table><thead><tr><th>名簿</th><th>会員数</th><th>自社HPリンク</th><th>電話番号</th><th>取扱品目</th><th>取得方法（HTTPリクエスト数）</th></tr></thead><tbody>
+<tr><td>日本玩具協会</td><td>195</td><td><strong>163（84%）実測</strong></td><td>なし（0件）実測</td><td>なし</td><td>一覧1回</td></tr>
+<tr><td>NAPAC（自動車用品・部品）</td><td>161</td><td>各社の詳細ページに掲載 <strong>推測</strong></td><td><strong>TEL・FAX 掲載 推測</strong></td><td>なし</td><td>一覧1回＋詳細161回</td></tr>
+<tr><td>日本ペット用品工業会</td><td>118</td><td><strong>111（94%）実測</strong></td><td>なし 実測</td><td>2件のみ</td><td>一覧1回</td></tr>
+<tr><td>日本釣用品工業会</td><td>115</td><td>12/18（67%）実測※</td><td><strong>18/18（100%）実測※</strong></td><td><strong>18/18（100%）実測※</strong></td><td>五十音別に10回</td></tr>
+<tr><td>日本スポーツ用品工業協会</td><td>113</td><td><strong>112（99%）実測</strong></td><td>2件のみ 実測</td><td>なし</td><td>一覧1回</td></tr>
+<tr><td>ペットフード協会</td><td>100</td><td><strong>77（77%）実測</strong></td><td><strong>20（20%）実測</strong></td><td><strong>52（52%）実測</strong></td><td>一覧1回</td></tr>
+<tr><td>日本プラスチック日用品工業組合</td><td>72</td><td><strong>66（92%）実測</strong></td><td>なし 実測</td><td>なし</td><td>一覧1回</td></tr>
+<tr><td>日本金属ハウスウェア工業組合（燕）</td><td>67</td><td>各社の詳細ページに掲載 <strong>推測</strong></td><td><strong>TEL・FAX 掲載 推測</strong></td><td><strong>主な業務内容・主な製品 推測</strong></td><td>一覧1回＋詳細67回</td></tr>
+<tr><td>全国自動車用品工業会（JAAMA）</td><td>65</td><td><strong>65（100%）実測</strong></td><td>なし 実測</td><td>なし</td><td>一覧1回</td></tr>
+<tr><td><strong>合計</strong></td><td><strong>1,006</strong></td><td><strong>約899（89.4%）</strong></td><td><strong>約363（36.1%）</strong></td><td><strong>約234（23.3%）</strong></td><td><strong>約250回</strong></td></tr>
+</tbody></table>
+<p>※釣用品工業会は一覧が五十音タブ別に分割されており、取得できたのは「ア行」18社分のみ。<strong>実測は18社に対する率</strong>で、115社全体は同一テンプレートからの推測（確度：高）。</p>
+<p>※NAPAC・金属ハウスウェアは<strong>各1社の詳細ページを実際に開いて項目を確認済み</strong>（NAPAC＝社名/所在地/TEL/FAX/URL、燕＝郵便番号/所在地/TEL/FAX/ホームページ/主な業務内容/主な製品）。全社に同じ項目があるかは推測（確度：高。同一CMSの定型ページ）。</p>
+<p>※「なし」は<strong>該当なし（そのページに電話番号欄が存在しない）</strong>の意味で、「未調査」ではありません。</p>
+<p><strong>推測（確度：高）：名簿だけで、社長の必須4項目のうち「HP」と「品目」の大半、「電話番号」の3分の1が埋まります。</strong> 追加費用0円・約250リクエスト。robots.txt 尊重・同一ホスト3秒間隔で数時間の作業です（ハルオが T-20260831-001 Phase B で「メーカー公式サイトの低速クロールは可」と判定済み。業界団体サイトも同じ条件で扱う前提）。</p>
+<h3>6.2. 名簿に電話番号が無い社 → 自社HPから取る（実測 N=39）</h3>
+<p>名簿から抽出した自社HPリンク586本からランダムに40社（seed=20260920）を選び、実際に取得しました。</p>
+<table><thead><tr><th>指標</th><th>実測値</th></tr></thead><tbody>
+<tr><td>HTTPで到達できた</td><td><strong>39 / 40（97.5%）</strong></td></tr>
+<tr><td>トップページに電話番号が載っていた</td><td><strong>14 / 39（35.9%）</strong></td></tr>
+<tr><td>＋「会社概要／会社案内／お問い合わせ」等を最大3ページ追って取得</td><td><strong>＋11社 → 25 / 39（64.1%）</strong></td></tr>
+<tr><td>EC の信号（カート語・ショップ導線）が検出された</td><td><strong>19 / 39（48.7%）</strong></td></tr>
+</tbody></table>
+<ul>
+<li>取得できなかった14社の内訳（目視）：候補ページが0件（画像・JS描画）5社／候補は多いが番号が画像・PDF内 9社。</li>
+<li>取得できた番号には <strong>0120（お客様センター）が4件</strong>含まれます。代表番号とフリーダイヤルは列で区別すべきです。</li>
+<li>生データ：<code>workspace/output/agent_output/T-20260920-002/S-B/hp_probe.csv</code>・<code>probe2.json</code></li>
+</ul>
+<p><strong>電話番号の最終見込み（積み上げ）</strong></p>
+<table><thead><tr><th>経路</th><th>社数</th><th>確度</th></tr></thead><tbody>
+<tr><td>名簿に直載</td><td>363社（36.1%）</td><td>推測（実測40社で構造確認）</td></tr>
+<tr><td>自社HPから（HPあり536社 × 64.1%）</td><td>344社（34.2%）</td><td>実測歩留まりの外挿</td></tr>
+<tr><td><strong>機械で取れる合計</strong></td><td><strong>約707社（70.3%）</strong></td><td>—</td></tr>
+<tr><td><strong>機械では取れない</strong></td><td><strong>約299社（29.7%）</strong></td><td>人がブラウザで1社ずつ見る＝1社3〜5分・299社で15〜25時間</td></tr>
+</tbody></table>
+<h3>6.3. 項目別の取得元・自動化・規約</h3>
+<table><thead><tr><th>項目</th><th>取得元の候補</th><th>カバー率</th><th>自動化</th><th>規約</th></tr></thead><tbody>
+<tr><td><strong>電話番号</strong></td><td>①業界団体名簿 ②メーカー自社HP（会社概要/問い合わせ）</td><td>①36.1% ②残りの64.1%（実測）</td><td><strong>可</strong>（低速クロール）</td><td>可（ハルオ既判定：robots.txt尊重・同一ホスト3秒・UA明示・会社概要系パス限定）</td></tr>
+<tr><td>〃</td><td>③gBizINFO</td><td><strong>0%</strong></td><td>—</td><td><strong>電話番号フィールドが存在しない</strong>（公式OpenAPIで確認・後述）</td></tr>
+<tr><td>〃</td><td>④国税庁 法人番号（全件CSV・無料・申請不要）</td><td>0%</td><td>—</td><td>商号・所在地・法人番号のみ。電話番号なし</td></tr>
+<tr><td>〃</td><td>⑤iタウンページデータベース（約800万件）</td><td>未調査</td><td>購入データ</td><td><strong>1件1円＋初期費用。申込は §4.1（金銭）＝実行不可</strong></td></tr>
+<tr><td><strong>企業規模</strong></td><td>gBizINFO <code>employee_number</code> <code>capital_stock</code> <code>industry</code> <code>date_of_establishment</code></td><td><strong>未取得</strong>（トークン未発行のため測定不能）</td><td>可</td><td><strong>利用申請が必要</strong>（申請＝規約同意＝§4.1）。料金の明記は公式ページで確認できず＝<strong>取得できず</strong></td></tr>
+<tr><td>〃</td><td>gBizINFO の画面検索（詳細検索に資本金・従業員数・業種・取扱営業品目の絞り込みあり）</td><td>—</td><td>手動</td><td>閲覧は自由</td></tr>
+<tr><td>〃</td><td>決算公告・求人情報</td><td>未調査</td><td>不可</td><td>—</td></tr>
+<tr><td><strong>HPリンク</strong></td><td>①業界団体名簿 ②gBizINFO <code>company_url</code></td><td>①89.4%（実測594＋推測305）</td><td><strong>可</strong></td><td>可</td></tr>
+<tr><td><strong>何を作っているか</strong></td><td>①名簿の取扱品目欄 ②自社HPの製品ページ ③gBizINFO <code>business_summary</code> <code>business_items</code></td><td>①23.3% ②ほぼ全社（HPがある限り）</td><td>①可 ②<strong>半自動</strong>（本文要約はAIで可、正確さは人の確認要）</td><td>可</td></tr>
+<tr><td>〃</td><td>特許・意匠（特許庁 国内特許情報取得API・無料）</td><td>未調査</td><td>可</td><td>可（新規受付停止は OPD-API のみ）</td></tr>
+<tr><td><strong>EC をやっているか</strong></td><td>①自社HPのカート導線（カート語・ショップリンク）</td><td><strong>48.7%に信号あり（実測 N=39）</strong></td><td><strong>可・ただし誤検知あり</strong></td><td>可</td></tr>
+<tr><td>〃</td><td>②楽天市場の出店有無</td><td>—</td><td><strong>不可</strong></td><td>楽天は規約第7条1項7号で機械取得禁止 → <strong>ハルオ判定要</strong></td></tr>
+<tr><td>〃</td><td>③Amazon のブランドストア有無</td><td>—</td><td><strong>不可</strong></td><td>Amazon利用規約でデータ収集ツールを明文禁止（T-20260831-001 Phase B で判定済み）</td></tr>
+<tr><td>〃</td><td>④Yahoo!ショッピング</td><td>未調査</td><td>条件付き</td><td><strong>ハルオ判定要</strong></td></tr>
+</tbody></table>
+<p><strong>gBizINFO のフィールド定義（一次情報・2026-09-20 取得）</strong></p>
+<p>公式 OpenAPI JSON（<code>https://api.info.gbiz.go.jp/hojin/v3/api-docs/v2</code>・HTTP 200・58,806バイト）を直接取得し、<code>HojinInfoV2</code> の34フィールドを全数確認しました。</p>
+<ul>
+<li><strong>ある</strong>：<code>employee_number</code>（従業員数）／<code>capital_stock</code>（資本金）／<code>company_url</code>（企業ホームページ）／<code>business_summary</code>（事業概要）／<code>business_items</code>（全省庁統一資格の営業品目）／<code>industry</code>（業種）／<code>date_of_establishment</code>／<code>representative_name</code></li>
+<li><strong>ない</strong>：<strong>電話番号（<code>tel</code> <code>phone</code> <code>電話</code> の文字列はJSON全体で0件）</strong></li>
+<li>収録件数 5,835,458件（[データダッシュボード](https://info.gbiz.go.jp/hojin/dashboard) 2026-09-20取得）</li>
+<li>利用手順：①利用申請 → ②メールでAPIトークン受領 → ③利用（[APIの利用](https://content.info.gbiz.go.jp/api/index.html) 2026-09-20取得）。<strong>利用規約ページ（help.info.gbiz.go.jp）は Cloudflare により取得できず＝規約本文は未確認。</strong></li>
+</ul>
+<h3>6.4. 「小さい企業」を当社としてどう定義するか（提案）</h3>
+<p>法定の線を使えば、恣意性が入りません。中小企業基本法（[中小企業庁 2026-09-20取得](https://www.chusho.meti.go.jp/soshiki/teigi.html)）：</p>
+<table><thead><tr><th>区分</th><th>製造業その他</th><th>卸売業</th><th>小売業</th><th>サービス業</th></tr></thead><tbody>
+<tr><td>中小企業者</td><td>資本金3億円以下 <strong>または</strong> 従業員300人以下</td><td>1億円以下 / 100人以下</td><td>5千万円以下 / 50人以下</td><td>5千万円以下 / 100人以下</td></tr>
+<tr><td><strong>小規模企業者</strong></td><td><strong>従業員20人以下</strong></td><td>従業員5人以下（商業）</td><td>同左</td><td>従業員5人以下</td></tr>
+</tbody></table>
+<p><strong>当社の列としての提案（4段階・法定の線に合わせる）</strong></p>
+<table><thead><tr><th>規模区分</th><th>条件（製造業）</th><th>電話の扱い</th></tr></thead><tbody>
+<tr><td><strong>S：小規模</strong></td><td>従業員20人以下</td><td><strong>電話必須</strong>（社長の仮説どおり、メールを見ていない可能性が最も高い層）</td></tr>
+<tr><td>M：小</td><td>21〜100人</td><td>電話推奨</td></tr>
+<tr><td>L：中</td><td>101〜300人</td><td>メール／フォーム中心</td></tr>
+<tr><td>X：除外</td><td>301人以上 または 資本金3億円超</td><td>既存の「大手」フラグに統合して除外</td></tr>
+<tr><td>?：未取得</td><td>gBizINFO に欠測</td><td><strong>「不明」で濁さず「未取得（gBizINFO欠測）」と書く</strong></td></tr>
+</tbody></table>
+<hr>
+<h2>7. 推奨するリストの列構成（確定案・1つだけ出します）</h2>
+<p>判定基準＝<strong>1行見れば「どこに・何の用件で・何を作っている会社にかけるのか」が分かるか。</strong></p>
+<table><thead><tr><th>#</th><th>列名</th><th>型</th><th>埋め方</th><th>優先度</th><th>この列が要る理由</th></tr></thead><tbody>
+<tr><td>1</td><td>優先度</td><td>S / A / B / C</td><td>自動（#5×#12×#7 から算出）</td><td><strong>必須</strong></td><td>並べ替えの主キー。上から順にかけるだけにする</td></tr>
+<tr><td>2</td><td>社名</td><td>文字列</td><td>既存（重複22行は名寄せ）</td><td><strong>必須</strong></td><td>—</td></tr>
+<tr><td>3</td><td><strong>電話番号</strong></td><td>文字列</td><td>自動（名簿→自社HP）</td><td><strong>必須</strong></td><td>社長の指示。空欄は電話対象外を意味する</td></tr>
+<tr><td>4</td><td>番号の種別</td><td>代表 / フリーダイヤル / 部門</td><td>自動</td><td>あれば良い</td><td>0120 は担当者に繋がらない（実測で4/25件が0120）</td></tr>
+<tr><td>5</td><td><strong>規模区分</strong></td><td>S / M / L / X / ?</td><td>自動（gBizINFO）</td><td><strong>必須</strong></td><td>社長の指示「小さい企業かどうか分かること」。定義は §6.4</td></tr>
+<tr><td>6</td><td>従業員数</td><td>整数</td><td>自動（gBizINFO）</td><td>あれば良い</td><td>区分の根拠を見せる。空欄は「未取得」と明記</td></tr>
+<tr><td>7</td><td><strong>取扱品目</strong></td><td>文字列（名簿の記載そのまま）</td><td>自動（名簿）</td><td><strong>必須</strong></td><td>電話の切り出し。約234社</td></tr>
+<tr><td>8</td><td><strong>主な製品</strong></td><td>文字列（40字以内）</td><td>半自動（HPから抽出→AI要約→人が確認）</td><td><strong>必須</strong></td><td>社長の指示「何を作っているのか分からないと電話ができない」の本体</td></tr>
+<tr><td>9</td><td><strong>自社HP</strong></td><td>URL</td><td>自動（名簿）</td><td><strong>必須</strong></td><td>社長の指示。<strong>既存の「名簿URL」列とは別列にする</strong>（混同が今回の原因）</td></tr>
+<tr><td>10</td><td>問い合わせURL</td><td>URL</td><td>自動</td><td><strong>必須</strong></td><td>メール／フォーム送信の宛先</td></tr>
+<tr><td>11</td><td>FAX番号</td><td>文字列</td><td>自動（名簿）</td><td>あれば良い</td><td>メール→FAX→電話の2段目。NAPAC・釣用品・燕は名簿に併載</td></tr>
+<tr><td>12</td><td><strong>自社EC</strong></td><td>有 / 無 / 未調査</td><td>自動（誤検知あり）→ 人が確認</td><td><strong>必須</strong></td><td>社長の指示。かつ「ネット販売に疎い＝本丸」の判定軸</td></tr>
+<tr><td>13</td><td>モール出店</td><td>楽天 / Yahoo / Amazon / なし / 未調査</td><td><strong>手動のみ</strong></td><td>あれば良い</td><td>機械取得は規約で不可。<strong>ハルオ判定要</strong></td></tr>
+<tr><td>14</td><td>OEM・卸の記載</td><td>有 / 無</td><td>自動（HP内の語句）</td><td>あれば良い</td><td>平井氏「書いていないメーカーほど少ロットに柔軟」</td></tr>
+<tr><td>15</td><td>所在地（都道府県）</td><td>文字列</td><td>自動</td><td>あれば良い</td><td>訪問・地場の話題づくり</td></tr>
+<tr><td>16</td><td>カテゴリ</td><td>既存</td><td>既存</td><td><strong>必須</strong></td><td>既存列を維持</td></tr>
+<tr><td>17</td><td>名簿 / 会員種別</td><td>既存</td><td>既存</td><td>あれば良い</td><td>「◯◯協会の会員さんですね」が使える</td></tr>
+<tr><td>18</td><td><strong>接触状況</strong></td><td>未 / メール済 / FAX済 / 電話済 / 返信 / 見積 / 成約 / NG</td><td>手動</td><td><strong>必須</strong></td><td>二重接触の防止。週70社を回す運用の土台</td></tr>
+<tr><td>19</td><td><strong>最終接触日</strong></td><td>日付</td><td>手動</td><td><strong>必須</strong></td><td>「メールの1週間後にFAX」の判定に使う</td></tr>
+<tr><td>20</td><td><strong>出典URL</strong></td><td>URL</td><td>自動</td><td><strong>必須</strong></td><td>電話番号の根拠。間違い電話の責任分界</td></tr>
+<tr><td>21</td><td><strong>確度</strong></td><td>確定 / 候補 / 未取得</td><td>自動</td><td><strong>必須</strong></td><td>推定と実測を混ぜないため（社長の最重要フィードバック）</td></tr>
+</tbody></table>
+<ul>
+<li><strong>必須13列 / あれば良い8列。</strong> 社長が電話をかける画面は必須13列だけのビューにします（21列を横スクロールさせない）。</li>
+<li><strong>空欄の扱いを2種類に分ける</strong>：<code>未取得（出典に記載なし）</code> と <code>該当なし</code> を別の文字列で入れる。「未調査」という現行の表記は両方を飲み込んでいて判断できません（今のEC列1,006行がまさにこれ）。</li>
+<li><strong>既存列で落とすもの</strong>：なし。「商社語を含む社名」「外資の日本法人」「大手」は除外フラグとして残し、#1 優先度の計算に使います。</li>
+</ul>
+<hr>
+<h2>8. 段取り（3ステップ）</h2>
+<table><thead><tr><th>#</th><th>やること</th><th>担当</th><th>所要</th><th>実費</th><th>埋まるもの</th></tr></thead><tbody>
+<tr><td><strong>1</strong></td><td>業界団体名簿9本を<strong>項目ごと</strong>に再取得（今回は社名だけ抜いていた）。詳細ページがある2団体（NAPAC 161・燕 67）と五十音別の1団体（釣用品 10ページ）を含め<strong>約250リクエスト</strong>。robots.txt 尊重・同一ホスト3秒間隔</td><td>タカシ（自動化）</td><td>半日（実装3〜4h＋実行13分）</td><td><strong>0円</strong></td><td>自社HP 約899社（89%）／電話番号 約363社（36%）／FAX／取扱品目 約234社</td></tr>
+<tr><td><strong>2</strong></td><td>ステップ1でHPが判明した社のうち電話番号が未取得の<strong>約536社</strong>の自社HPを低速クロール（トップ＋「会社概要／会社案内／お問い合わせ」最大3ページ）。同時に EC信号・OEM/卸の記載・主な製品を抽出</td><td>タカシ（自動化）</td><td>1日（実装2h＋実行1.5〜2h）</td><td><strong>0円</strong></td><td>電話番号 ＋約344社（累計 約707社＝70%）／自社EC 信号／主な製品の原文</td></tr>
+<tr><td><strong>3</strong></td><td>gBizINFO の<strong>利用申請</strong>（規約同意＝§4.1・社長の一手）→ トークン取得後に <code>employee_number</code> <code>capital_stock</code> <code>business_summary</code> を一括付与</td><td>社長（申請1回）→ タカシ</td><td>申請5分＋実行半日</td><td>料金の明記を公式で確認できず＝<strong>未確認</strong></td><td>規模区分 S/M/L/X</td></tr>
+</tbody></table>
+<p><strong>この順序にした理由</strong>：ステップ1と2は<strong>社長の手が0回</strong>で、実費0円、かつ電話番号の7割・HPの9割が埋まります。規模（ステップ3）は社長の一手が要るので後回しにしても、<strong>規模列が「未取得」のままでも週70社のメール送信は開始できます</strong>（電話の優先順位づけだけが後追いになる）。</p>
+<p><strong>並行してやらないこと</strong>：ステップ2が終わる前に電話を始めないでください。品目と製品が空の行に電話すると、1社あたり4分の予算（§5.2）を確実に超えます。</p>
+<hr>
+<h2>9. 残課題と、社長判断が必要な論点</h2>
+<h3>9.1. 社長判断（A/B/C＋材料）</h3>
+<p><strong>論点1：機械で電話番号が取れない約299社（29.7%）をどうするか</strong></p>
+<table><thead><tr><th>案</th><th>内容</th><th>コスト</th><th>材料</th></tr></thead><tbody>
+<tr><td>A</td><td>埋めずに進める。電話対象は約707社に限定し、残り299社はメール／フォームのみ</td><td>0円・0時間</td><td>707社＝週70社で<strong>8.5週分</strong>。1社目の成約は公開4例すべて開始1ヶ月以内（memory <code>knowledge_maker_wholesale_practitioners_2026-09</code>）＝当面枯れない</td></tr>
+<tr><td>B</td><td>人（ブラウザ）が1社ずつ見て埋める</td><td>15〜25時間（1社3〜5分×299社）</td><td>実測で取れなかった理由の9/14は「番号が画像・PDF内」＝人が見れば取れる</td></tr>
+<tr><td>C</td><td>iタウンページデータベースを購入（約800万件・<strong>1件1円</strong>＋初期費用）</td><td>§4.1（金銭）＝要承認</td><td>1,006社で約1,000円＋初期費用。ただし<strong>規約上の再利用条件は未確認</strong>（要ハルオ）</td></tr>
+</tbody></table>
+<p><strong>推奨の材料</strong>：A で開始し、707社が枯れる8.5週後に B か C を判断するのが、社長の手を止めない順序です。<strong>選択はタケシ／社長の領分です。</strong></p>
+<p><strong>論点2：gBizINFO の利用申請（§4.1・法的拘束）</strong></p>
+<p>T-20260831-001 で既に承認待ちになっている件と同一です。<strong>規約本文（help.info.gbiz.go.jp）は Cloudflare により取得できず、法務の再確認が必要</strong>。これは規模列の唯一の無料の取得元です。</p>
+<h3>9.2. ハルオ（法務）判定要</h3>
+<table><thead><tr><th>論点</th><th>状況</th></tr></thead><tbody>
+<tr><td>楽天市場の出店有無の確認</td><td>規約第7条1項7号で機械取得禁止。<strong>人が見るのは可か</strong>の線引きが未確定</td></tr>
+<tr><td>Yahoo!ショッピングの出店有無</td><td>条件付きと聞いているが一次確認していない</td></tr>
+<tr><td>業界団体サイトのクロール</td><td>T-20260831-001 Phase B の判定は「<strong>メーカー公式サイト</strong>の低速クロール」。業界団体サイトが同条件でよいかは明示されていない</td></tr>
+<tr><td>iタウンページデータベースの再利用条件</td><td>一次情報の規約本文を未取得</td></tr>
+</tbody></table>
+<h3>9.3. 取得できなかったもの（推測で埋めていません）</h3>
+<table><thead><tr><th>未確認</th><th>理由</th></tr></thead><tbody>
+<tr><td>gBizINFO の <code>employee_number</code> <code>capital_stock</code> <code>company_url</code> の<strong>項目充足率</strong></td><td>APIトークン未発行のため測定不能。データダッシュボードは総件数（5,835,458件）しか静的HTMLに出ない</td></tr>
+<tr><td>gBizINFO の<strong>利用料金の公式明記</strong>・利用規約本文</td><td><code>help.info.gbiz.go.jp</code> および <code>content.info.gbiz.go.jp/agreement/</code> が 403</td></tr>
+<tr><td>中小企業庁のページ</td><td>WebFetch は 403。<code>curl</code> ＋UA指定で取得（本文は取得済み）</td></tr>
+<tr><td>EC STARs Lab. の「電話」記事の返信率内訳</td><td>記事に記載なし（トークスクリプト中心）</td></tr>
+<tr><td>実践者の<strong>失敗例</strong>の歩留まり</td><td>公開されているのは成功例のみ。返信率30%・成約3〜5%はいずれも自称値</td></tr>
+</tbody></table>
+<h3>9.4. タケシ（プランナー）へのバトン</h3>
+<p>事実は上でそろいました。<strong>戦略判断として残るのは次の4つ</strong>で、これは私の領分ではありません。</p>
+<p>1. 電話の優先順位を「規模」「EC無し」「品目一致」のどの順で掛けるか</p>
+<p>2. 週70社の内訳（メール何社／電話何社）と、社長の可処分時間（週14〜21時間）への配分</p>
+<p>3. 名簿起点（本丸・Amazon不在）と Amazon起点（実践者の型・品目が最初から分かる）を並走させるか、どちらかに寄せるか</p>
+<p>4. 論点1（299社）の A/B/C の選択</p>
+<hr>
+<h2>付録A. 出典一覧（すべて 2026-09-20 取得）</h2>
+<p><strong>実践者（一次・公開）</strong></p>
+<table><thead><tr><th>#</th><th>ページタイトル</th><th>URL</th><th>HTTP</th></tr></thead><tbody>
+<tr><td>1</td><td>【2026年版】Amazonメーカー仕入れは個人でも可能！月利50万を達成する最強7ステップ（EC STARs Lab.）</td><td>https://ecstarslab.com/blog/amazon-メーカー仕入れ-個人-2/</td><td>200</td></tr>
+<tr><td>2</td><td>メーカー仕入れで個人でも使える新規お取引のお願いメール例文6選（EC STARs Lab.）</td><td>https://ecstarslab.com/blog/mail-bargaining-text/</td><td>200</td></tr>
+<tr><td>3</td><td>Amazonメーカー仕入れに電話が超有効な理由と3つの有用性（EC STARs Lab.）</td><td>https://ecstarslab.com/blog/amazon-メーカー仕入れ-電話/</td><td>200（返信率の内訳は記載なし）</td></tr>
+<tr><td>4</td><td>メーカー仕入れは個人でもできる！直接取引のやり方・交渉メールの例文も紹介（日本郵便）</td><td>https://www.post.japanpost.jp/bizpost/column/sales_promotion20/maker-purchase/</td><td>検索結果経由</td></tr>
+</tbody></table>
+<p><strong>BtoB法人営業（架電リストの定石）</strong></p>
+<table><thead><tr><th>#</th><th>ページタイトル</th><th>URL</th></tr></thead><tbody>
+<tr><td>5</td><td>テレアポリストの作り方完全ガイド（Sansan 営業DX Handbook）</td><td>https://jp.sansan.com/media/make-telemarketer/</td></tr>
+<tr><td>6</td><td>テレアポリストの作り方とは？架電リストの集め方・ポイントも解説（お名前.com ビジネスコンシェルジュ）</td><td>https://www.onamae.com/business/article/46673/</td></tr>
+<tr><td>7</td><td>テレアポは1時間に何件？目安は12〜15件、1日の架電数も解説</td><td>https://solutionds1.co.jp/column/line-service/tele-appointment-results/</td></tr>
+<tr><td>8</td><td>フォーム営業の反応率の平均は？（ネクスウェイ）</td><td>https://faxdm.nexway.co.jp/blog/227</td></tr>
+<tr><td>9</td><td>営業のための全国企業・法人リスト提供（タウンページデータベース）</td><td>https://tpdb.jp/townpage/product/townpagedatabase/</td></tr>
+<tr><td>10</td><td>法人タウンページのリストデータを購入できるサービス5選（1件1円の出典）</td><td>https://meibo-engine.com/column/townpage-list.html</td></tr>
+</tbody></table>
+<p><strong>公的・一次情報</strong></p>
+<table><thead><tr><th>#</th><th>内容</th><th>URL</th><th>結果</th></tr></thead><tbody>
+<tr><td>11</td><td>gBizINFO REST API v2 OpenAPI JSON（フィールド定義34項目）</td><td>https://api.info.gbiz.go.jp/hojin/v3/api-docs/v2</td><td><strong>HTTP 200・58,806B・電話番号フィールドなしを確認</strong></td></tr>
+<tr><td>12</td><td>Gビズインフォ APIの利用（申請フロー）</td><td>https://content.info.gbiz.go.jp/api/index.html</td><td>HTTP 200</td></tr>
+<tr><td>13</td><td>Gビズインフォ データダッシュボード（収録5,835,458件）</td><td>https://info.gbiz.go.jp/hojin/dashboard</td><td>HTTP 200</td></tr>
+<tr><td>14</td><td>Gビズインフォ API・データダウンロード利用規約</td><td>https://help.info.gbiz.go.jp/hc/ja/...</td><td><strong>取得できず（Cloudflare）</strong></td></tr>
+<tr><td>15</td><td>Gビズインフォ ダウンロード／利用規約（content 配下）</td><td>https://content.info.gbiz.go.jp/download/index.html 他</td><td><strong>HTTP 403</strong></td></tr>
+<tr><td>16</td><td>中小企業・小規模企業者の定義（中小企業庁）</td><td>https://www.chusho.meti.go.jp/soshiki/teigi.html</td><td>WebFetch 403 → <strong>curl+UA指定で HTTP 200・本文取得</strong></td></tr>
+</tbody></table>
+<p><strong>業界団体名簿（すべて HTTP 200・2026-09-20 実取得）</strong></p>
+<table><thead><tr><th>団体</th><th>URL</th></tr></thead><tbody>
+<tr><td>日本玩具協会</td><td>https://www.toys.or.jp/kaiin_ichiran.html</td></tr>
+<tr><td>NAPAC</td><td>https://www.napac.jp/cms/ja/members（＋詳細例 <code>/cms/ja/members/10-jp/member-list/2-ja-rih</code>）</td></tr>
+<tr><td>日本ペット用品工業会</td><td>https://www.jppma.or.jp/member/list.php</td></tr>
+<tr><td>日本釣用品工業会</td><td>https://www.jaftma.or.jp/about/member_list/</td></tr>
+<tr><td>日本スポーツ用品工業協会</td><td>https://jaspo.org/member-list/</td></tr>
+<tr><td>ペットフード協会</td><td>https://petfood.or.jp/outline-list/</td></tr>
+<tr><td>日本プラスチック日用品工業組合</td><td>https://jpm.or.jp/kumiai/</td></tr>
+<tr><td>日本金属ハウスウェア工業組合（燕）</td><td>https://houseware.jp/company/（＋詳細例 <code>/company/318/</code>）</td></tr>
+<tr><td>全国自動車用品工業会</td><td>https://www.jaama.gr.jp/member-companies/member-list.html</td></tr>
+</tbody></table>
+<p><strong>社内一次資料</strong></p>
+<ul>
+<li><code>docs/reference/maker-shiire/seminar-20260610-realtime-notes.md</code>（中西恒太セミナー受講記録。稲葉氏530通/FAX390通・松井氏46→66.5%・可処分時間60〜90h・300通×6分は §8.2 と §3）</li>
+<li><code>docs/reference/kokunai-niche-oem/README.md</code> および memory <code>knowledge_kokunai_niche_oem</code>（平井氏の生電話・絞り込み4基準）</li>
+<li>memory <code>knowledge_company_contact_data_sources_jp</code>（2026-08時点の手段マップ）／<code>owner_honmaru_ec_weak_makers</code>／<code>feedback_list_quality_over_count</code></li>
+<li><code>workspace/tickets/doing/T-20260831-001_maker-contact-enrichment.md</code>（ハルオの適法性判定・822社の実測）</li>
+</ul>
+<h2>付録B. 再現手順と生データ</h2>
+<p><code>workspace/output/agent_output/T-20260920-002/S-B/</code> に以下を保存しています。</p>
+<table><thead><tr><th>ファイル</th><th>内容</th></tr></thead><tbody>
+<tr><td><code>m.py</code></td><td>名簿9本のHTMLから「会員数・社名出現・外部リンク・TEL」を数える計測スクリプト</td></tr>
+<tr><td><code>extract_hp.py</code></td><td>名簿6本から自社HPリンク586本を抽出し、seed=20260920 で40社をサンプリング</td></tr>
+<tr><td><code>probe_hp.py</code> / <code>hp_probe.csv</code></td><td>40社のHPを実取得。到達39・トップページTEL 14・EC信号19</td></tr>
+<tr><td><code>probe2.py</code> / <code>probe2.json</code></td><td>TEL未取得25社について「会社概要／問い合わせ」最大3ページを追跡。＋11社取得</td></tr>
+<tr><td><code>gbiz.json</code></td><td>gBizINFO 公式 OpenAPI JSON の生ファイル（フィールド定義の原本）</td></tr>
+</tbody></table>
+<p><strong>重複の扱い</strong>：1,006行に社名重複が22行あります（複数の団体に加盟している社）。名寄せすると984社。<strong>電話をかける単位は社なので、名寄せは必須</strong>です（同じ会社に2回電話するのが最悪の事故）。</p>
+<h2>付録C. この調査で「事実」と「推測」を分けた箇所の一覧</h2>
+<table><thead><tr><th>主張</th><th>区分</th><th>根拠</th></tr></thead><tbody>
+<tr><td>現行CSVの列充足率（TEL 0 / EC 0 / 品目115 / 従業員29）</td><td><strong>事実</strong></td><td>1,006行を自分で数えた</td></tr>
+<tr><td>名簿9本すべてが HTTP 200 で取得できる</td><td><strong>事実</strong></td><td>実取得</td></tr>
+<tr><td>名簿から自社HPが約89%取れる</td><td>事実594社＋<strong>推測</strong>305社</td><td>6団体は実測、3団体は同一テンプレートからの推測（確度：高）</td></tr>
+<tr><td>名簿から電話番号が約36%取れる</td><td><strong>推測（確度：高）</strong></td><td>実測は釣用品ア行18社・ペットフード100社・NAPAC/燕は各1社で構造確認</td></tr>
+<tr><td>自社HPから電話番号が64.1%取れる</td><td><strong>事実（N=39）</strong></td><td>実取得。母集団への外挿は推測</td></tr>
+<tr><td>EC信号が48.7%で検出</td><td><strong>事実（N=39）</strong></td><td>ただし誤検知あり（小売業者・<code>shop.</code> リンクの一致）。<strong>機械判定は一次スクリーニングまで</strong></td></tr>
+<tr><td>gBizINFO に電話番号フィールドが無い</td><td><strong>事実</strong></td><td>公式 OpenAPI JSON を全数確認（<code>tel</code>/<code>phone</code>/<code>電話</code> が0件）</td></tr>
+<tr><td>実践者はメーカー属性で絞っていない</td><td><strong>事実（公開情報の範囲で）</strong></td><td>上表#1〜6。ただし「公開していないだけ」の可能性は排除できない</td></tr>
+<tr><td>実践者の絞り方は当社に写せない</td><td><strong>推測（確度：高）</strong></td><td>起点（Amazon vs 名簿）が違うという構造的理由</td></tr>
+<tr><td>週70社を全部電話すると週11.7〜12.8時間</td><td><strong>推測（算術）</strong></td><td>単価（メール6分・電話4〜5分）は出典あり。掛け算は当社の前提</td></tr>
+</tbody></table>
+</body></html>
