@@ -88,7 +88,7 @@ def is_valid(digits: str) -> bool:
 
 
 def normalize(raw: str) -> str | None:
-    """『(011)-826-3533』『０３－１２３４－５６７８』→『011-826-3533』。"""
+    """『(011)-000-0000』『０３－１２３４－５６７８』→『011-000-0000』。"""
     m = _PATTERN.search(unicodedata.normalize("NFKC", raw))
     if not m:
         return None
