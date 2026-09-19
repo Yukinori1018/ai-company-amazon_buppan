@@ -1,5 +1,9 @@
 """抽出ロジックのテスト。社長が実際にダイヤルする値なので、ここは落とせない。
 
+**ここに実在の会社の電話番号・住所を書かないこと。** このリポジトリは PUBLIC で、
+30分ごとに自動 push される。テスト値はすべて架空（加入者番号を 0000 にしてある）。
+表記の型だけを本物から借りて、番号そのものは作り物にする。
+
     python3 -m unittest discover -s scripts/maker_list/tests -t .
 """
 
@@ -16,23 +20,23 @@ from scripts.maker_list.extract.htmlutil import norm_name  # noqa: E402
 
 class TestPhoneNormalize(unittest.TestCase):
     def test_plain(self):
-        self.assertEqual(phone.normalize("0798-26-1882"), "0798-26-1882")
+        self.assertEqual(phone.normalize("0798-00-0000"), "0798-00-0000")
 
     def test_paren_style(self):     # JASPO の表記
-        self.assertEqual(phone.normalize("(011)-826-3533"), "011-826-3533")
+        self.assertEqual(phone.normalize("(011)-000-0000"), "011-000-0000")
 
     def test_fullwidth(self):
         self.assertEqual(phone.normalize("０３－１２３４－５６７８"), "03-1234-5678")
 
     def test_spaces(self):
-        self.assertEqual(phone.normalize("06 6536 5002"), "06-6536-5002")
+        self.assertEqual(phone.normalize("06 0000 0000"), "06-0000-0000")
 
     def test_postal_code_is_not_a_phone(self):
         """郵便番号 003-0862 を電話番号として拾わない。これが最悪の事故。"""
         self.assertIsNone(phone.normalize("〒003-0862"))
 
     def test_address_banchi_is_not_a_phone(self):
-        self.assertIsNone(phone.normalize("埼玉県越谷市増森207-1"))
+        self.assertIsNone(phone.normalize("東京都千代田区架空町207-1"))
 
     def test_too_short(self):
         self.assertIsNone(phone.normalize("03-123-456"))
@@ -40,7 +44,7 @@ class TestPhoneNormalize(unittest.TestCase):
 
 class TestPhoneClassify(unittest.TestCase):
     def test_kinds(self):
-        self.assertEqual(phone.classify("0120-712-122"), "フリーダイヤル")
+        self.assertEqual(phone.classify("0120-000-000"), "フリーダイヤル")
         self.assertEqual(phone.classify("0800-123-4567"), "フリーダイヤル")
         self.assertEqual(phone.classify("090-1234-5678"), "携帯")
         self.assertEqual(phone.classify("050-1234-5678"), "IP電話")
@@ -48,7 +52,7 @@ class TestPhoneClassify(unittest.TestCase):
 
     def test_valid_lengths(self):
         self.assertTrue(phone.is_valid("0312345678"))       # 固定10桁
-        self.assertTrue(phone.is_valid("0120712122"))       # 0120は10桁
+        self.assertTrue(phone.is_valid("0120000000"))       # 0120は10桁
         self.assertTrue(phone.is_valid("08001234567"))      # 0800は11桁
         self.assertFalse(phone.is_valid("0120712122X".replace("X", "")[:9]))
         self.assertFalse(phone.is_valid("1234567"))         # 郵便番号の桁
@@ -77,12 +81,12 @@ class TestPickTelAndFax(unittest.TestCase):
 
     def test_fixed_line_beats_freedial(self):
         """0120 は担当者に繋がらないので、固定電話があればそちらを採る。"""
-        tel, _k, _f = phone.pick_tel_and_fax("お客様センター 0120-712-122 代表 03-5555-6666")
+        tel, _k, _f = phone.pick_tel_and_fax("お客様センター 0120-000-000 代表 03-5555-6666")
         self.assertEqual(tel, "03-5555-6666")
 
     def test_freedial_used_when_only_option(self):
-        tel, kind, _f = phone.pick_tel_and_fax("お客様センター 0120-712-122")
-        self.assertEqual((tel, kind), ("0120-712-122", "フリーダイヤル"))
+        tel, kind, _f = phone.pick_tel_and_fax("お客様センター 0120-000-000")
+        self.assertEqual((tel, kind), ("0120-000-000", "フリーダイヤル"))
 
     def test_fax_only_page_yields_no_tel(self):
         tel, _k, fax = phone.pick_tel_and_fax("FAX 03-1111-3333")
