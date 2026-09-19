@@ -46,6 +46,23 @@ Notion の Assignee は snake_case の固定語彙10種（`docs/notion-board-sch
 → `secretary` に正規化し、欠けていた `created_at`/`updated_at` も補完。カードには正規化後の値で書いた。
 起票直後の回では **`grep -h "^assignee:" tickets/*/*.md | sort | uniq -c`** が30秒で異常値を出す。
 
+## 学び⑤：巻き込みは「自分がする」より「されて」起きた
+
+今回、私の4ファイル（owner-tasks.md・チケット2枚・この memory）は、**commit する前に
+並列セッション（SD 入会審査の同期）の commit `4cfebbf6` に丸ごと取り込まれた**。
+内容は全て正しく入っており実害はないが、**私の意図した commit メッセージは履歴に残らなかった**。
+
+- 検知のしかた：`git add` 後の `git diff --cached --stat` に**自分が触っていないファイルが並ぶ**（今回は
+  T-20260920-003 と T-20260904-005 の rename）。そこで止まったのは正解だった
+- その時点で既に相手が commit していると、`git status` は**clean**になり `git diff --cached` も空になる。
+  「消えた」ではなく「先に入った」ので、**まず `git log --oneline -4` と `git cat-file -e HEAD:<path>` で在籍確認する**。
+  慌てて作り直すと二重に書く（`knowledge_resume_after_usage_limit_verify_before_redo_2026-09-13.md` と同じ型）
+- 遅れて `git show HEAD:<file>` から自分の差分を再構成しようとすると、HEAD が既に相手の版なので
+  **assert で必ず落ちる**。落ちたら「相手が commit 済み」のサインと読む
+- ⚠️ heredoc の python が非ゼロ終了しても、**次の行のコマンドは `&&` でつながっていないので走る**。
+  今回 `git update-index --cacheinfo` が HEAD 版の blob を stage しかけた（index==HEAD だったため無害）。
+  **後続を `&&` でつなぐか、`set -e` を置く**こと
+
 ## 手順の再利用形（衝突しない書き方）
 
 番号決定 → 3つの置換 → 即 `git add <各パス>` → commit を **1本の bash（python heredoc）**で閉じた。
