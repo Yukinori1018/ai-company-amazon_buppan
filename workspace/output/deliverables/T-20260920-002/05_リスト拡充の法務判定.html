@@ -1,0 +1,236 @@
+<!doctype html><html lang='ja'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>05. リスト拡充（必須4項目）の法務判定</title><style>body{font-family:-apple-system,'Hiragino Sans','Noto Sans JP',sans-serif;max-width:1150px;margin:2em auto;padding:0 1em;line-height:1.65;color:#222;font-size:14.5px}table{border-collapse:collapse;margin:.8em 0;font-size:.92em}th,td{border:1px solid #bbb;padding:.35em .6em;vertical-align:top}th{background:#eef2f8}tr:nth-child(even) td{background:#fafafa}h1{font-size:1.5em;border-bottom:2px solid #444}h2{font-size:1.25em;border-left:5px solid #25b;padding-left:8px;margin-top:1.8em}h3{font-size:1.05em;margin-top:1.4em}blockquote{border-left:4px solid #ccc;margin:.8em 0;padding:.2em 1em;color:#444}code{background:#f3f3f3;padding:1px 4px;border-radius:3px}hr{border:0;border-top:1px solid #ccc;margin:1.6em 0}</style></head><body>
+<h1>05. リスト拡充（必須4項目）の法務判定</h1>
+<p>法務ハルオ／2026-09-20／T-20260920-002 S-E</p>
+<p>判定対象：サトル S-B <code>02_リストの必須項目と絞り方.md</code> が「ハルオ判定要」として残した4論点。</p>
+<p>一次情報はすべて 2026-09-20 に当職が取得（§7）。取れなかったものは「取得できず」と書きます。</p>
+<p>既判定（8/31 T-20260831-001 Phase B、9/13 T-20260912-002、9/14 T-20260914-002）は<strong>引き継ぎ、差分だけを書きます</strong>。</p>
+<p>社長指示（9/13）の読み方：NO は選択肢の事前フィルタにしません。NG と書くときは射程と適法な代替を必ず添えます。</p>
+<hr>
+<h2>1. 結論</h2>
+<table><thead><tr><th>論点</th><th>判定</th><th>一行理由</th></tr></thead><tbody>
+<tr><td>① 業界団体9本の会員名簿の取得</td><td><strong>条件付きOK（8本）／取得OK（1本）／NGは0本</strong></td><td>名簿ページを <code>Disallow</code> にしている団体は1つもなく（実査）、抽出対象は社名・TEL・URL・品目＝著作物でない事実。NAPAC だけ明示の不許諾宣言があるので条件を一段狭める</td></tr>
+<tr><td>② メーカー自社HP（3ページ・電話番号の保存と営業利用）</td><td><strong>条件付きOK。範囲は変わらない</strong>（8/31 の上限10ページより狭いので当然に内側）</td><td>法人の代表電話は個人情報でない（法2条1項・通則編ガイドライン）。ただし個人事業主が混ざるのでデータセット全体を個人情報として扱う</td></tr>
+<tr><td>②-2 <strong>電話番号を PUBLIC リポに置いてよいか</strong></td><td><strong>NO</strong>（yes/no で答えよとの指示につき明言）</td><td>個情法27条＋NAPAC の不許諾宣言＋「名簿の代わりになる形で外に出る」＝段階2。push は不可逆（削除に force push＝§4.1）</td></tr>
+<tr><td>③ EC出店の有無</td><td><strong>自社HPのリンク先判定＝OK／楽天は人の目視のみ可（機械・AIはNG）／Yahoo!は条件付きOK（9条件）／Amazonは当社に限り閲覧も非推奨（代替3本）</strong></td><td>相手のサーバに1リクエストも送らない方法が第一選択。送る場合は規約の名宛人になる</td></tr>
+<tr><td>④ gBizINFO</td><td><strong>条件付きOK。規約本文を全文取得できた（サトルの「取得できず」は解消）</strong></td><td>本体規約は政府標準利用規約2.0準拠・<strong>CC BY互換・商用利用可</strong>。API規約に営利利用の禁止条項は無い。申請時の申告目的に「営業」を書くことが条件</td></tr>
+<tr><td>④ iタウンページDB</td><td><strong>条件付きOK（社内限定）。ただし法務は購入を推奨しない</strong></td><td>規約全文取得。<strong>料金は「1件1円」ではなく基本110,000円＋9.9円/件（税込）＝1,006社で約12万円</strong>。かつ<strong>HP URL・従業員数・資本金は入っていない</strong>。違約金は使用料の3倍</td></tr>
+</tbody></table>
+<p><strong>§4.1（社長の一手）に当たるもの</strong>：gBizINFO 利用申請（規約同意）／iタウンページ購入（金銭＋契約）／メーカー・団体への連絡。<strong>当職は1件も実行していません。</strong></p>
+<hr>
+<h2>2. 論点① 業界団体サイトの会員名簿（1団体1行）</h2>
+<h3>2-1. 実査結果と判定</h3>
+<p>すべて 2026-09-20 に当職が <code>robots.txt</code> とサイト内の規約・著作権表示を実取得して判定しました。</p>
+<table><thead><tr><th>#</th><th>団体（ホスト）</th><th>robots.txt</th><th>名簿ページが Disallow か</th><th>規約・不許諾宣言</th><th>判定</th><th>個別条件</th></tr></thead><tbody>
+<tr><td>1</td><td>日本玩具協会 <code>www.toys.or.jp</code></td><td><strong>200</strong>（<code>/testxx/</code> <code>/pdf/kaiin/</code> <code>/jtamember/</code> を Disallow）</td><td><strong>非該当</strong>（<code>/kaiin_ichiran.html</code>）</td><td>サイト利用規約なし。個人情報保護宣言のみ</td><td><strong>条件付きOK</strong></td><td><strong><code>/pdf/kaiin/</code> と <code>/jtamember/</code> は絶対に取得しない</strong>（会員限定領域の明示拒否）。リンクを見つけても辿らない</td></tr>
+<tr><td>2</td><td>NAPAC <code>www.napac.jp</code></td><td><strong>404（存在しない）</strong></td><td>—</td><td><strong>あり。</strong>「NAPAC および著作権者の許可無く、…個人利用の範囲を超えて、複製、転載、転用等の二次利用を行うことを固く禁止します」（<code>/cms/ja/copyright</code>）</td><td><strong>条件付きOK（最狭）</strong></td><td>抽出は<strong>社名・住所・TEL・FAX・URL の5項目のみ</strong>。本文の文章（紹介文等）は保存しない。詳細ページは1社1回・再訪しない。<strong>再公開は一切不可</strong></td></tr>
+<tr><td>3</td><td>日本ペット用品工業会 <code>www.jppma.or.jp</code></td><td>404</td><td>—</td><td>プライバシーポリシーのみ</td><td><strong>条件付きOK</strong></td><td>共通条件のみ</td></tr>
+<tr><td>4</td><td>日本釣用品工業会 <code>www.jaftma.or.jp</code></td><td>404</td><td>—</td><td>プライバシーポリシー／特商法表記のみ</td><td><strong>条件付きOK</strong></td><td>五十音別10ページは<strong>1ページずつ3秒空けて</strong>取得</td></tr>
+<tr><td>5</td><td>日本スポーツ用品工業協会 <code>jaspo.org</code></td><td>200（<code>/wp-admin/</code> のみ）</td><td>非該当</td><td>なし</td><td><strong>条件付きOK</strong></td><td>共通条件のみ</td></tr>
+<tr><td>6</td><td>ペットフード協会 <code>petfood.or.jp</code></td><td>200（<code>/wp/wp-admin/</code>、加えて <code>Disallow:</code>＝空＝全許可）</td><td>非該当</td><td>なし</td><td><strong>条件付きOK</strong></td><td>共通条件のみ</td></tr>
+<tr><td>7</td><td>日本プラスチック日用品工業組合 <code>jpm.or.jp</code></td><td>200（<code>/jpm/wp-admin/</code>）</td><td>非該当</td><td>なし</td><td><strong>条件付きOK</strong></td><td>共通条件のみ</td></tr>
+<tr><td>8</td><td>日本金属ハウスウェア工業組合 <code>houseware.jp</code></td><td>200（<code>/wp-admin/</code>）</td><td>非該当</td><td>なし</td><td><strong>条件付きOK</strong></td><td>詳細67ページも同条件</td></tr>
+<tr><td>9</td><td>全国自動車用品工業会 <code>www.jaama.gr.jp</code></td><td>**200（<code>User-agent: *</code> / <code>Allow: /</code>＝明示の全面許可）**</td><td>非該当</td><td>なし</td><td><strong>取得OK</strong></td><td>速度条件は下記の下限を適用（相手の許可とは別に刑事リスクの話）</td></tr>
+</tbody></table>
+<p><strong>NG はゼロです。</strong> 9本すべて取得できます。</p>
+<h3>2-2. 著作権法上の整理（依頼の3点に答えます）</h3>
+<table><thead><tr><th>論点</th><th>判定</th><th>根拠</th></tr></thead><tbody>
+<tr><td>社名・電話番号・URL・取扱品目の<strong>事実データの複製</strong></td><td>著作権が及ばない</td><td>2条1項1号「思想又は感情を<strong>創作的に表現</strong>したもの」に当たらない</td></tr>
+<tr><td>HTML の取得・解析（一時複製）</td><td>適法</td><td><strong>30条の4第2号</strong>（情報解析）。「その必要と認められる限度において」社内解析まで</td></tr>
+<tr><td>会員名簿の<strong>データベースの著作物性</strong>（12条の2）</td><td>成立しにくい（確度：中）</td><td>12条の2は「情報の選択又は<strong>体系的な構成</strong>によつて創作性を有するもの」。会員名簿の選択は「会員であるか」という事実で決まり、協会の創作的選択ではない。配列も五十音順。<strong>ただしタウンページDB事件（東京地判平12.3.17）は職業別の分類体系に創作性を認めた</strong>ので、<strong>団体独自の分類体系（会員種別・カテゴリ区分）をそのまま写すことはしない</strong></td></tr>
+<tr><td><strong>47条の5（軽微利用）</strong></td><td><strong>援用しない</strong></td><td>1項柱書が「政令で定める基準に従って行う者に限る」と主体を絞る。社内利用なら30条の4だけで完結し、無理に乗せると逆にリスク。8/31 判定を維持</td></tr>
+<tr><td>名簿の<strong>全件をそのまま外部に出す</strong></td><td><strong>不可</strong></td><td>30条の4の「必要と認められる限度」を超える。ただし書（著作権者の利益を不当に害する）にも触れる。§3-2 の PUBLIC 判定と同じ結論</td></tr>
+</tbody></table>
+<h3>2-3. robots.txt が無い団体（#2・#3・#4）の扱い</h3>
+<p><strong>「禁止されていない＝OK」とは扱いません。正しくは「robots.txt は許諾を与える文書ではなく、拒否の意思表示の置き場である」。無いことは意思表示が無いことに過ぎず、適法性は §2-2 の著作権法の論証で立てます。</strong></p>
+<p>タカシへの実装上の差分（ここが一番大事です）：</p>
+<pre>8/31 の実装制約「robots.txt の取得失敗時は『許可なし』と扱う」は、
+HTTP 404 には適用しない。404 = ファイルが存在しない = 制限の宣言が無い → 取得してよい。
+403 / 5xx / タイムアウトでの取得失敗 = サーバ側が拒んでいる → 「許可なし」として当該ホストを打ち切る。
+この2つを区別しないと、NAPAC・JPPMA・JAFTMA の3本（計394社）が理由なく落ちる。</pre>
+<h3>2-4. 数値条件（<code>scripts/maker_list/config.py</code> にそのまま入れる値）</h3>
+<table><thead><tr><th>定数</th><th>値</th><th>根拠</th></tr></thead><tbody>
+<tr><td><code>ASSOCIATION_MIN_INTERVAL</code></td><td><strong>3.0 秒</strong>（同一ホスト・据え置き）</td><td>8/31 判定と同じ。<code>Crawl-delay</code> の記載があればその値と比較して<strong>大きい方</strong>を採る（9本とも記載なしを確認済み）</td></tr>
+<tr><td><code>CONCURRENCY</code></td><td><strong>1</strong>（同一ホスト。異なるホストへの並列も1で開始）</td><td>250リクエスト×3秒＝約13分。並列にする理由がない</td></tr>
+<tr><td><code>USER_AGENT</code></td><td><strong><code>SatoySelect-MakerListBot/1.0 (business partner research; 1 req/3s; respects robots.txt; +https://&lt;当社サイト&gt;/bot)</code></strong></td><td>現行の文言で可。<strong>個人のメールアドレスは載せない</strong>判断は正しい。連絡先はURLで足りる。ブラウザUAの詐称は個情法20条1項「偽りその他不正の手段」に寄るので禁止</td></tr>
+<tr><td>取得時間帯</td><td><strong>平日・祝日を問わず 09:00〜21:00 JST</strong></td><td>現行 <code>8〜21</code> を 09:00 開始に。深夜の無人アクセスは先方が異常に気づいても連絡できず心証が最悪</td></tr>
+<tr><td><code>DAILY_REQUEST_LIMIT</code></td><td><strong>業界団体分は 400/日</strong>（全体1,500は据え置き）</td><td>名簿全量＝約250。1日で終わる。上限に張り付く設計にしない</td></tr>
+<tr><td>取得回数</td><td><strong>1団体1回。再取得は年1回まで</strong></td><td>差分監視のための定期クロールはしない</td></tr>
+<tr><td>停止条件</td><td><strong>403 / 429 / 5xx が1回でも出たら当該ホストを即時・永久打ち切り。CAPTCHA・WAF は回避しない</strong></td><td>岡崎市立中央図書館事件（2010・1秒1回で逮捕/21日勾留/起訴猶予）。刑法233条・234条の2</td></tr>
+<tr><td>全レコード</td><td><code>source_url</code> と <code>fetched_at</code>（JST）を必須列に</td><td>出所の立証と、削除要請への追従のため</td></tr>
+</tbody></table>
+<h3>2-5. グレーを進めるための3点セット（NAPAC 用・他8本はこれより軽い）</h3>
+<table><thead><tr><th>項目</th><th>内容</th></tr></thead><tbody>
+<tr><td>リスクシナリオ</td><td>NAPAC 事務局から「著作権ページに反する。削除せよ」と連絡が来る</td></tr>
+<tr><td>発生確率／影響度／<strong>不可逆性</strong></td><td>低／小〜中／<strong>低</strong>（社内データを消せば原状回復できる） ← ここが進めてよい理由</td></tr>
+<tr><td>対応策</td><td>争わない。即時に全データを削除し、以後は<strong>段階3</strong>（名簿で知った社名を手がかりに、各社の自社HPから取り直す）だけで運用する</td></tr>
+<tr><td>撤退条件</td><td>①403/429/5xx が1回 ②団体から連絡 ③<code>robots.txt</code> が新設され名簿パスが Disallow になる — いずれか1つで即時永久停止</td></tr>
+</tbody></table>
+<hr>
+<h2>3. 論点② メーカー自社HPからの取得と、電話番号の保存</h2>
+<h3>3-1. 範囲は変わりません</h3>
+<p>8/31 判定は「robots.txt 尊重・同一ホスト3秒・UA明示・会社概要/問い合わせ系パス限定・1社10ページまで」。今回の運用（<strong>1社3ページ・トップ＋会社概要＋問い合わせ</strong>）はその内側で、<strong>新たな論点は生じません</strong>。<code>MAKER_MIN_INTERVAL = 2.5</code> は 3.0 に上げてください（8/31 の数字と揃える。2.5 にする根拠がありません）。</p>
+<p>取得した電話番号を<strong>社内リストに保存し、営業電話に使うこと</strong>の可否：</p>
+<table><thead><tr><th>論点</th><th>判定</th><th>根拠</th></tr></thead><tbody>
+<tr><td><strong>法人の代表電話は個人情報か</strong></td><td><strong>非該当</strong></td><td>個情法2条1項は「<strong>生存する個人に関する情報</strong>」。個人情報保護委員会ガイドライン（通則編）「法人その他の団体は『個人』に該当しないため、法人等の団体そのものに関する情報は『個人情報』に該当しない」</td></tr>
+<tr><td>個人事業主のメーカーで代表者氏名と電話が紐づく場合</td><td><strong>該当する</strong></td><td>同ガイドライン。事業情報がそのまま個人の情報になる。<strong>S-B 実測で法人格表記があるのは85.2%</strong>＝14.8%は判定できない</td></tr>
+<tr><td>実務上の扱い</td><td><strong>データセット全体に個人情報の取扱いルールを適用する</strong></td><td>1,006行を1件ずつ法人/個人事業主に仕分けてから扱いを分けるのは破綻します。全体に掛けるのが最も安全で最も安い</td></tr>
+<tr><td>営業電話に使うこと</td><td><strong>可</strong>。法的障害なし</td><td>事業者間の電話勧誘は特商法の電話勧誘販売（26条1項1号で営業のためのものを除外）の対象外。特定電子メール法は電話に及ばない</td></tr>
+<tr><td>利用目的</td><td>「当社のメーカー仕入れに係る取引先候補の調査、連絡、商談管理のため」で確定（17条）</td><td>目的外利用の禁止（18条）。名簿販売・他事業への転用は不可</td></tr>
+<tr><td>利用目的の通知または公表（21条1項）</td><td><strong>公表の場を先に用意する</strong>（自社サイトに1ページ）。連絡開始より前に</td><td>1,006社に個別通知は本末転倒。8/31 判定と同じ</td></tr>
+<tr><td>代表者氏名</td><td><strong>取得しない・保存しない</strong></td><td>個人情報の混入経路を1本潰せば、以後の議論がまるごと消えます</td></tr>
+</tbody></table>
+<h3>3-2. 電話番号を PUBLIC リポジトリに置いてよいか → <strong>NO</strong></h3>
+<p>理由は4つ。いずれか1つでも足ります。</p>
+<ol>
+<li style='margin-left:0.0em'><strong>個情法27条1項</strong>（第三者提供の制限）。個人事業主が混ざる前提である以上、commit＝不特定多数への提供。本人同意はありません。</li>
+<li style='margin-left:0.0em'><strong>NAPAC の不許諾宣言</strong>（§2-1 #2）。事実データに著作権は及びませんが、161社分を丸ごと再公開すれば「元の名簿の代わりになる形」であり、段階2（公開）＝不可の型に入ります。</li>
+<li style='margin-left:0.0em'><strong>不可逆性</strong>。このリポは PUBLIC で30分ごとに自動 push されます。commit した瞬間に世界へ公開され、取り消しには <code>force push</code>＝§4.1。確率が低くても止める類の話です（行動原則1）。</li>
+<li style='margin-left:0.0em'>iタウンページを将来買う場合、<strong>第11条2項（第三者提供の禁止）に正面から違反</strong>し、第18条の違約金（使用料の3倍）が起動します（§5-2）。置き場を今のうちに分けておけば、後から設計を作り直さずに済みます。</li>
+</ol>
+<p><strong>置き場の指定（タカシへ）</strong></p>
+<table><thead><tr><th>層</th><th>何を置くか</th><th>場所</th></tr></thead><tbody>
+<tr><td><strong>実データの正</strong></td><td>社名・電話番号・FAX・住所・自社HP・品目・接触状況の全列</td><td><strong>限定共有の Google スプレッドシート</strong>（マリエ運用・社長が電話しながら見る画面もこれ）。共有範囲は社長アカウントのみ</td></tr>
+<tr><td>ローカル原本（バックアップ）</td><td>同 CSV</td><td><code>~/Documents/AI Company 素材/Amazon物販事業/maker-list-20260920/</code>（README.md 必須。リポ外＝Git に載らない）</td></tr>
+<tr><td>途中経過・キャッシュ</td><td>HTML キャッシュ・抽出ログ</td><td><code>workspace/output/agent_output/T-20260920-002/S-F/</code>（<code>.gitignore</code> 対象）。HTML 全文の恒久保存はしない（7日で削除）</td></tr>
+<tr><td><strong>deliverables に置いてよいもの</strong></td><td>件数サマリ（<code>summary.json</code>）・カバー率・列定義・スクリプト・スプレッドシートのURL</td><td><code>workspace/output/deliverables/T-20260920-002/</code>（Git 追跡）</td></tr>
+</tbody></table>
+<p><strong>現行の <code>deliverables/T-20260920-002/.gitignore</code>（<code>out/</code> を除外）は設計として正しいので、そのまま維持してください。</strong> ただし <code>out/</code> は <code>.gitignore</code> 対象＝worktree が消えると成果物ごと消えます。<strong>生成したら同じ実行の中でスプレッドシートへ同期し、素材フォルダへコピーするところまでを1セットにしてください。</strong>「あとでコピーする」は必ず忘れます。</p>
+<p><strong>公開してよい列（参考）</strong>：gBizINFO 由来の列（従業員数・資本金・企業HP・業種）は CC BY 互換で再公開可です（§5-1）。ただし社名と紐付けて公開する実益がないので、<strong>原則は公開しない</strong>で揃えてください。列の由来をファイルレベルで分けておけば事故が起きません。</p>
+<hr>
+<h2>4. 論点③ EC出店の有無</h2>
+<h3>4-0. 第一選択：相手のサーバに1リクエストも送らない方法</h3>
+<p><strong>メーカー自社HPの外部リンク先ドメインで判定してください。</strong> 「公式オンラインショップ」「楽天市場店」「Yahoo!店」のリンクは会社概要・トップに載っています。これは §3（メーカー自社HPの取得）の範囲内で完結し、<strong>楽天・Yahoo!・Amazon のサーバにアクセスしないので、各社の規約の名宛人になりません</strong>。判定は 0円・0リスクです。</p>
+<pre>判定ロジック（実装そのまま）
+  リンク先ホストが *.rakuten.co.jp          → モール出店:楽天 = 有（出典: 自社HP URL）
+               shopping.yahoo.co.jp / *.store.yahoo.co.jp → Yahoo = 有
+               *.amazon.co.jp                → Amazon = 有
+               *.base.shop / *.stores.jp / *.thebase.in / *.myshopify.com / cart 語 → 自社EC = 有
+  リンクが無い場合 → 「無」と書かない。必ず「未確認」と書く（出店していてもHPに貼らない社がある）</pre>
+<h3>4-1. 楽天市場</h3>
+<table><thead><tr><th>行為</th><th>判定</th><th>根拠</th></tr></thead><tbody>
+<tr><td>スクリプトによる取得</td><td><strong>NG</strong></td><td>楽天ショッピングサービスご利用規約 <strong>第7条1項(7)</strong>「当社の事前の許可を得ることなく、自動化された手段（自動購入ツール・ロボットなどこれらに準ずる手段）を用いて商品を購入すること（<strong>商品ページ上の情報取得等を含む</strong>）」。第1条3項で非会員にも及ぶ（2026-09-20 取得）</td></tr>
+<tr><td><strong>カズヨ（AIブラウザ）が1社ずつ見て転記</strong></td><td><strong>NG</strong></td><td>9/14 判定。取得・読取・転記を実行しているのがソフトウェアである以上「自動化された手段」。人の指示があっても要件は外れない</td></tr>
+<tr><td><strong>人（社長）がブラウザで見て、出店あり/なしを記録</strong></td><td><strong>可</strong></td><td>第7条1項に人の閲覧を禁じる号はない。(19)「不正な目的」・(20)「本サービスの趣旨目的に反する」の一般条項は、店舗の有無を見る通常の閲覧には当てはまらない</td></tr>
+<tr><td>検索結果を目視して記録</td><td><strong>可（上と同じ）</strong></td><td>記録してよいのは<strong>出店の有無・店舗名・店舗URL・確認日</strong>のみ。商品名・価格・ランキング・レビュー数は転記しない（一般条項を招かないため）</td></tr>
+</tbody></table>
+<p>条件：①楽天にログインしない（楽天ID を賭けない）②件数は社長が実際に見た分だけ ③PUBLIC リポに入れない ④カズヨは楽天に<strong>アクセスしない</strong>。カズヨがやってよいのは「検索URLを一覧にして社長に渡す」ところまで（9/14 判定で「可」と確定済み）。</p>
+<h3>4-2. Yahoo!ショッピング — 条件付きOK（今回用に9条件へ書き換え）</h3>
+<p>根拠：LINEヤフー共通利用規約（2026-09-20 取得）<strong>2.1・2.2</strong>（登録の有無にかかわらず、利用により同意したものとみなす＝非会員にも及ぶ）、<strong>14.</strong>「当社サービスやそれらを構成するデータを、<strong>その提供目的を超えて利用することができません</strong>。…<strong>それらの行為によってお客様が得た利益相当額を請求する権利</strong>を有します」、<strong>15.(5)</strong> BOT等による不正な操作の禁止。自動閲覧を名指しで禁じる明文はありません。</p>
+<p>9/14 の8条件は「JAN で商品価格を採る」用途のものでした。<strong>今回の用途（出店の有無）に合わせて書き換えます。</strong></p>
+<table><thead><tr><th>#</th><th>条件（全部必須）</th><th>9/14 からの差分</th></tr></thead><tbody>
+<tr><td>1</td><td>社長の指示で始めたセッション内のみ。夜間・<code>/loop</code> からは実行しない</td><td>同じ</td></tr>
+<tr><td>2</td><td><strong>1セッション20社・週60社・同時1タブ・5秒間隔</strong></td><td>単位を「件」から「社」へ</td></tr>
+<tr><td>3</td><td>開いてよいURLは <code>shopping.yahoo.co.jp/search?p=&lt;社名&gt;</code> と、ヒットしたストアのトップのみ。<strong>商品ページは開かない</strong></td><td><strong>変更</strong>（商品ページ→ストアトップ）</td></tr>
+<tr><td>4</td><td>ログインなしの専用 Chrome プロファイル（Yahoo! JAPAN ID を使わない）</td><td>同じ</td></tr>
+<tr><td>5</td><td><strong>転記してよいのは 出店の有無・ストア名・ストアURL・確認日 の4つだけ</strong></td><td><strong>変更</strong>（価格・送料・ポイント・在庫は転記しない）</td></tr>
+<tr><td>6</td><td><strong>1社1回。定期再取得・価格監視をしない</strong>（更新は年1回まで）</td><td>強化。§14 の「蓄積」を作らないため</td></tr>
+<tr><td>7</td><td>CAPTCHA・エラー・レート制限が出たら即中止。回避しない</td><td>同じ</td></tr>
+<tr><td>8</td><td>PUBLIC リポに入れない</td><td>同じ</td></tr>
+<tr><td>9</td><td>カート投入・購入は AI がしない</td><td>同じ</td></tr>
+</tbody></table>
+<p>確度：<strong>中（グレー寄り）</strong>。明文が無いことに依拠しています。相手が「提供目的を超える」と主張してくる余地は残ります。制裁単位は Yahoo! ID と<strong>利益相当額の金銭請求</strong>で、ID を分けても金銭請求は消えません。<strong>社長が「人が見る」でよいと言うなら、そちらを採ってください（法務の推奨はこちら）。</strong></p>
+<h3>4-3. Amazon — 当社に限り、閲覧も推奨しません</h3>
+<table><thead><tr><th>行為</th><th>判定</th><th>根拠</th></tr></thead><tbody>
+<tr><td>スクリプト・AIによる取得</td><td><strong>NG（維持）</strong></td><td>Amazon.co.jp 利用規約（nodeId=643006）「<strong>製品リスト、解説、価格などの収集と利用</strong>…<strong>データマイニング、ロボットなどのデータ収集・抽出ツールの使用は、一切含まれません</strong>」。robots.txt は <code>ClaudeBot</code> <code>Claude-User</code> <code>Scrapy</code> ほか100 UA を <code>Disallow: /</code></td></tr>
+<tr><td><strong>人がブラウザでブランドストアの有無を見る</strong></td><td><strong>NG に引き締めます（8/31 §5.4 の射程を今回の用途に限り狭めます）</strong></td><td>同規約は「限定的、非独占的、<strong>非商業的および個人的</strong>に利用する権利」しか許諾しておらず、「商業目的のために…アクセス…はできません」と明記。仕入れ判断のための閲覧は商業目的です。<strong>制裁単位は当社の出品アカウント＝事業の全損。確率が低くても止める類です（行動原則1）。社長は既に停止を経験しています</strong></td></tr>
+</tbody></table>
+<p><strong>適法な代替（3本）</strong></p>
+<table><thead><tr><th>代替</th><th>可否</th><th>条件</th></tr></thead><tbody>
+<tr><td>メーカー自社HPの「Amazon店はこちら」リンク</td><td><strong>可・第一選択</strong></td><td>§4-0。Amazon に1リクエストも送らない</td></tr>
+<tr><td>Keepa（既契約の範囲）</td><td>業務目的の範囲で可</td><td>Price Data API T&amp;C §2(2) 自社業務目的限定／§6.1(1) 再販厳禁／<strong>PUBLIC リポ不可</strong>。ただし Keepa は解約判断中（S-A）なので、これを前提に設計しない</td></tr>
+<tr><td>SP-API</td><td>将来的に可</td><td>アカウント復旧が前提。Developer 登録＝§4.1。9/13 判定のとおり同意前に DPP §1 の整備が要る</td></tr>
+</tbody></table>
+<p><strong>運用上の結論</strong>：モール出店列は「楽天＝人が見て確定／Yahoo!＝人が見て確定（またはカズヨが9条件で）／Amazon＝未確認のまま開始」で始めてください。<strong>Amazon 列が空でも週70社の連絡は開始できます。</strong></p>
+<h3>4-4. 自社EC</h3>
+<p><strong>可。</strong> §3 の範囲内です（メーカー自社HPのカート導線の検出）。条件は1つ：<strong>機械判定は「候補」までとし、列の値は「有（要確認）／未確認」の2値で出す。「無」と書かない。</strong> S-B 実測で誤検知が出ています（小売業者・<code>shop.</code> リンクの一致）。「ネット販売に疎い＝本丸」の判定軸そのものなので、誤検知は戦略判断を直接歪めます。</p>
+<hr>
+<h2>5. 論点④ gBizINFO と iタウンページ</h2>
+<h3>5-1. gBizINFO — 条件付きOK。<strong>規約本文を全文取得できました</strong></h3>
+<p>サトルが「Cloudflare により取得できず」としていた規約本文は、<strong>Zendesk の公開 API 経由で全文取得できました</strong>（Makuake で使ったのと同じ手口）。</p>
+<pre>https://help.info.gbiz.go.jp/api/v2/help_center/ja/articles/4795140981406.json  ← 本体 利用規約（更新 2026-09-19）
+https://help.info.gbiz.go.jp/api/v2/help_center/ja/articles/4999421139102.json  ← API・データダウンロード利用規約（最終更新 2026-04-08 / 制定 2025-12-21）</pre>
+<table><thead><tr><th>論点</th><th>判定</th><th>根拠（逐語）</th></tr></thead><tbody>
+<tr><td>取得データを<strong>社内リストに保存</strong>すること</td><td><strong>可</strong></td><td>本体規約「どなたでも…<strong>複製、公衆送信、翻訳・変形等の翻案等、自由に利用できます。商用利用も可能です。</strong>」「政府標準利用規約（第2.0版）に準拠」「<strong>CC BY</strong> と互換性があり」</td></tr>
+<tr><td><strong>営業に使う</strong>こと</td><td><strong>可</strong></td><td>API規約 3)禁止事項は6つ（不正利用／仕様の改変・解析／他者の権利侵害／法令・公序良俗違反／トークン複数取得・過剰アクセス／過度な頻度・大量アクセス）。<strong>営利利用・営業利用の禁止は無い</strong></td></tr>
+<tr><td>申請時の目的拘束</td><td><strong>条件</strong></td><td>API規約 2)「本サービスの利用は、<strong>申請時に申告した目的の範囲内に限られます</strong>」。→ 申請書の利用目的欄には<strong>営業利用を含めて書く</strong>こと。推奨文言：<strong>「当社のメーカー仕入れに係る取引先候補の法人情報照合（商号・所在地・従業員数・資本金・企業HPの付与）および当該候補先への営業連絡のため」</strong></td></tr>
+<tr><td>料金</td><td><strong>無償</strong>（規約に金銭債務の条項が1つも無い）</td><td>サトルの「料金の明記を確認できず」への回答。第13条相当の使用料条項が存在しません</td></tr>
+<tr><td>PUBLIC リポへの掲載</td><td>規約上は<strong>可</strong>（出典明記＋加工明記が条件）</td><td>ただし §3-2 のとおり、実務上は他列と混ざるので<strong>原則置かない</strong>運用に揃えてください</td></tr>
+<tr><td><code>representative_name</code>（代表者氏名）</td><td><strong>取得しない</strong></td><td>個人情報（通則編ガイドライン）。規約が許しても個情法27条は別に効きます</td></tr>
+<tr><td>「別紙」の外部DB由来コンテンツ</td><td>注意</td><td>本体規約「外部データベース等とのAPI連携等により取得しているコンテンツについては、<strong>その提供元の利用条件に従ってください</strong>」。丸ごと CC BY と思い込まないこと</td></tr>
+</tbody></table>
+<p><strong>申請時に社長が同意する内容の要約（5点）</strong>：①事前申請とトークン取得が要る（法人番号・法人名・担当部署・所在地・連絡先・利用目的を申告）②利用は申告した目的の範囲内③レート上限は非公開で、過度なアクセスは<strong>予告なく</strong>遮断・トークン取消し④経産省は一切の免責（正確性の保証なし）⑤準拠法は日本法・<strong>東京地裁の専属的合意管轄</strong>。当社に不利な条項（金銭債務・損害賠償・自動更新・競業避止）は<strong>ありません</strong>。8/31 の「承認して差し支えない」という判断を維持します。</p>
+<p>実装制約（8/31 から据え置き）：トークンは環境変数・リポにコミットしない／トークンは1本のみ（複数取得は3)禁止事項）／1 req/秒／429・403 が出たら即停止して翌日まで再開しない／出典「『Gビズインフォ』（経済産業省）（URL）（2026年◯月◯日に利用）」＋「をもとに作成」を README に記載。</p>
+<h3>5-2. iタウンページデータベース — 条件付きOK（社内限定）。<strong>ただし購入は推奨しません</strong></h3>
+<p>利用規約（オンラインお申込み・2025年10月1日実施）の全文を取得しました（<code>https://www.ntttp-db.com/online-quote-terms/</code>）。</p>
+<p><strong>まず数字の訂正です。サトルの引いた「1件1円」は二次情報で、誤りでした。</strong></p>
+<table><thead><tr><th>項目</th><th>一次情報（2026-09-20 取得）</th></tr></thead><tbody>
+<tr><td>基本料金</td><td><strong>220,000円（税込）／オンライン申込なら50%OFF＝110,000円</strong></td></tr>
+<tr><td>情報料金</td><td><strong>9.9円/件（税込）</strong></td></tr>
+<tr><td>1,006社を買った場合</td><td><strong>約119,960円（1社あたり約119円）</strong></td></tr>
+<tr><td>電話番号が機械で取れない299社だけを狙う場合</td><td>業種・地域でしか絞れないため<strong>299社だけを買うことはできない</strong>。実質、基本料金11万円が最低コスト＝<strong>1件あたり約400円</strong></td></tr>
+<tr><td><strong>取れるデータ項目</strong></td><td>電話番号・漢字住所・掲載名・業種（TP分類/基本64分類）・郵便番号・法人種類コード等。<strong>企業HP URL は無い。従業員数・資本金も標準では無い</strong>（「付加価値情報14項目」はオプションかつ「webでの提供は行っておりません」）</td></tr>
+</tbody></table>
+<p><strong>規約上の制約（不利な条項を明示します）</strong></p>
+<table><thead><tr><th>条</th><th>内容</th><th>当社への影響</th></tr></thead><tbody>
+<tr><td><strong>第11条1項</strong></td><td>申込時に選択した<strong>使用目的および使用方法以外で使用できない</strong></td><td>申込時に「自社の仕入先開拓の営業（電話・メール・FAX）」と明記する必要がある</td></tr>
+<tr><td><strong>第11条2項</strong></td><td><strong>子会社・関連会社を含む第三者に、有償無償を問わず提供・使用させることはできない</strong></td><td><strong>PUBLIC リポへの commit は正面から違反</strong>。§3-2 の置き場設計が必須の前提になる</td></tr>
+<tr><td><strong>第18条（違約金）</strong></td><td>第11条違反等の場合、<strong>使用料金の3倍</strong>を支払う義務。<strong>当社が「疎明」することで請求できる</strong></td><td>11万円なら約33万円。立証（証明）ではなく疎明で足りる＝請求のハードルが低い</td></tr>
+<tr><td><strong>第15条3項</strong></td><td>掲載事業者からの要望等で削除通知が来たら、<strong>自社が管理するDBおよび加工物から速やかに削除する義務</strong></td><td>削除に追従できる設計（<code>source</code> 列・削除フラグ）が要る。<strong>公開してしまうと追従不能</strong></td></tr>
+<tr><td><strong>第12条</strong></td><td>作業を受託業者に委託する場合は<strong>事前に通知</strong>。作業終了後は加工物を返納・消去させる</td><td>将来テレアポや入力を外注するなら通知が要る</td></tr>
+<tr><td><strong>第20条</strong></td><td>当社の承諾を得た上で、<strong>事務所等への立入検査</strong></td><td>個人宅兼事務所での受け入れ可否を先に考えること</td></tr>
+<tr><td><strong>第28条</strong></td><td>契約終了後は<strong>加工物を含めて消去</strong>しなければならない</td><td>リストに混ぜ込むと、終了時に自社データと切り分けられない。<strong>列に <code>src=tpdb</code> を必ず持たせて分離可能にする</strong></td></tr>
+<tr><td><strong>第26条</strong></td><td>本契約に係る情報・成果物は<strong>いかなる国へも輸出されない</strong></td><td><strong>Google スプレッドシート（米国サーバ）に置く運用と衝突するおそれ</strong>があります。「輸出」に越境保存が含まれるかは規約から一義に決まりません（<strong>未確認</strong>）。買うなら国内保存で運用するか、事前に NTT タウンページに照会（§4.1 第三者連絡）</td></tr>
+<tr><td>第9条</td><td>5万件超または定期更新は別途の契約書。締結しなければ提供されない</td><td>当社は1,006件なのでオンライン規約で足りる</td></tr>
+</tbody></table>
+<p><strong>個人情報</strong>：公式FAQ に「弁護士や税理士、農業、漁業などの業種に多い個人事業主は、<strong>個人名で iタウンページに掲載されることが多いため、データとしても個人名で出力されます</strong>」と明記。<strong>個人情報が混入する前提のDB</strong>です（§3-1 の全体適用でカバーされます）。</p>
+<p><strong>判定</strong>：購入そのものは適法で、社内限定の営業利用は規約の予定する使い方です。<strong>ただし法務は推奨しません。</strong> 理由は規約ではなく、費用と効果の不一致です。</p>
+<ul>
+<li style='margin-left:0.0em'>約12万円払って埋まるのは<strong>電話番号だけ</strong>。社長の必須4項目のうち HP・規模・品目は1つも埋まらない。</li>
+<li style='margin-left:0.0em'>一方、S-B 案B（人が299社をブラウザで見る）は <strong>15〜25時間・0円</strong>で、HP と品目も同時に埋まる。</li>
+<li style='margin-left:0.0em'>しかも違約金3倍・削除追従義務・契約終了時の消去義務・立入検査・輸出禁止が付いてくる。</li>
+</ul>
+<p><strong>推奨の材料</strong>：S-B 論点1は <strong>A（埋めずに707社で開始）→ 8.5週後に B（人が埋める）</strong> の順。C（購入）は、A・B を尽くしてなお母数が足りないときの最後の手段です。<strong>選択は社長の領分で、購入は §4.1（金銭＋契約）です。</strong></p>
+<hr>
+<h2>6. 取得できなかったもの／確度</h2>
+<table><thead><tr><th>対象</th><th>状況</th></tr></thead><tbody>
+<tr><td>iタウンページ 第26条「輸出」の解釈（越境保存を含むか）</td><td><strong>取得できず</strong>（規約本文に定義なし）。照会は §4.1</td></tr>
+<tr><td>iタウンページ「付加価値情報14項目」の内容・料金</td><td><strong>取得できず</strong>（「webでの提供は行っておりません」）</td></tr>
+<tr><td>gBizINFO 規約「別紙」の対象コンテンツ一覧</td><td>未取得（本体規約からリンク。判定に影響しないため打ち切り）</td></tr>
+<tr><td>gBizINFO の項目充足率・レート上限の具体値</td><td><strong>非公開</strong>。保守的に 1 req/秒</td></tr>
+<tr><td>各メーカー自社HPの個別規約</td><td>全1,006社は読めない。8/31 の <code>TOS_KEYWORD_SCAN</code>（「クローリング」「スクレイピング」「自動収集」「無断転載」等がヒットしたドメインを即ブラックリスト化し、当職が読むまで止める）を<strong>今回も必ず実装してください</strong></td></tr>
+</tbody></table>
+<p>確度の申告：<strong>事実（逐語取得）</strong>＝§2-1 の robots.txt・NAPAC 著作権ページ、§4-1 楽天7条1項(7)、§4-2 LINEヤフー14.・15.(5)・2.2、§5-1 gBizINFO 両規約、§5-2 iタウンページ規約と料金表。<strong>推測（確度：中）</strong>＝会員名簿の編集著作物性の否定（判例原文は未確認）、AUP・楽天一般条項の射程、Yahoo! の9条件（明文が無いことに依拠）。</p>
+<hr>
+<h2>7. 社長判断が必要な論点（秘書カズヨへ）</h2>
+<table><thead><tr><th>#</th><th>論点</th><th>A</th><th>B</th><th>C</th><th>法務の材料</th></tr></thead><tbody>
+<tr><td>1</td><td>gBizINFO 利用申請（§4.1 法的拘束・無償）</td><td>申請する</td><td>申請しない（規模列は「未取得」のまま進む）</td><td>—</td><td><strong>規約を全文精査した結果、当社に不利な条項はありません</strong>（金銭債務なし・いつでも離脱可・禁止事項6つのみ）。8/31 の「承認して差し支えない」を維持。これが規模列の唯一の無料の取得元です</td></tr>
+<tr><td>2</td><td>電話番号が取れない299社（S-B 論点1）</td><td>埋めずに707社で開始</td><td>人が15〜25時間かけて埋める</td><td>iタウンページ購入</td><td><strong>Cは約12万円で電話番号のみ。違約金3倍・消去義務・輸出禁止が付く。A→B の順を推します</strong></td></tr>
+<tr><td>3</td><td>モール出店の確認方法</td><td>自社HPのリンク判定だけ（0リスク）</td><td>＋Yahoo! を9条件でカズヨが見る</td><td>＋楽天・Yahoo! を社長が目視</td><td><strong>Amazon は当社の出品アカウントを賭けるので、どの案でも閲覧しない。A で開始し、必要になってから B/C</strong></td></tr>
+</tbody></table>
+<hr>
+<h2>8. 出典（すべて 2026-09-20 当職取得）</h2>
+<table><thead><tr><th>#</th><th>対象</th><th>URL</th><th>結果</th></tr></thead><tbody>
+<tr><td>1-9</td><td>業界団体9本の <code>robots.txt</code></td><td>各ホスト <code>/robots.txt</code></td><td>200×6（toys, jaspo, petfood, jpm, houseware, jaama）／<strong>404×3</strong>（napac, jppma, jaftma）</td></tr>
+<tr><td>10</td><td>NAPAC 著作権</td><td>https://www.napac.jp/cms/ja/copyright</td><td>200・<strong>不許諾宣言を逐語取得</strong></td></tr>
+<tr><td>11</td><td>日本玩具協会 個人情報保護宣言</td><td>https://www.toys.or.jp/privacy.html</td><td>200・サイト利用規約は存在せず</td></tr>
+<tr><td>12</td><td>日本ペット用品工業会 プライバシーポリシー</td><td>https://www.jppma.or.jp/pages/1_index_detail.html</td><td>200</td></tr>
+<tr><td>13</td><td>日本釣用品工業会 プライバシーポリシー</td><td>https://www.jaftma.or.jp/ppolicy/</td><td>200</td></tr>
+<tr><td>14</td><td>会員名簿9ページ（制限文言スキャン）</td><td>§2-1 の各URL</td><td>全9本 200・NAPAC 以外に禁止文言なし</td></tr>
+<tr><td>15</td><td>楽天ショッピングサービスご利用規約（第1条3項・第7条1項(7)(19)(20)）</td><td>https://www.rakuten.co.jp/doc/info/rule/ichiba_shopping.html</td><td>200・逐語</td></tr>
+<tr><td>16</td><td>LINEヤフー共通利用規約（2.1・2.2・14.・15.(5)）</td><td>https://www.lycorp.co.jp/ja/company/terms/</td><td>200・逐語</td></tr>
+<tr><td>17</td><td>gBizINFO 利用規約（本体・更新 2026-09-19）</td><td>https://help.info.gbiz.go.jp/api/v2/help_center/ja/articles/4795140981406.json</td><td><strong>200・全文取得（Zendesk API 経由）</strong></td></tr>
+<tr><td>18</td><td>gBizINFO API・データダウンロード利用規約（更新 2026-04-08）</td><td>https://help.info.gbiz.go.jp/api/v2/help_center/ja/articles/4999421139102.json</td><td><strong>200・全文取得</strong></td></tr>
+<tr><td>19</td><td>iタウンページDB 利用規約（オンラインお申込み・2025-10-01 実施）＋料金別表</td><td>https://www.ntttp-db.com/online-quote-terms/</td><td><strong>200・全文取得</strong></td></tr>
+<tr><td>20</td><td>iタウンページDB オンライン申込の注意事項（社内利用限定・データ項目一覧）</td><td>https://www.ntttp-db.com/online-quote-notice</td><td>200</td></tr>
+<tr><td>21</td><td>iタウンページDB よくあるご質問（個人名の混入・再販売・過去データ）</td><td>https://tpdb.jp/townpage/faq/</td><td>200</td></tr>
+<tr><td>22</td><td>Amazon.co.jp 利用規約（nodeId=643006）／robots.txt</td><td>8/31 当職取得を再掲</td><td>変更なしの前提（再取得はしていない）</td></tr>
+<tr><td>23</td><td>著作権法 2条1項1号・12条・12条の2・30条の4・47条の5／個人情報保護法 2条・17条・18条・20条・21条・27条／刑法233条・234条の2</td><td>e-Gov（法令ID 345AC0000000048 / 415AC0000000057 / 140AC0000000045）</td><td>8/31 取得分を援用</td></tr>
+</tbody></table>
+<hr>
+<h2>9. 依頼範囲外だが見つけたこと（3件）</h2>
+<ol>
+<li style='margin-left:0.0em'><strong><code>robots.txt</code> の 404 と 403 を区別する実装が必要</strong>（§2-3）。区別しないと394社が理由なく落ちます。<code>scripts/maker_list/config.py</code> の注記だけでは足りず、<code>fetcher.py</code> 側の分岐が要ります。</li>
+<li style='margin-left:0.0em'><strong>iタウンページの単価は二次情報（1件1円）の約10倍</strong>でした（§5-2）。S-B §9.1 の C 案と <code>02_リストの必須項目と絞り方.md</code> の記述は訂正が要ります。</li>
+<li style='margin-left:0.0em'><strong><code>MAKER_MIN_INTERVAL = 2.5</code> は 3.0 に戻してください</strong>（§3-1）。2.5 にした根拠が既判定にありません。既定値を静かに緩めるのは、この会社で繰り返し起きている型の事故です。</li>
+</ol>
+</body></html>
