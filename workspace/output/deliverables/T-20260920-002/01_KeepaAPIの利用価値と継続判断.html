@@ -1,0 +1,198 @@
+<!doctype html><html lang='ja'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>Keepa API の利用価値と継続判断（S-A）</title><style>body{font-family:-apple-system,'Hiragino Sans','Noto Sans JP',sans-serif;max-width:1150px;margin:2em auto;padding:0 1em;line-height:1.65;color:#222;font-size:14.5px}table{border-collapse:collapse;margin:.8em 0;font-size:.92em}th,td{border:1px solid #bbb;padding:.35em .6em;vertical-align:top}th{background:#eef2f8}tr:nth-child(even) td{background:#fafafa}h1{font-size:1.5em;border-bottom:2px solid #444}h2{font-size:1.25em;border-left:5px solid #25b;padding-left:8px;margin-top:1.8em}h3{font-size:1.05em;margin-top:1.4em}blockquote{border-left:4px solid #ccc;margin:.8em 0;padding:.2em 1em;color:#444}code{background:#f3f3f3;padding:1px 4px;border-radius:3px}hr{border:0;border-top:1px solid #ccc;margin:1.6em 0}</style></head><body>
+<h1>Keepa API の利用価値と継続判断（S-A）</h1>
+<p>T-20260920-002 / サトル（リサーチャー） / 2026-09-20</p>
+<p>親: T-20260915-002 → T-20260920-002。判断期限: <strong>2026-10-03</strong>（10-04 に €49 自動更新）</p>
+<hr>
+<h2>1. 結論</h2>
+<ol>
+<li style='margin-left:0.0em'><strong>止めてよい。</strong> 型A（メーカー大量連絡→独占）を実際に回している実践者は、調べた範囲で<strong>1人も Keepa API を使っていません</strong>。使っているのは全員 <strong>ウェブ版 Pro（€29）の Product Finder / Seller Lookup / Best Sellers</strong> です。API を払っているのは「ツールを作って売る人・SaaS・研究者」でした。</li>
+<li style='margin-left:0.0em'>当社の API 用途8系統のうち、<strong>型Aで今後も繰り返し要るのは「見積り後の実売確認」と「取引開始後の価格監視」の2つだけ</strong>で、どちらも Amazon の画面（過去1か月に N 点購入）と Pro で代替できます。連絡先メーカーの母数は 2,425社＝<strong>週70通で35週分</strong>あり、更新は8ヶ月後まで不要です（出典: T-20260914-006/01）。</li>
+<li style='margin-left:0.0em'>推奨は <strong>③ いったん解約 → 必要な月だけ再契約</strong>。10/2 までに T-3・S-3 の抽出を終えること、再契約は新規契約（Keepa は理由なしに断れる・§3(3)）という2点が条件です。<strong>年10.4万円の固定費を落とせます</strong>（黒字確率への効きは §7）。</li>
+</ol>
+<blockquote>事実と推測の境目: 「実践者が API を使っていない」は<strong>出典付きの事実</strong>（§3・§4）。「当社が止めても詰まらない」は工程を並べた上での<strong>判定＝推測（確度 中〜高）</strong>で、§6 に根拠を置きました。</blockquote>
+<hr>
+<h2>2. イシューと調査スコープ</h2>
+<p><strong>イシュー: Keepa API（€49/月）は、型Aを主戦略にした当社の工程のどこかで「無いと詰まる」か。</strong></p>
+<table><thead><tr><th>項目</th><th>内容</th></tr></thead><tbody>
+<tr><td>調査した対象</td><td>Keepa <strong>API</strong> を実務で回している人・事業者（日本・海外）／API をバックエンドに使う商用ツール／GitHub 実装／Keepa 公式 api-docs</td></tr>
+<tr><td>打ち切り条件</td><td>実例20件、または「これ以上は API か Pro かの区別が付かない二次記事しか出ない」ライン。<strong>実際は21件で打ち切り</strong>（§3）</td></tr>
+<tr><td>調べなかったこと</td><td>Keepa の有料フォーラム・Discord・有料 note の本文（課金が必要＝§4.1）／paywall 記事（付録B に「取得できず」で記載）</td></tr>
+<tr><td>API は叩いていない</td><td>今回トークン消費ゼロ。解約・契約操作もしていない</td></tr>
+</tbody></table>
+<p><strong>この調査のロードマップ上の位置</strong>: 10/03 の解約期限に対する社長判断の材料。次につながるのは「固定費を落として12ヶ月黒字の条件を満たす」判断と、「型Aのリサーチ手段を Pro 系に一本化するか」の戦略判断（＝タケシの領分）。</p>
+<hr>
+<h2>3. Keepa API を実務で回している実例（21件）</h2>
+<p>「誰が / 事業 / 使うエンドポイント / 何の判断 / 頻度・規模 / 成果の記載」。<strong>空欄は「記載なし」、未調査は明記</strong>。出典URLは付録A（全件 2026-09-20 取得）。</p>
+<h3>3-1. API を<strong>自分で叩いている</strong>人・組織（＝API 課金者）</h3>
+<table><thead><tr><th>#</th><th>誰が</th><th>事業</th><th>エンドポイント</th><th>何の判断のために</th><th>頻度・規模</th><th>月利/成果の記載</th></tr></thead><tbody>
+<tr><td>1</td><td>ツールドブッパン（Ryoku）</td><td>欧米輸入＋自作ツールの配布</td><td>product / seller / Finder</td><td>「SELLER LISTER」= 複数ASINからセラーIDを集めてセラー一覧を自動生成 → ライバルの出品ASINを丸ごと吸う</td><td>ツール配布（2026-02 で配布終了）</td><td>記載なし</td></tr>
+<tr><td>2</td><td>amznlog（zent）</td><td>輸入ビジネス＋エンジニア。ツール monoPeak / AsinKeeper を開発</td><td>product（history・stats）</td><td>MWS では取れないランキング変動数を取る。AsinKeeper は47項目を抽出</td><td>1商品1トークン。€15/5トークン分プランで月21.6万トークン</td><td>記載なし。<strong>「個人で扱うことを目的としたAPIではないかも」と明記</strong></td></tr>
+<tr><td>3</td><td>TechTech Note</td><td>中国輸入＋無在庫（副業・試作段階）</td><td>product のみ</td><td>手元のASINリストを6条件（1,600円以上・評価3.5以上・複数セラー・2kg未満・30日販売数・利益率20%以上）でふるいにかける</td><td>1回80ASIN（API上限100）</td><td>記載なし。「面倒な手作業の自動化には値する」</td></tr>
+<tr><td>4</td><td>ZIDOOKA!（関西のフリーランスエンジニア）</td><td>業務自動化の受託</td><td>product（history・stats）</td><td>GAS から価格履歴・ランキングを取る解説（自社運用の記録ではなく実装解説）</td><td>記載なし</td><td>記載なし</td></tr>
+<tr><td>5</td><td>Jürgensmeier &amp; Skiera（Goethe大 ほか）</td><td>学術研究（Amazon の自己優遇の計測）</td><td>product（offers/オファー数）</td><td>11マーケットプレイスのオファー構成を測り、Amazon 本体が買い物かごを持つ比率を推定</td><td>2024-01-19 に11市場を一括取得。N=数十万件規模</td><td>Journal of Marketing 2025 ほか査読論文。R パッケージ <code>keepar</code> を公開</td></tr>
+<tr><td>6</td><td>United-Compute</td><td>GPU の市場価格ウォッチ（物販ではない）</td><td>product</td><td>GPU の日次価格を追い、TFLOPS/$ を公開</td><td>GitHub Actions で毎日・28 stars</td><td>記載なし</td></tr>
+<tr><td>7</td><td>BWB03</td><td>MCP サーバ「keepa-adapter」の開発</td><td>33ツール＝公式エンドポイント全網羅</td><td>Claude Desktop から Keepa を引く。ローカルにスナップショット保存・差分検知・BSR分析・販促効果測定</td><td>2026-09-14 更新・15 stars</td><td>記載なし</td></tr>
+<tr><td>8</td><td>akaszynski ほか</td><td>Python クライアント <code>keepa</code>（非公式・公式が推奨）</td><td>product / Finder / deals / seller / bestsellers</td><td>上記すべての土台</td><td>315 stars・PyPI 公開</td><td>記載なし</td></tr>
+<tr><td>9</td><td>Keepa GmbH 公式</td><td>Java / PHP フレームワーク配布</td><td>全エンドポイント</td><td>開発者の統合用</td><td>—</td><td>—</td></tr>
+<tr><td>10</td><td>ntwholesales</td><td>GitHub「FBA Brand Sourcing Scanner」</td><td>Finder → product</td><td><strong>仕入れ先のブランドリストを投げて、そのブランドのAmazon商品を日次でスコアリング</strong></td><td>日次 cron・CSV 出力・0 stars</td><td><strong>成果の記載なし。README に「私（Claude）はライブAPIを叩けない」と書かれた AI 生成コードで、稼いだ実績の証拠ではない</strong></td></tr>
+<tr><td>11</td><td>GitHub 全体</td><td>—</td><td><code>api.keepa.com</code> を含むコードは <strong>560件</strong>（リポジトリ検索は KeePass のノイズ多数）</td><td>—</td><td>2026-09-20 実測</td><td>—</td></tr>
+</tbody></table>
+<h3>3-2. API を<strong>製品に組み込んで売っている</strong>事業者（＝API 課金者。当社の代替候補）</h3>
+<table><thead><tr><th>#</th><th>事業者</th><th>何を売っているか</th><th>Keepa の使い方</th><th>価格</th><th>備考</th></tr></thead><tbody>
+<tr><td>12</td><td>Seller Assistant</td><td>Amazon 卸／OA 向け SaaS。Price List Analyzer（<strong>卸の価格表を丸ごと流して利益商品を抽出</strong>）・拡張機能</td><td><strong>Keepa API + Amazon SP-API を自社で統合</strong>し、自社APIとして Keepa の product / Finder も再提供</td><td>年払 $13.33/月〜、月払 Pro $29.99〜。14日無料</td><td>当社の「卸価格表 × Amazon 実売」の照合をそのまま代替する製品</td></tr>
+<tr><td>13</td><td>Databar.ai</td><td>ノーコードのデータ連携</td><td>Keepa API コネクタ</td><td>未調査</td><td>行単位課金型</td></tr>
+<tr><td>14</td><td>Keepa API Connector（Google Workspace アドオン）</td><td>スプレッドシート用アドオン</td><td>セラーID/カテゴリID から ASIN 一括取得、カート価格・30日平均・<strong>30日販売数</strong>を取得</td><td>未調査（別途 API キーが要ると推測）</td><td>当社の GAS 自作を置き換える位置</td></tr>
+<tr><td>15</td><td>Helium 10 / AMZScout / 主要 OA アプリ</td><td>リサーチツール</td><td>Keepa グラフを内部に埋め込み（<strong>二次情報</strong>・確度中）</td><td>各社</td><td>Keepa が業界のデータ基盤である傍証</td></tr>
+</tbody></table>
+<h3>3-3. <strong>API を使っていない</strong>高実績の実践者（ウェブ版 Pro で同じ仕事をしている）</h3>
+<table><thead><tr><th>#</th><th>誰が</th><th>実績の記載</th><th>使っている機能</th><th>何の判断のために</th><th>API 言及</th></tr></thead><tbody>
+<tr><td>16</td><td><strong>EC STARs Lab.／中西恒太</strong>（当社が型Aの原典にしている人）</td><td>スクール運営・メーカー仕入れの指導</td><td><strong>Keepa 有料版（Pro）必須と明記</strong>（「必ず有料版にして使ってください」€19≒3,400円/月）</td><td>ランク5万位以内・Amazon本体なし・出品者数などで商品を絞り、そこからメーカーを辿る</td><td><strong>一切なし</strong></td></tr>
+<tr><td>17</td><td>ECセラーラボ（メーカー仕入れのリサーチ手順）</td><td>—</td><td><strong>Keepa Chrome 拡張 ＋ Amazon 管理画面 ＋ スプレッドシート</strong></td><td>カテゴリリサーチ／<strong>セラーリサーチ（メーカー仕入れをしている他セラーの出品商品からメーカーを逆引き）</strong>。ランク5万位以内・カート取得率80%未満</td><td>なし</td></tr>
+<tr><td>18</td><td>Simon Knight（FBA Mogul）</td><td><strong>自称 7 Figure Amazon Seller</strong>（UK/ドバイ）</td><td><strong>Pro ウェブの Product Finder</strong>（「Product Finder は有料サブスクが必要」と明記）</td><td><strong>仕入れ先のブランドリストを貼って、その全商品をAmazon上で一発で洗い出す</strong>。Amazon OOS%・New Offer Count・Buy Box % Amazon で絞る。Brand と Manufacturer は別項目</td><td>なし</td></tr>
+<tr><td>19</td><td>BT Slinger（BowTied Slinger）</td><td>ニュースレター運営（規模の記載なし）</td><td><strong>Pro ウェブの Product Finder</strong>（明記）</td><td>逆引き仕入れ。ランク・在庫状況・出品者数・"discontinued"等のテキスト検索で絞り、<strong>卸のブランドを Finder に入れて勝ち筋商品を特定 → 営業担当にメールで特別発注を依頼</strong></td><td>なし</td></tr>
+<tr><td>20</td><td>Gのすけ</td><td><strong>EC物販 年商1億円突破</strong>（国内／輸入）</td><td><strong>Keepa 内のツール「Product Best Sellers」</strong>（Pro）</td><td>Amazon 画面が100位までしか見えない制約を超えてランキングを見る／急上昇商品の検知</td><td>なし</td></tr>
+<tr><td>21</td><td>tremas-lab（Sara）</td><td>二次情報サイト（実績の記載なし）</td><td>—</td><td><strong>API を払うべき人／払わなくていい人</strong>の切り分けを明示（§4 で引用）</td><td>あり</td></tr>
+</tbody></table>
+<p><strong>この表から読める事実（N=21）</strong></p>
+<ul>
+<li style='margin-left:0.0em'>API 課金者 15件の内訳は、<strong>ツール開発・配布 9件／SaaS・アドオン 4件／学術 1件／物販以外の価格ウォッチ 1件</strong>。<strong>「自分の仕入れ判断のためだけに API を払っている実践者」は0件</strong>。</li>
+<li style='margin-left:0.0em'>逆に、<strong>月商・年商の数字を出している実践者（#18 7桁ドル・#20 年商1億）は全員ウェブ版 Pro</strong>。</li>
+<li style='margin-left:0.0em'><strong>当社の型A（卸/メーカーのブランド名 → Amazon上の商品を洗い出す → 営業担当に連絡）そのものの手順が、#18・#19 で Pro ウェブの Product Finder として書かれている。</strong> API 版ではない。</li>
+</ul>
+<hr>
+<h2>4. 用途の分類 — 実践者は本当に何に使っているか</h2>
+<table><thead><tr><th>用途</th><th>API で実際にやっている人（§3 の#）</th><th>主な担い手</th><th>社長の関心への答え</th></tr></thead><tbody>
+<tr><td><strong>(a) 仕入れ判断（利益商品を探す）</strong></td><td>#3（80ASIN/回のふるい分け）・#10（ブランド日次スコア・実績なし）・#12（卸価格表の一括判定・SaaS側）</td><td><strong>ほぼ SaaS 側</strong>。個人は試作レベル</td><td><strong>社長の見立ては実践者の実態と一致します。</strong> 「API で利益商品を探す」を自力でやっている実践者は #3 の副業試作しか見つかりませんでした。実績者は Pro ウェブか SaaS を買っています</td></tr>
+<tr><td><strong>(b) 価格・在庫の監視</strong></td><td>#6（GPU 日次）・#7（差分検知つき MCP）・#12（SaaS）／公式 tracking API は webhook 通知あり</td><td>ツール側</td><td>SKU が数十〜数百になってから効く用途。当社は現在 SKU ほぼ0</td></tr>
+<tr><td><strong>(c) 競合／セラー調査</strong></td><td>#1（SELLER LISTER＝セラーID収集）・#14（セラーIDからASIN一括）</td><td>自作ツール勢</td><td>Pro の Seller Lookup が同じことを画面でやる（CSV/Excel 出力可・「500商品でも1,000商品でも」）</td></tr>
+<tr><td><strong>(d) メーカー／ブランドの発掘</strong></td><td><strong>API でこれをやっている実例は0件。</strong> Pro ウェブでは #16〜#19 が全員やっている（#18「仕入れ先のブランドリストを貼って全商品を洗い出す」、#17「他セラーの出品商品からメーカーを逆引き」）</td><td><strong>Pro ウェブ</strong></td><td><strong>当社が API で 2,425社の母数を出したのは、実践者の型より一歩進んだ使い方</strong>（brandStoreName 空欄での炙り出しは実例が見つからず＝当社独自）。ただし型Aの実践者はこれを Pro の画面でやって年商を作っている</td></tr>
+<tr><td><strong>(e) 需要の裏取り（月100個以上売れているか）</strong></td><td>#14（30日販売数をシートへ）</td><td>Pro ウェブでも可</td><td><strong>Keepa の monthly sold フィルタは Product Finder に実装済み</strong>（Pro）。元データは Amazon 公表値で、<strong>50個/月以上の商品にしか表示されない</strong>（＝社長の「月100個以上」基準はそのまま使える）</td></tr>
+<tr><td><strong>(f) その他</strong></td><td>#5 学術研究・#9 公式クライアント配布・#8 OSS 土台</td><td>—</td><td>当社に関係なし</td></tr>
+</tbody></table>
+<p><strong>tremas-lab（#21）が挙げる「API を払うべき人」</strong>: 数千〜数万ASINを定期処理する／自動通知・分析システムを作る／カテゴリ全体を分析する／開発とDB運用を自分で続けられる。</p>
+<p><strong>「払わなくていい人」</strong>: 週末に副業でせどりをする個人／判断の速さを少し上げたいだけの人／プログラムの保守とエラー対応をやりたくない人／価格アラートが欲しいだけの人（Keepa 標準機能で足りる）。</p>
+<hr>
+<h2>5. 代替手段との比較</h2>
+<p>まず、当社が持っていない <strong>Keepa Pro（€29）に何が付くか</strong>を確定させます。当社は API €49 の1本だけで、<strong>Pro の画面は1度も使っていません</strong>（参照: <code>reference_keepa_billing_api_only.md</code>）。</p>
+<table><thead><tr><th>機能</th><th>無料</th><th><strong>Pro €29</strong></th><th>API €49（当社の現契約）</th></tr></thead><tbody>
+<tr><td>ランク／出品者数／評価の履歴グラフ</td><td>×</td><td>○</td><td>○（JSON）</td></tr>
+<tr><td><strong>Product Finder（条件で全DB検索）</strong></td><td>×</td><td><strong>○（画面。1検索でクオータ5%消費・1%/時 回復＝1日20〜24検索）</strong></td><td>○（1クエリ約10トークン）</td></tr>
+<tr><td><strong>Finder 結果の CSV/Excel 出力</strong></td><td>×</td><td><strong>○（全列 or ASINのみ。表示は1画面最大5,000件）</strong></td><td>○（JSON）</td></tr>
+<tr><td><strong>Product Viewer（ASIN/UPC を一括投入）</strong></td><td>×</td><td><strong>○（1回 最大10,000件、クオータ100%で1日 最大36,000件の入出力）</strong></td><td>○（1件1トークン）</td></tr>
+<tr><td>Seller Lookup（セラーの出品ASIN全件）</td><td>×</td><td>○（CSV/Excel 出力可）</td><td>○（/seller 1トークン）</td></tr>
+<tr><td>Best Sellers（100位より深いランキング）</td><td>×</td><td>○</td><td>○</td></tr>
+<tr><td><strong>API アクセス</strong></td><td>×</td><td><strong>○ ただし 1トークン/分</strong>（＝月約4.3万トークン）</td><td>20トークン/分（＝月約86万）</td></tr>
+<tr><td>価格の履歴グラフ</td><td>○</td><td>○</td><td>○</td></tr>
+</tbody></table>
+<blockquote>出典: Keepa 公式スクリプト（購入画面の文言）＝当社 T-20260912-002/09、revenuegeeks（2026）、ひこーるラボ・ECセラーラボ（画面の実写解説）。<strong>Pro の「1トークン/分」で全エンドポイントが使えるか（Finder を含むか）は未確認。</strong></blockquote>
+<h3>用途ごとの代替可否</h3>
+<table><thead><tr><th>用途</th><th>解約したら何で代替するか</th><th>代替できるか</th></tr></thead><tbody>
+<tr><td>(a) 仕入れ判断</td><td>Pro の Product Finder（画面＋CSV）／Seller Assistant 等 SaaS（$13〜30/月）／Amazon 画面</td><td><strong>できる</strong>（実践者は全員これ）</td></tr>
+<tr><td>(b) 価格・在庫の監視</td><td>Pro のトラッキング＋メール通知／Amazon の画面／SKU が増えたら SaaS</td><td><strong>できる</strong>（当社の SKU 数では画面で足りる）</td></tr>
+<tr><td>(c) 競合・セラー調査</td><td>Pro の Seller Lookup（CSV 出力可）</td><td><strong>できる</strong></td></tr>
+<tr><td>(d) メーカー発掘（母数づくり）</td><td>Pro の Product Finder ＋ Product Viewer（1日1万ASIN投入・3.6万件出力）</td><td><strong>ほぼできる。ただし未確認点1つ</strong> — ブランドストア名（<code>brandStoreName</code>）が Product Viewer の出力列にあるかを確認していない。無ければ「自社出品していないメーカー」の判定だけ手作業（ブランド名で Amazon 検索）になる</td></tr>
+<tr><td>(e) 需要の裏取り</td><td><strong>Amazon の商品ページ「過去1か月に N点以上購入」（無料・一次情報）</strong>／Pro の monthly sold フィルタ</td><td><strong>できる</strong>（元データが同じ Amazon 公表値）</td></tr>
+<tr><td>(f) 大量の履歴を自動で回す</td><td><strong>代替なし</strong></td><td><strong>できない。</strong> 1回1万〜2万トークンの夜間スキャン（T-1 型）は、Pro の 1トークン/分では 7時間 → <strong>約1週間</strong>に伸びる</td></tr>
+<tr><td>出品当日のカート価格で利益再計算</td><td>Amazon の商品ページを見る（1商品10秒）</td><td>できる（SKU 数個なら手作業で十分）</td></tr>
+<tr><td>SP-API</td><td>当社は規約同意前。Seller Assistant 等は SP-API と Keepa を併用している</td><td>未着手（別論点）</td></tr>
+</tbody></table>
+<p><strong>代替できないのは「速度」だけです。</strong> 取れるデータの種類ではなく、単位時間あたりの件数が 1/20 になります。</p>
+<hr>
+<h2>6. 当社での利用価値 — 型Aの工程を並べて判定</h2>
+<p>型A＝ネット販売に疎い国内中小メーカーへ大量に連絡し、独占／正規取引を取る。工程ごとに「API が無いと詰まるか」を判定します。</p>
+<table><thead><tr><th>#</th><th>工程</th><th>API の要否</th><th>根拠・代替</th><th>判定</th></tr></thead><tbody>
+<tr><td>1</td><td><strong>連絡先メーカーの母数づくり</strong></td><td><strong>もう要らない</strong></td><td>既に 2,425社（80%区間 1,896〜2,984）を抽出済み。<strong>週70通なら35週＝約8ヶ月分</strong>（T-20260914-006/01）。母数を使い切るまで再抽出は発生しない</td><td><strong>詰まらない</strong></td></tr>
+<tr><td>2</td><td>母数の「質」を上げる（電話番号・企業規模・HP・EC有無）</td><td><strong>要らない</strong></td><td>Keepa には電話番号・HP・EC有無のデータが無い。取得元は各社サイト・gBizINFO 等（S-B の担当範囲）</td><td><strong>詰まらない</strong>（API と無関係）</td></tr>
+<tr><td>3</td><td>送信（メール／FAX／電話）</td><td>要らない</td><td>—</td><td>詰まらない</td></tr>
+<tr><td>4</td><td><strong>見積りが来た後の「本当に売れているか」確認</strong></td><td><strong>要らない（画面で足りる）</strong></td><td>Amazon の商品ページの「過去1か月に N点以上購入」が一次情報で無料。50個/月未満は非表示＝社長の月100個基準はこれで判定できる。ランク履歴が見たいときは Pro</td><td><strong>詰まらない。ただし1件ずつ手で見る</strong></td></tr>
+<tr><td>5</td><td>出品当日のカート価格で利益を再計算</td><td>要らない</td><td>Amazon の画面（1商品10秒）。当社の SKU 数は現在ほぼ0〜10</td><td>詰まらない</td></tr>
+<tr><td>6</td><td><strong>取引開始後の価格崩れ・競合参入の監視</strong></td><td><strong>要らない（今は）</strong></td><td>扱う SKU が数個のうちは画面と Keepa の無料グラフで足りる。<strong>SKU が数十を超えたら Pro か SaaS（Seller Assistant 月$13〜30）へ</strong>。API を自分で回すのは実践者の型ではない</td><td><strong>詰まらない。SKU 増加時に再検討</strong></td></tr>
+<tr><td>7</td><td>打診先メーカーが Amazon に実在するか／自社出品しているかの検証</td><td>あると速い</td><td>現在 10トークン/社。代替は「ブランド名で Amazon 検索」（1社30秒）。952社なら約8時間の手作業</td><td><strong>詰まる手前</strong>。§7 の再契約トリガーに置く</td></tr>
+<tr><td>8</td><td>需要先行スキャン（T-1 型・Product Finder の大量抽出）</td><td><strong>API か Pro のどちらかが必要</strong></td><td>無料版では Product Finder が使えない。Pro の画面（1検索1万件・CSV出力）でも可能だが、当社が組んだ自動処理はそのままでは動かない</td><td><strong>補給月にだけ必要</strong></td></tr>
+</tbody></table>
+<p><strong>判定</strong>: 工程8つのうち <strong>API が無いと止まるのは #8 の1つだけ</strong>で、それは「毎月やる作業ではない」（前回実行は 2026-09、次は補給月）。#1 が今後8ヶ月不要である以上、<strong>10月以降の型Aの進行は API 無しで回ります（推測・確度 高）</strong>。</p>
+<p><strong>逆に、事実として押さえておくべき不利な点</strong></p>
+<ul>
+<li style='margin-left:0.0em'>当社が API で作った 2,425社の母数（brandStoreName 空欄での炙り出し）は、<strong>実践者の誰もやっていない独自の手</strong>です。これは「API のおかげで一歩先に出た」とも読めます（推測）。ただし母数はもう手元にあり、<strong>使い切るのに8ヶ月</strong>かかります。</li>
+<li style='margin-left:0.0em'>取得済みデータは解約後も自社業務で使い続けられます（API T&amp;C §11(2)・ハルオ判定 T-20260912-002/10）。<strong>捨てることにはなりません。</strong></li>
+</ul>
+<hr>
+<h2>7. 結論</h2>
+<h3>3択の比較</h3>
+<table><thead><tr><th>案</th><th>年コスト</th><th>得るもの</th><th>失うもの・リスク</th></tr></thead><tbody>
+<tr><td>① 継続（€49×12）</td><td><strong>約10.4万円</strong>（8,732円/月）</td><td>20トークン/分の速度。いつでも夜間スキャンが打てる</td><td>実践者が使っていない機能に月8,700円。使途は年1〜2回の抽出だけ</td></tr>
+<tr><td>② 解約して Pro €29 に移る</td><td>約6.2万円（5,168円/月）</td><td>Product Finder・Product Viewer・Seller Lookup・Best Sellers の<strong>画面</strong>＋1トークン/分の API。<strong>型A実践者（#16〜#20）と同じ道具立て</strong></td><td>速度 1/20。Pro の契約は §4.1（金銭）で社長承認が必要。brandStoreName が出力列にあるか未確認</td></tr>
+<tr><td><strong>③ いったん解約し、必要な月だけ再契約（推奨）</strong></td><td><strong>年1回なら 約0.9万円／年3回で 約2.6万円</strong></td><td>固定費をほぼ消す。補給月だけ 20トークン/分を取り戻す</td><td>再契約は<strong>新規契約</strong>。復活不可・その時点の定価・<strong>Keepa は理由を示さず申込を断れる（T&amp;C §3(3)）</strong>。年8回以上再契約すると Pro×12 より高くなる</td></tr>
+</tbody></table>
+<h3>推奨: ③（10/3 までに解約）</h3>
+<ol>
+<li style='margin-left:0.0em'>型Aの実践者は誰も API を使っておらず、当社の工程で API が無いと止まるのは「補給月の大量抽出」1つだけです（§6）。</li>
+<li style='margin-left:0.0em'>その1つは<strong>年1〜3回</strong>で、必要になった月だけ €49 を払えば取り戻せます（年0.9〜2.6万円）。</li>
+<li style='margin-left:0.0em'>条件は2つ。<strong>10/2 までに T-3・S-3 の抽出を終える</strong>こと、<strong>再契約を断られる可能性（低・回復不能）を撤退条件に織り込む</strong>こと（ハルオ判定どおり）。</li>
+</ol>
+<h3>年間コストが12ヶ月黒字条件にどう効くか</h3>
+<p><strong>€49/月＝約8,700円/月の固定費削減。マサルの感度（固定費 月1,000円 ≒ 黒字確率 3.5pt）を当てると、①継続と③解約の差は月約8,000円＝約28pt</strong>（線形近似の大幅な外挿なので、<strong>数字そのものより「固定費の中で最大級の1本」という位置づけ</strong>として読んでください。マサルの試算はもともと年1回＝728円/月を置き値にしており、③はその置き値どおり、①は置き値より約28pt 不利という関係です）。</p>
+<hr>
+<h2>8. 論点シート（ここから先は戦略判断＝タケシの領分）</h2>
+<p>事実は出し切りました。以下は<strong>戦略判断</strong>なので、サトルは踏み込みません。</p>
+<table><thead><tr><th>論点</th><th>材料</th></tr></thead><tbody>
+<tr><td><strong>Pro €29 を契約するか（②の後段）</strong></td><td>型A実践者（EC STARs Lab.・FBA Mogul・年商1億のGのすけ）は全員 Pro。Product Finder は「必ず有料版」と原典が明記。一方で当社は Pro を1度も使っておらず、画面操作の学習コストは未計測。<strong>金銭＝§4.1</strong></td></tr>
+<tr><td>Seller Assistant（$13〜30/月）を Pro の代わりに検討するか</td><td>卸の価格表を一括判定する Price List Analyzer は、型Aで見積りが来た後の判定にそのまま効く。14日無料トライアルあり（<strong>申込＝§4.1</strong>）</td></tr>
+<tr><td>補給月の再契約トリガーを何に置くか</td><td>候補: 母数の残りが週70通換算で8週を割ったとき／新カテゴリに広げるとき／SKU が30を超えたとき</td></tr>
+<tr><td>10/2 までの抽出を実行するか（T-3・S-3）</td><td>合計 約1.4万〜2.2万トークン・12〜18時間。9/20〜10/2 の12日で供給 約34.6万トークン（28,800/日）＝その6%以下</td></tr>
+</tbody></table>
+<hr>
+<h2>付録A. 出典（全件 2026-09-20 取得）</h2>
+<p><strong>Keepa 公式（一次）</strong></p>
+<ul>
+<li style='margin-left:0.0em'>API Documentation 索引（全13エンドポイント: product / search / query=Product Finder / deal / bestsellers / category / seller / sellerquery / topseller / lightningdeal / graphimage / tracking） https://keepa.com/api-docs/</li>
+<li style='margin-left:0.0em'>Plans &amp; Tokens（解約は期間末まで有効・期間終了後は復活不可） https://keepa.com/api-docs/plans-tokens.html</li>
+<li style='margin-left:0.0em'>API T&amp;C（Version of July 28, 2026。§3(3) 申込拒否・§11(2) 保存データの利用） https://keepa.com/cdn/termsAPI.txt</li>
+<li style='margin-left:0.0em'>公式 Java / PHP フレームワーク https://github.com/keepacom/api_backend ・ https://github.com/keepacom/php_api</li>
+</ul>
+<p><strong>API を実務で回している例</strong></p>
+<ul>
+<li style='margin-left:0.0em'>ツールドブッパン「[Keepa API⑥] セラーリスト自動生成ツール SELLER LISTER を公開」 https://tooledbuppan.com/keepa-api-6/ （<strong>本文取得できず</strong>＝サイトがニュースポータルへ転送。検索結果のスニペットと ①〜⑥ の記事タイトルのみ）</li>
+<li style='margin-left:0.0em'>amznlog「MWS APIキーの取得が困難になってきたのでkeepa APIも視野に入れてみる→実際に作ってみた」 https://amznlog.com/keepa-api</li>
+<li style='margin-left:0.0em'>TechTech Note「Amazon中国輸入 | KeepaAPIを使用して商品リサーチの一部をシステム化してみた」 https://techtech-note.com/1264/</li>
+<li style='margin-left:0.0em'>ZIDOOKA!「Keepa APIによるAmazon商品価格情報の取得と活用」 https://www.zidooka.com/archives/197</li>
+<li style='margin-left:0.0em'>Jürgensmeier &amp; Skiera「Measuring Self-Preferencing on Digital Platforms」Journal of Marketing 2025 https://journals.sagepub.com/doi/full/10.1177/00222429251360772 ／「Opportunities for self-preferencing in international online marketplaces」IMR 41(5) https://www.emerald.com/imr/article/41/5/1118/1224020/Opportunities-for-self-preferencing-in ／R パッケージ https://github.com/lukas-jue/keepar</li>
+<li style='margin-left:0.0em'>United-Compute/gpu-price-tracker https://github.com/United-Compute/gpu-price-tracker</li>
+<li style='margin-left:0.0em'>BWB03/keepa-adapter（MCP サーバ・33ツール） https://github.com/BWB03/keepa-adapter</li>
+<li style='margin-left:0.0em'>akaszynski/keepa（Python クライアント・315 stars） https://github.com/akaszynski/keepa ／ドキュメント https://keepaapi.readthedocs.io/en/latest/</li>
+<li style='margin-left:0.0em'>ntwholesales/fbaautomation（ブランドリスト日次スキャン・<strong>AI生成コード</strong>） https://github.com/ntwholesales/fbaautomation</li>
+<li style='margin-left:0.0em'>GitHub コード検索 <code>api.keepa.com</code> = 560件（<code>gh api search/code</code>・2026-09-20 実測）</li>
+</ul>
+<p><strong>API を製品に組み込んでいる事業者</strong></p>
+<ul>
+<li style='margin-left:0.0em'>Seller Assistant「Seller Assistant API」（Keepa API と SP-API を統合） https://www.sellerassistant.app/blog/seller-assistant-api/ ／Keepa エンドポイント https://developer.sellerassistant.app/keepa/get-product ・ https://developer.sellerassistant.app/api-21568126 ／料金 https://revenuegeeks.com/software/seller-assistant-app</li>
+<li style='margin-left:0.0em'>Databar.ai https://databar.ai/explore/keepa-api</li>
+<li style='margin-left:0.0em'>Keepa API Connector（Google Workspace Marketplace） https://workspace.google.com/marketplace/app/keepa_api_connector/366094842816</li>
+</ul>
+<p><strong>API を使っていない実践者（Pro ウェブ）</strong></p>
+<ul>
+<li style='margin-left:0.0em'>EC STARs Lab.（中西恒太）「【有料級】Keepaの使い方徹底解説」 https://ecstarslab.com/blog/keepa-keezon/</li>
+<li style='margin-left:0.0em'>ECセラーラボ「メーカー仕入れにおける利益商品のリサーチ方法」 https://ec-seller-labo.co.jp/article/maker-purchase-research/ ／「Product Finderの使い方完全マニュアル」 https://ec-seller-labo.co.jp/article/keepa-product-finder/</li>
+<li style='margin-left:0.0em'>FBA Mogul（Simon Knight・7 Figure Seller）「Keepa Product Finder: Every Filter Explained (2026)」 https://fbamogul.com/keepa-product-finder-getting-started-guide/</li>
+<li style='margin-left:0.0em'>BowTied Slinger「Reverse Sourcing With Keepa Product Finder」 https://www.bowtiedslinger.com/p/reverse-sourcing-with-keepa-product</li>
+<li style='margin-left:0.0em'>Gのすけ（EC物販 年商1億突破）「Keepa内ツールの活用」 https://note.com/g_nosuke/n/n7bf7a9371b38</li>
+<li style='margin-left:0.0em'>ひこーるラボ「Keepa Product Finder の使い方」 https://hikomhikom.com/keepa-premium-data-access/ ／「Keepa Seller Lookup とは？」 https://hikomhikom.com/keepa-seller-lookup/</li>
+<li style='margin-left:0.0em'>tremas-lab「Keepa APIは必要？迷ったら読む判断ガイド」 https://www.tremas-lab.com/keepa-api-handan/</li>
+<li style='margin-left:0.0em'>revenuegeeks「Keepa Pricing 2026: Free vs €29 Pro」 https://revenuegeeks.com/software/keepa/pricing ／「Keepa API: Pricing, Tokens &amp; Real Costs」 https://revenuegeeks.com/software/keepa/api</li>
+</ul>
+<p><strong>社内（前提として参照）</strong></p>
+<ul>
+<li style='margin-left:0.0em'>T-20260912-002/08 Keepa 依存の棚卸し・09 Keepa 再契約の可否・10 Keepa 解約後のデータ利用</li>
+<li style='margin-left:0.0em'>T-20260914-006/01 型A の送信先の母数（2,425社）</li>
+<li style='margin-left:0.0em'>memory: <code>reference_keepa_billing_api_only.md</code>・<code>knowledge_maker_extraction_keepa.md</code>・<code>knowledge_keepa_dropcount_is_polling.md</code>・<code>reference_keepa_api_capabilities.md</code></li>
+</ul>
+<h2>付録B. 取得できなかったページ・調査の限界</h2>
+<table><thead><tr><th>対象</th><th>状況</th></tr></thead><tbody>
+<tr><td>tooledbuppan.com（Keepa API ①〜⑥ 全記事）</td><td><strong>取得できず。</strong> 独自ドメインが海外ニュースポータルへ転送される状態で、curl・WebFetch・r.jina.ai いずれも本文を返さない。Wayback も 429。<strong>検索スニペットのみを根拠にしており、確度は中</strong></td></tr>
+<tr><td>Basil Latif（Medium・10,000ASIN を Keepa API で引いた記事×2本）</td><td><strong>取得できず</strong>（Cloudflare 403）。検索スニペットから「1万ASIN超のオファー履歴取得に10時間以上」「オファー履歴はトークンを多く食う」を採ったが<strong>確度 中</strong></td></tr>
+<tr><td>The Olson Report「What Keepa's New Monthly Sold Filters Are Really For」</td><td><strong>取得できず</strong>（$9/月の paywall。§4.1 で課金せず）</td></tr>
+<tr><td>Reddit r/FulfillmentByAmazon の生の声</td><td>検索で該当スレッドに到達できず。<strong>未調査</strong></td></tr>
+<tr><td>Keepa Pro の画面そのもの</td><td><strong>未契約のため未検証。</strong> Pro の機能・クオータ・出力列は公式スクリプトの文言と第三者の画面解説に依存（brandStoreName の出力可否は未確認）</td></tr>
+<tr><td>型A実践者の API 利用の「不在証明」</td><td>「言及が無い」ことの確認であり、<strong>非公開で使っている可能性は否定できない</strong>（推測・不在証明の限界）</td></tr>
+</tbody></table>
+</body></html>
