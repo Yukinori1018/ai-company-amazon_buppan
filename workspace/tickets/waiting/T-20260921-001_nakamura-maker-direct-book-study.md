@@ -1,8 +1,8 @@
 ---
 ticket_id: T-20260921-001
 title: 書籍『Amazon国内メーカー直取引完全ガイド（増補改訂版）』の読み込みとナレッジ化
-status: doing
-assignee: secretary
+status: waiting
+assignee: owner
 requires_approval: false
 created_at: 2026-09-21
 updated_at: 2026-09-21
@@ -51,7 +51,15 @@ related_tickets:
 3. サトル（researcher）が構造化 → ヒデアキ（content_creator）が読み物に整形
 4. `deliverables/T-20260921-001/` へ納品＋ memory へ knowledge_* を1本追加
 
+## 成果物
+
+- [01_中村裕紀_国内メーカー直取引_読解ノート.md](../../output/deliverables/T-20260921-001/01_中村裕紀_国内メーカー直取引_読解ノート.md) — 全10章の読解ノート（当社の言葉による要約。本文の引用なし）
+- [02_当社への適用と差分.md](../../output/deliverables/T-20260921-001/02_当社への適用と差分.md) — 当社への適用・既定との衝突点・社長判断が要る論点
+
 ## ログ
 
-- 2026-09-21 起票。書誌情報を Amazon 商品ページで確認。Kindle Cloud Reader が未ログインのため社長依頼を waiting 相当で提示。
+- 2026-09-21 起票。書誌情報を Amazon 商品ページで確認。Kindle Cloud Reader が未ログインのため社長依頼。
+- 2026-09-21 社長の Chrome にログイン済みと判明。Claude in Chrome 経由で Kindle Cloud Reader を開き、**全336ページ（位置347/347）を通読完了**。固定レイアウトのため1見開きずつ画面で読み取り。
+- 2026-09-21 読解ノートと適用メモを deliverables へ納品。memory に knowledge を1本追加。
+- 2026-09-21 doing → waiting（社長判断3件：資金1,000万の壁のロードマップ反映／接触基準の二段構え整理／交渉道具の整備着手）。
 - 2026-09-21 マリエ：Notion カンバンへ新規カードを作成（doing 列 / page 3e1b0a40-44fa-81fe-ac5b-d2d7120f0fa3）。workspace/owner-tasks.md を更新59で最新化し、🔴 に「Kindle Cloud Reader へのログイン（期限の目安 9/22）」を1件追加。
