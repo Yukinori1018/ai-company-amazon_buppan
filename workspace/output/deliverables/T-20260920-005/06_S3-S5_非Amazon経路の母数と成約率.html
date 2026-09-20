@@ -1,0 +1,239 @@
+<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>S-3・S-4・S-5 — 非Amazon経路の母数と成約率</title><style>body{font-family:-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif;line-height:1.8;max-width:1080px;margin:0 auto;padding:2.5rem 1.5rem;color:#1a1a1a}
+h1{font-size:1.7rem;border-bottom:3px solid #1a5490;padding-bottom:.5rem}h2{font-size:1.3rem;margin-top:2.4rem;border-left:5px solid #1a5490;padding-left:.6rem}h3{font-size:1.05rem;margin-top:1.6rem;color:#1a5490}h4{font-size:.98rem;margin-top:1.2rem;color:#1a5490}
+table{border-collapse:collapse;width:100%;margin:1rem 0;font-size:.86rem}th,td{border:1px solid #d0d7de;padding:.45rem .6rem;vertical-align:top}th{background:#eef3f8;font-weight:600}tr:nth-child(even) td{background:#fafbfc}
+blockquote{border-left:5px solid #d97706;background:#fffbeb;margin:1.2rem 0;padding:.8rem 1.2rem}
+code{background:#f0f2f5;padding:.1rem .35rem;border-radius:3px;font-size:.85em}
+hr{border:0;border-top:1px solid #e1e4e8;margin:2rem 0}strong{color:#0d3d6b}a{color:#1a5490}</style></head><body>
+<h1>S-3・S-4・S-5 — 非Amazon経路の母数と成約率</h1>
+<p>担当：リサーチャー サトル｜チケット：T-20260920-005｜調査日：2026-09-21</p>
+<p>対象：タケシ 03 §1-3 の S-3（展示会）／S-4（公開名簿）／S-5（経路別成約率）</p>
+<p><strong>S-1（Keepa 条件緩和）・S-2（卸サイト）はタカシ担当のため本書では触れていません。</strong></p>
+<hr>
+<h2>0. 結論（3行）</h2>
+<ol><li><strong>母数7,000社は実在します。届きます。</strong> Amazon 外だけで、在宅・無料で取れる名簿が <strong>年あたり約1,700社</strong>、会員登録すれば <strong>29万社</strong>規模の DB が1本あります（実測）。<strong>2,400社＋4,600社の追加は、名簿の枯渇より先に社長の送信能力が尽きるレベルで足ります。</strong></li><li><strong>ただし「展示会の成約率が高い」は、リストを取る話ではなく会場に立つ話でした。</strong> 主催者調査（N=2,320・一次）で <strong>来場バイヤーの商談7.5件→成約3.4件＝45%</strong> と出ますが、これは<strong>ブースで会話した相手が分母</strong>です。名簿だけ取ってメールを送る場合、この45%は適用されません。<strong>展示会は「率は45%だが年6.8社」、メールは「率は1.16%だが年42社」</strong> で、社数ではメールが勝ちます。</li><li><strong>最大の発見は展示会でも名簿でもなく「ザ・商談モール」です。</strong> 商工会議所運営・無料・<strong>打診の向きが逆</strong>（買い手が案件を出し、売り手のメーカーから提案が来る）。累計実測で <strong>1案件あたり提案5.1件・成立0.24件</strong>。入会金3,000円＋年会費10,000円で使えます。<strong>「大手ECモールで販売可能な商品を幅広く募集」という案件が現に掲載中</strong>＝社長と同じ立場の人が既に使っています。</li></ol>
+<hr>
+<h2>1. 経路別の母数表（本題）</h2>
+<h3>1-1. 母数と取得コスト</h3>
+<table><thead><tr><th>#</th><th>経路</th><th style="text-align:right">名簿の生の社数</th><th style="text-align:right">撃てる社数（推定）</th><th>取得コスト（円）</th><th>取得コスト（時間）</th><th style="text-align:center">現地不要</th><th>事実/推測</th><th>出典</th></tr></thead><tbody>
+<tr><td>①</td><td>Amazon内・Keepa 3基準（<strong>現行</strong>）</td><td style="text-align:right"><strong>2,400</strong></td><td style="text-align:right">2,400</td><td>既契約（Keepa API €49/月）</td><td>済</td><td style="text-align:center">○</td><td>実測</td><td>タカシ T-20260914-006</td></tr>
+<tr><td><strong>S-3-a</strong></td><td><strong>東京ギフトショー 第102回 出展社PDF</strong></td><td style="text-align:right"><strong>2,353</strong></td><td style="text-align:right"><strong>約790／回</strong></td><td><strong>0円・登録不要</strong></td><td>GET 1回＋加工2h</td><td style="text-align:center"><strong>○</strong></td><td><strong>実測（本日再取得・HTTP 200）</strong></td><td><a href="https://www.giftshow.co.jp/tigs/102tigs/pdf/list.pdf">list.pdf</a>（2026-09-21取得・小間2,829件）</td></tr>
+<tr><td><strong>S-3-b</strong></td><td><strong>RX ライフスタイルWeek 4展 sitemap</strong></td><td style="text-align:right"><strong>1,839</strong>（うち日本語社名 972）</td><td style="text-align:right"><strong>約790</strong></td><td><strong>0円・登録不要</strong></td><td>GET 4回＋加工2h</td><td style="text-align:center"><strong>○</strong></td><td><strong>実測（本日）</strong></td><td><a href="https://www.lifestyle-expo.jp/sitemap.xml">lifestyle-expo.jp/sitemap.xml</a> → <code>&lt;show&gt;/ja-jp.exhibitors-sitemap.xml</code>（2026-09-21）</td></tr>
+<tr><td>S-3-c</td><td>インテリアライフスタイル（メッセフランクフルト）</td><td style="text-align:right">約400〜483</td><td style="text-align:right">未算出</td><td>0円</td><td><strong>ブラウザ必要</strong></td><td style="text-align:center">△</td><td>社数＝公式PR／取得可否＝実測（XHR のみ）</td><td><a href="https://interiorlifestyle-tokyo.jp.messefrankfurt.com/tokyo/ja/press/press-releases/2026/ILT2026-2.html">ILT2026-2</a>（2026-09-21）</td></tr>
+<tr><td>S-3-d</td><td>ギフトショー系 他展（大阪68・PI 74・京都・福岡・グルメ）</td><td style="text-align:right">未計測</td><td style="text-align:right">未計測</td><td>0円</td><td>─</td><td style="text-align:center">─</td><td><strong>未調査</strong>（PDFが画像・Gift Net は要ブラウザ）</td><td>下記 §2-3</td></tr>
+<tr><td><strong>S-4-a</strong></td><td><strong>ザ・ビジネスモール（商工会議所・商工会 596団体）</strong></td><td style="text-align:right"><strong>289,375</strong></td><td style="text-align:right"><strong>未算出</strong>（消費財比率 未計測）</td><td><strong>入会金3,000＋年会費10,000／年</strong></td><td>会員登録＋検索</td><td style="text-align:center"><strong>○</strong></td><td><strong>実測（本日）</strong></td><td><a href="https://www.b-mall.ne.jp/">b-mall.ne.jp</a>（2026-09-21）／<a href="https://www.b-mall.ne.jp/organization/list/">登録団体一覧</a></td></tr>
+<tr><td>S-4-b</td><td>J-GoodTech（中小機構）</td><td style="text-align:right">国内中小 <strong>30,000</strong></td><td style="text-align:right">未算出</td><td>0円（要会員登録＝規約同意）</td><td>登録＋審査</td><td style="text-align:center">○</td><td>社数＝公式表記</td><td><a href="https://jgoodtech.smrj.go.jp/pub/en/">jgoodtech.smrj.go.jp/pub/en</a>（2026-09-21）</td></tr>
+<tr><td><strong>S-4-c</strong></td><td><strong>ものづくり補助金 採択者一覧（法人番号つき）</strong></td><td style="text-align:right">1回 <strong>448〜1,909</strong>／一般型23回超＝<strong>推定23,000</strong></td><td style="text-align:right">消費財は <strong>推定5〜10%＝1,200〜2,300</strong></td><td><strong>0円・登録不要</strong></td><td>PDF 23本＋加工4h</td><td style="text-align:center"><strong>○</strong></td><td>件数＝実測2回／消費財比率＝<strong>推測</strong></td><td><a href="https://portal.monodukuri-hojo.jp/saitaku.html">saitaku.html</a>（23次448件・18次1,909件／2026-09-21取得）</td></tr>
+<tr><td>S-4-d</td><td>業界団体名簿 9本</td><td style="text-align:right">1,006行 → <strong>909社</strong></td><td style="text-align:right">909</td><td>0円</td><td>済（既測）</td><td style="text-align:center">○</td><td>実測（既存）</td><td>memory <code>knowledge_maker_denominator_stats_and_rosters</code>（2026-09-15）</td></tr>
+<tr><td>S-4-e</td><td>地域未来牽引企業（経産省）</td><td style="text-align:right">約4,700</td><td style="text-align:right">未算出</td><td>0円</td><td>─</td><td style="text-align:center">○</td><td><strong>二次</strong>（METI 本体が HTTP 403 で未検証）</td><td><a href="https://chiiki-kenin-kigyou.meti.go.jp/">chiiki-kenin-kigyou.meti.go.jp</a>（2026-09-21・トップのみ到達）</td></tr>
+<tr><td>S-4-f</td><td>伝統的工芸品 産地組合</td><td style="text-align:right">指定 <strong>244品目</strong>（2025-10-27現在）</td><td style="text-align:right">未算出</td><td>0円</td><td>─</td><td style="text-align:center">○</td><td>品目数＝一次PDF／組合数＝未調査</td><td><a href="https://kyokai.kougeihin.jp/wp/wp-content/uploads/2025/10/shitei-area_20251027.pdf">shitei-area_20251027.pdf</a></td></tr>
+<tr><td>S-4-g</td><td>gBizINFO（全法人）</td><td style="text-align:right">全法人</td><td style="text-align:right">─（名簿ではなく<strong>名寄せ・連絡先付与のエンジン</strong>）</td><td>0円</td><td>済</td><td style="text-align:center">○</td><td>実測（既存）</td><td>memory <code>knowledge_company_contact_data_sources_jp</code></td></tr>
+</tbody></table>
+<blockquote><p><strong>空白セルの区別</strong>：「未算出」＝母数は分かったが撃てる社数への変換をしていない。「未計測」「未調査」＝母数そのものを見ていない。「─」＝該当なし。</p></blockquote>
+<h3>1-2. 「撃てる社数」の出し方（推定の根拠を開示します）</h3>
+<p>展示会レーンの 790社／回 は、既存の実測歩留まりを掛けただけです。<strong>新規に測り直していません。</strong></p>
+<table><thead><tr><th>段</th><th style="text-align:right">歩留まり</th><th>出典</th></tr></thead><tbody>
+<tr><td>生の出展社数</td><td style="text-align:right">2,353</td><td>実測</td></tr>
+<tr><td>× 機械分類（海外表記・団体・商社を除去）</td><td style="text-align:right"><strong>41.5%</strong> → 976</td><td>memory <code>knowledge_expo_exhibitor_to_contactable_maker</code>（N=2,353・実測）</td></tr>
+<tr><td>× 連絡先（TEL/フォーム）が取れる率</td><td style="text-align:right"><strong>81%</strong>（17/21）</td><td>同上（N=21・実測・<strong>N が小さい</strong>）</td></tr>
+<tr><td>= <strong>撃てる社数</strong></td><td style="text-align:right"><strong>約790</strong></td><td>推測（確度 中）</td></tr>
+</tbody></table>
+<p>RX の 790社 は、日本語社名 972社に同じ 81% を掛けたものです。<strong>RX の名簿で法人特定率・連絡先取得率を実測していません</strong>（確度 低〜中）。</p>
+<hr>
+<h2>2. S-3 展示会 — 詳細</h2>
+<h3>2-1. 「現地に行かずにリストだけ取れるか」の判定（社長の制約への直接回答）</h3>
+<table><thead><tr><th>展示会</th><th>出展社リストの入手</th><th>費用</th><th>会期後も取れるか</th><th>判定</th></tr></thead><tbody>
+<tr><td><strong>東京ギフトショー</strong></td><td><strong>PDF 直リンクで丸ごと取れる</strong> <code>…/tigs/102tigs/pdf/list.pdf</code></td><td><strong>0円・登録不要</strong></td><td><strong>取れる。本日（会期終了17日後）も HTTP 200</strong></td><td><strong>◎ 在宅で完結</strong></td></tr>
+<tr><td>同・過去回</td><td><strong>取れない（404）</strong></td><td>─</td><td>─</td><td><strong>消えもの。開催回ごとに取りに行く</strong></td></tr>
+<tr><td><strong>RX ライフスタイルWeek</strong></td><td><strong>sitemap.xml に出展社名が URL に埋まっている</strong></td><td><strong>0円・登録不要</strong></td><td>4展（春・夏・秋・関西）が同時に生きている</td><td><strong>◎ 在宅で完結</strong></td></tr>
+<tr><td>インテリアライフスタイル</td><td>出展者検索は <code>exhibitorsearch.messefrankfurt.com</code> の XHR のみ。単純 GET では 0件</td><td>0円</td><td>─</td><td>△ ブラウザ操作が要る</td></tr>
+<tr><td>ギフトショー Gift Net</td><td>出展社検索＋<strong>会期前からオンラインで問い合わせ可</strong>（公式記載）</td><td>0円</td><td>─</td><td>△ ブラウザ操作が要る（<strong>ただし後述のとおり価値は高い</strong>）</td></tr>
+<tr><td>大阪・京都・福岡・PI・グルメショー</td><td>会場図PDFは<strong>画像PDF（フォント埋め込みなし）</strong>でテキスト抽出不可</td><td>0円</td><td>─</td><td>✕ OCR が要る</td></tr>
+</tbody></table>
+<p><strong>事実：東京ギフトショーと RX ライフスタイルWeek の2系統だけで、現地に行かずに年 約1,700社が0円で取れます。</strong>（2026-09-21 実測）</p>
+<p><strong>推測（確度 高）：RX Japan の展示会サイトは共通テンプレートで、<code>exhibitors-sitemap.xml</code> は他展でも生きています。</strong>（<code>manufacturing-world.jp</code> の sitemap.xml にも同パターンを確認。根拠＝テンプレ共通性のみで、消費財系の他展では未実測）</p>
+<h3>2-2. 開催時期（社長が現地に行く判断をするなら）</h3>
+<table><thead><tr><th>展示会</th><th>次回会期</th><th>会場</th><th>来場費用</th><th>出典</th></tr></thead><tbody>
+<tr><td>第103回 東京ギフトショー春2027（＋LIFE×DESIGN・グルメショー同時開催）</td><td><strong>2027-02-24〜26</strong></td><td>東京ビッグサイト</td><td><strong>招待状請求【無料】</strong></td><td><a href="https://www.giftshow.co.jp/tigs/103tigs/">103tigs</a>（2026-09-21）</td></tr>
+<tr><td>第74回 プレミアム・インセンティブショー秋2026</td><td>2026-10-14〜16</td><td>池袋サンシャインシティ</td><td>未調査</td><td><a href="https://www.giftshow.co.jp/">giftshow.co.jp</a></td></tr>
+<tr><td>第8回 京都ギフトショー2027</td><td>2027-03-10〜11</td><td>みやこめっせ</td><td>未調査</td><td>同上</td></tr>
+<tr><td>福岡ギフトショー2027</td><td>2027-06-09〜10</td><td>マリンメッセ福岡</td><td>未調査</td><td>同上</td></tr>
+<tr><td>インテリアライフスタイル</td><td>2027-06-23〜25</td><td>東京ビッグサイト</td><td>未調査</td><td><a href="https://interiorlifestyle-tokyo.jp.messefrankfurt.com/tokyo/ja/exhibitor-search.html">ILT 出展者検索ページ</a></td></tr>
+<tr><td>第104回 東京ギフトショー秋2027</td><td>2027年9月</td><td>東京ビッグサイト</td><td>─</td><td><a href="https://www.giftshow.co.jp/tigs/104tigs_lp/">104tigs_lp</a></td></tr>
+</tbody></table>
+<p><strong>注意（一次情報・日本郵便 bizpost 2024-03-29）：</strong>「参加者が法人に限られ、個人で参加できないこともあるため、事前によく確認すること」。社長は開業届提出済みの個人事業主で、<strong>屋号・名刺・事業実態が要ります</strong>。ギフトショーの来場資格そのものは本調査では未確認です（招待状請求フォームの入力項目を見れば分かる。ブラウザ作業なのでカズヨの領分）。</p>
+<h3>2-3. 規模の一次データ</h3>
+<table><thead><tr><th>指標</th><th style="text-align:right">値</th><th>出典</th></tr></thead><tbody>
+<tr><td>第101回 総出展社数（4展合計）</td><td style="text-align:right"><strong>2,788社</strong>（うち海外16の国・地域から368社＝国内 2,420社）</td><td><a href="https://www.giftshow.co.jp/tigs/pdf/101tigs_report.pdf">101tigs_report.pdf</a> p.1（2026-09-21取得）</td></tr>
+<tr><td>第102回 出展社（PDF実測）</td><td style="text-align:right"><strong>小間 2,829件／ユニーク 2,353社</strong></td><td>本日実測＋memory（T-20260906-005）</td></tr>
+<tr><td>ライフスタイルWeek 夏2026</td><td style="text-align:right">公称 1,250〜1,300社</td><td><a href="https://prtimes.jp/main/html/rd/p/000002055.000026157.html">PR TIMES 000002055</a></td></tr>
+<tr><td>ライフスタイルWeek 4展 sitemap 実測</td><td style="text-align:right"><strong>1,839件</strong></td><td>本日実測</td></tr>
+<tr><td>インテリアライフスタイル2025 実績</td><td style="text-align:right">483社（国内393／海外90）・来場 15,263名</td><td>メッセフランクフルト公式PR</td></tr>
+</tbody></table>
+<hr>
+<h2>3. S-4 公開企業名簿 — 詳細</h2>
+<h3>3-1. ザ・ビジネスモール（★最重要）</h3>
+<p><strong>事実（すべて 2026-09-21 実測）</strong></p>
+<table><thead><tr><th>項目</th><th>値</th><th>出典</th></tr></thead><tbody>
+<tr><td>運営</td><td>全国 <strong>596団体</strong>の商工会議所・商工会の共同運営</td><td><a href="https://www.b-mall.ne.jp/organization/list/">organization/list</a></td></tr>
+<tr><td>企業DB 掲載社数</td><td><strong>289,375社</strong></td><td><a href="https://www.b-mall.ne.jp/">トップ</a></td></tr>
+<tr><td>利用資格</td><td><strong>商工会議所・商工会の会員であること</strong></td><td><a href="https://www.b-mall.ne.jp/guide/">guide</a></td></tr>
+<tr><td>利用料・成約手数料</td><td><strong>すべて0円</strong></td><td>同上</td></tr>
+<tr><td>ザ・商談モール</td><td>買い手が「これを仕入れたい」案件を出し、売り手が提案する<strong>逆方向のマッチング</strong></td><td><a href="https://www.b-mall.ne.jp/syodan/">syodan</a></td></tr>
+<tr><td>累計実績（2000年1月〜）</td><td>案件 <strong>17,513</strong> ／提案 <strong>89,380</strong> ／商談 <strong>45,272</strong> ／<strong>成立報告 4,196</strong></td><td>同上</td></tr>
+<tr><td>現在の募集案件</td><td>96件（うち <strong>商品（日雑・住製品）47件</strong>・商品（ファッション）10件）</td><td>同上</td></tr>
+<tr><td>掲載中の実例</td><td>「<strong>大手ECモールで販売可能な商品を幅広く募集しています</strong>」「大手ECモールにて販売可能な各種商品を募集しております（兵庫県）」</td><td>同上</td></tr>
+</tbody></table>
+<p><strong>この数字から導ける率（実測値の割り算・N=17,513案件）</strong></p>
+<table><thead><tr><th>指標</th><th style="text-align:right">値</th></tr></thead><tbody>
+<tr><td>1案件あたりの提案数</td><td style="text-align:right"><strong>5.10件</strong></td></tr>
+<tr><td>1案件あたりの商談数</td><td style="text-align:right"><strong>2.59件</strong></td></tr>
+<tr><td>1案件あたりの成立報告</td><td style="text-align:right"><strong>0.240件</strong></td></tr>
+<tr><td>提案 → 成立</td><td style="text-align:right"><strong>4.7%</strong></td></tr>
+<tr><td>商談 → 成立</td><td style="text-align:right"><strong>9.3%</strong></td></tr>
+</tbody></table>
+<blockquote><p><strong>留意</strong>：「成立報告」は自己申告で、報告されなかった成立は含まれません（過小）。逆に、同一案件の重複報告や小口の単発取引も含まれ得ます（定義不明）。<strong>分母は「送ったメール」ではなく「出した案件」</strong>なので、Amazon 起点の 2% とは直接比較できません。比較すべきは<strong>工数あたりの成立数</strong>です（§5）。</p></blockquote>
+<p><strong>費用（§4.1 該当＝金銭。実行していません）</strong></p>
+<table><thead><tr><th>項目</th><th style="text-align:right">金額</th><th>出典</th></tr></thead><tbody>
+<tr><td>東京商工会議所 加入金（個人事業主・初年度のみ）</td><td style="text-align:right"><strong>3,000円</strong></td><td><a href="https://www.tokyo-cci-nyukai.jp/ex/fee/">tokyo-cci-nyukai.jp/ex/fee</a>（2026-09-21）</td></tr>
+<tr><td>同 年会費（個人事業主）</td><td style="text-align:right"><strong>1口 10,000円</strong>以上</td><td>同上</td></tr>
+<tr><td>入会資格</td><td style="text-align:right">「東京23区内で営業されている商工業者であれば、法人、団体、<strong>個人事業主を問わず</strong>ご入会いただけます」</td><td>同上</td></tr>
+</tbody></table>
+<blockquote><p>社長の所在地は本書では未確認です。23区外なら地元の商工会議所／商工会（596団体のいずれか）になり、会費は地域で異なります。</p></blockquote>
+<h3>3-2. ものづくり補助金 採択者一覧（名寄せコストが最も安い名簿）</h3>
+<p><strong>事実</strong>：採択者一覧PDFに <strong>商号・法人番号（13桁）・都道府県・事業計画名</strong> が入っています（<a href="https://portal.monodukuri-hojo.jp/saitaku.html">23次</a>・2026-09-21実測）。</p>
+<table><thead><tr><th>なぜ価値があるか</th><th>根拠</th></tr></thead><tbody>
+<tr><td><strong>法人番号が最初から付いている</strong></td><td>展示会名簿の最大のコスト＝法人特定（成功率41.3%・同名企業の取り違えリスク）が<strong>ゼロになる</strong>。gBizINFO に法人番号で直接引けば <code>company_url</code> が取れる</td></tr>
+<tr><td>事業計画名でフィルタできる</td><td>「新製品開発」「自社ブランド」「EC」等のキーワードで消費財メーカーを機械的に絞れる</td></tr>
+<tr><td>Amazon にいない確率が高い</td><td>補助金で設備投資する中小製造業＝本丸の定義に近い（<strong>推測・未検証</strong>）</td></tr>
+</tbody></table>
+<table><thead><tr><th>回</th><th style="text-align:right">採択件数</th><th>実測方法</th></tr></thead><tbody>
+<tr><td>第23次締切</td><td style="text-align:right"><strong>448件</strong>（パース成功 392件）</td><td>PDF 実取得</td></tr>
+<tr><td>第18次締切</td><td style="text-align:right"><strong>1,909件</strong>（13桁法人番号の出現数）</td><td>PDF 実取得</td></tr>
+<tr><td>一般型 累計</td><td style="text-align:right">23回超＋ビジネスモデル型</td><td>PDF リンク 37本を確認</td></tr>
+</tbody></table>
+<p><strong>推測（確度 低）</strong>：消費財の完成品メーカーの比率は <strong>5〜10%</strong>。23次 392件をキーワードで拾うと48件（12%）ヒットしますが、目視すると建設業・SaaS・医療が多数混じります。<strong>この比率は 200件ほど目視すれば実測できます（未実施）。</strong></p>
+<h3>3-3. 規約とハルオ判断が要る論点</h3>
+<p><strong>法務判断を求める点（ここで結論は出しません。memory <code>feedback_legal_no_is_not_a_prefilter</code> に従い、NO 判定を事前フィルタにしていません）</strong></p>
+<table><thead><tr><th>#</th><th>対象</th><th>条文・事実</th><th>論点</th></tr></thead><tbody>
+<tr><td>L-1</td><td>J-GoodTech 利用規約 <strong>第6条3項</strong></td><td>「本サービスによって提供する情報…の全部又は一部について、当機構…の事前の承諾なく、譲渡、編集、<strong>翻案、使用、複製、転載</strong>…を行ってはならず」</td><td><strong>企業DBを自分の名簿に写して機械処理すること</strong>が「複製・編集」に当たるか</td></tr>
+<tr><td>L-2</td><td>J-GoodTech 利用規約 <strong>第7条(7)</strong></td><td>「自己又は第三者の<strong>営業に関する宣伝又はその他の営利を目的にする投稿及び行為</strong>（<strong>第15条第1項第1号及び第3号の会員サービスを利用する場合を除く</strong>）…を禁止」</td><td>除外されているのは1号（自社ページ掲載）と3号（会員間の告知・アイデア交換）。<strong>4号「取引を希望する企業を探し直接コンタクトできる会員サービス」は除外リストに入っていない</strong>。条文の素読みでは、4号での営利目的コンタクトの扱いが読み切れない</td></tr>
+<tr><td>L-3</td><td>ザ・ビジネスモール</td><td>利用規約の単独URLを特定できず（本日は未到達）。「利用規約に基づいて買い手企業より申請された『買いたい案件情報』を原則としてそのまま掲載」とのみ記載</td><td><strong>転売目的の仕入れ案件の掲載可否</strong>。商工会議所会員向けの商取引支援という趣旨との整合</td></tr>
+<tr><td>L-4</td><td>展示会 出展社リスト（ギフトショーPDF／RX sitemap）</td><td>公開・登録不要で取得できる。<strong>著作権表示・利用条件は本日未確認</strong></td><td>名簿の機械処理と営業利用の可否</td></tr>
+<tr><td>L-5</td><td>NETSEA 利用規約 第7条2項5号</td><td><strong>プラットフォーム外での直接連絡を禁止</strong>（既調査）</td><td>S-2（タカシ担当）と重なるので再掲のみ</td></tr>
+</tbody></table>
+<hr>
+<h2>4. S-5 各経路の成約率の実勢</h2>
+<h3>4-1. 独立した実測データは「4本」しかありません</h3>
+<table><thead><tr><th>#</th><th>経路</th><th>分母</th><th>率</th><th style="text-align:right">N</th><th>一次/二次</th><th>出典</th></tr></thead><tbody>
+<tr><td><strong>R-1</strong></td><td><strong>展示会（来場バイヤー側）第101回</strong></td><td><strong>会場でした商談</strong></td><td><strong>商談7.5件 → 成約3.4件 ＝ 45.3%</strong></td><td style="text-align:right"><strong>2,320</strong></td><td><strong>一次（主催者調査）</strong></td><td><a href="https://www.giftshow.co.jp/tigs/pdf/101tigs_report.pdf">101tigs_report.pdf</a>（2026年2月4〜6日・新製品コンテスト会場）</td></tr>
+<tr><td><strong>R-2</strong></td><td><strong>展示会（来場バイヤー側）第100回</strong></td><td>同上</td><td><strong>商談8.55件 → 成約3.85件 ＝ 45.0%</strong></td><td style="text-align:right">未記載</td><td>一次（主催者調査）</td><td><a href="https://www.giftshow.co.jp/tigs/pdf/100tigs_report.pdf">100tigs_report.pdf</a></td></tr>
+<tr><td><strong>R-3</strong></td><td><strong>ザ・商談モール（案件投稿型）</strong></td><td><strong>出した案件</strong></td><td><strong>1案件 → 提案5.10・商談2.59・成立0.240</strong></td><td style="text-align:right"><strong>17,513案件</strong></td><td><strong>一次（運営集計・自己申告ベース）</strong></td><td><a href="https://www.b-mall.ne.jp/syodan/">b-mall.ne.jp/syodan</a>（2026-09-21）</td></tr>
+<tr><td>R-4</td><td>Amazon 起点コールドメール</td><td>送ったメール</td><td>14社 → 返信3・成立0</td><td style="text-align:right">14</td><td>一次（個人事業主の投稿）</td><td>memory <code>knowledge_share_reestimation_and_base_rates</code></td></tr>
+</tbody></table>
+<p><strong>同じ主催者の2回で 45.3% / 45.0% と一致</strong>しました。これは偶然ではなく、来場バイヤーの行動が安定していることを示します（確度 中〜高）。</p>
+<h3>4-2. 「展示会は成約率10%以上」の検証結果 → <strong>通説です。出典は取れませんでした</strong></h3>
+<p>タケシ 03 §1-3 の④「10%以上↑（対面のため）」の裏を取りにいった結果：</p>
+<table><thead><tr><th>主張</th><th>検証結果</th></tr></thead><tbody>
+<tr><td>「展示会の成約率は1〜5%」</td><td><strong>出展社側</strong>の「獲得名刺 → 商談化」の数字。マーケ支援会社のブログ（自社商材の販促文脈・二次）。<strong>買い手側には適用できません</strong></td></tr>
+<tr><td>「名刺交換20〜40件で1〜5件が取引に」</td><td><strong>検索エンジンの要約にのみ出現。原典（アクシグ 2023-07-14）を直接読むと、その数字は記載なし。</strong> 孫引き不可</td></tr>
+<tr><td>「展示会の成約率は10%以上」</td><td><strong>独立した出典ゼロ</strong></td></tr>
+</tbody></table>
+<blockquote><p><strong>これは私の過去の失敗パターンの再発防止です</strong>（memory <code>knowledge_success_seller_base_rates_2026-09</code>：検索要約の件数は回ごとに変わる）。<strong>検索要約に出た数字は、原典を開くまで使いません。</strong></p></blockquote>
+<h3>4-3. 率だけ見ると判断を誤ります — 工数あたりに直します</h3>
+<p><strong>これが本調査で一番重要な表です。</strong></p>
+<table><thead><tr><th>経路</th><th style="text-align:right">率</th><th>分母</th><th style="text-align:right">1年で何社と取引できるか</th><th style="text-align:right">社長の年間投下時間</th><th style="text-align:right"><strong>1時間あたりの成約社数</strong></th></tr></thead><tbody>
+<tr><td>① Amazon起点メール（現行）</td><td style="text-align:right"><strong>1.16%</strong>（劣化込み）</td><td>送ったメール</td><td style="text-align:right">週70通×52週×1.16% ＝ <strong>42社</strong></td><td style="text-align:right">送信 約87h（v4）</td><td style="text-align:right"><strong>0.48社/h</strong></td></tr>
+<tr><td>S-3 展示会（<strong>現地に行く</strong>）</td><td style="text-align:right"><strong>45%</strong></td><td>会場での商談</td><td style="text-align:right">年2回 × 成約3.4件 ＝ <strong>6.8社</strong></td><td style="text-align:right">移動込み 年6日＝約48h</td><td style="text-align:right"><strong>0.14社/h</strong></td></tr>
+<tr><td>S-3 展示会（<strong>リストだけ取って メール</strong>）</td><td style="text-align:right"><strong>1.16%</strong>（①と同じ扱い）</td><td>送ったメール</td><td style="text-align:right">①の母数に合流</td><td style="text-align:right">名簿加工 年8h</td><td style="text-align:right">①に含む</td></tr>
+<tr><td><strong>S-4 ザ・商談モール</strong></td><td style="text-align:right"><strong>0.24社/案件</strong></td><td>出した案件</td><td style="text-align:right">週1案件×52 ＝ <strong>12.5社</strong></td><td style="text-align:right">1案件 0.5h × 52 ＝ <strong>26h</strong></td><td style="text-align:right"><strong>0.48社/h</strong></td></tr>
+</tbody></table>
+<p><strong>推測（確度 低〜中）</strong>：上表の工数は私の置き値です。ザ・商談モールの「1案件0.5h」は未実測（提案が来た後の商談対応時間を含んでいません）。<strong>この表は順位を示すもので、絶対値は信用しないでください。</strong></p>
+<p><strong>言い切れること：</strong></p>
+<ul><li><strong>「展示会は成約率が高いから最優先」は、社数と工数で見ると成り立ちません。</strong> 45% は本物ですが、<strong>年6.8社が上限</strong>です。</li><li><strong>展示会の正しい使い方は、名簿ソースとしての利用です。</strong> 0円・在宅・年1,700社。会場に立つのは、粗利率と独占（タケシが 20〜30%↑ と置いた部分）を取りに行くときだけ。</li><li><strong>ザ・商談モールは、メールと同じ 0.48社/h を、送信作業なしで出せる可能性があります。</strong> ここは実測する価値が最も高い。</li></ul>
+<hr>
+<h2>5. 累計の母数 — 7,000社に届くか</h2>
+<h3>5-1. 届きます</h3>
+<table><thead><tr><th>レーン</th><th style="text-align:right">撃てる社数</th><th>確度</th></tr></thead><tbody>
+<tr><td>① 現行（Amazon内・Keepa 3基準）</td><td style="text-align:right">2,400</td><td>実測</td></tr>
+<tr><td>S-3 展示会（ギフトショー年2回＋RX 4展・重複未除去）</td><td style="text-align:right"><strong>約1,700／年 × 2年 ＝ 3,400</strong></td><td>推測（中）</td></tr>
+<tr><td>S-4-c ものづくり補助金（消費財5〜10%）</td><td style="text-align:right"><strong>1,200〜2,300</strong></td><td>推測（低）</td></tr>
+<tr><td>S-4-d 業界団体名簿9本</td><td style="text-align:right">909</td><td>実測</td></tr>
+<tr><td><strong>小計（ここまで）</strong></td><td style="text-align:right"><strong>7,900〜9,000</strong></td><td>—</td></tr>
+<tr><td>S-4-a ザ・ビジネスモール</td><td style="text-align:right">+（289,375社の DB・消費財比率未計測）</td><td>実測（社数のみ）</td></tr>
+<tr><td>S-4-b J-GoodTech</td><td style="text-align:right">+（国内中小 30,000）</td><td>公式表記</td></tr>
+<tr><td>S-4-e 地域未来牽引企業</td><td style="text-align:right">+（約4,700）</td><td>二次</td></tr>
+</tbody></table>
+<p><strong>結論：ザ・ビジネスモールと J-GoodTech を1社も数えなくても、0円・在宅の名簿だけで 7,900〜9,000社に届きます。</strong></p>
+<h3>5-2. ただし2つ留保があります</h3>
+<table><thead><tr><th>留保</th><th>中身</th></tr></thead><tbody>
+<tr><td><strong>重複を引いていません</strong></td><td>ギフトショー春/秋の重複（連続出展は多い）、RX 4展の重複、業界団体との重複。<strong>展示会レーンの 3,400 は、実質 2,000〜2,500 まで縮む可能性があります</strong>（推測・確度 低）。なお Keepa 起点 1,249社 と ギフトショー 2,346社 の重複は <strong>2社（0.1%）</strong> で、①とは事実上重ならないことだけは実測済み</td></tr>
+<tr><td><strong>「撃てる」の定義が甘い</strong></td><td>連絡先が取れる ≠ 売れる商品を持っている。⑤系（補助金・団体名簿）は「Amazon での需要が未検証」で、タケシが指摘したとおり <strong>1社ごとに Keepa 検証が要ります</strong>。この検証コストは本調査では測っていません</td></tr>
+</tbody></table>
+<p><strong>それでも「母数7,000社は仮置き」という制約は外れます。</strong> 数える対象は足りています。<strong>新しい律速は「名簿の枯渇」ではなく「1社を連絡可能・需要検証済みにするまでの加工時間」です。</strong></p>
+<hr>
+<h2>6. 社長の制約（週20時間・本業あり・現地移動困難・人脈ゼロ）で使える経路</h2>
+<table><thead><tr><th>経路</th><th>使えるか</th><th>理由</th></tr></thead><tbody>
+<tr><td><strong>S-3 展示会リストの取得（ギフトショーPDF・RX sitemap）</strong></td><td><strong>◎ すぐ使える</strong></td><td>0円・登録不要・在宅・GET 5回。社長の手は1ミリも動かない（カズヨ／タカシの作業）</td></tr>
+<tr><td><strong>S-4 ザ・商談モール</strong></td><td><strong>◎ 使える（要 §4.1 承認）</strong></td><td>13,000円/年。<strong>向こうから来る</strong>ので週20時間制約と最も相性が良い。人脈ゼロでも関係ない</td></tr>
+<tr><td>S-4-c ものづくり補助金名簿</td><td>○ 使える</td><td>0円・在宅。法人番号つきで加工が最も安い。ただし消費財比率が低くノイズ除去が重い</td></tr>
+<tr><td>S-4-b J-GoodTech</td><td>△ 保留</td><td>0円だが<strong>規約 L-1/L-2 の解釈が未決</strong>。ハルオ判断待ち</td></tr>
+<tr><td><strong>S-3 展示会への現地来場</strong></td><td><strong>△ 優先度は低い</strong></td><td>年6.8社。3日拘束＋移動。<strong>社数目的なら割に合いません。</strong>独占・粗利率を取りに行くフェーズ（2027 Q2以降・タケシ 03 の想定どおり）で初めて意味を持つ</td></tr>
+<tr><td>S-3-c/d 他の展示会</td><td>✕ 現時点では不可</td><td>画像PDF・XHR。ブラウザ or OCR の工数が先に要る</td></tr>
+</tbody></table>
+<hr>
+<h2>7. タケシへの引き渡し（ここから先は戦略判断です）</h2>
+<p><strong>事実として確定したので、計画に入れてよいもの：</strong></p>
+<ol><li>母数7,000社は実在する（§5-1）。<strong>案A の前提は成立します。</strong></li><li>展示会は「年6.8社の対面経路」と「年1,700社の名簿経路」の<strong>2つの別物</strong>である（§4-3）。03 §1-3 の④は、この2つを1行に混ぜています。<strong>分けて書き直す必要があります。</strong></li><li>④の成約率「10%以上」には出典がない。<strong>代わりに使える一次の数字は 45%（ただし分母は会場での商談）</strong>（§4-2）。</li></ol>
+<p><strong>ここから先はタケシの領分です（私は決めません）：</strong></p>
+<table><thead><tr><th>#</th><th>論点</th><th>材料</th></tr></thead><tbody>
+<tr><td>T-1</td><td><strong>母数の増分を、展示会名簿に寄せるか／ザ・商談モールに寄せるか</strong></td><td>前者は0円・社長の手は不要・ただし送信工数は従来どおり。後者は13,000円/年・<strong>送信工数が消える</strong>が実測ゼロ</td></tr>
+<tr><td>T-2</td><td><strong>展示会の現地来場を24ヶ月計画に残すか</strong></td><td>社数では割に合わない（0.14社/h）。残す理由があるとすれば粗利率と独占。<strong>その粗利率20〜30%↑ 自体が未実測</strong>（タケシの置き値）</td></tr>
+<tr><td>T-3</td><td><strong>⑤（地場産業・団体名簿）の「1社ごとの Keepa 需要検証」コストをどう積むか</strong></td><td>母数は足りたが、この検証がスループットの新しい律速になり得る。本調査では測っていない</td></tr>
+<tr><td>T-4</td><td><strong>J-GoodTech を入れるか</strong></td><td>30,000社。規約 L-1/L-2 の解釈次第。<strong>ハルオ判断が先</strong></td></tr>
+</tbody></table>
+<p><strong>カズヨへ（§4.1 該当・実行していません）：</strong></p>
+<ul><li>商工会議所への入会（加入金3,000円＋年会費10,000円）＝<strong>金銭＋規約同意</strong></li><li>J-GoodTech の会員登録＝<strong>規約同意</strong></li><li>展示会の来場登録・招待状請求＝<strong>第三者への情報提供</strong></li></ul>
+<p>→ いずれも <code>waiting/</code> へ出してください。<strong>推奨材料は §6 に揃えてあります。</strong></p>
+<hr>
+<h2>8. 調査の限界（何を調べていないか）</h2>
+<table><thead><tr><th>項目</th><th>状態</th></tr></thead><tbody>
+<tr><td>ギフトショー系 他展（大阪・京都・福岡・PI・グルメ）の出展社数</td><td><strong>未調査</strong>。会場図PDFが画像（フォント埋め込みなし）でテキスト抽出不可</td></tr>
+<tr><td>ザ・ビジネスモール 289,375社の<strong>消費財メーカー比率</strong></td><td><strong>未計測</strong>。会員登録しないと検索できない</td></tr>
+<tr><td>J-GoodTech 30,000社の<strong>消費財比率・連絡先取得可否</strong></td><td><strong>未計測</strong>。SPA で非ログインでは一覧すら見えない</td></tr>
+<tr><td>ものづくり補助金の<strong>消費財比率</strong></td><td><strong>推測5〜10%</strong>。200件目視すれば実測可能（未実施）</td></tr>
+<tr><td>各名簿間の<strong>重複率</strong></td><td><strong>未測定</strong>（Keepa起点×ギフトショー の 0.1% だけ既測）</td></tr>
+<tr><td>RX 名簿の<strong>法人特定率・連絡先取得率</strong></td><td><strong>未測定</strong>。ギフトショーの実測値（41.3% / 81%）を流用した</td></tr>
+<tr><td>地域未来牽引企業 約4,700社</td><td><strong>二次情報のみ</strong>。METI 本体が HTTP 403</td></tr>
+<tr><td>伝統的工芸品 産地組合の<strong>組合数・連絡先</strong></td><td><strong>未調査</strong>（品目数244のみ一次確認）</td></tr>
+<tr><td>展示会の<strong>来場資格</strong>（個人事業主が入れるか）</td><td><strong>未確認</strong>。招待状請求フォームを開けば分かる（ブラウザ作業）</td></tr>
+</tbody></table>
+<hr>
+<h2>付録：出典一覧（全URL・取得日 2026-09-21）</h2>
+<table><thead><tr><th>#</th><th>ページタイトル</th><th>URL</th></tr></thead><tbody>
+<tr><td>1</td><td>第102回 東京インターナショナル・ギフト・ショー 出展社一覧 PDF</td><td>https://www.giftshow.co.jp/tigs/102tigs/pdf/list.pdf</td></tr>
+<tr><td>2</td><td>第101回 東京インターナショナル・ギフト・ショー 報告書 PDF</td><td>https://www.giftshow.co.jp/tigs/pdf/101tigs_report.pdf</td></tr>
+<tr><td>3</td><td>第100回 東京インターナショナル・ギフト・ショー 報告書 PDF</td><td>https://www.giftshow.co.jp/tigs/pdf/100tigs_report.pdf</td></tr>
+<tr><td>4</td><td>第103回 東京インターナショナル・ギフト・ショー春2027</td><td>https://www.giftshow.co.jp/tigs/103tigs/</td></tr>
+<tr><td>5</td><td>株式会社ビジネスガイド社（開催スケジュール）</td><td>https://www.giftshow.co.jp/</td></tr>
+<tr><td>6</td><td>ライフスタイル Week sitemap</td><td>https://www.lifestyle-expo.jp/sitemap.xml</td></tr>
+<tr><td>7</td><td>ライフスタイル Week 出展社 sitemap（夏）</td><td>https://www.lifestyle-expo.jp/summer/ja-jp.exhibitors-sitemap.xml</td></tr>
+<tr><td>8</td><td>インテリア ライフスタイル 出展者検索</td><td>https://interiorlifestyle-tokyo.jp.messefrankfurt.com/tokyo/ja/exhibitor-search.html</td></tr>
+<tr><td>9</td><td>400社が出展。「インテリア ライフスタイル」がまもなく開幕</td><td>https://interiorlifestyle-tokyo.jp.messefrankfurt.com/tokyo/ja/press/press-releases/2026/ILT2026-2.html</td></tr>
+<tr><td>10</td><td>【1,250社が出展】第29回 ライフスタイルWeek 夏（PR TIMES）</td><td>https://prtimes.jp/main/html/rd/p/000002055.000026157.html</td></tr>
+<tr><td>11</td><td>ザ・ビジネスモール トップ</td><td>https://www.b-mall.ne.jp/</td></tr>
+<tr><td>12</td><td>ザ・ビジネスモールとは／ご利用方法</td><td>https://www.b-mall.ne.jp/guide/</td></tr>
+<tr><td>13</td><td>ザ・商談モール</td><td>https://www.b-mall.ne.jp/syodan/</td></tr>
+<tr><td>14</td><td>ザ・ビジネスモール 登録団体一覧（596団体）</td><td>https://www.b-mall.ne.jp/organization/list/</td></tr>
+<tr><td>15</td><td>東京商工会議所 会費と入会資格</td><td>https://www.tokyo-cci-nyukai.jp/ex/fee/</td></tr>
+<tr><td>16</td><td>J-GoodTech（英語版・登録社数）</td><td>https://jgoodtech.smrj.go.jp/pub/en/</td></tr>
+<tr><td>17</td><td>J-GoodTech 利用規約</td><td>https://jgoodtech.smrj.go.jp/pub/ja/terms/</td></tr>
+<tr><td>18</td><td>ものづくり補助金 採択結果</td><td>https://portal.monodukuri-hojo.jp/saitaku.html</td></tr>
+<tr><td>19</td><td>同 第23次締切 採択者リスト PDF</td><td>https://portal.monodukuri-hojo.jp/common/bunsho/ippan/23th/採択者リスト_23次締切.pdf</td></tr>
+<tr><td>20</td><td>同 第18次締切 採択者一覧 PDF</td><td>https://portal.monodukuri-hojo.jp/common/bunsho/ippan/18th/saitaku18ji_20240626.pdf</td></tr>
+<tr><td>21</td><td>地域未来牽引企業 選定一覧</td><td>https://chiiki-kenin-kigyou.meti.go.jp/</td></tr>
+<tr><td>22</td><td>伝統的工芸品 指定品目一覧（2025-10-27現在）</td><td>https://kyokai.kougeihin.jp/wp/wp-content/uploads/2025/10/shitei-area_20251027.pdf</td></tr>
+<tr><td>23</td><td>メーカー仕入れは展示会がおすすめ（日本郵便 bizpost・2024-03-29）</td><td>https://www.post.japanpost.jp/bizpost/column/sales_promotion19/exhibition/</td></tr>
+<tr><td>24</td><td>仕入れ商品を展示会で探そう（アクシグ・2023-07-14／<strong>数字の記載なしを確認</strong>）</td><td>https://aqcg.jp/tenzikai/</td></tr>
+</tbody></table>
+<p>作業ファイル・取得した生データ：<code>workspace/output/agent_output/T-20260920-005/s3s5/</code></p>
+</body></html>
