@@ -1,0 +1,115 @@
+<!doctype html><html lang='ja'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>S-1 母数拡張の実測 — Keepa の抽出条件を緩めると送信先は何社になるか</title><style>body{font-family:-apple-system,'Hiragino Sans','Noto Sans JP',sans-serif;max-width:1150px;margin:2em auto;padding:0 1em;line-height:1.65;color:#222;font-size:14.5px}table{border-collapse:collapse;margin:.8em 0;font-size:.92em}th,td{border:1px solid #bbb;padding:.35em .6em;vertical-align:top}th{background:#eef2f8}tr:nth-child(even) td{background:#fafafa}h1{font-size:1.5em;border-bottom:2px solid #444}h2{font-size:1.25em;border-left:5px solid #25b;padding-left:8px;margin-top:1.8em}h3{font-size:1.05em;margin-top:1.4em}blockquote{border-left:4px solid #ccc;margin:.8em 0;padding:.2em 1em;color:#444}code{background:#f3f3f3;padding:1px 4px;border-radius:3px}hr{border:0;border-top:1px solid #ccc;margin:1.6em 0}</style></head><body>
+<h1>S-1 母数拡張の実測 — Keepa の抽出条件を緩めると送信先は何社になるか</h1>
+<p>T-20260920-005 / タカシ / 2026-09-21。親: 03 2年ロードマップ §律速＝打診できるメーカーの母数 / 04 マサル検証。</p>
+<p>現行の母数 2,425社の出典: T-20260914-006 S-A。</p>
+<h2>結論</h2>
+<table><thead><tr><th></th><th>社数</th><th>80%区間</th><th>24ヶ月7,000通に対し</th></tr></thead><tbody>
+<tr><td><strong>A 現行</strong>（ランク5万・FBA2人以上）</td><td><strong>2,425</strong></td><td>1,896〜2,984</td><td>35%</td></tr>
+<tr><td>B ランク10万・FBA2人以上</td><td>2,818</td><td>1,896〜3,770</td><td>40%</td></tr>
+<tr><td>C ランク20万・FBA2人以上</td><td>3,530</td><td>2,133〜4,957</td><td>50%</td></tr>
+<tr><td>D ランク30万・FBA2人以上</td><td>4,270</td><td>2,532〜6,039</td><td>61%</td></tr>
+<tr><td><strong>D＋規制3カテゴリを戻す（推奨）</strong></td><td><strong>5,842</strong></td><td>3,529〜8,179</td><td>83%</td></tr>
+<tr><td>E ランク5万・FBA<strong>1人</strong>以上</td><td>5,173</td><td>3,383〜7,043</td><td>74%</td></tr>
+<tr><td>F ランク30万・FBA1人以上</td><td>21,232</td><td>8,893〜35,397</td><td>303%</td></tr>
+</tbody></table>
+<ol>
+<li style='margin-left:0.0em'><strong>ランクを6倍（5万→30万）に緩めても、母数は1.76倍（2,425→4,270）にしかなりません。</strong> ASIN は2.06倍に増えますが、<strong>増えた商品の82〜90%は「すでに名簿にいる会社」の別商品</strong>だからです。母数を ASIN 数で語ると2倍近く過大に見えます。</li>
+<li style='margin-left:0.0em'><strong>いちばん効くのは、いま除外している規制3カテゴリ（ドラッグ／ビューティー／食品）を戻すことです。</strong> +1,572社（現行比+65%）を、<strong>ランクを一切緩めずに</strong>得られます。しかも質は現行より良い（後述）。薬機法・食品表示の確認が要るので、実行はハルオ判断とセットです。</li>
+<li style='margin-left:0.0em'><strong>FBA を1人以上まで緩めるのは勧めません。</strong> 社数は跳ねますが、その層は<strong>61%が中国系OEM疑い</strong>で、かつ「どの転売業者も二重に在庫を持っていない商品」＝型Aが前提にしている<strong>転売需要の実証が無い</strong>会社です。数字の精度も低く（80%区間が3倍幅）、意思決定には使えません。</li>
+<li style='margin-left:0.0em'><strong>D＋規制3（5,842社）でも、24ヶ月の送信能力7,000通の83%止まりです。</strong> 母数だけで送信能力を埋めるなら F まで行く必要がありますが、それは質を捨てることと同義です。<strong>「母数を増やす」より「1通あたりの成約率を上げる」ほうに、このロードマップの余地は残っています。</strong></li>
+</ol>
+<hr>
+<h2>1. 軸ごとの ASIN 件数（Product Finder・domain=5・2026-09-21）</h2>
+<p>Amazon 本体不在（<code>current_AMAZON=-1</code>）は全条件で維持しています（緩めない軸）。15ルート（メディア13・アダルト・規制3を除く）。</p>
+<table><thead><tr><th>ランク上限</th><th>FBA2人以上</th><th>FBA1人以上</th><th>規制3カテゴリ・FBA2人以上</th></tr></thead><tbody>
+<tr><td>5万（現行）</td><td>80,700</td><td>1,701,100</td><td>17,400</td></tr>
+<tr><td>10万</td><td>111,200</td><td>2,316,000</td><td>25,200</td></tr>
+<tr><td>20万</td><td>145,500</td><td>3,016,000</td><td>34,400</td></tr>
+<tr><td>30万</td><td>165,900</td><td>3,431,200</td><td>35,900</td></tr>
+</tbody></table>
+<ul>
+<li style='margin-left:0.0em'>FBA ちょうど1本は 1,618,900（＝1,701,100 − 80,800）。<code>offerCountFBA_lte</code> が効いていることを引き算で突き合わせて確認済み。<code>offerCountFBA_gte=999999</code> で0件になることも確認（Finder は知らないキーを黙って無視するため）。</li>
+<li style='margin-left:0.0em'><strong>ホーム＆キッチンはランク緩和で1件も増えません。</strong> Keepa の root rank が全ランク合計で41,200件しかなく、5万位で尽きます。<strong>「5万位以内」の意味はカテゴリごとに別物です。</strong></li>
+<li style='margin-left:0.0em'>車＆バイクはランク5万超に11万件ありますが、本体なし＋FBA2人以上を掛けるとほぼ0になります。</li>
+</ul>
+<h2>2. 層ごとの「新しく入ってくる社数」</h2>
+<p>重ならない層に切り、層ごとに<strong>その層で初めて現れる社</strong>だけを数えました（層の和＝累計母数）。</p>
+<p>ある社が新規かどうかは、<strong>一段内側（より厳しい）条件でその社のブランドを Finder に引いて0件か</strong>で判定しています。</p>
+<table><thead><tr><th>層</th><th>ASIN</th><th>新規社数</th><th>80%区間</th><th><strong>既に名簿にいた率</strong></th><th>標本ASIN</th><th>分母を引いたブランド</th></tr></thead><tbody>
+<tr><td>S1 ランク5万→10万</td><td>29,803</td><td>393</td><td>0〜786</td><td><strong>90%</strong></td><td>350</td><td>39</td></tr>
+<tr><td>S2 ランク10万→20万</td><td>33,239</td><td>712</td><td>237〜1,187</td><td><strong>90%</strong></td><td>350</td><td>40</td></tr>
+<tr><td>S3 ランク20万→30万</td><td>18,005</td><td>740</td><td>399〜1,082</td><td><strong>83%</strong></td><td>300</td><td>39</td></tr>
+<tr><td>R0 規制3・ランク5万以内</td><td>19,939</td><td>1,572</td><td>997〜2,140</td><td>24%</td><td>250</td><td>25</td></tr>
+<tr><td>F0 FBA1人・ランク5万以内</td><td>1,618,900</td><td>2,748</td><td>1,487〜4,059</td><td>17%</td><td>518</td><td>30</td></tr>
+<tr><td>F3 FBA1人・ランク5万→30万</td><td>1,645,100</td><td>14,214</td><td>4,874〜25,299</td><td>36%</td><td>408</td><td>25</td></tr>
+</tbody></table>
+<ul>
+<li style='margin-left:0.0em'><strong>「既に名簿にいた率」がこの調査でいちばん重要な数字です。</strong> ランク帯を深くして見つかる会社の8〜9割は、すでに現行の2,425社に入っています。深いランクの商品は、既知メーカーの売れていない商品であることがほとんどでした。</li>
+<li style='margin-left:0.0em'>規制3と FBA1人の層だけ重複率が低い＝<strong>本当に別の会社の集合</strong>です。</li>
+<li style='margin-left:0.0em'>F3 の推定は1社（<code>own=1</code> のブランド）が全体の半分以上を動かすため、<strong>桁の目安としてしか読めません</strong>。区間が3倍幅なのはそのためです。</li>
+</ul>
+<p><strong>組み合わせ（ご依頼の「ランク20万位×FBA1人以上」）</strong>: 17,083社（F3 を ASIN 比 76% で按分した推定）。F と同じ理由で精度は低く、実務上は F と同じ扱いです。</p>
+<h2>3. 緩めると質はどうなるか</h2>
+<h3>3-1. どんな会社が混じるか（標本 ASIN の判定内訳）</h3>
+<table><thead><tr><th>層</th><th>国内中小・ストアなし＝送信先</th><th>中国系OEM疑い</th><th>大手</th><th>単品率</th></tr></thead><tbody>
+<tr><td>S0 現行</td><td>18.3%</td><td>22.2%</td><td>32.3%</td><td>29%</td></tr>
+<tr><td>S1 ランク5万→10万</td><td><strong>25.7%</strong></td><td>8.0%</td><td>36.9%</td><td>52%</td></tr>
+<tr><td>S2 ランク10万→20万</td><td><strong>28.6%</strong></td><td>8.9%</td><td>33.7%</td><td>59%</td></tr>
+<tr><td>S3 ランク20万→30万</td><td>24.7%</td><td>11.3%</td><td>32.3%</td><td>62%</td></tr>
+<tr><td>R0 規制3・ランク5万以内</td><td><strong>32.0%</strong></td><td>6.4%</td><td>10.0%</td><td>50%</td></tr>
+<tr><td>F0 FBA1人・ランク5万以内</td><td>14.5%</td><td><strong>61.4%</strong></td><td>2.3%</td><td>6%</td></tr>
+<tr><td>F3 FBA1人・ランク5万→30万</td><td>11.5%</td><td><strong>56.4%</strong></td><td>2.2%</td><td>26%</td></tr>
+</tbody></table>
+<p><strong>ランク緩和は「どんな会社か」の軸ではむしろ改善します。</strong> 中国系OEMはランク5万以内に集中しており（22%）、深いランク帯は国内ニッチメーカーの裾（8〜11%）です。ご依頼時の想定（緩めた分だけ質が落ちる）は、この軸では逆でした。</p>
+<p><strong>質が落ちるのは FBA の緩和のほうです。</strong> FBA1人だけの層は6割が中国系OEM疑い。しかも「FBA在庫を二重に持つ転売業者がいない」＝型Aが拠って立つ<strong>転売需要の実証が無い</strong>商品群です。</p>
+<h3>3-2. 売れているか（Amazon 公表の月間販売数 monthlySold）</h3>
+<p>社長の既定は「候補は月100個以上売れている商品とその類似品に絞る／入口は monthlySold で見る」（memory <code>feedback_volume_sellers_only</code>）。標本でその成立率を数えました。</p>
+<table><thead><tr><th>層</th><th>monthlySold が付いている</th><th>うち月100個以上</th></tr></thead><tbody>
+<tr><td>S0 現行</td><td>20.5%</td><td>9.5%</td></tr>
+<tr><td>S1 ランク5万→10万</td><td>0.3%</td><td>0%</td></tr>
+<tr><td>S2 ランク10万→20万</td><td><strong>0%</strong></td><td>0%</td></tr>
+<tr><td>S3 ランク20万→30万</td><td>0.3%</td><td>0.3%</td></tr>
+<tr><td>F0 FBA1人・ランク5万以内</td><td>5.2%</td><td>1.4%</td></tr>
+<tr><td>F3 FBA1人・ランク5万→30万</td><td>0.2%</td><td>0%</td></tr>
+<tr><td><strong>R0 規制3・ランク5万以内</strong></td><td><strong>56.0%</strong></td><td><strong>31.2%</strong></td></tr>
+</tbody></table>
+<p><strong>ランク5万位を超えると、公表販売数が付いた商品は事実上ゼロになります。</strong> Amazon がバッジを出す閾値が5万位あたりにあるためです。つまり<strong>ランク緩和は「月100個以上で入口を切る」という既定と原理的に両立しません</strong>。</p>
+<p>一方で<strong>規制3カテゴリは、ランクを一切緩めないまま、現行より条件が良い</strong>（公表販売数あり56%・月100個以上31%）。既定に最も素直に合う拡張先です。</p>
+<h3>3-3. どこまで緩めるかの目安</h3>
+<table><thead><tr><th>緩和</th><th>母数への効き</th><th>会社の質</th><th>売れ行きの実証</th><th>判定</th></tr></thead><tbody>
+<tr><td>規制3カテゴリを戻す</td><td>+1,572社（+65%）</td><td>現行より良い</td><td>現行より良い</td><td><strong>推奨</strong>（法務確認が前提）</td></tr>
+<tr><td>ランク10万まで</td><td>+393社（+16%）</td><td>良い</td><td>失われる</td><td>条件付き</td></tr>
+<tr><td>ランク20万まで</td><td>累計+1,105社（+46%）</td><td>良い</td><td>失われる</td><td>条件付き</td></tr>
+<tr><td>ランク30万まで</td><td>累計+1,845社（+76%）</td><td>良い</td><td>失われる</td><td>条件付き</td></tr>
+<tr><td>FBA1人以上</td><td>大きい（数千〜数万）</td><td>悪い（6割が中国系OEM）</td><td>無い</td><td><strong>非推奨</strong></td></tr>
+</tbody></table>
+<p><strong>「条件付き」の条件</strong>: ランク緩和で入る会社は、打診先としては良質ですが、<strong>見つけたその商品は仕入れ候補になりません</strong>（売れていないため）。使い方は「深いランクの商品を手がかりにメーカーを見つけ、<strong>そのメーカーの売れ筋のほうを扱わせてもらう</strong>」に限られます。83〜90%は既知の会社なので、実際に新しく会える社は思ったより少ないことも織り込んでください。</p>
+<h2>4. トークン消費と所要時間（実績）</h2>
+<p>事前見積り約8,000 token / 約6.5時間に対し、実績は下表。<strong>Keepa の解約期限 2026-10-03 まで12日あり、余裕をもって完了しています。</strong></p>
+<table><thead><tr><th>段</th><th>token</th><th>内容</th></tr></thead><tbody>
+<tr><td>件数プローブ</td><td>352</td><td>緩和グリッド24本＋フィールド検証5本</td></tr>
+<tr><td>ASIN 一覧</td><td>1,632</td><td>S1・S2・S3・R0 の全件（10＋件数/100）</td></tr>
+<tr><td>ランク窓</td><td>988</td><td>FBA1人層のクラスタ標本（全件一覧なら33,000 token）</td></tr>
+<tr><td>product 取得</td><td>2,176</td><td>標本2,176件（1 token/件）</td></tr>
+<tr><td>ブランド件数</td><td>3,743</td><td>165ブランド×2条件（11 token/回）</td></tr>
+<tr><td><strong>合計</strong></td><td><strong>8,891</strong></td><td>01:01→07:28＝<strong>6時間27分</strong></td></tr>
+</tbody></table>
+<ul>
+<li style='margin-left:0.0em'>token は<strong>上限1,200・毎分20の回復律速</strong>で、1日あたり最大28,800。所要時間はほぼ token 消費量で決まります。</li>
+<li style='margin-left:0.0em'>全段が冪等（raw があれば0 token で飛ばす）なので、追加の切り口は<strong>既存 raw を使い回して安く再計算できます</strong>。</li>
+</ul>
+<h2>5. 前提・限界（読むときの注意）</h2>
+<table><thead><tr><th>項目</th><th>向き</th></tr></thead><tbody>
+<tr><td>区分は T-1 の関数をそのまま使用。取りこぼす大手・海外ブランドは、新規と判定されたブランドを<strong>全件目視</strong>して落とした（S1で2件・F0で3件・F3で6件・R0で4件）</td><td>幅</td></tr>
+<tr><td>80%区間は分母を引いた部分標本のブートストラップ。<strong>標本2,176件そのもののばらつきは入っていない</strong>＝実際の区間はこれより少し広い</td><td>過小</td></tr>
+<tr><td>ブランド件数 k はブランド名の完全一致。1社が複数ブランドを持つと社数を多め、表記揺れは k を少なめ＝社数を多めに見る</td><td>多め</td></tr>
+<tr><td>R0 の一覧は19,939件で、件数プローブの17,400と15%ずれる。ランク分割の呼び出し間でランクが動いたため（推測）。重みは実測の一覧サイズで計算している</td><td>小</td></tr>
+<tr><td>FBA1人層の重みは1 ASIN あたり3,333〜4,098と大きく、<code>own=1</code> のブランドを1つ引くかどうかで数千社動く。<strong>F0・F3は桁の目安</strong></td><td>大</td></tr>
+<tr><td>ストアが無くてもメーカー本人が出品している社がある（S-A 実測で現行層の約2%）。FBA1人層ではこの比率が高いはず（<strong>推測</strong>・未計測）</td><td>F層は多め</td></tr>
+<tr><td>生涯成約社数に実効成約率1.16%を掛けるのは<strong>現行と同質の層に限った話</strong>。FBA1人層に同じ率を当てるのは誤り</td><td>—</td></tr>
+<tr><td>展示会・NETSEA・T-1打診済みとの重なりは引いていない</td><td>多め</td></tr>
+</tbody></table>
+<hr>
+<p>明細（Git 追跡外）: <code>agent_output/T-20260920-005/s1/out/s1_sample.csv</code>（標本2,176件の判定・層つき）・<code>s1_bands.csv</code>・<code>s1_estimate.json</code>。</p>
+<p>再現用コード: 同 <code>s1/</code>（<code>s1_common.py</code>・<code>s1_probe.py</code>・<code>s1_lists.py</code>・<code>s1_windows.py</code>・<code>s1_sample.py</code>・<code>s1_classify.py</code>・<code>s1_brandcount.py</code>・<code>s1_estimate.py</code>・<code>driver.sh</code>）。</p>
+</body></html>
