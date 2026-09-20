@@ -1,0 +1,255 @@
+<!doctype html><html lang='ja'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>初回仕入れ実行計画（13）の仮想実行</title><style>body{font-family:-apple-system,'Hiragino Sans','Noto Sans JP',sans-serif;max-width:1150px;margin:2em auto;padding:0 1em;line-height:1.65;color:#222;font-size:14.5px}table{border-collapse:collapse;margin:.8em 0;font-size:.92em}th,td{border:1px solid #bbb;padding:.35em .6em;vertical-align:top}th{background:#eef2f8}tr:nth-child(even) td{background:#fafafa}h1{font-size:1.5em;border-bottom:2px solid #444}h2{font-size:1.25em;border-left:5px solid #25b;padding-left:8px;margin-top:1.8em}h3{font-size:1.05em;margin-top:1.4em}blockquote{border-left:4px solid #ccc;margin:.8em 0;padding:.2em 1em;color:#444}code{background:#f3f3f3;padding:1px 4px;border-radius:3px}hr{border:0;border-top:1px solid #ccc;margin:1.6em 0}</style></head><body>
+<h1>初回仕入れ実行計画（13）の仮想実行</h1>
+<p>シミュレーター マサル／2026-09-21／チケット T-20260920-003</p>
+<p>対象：<code>13_初回仕入れ実行計画.md</code>（推奨 B案／発注約4.2万円・総支出約4.6万円・期待値+7,900円）</p>
+<p>計算：<code>workspace/output/agent_output/T-20260920-003/sim/</code>（01 単位採算・02 11/30 の工程・03 B案 MC 10万回・04 シナリオ）。種 20260921。</p>
+<hr>
+<h2>0. 収束したか — <strong>条件付き No（タケシへ差し戻し。本文修正のみ・2周目のシミュレーションは不要）</strong></h2>
+<table><thead><tr><th>収束条件</th><th>判定</th></tr></thead><tbody>
+<tr><td>中央が目標を満たす</td><td><strong>満たす。</strong> 中央 +11,800円（タケシ +11,000 とほぼ一致。構造は妥当）</td></tr>
+<tr><td>悲観で撤退条件を踏まない</td><td><strong>踏まない。</strong> 最悪 ▲22,200円・予備25万円を割る確率 <strong>0.00%</strong></td></tr>
+<tr><td><strong>案が実行できる確率</strong></td><td><strong>ここで落ちます。B案が書面どおり組める確率は約24%</strong>（丸進に該当品があり卸率が通る SKU が2件以上＝中央前提）。<strong>43%の世界では発注ゼロで終わります</strong></td></tr>
+<tr><td><strong>期待値</strong></td><td>タケシ +7,900円 → <strong>私の読みでは +2,600円</strong>。差の大半（▲4,200円）は「出品できない確率」を 5% と置いていること。実勢は <strong>41%</strong></td></tr>
+</tbody></table>
+<p><strong>差し戻す理由は「数字が間違っている」ではありません。3つの順序が逆です。</strong></p>
+<ol>
+<li style='margin-left:0.0em'><strong>ゲートの実機確認（タケシの§7④＝最後）を、発注の前に持ってくる。</strong> タケシは「ゲートは発注の可否を変えない」と書きましたが、<strong>発注を2週間遅らせても 11/30 の達成確率は 40.3% → 40.3% で変わりません</strong>（3週間で ▲1pt）。待つ費用はクーポン3,000円だけ。<strong>無料で41%の損失確率を潰せる手を、最後に置く理由がありません。</strong></li>
+<li style='margin-left:0.0em'><strong>キャラクター品（S1・S2）を1周目から外す。</strong> 現金の下限は守れますが、唯一<strong>現金で上限が付かない失敗</strong>（知財申立て → 健全性）がここに集まっています。4ストア停止中・本人確認の審査待ちの今、この1本だけは賭けの対象にしてはいけません。</li>
+<li style='margin-left:0.0em'><strong>11/30 の達成確率は 40.3%＝50%割れ。</strong> タケシ自身が置いた判定線（50%を割るなら発注より先に SD へ照会）に<strong>該当します</strong>。社長は 9/20 にこの照会を「見送り」と決めています。<strong>その決定の再考をお願いする形になります</strong>（§4）。</li>
+</ol>
+<h3>社長が決めるべき論点の最終形（3つ。どれも「いくら賭けるか」ではない）</h3>
+<table><thead><tr><th>#</th><th>論点</th><th>A</th><th>B</th><th>C</th><th>私の推奨</th></tr></thead><tbody>
+<tr><td><strong>1</strong></td><td><strong>SD へ 11/30 条件の照会を出すか</strong>（9/20 に見送りと決定済み）</td><td>予定どおり見送り、11/30 に間に合わせる努力で通す</td><td><strong>照会を出す</strong>（第三者連絡＝§4.1）</td><td>照会せず、Amazon 以外の販路を届け出て条件を満たす</td><td><strong>B。</strong> 達成確率 40.3% は「努力で埋まる差」ではありません。照会の下振れ（藪蛇）は§4.3 に整理しました</td></tr>
+<tr><td><strong>2</strong></td><td><strong>キャラクター品を1周目に入れるか</strong></td><td>B案どおり2SKU（発注の1/3）</td><td><strong>外す</strong>（グンゼ単品のみ）</td><td>S1 のみ4点に縮小</td><td><strong>B。</strong> 期待値はほぼ同じで、口座停止の尾を1本消せます</td></tr>
+<tr><td><strong>3</strong></td><td><strong>発注の前にゲートを確認するか</strong>（＝発注をストア再開後に回すか）</td><td>9/30 のクーポン期限に合わせて先に発注</td><td><strong>ストア再開 → 実機確認 →「出品する」が出た ASIN だけ発注</strong></td><td>半分だけ先に発注</td><td><strong>B。</strong> 費用は3,000円、見返りは 41%→15% の損失確率低減</td></tr>
+</tbody></table>
+<hr>
+<h2>1. タケシの計算の再現（構造は妥当です）</h2>
+<p>タケシの置き値のまま私の構造で回すと <strong>中央 +11,788円</strong>（タケシ +11,000）。<strong>差は 1pt 未満で、計算そのものに誤りはありません。</strong></p>
+<p>期待値だけが合いません。置き値を1つずつ私の値に替えると、こう落ちます。</p>
+<table><thead><tr><th>置き換え</th><th>期待値の変化</th></tr></thead><tbody>
+<tr><td>タケシの期待値（20/50/30% 加重）</td><td><strong>+7,900円</strong></td></tr>
+<tr><td>「出品できない」を 5% → <strong>41%</strong> に（ゲート実機確認なしで発注した場合）</td><td><strong>▲4,200円</strong></td></tr>
+<tr><td><strong>返品を 5% 計上</strong>（下着は返品されると再販不可。配送代行415〜430円も戻らない）</td><td>▲700円</td></tr>
+<tr><td>キャラ2SKU のページ消滅 15%／90日 を織り込む</td><td>▲400円</td></tr>
+<tr><td><strong>私の期待値</strong></td><td><strong>+2,600円</strong>（中央 +11,800／P10 ▲19,900／P90 +23,200／黒字確率 <strong>59%</strong>）</td></tr>
+</tbody></table>
+<p><strong>出品できた世界に条件を付けると、この案はかなり強い</strong>：中央 +18,100円・P10 +10,000円・<strong>黒字確率 99.7%</strong>。</p>
+<p>4SKU に分散しているため、1SKU の価格が崩れても全体は黒字で残ります。<strong>つまり risk はほぼ全量が「出品できるか否か」の一点に集まっています。</strong></p>
+<hr>
+<h2>2. 検証点1 — 中央想定売値の係数 0.85（タケシが「最大の感度」と呼んだ箇所）</h2>
+<h3>2-1. どこから赤字になるか</h3>
+<p><strong>上限ちょうどで買った場合の損益分岐は k = 0.685 です。</strong> タケシの「0.7 で中央赤字」はほぼ正確でしたが、<strong>0.70 はまだ +1,300円で、わずかに黒字</strong>です。</p>
+<p>そして<strong>この線は「いくらで買えたか」で動きます。ここが係数そのものより効きます。</strong></p>
+<p>B案全体の通算現金（出品できた世界・完売・キャラ健全。単位：円）</p>
+<table><thead><tr><th>買値 ÷ 原価上限</th><th>k=0.95</th><th>k=0.90</th><th>k=0.85</th><th>k=0.80</th><th>k=0.75</th><th><strong>k=0.70</strong></th><th>k=0.65</th><th>k=0.60</th><th><strong>損益分岐 k</strong></th></tr></thead><tbody>
+<tr><td><strong>1.00（上限ちょうど）</strong></td><td>+20,876</td><td>+17,968</td><td>+14,522</td><td>+10,124</td><td>+5,726</td><td><strong>+1,328</strong></td><td>▲3,070</td><td>▲7,468</td><td><strong>0.685</strong></td></tr>
+<tr><td>0.95</td><td>+22,995</td><td>+20,087</td><td>+16,641</td><td>+12,243</td><td>+7,845</td><td>+3,447</td><td>▲951</td><td>▲5,349</td><td>0.661</td></tr>
+<tr><td><strong>0.90</strong></td><td>+25,113</td><td>+22,205</td><td>+18,759</td><td>+14,361</td><td>+9,963</td><td>+5,565</td><td>+1,167</td><td>▲3,231</td><td><strong>0.637</strong></td></tr>
+<tr><td>0.85</td><td>+27,232</td><td>+24,324</td><td>+20,877</td><td>+16,479</td><td>+12,081</td><td>+7,683</td><td>+3,285</td><td>▲1,113</td><td>0.613</td></tr>
+<tr><td>0.80</td><td>+29,350</td><td>+26,442</td><td>+22,996</td><td>+18,598</td><td>+14,200</td><td>+9,802</td><td>+5,404</td><td>+1,006</td><td>0.589</td></tr>
+</tbody></table>
+<p><strong>読み方：k は「守る」ものではなく「買値で買う」もの。</strong> 上限の90%で買えば k=0.64 まで耐え、80%で買えば k=0.59 まで耐えます。</p>
+<p><strong>タケシの§5「上限の80%以下なら点数を増やす」ルールは、実は点数の話ではなく k 耐性の話でした。</strong> そこを明示すべきです。</p>
+<h3>2-2. k がその値になる確率</h3>
+<p>私が置いた k の分布（90日の実現平均売価 ÷ 現在価格）：<strong>中央 0.900／P10 0.666／P90 0.998／平均 0.865</strong>。</p>
+<p>内訳＝相場維持 50%（0.88〜1.05）／自分の投入で じり下げ 25%（0.78〜0.92）／<strong>Amazon 本体の復帰・出品者増 18%（0.60〜0.82）</strong>／崩壊 7%（0.45〜0.68）。</p>
+<table><thead><tr><th>閾値</th><th>確率</th></tr></thead><tbody>
+<tr><td><strong>P(k &lt; 0.685)</strong> ＝上限ちょうどで買って赤字</td><td><strong>12.0%</strong></td></tr>
+<tr><td>P(k &lt; 0.637) ＝上限の90%で買って赤字</td><td>7.4%</td></tr>
+<tr><td>P(k &lt; 0.85) ＝タケシの中央想定を下回る</td><td>36.0%</td></tr>
+</tbody></table>
+<p><strong>結論：0.85 は妥当な保守係数です。タケシの中央想定より下に出る確率が36%あり、保守側に振れています。</strong></p>
+<p><strong>ただし、この案の最大の感度は k ではありません。</strong> k の下振れは 12%の枝で最大 ▲7,500円。<strong>出品できない枝は 41%で ▲22,000円。</strong> 桁が違います。</p>
+<h3>2-3. 「自分が入って価格が崩れる」の崩れ方（応手を3手読む）</h3>
+<blockquote>うちが3社目として12点を投入 → 競合2社はカートを失う → <strong>追随値下げか、放置か</strong>。</blockquote>
+<p>私の読みでは<strong>1周目は崩れません。理由は在庫が薄すぎることです。</strong> G1 の取り分推定は月67個で、<strong>12点は5日で消えます。</strong> 5日で消える在庫が相場を壊す力はありません。</p>
+<p>崩れるのは4手目から先です。</p>
+<table><thead><tr><th>手</th><th>出来事</th><th>確度</th></tr></thead><tbody>
+<tr><td>1手目</td><td>うちが FBA・同額で参入 → カート交代が起き、5〜10日で12点が消化</td><td>75%</td></tr>
+<tr><td>2手目</td><td>競合2社は在庫が減らないことに気づき、<strong>1〜3%刻みの自動追随値下げ</strong>を始める</td><td>45%</td></tr>
+<tr><td>3手目</td><td>うちが2周目に<strong>60日分（100点超）を入れる</strong> → 在庫が滞留し、追随値下げが往復して k が 0.80 台へ</td><td>2周目で 40%</td></tr>
+<tr><td>4手目</td><td><strong>Amazon 本体の復帰</strong>（月400個も売れる定番肌着に本体が不在なのは、一時欠品である可能性が高い）→ カートを失い、k が 0.70 前後へ</td><td>90日以内で <strong>20〜25%</strong></td></tr>
+</tbody></table>
+<p><strong>要点：1周目の価格リスクは自分ではなく Amazon 本体です。</strong> タケシが心配した「自分で相場を壊す」は<strong>2周目に発生する問題</strong>で、そこでこそ「1SKU に厚く入れない」が効きます。1周目は逆に<strong>薄すぎて何も測れない</strong>のが問題です（§7-1）。</p>
+<h3>2-4. 副産物：2,500円の崖には「置いてはいけない価格帯」がある</h3>
+<p>服&amp;ファッション小物は 2,500円超で 8.4%→12.4%。手残りが 2,500円と同額になる価格を解くと <strong>2,627円</strong>。</p>
+<blockquote><strong>運用ルール（タケシの§1を精密化）：出品価格は 2,500円以下、または 2,630円以上。2,500〜2,627円の帯は手残りが 2,500円を下回るので使わない。</strong><br>さらに <strong>現在価格が 2,630円を超える ASIN は1周目の候補から外す</strong>。2,500円に置けばカートは取れますが、<strong>相場を10〜16%引き下げるのは自分になります</strong>（タケシの§11-5 と衝突する）。<br>→ <strong>B案の G2（現在価格2,880円・4枚組）はこのルールで落ちます。</strong> 落ちる理由はもう1つあります（§7-2）。</blockquote>
+<hr>
+<h2>3. 検証点2 — 請求書は SD（ラクーンコマース）名義で確定。ゲート解除は通るか</h2>
+<p><strong>前提の訂正は受け入れます。</strong> 成果物 01 §128・§199 のとおり、<strong>適格請求書・領収書は SD（ラクーンコマース T9010001196084）名義、納品書が丸進名義</strong>で確定しています。</p>
+<p>したがって「丸進名義の請求書が出る世界」は存在せず、<strong>タケシの撤退条件 9/24（名義がラクーンのみなら A案へ縮小）は判定する前から確定済み</strong>です。この行は撤退条件から外し、<strong>分岐は「解除が通るか」だけ</strong>に置き換えます。</p>
+<h3>3-1. 通る確率 — <strong>55%（幅 35〜70%・推測）</strong></h3>
+<table><thead><tr><th>通ると見る根拠</th><th>通らないと見る根拠</th></tr></thead><tbody>
+<tr><td><strong>判定は書類名ではなく記載4要件</strong>（購入者の名称・住所／仕入先の名称・住所／商品名／数量と日付）。宛名入りなら量販店・Amazon 本体でも通った実績がある（<code>knowledge_listing_restrictions_ungating</code>）</td><td><strong>適格請求書が明細なしの合計金額表示だと「商品名・数量」を満たしません</strong>。SD の帳票の様式は未確認</td></tr>
+<tr><td><strong>SD は法律上の販売元＝卸業者</strong>。ネット卸（NETSEA・SD）は確実性の序列で「メーカー／正規卸」の次、量販店より上</td><td><strong>SD 登録名が「【開業前】Satoy Select」</strong>。Amazon の登録名・住所と1文字でも違えば却下の主因①（名称・住所の不一致）に直撃</td></tr>
+<tr><td>丸進名義の<strong>納品書が併せて出る</strong>ので、補足書類として添えられる</td><td>ブランドごとに審査の厳しさが違う。GUNZE の実績は当社に無い</td></tr>
+</tbody></table>
+<p><strong>無料で上げられる確度が2つあります。発注前にやってください。</strong></p>
+<ol>
+<li style='margin-left:0.0em'><strong>SD の FAQ／帳票サンプルで、適格請求書に明細（商品名・数量）が載るかを確認</strong>（カズヨ・0円・ログイン内）。載らないなら解除の主経路は消え、③の「ゲートなし ASIN だけ買う」に一本化されます。</li>
+<li style='margin-left:0.0em'><strong>SD 会員名の「【開業前】」接頭辞と住所を、Amazon 出品用アカウントの登録情報と一字一句そろえる</strong>（社長の会員情報変更＝§4.1 ではない範囲はカズヨが下書き）。<strong>これは却下理由の第1位を潰す作業で、費用ゼロです。</strong></li>
+</ol>
+<h3>3-2. 通らない世界での最適発注量 — <strong>「10点以上」を捨てても発注はやめません。むしろ増えます</strong></h3>
+<table><thead><tr><th>世界</th><th>確率</th><th>最適な発注のかたち</th><th>中央の通算現金</th></tr></thead><tbody>
+<tr><td><strong>①ゲートなしの ASIN が実機確認で見つかる</strong>（基準率8%。56候補なら4〜5件）</td><td>—</td><td><strong>請求書は不要。点数は「売れる量」で決める＝1SKU 20〜24点（30日取り分の1/3〜1/2）。2SKU 通れば各20点</strong></td><td><strong>+12,400〜20,200円</strong></td></tr>
+<tr><td>②ゲートあり＋解除が通る</td><td>55%</td><td>10点要件は満たすが、<strong>12点は上限ではなく下限</strong>。20点でも要件は満たす</td><td>+18,100円</td></tr>
+<tr><td>③ゲートあり＋解除が通らない</td><td>45%</td><td><strong>その ASIN は買わない。</strong>点数を積む理由が消えるので、①の ASIN へ全額振り替える</td><td>±0（買わない）</td></tr>
+</tbody></table>
+<p><strong>結論：「解除が通らない世界」の最適発注量は 0点ではなく、「ゲートなしと確認できた ASIN に 20〜24点」です。</strong></p>
+<p>12点という数字は 10点要件から逆算したものなので、要件が消えた瞬間に<strong>根拠のない数字</strong>になります。そして<strong>売れる量から決め直すと、12点は少なすぎます</strong>。</p>
+<hr>
+<h2>4. 検証点3 — 11/30 に Amazon 日本ストアで出品が見えている確率</h2>
+<p>工程：提出 → 審査（往復あり）→ 出品前審査 → ストア再開 ／ 並行して 発注 → 着荷 → 検品 → 納品 → 受領反映 ／ かつ ゲート解除。20万回試行。</p>
+<table><thead><tr><th>前提</th><th><strong>P(11/30 に出品が見えている)</strong></th><th>中央の到達日</th></tr></thead><tbody>
+<tr><td><strong>A 現状（2026-09-21 社長判断「数日様子見」）</strong></td><td><strong>40.3%</strong></td><td>47日（＝11/7）</td></tr>
+<tr><td>A' 現状 ＋ 自己発送で先に1点出す</td><td>42.7%</td><td>—</td></tr>
+<tr><td>B 9/22 に提出（タケシの計画どおり）</td><td><strong>51.9%</strong></td><td>38日</td></tr>
+<tr><td>C 提出が10月中旬以降にずれた場合</td><td>17.0%</td><td>67日</td></tr>
+<tr><td>D 参考：<strong>ゲートが無い世界</strong>（現状の提出時期のまま）</td><td><strong>77.6%</strong></td><td>45日</td></tr>
+</tbody></table>
+<p><strong>判定：40.3%。タケシの判定線（50%割れ）を下回ります。</strong></p>
+<h3>4-1. 何が確率を削っているか（順位が重要）</h3>
+<table><thead><tr><th>要因</th><th>効き</th><th>コメント</th></tr></thead><tbody>
+<tr><td><strong>① ゲート（92%がゲートあり × 解除55%）</strong></td><td><strong>▲37pt</strong>（77.6%→40.3%）</td><td><strong>最大要因。しかも一番安く動かせる</strong>（§3-1 の2手＋実機確認）</td></tr>
+<tr><td>② 本人確認の提出時期（9/22 → 9/25〜10/5）</td><td>▲12pt</td><td>社長の一手。9/22 に出せば +12pt</td></tr>
+<tr><td>③ 審査の往復（1回目通過を62%と置いた。カナダは却下の実績）</td><td>▲10pt 相当</td><td>書類は要件どおり（旅券＋180日以内の明細PDF）。枠の取り違えだけが人為リスク</td></tr>
+<tr><td>④ FBA 受領の遅延（11月後半は FC 混雑）</td><td>▲4pt</td><td>11月下旬に納品がかかると受領4〜25日</td></tr>
+<tr><td>⑤ 発注の遅れ</td><td><strong>ほぼ0pt</strong></td><td><strong>下表</strong></td></tr>
+</tbody></table>
+<h3>4-2. 発注を遅らせる費用は、ほぼゼロです（これが今回いちばん重要な数字）</h3>
+<table><thead><tr><th>発注を遅らせる日数</th><th>P(11/30)</th><th>中央の到達日</th></tr></thead><tbody>
+<tr><td>0日（クーポン期限 9/30 に合わせる）</td><td><strong>40.3%</strong></td><td>47日</td></tr>
+<tr><td><strong>+14日</strong></td><td><strong>40.3%</strong></td><td>51日</td></tr>
+<tr><td>+21日</td><td>39.3%</td><td>56日</td></tr>
+<tr><td>+35日</td><td>22.7%</td><td>70日</td></tr>
+</tbody></table>
+<p><strong>理由：律速はストアの再開とゲートで、在庫の到着ではありません。</strong> 在庫は中央17日で手元に来ますが、ストアはそれより遅く開きます。</p>
+<p><strong>したがって「クーポン3,000円を取るために、ゲート未確認で4.2万円を発注する」のは、費用3,000円と損失確率26pt（41%→15%）の交換です。</strong> 交換比率が合っていません。</p>
+<p><strong>ただし +35日（＝11月に入ってからの発注）は崖です。</strong> 10月中旬までに発注する、が境界線になります。</p>
+<h3>4-3. 社長の 9/20「SD 照会は見送り」の再考をお願いします</h3>
+<table><thead><tr><th></th><th>照会を出す</th><th>出さない（現状の決定）</th></tr></thead><tbody>
+<tr><td>得られるもの</td><td>11/30 の判定基準（Amazon ストアフロントで足りるか／停止中の扱い／延長の可否）。<strong>40.3% という賭けを、条件の確認に置き換えられる</strong></td><td>何も動かない</td></tr>
+<tr><td>下振れ</td><td><strong>「開業前扱いのまま出品実績ゼロ」を先方に自己申告する形になり、期限前の判断を招く恐れ</strong>（＝藪蛇。確度 15〜20%）</td><td>11/30 に <strong>59.7%</strong> の確率で利用停止</td></tr>
+<tr><td>代替</td><td>—</td><td>Amazon 以外の販路（無料 EC）を SD へ届け出て「サイトオープン」を満たす。<strong>販売形態の届け出が必要・規約同意は§4.1</strong></td></tr>
+</tbody></table>
+<p><strong>私の推奨は「照会を出す」。</strong> ただし文面は「延長のお願い」ではなく、<strong>「サイトオープンの確認方法の照会」</strong>に限定してください（自社の遅れを申告しない書き方にできます）。</p>
+<p><strong>代替案（別販路の届け出）も生きています。</strong> SD の停止条件は「サイトオープンが確認できない」ことなので、Amazon 以外でも条件は満たせます。<strong>自己発送で先に1点出すヘッジは +2.4pt しかなく、効きません</strong>（律速がストア再開だから）。</p>
+<hr>
+<h2>5. プレモーテム — 3ヶ月後（2026-12-21）、この計画は失敗していた。なぜか</h2>
+<p>上位5つを、確率 × 損害 × <strong>撤退条件に落とせるか</strong> で並べます。</p>
+<table><thead><tr><th>#</th><th>失敗筋</th><th>確率</th><th>損害</th><th>撤退条件（私の案）</th></tr></thead><tbody>
+<tr><td><strong>1</strong></td><td><strong>ゲート解除が SD 名義の請求書で通らず、在庫が出品できないまま残った</strong></td><td><strong>41%</strong>（実機確認なしで発注した場合）／<strong>15%</strong>（確認後に発注）</td><td>▲22,000円＋2周目の設計（56ASIN の棚）が消える</td><td><strong>発注の前に実機確認。</strong>「出品許可を申請」が出た ASIN は、①SD 帳票に明細があること ②SD 登録名＝Amazon 登録名 の2つが取れるまで発注しない</td></tr>
+<tr><td><strong>2</strong></td><td><strong>丸進のカタログに該当品が無い／卸率が原価上限を通らず、発注ゼロで9月が終わった</strong></td><td><strong>43%</strong></td><td>現金の損失ゼロ・<strong>時間4週間と 11/30 の余裕</strong></td><td>10/10 に通過0件なら丸進を止め、SD 内の別のグンゼ出展企業へ（タケシの案を維持）。<strong>ただし判定は 9/27 に前倒し可能</strong>（卸値取得は1日作業）</td></tr>
+<tr><td><strong>3</strong></td><td><strong>11/30 に出品が見えず SD が利用停止。仕入れ棚を失った</strong></td><td><strong>60%</strong></td><td>SD レーン喪失。今回の学習（納品オペ・卸→ASIN 引き当て）の出口が消える</td><td>§4-3 の照会を 9/24 までに出す。10/24 にストア未再開なら別販路の届け出に切り替え</td></tr>
+<tr><td><strong>4</strong></td><td><strong>Amazon 本体が定番肌着に復帰し、k が 0.685 を割った</strong></td><td><strong>12%</strong>（本体復帰そのものは20〜25%）</td><td>▲300〜7,500円</td><td>買値は原価上限の<strong>90%以下</strong>を原則（耐性 k=0.637）。上限の90%超でしか買えない SKU は<strong>10点で止める</strong></td></tr>
+<tr><td><strong>5</strong></td><td><strong>キャラクター品で知財申立てが入り、本人確認の審査中に健全性を傷つけた</strong></td><td><strong>10〜15%</strong></td><td><strong>現金では上限が付かない。</strong>4ストア停止中の2件目は取れない</td><td><strong>1周目はキャラクター品を発注しない</strong>（撤退条件ではなく設計で消す）</td></tr>
+</tbody></table>
+<p><strong>6つ目（タケシの計上漏れ）：返品。</strong> 下着・肌着は返品されると再販不可で、配送代行 415〜430円も戻りません。1点あたり 30〜50円の費用として計上すべきです（B案で ▲700円）。</p>
+<p><strong>7つ目（出口の規約）：処分ルートが SD 規約と衝突します。</strong> SD は<strong>登録外の販売形態を禁止</strong>（01 §133）。</p>
+<p><strong>在庫をメルカリ等で処分するなら、その販路を SD へ届け出る必要があります。</strong> 回収率40%の前提は「届け出済みの販路がある」世界でのみ成立します。届け出ないなら取引中止事由です。<strong>古物商許可は不要</strong>（新品・卸仕入れ）。</p>
+<hr>
+<h2>6. 3シナリオの現金と、予備25万円</h2>
+<p>総支出 約4.3万円（案X・自宅検品）。120日通算。<strong>この表は「発注が組めた世界」に条件付けています。</strong></p>
+<table><thead><tr><th>シナリオ</th><th>確率</th><th>買値/上限</th><th>実現 k</th><th>消化</th><th>通算現金</th><th>期末の現金残（運転資金100万）</th></tr></thead><tbody>
+<tr><td><strong>楽観</strong></td><td>15%</td><td>0.80</td><td>0.97</td><td>38/38点</td><td><strong>+29,900円</strong></td><td>1,029,900円</td></tr>
+<tr><td><strong>中央</strong></td><td>45%</td><td>0.90</td><td>0.88</td><td>38/38点</td><td><strong>+20,100円</strong></td><td>1,020,100円</td></tr>
+<tr><td><strong>悲観</strong></td><td>25%</td><td>0.97</td><td>0.74</td><td>35/38点</td><td><strong>+3,700円</strong></td><td>1,003,700円</td></tr>
+<tr><td><strong>最悪（出品できず処分）</strong></td><td>15%</td><td>0.95</td><td>—</td><td>0/38点</td><td><strong>▲21,200円</strong></td><td>978,800円</td></tr>
+</tbody></table>
+<ul>
+<li style='margin-left:0.0em'><strong>予備25万円を割る確率は 0.00%。</strong> 最も薄い月の現金は 97.9万円で、予備（25万円）まで <strong>72.9万円</strong>の余裕があります。<strong>資金条件がこの発注で壊れることはありません</strong>（タケシの結論を支持）。</li>
+<li style='margin-left:0.0em'><strong>運転資金の前提が変わっています。</strong> 2026-09-21 のヒアリングで <strong>200万円 → 100万円</strong>（<code>project_goal_2m_operating_profit_2028-09</code>）。13 の §9・§10 は 200万円で書かれているので<strong>要修正</strong>。結論（1.2%→4.6%）は変わりません。</li>
+<li style='margin-left:0.0em'>月次の谷は「発注 → 入金までの約45〜60日」。<strong>4.3万円なので谷そのものが見えない規模</strong>です。現金の設計上、1周目は論点になりません。</li>
+</ul>
+<hr>
+<h2>7. タケシの推定値の妥当性（3点）</h2>
+<h3>7-1. 取り分＝購入数/月 ÷（出品者+1）× 0.5 → <strong>式は妥当。ただし B案ではこの数字が効いていません</strong></h3>
+<ul>
+<li style='margin-left:0.0em'>÷（出品者+1）は実務の標準式。×0.5 の新規割引も保守側で妥当です。<strong>むしろ保守すぎる可能性</strong>があり、競合が自己発送なら FBA のうちはカート獲得で有利に出ます。</li>
+<li style='margin-left:0.0em'><strong>問題は、この推定が B案の結果に一切効いていないこと。</strong> 感度を取ると、取り分が推定の <strong>25%</strong> でも12点は完売し、通算現金は変わりません（<strong>取り分が推定の12%を割って初めて動く</strong>）。</li>
+<li style='margin-left:0.0em'>裏返すと <strong>12点＝5日分の在庫</strong>です。<strong>タケシ自身のルール（グンゼは60〜90日取り分＝100点超）と矛盾しており、実際の点数は予算で決まっています。</strong></li>
+<li style='margin-left:0.0em'><strong>1周目に測りたいのは「価格が持つか」「回転するか」ですが、5日で在庫が切れると、どちらも測れません。</strong> 在庫切れの期間は観測ではなく空白です。</li>
+</ul>
+<p>  → <strong>点数は 20〜24点（30日取り分の1/3〜1/2）に上げるべき</strong>です。キャラ2SKU を外した予算がそのまま充てられます。</p>
+<h3>7-2. 4枚組・3枚組（G2・G7・G8・G9）は、卸率の構造上ほぼ通りません — <strong>B案の柱の半分が落ちます</strong></h3>
+<p>原価上限は<strong>パックの上代</strong>と比べなければなりません。卸率67%のとき、通過に必要な「現在価格 ÷ 上代」は</p>
+<table><thead><tr><th>SKU</th><th>必要倍率（卸率67%）</th><th>現実の見込み</th></tr></thead><tbody>
+<tr><td>G1（単品トランクス）</td><td><strong>1.82倍</strong></td><td>供給が薄い棚なら届きうる（これが利益の源泉）</td></tr>
+<tr><td><strong>G2（半袖V首 4枚組）</strong></td><td><strong>1.71倍</strong></td><td><strong>4枚分の上代に対して 1.71倍は現実的でない</strong>（パックは1枚あたりが安く売られる方向）</td></tr>
+<tr><td>G3（単品 V首T）</td><td>1.81倍</td><td>単品なので G1 と同じ土俵</td></tr>
+</tbody></table>
+<p><strong>判定：B案の G2 ×12点（発注の35%）は、発注前に落ちる確率が高い</strong>（私の読みで 85%・確度70%）。§2-4 の 2,630円ルールでも落ちます。</p>
+<p>→ <strong>B案は実質「グンゼ単品1SKU ＋ キャラ2SKU」であり、タケシが意図した「グンゼ2SKU が主柱」になっていません。</strong> ここは差し戻し項目です。</p>
+<h3>7-3. 処分回収率40% → <strong>定番肌着では妥当。キャラ品では 20〜30%</strong></h3>
+<ul>
+<li style='margin-left:0.0em'>肌着（単価900円前後・新品・定番）を別販路で処分：粗い回収は卸値の50〜60%、手数料10%＋送料175〜750円＋手間を引いて<strong>35〜45%</strong>。<strong>40%は妥当</strong>。</li>
+<li style='margin-left:0.0em'><strong>キャラ品は別</strong>です。知財申立てが理由で在庫が死んだ場合、他の販路でも同じ申立てが起きます（サンリオはメルカリと権利侵害対策で連携協定）。<strong>回収率は 20〜30% と置くべき</strong>。</li>
+<li style='margin-left:0.0em'><strong>前提条件つき</strong>：処分販路は SD へ届け出が必要（§5 の7つ目）。</li>
+</ul>
+<h3>7-4. シナリオ確率 20/50/30% → <strong>重心が1箇所ずれています</strong></h3>
+<table><thead><tr><th>タケシ</th><th>私</th><th>差の理由</th></tr></thead><tbody>
+<tr><td>楽観 20%</td><td>15%</td><td>大差なし</td></tr>
+<tr><td>中央 50%</td><td>45%</td><td>大差なし</td></tr>
+<tr><td><strong>悲観 30%（出品はできたが価格が崩れて処分売り）</strong></td><td><strong>12〜17%</strong></td><td>4SKU に分散していると、1SKU の崩れでは全体が赤字になりません（<strong>出品できた世界の黒字確率 99.7%</strong>）</td></tr>
+<tr><td><strong>最悪 5%（別枠・出品できず）</strong></td><td><strong>41%</strong>（実機確認なしで発注した場合）</td><td><strong>ここが8倍ずれています。</strong>「悲観」に置いた30%は、実際は「最悪」に置くべき確率でした</td></tr>
+</tbody></table>
+<p><strong>キャリブレーションの所見：タケシは価格リスクを過大、出品可否リスクを過小に見ています。</strong> 両方を正すと期待値は +7,900 → +2,600 になります。<strong>方向（賭けてよい規模である）は変わりません。</strong></p>
+<hr>
+<h2>8. 12ヶ月累計キャッシュ＞0（中央）という設計条件との関係</h2>
+<table><thead><tr><th>問い</th><th>答え</th></tr></thead><tbody>
+<tr><td>この初回仕入れは設計条件を壊すか</td><td><strong>壊しません。</strong> 中央 +11,800円のプラス寄与。最悪でも ▲22,200円</td></tr>
+<tr><td>この初回仕入れは設計条件を満たすか</td><td><strong>満たしません（そもそも寄与が小さすぎる）。</strong> 期待値 +2,600円。12ヶ月の判定に対して事実上ゼロです</td></tr>
+<tr><td>では「初回は学習コストと割り切る」のか</td><td><strong>割り切るのではなく、「オプションを買う」と言うべきです。</strong> 現金の期待値はゼロ近傍で、買っているのは①GUNZE 56ASIN の出品権 ②納品オペ1周 ③卸値→ASIN の引き当ての型。<strong>この3つが2周目以降の母数と速度を決めます。タケシの位置づけ（§0-2）は正しい</strong></td></tr>
+<tr><td>案そのものを変えるべきか</td><td><strong>案の骨格は維持。修正は §9 の6点</strong></td></tr>
+</tbody></table>
+<p><strong>ただし 13 の§10「このレーンで月商200万円が実効上限」は要修正です。</strong> 運転資金が 200万 → <strong>100万</strong>に変わったので、必要運転資金 ≒ 月商×1.0 の式では<strong>実効上限は月商約100万円</strong>、利益率20%で月利約20万円（経費前）。</p>
+<p><strong>私の24ヶ月シミュレーション（T-20260920-005）の中央は月利8万円</strong>で、<strong>12ヶ月累計キャッシュ＞0 は満たしますが、月営業利益200万円（2028-09）には20倍以上の距離があります。</strong> この距離は初回仕入れの点数では埋まりません。埋めるのは母数（接触社数）と独占化です。<strong>初回仕入れの役割は、その母数を回すための「請求書と実績」を作ることに限られます。</strong></p>
+<hr>
+<h2>9. タケシへの差し戻し項目（本文修正のみ・6点）</h2>
+<table><thead><tr><th>#</th><th>修正内容</th></tr></thead><tbody>
+<tr><td><strong>R1</strong></td><td><strong>§7 の順序を入れ替える。</strong>④ゲート実機確認を②の位置へ（発注前）。根拠＝発注を14日遅らせても 11/30 の確率は 40.3% で不変・費用はクーポン3,000円のみ</td></tr>
+<tr><td><strong>R2</strong></td><td><strong>§7②と撤退条件 9/24 を削除。</strong> 請求書名義は SD（ラクーンコマース）で<strong>確定事実</strong>。分岐は「解除が通るか」に置き換え、無料の確度上げ2手（SD 帳票の明細確認／SD 登録名と Amazon 登録名の一致）を追加</td></tr>
+<tr><td><strong>R3</strong></td><td><strong>B案からキャラクター品2SKU を外す</strong>（現金上限のない失敗が集中）。浮いた予算はグンゼ単品の点数へ</td></tr>
+<tr><td><strong>R4</strong></td><td><strong>G2（4枚組）を候補から外す。</strong>パック上代に対して必要倍率1.71倍は現実的でない。加えて 2,630円ルール。<strong>現在価格2,630円超の ASIN は1周目対象外</strong>とする</td></tr>
+<tr><td><strong>R5</strong></td><td><strong>点数を 12点 → 20〜24点に上げる</strong>（ゲートなしと確認できた ASIN に限る）。12点＝5日分では価格も回転も測れない。自分のルール（60〜90日取り分）との矛盾も解消</td></tr>
+<tr><td><strong>R6</strong></td><td><strong>返品5%を採算表に計上。処分の出口（別販路）は SD への届け出が前提</strong>であることを明記。キャラの回収率は40%→25%</td></tr>
+<tr><td><strong>R7</strong>（§9・§10）</td><td><strong>運転資金 200万 → 100万に差し替え。</strong>レーンの実効上限は月商200万 → <strong>約100万</strong>に訂正</td></tr>
+</tbody></table>
+<p><strong>修正後の姿（私の推奨形）：ストア再開 → 実機確認 →「出品する」が出たグンゼ単品 1〜2SKU × 各20〜24点（発注 3.6〜4.3万円）・キャラなし。</strong></p>
+<table><thead><tr><th></th><th>中央</th><th>平均</th><th>P10</th><th>黒字確率</th><th>最悪</th></tr></thead><tbody>
+<tr><td>B案（書面どおり・実機確認なしで発注）</td><td>+11,800</td><td><strong>+2,600</strong></td><td>▲19,900</td><td><strong>59.0%</strong></td><td>▲22,200</td></tr>
+<tr><td><strong>推奨形（2SKU×20点・実機確認後）</strong></td><td><strong>+20,200</strong></td><td><strong>+14,200</strong></td><td>▲17,000</td><td><strong>78.7%</strong></td><td>▲21,000</td></tr>
+<tr><td>推奨形（1SKU しか通らず 24点）</td><td>+12,400</td><td>+9,000</td><td>▲9,000</td><td>79.3%</td><td>▲11,600</td></tr>
+</tbody></table>
+<p><strong>同じ中央値で、平均が5倍、黒字確率が+20pt、そして知財の尾が消えます。</strong> 追加費用はクーポン3,000円の放棄だけです。</p>
+<hr>
+<h2>10. 読みようがない領域（正直に）</h2>
+<table><thead><tr><th>領域</th><th>なぜ読めないか</th><th>誰が潰すか</th></tr></thead><tbody>
+<tr><td>丸進のカタログと候補56ASIN の重なり</td><td>ログイン内の1,343件が未取得。<strong>私の突合率15%は当てずっぽう</strong>（幅 8〜25%）</td><td>カズヨ（卸価格の承認後・9/27）</td></tr>
+<tr><td>卸率の分布（55%以下が何点あるか）</td><td>実測は1点のみ（67%）。分布が分からないと通過件数が読めない</td><td>同上。サトルが 14 §5-2 で依頼済み</td></tr>
+<tr><td>SD 適格請求書の明細の有無</td><td>帳票様式が未確認。<strong>ゲート解除の主経路の成否がここで決まる</strong></td><td>カズヨ（0円・FAQ／ログイン内）</td></tr>
+<tr><td>ゲート解除の実際の通過率</td><td>当社の実績ゼロ。55%は二次情報からの推測</td><td>1周目の実測で確定する（これが初回の最大の学習価値）</td></tr>
+<tr><td>SD が 11/30 に何を確認するか</td><td>条文は「サイトオープンが確認できない場合」だけ</td><td>§4-3 の照会（社長判断）</td></tr>
+</tbody></table>
+<p><strong>想定外（モデルの外で分布が崩れる）の残余確率：12〜18%。</strong> 内訳の見当＝Amazon 側の規約・手数料改定、本人確認の3回目以降の却下、丸進の取引謝絶、SD 側の運用変更。</p>
+<hr>
+<h2>11. 答え合わせ（この予測を後で採点します）</h2>
+<table><thead><tr><th>予測</th><th>確度</th><th>照合日</th></tr></thead><tbody>
+<tr><td>丸進で原価上限を通るグンゼ SKU が2件以上</td><td>24%</td><td>2026-10-10</td></tr>
+<tr><td>G2（B0BZC1LLFK・4枚組）は原価上限を通らない</td><td>85%</td><td>2026-10-10</td></tr>
+<tr><td>グンゼの候補 ASIN にゲートがある（実機確認）</td><td>92%</td><td>ストア再開の翌営業日</td></tr>
+<tr><td>SD 名義の請求書でゲート解除が通る（申請した場合）</td><td>55%</td><td>2026-11 中</td></tr>
+<tr><td><strong>2026-11-30 に Amazon 日本で当社の出品が1件以上見えている</strong></td><td><strong>40%</strong>（9/22 提出なら 52%）</td><td>2026-11-30</td></tr>
+<tr><td>90日の実現平均売価が現在価格の 0.685 倍を割る</td><td>12%</td><td>出品から90日</td></tr>
+<tr><td>この発注で予備25万円を割る</td><td>0%</td><td>2027-01-31</td></tr>
+<tr><td>キャラクター品を入れた場合に知財申立てが入る</td><td>10〜15%</td><td>出品から90日</td></tr>
+</tbody></table>
+<hr>
+<h2>付記：この検証で使った事実と推測の切り分け</h2>
+<table><thead><tr><th>区分</th><th>内容</th></tr></thead><tbody>
+<tr><td><strong>確定（一次）</strong></td><td>SD の適格請求書＝ラクーンコマース名義・納品書＝出展企業（01 §128・§199）／SD の登録外販売形態の禁止（01 §133）／販売手数料の料率・税抜表示・2,500円の崖（13 §1）／FBA 配送代行の区分別料金（10）／<code>monthlySold</code> がバリエーション固有（09）／丸進の送料条件・卸率67%の1点実測（14 §4）／本人確認の必要書類2点と「最大3営業日」（T-20260920-001 実画面）／<strong>2026-09-21 社長判断「数日様子見」＝書類未提出</strong>（同チケット）／運転資金100万円（<code>project_goal_2m_operating_profit_2028-09</code>）</td></tr>
+<tr><td><strong>推測（本文で確度を明示）</strong></td><td>丸進カタログとの突合率15%（8〜25%）／卸率の分布（平均66%・σ5%）／現在価格÷上代の分布／k の混合分布／ゲート基準率92%（2026-09-12 実測 13件中12件）／解除通過率55%（35〜70%）／審査の往復確率／FBA 受領日数／返品率5%／処分回収率40%（キャラ25%）</td></tr>
+<tr><td><strong>非掲載（規約）</strong></td><td>SD の卸値・上代・SD 品番・入数（SD 会員規約17条1項）／Keepa の履歴・平均・在庫切れ率（Keepa T&amp;C §11・成果物 08 の B クラス）</td></tr>
+</tbody></table>
+</body></html>
