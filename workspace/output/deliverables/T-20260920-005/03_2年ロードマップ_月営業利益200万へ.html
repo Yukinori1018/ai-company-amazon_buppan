@@ -1,0 +1,159 @@
+<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>2年ロードマップ — 月営業利益200万円へ</title><style>body{font-family:-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif;line-height:1.8;max-width:1080px;margin:0 auto;padding:2.5rem 1.5rem;color:#1a1a1a}
+h1{font-size:1.7rem;border-bottom:3px solid #1a5490;padding-bottom:.5rem}h2{font-size:1.3rem;margin-top:2.4rem;border-left:5px solid #1a5490;padding-left:.6rem}h3{font-size:1.05rem;margin-top:1.6rem;color:#1a5490}
+table{border-collapse:collapse;width:100%;margin:1rem 0;font-size:.88rem}th,td{border:1px solid #d0d7de;padding:.45rem .6rem;vertical-align:top}th{background:#eef3f8;font-weight:600}tr:nth-child(even) td{background:#fafbfc}
+blockquote{border-left:5px solid #d97706;background:#fffbeb;margin:1.2rem 0;padding:.8rem 1.2rem}blockquote h3{margin-top:.2rem;color:#92400e}
+code{background:#f0f2f5;padding:.1rem .35rem;border-radius:3px;font-size:.85em}hr{border:0;border-top:1px solid #e1e4e8;margin:2rem 0}strong{color:#0d3d6b}a{color:#1a5490}</style></head><body>
+<h1>2年ロードマップ — 月営業利益200万円へ（2026-10 → 2028-09）</h1>
+<p>T-20260920-005 ／ 2026-09-21 ／ プランナー タケシ</p>
+<p>入力：01（ハジメ・逆算と資金の壁）／02（サトル・到達者16人）／T-20260915-002 統合報告v4／memory <code>project_goal_2m_operating_profit_2028-09</code>・<code>project_strategy_core_offline_makers</code></p>
+<hr>
+<h2>0. 結論（5行）</h2>
+<ol><li><strong>勝ち筋は1本だけです。「1社あたりの月利を0.7万円→5万円に上げる」。</strong> 取引社数でも資金でもありません。ここ以外に2年で200万へ届く変数はありません。</li><li><strong>ハジメとサトルは矛盾していません。</strong> 到達者16人は「利益再投資 × 4〜5年」で在庫を積みました。融資は<strong>時間を買う道具</strong>です。2028年9月という期限を社長が固定した以上、融資は必要になります（§1）。</li><li><strong>本業（タクシー）が、いま社長が使える最大の資金調達です。</strong> 辞めなければ生活費20万円は給与から出ます。24ヶ月続ければ<strong>480万円の運転資金を温存</strong>でき、これはハジメが算出した必要融資額445万円（粗利率35%時）とほぼ同額です。<strong>辞める時期の設計＝資金計画そのものです。</strong></li><li><strong>推奨は案B（独占＋簡易OEM＋多販路・融資2回）。</strong> 2028年9月時点の月営業利益は中央95万円、悲観▲10万円、楽観220万円。<strong>200万到達確率は推定15%</strong>。期限を2029年9月まで伸ばせば推定40%に上がります。ここは社長判断の論点です（§4-g）。</li><li><strong>2027年Q3まで、A/B/C の3案は同じ動きです。</strong> 分岐は2027年7月の融資判断のみ。したがって<strong>いま決めるべきは案の選択ではなく、「1社あたり月利を上げる打ち手を、いつ始めるか」です。答えは2027年1月です。</strong></li></ol>
+<hr>
+<h2>1. 中心問題の解 — 「融資0人」と「融資必須」はなぜ両立するか</h2>
+<h3>1-1. 到達者が融資なしで在庫を積めた理由は「複利」と「年数」</h3>
+<p>ハジメのモデル（01 §3）を成長式に直すと、利益を全額再投資した場合の運転資金 W の月次成長率は次のとおりです。</p>
+<table><thead><tr><th style="text-align:right">粗利率 g</th><th style="text-align:right">月次成長率（W=150万時）</th><th style="text-align:right">W=300万時</th><th style="text-align:right">150万 → 1,000万に要する月数</th></tr></thead><tbody>
+<tr><td style="text-align:right">15%（相乗り）</td><td style="text-align:right">4.5%/月</td><td style="text-align:right">7.0%/月</td><td style="text-align:right"><strong>約32ヶ月</strong></td></tr>
+<tr><td style="text-align:right">25%（独占混在）</td><td style="text-align:right">15.4%/月</td><td style="text-align:right">17.8%/月</td><td style="text-align:right"><strong>約12ヶ月</strong></td></tr>
+<tr><td style="text-align:right">35%（独占中心）</td><td style="text-align:right">21.6%/月</td><td style="text-align:right">24.0%/月</td><td style="text-align:right"><strong>約9ヶ月</strong></td></tr>
+</tbody></table>
+<blockquote><p>計算式：W の成長 ＝ W×(g−0.04)/(c×1.5＋0.325) − 7.1万（c＝1−g−0.273）。ハジメ 01 §1〜3 の置き値をそのまま使用。</p></blockquote>
+<p><strong>資金は複利で増えます。静的な天井（資金÷倍率＝28万円/月）は、成長する事業では下限にしかなりません</strong>（私自身が T-20260915-002 で同じ誤りをしており、memory <code>knowledge_copy_practitioner_plan_2026-09</code> に記録済み）。</p>
+<p>なお、ハジメの天井28万円は外注費4%の控除前です。控除すると<strong>23万円</strong>です。結論は変わりません。</p>
+<h3>1-2. では何が4〜5年かかったのか — 仕入れ先の獲得速度</h3>
+<table><thead><tr><th>制約</th><th>速度</th><th style="text-align:right">200万到達までの所要</th></tr></thead><tbody>
+<tr><td><strong>資金（複利）</strong></td><td>g=25%で月15〜18%成長</td><td style="text-align:right"><strong>約12ヶ月</strong></td></tr>
+<tr><td><strong>仕入れ先の獲得</strong>（週70通・成約率2%＝月6社）</td><td>月6社</td><td style="text-align:right">286社 ÷ 6 ＝ <strong>約48ヶ月</strong></td></tr>
+</tbody></table>
+<p><strong>律速は資金ではなく、仕入れ先の獲得速度でした。</strong> 到達者16人の所要年数（A1 4年・A13 5年・A5 2.5年）はこの48ヶ月と一致します。彼らは融資が要らなかったのではなく、<strong>時間で代替した</strong>のです。</p>
+<h3>1-3. したがって、2年に圧縮する唯一の道</h3>
+<p>286社は24ヶ月では作れません。作る必要もありません。<strong>1社あたりの月利を上げれば、必要社数が落ちます。</strong></p>
+<table><thead><tr><th style="text-align:right">1社あたり月利</th><th style="text-align:right">必要社数</th><th style="text-align:right">24ヶ月での獲得ペース</th><th>実現可能性</th></tr></thead><tbody>
+<tr><td style="text-align:right">0.7万（相乗り・v4の実測置き値）</td><td style="text-align:right">286社</td><td style="text-align:right">月12社</td><td><strong>不可能</strong>（成約率2%では月6社が上限）</td></tr>
+<tr><td style="text-align:right">2.5万（実践者の上限・相乗り）</td><td style="text-align:right">80社</td><td style="text-align:right">月3.3社</td><td>資金が先に尽きる（在庫2,000万相当）</td></tr>
+<tr><td style="text-align:right"><strong>5万（独占・簡易OEM）</strong></td><td style="text-align:right"><strong>40社</strong></td><td style="text-align:right"><strong>月1.7社</strong></td><td><strong>射程内。これが設計解</strong></td></tr>
+<tr><td style="text-align:right">10万（強い独占）</td><td style="text-align:right">20社</td><td style="text-align:right">月0.8社</td><td>A3 岩上（1社独占で月利400万）が実在</td></tr>
+</tbody></table>
+<p><strong>2年ロードマップの主変数は1つです：1社あたり月利 0.7万 → 5万（7倍）。</strong> 社数は40社で足ります（v4 の2,400社リストの1.7%）。</p>
+<h3>1-4. 融資の位置づけ（ハジメの結論の書き換え）</h3>
+<table><thead><tr><th></th><th>ハジメ 01 §5</th><th>本ロードマップ</th></tr></thead><tbody>
+<tr><td>融資</td><td><strong>必須</strong>（条件2）</td><td><strong>期限を守るための手段</strong>。2029年9月まで伸ばすなら不要</td></tr>
+<tr><td>必要額</td><td>800〜1,500万</td><td><strong>445万（g=35%時）</strong>。うち480万は本業を24ヶ月続ければ温存できる</td></tr>
+<tr><td>融資が無いと</td><td>月利28万で頭打ち</td><td>月利28万は静的天井。<strong>複利では2029〜2030年に200万へ到達しうる</strong></td></tr>
+</tbody></table>
+<blockquote><p><strong>言い切り：融資は200万の必要条件ではありません。「2028年9月」が必要条件にしています。</strong></p></blockquote>
+<hr>
+<h2>2. ① 到達シナリオ A/B/C</h2>
+<p>3案とも <strong>2027年Q3まで同じ動き</strong>です（メーカー直・週70通・独占打診の開始）。分岐は2027年7月の融資判断のみ。</p>
+<h3>2-1. 比較表</h3>
+<table><thead><tr><th></th><th><strong>案A 独占集中・融資なし</strong></th><th><strong>案B 独占＋簡易OEM＋多販路・融資2回（推奨）</strong></th><th><strong>案C 前受で回す・在庫最小</strong></th></tr></thead><tbody>
+<tr><td><strong>誰の型か</strong></td><td>A3 岩上（1社独占で月利400万）／A2 佐藤（独占＋YouTuber発注で2年で278万）</td><td>A13 野村俊栄（自社ブランド×多販路×値上げ・5年で営業利益200万）＋ ハジメの2段融資</td><td>A6 矢島・A7 伊藤（クラウドファンディング）＋ A12 Taka（海外総代理・メーカー直送）</td></tr>
+<tr><td><strong>レイヤー構成（いつ何を足すか）</strong></td><td>①相乗りメーカー直 g15%（26Q4〜）②独占 g30〜35%（27Q1〜）③独占SKUにM1動画発注（27Q4〜）</td><td>①〜③は案Aと同一 ＋ ④簡易OEM g35〜45%（28Q1〜）⑤楽天・Yahoo!へ販路追加（28Q2〜）</td><td>①相乗り g15%（26Q4〜）②独占/総代理 g30〜40%（27Q1〜）③Makuake 先行販売 手残り60〜70%（27Q4〜）④情報発信 g≒100%（28Q2〜・要実績）</td></tr>
+<tr><td><strong>必要資金（2028年9月時点の運転資金）</strong></td><td><strong>約400万</strong>（月利55万規模）</td><td><strong>約770万</strong>（月利110万規模）／200万到達なら1,026万</td><td><strong>約250万</strong>（前受で在庫を作るため小さい）</td></tr>
+<tr><td><strong>調達方法</strong></td><td>自己150万＋利益再投資のみ。<strong>融資なし</strong></td><td>自己150万＋再投資＋<strong>公庫 2027/7に300〜500万・2028/4に500〜1,000万</strong></td><td>自己150万＋再投資＋<strong>Makuake の前受金</strong>（融資に代わる資金調達）</td></tr>
+<tr><td><strong>社長の週あたり工数</strong></td><td>20h（〜28Q1）→ 退職後40h。外注は28Q2に1名</td><td>20h（〜27Q3）→ <strong>退職後40h（27Q4〜）</strong>。外注27Q4に1名・28Q2に2名</td><td>20h 一定（CF は制作・広告を外注前提）。ただし案件期は一時的に30h</td></tr>
+<tr><td><strong>本業を辞められる時期（中央）</strong></td><td><strong>2028年Q2</strong></td><td><strong>2027年Q4</strong>（1回目融資の実行後）</td><td><strong>2028年Q3以降</strong>（収入が単発で不安定なため最も遅い）</td></tr>
+<tr><td><strong>2028-09 月営業利益（中央）</strong></td><td><strong>55万</strong></td><td><strong>95万</strong></td><td><strong>50万</strong></td></tr>
+<tr><td><strong>同（悲観20%）</strong></td><td>8万</td><td><strong>▲10万</strong>（返済が利益を食う）</td><td>3万</td></tr>
+<tr><td><strong>同（楽観20%）</strong></td><td>180万</td><td><strong>220万</strong></td><td>250万（CF が1本当たった場合）</td></tr>
+<tr><td><strong>P(2028-09 に200万到達)</strong></td><td>推定 <strong>5%</strong></td><td>推定 <strong>15%</strong></td><td>推定 <strong>8%</strong></td></tr>
+<tr><td><strong>P(2029-09 に200万到達)</strong></td><td>推定 25%</td><td>推定 <strong>40%</strong></td><td>推定 20%</td></tr>
+</tbody></table>
+<h3>2-2. 各案が死ぬ理由 上位3つ</h3>
+<table><thead><tr><th>案</th><th>1位</th><th>2位</th><th>3位</th></tr></thead><tbody>
+<tr><td><strong>A</strong></td><td><strong>独占が1件も取れない</strong>（実績ゼロの個人に独占を出すメーカーは稀。A2 佐藤も独占取得まで10ヶ月）</td><td><strong>時間の天井に張り付く</strong>（週20hで29社＝月利20万。退職条件を満たせず、満たせないから退職できない循環）</td><td><strong>1本依存</strong>。独占先が自社直販を始める／廃業すると月利が一夜で消える</td></tr>
+<tr><td><strong>B</strong></td><td><strong>融資が不成立または減額</strong>（2027/7 時点の申告は1期・実質4ヶ月分のみ。公庫の審査基準は非公開＝推定）</td><td><strong>2028/4 の2回目融資が売上化に間に合わない</strong>（在庫化→販売まで3〜6ヶ月。2028年9月は最速でギリギリ）</td><td><strong>返済＋生活費20万でCFが破綻</strong>（月返済 約10〜15万。悲観シナリオで債務超過）</td></tr>
+<tr><td><strong>C</strong></td><td><strong>CF に載せる商品を持てない</strong>（独占権か総代理権が前提。人脈ゼロからここに至る確度が最も低い）</td><td><strong>単発で継続月利にならない</strong>（A6・A7 は単月スパイク。月次の期待値に入れられない — サトル 02 §論点4）</td><td><strong>1案件あたり広告30万円＋ページ制作30万円の持ち出し</strong>（Makuake 公式）。外れると運転資金の半分が消える</td></tr>
+</tbody></table>
+<h3>2-3. 推奨とその理由</h3>
+<p><strong>推奨は案B。</strong> 理由は3つです。</p>
+<ol><li><strong>目標達成確率が最も高い</strong>（15% vs 5% / 8%）。社長が固定したのは「2028年9月・月営業利益200万」であり、これで選ぶなら案B以外にありません。</li><li><strong>案Aの1年目を完全に包含します。</strong> 2027年Q3まで動きが同一なので、<strong>いま案Bを選んでも案Aへ戻れます</strong>（分岐点は2027年7月）。逆は成り立ちません（案Aで進むと融資の実績要件を作りに行かない）。</li><li><strong>案Cは案Bの中に部品として入れられます。</strong> Makuake は「月利を作る手段」ではなく「在庫の前受調達」として、2028年Q1に<strong>独占SKUが取れていた場合に限り</strong>1本だけ試します。</li></ol>
+<p><strong>やらないこと（明示）</strong></p>
+<table><thead><tr><th>やらないこと</th><th>理由</th></tr></thead><tbody>
+<tr><td><strong>案Cを主線にしない</strong></td><td>独占権が先に要る。人脈ゼロ・実績ゼロの出発点から最も遠い</td></tr>
+<tr><td><strong>クラウドファンディングを月利の期待値に入れない</strong></td><td>単発スパイク。月次計画の数字として使わない（サトル 02）</td></tr>
+<tr><td><strong>B2B卸（A8 橘の型）はやらない</strong></td><td>在庫規模と現金負担が最大（A14 あもちゃんは月2,000万の仕入れコミットを理由に卸から撤退）</td></tr>
+<tr><td><strong>相乗り転売の量的拡大で200万を目指さない</strong></td><td>到達者16人中0人。48ヶ月かかる（§1-2）</td></tr>
+<tr><td><strong>無在庫はやらない</strong></td><td>社長既定。変更しない</td></tr>
+</tbody></table>
+<hr>
+<h2>3. ② 四半期マイルストン（2026Q4 〜 2028Q3）</h2>
+<h3>3-0. KPI 3階層</h3>
+<table><thead><tr><th>階層</th><th>指標</th><th>判定頻度</th></tr></thead><tbody>
+<tr><td><strong>北極星</strong></td><td>月営業利益（固定費・外注費控除後）</td><td>月次</td></tr>
+<tr><td><strong>先行</strong></td><td>①<strong>1社あたり月利</strong>（＝月営業利益 ÷ 取引中の社数）②独占/限定化の契約件数</td><td>月次</td></tr>
+<tr><td><strong>行動</strong></td><td>①週の送信通数 ②返信への24時間以内の一次回答率 ③独占提案の実施件数</td><td>週次</td></tr>
+</tbody></table>
+<blockquote><p><strong>先行指標の1番目を「取引社数」ではなく「1社あたり月利」に置いています。</strong> §1-3 のとおり、これが唯一の主変数です。社数を追うと案が48ヶ月コースに戻ります。</p></blockquote>
+<h3>3-1. 8四半期の表</h3>
+<table><thead><tr><th>期</th><th>目的（1行）</th><th style="text-align:right">月営業利益の目標（期末・中央）</th><th>軌道の判定指標</th><th>社長が手を動かすこと</th><th>前期から何が変わるか</th></tr></thead><tbody>
+<tr><td><strong>2026 Q4</strong>&lt;br&gt;(10-12月)</td><td>出品ゼロを解消し、<strong>成約率を実測する</strong></td><td style="text-align:right"><strong>▲3万</strong>（立ち上げ費用が先行）</td><td>①累計送信 700通 ②累計成約 <strong>3社以上</strong></td><td>週1回のまとめ承認／初回発注の決済／ネットFAX・050番号の契約</td><td>送信を開始（v4 §5 のとおり）</td></tr>
+<tr><td><strong>2027 Q1</strong>&lt;br&gt;(1-3月)</td><td><strong>独占提案を開始する</strong>。相乗りのまま終わらせない</td><td style="text-align:right"><strong>+1万</strong></td><td>①取引中 8社 ②<strong>独占提案 5社に実施</strong></td><td>独占提案の電話（確度の高い先のみ）／見積・契約の判断</td><td><strong>相乗り一本 → 独占提案を並走</strong>。ここが最大の変更点</td></tr>
+<tr><td><strong>2027 Q2</strong>&lt;br&gt;(4-6月)</td><td>独占1社目を取り、<strong>粗利率を20%台に乗せる</strong></td><td style="text-align:right"><strong>+5万</strong></td><td>①<strong>1社あたり月利 1.5万</strong>（0.7万の2倍）②独占/限定化 <strong>1件</strong></td><td>独占契約の判断／公庫の相談予約（無料・§4.1非該当）</td><td>週70通の送信は<strong>2,400社を撃ち切って終了</strong>。工数を深掘りへ移す</td></tr>
+<tr><td><strong>2027 Q3</strong>&lt;br&gt;(7-9月)</td><td><strong>1回目の融資を通す</strong>（案Bの分岐点）</td><td style="text-align:right"><strong>+12万</strong></td><td>①融資 <strong>300〜500万の実行</strong> ②累計売上100万超・単月黒字</td><td><strong>公庫へ申請</strong>（創業計画書は社内で作成）／実行後に退職の意思決定</td><td><strong>資金制約が外れる</strong>。ここで案A/B/C が分岐</td></tr>
+<tr><td><strong>2027 Q4</strong>&lt;br&gt;(10-12月)</td><td><strong>本業を辞め、時間の天井を外す</strong></td><td style="text-align:right"><strong>+30万</strong></td><td>①<strong>3ヶ月連続で月営業利益35万以上</strong>（退職条件）②外注1名の稼働</td><td>退職の実行／外注1名の採用・契約／独占SKUへのM1動画発注</td><td>週20h → 40h。<strong>外注に発送・リサーチ・価格管理を移す</strong></td></tr>
+<tr><td><strong>2028 Q1</strong>&lt;br&gt;(1-3月)</td><td><strong>簡易OEMを1本立てる</strong>。粗利率35%へ</td><td style="text-align:right"><strong>+60万</strong></td><td>①1社あたり月利 <strong>3万</strong> ②独占＋OEM が月商の <strong>50%</strong></td><td>OEMの発注・商標の判断／（独占SKUがあればMakuake 1本）</td><td>粗利率を上げる手が<strong>独占→OEM</strong>に移る。仕入れ倍率が変わる</td></tr>
+<tr><td><strong>2028 Q2</strong>&lt;br&gt;(4-6月)</td><td><strong>2回目の融資 ＋ 販路追加</strong>。在庫の規模を変える</td><td style="text-align:right"><strong>+110万</strong></td><td>①融資 <strong>500〜1,000万の実行</strong> ②楽天 or Yahoo! で月商 <strong>+100万</strong></td><td>2回目の融資申請／モール出店契約／外注2名目</td><td><strong>粗利率はもう上げない。在庫額と販路の数を変える段へ</strong>（A13 の型）</td></tr>
+<tr><td><strong>2028 Q3</strong>&lt;br&gt;(7-9月)</td><td><strong>月営業利益200万</strong>（目標線）</td><td style="text-align:right"><strong>目標200万 / 中央見込み95万</strong></td><td>①1社あたり月利 <strong>5万</strong> ②取引中 <strong>40社</strong></td><td>値上げの判断（A13 は15%値上げで利益2倍）／次の2年の再設計</td><td>新規獲得を止め、<strong>既存の利益率と回転の最適化</strong>に全振り</td></tr>
+</tbody></table>
+<h3>3-2. 「月利10万 → 50万 → 200万」で何を変えるか（最重要）</h3>
+<p>サトルの調査では<strong>量的拡大で上がった人は0人</strong>です。段ごとに変える変数を固定します。</p>
+<table><thead><tr><th>段</th><th>変える変数</th><th>具体的な打ち手</th><th>変えてはいけないもの</th><th>該当する到達者</th></tr></thead><tbody>
+<tr><td><strong>0 → 月利10万</strong>&lt;br&gt;(26Q4〜27Q2)</td><td><strong>量</strong>（取引社数）</td><td>週70通の送信。成約率2%。1社0.7万を積む</td><td>粗利率を上げようとしない（実績ゼロでは独占が取れない）。<strong>まず取引実績を作る</strong></td><td>全員がここを通過</td></tr>
+<tr><td><strong>月利10万 → 50万</strong>&lt;br&gt;(27Q2〜28Q1)</td><td><strong>粗利率</strong>（15% → 30〜35%）</td><td>①取引済みの社から<strong>値崩れ・相乗りに困っている社</strong>を選び独占提案（本丸B）②限定化 → 独占 ③独占SKUにM1動画</td><td><strong>社数を増やさない</strong>。2,400社リストは撃ち切って終わり。ここで社数を追うと48ヶ月コースに落ちる</td><td>A1 河野・A2 佐藤・A4 森・A12 Taka</td></tr>
+<tr><td><strong>月利50万 → 200万</strong>&lt;br&gt;(28Q1〜28Q3)</td><td><strong>在庫の規模と販路の数</strong>（粗利率ではない）</td><td>①融資2回目で在庫を595万→1,026万へ ②楽天・Yahoo!・自社EC ③値上げ</td><td><strong>粗利率をさらに上げようとしない</strong>。A13 の実数では粗利率50%でも営業利益率は16.7%。<strong>販管費が粗利の2/3を食う</strong></td><td>A13 野村・A10 西村</td></tr>
+</tbody></table>
+<hr>
+<h2>4. ③ 撤退・方向転換の判定条件（3回のみ）</h2>
+<table><thead><tr><th>#</th><th>判定日</th><th>見る数字</th><th>該当したら</th><th style="text-align:right">誤って踏む確率</th></tr></thead><tbody>
+<tr><td><strong>判定1</strong></td><td><strong>2027-03-31</strong></td><td>累計成約 <strong>5社未満</strong> かつ 単月黒字 <strong>0回</strong></td><td><strong>メーカー直レーンを縮小</strong>し、卸（NETSEA/スーパーデリバリー）中心へ振り直す。撤退ではない</td><td style="text-align:right">推定 10%</td></tr>
+<tr><td><strong>判定2</strong></td><td><strong>2027-09-30</strong></td><td>独占/限定化の契約 <strong>0件</strong>、または 月営業利益 <strong>10万未満</strong></td><td><strong>2028年9月の200万到達は不能と確定</strong>。社長判断：(a) 期限を2030年まで延ばす (b) 第2事業（動画）を立てる (c) 撤退</td><td style="text-align:right">推定 8%</td></tr>
+<tr><td><strong>判定3</strong></td><td><strong>2028-03-31</strong></td><td>1回目融資が不成立、または 月営業利益 <strong>40万未満</strong></td><td><strong>案Bを撤退し案Aへ切替</strong>（融資なし・月利50〜80万規模で運営）。200万は2029年以降</td><td style="text-align:right">推定 15%</td></tr>
+</tbody></table>
+<p><strong>判定を3回に絞った理由：</strong> 月次で判定すると、成長が階段状に来る事業（独占1件で月利が跳ねる）では必ず早すぎる撤退を踏みます。判定1・2・3は「変数が1つ前進しているか」を見るもので、金額そのものは補助的です。</p>
+<p><strong>判定以外で即時に止めるもの</strong>（v4 §3 を継承・変更なし）：受信拒否1件でその会社へ全経路停止／苦情2件で文面の型を廃止／300通で苦情3件または公的通報1件で送信全停止／アカウント健全性の警告1件で該当SKUを即時停止。</p>
+<hr>
+<h2>5. ④ 既存の取り決めとの不整合（本ロードマップが上書きするもの）</h2>
+<table><thead><tr><th>#</th><th>既定</th><th>何が不整合か</th><th><strong>書き換え案</strong></th></tr></thead><tbody>
+<tr><td><strong>a</strong></td><td><strong>月商800万・利益率20%・SKU100</strong>（CLAUDE.md §1）</td><td>満額達成しても営業利益 <strong>120万</strong>（ハジメ 01 §2）。200万に届かない</td><td><strong>北極星を「月営業利益200万」に差し替え</strong>。月商800万は2028Q2の通過点、利益率20%→<strong>営業利益率25%（粗利率35%）</strong>、SKU100→<strong>「独占/専売SKU 20本を含むSKU 100」</strong>（本数でなく中身を規定）</td></tr>
+<tr><td><strong>b</strong></td><td><strong>在庫回転6ヶ月上限</strong>（<code>feedback_dont_present_absurd_options</code>）</td><td>200万を狙うと必要在庫が4倍（g25%で2,822万）。資金要件が成立しない</td><td><strong>既定値を1.5〜2ヶ月に変更</strong>。6ヶ月は「例外の上限」から<strong>「不合格ライン」に格下げ</strong>。3ヶ月超のSKUは新規採用しない</td></tr>
+<tr><td><strong>c</strong></td><td><strong>v4 の週70通</strong>（T-20260915-002）</td><td>「月利を作る手段」として位置づけられているが、月利0.7万×社数では48ヶ月かかる</td><td><strong>位置づけを「独占候補の母数づくり」に変更</strong>。2,400社 ÷ 70通 ＝ 35週で<strong>2027年Q2に撃ち切って終了</strong>。以後は返信済み・取引済みの深掘りへ工数を移す</td></tr>
+<tr><td><strong>d</strong></td><td><strong>利益率5%でも数を打つ</strong>（<code>project_strategy_core_offline_makers</code>・<code>project_first_cycle_speed_first</code>）</td><td>実績づくりとしては正しいが、続けると粗利率が上がらない</td><td><strong>期限を切る：2027年Q1まで</strong>。2027年Q2以降、<strong>粗利率15%未満の新規SKUを増やさない</strong>（既存の継続は可）</td></tr>
+<tr><td><strong>e</strong></td><td><strong>12ヶ月黒字が設計条件</strong>（<code>feedback_12m_profit_is_design_condition</code>）</td><td>維持できる。ただし物差しの指定が要る</td><td><strong>累計損益ベース（在庫を原価で資産計上）で判定</strong>。現金ベースは再投資のため必ずマイナスになる。2027年9月に累計損益プラス・月利12万を維持する</td></tr>
+<tr><td><strong>f</strong></td><td><strong>電話営業は確度の高い先に絞る</strong></td><td>独占提案の段では電話が主経路になる</td><td><strong>変更なし、ただし定義を明確化</strong>：「確度の高い先」＝<strong>既に取引があり、Amazonで値崩れ・相乗りに困っている社</strong>。新規開拓の電話はしない</td></tr>
+<tr><td><strong>g</strong></td><td><strong>期限 2028年9月</strong>（社長確定・2026-09-21）</td><td>中央シナリオでは届かない（95万）。到達確率15%</td><td><strong>社長判断の論点として提示</strong>：(ア)期限維持（15%）(イ)2029年9月へ延長（40%）(ウ)目標額を月100万へ下方修正（60%）。<strong>私の推奨は(ア)のまま進め、2027-09-30 の判定2で（イ）へ切り替える</strong>（いま下げると打ち手が緩む）</td></tr>
+<tr><td><strong>h</strong></td><td><strong>顔出しは静止画のみ</strong>（社長確定）</td><td>不整合なし。<strong>M1（他人のクリエイターに撮らせる）は制約に抵触しない</strong></td><td>変更不要。明記のみ</td></tr>
+<tr><td><strong>i</strong></td><td><strong>無在庫はやらない</strong>（社長確定）</td><td>クラウドファンディングとの区別が曖昧になる恐れ</td><td><strong>区別を明記</strong>：CFは前受（受注生産）であり、自社が在庫を持つ。無在庫（注文後に仕入れて直送）には該当しない。既定は維持</td></tr>
+</tbody></table>
+<hr>
+<h2>6. ⑤ 動画投稿事業の扱い（判断材料のみ・結論は出しません）</h2>
+<p>サトル 02 §3-0 のとおり、<strong>M1 と M5 は別事業</strong>です。</p>
+<table><thead><tr><th></th><th><strong>M1：他人のクリエイターに撮らせて物販を売る</strong></th><th><strong>M5：顔出しなし多チャンネルで動画そのもので稼ぐ</strong></th></tr></thead><tbody>
+<tr><td>収益源</td><td>自社商品の粗利</td><td>YouTube 広告収益</td></tr>
+<tr><td>初期資金</td><td>1施策 1万〜30万円（登録者数×1.5〜3円）</td><td><strong>300〜450万円</strong>（10ch×200〜300本の全外注）</td></tr>
+<tr><td>運転資金との関係</td><td>在庫の回転を上げる＝<strong>物販の利益率に効く</strong></td><td><strong>運転資金と正面から競合する</strong></td></tr>
+<tr><td><strong>検討が妥当になる時点</strong></td><td><strong>2027年Q4</strong>。独占SKUが1本以上あり、月営業利益30万に到達したとき</td><td><strong>2028年Q2以降</strong>。かつ下記3条件をすべて満たしたとき</td></tr>
+<tr><td><strong>それまで触らない理由</strong></td><td>独占商品がないと、広告費が競合の売上を増やすだけになる（A2 佐藤も施策を2〜3回失敗）</td><td>初期300〜450万は2027年の運転資金そのもの。ここに使うと物販の複利が止まる（§1-1）</td></tr>
+</tbody></table>
+<p><strong>M5 を検討してよい条件（すべて満たしたときのみ）</strong></p>
+<table><thead><tr><th>#</th><th>条件</th><th>理由</th></tr></thead><tbody>
+<tr><td>1</td><td>物販の月営業利益が <strong>3ヶ月連続50万以上</strong></td><td>第2事業に社長の時間を割ける状態</td></tr>
+<tr><td>2</td><td>在庫とは別に事業用現金 <strong>300万以上</strong></td><td>M5の初期投資を物販の在庫から引き抜かない</td></tr>
+<tr><td>3</td><td>物販側の運用が <strong>外注2名で回っている</strong></td><td>週20時間の奪い合いを起こさない</td></tr>
+</tbody></table>
+<p><strong>論点として社長に残すもの（私は結論を出しません）</strong>：M5 は物販の月利に一切寄与しません。<strong>「2028年9月に月営業利益200万」を物販単線で追うなら M5 は不要</strong>です。一方、判定2（2027-09-30）で物販が200万に届かないと確定した場合、<strong>M5 は「もう1本の柱」として最も現実的な候補</strong>になります。つまり M5 は<strong>第2の柱ではなく、保険</strong>として置くのが構造的に正しい位置です。</p>
+<hr>
+<h2>7. 私が実行していないこと（§4.1）</h2>
+<ul><li>融資の申込・相談予約、メーカーへの送信・電話、契約、課金、外部発信は<strong>一切していません</strong>。すべて計画上の記述です。</li><li>本書の融資額・審査基準・到達確率は<strong>すべて推定</strong>です。到達者16人の数字は<strong>すべて自称</strong>（第三者監査なし）。</li><li>会員限定の取引条件（卸値・品番・上代）は本書に含めていません。</li></ul>
+<hr>
+<h2>8. 答え合わせ用の数字（照合日を併記）</h2>
+<table><thead><tr><th>照合日</th><th>予測</th></tr></thead><tbody>
+<tr><td>2026-12-31</td><td>累計成約 中央3社（P20 1社）／月営業利益 ▲3万</td></tr>
+<tr><td>2027-03-31</td><td>判定1を踏む確率 10%／取引中 8社</td></tr>
+<tr><td>2027-06-30</td><td>1社あたり月利 中央1.5万／独占 1件（P 45%）</td></tr>
+<tr><td>2027-09-30</td><td>月営業利益 中央12万／融資300万以上の実行 P 55%／判定2を踏む確率 8%</td></tr>
+<tr><td>2028-03-31</td><td>月営業利益 中央60万／判定3を踏む確率 15%</td></tr>
+<tr><td><strong>2028-09-30</strong></td><td><strong>月営業利益 中央95万・悲観▲10万・楽観220万／P(200万以上) 15%／P(50万以上) 62%</strong></td></tr>
+</tbody></table>
+</body></html>
