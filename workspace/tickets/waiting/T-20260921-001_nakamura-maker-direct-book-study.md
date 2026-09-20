@@ -63,3 +63,4 @@ related_tickets:
 - 2026-09-21 読解ノートと適用メモを deliverables へ納品。memory に knowledge を1本追加。
 - 2026-09-21 doing → waiting（社長判断3件：資金1,000万の壁のロードマップ反映／接触基準の二段構え整理／交渉道具の整備着手）。
 - 2026-09-21 マリエ：Notion カンバンへ新規カードを作成（doing 列 / page 3e1b0a40-44fa-81fe-ac5b-d2d7120f0fa3）。workspace/owner-tasks.md を更新59で最新化し、🔴 に「Kindle Cloud Reader へのログイン（期限の目安 9/22）」を1件追加。
+- 2026-09-21 マリエ：完了同期。Notion カードを **doing → waiting**（Assignee=owner／UpdatedAt=2026-09-21）へ移し、本文の `## 結果要約` と `## 成果物` 節を納品内容（読解ノート＋適用メモの2本・社長判断3件）で書き換え。`workspace/owner-tasks.md` を更新60で最新化し、**Kindle ログインの依頼を削除**（社長の Chrome に既にログイン済みだったため解消）、代わりに社長判断3件を 🔴 に追加（🔴 2件 → 4件）。成果物カタログへ2行追記し、スプレッドシートへ同期（849行）。
