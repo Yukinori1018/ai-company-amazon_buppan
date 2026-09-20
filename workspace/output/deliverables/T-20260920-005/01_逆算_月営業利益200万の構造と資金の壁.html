@@ -1,0 +1,151 @@
+<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>逆算：月営業利益200万円の構造と、資金の壁</title><style>body{font-family:-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif;line-height:1.8;max-width:1080px;margin:0 auto;padding:2.5rem 1.5rem;color:#1a1a1a}
+h1{font-size:1.7rem;border-bottom:3px solid #1a5490;padding-bottom:.5rem}h2{font-size:1.3rem;margin-top:2.4rem;border-left:5px solid #1a5490;padding-left:.6rem}h3{font-size:1.05rem;margin-top:1.6rem;color:#1a5490}
+table{border-collapse:collapse;width:100%;margin:1rem 0;font-size:.88rem}th,td{border:1px solid #d0d7de;padding:.45rem .6rem}th{background:#eef3f8;font-weight:600}tr:nth-child(even) td{background:#fafbfc}
+blockquote{border-left:5px solid #d97706;background:#fffbeb;margin:1.2rem 0;padding:.8rem 1.2rem}blockquote h3{margin-top:.2rem;color:#92400e}
+code{background:#f0f2f5;padding:.1rem .35rem;border-radius:3px;font-size:.85em}hr{border:0;border-top:1px solid #e1e4e8;margin:2rem 0}strong{color:#0d3d6b}a{color:#1a5490}</style></head><body><h1>逆算：月営業利益200万円の構造と、資金の壁</h1>
+<p>T-20260920-005 ／ 2026-09-21 ／ 経理ハジメ</p>
+<p>対象：物販単線（有在庫・Amazon・FBA）。無在庫・別事業は含みません。</p>
+<hr>
+<h2>0. 結論（1行）</h2>
+<p><strong>条件付きで可能。ただし中央シナリオでは不可能です。</strong> 達成確率は<strong>推定15〜25%</strong>。</p>
+<ul>
+<li>融資なしの天井は <strong>月営業利益 約28万円/月</strong>（中央）。200万の1/7で頭打ちになります。</li>
+<li>今すぐ月20万円の生活費を引き出すと、<strong>約7.5ヶ月で運転資金が尽きます</strong>（現金100万＋カード枠50万・中央）。</li>
+<li>成立させる条件は3つだけです（§5）。うち1つでも欠けると届きません。</li>
+</ul>
+<hr>
+<h2>1. 使う数字の出どころ（実測／推定／仮定）</h2>
+<table><thead><tr><th>項目</th><th style="text-align:right">値</th><th>確度</th><th>出典</th></tr></thead><tbody>
+<tr><td>Amazon手数料三層＋納品代行＋送料</td><td style="text-align:right">売価の <strong>27.3%</strong></td><td>実測</td><td>売価3,000円・標準区分3。販売手数料10.4%×1.1＋FBA配送代行415円＋保管/納品送料/ラベル61円（memory <code>knowledge_fba_pickpack_415_fashion_2026-09</code>）</td></tr>
+<tr><td>固定費</td><td style="text-align:right"><strong>7.1万円/月</strong></td><td>実測3.06万＋推定4万</td><td>実測：大口5,390＋Keepa API 8,732＋セラースプライト13,998＋会計900＋ドメイン131＋GS1 1,421。推定：税理士3万＋通信/保険1万</td></tr>
+<tr><td>外注・人件費</td><td style="text-align:right">月商の <strong>4%</strong></td><td>仮定</td><td>受発注・リサーチ・価格管理・CS。FBA原価に入らない人的オペ。感度高（§6）</td></tr>
+<tr><td>1社あたり定常月利</td><td style="text-align:right"><strong>0.7万円/月</strong></td><td>実測置き値</td><td>統合報告 v4 §2（実践者0.7〜2.5万の下限を据え置き）</td></tr>
+<tr><td>1社あたりSKU数</td><td style="text-align:right"><strong>1.5</strong>（初回）／上限11 ASIN</td><td>実測置き値／実測</td><td>v4 §2・T-1母数</td></tr>
+<tr><td>1SKUあたり月商</td><td style="text-align:right"><strong>3.1万円/月</strong></td><td>逆算</td><td>0.7万 ÷ 1.5SKU ÷ 粗利率15%</td></tr>
+<tr><td>売掛（入金待ち）</td><td style="text-align:right">月商の <strong>32.5%</strong></td><td>モデル</td><td>入金待ち0.5ヶ月 × 入金率0.65（v4・マサル §1）</td></tr>
+<tr><td>在庫月数（運用中央）</td><td style="text-align:right"><strong>1.5ヶ月</strong></td><td>モデル</td><td>v4の1.35ヶ月に合わせた運用値。<strong>既定の上限は6ヶ月</strong>（§2に併記）</td></tr>
+<tr><td>社長の可処分時間</td><td style="text-align:right"><strong>月87時間</strong>（週20h×4.35）</td><td>社長確定</td><td>2026-09-21 ヒアリング</td></tr>
+<tr><td>1社あたり維持工数</td><td style="text-align:right"><strong>1.5時間/月</strong></td><td>仮定</td><td>発注・価格改定・在庫確認・問い合わせ</td></tr>
+</tbody></table>
+<p><strong>粗利率 g の定義</strong>：（売価 − 仕入原価 − Amazon手数料三層 − 納品代行 − 仕入送料）÷ 売価。固定費・外注費は控除前。</p>
+<p>→ 原価率 ＝ 1 − g − 0.273</p>
+<p><strong>営業利益 ＝ 月商 × g − 固定費 − 月商 × 4%</strong></p>
+<hr>
+<h2>2. 逆算の構造表（月営業利益200万円に必要な数字）</h2>
+<p>必要月商 S ＝ (200万 + 7.1万) ÷ (g − 0.04)</p>
+<table><thead><tr><th style="text-align:right">粗利率 g</th><th style="text-align:right">必要月商/月</th><th style="text-align:right">原価率</th><th style="text-align:right">必要在庫（回転1.5ヶ月）</th><th style="text-align:right">必要在庫（既定上限6ヶ月）</th><th style="text-align:right">必要運転資金（在庫1.5＋売掛）</th><th style="text-align:right">必要SKU数</th><th style="text-align:right">必要社数（1.5SKU/社）</th><th style="text-align:right">必要社数（4SKU/社・育成後）</th><th style="text-align:right">外注費/月</th></tr></thead><tbody>
+<tr><td style="text-align:right"><strong>15%</strong>（相乗り卸・v4の実態）</td><td style="text-align:right">1,883万</td><td style="text-align:right">57.7%</td><td style="text-align:right">1,630万</td><td style="text-align:right">6,518万</td><td style="text-align:right"><strong>2,241万</strong></td><td style="text-align:right">607</td><td style="text-align:right">405社</td><td style="text-align:right">152社</td><td style="text-align:right">75万</td></tr>
+<tr><td style="text-align:right"><strong>25%</strong>（独占・準OEM混在）</td><td style="text-align:right">986万</td><td style="text-align:right">47.7%</td><td style="text-align:right">706万</td><td style="text-align:right">2,822万</td><td style="text-align:right"><strong>1,026万</strong></td><td style="text-align:right">318</td><td style="text-align:right">212社</td><td style="text-align:right">80社</td><td style="text-align:right">39万</td></tr>
+<tr><td style="text-align:right"><strong>35%</strong>（独占・簡易OEM中心）</td><td style="text-align:right">668万</td><td style="text-align:right">37.7%</td><td style="text-align:right">378万</td><td style="text-align:right">1,511万</td><td style="text-align:right"><strong>595万</strong></td><td style="text-align:right">216</td><td style="text-align:right">144社</td><td style="text-align:right">54社</td><td style="text-align:right">27万</td></tr>
+<tr><td style="text-align:right"><strong>50%</strong>（OEM自社ブランド）</td><td style="text-align:right">450万</td><td style="text-align:right">22.7%</td><td style="text-align:right">153万</td><td style="text-align:right">613万</td><td style="text-align:right"><strong>300万</strong></td><td style="text-align:right">145</td><td style="text-align:right">97社</td><td style="text-align:right">36社</td><td style="text-align:right">18万</td></tr>
+</tbody></table>
+<p><strong>読み方</strong></p>
+<ul>
+<li><strong>g=50% は国内卸では成立しません。</strong> 原価率22.7%＝仕入れ倍率4.4倍。中国OEMか自社ブランドでのみ届く水準です（参考：memory の「卸相場は上代の60〜70%」）。</li>
+<li><strong>「回転6ヶ月上限」を実際に使うと資金要件が4倍になります。</strong> g=25%で在庫2,822万。既定は上限であって目標ではありません。200万を狙う世界では<strong>回転1.5〜2ヶ月が事実上の必須条件</strong>です。</li>
+<li>既存KPI（月商800万・利益率20%）は、営業利益に直すと 800万×20% − 7.1万 − 32万 ＝ <strong>約120万円/月</strong>。<strong>現KPIを満額達成しても200万には届きません。</strong></li>
+</ul>
+<h3>2b. 社数のクロスチェック（1社あたり月利ベース）</h3>
+<table><thead><tr><th style="text-align:right">1社あたり月利</th><th style="text-align:right">必要社数</th><th style="text-align:right">維持工数（1.5h/社）</th><th style="text-align:right">外注費（1,500円/h）</th></tr></thead><tbody>
+<tr><td style="text-align:right">0.7万（v4置き値）</td><td style="text-align:right"><strong>286社</strong></td><td style="text-align:right">429時間/月</td><td style="text-align:right">64万円/月</td></tr>
+<tr><td style="text-align:right">1.0万（松井の値）</td><td style="text-align:right">200社</td><td style="text-align:right">300時間/月</td><td style="text-align:right">45万円/月</td></tr>
+<tr><td style="text-align:right">1.5万</td><td style="text-align:right">133社</td><td style="text-align:right">200時間/月</td><td style="text-align:right">30万円/月</td></tr>
+<tr><td style="text-align:right">2.5万（実践者上限）</td><td style="text-align:right">80社</td><td style="text-align:right">120時間/月</td><td style="text-align:right">18万円/月</td></tr>
+</tbody></table>
+<p>粗利率ベース（§2の212社@g25%）と月利ベース（286社@0.7万）は同じ桁に収まっており、モデルは自己整合しています。</p>
+<h3>2c. 時間の天井（社長1人・週20時間）</h3>
+<table><thead><tr><th>配分</th><th style="text-align:right">時間</th><th style="text-align:right">回せる社数</th><th style="text-align:right">対応する月利</th></tr></thead><tbody>
+<tr><td>新規開拓（v4の週70通運用）</td><td style="text-align:right">43時間/月</td><td style="text-align:right">—</td><td style="text-align:right">—</td></tr>
+<tr><td>維持（1.5h/社）</td><td style="text-align:right">44時間/月</td><td style="text-align:right"><strong>29社</strong></td><td style="text-align:right"><strong>約20万円/月</strong></td></tr>
+</tbody></table>
+<p>→ <strong>外注ゼロなら社長1人の天井は月利約20万円/月</strong>（時間律速・推定）。資金の天井28万（§3）とほぼ同水準で、<strong>どちらを先に外しても片方が効きます。両方を同時に外さない限り200万には向かいません。</strong></p>
+<p>→ 286社を回すには、社長の直接工数を <strong>1社あたり0.3時間/月</strong>（87h÷286社）まで下げる必要があります。交渉・与信・発注承認だけを社長が持ち、それ以外を全部外注する体制が前提です（仮定・未検証）。</p>
+<hr>
+<h2>3. 資金の壁：融資なしの天井</h2>
+<p>自己資金 ＝ 運転資金100万円 ＋ カード枠50万円 ＝ <strong>150万円</strong></p>
+<p>制約式：月商 ×（原価率×1.5 ＋ 0.325）≦ 150万円</p>
+<table><thead><tr><th style="text-align:right">粗利率 g</th><th style="text-align:right">回せる月商の上限</th><th style="text-align:right">うち在庫</th><th style="text-align:right">うち売掛</th><th style="text-align:right"><strong>月営業利益の天井</strong></th></tr></thead><tbody>
+<tr><td style="text-align:right">15%（悲観・v4の実態）</td><td style="text-align:right">126万/月</td><td style="text-align:right">109万</td><td style="text-align:right">41万</td><td style="text-align:right"><strong>6.8万円/月</strong></td></tr>
+<tr><td style="text-align:right"><strong>25%（中央）</strong></td><td style="text-align:right"><strong>144万/月</strong></td><td style="text-align:right">103万</td><td style="text-align:right">47万</td><td style="text-align:right"><strong>約28万円/月</strong></td></tr>
+<tr><td style="text-align:right">35%（楽観）</td><td style="text-align:right">168万/月</td><td style="text-align:right">95万</td><td style="text-align:right">55万</td><td style="text-align:right"><strong>45.1万円/月</strong></td></tr>
+<tr><td style="text-align:right">50%（参考・国内卸では非現実的）</td><td style="text-align:right">225万/月</td><td style="text-align:right">77万</td><td style="text-align:right">73万</td><td style="text-align:right">96.6万円/月</td></tr>
+</tbody></table>
+<blockquote><h3>言い切り</h3><p><strong>融資を使わない限り、月営業利益は約28万円/月で頭打ちになります。</strong>（中央・粗利率25%・回転1.5ヶ月・カード枠50万込み）</p><p>目標200万に対して <strong>1/7</strong>。残り172万は、構造を変えない限り資金制約だけで説明がつきます。</p><p>悲観（相乗り卸のまま・g15%）では <strong>6.8万円/月</strong>。v4の「12ヶ月目 月利 中央4〜10万」と一致しており、<strong>v4の結果はすでに資金の天井に当たっています</strong>（能力不足ではなく資金律速）。</p></blockquote>
+<h3>3b. 生活費20万円/月の引き出しが始まったとき</h3>
+<p>成長期は利益が在庫に化けるため、<strong>手元現金は増えません</strong>（memory <code>knowledge_cashflow_physics_2026-09</code> §1・v4 §2で実証済み）。</p>
+<table><thead><tr><th>シナリオ</th><th style="text-align:right">月の現金流出</th><th style="text-align:right">現金100万のみ</th><th style="text-align:right">カード枠込み150万</th></tr></thead><tbody>
+<tr><td>悲観（立ち上がりで月▲3万）</td><td style="text-align:right">23万/月</td><td style="text-align:right">4.3ヶ月</td><td style="text-align:right">6.5ヶ月</td></tr>
+<tr><td><strong>中央（利益は全額在庫へ・実質手残り0）</strong></td><td style="text-align:right"><strong>20万/月</strong></td><td style="text-align:right"><strong>5.0ヶ月</strong></td><td style="text-align:right"><strong>7.5ヶ月</strong></td></tr>
+<tr><td>楽観（利益の50%が現金化）</td><td style="text-align:right">17万/月</td><td style="text-align:right">5.9ヶ月</td><td style="text-align:right">8.8ヶ月</td></tr>
+</tbody></table>
+<blockquote><p><strong>今すぐ月20万を引き出すと、中央で7.5ヶ月（2027年5月頃）に資金が尽きます。</strong></p><p>引き出しに耐えられるのは、月営業利益が <strong>28万円/月</strong>（＝融資なしの天井そのもの）に達してからです。つまり<strong>本業を辞められるのは、融資なしの天井に到達した後</strong>。到達時期は v4 の軌道では 2027年後半〜2028年前半（推定）。</p></blockquote>
+<p><strong>感度（社長への提示用）</strong></p>
+<table><thead><tr><th>前提</th><th>主シナリオ（本業継続・引き出しは辞めた後）</th><th>感度（今すぐ月20万引き出し）</th></tr></thead><tbody>
+<tr><td>資金が尽きる時期</td><td>尽きない（投下額を資金内に抑える限り）</td><td><strong>2027年5月頃</strong>（中央・7.5ヶ月後）</td></tr>
+<tr><td>200万到達への影響</td><td>融資まで生き残れる</td><td><strong>融資申請可能な2027年7月より前に力尽きる</strong>＝計画が成立しない</td></tr>
+</tbody></table>
+<p>→ <strong>本業は、月営業利益28万円/月を実測するまで辞められません。</strong> これは好みではなく算術です。</p>
+<hr>
+<h2>4. 必要な追加資金（融資）</h2>
+<h3>4a. いくら足りないか</h3>
+<table><thead><tr><th style="text-align:right">粗利率 g</th><th style="text-align:right">200万到達時の必要運転資金</th><th style="text-align:right">自己資金150万との差＝<strong>必要融資額</strong></th></tr></thead><tbody>
+<tr><td style="text-align:right">15%</td><td style="text-align:right">2,241万</td><td style="text-align:right"><strong>2,091万</strong> ← 創業融資の現実的レンジ外</td></tr>
+<tr><td style="text-align:right">25%</td><td style="text-align:right">1,026万</td><td style="text-align:right"><strong>876万</strong></td></tr>
+<tr><td style="text-align:right">35%</td><td style="text-align:right">595万</td><td style="text-align:right"><strong>445万</strong></td></tr>
+</tbody></table>
+<h3>4b. 日本政策金融公庫「新規開業・スタートアップ支援資金」（一次情報・2026-09-21 取得）</h3>
+<p>出典：<a href="https://www.jfc.go.jp/n/finance/search/01_sinkikaigyou_m.html">https://www.jfc.go.jp/n/finance/search/01_sinkikaigyou_m.html</a> ／ <a href="https://www.jfc.go.jp/n/finance/flow/tetsudukij_c.html">https://www.jfc.go.jp/n/finance/flow/tetsudukij_c.html</a></p>
+<table><thead><tr><th>項目</th><th>内容</th><th>確度</th></tr></thead><tbody>
+<tr><td>融資限度額</td><td><strong>7,200万円</strong></td><td>一次（公庫サイト原文）</td></tr>
+<tr><td>うち運転資金の上限</td><td><strong>ページに明記なし</strong></td><td>未確認（内訳は非公表。俗に言う「4,800万円」は一次で裏取りできず）</td></tr>
+<tr><td>返済期間（運転資金）</td><td>10年以内＜うち据置期間5年以内＞</td><td>一次</td></tr>
+<tr><td>対象者</td><td>「新たに事業を始める方または事業開始後おおむね7年以内の方」</td><td>一次</td></tr>
+<tr><td>自己資金要件</td><td><strong>ページに記載なし</strong></td><td>未確認（「撤廃された」と断定しない）</td></tr>
+<tr><td>担保・保証人</td><td>「お客さまのご希望を伺いながらご相談」／<strong>経営者保証免除特例制度</strong>あり</td><td>一次</td></tr>
+<tr><td>利率</td><td>基準利率。<strong>創業支援貸付利率特例制度で 0.65%引下げ</strong>（雇用拡大なら0.9%）</td><td>一次</td></tr>
+<tr><td>必要書類（創業段階）</td><td>創業計画書・見積書・本人確認書類・許認可証。<strong>確定申告書の記載なし</strong></td><td>一次</td></tr>
+</tbody></table>
+<p><strong>社長の適格性（事実）</strong></p>
+<ul>
+<li>開業日 2026-08-20 → 「事業開始後おおむね7年以内」＝<strong>2033年頃まで対象</strong>。制度上の期限は問題になりません。</li>
+<li>確定申告：2026年分（2027年3月提出・実質4ヶ月分）／2027年分（2028年3月提出・12ヶ月分）。</li>
+<li><strong>2027年7月の申請時点で手元にあるのは「1期分・4ヶ月のみの申告」＋2027年上期の試算表。</strong></li>
+</ul>
+<h3>4c. 2段構えの資金計画（融資額は推定）</h3>
+<table><thead><tr><th>回</th><th>時期</th><th style="text-align:right">融資額（推定）</th><th>そのとき求められる実績</th><th>確度</th></tr></thead><tbody>
+<tr><td>1回目</td><td><strong>2027年7月</strong></td><td style="text-align:right"><strong>300〜500万円</strong></td><td>直近12ヶ月の累計売上100万円超・単月黒字・1期分の確定申告・自己資金の入出金が説明できる通帳</td><td>推定（公庫の審査基準は非公開）</td></tr>
+<tr><td>2回目</td><td><strong>2028年4月以降</strong></td><td style="text-align:right"><strong>500〜1,000万円</strong></td><td>2期分の確定申告（2027年分・年商1,000万円超）・1回目の返済実績9ヶ月以上・黒字決算</td><td>推定</td></tr>
+<tr><td>合計</td><td>—</td><td style="text-align:right"><strong>800〜1,500万円</strong></td><td>—</td><td>—</td></tr>
+</tbody></table>
+<ul>
+<li>累計売上100万円の到達は<strong>中央で2027年8月</strong>（memory <code>knowledge_strategy_profitability_check_2026-09</code> §4）。<strong>2027年7月の申請は中央より1ヶ月早い</strong>。前倒しで申請するなら、2027年前半に売上を意図的に積む必要があります。</li>
+<li>2回目（2028年4月実行）から在庫を積んで売上化するまで<strong>3〜6ヶ月</strong>。<strong>2028年9月は最速でギリギリ</strong>です。1ヶ月でも遅れると期限に間に合いません。</li>
+</ul>
+<hr>
+<h2>5. 判定と条件</h2>
+<p><strong>条件付きで可能。達成確率は推定15〜25%。</strong> 以下3つが<strong>すべて</strong>成立した場合に限ります。</p>
+<table><thead><tr><th>#</th><th>条件</th><th>なぜ必須か</th><th>判定期限</th></tr></thead><tbody>
+<tr><td><strong>1</strong></td><td><strong>粗利率を35%以上に上げる</strong>（独占契約 or 簡易OEMへ移行）</td><td>g=15%（相乗り卸）だと必要融資2,091万。創業融資の現実的レンジ（800〜1,500万）を超え、<strong>算術的に到達不能</strong>。g=35%なら445万で足り、1回目の融資だけで射程に入る</td><td>2027年6月までに独占/OEM SKU が月商の5割</td></tr>
+<tr><td><strong>2</strong></td><td><strong>2027年7月に300〜500万、2028年4月に500〜1,000万の2回融資を通す</strong></td><td>自己資金150万では天井28万/月。融資なしで200万に向かう筋は存在しない</td><td>2027年6月末までに累計売上100万円超・単月黒字を作る</td></tr>
+<tr><td><strong>3</strong></td><td><strong>2027年前半に、社長の直接工数を1社0.3時間/月まで下げた外注体制を作る</strong></td><td>週20時間では29社＝月利20万が天井。144〜286社は1人では物理的に回せない</td><td>2027年6月までに外注1名（月27万・g35%時）を稼働</td></tr>
+</tbody></table>
+<p><strong>中央シナリオでの判定：不可能。</strong> v4の軌道（相乗り卸・g15%・1社0.7万）を24ヶ月延長しても、資金の天井6.8万/月と時間の天井20万/月に当たって止まります。<strong>200万は「もっと頑張る」で届く距離ではなく、粗利構造そのものを変えないと届きません。</strong></p>
+<hr>
+<h2>6. この試算の弱点（感度が高い順）</h2>
+<table><thead><tr><th>#</th><th>前提</th><th style="text-align:right">中央値</th><th>±で結論がどう動くか</th></tr></thead><tbody>
+<tr><td>1</td><td>粗利率 g</td><td style="text-align:right">25%</td><td><strong>最大の分岐。</strong>15%なら不可能、35%なら射程内。ここ1本で結論が変わる</td></tr>
+<tr><td>2</td><td>1社あたり月利</td><td style="text-align:right">0.7万</td><td>2.5万（実践者上限）なら必要80社まで落ち、時間の壁が消える</td></tr>
+<tr><td>3</td><td>融資の可否・金額</td><td style="text-align:right">800〜1,500万（推定）</td><td>公庫の審査基準は非公開。<strong>推定であり保証ではない</strong></td></tr>
+<tr><td>4</td><td>外注費率</td><td style="text-align:right">月商の4%（仮定）</td><td>8%なら g=25% の必要月商が986万→1,220万に膨らむ</td></tr>
+<tr><td>5</td><td>在庫回転</td><td style="text-align:right">1.5ヶ月</td><td>3ヶ月なら必要運転資金が約1.7倍。融資1回では足りなくなる</td></tr>
+</tbody></table>
+<hr>
+<h2>7. 私が実行していないこと（§4.1）</h2>
+<ul>
+<li>融資の申込・相談予約・外部への問い合わせは<strong>していません</strong>。</li>
+<li>会員限定の取引条件（卸値・品番・上代）は本書に一切含めていません。</li>
+<li>本書の融資額・審査基準は<strong>すべて推定</strong>です。実額は公庫の支店相談でしか確定しません（相談自体は無料・§4.1非該当ですが、社長の一手です）。</li>
+</ul>
+<hr>
+<h2>8. 計算スクリプト</h2>
+<p><code>workspace/output/agent_output/T-20260920-005/01_calc.py</code>（全数値の再現可能な計算式）</p></body></html>
