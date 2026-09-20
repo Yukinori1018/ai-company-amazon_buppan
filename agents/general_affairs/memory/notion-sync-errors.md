@@ -44,3 +44,10 @@
 - **教訓**: 「同じ失敗の記録が既にある」と気づいたら、**前回の原因分析を疑ってかかる**。
   前回の結論（接続が無い）が正しければ 2026-08-24 の別セッションで notion-fetch が動いた説明がつかない。
   **記録は残っていたのに、原因が間違っていたので再発した。**記録するだけでは再発は止まらない。
+
+## 2026-09-20 — Labels の未定義オプションは「追加」ができない（T-20260920-005）
+
+- 事象：`notion-create-pages` が `Invalid multi_select value for property "Labels": "roadmap"` で 400。チケット frontmatter の `labels: [roadmap, strategy, owner-profile, kpi]` のうち **`strategy` 以外の3つが Notion の選択肢に存在しなかった**。
+- 対処として `notion-update-data-source` の `ALTER COLUMN "Labels" SET MULTI_SELECT(...)`（既存55個＋新規3個を全列挙）を試みたが、**Claude Code の auto mode classifier に拒否された**（スキーマ変更は許可外）。
+- 結論：**Labels は既存の選択肢だけで代替する**。今回は `roadmap`→`master-plan`、`strategy`→そのまま、`owner-profile`/`kpi`→当てはめなし。カード本文に「チケット本体の labels が正」と1行注記を残した。
+- 再発防止：新規起票時は **先にエラーメッセージ中の選択肢一覧と突き合わせる**。存在しないラベルは(a)既存で最も近いものに寄せる(b)カード本文に正の labels を注記、の2手で閉じる。選択肢そのものの追加が要るなら社長 or 権限のある経路へ回す（マリエの権限では追加できない）。
