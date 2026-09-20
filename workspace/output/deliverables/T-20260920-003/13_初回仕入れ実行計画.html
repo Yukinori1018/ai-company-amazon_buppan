@@ -1,0 +1,275 @@
+<!doctype html><html lang='ja'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>初回仕入れの実行計画（SD 丸進 / グンゼ＋キャラクター品）</title><style>body{font-family:-apple-system,'Hiragino Sans','Noto Sans JP',sans-serif;max-width:1150px;margin:2em auto;padding:0 1em;line-height:1.65;color:#222;font-size:14.5px}table{border-collapse:collapse;margin:.8em 0;font-size:.92em}th,td{border:1px solid #bbb;padding:.35em .6em;vertical-align:top}th{background:#eef2f8}tr:nth-child(even) td{background:#fafafa}h1{font-size:1.5em;border-bottom:2px solid #444}h2{font-size:1.25em;border-left:5px solid #25b;padding-left:8px;margin-top:1.8em}h3{font-size:1.05em;margin-top:1.4em}blockquote{border-left:4px solid #ccc;margin:.8em 0;padding:.2em 1em;color:#444}code{background:#f3f3f3;padding:1px 4px;border-radius:3px}hr{border:0;border-top:1px solid #ccc;margin:1.6em 0}</style></head><body>
+<h1>初回仕入れの実行計画（SD 丸進 / グンゼ＋キャラクター品）</h1>
+<p>プランナー タケシ／2026-09-21／チケット T-20260920-003</p>
+<blockquote><strong>ロードマップ上の位置</strong>：1周目の「実 Do」を1回に絞るための実行設計。ここで作るのは現金ではなく、<br>①<strong>グンゼ56ASIN の出品権（ゲート解除の請求書）</strong> ②<strong>丸進 → 検品 → FBA の納品オペ</strong> ③<strong>卸値からASINを引き当てる探索の型</strong>。<br>この3つが2周目以降の母数と速度を決めます。</blockquote>
+<hr>
+<h2>0. 結論（先に読む3行）</h2>
+<ol>
+<li style='margin-left:0.0em'><strong>カズヨの推奨（3SKU・各10点・5万円）は方向として正しい。ただし SKU の中身と発注の順序は変えるべきです。</strong> 買う前に決まっていない変数が2つ（卸値・ゲート）あり、<strong>SKU を先に決めてから卸値を見る順序だと、高い確率で「全部落ちる」で終わります</strong>。順序を逆にします（卸値を見てから SKU を決める）。</li>
+<li style='margin-left:0.0em'><strong>推奨は B 案：グンゼ2SKU × 各12点 ＋ キャラクター品2SKU（30日で売り切れる量）＝ 発注 約4.2万円・総支出 約4.6万円。</strong> 期待値は <strong>＋7,900円</strong>（楽観+30,000 / 中央+11,000 / 悲観▲12,000）。<strong>現金リターンを目的にしてはいけない規模</strong>です。取りに行くのは上の3つ。</li>
+<li style='margin-left:0.0em'><strong>最悪ケース（出品できずに処分）でも現金の減りは約2.5万円。運転資金200万円に対して1.2%で、予備25万円には一切触りません。</strong> この発注で資金条件が壊れることは構造上ありません。だから<strong>迷うべきは「いくら賭けるか」ではなく「何を確かめる順序か」</strong>です。</li>
+</ol>
+<h3>結論を1行にすると</h3>
+<blockquote><strong>この棚の利益は「供給が薄いことで価格が上代を超えている」ことから出ています。だから儲かるし、だから壊れやすい。</strong> 1SKU に厚く入れず、価格を2,500円より上に置かず、30〜60日で売り切る量だけ入れる。</blockquote>
+<hr>
+<h2>1. 先に直しておく前提2件（これで計画の形が変わります）</h2>
+<h3>訂正① 「月100個はバリエーション家族の合計」は誤りでした → <strong>ASIN 単位の実数です</strong></h3>
+<p>成果物 <strong>04 §「最大の減点はバリエーション」</strong> は、月間販売数を家族合計と読み、</p>
+<p>「1バリエーションは月8個 → 出品者2社と分けて月2.7個 → 初回10点で消化3.7ヶ月」と結論していました。</p>
+<p><strong>この減点は消えます。</strong> 成果物 <strong>09 §1</strong> が Keepa 公式の構造定義（<code>monthlySold</code> — *"The value is variation specific."*）を一次で取り、</p>
+<p><strong>同一家族の兄弟で値が割れる</strong>ことを実データで確認済みです（本件の候補でも、同じ家族の3兄弟が 200／100／100 に割れています）。</p>
+<table><thead><tr><th></th><th>04 の前提（誤）</th><th>訂正後（09）</th></tr></thead><tbody>
+<tr><td>月100個の意味</td><td>12サイズ・色の合計</td><td><strong>その ASIN 単体の実数（Amazon 公表値・推計ではない）</strong></td></tr>
+<tr><td>1ASIN の月販</td><td>約8個</td><td><strong>100個以上</strong></td></tr>
+<tr><td>出品者2社との取り分</td><td>月2.7個</td><td><strong>月33個以上</strong></td></tr>
+<tr><td>10点の消化</td><td>3.7ヶ月</td><td><strong>0.3ヶ月</strong></td></tr>
+</tbody></table>
+<p>→ <strong>回転は論点から外れます。</strong> 代わりに<strong>入れ過ぎ（価格を自分で崩す）が論点になります</strong>。04 の推奨「初回10点」は、根拠が消えた上で結論だけが正しい状態です。</p>
+<h3>訂正② 販売手数料は<strong>税抜表示</strong>なので ×1.1 が乗ります</h3>
+<p>公式料金ページの注記：「<strong>販売手数料のみが税抜きで計算され</strong>、その他のすべての手数料には適用される税金が含まれます」。</p>
+<p>成果物 10 の採算表は手数料を税抜のまま引いていました。<strong>免税事業者なので、この消費税分も費用</strong>です。</p>
+<p>1点あたり <strong>15〜35円</strong> 不利側に動きます。本計画の表はすべて ×1.1 で計上済み。</p>
+<h3>あわせて確定した「価格の崖」</h3>
+<p>服&amp;ファッション小物の販売手数料は <strong>750円超〜2,500円以下 8.4%／2,500円超〜3,000円以下 12.4%</strong>。</p>
+<p><strong>2,500円をまたぐと1点あたり約115円（税込）増えます。</strong> 2,533円で売るより 2,500円で売った方が手残りが多い。</p>
+<blockquote><strong>運用ルール：服&amp;ファッション小物の出品価格は 2,500円を超えない。</strong> 相場が上振れしても2,500円で止める。</blockquote>
+<hr>
+<h2>2. 判定式（SKU ごとの「原価上限」の作り方）</h2>
+<p>社長の既定（利益率20%以上・粗利額500円以上）を、<strong>1点あたりの原価上限（税込）</strong>に翻訳します。これが発注の合否そのものです。</p>
+<pre>原価上限(税込) = min(
+    中央想定売値 × 0.80 − 販売手数料(税込) − FBA配送代行 − 62円 ,
+    中央想定売値 − 500円
+)
+  ・中央想定売値 = 現在価格 × 0.85（新規参入は相場を下げる方に効くため保守側に置く）
+  ・62円 = FBA納品送料25 ＋ ラベル貼付・梱包32 ＋ 保管5（成果物 10 の仮定を踏襲）
+  ・免税事業者なので卸価格は必ず ×1.1 して原価に入れる</pre>
+<p><strong>丸進で既に分かっている1点の実測は「卸率67%（上代比・税抜）」</strong>（成果物 07／実額は SD 会員規約17条1項により非掲載）。</p>
+<p>これを税込に直すと <strong>上代の73.7%</strong>。つまり丸進の条件が67%で一定なら、通過の必要条件は</p>
+<blockquote><strong>上代 ≤ 中央想定売値 × 0.64</strong> ＝ <strong>Amazon の中央想定売値が上代の1.56倍以上あること</strong></blockquote>
+<p>肌着は通常 Amazon 実売が上代を下回るので、<strong>この条件を満たすのは「供給が薄くて価格が上代を超えている棚」だけ</strong>です。</p>
+<p>候補56件がまさにその状態（Amazon 本体不在・出品者1〜2社）であり、<strong>それがこのレーンの利益の源泉</strong>です。同時に<strong>それが最大の脆さ</strong>です。</p>
+<hr>
+<h2>3. 候補 SKU（04 の CSV から絞った18件）</h2>
+<p>掲載値は Amazon の現在スナップショット（法務判定 08 の A クラス）。<strong>卸値・上代・SD 品番は非掲載</strong>。</p>
+<p>「原価上限」を<strong>1円でも超える卸値なら買わない</strong>、が判定です。</p>
+<h3>3-1. グンゼ／ボディワイルド（定番・通年）</h3>
+<table><thead><tr><th>#</th><th>ASIN</th><th>商品名（短縮）</th><th>現在価格</th><th>中央想定</th><th>購入数/月(Amazon表示)</th><th>新品出品者</th><th>FBA区分/配送代行</th><th>販売手数料(税込)</th><th><strong>原価上限(税込)</strong></th><th>上限÷中央</th><th>取り分/月(保守)</th></tr></thead><tbody>
+<tr><td>G1</td><td><strong>B00BEB6SPA</strong></td><td>やわらか肌着 ニットトランクス SV61912</td><td>2,469</td><td>2,099</td><td><strong>400</strong></td><td><strong>2</strong></td><td>標準5／425</td><td>194</td><td><strong>998</strong></td><td>47.6%</td><td>67</td></tr>
+<tr><td>G2</td><td><strong>B0BZC1LLFK</strong></td><td>やわらか肌着 半袖V首 <strong>4枚組</strong> SV6115</td><td>2,880</td><td>2,448</td><td>200</td><td>3</td><td>標準6／430</td><td>226</td><td><strong>1,240</strong></td><td>50.7%</td><td>25</td></tr>
+<tr><td>G3</td><td><strong>B0CXJ1QJY6</strong></td><td>アセドロン メンズ V首T</td><td>1,947</td><td>1,655</td><td>200</td><td><strong>1</strong></td><td>標準1／318</td><td>153</td><td><strong>791</strong></td><td>47.8%</td><td>50</td></tr>
+<tr><td>G4</td><td>B0DJBVM9JM</td><td>やわらか肌着 ボクサー SV61902</td><td>2,483</td><td>2,111</td><td><strong>400</strong></td><td>4</td><td>標準5／425</td><td>195</td><td>1,007</td><td>47.7%</td><td>40</td></tr>
+<tr><td>G5</td><td>B0CXCT7CZ3</td><td>アセドロン ブラトップ（カップ付）</td><td>2,950</td><td>2,508</td><td>300</td><td><strong>1</strong></td><td>標準6／430</td><td>342</td><td>1,172</td><td>46.7%</td><td>75</td></tr>
+<tr><td>G6</td><td>B0CXCJ2VXF</td><td>アセドロン ブラトップ（カップ付）</td><td>2,420</td><td>2,057</td><td>300</td><td>2</td><td>標準6／430</td><td>190</td><td>964</td><td>46.8%</td><td>50</td></tr>
+<tr><td>G7</td><td>B0BZC24JH4</td><td>やわらか肌着 半袖V首 4枚組 SV6115</td><td>2,814</td><td>2,392</td><td>100</td><td>4</td><td>標準6／430</td><td>221</td><td>1,201</td><td>50.2%</td><td>10</td></tr>
+<tr><td>G8</td><td>B0DC5J52N1</td><td>ボディワイルド ボクサー <strong>3枚組</strong></td><td>2,780</td><td>2,363</td><td>100</td><td>3</td><td>標準5／425</td><td>218</td><td>1,185</td><td>50.2%</td><td>12</td></tr>
+<tr><td>G9</td><td>B0DC5L68D8</td><td>ボディワイルド ボクサー 3枚組</td><td>2,980</td><td>2,533</td><td>100</td><td>2</td><td>標準5／425</td><td>346</td><td>1,194</td><td>47.1%</td><td>17</td></tr>
+<tr><td>G10</td><td>B0CCSB8KLL</td><td>POLO BCS 靴下 クルー丈</td><td>1,980</td><td>1,683</td><td>100</td><td>2</td><td>標準5／425</td><td>156</td><td>704</td><td>41.8%</td><td>17</td></tr>
+</tbody></table>
+<ul>
+<li style='margin-left:0.0em'><strong>取り分/月（保守）</strong> = 購入数/月 ÷（出品者数＋1）× 0.5。新規参入はカート獲得で不利という割引を掛けています。</li>
+<li style='margin-left:0.0em'><strong>FBA区分は登録寸法からの計算値で、実寸未確認</strong>。G3 だけが薄型（標準1・318円）で、他は425〜430円。<strong>この差107円は原価上限の5%に相当</strong>するので、③で潰します（§7）。</li>
+<li style='margin-left:0.0em'><strong>ボディワイルドは別ブランド</strong>です。ゲート解除の請求書はブランド単位なので、<strong>GUNZE の出品権を取りたいなら GUNZE ブランドの点数で請求書を作る</strong>必要があります。</li>
+</ul>
+<h3>3-2. キャラクター品（サンリオ・Amazon 本体不在の全8件）</h3>
+<p>社長指示（2026-09-21）に従い、<strong>カテゴリで落とさず数字で判定</strong>しました。8件の内訳は以下。</p>
+<table><thead><tr><th>#</th><th>ASIN</th><th>商品名（短縮）</th><th>現在価格</th><th>購入数/月</th><th>出品者</th><th>FBA区分/配送代行</th><th>販売手数料率</th><th><strong>原価上限(税込)</strong></th><th>判定</th></tr></thead><tbody>
+<tr><td>S1</td><td><strong>B0BFK44R71</strong></td><td>マイメロディ ぬいぐるみおせわセット</td><td>5,000</td><td>200</td><td>6</td><td>標準7／472</td><td>10.4%</td><td><strong>2,380</strong></td><td><strong>候補</strong>（上限が高く、唯一の高単価）</td></tr>
+<tr><td>S2</td><td><strong>B0BYTS6C1K</strong></td><td>マイメロディ お椀</td><td>1,980</td><td>100</td><td>2</td><td>標準3／415</td><td><strong>15.4%</strong></td><td><strong>584</strong></td><td><strong>条件付き候補</strong>（価格の持続性に疑い）</td></tr>
+<tr><td>S3</td><td>B0HB3J4HBN</td><td>ボンボンドロップシール</td><td>1,299</td><td>100</td><td>4</td><td>小型／288</td><td><strong>15.4%</strong></td><td>346</td><td>条件付き（入数が未確認）</td></tr>
+<tr><td>S4</td><td>B0BJ734J7P</td><td>ハローキティ 歯ブラシ3本</td><td>999</td><td>100</td><td>7</td><td>小型／288</td><td>10.4%</td><td>335</td><td><strong>落とす</strong>（粗利額500円に届かない＝売値−500＝499が上限）</td></tr>
+<tr><td>S5</td><td>B0DJJM3FQ4</td><td>ハンカチ シナモロール</td><td>590</td><td>100</td><td>3</td><td>小型／288</td><td>5%</td><td><strong>89</strong></td><td><strong>落とす</strong>（原価89円以下は成立しない）</td></tr>
+<tr><td>S6</td><td>B01MSH0I42</td><td>どうぶつの森 amiibo カード 全6種</td><td>1,762</td><td>100</td><td><strong>13</strong></td><td>小型／288</td><td><strong>15.4%</strong></td><td>761</td><td><strong>落とす</strong>（出品者13＝取り分 月7個・サンリオ卸の商材でない）</td></tr>
+<tr><td>S7</td><td>B09Y5TLL1Q</td><td>バースデーカード</td><td>—</td><td>100</td><td><strong>0</strong></td><td>小型／288</td><td>15.4%</td><td>—</td><td><strong>落とす</strong>（新品オファーがゼロ＝価格が観測できない）</td></tr>
+<tr><td>S8</td><td>B0H39TY4Q1</td><td>カラビナ付きミニポーチ ウサハナ</td><td>—</td><td>100</td><td><strong>0</strong></td><td>標準3／415</td><td>8.4%</td><td>—</td><td><strong>落とす</strong>（同上）</td></tr>
+</tbody></table>
+<p><strong>数字での結論：8件中5件は基準で落ちます。残るのは S1／S2／S3 の3件。</strong></p>
+<p>落ちた理由はキャラクターだからではなく、<strong>①低単価（ハンカチ・歯ブラシは手数料と配送代行で粗利が消える）②ホーム&amp;キッチン／文房具の販売手数料15.4%③価格が観測できない④出品者が多すぎる</strong>——いずれも他の商材と同じ基準です。</p>
+<p><strong>S2・S3 に付けた「条件付き」の中身</strong>（ここは社長に判断してほしい論点ではなく、発注前に潰す事実です）</p>
+<ul>
+<li style='margin-left:0.0em'>S2 は<strong>現在価格が直近の相場水準を大きく上回っています</strong>（水準の数値は Keepa 履歴＝法務判定 08 の B クラスのため非掲載）。<strong>相場水準まで戻ると赤字</strong>です。→ 発注は「現在価格が2週間維持されているか」を確認してから。</li>
+<li style='margin-left:0.0em'>S3 は<strong>上代に対して Amazon 価格が3倍以上</strong>で、<strong>SD 側の入数（1セット何個か）が未確認</strong>です。丸進は既知の1品目で「1セット2点」でした。<strong>入数が2以上なら通ります。</strong></li>
+</ul>
+<h3>3-3. キャラクター品の在庫上限（社長指示2の具体化）</h3>
+<p>キャラクター品はページ寿命が短く（年度更新で ASIN が立ち替わる／成果物 07）、</p>
+<p><strong>規約を守っていてもカタログ画像への知財申立てが通ればページごと消えます</strong>（実例2件が現在404／成果物 06）。</p>
+<p>これは「扱うか否か」ではなく<strong>在庫量で管理する</strong>のが正しい。私が置く数字は次の3つです。</p>
+<table><thead><tr><th>制約</th><th>数値</th><th>理由</th></tr></thead><tbody>
+<tr><td><strong>1SKU の発注量</strong></td><td><strong>30日取り分以内</strong>＝購入数/月 ÷（出品者+1）× 0.5</td><td>ページが消えても在庫が30日分なら、消える前に売り切っている確率が高い</td></tr>
+<tr><td><strong>1SKU の発注金額</strong></td><td><strong>12,000円以内</strong></td><td>ページ消滅は1件で全損。1件の全損が総支出の30%を超えない大きさ</td></tr>
+<tr><td><strong>キャラクター品の合計</strong></td><td><strong>初回予算の1/3以内</strong></td><td>同時多発（権利者の一斉申立て）でも初回予算の2/3は守られる</td></tr>
+</tbody></table>
+<p>グンゼ（定番・通年・年度更新が緩い）は <strong>60〜90日取り分</strong>まで許容します。<strong>在庫の置き方を分ける</strong>のはこの1点です。</p>
+<hr>
+<h2>4. A / B / C ＋推奨</h2>
+<h3>A案「グンゼ集中」— 3SKU × 各10点</h3>
+<table><thead><tr><th></th><th>内容</th></tr></thead><tbody>
+<tr><td>構成</td><td>G1・G2・G3 を各10点（発注 <strong>約3.0万円</strong>／クーポン後 2.7万円）</td></tr>
+<tr><td>想定リターン</td><td>中央 粗利 <strong>+9,000円</strong>（50%）／楽観 +16,000（20%）／悲観 ▲8,000（30%）。<strong>期待値 +5,300円</strong></td></tr>
+<tr><td>取りに行くもの</td><td>GUNZE 30点の請求書（ゲート解除）／納品オペ1周</td></tr>
+<tr><td>リスク</td><td>キャラ棚のデータが1件も取れない。丸進の卸率が肌着で一律に悪ければ<strong>発注ゼロで終わる</strong>（＝損失もゼロ）</td></tr>
+<tr><td>撤退条件</td><td>10/10 までに原価上限を通る SKU が0件なら発注中止</td></tr>
+</tbody></table>
+<h3>B案【推奨】「グンゼ2SKU厚め ＋ キャラ2SKU薄め」</h3>
+<table><thead><tr><th></th><th>内容</th></tr></thead><tbody>
+<tr><td>構成</td><td><strong>G1 × 12点／G2 × 12点／S1 × 4点／S2 or S3 × 10点</strong>（発注 <strong>約4.2万円</strong>／クーポン後 3.9万円／総支出 約4.6万円）</td></tr>
+<tr><td>想定リターン</td><td>中央 粗利 <strong>+11,000円</strong>（確率50%）／楽観 <strong>+30,000円</strong>（20%）／悲観 <strong>▲12,000円</strong>（30%・出品はできたが価格が崩れて処分売り）。<strong>期待値 +7,900円</strong></td></tr>
+<tr><td>取りに行くもの</td><td>GUNZE <strong>24点</strong>の請求書（10点要件の2.4倍で安全余裕）／納品オペ1周／<strong>キャラ棚の実測（回転・返品・ページ寿命）</strong></td></tr>
+<tr><td>リスク</td><td>キャラ2SKU のページ消滅（合計1.5万円が上限）／S2・S3 の価格が持続しない</td></tr>
+<tr><td>撤退条件</td><td>§8 のとおり</td></tr>
+</tbody></table>
+<h3>C案「広く薄く」— 6SKU × 各6点</h3>
+<table><thead><tr><th></th><th>内容</th></tr></thead><tbody>
+<tr><td>構成</td><td>G1〜G3・S1〜S3 を各6点（発注 約4.5万円）</td></tr>
+<tr><td>判定</td><td><strong>却下を推奨。</strong> ①1明細6点では<strong>ゲート解除の「10点以上」を単品で満たさない</strong>恐れ ②納品作業が6倍で社長の物理作業が増える ③1SKU あたりの学習量が薄く、価格・回転の検証ができない</td></tr>
+</tbody></table>
+<h3>推奨：<strong>B案</strong></h3>
+<p>理由は3つです。</p>
+<ol>
+<li style='margin-left:0.0em'><strong>不確実なもの（キャラ）に小さく、確実なもの（グンゼ定番）に大きく置く</strong>。B案はグンゼ24点が主柱で、キャラは合計1.5万円の観測用です。</li>
+<li style='margin-left:0.0em'><strong>ゲート解除の要件に余裕を持たせられる</strong>。10点ちょうどは、Amazon 側が「合計点数」ではなく「明細の点数」を見た場合に落ちます。12点×2明細なら両方の読み方で通ります。</li>
+<li style='margin-left:0.0em'><strong>キャラ棚を数字で判定した結果、残ったのが3件しかない</strong>。3件のうち上限が高い S1 と、条件付きの1件。<strong>この規模なら、外れても計画が壊れません。</strong></li>
+</ol>
+<hr>
+<h2>5. 予算配分 — 5万円は「妥当。ただし上限を6万円に置く」</h2>
+<table><thead><tr><th>費目</th><th>金額</th><th>備考</th></tr></thead><tbody>
+<tr><td>商品代（B案・原価上限で買った場合）</td><td>約42,000円</td><td>実際の卸値が上限より安ければ点数を増やす（下記ルール）</td></tr>
+<tr><td>SD 3,000円OFFクーポン</td><td><strong>▲3,000円</strong></td><td><strong>2026-09-30 前後で失効</strong>。初回の6%に相当</td></tr>
+<tr><td>丸進 送料</td><td><strong>0円</strong></td><td>本州・<strong>税抜20,000円以上で無料</strong>。B案は税抜3.8万円で条件を満たす</td></tr>
+<tr><td>FBA ラベル貼付（Amazon 代行 22円/点・38点）</td><td>約840円</td><td>自分で貼らないための費用。社長の物理作業を減らす</td></tr>
+<tr><td>FBA 納品送料（1箱・ヤマト）</td><td>約1,500円</td><td>集荷を使う</td></tr>
+<tr><td>検品（案X＝社長宅の場合）</td><td>0円</td><td>案Y（外注）なら +6,000〜9,000円</td></tr>
+<tr><td><strong>総支出</strong></td><td><strong>約41,300円</strong>（案X）／<strong>約48,000円</strong>（案Y）</td><td>上限 <strong>6万円</strong></td></tr>
+</tbody></table>
+<p><strong>予算を増やすべきか減らすべきか</strong> → <strong>増やす必要はありません。減らす理由もありません。</strong></p>
+<p>理由：<strong>この段階でのボトルネックは資金ではなく「原価上限を通る SKU の数」</strong>です。運転資金200万円に対して4〜6万円は3%で、</p>
+<p>仮に倍にしても期待値は倍になりません（<strong>通る SKU がなければ金額を積めない</strong>）。</p>
+<p><strong>卸値が上限より安かった場合だけ、同じ SKU の点数を増やして 6万円まで使ってよい</strong>——これが正しい使い方です。</p>
+<blockquote><strong>点数の増やし方（発注時のルール）</strong>：実卸値が原価上限の80%以下だった SKU は、<strong>60日取り分まで</strong>点数を増やす。<br>90%以下なら 30日取り分まで。90%超（＝ぎりぎり通過）なら <strong>10点で止める</strong>。</blockquote>
+<hr>
+<h2>6. 週次の実行手順（社長の一手と秘書の作業を分離）</h2>
+<p><strong>依存関係の明示</strong>：日本ストアは現在停止中です。<strong>本人確認書類の提出（社長・期限 9/22）→ 審査 → 再開</strong>が済むまで、</p>
+<p>出品・FBA 納品プランの作成・ゲートの実機確認は<strong>すべてできません</strong>。</p>
+<p>一方で<strong>仕入れは先行できます</strong>（丸進の条件「仕入れ前の販売は不可」＝在庫を先に持つのが正しい順序）。</p>
+<p><strong>この2本を並行で走らせるのが本計画の骨格です。</strong></p>
+<h3>第0週（9/21〜9/22）— 動かせるものを全部動かす</h3>
+<table><thead><tr><th>担当</th><th>作業</th></tr></thead><tbody>
+<tr><td><strong>社長の一手</strong></td><td>① <strong>本人確認書類を提出（9/22 期限）</strong>。書類は作成済み：<code>~/Downloads/Amazon_01_ID_passport_v3.jpg</code> と <code>Amazon_02_bank_statement.pdf</code>（枠の取り違えが過去の却下原因。提出枠をカズヨと読み合わせてから送信）</td></tr>
+<tr><td>社長の一手</td><td>② <strong>SD 会員情報の保存を承認</strong>（店舗紹介文・業種・設立年月・ネットショップURL）。<strong>卸価格の申請ボタンは、店舗情報を埋めないと出ません</strong></td></tr>
+<tr><td>カズヨ</td><td>③ SD 店舗情報を成果物 02 の文案で入力（保存は②の承認後）</td></tr>
+<tr><td>カズヨ</td><td>④ <strong>ネットショップURL を <code>https://www.amazon.co.jp/</code> から当社ストアフロントへ差し替える</strong>。現状のトップページURLは 11/30 条件の判定で「当社の販売ページに到達しない」＝それ自体が停止理由になり得る（成果物 01）</td></tr>
+</tbody></table>
+<h3>第1週（9/23〜9/27）— 卸値を見る／候補を確定する</h3>
+<table><thead><tr><th>担当</th><th>作業</th></tr></thead><tbody>
+<tr><td><strong>社長の一手</strong></td><td>⑤ <strong>丸進への卸価格閲覧申請を承認</strong>（§4.1・第三者への連絡）。申請文はカズヨが用意。<strong>回答は1〜3営業日</strong></td></tr>
+<tr><td>カズヨ</td><td>⑥ 承認後、丸進の全商品（1,343件）の<strong>卸値・品番・JAN・上代・入数</strong>を画面から取得（非公開メモへ）</td></tr>
+<tr><td><strong>タカシ</strong>（IT）</td><td>⑦ <strong>JAN → ASIN の引き当てを一括実行</strong>（Keepa <code>/product?code=</code>）。<strong>Keepa 契約が 10/3 で切れるため、この作業は9月中に済ませる</strong>。出力＝丸進の全商品 × Amazon 側の購入数/月・本体在否・現在価格・出品者数</td></tr>
+<tr><td><strong>タケシ</strong>（私）</td><td>⑧ §2 の原価上限式を全件に当て、<strong>通過 SKU を一覧化</strong>。B案の SKU を確定（通過が少なければ点数を振り替える）</td></tr>
+<tr><td>カズヨ</td><td>⑨ <strong>FBA 料金シミュレーターに候補 ASIN を投入</strong>（無料）。区分318 / 425 / 430円を確定</td></tr>
+<tr><td>カズヨ</td><td>⑩ <strong>SD で発行される請求書の名義を確認</strong>（丸進名義か、ラクーンコマース名義か）。§7 の④</td></tr>
+</tbody></table>
+<h3>第2週（9/28〜9/30）— 発注（クーポン期限）</h3>
+<table><thead><tr><th>担当</th><th>作業</th></tr></thead><tbody>
+<tr><td>カズヨ</td><td>⑪ 発注内容（SKU・点数・金額・クーポン適用後の総額）を<strong>カートの確定ボタン手前まで</strong>組む</td></tr>
+<tr><td><strong>社長の一手</strong></td><td>⑫ <strong>発注の承認と確定クリック</strong>（§4.1・金銭）。9/30 のクーポン失効前</td></tr>
+</tbody></table>
+<blockquote><strong>9/30 に間に合わなかった場合</strong>：クーポン3,000円は捨てます。<strong>待つ価値はありません</strong>が、<br><strong>卸価格の承認が下りていない状態で発注することはできません</strong>（価格が見えない）。<br>間に合わなければ 10/上旬に発注し、<strong>在庫の陳腐化リスクが小さい定番肌着だけで組む</strong>（キャラは年度更新があるので後ろに回すほど不利）。</blockquote>
+<h3>第3週（10/1〜10/10）— 着荷・検品・納品</h3>
+<table><thead><tr><th>担当</th><th>作業</th></tr></thead><tbody>
+<tr><td><strong>社長の一手</strong></td><td>⑬ 荷受け（案X の場合）。開封・外観目視・<strong>写真を撮る</strong>（丸進の不良品返品は<strong>到着2日以内・事前連絡・写真</strong>が条件。2日は動かせない）</td></tr>
+<tr><td><strong>社長の一手</strong></td><td>⑭ 箱詰め → ヤマト集荷の受け渡し。<strong>所要 約40分／1回限り</strong></td></tr>
+<tr><td>カズヨ</td><td>⑮ 再開後のセラセンで<strong>納品プラン作成・FNSKU 発行・ラベル貼付サービス（22円/点）を指定</strong></td></tr>
+<tr><td>カズヨ</td><td>⑯ 出品（価格は<strong>2,500円を超えない</strong>／在庫は分割せず全量）</td></tr>
+</tbody></table>
+<h3>第4週以降（10/11〜）— 販売と観測</h3>
+<table><thead><tr><th>担当</th><th>作業</th></tr></thead><tbody>
+<tr><td>カズヨ</td><td>⑰ <strong>毎日：カート獲得率・在庫数・価格の変化を記録</strong>（行動指標）</td></tr>
+<tr><td>カズヨ</td><td>⑱ 初回販売が立ったら <strong>SD へネットショップURL を再申告</strong>（「【開業前】」の接頭辞が外れる＋11/30 条件のクリア）</td></tr>
+<tr><td>タケシ</td><td>⑲ 実績 vs 予測の差分を測り、2周目の点数と SKU を再設計</td></tr>
+</tbody></table>
+<h3>検品の置き方（選択肢＋推奨）</h3>
+<table><thead><tr><th>案</th><th>内容</th><th>コスト</th><th>社長の物理作業</th><th>判定</th></tr></thead><tbody>
+<tr><td><strong>案X【1周目の推奨】</strong></td><td>社長宅で受け取り、開封・外観目視・写真 → 箱詰め → ヤマト集荷。ラベルは Amazon 代行（22円/点）</td><td>約2,300円</td><td><strong>約40分／1回</strong></td><td><strong>推奨</strong>。現物を見る学習価値が1周目だけ突出して大きい。丸進の「到着2日以内・写真つき」の返品条件も自分で握れる</td></tr>
+<tr><td>案Y</td><td>FBA 納品代行業者に丸進から直送し、検品・ラベル・納品を委託</td><td>約6,000〜9,000円（100〜200円/点＋送料）</td><td><strong>ゼロ</strong></td><td><strong>2周目から採用</strong>。業者選定・契約は §4.1（金銭・契約）。10月中に候補調査を発注しておく</td></tr>
+<tr><td>案Z</td><td>丸進から FBA 倉庫へ直送</td><td>最安</td><td>ゼロ</td><td><strong>不可</strong>。丸進の取引条件「第三者へ売る前に検品必須」に反し、FNSKU ラベルも貼れない</td></tr>
+</tbody></table>
+<blockquote>社長の既定（2026-06-03「物理作業は外注、社長は PC 上で完結」）と案X は衝突します。<br><strong>1周目に限った例外として推奨</strong>します（副業初心者としての体験学習価値／不良品返品の2日期限を自分で握れる）。<br><strong>案Y を選ぶ判断もあり</strong>で、その場合は業者調査を先に回すため発注が1週間遅れます（クーポンを捨てる）。</blockquote>
+<hr>
+<h2>7. 未確認事項を潰す順序（誰が・いつ・いくら）</h2>
+<p><strong>順序の原則：0円で潰せるもの・他を無意味にするものを先に。</strong></p>
+<table><thead><tr><th>順</th><th>未確認事項</th><th>誰が</th><th>いつまで</th><th>費用</th><th>なぜこの順番か</th></tr></thead><tbody>
+<tr><td><strong>①</strong></td><td><strong>丸進に該当品番があるか・卸率はいくらか</strong></td><td>申請の承認＝社長／画面取得＝カズヨ／ASIN 引き当て＝タカシ／判定＝タケシ</td><td><strong>9/27</strong></td><td>0円（Keepa は既契約）</td><td><strong>これが0なら②③④は全部無意味</strong>。しかも Keepa 契約が 10/3 で切れるので引き当ては9月中が最後</td></tr>
+<tr><td><strong>②</strong></td><td><strong>SD の請求書は誰の名義で出るか</strong>（丸進／ラクーンコマース）</td><td>カズヨ（SD のログイン内・FAQ と注文履歴）</td><td><strong>9/24</strong></td><td>0円</td><td><strong>ゲート解除の請求書要件は「メーカー/卸の名称・住所」</strong>。ラクーン名義だけなら<strong>この発注のいちばん大きな目的が消えます</strong>。0円で潰せるのに計画の骨格を決める＝最優先で①と並走</td></tr>
+<tr><td><strong>③</strong></td><td><strong>実寸による FBA サイズ区分</strong>（318 / 425 / 430円）</td><td>カズヨ（FBA 料金シミュレーターに ASIN 投入）</td><td><strong>9/27</strong></td><td>0円</td><td>107円/個＝原価上限の5%。<strong>①の判定精度を上げるので発注前に必要</strong>。ただし①より後でよい</td></tr>
+<tr><td><strong>④</strong></td><td><strong>ゲート（出品許可）の有無</strong></td><td>カズヨ（セラセンの商品登録で ASIN 検索・<strong>申請ボタンは押さない</strong>）</td><td>日本ストア再開の翌営業日</td><td>0円</td><td><strong>発注の可否を変えません</strong>（ゲートがあっても請求書を取るために買う）。変えるのは<strong>納品のタイミング</strong>だけ。よって最後</td></tr>
+</tbody></table>
+<p><strong>補足</strong>：④はストア停止中でも画面が見える可能性があります（未確認）。見えるなら前倒ししてください。</p>
+<p>見えた結果が「制限あり」でも、<strong>発注は止めません</strong>。止まるのは①が通らなかったときだけです。</p>
+<hr>
+<h2>8. 撤退条件</h2>
+<table><thead><tr><th>期日</th><th>指標</th><th>条件</th><th>撤退の内容</th></tr></thead><tbody>
+<tr><td><strong>9/24</strong></td><td>SD 請求書の名義</td><td>ラクーンコマース名義のみで、<strong>卸・メーカー名の記載が無い</strong></td><td>ゲート解除を目的から外す。<strong>発注規模を A 案（3万円）まで落とす</strong>（請求書が取れないなら点数を積む理由が半分消える）</td></tr>
+<tr><td><strong>9/27</strong></td><td>卸価格の閲覧承認</td><td>丸進から<strong>承認が下りない</strong></td><td>丸進を一旦停止。SD 内でグンゼを扱う別の出展企業へ切替（10/3 までに再申請）</td></tr>
+<tr><td><strong>10/10</strong></td><td>原価上限を通る SKU 数</td><td><strong>0件</strong></td><td><strong>丸進での発注を中止</strong>（在庫ゼロ・損失ゼロ）。丸進は「請求書を取る相手」としてのみ残す</td></tr>
+<tr><td><strong>10/24</strong></td><td>日本ストアの状態</td><td><strong>再開していない</strong></td><td>FBA 納品を止めて在庫を自宅保留。SD へ 11/30 条件の延長を照会（§4.1）</td></tr>
+<tr><td><strong>11/30</strong></td><td>Amazon の出品</td><td><strong>1件も見えていない</strong></td><td>SD の利用停止を受け入れる。主戦場を NETSEA／メーカー直へ移す</td></tr>
+<tr><td><strong>12/20</strong></td><td>初回在庫の消化率</td><td><strong>50%未満</strong>（＝回転6ヶ月ペース超過）</td><td>グンゼレーンへの追加投資を停止。価格を下げて処分し、原因（カート獲得か需要か）を分離</td></tr>
+<tr><td>随時</td><td>1SKU の消化</td><td>出品から<strong>90日で消化30%未満</strong></td><td>その SKU は追加発注しない（他 SKU への振り替え）</td></tr>
+<tr><td>随時</td><td>キャラ品のページ</td><td><strong>ASIN が404 or 出品不可になった</strong></td><td>即座に同シリーズの追加発注を停止。残在庫は値下げして消化</td></tr>
+<tr><td>随時</td><td>アカウント健全性</td><td><strong>知財申立てが1件でも入った</strong></td><td>キャラクター品の新規発注を全停止（4ストア停止中の今、2件目は取れない）</td></tr>
+</tbody></table>
+<hr>
+<h2>9. 失敗したらどうなるか（最悪ケースの現金）</h2>
+<p>§4 の「悲観」よりさらに下、<strong>確率5%前後の最悪ケース</strong>を置きます。<strong>定義</strong>：発注は済んだ／日本ストアが再開しない、またはゲート解除が通らず出品できない／在庫を Amazon 以外で処分。</p>
+<table><thead><tr><th>項目</th><th>金額</th></tr></thead><tbody>
+<tr><td>商品代（B案・クーポン適用後）</td><td>▲39,000円</td></tr>
+<tr><td>ラベル・納品送料（納品まで進んだ場合のみ発生）</td><td>▲2,300円</td></tr>
+<tr><td>在庫の処分回収（定番肌着中心・回収率40%と仮定）</td><td>＋16,000円</td></tr>
+<tr><td><strong>現金の純減</strong></td><td><strong>約▲25,000円</strong>（納品前に止まった場合は <strong>約▲23,000円</strong>）</td></tr>
+</tbody></table>
+<ul>
+<li style='margin-left:0.0em'><strong>運転資金200万円に対して 1.2%。予備25万円には触りません</strong>（200万 − 2.5万 ＝ 197.5万）。</li>
+<li style='margin-left:0.0em'><strong>12ヶ月累計キャッシュ＞0（中央）の設計条件も崩しません</strong>。中央シナリオでは+11,000円のプラス寄与です。</li>
+<li style='margin-left:0.0em'><strong>最も痛い失敗は現金ではなく時間</strong>です。①が通らず10/10 に発注中止となった場合、<strong>11/30 の SD 条件に間に合わせる余裕が消えます</strong>。</li>
+</ul>
+<p>  ですから §7 の①②を<strong>9/24〜9/27 に必ず終わらせる</strong>。ここだけが本当のクリティカルパスです。</p>
+<hr>
+<h2>10. KPI 3階層と、最重要KPI への接続</h2>
+<table><thead><tr><th>階層</th><th>指標</th><th>初回の目標値</th></tr></thead><tbody>
+<tr><td><strong>北極星</strong></td><td>月商800万円・利益率20%以上・SKU数100</td><td>—</td></tr>
+<tr><td><strong>先行指標</strong></td><td>① <strong>出品可能な GUNZE の ASIN 数</strong>（ゲート解除で 0 → 最大56）&lt;br&gt;② <strong>原価上限を通った候補 SKU 数</strong>（＝使える母数）&lt;br&gt;③ FBA 在庫金額</td><td>① 56（10月中）&lt;br&gt;② <strong>10件以上</strong>（9/27）&lt;br&gt;③ 4万円</td></tr>
+<tr><td><strong>行動指標</strong></td><td>④ 卸値 × ASIN の引き当て件数／週&lt;br&gt;⑤ 納品点数／週&lt;br&gt;⑥ カート獲得率・在庫切れ日数（毎日）</td><td>④ 1,343件を1回&lt;br&gt;⑤ 38点&lt;br&gt;⑥ カート50%以上・在庫切れ0日</td></tr>
+</tbody></table>
+<p><strong>最重要KPI への接続（正直な上限つき）</strong></p>
+<ul>
+<li style='margin-left:0.0em'><strong>SKU100 への寄与</strong>：ゲート解除が通れば、グンゼ＋ボディワイルドで<strong>最大56SKU＝目標の56%</strong>が1ブランドで埋まります。<strong>初回の本当のリターンはここ</strong>です。</li>
+<li style='margin-left:0.0em'><strong>月商への寄与</strong>：候補56件を平均売値2,200円・取り分30個/月で回せば<strong>理論上 月商370万円</strong>。ただし<strong>運転資金200万円・現金サイクル2ヶ月という制約で、実効上限は月商約200万円</strong>（必要運転資金 ≒ 月商×1.0）。</li>
+</ul>
+<p>  → <strong>このレーン単独で届くのは 800万円の約25%</strong>。残りはメーカー直仕入れ・OEM の別レーンが必要です。<strong>1周目にこのレーンを選ぶ理由は、金額ではなく「速度と再現性」</strong>です。</p>
+<ul>
+<li style='margin-left:0.0em'><strong>利益率20%</strong>：§2 の原価上限式が20%を構造的に担保します。<strong>上限を1円でも超える卸値を買わない限り、利益率は割れません。</strong></li>
+</ul>
+<hr>
+<h2>11. やらないこと（全方位は戦略ではない）</h2>
+<ol>
+<li style='margin-left:0.0em'><strong>新規 ASIN を作らない。</strong> セット組成・GS1 事業者コードの取得（27,500円＋<strong>自宅住所が公開される</strong>）・製品コード免除申請は<strong>今期やりません</strong>。既存 ASIN への相乗りだけで56件の棚があります。</li>
+<li style='margin-left:0.0em'><strong>丸進以外の SD 出展企業を今周は開拓しない。</strong> 1周目は1社に集中し、卸 → 検品 → FBA → 販売の1本を完走させる。判明48社の35%が Amazon 不可という事実（成果物 01）の前で、社数を増やしても通らない相手が増えるだけです。</li>
+<li style='margin-left:0.0em'><strong>低単価品を追わない。</strong> <strong>粗利額500円未満は入口で落とす</strong>（ハンカチ・歯ブラシ・シール単品）。ホーム&amp;キッチン／文房具（販売手数料15.4%）の1,000円台は構造的に通りません。</li>
+<li style='margin-left:0.0em'><strong>価格を2,500円より上に置かない</strong>（服&amp;ファッション小物）。上振れ相場を取りに行かず、手数料の崖の手前で止める。</li>
+<li style='margin-left:0.0em'><strong>1SKU に厚く入れない。</strong> この棚の利益は供給が薄いことから出ています。<strong>自分の在庫で前提を壊すのが、この計画で最も起こりやすい失敗</strong>です。</li>
+</ol>
+<hr>
+<h2>12. マサル（シミュレーター）に検証してほしい3点</h2>
+<ol>
+<li style='margin-left:0.0em'><strong>「供給が薄い棚に自分が入ると価格が崩れる」の崩れ方。</strong> 出品者2社の棚に3社目として入り、在庫12点を投入したときの価格と消化の推移。私は中央想定売値を現在価格の85%に置きましたが、<strong>この係数が0.7だと B案は中央でも赤字</strong>になります（原価上限が約200円下がる）。ここが計画の最大の感度です。</li>
+<li style='margin-left:0.0em'><strong>§7 の②（請求書の名義）が「ラクーン名義のみ」だった世界。</strong> ゲート解除の目的が消えたとき、B案の点数（12点×2）は正当化できるか。A案に落とすべきか、そもそも発注をやめるべきか。</li>
+<li style='margin-left:0.0em'><strong>11/30 の SD 条件に間に合わない確率。</strong> 本人確認 → 審査 → 再開 → 納品 → 反映の各段に遅延を入れたとき、<strong>11/30 に出品が見えている確率</strong>。ここが50%を割るなら、<strong>発注より先に「SD へ 11/30 条件の照会」を社長承認で出す</strong>順序に組み替えるべきです。</li>
+</ol>
+<hr>
+<h2>付記：この計画で使った事実の出所と確度</h2>
+<table><thead><tr><th>区分</th><th>内容</th></tr></thead><tbody>
+<tr><td><strong>確定（一次・実測）</strong></td><td>FBA 配送代行手数料表と「三辺合計」の定義／販売手数料のカテゴリ別料率・<strong>税抜表示</strong>・2,500円の崖（<code>sell.amazon.co.jp/pricing</code> 2026-09-21 取得）／候補 ASIN の現在価格・出品者数・購入数/月・Amazon 本体不在（Keepa 2026-09-20）／<code>monthlySold</code> がバリエーション固有であること（Keepa 公式構造定義）／丸進の送料条件（税抜20,000円以上無料）／SD クーポンの期限・11/30 の利用停止条件</td></tr>
+<tr><td><strong>推定（明示）</strong></td><td>中央想定売値＝現在価格×0.85（私の設定した保守係数）／取り分＝購入数/月÷(出品者+1)×0.5／FBA サイズ区分（<strong>登録寸法からの計算値・実寸未確認</strong>）／在庫処分の回収率40%／各シナリオの確率（20/50/30%）</td></tr>
+<tr><td><strong>未確認（潰す手順つき）</strong></td><td>丸進に該当品番があるか・卸率（§7①）／請求書の名義（②）／実寸区分（③）／ゲートの有無（④）／S3 の SD 入数／グンゼ商品の Product Group が「服&amp;ファッション小物」で課金されるか（成果物 10 の教訓：<strong>Root カテゴリーではなく商品属性で決まる</strong>。おもちゃ課金なら10.4%で手数料が上がる）</td></tr>
+<tr><td><strong>非掲載（規約）</strong></td><td>SD の卸値・上代・SD 品番・入数（SD 会員規約17条1項）／Keepa の履歴・平均・在庫切れ率・セラーID（Keepa T&amp;C §11・法務判定 08 の B クラス）</td></tr>
+</tbody></table>
+</body></html>
