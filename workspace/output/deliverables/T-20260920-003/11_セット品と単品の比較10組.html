@@ -1,0 +1,144 @@
+<!doctype html><html lang='ja'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>セット品と単品の比較 10組 — Keepa 実測</title><style>body{font-family:-apple-system,'Hiragino Sans','Noto Sans JP',sans-serif;max-width:1150px;margin:2em auto;padding:0 1em;line-height:1.65;color:#222;font-size:14.5px}table{border-collapse:collapse;margin:.8em 0;font-size:.92em}th,td{border:1px solid #bbb;padding:.35em .6em;vertical-align:top}th{background:#eef2f8}tr:nth-child(even) td{background:#fafafa}h1{font-size:1.5em;border-bottom:2px solid #444}h2{font-size:1.25em;border-left:5px solid #25b;padding-left:8px;margin-top:1.8em}h3{font-size:1.05em;margin-top:1.4em}blockquote{border-left:4px solid #ccc;margin:.8em 0;padding:.2em 1em;color:#444}code{background:#f3f3f3;padding:1px 4px;border-radius:3px}hr{border:0;border-top:1px solid #ccc;margin:1.6em 0}</style></head><body>
+<h1>セット品と単品の比較 10組 — Keepa 実測</h1>
+<p>IT エンジニア タカシ／2026-09-20／チケット T-20260920-003</p>
+<p>Keepa 実測（取得日 2026-09-20・<strong>消費 129 トークン</strong>／上限 150）</p>
+<blockquote><strong>ロードマップ上の位置</strong>：SD 初回仕入れの「売り方」の決定。10 の「配送代行 415 円は削れない」を受け、<br>セット化で 1 個あたりに割れるかを実測で決める。次につながるのは初回発注の入数と価格の置き方。</blockquote>
+<hr>
+<h2>結論（先に読む3行）</h2>
+<ol>
+<li style='margin-left:0.0em'><strong>「セットだと1個あたりを高く設定できる」は、当社が触れる棚では成り立っていません。</strong> 単価倍率（セット単価 ÷ 単品単価）の<strong>中央値は 1.000</strong>（n=7）。1.2 倍以上だったのは 2 組だけで、<strong>その 2 組はどちらも売れていません</strong>（<code>monthlySold</code> なし）。</li>
+<li style='margin-left:0.0em'><strong>10 組すべてのセット側で <code>monthlySold</code> が付いていません</strong>（＝月 50 個未満）。うち 3 組は<strong>新品オファーが 1 本もなく、ページが死んでいます</strong>。セット ASIN は「高く売れる場所」ではなく「ほぼ売れていない場所」でした。</li>
+<li style='margin-left:0.0em'><strong>それでもセット化には意味があります。理由は値上げではなく手数料です。</strong> FBA 配送代行は 1 注文あたり定額なので、入数 5 で 1 個あたり <strong>415 円 → 85 円</strong>。サンリオ単品の手残りは <strong>571 円 → 901 円/個</strong>（+330 円）になり、ハジメの「粗利 500 円未満は落とす」基準を<strong>単品では割っていた商品が越えます</strong>。</li>
+</ol>
+<hr>
+<h2>1. 10組の実測表</h2>
+<p>見方：<strong>価格は「新品最安の着地価格（送料込）」、Amazon 本体が唯一の出品者の場合は本体価格</strong>。</p>
+<p>「購入数/月(Amazon表示)」は Amazon の検索結果に出る「先月◯個購入」（Keepa の <code>monthlySold</code>・ASIN 単位の実数）。<strong>月 50 個未満は Amazon が表示しないため「なし」＝ 0 ではなく「月 50 個未満」</strong>です。</p>
+<p>「新品オファー本数」は Keepa <code>COUNT_NEW</code> で、<strong>社数ではなくオファー本数</strong>です（<code>-1</code> ＝オファーなし、<code>None</code> ＝履歴なし）。</p>
+<p>入数はタイトルの表記から手で確定しました（<code>numberOfItems</code> はセット側で <code>-1</code> になり使えません）。</p>
+<table><thead><tr><th>#</th><th>ペア</th><th>棚</th><th>側</th><th>ASIN</th><th>入数</th><th>価格(円)</th><th>1個あたり(円)</th><th>購入数/月(Amazon表示)</th><th>ランク</th><th>カテゴリ</th><th>新品オファー本数</th><th>Amazon本体</th><th>EAN</th><th>取扱開始</th><th>レビュー数</th></tr></thead><tbody>
+<tr><td>1</td><td>ゼブラ サラサクリップ 0.5 黒</td><td>文具</td><td>単品</td><td>B00P0PT7BS</td><td>10</td><td>582</td><td>58.2</td><td><strong>3,000</strong></td><td>67</td><td>ジェルインクボールペン</td><td>10</td><td>在庫あり</td><td>4901681376810</td><td>2014-11</td><td>903</td></tr>
+<tr><td>1</td><td>〃 (× 2)</td><td>文具</td><td>セット</td><td>B0HFM89JY9</td><td>20</td><td><strong>出品なし</strong></td><td>—</td><td>なし</td><td>66</td><td>ジェルインクボールペン</td><td>なし</td><td>出品なし</td><td>なし</td><td>2014-11</td><td>903</td></tr>
+<tr><td>2</td><td>激落ちくんキューブ 30個入</td><td>日用品</td><td>単品</td><td>B07J6534TN</td><td>30</td><td>640</td><td>21.3</td><td>300</td><td>8,020</td><td>浴室掃除用スポンジ</td><td>14</td><td>出品なし</td><td>4903320042544</td><td>2018-10</td><td>1,001</td></tr>
+<tr><td>2</td><td>〃 3個セット</td><td>日用品</td><td>セット</td><td>B0DJBTYG6D</td><td>90</td><td><strong>出品なし</strong></td><td>—</td><td>なし</td><td>22,922</td><td>キッチンスポンジ</td><td>-1</td><td>出品なし</td><td>なし</td><td>2024-09</td><td>4</td></tr>
+<tr><td>3</td><td>激落ちくんキューブ 60個入</td><td>日用品</td><td>単品</td><td>B07YR227W9</td><td>60</td><td>772</td><td>12.9</td><td>100</td><td>23,520</td><td>浴室掃除用スポンジ</td><td>14</td><td>出品なし</td><td>4903320045514</td><td>2019-10</td><td>813</td></tr>
+<tr><td>3</td><td>〃 ×4個</td><td>日用品</td><td>セット</td><td>B0DJBTV18H</td><td>240</td><td><strong>出品なし</strong></td><td>—</td><td>なし</td><td>22,917</td><td>キッチンスポンジ</td><td>-1</td><td>出品なし</td><td>なし</td><td>2024-09</td><td>4</td></tr>
+<tr><td>4</td><td>エボルタNEO 単4 8本</td><td>小型家電/電池</td><td>単品</td><td>B06XCJNC11</td><td>8</td><td>930</td><td>116.2</td><td>400</td><td>467</td><td>乾電池</td><td>35</td><td>出品なし</td><td>4549077898951</td><td>2017-02</td><td>4,322</td></tr>
+<tr><td>4</td><td>〃（まとめ買い）【×3】</td><td>小型家電/電池</td><td>セット</td><td>B075K74YQJ</td><td>24</td><td>2,599</td><td>108.3</td><td>なし</td><td>37,397</td><td>乾電池</td><td>14</td><td>出品なし</td><td>4549077898951</td><td>2017-09</td><td>—</td></tr>
+<tr><td>5</td><td>エボルタ 単4 8本</td><td>小型家電/電池</td><td>単品</td><td>B0016JWQXI</td><td>8</td><td>826</td><td>103.2</td><td>100</td><td>488</td><td>乾電池</td><td>21</td><td>在庫あり</td><td>4984824811461</td><td>—</td><td>5,081</td></tr>
+<tr><td>5</td><td>〃 8個パック 2個セット</td><td>小型家電/電池</td><td>セット</td><td>B07ZVH2S9T</td><td>16</td><td>2,725</td><td><strong>170.3</strong></td><td>なし</td><td>170,931</td><td>乾電池</td><td>10</td><td>出品なし</td><td>4984824811461</td><td>2019-11</td><td>—</td></tr>
+<tr><td>6</td><td>エボルタNEO 単4 4本</td><td>小型家電/電池</td><td>単品</td><td>B06XCS48X2</td><td>4</td><td>599</td><td>149.8</td><td>なし</td><td>31,693</td><td>乾電池</td><td>28</td><td>在庫あり</td><td>4549077898999</td><td>2017-02</td><td>654</td></tr>
+<tr><td>6</td><td>〃（まとめ買い）【×3】</td><td>小型家電/電池</td><td>セット</td><td>B075K5DTBM</td><td>12</td><td>2,491</td><td><strong>207.6</strong></td><td>なし</td><td>260,804</td><td>乾電池</td><td>13</td><td>出品なし</td><td>4549077898999</td><td>2017-09</td><td>—</td></tr>
+<tr><td>7</td><td>エボルタNEO 単2 4本</td><td>小型家電/電池</td><td>単品</td><td>B06XC9KP8H</td><td>4</td><td>860</td><td>215.0</td><td>なし</td><td>7,314</td><td>乾電池</td><td>36</td><td>出品なし</td><td>4549077898579</td><td>2017-02</td><td>3,275</td></tr>
+<tr><td>7</td><td>〃（まとめ買い）【×3】</td><td>小型家電/電池</td><td>セット</td><td>B075K221T4</td><td>12</td><td>2,200</td><td>183.3</td><td>なし</td><td>64,003</td><td>乾電池</td><td>13</td><td>出品なし</td><td>4549077898579</td><td>2017-09</td><td>2</td></tr>
+<tr><td>8</td><td>サンリオ シナモロール（丸進）</td><td>雑貨</td><td>単品</td><td>B0C1JCJNVY</td><td>1</td><td>1,045</td><td>1,045.0</td><td>200</td><td>1,310</td><td>キーホルダー・チェーン</td><td>5</td><td>在庫あり</td><td>4550337305515</td><td>2023-04</td><td>1,265</td></tr>
+<tr><td>8</td><td>〃 (× 5)</td><td>雑貨</td><td>セット</td><td>B0H8DR7DLG</td><td>5</td><td>5,225</td><td>1,045.0</td><td>なし</td><td>1,310</td><td>キーホルダー・チェーン</td><td><strong>本体1本のみ</strong></td><td>在庫あり</td><td>なし</td><td>2023-04</td><td>1,265</td></tr>
+<tr><td>9</td><td>サンリオ クロミ（丸進）</td><td>雑貨</td><td>単品</td><td>B0C1JC88S5</td><td>1</td><td>1,045</td><td>1,045.0</td><td>200</td><td>1,310</td><td>キーホルダー・チェーン</td><td>8</td><td>在庫あり</td><td>4550337305898</td><td>2023-04</td><td>1,265</td></tr>
+<tr><td>9</td><td>〃 (× 3)</td><td>雑貨</td><td>セット</td><td>B0H8DZM3PT</td><td>3</td><td>3,135</td><td>1,045.0</td><td>なし</td><td>1,292</td><td>キーホルダー・チェーン</td><td><strong>本体1本のみ</strong></td><td>在庫あり</td><td>なし</td><td>2023-04</td><td>1,265</td></tr>
+<tr><td>10</td><td>サンリオ ハローキティ 174459（丸進）</td><td>雑貨</td><td>単品</td><td>B0FQDWCGQD</td><td>1</td><td>1,100</td><td>1,100.0</td><td>100</td><td>1,310</td><td>キーホルダー・チェーン</td><td>8</td><td>在庫あり</td><td>4550624174459</td><td>2025-10</td><td>1,265</td></tr>
+<tr><td>10</td><td>〃 (× 4)</td><td>雑貨</td><td>セット</td><td>B0HF7QRC5N</td><td>4</td><td>4,400</td><td>1,100.0</td><td>なし</td><td>1,310</td><td>キーホルダー・チェーン</td><td><strong>本体1本のみ</strong></td><td>在庫あり</td><td>なし</td><td>2025-10</td><td>1,265</td></tr>
+</tbody></table>
+<p><strong>参考（異なる商品のセット＝固有 JAN が必要な型）</strong></p>
+<table><thead><tr><th>ペア</th><th>側</th><th>ASIN</th><th>入数</th><th>価格(円)</th><th>購入数/月(Amazon表示)</th><th>ランク</th><th>新品オファー本数</th><th>Amazon本体</th></tr></thead><tbody>
+<tr><td>貝印 DH3345 ＋ ピーラー</td><td>単品</td><td>B079ZK83RB</td><td>1</td><td>3,382</td><td><strong>900</strong></td><td>395</td><td>29</td><td>在庫あり</td></tr>
+<tr><td>〃【セット買い】</td><td>セット</td><td>B0FX8XC9TW</td><td>2</td><td><strong>出品なし</strong></td><td>なし</td><td>349,836</td><td>-1</td><td>出品なし</td></tr>
+</tbody></table>
+<p>表の読みかたで注意が要るもの（3点）:</p>
+<ul>
+<li style='margin-left:0.0em'><strong>サンリオ 4組のランク 1,310 は兄弟共有</strong>です。単品・セット・親の全部が同じ値で、セットの売れ行きを表していません（09 で検証済み）。<strong>ランクの良さをセットの根拠に使えません。</strong></li>
+<li style='margin-left:0.0em'><strong>サンリオのレビュー数 1,265 も兄弟共有</strong>（単品・セットで同値）。一方 <strong>激落ちのセットは 4 件</strong>で単品 1,001 件と別勘定でした。<strong>レビュー数は「共有か独立か」がペアによって違う</strong>ので、単独の判断材料にできません。</li>
+<li style='margin-left:0.0em'><strong>取扱開始日は、兄弟共有のペアでは単品と同日</strong>（サラサ 2014-11、サンリオ、貝印）。セットページ自身の開設日ではない可能性が高い〔推測〕。独立していた激落ち 2 組だけは 2024-09 と自前の日付でした。</li>
+</ul>
+<hr>
+<h2>2. 論点1 — 「セットの方が1個あたり高く売れる」は本当か</h2>
+<p><strong>単価倍率が計算できたのは 7 組</strong>（残る 3 組はセット側にオファーがなく価格が存在しない）。</p>
+<table><thead><tr><th>倍率</th><th>組</th><th>購入数/月(Amazon表示・セット側)</th></tr></thead><tbody>
+<tr><td>0.853</td><td>7 エボルタNEO 単2 4本</td><td>なし</td></tr>
+<tr><td>0.932</td><td>4 エボルタNEO 単4 8本</td><td>なし</td></tr>
+<tr><td>1.000</td><td>8 シナモロール</td><td>なし</td></tr>
+<tr><td>1.000</td><td>9 クロミ</td><td>なし</td></tr>
+<tr><td>1.000</td><td>10 ハローキティ</td><td>なし</td></tr>
+<tr><td>1.386</td><td>6 エボルタNEO 単4 4本</td><td>なし</td></tr>
+<tr><td>1.650</td><td>5 エボルタ 単4 8本</td><td>なし</td></tr>
+</tbody></table>
+<ul>
+<li style='margin-left:0.0em'><strong>中央値 1.000／範囲 0.853〜1.650／1.2 倍以上は 2 組（29%）。</strong></li>
+<li style='margin-left:0.0em'><strong>1.0 未満が 2 組ある</strong>（セットの方が 1 個あたり<strong>安い</strong>）。同じ棚の電池で、値上げどころか値下げで売っています。</li>
+<li style='margin-left:0.0em'><strong><code>monthlySold</code> が付いたセットは 10 組中 0 組。</strong> 1.65 倍で売っている B07ZVH2S9T はランク 170,931 位、1.386 倍の B075K5DTBM は 260,804 位。<strong>高く置けているのではなく、高くて売れていない</strong>という読みが自然です。</li>
+</ul>
+<p><strong>反例として明記すべき2件</strong>：#5（倍率 1.650・ランク 170,931 位）と #6（倍率 1.386・ランク 260,804 位）。</p>
+<p>「セットは単価を上げられる」の実例に見えますが、<strong>上げた結果が無販売</strong>です。これを根拠に当社が値上げすると同じ場所に着きます。</p>
+<p>サンリオ 3 組が <strong>きっかり 1.000</strong> なのは偶然ではありません。<strong>Amazon 本体が単品価格 × 入数でそのまま値付けしている</strong>ためで、5,225 = 1,045 × 5、3,135 = 1,045 × 3、4,400 = 1,100 × 4 と 1 円まで一致します。</p>
+<hr>
+<h2>3. 論点2 — セット側の競合構造</h2>
+<table><thead><tr><th>パターン</th><th>該当</th><th>中身</th></tr></thead><tbody>
+<tr><td>セット側に<strong>新品オファーが1本もない</strong>（死んだページ）</td><td><strong>3組</strong></td><td>#1 サラサ(× 2)、#2 激落ち3個セット、#3 激落ち×4個。参考の貝印セット買いも同じ</td></tr>
+<tr><td>セット側の出品者は <strong>Amazon 本体1本だけ</strong>（第三者オファーは履歴上ゼロ）</td><td><strong>3組</strong></td><td>#8・#9・#10 のサンリオ「(× N)」ページ</td></tr>
+<tr><td><strong>単品に本体がいて、セットに本体がいない</strong></td><td><strong>2組</strong></td><td>#5（単品 在庫あり → セット 出品なし）、#6（同じ）</td></tr>
+<tr><td>両方とも本体なし</td><td>2組</td><td>#4・#7</td></tr>
+</tbody></table>
+<p><strong>ご質問の「本体は単品にいてセットにはいない」は実在しました（#5・#6）。ただし当社の勝ち筋にはなりません。</strong></p>
+<p>理由は 2 つで、① その 2 組が<strong>倍率 1.386〜1.650 と高値のまま無販売</strong>、② セット側のオファー本数が 10〜13 本あり、<strong>空いている棚ではない</strong>からです。</p>
+<p>もう一つ重要なのは <strong>サンリオ型の「(× N)」ページの正体</strong>です。<strong>Amazon 本体が作って本体だけが売る専用ページ</strong>で、第三者の新品オファーが<strong>一度も立ったことがありません</strong>（Keepa の新品価格履歴が空）。</p>
+<p><strong>単価は単品と完全に同額</strong>なので、ここに相乗りしても価格で勝てず、<strong>カートは本体が持ち続けます</strong>。丸進のシリーズで社長が 09 で見た ×3/×4/×5 のページは、<strong>当社が入る場所ではありません。</strong></p>
+<p>→ <strong>当社がセットで戦うなら、既存の「(× N)」ページへの相乗りではなく、自分で JAN を取って作る N 個パック</strong>（ハルオ判定の <strong>IPQ ルート＝同一商品のまとめ売り、ブランド認証不要</strong>）です。</p>
+<hr>
+<h2>4. 論点3 — 手数料の効果（ここがセット化の本体）</h2>
+<p>FBA 配送代行手数料は <strong>1 注文あたりの定額</strong>で、サイズ区分が上がっても増え方はごく小さい（10 の公式表より、税込・売値 1,000 円超）。</p>
+<table><thead><tr><th>サイズ区分</th><th>三辺合計・重量</th><th>手数料</th></tr></thead><tbody>
+<tr><td>標準3</td><td>30cm 以下・2kg 以下</td><td>415</td></tr>
+<tr><td>標準4</td><td>40cm 以下・2kg 以下</td><td>420</td></tr>
+<tr><td>標準5</td><td>50cm 以下・2kg 以下</td><td>425</td></tr>
+<tr><td>標準6</td><td>60cm 以下・5kg 以下</td><td>430</td></tr>
+</tbody></table>
+<p>サンリオ ミニマスコット（単品 = 標準3 / 415 円）を N 個にまとめた場合〔<strong>区分は寸法の推定。実寸未確認</strong>〕:</p>
+<table><thead><tr><th>入数</th><th>三辺合計の見込み</th><th>区分</th><th>配送代行</th><th><strong>1個あたり</strong></th><th>単品比</th></tr></thead><tbody>
+<tr><td>1</td><td>25cm</td><td>標準3</td><td>415</td><td><strong>415.0</strong></td><td>—</td></tr>
+<tr><td>3</td><td>35cm（厚み方向に積む）</td><td>標準4</td><td>420</td><td><strong>140.0</strong></td><td>−275</td></tr>
+<tr><td>4</td><td>40cm</td><td>標準4</td><td>420</td><td><strong>105.0</strong></td><td>−310</td></tr>
+<tr><td>5</td><td>45cm</td><td>標準5</td><td>425</td><td><strong>85.0</strong></td><td>−330</td></tr>
+<tr><td>10</td><td>55cm</td><td>標準6</td><td>430</td><td><strong>43.0</strong></td><td>−372</td></tr>
+</tbody></table>
+<p>手残り（売値 − 販売手数料 10.4%〔おもちゃ&amp;ホビー・10 で確定〕− 配送代行）を 1 個あたりで並べると:</p>
+<pre>単品   1,100 − 114 − 415 = 571 円/個
+×3    3,300 − 343 − 420 = 2,537 → 845.7 円/個
+×5    5,500 − 572 − 425 = 4,503 → 900.6 円/個
+×10  11,000 − 1,144 − 430 = 9,426 → 942.6 円/個</pre>
+<ul>
+<li style='margin-left:0.0em'><strong>ハジメの「粗利額 500 円未満は落とす」基準に、セット化で乗ります。</strong> 1 注文あたりの手残りは ×3 で 2,537 円、×5 で 4,503 円。単品 571 円では仕入を引くと基準を割っていた商品が、<strong>入数 3 で越えます</strong>。</li>
+<li style='margin-left:0.0em'><strong>1個あたりの上限は 986 円</strong>（571 + 415）。配送代行を全部消してもそこまでで、<strong>セット化で取り戻せるのは最大 415 円/個</strong>です。入数 5 で 330 円（枠の 80%）、入数 10 で 372 円（90%）。<strong>入数を 5 から 10 に倍にしても、増えるのは 42 円/個だけ</strong>です。</li>
+<li style='margin-left:0.0em'><strong>「区分が上がって逆に高くなる」は、1個あたりでは起きません。</strong> 手数料表は 30cm→60cm で 415→430 円（+3.6%）しか増えず、入数は 3〜10 倍になるためです。<strong>1注文あたりでは 15 円増えます</strong>が、割る個数の増加が常に勝ちます。</li>
+<li style='margin-left:0.0em'><strong>保管手数料は変わりません</strong>（体積課金なので、同じ個数を箱にまとめても総体積はほぼ同じ）。</li>
+<li style='margin-left:0.0em'><strong>注意：×10 は売値 11,000 円</strong>で、社長指定の 1,000〜5,000 円帯を外れます。<strong>帯の中に収まるのは入数 3〜5</strong>（3,135〜5,225 円）。</li>
+</ul>
+<hr>
+<h2>5. 論点4 — 在庫回転の代償</h2>
+<p><strong>測れませんでした。正直に書きます。</strong></p>
+<p><code>monthlySold</code> は Amazon が月 50 個未満を表示しないため、<strong>10 組すべてのセット側が「なし」= 月 50 件未満</strong>という以上のことが言えません。「単品の 1/3 か 1/10 か」は、<strong>この計器では区別が付きません</strong>（09 で確認した粒度の限界）。</p>
+<p>代わりに言えること:</p>
+<ul>
+<li style='margin-left:0.0em'><strong>単品の実績から逆算する。</strong> #8 シナモロール単品は月 200 個・オファー 5 本。うみぞうの目安（仕入れ数＝月販 ÷ (出品者+1)）で <strong>月 33 個</strong>が当社の取り分。<strong>入数 5 なら月 6.6 セット</strong>です。</li>
+<li style='margin-left:0.0em'><strong>6ヶ月回転の上限に収まる仕入れ量は、入数で割った数</strong>になります。上の例なら 6 ヶ月ぶん = 40 セット（200 個）。<strong>入数を大きくすると、1 回の発注で抱える個数が入数倍になる</strong>ので、回転上限に当たるのは<strong>個数ではなく発注のタイミング</strong>です。</li>
+<li style='margin-left:0.0em'><strong>セットページは「作れば売れる」場所ではありません。</strong> 3 組はオファーゼロで死に、7 組は月 50 個未満。<strong>新規に作った ASIN は、単品のランクもレビューも引き継がない</strong>（激落ちのセットはレビュー 4 件でした）。ゼロからの立ち上げになります。</li>
+</ul>
+<hr>
+<h2>6. 結論 — 当社がセット化を使う条件</h2>
+<ol>
+<li style='margin-left:0.0em'><strong>単品側で <code>monthlySold</code> が月 100 個以上ついている商品に限る。</strong> セット ASIN 自身の実績は当てにできない（10 組すべて無実績）ため、<strong>根拠は単品の実売しかありません</strong>。</li>
+<li style='margin-left:0.0em'><strong>入数は 3〜5。</strong> 売値 1,000〜5,000 円の帯に収まり、配送代行の削減枠 415 円のうち 275〜330 円（66〜80%）を取れます。入数を増やしてもここから先は 1 個あたり数十円しか増えません。</li>
+<li style='margin-left:0.0em'><strong>価格は「単品価格 × 入数」に置く（単価倍率 1.0）。値上げは狙わない。</strong> 1.2 倍以上に置いた実例 2 件はどちらも無販売で、Amazon 本体自身も 1.000 倍で値付けしています。<strong>取りに行くのは 330 円/個の手数料であって、値上げ分ではありません。</strong></li>
+<li style='margin-left:0.0em'><strong>既存の「(× N)」ページには相乗りしない。</strong> Amazon 本体専用で第三者オファーが履歴上ゼロ、単価も同額でカートが取れません。<strong>自分で JAN を取って IPQ ルートで作る</strong>（ブランド認証不要・ハルオ判定）。</li>
+</ol>
+<blockquote>1行でいうと：<strong>セット化は「高く売る技」ではなく「配送代行 415 円を N で割る技」です。単品で月 100 個以上売れている商品を、単価を変えずに入数 3〜5 でまとめたときだけ効きます。</strong></blockquote>
+<hr>
+<h2>7. 手法・制約・トークン</h2>
+<ul>
+<li style='margin-left:0.0em'><strong>消費 129 トークン</strong>（上限 150）。内訳：<code>/search</code> 9 回 × 10 = 90、<code>/product?code=</code>（EAN 逆引き）11、<code>/product</code> 14 ASIN + <code>rating=1</code> = 28。</li>
+<li style='margin-left:0.0em'><strong>ペアの見つけ方</strong>：出品者が作ったまとめ売り ASIN は<strong>構成品の JAN をそのまま持つ</strong>ので、セット側の EAN で <code>code</code> 検索すると単品側がそのまま出ます（1 トークン/返却 ASIN・最も安い）。Amazon 作成の「(× N)」ページは EAN を持たないため、こちらは兄弟スキャン（09 の取得分・追加 0 トークン）から拾いました。</li>
+<li style='margin-left:0.0em'><strong>価格列は「新品最安の着地価格（送料込）」</strong>です。BuyBox 価格を厳密に取るには <code>buybox=1</code>（+2 トークン/ASIN = +40）が必要で、今回の上限に入らないため見送りました。<strong>列名を実体に合わせてあります</strong>。</li>
+<li style='margin-left:0.0em'><strong>棚の偏り（申告）</strong>：小型家電/電池 4 組・雑貨（丸進）3 組・日用品 2 組・文具 1 組。<strong>キッチン・インテリア・肌着のペアは、上限内で単品↔セットの両方が揃うものを見つけられませんでした</strong>（キッチンは参考の貝印 1 組のみ）。追加は 1 棚あたり 10〜20 トークンで足せます。</li>
+<li style='margin-left:0.0em'><strong>公開基準（ハルオ 08）</strong>：ASIN・商品名・EAN・現在価格・現在のオファー本数・現在ランク・<code>monthlySold</code> の現在値は A クラスなので本書に掲載。<strong>90 日在庫率・時系列・セラー ID は B クラスのため本書には載せず</strong>、<code>workspace/output/agent_output/T-20260920-003/sets/</code> に置いています。</li>
+<li style='margin-left:0.0em'><strong>SD の卸値・品番・上代・ロットは本書に金額で出していません</strong>（SD 会員規約 17 条 1 項）。手数料の試算は Amazon 公式の手数料表と現在のカート価格だけで組んでいます。</li>
+<li style='margin-left:0.0em'>スクリプト：<code>workspace/output/agent_output/T-20260920-003/sets/</code>（<code>ksearch.py</code> 探索／<code>kcode.py</code> EAN 逆引き／<code>kfinal.py</code> 確定取得／<code>build.py</code> 表組み／<code>hist.py</code> 在庫履歴）。<strong>取得は 1 回だけで、集計はすべてローカル JSON から再計算できます</strong>（0 トークンで再現可）。</li>
+</ul>
+</body></html>
