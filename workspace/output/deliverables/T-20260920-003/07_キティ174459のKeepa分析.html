@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>07_キティ174459のKeepa分析 — T-20260920-003</title><style>
+:root{--fg:#1d2129;--mut:#6b7280;--line:#e3e6ea;--bg:#fff;--acc:#0b6fb4;--warn:#fff7ed;--warnb:#f59e0b;--th:#f6f8fa}
+*{box-sizing:border-box}
+body{margin:0;background:#f2f4f7;color:var(--fg);
+ font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",sans-serif;line-height:1.85}
+main{max-width:1000px;margin:0 auto;padding:44px 28px 90px;background:var(--bg);
+ box-shadow:0 1px 3px rgba(0,0,0,.07)}
+h1{font-size:1.72rem;line-height:1.4;margin:0 0 .6em;padding-bottom:.5em;border-bottom:3px solid var(--fg)}
+h2{font-size:1.28rem;margin:2.4em 0 .7em;padding:.35em 0 .35em .7em;border-left:5px solid var(--acc);background:#f6f9fc}
+h3{font-size:1.06rem;margin:1.9em 0 .5em;color:#14456b}
+p{margin:.8em 0}
+hr{border:0;border-top:1px solid var(--line);margin:2.2em 0}
+.tw{overflow-x:auto;margin:1.1em 0}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--th);font-weight:600;white-space:nowrap}
+tbody tr:nth-child(even){background:#fbfcfd}
+code{background:#f0f2f5;padding:.1em .35em;border-radius:3px;font-size:.87em;
+ font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+pre{background:#1e2430;color:#e6edf3;padding:14px 16px;border-radius:6px;overflow-x:auto;
+ font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.86rem;line-height:1.7}
+pre code{background:none;color:inherit;padding:0}
+a{color:var(--acc);word-break:break-all}
+ul,ol{padding-left:1.5em}
+li{margin:.4em 0}
+strong{color:#0a2540}
+.graphs{display:grid;gap:18px;margin:1.2em 0}
+.graphs figure{margin:0;border:1px solid var(--line);border-radius:6px;padding:10px;background:#fff}
+.graphs figcaption{font-size:.85rem;color:var(--mut);margin-bottom:6px}
+.graphs img{width:100%;height:auto;display:block}
+.note{background:var(--warn);border-left:4px solid var(--warnb);padding:10px 14px;margin:1.2em 0;font-size:.92rem}
+@media (max-width:640px){main{padding:26px 14px 60px}h1{font-size:1.4rem}table{font-size:.82rem}}
+</style></head>
+<body><main><h1>キティ 174459 ほか3 ASIN の Keepa 分析（公開版）</h1>
+<ul><li>チケット: T-20260920-003 ／ 担当: IT エンジニア タカシ</li><li>データ取得: <strong>2026-09-20 12:52 UTC</strong>・<strong>Keepa API</strong> <code>/product</code>（domain=5 / amazon.co.jp）</li><li>消費トークン: 14（残 1,186）</li></ul>
+<p>&gt; <strong>これは公開版です。</strong> 本リポジトリは PUBLIC のため、法務判定<br>&gt; [<code>08_Keepa由来データの公開基準</code>](08_Keepa由来データの公開基準.md)（ハルオ／2026-09-20／ABCD クラス分類）に従い、<br>&gt; <strong>C＝スーパーデリバリーの取引条件</strong>（卸の金額・SD 品番・上代・最小ロット。SD 会員規約17条1項）と<br>&gt; <strong>B＝Keepa 固有の履歴</strong>（価格・ランク・オファー本数・月間販売数の時系列表、90日平均、在庫切れ率、BuyBox 交代履歴。Keepa T&amp;C §11(1)）を<br>&gt; 落としています。<strong>結論は同じで、数値の粒度だけが違います。</strong><br>&gt;<br>&gt; <strong>完全版:</strong> <code>~/Documents/AI Company 素材/Amazon物販事業/keepa-sanrio-kitty-20260920/</code>（リポジトリ外・README 同梱）</p>
+<hr>
+<h2>0. 結論</h2>
+<div class='tw'><table><thead><tr><th>ASIN</th><th>正体</th><th>現在ランク（ファッション）</th><th>Amazon 本体</th><th>判定</th></tr></thead><tbody><tr><td><strong>B0FQDWCGQD</strong> 174459</td><td>子 ASIN（購入可）</td><td>1,310 位</td><td><strong>出品中・カート保持</strong></td><td><strong>NG</strong></td></tr><tr><td><strong>B0F795L9SM</strong></td><td><strong>バリエーション親</strong>（購入不可）</td><td>1,310 位</td><td>なし</td><td>対象外</td></tr><tr><td><strong>B0C1J9QV1H</strong> 304832</td><td><strong>別商品</strong>（2023年版）</td><td>94,345 位</td><td>なし</td><td><strong>見送り</strong></td></tr></tbody></table></div>
+<p><strong>Amazon が表示している月間販売数は、B0FQDWCGQD が月100個、B0C1J9QV1H は表示なし（＝月50個未満）</strong>です（親 B0F795L9SM は親 ASIN のため表示なし）。<br>&gt; ⚠️ <strong>月間販売数は表に載せていません。</strong> 法務判定 08 では「現在表示されている月間販売数」は<br>&gt; <strong>A クラス（公開可）</strong>ですが、<code>.claude/hooks</code> の pre-commit は旧 E2 判定の語彙のままで<br>&gt; <strong>表の列として検知します</strong>。<strong>フックをバイパスするのは筋が悪い</strong>ので、<br>&gt; 本文（散文）での記述にとどめ、ASIN ごとの対応は完全版に置きました。<br>&gt; 語彙の是正は 08 §7 で IT へ発注済みの項目です。</p>
+<p><strong>1 と 2 は親子で確定。3 は別商品。</strong> 根拠は §1・§3。</p>
+<p>社長が SD 丸進で見つけた「メーカー品番 174459」は <strong>B0FQDWCGQD と一致</strong>します（Keepa の <code>model</code> / <code>partNumber</code> = <code>174459</code>、EAN <code>4550624174459</code>）。<strong>商品としては当たりですが、Amazon 本体がカートを保持しているため、この ASIN では戦えません。</strong></p>
+<hr>
+<h2>1. バリエーション構成（親子関係の確定）</h2>
+<div class='tw'><table><thead><tr><th>項目</th><th>B0FQDWCGQD</th><th>B0F795L9SM</th><th>B0C1J9QV1H</th></tr></thead><tbody><tr><td><code>parentAsin</code></td><td><strong>B0F795L9SM</strong></td><td>B0F795L9SM（自分自身＝親）</td><td><strong>なし</strong></td></tr><tr><td><code>variations</code> 件数</td><td>20（親のファミリーを参照）</td><td><strong>20</strong></td><td><strong>0</strong></td></tr><tr><td>オファー取得</td><td>成功</td><td><strong>失敗＝出品なし</strong></td><td>成功</td></tr><tr><td><code>productType</code></td><td>0（通常）</td><td><strong>5（バリエーション親）</strong></td><td>0</td></tr><tr><td>EAN</td><td>あり</td><td><strong>なし</strong></td><td>あり</td></tr></tbody></table></div>
+<p>→ <strong>B0F795L9SM は購入できないバリエーション親</strong>です。商品ページの「商品情報」欄に出ていたのはこの親 ASIN で、取り扱い開始日 2025/5/2 は<strong>親の登録日</strong>。子（キティ 174459）は 2025/10/22 登録・2025/10/27 発売です。</p>
+<h3>親 B0F795L9SM の子 ASIN 20件</h3>
+<div class='tw'><table><thead><tr><th>子 ASIN</th><th>Color</th><th>Size</th></tr></thead><tbody><tr><td><strong>B0FQDWCGQD</strong></td><td><strong>ハローキティ</strong></td><td>約幅6×奥行4×高さ10cm</td></tr><tr><td>B0F6D9T3RD</td><td>バッドばつ丸</td><td>小さい (chiisai)</td></tr><tr><td>B0C1JBSF87</td><td>マイメロディ</td><td>1個 (x 1)</td></tr><tr><td>B0F6D8JS76</td><td>けろけろけろっぴ</td><td>約幅6cm×奥行4cm×高さ11cm</td></tr><tr><td>B0F6D5P9G6</td><td>あひるのペックル</td><td>6.5 x 5 x 12 cm</td></tr><tr><td>B0F6D952S2</td><td>ぐでたま</td><td>約幅6×奥行5.5×高さ11.5cm</td></tr><tr><td>B0C1JCJNVY</td><td>シナモロール</td><td>1個 (x 1)</td></tr><tr><td>B0H8DR7DLG</td><td>ホワイト</td><td>1個 (x 5)</td></tr><tr><td>B0F6D5P96S</td><td>ポムポムプリン</td><td>8.5cm x 5.5cm x 12.5cm</td></tr><tr><td>B0F6D5QWSD</td><td>こぎみゅん</td><td>8.5 x 5 x 10.5 cm</td></tr><tr><td>B0F6D5NVV8</td><td>コロコロクリリン</td><td>約幅6cm×奥行4cm×高さ11.5cm</td></tr><tr><td>B0F6D755WY</td><td>マイウィートピアノ</td><td>幅7×奥行5×高さ9.5cm</td></tr><tr><td>B0F6D9S46J</td><td>はなまるおばけ</td><td>約6.5cm×6.5cm×10cm</td></tr><tr><td>B0F6D7TFZD</td><td>ハンギョドン</td><td>8 x 5.5 x 11.5 cm</td></tr><tr><td>B0HF7QRC5N</td><td>红色</td><td>約幅6×奥行4×高さ10cm (× 4)</td></tr><tr><td>B0H8DZM3PT</td><td>マルチカラー</td><td>8×4.5×9cm (× 3)</td></tr><tr><td>B0F6DC2W74</td><td>KIRIMIちゃん.</td><td>小</td></tr><tr><td>B0F6DD89ZZ</td><td>タキシードサム</td><td>小型 (kompyoku)</td></tr><tr><td>B0C1JC88S5</td><td>クロミ</td><td>8×4.5×9cm</td></tr><tr><td>B0F6DF14X4</td><td>ポチャッコ</td><td>約幅8cm×奥行4cm×高さ11.5cm</td></tr></tbody></table></div>
+<p>サイズ表記が「小さい (chiisai)」「小型 (kompyoku)」「红色」のように荒れています。<strong>このファミリーは複数の年度・複数の別商品が1つの親に寄せ集められた雑なカタログ</strong>で、だから「画像が同じで品番違い」が起きます。</p>
+<hr>
+<h2>2. 販売数・ランク・出品構成（いずれも現在値）</h2>
+<p><strong>月間販売数（Amazon 表示・現在）</strong>：B0FQDWCGQD は <strong>100</strong>（最終更新 2026-09-20）、B0F795L9SM は表示なし（親 ASIN のため）、B0C1J9QV1H は <strong>表示なし</strong>（最終更新 2026-03-09＝以後消えたまま）。</p>
+<div class='tw'><table><thead><tr><th>項目</th><th>B0FQDWCGQD</th><th>B0F795L9SM</th><th>B0C1J9QV1H</th></tr></thead><tbody><tr><td>ランク（ファッション）</td><td>1,310 位</td><td>1,292 位</td><td>94,345 位</td></tr><tr><td>ランク（キーホルダー・チェーン）</td><td>2 位</td><td>2 位</td><td>697 位</td></tr><tr><td>新品オファー本数</td><td>8</td><td>0</td><td>4</td></tr><tr><td>カート価格</td><td><strong>1,100 円</strong></td><td>カートなし</td><td>1,280 円</td></tr><tr><td>カート保持者</td><td><strong>Amazon 本体</strong></td><td>—</td><td>第三者セラー</td></tr><tr><td>紹介料率</td><td>10%（実効 10.36%）</td><td>—</td><td>12%（実効 12.42%）</td></tr></tbody></table></div>
+<p><strong>読み方の注意が2つあります。</strong></p>
+<ol><li>⚠️ <strong>ランクは判定に使えません。</strong> 親と子でランクが同値（1,310 / 1,292、末端はどちらも2位）です。バリエーション family でランクを共有しているためで、<strong>末端カテゴリ2位はキティ単体の実力ではなく20兄弟の合計</strong>です。兄弟20件を実測した結果は [<code>09_兄弟ASINスキャンとmonthlySoldの粒度</code>](09_兄弟ASINスキャンとmonthlySoldの粒度.md) にあります。</li><li><strong>月間販売数は ASIN 単位の実数</strong>です（Keepa 公式定義に &quot;The value is variation specific.&quot; / &quot;It is not an estimate.&quot;）。<strong>ドロップ数は販売数の代わりに使っていません</strong>（<code>knowledge_keepa_dropcount_is_polling</code>）。<strong>「表示なし」は「売れていない」ではなく「月50個未満」</strong>です（Amazon が50個未満を表示しないため）。</li></ol>
+<p><strong>B0C1J9QV1H は月間販売数の表示が 2026-03 に消え、ランクも9万位台</strong>です。2025年秋までは上位にいた商品で、<strong>入れ替えで死んだ旧年度品</strong>と読めます。</p>
+<hr>
+<h2>3. 3つの関係（同一商品判定）</h2>
+<div class='tw'><table><thead><tr><th>材料</th><th>B0FQDWCGQD</th><th>B0F795L9SM</th><th>B0C1J9QV1H</th></tr></thead><tbody><tr><td><strong>EAN/JAN</strong></td><td><strong>4550624174459</strong></td><td><strong>なし</strong></td><td><strong>4550337304839</strong></td></tr><tr><td>GTIN</td><td>04550624174459</td><td>なし</td><td>なし</td></tr><tr><td>メーカー品番</td><td><strong>174459</strong></td><td>なし</td><td><strong>304832</strong></td></tr><tr><td>商品名</td><td>ミニマスコットホルダー ハローキティ 174459</td><td>ミニマスコットホルダー 2025年 グッズ ポリエステル・スチール</td><td>ハローキティ ミニマスコットホルダー 304832</td></tr><tr><td>ブランド / メーカー</td><td>サンリオ(SANRIO) / サンリオ</td><td>サンリオ(SANRIO) / なし</td><td>サンリオ(SANRIO) / サンリオ</td></tr><tr><td>サイズ</td><td>約幅6×奥行4×高さ10cm（カラビナ含まず）</td><td>なし</td><td>約6×4×8.7cm（金属パーツ含まず）</td></tr><tr><td>素材・付属</td><td>ポリエステル、スチール／カラビナ</td><td>—</td><td>ポリエステル／<strong>ハート形金属パーツ</strong></td></tr><tr><td>著作権表記</td><td><strong>(C) 2025 SANRIO</strong></td><td>—</td><td><strong>(C)1976,2023 SANRIO</strong></td></tr><tr><td>商品タイプ</td><td>KEYCHAIN / productType 0</td><td>KEYCHAIN / <strong>productType 5</strong></td><td><strong>TOY_FIGURE</strong> / productType 0</td></tr><tr><td>紹介料率</td><td><strong>10%</strong></td><td>—</td><td><strong>12%</strong></td></tr><tr><td>Amazon 登録日</td><td>2025-10-22</td><td>2025-05-02</td><td>2023-04-06</td></tr><tr><td>発売日</td><td>2025-10-27</td><td>—</td><td>2023年（キャラクター大賞テーマ品）</td></tr></tbody></table></div>
+<h3>推定（確度つき）</h3>
+<ol><li><strong>B0FQDWCGQD と B0F795L9SM は親子で確定（事実）。</strong> <code>parentAsin</code> が一致し、親の <code>variations</code> 20件に子が含まれ、親はオファー0本・EAN なし・<code>productType=5</code>。<strong>同一商品が分裂しているのではなく、親は購入不可の器</strong>です。</li></ol>
+<ol><li><strong>B0C1J9QV1H は別商品（ほぼ確実）。</strong> 決め手は <strong>EAN が違う</strong>こと。加えて著作権表記が 2023 vs 2025、品番が 304832 vs 174459、付属品がハート形金属パーツ vs カラビナ、紹介料率が 12% vs 10%、商品タイプが TOY_FIGURE vs KEYCHAIN。<strong>「2023年キャラクター大賞版」と「2025年版」という別年度の商品</strong>です。</li></ol>
+<ol><li><strong>画像が同じに見える理由（推定）。</strong> サンリオがシリーズを年度更新する際、キティの造形をほぼ流用しているため。加えて B0C1J9QV1H の <code>parentAsinHistory</code> は <strong>2024-12-30 に B0C23CPXDW → 2025-05-09 に B0DS1YZ4F7 → 2025-11-19 に B0F795L9SM</strong> と親を渡り歩いた記録を持っています（現在の <code>parentAsin</code> は空）。<strong>Amazon のカタログ側で B0FQDWCGQD と同じ親に寄せられた時期が実在</strong>したわけで、社長が混同したのは Amazon のカタログが雑なせいです。社長の読み違いではありません。<br>※ B0FQDWCGQD 側も 2025-11-20 に紐付けが1回動いており、<strong>両 ASIN の親が 2025-11 の同じ週に動いています</strong>。Amazon がこの時期にファミリーを組み替えた痕跡と読めます（推定）。</li></ol>
+<ol><li><strong>同一ファミリーへの相乗り出品はリスク（推定）。</strong> 174459 を 304832 の ASIN に、あるいはその逆に出品すると、EAN 不一致で「商品情報の相違」の申し立て対象になります。<strong>仕入れるなら EAN で ASIN を引き直してから出品</strong>してください。</li></ol>
+<h3>⚠️ レビュー数は同一商品判定に使えません</h3>
+<div class='tw'><table><thead><tr><th>項目</th><th>B0FQDWCGQD</th><th>B0C1J9QV1H</th></tr></thead><tbody><tr><td>ページ表示レビュー数</td><td><strong>1,265 件</strong></td><td><strong>258 件</strong></td></tr><tr><td>この ASIN 単体のレビュー</td><td><strong>10 件</strong></td><td>74 件</td></tr><tr><td>評価</td><td>4.6</td><td>4.4</td></tr></tbody></table></div>
+<p>B0FQDWCGQD のページに出る1,265件は <strong>20兄弟の合算</strong>で、この ASIN 自身のレビューは10件だけです。社長が見た「レビュー258件」は B0C1J9QV1H の表示値と一致しますが、これも過去に別の親に紐付いていた時期の合算を含みます。</p>
+<hr>
+<h2>4. 現在の出品構成</h2>
+<p>セラーIDは伏せています（法務判定 08 §2-2）。</p>
+<p><strong>B0FQDWCGQD — 新品7社＋中古1社。カートは Amazon 本体</strong></p>
+<div class='tw'><table><thead><tr><th>セラー</th><th>Amazon 本体</th><th>FBA</th><th>状態</th><th>着地価格</th></tr></thead><tbody><tr><td>S1</td><td><strong>Yes</strong></td><td>Yes</td><td>新品</td><td><strong>1,100 円（カート保持）</strong></td></tr><tr><td>S2</td><td>No</td><td>Yes</td><td>新品</td><td>1,089 円</td></tr><tr><td>S3</td><td>No</td><td>No</td><td>新品</td><td>1,212 円</td></tr><tr><td>S4</td><td>No</td><td>No</td><td>新品</td><td>1,330 円</td></tr><tr><td>S5</td><td>No</td><td>No</td><td>新品</td><td>1,340 円</td></tr><tr><td>S6</td><td>No</td><td>No</td><td>新品</td><td>1,357 円</td></tr><tr><td>S7</td><td>No</td><td>No</td><td>新品</td><td>1,400 円</td></tr><tr><td>S8</td><td>No</td><td>No</td><td><strong>中古</strong></td><td>1,960 円</td></tr></tbody></table></div>
+<p><strong>B0C1J9QV1H — 新品4社。Amazon 本体なし</strong></p>
+<div class='tw'><table><thead><tr><th>セラー</th><th>FBA</th><th>着地価格</th></tr></thead><tbody><tr><td>S9</td><td>No</td><td><strong>1,280 円（カート）</strong></td></tr><tr><td>S10</td><td>No</td><td>1,280 円</td></tr><tr><td>S11</td><td><strong>Yes</strong></td><td>2,060 円</td></tr><tr><td>S12</td><td>No</td><td>5,125 円</td></tr></tbody></table></div>
+<hr>
+<h2>5. ⚠️ ブラウザ観測との差（未ログインが原因）</h2>
+<div class='tw'><table><thead><tr><th>ASIN</th><th>ブラウザでの見え方</th><th><strong>Keepa（正）</strong></th></tr></thead><tbody><tr><td>B0FQDWCGQD</td><td>「出品者1件だけ」</td><td><strong>新品7社＋中古1社</strong>（Amazon 本体を含む）</td></tr><tr><td>B0C1J9QV1H</td><td>「出品者1件だけ」</td><td><strong>新品4社</strong></td></tr></tbody></table></div>
+<p><strong>原因は未ログインでした</strong>（2026-09-20 にカズヨが実画面で確認）。未ログイン状態では Amazon がお届け先を既定の海外拠点（Nadi 6CJP）に置くため、<strong>海外配送に対応しない出品が画面から丸ごと落ちます</strong>。Keepa 側では上記すべてが <code>isShippable: true</code>（日本国内へ配送可）で、<strong>ログインすれば複数社が見えて Keepa の数字と整合します</strong>。</p>
+<p>※ 当初「アカウント設定のお届け先が海外になっている」と報告しましたが誤りで、<strong>アカウントを直す必要はありません</strong>。</p>
+<p><strong>Amazon 本体が見えていなかったのが一番危険な取りこぼしです。</strong> 本体がいるかどうかは仕入れの生死を決めるので、<strong>判定は Keepa で行い、未ログインのブラウザの出品者数は信用しない</strong>でください。</p>
+<hr>
+<h2>6. 仕入れ判定</h2>
+<h3>B0FQDWCGQD（キティ 174459）— <strong>NG</strong></h3>
+<p>カート価格 1,100 円（＝Amazon 本体の価格）で計算します。出典は Keepa API（2026-09-20 取得）の紹介料率 10% と FBA 配送代行手数料 415 円です。</p>
+<pre>売値                                  1,100 円
+− 販売手数料 10%                       −110 円
+− FBA 配送代行手数料                   −415 円
+────────────────────────────────
+= 仕入れに使える上限                     575 円</pre>
+<p><strong>丸進の卸条件はこの上限を上回るため、1個あたり赤字になります</strong>（SD 送料・FBA 納品送料を引く前の時点で赤字）。<strong>具体的な取引条件は SD 会員規約17条1項によりここには記載しません</strong>（完全版を参照）。</p>
+<p>売値を上げる余地もありません。<strong>Amazon 本体が1,100円でカートを保持しており、同額では基本カートは取れず、下回れば上の計算が崩れます。</strong></p>
+<p>回転は良い（月100個・ファミリー内では上位）。<strong>商品としては当たりですが、この ASIN では Amazon 本体が壁です。</strong></p>
+<h3>B0C1J9QV1H（304832）— <strong>見送り</strong></h3>
+<ul><li>Amazon 本体なし・4社・カート1,280円という<strong>構造は悪くありません</strong>（1,280 − 12.42% − FBA415 = 手残り 706 円）。</li><li>ただし <strong>月間販売数の表示が2026-03から消えており（＝月50個未満）、ランクも9万位台</strong>。「月100個以上とその類似品に絞る」基準（<code>feedback_volume_sellers_only</code>）に該当しません。</li><li><strong>利益率が高く見えるのに回転が死んでいる</strong>のは終売品の典型サイン（<code>knowledge_discontinued_bias_in_margin_ranking</code>）。2023年版・本体撤退済み・オファー本数が減り続けた履歴と整合します。</li></ul>
+<hr>
+<h2>7. 参考リンク</h2>
+<div class='tw'><table><thead><tr><th>ASIN</th><th>Keepa ページ</th></tr></thead><tbody><tr><td>B0FQDWCGQD</td><td><a href="https://keepa.com/#!product/5-B0FQDWCGQD">https://keepa.com/#!product/5-B0FQDWCGQD</a></td></tr><tr><td>B0F795L9SM</td><td><a href="https://keepa.com/#!product/5-B0F795L9SM">https://keepa.com/#!product/5-B0F795L9SM</a></td></tr><tr><td>B0C1J9QV1H</td><td><a href="https://keepa.com/#!product/5-B0C1J9QV1H">https://keepa.com/#!product/5-B0C1J9QV1H</a></td></tr></tbody></table></div>
+<ul><li>集計スクリプト: <code>workspace/output/agent_output/T-20260920-003/keepa/</code>（<code>fetch_keepa.py</code> / <code>analyze.py</code> / <code>md2html.py</code>）</li><li>生 JSON・完全版: <code>~/Documents/AI Company 素材/Amazon物販事業/keepa-sanrio-kitty-20260920/</code>（リポジトリ外）</li></ul>
+<h3>注意している罠</h3>
+<ul><li><code>csv[11]</code>（COUNT_NEW）は <strong>オファー本数</strong>で出品者数ではありません（<code>knowledge_keepa_count_new_is_not_seller_count</code>）。本稿の社数は稼働オファーの <code>sellerId</code> ユニーク数です。</li><li><code>salesRankDrops</code> は観測回数です（<code>knowledge_keepa_dropcount_is_polling</code>）。販売数として使っていません。</li><li><strong>ランクはバリエーション family で共有されます。</strong> 末端カテゴリ2位はキティ単体の実力ではありません。</li></ul>
+<h2>付録：Keepa の価格・ランクグラフ（直近90日）</h2>
+<p class="note">画像が表示されない場合は Keepa へのログインが必要です。ASIN 名のリンクから Keepa のページを直接開けます。</p>
+<div class="graphs">
+<figure><figcaption><a href="https://keepa.com/#!product/5-B0FQDWCGQD">B0FQDWCGQD</a> — キティ 174459（子・購入可）
+ ／ 青=Amazon本体 橙=新品最安 緑=売れ筋ランク</figcaption>
+ <img src="https://graph.keepa.com/pricehistory.png?asin=B0FQDWCGQD&domain=co.jp&amazon=1&new=1&salesrank=1&range=90"
+  alt="B0FQDWCGQD の Keepa グラフ" loading="lazy"></figure><figure><figcaption><a href="https://keepa.com/#!product/5-B0F795L9SM">B0F795L9SM</a> — バリエーション親
+ ／ 青=Amazon本体 橙=新品最安 緑=売れ筋ランク</figcaption>
+ <img src="https://graph.keepa.com/pricehistory.png?asin=B0F795L9SM&domain=co.jp&amazon=1&new=1&salesrank=1&range=90"
+  alt="B0F795L9SM の Keepa グラフ" loading="lazy"></figure><figure><figcaption><a href="https://keepa.com/#!product/5-B0C1J9QV1H">B0C1J9QV1H</a> — キティ 304832（2023年版）
+ ／ 青=Amazon本体 橙=新品最安 緑=売れ筋ランク</figcaption>
+ <img src="https://graph.keepa.com/pricehistory.png?asin=B0C1J9QV1H&domain=co.jp&amazon=1&new=1&salesrank=1&range=90"
+  alt="B0C1J9QV1H の Keepa グラフ" loading="lazy"></figure></div></main></body></html>

@@ -1,0 +1,148 @@
+<!doctype html><html lang='ja'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>Keepa 由来データの公開基準（PUBLIC リポ）— 07 の可否判定つき</title><style>body{font-family:-apple-system,'Hiragino Sans','Noto Sans JP',sans-serif;max-width:1150px;margin:2em auto;padding:0 1em;line-height:1.65;color:#222;font-size:14.5px}table{border-collapse:collapse;margin:.8em 0;font-size:.92em}th,td{border:1px solid #bbb;padding:.35em .6em;vertical-align:top}th{background:#eef2f8}tr:nth-child(even) td{background:#fafafa}h1{font-size:1.5em;border-bottom:2px solid #444}h2{font-size:1.25em;border-left:5px solid #25b;padding-left:8px;margin-top:1.8em}h3{font-size:1.05em;margin-top:1.4em}blockquote{border-left:4px solid #ccc;margin:.8em 0;padding:.2em 1em;color:#444}code{background:#f3f3f3;padding:1px 4px;border-radius:3px}hr{border:0;border-top:1px solid #ccc;margin:1.6em 0}</style></head><body>
+<h1>Keepa 由来データの公開基準（PUBLIC リポ）— 07 の可否判定つき</h1>
+<ul>
+<li style='margin-left:0.0em'>チケット: T-20260920-003（assignee: secretary。本件は法務への下請け依頼として受領）</li>
+<li style='margin-left:0.0em'>担当: 法務 ハルオ</li>
+<li style='margin-left:0.0em'>判定日: 2026-09-20</li>
+<li style='margin-left:0.0em'>一次情報の確認: Keepa Price Data API T&amp;C（<code>https://keepa.com/cdn/termsAPI.txt</code> / <strong>Version of July 28, 2026</strong> / 2026-09-20 当職が実取得・§11 全文を目視）</li>
+</ul>
+<hr>
+<h2>0. 結論（先に）</h2>
+<blockquote><strong>07 は「条件付き可」。ただし現在の commit のまま push するのは不可。</strong><br><strong>止めている原因は Keepa ではなく スーパーデリバリー（SD）です。</strong> 07 に <strong>SD の卸値・SD品番・上代</strong>が入っており、これは SD 会員規約 第17条1項（一般的発信禁止型）で<strong>一律アウト</strong>。Keepa 側の項目は、社長の 2026-09-06 決定の範囲で受容可です。</blockquote>
+<p><strong>期限の認識（ここが今回の急所）</strong></p>
+<table><thead><tr><th>実測事実</th><th>値</th></tr></thead><tbody>
+<tr><td>07 の commit</td><td><code>378ba9ea</code>（2026-09-20 22:00）</td></tr>
+<tr><td>その commit は push 済みか</td><td><strong>未 push</strong>（<code>origin/claude/nighttime-work-checkin-iTWEa</code> の祖先でないことを <code>git merge-base --is-ancestor</code> で確認）</td></tr>
+<tr><td>自動同期</td><td><code>github-sync.sh</code> が launchd で30分間隔。次回起動で <code>HEAD</code> ごと push される</td></tr>
+</tbody></table>
+<p><strong>つまり、いま直せば「公開前の修正」で済み、push 後は「公開済みの取り下げ」になります。</strong> 後者は履歴に残り、消すには force push（§4.1・かつ自動同期が停止する副作用あり）か GitHub Support への依頼（§4.1 第三者連絡）しか手段がありません。<strong>措置の費用が桁で変わる境目に、いま立っています。</strong></p>
+<h3>伏せるべき項目（07 の実所在つき）</h3>
+<table><thead><tr><th>項目（07 での所在）</th><th>判定</th><th>根拠</th></tr></thead><tbody>
+<tr><td><strong>① SD の取引条件</strong>（卸の金額・SD品番・上代・最小ロット）／md 14行目・291〜295行目、html 内2箇所</td><td><strong>削除（必須）</strong></td><td>SD 会員規約 17条1項</td></tr>
+<tr><td><strong>② <code>monthlySold</code> の時期別テーブル</strong>／md §2 の2列表2本</td><td>落とす（現在値の記述だけ残す）</td><td>Keepa §11(1)</td></tr>
+<tr><td><strong>③ 90日平均価格・90日平均ランク・在庫切れ率・月別の新品最安値表</strong>／md §3 の月次表2本</td><td>落とす（結論文に圧縮）</td><td>Keepa §11(1)</td></tr>
+<tr><td><strong>④ BuyBox の交代履歴</strong>（回数・時刻）／md §5 の本文2箇所</td><td>落とす</td><td>Keepa §11(1)</td></tr>
+<tr><td><strong>⑤ セラーID × 価格 × 送料 × FBA の一覧</strong>／md §5 の表2本・ユニーク12件</td><td><strong>条件付き可</strong>（ID を <code>S1</code>〜<code>S8</code> に伏せれば白）</td><td>下記 §2-2</td></tr>
+<tr><td>⑥ ASIN・商品名・ブランド・EAN/JAN・親子構成・現在価格・現在オファー本数・現在ランク・紹介料率／全体</td><td><strong>公開可</strong></td><td>社長判断 2026-09-06 ＋ Amazon 商品ページで誰でも見える</td></tr>
+</tbody></table>
+<p><strong>削除・改変は当職では行いません（§4.1）。</strong> 措置は §6 にカズヨ宛の指示として書きました。</p>
+<hr>
+<h2>1. 一本ルール（次回から迷わないための本体）</h2>
+<h3>1-1. 判定は4問。上から順に見て、止まったところで確定する</h3>
+<table><thead><tr><th>#</th><th>問い</th><th>止まったときの扱い</th></tr></thead><tbody>
+<tr><td><strong>Q1</strong></td><td>出所に「一般的発信禁止型」の会員サイトが混ざっていないか（<strong>SD＝一切の情報が一律アウト</strong> ／ NETSEA＝卸値だけアウト）</td><td><strong>Hard NO。</strong>ここが最優先。Keepa の議論に入る前に見る</td></tr>
+<tr><td><strong>Q2</strong></td><td>その値は <strong>Keepa の履歴 DB を通らないと出せない</strong>か（時系列・平均・最安・在庫切れ率・交代履歴・派生指標）</td><td>非公開（B クラス）。公開物には結論と統計だけ</td></tr>
+<tr><td><strong>Q3</strong></td><td>行データか、統計・判断か（中央値・件数・分布・結論は<strong>白</strong>。原データを復元できない）</td><td>統計なら通す</td></tr>
+<tr><td><strong>Q4</strong></td><td>ユニーク ASIN が20件以上か</td><td>20件以上は社長判断により<strong>警告のみで通す</strong>が、B クラスの列は必ず落とす</td></tr>
+</tbody></table>
+<h3>1-2. 決定表（項目を4クラスに分ける。迷ったらこの表に当てる）</h3>
+<table><thead><tr><th>クラス</th><th>中身</th><th>扱い</th></tr></thead><tbody>
+<tr><td><strong>A</strong> Amazon の現在スナップショット</td><td>ASIN／商品名／ブランド／メーカー／カテゴリ／EAN・JAN／親子構成（parentAsin・variations）／現在価格／現在の新品オファー本数／現在の売れ筋ランク／現在表示されている月間販売数／紹介料率／セラーID</td><td><strong>公開可</strong></td></tr>
+<tr><td><strong>B</strong> Keepa 固有の履歴・派生値</td><td>時系列テーブル全般／90日・30日平均／過去最安値・365日最安／在庫切れ率／BuyBox 交代履歴／ドロップ数／消化月数／損益分岐仕入れ値</td><td><strong>非公開。</strong>公開物は結論・統計に圧縮。完全版はリポ外素材へ</td></tr>
+<tr><td><strong>C</strong> 会員限定の取引条件</td><td>SD・NETSEA 等の卸値／会員向け品番／上代／最小ロット／取引条件</td><td><strong>非公開（Hard NO）</strong></td></tr>
+<tr><td><strong>D</strong> 認証情報・生レスポンス</td><td>API キー／<code>accesskey=</code>／Keepa の生 JSON</td><td><strong>非公開（例外なし）</strong></td></tr>
+</tbody></table>
+<h3>1-3. B クラスの唯一の例外（グレーを通すための3条件）</h3>
+<p><strong>少数 ASIN について、散文の中で B クラスの数値を引用することは可</strong>とします。根拠は独 UrhG §87e（相当でない部分の複製を禁ずる契約条項は無効）と、実害が事実上ゼロであること。ただし<strong>3条件すべて</strong>を満たす場合に限ります。</p>
+<ol>
+<li style='margin-left:0.0em'>対象 ASIN が <strong>5件以下</strong></li>
+<li style='margin-left:0.0em'><strong>表の形にしない</strong>（表にした瞬間にアウト。機械判定と人の判断を一致させるための線です）</li>
+<li style='margin-left:0.0em'>出典（Keepa API）と取得日を本文に明記する</li>
+</ol>
+<p><strong>3点セット（グレーを通す条件）</strong></p>
+<table><thead><tr><th>項目</th><th>内容</th></tr></thead><tbody>
+<tr><td>リスクシナリオ</td><td>Keepa から警告メールが来る／§13 により API キーが遮断される</td></tr>
+<tr><td>発生時の対応</td><td>該当ファイルを HEAD から列ごと落とす（2026-09-06 と同じ扱い）。<strong>履歴の書き換えはしない</strong>（force push は自動同期を止め、被害が増える）。観測は Amazon 画面の手動確認と SP-API に切替</td></tr>
+<tr><td>撤退条件</td><td><strong>Keepa から1通でも指摘が来たら、この例外は即廃止。</strong>以後の公開物は統計値のみに戻す</td></tr>
+</tbody></table>
+<hr>
+<h2>2. 根拠</h2>
+<h3>2-1. Keepa（当社に適用されるのは API T&amp;C の1本）</h3>
+<blockquote><strong>§11(1)</strong> "The user may retrieve and display the online contents … solely for their own business purposes … This right of use is limited to the duration of the contractual relationship … The user is <strong>not permitted to modify, edit, translate, or reproduce</strong> any content from the Service Provider's website without express permission …"<br><strong>§11(2)</strong> "The user may <strong>save or print out</strong> contents … for their own business purposes, with a non-exclusive and <strong>unlimited</strong> right of use …"</blockquote>
+<ul>
+<li style='margin-left:0.0em'>効くのは <strong>§11(1) の reproduce 禁止 1本だけ</strong>。ローカル保存・社内利用は §11(2) で明文許諾されているので白。黒いのは公衆送信です。</li>
+<li style='margin-left:0.0em'>§2(2)・§6.1(1) の Reselling／Resale は<strong>動詞が「販売」。無償公開は当たらない</strong>。ここを引くと過剰判定になります。</li>
+<li style='margin-left:0.0em'>制裁は分けて把握すること。<strong>①§13 の API 遮断（本命）②§12(3) の特別解約（"intentionally" 要件で重い）③§14(3) の金銭＝年額の2倍が上限（約20万円）④Amazon アカウントへの波及＝なし。</strong></li>
+<li style='margin-left:0.0em'>秘密性は要件ではないので、<strong>「Amazon で誰でも見えるから白」という論法は Keepa には効きません</strong>（A クラスを通しているのは規約上の白ではなく、2026-09-06 の社長判断＋実害ゼロという運用判断です。ここは混同しないこと）。</li>
+</ul>
+<h3>2-2. Amazon 側（触れないと判断。根拠を分けて示します）</h3>
+<table><thead><tr><th>論点</th><th>判定</th><th>根拠</th></tr></thead><tbody>
+<tr><td>購入者・注文データの流出</td><td><strong>該当なし（事実）</strong></td><td>07 のデータ源は Keepa API のみ（07 冒頭に取得条件つきの記録あり）。セラーセントラル／SP-API 由来の注文・購入者情報は1件も含まれない＝Amazon のデータ保護方針（購入者 PII が対象）の射程外</td></tr>
+<tr><td>他セラーのセラーID・価格の公開</td><td><strong>低リスク（推定・確度高）</strong></td><td>セラーID は商品ページのオファー一覧および <code>/sp?seller=</code> の URL に含まれ、非ログインで表示される公開情報。<strong>実測は未達</strong>（当職の <code>curl</code> は Anti-bot で 503。カズヨのブラウザなら1分で裏取り可）</td></tr>
+<tr><td>価格の公開＝価格協調（独禁法）</td><td><strong>該当しない</strong></td><td>競合との意思連絡がない。ただし「競合に価格を合わせる連絡」は今後もしないこと</td></tr>
+<tr><td>出品規約の名指し禁止条項</td><td><strong>見つけていない（未網羅）</strong></td><td>ASBA 全文との照合は未実施。<strong>「無い」とは言い切りません。</strong></td></tr>
+</tbody></table>
+<h3>2-3. 当社既定（CLAUDE.md §6）との整合</h3>
+<p>§6 が除外対象として明記しているのは<strong>本人特定情報と APIキーの2つだけ</strong>で、<strong>C クラス（第三者の会員限定データ）と B クラスが穴になっています</strong>。これは 2026-08-31 以降、当職が3回同じ指摘をしている構造です。<strong>§6 に C・D クラスを明記する改訂</strong>を社長判断として上げることを推奨します（本基準がその改訂案の本文として使えます）。</p>
+<p><strong>「可視性」と「公開」は別の軸です</strong>（<code>knowledge_deliverables_gitignore_allowlist_trap</code>）。非公開にしても、社長は Finder のシンボリックリンクから deliverables を読めますし、カタログはファイルシステム走査で生成されます。<strong>公開しない＝社長が読めなくなる、ではありません。</strong> 完全版をリポ外へ退避する案に「社長が見られなくなる」という反論は成り立ちません。</p>
+<hr>
+<h2>3. 前例との整合（04 CSV。依頼の4点目）</h2>
+<p>実測しました。<strong>依頼文の「同水準」という前提は、半分だけ正しい。</strong></p>
+<table><thead><tr><th>項目</th><th>実測</th></tr></thead><tbody>
+<tr><td>ファイル</td><td><code>04_候補ASIN_ゲート実機確認リスト.csv</code>（69行＝ヘッダ＋68件）</td></tr>
+<tr><td>列</td><td>ブランド群／掲載順／ASIN／商品名／現在新品価格／<strong>90日平均新品価格</strong>／新品出品者数／バリエーション数／売れ筋ランク／カテゴリ</td></tr>
+<tr><td>B クラスの混入</td><td><strong>あり＝「90日平均新品価格」1列</strong>。他9列は A クラス</td></tr>
+<tr><td>commit</td><td><code>1bb5a04f</code>。<strong>すでに push 済み（＝公開済み）</strong></td></tr>
+<tr><td><code>origin/main</code></td><td>未収録（作業ブランチのみ。ただしブランチも PUBLIC なので露出している）</td></tr>
+<tr><td>SD・NETSEA 由来</td><td><strong>なし</strong>（C クラスの混入はゼロ）</td></tr>
+</tbody></table>
+<p><strong>判断</strong></p>
+<ol>
+<li style='margin-left:0.0em'><strong>04 は「基準」ではなく「事故」です。</strong>先例として 07 を通す根拠にはしません。「前に通ったから今回も」で基準が崩れるのは、2026-08-31／09-06 で経験済みです。</li>
+<li style='margin-left:0.0em'>ただし <strong>04 を取り下げる措置は採りません。</strong>根拠は 2026-09-06 の先例（卸価格227行でも HEAD 削除・履歴残置を社長が選択）と、既に不可逆であること。<strong>既に消せないものは「これ以上増やさない」に切り替える</strong>のが当社の型です。</li>
+<li style='margin-left:0.0em'><strong>04 が pre-commit を通過した理由は語彙の穴です。</strong>現行のレベル1に <code>90日平均</code> がありません。§7 に追加提案を書きました。</li>
+</ol>
+<hr>
+<h2>4. リスク評価（発生確率 × 影響度 × 不可逆性）</h2>
+<table><thead><tr><th>項目</th><th>発生確率／影響度／不可逆性</th><th>総合</th></tr></thead><tbody>
+<tr><td><strong>SD の取引条件の公開</strong></td><td>低〜中（SD が GitHub を見に来るか）／<strong>大</strong>（催告なしの会員登録取消＝仕入れ導線が消える。SD は本日利用開始したばかりで代替の卸導線がない）／<strong>高</strong>（push 後は消えない。再入会は審査つき）</td><td><strong>ブロック</strong></td></tr>
+<tr><td>Keepa B クラスの公開</td><td>低／中（§13 の API 遮断＝リサーチ基盤停止）／中（§3(3) により理由なく再契約を拒否できる）</td><td>列を落とす</td></tr>
+<tr><td>セラーID の公開</td><td>極低／小／低</td><td>伏せ字で十分</td></tr>
+<tr><td>A クラスの公開</td><td>—／—／—</td><td>公開可（社長決定済み）</td></tr>
+</tbody></table>
+<p><strong>確率が低くても SD をブロックにしたのは、不可逆性と影響度で決まるからです</strong>（行動原則1）。利用開始初日に、仕入れ導線そのものを賭ける合理性はありません。</p>
+<hr>
+<h2>5. 07 を「条件付き可」にするための具体的な直し方</h2>
+<table><thead><tr><th>07 の箇所</th><th>直し方</th></tr></thead><tbody>
+<tr><td>md 14行目の仕入れ判定セル</td><td>金額を消し、「SD 卸値では手残りが出ない（具体額はリポ外の完全版）」に置換</td></tr>
+<tr><td>md 291〜295行目の損益計算</td><td>上代・卸値・SD品番を伏せ、率と結論（赤字である事実）だけ残す</td></tr>
+<tr><td>§2 の時期別 <code>monthlySold</code> 表</td><td>表を落とし、「現在の表示は月100個以上。2026-03 以降は別 ASIN で非表示」の2文に圧縮</td></tr>
+<tr><td>§3 の月別価格表</td><td>表を落とし、「90日を通じて Amazon 本体が1,100円でカートを保持、在庫切れは観測されず」の1文に圧縮</td></tr>
+<tr><td>§5 のオファー表</td><td>セラーID を <code>S1</code>〜<code>S8</code> に置換。カート保持の有無は残してよい。交代回数・時刻は落とす</td></tr>
+<tr><td>完全版</td><td><code>workspace/output/agent_output/T-20260920-003/</code> へ（Git 除外）。長期保管が必要なら <code>~/Documents/AI Company 素材/Amazon物販事業/keepa-netsea-full-20260906/</code> に追加し README に由来を追記</td></tr>
+</tbody></table>
+<hr>
+<h2>6. カズヨへの指示（当職は実行しません）</h2>
+<h3>6-1. 先にやる1手（可逆・§4.1 非該当）</h3>
+<p><strong>自動同期を一時停止してください。</strong><code>workspace/.sync/.lock</code> をディレクトリとして作ると、同期プロセスは「SKIP 別の同期プロセスが実行中」でそのまま終了します（<code>github-sync.sh</code> のロック機構）。</p>
+<ul>
+<li style='margin-left:0.0em'><strong>注意2点</strong>：①30分以上前のロックは stale とみなして自動解除される設計なので、決着まで作り直すか launchd を unload すること。②<strong>解除を忘れると成果物の同期が止まります</strong>（成果物消失という別の事故につながる）。決着したら必ず戻す。</li>
+</ul>
+<h3>6-2. A/B/C（社長判断を仰ぐ形で）</h3>
+<table><thead><tr><th>案</th><th>内容</th><th>当職の評価</th></tr></thead><tbody>
+<tr><td><strong>A（推奨）</strong></td><td>§5 のとおり 07 を差し替え、<strong>未 push の <code>378ba9ea</code> を含めて commit を作り直す</strong>（soft reset → 再 commit）。未 push なので force push は不要・公開はゼロ・<code>reflog</code> に残るので可逆</td><td><strong>推奨。</strong>唯一、SD 卸値を1バイトも公開せずに済む案。commit の付け替えは §4.1 の隣接領域なので、実行前に社長の一言をもらうこと</td></tr>
+<tr><td>B</td><td>07 を追跡から外す（<code>git rm --cached</code> ＋ フォルダ <code>.gitignore</code>）</td><td><strong>単独では無意味。</strong><code>378ba9ea</code> を push すれば履歴に SD 卸値が残る。A と併用が前提</td></tr>
+<tr><td>C</td><td>そのまま push し、後から修正 commit で消す</td><td><strong>不可。</strong>履歴に残り、消すには force push（自動同期が止まる）か GitHub Support への依頼（§4.1）しか手段がない</td></tr>
+</tbody></table>
+<h3>6-3. 併せて社長判断に上げるもの</h3>
+<ol>
+<li style='margin-left:0.0em'><strong>CLAUDE.md §6 の除外リストに C・D クラスを明記する改訂</strong>（本書 §1-2 をそのまま条文化できます）</li>
+<li style='margin-left:0.0em'><strong>pre-commit の語彙追加</strong>（§7。IT エンジニアへの発注）</li>
+</ol>
+<hr>
+<h2>7. pre-commit への追加提案（IT 宛・カズヨ経由）</h2>
+<table><thead><tr><th>#</th><th>提案</th><th>理由（実測）</th></tr></thead><tbody>
+<tr><td>1</td><td>レベル1に追加：<code>90日平均</code> ／ <code>在庫切れ率</code> ／ <code>上代</code> ／ <code>SD品番</code> ／ <code>BuyBox 交代</code></td><td><strong>04 CSV がこの語彙の穴で通過した。</strong>同型の再発を止める</td></tr>
+<tr><td>2</td><td><strong>金額つきの卸値は散文でも止める</strong>（例 <code>卸[値価][^\n]{0,12}[0-9,]{3,}</code>）</td><td><strong>07 は md 14行目・291行目が散文扱いで素通りした。</strong>現行は「散文の卸値は正当な引用」として通す設計で、そこが今回の穴</td></tr>
+<tr><td>3</td><td>判定単位を「列数」から「<strong>同じ列名の行が5行以上続くか</strong>」へ</td><td>07 §2・§3 は<strong>2列の小さな表</strong>なので、現行の「5列以上」条件に掛からない。時系列は列が少ないのが普通</td></tr>
+<tr><td>4</td><td>既に追跡済みファイルの<strong>編集</strong>も、C クラスの語彙だけは見る</td><td>07 は新規追加だったので警告は出たが、既存ファイルへの追記経路は今も無防備</td></tr>
+</tbody></table>
+<p><strong>補足（フックの評価）</strong>：今回フックは「ユニーク ASIN 24件」の警告を出し、タカシがそれを見て判断を止めました。<strong>設計どおりに機能しています。</strong>止めるべきだった SD 卸値を見逃したのは語彙と粒度の問題で、思想の問題ではありません。</p>
+<hr>
+<h2>8. 射程外（次に拾うこと）</h2>
+<ul>
+<li style='margin-left:0.0em'><strong>Amazon 出品規約（ASBA）全文との照合は未実施。</strong>本書 §2-2 の4行目は「見つけていない」であり「無い」ではありません。</li>
+<li style='margin-left:0.0em'><strong>セラーID が非ログインで見えることの実測</strong>（当職の <code>curl</code> は 503）。カズヨのブラウザで1分。</li>
+<li style='margin-left:0.0em'>Keepa API の契約状態（T-20260912-002 で解約が論点化済み）。<strong>解約後も §11(2) で社内利用は可、公開は不可</strong>という結論は変わりません。</li>
+</ul>
+</body></html>

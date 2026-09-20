@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>09_兄弟ASINスキャンとmonthlySoldの粒度 — T-20260920-003</title><style>
+:root{--fg:#1d2129;--mut:#6b7280;--line:#e3e6ea;--bg:#fff;--acc:#0b6fb4;--warn:#fff7ed;--warnb:#f59e0b;--th:#f6f8fa}
+*{box-sizing:border-box}
+body{margin:0;background:#f2f4f7;color:var(--fg);
+ font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",sans-serif;line-height:1.85}
+main{max-width:1000px;margin:0 auto;padding:44px 28px 90px;background:var(--bg);
+ box-shadow:0 1px 3px rgba(0,0,0,.07)}
+h1{font-size:1.72rem;line-height:1.4;margin:0 0 .6em;padding-bottom:.5em;border-bottom:3px solid var(--fg)}
+h2{font-size:1.28rem;margin:2.4em 0 .7em;padding:.35em 0 .35em .7em;border-left:5px solid var(--acc);background:#f6f9fc}
+h3{font-size:1.06rem;margin:1.9em 0 .5em;color:#14456b}
+p{margin:.8em 0}
+hr{border:0;border-top:1px solid var(--line);margin:2.2em 0}
+.tw{overflow-x:auto;margin:1.1em 0}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--th);font-weight:600;white-space:nowrap}
+tbody tr:nth-child(even){background:#fbfcfd}
+code{background:#f0f2f5;padding:.1em .35em;border-radius:3px;font-size:.87em;
+ font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+pre{background:#1e2430;color:#e6edf3;padding:14px 16px;border-radius:6px;overflow-x:auto;
+ font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.86rem;line-height:1.7}
+pre code{background:none;color:inherit;padding:0}
+a{color:var(--acc);word-break:break-all}
+ul,ol{padding-left:1.5em}
+li{margin:.4em 0}
+strong{color:#0a2540}
+.graphs{display:grid;gap:18px;margin:1.2em 0}
+.graphs figure{margin:0;border:1px solid var(--line);border-radius:6px;padding:10px;background:#fff}
+.graphs figcaption{font-size:.85rem;color:var(--mut);margin-bottom:6px}
+.graphs img{width:100%;height:auto;display:block}
+.note{background:var(--warn);border-left:4px solid var(--warnb);padding:10px 14px;margin:1.2em 0;font-size:.92rem}
+@media (max-width:640px){main{padding:26px 14px 60px}h1{font-size:1.4rem}table{font-size:.82rem}}
+</style></head>
+<body><main><h1>兄弟 ASIN 20件のスキャンと <code>monthlySold</code> の粒度検証（公開版）</h1>
+<ul><li>チケット: T-20260920-003 ／ 担当: IT エンジニア タカシ</li><li>データ取得: <strong>2026-09-20 13:06 UTC</strong>・<strong>Keepa API</strong> <code>/product</code>（domain=5 / amazon.co.jp）</li><li>消費トークン: 114（07 の14と合わせて累計128・残 1,086）</li><li>[<code>07_キティ174459のKeepa分析</code>](07_キティ174459のKeepa分析.md) の続き</li></ul>
+<p>&gt; <strong>これは公開版です。</strong> 法務判定 [<code>08_Keepa由来データの公開基準</code>](08_Keepa由来データの公開基準.md)（ハルオ／2026-09-20）の<br>&gt; ABCD クラス分類に従い、<strong>C＝SD の取引条件</strong>（SD 会員規約17条1項）と<br>&gt; <strong>B＝Keepa 固有の履歴</strong>（時系列表・90日平均・在庫切れ率・BuyBox 交代履歴。Keepa T&amp;C §11(1)）を落としています。<br>&gt; 表に載せているのは <strong>A＝Amazon の現在スナップショット</strong>だけです。<strong>結論は完全版と同じです。</strong><br>&gt;<br>&gt; <strong>完全版:</strong> <code>~/Documents/AI Company 素材/Amazon物販事業/keepa-sanrio-kitty-20260920/</code></p>
+<hr>
+<h2>0. 結論</h2>
+<h3>問い1「ランクが1,000位以下なのは兄弟と連動しているのでは」→ <strong>連動しています。社長の疑いは的中</strong></h3>
+<p>21 ASIN（親を除く子20件＋304832）のランクを並べると、<strong>ファッションランクは 1,310 と 1,292 の2値しかなく、末端「キーホルダー・チェーン」は全員2位</strong>でした。ばつ丸もぐでたまもキティも同じ値です。</p>
+<p>例外は B0C1J9QV1H（304832・現在は親から外れている）だけで、こちらは 94,345 位。<strong>親から外れた瞬間に本当のランクが出る</strong>という形で、共有の仕組みがそのまま見えています。</p>
+<p>→ <strong>07 の「割り引いて読む」では足りませんでした。この親の下にいる限り、ランクは判定に使えません。</strong></p>
+<h3>問い1の本題「<code>monthlySold</code>（月100個）は ASIN 単位か family 合算か」→ <strong>ASIN 単位</strong></h3>
+<p>公式定義と実データが一致しました。詳細は §1。<strong>「月100個」はキティ単体の実数</strong>で、07 の記述は維持されます。</p>
+<h3>問い2「Amazon 本体がいない兄弟」→ <strong>2件だけ。どちらも仕入れには使えません</strong></h3>
+<div class='tw'><table><thead><tr><th>ASIN</th><th>色</th><th>品番</th><th>状態</th></tr></thead><tbody><tr><td><strong>B0C1JBSF87</strong></td><td><strong>マイメロディ</strong></td><td>304981</td><td>Amazon 本体なし。<strong>カートが成立しておらず</strong>、3社が FBA で1,683〜1,980円。<strong>ただし月間販売数の表示は消えている（＝月50個未満）</strong></td></tr><tr><td>B0C1J9QV1H</td><td>キティ 2023年版</td><td>304832</td><td>07 で判定済み（本体なし・ランク9万位台・月間販売数の表示なし）</td></tr></tbody></table></div>
+<p><strong>残り18件は全部 Amazon 本体が出品中で、16件で本体がカートを保持しています。</strong> カート価格は <strong>1,100円</strong>（2023年版は1,045円）に1円単位で揃っています。</p>
+<p>→ <strong>このシリーズは丸ごと Amazon 本体の縄張りです。</strong> 本体がいない2件は「本体が抜けた後」であり、<strong>空いている棚ではなく、本体が去った後の売れ残り棚</strong>でした。</p>
+<hr>
+<h2>1. <code>monthlySold</code> の粒度検証（問い1）</h2>
+<h3>一次情報</h3>
+<p>Keepa 公式（Keepa 自身が保守する product object の構造定義）より、<code>monthlySold</code> の説明を原文のまま：</p>
+<p>&gt; &quot;How often this product was bought in the past month. This field represents the bought past month metric found on Amazon search result pages. <strong>It is not an estimate.</strong> null if it has no value. Most ASINs do not have this value set. <strong>The value is variation specific.</strong>&quot;</p>
+<p>同じ定義ファイルから対照として：</p>
+<p>&gt; <code>salesRanks</code> — &quot;Contains subcategory rank histories. Each key represents the categoryId of the rank with the history in the corresponding value.&quot;<br>&gt; <code>salesRankReference</code> — &quot;The category node id of the main sales rank.&quot;</p>
+<p><strong>ランク側の定義には「variation specific」に相当する記述がありません。</strong> <code>monthlySold</code> だけが明示的にバリエーション固有だと言っています。列名から推測せず定義に遡った結果、<strong>2つのフィールドで粒度が違う</strong>ことが分かりました。</p>
+<p>あわせて <strong><code>monthlySold</code> は Amazon の検索結果に出る「先月N点購入」そのもの</strong>で、Keepa の推計値ではありません（&quot;It is not an estimate.&quot;）。</p>
+<p>出典:</p>
+<ul><li><code>https://github.com/keepacom/api_backend/blob/master/src/main/java/com/keepa/api/backend/structs/Product.java</code>（Keepa 公式リポジトリ・2026-09-20 取得）</li><li><code>https://keepa.com/api-docs/product.html</code>（Product Request のドキュメント）</li><li>※ <code>keepa.com/api-docs/product-object</code> は <strong>404</strong>。用語定義を取るなら上の構造定義が一次情報です</li></ul>
+<h3>実データでの検証（21 ASIN・すべて現在値）</h3>
+<p>&gt; ⚠️ <strong>月間販売数を表の列にしていません。</strong> 法務判定 08 では「現在表示されている月間販売数」は<br>&gt; <strong>A クラス（公開可）</strong>ですが、<code>.claude/hooks</code> の pre-commit は旧 E2 判定の語彙のままで<br>&gt; <strong>表の列として検知して commit を止めます</strong>。<strong>バイパスするのは筋が悪い</strong>ので散文にとどめ、<br>&gt; ASIN ごとの対応は完全版に置きました。語彙の是正は 08 §7 で IT へ発注済みの項目です。</p>
+<div class='tw'><table><thead><tr><th>ASIN</th><th>色</th><th>最終更新</th><th>ランク（ファッション）</th><th>ランク（キーホルダー）</th></tr></thead><tbody><tr><td>B0C1JCJNVY</td><td>シナモロール</td><td>2026-09-20</td><td>1,310</td><td>2</td></tr><tr><td>B0C1JC88S5</td><td>クロミ</td><td>2026-09-20</td><td>1,310</td><td>2</td></tr><tr><td><strong>B0FQDWCGQD</strong></td><td><strong>ハローキティ 174459</strong></td><td><strong>100</strong></td><td>2026-09-20</td><td>1,310</td><td>2</td></tr><tr><td>B0F6D5P96S</td><td>ポムポムプリン</td><td>2026-09-20</td><td>1,310</td><td>2</td></tr><tr><td>B0F6D755WY</td><td>マイウィートピアノ</td><td>2026-09-15</td><td>1,310</td><td>2</td></tr><tr><td>B0F6D7TFZD</td><td>ハンギョドン</td><td>2026-09-20</td><td>1,310</td><td>2</td></tr><tr><td>B0F6D5P9G6</td><td>あひるのペックル</td><td>2026-09-02</td><td>1,310</td><td>2</td></tr><tr><td>B0F6D9T3RD</td><td>バッドばつ丸</td><td>2026-08-11</td><td>1,310</td><td>2</td></tr><tr><td>B0F6D5NVV8</td><td>コロコロクリリン</td><td>2026-08-11</td><td>1,292</td><td>2</td></tr><tr><td>B0F6DF14X4</td><td>ポチャッコ</td><td>2026-08-10</td><td>1,310</td><td>2</td></tr><tr><td>B0F6DD89ZZ</td><td>タキシードサム</td><td>2026-08-09</td><td>1,292</td><td>2</td></tr><tr><td>B0F6D8JS76</td><td>けろけろけろっぴ</td><td>2026-08-08</td><td>1,292</td><td>2</td></tr><tr><td>B0F6D5QWSD</td><td>こぎみゅん</td><td>2026-08-02</td><td>1,292</td><td>2</td></tr><tr><td><strong>B0C1JBSF87</strong></td><td><strong>マイメロディ</strong></td><td>表示なし</td><td>2026-07-15</td><td>1,292</td><td>2</td></tr><tr><td>B0F6DC2W74</td><td>KIRIMIちゃん.</td><td>2026-04-06</td><td>1,310</td><td>2</td></tr><tr><td>B0F6D952S2</td><td>ぐでたま</td><td>2026-04-04</td><td>1,292</td><td>2</td></tr><tr><td>B0F6D9S46J</td><td>はなまるおばけ</td><td>2026-03-09</td><td>1,310</td><td>2</td></tr><tr><td>B0C1J9QV1H</td><td>キティ 304832</td><td>2026-03-09</td><td><strong>94,345</strong></td><td>697</td></tr><tr><td>B0H8DR7DLG</td><td>ホワイト ×5</td><td>—</td><td>1,310</td><td>2</td></tr><tr><td>B0HF7QRC5N</td><td>红色 ×4</td><td>—</td><td>1,310</td><td>2</td></tr><tr><td>B0H8DZM3PT</td><td>マルチカラー ×3</td><td>—</td><td>1,292</td><td>2</td></tr></tbody></table></div>
+<p><strong>読み取り</strong></p>
+<ol><li><strong><code>monthlySold</code> が入っているのは6件で、その値は 200 / 200 / 100 / 100 / 50 / 50 の3水準に割れました</strong> → ASIN 単位。合算なら全員同じ値になります。値が入っているのは上の表で最終更新が 2026-09 のもの（シナモロール・クロミ・<strong>ハローキティ 174459</strong>・ポムポムプリン・マイウィートピアノ・ハンギョドン）で、<strong>ASIN と値の対応は完全版</strong>にあります。</li><li><strong>ランクは2値しかなく、末端は全員2位</strong> → family 共有。1,310 と 1,292 の差は Keepa の観測タイミングの差で、実質同一の系列です。</li><li><strong>決定的な対照</strong>：キティとマイメロディは<strong>ランクが完全に同一</strong>（同月に同値、現在も同値）なのに、<strong>月間販売数のピーク時期と水準が別物</strong>です（キティは2026年春がピーク、マイメロディは2025年末がピーク。数値は完全版）。<strong>同じランク・別の販売数</strong>で粒度は決着です。</li><li>値が入っているのは <strong>6/21 件</strong>。公式定義の &quot;Most ASINs do not have this value set&quot; のとおりで、<strong>Amazon が月50個未満を表示しない</strong>ためです。<strong>「表示なし」は「売れていない」ではなく「50個に届いていない」</strong>と読むのが正しい（今回の文脈ではほぼ同義）。</li><li><code>salesRankDrops</code> は ASIN ごとにばらけますが、これは <strong>Keepa の観測回数</strong>であって販売数ではありません。<strong>ランクが family で同一なのに drops が違うこと自体が、drops が「順位が動いたのを何回見たか」の記録である証拠</strong>です。</li></ol>
+<h3>この検証で 07 のどこが変わるか</h3>
+<div class='tw'><table><thead><tr><th>07 の記述</th><th>修正</th></tr></thead><tbody><tr><td>「月100個」はキティ単体の実数</td><td><strong>維持</strong>（公式定義＋実データで確認）</td></tr><tr><td>末端カテゴリ2位は20兄弟の合算なので割り引いて読む</td><td><strong>「割り引く」では足りない。この親の下にいる限りランクは判定に使えない</strong>（21 ASIN 全員が2位）</td></tr><tr><td><code>salesRankDrops</code> は参考値</td><td>維持。<strong>単品の傍証にもなりません</strong></td></tr><tr><td>ページ表示レビュー1,265件は family 合算</td><td>維持</td></tr></tbody></table></div>
+<hr>
+<h2>2. 兄弟 ASIN 20件の現況（問い2）</h2>
+<p>Amazon 本体の有無・カート保持者・現在の新品オファー本数・カート価格・EAN・品番はいずれも A クラス（Amazon の現在スナップショット）です。</p>
+<div class='tw'><table><thead><tr><th>ASIN</th><th>色</th><th>Amazon 本体</th><th>カート保持者</th><th>新品&lt;br&gt;オファー本数</th><th>カート価格</th><th>紹介料</th><th>EAN</th><th>品番</th></tr></thead><tbody><tr><td><strong>B0C1JBSF87</strong></td><td><strong>マイメロディ</strong></td><td><strong>なし</strong></td><td><strong>カートなし</strong></td><td>3</td><td>—</td><td>12%</td><td>4550337304983</td><td>304981</td></tr><tr><td>B0C1J9QV1H</td><td>キティ 304832</td><td>なし</td><td>第三者</td><td>4</td><td>1,280</td><td>12%</td><td>4550337304839</td><td>304832</td></tr><tr><td>B0HF7QRC5N</td><td>红色 ×4</td><td>あり</td><td><strong>本体</strong></td><td>1</td><td>4,400</td><td>10%</td><td>なし</td><td>174459</td></tr><tr><td>B0H8DR7DLG</td><td>ホワイト ×5</td><td>あり</td><td><strong>本体</strong></td><td>1</td><td>5,225</td><td>10%</td><td>なし</td><td>305511</td></tr><tr><td>B0H8DZM3PT</td><td>マルチカラー ×3</td><td>あり</td><td><strong>本体</strong></td><td>1</td><td>3,135</td><td>10%</td><td>なし</td><td>305898</td></tr><tr><td><strong>B0FQDWCGQD</strong></td><td><strong>キティ 174459</strong></td><td><strong>あり</strong></td><td><strong>本体</strong></td><td>8</td><td><strong>1,100</strong></td><td>10%</td><td>4550624174459</td><td>174459</td></tr><tr><td>B0C1JCJNVY</td><td>シナモロール</td><td>あり</td><td><strong>本体</strong></td><td>5</td><td>1,045</td><td>12%</td><td>4550337305515</td><td>305511</td></tr><tr><td>B0C1JC88S5</td><td>クロミ</td><td>あり</td><td><strong>本体</strong></td><td>8</td><td>1,045</td><td>12%</td><td>4550337305898</td><td>305898</td></tr><tr><td>B0F6D5P96S</td><td>ポムポムプリン</td><td>あり</td><td><strong>本体</strong></td><td>11</td><td>1,100</td><td>12%</td><td>4550624174671</td><td>174670</td></tr><tr><td>B0F6D755WY</td><td>マイウィートピアノ</td><td>あり</td><td><strong>本体</strong></td><td>7</td><td>1,100</td><td>12%</td><td>4550624175135</td><td>175137</td></tr><tr><td>B0F6D7TFZD</td><td>ハンギョドン</td><td>あり</td><td><strong>本体</strong></td><td>8</td><td>1,100</td><td>12%</td><td>4550624174909</td><td>174904</td></tr><tr><td>B0F6D9T3RD</td><td>バッドばつ丸</td><td>あり</td><td><strong>本体</strong></td><td>8</td><td>1,100</td><td>12%</td><td>4550624175067</td><td>175064</td></tr><tr><td>B0F6D5P9G6</td><td>あひるのペックル</td><td>あり</td><td><strong>本体</strong></td><td>5</td><td>1,100</td><td>12%</td><td>4550624175050</td><td>175056</td></tr><tr><td>B0F6DF14X4</td><td>ポチャッコ</td><td>あり</td><td><strong>本体</strong></td><td>8</td><td>1,100</td><td>12%</td><td>4550624174855</td><td>174858</td></tr><tr><td>B0F6DD89ZZ</td><td>タキシードサム</td><td>あり</td><td><strong>本体</strong></td><td>5</td><td>1,100</td><td>12%</td><td>4550624174862</td><td>174866</td></tr><tr><td>B0F6D8JS76</td><td>けろけろけろっぴ</td><td>あり</td><td><strong>本体</strong></td><td>5</td><td>1,100</td><td>12%</td><td>4550624174978</td><td>174971</td></tr><tr><td>B0F6D5QWSD</td><td>こぎみゅん</td><td>あり</td><td><strong>本体</strong></td><td>3</td><td>1,100</td><td>12%</td><td>4550624175210</td><td>175218</td></tr><tr><td>B0F6D5NVV8</td><td>コロコロクリリン</td><td>あり</td><td><strong>本体</strong></td><td>6</td><td>1,100</td><td>12%</td><td>4550624175234</td><td>175234</td></tr><tr><td>B0F6DC2W74</td><td>KIRIMIちゃん.</td><td>あり</td><td><strong>本体</strong></td><td>4</td><td>1,100</td><td>12%</td><td>4550624175203</td><td>175200</td></tr><tr><td>B0F6D9S46J</td><td>はなまるおばけ</td><td>あり</td><td><strong>本体</strong></td><td>3</td><td>1,100</td><td>12%</td><td>4550624175326</td><td>175323</td></tr><tr><td>B0F6D952S2</td><td>ぐでたま</td><td>あり</td><td><strong>本体</strong></td><td>4</td><td>1,100</td><td>12%</td><td>4550624175180</td><td>175188</td></tr></tbody></table></div>
+<h3>この表から分かる3つのこと</h3>
+<p><strong>① Amazon 本体が16件でカートを保持し、価格を1,100円（2023年版は1,045円）に固定している。</strong><br>16件すべてカート保持者が Amazon 本体で、価格が1円単位で揃っています。<strong>このシリーズの価格は Amazon 本体が決めています。</strong></p>
+<p><strong>② セット組みの3 ASIN は Amazon 本体の「まとめ買い」ページ。</strong><br>B0HF7QRC5N（4,400円）= 1,100 × 4、B0H8DR7DLG（5,225円）= 1,045 × 5、B0H8DZM3PT（3,135円）= 1,045 × 3。<strong>単価が完全に一致</strong>します。EAN を持たず、品番は単品 ASIN と重複（174459 / 305511 / 305898）。<strong>新規参入の余地はありません。</strong><br>※ <strong>B0HF7QRC5N は品番 174459＝キティと同一</strong>です。「同じ品番で別 ASIN」は 07 で扱った現象と同じで、この親の下だけで3例あります。</p>
+<p><strong>③ 月間販売数が表示されている6件は全部 Amazon 本体が在庫を持っている</strong>（どの ASIN かは §1 の読み取り1を参照）<strong>。</strong><br>逆に、本体がいない2件は表示が消えています。<strong>本体の1,045〜1,100円が需要を作っていた</strong>という読みが、20件全体で一貫します。</p>
+<hr>
+<h2>3. 唯一の候補 B0C1JBSF87（マイメロディ 304981）の精査</h2>
+<p>問い2の「本体がいない兄弟を名指し」に対する答えは<strong>この1件</strong>です（304832 は 07 で判定済み）。</p>
+<h3>現況</h3>
+<div class='tw'><table><thead><tr><th>項目</th><th>値</th></tr></thead><tbody><tr><td>Amazon 本体</td><td><strong>なし</strong>（2026年夏に撤退。時期の詳細は完全版）</td></tr><tr><td>カート</td><td><strong>成立していない</strong></td></tr><tr><td>稼働オファー</td><td>3社・<strong>全員 FBA・新品</strong></td></tr><tr><td>着地価格</td><td>1,683 円（最安）／1,700 円／1,980 円</td></tr><tr><td>月間販売数</td><td><strong>表示なし</strong>（2026年夏に消滅＝月50個未満）</td></tr><tr><td>紹介料率</td><td>12%（実効 12.42%）／ FBA 配送代行 420 円</td></tr><tr><td>EAN / 品番</td><td>4550337304983 / 304981</td></tr><tr><td>Amazon 登録日</td><td>2023-04-06</td></tr></tbody></table></div>
+<p><strong>Amazon 本体が抜けた直後に最安価格が跳ね上がり、同時に月間販売数の表示が消えました。値上げした結果売れなくなった、という順序です</strong>（時系列は完全版）。</p>
+<p>3社とも FBA なのにカートが付かないのは、<strong>Amazon が価格が相場から乖離していると判断している</strong>ときに起きる状態です（推定）。07 の 304832 はカートが1,280円で付いており、そちらは乖離していません。</p>
+<h3>採算（出典：Keepa API 2026-09-20 取得の紹介料率と FBA 手数料）</h3>
+<p><strong>ケースA：今の最安 1,683 円で売れたら</strong></p>
+<pre>売値 1,683 − 販売手数料 12.42%（209円）− FBA 配送代行 420円 = 手残り 1,054 円</pre>
+<p><strong>ケースB：Amazon 本体が1,045円で戻ってきたら</strong></p>
+<pre>売値 1,045 − 販売手数料 12.42%（130円）− FBA 配送代行 420円 = 手残り  495 円</pre>
+<p><strong>丸進の卸条件はケースAの手残りには収まりますが、ケースBでは赤字になります</strong>（具体的な取引条件は SD 会員規約17条1項によりここには記載しません。完全版を参照）。</p>
+<p><strong>見送りを推奨します。</strong> ケースAの数字は良いのですが、成立条件が2つとも怪しいです。</p>
+<ol><li><strong>月50個未満しか売れていない。</strong> 以前は月数百個売れていた商品が、1,683円になった途端に表示が消えました。<strong>この価格では需要がない</strong>と実データが言っています。回転上限6ヶ月（既定）を満たせる確証がありません。</li><li><strong>Amazon 本体は2026年夏まで11ヶ月以上ずっといました。</strong> 戻る前提で考えるべきで、戻ればケースBになります。しかも本体は在庫を持てば即カートを取ります。</li></ol>
+<p><code>feedback_first_purchase_must_expect_success</code>（1件目は成功する気でやる）に照らすと、根拠が「本体がいない」という消極条件だけです。</p>
+<hr>
+<h2>4. 全体の結論</h2>
+<p><strong>SD 丸進 × サンリオ ミニマスコットホルダー（このファミリー全体）は成立しません。</strong></p>
+<div class='tw'><table><thead><tr><th>観点</th><th>事実</th></tr></thead><tbody><tr><td>本体の支配</td><td>20件中 <strong>16件でカート保持</strong>、うち単品13件が1,100円 / 1,045円固定</td></tr><tr><td>本体がいない2件</td><td>どちらも月間販売数の表示が消滅（月50個未満）。本体撤退後に値上げして売れなくなった</td></tr><tr><td>セット3件</td><td>本体のまとめ買いページ。単価×個数で完全一致。参入余地なし</td></tr><tr><td>価格の天井</td><td><strong>1,100円</strong>。手残りは <strong>550〜575円</strong>（紹介料10〜12%・FBA 415〜420円を引いた後）</td></tr><tr><td>丸進の条件</td><td><strong>この手残りを上回るため、どの兄弟でも赤字</strong>（金額は完全版）</td></tr></tbody></table></div>
+<p><strong>損益分岐の卸率は売値の約50〜52%です。</strong> 仕入れ値がカート価格の半分を超えたら、<strong>Amazon 側を見るまでもなく落とせます。</strong> この1行が丸進のカテゴリ選定にそのまま使えます。</p>
+<h3>次に見るべきもの（提案）</h3>
+<ol><li><strong>SD 側で「卸率が売値の52%以下」を先に絞る。</strong> Amazon 側を見る前に SD でフィルタすれば、Keepa のトークンを使わずに候補を落とせます。<strong>契約が 10/3 までなので、トークンは「絞った後の検証」だけに使う</strong>のが正しい順序です。</li><li><strong>Amazon 本体の有無を最初の門にする。</strong> 今回のスキャンで、本体がいる ASIN は例外なく価格が固定されていました。<code>availabilityAmazon</code> は <code>offers</code> なし（<strong>1トークン/ASIN</strong>）で取れるので、<strong>100件を100トークンで一次スクリーニングできます</strong>。</li><li><strong>ランクは門に使わない。</strong> family 共有で無意味です。使うのは <strong><code>monthlySold</code> の実値のみ</strong>（<code>feedback_volume_sellers_only</code> の「入口は monthlySold、ドロップ数で代替しない」に<strong>「ランクも代替にしない」</strong>を足す形）。</li></ol>
+<hr>
+<h2>5. データの出所</h2>
+<ul><li>集計スクリプト: <code>workspace/output/agent_output/T-20260920-003/keepa/</code>（<code>fetch_siblings.py</code> / <code>analyze.py</code> / <code>md2html.py</code>）</li><li>生 JSON・完全版（B・C クラスを含む）: <code>~/Documents/AI Company 素材/Amazon物販事業/keepa-sanrio-kitty-20260920/</code>（リポジトリ外・README 同梱）</li><li>公開判定: [<code>08_Keepa由来データの公開基準</code>](08_Keepa由来データの公開基準.md)（法務ハルオ／2026-09-20）</li></ul>
+<h2>付録：Keepa の価格・ランクグラフ（直近90日）</h2>
+<p class="note">画像が表示されない場合は Keepa へのログインが必要です。ASIN 名のリンクから Keepa のページを直接開けます。</p>
+<div class="graphs">
+<figure><figcaption><a href="https://keepa.com/#!product/5-B0C1JBSF87">B0C1JBSF87</a> — マイメロディ 304981 — 本体が2026-07に撤退した唯一の生存候補
+ ／ 青=Amazon本体 橙=新品最安 緑=売れ筋ランク</figcaption>
+ <img src="https://graph.keepa.com/pricehistory.png?asin=B0C1JBSF87&domain=co.jp&amazon=1&new=1&salesrank=1&range=90"
+  alt="B0C1JBSF87 の Keepa グラフ" loading="lazy"></figure><figure><figcaption><a href="https://keepa.com/#!product/5-B0FQDWCGQD">B0FQDWCGQD</a> — キティ 174459 — 本体が1,100円で固定（対照）
+ ／ 青=Amazon本体 橙=新品最安 緑=売れ筋ランク</figcaption>
+ <img src="https://graph.keepa.com/pricehistory.png?asin=B0FQDWCGQD&domain=co.jp&amazon=1&new=1&salesrank=1&range=90"
+  alt="B0FQDWCGQD の Keepa グラフ" loading="lazy"></figure><figure><figcaption><a href="https://keepa.com/#!product/5-B0C1J9QV1H">B0C1J9QV1H</a> — キティ 304832 — 本体撤退後に回転が死んだ例
+ ／ 青=Amazon本体 橙=新品最安 緑=売れ筋ランク</figcaption>
+ <img src="https://graph.keepa.com/pricehistory.png?asin=B0C1J9QV1H&domain=co.jp&amazon=1&new=1&salesrank=1&range=90"
+  alt="B0C1J9QV1H の Keepa グラフ" loading="lazy"></figure></div></main></body></html>
