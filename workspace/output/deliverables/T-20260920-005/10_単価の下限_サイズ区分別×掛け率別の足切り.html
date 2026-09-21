@@ -1,0 +1,145 @@
+<!doctype html><html lang='ja'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>単価の下限：この価格帯より下は候補から落とす</title><style>body{font-family:-apple-system,'Hiragino Sans','Noto Sans JP',sans-serif;max-width:1150px;margin:2em auto;padding:0 1em;line-height:1.65;color:#222;font-size:14.5px}table{border-collapse:collapse;margin:.8em 0;font-size:.92em}th,td{border:1px solid #bbb;padding:.35em .6em;vertical-align:top}th{background:#eef2f8}tr:nth-child(even) td{background:#fafafa}h1{font-size:1.5em;border-bottom:2px solid #444}h2{font-size:1.25em;border-left:5px solid #25b;padding-left:8px;margin-top:1.8em}h3{font-size:1.05em;margin-top:1.4em}blockquote{border-left:4px solid #ccc;margin:.8em 0;padding:.2em 1em;color:#444}code{background:#f3f3f3;padding:1px 4px;border-radius:3px}hr{border:0;border-top:1px solid #ccc;margin:1.6em 0}</style></head><body>
+<h1>単価の下限：この価格帯より下は候補から落とす</h1>
+<p>T-20260920-005 ／ 2026-09-21 ／ 経理ハジメ</p>
+<p>社長の指摘「ある程度の単価がないと、FBA などの手数料や送料で負けてしまう」を、サイズ区分 × 掛け率 × カテゴリ料率の表にしたもの。<strong>リサーチの足切り条件として実装に渡す値</strong>です。</p>
+<hr>
+<h2>0. 結論（3行）</h2>
+<ol>
+<li style='margin-left:0.0em'><strong>既定の足切りは 2,200円。</strong>（標準サイズ区分3・カテゴリ料率10.4%・6掛けの損益分岐＝2,163円）。サイズもカテゴリも未確定の段階では、<strong>売価2,200円未満は見ない</strong>。</li>
+<li style='margin-left:0.0em'><strong>実用下限は 3,900円。</strong> 6掛けで営業利益率10%を確保できる最低売価（標準区分3・10.4%＝3,885円）。<strong>2,200〜3,900円は「5掛け以下を取れるなら可」のグレーゾーン</strong>です。</li>
+<li style='margin-left:0.0em'><strong>KPI の利益率20%は、6掛けでは事実上達成できません。</strong> 6掛けだとカテゴリ料率12.7%未満でしか成立せず、ホーム&amp;キッチン・文房具・DIY（15.4%）は価格をいくら上げても不可能です。<strong>利益率20%を守るなら「5掛け以下」が必須条件</strong>になります。</li>
+</ol>
+<hr>
+<h2>1. 使う数字の出どころ（すべて一次・2026-09-21 取得）</h2>
+<p>出典：<code>sell.amazon.co.jp/pricing</code> を curl で原文取得（ログイン不要・静的HTML）。</p>
+<table><thead><tr><th>項目</th><th>値</th><th>確度</th></tr></thead><tbody>
+<tr><td>FBA配送代行手数料</td><td>下表（<strong>1,000円超／1,000円以下の2段</strong>・税込）</td><td><strong>一次</strong></td></tr>
+<tr><td>販売手数料</td><td>カテゴリ別・段階料率（<strong>税抜表示</strong>→原価計上は×1.1）</td><td><strong>一次</strong></td></tr>
+<tr><td>FBA在庫保管手数料</td><td>5.676円/1,000cm³/月（1〜9月・小型/標準）、10.087円（10〜12月）。服&amp;ファッション小物/シューズ&amp;バッグは 3.10 / 5.50円</td><td><strong>一次</strong></td></tr>
+<tr><td>返金処理手数料</td><td>500円 と 販売手数料の10% の低い方</td><td><strong>一次</strong></td></tr>
+<tr><td>FBAパートナーキャリア ヤマト 140サイズ 関東→関東</td><td>608円</td><td>実測（memory <code>knowledge_first_purchase_cost_model_2026-09</code>）</td></tr>
+<tr><td>納品代行（検品・ラベル・梱包）</td><td>30円/点（小型〜標準）、40〜80円/点（大型）</td><td>実測レンジの中央（e-fba 12円＋ラベル/梱包）</td></tr>
+<tr><td>メーカー→当社の送料</td><td>FBA納品送料の50%と<strong>仮定</strong></td><td><strong>仮定</strong>（メーカーは一定額以上で送料無料が多く、0〜同額の幅）</td></tr>
+<tr><td>保管計上月数</td><td>0.75ヶ月（消化1.5ヶ月 ÷ 2）</td><td>モデル（平均在庫は初期数量の1/2）</td></tr>
+<tr><td>免税事業者のため仕入は税込が原価</td><td>掛け率 × 1.1</td><td>実測（memory <code>tax_invoice_menzei_seller</code>）</td></tr>
+</tbody></table>
+<p><strong>計算式</strong></p>
+<pre>利益率 m を満たす最低売価 P ＝ 1個あたり固定費 ÷ （1 − m − 1.1×掛け率 − 1.1×カテゴリ料率）
+1個あたり固定費 ＝ FBA配送代行 ＋ 保管 ＋ FBA納品送料 ＋ 仕入送料 ＋ 納品代行</pre>
+<p>分母が0以下になる組み合わせは、<strong>価格をいくら上げても成立しません</strong>（表では「到達不能」）。</p>
+<hr>
+<h2>2. 1個あたりの固定費（円／個・税込）</h2>
+<p>段ボール140サイズ（有効容積46,200cm³・重量上限25kg）に何個入るかで送料を按分。</p>
+<table><thead><tr><th>サイズ区分</th><th>FBA配送代行</th><th>保管</th><th>FBA納品送料</th><th>仕入送料</th><th>納品代行</th><th><strong>合計</strong></th></tr></thead><tbody>
+<tr><td>小型（25×18×2.0cm・250g）</td><td>288</td><td>4</td><td>12</td><td>6</td><td>30</td><td><strong>340</strong></td></tr>
+<tr><td>標準1（35×30×3.3cm・1kg）</td><td>318</td><td>9</td><td>26</td><td>13</td><td>30</td><td><strong>396</strong></td></tr>
+<tr><td><strong>標準3（三辺30cm・2kg）</strong></td><td><strong>415</strong></td><td>6</td><td>24</td><td>12</td><td>30</td><td><strong>488</strong></td></tr>
+<tr><td>標準6（三辺60cm・5kg）</td><td>430</td><td>32</td><td>99</td><td>49</td><td>40</td><td><strong>650</strong></td></tr>
+<tr><td>標準8（三辺100cm・9kg）</td><td>532</td><td>119</td><td>368</td><td>184</td><td>50</td><td><strong>1,254</strong></td></tr>
+<tr><td>大型4（三辺120cm・15kg）</td><td>781</td><td>148</td><td>608</td><td>304</td><td>80</td><td><strong>1,921</strong></td></tr>
+</tbody></table>
+<p><strong>要点：重い・かさばる商品は「送料が二重に効く」</strong>（仕入送料＋FBA納品送料）。標準8以降は送料だけで配送代行手数料を上回ります。標準3の合計488円に対し、大型4は1,921円＝<strong>3.9倍</strong>です。</p>
+<hr>
+<h2>3. 損益分岐（営業利益0%）を満たす最低売価（円・税込）</h2>
+<p><strong>この価格を下回ったら、その掛け率では赤字です。</strong></p>
+<h3>カテゴリ料率 10.4%（おもちゃ&amp;ホビー・スポーツ・食品1,500円超・カー用品 等）</h3>
+<table><thead><tr><th>サイズ区分</th><th>6掛け</th><th>5掛け</th><th>4掛け</th></tr></thead><tbody>
+<tr><td>小型</td><td>1,505</td><td>1,012</td><td>614</td></tr>
+<tr><td>標準1</td><td>1,755</td><td>1,180</td><td>741</td></tr>
+<tr><td><strong>標準3</strong></td><td><strong>2,163</strong></td><td><strong>1,454</strong></td><td><strong>1,095</strong></td></tr>
+<tr><td>標準6</td><td>2,881</td><td>1,937</td><td>1,459</td></tr>
+<tr><td>標準8</td><td>5,558</td><td>3,736</td><td>2,814</td></tr>
+<tr><td>大型4</td><td>8,513</td><td>5,723</td><td>4,310</td></tr>
+</tbody></table>
+<h3>カテゴリ料率 8.4%（家電・PC・楽器・服2,500円以下 等）</h3>
+<table><thead><tr><th>サイズ区分</th><th>6掛け</th><th>5掛け</th><th>4掛け</th></tr></thead><tbody>
+<tr><td>小型</td><td>1,372</td><td>765</td><td>585</td></tr>
+<tr><td>標準1</td><td>1,599</td><td>1,107</td><td>706</td></tr>
+<tr><td><strong>標準3</strong></td><td><strong>1,970</strong></td><td><strong>1,364</strong></td><td><strong>1,043</strong></td></tr>
+<tr><td>標準6</td><td>2,625</td><td>1,818</td><td>1,390</td></tr>
+<tr><td>標準8</td><td>5,064</td><td>3,506</td><td>2,682</td></tr>
+<tr><td>大型4</td><td>7,757</td><td>5,371</td><td>4,107</td></tr>
+</tbody></table>
+<h3>カテゴリ料率 15.4%（ホーム&amp;キッチン・文房具・DIY・家具・腕時計・その他 等）</h3>
+<table><thead><tr><th>サイズ区分</th><th>6掛け</th><th>5掛け</th><th>4掛け</th></tr></thead><tbody>
+<tr><td>小型</td><td>1,991</td><td>1,210</td><td>700</td></tr>
+<tr><td>標準1</td><td>2,321</td><td>1,411</td><td>1,014</td></tr>
+<tr><td><strong>標準3</strong></td><td><strong>2,860</strong></td><td><strong>1,739</strong></td><td><strong>1,249</strong></td></tr>
+<tr><td>標準6</td><td>3,810</td><td>2,316</td><td>1,664</td></tr>
+<tr><td>標準8</td><td>7,350</td><td>4,469</td><td>3,210</td></tr>
+<tr><td>大型4</td><td>11,257</td><td>6,844</td><td>4,917</td></tr>
+</tbody></table>
+<hr>
+<h2>4. 営業利益率10%を満たす最低売価（＝実用下限）</h2>
+<p>損益分岐は「1円も残らない線」です。返品・値下がり・広告費の余地がありません。<strong>実務で使う下限はこちらです。</strong></p>
+<h3>カテゴリ料率 10.4%</h3>
+<table><thead><tr><th>サイズ区分</th><th>6掛け</th><th>5掛け</th><th>4掛け</th></tr></thead><tbody>
+<tr><td>小型</td><td>2,704</td><td>1,441</td><td>792</td></tr>
+<tr><td>標準1</td><td>3,153</td><td>1,681</td><td>1,146</td></tr>
+<tr><td><strong>標準3</strong></td><td><strong>3,884</strong></td><td><strong>2,071</strong></td><td><strong>1,412</strong></td></tr>
+<tr><td>標準6</td><td>5,175</td><td>2,759</td><td>1,881</td></tr>
+<tr><td>標準8</td><td>9,983</td><td>5,322</td><td>3,628</td></tr>
+<tr><td>大型4</td><td>15,291</td><td>8,152</td><td>5,557</td></tr>
+</tbody></table>
+<h3>カテゴリ料率 15.4%</h3>
+<table><thead><tr><th>サイズ区分</th><th>6掛け</th><th>5掛け</th><th>4掛け</th></tr></thead><tbody>
+<tr><td>小型</td><td>4,810</td><td>1,880</td><td>1,169</td></tr>
+<tr><td>標準1</td><td>5,609</td><td>2,193</td><td>1,363</td></tr>
+<tr><td><strong>標準3</strong></td><td><strong>6,910</strong></td><td><strong>2,701</strong></td><td><strong>1,679</strong></td></tr>
+<tr><td>標準6</td><td>9,207</td><td>3,599</td><td>2,237</td></tr>
+<tr><td>標準8</td><td>17,761</td><td>6,943</td><td>4,315</td></tr>
+<tr><td>大型4</td><td>27,203</td><td>10,634</td><td>6,609</td></tr>
+</tbody></table>
+<p><strong>6掛けから5掛けに1段階下げると、必要売価が半分近くになります</strong>（標準3・10.4%で 3,884円 → 2,071円）。<strong>価格交渉1段階の価値は、売価を倍にするのとほぼ同じ</strong>です。ここが一番効きます。</p>
+<hr>
+<h2>5. 営業利益率20%（KPI）を満たす最低売価</h2>
+<h3>カテゴリ料率 10.4%</h3>
+<table><thead><tr><th>サイズ区分</th><th>6掛け</th><th>5掛け</th><th>4掛け</th></tr></thead><tbody>
+<tr><td>小型</td><td>13,266</td><td>2,504</td><td>1,383</td></tr>
+<tr><td>標準1</td><td>15,469</td><td>2,920</td><td>1,612</td></tr>
+<tr><td><strong>標準3</strong></td><td><strong>19,057</strong></td><td><strong>3,598</strong></td><td><strong>1,986</strong></td></tr>
+<tr><td>標準6</td><td>25,390</td><td>4,793</td><td>2,646</td></tr>
+<tr><td>大型4</td><td>75,020</td><td>14,163</td><td>7,820</td></tr>
+</tbody></table>
+<h3>カテゴリ料率 15.4%</h3>
+<table><thead><tr><th>サイズ区分</th><th>6掛け</th><th>5掛け</th><th>4掛け</th></tr></thead><tbody>
+<tr><td>すべて</td><td><strong>到達不能</strong></td><td>4,213〜23,828</td><td>1,782〜10,076</td></tr>
+</tbody></table>
+<blockquote><strong>掛け率ごとの「利益率20%が成立しうる上限料率」</strong><br><br>| 掛け率 | 成立条件 |<br>|---|---|<br>| 6掛け | カテゴリ料率 <strong>12.7%未満</strong>（15.4%カテゴリは価格をいくら上げても不可能） |<br>| 5掛け | カテゴリ料率 22.7%未満（全カテゴリで可） |<br>| 4掛け | カテゴリ料率 32.7%未満（全カテゴリで可） |<br><br><strong>KPI「利益率20%」を守るなら、掛け率5掛け以下が必須条件です。</strong> 6掛けで20%を狙うには売価を1万円以上にする必要があり、その価格帯は月100個以上売れる商品がほとんどありません（社長既定「月100個以上」と両立しない）。</blockquote>
+<hr>
+<h2>6. 重要な補正：Amazon実売が上代を下回るとき</h2>
+<p>上の表は <strong>「Amazon売価＝メーカー上代」</strong> を仮定しています。実際はAmazon実売が上代の80〜90%であることが多く、その場合<strong>実効掛け率が上がります</strong>（6掛け ÷ 0.8 ＝ 実効7.5掛け）。</p>
+<p>損益分岐の最低売価（標準区分3・料率10.4%）</p>
+<table><thead><tr><th>売価 / 上代</th><th>6掛け</th><th>5掛け</th><th>4掛け</th></tr></thead><tbody>
+<tr><td><strong>100%（上の表）</strong></td><td>2,163</td><td>1,454</td><td>1,095</td></tr>
+<tr><td>90%</td><td>3,205</td><td>1,778</td><td>1,230</td></tr>
+<tr><td><strong>80%</strong></td><td><strong>8,053</strong></td><td>2,463</td><td>1,454</td></tr>
+</tbody></table>
+<p><strong>売価が上代の80%まで落ちると、6掛け仕入れは標準区分3で8,053円未満がすべて赤字になります。利益率10%は価格をいくら上げても到達不能です。</strong></p>
+<blockquote><strong>実装への指示：掛け率は「上代基準」ではなく「Amazon実売基準」で判定してください。</strong> 上代基準の6掛けは、実売が上代の80%なら実質7.5掛けです。メーカーとの交渉では上代基準で話しますが、採算判定は実売基準に直してから行います。</blockquote>
+<hr>
+<h2>7. 実装に渡す足切り条件（推奨）</h2>
+<table><thead><tr><th>#</th><th>条件</th><th>値</th><th>適用</th></tr></thead><tbody>
+<tr><td><strong>1</strong></td><td><strong>絶対足切り</strong></td><td>Amazon実売 <strong>2,200円未満</strong>は候補から除外</td><td>サイズ・カテゴリ未確定でも一律適用。標準区分3・10.4%・6掛けの損益分岐2,163円を丸めた値</td></tr>
+<tr><td><strong>2</strong></td><td><strong>要交渉ライン</strong></td><td>実売 2,200〜3,900円は「<strong>実売基準で5掛け以下</strong>が取れる見込みがある場合のみ通す」</td><td>6掛けでは利益率10%に届かない帯</td></tr>
+<tr><td><strong>3</strong></td><td><strong>サイズ別の上乗せ</strong></td><td>標準6は ×1.33、標準8は ×2.57、大型は ×3.94 を §1 の値に掛ける</td><td>1個あたり固定費の比（488円基準）</td></tr>
+<tr><td><strong>4</strong></td><td><strong>カテゴリ別の上乗せ</strong></td><td>15.4%カテゴリは ×1.32</td><td>標準区分3の損益分岐比（2,860 ÷ 2,163）</td></tr>
+<tr><td><strong>5</strong></td><td><strong>サイズ不明時の扱い</strong></td><td>標準区分3（488円）を既定とする</td><td>三辺30cm以下・2kg以下。最頻の区分</td></tr>
+<tr><td><strong>6</strong></td><td><strong>KPI適合フラグ</strong></td><td>実売基準で5掛け以下のもののみ「KPI20%達成可能」と立てる</td><td>6掛けでは12.7%未満のカテゴリでしか成立しない</td></tr>
+</tbody></table>
+<p><strong>本表に入っていないコスト（判定を甘くしている要因）</strong></p>
+<ul>
+<li style='margin-left:0.0em'><strong>返品</strong>（返品率2%で売価の約2%相当。FBA配送代行は返金されず、再販不可なら仕入＋外注が丸損）</li>
+<li style='margin-left:0.0em'><strong>広告費</strong>（SP広告を打つならACOSの分だけ下限が上がる）</li>
+<li style='margin-left:0.0em'><strong>値下がり</strong>（本表は現在の実売で固定。過去1年最安値で当てると下限はさらに上がる）</li>
+<li style='margin-left:0.0em'><strong>長期在庫保管手数料</strong>（365日超で月20円/点〜）</li>
+<li style='margin-left:0.0em'><strong>大口月額4,900円</strong>（固定費なので単品には乗せていない）</li>
+</ul>
+<p>→ <strong>本表の下限は「これ以下は確実に負ける」線であり、「これ以上なら勝てる」線ではありません。</strong></p>
+<hr>
+<h2>8. 無料・即時でできる裏取り</h2>
+<p><strong>セラーセントラルの「FBA料金シミュレーター」に実ASINを投入する</strong>のが最も確実です（無料・5分・§4.1 非該当）。寸法とカテゴリが実データで当たるため、本表の推定（サイズ区分・料率）を1件ずつ潰せます。発注直前には必ず実施してください。</p>
+<hr>
+<h2>9. 計算スクリプト</h2>
+<p><code>workspace/output/agent_output/T-20260920-005/09_growth_model.py</code> §2（全数値・再現可能）／出力ログ <code>09_output.txt</code></p>
+</body></html>

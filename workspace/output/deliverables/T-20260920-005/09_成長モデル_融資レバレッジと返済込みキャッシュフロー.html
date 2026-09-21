@@ -1,0 +1,187 @@
+<!doctype html><html lang='ja'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>成長モデル：自己資金200万 → 公庫融資 → レバレッジ反復</title><style>body{font-family:-apple-system,'Hiragino Sans','Noto Sans JP',sans-serif;max-width:1150px;margin:2em auto;padding:0 1em;line-height:1.65;color:#222;font-size:14.5px}table{border-collapse:collapse;margin:.8em 0;font-size:.92em}th,td{border:1px solid #bbb;padding:.35em .6em;vertical-align:top}th{background:#eef2f8}tr:nth-child(even) td{background:#fafafa}h1{font-size:1.5em;border-bottom:2px solid #444}h2{font-size:1.25em;border-left:5px solid #25b;padding-left:8px;margin-top:1.8em}h3{font-size:1.05em;margin-top:1.4em}blockquote{border-left:4px solid #ccc;margin:.8em 0;padding:.2em 1em;color:#444}code{background:#f3f3f3;padding:1px 4px;border-radius:3px}hr{border:0;border-top:1px solid #ccc;margin:1.6em 0}</style></head><body>
+<h1>成長モデル：自己資金200万 → 公庫融資 → レバレッジ反復</h1>
+<p>T-20260920-005 ／ 2026-09-21 ／ 経理ハジメ</p>
+<p>対象：社長が 2026-09-21 に確定させた「本業の貯蓄で200万まで積み、利益が出たら国庫から借り、借入で売上を伸ばす」モデルを数字にしたもの。</p>
+<hr>
+<h2>0. 結論（4行）</h2>
+<ol>
+<li style='margin-left:0.0em'><strong>融資は正しい手段です。ただし外れるのは「資金の天井」だけです。</strong> 中央シナリオの律速は資金ではなく<strong>仕入れ先の獲得速度（取引社数）</strong>で、そこは融資では動きません。</li>
+<li style='margin-left:0.0em'><strong>借りすぎが最大のリスクです。</strong> 社数が24社で止まったまま800万借りると、<strong>639万が遊休</strong>のまま月10.9万の返済だけが発生します（年利息25万の純損）。</li>
+<li style='margin-left:0.0em'><strong>推奨は「借入を社数の実績に後追いさせる」運用。</strong> 1回目は<strong>300万・2027年8月以降</strong>。増額は「手元資金が必要運転資金を3ヶ月連続で下回った」ことを確認してから。</li>
+<li style='margin-left:0.0em'><strong>2028-09 の中央着地は月営業利益 17〜55万円/月</strong>（社数24社・幅は1社あたり収益の置き方による）。200万には届きません。届かせるには<strong>取引78社 × 粗利率25%</strong> が要ります。融資はその前提が満たされたときに初めて200万へ効きます。</li>
+</ol>
+<hr>
+<h2>1. 使う数字の出どころ（実測／一次／推定／仮定）</h2>
+<table><thead><tr><th>項目</th><th>値</th><th>確度</th><th>出所</th></tr></thead><tbody>
+<tr><td>公庫 融資限度額</td><td>7,200万円</td><td><strong>一次</strong></td><td>jfc.go.jp 新規開業・スタートアップ支援資金（2026-09-21 取得）</td></tr>
+<tr><td>公庫 返済期間（運転資金）</td><td>10年以内＜据置5年以内＞</td><td><strong>一次</strong></td><td>同上</td></tr>
+<tr><td>公庫 対象者</td><td>新規開業または<strong>事業開始後おおむね7年以内</strong></td><td><strong>一次</strong></td><td>同上</td></tr>
+<tr><td>公庫 金利（無担保・<strong>税務申告を2期終えていない方</strong>）</td><td><strong>基準 3.75〜5.35%</strong> / 特別利率A 3.35〜4.95%</td><td><strong>一次</strong></td><td>jfc.go.jp 金利情報（<strong>令和8年9月1日現在</strong>）</td></tr>
+<tr><td>公庫 金利（無担保・2期終えている方）</td><td>基準 3.80〜5.40%</td><td><strong>一次</strong></td><td>同上</td></tr>
+<tr><td>創業支援貸付利率特例</td><td><strong>▲0.65%</strong>（雇用拡大時▲0.9%）</td><td><strong>一次</strong></td><td>同上（制度ページ）</td></tr>
+<tr><td>開業者の資金調達実態</td><td>調達額 平均<strong>1,219万円</strong> / 金融機関等からの借入 平均<strong>827万円</strong>（67.9%）/ 自己資金 平均<strong>279万円</strong>（22.9%）</td><td><strong>一次</strong></td><td>公庫総研「2025年度新規開業実態調査」2025-12-05 公表（n≈2,000・公庫融資先が対象）</td></tr>
+<tr><td>開業費用</td><td>平均975万円・<strong>中央値600万円</strong></td><td><strong>一次</strong></td><td>同上</td></tr>
+<tr><td>自己資金要件・「うち運転資金4,800万」</td><td><strong>公庫サイトに記載なし</strong></td><td><strong>未確認</strong></td><td>世間でよく書かれるが一次で裏が取れない。断定しない</td></tr>
+<tr><td>審査基準・融資可能額</td><td>非公開</td><td><strong>推定</strong></td><td>本書の借入額はすべて推定</td></tr>
+<tr><td>当社の運転資金（現在）</td><td>100万円＋カード枠50万円</td><td>社長確定</td><td>2026-09-21</td></tr>
+<tr><td>本業の手取り</td><td>月40万＋賞与年約90万＝年約570万</td><td>社長確定</td><td>同上</td></tr>
+<tr><td>Amazon三層＋物流</td><td>売価の27.3%</td><td>実測</td><td>売価3,000円・標準区分3</td></tr>
+<tr><td>固定費</td><td>7.1万円/月</td><td>実測3.06＋推定4.0</td><td>成果物01 §1</td></tr>
+<tr><td>外注費</td><td>月商の4%</td><td><strong>仮定</strong></td><td>成果物01 §1</td></tr>
+<tr><td>在庫回転</td><td>1.5ヶ月</td><td>モデル</td><td>既定の<strong>上限は6ヶ月</strong>。200万を狙う世界では1.5〜2ヶ月が必須</td></tr>
+<tr><td>1社あたり月利</td><td>0.7万円（実測置き値）／ 4SKU×3.1万＝月商12.4万（育成後）</td><td>実測置き値／仮定</td><td>統合報告 v4・成果物01</td></tr>
+</tbody></table>
+<blockquote><strong>当社ナレッジ「融資は売上100万実績後」（<code>knowledge_maker_shiire_ecstars</code>）は、一次では裏が取れませんでした。</strong> 公庫の必要書類に確定申告書の指定はなく（創業段階）、売上金額の基準も公表されていません。<strong>「100万」は実務上の目安であって公庫の要件ではない</strong>、というのが今回の到達点です。</blockquote>
+<p><strong>粗利率 g の定義</strong>：（売価 − 仕入原価 − Amazon三層 − 納品代行 − 仕入送料）÷ 売価。固定費・外注費は控除前。</p>
+<p><strong>月営業利益 ＝ 月商 ×（g − 4%）− 7.1万</strong>。利息は営業外なので営業利益には含めず、返済は別行で引きます。</p>
+<hr>
+<h2>2. 自己資金フェーズ（100万 → 200万）</h2>
+<h3>2a. 本業の貯蓄をいくら入れると、いつ200万に届くか</h3>
+<p>起点 2026-10 / 自己資金100万 / 上限200万（社長確定）。利益は全額再投資。</p>
+<table><thead><tr><th>本業からの投入</th><th>200万到達</th><th>年換算の投入額</th><th>本業手取り（年570万）に占める割合</th></tr></thead><tbody>
+<tr><td>月 5万円</td><td>10ヶ月後（<strong>2027-08</strong>）</td><td>60万</td><td>10.5%</td></tr>
+<tr><td><strong>月10万円</strong></td><td><strong>7ヶ月後（2027-05）</strong></td><td>120万</td><td>21.1%</td></tr>
+<tr><td>月15万円</td><td>5ヶ月後（2027-03）</td><td>180万</td><td>31.6%</td></tr>
+<tr><td>月20万円</td><td>4ヶ月後（2027-02）</td><td>240万</td><td>42.1%</td></tr>
+</tbody></table>
+<p><strong>推奨は月10万円</strong>（2027-05 到達）。社長の言う「200万で利益が出たら借りる」の時期目安 2027-07 と整合し、本業の可処分から見ても無理がありません。月15万以上に上げても到達は2ヶ月しか早まらず、生活の余裕を削る割に効きません。</p>
+<h3>2b. 運転資金200万のとき、何が見えているか</h3>
+<table><thead><tr><th>粗利率 g</th><th>回せる月商/月</th><th>うち在庫</th><th>うち売掛</th><th><strong>月営業利益/月</strong></th></tr></thead><tbody>
+<tr><td>15%（相乗り卸・v4の実態）</td><td>168万</td><td>145万</td><td>55万</td><td><strong>11.4万</strong></td></tr>
+<tr><td>20%</td><td>179万</td><td>142万</td><td>58万</td><td><strong>21.6万</strong></td></tr>
+<tr><td><strong>25%（中央）</strong></td><td><strong>192万</strong></td><td>138万</td><td>62万</td><td><strong>33.3万</strong></td></tr>
+<tr><td>35%（独占・簡易OEM）</td><td>225万</td><td>127万</td><td>73万</td><td><strong>62.5万</strong></td></tr>
+</tbody></table>
+<blockquote><strong>「200万規模で利益が出るようになったら」の判定基準（経理としての推奨）</strong><br>単月黒字ではなく、<strong>3ヶ月連続で月営業利益20万円以上</strong>。g=15%（相乗り卸のまま）では11.4万で届きません。<strong>この基準を置くと、融資申請のタイミングが「粗利率を20%以上に上げられたか」と同義になります。</strong> 時期ではなく状態で判定してください。</blockquote>
+<hr>
+<h2>3. 融資フェーズ（日本政策金融公庫・国民生活事業）</h2>
+<h3>3a. 制度（一次情報・2026-09-21 取得）</h3>
+<table><thead><tr><th>項目</th><th>内容</th></tr></thead><tbody>
+<tr><td>制度名</td><td>新規開業・スタートアップ支援資金</td></tr>
+<tr><td>融資限度額</td><td>7,200万円（<strong>うち運転資金の内訳はサイトに記載なし＝未確認</strong>）</td></tr>
+<tr><td>返済期間（運転資金）</td><td>10年以内 ＜うち<strong>据置期間5年以内</strong>＞</td></tr>
+<tr><td>対象</td><td>新たに事業を始める方または<strong>事業開始後おおむね7年以内</strong>（社長は 2026-08-20 開業 → 2033年頃まで対象）</td></tr>
+<tr><td>金利（無担保・2期未了）</td><td>基準 <strong>3.75〜5.35%</strong> ／ 特別利率A 3.35〜4.95%</td></tr>
+<tr><td>併用できる特例</td><td>経営者保証免除特例／<strong>創業支援貸付利率特例（▲0.65%）</strong>／賃上げ貸付利率特例</td></tr>
+<tr><td>必要書類（創業段階）</td><td>創業計画書・見積書・本人確認書類・許認可証（<strong>確定申告書の指定なし</strong>）</td></tr>
+<tr><td>自己資金要件</td><td><strong>サイトに記載なし＝未確認</strong></td></tr>
+</tbody></table>
+<p><strong>当社に当たる金利の見立て（推定）</strong>：基準3.75% − 創業支援特例0.65% ＝ <strong>3.10%（楽観）／中央3.90%／悲観4.70%</strong>。担保なし・無保証を前提としています。</p>
+<h3>3b. いくら借りられるか（推定。公庫の審査基準は非公開）</h3>
+<p>一次の手がかりは1つだけです。<strong>公庫融資先の開業時の平均は、自己資金279万に対し金融機関借入827万（＝自己資金の約3.0倍）</strong>（2025年度新規開業実態調査）。ただしこれは「融資が通った人」の平均なので、上振れしたサンプルです。</p>
+<table><thead><tr><th>シナリオ</th><th>自己資金</th><th>借入額（推定）</th><th>自己資金倍率</th><th>根拠</th></tr></thead><tbody>
+<tr><td>悲観</td><td>200万</td><td><strong>100万</strong></td><td>0.5倍</td><td>副業・1期未了・小規模を理由に減額</td></tr>
+<tr><td><strong>中央</strong></td><td>200万</td><td><strong>300万</strong></td><td>1.5倍</td><td>副業段階の創業融資で通りやすい水準（推定）</td></tr>
+<tr><td>楽観</td><td>200万</td><td><strong>600万</strong></td><td>3.0倍</td><td>公庫平均の倍率をそのまま当てた場合</td></tr>
+</tbody></table>
+<p><strong>2回目以降</strong>：返済実績6〜12ヶ月＋黒字決算が通例（<strong>推定</strong>）。2028-09 までに現実的に踏めるのは<strong>2回まで</strong>（2027-08 / 2028-06）。中央で累計600万、楽観で累計1,000〜1,200万です。</p>
+<h3>3c. 返済の重さ（元利均等・7年・据置なし）</h3>
+<table><thead><tr><th>借入額</th><th>金利3.10%（楽観）</th><th><strong>金利3.90%（中央）</strong></th><th>金利4.70%（悲観）</th><th>年間（中央）</th></tr></thead><tbody>
+<tr><td>300万</td><td>3.98万/月</td><td><strong>4.09万/月</strong></td><td>4.20万/月</td><td>49.0万</td></tr>
+<tr><td>500万</td><td>6.63万/月</td><td><strong>6.81万/月</strong></td><td>7.00万/月</td><td>81.7万</td></tr>
+<tr><td>800万</td><td>10.61万/月</td><td><strong>10.90万/月</strong></td><td>11.19万/月</td><td>130.8万</td></tr>
+<tr><td>1,000万</td><td>13.26万/月</td><td><strong>13.62万/月</strong></td><td>13.99万/月</td><td>163.5万</td></tr>
+</tbody></table>
+<p><strong>据置期間（最大5年）を使えば、据置中の支払いは利息だけになります。</strong> 800万・3.9%なら月2.6万。<strong>据置は「返済が始まる前に売上を立てる」ための時間を買う制度で、当社の使いどころはここです。</strong> ただし据置分は後ろで重くなるので、据置は12ヶ月を上限に置くのが妥当です（推奨・経理判断）。</p>
+<hr>
+<h2>4. レバレッジの反復：何周で200万に届くか</h2>
+<h3>4a. 資金だけを見た場合（＝社数の制約を外した理想）</h3>
+<p>g=25%・回転1.5ヶ月・金利3.9%・7年</p>
+<table><thead><tr><th>運転資金</th><th>回せる月商/月</th><th>月営業利益/月</th><th>月返済</th><th><strong>返済後の手残り/月</strong></th></tr></thead><tbody>
+<tr><td>200万（借入0）</td><td>192万</td><td>33.3万</td><td>0</td><td><strong>33.3万</strong></td></tr>
+<tr><td>500万（借入300万）</td><td>481万</td><td>93.8万</td><td>4.09万</td><td><strong>89.7万</strong></td></tr>
+<tr><td>800万（借入600万）</td><td>769万</td><td>154.4万</td><td>8.17万</td><td><strong>146.2万</strong></td></tr>
+<tr><td>1,000万（借入800万）</td><td>961万</td><td>194.7万</td><td>10.90万</td><td><strong>183.8万</strong></td></tr>
+<tr><td><strong>1,030万（借入830万）</strong></td><td><strong>990万</strong></td><td><strong>200.8万</strong></td><td>11.31万</td><td><strong>189.5万</strong></td></tr>
+</tbody></table>
+<blockquote><strong>資金だけで見れば、運転資金1,030万円・借入830万円で月営業利益200万に届きます。周回数は2回（300万→530万の増額）です。</strong><br>返済は月11.3万。200万の利益に対して<strong>5.6%</strong>で、<strong>到達後の返済は重くありません。重いのは到達前です。</strong></blockquote>
+<h3>4b. 月営業利益200万の逆算（粗利率別）</h3>
+<table><thead><tr><th>粗利率 g</th><th>必要月商/月</th><th>必要運転資金</th><th><strong>必要借入（自己200万控除後）</strong></th><th>月返済</th><th>返済後手残り</th><th>必要SKU</th><th>必要社数（4SKU/社）</th></tr></thead><tbody>
+<tr><td>15%</td><td>1,883万</td><td>2,241万</td><td><strong>2,041万</strong></td><td>27.8万</td><td>172.2万</td><td>607</td><td>152社</td></tr>
+<tr><td>20%</td><td>1,294万</td><td>1,444万</td><td><strong>1,244万</strong></td><td>17.0万</td><td>183.1万</td><td>418</td><td>104社</td></tr>
+<tr><td><strong>25%</strong></td><td><strong>986万</strong></td><td><strong>1,026万</strong></td><td><strong>826万</strong></td><td>11.3万</td><td>188.7万</td><td>318</td><td><strong>80社</strong></td></tr>
+<tr><td>35%</td><td>668万</td><td>595万</td><td><strong>395万</strong></td><td>5.4万</td><td>194.6万</td><td>216</td><td>54社</td></tr>
+</tbody></table>
+<p><strong>g=15%（相乗り卸のまま）は借入2,041万が必要で、創業融資の射程外です。粗利率を上げない限り、融資を何周回しても届きません。</strong></p>
+<h3>4c. 社数の天井を入れると絵が変わる（ここが本題）</h3>
+<p>月商は「資金の上限」と「社数の上限」の<strong>小さい方</strong>で決まります。社数は融資では増えません。</p>
+<table><thead><tr><th>取引社数</th><th>SKU数</th><th>回せる月商/月</th><th>必要運転資金（g25%）</th><th>月営業利益/月</th><th>借入800万時の返済後手残り</th></tr></thead><tbody>
+<tr><td>16社</td><td>64</td><td>198万</td><td>206万</td><td>34.6万</td><td>23.7万</td></tr>
+<tr><td><strong>28社</strong>（マサル試算の生涯上限）</td><td>112</td><td>347万</td><td><strong>361万</strong></td><td>65.8万</td><td>54.9万</td></tr>
+<tr><td>40社</td><td>160</td><td>496万</td><td>516万</td><td>97.1万</td><td>86.2万</td></tr>
+<tr><td>60社</td><td>240</td><td>744万</td><td>774万</td><td>149.1万</td><td>138.2万</td></tr>
+<tr><td><strong>78社</strong></td><td>312</td><td>967万</td><td><strong>1,006万</strong></td><td><strong>196.0万</strong></td><td>185.1万</td></tr>
+<tr><td>100社</td><td>400</td><td>1,240万</td><td>1,290万</td><td>253.3万</td><td>242.4万</td></tr>
+</tbody></table>
+<blockquote><strong>借りすぎの正体</strong>：社数28社で止まった世界では、必要運転資金は<strong>361万</strong>です。自己資金200万＋借入800万＝1,000万を持っていると、<strong>639万が遊休</strong>します。遊休分の利息だけで<strong>年24.9万円</strong>。月営業利益65.8万に対し月返済10.9万（17%）が、何も生まないまま出ていきます。<br><strong>同じ28社でも、借入を300万に抑えれば月返済4.09万で済みます。差は月6.8万・2年で163万円です。</strong></blockquote>
+<hr>
+<h2>5. 24ヶ月の月次シミュレーション（2026-10 〜 2028-09）</h2>
+<p>前提：借入は 2027-08 に1回。回転1.5ヶ月・金利3.9%・7年・据置なし。月商は「資金の上限」と「社数の上限」の小さい方。</p>
+<table><thead><tr><th>シナリオ</th><th>本業投入</th><th>g</th><th>借入</th><th>新規社数</th><th>2028-09 の月営業利益</th><th>取引社数</th><th><strong>最薄月の現金</strong></th></tr></thead><tbody>
+<tr><td>楽観</td><td>15万/月</td><td>35%</td><td>600万</td><td>2.0社/月</td><td><strong>177.4万/月</strong></td><td>48社</td><td>108万（2026-11）</td></tr>
+<tr><td><strong>中央</strong></td><td>10万/月</td><td>25%</td><td>300万</td><td>1.0社/月</td><td><strong>55.4万/月</strong>（1社0.7万基準なら16.8万）</td><td>24社</td><td><strong>101万（2026-11）</strong></td></tr>
+<tr><td>悲観</td><td>5万/月</td><td>15%</td><td>300万</td><td>0.5社/月</td><td><strong>9.3万/月</strong></td><td>12社</td><td>84万（2027-05）</td></tr>
+<tr><td>危険（借りすぎ）</td><td>10万/月</td><td>25%</td><td><strong>800万</strong></td><td>1.0社/月</td><td>55.4万/月（中央と同じ）</td><td>24社</td><td>101万</td></tr>
+<tr><td><strong>最悪（本業喪失）</strong></td><td>0</td><td>15%</td><td>300万</td><td>0.5社/月</td><td>—</td><td>12社</td><td><strong>2027-02 に現金がマイナス＝資金ショート</strong></td></tr>
+</tbody></table>
+<p><strong>読み方</strong></p>
+<ul>
+<li style='margin-left:0.0em'><strong>最薄月は成長期の初期（2026-11 前後）に来ます。</strong> 100万前後で、現状の手元資金とほぼ同額です。<strong>立ち上がり4ヶ月を越えれば、本業を続けている限り資金ショートはしません。</strong></li>
+<li style='margin-left:0.0em'><strong>「危険」と「中央」の 2028-09 の利益は同じ55.4万です。</strong> 800万借りても社数が同じなら1円も増えません。<strong>増えるのは返済だけ</strong>（月+6.8万）。</li>
+<li style='margin-left:0.0em'><strong>「最悪」＝本業を失い生活費20万を引き出すケースは、2027年2月（4ヶ月目）に現金がマイナスになります。</strong> 成果物01の「7.5ヶ月で枯渇」より早いのは、本書では仕入れも並行して増やしているためです。<strong>本業は月営業利益が安定して30万円/月を超えるまで辞められません</strong>（算術であり、好みの問題ではありません）。</li>
+<li style='margin-left:0.0em'>中央の 2028-09 は <strong>55.4万（1社あたり4SKU×3.1万の基準）</strong> と <strong>16.8万（1社あたり月利0.7万の実測置き値）</strong> の幅があります。マサルの中央（18〜28万）は後者寄りです。<strong>この1社あたり収益の置き値が、本モデル最大の不確実性です。</strong></li>
+</ul>
+<hr>
+<h2>6. リスク：どの前提が崩れると破綻するか（感度が高い順）</h2>
+<h3>6a. 粗利率の低下（借入800万を実行済みの世界）</h3>
+<table><thead><tr><th>粗利率 g</th><th>回せる月商/月</th><th>月営業利益/月</th><th><strong>返済後の手残り/月</strong></th></tr></thead><tbody>
+<tr><td>10%</td><td>790万</td><td>40.3万</td><td><strong>29.4万</strong></td></tr>
+<tr><td>15%</td><td>840万</td><td>85.3万</td><td>74.4万</td></tr>
+<tr><td>20%</td><td>896万</td><td>136.3万</td><td>125.4万</td></tr>
+<tr><td>25%</td><td>961万</td><td>194.7万</td><td>183.8万</td></tr>
+</tbody></table>
+<p>粗利率が25%→10%に落ちても、<strong>資金を使い切れていれば</strong>返済後で29万残ります。<strong>粗利率の低下だけでは破綻しません。</strong></p>
+<h3>6b. 在庫の滞留（借入800万・g25%）</h3>
+<table><thead><tr><th>在庫回転</th><th>回せる月商/月</th><th>月営業利益/月</th><th><strong>返済後の手残り/月</strong></th></tr></thead><tbody>
+<tr><td>1.5ヶ月</td><td>961万</td><td>194.7万</td><td>183.8万</td></tr>
+<tr><td>2.0ヶ月</td><td>782万</td><td>157.1万</td><td>146.2万</td></tr>
+<tr><td>3.0ヶ月</td><td>569万</td><td>112.5万</td><td>101.6万</td></tr>
+<tr><td>4.0ヶ月</td><td>448万</td><td>86.9万</td><td>76.0万</td></tr>
+<tr><td><strong>6.0ヶ月（既定の上限）</strong></td><td><strong>314万</strong></td><td><strong>58.8万</strong></td><td><strong>47.9万</strong></td></tr>
+</tbody></table>
+<p><strong>回転が1.5ヶ月→6ヶ月に延びると、同じ資金で回せる月商が</strong>1/3<strong>になります。200万到達の可否を決めるのは粗利率よりも回転です。</strong> 加えて365日超の在庫には長期保管手数料（月20円/点〜）が乗ります。</p>
+<h3>6c. 本業の収入が絶たれた場合（生活費20万/月の引き出し）</h3>
+<table><thead><tr><th>状態</th><th>月営業利益</th><th>−返済</th><th>−生活費20万</th><th><strong>手残り/月</strong></th></tr></thead><tbody>
+<tr><td>運転資金200万・借入0・g15%</td><td>11.4万</td><td>0</td><td>−20万</td><td><strong>−8.6万（破綻）</strong></td></tr>
+<tr><td>運転資金200万・借入0・g25%</td><td>33.3万</td><td>0</td><td>−20万</td><td>+13.3万</td></tr>
+<tr><td>運転資金500万・借入300万・g25%</td><td>93.8万</td><td>−4.09万</td><td>−20万</td><td>+69.7万</td></tr>
+<tr><td>運転資金1,000万・借入800万・g25%</td><td>194.7万</td><td>−10.90万</td><td>−20万</td><td>+163.8万</td></tr>
+</tbody></table>
+<p><strong>本業を辞められる線は「月営業利益30万円/月を3ヶ月連続」。</strong> それ以前に辞めると、借入の有無にかかわらず数ヶ月で現金が尽きます。<strong>借入があると、その線はむしろ上がります</strong>（返済分だけ必要な利益が増えるため）。</p>
+<h3>6d. 破綻の順位（経理としての判定）</h3>
+<table><thead><tr><th>順位</th><th>前提が崩れる内容</th><th>破綻するか</th><th>理由</th></tr></thead><tbody>
+<tr><td><strong>1</strong></td><td><strong>本業を早期に辞める</strong></td><td><strong>する</strong>（4ヶ月）</td><td>生活費20万が丸ごと流出。唯一、単独で即死する要因</td></tr>
+<tr><td><strong>2</strong></td><td><strong>社数が伸びないまま借りすぎる</strong></td><td>しないが<strong>毀損</strong></td><td>遊休資金の利息が年25万。2年で50万の純損</td></tr>
+<tr><td><strong>3</strong></td><td>在庫が滞留する（回転6ヶ月）</td><td>しない</td><td>利益は1/3になるが返済は賄える</td></tr>
+<tr><td>4</td><td>粗利率が10%に落ちる</td><td>しない</td><td>返済後で月29万残る</td></tr>
+<tr><td>5</td><td>金利が4.7%に上がる</td><td>しない</td><td>800万で月+0.3万。誤差</td></tr>
+</tbody></table>
+<hr>
+<h2>7. 経理としての推奨（3つ）</h2>
+<table><thead><tr><th>#</th><th>推奨</th><th>根拠</th></tr></thead><tbody>
+<tr><td><strong>1</strong></td><td><strong>借入は社数の実績に後追いさせる。</strong> 1回目は300万を上限とし、増額は「手元資金 &lt; 必要運転資金」が<strong>3ヶ月連続</strong>で成立してから</td><td>社数28社なら必要運転資金は361万。先に800万借りると639万が遊び、年25万の利息を払い続ける</td></tr>
+<tr><td><strong>2</strong></td><td><strong>融資申請の判定は時期ではなく状態で行う。</strong>「3ヶ月連続で月営業利益20万円以上」＝実質「粗利率20%以上を作れたか」</td><td>g=15%のままだと運転資金200万でも月11.4万。この状態で借りても月商が168万→481万に増えるだけで、粗利が薄いので返済後の伸びが鈍い</td></tr>
+<tr><td><strong>3</strong></td><td><strong>据置期間を12ヶ月使う。</strong> 据置中は利息のみ（800万で月2.6万）</td><td>在庫を仕入れてから現金化されるまで最短でも2〜3ヶ月。据置は「借りてから売れるまで」の谷を埋める制度</td></tr>
+</tbody></table>
+<hr>
+<h2>8. 私が実行していないこと（CLAUDE.md §4.1）</h2>
+<ul>
+<li style='margin-left:0.0em'><strong>融資の申込・相談予約・支店への問い合わせは一切していません。</strong> 融資申込は §4.1（金銭が動く／法的拘束）に該当し、<strong>社長承認が必須</strong>です。</li>
+<li style='margin-left:0.0em'>公庫の「創業相談（無料）」も、外部への第三者連絡にあたるため実行していません。</li>
+<li style='margin-left:0.0em'>本書の借入額・審査可否・2回目以降の周期は<strong>すべて推定</strong>です。実額は支店相談でしか確定しません。</li>
+<li style='margin-left:0.0em'>会員限定の取引条件（卸値・品番・上代・ロット）は本書に一切含めていません。</li>
+</ul>
+<hr>
+<h2>9. 計算スクリプト</h2>
+<p><code>workspace/output/agent_output/T-20260920-005/09_growth_model.py</code>（全数値・再現可能）／ 出力ログ <code>09_output.txt</code></p>
+</body></html>
