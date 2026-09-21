@@ -2,7 +2,7 @@
 ticket_id: T-20260909-002
 title: 初回発注セットの組成（生産終了チェック済みSKUから・サプライヤー集約＋送料最適）
 status: doing
-assignee: it_engineer
+assignee: researcher
 priority: high
 created_at: 2026-09-09
 updated_at: 2026-09-21
@@ -53,6 +53,8 @@ parent_ticket: T-20260904-004
 ## ログ
 
 - 2026-09-09 起票（カズヨ）。社長「早く成果物がほしい」。日本ストア再開で出品可能になったため発注組成へ進む。
+
+- 2026-09-21 マリエ：**assignee を `it_engineer` → `researcher` に訂正。**サトルが `13_初回SKUセット_事実シート` を納品済みで、実作業の担当と frontmatter が食い違っていたため。成果物カタログに 13 の3ファイル（md / html / ゲート実機確認リスト.csv）を追記。
 
 ## 現在地
 

@@ -1,12 +1,12 @@
 ---
 ticket_id: T-20260920-004
 title: pre-commit フックの穴3つを埋める（会員限定の取引条件・2列時系列・散文中の金額）
-status: todo
+status: done
 assignee: it_engineer
 requires_approval: false
 created_at: 2026-09-20
-updated_at: 2026-09-20
-next_check_at: 2026-09-22
+updated_at: 2026-09-21
+next_check_at: 2026-09-28
 priority: high
 labels: [ops, security, tooling]
 related_tickets:
@@ -77,3 +77,12 @@ related_tickets:
 **秘書への引き継ぎ2件**
 1. `workspace/source-ledger.md` の「公開」区分が**空**です。T-20260903-001 で公開可と判定された2サイトのホスト名を庶務に追記させてください。ここが埋まるまで、公開ページ由来の正当な金額を書く出口が開きません
 2. `monthly_sold_real` は A クラス相当だとフィールド定義で確認できました。外すかどうかはハルオの判定事項なので、判断を回してください
+
+---
+
+## ログ（2026-09-21 マリエ）— done へ
+
+- **done の根拠は commit 2本**：`8454b806` feat(hooks) 会員限定の取引条件の漏えいを書き込み前に止める（`source-terms-guard.py` 新設・`pre-commit` の語彙修正・`source-ledger.md` 新設・`settings.json` 登録）／`3c27c04b` fix(hooks) 丁寧形の否定「かかりません」を検知、**網であって証明ではない**旨を明記。テスト54ケース全 pass。
+- **タカシの引き継ぎ2件のうち1件を解消**：`workspace/source-ledger.md` の「公開」区分に `fuwamarket-b2b.com` を登録（HTTP 200・robots `Allow: /`・policy ページ crawlable の明記を 2026-09-21 に再実測）。これで公開ページ由来の正当な金額を書く出口が開いた。
+- **持ち越し2件（本チケットでは閉じない）**：①`monthly_sold_real` の公開クラス判定は**ハルオ待ち**。タカシの調査では `prod.get("monthlySold")` をそのまま書いた列＝A クラス相当だが、**判定の変更は法務の領分**なので pre-commit から外していない ②**過去分の棚卸しが未実施**。追跡下1,242ファイルに新フックの判定を当てると61ファイル・211行が発火（**誤検知を含む**。本日も6パターン中4つが誤検知だった）。commit 時のゲートは新規ファイルしか見ないため、**週次の棚卸しが別途要る＝別チケット向き**（判定16 §5 対策4）。
+- 判定書 16 が挙げた「2サイト目のホスト名」は判定書にも法務 memory にも書かれておらず、**庶務の判断では足さない**。ハルオへ確認依頼（台帳にコメントで明記済み）。
