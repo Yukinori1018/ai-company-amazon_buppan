@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>メーカーへの初回交渉メール 文面集｜Satoy Select</title>
+<meta name="robots" content="noindex, nofollow">
+<style>
+:root{
+  color-scheme: light dark;
+  --bg:#ffffff; --surface:#f5f7f9; --surface2:#eceff3;
+  --text:#1b1f24; --muted:#525b66; --faint:#6c7681;
+  --border:#d5dae1; --border-strong:#b8c0ca;
+  --accent:#1c5b86; --accent-bg:#eef5fa;
+  --warn:#8a4b00; --warn-bg:#fdf1df; --warn-border:#dd9a3c;
+  --alert:#7d2b2b; --alert-bg:#fbeeee; --alert-border:#d08b8b;
+  --ok:#1b6144; --ok-bg:#eaf4ef; --ok-border:#8ab9a3;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#15181c; --surface:#1d2126; --surface2:#252a31;
+    --text:#e4e8ec; --muted:#aab4bf; --faint:#949eaa;
+    --border:#333a43; --border-strong:#48515c;
+    --accent:#79b4dc; --accent-bg:#1a2a36;
+    --warn:#f0b866; --warn-bg:#332616; --warn-border:#7a5a2a;
+    --alert:#e79a9a; --alert-bg:#331e1e; --alert-border:#6e4040;
+    --ok:#84cfa9; --ok-bg:#17281f; --ok-border:#3c6450;
+  }
+}
+*{box-sizing:border-box;}
+html{ -webkit-text-size-adjust:100%; }
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic Medium","Yu Gothic",
+              "Noto Sans JP","Meiryo",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:16px; line-height:1.85;
+  font-feature-settings:"palt" 1;
+  text-align:left;
+}
+.wrap{max-width:900px; margin:0 auto; padding:32px 20px 96px;}
+
+/* ---------- header ---------- */
+.kicker{
+  font-size:12px; letter-spacing:.14em; color:var(--faint);
+  margin:0 0 10px; font-variant-numeric:tabular-nums;
+}
+h1{
+  font-size:27px; line-height:1.5; margin:0 0 20px;
+  letter-spacing:.01em; font-weight:700; text-wrap:balance;
+}
+.lead{
+  margin:0; color:var(--muted); font-size:15px; line-height:1.8;
+  border-left:3px solid var(--border-strong); padding:2px 0 2px 14px;
+}
+
+/* ---------- toc ---------- */
+.toc{
+  margin:30px 0 8px; padding:18px 22px 20px;
+  background:var(--surface); border:1px solid var(--border); border-radius:10px;
+}
+.toc-h{
+  margin:0 0 10px; font-size:13px; font-weight:700;
+  letter-spacing:.1em; color:var(--muted);
+}
+.toc ul.toc-list{margin:0; padding:0; list-style:none;}
+.toc li{margin:.26em 0; line-height:1.65;}
+.toc li.toc-lv1{margin:.85em 0 .3em; font-weight:700;}
+.toc li.toc-lv1:first-child{margin-top:0;}
+.toc li.toc-lv2{padding-left:1.1em;}
+.toc li.toc-lv3{padding-left:2.5em; font-size:14.5px; color:var(--muted); margin:.16em 0;}
+.toc li.toc-lv3::before{content:"–"; color:var(--faint); margin-right:.45em;}
+.toc a{color:var(--accent); text-decoration:none; border-bottom:1px solid transparent;}
+.toc a:hover{border-bottom-color:currentColor;}
+
+/* ---------- part ---------- */
+h1.part{
+  font-size:24px; line-height:1.5; font-weight:700; letter-spacing:.02em;
+  margin:64px 0 8px; padding:14px 0 0; border-top:4px solid var(--text);
+  scroll-margin-top:16px;
+}
+
+/* ---------- sections ---------- */
+.sec{margin:0;}
+.sec>*:last-child{margin-bottom:0;}
+h2{
+  font-size:21px; line-height:1.5; margin:46px 0 16px; padding-bottom:9px;
+  border-bottom:2px solid var(--border-strong); font-weight:700;
+  scroll-margin-top:16px;
+}
+h3{
+  font-size:17px; line-height:1.6; margin:32px 0 12px; font-weight:700;
+  color:var(--text); scroll-margin-top:16px;
+}
+h3::before{content:""; display:inline-block; width:4px; height:1em;
+  background:var(--accent); margin-right:9px; vertical-align:-.13em; border-radius:2px;}
+p{margin:0 0 1.1em;}
+ul,ol{margin:0 0 1.2em; padding-left:1.6em;}
+li{margin:.4em 0;}
+li>ul{margin:.45em 0 .2em;}
+blockquote{
+  margin:0 0 1.2em; padding:14px 18px;
+  background:var(--surface); border-left:4px solid var(--accent); border-radius:0 8px 8px 0;
+}
+blockquote p{margin:0;}
+hr.rule{
+  border:0; border-top:1px solid var(--border);
+  margin:40px 0 0; opacity:.55;
+}
+hr.rule:has(+ .sec-box),hr.rule:has(+ h1.part){display:none;}
+
+/* ---------- tables ---------- */
+.tw{
+  overflow-x:auto; -webkit-overflow-scrolling:touch;
+  margin:0 0 1.4em; border:1px solid var(--border); border-radius:9px;
+  background:
+    linear-gradient(to right, var(--bg) 30%, rgba(0,0,0,0)) left / 28px 100% no-repeat local,
+    linear-gradient(to left,  var(--bg) 30%, rgba(0,0,0,0)) right / 28px 100% no-repeat local,
+    radial-gradient(farthest-side at 0 50%, rgba(90,110,130,.28), rgba(0,0,0,0)) left / 12px 100% no-repeat scroll,
+    radial-gradient(farthest-side at 100% 50%, rgba(90,110,130,.28), rgba(0,0,0,0)) right / 12px 100% no-repeat scroll;
+}
+.tw:focus{outline:2px solid var(--accent); outline-offset:2px;}
+table{border-collapse:collapse; width:100%; font-size:14.5px; line-height:1.72;}
+thead th{
+  background:var(--surface2); text-align:left; font-weight:700;
+  padding:11px 14px; border-bottom:2px solid var(--border-strong);
+  white-space:nowrap; vertical-align:bottom;
+}
+tbody td{padding:11px 14px; border-bottom:1px solid var(--border); vertical-align:top;
+  overflow-wrap:anywhere;}
+tbody tr:last-child td{border-bottom:0;}
+tbody tr:nth-child(even){background:color-mix(in srgb, var(--surface) 55%, transparent);}
+tbody td:first-child{font-weight:600;}
+thead th:first-child,tbody td:first-child{min-width:7.5em;}
+thead th:last-child,tbody td:last-child{white-space:normal;}
+
+/* ---------- inline markers ---------- */
+.ref{
+  font-size:.75em; color:var(--faint); margin-left:.15em;
+  white-space:nowrap; font-variant-numeric:tabular-nums;
+  letter-spacing:.01em; vertical-align:.06em;
+}
+/* [#n] は出典表に行がある時だけリンクになる。見た目は span と同じにして
+   本文の印象を変えない（追加したのは移動手段だけで、文字は足していない） */
+a.ref{text-decoration:none;}
+a.ref:hover,a.ref:focus{color:var(--accent); text-decoration:underline;}
+.chk{
+  display:inline-block; font-size:.75em; line-height:1.5;
+  padding:0 .5em; margin:0 .12em; border-radius:4px;
+  background:var(--warn-bg); color:var(--warn);
+  border:1px solid var(--warn-border); font-weight:700;
+  white-space:nowrap; vertical-align:.09em;
+}
+
+/* ---------- inline emphasis ---------- */
+strong{font-weight:700; color:var(--text);}
+td strong,th strong{font-weight:700;}
+pre.codeblock{white-space:pre-wrap; word-break:break-all; background:rgba(127,127,127,.10); border:1px solid rgba(127,127,127,.35); border-radius:6px; padding:14px 16px; line-height:1.7; font-size:14px; overflow-x:auto;}
+pre.codeblock code{background:none; border:0; padding:0; font-size:inherit;}
+code{
+  font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+  font-size:.9em; padding:.05em .35em; border-radius:4px;
+  background:var(--surface2); border:1px solid var(--border);
+}
+code .chk{font-family:inherit;}
+
+/* ---------- 表セル内の語ハイライト ---------- */
+.pill{
+  display:inline-block; padding:0 .45em; border-radius:4px;
+  font-weight:700; white-space:nowrap;
+}
+.pill-danger{background:var(--alert); color:#fff; border:1px solid var(--alert);}
+.pill-warn{background:var(--warn-bg); color:var(--warn); border:1px solid var(--warn-border);}
+.pill-ok{background:var(--ok-bg); color:var(--ok); border:1px solid var(--ok-border);}
+.pill-info{background:var(--accent-bg); color:var(--accent); border:1px solid var(--accent);}
+/* muted は「検証していない」を表す。塗らず・破線で、済んだものと視覚的に別系統にする */
+.pill-muted{background:transparent; color:var(--faint);
+  border:1px dashed var(--border-strong); font-weight:600;}
+tbody tr.row-danger td:first-child{box-shadow:inset 4px 0 0 var(--alert);}
+tbody tr.row-danger td{background:color-mix(in srgb, var(--alert-bg) 70%, transparent);}
+
+/* ---------- 出典一覧（--reftable） ---------- */
+table.reftable:has(colgroup){table-layout:fixed; min-width:600px;}
+/* 狭い画面で列が1〜2文字幅に潰れるのを防ぐ。溢れは .tw の横スクロールが受ける */
+table.reftable td:first-child{
+  min-width:2.6em; width:2.6em; text-align:right; white-space:nowrap;
+  font-variant-numeric:tabular-nums; color:var(--muted);
+}
+table.reftable th:first-child{min-width:2.6em; width:2.6em; text-align:right;}
+tbody tr[id]{scroll-margin-top:14px;}
+tbody tr[id]:target td{background:var(--accent-bg);}
+tbody tr[id]:target td:first-child{box-shadow:inset 4px 0 0 var(--accent); color:var(--accent);}
+
+/* ---------- emphasised sections ---------- */
+.sec-box{
+  margin:28px 0 0; padding:6px 26px 20px;
+  border:1px solid var(--border-strong); border-radius:10px;
+}
+.sec-box h2{margin-top:26px;}
+.sec-box .tw{background-color:var(--bg);}
+.sec-conclusion{background:var(--accent-bg); border-left:6px solid var(--accent);}
+.sec-conclusion h2{border-bottom-color:var(--accent);}
+.sec-alert{background:var(--alert-bg); border-color:var(--alert-border);
+  border-left:6px solid var(--alert);}
+.sec-alert h2{border-bottom-color:var(--alert-border);}
+.sec-danger{background:var(--alert-bg); border:2px solid var(--alert);
+  border-left:10px solid var(--alert);}
+.sec-danger h2{border-bottom-color:var(--alert);}
+.sec-warn{background:var(--warn-bg); border-color:var(--warn-border);
+  border-left:6px solid var(--warn-border);}
+.sec-warn h2{border-bottom-color:var(--warn-border);}
+.sec-checklist{background:var(--surface); border:2px solid var(--border-strong);
+  border-left:10px solid var(--accent);}
+.sec-checklist h2{border-bottom-color:var(--accent);}
+/* チェックリストは印刷して手元で使う。番号は原稿どおり残し、記入欄だけ CSS で足す */
+.sec-checklist ol{list-style:decimal; padding-left:1.9em;}
+.sec-checklist ol>li{margin:.7em 0; padding-left:2.1em; position:relative;}
+.sec-checklist ol>li::before{
+  content:""; position:absolute; left:0; top:.25em;
+  width:1.15em; height:1.15em; border:1.5px solid var(--border-strong);
+  border-radius:3px; background:var(--bg);
+}
+
+/* ---------- toc: 囲み枠の節は目次でも色を付ける ---------- */
+.toc a.toc-danger,.toc a.toc-alert{color:var(--alert); font-weight:700;}
+.toc a.toc-warn{color:var(--warn); font-weight:700;}
+.toc a.toc-checklist{color:var(--accent); font-weight:700;}
+
+/* ---------- footer / nav ---------- */
+.prov{
+  margin:56px 0 0; padding-top:16px; border-top:1px solid var(--border);
+  font-size:12.5px; line-height:1.8; color:var(--faint); word-break:break-all;
+}
+.top{
+  position:fixed; right:18px; bottom:18px; z-index:5;
+  display:block; width:42px; height:42px; line-height:40px; text-align:center;
+  border-radius:50%; text-decoration:none; font-size:17px;
+  background:var(--surface); color:var(--muted);
+  border:1px solid var(--border-strong);
+  box-shadow:0 2px 8px rgba(0,0,0,.14);
+}
+.top:hover{color:var(--accent); border-color:var(--accent);}
+
+/* ---------- narrow screens ---------- */
+@media (max-width:640px){
+  body{font-size:15.5px;}
+  .wrap{padding:22px 14px 88px;}
+  h1{font-size:22px;}
+  h1.part{font-size:20px; margin-top:46px;}
+  h2{font-size:19px;}
+  h3{font-size:16.5px;}
+  .toc{padding:14px 16px 16px;}
+  .sec-box{padding:4px 14px 14px;}
+  table{font-size:14px;}
+  thead th,tbody td{padding:9px 11px;}
+}
+
+/* ---------- print ---------- */
+@media print{
+  :root{
+    --bg:#fff; --surface:#fff; --surface2:#fff; --text:#000; --muted:#333; --faint:#555;
+    --border:#999; --border-strong:#555; --accent:#000; --accent-bg:#fff;
+    --warn:#000; --warn-bg:#fff; --warn-border:#000;
+    --alert:#000; --alert-bg:#fff; --alert-border:#000;
+  }
+  body{background:#fff; color:#000; font-size:10.5pt; line-height:1.7;}
+  .wrap{max-width:none; padding:0;}
+  a{color:#000; text-decoration:none;}
+  .top{display:none;}
+  .tw{overflow:visible; background:none; border:1px solid #999;}
+  table{font-size:9pt;}
+  thead th{background:#fff; border-bottom:1.5pt solid #000;}
+  tbody tr:nth-child(even){background:#fff;}
+  .sec-box{background:#fff; border:1.5pt solid #000;}
+  .sec-danger{border:2.5pt solid #000; border-left:2.5pt solid #000;}
+  .chk{background:#fff; color:#000; border:1pt solid #000;}
+  pre.codeblock{background:#fff; border:1px solid #999; break-inside:avoid;}
+  code{background:#fff; border:1px solid #999;}
+  .pill{background:#fff!important; color:#000!important; border:1.2pt solid #000!important;}
+  /* 未検証は印刷でも「済んだもの」と別に見えなければ意味がない。
+     モノクロでは色が消えるので、破線と濃度で差を残す */
+  .pill-muted{border:1pt dashed #666!important; color:#555!important; font-weight:400!important;}
+  /* 長いURLは印刷で紙幅を超える。折り返しを許可して溢れを止める */
+  .tw{overflow:hidden;}
+  table{table-layout:auto; width:100%;}
+  tbody td{overflow-wrap:anywhere; word-break:break-word;}
+  thead th{white-space:normal;}
+  table.reftable{font-size:7.6pt; line-height:1.5;}
+  table.reftable thead th,table.reftable tbody td{padding:5px 6px;}
+  tbody tr[id]:target td{background:#fff;}
+  tbody tr.row-danger td{background:#fff;}
+  tbody tr.row-danger td:first-child{box-shadow:inset 3pt 0 0 #000;}
+  /* チェックリストは1枚で手元に置けるよう独立ページにする */
+  .sec-checklist{break-before:page; page-break-before:always;
+    border:1.5pt solid #000; border-left:1.5pt solid #000;}
+  .sec-checklist ol>li::before{border:1.2pt solid #000;}
+  .ref{color:#555; opacity:1;}
+  blockquote{background:#fff; border-left:3pt solid #000;}
+  h1.part{break-before:page; page-break-before:always; border-top:2.5pt solid #000;
+    font-size:15pt; margin-top:0;}
+  h1.part,h2,h3{break-after:avoid; page-break-after:avoid;}
+  .tw,blockquote,tr{break-inside:avoid; page-break-inside:avoid;}
+  .toc{border:1px solid #999; background:#fff;}
+}
+</style>
+</head>
+<body id="top">
+<div class="wrap">
+<p class="kicker">T-20260915-002 / 2026-09-21 ヒデアキ</p>
+<h1>メーカーへの初回交渉メール 文面集</h1>
+
+<nav class="toc" aria-label="目次"><p class="toc-h">目次</p><ul class="toc-list"><li class="toc-lv2"><a href="#s1" class="toc-conclusion">0. 結論（先に3行）</a></li><li class="toc-lv2"><a href="#s2">1. 送る前に必ず埋める差し込み欄</a></li><li class="toc-lv3"><a href="#s2-1">1-2.「良いと思った理由」の書き方（この文面集で唯一、機械化してはいけない欄）</a></li><li class="toc-lv2"><a href="#s3">2. ①標準版（主力）</a></li><li class="toc-lv2"><a href="#s4">3. ②メーカー側のメリットを強めた版</a></li><li class="toc-lv2"><a href="#s5">4. ③短文版</a></li><li class="toc-lv2"><a href="#s6">5. 使い分けと、期待する返信率</a></li><li class="toc-lv2"><a href="#s7">6. 断られたときの切り返し（4分類）</a></li><li class="toc-lv3"><a href="#s7-1">6-1.「Amazon 販売・オンライン販売はお断りしています」→ <strong>粘る価値あり（最重要）</strong></a></li><li class="toc-lv3"><a href="#s7-2">6-2.「実店舗がないとお取引できません」→ <strong>1往復だけして、引く</strong></a></li><li class="toc-lv3"><a href="#s7-3">6-3.「現在、新規のお取引先は募集しておりません」→ <strong>理由で分岐。時期を聞く</strong></a></li><li class="toc-lv3"><a href="#s7-4">6-4.「法人でないとお取引できません」→ <strong>押さない。名簿に残して終わる</strong></a></li><li class="toc-lv2"><a href="#s8">7. 見積りで利益が出ないときの返し（3切り口）</a></li><li class="toc-lv2"><a href="#s9">8. 署名（全通共通・法定表示）</a></li><li class="toc-lv2"><a href="#s10" class="toc-checklist">9. 送信前チェックリスト</a></li><li class="toc-lv2"><a href="#s11">10. なぜこの表現にしたか（設計意図）</a></li><li class="toc-lv2"><a href="#s12" class="toc-alert">11. この文面集の限界（先に申し上げておくこと）</a></li></ul></nav>
+<ul><li>担当：ヒデアキ（コンテンツ制作）／2026-09-21</li><li>対象：T-20260915-002 型A（多社・相乗り）の送信先 約2,425社</li><li>原典：中村裕紀『Amazon国内メーカー直取引完全ガイド（増補改訂版）』Chapter 6-01／6-02／7-04／8-05（読解ノート＝<code>../T-20260921-001/01_中村裕紀_国内メーカー直取引_読解ノート.md</code>）</li><li>法務の枠：<code>10_大量送信の法規と苦情ルール.md</code>（署名・URL・拒否の扱いはこれに従う）</li></ul>
+<section id="s1" class="sec sec-box sec-conclusion">
+<h2>0. 結論（先に3行）</h2>
+<ol><li>初回メールは<strong>3パターン</strong>。主力は①標準版。②は「Amazon で既に困っていると分かった相手」だけ、③は入力欄が短い／大企業の総合窓口向け。</li><li>3パターンとも、<strong>当店に商品が1点も並んでいない事実を隠さない</strong>。隠さずに、御社に在庫リスクも与信リスクも負わせない条件（初回10点・前払い・価格は御社指定）とセットで出す。実績ゼロを「リスクゼロ」に翻訳するのがこの文面の設計。</li><li><strong>送信はできません。</strong> メーカーへの連絡は CLAUDE.md §4.1（第三者連絡）。本書は下書きです。§6・§7 の返信文は金銭・条件に触れるため、<strong>1通ごとに社長承認</strong>（<code>10_...md</code> §5）。</li></ol>
+</section>
+<hr class="rule">
+<section id="s2" class="sec">
+<h2>1. 送る前に必ず埋める差し込み欄</h2>
+<p>〔 〕は差し込み欄。<strong>実住所・電話番号・FAX番号はこのリポジトリに書きません</strong>（PUBLIC リポジトリのため）。送信時に差し込みます。</p>
+<div class="tw" tabindex="0"><table><thead><tr><th>欄</th><th>中身</th><th>どこから取るか</th></tr></thead><tbody><tr><td>〔メーカー名〕〔ご担当者名〕</td><td>敬称は「御中」／担当者名が分かれば「様」</td><td>メーカーリスト（T-20260920-002）</td></tr><tr><td>〔商品名〕</td><td><strong>メーカー公式サイトの表記を1字まで合わせる</strong>（Amazon の商品名ではない）</td><td>メーカー公式サイト</td></tr><tr><td>〔この商品のどこが良いと思ったか〕</td><td><strong>ここだけは1社ごとに書き下ろす。使い回し禁止</strong></td><td>下の §1-2</td></tr><tr><td>〔氏名〕〔住所〕〔電話番号〕</td><td>署名の法定表示</td><td>送信時に差し込む</td></tr></tbody></table></div>
+<h3 id="s2-1">1-2.「良いと思った理由」の書き方（この文面集で唯一、機械化してはいけない欄）</h3>
+<p>中村の指摘：<strong>テンプレの丸写しはダメ。複数の出品者から定型文ばかり届けばメーカーは嫌がる。</strong><br>実際、同じメーカーに送った2人のうち、文章を作り込んだ側だけ取引が決まった例が原典にあります（Chapter 6 Column）。</p>
+<p>書き方の型は1つだけ。<strong>カタログに書いてある性能をなぞらない。「誰のどんな場面で効くか」を1〜2文で書く。</strong></p>
+<div class="tw" tabindex="0"><table><thead><tr><th>悪い例（カタログの写し）</th><th>良い例（使う人から見た言い方）</th></tr></thead><tbody><tr><td>「ステンレス真空二重構造で保温力が高い点に魅力を感じました」</td><td>「飲み口が広く、氷が入る。夏場に車で持ち歩く方には、この一点が効くと思いました」</td></tr><tr><td>「抗菌加工されたまな板とのことで高品質と感じました」</td><td>「反りにくい厚みで、しかも食洗機に入る。毎日使う道具で、この2つが両立しているものは多くありません」</td></tr><tr><td>「御社の企業理念に共感いたしました」</td><td>（書かない。誰にでも書ける）</td></tr></tbody></table></div>
+<p><strong>1社あたり5分以内で書ける量に留める。</strong>書けなければ、その商品は理解できていないということなので、送る商品を変えます。</p>
+<p><strong>「どこで知ったか」を1句だけ混ぜる。</strong> 原典 Chapter 7-02 によると、メーカーが電話で聞いてくる定番の質問に「ウチの商品をどうやって知ったか」があります。メールの段階で「Amazon で拝見し」「〇〇の売り場で見かけ」と半句入れておくと、この質問が消えます。<strong>嘘は書かない</strong>（知った経路が Amazon なら、そう書く）。</p>
+</section>
+<hr class="rule">
+<section id="s3" class="sec">
+<h2>2. ①標準版（主力）</h2>
+<p><strong>件名</strong></p>
+<pre class="codeblock"><code>【お取引のご相談】〔商品名〕の仕入れについて（Satoy Select・佐藤）</code></pre>
+<blockquote><p>件名に「お取引のご相談」「仕入れ」を置くのは、開く前に「営業メール」と判定されないため。商品名を入れるのは、担当部署へ転送されやすくするためです。</p></blockquote>
+<p><strong>本文</strong></p>
+<pre class="codeblock"><code>〔メーカー名〕御中
+〔ご担当者名〕様
+
+突然のご連絡を失礼いたします。
+Amazon.co.jp でネットショップ「Satoy Select」を営んでおります、佐藤之則と申します。
+本日は売り込みではなく、御社の〔商品名〕を仕入れさせていただきたいというご相談です。
+
+〔この商品のどこが良いと思ったか：1〜2文〕
+
+はじめに、正直に申し上げたいことが2つございます。
+
+1つは、販売先が Amazon.co.jp であることです。Amazon での販売をご懸念なさるメーカー様が
+多いことは承知しております。価格が崩れないように売る方法がありますので、
+ご関心があればご説明いたします。
+
+もう1つは、当店にまだ1点も商品が並んでいないことです。2026年8月に開業し、
+いま最初に並べる商品を選んでいるところです。実績のない相手にご不安を感じられるのは当然ですので、
+御社にご負担のかからない形をご提案します。
+
+・初回は10点程度の小ロットで結構です。御社に在庫を持っていただく必要はありません
+・お支払いは前払い（銀行振込）で承ります。掛け取引の枠は不要です
+・販売価格は御社のご指定に従います。安売りで数を稼ぐことはいたしません
+
+まだ何も抱えていない店ですので、在庫をさばくために値下げをする事情がありません。
+本業も続けておりますので、生活のために売り急ぐこともありません。
+価格を守るお約束は、そのままお守りできます。
+
+私は普段、東京でタクシーの運転手をしております。毎日いろいろな方を乗せていると、
+「買ったけれどすぐ駄目になった」という話をよく聞きます。その一方で、
+良いものが知られないままになっているとも感じ、その間をつなぐ店をやりたいと考えました。
+
+お取引の方針は下記に公開しております。
+https://satoy-select.com/partners
+
+つきましては、下記をお知らせいただけますでしょうか。
+
+・卸価格（掛け率）
+・最低発注ロット
+・お支払い条件
+・納期の目安
+
+ご検討のほど、よろしくお願い申し上げます。
+
+〔署名（§8）〕</code></pre>
+</section>
+<hr class="rule">
+<section id="s4" class="sec">
+<h2>3. ②メーカー側のメリットを強めた版</h2>
+<p>①との差分は<strong>2箇所だけ</strong>（「できること4つ」の挿入と、冒頭の理由の具体化）。全文を別に書き起こさず、①の差し替えで運用します。</p>
+<p><strong>使う条件</strong>：送る前に、そのメーカーの商品の Amazon ページを見て、<strong>下の困りごとが実際に確認できたときだけ</strong>。確認できていないのに「お困りではありませんか」と書くと、見当違いの営業になります。</p>
+<div class="tw" tabindex="0"><table><thead><tr><th>画面で見える状態</th><th>相手の困りごと</th><th>当店が出せる手</th></tr></thead><tbody><tr><td>出品者が多く、価格が下がっている</td><td>値崩れ・ブランドの毀損</td><td>価格を下げない。下回っていれば当店から値上げ調整</td></tr><tr><td>商品名・画像・説明が公式と違う</td><td>情報の改変</td><td>公式情報を基準に整える。変更時は事前相談</td></tr><tr><td>レビューの質問・低評価に返答がない</td><td>販売後の手間</td><td>問い合わせ・レビュー・返品の一次対応は当店が引き受け</td></tr><tr><td>そもそも Amazon に出ていない</td><td>販路がない／やり方が分からない</td><td>出品・在庫・配送まで当店が担当。御社は卸すだけ</td></tr></tbody></table></div>
+<p><strong>差し替え①：冒頭3行目の後に1文を足す</strong></p>
+<pre class="codeblock"><code>〔商品名〕の Amazon のページを拝見したところ、〔見えた状態を1文。例：複数の出品者で価格が
+分かれており、公式サイトの表記と商品名が異なっておりました〕。
+差し出がましいのですが、この点で当店がお役に立てるのではないかと考え、ご連絡いたしました。</code></pre>
+<p><strong>差し替え②：「価格を守るお約束は〜」の段落の後に、できること4つを足す</strong></p>
+<pre class="codeblock"><code>取引が始まりましたら、当店で以下をお引き受けします。
+
+・価格を下げません。相場を下回っていれば、当店から値上げの調整をします
+・商品名・画像・説明は御社の公式情報を基準に整えます。変更が必要なときは事前にご相談します
+・お客様からのお問い合わせ、レビューへの返信、返品・交換の一次対応は当店が担当します
+・毎月、どの型番がいくつ・いくらで売れたかを御社にご報告します
+
+最後の販売状況のご報告は、御社が卸先からは受け取りにくい情報だと思います。
+売れ筋の把握にお使いいただければ幸いです。</code></pre>
+<blockquote><p><strong>なぜ「月次の販売報告」を最後に置いたか</strong>：4つのうち3つは「損をさせません」という守りの話で、相手にとっては当たり前の期待値です。<strong>能動的に差し上げられるものは、卸先から返ってこない売れ方のデータだけ</strong>。ここが①との本当の差分なので、最後に置いて1文だけ解説を付けました。</p></blockquote>
+</section>
+<hr class="rule">
+<section id="s5" class="sec">
+<h2>4. ③短文版</h2>
+<pre class="codeblock"><code>〔メーカー名〕御中
+
+突然のご連絡を失礼いたします。
+Amazon.co.jp でネットショップ「Satoy Select」を営んでおります、佐藤之則と申します。
+御社の〔商品名〕を仕入れさせていただきたく、ご連絡いたしました。
+
+〔この商品のどこが良いと思ったか：1文〕
+
+2026年8月に開業したばかりで、まだ販売実績はございません。
+初回は10点程度・前払いで承りますので、御社にご負担はおかけしません。
+販売価格は御社のご指定に従います。
+
+卸価格・最低発注ロット・お支払い条件をお知らせいただけますでしょうか。
+お取引の方針は https://satoy-select.com/partners に公開しております。
+
+〔署名（§8）〕</code></pre>
+<blockquote><p><strong>原典との相違を1点、意図して入れています。</strong> 中村の短文例は Amazon 販売に触れず、返信率を上げる代わりに後のやり取りで確認する作りです。本書の③は<strong>「Amazon.co.jp で」を残しました</strong>。理由は、社長が「Amazon 販売は正直に書く」を既定としているため（原典 Chapter 6-02 も、偽ると後の販売者限定化の交渉ができなくなると書いています）。省略は嘘ではありませんが、後から「実は Amazon です」と言う形になり、同じ不信を招きます。<strong>短くするのは Amazon の説明であって、Amazon の事実ではない</strong>、という切り分けです。</p></blockquote>
+</section>
+<hr class="rule">
+<section id="s6" class="sec">
+<h2>5. 使い分けと、期待する返信率</h2>
+<div class="tw" tabindex="0"><table><thead><tr><th>版</th><th>どういうメーカーに使うか</th><th>期待する返信率</th></tr></thead><tbody><tr><td>①標準</td><td>HP と問い合わせ窓口がある中小メーカー。主力。迷ったらこれ</td><td>10〜15%（推測）</td></tr><tr><td>②メリット強化</td><td>自社商品が既に Amazon にあり、値崩れ・情報の乱れ・無返答レビューが<strong>画面で確認できた</strong>メーカー</td><td>15〜20%（推測）。返信の中身が濃くなる分、成約に近い</td></tr><tr><td>③短文</td><td>フォームの入力欄が短い／大企業の総合窓口／宛先が部署名しか分からない</td><td>20〜25%（推測）。ただし条件の確認往復が2〜3回増える</td></tr></tbody></table></div>
+<p><strong>数字の出どころ（事実と推測の分離）</strong></p>
+<ul><li><strong>事実（原典）</strong>：メールでの<strong>成約</strong>は30〜50社に1社（＝2〜3%）。電話は10社に1社（＝10%）。</li><li><strong>事実（社内）</strong>：<code>09_真似する計画_改訂.md</code> の置き値は成約率 2%／1.5%。</li><li><strong>推測</strong>：上表の「返信率」は原典にも社内にも実測がありません。成約率2〜3%から逆算した見当です（返信のうち条件が合って成約に至るのは1〜2割と置いた）。<strong>最初の100通で実測に置き換えてください。</strong></li></ul>
+<p><strong>測る2つの数字</strong>（原典 Chapter 7-04 が週次で報告させている項目のうち、当社に要るもの）</p>
+<ol><li>送信数に対する返信率（版ごと・経路ごと）</li><li>見積りが届いた社数／うち利益が出た社数</li></ol>
+</section>
+<hr class="rule">
+<section id="s7" class="sec">
+<h2>6. 断られたときの切り返し（4分類）</h2>
+<p>原典が「ここで差がつく」と強調する箇所です。理由は反直感的ですが明快で、<strong>すぐ見積りが返ってくるメーカーはライバルも多い。一度断るメーカーはライバルが少ない</strong>（断られるとすぐ引く人が多いため）。</p>
+<blockquote><p><strong>原典は「切り返しはメールより電話のほうが気持ちが伝わる」と書いています。</strong> 当社は現時点で電話番号が未取得のため、ここではメール文面を主に置き、電話が使えるようになったら同じ内容を口頭で言う想定です（<code>11_050番号の料金と運用.md</code>）。<br><br><strong>ここから先の返信は §4.1 です。</strong> 条件・価格に触れるため、1通ごとに社長承認をいただいてから送ります。</p></blockquote>
+<h3 id="s7-1">6-1.「Amazon 販売・オンライン販売はお断りしています」→ <strong>粘る価値あり（最重要）</strong></h3>
+<p>原典の見立て：既に販売者を限定済みなら難しいが、<strong>理由が「何となく怖い」「価格破壊が起きやすい」「ブランドイメージが落ちる」と曖昧ならチャンス</strong>。</p>
+<pre class="codeblock"><code>ご検討いただき、ありがとうございました。
+
+差し支えなければ、1点だけ教えていただけますでしょうか。
+Amazon での販売をお断りされているのは、価格が崩れることへのご懸念でしょうか。
+それとも、すでに販売される方を限定しておられるということでしょうか。
+
+前者でしたら、当店でお役に立てるかもしれません。
+Amazon で価格が崩れるのには決まった原因がいくつかあり、それを起こさない売り方があります。
+当店はまだ1点も商品を並べておらず、値下げで数を稼ぐ必要がありません。
+御社がご指定される価格をそのまま守れる立場にあります。
+
+すでに限定しておられるのであれば、無理にお願いするつもりはございません。
+そのときは、その旨だけお知らせいただければ、以後ご連絡は控えます。</code></pre>
+<blockquote><p><strong>なぜ「理由を聞く」から入るか</strong>：いきなり反論すると押し売りになります。原典も「まず理由を再確認する」としています。<strong>二択で聞くのは、相手が1行で返せるようにするため。</strong><br><strong>なぜ最後に引き際を置くか</strong>：逃げ道を示した相手のほうが答えやすく、「限定済み」という貴重な情報が取れます。取れれば以後その社に送らずに済みます。<br><strong>価格崩壊の詳細をここで書かない理由</strong>：原典 Chapter 7-03「詳細な説明は相手が興味を持って質問してきたときに。一方的に話すのは逆効果」。<strong>質問が返ってきてから初めて中身を出します。</strong></p></blockquote>
+<h3 id="s7-2">6-2.「実店舗がないとお取引できません」→ <strong>1往復だけして、引く</strong></h3>
+<p>原典の見立て：かなり厳しい。<strong>実店舗や卸業者だと偽って黙って Amazon で売るのは論外</strong>。粘るより「価格を守って販売する方法がある」と伝えたほうがよい。</p>
+<pre class="codeblock"><code>ご事情を承知いたしました。ご検討いただきありがとうございました。
+
+1点だけ申し添えます。
+店舗をお持ちの販売先をご指定なさっているのは、販売価格や売り方を管理できることが
+理由ではないかと拝察いたします。
+当店は Amazon の1店舗のみで、御社のご指定価格を守って販売いたします。
+もし将来ご方針が変わることがございましたら、そのときにまたご相談させてください。
+
+今後ともよろしくお願い申し上げます。</code></pre>
+<blockquote><p><strong>1往復で引く</strong>と決めているのは、この分類の成功確率が低く、粘ると印象だけ悪くなるからです。<strong>「将来方針が変わったら」で終えるのは、名簿に残す作法</strong>。半年後に再送する候補になります。</p></blockquote>
+<h3 id="s7-3">6-3.「現在、新規のお取引先は募集しておりません」→ <strong>理由で分岐。時期を聞く</strong></h3>
+<p>原典の見立て：限定化済みなら難しい。<strong>生産が追いついていない等の理由なら、様子を見て再アプローチ</strong>。</p>
+<pre class="codeblock"><code>承知いたしました。ご返信いただきありがとうございます。
+
+差し支えなければ、1点だけ教えていただけますでしょうか。
+お取引先を限定されているということでしょうか。それとも、生産の状況などにより
+一時的に見合わせておられるということでしょうか。
+
+後者でしたら、時期を改めてご相談させていただければと思います。
+「このころにまた」という目安がございましたら、それに合わせてご連絡いたします。
+
+今後ともよろしくお願い申し上げます。</code></pre>
+<blockquote><p><strong>「一時的ですか」という逃げ道を先に用意する</strong>のがこの文の要点です。断る側は理由を細かく説明したくありません。二択にすれば1語で返せます。<br><strong>運用</strong>：「一時的」の返答が来たら、再送予定日をメーカーリストに記入。目安が無ければ<strong>6ヶ月後</strong>に置きます。</p></blockquote>
+<h3 id="s7-4">6-4.「法人でないとお取引できません」→ <strong>押さない。名簿に残して終わる</strong></h3>
+<p>原典の見立て：<strong>「国内メーカー直取引は法人でないとできない」は大きな誤解で、個人事業主でも応じるメーカーは多数ある</strong>。ただし稀にこう言うメーカーがあるのも事実で、その場合は法人化後に再アプローチ。</p>
+<pre class="codeblock"><code>承知いたしました。ご検討いただきありがとうございました。
+
+当方は個人事業主で、2026年8月に開業届を提出しております。
+法人化は今後の売上の状況を見ながら判断してまいります。
+その際には、あらためてご相談させていただければ幸いです。
+
+今後ともよろしくお願い申し上げます。</code></pre>
+<blockquote><p><strong>反論しない</strong>理由：これは相手の社内規程であることが多く、担当者に裁量がありません。ここで粘ると、法人化後に再訪したときの心証まで悪くします。<br><strong>「開業届を提出しております」の1行</strong>は、事業者であることの裏付けとして入れています（e-Tax 受信通知あり）。ただし提出を求められたら §4.1（機密情報の外部送信）なので、社長の承認を取ってからお送りします。</p></blockquote>
+</section>
+<hr class="rule">
+<section id="s8" class="sec">
+<h2>7. 見積りで利益が出ないときの返し（3切り口）</h2>
+<p>原典 Chapter 8-05。<strong>10社中1社でも通れば勝ち</strong>（他の人はすぐ諦めるので、ここで差別化できる）。実例では切り返し1つで6掛けが5掛けになったケースがあります。</p>
+<p><strong>3つを1通に全部入れないでください。</strong> 3つ並べると値切りの詰問になります。<strong>①＋②</strong>か、<strong>②＋③</strong>の2つまで。</p>
+<div class="tw" tabindex="0"><table><thead><tr><th>切り口</th><th>中身</th><th>いつ使うか</th></tr></thead><tbody><tr><td>① 数量を増やしたときの掛け率</td><td>最初の見積りが7〜8掛けなら、1個単位の条件を提示されている可能性がある</td><td>見積りの掛け率が明らかに高いとき</td></tr><tr><td>② 正直に「これでは利益が出ない」と言う</td><td>＋長期取引での改善余地／既存の Amazon 出品者と同条件にする道はあるか</td><td>基本。どの場面でも使える</td></tr><tr><td>③ 小売と卸で掛け率が違うか</td><td>商流上、卸業者のほうが掛け率は良い。小売6掛け・卸5掛けと分けているメーカーは実在する</td><td>相手が卸問屋も持っているとき</td></tr></tbody></table></div>
+<p><strong>文面（②＋①）</strong></p>
+<pre class="codeblock"><code>お見積りをお送りいただき、ありがとうございました。
+
+正直に申し上げます。いただいた条件ですと、Amazon の手数料を差し引いたあとに
+利益が残らず、このままではお取引を始められない状況です。
+御社の商品はぜひ扱わせていただきたいので、条件について3点だけ伺わせてください。
+
+・発注数量を増やした場合、掛け率は変わりますでしょうか
+・最初は小さく始めさせていただき、売れ行きを見ながら数量を増やしてまいります。
+　継続的にお取引させていただく中で、卸値をご相談できる余地はございますでしょうか
+・現在 Amazon で御社商品を販売されている方がいらっしゃいますが、
+　その方々と同じ条件にしていただくには、何が必要でしょうか
+
+条件が合いましたら、初回から発注させていただきたいと考えております。
+ご検討のほど、よろしくお願い申し上げます。</code></pre>
+<p><strong>文面（③を足す場合の差し替え）</strong></p>
+<pre class="codeblock"><code>・御社では、小売店と卸業者とで掛け率を分けておられますでしょうか。
+　分かれている場合、卸業者と同じ条件にしていただくには、どの程度の数量が必要でしょうか</code></pre>
+<blockquote><p><strong>なぜ「正直に利益が出ない」と最初に書くか</strong>：原典の指示そのままです。理由を伏せて値切ると、ただ安く買いたい客になります。<strong>「Amazon の手数料を差し引くと」まで書くと、値切りではなく計算の話になります。</strong><br><strong>なぜ最後に「初回から発注させていただきたい」を置くか</strong>：原典は「一度商品を買って客になってから交渉するとスムーズ」と書いています。当社はまだ買っていないので、<strong>買う意思を言葉で先に置くのが代替</strong>になります。確約語（発注します）は使わず「考えております」で止めています。<br><strong>具体的な数量・金額をこちらから書かない</strong>理由：金額は §4.1。社長の承認が要ります。</p></blockquote>
+</section>
+<hr class="rule">
+<section id="s9" class="sec">
+<h2>8. 署名（全通共通・法定表示）</h2>
+<p><code>10_大量送信の法規と苦情ルール.md</code> §6 の確定版をそのまま使います。<strong>5行を1行でも削ると特定電子メール法4条の表示義務を満たさなくなります。</strong></p>
+<pre class="codeblock"><code>――――――――――――――――
+送信者：Satoy Select（〔氏名〕）
+住所：〔住所〕
+電話：〔電話番号〕
+メール：info@satoy-select.com
+取引先向けのご案内：https://satoy-select.com/partners
+今後このようなご連絡が不要な場合は、本メールに「不要」とご返信ください。以後お送りいたしません。
+いただいたご担当者様のお名前・ご連絡先は、本件のお取引のご相談にのみ使用いたします。
+――――――――――――――――</code></pre>
+<ul><li><strong>載せてよい URL は <code>/partners</code> の1本だけ。</strong> トップ・<code>/about</code>・<code>/guide-*</code> は消費者向けの案内なので、貼ると「広告又は宣伝のサイトへの誘導」に当たります。</li><li>電話番号が未取得の間は、その行を削ってかまいません（施行規則9条3号は電話・メール・URL のいずれかで足ります）。</li><li>問い合わせフォームから送る場合、法の義務はありませんが、<strong>同じ署名を本文末尾に貼ります</strong>。会社名欄は「Satoy Select（〔氏名〕）」。</li></ul>
+</section>
+<hr class="rule">
+<section id="s10" class="sec sec-box sec-checklist">
+<h2>9. 送信前チェックリスト</h2>
+<ul><li>[ ] 〔商品名〕は<strong>メーカー公式サイトの表記</strong>か（Amazon の商品名を写していないか）</li><li>[ ] 「良いと思った理由」は、この1社のために書き下ろしたか</li><li>[ ] 署名7行が入っているか。URL は <code>/partners</code> 1本だけか</li><li>[ ] 実住所・電話番号を差し込んだか（リポジトリ側は〔 〕のまま）</li><li>[ ] 送信先が拒否リストに載っていないか（法人番号とドメインで突合）</li><li>[ ] 送信先の窓口に「営業・売り込みお断り」「自動送信お断り」の表示がないか</li><li>[ ] 独占・限定・総代理の語が1語も入っていないか（初回で書かない）</li><li>[ ] 卸値・掛け率の実数を書いていないか</li><li>[ ] 社長の週次一括承認の範囲内か（型ID・件数・期間）</li></ul>
+</section>
+<hr class="rule">
+<section id="s11" class="sec">
+<h2>10. なぜこの表現にしたか（設計意図）</h2>
+<p><strong>① 出品0件を、文の「弱点」ではなく「構造」に置いた。</strong><br>これが本書でいちばん難しいところでした。取れた解は、事実→条件→意味の3段です。</p>
+<ol><li>事実：「まだ1点も商品が並んでいません」（ぼかさない。「開店準備中」は逃げ）</li><li>条件：初回10点・前払い・価格は御社指定（相手の損失をゼロにする）</li><li>意味：「何も抱えていない店ですので、在庫をさばくために値下げをする事情がありません」</li></ol>
+<p>3が無ければ、ただの実績ゼロの申告で終わります。<strong>「何も持っていない」を「値下げの動機がない」に読み替える</strong>ことで、初めて相手の関心事（価格が崩れること）に接続します。</p>
+<p><strong>② タクシードライバーを「人柄の話」で終わらせなかった。</strong><br>原典は強み（経験・職業・資格）を書けと言いますが、職業を書いただけでは自己紹介です。<strong>本業があること＝生活費を物販に依存していない＝投げ売りしない</strong>、という因果でつないで、①の「値下げの動機がない」を二重に支える位置に置きました。ここは当社固有の材料で、他のセラーには書けません。</p>
+<p><strong>③ 5つのお約束を本文に書かず、URL に逃がした。</strong><br><code>https://satoy-select.com/partners</code> には既に5項目が公開されています。<strong>本文で宣言するより、送る前から公開されていた事実のほうが強い</strong>（先に書いたものは後から都合よく変えられないため）。本文が長くなる問題も同時に解けます。</p>
+<p><strong>④ 価格崩壊の対策は「ある」とだけ書いた。</strong><br>原典の指示（一方的に話すのは逆効果）に従いました。これは駆け引きではなく、<strong>相手が質問してきた＝その困りごとが実在する</strong>という選別にもなります。</p>
+<p><strong>⑤ 「実績があります」「専門家です」と書かない。</strong><br>原典は「Amazon 販売の専門家であること」を伝えよとしていますが、<strong>当社はまだ1点も売っていないので、そう名乗ると虚偽になります</strong>。代わりに「価格が崩れる原因と、それを起こさない売り方を知っている」という、実績に依存しない言い方に置き換えました。</p>
+<p><strong>⑥ 分量は機械で数えました（宛名・署名・差し込み欄を除いた本文の実測値）</strong></p>
+<div class="tw" tabindex="0"><table><thead><tr><th>版</th><th>実測</th></tr></thead><tbody><tr><td>①標準版</td><td><strong>785字</strong></td></tr><tr><td>②メリット強化版</td><td><strong>1,088字</strong>（①＋差し替え303字）</td></tr><tr><td>③短文版</td><td><strong>258字</strong></td></tr><tr><td>署名（全通共通）</td><td>213字</td></tr></tbody></table></div>
+<p>原典は「長文になり過ぎるとNG」としており、<strong>①は正直に申し上げて上限ぎりぎり、②は超えています。</strong> ②を「画面で困りごとが確認できた相手だけ」に限っているのは、この長さを相手が読む動機がある場合に限定するためです。</p>
+<p><strong>入力欄に制限があるときや、短くしたいときの削る順</strong>（上から削る）</p>
+<ol><li>タクシーの段落（人柄の話。削っても条件の提示は壊れない）</li><li>「お取引の方針は下記に公開しております」の1文（URL は署名にも入っているため）</li><li>「はじめに、正直に申し上げたいことが2つございます」の前置き（本題に直結させる）</li><li>「Amazon での販売をご懸念なさるメーカー様が多いことは承知しております」の1文</li></ol>
+<p><strong>削らないもの</strong>：Amazon であることの開示／出品0件の開示／ロット・支払い・価格の3行／署名。<strong>「はい」と言える材料そのもの</strong>だからです。1〜4を全部削ると①は約480字になり、③短文版との中間の長さになります。</p>
+</section>
+<hr class="rule">
+<section id="s12" class="sec sec-box sec-alert">
+<h2>11. この文面集の限界（先に申し上げておくこと）</h2>
+<div class="tw" tabindex="0"><table><thead><tr><th>#</th><th>限界</th><th>影響</th></tr></thead><tbody><tr><td>1</td><td><strong>返信率は推測です。</strong> 原典・社内のどちらにも実測がありません</td><td>最初の100通で実測に置き換えてください。版ごとに分けて数えないと比較できません</td></tr><tr><td>2</td><td><strong>電話の台本は作っていません。</strong> 電話番号が未取得のため</td><td>原典は「切り返しはメールより電話」としており、成約率も3〜5倍（10社に1社）。番号が決まったら台本が必要です</td></tr><tr><td>3</td><td><strong>FAX 版は作っていません。</strong> ネット FAX が未契約のため</td><td>原典は「メールに反応しなくても FAX に反応するメーカーは多い」としています</td></tr><tr><td>4</td><td><strong>会社概要の添付/リンクの扱いは未確定。</strong> PDF を Google ドライブに置いて共有リンクを送る運用が原典の推奨ですが、<code>/partners</code> への URL 1本に絞る法務判断と衝突する可能性があります</td><td>相手から「会社概要を送ってほしい」と言われたときは添付で送る（誘導ではないので問題なし）。こちらから先に貼るのは避けています</td></tr><tr><td>5</td><td><strong>②の「Amazon ページの現状」は1社ずつ目視が要ります。</strong> 機械で判定していません</td><td>②は使える社数が限られます。①が主力である前提は変わりません</td></tr></tbody></table></div>
+</section>
+<p class="prov">HTML版。内容の唯一の正は 14_メーカー初回交渉メール文面集.md です。送信は CLAUDE.md §4.1（第三者連絡）に該当するため、本書は下書きです。</p>
+</div>
+<a class="top" href="#top" aria-label="先頭へ戻る">&#8593;</a>
+</body>
+</html>
