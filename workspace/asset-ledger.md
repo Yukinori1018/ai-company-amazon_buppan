@@ -43,7 +43,7 @@ ASSET: 消費税の設定 | 登録済み セラセン確定値＝納税義務「
 
 ### 販売・仕入れのアカウント
 
-ASSET: Amazon出品アカウント | 保有（日本＝大口・2026-09-12 切替／2026-09-20 時点で日本・米国・カナダ・メキシコの4ストアとも出品ステータスは「停止中」。再開手続き進行中） | project_amazon_account_ledger / T-20260920-001
+ASSET: Amazon出品アカウント | 保有（**日本ストアは2026-09-20に本人確認完了で復活・出品可**／大口／北米3ストアは停止中） | project_amazon_account_ledger
 ASSET: Amazonセラーセントラル | 保有（アカウント自体は保有。ログイン入口は project_amazon_login_entrypoint） | project_amazon_account_ledger
 ASSET: Amazonビジネス | 登録済み B2B（セラセン「サービスの管理」で画面確認） | T-20260603-006
 ASSET: NETSEA | 保有 バイヤー会員（無料・satoyselect 名義）。承認サプライヤー100社を API で実測取得済み | T-20260606-001 / reference_business_accounts
@@ -202,6 +202,7 @@ ASSET: 夜間自走launchd | 未稼働（night-shift.sh が不在。復旧の要
 | GitHub アカウント／リポジトリ | 自動同期が動いている＝保有は確実だが、プラン（無料/Pro）の記録が無い | GitHub 設定画面 |
 
 ### 更新履歴
+- 2026-09-21 Amazon日本ストアの復活を反映（ケース3520779323 完了）。
 - 2026-09-21 キーゾンを追加（社長申告）。
 - 2026-09-21 新設。3度目の同型事故（書籍のチェックリストを当てはめ、保有済みの独自ドメイン・HP・会社概要を「未整備」と報告）を受けて。初版は18件。
 - 2026-09-21 **全件棚卸し（マリエ）**。`workspace/tickets/done/` 全件・`workspace/output/deliverables/` 全件・`scripts/` `.claude/hooks/` `.claude/commands/` `docs/reference/`・memory を突き合わせ、**18行 → 保有側81行／未保有側17行**へ拡充。キーワードの部分文字列衝突（保有キーワードが未保有キーワードに含まれて誤ブロックする）を検査し、`屋号`→`Satoy Select`、`Keepa`→`Keepa API` に付け替えて解消。あわせて Amazon 出品アカウントの状態を訂正（旧「北米は停止中」→ 2026-09-20 実画面で**4ストアとも停止中**）。裏の取れなかった5件は「要確認」として別掲。
