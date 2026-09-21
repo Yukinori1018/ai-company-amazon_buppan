@@ -1,330 +1,29 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>丸進への初回問い合わせ文（SD メッセージ）</title>
-<meta name="robots" content="noindex, nofollow">
-<style>
-:root{
-  color-scheme: light dark;
-  --bg:#ffffff; --surface:#f5f7f9; --surface2:#eceff3;
-  --text:#1b1f24; --muted:#525b66; --faint:#6c7681;
-  --border:#d5dae1; --border-strong:#b8c0ca;
-  --accent:#1c5b86; --accent-bg:#eef5fa;
-  --warn:#8a4b00; --warn-bg:#fdf1df; --warn-border:#dd9a3c;
-  --alert:#7d2b2b; --alert-bg:#fbeeee; --alert-border:#d08b8b;
-  --ok:#1b6144; --ok-bg:#eaf4ef; --ok-border:#8ab9a3;
-}
-@media (prefers-color-scheme: dark){
-  :root{
-    --bg:#15181c; --surface:#1d2126; --surface2:#252a31;
-    --text:#e4e8ec; --muted:#aab4bf; --faint:#949eaa;
-    --border:#333a43; --border-strong:#48515c;
-    --accent:#79b4dc; --accent-bg:#1a2a36;
-    --warn:#f0b866; --warn-bg:#332616; --warn-border:#7a5a2a;
-    --alert:#e79a9a; --alert-bg:#331e1e; --alert-border:#6e4040;
-    --ok:#84cfa9; --ok-bg:#17281f; --ok-border:#3c6450;
-  }
-}
-*{box-sizing:border-box;}
-html{ -webkit-text-size-adjust:100%; }
-body{
-  margin:0; background:var(--bg); color:var(--text);
-  font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic Medium","Yu Gothic",
-              "Noto Sans JP","Meiryo",system-ui,-apple-system,"Segoe UI",sans-serif;
-  font-size:16px; line-height:1.85;
-  font-feature-settings:"palt" 1;
-  text-align:left;
-}
-.wrap{max-width:900px; margin:0 auto; padding:32px 20px 96px;}
-
-/* ---------- header ---------- */
-.kicker{
-  font-size:12px; letter-spacing:.14em; color:var(--faint);
-  margin:0 0 10px; font-variant-numeric:tabular-nums;
-}
-h1{
-  font-size:27px; line-height:1.5; margin:0 0 20px;
-  letter-spacing:.01em; font-weight:700; text-wrap:balance;
-}
-.lead{
-  margin:0; color:var(--muted); font-size:15px; line-height:1.8;
-  border-left:3px solid var(--border-strong); padding:2px 0 2px 14px;
-}
-
-/* ---------- toc ---------- */
-.toc{
-  margin:30px 0 8px; padding:18px 22px 20px;
-  background:var(--surface); border:1px solid var(--border); border-radius:10px;
-}
-.toc-h{
-  margin:0 0 10px; font-size:13px; font-weight:700;
-  letter-spacing:.1em; color:var(--muted);
-}
-.toc ul.toc-list{margin:0; padding:0; list-style:none;}
-.toc li{margin:.26em 0; line-height:1.65;}
-.toc li.toc-lv1{margin:.85em 0 .3em; font-weight:700;}
-.toc li.toc-lv1:first-child{margin-top:0;}
-.toc li.toc-lv2{padding-left:1.1em;}
-.toc li.toc-lv3{padding-left:2.5em; font-size:14.5px; color:var(--muted); margin:.16em 0;}
-.toc li.toc-lv3::before{content:"–"; color:var(--faint); margin-right:.45em;}
-.toc a{color:var(--accent); text-decoration:none; border-bottom:1px solid transparent;}
-.toc a:hover{border-bottom-color:currentColor;}
-
-/* ---------- part ---------- */
-h1.part{
-  font-size:24px; line-height:1.5; font-weight:700; letter-spacing:.02em;
-  margin:64px 0 8px; padding:14px 0 0; border-top:4px solid var(--text);
-  scroll-margin-top:16px;
-}
-
-/* ---------- sections ---------- */
-.sec{margin:0;}
-.sec>*:last-child{margin-bottom:0;}
-h2{
-  font-size:21px; line-height:1.5; margin:46px 0 16px; padding-bottom:9px;
-  border-bottom:2px solid var(--border-strong); font-weight:700;
-  scroll-margin-top:16px;
-}
-h3{
-  font-size:17px; line-height:1.6; margin:32px 0 12px; font-weight:700;
-  color:var(--text); scroll-margin-top:16px;
-}
-h3::before{content:""; display:inline-block; width:4px; height:1em;
-  background:var(--accent); margin-right:9px; vertical-align:-.13em; border-radius:2px;}
-p{margin:0 0 1.1em;}
-ul,ol{margin:0 0 1.2em; padding-left:1.6em;}
-li{margin:.4em 0;}
-li>ul{margin:.45em 0 .2em;}
-blockquote{
-  margin:0 0 1.2em; padding:14px 18px;
-  background:var(--surface); border-left:4px solid var(--accent); border-radius:0 8px 8px 0;
-}
-blockquote p{margin:0;}
-hr.rule{
-  border:0; border-top:1px solid var(--border);
-  margin:40px 0 0; opacity:.55;
-}
-hr.rule:has(+ .sec-box),hr.rule:has(+ h1.part){display:none;}
-
-/* ---------- tables ---------- */
-.tw{
-  overflow-x:auto; -webkit-overflow-scrolling:touch;
-  margin:0 0 1.4em; border:1px solid var(--border); border-radius:9px;
-  background:
-    linear-gradient(to right, var(--bg) 30%, rgba(0,0,0,0)) left / 28px 100% no-repeat local,
-    linear-gradient(to left,  var(--bg) 30%, rgba(0,0,0,0)) right / 28px 100% no-repeat local,
-    radial-gradient(farthest-side at 0 50%, rgba(90,110,130,.28), rgba(0,0,0,0)) left / 12px 100% no-repeat scroll,
-    radial-gradient(farthest-side at 100% 50%, rgba(90,110,130,.28), rgba(0,0,0,0)) right / 12px 100% no-repeat scroll;
-}
-.tw:focus{outline:2px solid var(--accent); outline-offset:2px;}
-table{border-collapse:collapse; width:100%; font-size:14.5px; line-height:1.72;}
-thead th{
-  background:var(--surface2); text-align:left; font-weight:700;
-  padding:11px 14px; border-bottom:2px solid var(--border-strong);
-  white-space:nowrap; vertical-align:bottom;
-}
-tbody td{padding:11px 14px; border-bottom:1px solid var(--border); vertical-align:top;
-  overflow-wrap:anywhere;}
-tbody tr:last-child td{border-bottom:0;}
-tbody tr:nth-child(even){background:color-mix(in srgb, var(--surface) 55%, transparent);}
-tbody td:first-child{font-weight:600;}
-thead th:first-child,tbody td:first-child{min-width:7.5em;}
-thead th:last-child,tbody td:last-child{white-space:normal;}
-
-/* ---------- inline markers ---------- */
-.ref{
-  font-size:.75em; color:var(--faint); margin-left:.15em;
-  white-space:nowrap; font-variant-numeric:tabular-nums;
-  letter-spacing:.01em; vertical-align:.06em;
-}
-/* [#n] は出典表に行がある時だけリンクになる。見た目は span と同じにして
-   本文の印象を変えない（追加したのは移動手段だけで、文字は足していない） */
-a.ref{text-decoration:none;}
-a.ref:hover,a.ref:focus{color:var(--accent); text-decoration:underline;}
-.chk{
-  display:inline-block; font-size:.75em; line-height:1.5;
-  padding:0 .5em; margin:0 .12em; border-radius:4px;
-  background:var(--warn-bg); color:var(--warn);
-  border:1px solid var(--warn-border); font-weight:700;
-  white-space:nowrap; vertical-align:.09em;
-}
-
-/* ---------- inline emphasis ---------- */
-strong{font-weight:700; color:var(--text);}
-td strong,th strong{font-weight:700;}
-pre.codeblock{white-space:pre-wrap; word-break:break-all; background:rgba(127,127,127,.10); border:1px solid rgba(127,127,127,.35); border-radius:6px; padding:14px 16px; line-height:1.7; font-size:14px; overflow-x:auto;}
-pre.codeblock code{background:none; border:0; padding:0; font-size:inherit;}
-code{
-  font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
-  font-size:.9em; padding:.05em .35em; border-radius:4px;
-  background:var(--surface2); border:1px solid var(--border);
-}
-code .chk{font-family:inherit;}
-
-/* ---------- 表セル内の語ハイライト ---------- */
-.pill{
-  display:inline-block; padding:0 .45em; border-radius:4px;
-  font-weight:700; white-space:nowrap;
-}
-.pill-danger{background:var(--alert); color:#fff; border:1px solid var(--alert);}
-.pill-warn{background:var(--warn-bg); color:var(--warn); border:1px solid var(--warn-border);}
-.pill-ok{background:var(--ok-bg); color:var(--ok); border:1px solid var(--ok-border);}
-.pill-info{background:var(--accent-bg); color:var(--accent); border:1px solid var(--accent);}
-/* muted は「検証していない」を表す。塗らず・破線で、済んだものと視覚的に別系統にする */
-.pill-muted{background:transparent; color:var(--faint);
-  border:1px dashed var(--border-strong); font-weight:600;}
-tbody tr.row-danger td:first-child{box-shadow:inset 4px 0 0 var(--alert);}
-tbody tr.row-danger td{background:color-mix(in srgb, var(--alert-bg) 70%, transparent);}
-
-/* ---------- 出典一覧（--reftable） ---------- */
-table.reftable:has(colgroup){table-layout:fixed; min-width:600px;}
-/* 狭い画面で列が1〜2文字幅に潰れるのを防ぐ。溢れは .tw の横スクロールが受ける */
-table.reftable td:first-child{
-  min-width:2.6em; width:2.6em; text-align:right; white-space:nowrap;
-  font-variant-numeric:tabular-nums; color:var(--muted);
-}
-table.reftable th:first-child{min-width:2.6em; width:2.6em; text-align:right;}
-tbody tr[id]{scroll-margin-top:14px;}
-tbody tr[id]:target td{background:var(--accent-bg);}
-tbody tr[id]:target td:first-child{box-shadow:inset 4px 0 0 var(--accent); color:var(--accent);}
-
-/* ---------- emphasised sections ---------- */
-.sec-box{
-  margin:28px 0 0; padding:6px 26px 20px;
-  border:1px solid var(--border-strong); border-radius:10px;
-}
-.sec-box h2{margin-top:26px;}
-.sec-box .tw{background-color:var(--bg);}
-.sec-conclusion{background:var(--accent-bg); border-left:6px solid var(--accent);}
-.sec-conclusion h2{border-bottom-color:var(--accent);}
-.sec-alert{background:var(--alert-bg); border-color:var(--alert-border);
-  border-left:6px solid var(--alert);}
-.sec-alert h2{border-bottom-color:var(--alert-border);}
-.sec-danger{background:var(--alert-bg); border:2px solid var(--alert);
-  border-left:10px solid var(--alert);}
-.sec-danger h2{border-bottom-color:var(--alert);}
-.sec-warn{background:var(--warn-bg); border-color:var(--warn-border);
-  border-left:6px solid var(--warn-border);}
-.sec-warn h2{border-bottom-color:var(--warn-border);}
-.sec-checklist{background:var(--surface); border:2px solid var(--border-strong);
-  border-left:10px solid var(--accent);}
-.sec-checklist h2{border-bottom-color:var(--accent);}
-/* チェックリストは印刷して手元で使う。番号は原稿どおり残し、記入欄だけ CSS で足す */
-.sec-checklist ol{list-style:decimal; padding-left:1.9em;}
-.sec-checklist ol>li{margin:.7em 0; padding-left:2.1em; position:relative;}
-.sec-checklist ol>li::before{
-  content:""; position:absolute; left:0; top:.25em;
-  width:1.15em; height:1.15em; border:1.5px solid var(--border-strong);
-  border-radius:3px; background:var(--bg);
-}
-
-/* ---------- toc: 囲み枠の節は目次でも色を付ける ---------- */
-.toc a.toc-danger,.toc a.toc-alert{color:var(--alert); font-weight:700;}
-.toc a.toc-warn{color:var(--warn); font-weight:700;}
-.toc a.toc-checklist{color:var(--accent); font-weight:700;}
-
-/* ---------- footer / nav ---------- */
-.prov{
-  margin:56px 0 0; padding-top:16px; border-top:1px solid var(--border);
-  font-size:12.5px; line-height:1.8; color:var(--faint); word-break:break-all;
-}
-.top{
-  position:fixed; right:18px; bottom:18px; z-index:5;
-  display:block; width:42px; height:42px; line-height:40px; text-align:center;
-  border-radius:50%; text-decoration:none; font-size:17px;
-  background:var(--surface); color:var(--muted);
-  border:1px solid var(--border-strong);
-  box-shadow:0 2px 8px rgba(0,0,0,.14);
-}
-.top:hover{color:var(--accent); border-color:var(--accent);}
-
-/* ---------- narrow screens ---------- */
-@media (max-width:640px){
-  body{font-size:15.5px;}
-  .wrap{padding:22px 14px 88px;}
-  h1{font-size:22px;}
-  h1.part{font-size:20px; margin-top:46px;}
-  h2{font-size:19px;}
-  h3{font-size:16.5px;}
-  .toc{padding:14px 16px 16px;}
-  .sec-box{padding:4px 14px 14px;}
-  table{font-size:14px;}
-  thead th,tbody td{padding:9px 11px;}
-}
-
-/* ---------- print ---------- */
-@media print{
-  :root{
-    --bg:#fff; --surface:#fff; --surface2:#fff; --text:#000; --muted:#333; --faint:#555;
-    --border:#999; --border-strong:#555; --accent:#000; --accent-bg:#fff;
-    --warn:#000; --warn-bg:#fff; --warn-border:#000;
-    --alert:#000; --alert-bg:#fff; --alert-border:#000;
-  }
-  body{background:#fff; color:#000; font-size:10.5pt; line-height:1.7;}
-  .wrap{max-width:none; padding:0;}
-  a{color:#000; text-decoration:none;}
-  .top{display:none;}
-  .tw{overflow:visible; background:none; border:1px solid #999;}
-  table{font-size:9pt;}
-  thead th{background:#fff; border-bottom:1.5pt solid #000;}
-  tbody tr:nth-child(even){background:#fff;}
-  .sec-box{background:#fff; border:1.5pt solid #000;}
-  .sec-danger{border:2.5pt solid #000; border-left:2.5pt solid #000;}
-  .chk{background:#fff; color:#000; border:1pt solid #000;}
-  pre.codeblock{background:#fff; border:1px solid #999; break-inside:avoid;}
-  code{background:#fff; border:1px solid #999;}
-  .pill{background:#fff!important; color:#000!important; border:1.2pt solid #000!important;}
-  /* 未検証は印刷でも「済んだもの」と別に見えなければ意味がない。
-     モノクロでは色が消えるので、破線と濃度で差を残す */
-  .pill-muted{border:1pt dashed #666!important; color:#555!important; font-weight:400!important;}
-  /* 長いURLは印刷で紙幅を超える。折り返しを許可して溢れを止める */
-  .tw{overflow:hidden;}
-  table{table-layout:auto; width:100%;}
-  tbody td{overflow-wrap:anywhere; word-break:break-word;}
-  thead th{white-space:normal;}
-  table.reftable{font-size:7.6pt; line-height:1.5;}
-  table.reftable thead th,table.reftable tbody td{padding:5px 6px;}
-  tbody tr[id]:target td{background:#fff;}
-  tbody tr.row-danger td{background:#fff;}
-  tbody tr.row-danger td:first-child{box-shadow:inset 3pt 0 0 #000;}
-  /* チェックリストは1枚で手元に置けるよう独立ページにする */
-  .sec-checklist{break-before:page; page-break-before:always;
-    border:1.5pt solid #000; border-left:1.5pt solid #000;}
-  .sec-checklist ol>li::before{border:1.2pt solid #000;}
-  .ref{color:#555; opacity:1;}
-  blockquote{background:#fff; border-left:3pt solid #000;}
-  h1.part{break-before:page; page-break-before:always; border-top:2.5pt solid #000;
-    font-size:15pt; margin-top:0;}
-  h1.part,h2,h3{break-after:avoid; page-break-after:avoid;}
-  .tw,blockquote,tr{break-inside:avoid; page-break-inside:avoid;}
-  .toc{border:1px solid #999; background:#fff;}
-}
-</style>
-</head>
-<body id="top">
-<div class="wrap">
-<p class="kicker">T-20260920-003 / ヒデアキ 2026-09-20</p>
+<!doctype html><html lang='ja'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>丸進への初回問い合わせ文（SD メッセージ）</title><style>body{font-family:-apple-system,'Hiragino Sans','Noto Sans JP',sans-serif;max-width:1150px;margin:2em auto;padding:0 1em;line-height:1.65;color:#222;font-size:14.5px}table{border-collapse:collapse;margin:.8em 0;font-size:.92em}th,td{border:1px solid #bbb;padding:.35em .6em;vertical-align:top}th{background:#eef2f8}tr:nth-child(even) td{background:#fafafa}h1{font-size:1.5em;border-bottom:2px solid #444}h2{font-size:1.25em;border-left:5px solid #25b;padding-left:8px;margin-top:1.8em}h3{font-size:1.05em;margin-top:1.4em}blockquote{border-left:4px solid #ccc;margin:.8em 0;padding:.2em 1em;color:#444}code{background:#f3f3f3;padding:1px 4px;border-radius:3px}hr{border:0;border-top:1px solid #ccc;margin:1.6em 0}</style></head><body>
 <h1>丸進への初回問い合わせ文（SD メッセージ）</h1>
-
-<nav class="toc" aria-label="目次"><p class="toc-h">目次</p><ul class="toc-list"><li class="toc-lv2"><a href="#s1">1. 送信の前提</a></li><li class="toc-lv2"><a href="#s2">2. 件名</a></li><li class="toc-lv2"><a href="#s3" class="toc-conclusion">3. 本文（このまま貼れます）</a></li><li class="toc-lv2"><a href="#s4">4. なぜこの表現にしたか</a></li><li class="toc-lv3"><a href="#s4-1">4-1. 件名で「Amazon」を単独露出させない</a></li><li class="toc-lv3"><a href="#s4-2">4-2. 質問1（Amazon 可否）を先頭に置き、直前に方針を置いた</a></li><li class="toc-lv3"><a href="#s4-3">4-3. 質問3（請求書）を、監査に読ませない</a></li><li class="toc-lv3"><a href="#s4-4">4-4. 質問2に、相手側の利点を1行付けた</a></li><li class="toc-lv3"><a href="#s4-5">4-5. 冒頭で先方のメッセージを引き取った</a></li><li class="toc-lv3"><a href="#s4-6">4-6. 初回発注の意思は「想定」で止めた</a></li><li class="toc-lv3"><a href="#s4-7">4-7. 書かなかったもの（意図的な不採用）</a></li><li class="toc-lv2"><a href="#s5" class="toc-checklist">5. 送信前チェックリスト</a></li><li class="toc-lv2"><a href="#s6">6. 返答別の次の一手</a></li><li class="toc-lv2"><a href="#s7" class="toc-alert">7. 妥協点・未確認（正直に）</a></li></ul></nav>
-<ul><li>作成：2026-09-20 ヒデアキ（コンテンツ制作）／チケット T-20260920-003</li><li>根拠：<code>04_丸進_サンリオとグンゼのAmazon適性.md</code> §6（残る論点 C・D・E）。3件を1通にまとめています</li><li><strong>送信は未実施。第三者連絡＝CLAUDE.md §4.1 に該当するため、社長承認後にカズヨが送信してください。</strong></li></ul>
-<section id="s1" class="sec">
+<ul>
+<li style='margin-left:0.0em'>作成：2026-09-20 ヒデアキ（コンテンツ制作）／チケット T-20260920-003</li>
+<li style='margin-left:0.0em'>根拠：<code>04_丸進_サンリオとグンゼのAmazon適性.md</code> §6（残る論点 C・D・E）。3件を1通にまとめています</li>
+<li style='margin-left:0.0em'><strong>送信は未実施。第三者連絡＝CLAUDE.md §4.1 に該当するため、社長承認後にカズヨが送信してください。</strong></li>
+</ul>
 <h2>1. 送信の前提</h2>
-<div class="tw" tabindex="0"><table><thead><tr><th>項目</th><th>内容</th></tr></thead><tbody><tr><td>送信手段</td><td>スーパーデリバリー内のメッセージ機能</td></tr><tr><td>URL</td><td>https://www.superdelivery.com/i/r/msgbox/edit?messageCategoryTypeCode=3&amp;partnerCode=102452</td></tr><tr><td>宛先</td><td>株式会社丸進（SD 企業コード 102452）／運営責任者 中村秀樹様</td></tr><tr><td>前提となる出来事</td><td>2026-09-20 に卸価格の開示（取引）をご承認いただいた直後</td></tr><tr><td>送信者</td><td>【開業前】Satoy Select（お客様番号 3166793）／佐藤 之則</td></tr></tbody></table></div>
-</section>
-<section id="s2" class="sec">
+<table><thead><tr><th>項目</th><th>内容</th></tr></thead><tbody>
+<tr><td>送信手段</td><td>スーパーデリバリー内のメッセージ機能</td></tr>
+<tr><td>URL</td><td>https://www.superdelivery.com/i/r/msgbox/edit?messageCategoryTypeCode=3&amp;partnerCode=102452</td></tr>
+<tr><td>宛先</td><td>株式会社丸進（SD 企業コード 102452）／運営責任者 中村秀樹様</td></tr>
+<tr><td>前提となる出来事</td><td>2026-09-20 に卸価格の開示（取引）をご承認いただいた直後</td></tr>
+<tr><td>送信者</td><td>【開業前】Satoy Select（お客様番号 3166793）／佐藤 之則</td></tr>
+</tbody></table>
 <h2>2. 件名</h2>
 <p><strong>推奨（A案）</strong></p>
-<pre class="codeblock"><code>お取引承認のお礼と、発注前のご確認3点（Satoy Select）</code></pre>
+<pre>お取引承認のお礼と、発注前のご確認3点（Satoy Select）</pre>
 <p>代替案（使い分けは §4-1 を参照）</p>
-<div class="tw" tabindex="0"><table><thead><tr><th>案</th><th>件名</th><th>使う場面</th></tr></thead><tbody><tr><td>B</td><td>発注前のご確認3点（販路・売れ筋サイズ・請求書について）</td><td>相手が件名で用件を把握したいタイプだと分かっている場合</td></tr><tr><td>C</td><td>Amazon.co.jp での販売可否についてのご相談（Satoy Select）</td><td>販路の可否だけを単独で先に確定させたい場合（本通では非推奨）</td></tr></tbody></table></div>
-</section>
-<section id="s3" class="sec sec-box sec-conclusion">
+<table><thead><tr><th>案</th><th>件名</th><th>使う場面</th></tr></thead><tbody>
+<tr><td>B</td><td>発注前のご確認3点（販路・売れ筋サイズ・請求書について）</td><td>相手が件名で用件を把握したいタイプだと分かっている場合</td></tr>
+<tr><td>C</td><td>Amazon.co.jp での販売可否についてのご相談（Satoy Select）</td><td>販路の可否だけを単独で先に確定させたい場合（本通では非推奨）</td></tr>
+</tbody></table>
 <h2>3. 本文（このまま貼れます）</h2>
 <p>宛名・署名を含めた全文です。SD のメッセージ欄に宛名欄が別にある場合は、先頭2行を省いてください。</p>
-<pre class="codeblock"><code>株式会社丸進
+<pre>株式会社丸進
 運営責任者 中村秀樹様
 
 このたびはお取引をご承認いただき、ありがとうございます。オープン在庫のため欠品・終了があること、発注後のキャンセル不可も承知しております。
@@ -340,51 +39,75 @@ https://satoy-select.com/partners
 
 3. ご発行の請求書に、当方の名称・住所、商品のメーカー名、購入点数は記載されますでしょうか。Amazonでは一部ブランドの出品前に仕入れ先の請求書の提出を求められ、この3点の記載が必要です。通常の書式のままで結構ですので、記載の有無だけお知らせください。
 
-初回は送料無料となる税抜20,000円以上で組む想定で品目を選んでおります。ご回答をお待ちしております。
+初回は送料無料となる〔一定額以上〕で組む想定で品目を選んでおります。ご回答をお待ちしております。
 
-Satoy Select　佐藤 之則</code></pre>
+Satoy Select　佐藤 之則</pre>
 <p><strong>文字数（宛名・署名・空行を除き、空白を除いた実測）：604字。</strong>うち33字は URL なので、実際に読む文は571字です。目安の600字をわずかに超えていますが、超過分は URL の一部であり、読む負荷は増えていないと判断して採用しました。</p>
 <p><strong>入力欄に文字数上限があった場合の削る順番（上から削る）</strong></p>
-<div class="tw" tabindex="0"><table><thead><tr><th>順</th><th>削る箇所</th><th>失うもの</th></tr></thead><tbody><tr><td>1</td><td>「仕入れた商品はAmazonの倉庫（FBA）に納品します。」</td><td>在庫を持って売る（＝仕入れ前の販売をしない）ことの明示</td></tr><tr><td>2</td><td>2の理由「売れ筋を外さず、継続して発注しやすくなります。」</td><td>相手側の利点の提示</td></tr><tr><td>3</td><td>1の理由「取引条件に〜双方にとって確実と考えました。」</td><td><strong>ここを削ると質問1が詰問になります。削るなら質問1ごと別便に回すこと</strong></td></tr></tbody></table></div>
+<table><thead><tr><th>順</th><th>削る箇所</th><th>失うもの</th></tr></thead><tbody>
+<tr><td>1</td><td>「仕入れた商品はAmazonの倉庫（FBA）に納品します。」</td><td>在庫を持って売る（＝仕入れ前の販売をしない）ことの明示</td></tr>
+<tr><td>2</td><td>2の理由「売れ筋を外さず、継続して発注しやすくなります。」</td><td>相手側の利点の提示</td></tr>
+<tr><td>3</td><td>1の理由「取引条件に〜双方にとって確実と考えました。」</td><td><strong>ここを削ると質問1が詰問になります。削るなら質問1ごと別便に回すこと</strong></td></tr>
+</tbody></table>
 <p>方針の3点（価格・正規品・商品情報）と URL、そして最終段落の初回発注の意思は<strong>削らない</strong>でください。この2つが、質問1に「はい」と言える材料そのものです。</p>
-</section>
-<section id="s4" class="sec">
 <h2>4. なぜこの表現にしたか</h2>
-<h3 id="s4-1">4-1. 件名で「Amazon」を単独露出させない</h3>
+<h3>4-1. 件名で「Amazon」を単独露出させない</h3>
 <p>社内文書なら結論を件名に置きます。しかしこれは<strong>可否を握っている相手に判断を仰ぐ文</strong>です。件名を「Amazon.co.jp での販売可否」にすると、本文を読む前に「Amazon は……」で結論が出ます。サトルの実測では、<strong>ネット販売の可否を明示している48社の35%が Amazon を名指しで不可</strong>としており、名指しの拒否は開く前に起きます。</p>
 <p>A案は「お礼」から入り、「確認3点」で用件があることだけを伝えます。ただし<strong>騙し討ちにはしない</strong>。本文は3行目で「Amazon.co.jp のストア」と自ら名乗り、同じ段落で方針とURLを出しています。件名で伏せて本文で明かす、ではなく、<strong>件名は分類、本文の冒頭で開示</strong>という設計です。</p>
-<h3 id="s4-2">4-2. 質問1（Amazon 可否）を先頭に置き、直前に方針を置いた</h3>
+<h3>4-2. 質問1（Amazon 可否）を先頭に置き、直前に方針を置いた</h3>
 <p>最も断られやすい質問を最後に置くと、相手は2・3に答えた後で1に突き当たり、<strong>すでに答えた手前で断りにくい</strong>——という順番も考えました。採りませんでした。誠実さを欠くうえ、断られたときに2・3の回答が無駄になります。</p>
 <p>代わりに<strong>質問1の直前に方針の3点と自社サイトを置きました</strong>。相手が「Amazon は不可」と反射的に考える理由は、ほぼ値崩れ・非正規品の混入・勝手な商品情報の3つです。<strong>反論ではなく先回りで潰す</strong>。読む順が「方針を見る → 可否を聞かれる」になるよう段落を並べています。</p>
 <p>「先に伺う方が双方にとって確実」は、依頼にあった立て付けをそのまま1文にしたものです。<strong>当社の都合ではなく、相手が後で取引中止という手間を負わずに済む話</strong>として書いています。</p>
-<h3 id="s4-3">4-3. 質問3（請求書）を、監査に読ませない</h3>
+<h3>4-3. 質問3（請求書）を、監査に読ませない</h3>
 <p>角が立つのは、質問そのものではなく<strong>「なぜ聞かれているか分からない」</strong>ときです。書式だけ問われると、相手は「何か疑われている」「追加の様式を求められる」と身構えます。そこで3点を入れました。</p>
-<ol><li><strong>目的を先に言う</strong> — 「Amazonでは一部ブランドの出品前に仕入れ先の請求書の提出を求められ」。社内用語の「出品許可」「ゲート」は使わず、仕組みを1文で説明しています（相手が Amazon の運用に詳しい保証はありません）。</li><li><strong>追加作業を求めないと明言する</strong> — 「通常の書式のままで結構ですので」。これが角を消す一番効いている一文です。<strong>依頼ではなく確認</strong>だと相手に伝わります。</li><li><strong>「記載の有無だけ」</strong> — 回答コストを最小に見せる。丸進側は「載ります／載りません」の一言で済みます。</li></ol>
+<ol>
+<li style='margin-left:0.0em'><strong>目的を先に言う</strong> — 「Amazonでは一部ブランドの出品前に仕入れ先の請求書の提出を求められ」。社内用語の「出品許可」「ゲート」は使わず、仕組みを1文で説明しています（相手が Amazon の運用に詳しい保証はありません）。</li>
+<li style='margin-left:0.0em'><strong>追加作業を求めないと明言する</strong> — 「通常の書式のままで結構ですので」。これが角を消す一番効いている一文です。<strong>依頼ではなく確認</strong>だと相手に伝わります。</li>
+<li style='margin-left:0.0em'><strong>「記載の有無だけ」</strong> — 回答コストを最小に見せる。丸進側は「載ります／載りません」の一言で済みます。</li>
+</ol>
 <p>なお「請求書に書いてください」という<strong>依頼形は今回は使っていません</strong>。実際に買う前に様式変更をお願いするのは順序が逆で、断られると質問1にも悪く響きます。載らないと分かった場合の打ち手は §6 に回しました。</p>
-<h3 id="s4-4">4-4. 質問2に、相手側の利点を1行付けた</h3>
+<h3>4-4. 質問2に、相手側の利点を1行付けた</h3>
 <p>「よく出るサイズ・色」は、相手にとっては<strong>手間だけがかかる質問</strong>です。そこで「売れ筋を外さず、継続して発注しやすくなります」を添えました。卸にとっての利点は、返品が出ないことと<strong>継続発注</strong>です。当社の在庫効率の話（死に在庫・回転月数）は書いていません。社内の語彙をそのまま出すと、相手には「自分の都合」としか読めません。</p>
-<h3 id="s4-5">4-5. 冒頭で先方のメッセージを引き取った</h3>
+<h3>4-5. 冒頭で先方のメッセージを引き取った</h3>
 <p>「オープン在庫のため欠品・終了があること、発注後のキャンセル不可も承知しております」。先方が承認時に送ってきた3点のうち2点をそのまま返しています。<strong>読んだことの証明</strong>であり、同時に「条件を理解しない新規客」という警戒を最初の2行で外します。</p>
-<h3 id="s4-6">4-6. 初回発注の意思は「想定」で止めた</h3>
-<p>「税抜20,000円以上で組む想定で品目を選んでおります」。<strong>確約はしていません</strong>（「発注します」「購入します」は使っていない）。それでも本気度は伝わります。理由は、金額が送料無料ラインという<strong>先方の条件表の数字</strong>であり、これを知っているのは実際に取引条件を読み込んだ相手だけだからです。</p>
-<h3 id="s4-7">4-7. 書かなかったもの（意図的な不採用）</h3>
-<div class="tw" tabindex="0"><table><thead><tr><th>書かなかったもの</th><th>理由</th></tr></thead><tbody><tr><td>独占・総代理・限定販売の打診</td><td>初対面で持ち出さない。かつ<strong>SD 内で直接取引（SD を通さない取引）の相談は規約違反</strong>。そう読まれうる語は1語も入れていません</td></tr><tr><td>メール・電話での直接のやり取りの提案</td><td>同上。本通はすべて SD のメッセージ内で完結する前提</td></tr><tr><td>販売実績・売上見込み・Amazon の販売数データ</td><td>実績はゼロです。無い実績を匂わせると、後で必ず食い違います</td></tr><tr><td>値引き・数量の交渉</td><td>1通目でやることではありません。条件表にある送料無料ラインに合わせる姿勢だけ示しています</td></tr><tr><td>当社の住所・電話</td><td>SD の会員情報で先方が参照できます。本文に重ねて書く必要がなく、本リポジトリは公開です</td></tr></tbody></table></div>
-</section>
-<section id="s5" class="sec sec-box sec-checklist">
+<h3>4-6. 初回発注の意思は「想定」で止めた</h3>
+<p>「〔一定額以上〕で組む想定で品目を選んでおります」。<strong>確約はしていません</strong>（「発注します」「購入します」は使っていない）。それでも本気度は伝わります。理由は、金額が送料無料ラインという<strong>先方の条件表の数字</strong>であり、これを知っているのは実際に取引条件を読み込んだ相手だけだからです。</p>
+<h3>4-7. 書かなかったもの（意図的な不採用）</h3>
+<table><thead><tr><th>書かなかったもの</th><th>理由</th></tr></thead><tbody>
+<tr><td>独占・総代理・限定販売の打診</td><td>初対面で持ち出さない。かつ<strong>SD 内で直接取引（SD を通さない取引）の相談は規約違反</strong>。そう読まれうる語は1語も入れていません</td></tr>
+<tr><td>メール・電話での直接のやり取りの提案</td><td>同上。本通はすべて SD のメッセージ内で完結する前提</td></tr>
+<tr><td>販売実績・売上見込み・Amazon の販売数データ</td><td>実績はゼロです。無い実績を匂わせると、後で必ず食い違います</td></tr>
+<tr><td>値引き・数量の交渉</td><td>1通目でやることではありません。条件表にある送料無料ラインに合わせる姿勢だけ示しています</td></tr>
+<tr><td>当社の住所・電話</td><td>SD の会員情報で先方が参照できます。本文に重ねて書く必要がなく、本リポジトリは公開です</td></tr>
+</tbody></table>
 <h2>5. 送信前チェックリスト</h2>
-<ol><li>宛先が丸進（<code>partnerCode=102452</code>）であること。URL のパラメータを目で確認する</li><li>社長承認（§4.1 第三者連絡）が取れていること。<strong>承認前に送信しない</strong></li><li>本文に「直接」「SD を通さず」「個別に」「独占」「限定」「代理店」が<strong>入っていないこと</strong>（規約違反に読まれる）</li><li>数量・金額の<strong>確約表現が無いこと</strong>（「想定」で止まっているか）</li><li><code>https://satoy-select.com/partners</code> が HTTP 200 で開き、方針5項目が表示されること（送信直前に1回開く）</li><li>宛名「株式会社丸進／運営責任者 中村秀樹様」の表記に誤りが無いこと</li><li>Amazon ストアフロントの URL を<strong>書いていないこと</strong>（現在4ストア停止中・出品0件。クリックされると逆効果）</li><li>署名が「Satoy Select　佐藤 之則」であること</li><li>送信後、送信日時と本文をチケット T-20260920-003 のログに残す（返信期限の起算点になります）</li></ol>
-</section>
-<section id="s6" class="sec">
+<ol>
+<li style='margin-left:0.0em'>宛先が丸進（<code>partnerCode=102452</code>）であること。URL のパラメータを目で確認する</li>
+<li style='margin-left:0.0em'>社長承認（§4.1 第三者連絡）が取れていること。<strong>承認前に送信しない</strong></li>
+<li style='margin-left:0.0em'>本文に「直接」「SD を通さず」「個別に」「独占」「限定」「代理店」が<strong>入っていないこと</strong>（規約違反に読まれる）</li>
+<li style='margin-left:0.0em'>数量・金額の<strong>確約表現が無いこと</strong>（「想定」で止まっているか）</li>
+<li style='margin-left:0.0em'><code>https://satoy-select.com/partners</code> が HTTP 200 で開き、方針5項目が表示されること（送信直前に1回開く）</li>
+<li style='margin-left:0.0em'>宛名「株式会社丸進／運営責任者 中村秀樹様」の表記に誤りが無いこと</li>
+<li style='margin-left:0.0em'>Amazon ストアフロントの URL を<strong>書いていないこと</strong>（現在4ストア停止中・出品0件。クリックされると逆効果）</li>
+<li style='margin-left:0.0em'>署名が「Satoy Select　佐藤 之則」であること</li>
+<li style='margin-left:0.0em'>送信後、送信日時と本文をチケット T-20260920-003 のログに残す（返信期限の起算点になります）</li>
+</ol>
 <h2>6. 返答別の次の一手</h2>
-<div class="tw" tabindex="0"><table><thead><tr><th>#</th><th>想定される返答</th><th>次の一手</th><th>担当</th></tr></thead><tbody><tr><td>1</td><td><strong>Amazon 可／請求書に3点とも記載あり／売れ筋サイズの回答あり</strong></td><td>最良。丸進の卸価格と Keepa 候補の JAN 突き合わせ（卸値税込×1.7〜2.3倍フィルタ）→ セラセンでゲート実機確認 → <strong>同一ブランドで10点以上</strong>になるよう初回を組む。税抜20,000円以上＋3,000円OFFクーポン</td><td>カズヨ／サトル</td></tr><tr><td>2</td><td><strong>Amazon 不可</strong></td><td>丸進での仕入れは打ち切り。<strong>請求書要員としても使えません</strong>（売れない商品の請求書に価値は無い）。食い下がらない（SD 内での再交渉は心証を損ね、他社への申請にも響く）。SD 内の承認済み他社へ移る</td><td>カズヨ</td></tr><tr><td>3</td><td><strong>Amazon 可だが条件付き</strong>（価格の下限指定／出品方法の制限／メーカー確認が必要）</td><td>条件を<strong>SD のメッセージ上に文字で残したまま</strong>受ける（口頭・電話に移さない）。価格下限が付いた場合は、その価格で ROS 20%・ROI 35% が立つかをハジメに検算させてから発注</td><td>カズヨ → ハジメ</td></tr><tr><td>4</td><td><strong>請求書は様式固定で3点が載らない</strong>（例：メーカー名が載らない、宛名が屋号だけ 等）</td><td><strong>ゲートのある ASIN は採らない</strong>。成果物04 §2.2 の実機確認（セラセンで ASIN を検索し「出品する」が出るか見る）を通った ASIN だけで初回を組む。並行して、納品書・取引明細書に記載があるかを次の1通で確認（書類名ではなく記載4要件で判定する）</td><td>カズヨ</td></tr><tr><td>5</td><td><strong>売れ筋サイズは回答できない</strong>（社外秘・把握していない）</td><td>深追いしない。Keepa のバリエーション別推定に戻し、<strong>初回は点数を絞る</strong>（同一ブランド10点の要件は満たしつつ、サイズは中心3つに寄せる）</td><td>サトル／タケシ</td></tr><tr><td>6</td><td><strong>5営業日たっても無回答</strong></td><td>短い催促を1回だけ。3点すべてを再掲せず、<strong>質問1（Amazon 可否）だけに絞る</strong>。それ以上は追わない</td><td>カズヨ</td></tr></tbody></table></div>
-<blockquote><p>2・4・5 はいずれも「丸進を外す」ではなく「<strong>採る範囲を狭める</strong>」判断です。丸進は SD 評価4.6（263件）・設立1950年の実在卸で、関係を切る理由にはなりません。</p></blockquote>
-</section>
-<section id="s7" class="sec sec-box sec-alert">
+<table><thead><tr><th>#</th><th>想定される返答</th><th>次の一手</th><th>担当</th></tr></thead><tbody>
+<tr><td>1</td><td><strong>Amazon 可／請求書に3点とも記載あり／売れ筋サイズの回答あり</strong></td><td>最良。丸進の卸価格と Keepa 候補の JAN 突き合わせ（卸値税込×1.7〜2.3倍フィルタ）→ セラセンでゲート実機確認 → <strong>同一ブランドで10点以上</strong>になるよう初回を組む。〔一定額以上〕＋3,000円OFFクーポン</td><td>カズヨ／サトル</td></tr>
+<tr><td>2</td><td><strong>Amazon 不可</strong></td><td>丸進での仕入れは打ち切り。<strong>請求書要員としても使えません</strong>（売れない商品の請求書に価値は無い）。食い下がらない（SD 内での再交渉は心証を損ね、他社への申請にも響く）。SD 内の承認済み他社へ移る</td><td>カズヨ</td></tr>
+<tr><td>3</td><td><strong>Amazon 可だが条件付き</strong>（価格の下限指定／出品方法の制限／メーカー確認が必要）</td><td>条件を<strong>SD のメッセージ上に文字で残したまま</strong>受ける（口頭・電話に移さない）。価格下限が付いた場合は、その価格で ROS 20%・ROI 35% が立つかをハジメに検算させてから発注</td><td>カズヨ → ハジメ</td></tr>
+<tr><td>4</td><td><strong>請求書は様式固定で3点が載らない</strong>（例：メーカー名が載らない、宛名が屋号だけ 等）</td><td><strong>ゲートのある ASIN は採らない</strong>。成果物04 §2.2 の実機確認（セラセンで ASIN を検索し「出品する」が出るか見る）を通った ASIN だけで初回を組む。並行して、納品書・取引明細書に記載があるかを次の1通で確認（書類名ではなく記載4要件で判定する）</td><td>カズヨ</td></tr>
+<tr><td>5</td><td><strong>売れ筋サイズは回答できない</strong>（社外秘・把握していない）</td><td>深追いしない。Keepa のバリエーション別推定に戻し、<strong>初回は点数を絞る</strong>（同一ブランド10点の要件は満たしつつ、サイズは中心3つに寄せる）</td><td>サトル／タケシ</td></tr>
+<tr><td>6</td><td><strong>5営業日たっても無回答</strong></td><td>短い催促を1回だけ。3点すべてを再掲せず、<strong>質問1（Amazon 可否）だけに絞る</strong>。それ以上は追わない</td><td>カズヨ</td></tr>
+</tbody></table>
+<blockquote>2・4・5 はいずれも「丸進を外す」ではなく「<strong>採る範囲を狭める</strong>」判断です。丸進は SD 評価4.6（263件）・設立1950年の実在卸で、関係を切る理由にはなりません。</blockquote>
 <h2>7. 妥協点・未確認（正直に）</h2>
-<ol><li><strong>SD メッセージ欄の文字数上限・件名の文字数上限は未確認です。</strong> 画面を見ないと分かりません。上限に当たった場合の削る順番を §3 の表に用意してあります。</li><li><strong>中村秀樹様が今回の取引承認を判断した本人かは未確認です。</strong> SD の企業情報に「運営責任者」として掲載されている氏名を使っています。担当者名が別に判明している場合は、そちらに差し替えてください（宛名だけの差し替えで、本文は変わりません）。</li><li><strong>「グンゼの肌着・靴下・ストッキング」というカテゴリの切り方は、Keepa 側の実測（Amazon 本体不在56件のカテゴリ分布）に基づく当社側の関心です。</strong> 丸進の在庫構成と一致する保証はありません。先方が「グンゼはこの範囲しか扱っていない」と返してくる可能性はあります（その場合は §6-5 と同じ扱い）。</li><li><strong>質問1に「はい」が返る確率は見積もっていません。</strong> サトルの実測はあくまで「取引条件に明記している48社」の分布で、丸進は<strong>表記なし</strong>側です。表記なしの企業が可・不可のどちらに寄るかのデータはありません。</li><li><strong>本通では請求書の様式変更を依頼していません</strong>（§4-3）。初回発注後、実物の請求書を見てから必要なら次便で相談する順序です。1通目に詰め込むと、質問1の心証を下げると判断しました。</li></ol>
-</section>
-<p class="prov">HTML版。内容の唯一の正は workspace/output/deliverables/T-20260920-003/05_丸進への初回問い合わせ文.md です。送信は社長承認後にカズヨが行います。</p>
-</div>
-<a class="top" href="#top" aria-label="先頭へ戻る">&#8593;</a>
-</body>
-</html>
+<ol>
+<li style='margin-left:0.0em'><strong>SD メッセージ欄の文字数上限・件名の文字数上限は未確認です。</strong> 画面を見ないと分かりません。上限に当たった場合の削る順番を §3 の表に用意してあります。</li>
+<li style='margin-left:0.0em'><strong>中村秀樹様が今回の取引承認を判断した本人かは未確認です。</strong> SD の企業情報に「運営責任者」として掲載されている氏名を使っています。担当者名が別に判明している場合は、そちらに差し替えてください（宛名だけの差し替えで、本文は変わりません）。</li>
+<li style='margin-left:0.0em'><strong>「グンゼの肌着・靴下・ストッキング」というカテゴリの切り方は、Keepa 側の実測（Amazon 本体不在56件のカテゴリ分布）に基づく当社側の関心です。</strong> 丸進の在庫構成と一致する保証はありません。先方が「グンゼはこの範囲しか扱っていない」と返してくる可能性はあります（その場合は §6-5 と同じ扱い）。</li>
+<li style='margin-left:0.0em'><strong>質問1に「はい」が返る確率は見積もっていません。</strong> サトルの実測はあくまで「取引条件に明記している48社」の分布で、丸進は<strong>表記なし</strong>側です。表記なしの企業が可・不可のどちらに寄るかのデータはありません。</li>
+<li style='margin-left:0.0em'><strong>本通では請求書の様式変更を依頼していません</strong>（§4-3）。初回発注後、実物の請求書を見てから必要なら次便で相談する順序です。1通目に詰め込むと、質問1の心証を下げると判断しました。</li>
+</ol>
+</body></html>
