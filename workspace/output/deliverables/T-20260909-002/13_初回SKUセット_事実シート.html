@@ -1,0 +1,169 @@
+<!doctype html><html lang='ja'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>13 初回SKUセット — 事実シート</title><style>body{font-family:-apple-system,'Hiragino Sans','Noto Sans JP',sans-serif;max-width:1150px;margin:2em auto;padding:0 1em;line-height:1.65;color:#222;font-size:14.5px}table{border-collapse:collapse;margin:.8em 0;font-size:.92em}th,td{border:1px solid #bbb;padding:.35em .6em;vertical-align:top}th{background:#eef2f8}tr:nth-child(even) td{background:#fafafa}h1{font-size:1.5em;border-bottom:2px solid #444}h2{font-size:1.25em;border-left:5px solid #25b;padding-left:8px;margin-top:1.8em}h3{font-size:1.05em;margin-top:1.4em}blockquote{border-left:4px solid #ccc;margin:.8em 0;padding:.2em 1em;color:#444}code{background:#f3f3f3;padding:1px 4px;border-radius:3px}hr{border:0;border-top:1px solid #ccc;margin:1.6em 0}</style></head><body>
+<h1>13 初回SKUセット — 事実シート</h1>
+<p>T-20260909-002 ／ リサーチャー サトル ／ 2026-09-21</p>
+<p>出典：Keepa Product API（<code>api.keepa.com/product</code>・<code>/query</code>、domain=5、<strong>2026-09-21 取得</strong>）／<code>sell.amazon.co.jp/pricing</code>（2026-09-21・ハジメ経由）／当社 NETSEA プール（T-20260906-003, 2026-09-06〜09 監視）</p>
+<blockquote><strong>発注・申請・第三者連絡は一切していません（CLAUDE.md §4.1）。</strong></blockquote>
+<hr>
+<h2>0. 結論（3行）</h2>
+<ol>
+<li style='margin-left:0.0em'><strong>指定条件を全部通す SKU は 2件。</strong> グンゼ「やわらか肌着 半袖V首 4枚組 SV6115」の色・サイズ違い2点です。<strong>ご依頼の「5〜10SKU」は、今日入手できるデータでは組めません。</strong></li>
+<li style='margin-left:0.0em'><strong>落ちた理由は経路ごとに別。</strong> NETSEA（月100以上 738件）は入数補正後の黒字が2件で、<strong>どちらも売価2,200円未満</strong>＝ハジメの足切りで全滅。SD/丸進レーン（グンゼ＋ボディワイルド＋サンリオ）は、月100以上×売価2,200円以上の<strong>90件のうち、Amazon 本体が過去365日ほぼ不在だったのは2件だけ</strong>でした。</li>
+<li style='margin-left:0.0em'><strong>残っている未確認は「卸値」1つ。</strong> 丸進が SV6115 を扱っているか、卸値が本書 §3 の上限以下か。ここが決まれば発注可否が決まります。<strong>ゲートは発注可否を変えません</strong>（変えるのは納品時期だけ）。</li>
+</ol>
+<h3>今回いちばん重要な発見</h3>
+<blockquote><strong>「Amazon 本体なし」をスナップショットで判定していたため、候補の 93% が過大に残っていました。</strong><br>9/20 に「Amazon 本体なし」として抽出した68件を履歴で見直すと、<strong>63件は直近365日のどこかで Amazon 本体が在庫していました</strong>（Keepa API・2026-09-21 取得）。中村『国内メーカー直取引完全ガイド』の条件は「グラフがオレンジで塗りつぶされていないこと」＝<strong>履歴</strong>の条件であり、現時点の在庫有無ではありません。<strong>この1点だけで候補は68→5件になります。</strong></blockquote>
+<hr>
+<h2>1. イシューとスコープ</h2>
+<p><strong>イシュー：いま実際に仕入れて出品できる初回SKUは、どれとどれか。</strong></p>
+<table><thead><tr><th>区分</th><th>内容</th></tr></thead><tbody>
+<tr><td><strong>入れた</strong></td><td>①NETSEA 月100以上 738件の再選別（入数補正済みデータを使用）②SD/丸進の対象ブランド（グンゼ／ボディワイルド／サンリオ）を Keepa Product Finder で取り直し ③全候補の Amazon 本体の<strong>履歴</strong>判定 ④実測手数料での原価上限 ⑤危険物・要期限管理・価格推移の確認</td></tr>
+<tr><td><strong>入れない（打ち切り条件）</strong></td><td>⑴<strong>卸値の取得</strong>（SD ログインが要る＝カズヨの領分）⑵<strong>ゲートの実機確認</strong>（セラーセントラル＝カズヨ）⑶丸進以外の SD 出展企業の新規開拓（1周目の方針として除外済み）⑷Keepa の追加大量取得（契約 10/3 まで・本件の消費は <strong>571 トークン</strong>、残 550）</td></tr>
+<tr><td><strong>ここから先は戦略</strong></td><td>どの案を採るか／SKU が2件しかない状態で発注するか・広げるか。<strong>タケシ（プランナー）の領分</strong>です</td></tr>
+</tbody></table>
+<hr>
+<h2>2. 絞り込みの滝（件数）</h2>
+<h3>2-1. NETSEA レーン</h3>
+<table><thead><tr><th>#</th><th>条件</th><th>残</th></tr></thead><tbody>
+<tr><td>0</td><td>NETSEA プール（回転・仕入れ可否を通過）</td><td>3,309</td></tr>
+<tr><td>1</td><td><strong>月間販売数（monthlySold）100以上</strong></td><td><strong>738</strong></td></tr>
+<tr><td>2</td><td>＋入数補正後の利益率5%以上（広告0）</td><td>13</td></tr>
+<tr><td>3</td><td>＋Amazon 本体なし（スナップショット）</td><td>9</td></tr>
+<tr><td>4</td><td><strong>＋売価 2,200円以上</strong></td><td><strong>3</strong></td></tr>
+<tr><td>5</td><td>＋食品でない／入数が確定している</td><td><strong>1</strong>（Brighte ELEKI BRUSH+）</td></tr>
+<tr><td>6</td><td>＋危険物でない</td><td><strong>0</strong></td></tr>
+</tbody></table>
+<ul>
+<li style='margin-left:0.0em'>ステップ2の落ち方が全体を決めています。<strong>月100以上738件のうち695件が赤字</strong>で、そのうち 637件は卸値が Amazon 価格の70%以上でした（T-20260909-002/11、2026-09-15）。</li>
+<li style='margin-left:0.0em'><strong>9/15 に生き残っていた2件は、今日の再取得で状況が悪化していました。</strong> パンテーン（B0FL29HS6N）は現在価格が 1,550円→1,287円、出品5→15。カムテクト（B07HG63Z9N）は現在1,600円ですが<strong>年平均は1,192円</strong>で、一時的な高値です（Keepa・2026-09-21・散文引用）。どちらも売価2,200円未満なので、いずれにせよ落ちます。</li>
+</ul>
+<h3>2-2. SD／丸進レーン</h3>
+<table><thead><tr><th>#</th><th>条件</th><th>残</th></tr></thead><tbody>
+<tr><td>0</td><td>グンゼ／ボディワイルド／サンリオ ＋ <strong>月100以上</strong></td><td>1,045</td></tr>
+<tr><td>1</td><td>＋Amazon 本体なし（スナップショット・9/20 時点）</td><td>68</td></tr>
+<tr><td>2</td><td>＋<strong>売価 2,200円以上</strong>（Finder で取り直し・9/21）</td><td><strong>90</strong></td></tr>
+<tr><td>3</td><td><strong>＋Amazon 本体が過去365日ほぼ不在</strong></td><td><strong>2</strong></td></tr>
+<tr><td>4</td><td>＋在庫回転6ヶ月以内</td><td><strong>2</strong></td></tr>
+<tr><td>5</td><td>＋危険物でない・要期限管理でない</td><td><strong>2</strong></td></tr>
+</tbody></table>
+<ul>
+<li style='margin-left:0.0em'>ステップ2の90件は、ステップ1の68件とは別の取り方（売価条件を先に当てた）です。<strong>どちらの経路から入っても、ステップ3を通るのは同じ2件</strong>でした。</li>
+<li style='margin-left:0.0em'>90件のうち、Amazon 本体が365日まったく在庫しなかったのは<strong>1件</strong>、90%以上欠品だったのが<strong>1件</strong>。残る88件は Amazon 本体が年間を通じて繰り返し在庫しています。</li>
+</ul>
+<hr>
+<h2>3. 初回セット候補（2件）</h2>
+<p>掲載値は Amazon の現在スナップショット（Keepa API・2026-09-21 取得）。<strong>卸値・SD 品番・上代・ロットは非掲載</strong>（SD 会員規約 17条1項）。</p>
+<table><thead><tr><th>#</th><th>ASIN</th><th>商品名</th><th>販売価格（現在）</th><th>需要の入口条件</th><th>新品出品者</th><th>FBA配送代行</th><th>販売手数料率</th><th>サプライヤー</th><th>ゲート</th><th>回転の見込み</th></tr></thead><tbody>
+<tr><td><strong>1</strong></td><td><strong>B0BZC1LLFK</strong></td><td>グンゼ やわらか肌着 半袖V首 4枚組 SV6115</td><td>2,880円</td><td>条件（100以上）を通過・上位</td><td>3</td><td>430円</td><td>12.4%</td><td>丸進（SD）／<strong>要確認</strong></td><td>未確認</td><td>12点で <strong>0.5ヶ月</strong></td></tr>
+<tr><td><strong>2</strong></td><td><strong>B0BZC24JH4</strong></td><td>グンゼ やわらか肌着 半袖V首 4枚組 SV6115（別色・別サイズ）</td><td>2,880円</td><td>条件（100以上）を通過</td><td>3</td><td>430円</td><td>12.4%</td><td>丸進（SD）／<strong>要確認</strong></td><td>未確認</td><td>12点で <strong>1.0ヶ月</strong></td></tr>
+</tbody></table>
+<blockquote><strong>月間販売数の実数は <code>out/13_初回SKUセット_事実シート_数値入り.md</code> に入れています</strong>（Finder から開けます）。追跡対象の本文に載せない運用は pre-commit フックの既定に従ったもので、法務の最新判定（T-20260920-003/08 では A クラス＝公開可）とは食い違っています。整理はカズヨへ申し送り済み（§10）。</blockquote>
+<p><strong>なぜ売れると言えるのか（1行ずつ）</strong></p>
+<ul>
+<li style='margin-left:0.0em'><strong>#1</strong>：Amazon が自ら公表している月間購入数が条件の2倍あり、出品者は3社しかおらず、<strong>Amazon 本体が過去1年ほぼ在庫していない棚</strong>＝需要が実在し、かつ最大の競合が不在です。</li>
+<li style='margin-left:0.0em'><strong>#2</strong>：同じ商品の別色・別サイズで、こちらも条件を通過。<strong>同一メーカーの同一品番なので、1明細でゲート解除用の点数を積める</strong>（同じ箱で納品できる）。</li>
+</ul>
+<p><strong>原価上限（実測手数料ベース・税込。この額を1円でも超える卸値なら買わない）</strong></p>
+<table><thead><tr><th>#</th><th>損益分岐</th><th>利益率5%</th><th>利益率10%</th><th>利益率20%</th><th>利益率10%の対売価</th></tr></thead><tbody>
+<tr><td>1</td><td>1,583円</td><td>1,454円</td><td><strong>1,325円</strong></td><td>1,066円</td><td>51.2%</td></tr>
+<tr><td>2</td><td>1,798円</td><td>1,657円</td><td><strong>1,515円</strong></td><td>1,231円</td><td>53.4%</td></tr>
+</tbody></table>
+<ul>
+<li style='margin-left:0.0em'>手数料は<strong>推定ではなく実測</strong>です。FBA 配送代行 430円と販売手数料 12.4% は Keepa が Amazon から取得している当該 ASIN の値（2026-09-21）。</li>
+<li style='margin-left:0.0em'>配送代行以外の1個あたり固定費 220円（保管・FBA 納品送料・仕入送料・納品代行）は <strong>T-20260920-005/10（ハジメ）の標準区分6 の実測レンジ</strong>を使用。ここだけが推定です。</li>
+<li style='margin-left:0.0em'>免税事業者なので仕入消費税は費用。<strong>卸値（税抜）の上限は上表 ÷ 1.1</strong> ＝ #1 1,204円／#2 1,377円。</li>
+<li style='margin-left:0.0em'>販売手数料は2,500円超で12.4%に上がります（2,500円以下は8.4%）。<strong>2,880円という価格はこの崖の上</strong>にあり、値下げして2,500円に置くと1点あたり約115円得をします。価格設定はタケシの領分です。</li>
+</ul>
+<hr>
+<h2>4. 落としたもの（境界事例は理由つきで残す）</h2>
+<h3>4-1. 一発で落ちたもの</h3>
+<table><thead><tr><th>落ちた条件</th><th>件数</th><th>代表例</th></tr></thead><tbody>
+<tr><td>需要の入口条件（Amazon 公表の購入数 月100以上）を満たさない</td><td>2,571（NETSEA プール）</td><td>—</td></tr>
+<tr><td>入数補正後に赤字</td><td>695（738件中）</td><td>国分ネット卸の食品ほぼ全部（商品名はケースだが卸値は1個）</td></tr>
+<tr><td>売価2,200円未満</td><td>6（利益率5%以上のうち）</td><td>パンテーン 1,287円／カムテクト 1,600円</td></tr>
+<tr><td><strong>Amazon 本体が過去365日に在庫</strong></td><td><strong>88（90件中）／63（68件中）</strong></td><td>グンゼ アセドロン各種、キレイラボ各種、ボディワイルド各種</td></tr>
+<tr><td>危険物</td><td>1</td><td>Brighte ELEKI BRUSH+（§4-2）</td></tr>
+<tr><td>出品者が多すぎる</td><td>2</td><td>Kirkland オリーブオイル（24社）、どうぶつの森 amiibo（13社）</td></tr>
+</tbody></table>
+<h3>4-2. 境界事例（落としたが理由を残すもの）</h3>
+<table><thead><tr><th>商品</th><th>ASIN</th><th>売価</th><th>通った条件</th><th><strong>落ちた条件</strong></th><th>復活の条件</th></tr></thead><tbody>
+<tr><td>Brighte ELEKI BRUSH+</td><td>B0DYNG386S</td><td>29,800円</td><td>Amazon 本体365日不在／月販条件通過／出品3社／売価◎</td><td><strong>危険物（リチウムイオン電池内蔵・UN3481）</strong>。ハルオの3危険条件②に直撃（T-20260908-001）。加えて価格が年平均35,241円→現在29,800円と下落中</td><td>メーカーから SDS／電池情報シートを取り寄せ、FBA 危険物審査を通す。<strong>停止明け直後にやる作業ではない</strong>（ハルオの推奨）</td></tr>
+<tr><td>マイメロディ ぬいぐるみおせわセット</td><td>B0BFK44R71</td><td>5,000円</td><td>売価◎／月販条件通過／出品5社／原価上限3,070円（利益率10%）と余裕あり</td><td><strong>Amazon 本体が年の約4割で在庫</strong>。中村ルール不通過</td><td>Amazon 本体の在庫パターンが変われば復活。ただしキャラ品はページ消滅リスク（T-20260920-003/06）</td></tr>
+<tr><td>theGUNZE ニットトランクス</td><td>B0CZ38MG9V</td><td>1,930円</td><td>Amazon 本体365日不在／月販条件通過／<strong>出品1社＝実質独占</strong></td><td><strong>売価2,200円未満、かつ FBA 配送代行が675円と重い</strong>。利益率10%の原価上限がマイナス＝<strong>価格をいくら下げても構造的に成立しない</strong></td><td>なし。この ASIN は売価が上がらない限り不可</td></tr>
+<tr><td>グンゼ ソックス フォーマル</td><td>B0D65N2CYC</td><td>750円</td><td>Amazon 本体365日不在／月販条件通過／販売手数料5.07%と安い／原価上限304円（利益率10%）</td><td><strong>売価2,200円未満</strong>（ハジメの絶対足切り）</td><td>卸値が極端に安い（税抜276円以下）なら数字上は成立する。<strong>ただし粗利額は1点75円</strong>で、社長既定「粗利額500円未満は入口で落とす」に抵触</td></tr>
+<tr><td>Kirkland ピュアオリーブオイル</td><td>B01BHJDZD6</td><td>7,738円</td><td>Amazon 本体365日不在／月販条件通過／売価◎</td><td><strong>出品者24社</strong>（取り分 月2個）＋食品（賞味期限）＋新旧ラベル混在</td><td>なし</td></tr>
+<tr><td>サントリー 胡麻麦茶 2ケース</td><td>B007HHR04S</td><td>9,020円</td><td>Amazon 本体365日不在／月販条件通過／売価◎</td><td><strong>入数が未確定</strong>（「12本×2ケース」を1本単価で直すと赤字）＋出品16社＋大型（FBA 781円）</td><td>NETSEA の口設定を実画面で確認すれば判定可能</td></tr>
+</tbody></table>
+<hr>
+<h2>5. 合計の必要資金</h2>
+<p><strong>原価上限いっぱいで買った場合の上限額</strong>です（実際の卸値は未取得なので、これより安くなることはあっても高くはなりません）。</p>
+<table><thead><tr><th>費目</th><th>利益率10%で買う</th><th>利益率5%で買う</th><th>確度</th></tr></thead><tbody>
+<tr><td>商品代（#1・#2 を各12点＝24点）</td><td>34,080円</td><td>37,332円</td><td><strong>上限値</strong>（実額は卸値次第）</td></tr>
+<tr><td>FBA ラベル貼付（Amazon 代行・22円/点×24）</td><td>528円</td><td>528円</td><td>実測（公式料金）</td></tr>
+<tr><td>FBA 納品送料（1箱・ヤマト）</td><td>約1,500円</td><td>約1,500円</td><td>推定</td></tr>
+<tr><td>仕入送料</td><td>0円</td><td>0円</td><td>実測（一定額以上で無料。条件の実額は非掲載）</td></tr>
+<tr><td><strong>合計</strong></td><td><strong>約36,100円</strong></td><td><strong>約39,400円</strong></td><td>—</td></tr>
+</tbody></table>
+<ul>
+<li style='margin-left:0.0em'>運転資金100万円に対して <strong>約3.6〜3.9%</strong>。予備資金には触りません。</li>
+<li style='margin-left:0.0em'><strong>12点という数量の根拠</strong>：ゲート解除の公式要件が「180日以内の請求書・10点以上」なので、Amazon 側が「合計点数」ではなく「明細の点数」で見た場合にも通る余裕を取っています（2点分の余裕）。回転は #1 で0.5ヶ月、#2 で1.0ヶ月と、上限6ヶ月に対して十分に内側です。</li>
+</ul>
+<hr>
+<h2>6. ゲート実機確認リスト（カズヨへ）</h2>
+<p>セラーセントラル「商品登録 → ASIN 検索」で、<strong>申請ボタンは押さずに</strong>表示だけ確認してください。一覧は <code>13_ゲート実機確認リスト.csv</code>。</p>
+<table><thead><tr><th>優先</th><th>ASIN</th><th>商品</th><th>確認したいこと</th></tr></thead><tbody>
+<tr><td><strong>1</strong></td><td>B0BZC1LLFK</td><td>グンゼ SV6115</td><td>GUNZE ブランドにゲートがかかっているか</td></tr>
+<tr><td><strong>1</strong></td><td>B0BZC24JH4</td><td>グンゼ SV6115（別色）</td><td>同上（同ブランドなので1件見れば足りる可能性が高い）</td></tr>
+<tr><td>2</td><td>B0BFK44R71</td><td>マイメロディ ぬいぐるみ</td><td>サンリオ ブランドのゲート有無（2周目の母数判断に使う）</td></tr>
+<tr><td>2</td><td>B0DC5J52N1</td><td>ボディワイルド ボクサー3枚組</td><td>BODY WILD は GUNZE と<strong>別ブランド扱い</strong>。請求書がブランド単位なので別に確認が要る</td></tr>
+<tr><td>3</td><td>B0DYNG386S</td><td>Brighte ELEKI BRUSH+</td><td>美容家電＋リチウム電池。ゲートと危険物の両方</td></tr>
+</tbody></table>
+<blockquote><strong>ゲートの有無は発注の可否を変えません。</strong> 変えるのは納品のタイミングだけです（制限があれば請求書を取ってから納品）。この確認を発注のブロッカーにしないでください。</blockquote>
+<hr>
+<h2>7. 仕入れ前の5点確認（中村 Ch8-01）の現在地</h2>
+<table><thead><tr><th>#</th><th>確認項目</th><th>#1・#2（グンゼ SV6115）</th><th>判定方法</th></tr></thead><tbody>
+<tr><td>1</td><td><strong>出品制限（ゲート）</strong></td><td><strong>未確認</strong></td><td>セラセン実機のみ（§6）</td></tr>
+<tr><td>2</td><td>FBA 禁止商品</td><td>非該当（肌着・衣料）</td><td>Amazon 出品禁止商品リスト</td></tr>
+<tr><td>3</td><td>危険物</td><td><strong>非該当</strong>（Keepa <code>hazardousMaterials</code> が空・2026-09-21）</td><td>Keepa 実測</td></tr>
+<tr><td>4</td><td>要期限管理商品</td><td><strong>非該当</strong>（服＆ファッション小物）</td><td>カテゴリツリー実測</td></tr>
+<tr><td>5</td><td>過去の価格推移</td><td><strong>安定</strong>。現在価格は年平均から大きく乖離していません（Keepa・2026-09-21・散文引用）</td><td>Keepa 実測</td></tr>
+</tbody></table>
+<hr>
+<h2>8. 事実と推定の分離</h2>
+<table><thead><tr><th>区分</th><th>内容</th></tr></thead><tbody>
+<tr><td><strong>事実（実測・一次）</strong></td><td>現在価格・月間販売数・新品出品者数・FBA 配送代行手数料・販売手数料率・危険物指定・カテゴリ（すべて Keepa Product API、2026-09-21 取得、N=163 ASIN）／Amazon 本体の在庫履歴（同上）／FBA ラベル貼付 22円・ゲート解除の10点要件（Amazon 公式）</td></tr>
+<tr><td><strong>推定（根拠と確度つき）</strong></td><td>①配送代行以外の1個あたり固定費 220円 — ハジメの実測レンジの中央値。確度中（サイズ区分の実寸が未確認のため±20%）②FBA 納品送料 1,500円 — 1箱・ヤマト・関東内の実績値。確度中③取り分＝月販÷(出品者+1)×0.5 — 新規参入のカート不利を織り込んだ保守係数。<strong>実績データなし・確度低</strong></td></tr>
+<tr><td><strong>未確認（潰す手順つき）</strong></td><td>①<strong>丸進が SV6115 を扱っているか・卸値</strong>（SD ログイン＝カズヨ。これが0なら本書の2件は消える）②ゲート（§6）③FBA サイズ区分の実寸（FBA 料金シミュレーターに ASIN 投入・0円）④SD 発行の請求書の名義</td></tr>
+<tr><td><strong>非掲載（規約）</strong></td><td>SD の卸値・品番・上代・ロット・送料の実額（SD 会員規約17条1項）／Keepa の履歴・平均・在庫切れ率の行データ（Keepa API T&amp;C §11(1)。本書は結論と統計に圧縮し、2 ASIN のみ散文で引用）</td></tr>
+</tbody></table>
+<hr>
+<h2>9. タケシ（プランナー）・社長への論点</h2>
+<p><strong>ここから先は事実ではなく判断です。サトルは踏み込みません。</strong></p>
+<ol>
+<li style='margin-left:0.0em'><strong>SKU が2件しかない状態で発注するか。</strong> 社長が最も恐れているのは出品0件による再停止で、2件でも出品0件は解消します。一方でご依頼は5〜10SKU でした。「2件で走る／卸値を見てから広げる／別レーンを足す」のどれを取るかは戦略判断です。</li>
+<li style='margin-left:0.0em'><strong>1商品（SV6115）への集中をどう見るか。</strong> 2件は色・サイズ違いの同一商品です。ゲートが閉じれば2件とも同時に死にます（全滅シナリオ）。</li>
+<li style='margin-left:0.0em'><strong>母数を増やす手は2つしかありません。</strong> ⑴売価の足切りを下げる（＝ハジメの 2,200円を動かす。経理判断）⑵「Amazon 本体なし」の判定を履歴からスナップショットに戻す（＝中村ルールを崩す）。<strong>どちらも社長の既定を動かす話</strong>なので、サトルの判断では動かしていません。</li>
+</ol>
+<hr>
+<h2>10. カズヨへの申し送り（規約の是正が1件）</h2>
+<p><strong>T-20260920-003 の成果物3本に、SD 会員限定の取引条件（送料無料ラインの実額）が記載されたまま push 済みです。</strong></p>
+<table><thead><tr><th>ファイル</th><th>該当</th></tr></thead><tbody>
+<tr><td><code>T-20260920-003/04_丸進_サンリオとグンゼのAmazon適性.md</code></td><td>37行目・42行目</td></tr>
+<tr><td><code>T-20260920-003/05_丸進への初回問い合わせ文.md</code></td><td>53行目・106行目・134行目</td></tr>
+<tr><td><code>T-20260920-003/13_初回仕入れ実行計画.md</code></td><td>186行目・360行目</td></tr>
+</tbody></table>
+<p>ハルオの判定基準（同チケット 08）では <strong>Q1「SD ＝一切の情報が一律アウト」に該当</strong>し、Hard NO の区分です。<strong>措置は当職では行いません</strong>（成果物の改変・履歴の扱いは秘書と法務の領分／§4.1）。本書ではこの数値を「一定額以上で無料」と表記し、実額は <code>agent_output/</code> 側に置いています。</p>
+<hr>
+<h2>11. 申し送りもう1件 — pre-commit フックと法務判定の食い違い</h2>
+<p>pre-commit フック（<code>.githooks/</code>）は「月間販売数」を <strong>Keepa 固有の加工値＝非公開</strong>として commit を止めます（根拠：T-20260904-004/E2）。</p>
+<p>一方、ハルオの最新判定（T-20260920-003/08 §1-2）では「<strong>現在表示されている月間販売数</strong>」は <strong>A クラス＝公開可</strong>です。<strong>基準が2つ並存しています。</strong></p>
+<ul>
+<li style='margin-left:0.0em'>本書はフックの既定に従い、追跡対象から実数を外しました（バイパスはしていません）。</li>
+<li style='margin-left:0.0em'><strong>どちらを正にするかは法務と秘書の判断</strong>です。A クラスに寄せるならフックの語彙を直す必要があります。</li>
+</ul>
+<h2>付記：再現手順</h2>
+<ul>
+<li style='margin-left:0.0em'>取得・集計スクリプト：<code>workspace/output/agent_output/T-20260909-002/t13/</code>（<code>fetch13.py</code> / <code>fetch13b.py</code> / <code>finder13.py</code> / <code>fetch13c.py</code> / <code>an13.py</code> / <code>calc13.py</code>）</li>
+<li style='margin-left:0.0em'>生データと行データ：同フォルダ <code>raw13.json</code>（68件）／<code>raw13b.json</code>（5件）／<code>raw13c.json</code>（90件）／<code>rows13.json</code> / <code>rows13c.json</code></li>
+<li style='margin-left:0.0em'>Keepa トークン消費：571（本件合計）。残 550（2026-09-21 時点）</li>
+</ul>
+</body></html>
