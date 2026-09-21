@@ -53,6 +53,7 @@ ASSET: スーパーデリバリー | 通過済み 入会審査（2026-09-16「�
 ### 有料サービス（固定費）
 
 ASSET: Keepa API | 契約中 API Access €49/月・20 tokens/min（毎月4日引落し・Visa）。※キーワードを「Keepa」にすると未契約の「Keepa Pro」を誤ブロックするため API で登録 | reference_keepa_billing_api_only
+ASSET: キーゾン | 契約中（Keepa と併用。Keepa のグラフに月間販売個数を表示する Chrome 拡張） | 社長申告 2026-09-21
 ASSET: Amazon大口出品 | 契約中 月4,900円＋税（2026-09-12 小口から切替） | project_amazon_plan_koguchi
 ASSET: Exa | 契約中 MCPプラグイン（従量・OAuth認証済み・claude mcp list で Connected） | T-20260902-001 / reference_exa_deep_research_plugin
 
@@ -201,5 +202,6 @@ ASSET: 夜間自走launchd | 未稼働（night-shift.sh が不在。復旧の要
 | GitHub アカウント／リポジトリ | 自動同期が動いている＝保有は確実だが、プラン（無料/Pro）の記録が無い | GitHub 設定画面 |
 
 ### 更新履歴
+- 2026-09-21 キーゾンを追加（社長申告）。
 - 2026-09-21 新設。3度目の同型事故（書籍のチェックリストを当てはめ、保有済みの独自ドメイン・HP・会社概要を「未整備」と報告）を受けて。初版は18件。
 - 2026-09-21 **全件棚卸し（マリエ）**。`workspace/tickets/done/` 全件・`workspace/output/deliverables/` 全件・`scripts/` `.claude/hooks/` `.claude/commands/` `docs/reference/`・memory を突き合わせ、**18行 → 保有側81行／未保有側17行**へ拡充。キーワードの部分文字列衝突（保有キーワードが未保有キーワードに含まれて誤ブロックする）を検査し、`屋号`→`Satoy Select`、`Keepa`→`Keepa API` に付け替えて解消。あわせて Amazon 出品アカウントの状態を訂正（旧「北米は停止中」→ 2026-09-20 実画面で**4ストアとも停止中**）。裏の取れなかった5件は「要確認」として別掲。
