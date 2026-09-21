@@ -1,0 +1,162 @@
+<!doctype html><html lang='ja'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>公開リポに残る取引条件の公開可否 — 法務判定</title><style>body{font-family:-apple-system,'Hiragino Sans','Noto Sans JP',sans-serif;max-width:1150px;margin:2em auto;padding:0 1em;line-height:1.65;color:#222;font-size:14.5px}table{border-collapse:collapse;margin:.8em 0;font-size:.92em}th,td{border:1px solid #bbb;padding:.35em .6em;vertical-align:top}th{background:#eef2f8}tr:nth-child(even) td{background:#fafafa}h1{font-size:1.5em;border-bottom:2px solid #444}h2{font-size:1.25em;border-left:5px solid #25b;padding-left:8px;margin-top:1.8em}h3{font-size:1.05em;margin-top:1.4em}blockquote{border-left:4px solid #ccc;margin:.8em 0;padding:.2em 1em;color:#444}code{background:#f3f3f3;padding:1px 4px;border-radius:3px}hr{border:0;border-top:1px solid #ccc;margin:1.6em 0}</style></head><body>
+<h1>公開リポに残る取引条件の公開可否 — 法務判定</h1>
+<p>法務ハルオ／2026-09-21／T-20260920-003</p>
+<p><strong>本書には実額を一切書きません。</strong>該当箇所はすべてファイル名と行番号で指します。</p>
+<hr>
+<h2>0. 結論</h2>
+<table><thead><tr><th>対象</th><th>判定</th><th>根拠</th></tr></thead><tbody>
+<tr><td>① T-20260903-001（各社の自社サイトの取引条件）</td><td><strong>公開可</strong></td><td>非ログインで表示・robots で公開を自ら要求・当該 ToS に発信禁止条項なし（2026-09-21 実測）</td></tr>
+<tr><td>② T-20260904-004（送料の段階条件）</td><td><strong>不可（C クラス・Hard NO）</strong></td><td>出所は NETSEA Buyer API <code>/tariffs</code>。API 利用規約 15条1項・会員規約 7条2項3号</td></tr>
+<tr><td>★ T-20260920-003（丸進）</td><td><strong>伏せ字化は未完了。4ファイルに実額が残存</strong></td><td>SD 会員規約 17条1項。<strong>しかも既に public ブランチへ push 済み</strong></td></tr>
+<tr><td>③ 月間販売数の基準の並存</td><td><strong>ABCD の A クラス（公開可）を正とする。フックを直す</strong></td><td>同じ語が別物を指している。語ではなく意味で止める</td></tr>
+<tr><td>④ 再発防止</td><td>出所台帳＋ PreToolUse ガード＋ pre-commit 語彙修正の3点</td><td>人の注意力に置かない</td></tr>
+</tbody></table>
+<p><strong>最優先は ★ です。</strong>依頼文の前提「追跡下の残存0件」は誤りでした。②③④より先に手当てしてください。</p>
+<hr>
+<h2>1. ★ 先に訂正 — 丸進の伏せ字化は終わっていません</h2>
+<p>検索語 <code>20,000円以上</code> では漢数字表記と卸値分布を拾えません。実際に残っているのは次のとおりです。</p>
+<table><thead><tr><th>ファイル</th><th>行</th><th>何が残っているか</th></tr></thead><tbody>
+<tr><td><code>T-20260920-003/04_丸進_…適性.md</code></td><td>39</td><td>決済手段の手数料の実額</td></tr>
+<tr><td>同上</td><td>42 / 233</td><td>送料無料ラインの実額（漢数字表記）。<strong>42行目は同じ文の前半で〔一定額以上〕と伏せた直後に実額を書いています</strong></td></tr>
+<tr><td>同上</td><td>157</td><td>中央値ケースの卸の実額（税抜・税込の両方）</td></tr>
+<tr><td>同上</td><td>173〜179</td><td><strong>卸値の分布表</strong>（最小・25%点・中央・75%点）</td></tr>
+<tr><td><code>T-20260920-003/04_丸進_…適性.html</code></td><td>32 / 35 / 124 / 139 / 185</td><td>上記の HTML 版</td></tr>
+<tr><td><code>T-20260920-003/14_サンリオ…ASIN.md</code></td><td>194</td><td><strong>卸価格の分布（最小・中央・最大）を地の文で記載</strong>。同ファイル 238行目には「金額で一切記載せず」と書かれており、自己申告と実体が矛盾しています</td></tr>
+</tbody></table>
+<ul>
+<li style='margin-left:0.0em'>判定：いずれも <strong>C クラス（会員限定の取引条件）</strong>。SD 会員規約 17条1項は公開情報か否かを問わない一般的発信禁止型なので、金額である限り例外はありません（既判定 08 の Q1）。</li>
+<li style='margin-left:0.0em'><strong>公開状況（2026-09-21 13:46 実測）</strong>：<code>1bb5a04f</code>（04）・<code>d6f27e63</code>（14）とも <code>origin/claude/nighttime-work-checkin-iTWEa</code> に含まれます。このリポは PUBLIC なので、<strong>ブランチが main でなくても公開済み</strong>です。<code>origin/main</code> には未到達。</li>
+<li style='margin-left:0.0em'>措置：<strong>HEAD から伏せ字化する（先例どおり）。履歴は書き換えない。</strong>根拠は 2026-08-31 の卸価格227行・2026-09-06 の判断と同じで、既に不可逆なものに新たなコストを積む合理性がないためです（<code>knowledge_netsea_public_repo_leak_judgment</code> §4）。履歴書き換えの要否評価は §5 に書きました。</li>
+<li style='margin-left:0.0em'>残してよいもの：<strong>率と結論</strong>（卸率・必要倍率・「黒字にならない」という判断）。13・15 の記述は率だけなので<strong>このままで可</strong>です。</li>
+</ul>
+<hr>
+<h2>2. ① 自社サイトで公開されている取引条件 — 公開可</h2>
+<h3>判定</h3>
+<p><strong>出典 URL を付して当社成果物に転記することは問題ありません。</strong>該当は <code>T-20260903-001</code> の <code>research/raw/02_primary_disclosure.md</code> 39・42行目、<code>research/notes.md</code> 57・111行目、<code>research/draft.md</code> 76行目、<code>01_*.html</code> 238行目。<strong>いずれも修正不要</strong>です。</p>
+<h3>根拠（3本足。1本足で「公開情報だから白」と言わない）</h3>
+<table><thead><tr><th>足</th><th>確認内容（2026-09-21 当職実測）</th></tr></thead><tbody>
+<tr><td>実測</td><td>認証なしの <code>curl</code> で HTTP 200。当該条件の文字列が非ログイン HTML 内に存在</td></tr>
+<tr><td>相手方の意思表示</td><td>両サイトとも <code>robots.txt</code> が <code>Allow: /</code> かつ「policy ページは crawlable」と明記。<code>&lt;link rel="canonical"&gt;</code> を自ら出力＝検索エンジンへの掲載を自ら要求している</td></tr>
+<tr><td>条文</td><td>当該 ToS を全文検索。<code>転載</code> <code>複製</code> <code>発信</code> <code>秘密</code> <code>無断</code> の語はいずれも 0 件。<strong>当社を拘束する発信禁止条項が存在しない</strong></td></tr>
+</tbody></table>
+<p>加えて、取引条件そのものは事実の記述であり著作物性が低く（著作権法2条1項1号）、出典明示のうえでの引用は同法32条1項の範囲内です。</p>
+<h3>明文化（以後の誤検知を止めるためのルール）</h3>
+<blockquote><strong>公開ページ由来ルール</strong> — 次の4条件をすべて満たす取引条件は、実額を含めて当社成果物に転記してよい。<br>1. <strong>非ログインで表示される</strong>ことを取得当日に実測している<br>2. <strong>出典 URL と取得日</strong>を同じ箇所に併記する<br>3. 出典サイトの規約に<strong>発信・転載・秘密保持の禁止条項がない</strong>ことを確認している<br>4. <strong>出所が会員制卸（SD・NETSEA 等）ではない</strong></blockquote>
+<p><strong>4 が最重要です。</strong>SD・NETSEA は、その情報が公開ページに出ていても<strong>会員である当社が発信することを契約で禁じられている</strong>ため、①のルールを横展開してはいけません。禁止条項の型（一般的発信禁止型か秘密保持型か）で結論が反転します。</p>
+<hr>
+<h2>3. ② 送料の段階条件 — 出所は NETSEA、非公開</h2>
+<h3>出所の特定（一次）</h3>
+<p><code>T-20260904-004/C1_費目一覧.csv</code> 17行目と <code>C1_cost_assumptions.json</code> 193〜199行目の出典欄に、<strong>NETSEA Buyer API <code>GET /tariffs</code> の実データ（1社ぶん）</strong>と明記されています。丸進（SD）とは無関係の別サプライヤーです。該当箇所は次のとおり。</p>
+<table><thead><tr><th>ファイル</th><th>行</th></tr></thead><tbody>
+<tr><td><code>C1_コスト前提_実測版.md</code></td><td>92〜98</td></tr>
+<tr><td><code>C1_コスト前提_実測版.html</code></td><td>88〜93</td></tr>
+<tr><td><code>C1_cost_assumptions.json</code></td><td>193〜199 / 417</td></tr>
+<tr><td><code>C1_費目一覧.csv</code></td><td>17</td></tr>
+<tr><td><code>A_実測ログ.md</code></td><td>163</td></tr>
+</tbody></table>
+<p>いずれも <code>origin/main</code> に push 済みです。</p>
+<h3>判定：C クラス（Hard NO）</h3>
+<table><thead><tr><th>判断軸</th><th>当職の確認</th></tr></thead><tbody>
+<tr><td>非ログインで見えるか</td><td><strong>見えない。</strong>NETSEA のサプライヤーページを認証なしで取得したところ、<code>送料無料</code> のラベルは出るが、<strong>境目の金額・未満時の送料・複数社混載時の適用規則は HTML 中に存在しない</strong>（2026-09-21 実測）</td></tr>
+<tr><td>相手方の意思表示</td><td><code>robots.txt</code> に <code>Disallow: /api/</code>。<strong>API の応答を公開対象と見なしていない</strong></td></tr>
+<tr><td>条文</td><td>API 利用規約 15条1項「本規約において提供された相手方の<strong>一切の情報</strong>を秘密として保持し…第三者に開示または漏洩してはなりません」。<code>/tariffs</code> は本規約に基づき提供された情報そのもので、<strong>直撃</strong>。会員規約 7条2項3号（権利行使の範囲を超えた利用）も重ねて当たる</td></tr>
+</tbody></table>
+<p>社名・サプライヤー ID を伏せてあることは<strong>免責になりません。</strong>15条1項は秘密性でも識別可能性でもなく「提供された情報」を対象にしているためです（明文どおりに読む）。</p>
+<h3>リスク3軸</h3>
+<table><thead><tr><th>軸</th><th>評価</th></tr></thead><tbody>
+<tr><td>発生確率</td><td>低〜中（NETSEA が GitHub を見に来るか）</td></tr>
+<tr><td>影響度</td><td><strong>大</strong>（12条1号：催告なく API 提供解除。リサーチ基盤と仕入れ導線が同時に止まる）</td></tr>
+<tr><td>不可逆性</td><td><strong>高</strong>（push 済み。再契約の保証なし）</td></tr>
+</tbody></table>
+<p>→ <strong>ブロック。</strong>確率が低くても、不可逆性と影響度で決まります（行動原則1）。</p>
+<h3>指摘（改変はカズヨが実施）</h3>
+<ul>
+<li style='margin-left:0.0em'>5ファイルの該当行から<strong>実額と <code>gradual_border_price</code> / <code>apply_type</code> の値を削る</strong>。実額は <code>agent_output/T-20260904-004/</code> へ。</li>
+<li style='margin-left:0.0em'>成果物側に残す形：<strong>「送料は発注額の段階制。境目を越えると無料になる。値は非公開（NETSEA API 利用規約 15条1項）／実値は agent_output」</strong>。構造と結論だけなら復元不能で、コスト前提としての用は足ります。</li>
+<li style='margin-left:0.0em'><code>C1_損益シミュレーション.csv</code> と <code>.xlsx</code> にこの値が計算式として入っていないか、カズヨ側で確認してください（当職は表計算の内部参照までは検査していません）。</li>
+</ul>
+<hr>
+<h2>4. ③ 基準の並存 — A クラス（公開可）を正とし、フックを直す</h2>
+<h3>決定</h3>
+<p><strong>ABCD の A クラスが正です。</strong><code>pre-commit</code> の <code>pat_keepa</code> から「Amazon の商品ページに現在表示されている月間販売数」を指す語を外してください。</p>
+<p>理由は、<strong>同じ「月間販売数」という語が2つの別物を指している</strong>ためです。当社は同型の事故を6回起こしており（<code>knowledge_verify_field_semantics_not_names</code>）、<strong>語ではなく意味で止める</strong>のが既定です。</p>
+<table><thead><tr><th>指しているもの</th><th>クラス</th><th>扱い</th></tr></thead><tbody>
+<tr><td>Amazon の商品ページに現在表示されている購入点数のスナップショット</td><td><strong>A</strong></td><td>公開可（2026-09-06 社長決定：ASIN・現在価格・ランク・オファー数と同列）</td></tr>
+<tr><td>Keepa の履歴から推計した想定月販・合計・時系列</td><td><strong>B</strong></td><td>非公開のまま</td></tr>
+</tbody></table>
+<p><strong>ただし A を通す根拠を取り違えないこと。</strong>Keepa T&amp;C §11(1) は秘密性を要件にしていないので、「Amazon で誰でも見えるから白」という理屈は Keepa には効きません。A を通しているのは<strong>規約上の白ではなく、2026-09-06 の社長判断＋実害ゼロという運用判断</strong>です（ABCD §3）。フックのコメントにこの一文を残してください。ここを混同すると、次に「B も見えるから白」と展開されて基準が崩れます。</p>
+<h3>タカシへの指示（実装）</h3>
+<ol>
+<li style='margin-left:0.0em'><strong><code>pat_keepa</code> から外す</strong>：<code>月間販売数</code> / <code>monthlySold</code> / <code>monthly_sold</code></li>
+</ol>
+<p>   → <strong>外す前に、各列が「現在表示のスナップショット」か「推計」かをフィールド定義で確認すること。</strong>名前で判断しない。<code>monthly_sold_real</code> は名前からは判別できないので、確認できるまで<strong>残す</strong>。</p>
+<ol>
+<li style='margin-left:0.0em'><strong><code>pat_keepa</code> に残す／足す</strong>：<code>想定月販</code> <code>monthly_sales</code> <code>sum_monthly</code> <code>msales</code> <code>drop_count</code> <code>ドロップ数</code> に加え、08 §6 の宿題 <code>90日平均</code> <code>在庫切れ率</code> <code>BuyBox 交代</code></li>
+<li style='margin-left:0.0em'><strong>A が B に戻る条件を実装する</strong>：同一 ASIN の販売数が<strong>2時点以上</strong>並んだら時系列＝B。簡易判定として、列名に日付が付く形（<code>月間販売数（YYYY-MM）</code> <code>monthlySold_YYYYMMDD</code>）を検知対象に加える</li>
+<li style='margin-left:0.0em'><strong>C クラスの語彙を足す</strong>：<code>上代</code> <code>SD品番</code> <code>送料無料ライン</code> <code>gradual_border_price</code> <code>apply_type</code> <code>代引手数料</code> <code>掛け率</code></li>
+</ol>
+<hr>
+<h2>5. ④ 再発防止 — 人の注意力に置かない</h2>
+<h3>なぜ今回すり抜けたか（実測での切り分け）</h3>
+<table><thead><tr><th>穴</th><th>事実</th></tr></thead><tbody>
+<tr><td><strong>粒度</strong></td><td><code>04_…md</code> の卸値分布表は<strong>4列</strong>。フックの md ルールは5列以上の表ヘッダしか見ないため素通りした</td></tr>
+<tr><td><strong>散文</strong></td><td><code>04_…md</code> 42行目・<code>14_…md</code> 194行目は地の文。フックは散文中の金額を意図的に通す設計</td></tr>
+<tr><td><strong>差分範囲</strong></td><td>フックは<strong>新規追加ファイルのみ</strong>を見る。既存ファイルへの追記で入った実額は検査されない</td></tr>
+<tr><td><strong>表記ゆれ</strong></td><td>検索語が <code>20,000円以上</code> 固定で、漢数字表記を拾えなかった（今回の調査自体が踏んだ）</td></tr>
+</tbody></table>
+<p><strong>フックの思想は正しく、語彙・粒度・差分範囲の問題です。</strong>ゲートを外す方向の議論にしないでください。</p>
+<h3>対策1：出所台帳（<code>workspace/source-ledger.md</code>）— 資産台帳と同じ型</h3>
+<pre>SOURCE: スーパーデリバリー | 会員限定 | 一般的発信禁止型 | 会員規約17条1項 | 2026-09-20
+SOURCE: NETSEA          | 会員限定 | 秘密保持型（金額のみ） | API規約15条1項/会員規約7条2項3号 | 2026-09-06
+SOURCE: api.netsea.jp   | 会員限定 | API応答は全項目 | API規約15条1項 | 2026-09-21
+SOURCE: &lt;公開卸のホスト名&gt; | 公開 | 発信禁止条項なし・robots Allow | （ToS URL） | 2026-09-21</pre>
+<p><strong>これが①の誤検知を止める鍵です。</strong>「公開」区分に載っているホストの出典が併記されていれば、以降そのホスト由来の金額は止めません。</p>
+<h3>対策2：PreToolUse ガード（<code>source-terms-guard.py</code>）— 書き込む前に止める</h3>
+<ul>
+<li style='margin-left:0.0em'>対象：<code>Write</code> / <code>Edit</code> / <code>MultiEdit</code> で、<code>workspace/output/deliverables/</code> 配下と <code>workspace/tickets/</code> 配下に書くとき</li>
+<li style='margin-left:0.0em'><strong>検知パターン（ラベル＋数値の共起。数字が付くときだけ止める）</strong></li>
+</ul>
+<pre>(卸値|卸価格|卸率[^\n]{0,4}実額|上代|仕入単価|最小ロット|最低発注|送料無料ライン|
+ 代引手数料|掛け率|gradual_border_price|apply_type|wholesale_price)
+[^\n]{0,15}
+([0-9０-９][0-9,０-９\.]{1,}|[0-9０-９一二三四五六七八九十]+万)</pre>
+<ul>
+<li style='margin-left:0.0em'><strong>除外条件（誤検知を避ける。保護効果ゼロの印は危険側の設定です）</strong></li>
+</ul>
+<table><thead><tr><th>除外</th><th>理由</th></tr></thead><tbody>
+<tr><td><code>workspace/output/agent_output/</code> 配下</td><td>そこが実額の正しい置き場</td></tr>
+<tr><td>同一行に <code>非公開</code> <code>非掲載</code> <code>伏せ</code> <code>〔</code> を含む</td><td>既に伏せた表現</td></tr>
+<tr><td>同一行に <code>規約上の理由でリポジトリから除外</code></td><td>既存フックと同じ注記</td></tr>
+<tr><td>直前3行以内に <code>&lt;!-- public-source: &lt;URL&gt; verified:YYYY-MM-DD --&gt;</code> があり、URL のホストが台帳で「公開」区分</td><td><strong>①の正当な仕事を止めないための唯一の出口</strong></td></tr>
+<tr><td>自社の費用（FBA 手数料・販売手数料・外注費・送料の自社実費）</td><td>ラベル限定なので自然に外れる</td></tr>
+<tr><td><code>agents/legal/</code> 配下・ファイル名に <code>法務判定</code> <code>公開基準</code> を含む</td><td>語を引用するが金額は書かない運用と一致</td></tr>
+</tbody></table>
+<ul>
+<li style='margin-left:0.0em'>止めたときのメッセージには、<strong>台帳の該当行と「実額は agent_output へ」</strong>を出すこと。バイパス手段は書かない（書けば常態化します）。</li>
+</ul>
+<h3>対策3：pre-commit の修正（§4-4 の語彙追加と合わせて）</h3>
+<ol>
+<li style='margin-left:0.0em'><strong>差分範囲</strong>：上記の「ラベル＋数値」共起パターンに限り、<strong>新規追加だけでなく変更ファイルも検査</strong>する。数字が付くときだけなので誤検知は増えません。</li>
+<li style='margin-left:0.0em'><strong>粒度</strong>：md の表は列数で切らず、<strong>表の中か地の文かを問わず</strong>このパターンを見る。</li>
+<li style='margin-left:0.0em'><strong>表記ゆれ</strong>：<code>万</code> を数値表現に含める（今回の直接原因）。</li>
+</ol>
+<h3>対策4：週次の棚卸し（検知のみ・ブロックしない）</h3>
+<p>追跡下の全ファイルを同じパターンで走査し、ヒット一覧を週次でカズヨに出す。<strong>自動修正はしません</strong>（<code>feedback_detect_dont_auto_sync</code>：新しい方が正とは限らず、巻き戻しかを判断できるのは人間だけ）。今回のように<strong>過去に入り込んだもの</strong>は、commit 時のゲートでは永久に見つかりません。</p>
+<hr>
+<h2>6. 社長判断に上げる論点（当職は実行しません）</h2>
+<p><strong>論点：★ の既公開分について履歴を書き換えるか。</strong></p>
+<table><thead><tr><th>案</th><th>内容</th><th>当職の評価</th></tr></thead><tbody>
+<tr><td><strong>A（推奨）</strong></td><td>HEAD から伏せ字化し、履歴は残す</td><td>先例2件（2026-08-31・2026-09-06）と同じ扱い。同種事案で扱いを変えると基準が無くなる</td></tr>
+<tr><td>B</td><td>該当ブランチを force push で書き換える</td><td><strong>推奨しない。</strong>ダングリングコミットは直 URL で当分読め、確実な消去には GitHub Support への連絡（§4.1 第三者連絡）が要る。さらに <code>github-sync.sh</code> は diverge を検知すると停止し、<strong>30分ごとの自動同期が止まる</strong>＝成果物消失という別の事故を招く</td></tr>
+<tr><td>C</td><td>リポジトリを Private 化</td><td>可逆な手段で不可逆なリスクを消せる唯一の案だが、<strong>既に公開済みなので今回は効果が限定的</strong>。今後の運用方針としては別途議論の価値あり</td></tr>
+</tbody></table>
+<p>いずれも §4.1（破壊的 Git 操作／第三者連絡）に該当するため、<strong>実行は社長承認後、カズヨの手で</strong>お願いします。</p>
+<hr>
+<h2>7. 確度の区分</h2>
+<table><thead><tr><th>区分</th><th>内容</th></tr></thead><tbody>
+<tr><td><strong>一次・実測（2026-09-21）</strong></td><td>①2サイトの非ログイン取得・robots・ToS 全文検索／NETSEA サプライヤーページの非ログイン取得・<code>robots.txt</code>／該当ファイルの行番号／push 済みか否かの検証</td></tr>
+<tr><td><strong>一次（既存文書）</strong></td><td>NETSEA API 利用規約 15条1項・12条1号、会員規約 7条2項3号（<code>knowledge_netsea_public_repo_leak_judgment</code>）／SD 会員規約 17条1項（既判定 08）</td></tr>
+<tr><td><strong>推定</strong></td><td>対策2・3の誤検知率（実装後に実データで測るまで未検証）／<code>monthly_sold_real</code> の意味（フィールド定義を未確認のため「残す」側に倒した）</td></tr>
+<tr><td><strong>未検査</strong></td><td><code>C1_損益シミュレーション.csv</code> / <code>.xlsx</code> 内部の計算式に②の値が埋まっていないか</td></tr>
+</tbody></table>
+</body></html>
