@@ -159,4 +159,34 @@ SOURCE: &lt;公開卸のホスト名&gt; | 公開 | 発信禁止条項なし・r
 <tr><td><strong>推定</strong></td><td>対策2・3の誤検知率（実装後に実データで測るまで未検証）／<code>monthly_sold_real</code> の意味（フィールド定義を未確認のため「残す」側に倒した）</td></tr>
 <tr><td><strong>未検査</strong></td><td><code>C1_損益シミュレーション.csv</code> / <code>.xlsx</code> 内部の計算式に②の値が埋まっていないか</td></tr>
 </tbody></table>
+<hr>
+<h2>8. 追記（2026-09-21・マリエ／タカシからの確認への回答）</h2>
+<h3>8-1. §2 の対象は1ホストではありません。<strong>6ホストです</strong></h3>
+<p><strong>当職の §2 の書き方に誤りがありました。</strong>行番号で名指ししたのが <code>fuwamarket-b2b.com</code> の該当行だけだったため、対象が1ホストに見えています。<strong>判定（公開可）の対象は、<code>T-20260903-001/research/raw/02_primary_disclosure.md</code> に一次開示として収録された供給側のうち、金額を伴う条件を転記した全ホスト</strong>です。</p>
+<p><strong>原因は §5 で自分が指摘した「表記ゆれ」そのものです。</strong>2ホスト目の記載は <code>20,000円（税込22,000円）未満</code> という形で、当職の検索語（<code>20,000円以上</code>）では拾えませんでした。<strong>ラベル＋数値で数え直す</strong>という自分の指示を、自分の §2 に適用していませんでした。マリエが「当てはまりそうで足さない」と止めた判断は正しいです。</p>
+<h3>8-2. 台帳に「公開」区分で登録してよいホスト（当職が3本足で確認済み・2026-09-21）</h3>
+<table><thead><tr><th>ホスト</th><th>該当箇所（raw/02）</th><th>3本足の確認結果</th></tr></thead><tbody>
+<tr><td><code>fuwamarket-b2b.com</code></td><td>S3（34〜42行）</td><td>非ログイン200／robots <code>Allow: /</code>・policy は crawlable と明記／禁止語（転載・複製・無断・秘密・発信・再配布）0件</td></tr>
+<tr><td><code>www.ornedefeuilles.com</code></td><td><strong>S4（45〜55行）</strong></td><td>非ログイン200・canonical あり／robots <code>Allow: /</code>／<code>発信</code> は1件ヒットするが<strong>通知の到達時期を定めた条項</strong>（発信主義）で、情報発信の禁止ではない。他の禁止語0件</td></tr>
+<tr><td><code>www.moon-rabbit.jp</code></td><td>S6（67〜76行）</td><td>非ログイン200・canonical あり／<code>robots.txt</code> に当該パスの Disallow なし／禁止語0件</td></tr>
+<tr><td><code>www.toyoake.or.jp</code></td><td>S8（89〜98行）</td><td>非ログイン200・canonical あり／Disallow は <code>/wp-admin/</code> のみ／禁止語0件</td></tr>
+<tr><td><code>117kirei.com</code></td><td>S14（155〜164行）</td><td>非ログイン200・canonical あり／Disallow は管理画面のみ／禁止語0件</td></tr>
+<tr><td><code>daikichikimchi.jp</code></td><td>S19（213〜222行）</td><td>非ログイン200・canonical あり／Disallow は管理画面のみ・Sitemap 公示／禁止語0件</td></tr>
+</tbody></table>
+<p>マリエは上表の6件をそのまま登録して構いません。実測日はいずれも 2026-09-21。</p>
+<h3>8-3. <code>www.superdelivery.com</code> は「公開」区分に<strong>入れません</strong></h3>
+<p>S1・S2（12〜28行）に SD 自身の公開ページ由来の比率が2つあります（非ログインで読めるページです）。それでも<strong>「会員限定」区分のまま</strong>にしてください。</p>
+<ul>
+<li style='margin-left:0.0em'>SD 会員規約 17条1項は<strong>公知除外を置いていない一般的発信禁止型</strong>で、既判定 08 の Q1 は「SD＝一律アウト」。<strong>ここに例外を作ると、次に卸値で同じ理屈が使われます</strong>（グレーは原則 NO）。</li>
+<li style='margin-left:0.0em'>ただし<strong>既に 01 html 238行に入っている SD 由来の比率は取り下げ不要</strong>です。SD 自身が広告として公開している自社統計であり、発生確率が極めて低い。措置は「<strong>これ以上増やさない</strong>」＝以後は新規に書かない、で足ります。</li>
+<li style='margin-left:0.0em'>ガードが SD 由来の金額を止めるのは<strong>正しい挙動</strong>です。誤検知ではありません。</li>
+</ul>
+<h3>8-4. <code>monthly_sold_real</code> は <strong>A クラスで確定</strong>（pre-commit から外して可）</h3>
+<p><code>T-20260804-001/monthlysold_refetch.py</code> を読みました。85・90行目で <code>prod.get("monthlySold")</code> を <code>int()</code> するだけで、<strong>履歴からの推計・平均・合算を一切していません</strong>。Keepa の <code>monthlySold</code> は Amazon 商品ページ表示の購入点数の転記なので、<strong>A クラス（現在表示のスナップショット）</strong>です。タカシの見立てで正しく、<code>月間販売数</code> <code>monthlySold</code> <code>monthly_sold</code> と同じ扱いで外して構いません。</p>
+<p><strong>ただし2条件を付けます。</strong></p>
+<ol>
+<li style='margin-left:0.0em'><strong>同一 ASIN を複数時点で並べない。</strong>列名に日付が付く形（<code>monthly_sold_real_YYYYMMDD</code> 等）になった時点で時系列＝<strong>B クラスに戻ります</strong>。</li>
+<li style='margin-left:0.0em'><strong>取得日を併記する。</strong>スナップショットは日付が無いと「現在値」であることを主張できません。</li>
+</ol>
+<p>同ファイルが同時に出す <code>main_rank</code>（<code>stats.current[3]</code>）も<strong>現在ランク＝A</strong>です。こちらも止める必要はありません。</p>
 </body></html>
