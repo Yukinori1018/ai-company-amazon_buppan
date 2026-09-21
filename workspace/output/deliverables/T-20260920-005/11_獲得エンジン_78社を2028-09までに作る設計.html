@@ -1,281 +1,261 @@
-<!doctype html><html lang='ja'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>獲得エンジン — 78社を2028-09までに作る設計</title><style>body{font-family:-apple-system,'Hiragino Sans','Noto Sans JP',sans-serif;max-width:1150px;margin:2em auto;padding:0 1em;line-height:1.65;color:#222;font-size:14.5px}table{border-collapse:collapse;margin:.8em 0;font-size:.92em}th,td{border:1px solid #bbb;padding:.35em .6em;vertical-align:top}th{background:#eef2f8}tr:nth-child(even) td{background:#fafafa}h1{font-size:1.5em;border-bottom:2px solid #444}h2{font-size:1.25em;border-left:5px solid #25b;padding-left:8px;margin-top:1.8em}h3{font-size:1.05em;margin-top:1.4em}blockquote{border-left:4px solid #ccc;margin:.8em 0;padding:.2em 1em;color:#444}code{background:#f3f3f3;padding:1px 4px;border-radius:3px}hr{border:0;border-top:1px solid #ccc;margin:1.6em 0}</style></head><body>
-<h1>獲得エンジン — 78社を2028-09までに作る設計</h1>
+<!doctype html><html lang='ja'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>獲得エンジン v2 — 78社では200万に届きません。拘束条件は「段」です</title><style>body{font-family:-apple-system,'Hiragino Sans','Noto Sans JP',sans-serif;max-width:1150px;margin:2em auto;padding:0 1em;line-height:1.65;color:#222;font-size:14.5px}table{border-collapse:collapse;margin:.8em 0;font-size:.92em}th,td{border:1px solid #bbb;padding:.35em .6em;vertical-align:top}th{background:#eef2f8}tr:nth-child(even) td{background:#fafafa}h1{font-size:1.5em;border-bottom:2px solid #444}h2{font-size:1.25em;border-left:5px solid #25b;padding-left:8px;margin-top:1.8em}h3{font-size:1.05em;margin-top:1.4em}blockquote{border-left:4px solid #ccc;margin:.8em 0;padding:.2em 1em;color:#444}code{background:#f3f3f3;padding:1px 4px;border-radius:3px}hr{border:0;border-top:1px solid #ccc;margin:1.6em 0}</style></head><body>
+<h1>獲得エンジン v2 — 78社では200万に届きません。拘束条件は「段」です</h1>
 <p>T-20260920-005 ／ 2026-09-21 ／ プランナー タケシ</p>
-<p>入力：09（ハジメ・成長モデル）／08（タカシ・母数拡張の実測）／06（サトル・非Amazon経路）／03 v3（2年ロードマップ）／05（マサル再審査）／T-20260921-001 中村裕紀『Amazon国内メーカー直取引完全ガイド』読解ノート</p>
-<p><strong>この文書は 03 の設計の中心を「資金の作り方」から「78社の作り方」に差し替えるものです。03 の §2〜§4 を上書きします。</strong></p>
+<p><strong>v2（v1 を全面上書き）。</strong> マサル 13 の差し戻し6項目と、ハジメ 12・タカシ 08 の確定事項を反映しました。</p>
+<p>入力：13（マサル検証）／12（ハジメ再検算）／09／08／06／03 v3／T-20260921-001 中村読解ノート</p>
+<p>計算：<code>agent_output/T-20260920-005/11v2_engine.py</code>（段コホート月次モデル・工数モデル。全表を再現可能）</p>
 <hr>
-<h2>0. 結論（6行）</h2>
+<h2>0. 結論 — v2 の着地</h2>
+<h3>0-1. 数字</h3>
+<table><thead><tr><th></th><th>v1（撤回）</th><th><strong>v2 主線A</strong></th><th>v2 主線Aで段が上がらない場合</th><th>マサル 13 の中央</th></tr></thead><tbody>
+<tr><td>2028-09 取引社数</td><td>78社</td><td><strong>71社</strong></td><td>71社</td><td>40社</td></tr>
+<tr><td>2028-09 月商</td><td>981万</td><td><strong>718万</strong></td><td>602万</td><td>396万</td></tr>
+<tr><td>粗利率</td><td>25%</td><td><strong>19.4%</strong></td><td>16.7%</td><td>19.8%</td></tr>
+<tr><td><strong>2028-09 月営業利益</strong></td><td><strong>193万</strong></td><td><strong>99万</strong></td><td><strong>65万</strong></td><td><strong>50万</strong></td></tr>
+<tr><td>段3以上の社数</td><td>33社（42%）</td><td><strong>10.5社（15%）</strong></td><td>3.4社（5%）</td><td>5社（12.5%）</td></tr>
+<tr><td>12ヶ月累計 営業利益</td><td>+24万</td><td><strong>+21万</strong></td><td>▲0.3万</td><td>▲4万</td></tr>
+<tr><td>12ヶ月末（2027-09）現金 <strong>注入込み</strong></td><td>+34万</td><td><strong>▲8万</strong></td><td>▲8万</td><td>—</td></tr>
+<tr><td>12ヶ月末（2027-09）現金 <strong>注入なし</strong></td><td>（未記載）</td><td><strong>▲128万</strong></td><td>▲128万</td><td>—</td></tr>
+<tr><td>24ヶ月 累計接触</td><td>2,037通</td><td><strong>2,520通</strong></td><td>2,520通</td><td>—</td></tr>
+<tr><td>必要な名簿（母数）</td><td>2,425社</td><td><strong>6,500社</strong></td><td>6,500社</td><td>—</td></tr>
+</tbody></table>
+<p><strong>マサルの50万と私の99万の差は、1行で言えます。彼は v1 の接触計画（2,037通・名簿2,425社）をそのまま評価したからです。</strong> 同じ計算器に v1 の計画を入れると私も 41社・32万になります（＝彼の40社・50万の再現）。v2 は ①母数を6,500社へ広げ接触を2,520通に増やし（41社→71社）、②交渉時間を1社15分→45分にして段2→段3 を20%→45%へ取りに行く（32万→99万）。<strong>差は「彼の悲観 vs 私の楽観」ではなく、v1 には無かった打ち手2つ分です。</strong></p>
+<h3>0-2. 設計の結論（6行）</h3>
 <ol>
-<li style='margin-left:0.0em'><strong>主変数は接触数ではなく成約率です。</strong> 月4.2社の新規成約を24ヶ月続ければ78社に届きます。成約率が 2.0%（中村の初心者値）のままなら累計4,600社に接触が要り、時間も名簿も破綻します。<strong>成約率を 2.0% → 6.7% に上げられれば、累計2,035社＝いま持っている名簿だけで足ります。</strong></li>
-<li style='margin-left:0.0em'><strong>したがって「母数の拡張（4,000社か7,000社か）」は主線から降ります。</strong> 母数は成約率が上がらなかったときの保険です。03 §5-k の社長判断①は、いったん保留で構いません。</li>
-<li style='margin-left:0.0em'><strong>成約率を上げる最安の手は、道具を揃えることです。</strong> 独自ドメイン・名刺・会社概要・ネットFAX・050番号で<strong>初期3.5万円＋月2,700円</strong>。中村の実例では会社概要の作り込みだけで成約率が2倍（40社に1社→20社に1社）になっています。当社の現行値1.16%と中村の2.0〜3.3%の差は、この道具の有無でほぼ説明できます。</li>
-<li style='margin-left:0.0em'><strong>78社は必要条件であって十分条件ではありません。</strong> 78社 × 粗利率25% ＝ 月商986万は、<strong>1社あたり月商12.6万（4SKU）</strong>を同時に要求します。いま社長が持っている実測置き値は1社あたり月商5万です。<strong>社数を2.8倍、1社あたりを2.5倍</strong>、両方が要ります。</li>
-<li style='margin-left:0.0em'><strong>粗利率25%は、78社のうち33社（42%）が「限定化・卸区分」段に到達して初めて成立します。</strong> 到達には取引開始から6ヶ月以上かかるため、<strong>新規獲得のデッドラインは2028-03</strong>です。2028-04以降に取った社は 2028-09 の200万に寄与しません。</li>
-<li style='margin-left:0.0em'><strong>融資は中央世界では1回・300万で足ります。</strong> 利益を全額再投資すると、手元資金が必要運転資金を下回る瞬間は 2027Q3末（差35万）と2027Q4末（差39万）の2回だけです。ハジメの「借入826万」は社数が24社で止まる世界の数字で、78社が積み上がる世界では再投資が効きます（<strong>要ハジメ再検算</strong>）。</li>
+<li style='margin-left:0.0em'><strong>v1 の中心命題「78社を作れば200万」は誤りでした。</strong> 私自身が §4-1 で置いた段進行率（40%／20%）を素直に通すと、<strong>78社の月営業利益は86万</strong>です。200万に届かせるには169社が要り、週20時間では不可能です。</li>
+<li style='margin-left:0.0em'><strong>拘束条件は社数ではなく段です。</strong> 段2→段3（卸区分・限定化）の到達率が20%のままなら、社数をいくら積んでも営業利益率は13.8%で頭打ちになります。<strong>会社KPIの「利益率20%以上」も、段3以上が4割に乗らない限り構造的に達成できません。</strong></li>
+<li style='margin-left:0.0em'><strong>1社あたり月商＝段構成の関数です。</strong> マサルの「難しいのは社数（12.3%）ではなく1社あたり（2.8%）」と、彼の「最も危険な置き値は段2→段3」は、<strong>同じことを2回言っています</strong>。v1 はこの2つを別の話として扱い、優先順位を逆に置きました。<strong>v2 は重心を段上げに移します。</strong></li>
+<li style='margin-left:0.0em'><strong>量（母数・接触）は捨てません。燃料だからです。</strong> 名簿劣化を別建てにすると、現行名簿2,425社では71社に届きません（41社で止まる）。<strong>母数拡張は「保険」から「主線」に戻します（2027Q3 → 2027Q1）。</strong> v1 §9-4「増やすべきは率であって量ではない」は撤回します。</li>
+<li style='margin-left:0.0em'><strong>2028-09 に200万へ届く道は1本だけ残っています。「段上げを1社15分/月で回せる型」を作ることです。</strong> 段74/57＋90社の世界でも月営利182万・<strong>社長工数は月116時間（週27時間）で破綻</strong>します。交渉を15分/社に圧縮できれば月70時間に収まり、そこだけが到達経路です（§4-4）。</li>
+<li style='margin-left:0.0em'><strong>設計条件「12ヶ月累計キャッシュ&gt;0」と、月営業利益200万は、自己資金100万のままでは両立しません。</strong> 注入なし・借入なしで現金を割らずに走れるのは、<strong>2027-09 時点で月商100万・取引14社</strong>まで。成長期は運転資金が利益より速く膨らむからです。<strong>v1 はここを本業からの月10万注入（24ヶ月で240万）で静かに埋めていました。撤回し、借入で埋める形に置き直します（§6）。</strong></li>
 </ol>
 <hr>
-<h2>1. 逆算 — 月に何社へ接触し続けるか</h2>
-<h3>1-1. 必要な新規成約数</h3>
-<p>離脱率は月2.2%（マサル置き値）。24ヶ月で78社を残すには、<strong>累計92社の新規成約</strong>が要ります（14社が離脱する前提）。</p>
-<table><thead><tr><th></th><th>値</th></tr></thead><tbody>
-<tr><td>2028-09 の取引社数（目標）</td><td><strong>78社</strong></td></tr>
-<tr><td>24ヶ月の累計新規成約</td><td><strong>92社</strong></td></tr>
-<tr><td>平均すると</td><td><strong>月3.8社</strong>（定常なら月4.2社）</td></tr>
+<h2>1. v1 のどこが壊れていたか（自己検証）</h2>
+<table><thead><tr><th>#</th><th>v1 の記述</th><th>検算</th><th>v2 での扱い</th></tr></thead><tbody>
+<tr><td>1</td><td>§4-1「段1→2 が40%、段2→3 が20%」／§4-3「段3以上が33社（42%）」</td><td>40%×20% なら <strong>6.2社（8%）</strong>。5.3倍の開き</td><td><strong>§4-1 の率を採用し、§4-3 を破棄</strong>（§4で作り直し）</td></tr>
+<tr><td>2</td><td>§4-3「78社 → 月商1,160万・粗利率25%・月営利229万」</td><td>§4-1 の率だと <strong>710万・17.8%・86万</strong>（▲143万）。その率で200万には<strong>169社</strong></td><td>破棄。§4-2 に差し替え</td></tr>
+<tr><td>3</td><td>§5「12ヶ月累計 +24万で設計条件を満たす」</td><td>本業からの月10万注入込み。<strong>注入を外すと▲86万</strong></td><td><strong>注入込み／注入なしを全表で併記</strong>（§6）</td></tr>
+<tr><td>4</td><td>§8-2「名簿劣化は上昇曲線に吸収させた」</td><td>劣化＝名簿の性質／上昇＝送信者の性質。<strong>主語が違うので掛け算</strong>。累計成約 92社→<strong>53社</strong>、必要接触 2,035通→<strong>5,500通（1.7倍）</strong></td><td><strong>別建てに変更。</strong>私の見立て（1.3〜1.5倍）が甘かった</td></tr>
+<tr><td>5</td><td>§0-4「社数2.8倍と1社あたり2.5倍の両方が要る」（並列）</td><td>P(78社)=12.3% に対し <strong>P(1社12.6万)=2.8%</strong></td><td><strong>重心を1社あたり（＝段）へ移す。</strong>05 に続き2回続けて逆に置いた</td></tr>
+<tr><td>6</td><td>§8-1 危険度1位「成約率」／§9-4「増やすべきは率であって量ではない」</td><td>1位は<strong>段2→段3 の20%</strong>（階段法で▲48万＞成約率＋劣化の▲40万）。量は 母数+9万／母数＋接触倍増 <strong>+40万</strong></td><td><strong>両方を訂正</strong>（§7・§9）</td></tr>
+<tr><td>7</td><td>§1-2「当社の実測は1.16%」</td><td>1.16% はマサル04の<strong>モデル出力</strong>。<strong>当社の成約率の観測値はゼロ件</strong></td><td>表記を訂正（§2）</td></tr>
 </tbody></table>
-<h3>1-2. 成約率別の必要接触数（中村の置き値を使用）</h3>
-<table><thead><tr><th>成約率</th><th>中村の表現</th><th>月あたり接触（Q8時点）</th><th><strong>24ヶ月の累計接触</strong></th><th>判定</th></tr></thead><tbody>
-<tr><td><strong>2.0%</strong></td><td>50社に1社（初心者・メールのみ）</td><td>325社</td><td><strong>4,600社</strong></td><td><strong>悲観。</strong>時間が破綻し母数拡張も必須</td></tr>
-<tr><td>3.3%</td><td>30社に1社（標準・メールのみ）</td><td>197社</td><td>2,788社</td><td>母数は現行＋規制3カテゴリで足りる</td></tr>
-<tr><td><strong>段階上昇（推奨の置き方）</strong></td><td>2.0→3.3→5.0→6.7%</td><td><strong>35→97社</strong></td><td><strong>2,035社</strong></td><td><strong>中央。現行名簿2,425社だけで足りる</strong></td></tr>
-<tr><td>10.0%</td><td>10社に1社（電話併用・上手い人）</td><td>65社</td><td>920社</td><td>楽観。当社では2年以内に到達しない想定</td></tr>
-</tbody></table>
-<blockquote><strong>当社の実測は 1.16%</strong>（マサル 04：基礎2% × 名簿劣化係数0.58）。中村の2.0%より低いのは、<strong>道具（独自ドメイン・名刺・会社概要・固定電話・FAX）を1つも持っていない</strong>からだと見ています（推定）。<strong>当社の実測が出たら、この表の置き値はすべて差し替えます</strong>（初回の実測は2026Q4の700通で取れます）。</blockquote>
-<h3>1-3. 成約率を上げる手と、その効き（すべて中村の実測／推定）</h3>
-<table><thead><tr><th>手</th><th>効き</th><th>費用</th><th>当社の着手時期</th><th>確度</th></tr></thead><tbody>
-<tr><td><strong>会社概要Excelの作り込み</strong></td><td>40社に1社 → <strong>20社に1社（2倍）</strong></td><td>0円</td><td><strong>2026-10</strong></td><td>中村の実例（N=1）</td></tr>
-<tr><td>独自ドメインのメール</td><td>返信率に効く（数値なし）</td><td>748円/月</td><td>2026-10</td><td>中村★★★★★</td></tr>
-<tr><td>名刺</td><td>同上</td><td>1,000円/100枚</td><td>2026-10</td><td>中村★★★★★</td></tr>
-<tr><td>返信のない先へのFAX</td><td>「メールに反応しなくてもFAXに反応する」</td><td>1,200円/月</td><td>2027-04</td><td>中村（数値なし）</td></tr>
-<tr><td><strong>電話併用</strong></td><td>メール比 <strong>3〜5倍（10社に1社）</strong></td><td>050番号0円／架電外注400円/社</td><td>2027-10</td><td>中村のコンサル生実績</td></tr>
-<tr><td><strong>断られた先への切り返し</strong></td><td>「やるかやらないかで結果が大きく変わる」</td><td>0円</td><td><strong>2026-10</strong></td><td>中村（数値なし）</td></tr>
-<tr><td>簡易HP</td><td>「会社概要の提示を求められることが多い」</td><td>3万円（一時）</td><td>2027-04</td><td>中村★★★</td></tr>
-</tbody></table>
-<p><strong>24ヶ月の追加費用は、初期3.5万円＋月2,700円〜。これが78社の到達可否を分ける最大のレバーです。</strong></p>
 <hr>
-<h2>2. 時間の割り付け — 週20時間に収まるか</h2>
-<h3>2-1. 工数の置き値（すべて推定。実測ゼロ）</h3>
-<table><thead><tr><th>作業</th><th>1件あたり</th><th>誰が</th></tr></thead><tbody>
-<tr><td>名簿整備（連絡先の収集）</td><td>4分</td><td>外注可</td></tr>
-<tr><td>メール／フォーム送信</td><td>3分</td><td>外注可</td></tr>
-<tr><td>FAX送信（ネットFAX一括）</td><td>1分</td><td>外注可</td></tr>
-<tr><td>架電（不在・折り返し込み）</td><td>20分</td><td><strong>社長 or 架電外注</strong></td></tr>
-<tr><td>返信への対応・見積依頼</td><td>30分</td><td><strong>社長のみ</strong></td></tr>
-<tr><td>見積の利益精査（仕入表）</td><td>45分</td><td>外注可（慣れてから）</td></tr>
-<tr><td>成約後の初回立ち上げ（商品登録・発注・納品プラン）</td><td>2時間</td><td><strong>社長のみ</strong></td></tr>
-<tr><td>既存社のリピート発注・在庫管理</td><td>18分/社/月</td><td>半分は外注可</td></tr>
-<tr><td>深掘り打診・価格交渉</td><td>15分/社/月</td><td><strong>社長のみ</strong></td></tr>
+<h2>2. 成約率と名簿 — 劣化を別建てにする</h2>
+<h3>2-1. 実効成約率の定義（v2）</h3>
+<p><code>実効 p(t) ＝ p_skill(t) × exp(−1.2 × f)</code>　f ＝ 累計接触数 ÷ 名簿社数</p>
+<table><thead><tr><th>項</th><th>中身</th><th>出どころ</th></tr></thead><tbody>
+<tr><td>p_skill(t)</td><td>2.0% → 3.3% → 5.0% → 6.7%（半年ごと）</td><td>中村の置き値（他人の実績・自己申告）</td></tr>
+<tr><td>exp(−1.2f)</td><td>名簿の上位から撃つことによる劣化</td><td>マサル04</td></tr>
+<tr><td><strong>当社の観測値</strong></td><td><strong>ゼロ件。初回は2026Q4の返信率で取る</strong></td><td>—</td></tr>
 </tbody></table>
-<h3>2-2. 月あたりの工数（週20時間＝月87時間）</h3>
-<table><thead><tr><th>期</th><th>接触/月</th><th>取引社数</th><th>総工数</th><th>うち外注可</th><th><strong>社長の工数</strong></th><th><strong>週換算</strong></th></tr></thead><tbody>
-<tr><td>2026Q4</td><td>35</td><td>2</td><td>11h</td><td>5h</td><td><strong>6h</strong></td><td>1.3h</td></tr>
-<tr><td>2027Q1</td><td>75</td><td>6</td><td>27h</td><td>12h</td><td><strong>15h</strong></td><td>3.4h</td></tr>
-<tr><td>2027Q2</td><td>76</td><td>13</td><td>37h</td><td>16h</td><td><strong>22h</strong></td><td>5.0h</td></tr>
-<tr><td><strong>2027Q3</strong></td><td>106</td><td>23</td><td>54h</td><td>22h</td><td><strong>32h</strong></td><td>7.4h</td></tr>
-<tr><td>2027Q4</td><td>90</td><td>34</td><td>66h</td><td>22h</td><td><strong>44h</strong></td><td>10.2h</td></tr>
-<tr><td><strong>2028Q1</strong></td><td>110</td><td>48</td><td><strong>86h</strong></td><td>28h</td><td><strong>58h</strong></td><td>13.5h</td></tr>
-<tr><td>2028Q2</td><td>90</td><td>63</td><td><strong>94h</strong></td><td>27h</td><td><strong>66h</strong></td><td>15.3h</td></tr>
-<tr><td>2028Q3</td><td>97</td><td>78</td><td><strong>105h</strong></td><td>31h</td><td><strong>74h</strong></td><td><strong>17.2h</strong></td></tr>
+<h3>2-2. 劣化を別建てにすると何が変わるか</h3>
+<table><thead><tr><th></th><th>v1（吸収）</th><th><strong>v2（別建て）</strong></th></tr></thead><tbody>
+<tr><td>24ヶ月末の実効成約率</td><td>6.7%</td><td><strong>2.5%</strong>（2.0×3.35×0.37）</td></tr>
+<tr><td>2,037通で取れる累計成約</td><td>92社</td><td><strong>53社</strong></td></tr>
+<tr><td>92社に要する接触</td><td>2,035通</td><td><strong>5,500通</strong></td></tr>
+<tr><td>現行名簿2,425社で足りるか</td><td>足りる</td><td><strong>足りない（2.3倍）</strong></td></tr>
 </tbody></table>
-<p><strong>読み方</strong></p>
-<ul>
-<li style='margin-left:0.0em'><strong>総工数が週20時間（月87h）を超えるのは2028Q1です。</strong> そこから先は外注なしで回りません。</li>
-<li style='margin-left:0.0em'><strong>外注は「足りなくなってから」では遅い。</strong> 中村の警告：外注は自分の30%しか働けず、育成期間はむしろ自分が忙しくなる。<strong>2四半期前倒しの2027-07（27Q3）に開始</strong>します。</li>
-<li style='margin-left:0.0em'><strong>2028Q3 の社長工数は週17.2時間。余裕は13%しかありません。</strong> マサルが指摘した「社長1人の運用破綻点58社」は、外注を入れて78社まで押し上げた形です。<strong>それでも余裕は小さい。78社が上限です。</strong></li>
-<li style='margin-left:0.0em'><strong>外注に出せないもの＝社長の下限</strong>：返信対応17h・初回立ち上げ13h・深掘りと交渉19h・架電13h＝<strong>月62h（週14.3h）</strong>。これは2028Q3時点で圧縮できません。</li>
-</ul>
-<h3>2-3. 外注の投入計画と費用（ハジメの固定費に乗せる形）</h3>
-<p><strong>報酬は件数単価（中村：リサーチ〜メール送信 1件10〜70円）ですが、月1万円を下回ると応募が集まりません（中村）。よって月額固定で設計します。</strong></p>
-<table><thead><tr><th>開始</th><th>出す作業</th><th>月額</th><th>累計固定費（基礎7.1万＋道具込み）</th></tr></thead><tbody>
-<tr><td>2026-10</td><td>なし（<strong>社長が9ヶ月、全工程を自分で回す</strong>）</td><td>0</td><td>7.3万</td></tr>
-<tr><td><strong>2027-07</strong></td><td>名簿整備＋メール／フォーム送信（月100〜110社）</td><td><strong>1.0万</strong></td><td>8.4万</td></tr>
-<tr><td>2027-10</td><td>＋FAX送信・見積の一次精査</td><td>1.5万</td><td>8.9万</td></tr>
-<tr><td>2028-01</td><td>＋発注書作成・在庫表更新</td><td>3.0万</td><td>10.4万</td></tr>
-<tr><td>2028-04</td><td>＋架電代行（月40社×400円）</td><td>4.6万</td><td>12.0万</td></tr>
-<tr><td>2028-07</td><td>同上（社数増）</td><td><strong>5.4万</strong></td><td><strong>12.8万</strong></td></tr>
+<blockquote><strong>v1 §0-2「母数の拡張は主線から降りる」を撤回します。</strong> 劣化を別建てにした瞬間、母数は律速に戻ります。</blockquote>
+<h3>2-3. 母数の手当て（2027Q1 に発動）</h3>
+<table><thead><tr><th>経路</th><th>社数</th><th>確度</th><th>前提</th></tr></thead><tbody>
+<tr><td>(a) Keepa 現行名簿</td><td>2,425</td><td>実測</td><td>稼働中</td></tr>
+<tr><td>(a') ＋規制3カテゴリ（ドラッグ／ビューティー／食品）</td><td>+1,572</td><td>実測（08）</td><td><strong>ハルオ判断が前提（U-3）</strong></td></tr>
+<tr><td>(d) 展示会名簿（ギフトショーPDF・RX sitemap）</td><td>+2,000〜3,400</td><td>推測・中（06）</td><td>0円・在宅で取得可</td></tr>
+<tr><td><strong>合計</strong></td><td><strong>6,000〜7,400</strong></td><td></td><td>A案の必要量6,500を満たす</td></tr>
 </tbody></table>
-<ul>
-<li style='margin-left:0.0em'><strong>24ヶ月の外注費累計は約84万円。</strong> 月商比では1%未満で、ハジメの「外注費＝月商の4%」（納品代行）とは別枠です。二重計上しないでください。</li>
-<li style='margin-left:0.0em'><strong>なぜ2027-07まで自分でやるのか。</strong> 中村：「自分が理解していない作業を外注すると100%失敗する。月利100万・200万の人でも同じ」。当社は9ヶ月・約2,100社の送信で型を作ってから渡します。</li>
-<li style='margin-left:0.0em'>固定1名（月25万）は採りません（03 v3 の既定を継承。月利50万超から）。</li>
-</ul>
 <hr>
-<h2>3. 既存経路との接続 — どこから月100社を供給するか</h2>
-<h3>3-1. 経路ごとの供給力</h3>
-<table><thead><tr><th>経路</th><th>24ヶ月で供給できる接触社数</th><th>月あたり</th><th>確度</th><th>当社の状態</th></tr></thead><tbody>
-<tr><td><strong>(a) Keepa 現行名簿</strong></td><td><strong>2,425</strong></td><td>101</td><td>実測（T-20260914-006）</td><td>稼働可</td></tr>
-<tr><td>(a') ＋規制3カテゴリ（ドラッグ/ビューティー/食品）</td><td>+1,572</td><td>+65</td><td>実測（08）</td><td><strong>ハルオ判断が前提</strong></td></tr>
-<tr><td>(d) 展示会名簿（ギフトショーPDF・RX sitemap）</td><td>+2,000〜3,400（重複除去後）</td><td>+85〜142</td><td>推測・中（06）</td><td>0円・在宅で取得可</td></tr>
-<tr><td>(f) ものづくり補助金 採択者一覧</td><td>+1,200〜2,300</td><td>+50〜96</td><td>推測・低（06）</td><td>0円・法人番号つき</td></tr>
-<tr><td><strong>供給の合計</strong></td><td><strong>7,200〜9,700</strong></td><td><strong>300〜400</strong></td><td>—</td><td>—</td></tr>
-<tr><td><strong>必要量（中央）</strong></td><td><strong>2,035</strong></td><td><strong>35〜110</strong></td><td>—</td><td>—</td></tr>
+<h2>3. 段の定義と、段が上がらないことの値段</h2>
+<h3>3-1. 段（中村 Chapter 8-9 を当社の数字に翻訳）</h3>
+<table><thead><tr><th>段</th><th>期間</th><th>打ち手</th><th>粗利率 g</th><th><strong>1社あたり月商</strong></th><th>次段への率（推定・実測ゼロ）</th></tr></thead><tbody>
+<tr><td>段1 初回</td><td>0〜2ヶ月</td><td>薄利でも仕入れて「売れる」を確認</td><td>12%</td><td><strong>6万</strong></td><td>—</td></tr>
+<tr><td>段2 数量交渉</td><td>2回目の発注時</td><td>数量増×掛け率／「一番安い方の条件は」</td><td>19%</td><td><strong>12万</strong></td><td>段1→2：<strong>40%</strong></td></tr>
+<tr><td>段3 卸区分・限定化</td><td>6ヶ月〜</td><td>小売/卸の区分を聞く／販売者の限定化</td><td>27%</td><td><strong>20万</strong></td><td>段2→3：<strong>20%</strong>（A案では45%を取りに行く）</td></tr>
+<tr><td>段4 独占</td><td>12ヶ月〜</td><td>独占販売の提案</td><td>34%</td><td><strong>30万</strong></td><td>段3→4：8%</td></tr>
 </tbody></table>
-<p><strong>供給は需要の3.5〜4.8倍あります。母数は律速ではありません。</strong> 08 の結論「母数を増やすより1通あたりの成約率を上げるほうに余地が残っている」と一致します。</p>
-<h3>3-2. 成約に直接効く経路（接触数ではなく社数で効く）</h3>
-<table><thead><tr><th>経路</th><th>24ヶ月の成約寄与</th><th>社長の時間</th><th>費用</th><th>根拠</th></tr></thead><tbody>
-<tr><td><strong>(e) ザ・商談モール</strong></td><td><strong>20社</strong></td><td>週0.5h（1案件）</td><td>13,000円/年</td><td>1案件→成立0.240（運営集計・N=17,513）</td></tr>
-<tr><td>展示会の現地来場（2027Q4以降・年1回）</td><td>4社</td><td>年48h</td><td>交通費</td><td>商談7.5件→成約3.4件（主催者調査・N=2,320）</td></tr>
+<blockquote><strong>段別の1社あたり月商（6/12/20/30万）はマサルがそのまま採用しています。</strong> v2 でも維持します。<strong>1社あたり月商は独立変数ではなく、段構成の従属変数</strong>です。</blockquote>
+<h3>3-2. 段が上がらないことの値段（定常スナップショット・固定費12.8万）</h3>
+<table><thead><tr><th>世界</th><th>社数</th><th>月商</th><th>粗利率</th><th>1社あたり</th><th>段3以上</th><th><strong>月営業利益</strong></th></tr></thead><tbody>
+<tr><td><strong>78社・段40/20（v1 §4-1 の率）</strong></td><td>78</td><td>710万</td><td>17.8%</td><td>9.1万</td><td>6.2社（8%）</td><td><strong>86万</strong></td></tr>
+<tr><td>78社・段74/57（v1 §4-3 と整合する率）</td><td>78</td><td>1,104万</td><td>23.7%</td><td>14.2万</td><td>32.9社（42%）</td><td>205万</td></tr>
+<tr><td><strong>段20%のまま200万に届かせるには</strong></td><td><strong>169</strong></td><td>1,539万</td><td>17.8%</td><td>9.1万</td><td>13.5社</td><td>200万</td></tr>
+<tr><td>60社・段55/45（A案の目標）</td><td>60</td><td>692万</td><td>21.4%</td><td>11.5万</td><td>14.8社（25%）</td><td>109万</td></tr>
+<tr><td>40社・段40/20（マサル中央の再現）</td><td>40</td><td>364万</td><td>17.8%</td><td>9.1万</td><td>3.2社</td><td>40万</td></tr>
 </tbody></table>
-<p><strong>ザ・商談モールは 0.48社/h。メール経路と同じ効率を、送信工数ゼロで出します。</strong> 向こうから提案が来るので、週20時間制約と最も相性が良い経路です。<strong>2026-11 の入会を推奨します</strong>（§7 判断2）。</p>
-<h3>3-3. NETSEA／スーパーデリバリーの位置づけ（重要な再定義）</h3>
-<p><strong>この2つは「78社」に数えません。</strong></p>
-<table><thead><tr><th>理由</th><th>中身</th></tr></thead><tbody>
-<tr><td>規約</td><td>NETSEA はプラットフォーム外での直接連絡を禁止（利用規約 第7条2項5号）。<strong>掛け率交渉も限定化も独占もできない</strong></td></tr>
-<tr><td>構造</td><td>卸サイトの掛け率は全会員共通。<strong>粗利率25%の道（§4）に1段も乗れない</strong></td></tr>
+<p><strong>読み方：社数を2倍にしても営業利益は2倍にしかならないが、段を上げると社数を減らしても利益は増える。</strong> 60社・段45% が 78社・段20% を上回ります（109万 vs 86万）。<strong>これが「重心を段へ移す」の中身です。</strong></p>
+<h3>3-3. §4-3 の「段3以上42%」は、時間の面からも成立しません</h3>
+<p>段3には取引開始から6ヶ月が要ります。<strong>2026-10 にゼロから始め、成約率が後半ほど高くなる（＝獲得が後ろに寄る）以上、2028-09 時点で6ヶ月以上経過している社は全体の4割弱です。</strong></p>
+<table><thead><tr><th>世界</th><th>2028-09 の段3以上</th></tr></thead><tbody>
+<tr><td>A案（段45%）</td><td>10.5社（15%）</td></tr>
+<tr><td>段74/57 ＋ 90社（天井）</td><td>24.4社（26%）</td></tr>
 </tbody></table>
-<p><strong>では何のためにあるのか。「実績」を作るためです。</strong></p>
-<p>中村の記録では、メーカーが電話で必ず聞くのは<strong>売上規模・事業年数・従業員数</strong>で、初心者はここで詰まります。<strong>NETSEA／SDで先に売上と販売実績を作っておけば、この質問に数字で答えられます。</strong> 2026Q4〜2027Q1の月商は、ほぼこの2経路から出ます。</p>
-<blockquote><strong>やらないこと①：NETSEA／SDの仕入れを78社にカウントしない。</strong> ここを混ぜると、成約率も粗利率も測れなくなります。</blockquote>
+<p><strong>どの世界でも42%には届きません。42%は「率」ではなく「時間」が足りないのです。</strong> v1 の獲得デッドライン2028-03 は、日付としては正しくても、<strong>そこまでに48社を取っても段3は6社にしかならない</strong>ので目的を果たしません。マサルの「拘束条件は日付ではなく率」は正しく、さらに<strong>率でも足りず、期間そのものが足りない</strong>というのが v2 の判定です。</p>
 <hr>
-<h2>4. 粗利率25%への道 — いつ・何社目から交渉するか</h2>
-<h3>4-1. 段の定義（中村 Chapter 8-9 を当社の数字に翻訳）</h3>
-<table><thead><tr><th>段</th><th>取引開始からの期間</th><th>打ち手</th><th><strong>粗利率 g</strong></th><th>掛け率の目安</th><th>次段への成功率（推定）</th></tr></thead><tbody>
-<tr><td><strong>段1 初回</strong></td><td>0〜2ヶ月</td><td>薄利でも仕入れて「売れる」を確認</td><td><strong>12%</strong></td><td>6〜6.5掛け</td><td>—</td></tr>
-<tr><td><strong>段2 数量交渉</strong></td><td><strong>2回目の発注時（例外なし）</strong></td><td>数量増×掛け率／「一番安い方の条件は」</td><td><strong>19%</strong></td><td>5.5〜6掛け</td><td><strong>40%</strong></td></tr>
-<tr><td><strong>段3 卸区分・限定化</strong></td><td>6ヶ月〜</td><td>小売6掛け/卸5掛けの区分を聞く／販売者の限定化を提案</td><td><strong>27%</strong></td><td><strong>5掛け</strong></td><td><strong>20%</strong></td></tr>
-<tr><td>段4 独占</td><td>12ヶ月〜</td><td>独占販売の提案</td><td><strong>34%</strong></td><td>4.5掛け</td><td>8%（マサル置き値）</td></tr>
+<h2>4. 主線A — 段上げ全振り（60〜70社）</h2>
+<h3>4-1. 何を変えるか（v1 との差分は3つだけ）</h3>
+<table><thead><tr><th>#</th><th>v1</th><th><strong>v2 主線A</strong></th><th>根拠</th></tr></thead><tbody>
+<tr><td>1</td><td>深掘り・価格交渉 <strong>15分/社/月</strong></td><td><strong>45分/社/月</strong></td><td>段上げは「聞く」だけでは動かない。稟議を通す材料（数量コミット・年間取引額・販売実績の提示）を作る時間</td></tr>
+<tr><td>2</td><td>社数目標 78社</td><td><strong>60〜70社</strong>（上限は工数で決まる）</td><td>交渉45分/社では71社で週20.2時間。<strong>78社は入らない</strong></td></tr>
+<tr><td>3</td><td>母数拡張は2027Q3の保険</td><td><strong>2027Q1に発動・主線</strong></td><td>劣化別建ての帰結（§2-2）</td></tr>
 </tbody></table>
-<p><strong>ハジメの検算：6掛けでは利益率20%すら達成できません。5掛け以下が必須条件です。</strong> つまり<strong>段3に届かない取引先は、事業の目標に対して構造的に無力</strong>です。</p>
-<blockquote><strong>やらないこと②：2回目の交渉で5.5掛けに届かない取引先に、3本目以降のSKUを入れない。</strong> 深掘りの工数（月15分/社）は有限です。届いた社に寄せます。</blockquote>
-<h3>4-2. いつ始めるか</h3>
-<p><strong>「何社目から」ではなく「何回目の発注から」です。全社・2回目の発注時に必ず交渉を挿します。1社目から適用します。</strong></p>
-<ul>
-<li style='margin-left:0.0em'>初回発注は2026年11月ごろ。<strong>2026年12月〜2027年1月には、最初の価格交渉が発生します。</strong></li>
-<li style='margin-left:0.0em'>交渉テンプレは3種を用意（数量増／卸区分／他社同条件）。中村の返し文を当社の言い方に直したものを、2026-10 に作ります。</li>
-<li style='margin-left:0.0em'><strong>中村の釘：「10社中1社でも成功すればあなたの勝ち」。</strong> 他の人はすぐ諦めるので、交渉するだけで差別化になります。</li>
-</ul>
-<h3>4-3. 2028-09 に粗利率25%が成立する条件</h3>
-<table><thead><tr><th>段</th><th>社数</th><th>1社あたり月商</th><th>月商</th><th>g</th><th>粗利</th></tr></thead><tbody>
-<tr><td>段1 初回〜2回目</td><td>20</td><td>6万</td><td>120万</td><td>12%</td><td>14万</td></tr>
-<tr><td>段2 数量交渉済み</td><td>25</td><td>12万</td><td>300万</td><td>19%</td><td>57万</td></tr>
-<tr><td><strong>段3 卸区分・限定化</strong></td><td><strong>25</strong></td><td>20万</td><td>500万</td><td>27%</td><td>135万</td></tr>
-<tr><td>段4 独占</td><td>8</td><td>30万</td><td>240万</td><td>34%</td><td>82万</td></tr>
-<tr><td><strong>合計</strong></td><td><strong>78</strong></td><td>平均14.9万</td><td><strong>1,160万</strong></td><td><strong>24.8%</strong></td><td><strong>288万</strong></td></tr>
-<tr><td>月営業利益</td><td></td><td></td><td></td><td></td><td><strong>229万</strong></td></tr>
-</tbody></table>
-<p><strong>十分条件はこれです：78社のうち33社（42%）が段3以上にいること。</strong></p>
-<ul>
-<li style='margin-left:0.0em'>段3には取引開始から<strong>6ヶ月以上</strong>が要ります。→ <strong>33社を段3に乗せるには、2028-03 までに48社を取っている必要があります。</strong></li>
-<li style='margin-left:0.0em'><strong>2028-04以降に獲得した社は、2028-09 の200万に寄与しません。</strong> 獲得のデッドラインは2028-03です。</li>
-</ul>
-<blockquote><strong>やらないこと③：2028-04以降、新規獲得に工数を増やさない。</strong> その期の工数は、既存78社を段3へ押し上げることに全振りします。</blockquote>
-<hr>
-<h2>5. 四半期マイルストーン（2026Q4 〜 2028Q3）</h2>
-<p>前提：成約率は 2.0→3.3→5.0→6.7% に段階上昇。離脱2.2%/月。在庫回転1.5ヶ月（既定の上限6ヶ月は遵守）。本業継続・生活費の引き出しなし。本業から月10万を投入。</p>
-<table><thead><tr><th>期</th><th><strong>接触/月</strong></th><th><strong>取引社数</strong></th><th>月商</th><th>g</th><th><strong>月営業利益</strong></th><th><strong>必要運転資金</strong></th><th>手元資金</th><th>差</th></tr></thead><tbody>
-<tr><td><strong>2026Q4</strong></td><td>35</td><td><strong>2</strong></td><td>10万</td><td>13%</td><td><strong>▲6.4万</strong></td><td>13万</td><td>111万</td><td>+98</td></tr>
-<tr><td><strong>2027Q1</strong></td><td>75</td><td><strong>6</strong></td><td>38万</td><td>14%</td><td><strong>▲3.5万</strong></td><td>46万</td><td>130万</td><td>+84</td></tr>
-<tr><td><strong>2027Q2</strong></td><td>76</td><td><strong>13</strong></td><td>93万</td><td>15%</td><td><strong>+2.8万</strong></td><td>110万</td><td>169万</td><td>+59</td></tr>
-<tr><td><strong>2027Q3</strong></td><td>106</td><td><strong>23</strong></td><td>181万</td><td>17%</td><td><strong>+15.2万</strong></td><td>210万</td><td>245万</td><td><strong>+35</strong></td></tr>
-<tr><td><strong>2027Q4</strong></td><td>90</td><td><strong>34</strong></td><td>310万</td><td>19%</td><td><strong>+37.6万</strong></td><td>350万</td><td>389万</td><td><strong>+39</strong></td></tr>
-<tr><td><strong>2028Q1</strong></td><td>110</td><td><strong>48</strong></td><td>483万</td><td>21%</td><td><strong>+71.8万</strong></td><td>532万</td><td>639万</td><td>+107</td></tr>
-<tr><td><strong>2028Q2</strong></td><td>90</td><td><strong>63</strong></td><td>722万</td><td>23%</td><td><strong>+125.2万</strong></td><td>773万</td><td>1,048万</td><td>+275</td></tr>
-<tr><td><strong>2028Q3</strong></td><td>97</td><td><strong>78</strong></td><td>981万</td><td><strong>25%</strong></td><td><strong>+193.1万</strong></td><td>1,020万</td><td>1,658万</td><td>+638</td></tr>
+<h3>4-2. 四半期カーブ（A案・自己整合／接触2,520通・母数6,500・段55/45）</h3>
+<table><thead><tr><th>期</th><th>接触/月</th><th>社数</th><th>月商</th><th>粗利率</th><th>月営業利益</th><th>必要運転資金</th><th><strong>現金（注入込み）</strong></th><th><strong>現金（注入なし）</strong></th><th>段3以上</th></tr></thead><tbody>
+<tr><td>2026Q4</td><td>35</td><td>2.0</td><td>14万</td><td>14.1%</td><td>▲5.9万</td><td>17万</td><td>+94万</td><td>+64万</td><td>0.0</td></tr>
+<tr><td>2027Q1</td><td>75</td><td>6.0</td><td>46万</td><td>15.2%</td><td>▲2.1万</td><td>55万</td><td>+75万</td><td>+15万</td><td>0.0</td></tr>
+<tr><td>2027Q2</td><td>110</td><td>15.0</td><td>122万</td><td>16.1%</td><td>+6.3万</td><td>143万</td><td>+25万</td><td><strong>▲65万</strong></td><td>0.4</td></tr>
+<tr><td><strong>2027Q3</strong></td><td>130</td><td>24.4</td><td>214万</td><td>17.1%</td><td>+18.6万</td><td>249万</td><td><strong>▲8万</strong></td><td><strong>▲128万</strong></td><td>1.3</td></tr>
+<tr><td><strong>2027Q4</strong></td><td>130</td><td>37.5</td><td>343万</td><td>17.8%</td><td>+37.0万</td><td>393万</td><td><strong>▲32万</strong></td><td><strong>▲182万</strong></td><td>3.2</td></tr>
+<tr><td>2028Q1</td><td>130</td><td>48.7</td><td>466万</td><td>18.5%</td><td>+56.4万</td><td>531万</td><td>+11万</td><td>▲169万</td><td>5.3</td></tr>
+<tr><td>2028Q2</td><td>120</td><td>61.3</td><td>603万</td><td>19.0%</td><td>+78.8万</td><td>682万</td><td>+103万</td><td>▲107万</td><td>8.1</td></tr>
+<tr><td><strong>2028Q3</strong></td><td>110</td><td><strong>70.9</strong></td><td><strong>718万</strong></td><td><strong>19.4%</strong></td><td><strong>+99.0万</strong></td><td>808万</td><td>+285万</td><td>+45万</td><td>10.5</td></tr>
 </tbody></table>
 <ul>
-<li style='margin-left:0.0em'><strong>12ヶ月累計の営業利益は +24万（中央）。設計条件「12ヶ月累計キャッシュ＞0」を満たします。</strong> ただし薄い。運転資金の積み増し210万は、自己資金100万＋本業投入120万で賄います（ハジメの「最薄月101万」と整合）。</li>
-<li style='margin-left:0.0em'><strong>手元資金が最も薄いのは 2027Q3末（+35万）と2027Q4末（+39万）。ここが融資の窓です。</strong> ハジメの発動条件「3ヶ月連続で月営業利益20万円以上」は2027Q4に満たします。<strong>推奨は2027Q3末に300万・1回。</strong></li>
-<li style='margin-left:0.0em'><strong>月商800万（会社の最重要KPI）は2028Q2〜Q3で通過します。</strong> 利益率20%は 2028Q3 で 19.7%（193.1÷981）。<strong>SKU数は78社×4SKU＝312で、KPIのSKU100は2027Q4（34社×3SKU＝102）で通過します。SKU100はゴールではなく通過点です。</strong></li>
+<li style='margin-left:0.0em'><strong>24ヶ月累計 営業利益 753万</strong>（v1 の1,307万・ハジメ訂正後1,180万に対し大幅減。段を正直に置いた結果）</li>
+<li style='margin-left:0.0em'><strong>12ヶ月累計 営業利益 +21万</strong>。ただし<strong>現金は注入込みでも▲8万</strong>。設計条件は借入なしでは満たせません（§6）</li>
+<li style='margin-left:0.0em'>この表は同期運転資金・税なしの簡易式です。<strong>ハジメ12 の補正（在庫の先行取得で運転資金2割増＋税）を当てると現金は各期▲60〜90万下振れ</strong>します</li>
 </ul>
-<h3>5-1. 各期の分岐（達成できなかったら何を変えるか）</h3>
-<table><thead><tr><th>期</th><th>未達の判定</th><th><strong>変えること（1行）</strong></th></tr></thead><tbody>
-<tr><td>2026Q4</td><td>累計700通で成約0社</td><td><strong>初回メール文面と会社概要Excelを全面改訂する</strong>（中村：返信率20%以下は文面の問題）</td></tr>
-<tr><td>2027Q1</td><td>取引6社未満／返信率20%未満</td><td><strong>FAXと050番号を前倒しで導入し、返信のない先へ二の矢を入れる</strong></td></tr>
-<tr><td>2027Q2</td><td>2回目交渉の成功率が20%未満</td><td><strong>交渉テンプレを「卸区分を聞く型」に一本化する</strong>（中村の実例で6掛け→5掛けが出た型）</td></tr>
-<tr><td>2027Q3</td><td>取引23社未満</td><td><strong>母数の拡張を発動する</strong>（規制3カテゴリ＋展示会名簿・+3,500社）。保険の発動はここ</td></tr>
-<tr><td>2027Q4</td><td>段3到達が3社未満</td><td><strong>限定化の提案を、価格が荒れた商品を持つ先に絞って集中させる</strong>（中村：荒れた先ほど話が通る）</td></tr>
-<tr><td>2028Q1</td><td>社長工数が月75hを超えた</td><td><strong>架電代行を前倒し投入し、新規接触を月70社へ落とす</strong>（社数より段の深さを優先）</td></tr>
-<tr><td>2028Q2</td><td>取引63社未満</td><td><strong>新規獲得を止め、全工数を既存の段上げへ振る</strong>（新規は6ヶ月で段3に届かないため）</td></tr>
-<tr><td>2028Q3</td><td>月営業利益150万未満</td><td><strong>期限を2029-09へ延長する判断（03 §5-g）を社長へ上げる。目標額は下げない</strong></td></tr>
+<h3>4-3. 社長工数（週20時間＝月87時間）</h3>
+<table><thead><tr><th>案</th><th>接触/月</th><th>社数</th><th>交渉</th><th>月工数</th><th>週</th><th>可否</th></tr></thead><tbody>
+<tr><td><strong>A案 段上げ全振り</strong></td><td>110</td><td>70.9</td><td>45分</td><td><strong>87.5h</strong></td><td>20.2h</td><td><strong>ぎりぎり超過</strong></td></tr>
+<tr><td>A案（60社に抑制）</td><td>100</td><td>60</td><td>45分</td><td>75.0h</td><td>17.3h</td><td>○</td></tr>
+<tr><td>B案 量で押す</td><td>180</td><td>98.2</td><td>15分</td><td>78.3h</td><td>18.1h</td><td>○</td></tr>
+<tr><td>A+B 併走</td><td>150</td><td>92.7</td><td>45分</td><td>115.9h</td><td>26.8h</td><td><strong>×</strong></td></tr>
+<tr><td>A+B・交渉30分</td><td>150</td><td>92.7</td><td>30分</td><td>92.8h</td><td>21.4h</td><td><strong>×</strong></td></tr>
+<tr><td>v1（78社・交渉15分）</td><td>97</td><td>78</td><td>15分</td><td>58.8h</td><td>13.6h</td><td>○</td></tr>
 </tbody></table>
+<p>内訳：返信対応 0.5h×返信率30%×接触／初回立ち上げ 2h×新規成約／リピート 0.3h×社数×1/2（半分外注）／深掘り・交渉 交渉分×社数。名簿整備・送信・見積一次精査・架電は2027-07以降すべて外注前提。</p>
+<blockquote><strong>v1 §2 の「余裕13%」は、交渉15分/社という薄い置き値で出た数字でした。</strong> 段上げを本気でやると、工数は社数ではなく<strong>交渉時間×社数</strong>で決まります。<strong>A と B は、社長の週20時間の上ではほぼ排他です。</strong></blockquote>
+<h3>4-4. 200万に届く唯一の道</h3>
+<table><thead><tr><th>世界</th><th>2028-09 月営業利益</th><th>社長工数</th><th>判定</th></tr></thead><tbody>
+<tr><td>A+B 併走・段74/57・交渉45分</td><td><strong>182万</strong></td><td>116h（週27h）</td><td><strong>時間で不能</strong></td></tr>
+<tr><td>同上・<strong>交渉15分/社</strong>（段上げを型で回す）</td><td>182万</td><td>70h（週16h）</td><td><strong>唯一の到達経路</strong></td></tr>
+<tr><td>A案（現実線）</td><td>99万</td><td>88h</td><td>実行可能</td></tr>
+</tbody></table>
+<p><strong>200万は「段2→段3 を57%で、かつ1社15分/月で」回せたときにだけ届きます。</strong> 率だけでも量だけでも時間だけでも足りません。<strong>この3条件の同時成立をマサルは2.6%と見ており、私はそれを否定しません。</strong> よって v2 は、200万を「狙い続ける目標」として残しつつ、<strong>M4（2027-09）で目標の引き直しを自動発動する契約</strong>を先に結びます（§7）。</p>
 <hr>
-<h2>6. KPI 3階層と撤退条件</h2>
-<h3>6-1. KPI</h3>
-<table><thead><tr><th>階層</th><th>指標</th><th>判定</th><th>2028-09 の目標</th></tr></thead><tbody>
-<tr><td><strong>北極星</strong></td><td>月営業利益</td><td>月次</td><td><strong>200万円</strong></td></tr>
-<tr><td><strong>先行①</strong></td><td><strong>取引社数</strong>（上の曲線との差）</td><td>月次</td><td>78社</td></tr>
-<tr><td><strong>先行②</strong></td><td><strong>段3以上の社数比率</strong></td><td>月次</td><td><strong>42%（33社）</strong></td></tr>
-<tr><td><strong>先行③</strong></td><td>1社あたり月商</td><td>月次</td><td>12.6万円</td></tr>
-<tr><td><strong>行動①</strong></td><td>週の接触社数（メール＋FAX＋架電）</td><td>週次</td><td>22〜25社</td></tr>
-<tr><td><strong>行動②</strong></td><td><strong>返信率</strong>（中村：30%が標準・20%以下は文面を直す）</td><td>週次</td><td>35%</td></tr>
-<tr><td><strong>行動③</strong></td><td><strong>2回目発注時の価格交渉の実施率</strong></td><td>月次</td><td><strong>100%（例外を作らない）</strong></td></tr>
-<tr><td><strong>行動④</strong></td><td>見積受領社数（中村：返信の5〜10%が普通）</td><td>月次</td><td>接触の8%</td></tr>
-</tbody></table>
-<blockquote><strong>先行②を新設しました。</strong> 03 v3 の先行指標は「1社あたりSKU数」でしたが、<strong>SKUが増えても掛け率が6掛けのままなら200万には効きません</strong>（ハジメ）。段の深さで測ります。</blockquote>
-<h3>6-2. 撤退・方向転換の判定（03 の G0/G2/G3 を差し替え）</h3>
-<table><thead><tr><th>#</th><th>判定日</th><th>見る数字</th><th>該当したら</th></tr></thead><tbody>
-<tr><td><strong>H1</strong></td><td><strong>2027-03-31</strong></td><td>累計接触1,300社に対し<strong>取引6社未満</strong>（＝成約率0.5%未満）</td><td><strong>道具・文面の問題と断定し、全面改訂に1四半期を使う</strong>。それでも動かなければ、Amazon起点メールを主経路から降ろし、ザ・商談モール中心へ組み替える</td></tr>
-<tr><td><strong>H2</strong></td><td><strong>2027-09-30</strong></td><td><strong>段2（数量交渉済み）が8社未満</strong></td><td><strong>粗利率25%の道が閉じたと判定。</strong>目標を月営業利益120万（g20%・104社相当）へ引き直すか、期限を2029-09へ延ばすかを社長へ上げる</td></tr>
-<tr><td><strong>H3</strong></td><td><strong>2028-03-31</strong></td><td><strong>取引48社未満</strong></td><td><strong>新規獲得を即停止し、全工数を段上げへ。</strong>2028-09 の200万は不能と確定（獲得デッドライン超過）</td></tr>
-<tr><td><strong>H4</strong>（投入ゲート）</td><td><strong>2027-09-30</strong></td><td>3ヶ月連続で月営業利益20万未満</td><td><strong>借りない。</strong> 撤退線ではなく資金ゲートなので、発動率が高くて構いません</td></tr>
-</tbody></table>
-<p><strong>判定以外の即時停止ルール</strong>（03 から継承）：受信拒否1件でその会社へ全経路停止／苦情2件で文面の型を廃止／300通で苦情3件または公的通報1件で送信全停止／アカウント健全性の警告1件で該当SKUを即時停止。</p>
-<hr>
-<h2>7. 社長判断が要る論点（A/B/C＋推奨）</h2>
-<h3>判断1：成約率を上げる道具を、いつ入れるか</h3>
-<table><thead><tr><th>案</th><th>中身</th><th>費用</th><th>効き</th></tr></thead><tbody>
-<tr><td><strong>A（推奨）</strong></td><td><strong>2026-10 に一式</strong>：独自ドメイン＋メール／名刺100枚／会社概要Excel（自作）／ネットFAX／050番号</td><td>初期1.0万＋月0.27万</td><td>成約率 1.16% → 2.0〜3.3% を最初の1通目から取りに行く</td></tr>
-<tr><td>B</td><td>段階投入：10月にドメイン・名刺・会社概要、2027-04 にFAX・050・簡易HP</td><td>同額を後ろ倒し</td><td>最初の6ヶ月・約600通が低い成約率のまま消える</td></tr>
-<tr><td>C</td><td>入れない（メールのみ）</td><td>0円</td><td>成約率2.0%が上限。累計4,600社の接触が必要になり時間が破綻</td></tr>
-</tbody></table>
-<p><strong>推奨A。</strong> 名簿は撃つほど劣化する有限資源です。<strong>低い成約率で名簿を消費するのが、この事業でいちばん高くつきます。</strong> 24ヶ月の総額は約7.5万円で、78社の到達可否を分けます。</p>
-<p>※ 有料契約＝CLAUDE.md §4.1（金銭）。<strong>私は実行していません。</strong> 承認をいただければ、カズヨが申込画面の手前まで組みます。</p>
-<h3>判断2：ザ・商談モール（商工会議所入会）に入るか</h3>
-<table><thead><tr><th>案</th><th>中身</th><th>費用</th><th>24ヶ月の寄与</th></tr></thead><tbody>
-<tr><td><strong>A（推奨）</strong></td><td><strong>2026-11 に入会</strong>。週1案件を出し続ける</td><td>加入金3,000円＋年会費10,000円</td><td><strong>20社</strong>（週0.5hのみ）</td></tr>
-<tr><td>B</td><td>2027-04（送信の型ができてから）</td><td>同額</td><td>13社</td></tr>
-<tr><td>C</td><td>入らない</td><td>0円</td><td>0社。78社のうち20社分を、メール経路で追加2,000通かけて取り直すことになる</td></tr>
-</tbody></table>
-<p><strong>推奨A。</strong> 0.48社/h はメール経路と同率で、<strong>送信工数がかかりません</strong>。接触1社あたり43円は全経路で最安です。掲載中の案件に「大手ECモールで販売可能な商品を幅広く募集」が現にあり、社長と同じ立場の人が既に使っています。</p>
-<p>※ 金銭＋規約同意＝§4.1。<strong>未実行。</strong> 所在地が東京23区外なら、地元の商工会議所／商工会（596団体）に読み替えが要ります。</p>
-<h3>判断3：融資をどう置くか（ハジメと再検算が要る論点）</h3>
-<table><thead><tr><th>案</th><th>中身</th><th>効き</th><th>リスク</th></tr></thead><tbody>
-<tr><td><strong>A（推奨）</strong></td><td><strong>2027Q3末に300万・1回のみ</strong></td><td>手元が薄くなる2期（差+35万／+39万）を埋める。返済は月4.1万</td><td>なし（中央世界では使い切らない可能性あり）</td></tr>
-<tr><td>B</td><td>2027Q3に300万＋2028Q2に500万</td><td>資金上限を完全に外す</td><td>2回目の到達率7.5%（マサル）。社数が伸びなければ遊休資金の利息が年25万</td></tr>
-<tr><td>C</td><td>借りない</td><td>利息ゼロ</td><td>2027Q3末の差が35万。1社の初回発注が想定の2倍になると資金がショートする</td></tr>
-</tbody></table>
-<p><strong>推奨A。</strong> ハジメの「借入826万」は社数24社で止まる世界の数字です。<strong>78社が積み上がる世界では利益の再投資が効き、24ヶ月の累計営業利益は1,307万（中央）になります。</strong> この再投資の効きは私の計算であり、<strong>ハジメの再検算が要ります</strong>（§8-2）。</p>
-<hr>
-<h2>8. マサルへの引き渡し — 叩いてほしい前提</h2>
-<h3>8-1. この設計を壊せる置き値（感度が高い順）</h3>
-<table><thead><tr><th>#</th><th>置き値</th><th>私の値</th><th>出どころ</th><th><strong>実測はいつ取れるか</strong></th></tr></thead><tbody>
-<tr><td><strong>1</strong></td><td><strong>成約率の上昇曲線</strong></td><td>2.0→3.3→5.0→6.7%</td><td>中村（他人の実績値）</td><td><strong>2026Q4（700通）で初回。2027Q1で確定</strong></td></tr>
-<tr><td><strong>2</strong></td><td><strong>1社あたり月商の上昇</strong></td><td>5万 → 12.6万（2.5倍）</td><td>03 v3 の深掘り倍率</td><td>2027Q2（追加SKU打診）</td></tr>
-<tr><td><strong>3</strong></td><td><strong>段2→段3の到達率</strong></td><td>20%</td><td><strong>推定。実測ゼロ</strong></td><td>2027Q3（6ヶ月経過社が出る）</td></tr>
-<tr><td><strong>4</strong></td><td>段1→段2の到達率</td><td>40%</td><td><strong>推定。実測ゼロ</strong></td><td>2027Q1（2回目の発注）</td></tr>
-<tr><td>5</td><td>離脱率</td><td>2.2%/月</td><td>マサル 04</td><td>2027Q4</td></tr>
-<tr><td>6</td><td>工数の単価（§2-1の9項目）</td><td>すべて推定</td><td>なし</td><td>2026Q4</td></tr>
-<tr><td>7</td><td>外注の生産性</td><td>社長の30%（中村）</td><td>中村</td><td>2027Q3</td></tr>
-<tr><td>8</td><td>道具による成約率2倍</td><td>中村の実例 N=1</td><td>中村</td><td>2027Q1</td></tr>
-</tbody></table>
-<h3>8-2. 意図的に置いていないもの</h3>
-<ul>
-<li style='margin-left:0.0em'><strong>成約率の「名簿劣化」を、今回は上昇曲線に吸収させました。</strong> マサル 04 の 2%×exp(−1.2f) は、上昇と劣化が同時に走る形では二重計上になります。<strong>この扱いが正しいかを検算してください。</strong> 劣化を別建てにすると接触必要量が1.3〜1.5倍に膨らむ可能性があります。</li>
-<li style='margin-left:0.0em'><strong>利益の全額再投資を前提にしています。</strong> 生活費の引き出しなし、本業から月10万の投入あり。<strong>引き出しが入ると2027Q3末の差+35万は即座に消えます。</strong></li>
-<li style='margin-left:0.0em'><strong>2028Q3 の社長工数は週17.2時間で、余裕13%。</strong> 外注の育成失敗・風邪・繁忙をどこにも織り込んでいません。<strong>ここは確実に叩かれる想定です。</strong></li>
-<li style='margin-left:0.0em'><strong>展示会の現地来場4社・ザ・商談モール20社は、メール経路とは独立に足しています。</strong> 重複（同じ会社に両方から当たる）は引いていません。</li>
-</ul>
-<h3>8-3. 私が使っていない数字</h3>
-<ul>
-<li style='margin-left:0.0em'>中村の「月300社メール」は採用していません。<strong>当社の律速は接触数ではなく、返信対応と交渉の時間</strong>です。月300社は返信対応だけで月45時間を食い、週20時間に収まりません。</li>
-<li style='margin-left:0.0em'>中村の「必要資金＝月商−手数料−利益」も採用していません。ハジメの在庫回転モデル（月商×1.04）のほうが当社の実態（FBA・回転1.5ヶ月）に合います。</li>
-</ul>
-<hr>
-<h2>9. やらないこと（5つ）</h2>
+<h2>5. やらないこと（5つ・v1 から3つ入れ替え）</h2>
 <table><thead><tr><th>#</th><th>やらないこと</th><th>理由</th></tr></thead><tbody>
-<tr><td>1</td><td><strong>NETSEA／SDの仕入れを78社にカウントする</strong></td><td>規約上、掛け率交渉ができず、粗利率25%の道に1段も乗らない。役割は「実績づくり」に限定</td></tr>
-<tr><td>2</td><td><strong>2回目交渉で5.5掛けに届かない先へ、3本目以降のSKUを入れる</strong></td><td>6掛けでは利益率20%すら不能（ハジメ）。深掘りの工数を段3候補に寄せる</td></tr>
-<tr><td>3</td><td><strong>2028-04以降に新規獲得を増やす</strong></td><td>段3到達に6ヶ月。2028-09 の200万に寄与しない</td></tr>
-<tr><td>4</td><td><strong>接触数を月150社より増やす</strong></td><td>返信対応が週20時間を割る。<strong>増やすべきは率であって量ではない</strong></td></tr>
-<tr><td>5</td><td><strong>母数の拡張を2027Q3より前に発動する</strong></td><td>成約率が上がれば不要。<strong>保険の早撃ちは、時間と名簿を同時に減らす</strong></td></tr>
+<tr><td><strong>1（新）</strong></td><td><strong>社数を78社より増やす</strong></td><td>交渉45分/社では71社で週20時間を超える。<strong>社数は目標ではなく、工数から決まる従属変数</strong></td></tr>
+<tr><td><strong>2（新）</strong></td><td><strong>「率が上がれば量は要らない」という設計</strong></td><td>v1 §0-2・§9-4 を撤回。劣化を別建てにすると母数が律速に戻る</td></tr>
+<tr><td><strong>3（新）</strong></td><td><strong>本業からの注入を前提に置いた資金計画</strong></td><td>注入は社長未承認。前提に置くと自己資金340万を黙って要求することになる</td></tr>
+<tr><td>4（継続）</td><td><strong>NETSEA／SDの仕入れを取引社数にカウントする</strong></td><td>規約上、掛け率交渉も限定化もできず、段に1段も乗らない。役割は「実績づくり」に限定</td></tr>
+<tr><td>5（継続）</td><td><strong>2回目交渉で5.5掛けに届かない先へ、3本目以降のSKUを入れる</strong></td><td>6掛けでは利益率20%が構造的に不能（ハジメ）。深掘り工数は段3候補に寄せる</td></tr>
 </tbody></table>
 <hr>
-<h2>10. 私が実行していないこと（CLAUDE.md §4.1）</h2>
-<ul>
-<li style='margin-left:0.0em'>独自ドメイン・ネットFAX・050番号・簡易HPの<strong>契約は一切していません</strong>（金銭）。</li>
-<li style='margin-left:0.0em'>商工会議所への<strong>入会手続きをしていません</strong>（金銭＋規約同意）。</li>
-<li style='margin-left:0.0em'>外注の<strong>募集・発注をしていません</strong>（金銭・第三者連絡）。</li>
-<li style='margin-left:0.0em'>メーカー・卸への<strong>連絡を一切していません</strong>（第三者連絡）。</li>
-<li style='margin-left:0.0em'>展示会の<strong>来場登録をしていません</strong>（第三者への情報提供）。</li>
-<li style='margin-left:0.0em'>会員限定の取引条件（卸値・品番・上代・ロット）は本書に一切含めていません。</li>
-</ul>
-<h2>11. 未確認事項（憶測で埋めていません）</h2>
+<h2>6. 資金 — 注入込み／注入なしの両方</h2>
+<h3>6-1. 確定した事実（ハジメ 12）</h3>
+<table><thead><tr><th>項目</th><th>値</th></tr></thead><tbody>
+<tr><td>ハジメの旧主張「必要借入826万」</td><td><strong>取り下げ済み</strong>（再投資が効くという私の指摘が正しかった）</td></tr>
+<tr><td>v1 カーブでの必要借入</td><td><strong>119万</strong>（安全在庫30万込み）</td></tr>
+<tr><td>実行時期</td><td><strong>2027年4月</strong>（申込2027-02〜03）。私の2027Q3末は<strong>5ヶ月遅い</strong></td></tr>
+<tr><td>私の24ヶ月累計営業利益1,307万</td><td><strong>11%過大。正しくは1,180万</strong>（四半期末社数を3ヶ月全部に当てていた）</td></tr>
+<tr><td>四半期末スナップショット</td><td><strong>月次の谷を隠していた</strong>。v1 の前提でも2027-10〜2028-02 は現金マイナス（最薄▲12万）</td></tr>
+</tbody></table>
+<h3>6-2. A案での必要借入（概算・要ハジメ再検算）</h3>
+<table><thead><tr><th>前提</th><th>最薄月</th><th><strong>必要借入</strong></th><th>実行時期</th></tr></thead><tbody>
+<tr><td><strong>本業注入あり（月10万）</strong></td><td>2027Q4 ▲32万 ＋ハジメ補正</td><td><strong>約100万</strong></td><td>2027Q2</td></tr>
+<tr><td><strong>本業注入なし</strong></td><td>2027Q4 ▲182万 ＋ハジメ補正</td><td><strong>約230〜250万</strong></td><td><strong>2027Q1〜Q2</strong></td></tr>
+</tbody></table>
+<p><strong>どちらでも300万の枠で足ります。</strong> ただし<strong>注入なしの世界では、借入は「余裕」ではなく必須</strong>です。</p>
+<h3>6-3. 設計条件「12ヶ月累計キャッシュ&gt;0」との衝突</h3>
+<p>注入なし・借入なしで現金を割らずに走れる上限は次のとおりです（運転資金 ≒ 月商×1.18）。</p>
+<table><thead><tr><th>2027-09 の月商</th><th>必要運転資金</th><th>自己資金100万＋累計営利20万 との差</th></tr></thead><tbody>
+<tr><td>60万（約8社）</td><td>71万</td><td>+49万</td></tr>
+<tr><td>80万（約11社）</td><td>95万</td><td>+25万</td></tr>
+<tr><td><strong>100万（約14社）</strong></td><td>118万</td><td><strong>+2万</strong></td></tr>
+<tr><td>120万（約16社）</td><td>142万</td><td>▲22万</td></tr>
+<tr><td>140万（約19社）</td><td>166万</td><td>▲46万</td></tr>
+</tbody></table>
+<blockquote><strong>設計条件を文字どおり守ると、12ヶ月後の上限は月商100万・取引14社。</strong> そこから2028-09 に200万へ届く経路はありません。<strong>「12ヶ月キャッシュ&gt;0」と「2028-09 に月営業利益200万」は、自己資金100万のままでは両立しません。</strong> どちらを動かすかは社長判断です（§9 判断3）。</blockquote>
+<hr>
+<h2>7. KPI 3階層と判定線</h2>
+<h3>7-1. KPI（先行指標の1位を入れ替え）</h3>
+<table><thead><tr><th>階層</th><th>指標</th><th>判定</th><th>2028-09 の目標（A案）</th><th>会社KPIとの接続</th></tr></thead><tbody>
+<tr><td><strong>北極星</strong></td><td>月営業利益</td><td>月次</td><td><strong>99万</strong>（200万は §4-4 の条件付き）</td><td>根源目標（2028-09 月200万）</td></tr>
+<tr><td><strong>先行①（昇格）</strong></td><td><strong>段3以上の社数比率</strong></td><td>月次</td><td><strong>15%（10.5社）</strong></td><td><strong>利益率20%は段3以上4割と同値</strong>。ここが動かないとKPIは構造的に不能</td></tr>
+<tr><td>先行②</td><td>取引社数</td><td>月次</td><td>70社</td><td>月商800万（A案では718万＝90%）</td></tr>
+<tr><td>先行③</td><td>使える連絡先の在庫数</td><td>月次</td><td>6,500社以上を維持</td><td>母数が切れると社数が止まる</td></tr>
+<tr><td><strong>行動①（昇格）</strong></td><td><strong>2回目発注時の価格交渉の実施率</strong></td><td>月次</td><td><strong>100%（例外なし）</strong></td><td>段2の入口</td></tr>
+<tr><td><strong>行動②</strong></td><td><strong>返信率</strong>（中村標準30%・20%以下は文面の問題）</td><td>週次</td><td>30%以上</td><td>成約率より速く・多く・定義が固い</td></tr>
+<tr><td>行動③</td><td>週の接触社数</td><td>週次</td><td>25〜30社</td><td>母数の消費速度</td></tr>
+<tr><td>行動④</td><td>1社あたりの交渉接触回数</td><td>月次</td><td><strong>月1回以上</strong></td><td>段上げの実働量</td></tr>
+</tbody></table>
+<p><strong>SKU数100（会社KPI）は 2027Q4（約35社×3SKU）で通過</strong>します。ゴールではなく通過点です。</p>
+<h3>7-2. 判定線（マサル 13 §6-3 の M1〜M6 を全面採用）</h3>
+<table><thead><tr><th>#</th><th>判定日</th><th>見る数字</th><th>踏んだらやること</th></tr></thead><tbody>
+<tr><td><strong>M1</strong></td><td>2026-12-31</td><td>累計700通で<strong>返信率20%未満</strong></td><td>文面と会社概要を全面改訂。<strong>ここで初めて道具（ドメイン・FAX・050）の課金を社長に上げる</strong>。20%を超えていれば道具は不要</td></tr>
+<tr><td><strong>M2</strong></td><td>2027-03-31</td><td><strong>使える連絡先が1,600社未満</strong></td><td>母数拡張を即発動（在庫で測るので標本誤差もラグもゼロ）</td></tr>
+<tr><td><strong>M3</strong></td><td><strong>2027-06-30</strong></td><td><strong>段3に到達した社が0社</strong>（6ヶ月経過社が5社以上ある前提で）</td><td>段2→段3 が20%未満と判定 → 交渉テンプレを<strong>「稟議が要らない条件」（数量コミット・年間取引額の提示）に一本化</strong></td></tr>
+<tr><td><strong>M4</strong></td><td>2027-09-30</td><td>段2が<strong>8社未満</strong></td><td>粗利率25%の道が閉じたと判定。<strong>目標の引き直し（月120万）か期限延長（2029-09）を社長へ</strong></td></tr>
+<tr><td><strong>M5</strong></td><td>2027-09-30</td><td>3ヶ月連続で月営業利益20万未満</td><td><strong>借りない</strong>（投入ゲート）</td></tr>
+<tr><td><strong>M6</strong></td><td>2027-12-31</td><td>段3が<strong>2社未満</strong> かつ 月営業利益15万未満</td><td>2028-09 の200万は不能と確定。新規獲得を止め全工数を段上げへ（偽陽性0%）</td></tr>
+</tbody></table>
+<p><strong>v1 の H1〜H3 は破棄します。</strong> 特に「2028-03 段3が10社未満」（発動98%・偽陽性89%）は情報量ゼロでした。<strong>段2→段3 の初実測は 2027Q2</strong>（2026-11 開始の1社目が6ヶ月を迎える）で、v1 の2027-09 より3ヶ月早く取れます。</p>
+<p><strong>即時停止ルール（変更なし）</strong>：受信拒否1件でその会社へ全経路停止／苦情2件で文面の型を廃止／300通で苦情3件または公的通報1件で送信全停止／アカウント健全性の警告1件で該当SKUを即時停止。</p>
+<hr>
+<h2>8. 道具の扱い（前提を更新）</h2>
+<p><strong>v1 §7-判断1 の「到達可否を分ける最大のレバー」は過大でした。撤回します。</strong></p>
+<table><thead><tr><th>マサルの測定</th><th>値</th></tr></thead><tbody>
+<tr><td>道具の有無で動く月営業利益（中央）</td><td><strong>＋6万</strong>（23万 → 29万）</td></tr>
+<tr><td>P(78社以上)</td><td>0.2% → 0.9%（<strong>どちらもゼロ近傍</strong>）</td></tr>
+<tr><td>0円の道具のみ</td><td>23万 → 26万（<strong>＋3万・0円</strong>）</td></tr>
+<tr><td>母数＋接触倍増</td><td>23万 → <strong>63万（＋40万）</strong></td></tr>
+</tbody></table>
+<p><strong>v2 の方針：0円の3点を2026-10 に先行実行し、課金の判断は M1（2026-12・返信率の実測）後に回します。</strong></p>
+<table><thead><tr><th>今すぐやる（0円）</th><th>中身</th></tr></thead><tbody>
+<tr><td>会社概要Excelの自作</td><td>中村の実例で成約率2倍（40社に1社→20社に1社・N=1）</td></tr>
+<tr><td>断られた先への切り返しテンプレ</td><td>中村「やるかやらないかで結果が大きく変わる」</td></tr>
+<tr><td>初回メール文面の改訂（NETSEA/SDの販売実績を数字で記載）</td><td>電話で必ず聞かれる「売上規模・事業年数」に答えられる状態を先に作る</td></tr>
+</tbody></table>
+<blockquote><strong>社長は2026-09-21 に課金を却下しています。撤回を求めません。</strong> 却下されたのは体裁への課金であり、上記3点は対象外です。</blockquote>
+<hr>
+<h2>9. 社長判断（A/B/C＋推奨）</h2>
+<h3>判断1：主線をどう置くか</h3>
+<table><thead><tr><th>案</th><th>中身</th><th>2028-09 月営利</th><th>社数</th><th>粗利率</th><th>24ヶ月累計営利</th><th>必要借入</th></tr></thead><tbody>
+<tr><td><strong>A（推奨）</strong></td><td><strong>段上げ全振り</strong>。交渉45分/社、社数は60〜70社で止める、母数6,500</td><td><strong>99万</strong>（段が上がらなければ65万）</td><td>71</td><td><strong>19.4%</strong></td><td>753万</td><td>約100万（注入込）</td></tr>
+<tr><td>B</td><td><strong>量で押す</strong>。母数7,000＋送信全面外注、接触3,705通、交渉は15分/社のまま</td><td><strong>91万</strong></td><td>98</td><td>16.7%</td><td>712万</td><td>約250万（注入込）</td></tr>
+<tr><td>C</td><td>v1 のまま走り、2027年に矛盾が表面化してから直す</td><td>32万（劣化を入れた実力値）</td><td>41</td><td>16.9%</td><td>237万</td><td>—</td></tr>
+</tbody></table>
+<p><strong>推奨A。理由は3つです。</strong></p>
+<ol>
+<li style='margin-left:0.0em'><strong>中央値がほぼ同じ（99万 vs 91万）なのに、A は運転資金が163万少なくて済む</strong>（808万 vs 971万）。同じ利益なら、資本を食わない方を選びます。</li>
+<li style='margin-left:0.0em'><strong>B の粗利率は16.7%で頭打ち。会社KPI「利益率20%以上」に永久に届きません。</strong> A は19.4%で、2029年に20%を超えます。</li>
+<li style='margin-left:0.0em'><strong>A は上振れの余地がある。</strong> 段の型ができれば §4-4 の経路（182万）に接続します。B にその接続はありません。</li>
+</ol>
+<p><strong>ただし A は段2→段3 への賭けです。</strong>段が上がらない世界では A(65万) &lt; B(91万)。<strong>M3（2027-06）で段3が0社なら B へ切り替える</strong>ことを、あらかじめ契約しておきます。</p>
+<h3>判断2：本業からの月10万注入（24ヶ月で240万）</h3>
+<table><thead><tr><th>案</th><th>中身</th><th>12ヶ月末現金</th><th>必要借入</th></tr></thead><tbody>
+<tr><td><strong>A（推奨）</strong></td><td><strong>注入なしで設計し、不足は借入で埋める</strong>（2027Q1〜Q2・約230〜250万／300万枠）</td><td>▲128万 → 借入で+100万超</td><td>約250万</td></tr>
+<tr><td>B</td><td>月10万を注入する</td><td>▲8万</td><td>約100万</td></tr>
+<tr><td>C</td><td>注入も借入もしない</td><td>▲128万</td><td>— ＝<strong>2027-09 で月商100万・14社が上限</strong>。200万の道は閉じる</td></tr>
+</tbody></table>
+<p><strong>推奨A。</strong> 注入は社長が承認した条件（運転資金100万・引き出しなし）に含まれていません。<strong>生活の現金と事業の現金を混ぜると、撤退判断ができなくなります。</strong> 借入なら金利3.9%・月返済3.4万（250万・7年）で、損益に明示的に乗ります。<strong>注入を選ばれる場合でも、B の欄の数字がそのまま使えます。</strong></p>
+<h3>判断3：「12ヶ月累計キャッシュ&gt;0」と「2028-09 に200万」のどちらを動かすか</h3>
+<table><thead><tr><th>案</th><th>動かすもの</th><th>結果</th></tr></thead><tbody>
+<tr><td><strong>A（推奨）</strong></td><td><strong>設計条件を「借入込みで12ヶ月末の現金&gt;0」に読み替える</strong></td><td>成長を止めずに走れる。金利は損益に乗る</td></tr>
+<tr><td>B</td><td>200万の期限を2029-09 へ12ヶ月延長</td><td>段3が時間で育つ。§3-3 の「期間が足りない」問題が解ける</td></tr>
+<tr><td>C</td><td>目標額を月120万へ引き直す</td><td>A案の延長線上でほぼ確実に届く</td></tr>
+</tbody></table>
+<p><strong>推奨A。判断はいますぐ要りません。</strong> <strong>M4（2027-09）が B/C の自動発動点</strong>です。いま決めるべきは A（借入前提で走る）だけで、B・C は判定線が引き受けます。</p>
+<hr>
+<h2>10. 未確認事項（憶測で埋めていません）</h2>
 <table><thead><tr><th>#</th><th>確認したいこと</th><th>誰に</th></tr></thead><tbody>
-<tr><td>U-1</td><td><strong>社長の勤務シフトで、平日日中に電話できる時間帯があるか</strong>（タクシーの隔日勤務なら明け番・非番に可能性あり）。電話併用は成約率3〜5倍の最大レバーで、ここが閉じていると架電外注が必須になり月1.6万が乗ります</td><td><strong>社長（カズヨ経由）</strong></td></tr>
-<tr><td>U-2</td><td>社長の所在地が東京23区内か（商工会議所の会費が変わる）</td><td>社長</td></tr>
-<tr><td>U-3</td><td>規制3カテゴリ（ドラッグ／ビューティー／食品）を母数に戻してよいか</td><td><strong>ハルオ</strong></td></tr>
-<tr><td>U-4</td><td>利益の全額再投資を織り込んだ場合の必要借入額（私の計算では300万・1回）</td><td><strong>ハジメ</strong></td></tr>
+<tr><td>U-1</td><td>社長の勤務シフトで平日日中に電話できる時間帯があるか</td><td><strong>社長（カズヨ経由）</strong></td></tr>
+<tr><td>U-2</td><td>規制3カテゴリ（ドラッグ／ビューティー／食品）を母数に戻してよいか</td><td><strong>ハルオ</strong></td></tr>
+<tr><td>U-3</td><td>A案カーブでの必要借入額と実行月（私の概算100万／250万）</td><td><strong>ハジメ</strong></td></tr>
+<tr><td>U-4</td><td>「成約」の定義差（中村の口座開設 vs 当社の初回発注）</td><td><strong>サトル</strong></td></tr>
+<tr><td>U-5</td><td>段2→段3 の到達率。<strong>私の45%もマサルの20%も根拠は同等にゼロ</strong>。実測は2027Q2</td><td>実測のみ</td></tr>
 </tbody></table>
 <hr>
-<h3>計算スクリプト</h3>
-<p><code>workspace/output/agent_output/T-20260920-005/11_engine.py</code>（四半期モデル）・<code>11_time.py</code>（工数モデル）。すべて再現可能。</p>
+<h2>11. 私が実行していないこと（CLAUDE.md §4.1）</h2>
+<ul>
+<li style='margin-left:0.0em'>独自ドメイン・ネットFAX・050番号・簡易HP・商工会議所の<strong>契約／入会を一切していません</strong>（金銭・規約同意）。</li>
+<li style='margin-left:0.0em'>外注の<strong>募集・発注をしていません</strong>（金銭・第三者連絡）。</li>
+<li style='margin-left:0.0em'>メーカー・卸・第三者への<strong>連絡を一切していません</strong>。</li>
+<li style='margin-left:0.0em'>融資の<strong>申込・相談をしていません</strong>。</li>
+<li style='margin-left:0.0em'>会員限定の取引条件（卸値・品番・上代・ロット・送料表）は本書に含めていません。掛け率は公開記述の範囲（6掛け／5掛け等の一般語）に留めています。</li>
+</ul>
+<hr>
+<h3>再現</h3>
+<p><code>workspace/output/agent_output/T-20260920-005/11v2_engine.py</code> — 段コホート月次モデル（24ヶ月）・工数モデル・定常スナップショット・設計条件の上限計算。v1 の <code>11_engine.py</code> / <code>11_time.py</code> は参考として残置。</p>
 </body></html>
