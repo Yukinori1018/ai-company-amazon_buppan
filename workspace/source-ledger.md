@@ -28,16 +28,33 @@ SOURCE: NETSEA | 会員限定 | 秘密保持型（金額のみ） | API利用規
 SOURCE: netsea.jp | 会員限定 | 秘密保持型（金額のみ） | API利用規約 15条1項 | 2026-09-21
 SOURCE: api.netsea.jp | 会員限定 | API応答は全項目 | API利用規約 15条1項 | 2026-09-21
 
-SOURCE: fuwamarket-b2b.com | 公開 | 発信禁止条項なし・robots Allow（policy ページ crawlable と明記） | https://fuwamarket-b2b.com/policies/terms-of-service | 2026-09-21
+SOURCE: fuwamarket-b2b.com | 公開 | 発信禁止条項なし・robots Allow（policy crawlable と明記） | https://fuwamarket-b2b.com/policies/terms-of-service | 2026-09-21
+SOURCE: www.ornedefeuilles.com | 公開 | 発信禁止条項なし・robots Allow・canonical あり | https://www.ornedefeuilles.com/pages/stockists-guide | 2026-09-21
+SOURCE: www.moon-rabbit.jp | 公開 | 発信禁止条項なし・当該パスに Disallow なし | https://www.moon-rabbit.jp/c-fpage?fp=wholesale | 2026-09-21
+SOURCE: www.toyoake.or.jp | 公開 | 発信禁止条項なし・Disallow は管理画面のみ | https://www.toyoake.or.jp/guide/distributor-new-transaction/ | 2026-09-21
+SOURCE: 117kirei.com | 公開 | 発信禁止条項なし・Disallow は管理画面のみ | https://117kirei.com/2025sinkidauruten/ | 2026-09-21
+SOURCE: daikichikimchi.jp | 公開 | 発信禁止条項なし・Disallow は管理画面のみ・Sitemap 公示 | https://daikichikimchi.jp/kimchi/wholesale/ | 2026-09-21
 
 <!--
-法務判定 16 §2 は「公開可」を2サイトとしていますが、**判定書が行番号で名指ししている出所は
-fuwamarket-b2b.com の1つだけ**です（raw/02 の 39・42行目、notes の 57・111行目、draft の 76行目、
-01 の 238行目＝すべて同社）。2サイト目のホスト名は判定書・法務 memory のどちらにも書かれていません。
-**庶務の判断で足さない**（誤って足すとガードに穴が開きます）。ハルオが名指しした時点で1行足すこと。
-→ 2026-09-21 マリエ、カズヨ経由でハルオへ確認を依頼。
--->
----
+上記6件は法務ハルオが 2026-09-21 に**3本足（非ログイン表示の実測・robots・ToS の禁止語全文検索）**で
+確認したもの。判定の詳細は法務判定 16 §8-2（commit 857e0f06）。出所はすべて
+T-20260903-001/research/raw/02_primary_disclosure.md に一次開示として収録された供給側。
+
+注意3点:
+1. **www.ornedefeuilles.com** は ToS 検索で `発信` が1件当たるが、**通知の到達時期を定めた条項
+   （発信主義）**であって情報発信の禁止ではない、というのがハルオの判定。他の禁止語は0件。
+2. **www.superdelivery.com は「公開」区分に入れない。** 非ログインで読める自社ページ由来の比率が
+   S1・S2 にあるが、**会員規約17条1項に公知除外がない**ため会員限定のまま（判定16 §8-3）。
+   **ガードが SD 由来の金額を止めるのは誤検知ではなく正しい挙動。**既に 01_*.html 238行に入っている
+   分は取り下げ不要（SD 自身が広告として掲げる自社統計）で、措置は「これ以上増やさない」。
+3. `daikichikimchi.jp` は raw/02 側の「本文確認」が未（検索結果のハイライトのみ）だが、
+   ハルオが 2026-09-21 に非ログイン200 を自ら実測して公開可と判定している。
+
+**経緯**：当初この区分は空で、判定16 §2 が行番号で名指ししていたのが1ホストだけだったため、
+庶務は1件のみ登録して残りを差し戻した。原因はハルオの検索語が `20,000円以上` 固定で、2件目の
+`20,000円（税込22,000円）未満` を拾えなかったこと（**§5 で自分が指摘した表記ゆれを §2 に適用して
+いなかった**）。**「当てはまりそうで足さない」を守ったことで、誤ったホストを登録せずに済んだ。**
+-->---
 
 ## 根拠
 

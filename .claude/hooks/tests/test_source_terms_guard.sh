@@ -127,8 +127,16 @@ c_pass  "monthlySold は通る"                a2.csv 'asin,monthlySold,price
 B000000001,100,1980'
 c_pass  "monthly_sold は通る"               a3.csv 'asin,monthly_sold,price
 B000000001,100,1980'
-c_block "monthly_sold_real は残す（意味未確定）" b1.csv 'asin,monthly_sold_real,main_rank
-B000000001,100,5000'
+# monthly_sold_real は 2026-09-21 にハルオが A クラスで確定（monthlySold の素通し・推計なし）。
+# 条件は「複数時点で並べない」「取得日を併記する」の2つ。
+c_pass  "monthly_sold_real 単体（A クラス・取得日つき）" a4.csv 'asin,monthly_sold_real,main_rank,取得日
+B000000001,100,5000,2026-09-21'
+c_block "monthly_sold_real に日付が付いたら B へ戻る" b6.csv 'asin,monthly_sold_real_20260921,monthly_sold_real_20260820
+B000000001,100,90'
+c_block "同（全角カッコの日付）"              b7.csv 'asin,monthly_sold_real（2026-09）,現在価格
+B000000001,100,1980'
+c_pass  "main_rank 単体（現在ランク＝A）"     a5.csv 'asin,main_rank,現在価格,取得日
+B000000001,5000,1980,2026-09-21'
 c_block "想定月販（B クラス）は止まる"      b2.csv 'asin,想定月販,ドロップ数
 B000000001,120,14'
 c_block "時系列（日付つき列名）は止まる"    b3.csv 'asin,月間販売数（2026-09）,月間販売数（2026-08）
