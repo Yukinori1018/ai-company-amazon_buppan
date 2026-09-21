@@ -9,7 +9,7 @@ updated_at: 2026-09-21
 requires_approval: true
 parent_ticket: ""
 labels: [roadmap, strategy, owner-profile, kpi]
-next_check_at: 2026-09-23
+next_check_at: 2026-09-24
 ---
 
 ## 背景
