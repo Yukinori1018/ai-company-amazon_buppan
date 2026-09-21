@@ -40,7 +40,10 @@
 | 2 | **成果物カタログ同期** | `deliverables/` に新しい成果物が出たとき（①マスターCSV追記 → ②`python3 scripts/catalog/sync_catalog_to_sheet.py`） | [skills/deliverables-catalog.md](skills/deliverables-catalog.md) |
 | 3 | **社長タスクまとめの最新化** | 社長依存タスクが増減・変更されたとき | [skills/owner-tasks-summary-ownership.md](skills/owner-tasks-summary-ownership.md) |
 | 4 | **`_inbox_社長共有` の棚卸し** | SessionStart フックのリマインダー③／社長の申告／inbox 素材を使ったチケットの完了時 | [skills/inbox-intake.md](skills/inbox-intake.md) |
+| 5 | **資産台帳の最新化** | 資産が増減した turn（契約・解約・取得・失効・提出・開設）／新しい保有データ・社内ツールが `deliverables/` に出たとき | [workspace/asset-ledger.md](../../workspace/asset-ledger.md) ／ 運用は [memory/knowledge_asset_ledger_ownership.md](memory/knowledge_asset_ledger_ownership.md) |
 
+> 5 は 2026-09-21 追加。台帳に無い資産はガードを素通りするため、**網羅性がそのまま事故防止の性能**になります。行を足したら部分文字列衝突の検査（memory の手順）を必ず回すこと。
+>
 > 4 は 2026-08-21 追加（T-20260821-009）。それまで責務が誰にも割り当てられておらず、社長が置いたファイル21件が12日間放置されました。**「ルールが無い場所は、必ず放置される」**というのがこの事故の教訓です。
 
 ## スキル一覧
