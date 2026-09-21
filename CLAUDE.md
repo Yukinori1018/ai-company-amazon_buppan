@@ -345,6 +345,7 @@ todo → doing → waiting → done
 ## 8. 参照
 
 - **🔧 社長の手動運用メモ（プレイブック）**: [docs/owner-playbook.md](docs/owner-playbook.md) — 迷ったらまずここ
+- **📒 資産台帳**: [workspace/asset-ledger.md](workspace/asset-ledger.md) — **「当社は◯◯を持っていない」と書く前に必ずここ。** 外部のチェックリスト（書籍・他AIの提案）を当社に当てはめるときの事故防止。`.claude/hooks/asset-claim-guard.py` が保有済み資産への「持っていない」記述を**書き込み前にブロック**する
 - 設計の出典: [docs/reference/動画分析.md](docs/reference/動画分析.md)
 - 各エージェントの個別プロファイル: [agents/](agents/)
 - チケット運用詳細: [workspace/README.md](workspace/README.md)
