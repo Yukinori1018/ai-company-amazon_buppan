@@ -31,3 +31,46 @@ related_tickets:
 
 - [08_Keepa由来データの公開基準.md](../../output/deliverables/T-20260920-003/08_Keepa由来データの公開基準.md)
 - `agents/legal/memory/knowledge_public_data_release_standard_ABCD.md`
+
+---
+
+## 現在地（2026-09-21 タカシ）
+
+実装・テストとも完了。**チケットは `todo/` のまま置いてあります**（状態遷移は秘書の責務）。
+
+### スコープ（宣言）
+
+**入れたもの**
+- 新設: `.claude/hooks/source-terms-guard.py`（PreToolUse: Write|Edit|MultiEdit）。`deliverables/` と `tickets/` 配下への書き込みを、書く前に exit 2 で止める
+- 新設: `workspace/source-ledger.md`（出所台帳。法務 16 §5 対策1）
+- 修正: `.githooks/pre-commit` の語彙（A クラスを通す／C クラスと時系列を止める）
+- 新設: `.claude/hooks/tests/test_source_terms_guard.sh`（40ケース・全 pass）
+- 登録: `.claude/settings.json` の PreToolUse（JSON 妥当性を確認済み）
+
+**入れなかったもの（理由つき）**
+- **git 履歴の書き換え** — §4.1・社長判断待ち。触っていません
+- **pre-commit の差分範囲の拡張**（変更ファイルも見る／法務 16 §5 対策3-1・3-2） — 依頼が「不整合を1件直す」だったため別件に切り出します。書き込み経路は新フックで塞がっているので穴は残りません
+- **週次の棚卸し**（法務 16 §5 対策4） — 別チケット向き。過去に入り込んだ分は commit 時のゲートでは永久に見つからないので、これは必要です
+- **`卸率` を pre-commit の語彙に足すこと** — 本チケット起票時のタスクに入っていましたが、翌日の法務判定で「率は可・実額のみ不可」と確定したため足していません
+
+### ログ
+
+- 2026-09-21 タカシ：法務判定 16 の §4／§5 を仕様として実装。既存追跡ファイル1,242件を同じ判定で走査したところ61ファイルで発火（＝過去分の棚卸し規模の実測）。テストは `git clean -fd` が未追跡の `.githooks/` を消して「全部 pass」に見える罠を踏んだため、後片付けの方法を変えて再測定
+- 2026-09-21 タカシ：`monthly_sold_real` のフィールド定義を追跡。`T-20260804-001/monthlysold_refetch.py` で Keepa の `monthlySold` をそのまま書いている列＝A クラス相当と判明。ただし**判定の変更は法務の領分なので pre-commit からは外さず残置**し、確認結果のみ報告
+
+## 成果物
+
+- `.claude/hooks/source-terms-guard.py`
+- `.claude/hooks/tests/test_source_terms_guard.sh`
+- `workspace/source-ledger.md`
+- `.githooks/pre-commit`（修正）
+- `.claude/settings.json`（修正）
+- `agents/it_engineer/memory/knowledge_leak_detection_hook_design.md`
+
+## 完了報告
+
+機構は動いています。テスト40ケース全 pass（陽性: 今回漏れた4形＋全角・ロット・品番・チケット本文、陰性: 件数・Amazon の売価と手数料・率・code 引用・伏せ字済み・agent_output・法務判定書）。
+
+**秘書への引き継ぎ2件**
+1. `workspace/source-ledger.md` の「公開」区分が**空**です。T-20260903-001 で公開可と判定された2サイトのホスト名を庶務に追記させてください。ここが埋まるまで、公開ページ由来の正当な金額を書く出口が開きません
+2. `monthly_sold_real` は A クラス相当だとフィールド定義で確認できました。外すかどうかはハルオの判定事項なので、判断を回してください
