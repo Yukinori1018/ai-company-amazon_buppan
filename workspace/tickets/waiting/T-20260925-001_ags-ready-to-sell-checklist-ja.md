@@ -1,12 +1,12 @@
 ---
 ticket_id: T-20260925-001
 title: Amazon「Ready to Sell Checklist」(AGS) を日本語化しPDF化（同レイアウト・写真差し替え）
-status: doing
+status: waiting
 assignee: content_creator
 priority: medium
 created_at: 2026-09-25
 updated_at: 2026-09-25
-next_check_at: 2026-09-26
+next_check_at: 2026-09-28
 requires_approval: false
 labels: [translation, document, amazon]
 related_tickets: []
@@ -52,3 +52,4 @@ related_tickets: []
 - 妥協点：ロゴは画像ではなく文字で組んだ近似（Amazon のロゴデータは使っていない）。ヒラギノは Chrome の仕様で Type 3 形式で埋め込まれる（表示・印刷・検索に支障なし）
 - 引き継ぎ：資料は米国 Amazon.com 向けの2017年版。「FBA輸出」など日本から直接当てはまらない項目がある旨を README に記載
 - 「フォルダを開く」は秘書側で実施してください（サブエージェントからは社長の画面操作をしていません）
+- 2026-09-25 ヒデアキ納品（2ページ・Letter、Unsplash写真2枚）。カズヨが画像化して目視確認・問題なし。フォルダを社長の画面で開いた。社長レビュー待ちで waiting。
