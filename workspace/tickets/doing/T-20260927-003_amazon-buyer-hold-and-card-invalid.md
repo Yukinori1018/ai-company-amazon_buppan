@@ -42,6 +42,11 @@ related_tickets: [T-20260920-001, T-20260909-001, T-20260726-003]
   3. 米国＝ヘッダー「Healthy」（社長報告どおり復活）
   4. CA アカウント健全性: AHR 0・違反1件「Canada identity verification」(2026-08-26, Critical)。Submit appeal → `/mario/seller-verification/soa-coc/regional` は「We have failed to verify…contact Seller Support」で行き止まり（9/15 と同じ）
   - 日本は co.jp 側で別ログインを要求されたため未確認（本件の範囲外。次回確認）
+- 2026-09-27 社長承認→カズヨ操作: **メキシコの課金方法を末尾2075→6023に差し替え**（既存カードの選択のみ）。「Unable to charge」バナー消失を確認。US/CA/MX すべて6023
+- 2026-09-27 社長: 旧ケース 21912948521 を **Close this case**（状態 Answered を確認）
+- 2026-09-27 カズヨ: CA の Contact us に **書類添付つきの窓口**（Account health > Reactivate your account > "I need to submit documents to verify my selling account"）を発見。社長判断 **B案（文面＋書類2点添付）**。ヒデアキが B 版文面を作成
+- 2026-09-27 23:11 カズヨが件名・本文を入力、**社長が2点添付して Send** → **新ケース 22309188941**（Work in progress）。受付表示「We answer most emails in less than 24 hours」、Attachments に Amazon_01_ID_passport_v3.jpg / Amazon_02_bank_statement.pdf を確認。送信台帳 #7・#8 に記録
+- 次の確認: 2026-09-28 にケース 22309188941 と satoyukinori1018 のメールを確認（カズヨ）。社長の番ではないため doing のまま
 
 ## 対応方針（カズヨ判断）
 1. 購入アカウントの保留解除が最優先（24時間審査・書類提出）。出品用の課金カード判定もこれに連動している可能性が高い
