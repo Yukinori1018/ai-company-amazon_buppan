@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>2年後、こうなります — 2028年9月の姿と最初の90日</title>
+<meta name="robots" content="noindex, nofollow">
+<style>
+:root{
+  color-scheme: light dark;
+  --bg:#ffffff; --surface:#f5f7f9; --surface2:#eceff3;
+  --text:#1b1f24; --muted:#525b66; --faint:#6c7681;
+  --border:#d5dae1; --border-strong:#b8c0ca;
+  --accent:#1c5b86; --accent-bg:#eef5fa;
+  --warn:#8a4b00; --warn-bg:#fdf1df; --warn-border:#dd9a3c;
+  --alert:#7d2b2b; --alert-bg:#fbeeee; --alert-border:#d08b8b;
+  --ok:#1b6144; --ok-bg:#eaf4ef; --ok-border:#8ab9a3;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#15181c; --surface:#1d2126; --surface2:#252a31;
+    --text:#e4e8ec; --muted:#aab4bf; --faint:#949eaa;
+    --border:#333a43; --border-strong:#48515c;
+    --accent:#79b4dc; --accent-bg:#1a2a36;
+    --warn:#f0b866; --warn-bg:#332616; --warn-border:#7a5a2a;
+    --alert:#e79a9a; --alert-bg:#331e1e; --alert-border:#6e4040;
+    --ok:#84cfa9; --ok-bg:#17281f; --ok-border:#3c6450;
+  }
+}
+*{box-sizing:border-box;}
+html{ -webkit-text-size-adjust:100%; }
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic Medium","Yu Gothic",
+              "Noto Sans JP","Meiryo",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:16px; line-height:1.85;
+  font-feature-settings:"palt" 1;
+  text-align:left;
+}
+.wrap{max-width:900px; margin:0 auto; padding:32px 20px 96px;}
+
+/* ---------- header ---------- */
+.kicker{
+  font-size:12px; letter-spacing:.14em; color:var(--faint);
+  margin:0 0 10px; font-variant-numeric:tabular-nums;
+}
+h1{
+  font-size:27px; line-height:1.5; margin:0 0 20px;
+  letter-spacing:.01em; font-weight:700; text-wrap:balance;
+}
+.lead{
+  margin:0; color:var(--muted); font-size:15px; line-height:1.8;
+  border-left:3px solid var(--border-strong); padding:2px 0 2px 14px;
+}
+
+/* ---------- toc ---------- */
+.toc{
+  margin:30px 0 8px; padding:18px 22px 20px;
+  background:var(--surface); border:1px solid var(--border); border-radius:10px;
+}
+.toc-h{
+  margin:0 0 10px; font-size:13px; font-weight:700;
+  letter-spacing:.1em; color:var(--muted);
+}
+.toc ul.toc-list{margin:0; padding:0; list-style:none;}
+.toc li{margin:.26em 0; line-height:1.65;}
+.toc li.toc-lv1{margin:.85em 0 .3em; font-weight:700;}
+.toc li.toc-lv1:first-child{margin-top:0;}
+.toc li.toc-lv2{padding-left:1.1em;}
+.toc li.toc-lv3{padding-left:2.5em; font-size:14.5px; color:var(--muted); margin:.16em 0;}
+.toc li.toc-lv3::before{content:"–"; color:var(--faint); margin-right:.45em;}
+.toc a{color:var(--accent); text-decoration:none; border-bottom:1px solid transparent;}
+.toc a:hover{border-bottom-color:currentColor;}
+
+/* ---------- part ---------- */
+h1.part{
+  font-size:24px; line-height:1.5; font-weight:700; letter-spacing:.02em;
+  margin:64px 0 8px; padding:14px 0 0; border-top:4px solid var(--text);
+  scroll-margin-top:16px;
+}
+
+/* ---------- sections ---------- */
+.sec{margin:0;}
+.sec>*:last-child{margin-bottom:0;}
+h2{
+  font-size:21px; line-height:1.5; margin:46px 0 16px; padding-bottom:9px;
+  border-bottom:2px solid var(--border-strong); font-weight:700;
+  scroll-margin-top:16px;
+}
+h3{
+  font-size:17px; line-height:1.6; margin:32px 0 12px; font-weight:700;
+  color:var(--text); scroll-margin-top:16px;
+}
+h3::before{content:""; display:inline-block; width:4px; height:1em;
+  background:var(--accent); margin-right:9px; vertical-align:-.13em; border-radius:2px;}
+p{margin:0 0 1.1em;}
+ul,ol{margin:0 0 1.2em; padding-left:1.6em;}
+li{margin:.4em 0;}
+li>ul{margin:.45em 0 .2em;}
+blockquote{
+  margin:0 0 1.2em; padding:14px 18px;
+  background:var(--surface); border-left:4px solid var(--accent); border-radius:0 8px 8px 0;
+}
+blockquote p{margin:0;}
+hr.rule{
+  border:0; border-top:1px solid var(--border);
+  margin:40px 0 0; opacity:.55;
+}
+hr.rule:has(+ .sec-box),hr.rule:has(+ h1.part){display:none;}
+
+/* ---------- tables ---------- */
+.tw{
+  overflow-x:auto; -webkit-overflow-scrolling:touch;
+  margin:0 0 1.4em; border:1px solid var(--border); border-radius:9px;
+  background:
+    linear-gradient(to right, var(--bg) 30%, rgba(0,0,0,0)) left / 28px 100% no-repeat local,
+    linear-gradient(to left,  var(--bg) 30%, rgba(0,0,0,0)) right / 28px 100% no-repeat local,
+    radial-gradient(farthest-side at 0 50%, rgba(90,110,130,.28), rgba(0,0,0,0)) left / 12px 100% no-repeat scroll,
+    radial-gradient(farthest-side at 100% 50%, rgba(90,110,130,.28), rgba(0,0,0,0)) right / 12px 100% no-repeat scroll;
+}
+.tw:focus{outline:2px solid var(--accent); outline-offset:2px;}
+table{border-collapse:collapse; width:100%; font-size:14.5px; line-height:1.72;}
+thead th{
+  background:var(--surface2); text-align:left; font-weight:700;
+  padding:11px 14px; border-bottom:2px solid var(--border-strong);
+  white-space:nowrap; vertical-align:bottom;
+}
+tbody td{padding:11px 14px; border-bottom:1px solid var(--border); vertical-align:top;
+  overflow-wrap:anywhere;}
+tbody tr:last-child td{border-bottom:0;}
+tbody tr:nth-child(even){background:color-mix(in srgb, var(--surface) 55%, transparent);}
+tbody td:first-child{font-weight:600;}
+thead th:first-child,tbody td:first-child{min-width:7.5em;}
+thead th:last-child,tbody td:last-child{white-space:normal;}
+
+/* ---------- inline markers ---------- */
+.ref{
+  font-size:.75em; color:var(--faint); margin-left:.15em;
+  white-space:nowrap; font-variant-numeric:tabular-nums;
+  letter-spacing:.01em; vertical-align:.06em;
+}
+/* [#n] は出典表に行がある時だけリンクになる。見た目は span と同じにして
+   本文の印象を変えない（追加したのは移動手段だけで、文字は足していない） */
+a.ref{text-decoration:none;}
+a.ref:hover,a.ref:focus{color:var(--accent); text-decoration:underline;}
+.chk{
+  display:inline-block; font-size:.75em; line-height:1.5;
+  padding:0 .5em; margin:0 .12em; border-radius:4px;
+  background:var(--warn-bg); color:var(--warn);
+  border:1px solid var(--warn-border); font-weight:700;
+  white-space:nowrap; vertical-align:.09em;
+}
+
+/* ---------- inline emphasis ---------- */
+strong{font-weight:700; color:var(--text);}
+td strong,th strong{font-weight:700;}
+pre.codeblock{white-space:pre-wrap; word-break:break-all; background:rgba(127,127,127,.10); border:1px solid rgba(127,127,127,.35); border-radius:6px; padding:14px 16px; line-height:1.7; font-size:14px; overflow-x:auto;}
+pre.codeblock code{background:none; border:0; padding:0; font-size:inherit;}
+code{
+  font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+  font-size:.9em; padding:.05em .35em; border-radius:4px;
+  background:var(--surface2); border:1px solid var(--border);
+}
+code .chk{font-family:inherit;}
+
+/* ---------- 表セル内の語ハイライト ---------- */
+.pill{
+  display:inline-block; padding:0 .45em; border-radius:4px;
+  font-weight:700; white-space:nowrap;
+}
+.pill-danger{background:var(--alert); color:#fff; border:1px solid var(--alert);}
+.pill-warn{background:var(--warn-bg); color:var(--warn); border:1px solid var(--warn-border);}
+.pill-ok{background:var(--ok-bg); color:var(--ok); border:1px solid var(--ok-border);}
+.pill-info{background:var(--accent-bg); color:var(--accent); border:1px solid var(--accent);}
+/* muted は「検証していない」を表す。塗らず・破線で、済んだものと視覚的に別系統にする */
+.pill-muted{background:transparent; color:var(--faint);
+  border:1px dashed var(--border-strong); font-weight:600;}
+tbody tr.row-danger td:first-child{box-shadow:inset 4px 0 0 var(--alert);}
+tbody tr.row-danger td{background:color-mix(in srgb, var(--alert-bg) 70%, transparent);}
+
+/* ---------- 出典一覧（--reftable） ---------- */
+table.reftable:has(colgroup){table-layout:fixed; min-width:600px;}
+/* 狭い画面で列が1〜2文字幅に潰れるのを防ぐ。溢れは .tw の横スクロールが受ける */
+table.reftable td:first-child{
+  min-width:2.6em; width:2.6em; text-align:right; white-space:nowrap;
+  font-variant-numeric:tabular-nums; color:var(--muted);
+}
+table.reftable th:first-child{min-width:2.6em; width:2.6em; text-align:right;}
+tbody tr[id]{scroll-margin-top:14px;}
+tbody tr[id]:target td{background:var(--accent-bg);}
+tbody tr[id]:target td:first-child{box-shadow:inset 4px 0 0 var(--accent); color:var(--accent);}
+
+/* ---------- emphasised sections ---------- */
+.sec-box{
+  margin:28px 0 0; padding:6px 26px 20px;
+  border:1px solid var(--border-strong); border-radius:10px;
+}
+.sec-box h2{margin-top:26px;}
+.sec-box .tw{background-color:var(--bg);}
+.sec-conclusion{background:var(--accent-bg); border-left:6px solid var(--accent);}
+.sec-conclusion h2{border-bottom-color:var(--accent);}
+.sec-alert{background:var(--alert-bg); border-color:var(--alert-border);
+  border-left:6px solid var(--alert);}
+.sec-alert h2{border-bottom-color:var(--alert-border);}
+.sec-danger{background:var(--alert-bg); border:2px solid var(--alert);
+  border-left:10px solid var(--alert);}
+.sec-danger h2{border-bottom-color:var(--alert);}
+.sec-warn{background:var(--warn-bg); border-color:var(--warn-border);
+  border-left:6px solid var(--warn-border);}
+.sec-warn h2{border-bottom-color:var(--warn-border);}
+.sec-checklist{background:var(--surface); border:2px solid var(--border-strong);
+  border-left:10px solid var(--accent);}
+.sec-checklist h2{border-bottom-color:var(--accent);}
+/* チェックリストは印刷して手元で使う。番号は原稿どおり残し、記入欄だけ CSS で足す */
+.sec-checklist ol{list-style:decimal; padding-left:1.9em;}
+.sec-checklist ol>li{margin:.7em 0; padding-left:2.1em; position:relative;}
+.sec-checklist ol>li::before{
+  content:""; position:absolute; left:0; top:.25em;
+  width:1.15em; height:1.15em; border:1.5px solid var(--border-strong);
+  border-radius:3px; background:var(--bg);
+}
+
+/* ---------- toc: 囲み枠の節は目次でも色を付ける ---------- */
+.toc a.toc-danger,.toc a.toc-alert{color:var(--alert); font-weight:700;}
+.toc a.toc-warn{color:var(--warn); font-weight:700;}
+.toc a.toc-checklist{color:var(--accent); font-weight:700;}
+
+/* ---------- footer / nav ---------- */
+.prov{
+  margin:56px 0 0; padding-top:16px; border-top:1px solid var(--border);
+  font-size:12.5px; line-height:1.8; color:var(--faint); word-break:break-all;
+}
+.top{
+  position:fixed; right:18px; bottom:18px; z-index:5;
+  display:block; width:42px; height:42px; line-height:40px; text-align:center;
+  border-radius:50%; text-decoration:none; font-size:17px;
+  background:var(--surface); color:var(--muted);
+  border:1px solid var(--border-strong);
+  box-shadow:0 2px 8px rgba(0,0,0,.14);
+}
+.top:hover{color:var(--accent); border-color:var(--accent);}
+
+/* ---------- narrow screens ---------- */
+@media (max-width:640px){
+  body{font-size:15.5px;}
+  .wrap{padding:22px 14px 88px;}
+  h1{font-size:22px;}
+  h1.part{font-size:20px; margin-top:46px;}
+  h2{font-size:19px;}
+  h3{font-size:16.5px;}
+  .toc{padding:14px 16px 16px;}
+  .sec-box{padding:4px 14px 14px;}
+  table{font-size:14px;}
+  thead th,tbody td{padding:9px 11px;}
+}
+
+/* ---------- print ---------- */
+@media print{
+  :root{
+    --bg:#fff; --surface:#fff; --surface2:#fff; --text:#000; --muted:#333; --faint:#555;
+    --border:#999; --border-strong:#555; --accent:#000; --accent-bg:#fff;
+    --warn:#000; --warn-bg:#fff; --warn-border:#000;
+    --alert:#000; --alert-bg:#fff; --alert-border:#000;
+  }
+  body{background:#fff; color:#000; font-size:10.5pt; line-height:1.7;}
+  .wrap{max-width:none; padding:0;}
+  a{color:#000; text-decoration:none;}
+  .top{display:none;}
+  .tw{overflow:visible; background:none; border:1px solid #999;}
+  table{font-size:9pt;}
+  thead th{background:#fff; border-bottom:1.5pt solid #000;}
+  tbody tr:nth-child(even){background:#fff;}
+  .sec-box{background:#fff; border:1.5pt solid #000;}
+  .sec-danger{border:2.5pt solid #000; border-left:2.5pt solid #000;}
+  .chk{background:#fff; color:#000; border:1pt solid #000;}
+  pre.codeblock{background:#fff; border:1px solid #999; break-inside:avoid;}
+  code{background:#fff; border:1px solid #999;}
+  .pill{background:#fff!important; color:#000!important; border:1.2pt solid #000!important;}
+  /* 未検証は印刷でも「済んだもの」と別に見えなければ意味がない。
+     モノクロでは色が消えるので、破線と濃度で差を残す */
+  .pill-muted{border:1pt dashed #666!important; color:#555!important; font-weight:400!important;}
+  /* 長いURLは印刷で紙幅を超える。折り返しを許可して溢れを止める */
+  .tw{overflow:hidden;}
+  table{table-layout:auto; width:100%;}
+  tbody td{overflow-wrap:anywhere; word-break:break-word;}
+  thead th{white-space:normal;}
+  table.reftable{font-size:7.6pt; line-height:1.5;}
+  table.reftable thead th,table.reftable tbody td{padding:5px 6px;}
+  tbody tr[id]:target td{background:#fff;}
+  tbody tr.row-danger td{background:#fff;}
+  tbody tr.row-danger td:first-child{box-shadow:inset 3pt 0 0 #000;}
+  /* チェックリストは1枚で手元に置けるよう独立ページにする */
+  .sec-checklist{break-before:page; page-break-before:always;
+    border:1.5pt solid #000; border-left:1.5pt solid #000;}
+  .sec-checklist ol>li::before{border:1.2pt solid #000;}
+  .ref{color:#555; opacity:1;}
+  blockquote{background:#fff; border-left:3pt solid #000;}
+  h1.part{break-before:page; page-break-before:always; border-top:2.5pt solid #000;
+    font-size:15pt; margin-top:0;}
+  h1.part,h2,h3{break-after:avoid; page-break-after:avoid;}
+  .tw,blockquote,tr{break-inside:avoid; page-break-inside:avoid;}
+  .toc{border:1px solid #999; background:#fff;}
+}
+</style>
+</head>
+<body id="top">
+<div class="wrap">
+<p class="kicker">T-20260927-001 ／ 2026-09-27</p>
+<h1>2年後、こうなります</h1>
+<p class="lead">2028年9月の姿と、明日からの90日。</p>
+<nav class="toc" aria-label="目次"><p class="toc-h">目次</p><ul class="toc-list"><li class="toc-lv2"><a href="#s1" class="toc-conclusion">1. 結論</a></li><li class="toc-lv2"><a href="#s2">2. 何をやるか</a></li><li class="toc-lv3"><a href="#s2-1">主力3（時間をここに集める）</a></li><li class="toc-lv3"><a href="#s2-2">補助3（金額でなく信用と導線を取る）</a></li><li class="toc-lv3"><a href="#s2-3">捨てる7（捨てると書いておきます）</a></li><li class="toc-lv2"><a href="#s3">3. 最初の90日（2026-10-01 → 12-31）</a></li><li class="toc-lv3"><a href="#s3-1">12月31日に当てる打ち切り条件</a></li><li class="toc-lv2"><a href="#s4">4. 8四半期のマイルストン</a></li><li class="toc-lv2"><a href="#s5">5. 真似る相手</a></li><li class="toc-lv2"><a href="#s6" class="toc-warn">6. 注釈</a></li><li class="toc-lv3"><a href="#s6-1">未確定4点と、回答で動くもの（主線は変えません）</a></li></ul></nav>
+<p>結論 → 何をやるか → 最初の90日。ここまでで読み終われます。§4以降は裏付けと注です。</p>
+<hr class="rule">
+<section id="s1" class="sec sec-box sec-conclusion">
+<h2>1. 結論</h2>
+<p><strong>2028年9月、月営業利益は中央154万円。本業（タクシー）は2028年3月に辞められます。</strong><br>主力は3レーン（Amazon物販・EC/Amazon運用代行・AI業務自動化の受託）。補助3、捨てる7。<br><strong>月200万に届く確率は12〜18%。届く形は「物販の段上げ＋運用代行3社」の二枚重ね（154＋34＋18＝206万）の1本だけです。</strong><br><strong>最初の90日の支出は0円</strong>（有料ツール・ドメイン・外注は1件もなし。例外は条件付きのガイド検定8,360円だけ）。</p>
+<div class="tw" tabindex="0"><table><thead><tr><th>2028年9月</th><th>中央</th><th>楽観（上位20%）</th><th>悲観（下位20%）</th></tr></thead><tbody><tr><td><strong>月営業利益（6レーン合計）</strong></td><td><strong>154万</strong></td><td>236万</td><td>62万</td></tr><tr><td>月商（同）</td><td>約900万</td><td>約1,300万</td><td>約400万</td></tr><tr><td>利益率</td><td>22〜24%</td><td>24%</td><td>16%</td></tr><tr><td>取引メーカー</td><td>71社</td><td>90社</td><td>40社</td></tr><tr><td>本業（タクシー）</td><td><strong>2028年3月に退職</strong></td><td>2028年1月</td><td>継続</td></tr><tr><td>公庫借入</td><td>300万（2027-04）</td><td>600万（2028-01に2回目）</td><td>借りない</td></tr></tbody></table></div>
+<blockquote><p><strong>この表が本書で唯一の数字の出所</strong>です。以下の各節は内訳と手順だけを書きます。数字はすべて<strong>仮置き</strong>（モデル出力）で、当社の実測は0件です（→ 注1・注2）。</p></blockquote>
+<p><strong>200万に届く条件は3つ。うち2つが立てば届きます。</strong></p>
+<div class="tw" tabindex="0"><table><thead><tr><th>条件</th><th>効く額</th><th>立つ確率（仮置き）</th><th>初めて分かる日</th></tr></thead><tbody><tr><td>① 物販の段上げ（卸区分・販売者限定化）の到達率が20%→45%になる</td><td>+34万</td><td>40%</td><td>2027-06</td></tr><tr><td>② EC運用代行が3社に届く</td><td>+18万</td><td>50%</td><td>2027-09</td></tr><tr><td>③ AI受託が3社に届く</td><td>+60万</td><td>60%（1社目のみ）</td><td><strong>2026-12-31</strong></td></tr></tbody></table></div>
+</section>
+<hr class="rule">
+<section id="s2" class="sec">
+<h2>2. 何をやるか</h2>
+<h3 id="s2-1">主力3（時間をここに集める）</h3>
+<div class="tw" tabindex="0"><table><thead><tr><th>レーン</th><th>2028-09 月利（中央）</th><th>週工数</th><th>自己資金</th><th>律速</th></tr></thead><tbody><tr><td><strong>① Amazon物販</strong>（メーカー直取引・取引条件の段上げ）</td><td>65万</td><td>12h</td><td>100万＋借入300万</td><td>段2→段3の到達率（観測ゼロ・初実測2027-06）</td></tr><tr><td><strong>② EC/Amazon運用代行</strong>（メーカーのAmazonアカウントを預かって売る）</td><td>36万（2社×18万）</td><td>5h</td><td>0円（在庫なし）</td><td>物販1社目の実績。実績前に提案しても通らない</td></tr><tr><td><strong>③ AI業務自動化の受託</strong>（n8n／Dify／GAS でメーカーの手作業を止める）</td><td>30万（1社×30万）</td><td>5h</td><td>0円（n8n自己ホスト）</td><td>受注経路。かつ<strong>真似る先人が0人</strong>（§5）</td></tr></tbody></table></div>
+<p><strong>①②③は同じ1通で売ります。</strong> メーカーへの初回メールに「仕入れさせてください／御社アカウントで売らせてください／御社の手作業を止めます」の3択を置く。名簿2,425社は共通、送信通数も同じ、<strong>追加時間0</strong>。ここが設計の核です。</p>
+<h3 id="s2-2">補助3（金額でなく信用と導線を取る）</h3>
+<div class="tw" tabindex="0"><table><thead><tr><th>レーン</th><th>2028-09 月利（中央）</th><th>週工数</th><th>何のためにやるか</th></tr></thead><tbody><tr><td><strong>④ 観光ガイド</strong>（MagicalTrip → Airbnb体験 → 東京都地域通訳案内士）</td><td>8万</td><td>土日に月4日</td><td>退職後に月20万へ伸ばせる唯一の労働型。二種免許・地理・接客がそのまま効く</td></tr><tr><td><strong>⑤ スポットコンサル＋デジタル商品</strong>（ビザスク／ココナラ）</td><td>8万</td><td>2h</td><td>0円・7〜30日で「事業収入がある個人」になる。①〜③の信用の橋</td></tr><tr><td><strong>⑥ 動画（顔なし・静止画）＋アフィリエイト</strong></td><td>7万</td><td>2.5h</td><td>登録者1,000人で YouTubeショッピングアフィリエイトが開き、自社出品ページへの送客導線になる</td></tr></tbody></table></div>
+<p><strong>⑥で自社出品商品を紹介するときはアソシエイトタグを付けません</strong>（素のURL）。販売利益を満額取れるので付ける意味がなく、付けるとセラーアカウントを賭けることになる。<strong>代わりに「当店（Satoy Select）が販売しています」の一文を必ず入れます</strong>（景表法ステマ規制）。→ 注6</p>
+<h3 id="s2-3">捨てる7（捨てると書いておきます）</h3>
+<div class="tw" tabindex="0"><table><thead><tr><th>捨てるもの</th><th>理由（採算と時間）</th></tr></thead><tbody><tr><td><strong>eBay物販</strong></td><td>2026年ルール下で月利50万に登った日本人セラーが0件。検品・梱包・発送が<strong>物販と同じ時間帯</strong>を食い、取り合いで負ける。2027Q3に1度だけ再評価（不良在庫の英・独・豪向け出口としてのみ）</td></tr><tr><td>独自ドメイン＋SEOブログ</td><td>1位のCTRが2年で−58%（実測）。業界実査でも「月50万以上は多くの場合5年以上」。2年の窓に入らない</td></tr><tr><td>AIエージェント開発の準委任</td><td>常駐・準委任が中心で、週20hの形に入らない</td></tr><tr><td>AI生成素材のストック販売</td><td>単価33%・枚数勝負。時間あたりが①〜③の1/10</td></tr><tr><td>駐車場などスペースシェア</td><td>自分の労働で増やせない（土地がないからではなく、伸びる仕組みがない）</td></tr><tr><td>補助金申請サポートの受託</td><td>行政書士法の該当可否が未判定。判定を待つ価値に対して単価が合わない</td></tr><tr><td>個人タクシーへの独立</td><td>運転は時間を売る商売で、200万に届く形にならない</td></tr></tbody></table></div>
+</section>
+<hr class="rule">
+<section id="s3" class="sec">
+<h2>3. 最初の90日（2026-10-01 → 12-31）</h2>
+<p>例外の支出は東京シティガイド検定8,360円だけで、それも W7 の条件を満たしたときにしか払いません。</p>
+<div class="tw" tabindex="0"><table><thead><tr><th>週</th><th>やること（サイト名・手続き名・時間・金額）</th><th>週末に手に入るもの／打ち切り条件</th></tr></thead><tbody><tr><td><strong>W1</strong>　10/1〜5</td><td>①FBA納品プランを作成（セラーセントラル・既存在庫・2h・0円）②YouTubeチャンネル開設＋2段階認証（30分）③ビザスク登録（expert.visasq.com・1h／肩書「現役タクシー乗務」「AIエージェント自社運用」）④MagicalTrip ガイド応募（magical-trip.com/recruit・30分）⑤GビズIDプライム申請（gbiz-id.go.jp・30分・郵送審査あり）</td><td>出品ゼロの解消手続き／4つの口座／1応募</td></tr><tr><td><strong>W2</strong>　10/6〜12</td><td>①3オファー版のメール文面を作る（2h）②ランサーズ・クラウドワークスで「業務自動化」「GAS」「n8n」の募集10件の価格と要件を写す（1.5h・提案はまだしない）③VOICEVOX をダウンロードし、非公開テスト動画1本で工数を実測（2h）</td><td>3オファー文面／AI受託の相場表／動画1本の実所要時間　<strong>打ち切り：</strong>動画1本に6h超なら、動画は「物販の記録」に縮小</td></tr><tr><td><strong>W3</strong>　10/13〜19</td><td>①メーカーへ送信開始 週60通（4h）②ココナラで「Amazon 仕入れ判定」「AIエージェント」の出品20件の価格と販売実績を記録（1h）③ビザスクの公募に「タクシー」「配車」「ドライバー」「運輸」で応募3件（1h）</td><td>返信の1件目／デジタル商品の価格帯</td></tr><tr><td><strong>W4</strong>　10/20〜26</td><td>①送信 週60通 ②表記の型を3行で確定（1h）：「当店（Satoy Select）が販売しています」／自社商品は素のURL／他社商品のみ「Amazonアソシエイトです」を併記 ③動画1本目を公開（題材＝自分の実数字「◯円で仕入れて◯円で売れた全記録」・2.5h）④ランサーズで業務自動化の提案2件（5〜15万の小案件のみ・1.5h）</td><td>表記の型（以後使い回す）／公開動画1本／提案2件　<strong>打ち切り：</strong>表記の型より先に自社商品を紹介しない</td></tr><tr><td><strong>W5</strong>　10/27〜11/2</td><td>①送信 週60通 ②管轄の商工会議所に電話し、持続化補助金 様式4の相談枠を確認（30分・締切12/04）③MagicalTrip の面談・研修（0円）</td><td>様式4の相談枠／面談結果　<strong>打ち切り：</strong>面談に進めないならAirbnb体験の直販へ</td></tr><tr><td><strong>W6</strong>　11/3〜9</td><td>①送信 週60通 ②返信先へ2通目（切り返しテンプレ・2h）③提案2件 ④動画2本目</td><td>返信率の初実測</td></tr><tr><td><strong>W7</strong>　11/10〜16</td><td>①送信 週60通 ②東京シティガイド検定の申込判断（受験5,500円＋テキスト2,860円）→ MagicalTripで1本以上実施済みなら申込、未実施なら<strong>見送り</strong> ③提案2件</td><td>検定の申込 or 見送り　<strong>打ち切り：</strong>ガイド0本なら払わない</td></tr><tr><td><strong>W8</strong>　11/17〜23</td><td>①送信 週60通 ②初回受注の処理（メーカー発注 or 受託）③動画3本目 ④ビザスク応募3件</td><td>1社目の発注 or 受託1件目</td></tr><tr><td><strong>W9</strong>　11/24〜30</td><td>①送信 週60通 ②<strong>持続化補助金 第20回の Go/NoGo</strong>：「補助対象の支出75万を先に自腹で出せる／それが販路開拓に直結する」が両方Yesでなければ見送り（GビズIDは0円で取得済みなので第21回に回せる）</td><td>補助金の判断　<strong>打ち切り：</strong><strong>使い道を作るための支出はしない</strong></td></tr><tr><td><strong>W10</strong>　12/1〜7</td><td>①送信 週60通 ②（Goのみ）様式4の発行依頼 → <strong>12/04 締切</strong> ③動画4本目 ④受託の納品</td><td>様式4（Goの場合）</td></tr><tr><td><strong>W11</strong>　12/8〜14</td><td>①送信 週60通 ②（Goのみ）電子申請 → <strong>12/15 17:00 締切</strong> ③ココナラにデジタル商品を1本出品（自分が実際に使っている仕入れ判定シート・2h）</td><td>申請完了／出品1本</td></tr><tr><td><strong>W12</strong>　12/15〜21</td><td>①送信 週60通 ②3ヶ月の実測をまとめる：返信率／提案数と成約数／動画の平均視聴時間／ガイド実施本数（2h）</td><td>4つの実測値</td></tr><tr><td><strong>W13</strong>　12/22〜31</td><td>判定と2027Q1の週次構成を決める（2h・下表を1つずつ当てる）</td><td>2027Q1の構成　<strong>打ち切り：</strong>下表</td></tr></tbody></table></div>
+<h3 id="s3-1">12月31日に当てる打ち切り条件</h3>
+<div class="tw" tabindex="0"><table><thead><tr><th>レーン</th><th>打ち切り条件</th><th>該当したら</th></tr></thead><tbody><tr><td>① Amazon物販</td><td>累計700通で返信率20%未満</td><td>送信を止め、文面を直すまで撃たない（名簿は撃つほど劣化する有限資源）</td></tr><tr><td>② EC運用代行</td><td>提案10社で反応0</td><td>物販1社目が出るまで提案を止める（順序が逆だった証拠）</td></tr><tr><td>③ AI受託</td><td><strong>提案5件で受注0</strong></td><td><strong>主力から降格</strong>し、時間を②へ寄せる</td></tr><tr><td>④ 観光ガイド</td><td>MagicalTripで1本も実施できない</td><td>2027Q2まで凍結。検定費は払わない</td></tr><tr><td>⑤ コンサル＋デジタル</td><td>応募10件で成約0</td><td>月1回の応募に落とす（0円なので止めない）</td></tr><tr><td>⑥ 動画</td><td>12本で平均視聴時間3分未満かつ登録者50人未満</td><td>題材を替える（レーンは残す。1,000人が導線のスイッチ）</td></tr></tbody></table></div>
+</section>
+<hr class="rule">
+<section id="s4" class="sec">
+<h2>4. 8四半期のマイルストン</h2>
+<div class="tw" tabindex="0"><table><thead><tr><th>期</th><th>目的</th><th>月利目標</th><th>社長がやること</th><th>前の期から変えること</th></tr></thead><tbody><tr><td><strong>2026Q4</strong></td><td>出品ゼロの解消と6レーンの立ち上げ</td><td>2万</td><td>§3 の90日</td><td>（起点）</td></tr><tr><td><strong>2027Q1</strong></td><td>メーカー1社目とBtoB1件目</td><td>8万</td><td>接触を月250通で固定／段1の3社と2回目の発注交渉／受託1件を納品／ガイド検定を1月受験</td><td>名簿を4,270社へ拡張（0円）</td></tr><tr><td><strong>2027Q2</strong></td><td>公庫300万を実行し、段2を作る</td><td>18万</td><td>申込2027-02〜03 → 実行2027-04（据置12ヶ月）／段2の数量・掛け率交渉／運用代行の提案を10社へ</td><td>仕入れロットを1.5倍。<strong>2027-06-30に段3が0社なら「量で押す案B」へ切替</strong></td></tr><tr><td><strong>2027Q3</strong></td><td>段3（販売者限定化）の1社目</td><td>32万</td><td>段3交渉を1社45分/月で回す／運用代行1社目を受注／eBayを1度だけ再評価</td><td>交渉時間を15分→45分へ</td></tr><tr><td><strong>2027Q4</strong></td><td>現金の谷を越える（最薄期）</td><td>55万</td><td>在庫回転を毎月見る／受託2社／動画で登録者1,000人</td><td><strong>新規ロットを増やさない</strong>（谷は2027-10〜2028-02・最薄−12万）</td></tr><tr><td><strong>2028Q1</strong></td><td><strong>本業を辞める</strong></td><td>85万</td><td>2回目の借入300万（2028-01）／月営業利益53.4万が3ヶ月続いたのを確認 → <strong>2028年3月に退職</strong></td><td>週20h → 週40h。増分は④ガイドと③受託へ</td></tr><tr><td><strong>2028Q2</strong></td><td>空いた時間で②③を倍に</td><td>120万</td><td>受託3社／運用代行3社／ガイド月8日</td><td><strong>新規メーカー獲得の締切は2028-03</strong>（段3に6ヶ月要るため4月以降の獲得は2028-09に効かない）</td></tr><tr><td><strong>2028Q3</strong></td><td>200万に手を掛ける</td><td><strong>154万</strong></td><td>段上げの仕上げ／納税引当を別口座（月利の40〜45%）</td><td>新規獲得を止め、既存の段上げに全時間</td></tr></tbody></table></div>
+<p><strong>2028年3月より前に辞めてはいけません。</strong> 2027-10〜2028-02 は現金の谷で、この時期に手取り47.5万を失うと即ショートします。本モデルで唯一の即死経路です。<br><strong>公庫への申込は社長承認が必要な操作です</strong>（現時点で公庫には誰も連絡していません）。</p>
+</section>
+<hr class="rule">
+<section id="s5" class="sec">
+<h2>5. 真似る相手</h2>
+<div class="tw" tabindex="0"><table><thead><tr><th>レーン</th><th>真似る相手</th><th>写すところ</th><th>写さないところ</th></tr></thead><tbody><tr><td>① 物販</td><td><strong>中村裕紀</strong>『Amazon国内メーカー直取引完全ガイド』</td><td>接触メールの型／段上げの交渉手順／販売者限定化の持って行き方</td><td>月300社メール・運転資金1,000万・成約率2%の置き値（当社の律速は接触数ではない）</td></tr><tr><td>② 運用代行</td><td><strong>該当者なし</strong>（第三者取材のある個人は0件）。発注側の相場（月15〜50万）だけ写す</td><td>価格表の作り方</td><td>「実績ゼロで任せてください」という提案。物販1社目の後にしか出さない</td></tr><tr><td>③ AI受託</td><td><strong>0人。第三者取材で裏の取れた先人はいません。</strong>出典は全て受託事業者の自社媒体</td><td>—</td><td>「1社10〜50万・3〜5社で月50〜100万」は<strong><span class="pill pill-warn">自称</span></strong>。計画の前提に置かない</td></tr><tr><td>④ ガイド</td><td><strong>MagicalTrip 型</strong>（未経験9割・3,500円/h・企画と集客は運営持ち）</td><td>最初の1件までの経路</td><td>個人ガイドで月100万は事例0件</td></tr><tr><td>⑤ コンサル</td><td><strong>慶野英里名</strong>（ビザスクで10万・無料note・導線が薄い）</td><td>プロフィールの棚卸しと応募文の型</td><td>—</td></tr><tr><td>⑥ 動画</td><td><strong>サラタメさん</strong>（顔出しなし・登録80万超）</td><td>題材の選び方（会社員の悩み→具体的な行動）／顔出しなしの構成</td><td>本人音声＋アニメ外注（VOICEVOX 0円で代替）／登録80万という規模の期待</td></tr></tbody></table></div>
+<p><strong>③だけは真似る型が存在しません。</strong>だから §3 W2〜W12 で提案10件を出し、<strong>12/31に受注0なら主力から降格</strong>を先に決めてあります。取る案件は5〜15万の1件でよく、目的は金額ではなく「この型が実在するか」の実測です。</p>
+</section>
+<hr class="rule">
+<section id="s6" class="sec sec-box sec-warn">
+<h2>6. 注釈</h2>
+<ol><li><strong>数字のラベル。</strong> 月営業利益・月商・利益率・メーカー社数は<strong>すべて仮置き（モデル出力）</strong>です。当社の<strong>実測は0件</strong>。物販は「取引条件の段が上がらない世界」の65万を中央に採り、段が上がった世界の99万は楽観側に置いています。</li><li><strong>観測値がゼロの項目と実測日。</strong> 段2→段3の到達率（2027-06）／メーカーの成約率（2027-03）／1社あたり月商（2027-03）／AI受託の単価と成約率（<strong>2026-12-31</strong>）／運用代行の単価（2027-09）。実測が出た時点で§1の表を書き換えます。</li><li><strong>確率の出し方。</strong> 200万の12〜18%は、§1下表の3条件をそれぞれ独立とみなし「2つ以上成立」を数えたもの。条件の確率自体が仮置きなので、<strong>確率の確度も仮置き</strong>です。</li><li><strong>自称と実測の区別。</strong> AI受託の「1社10〜50万」、eBayの月利100万事例、Udemy講師の月21〜32万、サラタメさんの月100万は<strong>すべて自称</strong>。顔出しなし動画の月収益中央値58,365円（N=19）は<strong>チャンネル売却市場の掲載実数</strong>＝売りたい人のサンプルで、選択バイアスがあります。eBayの成功事例は<strong>全て旧関税ルール下</strong>（2025-08のデミニミス廃止前）。</li><li><strong>期限があるもの。</strong> ①<strong>持続化補助金 第20回</strong>＝様式4の締切12/04・電子申請12/15 17:00。後払いで自己負担が先。採択率51.0%（第17回・準一次）。<strong>使い道が実在してから判断</strong>（§3 W9）。②<strong>東京シティガイド検定</strong>＝申込は11月中旬〜1月中旬、8,360円。ガイド1本を実施してから払う（§3 W7）。</li><li><strong>法務の確定事項2点。</strong> ①<strong>自社が出品している商品にアソシエイトタグを付けない</strong>（明文の禁止はないが、得るのは紹介料の数%、失いうるのはセラーアカウント。素のURLなら販売利益は満額）。②<strong>「当店が販売しています」の明示が必要</strong>（景表法ステマ規制・2023-10-01施行）。当社は商品を供給する事業者本人なので、「アソシエイトです」の開示だけでは足りず、アソシエイトを使うかに関係なく必要。違反の制裁は措置命令＋<strong>事業者名の公表（取り消せません）</strong>。</li><li><strong>この資料の元データ。</strong> レーン別の実勢＝本チケット 01（eBay・観光ガイド）／02（動画・アフィリ）／03（個人×AI 12型）、法務＝04、ロードマップ本体＝05。物販の段モデル・借入・退職閾値53.4万・現金の谷＝T-20260920-005 の 10〜14。</li><li><strong>本書は計画のみです。</strong> 外部発信・課金・契約・第三者連絡（メーカーへの送信・公庫への申込を含む）は1件も実行していません。</li></ol>
+<h3 id="s6-1">未確定4点と、回答で動くもの（主線は変えません）</h3>
+<div class="tw" tabindex="0"><table><thead><tr><th>未確定</th><th>回答で動くもの</th></tr></thead><tbody><tr><td><strong>顔出しNGはオンライン1対1面談を含むか</strong></td><td>含むなら②③⑤が縮み、中央154万→<strong>約125万</strong>。<strong>影響が最大なのでここだけ早めに知りたい</strong></td></tr><tr><td>英語力</td><td>話せる→④は8万→20万の階段に乗る／話せない→日本語の国内客向けに振替え4万</td></tr><tr><td>声を出せるか</td><td>出せる→自分の声（伸びが1.5倍前後）／出せない→VOICEVOX（0円・商用可）で成立。ただし合成音声＋汎用情報は収益化不可なので<strong>必ず自分の実数字を入れる</strong></td></tr><tr><td>乗務年数・兼業規定・勤務先が観光タクシーを扱うか・土日の空き日数</td><td>兼業NG→④は退職まで凍結（−8万）／勤務先が観光タクシーを扱う→④は8万→15万（研修費4,120円のみ）</td></tr></tbody></table></div>
+</section>
+<p class="prov">HTML版。内容の唯一の正は 07_社長提出_2年ロードマップ.md です。数字はシミュレーション検証で更新される場合があります。</p>
+</div>
+<a class="top" href="#top" aria-label="先頭へ戻る">&#8593;</a>
+</body>
+</html>
