@@ -1,0 +1,251 @@
+<!doctype html><html lang='ja'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>マサル検証 — 多レーン・ロードマップ（05）</title><style>body{font-family:-apple-system,'Hiragino Sans','Noto Sans JP',sans-serif;max-width:1150px;margin:2em auto;padding:0 1em;line-height:1.65;color:#222;font-size:14.5px}table{border-collapse:collapse;margin:.8em 0;font-size:.92em}th,td{border:1px solid #bbb;padding:.35em .6em;vertical-align:top}th{background:#eef2f8}tr:nth-child(even) td{background:#fafafa}h1{font-size:1.5em;border-bottom:2px solid #444}h2{font-size:1.25em;border-left:5px solid #25b;padding-left:8px;margin-top:1.8em}h3{font-size:1.05em;margin-top:1.4em}blockquote{border-left:4px solid #ccc;margin:.8em 0;padding:.2em 1em;color:#444}code{background:#f3f3f3;padding:1px 4px;border-radius:3px}hr{border:0;border-top:1px solid #ccc;margin:1.6em 0}</style></head><body>
+<h1>マサル検証 — 多レーン・ロードマップ（05）</h1>
+<p>シミュレーター マサル／2026-09-27／T-20260927-001</p>
+<p>検証対象：<code>05_多レーン・ロードマップ.md</code>（タケシ）</p>
+<p>計算：<code>workspace/output/agent_output/T-20260927-001/06_mc_multilane.py</code>・<code>06b_extra.py</code>（乱数種 <strong>20260927</strong> 固定・n=8,000／補足 n=4,000・再現可）</p>
+<hr>
+<h2>0. 判定</h2>
+<p><strong>この案は「やること（レーンの選び方と90日の動き）」は社長に上げてよい。ただし数字は3つ撤回が必要で、そこはタケシに差し戻します。</strong></p>
+<table><thead><tr><th>タケシの主張</th><th>私の読み</th><th>差の正体</th></tr></thead><tbody>
+<tr><td>2028-09 月営業利益 <strong>中央154万</strong></td><td><strong>中央57万</strong>（幅 40〜110万）</td><td>受託の単価 −81万／④⑤⑥の置き値 −66万／3オファー化 −31万（§2の階段）</td></tr>
+<tr><td><strong>P(200万)＝12〜18%</strong></td><td><strong>P(200万)＝5%</strong>（4〜6%）／P(100万)＝20%（15〜28%）</td><td>同上</td></tr>
+<tr><td>本業は <strong>2028年3月に辞められる</strong></td><td><strong>2028-03 に辞める条件を満たすのは 約35%</strong>（53.4万×3ヶ月）。95万線なら <strong>12%</strong></td><td>§4</td></tr>
+<tr><td>1接触3オファーは <strong>追加時間0</strong></td><td><strong>追加時間はゼロではなく、差し引き月 −25万</strong>（中央値ベース）</td><td>§1</td></tr>
+<tr><td>レーンを足すと積み上がる</td><td><strong>週20時間では、レーンを足すほど中央値が下がる</strong>（物販単線74万 → 全レーン44万）</td><td>§1-3</td></tr>
+</tbody></table>
+<p><strong>最も重い指摘は1つです。</strong> 154万は「一桁違う構造変化」ではなく、<strong>在庫ゼロのレーン（②③）に置いた観測値ゼロの単価</strong>でできています。受託の単価と勝率をこちらの置き値に替えるだけで <strong>191万 → 110万</strong>、④⑤⑥まで替えると <strong>44万</strong>。<strong>レーンを足したことによる楽観の積み上げ</strong>という判定です。</p>
+<blockquote>本書の数字はすべて<strong>推定（当社の観測値ゼロ）</strong>です。実測日を併記しました。実測が出たら書き換えます。唯一の到達条件としては扱いません。</blockquote>
+<hr>
+<h2>1. プレモーテム（先に書く）— 2026-12-31 に「90日プランは失敗した」。なぜか</h2>
+<table><thead><tr><th>#</th><th>失敗の筋</th><th>起きる確率</th><th>起きたと分かる指標</th><th>撤退/縮小の条件（この形で契約する）</th></tr></thead><tbody>
+<tr><td><strong>1</strong></td><td><strong>W6 で週20時間が天井に当たり、送信60通・返信対応・動画・提案の全部が半端になった。</strong>返信を放置して名簿を焼いた</td><td><strong>75%</strong></td><td>週の実働が3週連続で22h超／返信の未返信残が10件超</td><td><strong>送信を週60通→30通に落とす。</strong>返信対応を先に時間予約し、余った時間だけ送信に使う（順序を逆にする）</td></tr>
+<tr><td><strong>2</strong></td><td>3オファーで返信は来たが、中身が「代行いくら？」「自動化いくら？」の見積依頼ばかりで、<strong>実績ゼロのため全部失注</strong>。見積作成に時間を取られ仕入れが進まなかった</td><td><strong>45%</strong></td><td>返信のうち仕入れ以外が半数超／見積作成が月8h超</td><td><strong>メール本文は仕入れ1本に戻し、②③は署名の1行（「販売代行・業務自動化も承ります」）に格下げ</strong>。見積は物販1社目が出るまで出さない</td></tr>
+<tr><td><strong>3</strong></td><td>受託の提案を10件出して0件。12/31に主力から降格したが、<strong>10件は判定に足りる数ではなかった</strong>（偽陰性）</td><td><strong>52%</strong>（提案11件で受注0の確率・§3）</td><td>提案数が累計15件未満で判定日が来る</td><td><strong>判定を「受注0」から「打診→商談（ヒアリング実施）化率」に変える。</strong>商談0/10件なら降格、商談ありなら提案を続ける</td></tr>
+<tr><td>4</td><td>FBA納品が1回で終わらず、出品ゼロが解消しないまま Amazon 側の審査で止まった</td><td>25%</td><td>W4 までに納品完了しない</td><td>納品を最小構成（1SKU・1箱）に割り、先に「出品1件」を作る</td></tr>
+<tr><td>5</td><td>補助金 第20回の様式4・申請に W10〜W11 を取られ、物販の初回発注と重なって両方遅れた</td><td>30%</td><td>W9 で Go を出した世界</td><td><strong>第20回は W9 を待たず今 NoGo にする</strong>（§5）</td></tr>
+</tbody></table>
+<p><strong>上位3つを撤退条件に落としました（右列）。</strong></p>
+<hr>
+<h2>2. 「1接触3オファー」は追加時間ゼロか</h2>
+<h3>2-1. 結論</h3>
+<table><thead><tr><th>論点</th><th>判定</th></tr></thead><tbody>
+<tr><td>各オファーの成約率は下がるか</td><td><strong>下がる。</strong>1通1CTA が原則で、3択は焦点がぼける。<strong>返信率に 0.55/0.78/0.95 倍（三角）を置いた</strong>（推定・観測ゼロ・実測日 2026-11-30＝累計700通時点）</td></tr>
+<tr><td>どれだけ下がると設計が壊れるか</td><td><strong>0.78倍でもう壊れています。</strong>希釈だけで中央 −11万（G0 69.5万 → G1 58.8万）</td></tr>
+<tr><td>返信後の工数は3倍になるか</td><td><strong>送信は共通・後工程は共通化不可。</strong>見積（仕入れ45分）／提案書（代行120分）／ヒアリング＋要件定義（受託180分）は別物。<strong>タケシは織り込んでいない</strong>（05 §2 は「追加時間0」と明記）</td></tr>
+<tr><td>後工程を入れるといくら動くか</td><td><strong>中央 −12万</strong>（G0 69.5万 → G2 46.9万 のうち後工程分）。<strong>希釈と同じ重さ</strong></td></tr>
+<tr><td>同じ名簿を3回使うのか</td><td>05 は「1回で3つ提示」なので<strong>名簿の劣化は3倍速にならない</strong>。ここはタケシの設計が正しい。ただし<strong>1通あたりの情報量が3倍になり、個社研究（「御社のどの手作業を止めるか」）が要る</strong>ので、送信工数が 7分/通 → 9分/通に増える</td></tr>
+</tbody></table>
+<h3>2-2. 切り分け（n=4,000・②③④⑤⑥あり）</h3>
+<table><thead><tr><th>世界</th><th>2028-09 中央</th><th>うち物販</th><th>Δ</th></tr></thead><tbody>
+<tr><td>G0 3オファーをやめる（仕入れ1本・②③なし）</td><td><strong>69.5万</strong></td><td>61.3万</td><td>—</td></tr>
+<tr><td>G1 ＋希釈のみ（後工程は無料と仮定）</td><td>58.8万</td><td>40.9万</td><td>▲10.7万</td></tr>
+<tr><td>G2 ＋後工程のみ（返信率は落ちないと仮定）</td><td>46.9万</td><td>36.7万</td><td>▲22.6万</td></tr>
+<tr><td><strong>G3 両方（既定）</strong></td><td><strong>43.9万</strong></td><td>31.5万</td><td><strong>▲25.6万</strong></td></tr>
+</tbody></table>
+<p><strong>得るものは②代行の +9.4万だけです。</strong>③受託は ±0（§3）。差し引き <strong>−16万</strong>。</p>
+<h3>2-3. 3手先まで読む</h3>
+<p><strong>うちが1通に3つ載せる → 相手（メーカー）は「何をしに来た人か」を判断できず、最も安全な「見積だけ取る」を選ぶ → 当社は見積を作る（無料の労働）→ 実績ゼロなので失注 → 名簿は消費済み。</strong></p>
+<p>この連鎖の3手目で当社の時間が溶けます。確度 45%（プレモーテム#2）。</p>
+<p><strong>私の推奨：オファーは2段にする。</strong>本文は仕入れ1本、<strong>署名に1行だけ「販売代行／業務自動化も承っています」</strong>を置く。反応した相手にだけ2通目で出す。これで希釈（−11万）はほぼ消え、後工程は「反応した相手だけ」に絞れます。<strong>追加時間ゼロに最も近い形はこれです。</strong></p>
+<hr>
+<h2>3. 中央154万の分解 — レーンを1つずつ足す／置き値を1つずつ替える</h2>
+<h3>3-1. 階段A：タケシの置き値から、私の置き値へ1段ずつ（社数上限は彼の計画どおり 代行3・受託3）</h3>
+<table><thead><tr><th>世界</th><th>2028-09 中央</th><th>Δ</th><th>何を替えたか</th></tr></thead><tbody>
+<tr><td><strong>E1 タケシの置き値そのまま</strong></td><td><strong>222万</strong></td><td>—</td><td>彼の単価・勝率・ガイド8万・コンサル8万・動画7万をそのまま入れた</td></tr>
+<tr><td>E2 ＋時間制約を外す</td><td>246万</td><td>+24万</td><td>（参考）週20hの縛りを外すと24万しか増えない＝<strong>彼の世界では時間は律速でない</strong></td></tr>
+<tr><td>E3 ＋3オファーの希釈と後工程</td><td>191万</td><td><strong>▲31万</strong></td><td>§1</td></tr>
+<tr><td>E4 ＋代行の実工数（10/20/35h）と実績ゲート</td><td>191万</td><td>▲0万</td><td>代行の社数が少ないため工数は効かない</td></tr>
+<tr><td><strong>E5 ＋受託の単価と勝率を私の置き値へ</strong></td><td><strong>110万</strong></td><td><strong>▲81万</strong></td><td><strong>最大の落差。</strong>保守 月30万→月3万／提案勝率 16%→5%</td></tr>
+<tr><td><strong>E6 ＋④⑤⑥も私の置き値へ</strong></td><td><strong>44万</strong></td><td><strong>▲66万</strong></td><td>ガイド8万→2.5万／コンサル8万→1.5万／動画7万→0（未収益化が55%）</td></tr>
+</tbody></table>
+<p><strong>E1 が 222万で、タケシの申告は 154万。</strong>彼は自分の置き値から既に3割引いています（正直な操作）。<strong>ですが引き算の場所が違います。</strong>引くべきは合計ではなく、<strong>受託と④⑤⑥の単価</strong>です。</p>
+<h3>3-2. 階段B：私の置き値で、レーンを1つずつ足す（週20時間の予算の上で）</h3>
+<table><thead><tr><th>世界</th><th>合計 中央</th><th>①物販</th><th>②代行</th><th>③受託</th><th>④ガイド</th><th>⑤コンサル</th><th>⑥動画</th><th>Δ合計</th></tr></thead><tbody>
+<tr><td>A0 <strong>物販単線（1オファー）</strong></td><td><strong>73.7万</strong></td><td>73.7</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+<tr><td>A1 ＋3オファー化（②③はまだ無し）</td><td>49.5万</td><td>49.5</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>▲24.2</td></tr>
+<tr><td>A2 ＋②代行</td><td>58.9万</td><td>48.7</td><td>10.1</td><td>—</td><td>—</td><td>—</td><td>—</td><td><strong>+9.4</strong></td></tr>
+<tr><td>A3 ＋③AI受託</td><td>58.9万</td><td>44.9</td><td>0.0</td><td>4.4</td><td>—</td><td>—</td><td>—</td><td><strong>±0.0</strong></td></tr>
+<tr><td>A4 ＋④観光ガイド</td><td>50.6万</td><td>38.0</td><td>0.0</td><td>2.8</td><td>2.6</td><td>—</td><td>—</td><td><strong>▲8.3</strong></td></tr>
+<tr><td>A5 ＋⑤コンサル</td><td>48.8万</td><td>36.5</td><td>0.0</td><td>1.2</td><td>2.5</td><td>1.5</td><td>—</td><td>▲1.8</td></tr>
+<tr><td><strong>A6 ＋⑥動画（全レーン）</strong></td><td><strong>44.4万</strong></td><td>31.8</td><td>0.0</td><td>0.0</td><td>2.5</td><td>1.5</td><td>0.0</td><td>▲4.4</td></tr>
+</tbody></table>
+<p><strong>レーンを足すほど中央値が下がります。</strong> 原因は1つで、<strong>週20時間が全レーンの共有制約</strong>だからです。月次の時間負荷（需要÷可能時間）は中央 <strong>1.9倍</strong>、超過率は24ヶ月のほぼ全月で 100%。</p>
+<p><strong>レーン別の「時間の限界単価」（私の置き値・推定）</strong></p>
+<table><thead><tr><th>レーン</th><th>投入</th><th>中央の見返り</th><th>差し引き</th><th>時間単価</th></tr></thead><tbody>
+<tr><td>①物販（段上げ）</td><td>—</td><td>—</td><td>—</td><td><strong>約5,200円/h</strong>（基準）</td></tr>
+<tr><td>②代行</td><td>0h（社数が立たない世界が多い）</td><td>+10.1万</td><td><strong>+9.4万</strong></td><td>高い（相乗り）</td></tr>
+<tr><td>③AI受託</td><td>提案3h/月＋構築</td><td>+4.4万</td><td><strong>±0</strong></td><td>物販と同じ</td></tr>
+<tr><td>④観光ガイド</td><td>18h/月</td><td>+2.6万</td><td><strong>▲8.3万</strong></td><td><strong>約1,200円/h</strong></td></tr>
+<tr><td>⑤コンサル</td><td>4.3h/月</td><td>+1.5万</td><td>▲1.8万</td><td>約2,900円/h</td></tr>
+<tr><td>⑥動画</td><td>8.7h/月</td><td>+0〜2.5万</td><td>▲4.4万</td><td>約1,400円/h</td></tr>
+</tbody></table>
+<p><strong>④⑥を週20hの中に入れると、物販を削って安い時間に置き換えることになります。</strong>（memory の「外注できる作業を理由に辞めてはいけない」と同じ算術です。時間単価の低い仕事に自分の時間を移してはいけない。）</p>
+<h3>3-3. 単価が半分・社数が半分の世界（依頼どおり）</h3>
+<table><thead><tr><th>世界</th><th>2028-09 中央</th><th>P(100万)</th></tr></thead><tbody>
+<tr><td>既定（全レーン）</td><td>44.4万</td><td>2.5%</td></tr>
+<tr><td>C1 受託の単価半分</td><td>42.3万</td><td>2.2%</td></tr>
+<tr><td>C2 代行の単価半分</td><td>42.8万</td><td>1.5%</td></tr>
+<tr><td><strong>C3 受託・代行とも単価半分×成約半分</strong></td><td><strong>43.7万</strong></td><td>1.8%</td></tr>
+</tbody></table>
+<p><strong>単価を半分にしても中央値はほとんど動きません。</strong>②③が中央世界では1社も立っていないからです（代行 P50 0社・受託 P50 0社）。<strong>②③は中央値ではなく上側（P90）を作るレーン</strong>で、<strong>154万の主力に置ける性質のものではありません。</strong></p>
+<h3>3-4. 私の中央値（混合）</h3>
+<table><thead><tr><th>世界</th><th>重み</th><th>2028-09 中央</th></tr></thead><tbody>
+<tr><td>A6/G3 全レーン（私の置き値）</td><td>0.30</td><td>44万</td></tr>
+<tr><td>H1 ①②③のみ（④⑤⑥を落とす）</td><td>0.20</td><td>57万</td></tr>
+<tr><td>H3/H4 物販単線＋動画のみ</td><td>0.25</td><td>74万</td></tr>
+<tr><td>E5 受託だけ私の値・他はタケシ</td><td>0.15</td><td>110万</td></tr>
+<tr><td>E3 希釈込みのタケシ世界</td><td>0.05</td><td>191万</td></tr>
+<tr><td>E1 タケシの置き値そのまま</td><td>0.05</td><td>222万</td></tr>
+</tbody></table>
+<p><strong>混合の中央 57万（幅 40〜110万）／P(200万)=5%／P(100万)=20%。想定外は別枠10%。</strong></p>
+<hr>
+<h2>4. AI受託を主力に置くリスク</h2>
+<table><thead><tr><th>論点</th><th>判定</th></tr></thead><tbody>
+<tr><td>先人の数</td><td><strong>第三者取材で裏の取れた個人は0人</strong>（サトル S-C の申告どおり）。出典はすべて受託事業者の自社媒体＝見込み客集め記事</td></tr>
+<tr><td>単価 月30万の性質</td><td><strong>自称</strong>。かつ<strong>当社の観測値ゼロ</strong>。私の置き値は「構築スポット 5〜15万＋保守 月0〜6万（中央3万）」（推定・確度低）</td></tr>
+<tr><td><strong>降格した世界の中央値</strong></td><td><strong>47.0万</strong>（C4：③をレーンごと外す）。既定 44.4万 より<strong>上がります</strong>。③は中央世界では時間を食うだけ</td></tr>
+<tr><td>12/31 判定の妥当性</td><td><strong>不適。</strong>提案11件（累計中央）で受注0になる確率は <strong>52%</strong>。型が良くても半分の世界で降格する＝<strong>偽陰性52%</strong></td></tr>
+<tr><td>偽陰性を10%未満にするには</td><td>勝率5%なら<strong>提案45件</strong>が必要（0.95^45=9.9%）。週2件では22週＝<strong>2027-03 まで掛かる</strong>。<strong>90日では原理的に判定できません</strong></td></tr>
+<tr><td>③に依存せず200万へ届く経路</td><td><strong>あります。</strong>①物販の段上げ1本（P(200万)=0.8%・A0）＋②代行（P90で+27万）。ただし<strong>どの経路も中央では届きません</strong>。200万は「上位5%の世界」です</td></tr>
+</tbody></table>
+<p><strong>私の推奨：③は「主力3」から外し、補助（0円の探索）に置く。</strong>判定は12/31ではなく、<strong>「打診→ヒアリング実施（商談化）」の率</strong>で測る。商談は受注の6〜10倍出るので、10件の提案でも識別力があります（推定・確度中）。<strong>受注0/11件は情報になりませんが、商談0/11件は情報になります。</strong></p>
+<hr>
+<h2>5. 本業を2028年3月に辞められるか</h2>
+<h3>5-1. 2028-03 時点の月利の分布</h3>
+<table><thead><tr><th>世界</th><th>2028-03 月営業利益 中央</th><th>P(≥53.4万)＝ハジメの退職閾値</th><th>P(≥95万)＝私の閾値</th></tr></thead><tbody>
+<tr><td>A6/G3 全レーン（私の置き値）</td><td>32.4万</td><td><strong>6%</strong></td><td>0%</td></tr>
+<tr><td>H1 ①②③のみ</td><td>—</td><td>約12%</td><td>0%</td></tr>
+<tr><td>H3 物販単線</td><td>53.7万</td><td><strong>51%</strong></td><td>5%</td></tr>
+<tr><td>E5 受託だけ私の値</td><td>67.0万</td><td>85%</td><td>9%</td></tr>
+<tr><td>E1 タケシの置き値</td><td>172.6万</td><td>100%</td><td>99%</td></tr>
+<tr><td><strong>混合（私の値）</strong></td><td><strong>約38万</strong></td><td><strong>約35%（25〜45%）</strong></td><td><strong>約12%</strong></td></tr>
+</tbody></table>
+<p><strong>「2028年3月に辞められます」は、3回に1回しか起きない事象です。</strong>計画の断定としては書けません。<strong>「2028-03 に判定し、満たしていなければ辞めない」</strong>が正しい書き方です。</p>
+<p><strong>2つの閾値の違い（両方出します）</strong></p>
+<table><thead><tr><th>閾値</th><th>根拠</th><th>意味</th></tr></thead><tbody>
+<tr><td><strong>53.4万</strong>（ハジメ 12）</td><td>(生活費20万＋社保6.7万)×2</td><td><strong>生活費が事業から出る</strong>線</td></tr>
+<tr><td><strong>95〜120万</strong>（マサル 04/05）</td><td>失う手取り47.5万の2〜2.5倍</td><td><strong>手取りを置き換える</strong>線。辞めると消えるのは生活費26.7万ではなく<strong>手取り47.5万</strong>で、差額20.8万は事業への注入原資でした</td></tr>
+</tbody></table>
+<p><strong>どちらが正しいかは社長の選択です。</strong>53.4万で辞めると、事業への月20.8万の注入が止まります（下記 5-2）。</p>
+<h3>5-2. 辞めた後に現金が尽きるか（借入の返済込み）</h3>
+<p>公庫 300万・2027-04 実行・据置12ヶ月・7年・3.9%（据置中は利息のみ 0.97万/月、2028-04 から元金4.17万＋利息＝約5.0万/月）を織り込みました。</p>
+<table><thead><tr><th>世界</th><th>最薄月の現金 中央</th><th>P(現金&lt;0)</th><th>谷の時期（中央）</th></tr></thead><tbody>
+<tr><td>I1 既定の退職規則（53.4万×3ヶ月）</td><td>95万</td><td>0%</td><td>2027-03</td></tr>
+<tr><td>I2 2028-03 に無条件退職</td><td>95万</td><td>0%</td><td>2027-03</td></tr>
+<tr><td><strong>I3 I2＋本業貯蓄の注入なし</strong></td><td><strong>42万</strong></td><td><strong>6%</strong></td><td><strong>2027-03（67%）／2028-09（5%）</strong></td></tr>
+<tr><td><strong>I4 I3＋借入なし</strong></td><td><strong>▲41万</strong></td><td><strong>66%</strong></td><td>2028-09</td></tr>
+<tr><td>I5 2027-10 に前倒し退職（注入なし）</td><td>39万</td><td><strong>18%</strong></td><td>2027-03</td></tr>
+<tr><td>（参考）H3 物販単線・退職なし</td><td>23万</td><td><strong>22%</strong></td><td>2027-03</td></tr>
+</tbody></table>
+<p><strong>読み</strong></p>
+<ol>
+<li style='margin-left:0.0em'><strong>谷は 2027-03（借入実行の1ヶ月前）です。</strong>タケシの「谷は 2027-10〜2028-02」は<strong>7ヶ月遅い</strong>。ハジメ 12 も「谷は 2027-04 に始まる」と書いています。<strong>借入の申込を 2027-02〜03 にすると、谷と申込が同じ月に来ます。</strong>→ <strong>申込を 2027-01 に1〜2ヶ月前倒し</strong>するのが素直です（§7 の差し替え）。</li>
+<li style='margin-left:0.0em'><strong>借入なしで退職すると 66% の世界で現金が尽きます。</strong>順序は「融資実行 → 退職」で正しい（memory §5 と一致）。</li>
+<li style='margin-left:0.0em'><strong>前倒し退職（2027-10）は P(現金&lt;0) を 6%→18% に上げます。</strong>前回「本業を早期に失うと 2027-02 に現金マイナス」と出した筋は、谷の位置（2027-03）として再現しました。</li>
+<li style='margin-left:0.0em'><strong>多レーン化は現金の保険にはなっています。</strong>物販単線は P(現金&lt;0) 22%、全レーン 0%。理由は「物販が小さいので運転資金も小さい」から。<strong>利益の中央値を30万払って、下振れ保険を買っている</strong>構造です。この取引を社長が望むかは別問題です。</li>
+</ol>
+<hr>
+<h2>6. 90日プランと判定線の性能</h2>
+<h3>6-1. 週20時間に収まるか — <strong>W4 以降は収まりません</strong></h3>
+<p>タケシの週次表に<strong>返信対応の時間が入っていません</strong>（W6 の「2回目のメール」しか無い）。週60通なら返信は週6〜7件出ます。</p>
+<table><thead><tr><th>週</th><th>タケシの合計</th><th><strong>私の再見積</strong></th><th>差の主因</th></tr></thead><tbody>
+<tr><td>W1</td><td>4.5h</td><td>5h</td><td>—</td></tr>
+<tr><td>W2</td><td>5.5h</td><td>6h（動画1本が6hなら 10.5h）</td><td>打ち切り条件が「6h超」なので上限は10.5h</td></tr>
+<tr><td>W3</td><td>6h</td><td><strong>12h</strong></td><td>送信 4h→9h（7分/通＋3オファー分の個社研究2分）</td></tr>
+<tr><td>W4</td><td>12h</td><td><strong>18h</strong></td><td>＋返信対応4h</td></tr>
+<tr><td>W5</td><td>7.5h</td><td><strong>19〜23h</strong></td><td>＋返信5h／MagicalTrip 研修 4〜8h</td></tr>
+<tr><td>W6</td><td>13.5h</td><td><strong>22h</strong></td><td>＋返信6h</td></tr>
+<tr><td>W7</td><td>9.5h</td><td><strong>19〜22h</strong></td><td>＋返信7h（＋ガイド実施3.5h）</td></tr>
+<tr><td><strong>W8</strong></td><td>13.5h</td><td><strong>24h（受託1件を取っていれば 29〜34h）</strong></td><td>初回受注処理4h＋構築5〜10h</td></tr>
+<tr><td>W9</td><td>8h</td><td>17h</td><td>＋返信7h</td></tr>
+<tr><td><strong>W10</strong></td><td>11.5h</td><td><strong>26〜31h</strong></td><td>様式4＋動画＋受託納品（構築）が重なる</td></tr>
+<tr><td>W11</td><td>12h</td><td>21h</td><td>電子申請3h</td></tr>
+<tr><td>W12</td><td>9h</td><td>18h</td><td>—</td></tr>
+<tr><td>W13</td><td>9h</td><td>18h</td><td>—</td></tr>
+</tbody></table>
+<p><strong>実行不能な週：W4 以降のほぼ全週。最悪は W8 と W10</strong>（受託の構築・補助金申請・メーカー初回発注が同じ2週に集中）。</p>
+<p><strong>直し方（3つ・0円）</strong></p>
+<table><thead><tr><th>#</th><th>直し</th><th>効果</th></tr></thead><tbody>
+<tr><td>1</td><td><strong>送信を週60通→週30通に落とす</strong>。返信対応を先に時間予約し、余りを送信に使う</td><td>週 −5h。名簿の消費も半分（名簿は有限資源）</td></tr>
+<tr><td>2</td><td><strong>補助金 第20回を W9 を待たず今 NoGo にする</strong>（下記 6-3）</td><td>W9〜W11 の −6h。判断の空回りを消す</td></tr>
+<tr><td>3</td><td><strong>⑥動画は「物販作業の記録」だけに固定</strong>（月4本→月2本・編集はAI任せ）</td><td>週 −1h</td></tr>
+</tbody></table>
+<h3>6-2. 判定線の性能（n=8,000・私の置き値の世界／成功＝2028-09 に月60万以上）</h3>
+<table><thead><tr><th>判定線</th><th><strong>全体で踏む率</strong></th><th>感度</th><th>偽陽性</th><th>踏んだ世界のP(成功)</th><th>採否</th></tr></thead><tbody>
+<tr><td>① 700通時点の<strong>返信率 &lt;20%</strong></td><td><strong>83%</strong></td><td>86%</td><td>71%</td><td>16%</td><td><strong>不可</strong>（ほぼ全世界で発動＝情報量ゼロ）</td></tr>
+<tr><td>①' 同 <strong>&lt;15%</strong></td><td>65%</td><td>69%</td><td>48%</td><td>14%</td><td>不可</td></tr>
+<tr><td>①'' 同 <strong>&lt;10%</strong></td><td><strong>34%</strong></td><td>38%</td><td><strong>17%</strong></td><td>9%</td><td><strong>採用</strong>（この線に下げる）</td></tr>
+<tr><td>③ 2026-12末 <strong>提案5件で受注0</strong></td><td>52%</td><td>48%</td><td>66%</td><td>24%</td><td><strong>不可</strong>（偽陽性66%・§4）</td></tr>
+<tr><td>M3 2027-06 <strong>段3が0社</strong></td><td><strong>82%</strong></td><td>84%</td><td>73%</td><td>17%</td><td><strong>不可</strong>（3回目の同型検出）</td></tr>
+<tr><td>M4 2027-09 <strong>段2が8社未満</strong></td><td>39%</td><td>45%</td><td><strong>12%</strong></td><td>6%</td><td><strong>採用</strong></td></tr>
+<tr><td>2028-03 <strong>月利&lt;53.4万</strong></td><td>94%</td><td>99%</td><td>72%</td><td>14%</td><td>判定ではなく<strong>事実確認</strong>として使う</td></tr>
+</tbody></table>
+<p><strong>返信率20%は、3オファー化した世界では機能しません。</strong>700通時点の返信率の分布は <strong>P10 6%／P50 12%／P90 23%</strong>（希釈込み）。<strong>中央の世界がすでに20%を割っています。</strong></p>
+<p>→ <strong>返信率の線は10%に下げる。</strong>ただし<strong>2オファー化（§1-3）を採るなら 15% でよい</strong>（希釈が消えるため）。<strong>どちらを採るかで線が変わる</strong>ので、文面を決める前に線を決めないこと。</p>
+<p>タケシ世界（E1）で測り直しても、①20%は 68% 発動・M3 は 70% 発動。<strong>世界に依存せず壊れている線</strong>です。</p>
+<h3>6-3. 期限もの2件は、その時点で判断できるか</h3>
+<table><thead><tr><th>期限もの</th><th>タケシの判定日</th><th>判断可能か</th><th>私の推奨</th></tr></thead><tbody>
+<tr><td><strong>持続化補助金 第20回</strong>（様式4 12/04・申請12/15）</td><td>W9（11/24〜30）に Go/NoGo</td><td><strong>不可。</strong>Go の条件「補助対象の支出75万を先に自腹で出せるか、かつ販路開拓に直結するか」は、<strong>どのメーカーがどのロットで売ってくれるかが決まる前</strong>には答えられない。加えて<strong>商品仕入れは補助対象外が通例</strong>（推定・確度中／<strong>要一次確認＝公募要領</strong>）で、90日総支出0円・「売上ゼロで体裁に投資しない」（社長 2026-09-21）と衝突する</td><td><strong>今 NoGo にする。</strong>GビズIDは0円で取れているので第21回に回す。<strong>Go の条件を「仕入れ以外の実需（FBA納品外注費・撮影・広告）が月10万以上発生している」に置き換え、判定日を借入申込と同じ 2027-01 に移す</strong></td></tr>
+<tr><td><strong>東京シティガイド検定</strong>（申込 11月中旬〜1月中旬・8,360円）</td><td>W7（11/10〜16）に「1本実施済みなら申込」</td><td><strong>不可。</strong>W1 応募→W5 面談/研修→実車は客の予約次第。<strong>W7 までに1本入る確率は 30%前後</strong>（推定・確度低）。かつ<strong>自分で制御できない事象</strong>を条件にしている</td><td><strong>判定日を 2027-01 上旬（申込締切直前）へ動かす。</strong>0円で情報が2ヶ月増える。条件はそのまま（1本実施済みなら申込）</td></tr>
+</tbody></table>
+<hr>
+<h2>7. ヒデアキのHTML向け — 動く数字の一覧（秘書が差し替え）</h2>
+<table><thead><tr><th>箇所</th><th>タケシ 05 の値</th><th><strong>差し替え後</strong></th></tr></thead><tbody>
+<tr><td>2028-09 月営業利益 中央</td><td>154万</td><td><strong>57万</strong>（幅 40〜110万）</td></tr>
+<tr><td>同 楽観（上位20%）</td><td>236万</td><td><strong>110万</strong></td></tr>
+<tr><td>同 悲観（下位20%）</td><td>62万</td><td><strong>32万</strong></td></tr>
+<tr><td>P(200万)</td><td>12〜18%</td><td><strong>5%</strong>（4〜6%）</td></tr>
+<tr><td>P(100万)</td><td>（記載なし）</td><td><strong>20%</strong>（15〜28%）</td></tr>
+<tr><td>内訳 ①Amazon物販</td><td>65万</td><td><strong>32万</strong>（全レーン構成）／<strong>74万</strong>（物販単線構成）</td></tr>
+<tr><td>内訳 ②EC運用代行</td><td>36万</td><td><strong>0万（中央）／27万（P90）</strong></td></tr>
+<tr><td>内訳 ③AI受託</td><td>30万</td><td><strong>0万（中央）／13万（P90）</strong></td></tr>
+<tr><td>内訳 ④観光ガイド</td><td>8万</td><td><strong>2.5万</strong></td></tr>
+<tr><td>内訳 ⑤コンサル＋デジタル</td><td>8万</td><td><strong>1.5万</strong></td></tr>
+<tr><td>内訳 ⑥動画＋アフィリ</td><td>7万</td><td><strong>0万（中央）／7万（P90）</strong>（未収益化が55%）</td></tr>
+<tr><td>本業退職</td><td>2028年3月に辞められる</td><td><strong>2028-03 に判定。条件を満たす確率 約35%（53.4万線）／12%（95万線）</strong></td></tr>
+<tr><td>現金の谷</td><td>2027-10〜2028-02・最薄 −12万</td><td><strong>2027-03（借入実行の1ヶ月前）。</strong>最薄 中央42万・P(現金&lt;0) 6%（注入なし）</td></tr>
+<tr><td>公庫の申込</td><td>2027-02〜03</td><td><strong>2027-01</strong>（谷と同月を避ける）</td></tr>
+<tr><td>3オファー</td><td>追加時間0</td><td><strong>差し引き月 −16万。</strong>推奨＝<strong>本文は仕入れ1本、署名に②③を1行</strong></td></tr>
+<tr><td>判定線 返信率</td><td>20%未満</td><td><strong>10%未満</strong>（2オファー化するなら15%未満）</td></tr>
+<tr><td>判定線 ③受託</td><td>12/31 提案5件で受注0なら降格</td><td><strong>受注ではなく「商談化0/10件」で判定。</strong>受注0での降格は偽陰性52%</td></tr>
+<tr><td>M3</td><td>2027-06 段3が0社</td><td><strong>2027-09 段2が8社未満</strong>（M3 は発動82%で使えない）</td></tr>
+<tr><td>補助金 第20回</td><td>W9 に Go/NoGo</td><td><strong>今 NoGo。</strong>第21回へ（判定日 2027-01）</td></tr>
+<tr><td>ガイド検定</td><td>W7 に判定</td><td><strong>2027-01 上旬に判定</strong></td></tr>
+<tr><td>週次の実働</td><td>週20h に収まる</td><td><strong>W4 以降は 18〜31h。送信を週30通に落とす前提で書き直す</strong></td></tr>
+<tr><td>レーンの数</td><td>主力3＋補助3</td><td><strong>週20時間では①②＋⑥（記録）の3本が中央値最大。</strong>④⑤は退職後に開く</td></tr>
+</tbody></table>
+<hr>
+<h2>8. 注釈 — 確度と、読みようがない領域</h2>
+<p><strong>推定（当社の観測値ゼロ）／実測日</strong></p>
+<table><thead><tr><th>置き値</th><th>私の値</th><th>実測できる日</th></tr></thead><tbody>
+<tr><td>3オファーの希釈倍率</td><td>0.55/0.78/0.95（三角）</td><td>2026-11-30（累計700通の返信率）</td></tr>
+<tr><td>後工程の時間（見積45分／提案120分／要件180分）</td><td>同左</td><td>2026-12-31（実測の記録）</td></tr>
+<tr><td>代行の成約率</td><td>0.12%（対数正規 s=0.6）</td><td>2027-06（提案10社の反応）</td></tr>
+<tr><td>代行の単価／工数</td><td>月5/10/20万／10/20/35h</td><td>1社目の契約日</td></tr>
+<tr><td>受託の提案勝率／保守単価</td><td>5%（2〜10%）／月0/3/6万</td><td>提案15件到達日（早くて2027-02）</td></tr>
+<tr><td>ガイドの月営業利益</td><td>2.0/4.5/7.0万（英語不可なら半分）</td><td>MagicalTrip 1本目の実施日</td></tr>
+<tr><td>YPP 到達確率</td><td>45%（8〜22ヶ月）</td><td>登録者1,000人到達日</td></tr>
+<tr><td>段2→段3 到達率</td><td>10/20/40%</td><td>2027-06</td></tr>
+</tbody></table>
+<p><strong>読みようがない領域（追加調査でも埋まらない）</strong></p>
+<ul>
+<li style='margin-left:0.0em'><strong>日本語チャンネルのRPM 一次統計は存在しない</strong>（YouTube 非公表・S-B の申告どおり）。⑥の値は自分の実測待ち。</li>
+<li style='margin-left:0.0em'><strong>AI受託の個人の実勢</strong>（第三者取材ゼロ）。当社が1件取るまで、この型は実在するかどうかも未確定。</li>
+<li style='margin-left:0.0em'><strong>持続化補助金の補助対象経費に商品仕入れが含まれるか</strong>は公募要領の一次確認が未了（本書では「対象外が通例」＝推定・確度中で扱った）。</li>
+</ul>
+<p><strong>モデルの限界（正直に）</strong></p>
+<ul>
+<li style='margin-left:0.0em'>借入300万を入れても中央値は動きません（D1＝D6）。<strong>私のモデルでは資金が律速になっていない</strong>＝「事業が小さすぎて資金が余る」（memory の前回結論と同じ）。<strong>借入が効くのは中央より上の世界だけ</strong>で、中央世界では返済だけが残ります。借入の是非は「谷を越えるための保険」として §5-2 で評価しました。</li>
+<li style='margin-left:0.0em'>退職後の可用時間を週40h（174h/月）に倍増させています。<strong>これは楽観</strong>（本業の疲労が消える効果を丸ごと入れた）。</li>
+<li style='margin-left:0.0em'>事故（アカウント停止・保留）は24ヶ月で15%・2〜4ヶ月ゼロ。社長の停止歴を踏まえるとこれも楽観側の可能性があります。</li>
+</ul>
+<p><strong>§4.1 該当（公庫への申込・メーカーへの送信・課金・契約・外部発信）は一件も実行していません。</strong> 本書は仮想実行のみです。</p>
+<hr>
+<h2>9. タケシへ差し戻す3点／社長に上げてよい3点</h2>
+<table><thead><tr><th>差し戻す（タケシ）</th><th>上げてよい（社長）</th></tr></thead><tbody>
+<tr><td>① 154万 → <strong>57万</strong>に書き換え、内訳を「中央／P90」の2列にする（②③は中央0万）</td><td>① <strong>レーンの選び方</strong>（eBay を捨てる・⑥は記録装置に置く・②は物販に相乗り）は妥当。ここは触りません</td></tr>
+<tr><td>② <strong>3オファーを2段（本文＝仕入れ／署名＝②③）に直す</strong>。現形は差し引き −16万</td><td>② <strong>90日の動きの具体性</strong>（サイト名・手続き名・金額・0円縛り）は社長の差し戻し「何をやるのかわからない」に正面から答えている</td></tr>
+<tr><td>③ <strong>判定線を3本入れ替える</strong>（返信率10%／M4 2027-09 段2&lt;8社／受託は商談化率）。現形は3本とも発動率80%超</td><td>③ <strong>2028-03 に退職を判定する</strong>という設計自体は正しい。確率（約35%）を添えれば社長判断の材料になる</td></tr>
+</tbody></table>
+<p><strong>収束の可否：条件付き。</strong> 上の3点は<strong>書き換えで済み、再計算は不要</strong>です（数字は本書の §7 にそろえてあります）。<strong>4周目は価値が出ません（確度80%）。</strong>秘書が §7 を当ててHTMLに載せれば、社長承認に上げてよい状態になります。</p>
+</body></html>
