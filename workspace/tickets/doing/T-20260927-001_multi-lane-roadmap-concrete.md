@@ -65,6 +65,8 @@ next_check_at: 2026-09-28
 
 ## 成果物
 
+- workspace/output/deliverables/T-20260927-001/01_S-A_eBay物販と観光ガイド業.md
+- workspace/output/deliverables/T-20260927-001/01_S-A_eBay物販と観光ガイド業.html
 - workspace/output/deliverables/T-20260927-001/02_S-B_動画投稿とアフィリエイト.md ／ .html（サトル S-B：動画投稿＝広告収益／アフィリエイト）
 
 - workspace/output/deliverables/T-20260927-001/03_S-C_個人×AIの稼ぎ方の探索.md
