@@ -1,0 +1,258 @@
+<!doctype html><html lang='ja'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>マサル検証 — 多レーン・ロードマップ v3</title><style>body{font-family:-apple-system,'Hiragino Sans','Noto Sans JP',sans-serif;max-width:1150px;margin:2em auto;padding:0 1em;line-height:1.65;color:#222;font-size:14.5px}table{border-collapse:collapse;margin:.8em 0;font-size:.92em}th,td{border:1px solid #bbb;padding:.35em .6em;vertical-align:top}th{background:#eef2f8}tr:nth-child(even) td{background:#fafafa}h1{font-size:1.5em;border-bottom:2px solid #444}h2{font-size:1.25em;border-left:5px solid #25b;padding-left:8px;margin-top:1.8em}h3{font-size:1.05em;margin-top:1.4em}blockquote{border-left:4px solid #ccc;margin:.8em 0;padding:.2em 1em;color:#444}code{background:#f3f3f3;padding:1px 4px;border-radius:3px}hr{border:0;border-top:1px solid #ccc;margin:1.6em 0}</style></head><body>
+<h1>マサル検証 — 多レーン・ロードマップ v3</h1>
+<p>シミュレーター マサル／2026-09-27／T-20260927-002</p>
+<p>検証対象：<code>03_多レーン・ロードマップv3.md</code>（タケシ）</p>
+<p>計算：<code>workspace/output/agent_output/T-20260927-002/04_mc_v3.py</code>・<code>04b_extra.py</code>（乱数種 <strong>20260927</strong> 固定・n=6,000／感度 n=4,000・再現可）</p>
+<p>前提入力：本チケット 01（手配側7社）・02（法務）／T-20260927-001 の 05・06</p>
+<blockquote><strong>数字はすべて推定です。当社の観測値はゼロ件。</strong>特に④は手配側7社が<strong>粗利・催行本数・マージン率を全社非公開</strong>で、参加人数・実費・運営取り分・打診返信率・ガイド離脱率・レビュー分布は<strong>当社の置き値</strong>です。一次なのは客単価・ガイド報酬・OTA料率だけ。実測日を各表に併記しました。<strong>唯一の到達条件としては扱いません。</strong></blockquote>
+<hr>
+<h2>0. 判定</h2>
+<p><strong>方針（評価軸の入れ替え・②③統合・2段オファー・⑤の格下げ）は正しい。社長に上げてよい。ただし中心主張は逆向きに外れており、数字は4つ差し戻します。</strong></p>
+<table><thead><tr><th>タケシの主張</th><th>私の読み</th><th>差の正体</th></tr></thead><tbody>
+<tr><td>軸を変えても<strong>中央は57万→57万</strong>。動いたのは上側（P90 110→130万）と P(200万)（5→8%）</td><td><strong>中央は 57万 → 61万</strong>（+4万）。<strong>上側は 110万 → 108万で縮み、P(200万)は 5% → 約1%</strong>（0〜2%）</td><td>中央を動かしたのは④ではなく<strong>2段オファー化と③の除去</strong>。上側を作っていたのは v2 の<strong>③受託の置き値</strong>で、それを②へ統合した時点で尾が消えた（§2）</td></tr>
+<tr><td>④は主力。<strong>中央6万／P90 28万</strong></td><td><strong>中央0〜1万／P90 2〜22万</strong>（置き値で10倍振れる）。期待値 0.7〜7.1万</td><td>1催行25,900円は<strong>参加6人</strong>が立つ世界の数字。参加2人なら1,545円＝<strong>16分の1</strong>（§3）</td></tr>
+<tr><td>社長の月工数は<strong>8.7h固定</strong>、時間単価 中央6,900／上側32,000円/h</td><td><strong>催行数に比例する。</strong>月6催行で9.5h、月10催行で13.5h。<strong>上側の世界では固定が崩れる</strong>＝時間単価32,000円/hは出ない（月10催行で19,200円/h・私の粗利なら8,900円/h）</td><td>§3-3</td></tr>
+<tr><td>G1 40%／G2 45%／G3 50%／G4 35%</td><td><strong>G1 4%／G2 86%／G3 99%／G4 35%（ただし④が立つ世界では94%）</strong></td><td>4本すべて外れ。<strong>G3 は発動99%で情報量ゼロ。G4 は失敗検出器ではなく成功検出器</strong>（§6）</td></tr>
+<tr><td>検品の必須条件は1つ＝他社が検品した人だけを母集団にする</td><td><strong>必須条件は合っている。ただし条件を満たす人の中で当社に応じる動機を持つのは「レビューはあるが暇なガイド」</strong>＝検品の信号が弱い側に選択が掛かる（§5）</td><td>§5</td></tr>
+<tr><td>①からの持ち出しは送信30→26通で中央▲5万</td><td><strong>▲6.7万。</strong>かつ①のP90が▲8万下がるので<strong>合計P90は改善しない</strong></td><td>§2-2</td></tr>
+</tbody></table>
+<p><strong>最も重い指摘は1つです。</strong> v3 で2段オファー化した結果、<strong>週の時間が余りました</strong>（2027-06 の時間負荷 P50 1.05倍＝ほぼ均衡）。その余りを④に置くのではなく<strong>送信に戻すのが最大の一手</strong>です。週26通→<strong>週36〜40通</strong>で中央 +12〜14万・P(100万) 5.3%→15%。<strong>④の期待寄与（0.7万）の15倍以上あります</strong>（§8）。</p>
+<hr>
+<h2>1. プレモーテム — 2027-03-31 に「④は失敗した」。なぜか</h2>
+<table><thead><tr><th>#</th><th>失敗の筋</th><th>起きる確率</th><th>起きたと分かる指標</th><th>撤退/縮小の条件</th></tr></thead><tbody>
+<tr><td><strong>1</strong></td><td><strong>モニター催行（W11）で客が2人集まらず、レビュー1件目が取れなかった。</strong>90日プランに<strong>モニター客の集め方が書かれていない</strong></td><td><strong>60%</strong></td><td>W10 終了時にモニター客の目処が0人</td><td><strong>モニター催行を「無料で人を探す」から「OTA経由の有料1本（¥3,000の導入価格）」に変える</strong>（下の #2 と同じ理由）</td></tr>
+<tr><td><strong>2</strong></td><td><strong>モニター催行は終わったが、OTAのレビューが1件も増えなかった。</strong>無料/実費のツアーは<strong>PFの予約を通っていない＝認証レビューにならない</strong>。ランキングは動かない</td><td><strong>70%</strong>（構造的）</td><td>催行1本後もOTAの表示順が変わらない</td><td><strong>段1の到達条件を「モニター催行1本」から「OTAを通した有料予約1本」に書き換える</strong>。ここが本当の起点</td></tr>
+<tr><td><strong>3</strong></td><td><strong>ガイド1人目が★3を1件出し、G4 の条項どおり切った。母集団は有限で、次が見つからないまま止まった</strong></td><td><strong>34%</strong>（★3以下が1件以上出る世界）／④が立つ世界では<strong>94%</strong></td><td>初回3催行のどこかで★3</td><td><strong>G4 を「★3以下1件で即切る」から「★1が1件／★3以下が2件／安全・ハラスメント事由は即」に変える</strong>（§6）</td></tr>
+<tr><td>4</td><td>掲載したOTAの契約構造がC（PFが旅行者と契約）で、無登録営業のリスクを抱えたまま出品していた</td><td>20%</td><td>規約の契約当事者条項が読めていない</td><td><strong>W7 で規約を読むまで出品しない</strong>（タケシの計画どおり。ここは正しい）</td></tr>
+<tr><td>5</td><td>④に週2h置いた分だけ送信が減り、①の段上げが遅れた</td><td><strong>確実に起きる</strong>（▲6.7万）</td><td>週の送信が26通で固定されている</td><td><strong>送信を36〜40通に戻す</strong>（§8）</td></tr>
+</tbody></table>
+<p><strong>上位3つは全部「レビュー1件目をどう取るか」に集まっています。</strong> ④の設計で未解決なのは検品ではなく<strong>起点</strong>です。</p>
+<hr>
+<h2>2. 「中央は動かず上側だけ動く」の検算（レーンを1つずつ足す階段）</h2>
+<h3>2-1. 階段（私の置き値・週26通・2段オファー／n=6,000）</h3>
+<table><thead><tr><th>世界</th><th>合計 中央</th><th>P90</th><th>P(100万)</th><th>①物販</th><th>②BtoB</th><th>④ガイド</th><th>Δ中央</th><th>ΔP90</th></tr></thead><tbody>
+<tr><td>V0 ①単線・<strong>週30通</strong>（v2 で私が推奨した形）</td><td><strong>51.5</strong></td><td><strong>99.2</strong></td><td>9.8%</td><td>51.5</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+<tr><td>V1 ①単線・<strong>週26通</strong>（v3 の送信量）</td><td>44.8</td><td>91.3</td><td>6.8%</td><td>44.8</td><td>—</td><td>—</td><td><strong>▲6.7</strong></td><td><strong>▲7.9</strong></td></tr>
+<tr><td>V2 ＋②BtoB（③統合後）</td><td>56.1</td><td>95.7</td><td>8.0%</td><td>43.1</td><td>10.1</td><td>—</td><td>+11.3</td><td>+4.4</td></tr>
+<tr><td>V3 ＋<strong>④観光ガイド（手配側）</strong></td><td>55.5</td><td>93.1</td><td>6.8%</td><td>42.1</td><td>9.9</td><td><strong>0.0</strong></td><td><strong>▲0.6</strong></td><td><strong>▲2.6</strong></td></tr>
+<tr><td>V4 ＋⑤コンサル</td><td>55.9</td><td>91.3</td><td>6.1%</td><td>42.0</td><td>9.5</td><td>0.0</td><td>+0.4</td><td>▲1.8</td></tr>
+<tr><td><strong>V5 ＋⑥動画 ＝ 案A 全レーン</strong></td><td><strong>56.4</strong></td><td><strong>89.8</strong></td><td><strong>5.3%</strong></td><td>40.6</td><td>8.8</td><td>0.0</td><td>+0.5</td><td>▲1.5</td></tr>
+</tbody></table>
+<p><strong>読み</strong></p>
+<p>1. <strong>④を足しても中央は動きません（▲0.6万）。ここはタケシの主張どおりです。</strong></p>
+<p>2. <strong>しかし上側も動きません。</strong> 案A の P90 89.8万は<strong>①単線（週30通）の 99.2万を下回ります</strong>。「上側だけを作る」という主張は、私の置き値では成立していません。</p>
+<p>3. <strong>v2 との違いは構造です。</strong> v2 は「レーンを足すほど中央が下がる」（74万→44万）でした。v3 は下がりません。<strong>理由は2段オファー化で時間制約が緩んだこと</strong>（時間負荷 P50 1.9倍 → 1.05倍）。<strong>タケシがこの改善を④の功績に帰しているのが誤りで、功績は2段オファーと③除去にあります。</strong></p>
+<h3>2-2. 送信30→26通の持ち出し（申し送り3への答え）</h3>
+<table><thead><tr><th>項目</th><th>タケシの申告</th><th>私の測定</th></tr></thead><tbody>
+<tr><td>中央の持ち出し</td><td>▲5万</td><td><strong>▲6.7万</strong>（V0→V1）</td></tr>
+<tr><td>交換で得る P90</td><td>+20万</td><td><strong>①のP90が▲7.9万減るので、合計P90は ▲9.4万（私の④）／+1.9万（タケシ寄りの④）</strong></td></tr>
+<tr><td>P(200万)</td><td>+3pt</td><td><strong>0.0pt</strong>（案A の P(200万)=0.0%）</td></tr>
+</tbody></table>
+<p><strong>この交換は買いではありません。</strong> 彼の「▲5万で P90 +20万」は、<strong>①側の上側が削れることを計算に入れていない</strong>のが原因です。</p>
+<h3>2-3. P(200万) はなぜ下がるのか（3手先）</h3>
+<p><strong>うちが③受託を②へ統合する → 「月30万×3社」という観測値ゼロの高単価レーンが消える → v2 の P(200万)=5% を作っていた尾が消える → ④が代わりに作る尾は P90 22〜28万で、消えた90万を埋めない。</strong></p>
+<p><strong>彼自身の表で算術が合いません。</strong> v3 の全レーン P90 を足すと ①90＋④28＋②30＋⑥9＋⑤3＝<strong>160万 &lt; 200万</strong>。全レーンが同時に P90 を引く確率（1%未満）でも200万に届かないので、<strong>P(200万)=8% は彼の内訳から再構成できません。</strong></p>
+<p><strong>経路2（ガイド手配の複製）は2028-09の話ではありません。</strong> 1都市目の初催行が2027Q1、2都市目が2028Q2。<strong>「2都市×3コース×5人」が立つのは早くて2029年</strong>で、24ヶ月の窓には入りません（確度75%）。経路2は残しますが、<strong>2028-09 の確率には数えない</strong>のが正しい扱いです。</p>
+<hr>
+<h2>3. ④の置き値の検算（申し送り1への答え）</h2>
+<h3>3-1. 1催行の運営粗利は参加人数で16倍振れる</h3>
+<p>客単価8,500円・OTA20%・実費1,000円/人・ガイド報酬8,855円＋交通/飲食1,200円（<strong>タケシはガイドの交通・飲食を落としています</strong>。MagicalTrip・JWT は全額支給が実勢＝一次）。</p>
+<table><thead><tr><th>参加人数</th><th>1催行の運営粗利</th><th>タケシの置き値との比</th></tr></thead><tbody>
+<tr><td>2人</td><td><strong>1,545円</strong></td><td>6%</td></tr>
+<tr><td>3人</td><td>7,345円</td><td>28%</td></tr>
+<tr><td><strong>3.5人（私の中央）</strong></td><td><strong>10,245円</strong></td><td><strong>40%</strong></td></tr>
+<tr><td>4人</td><td>13,145円</td><td>51%</td></tr>
+<tr><td><strong>6人（タケシの中央）</strong></td><td>24,745円</td><td>96%（彼の25,900円）</td></tr>
+<tr><td>8人</td><td>36,345円</td><td>140%</td></tr>
+</tbody></table>
+<p><strong>損益分岐は1.73人。</strong>下振れで赤字にはなりません（ここは安全）。<strong>問題は中央値で、新規出品の平均組人数は2〜4人</strong>です（レビュー0〜5件の出品に6人が入る前提は、当社の観測ゼロ・実例なし）。<strong>実測日は 2026-12 のモニター催行ではなく、OTA経由の有料予約1本目</strong>（§1 #2）。</p>
+<h3>3-2. 2028-09 の分布</h3>
+<table><thead><tr><th></th><th>タケシ</th><th><strong>マサル（私の置き値）</strong></th><th><strong>マサル（タケシ寄りに最大限寄せた世界）</strong></th></tr></thead><tbody>
+<tr><td>月催行本数 中央／P90</td><td>2〜3／10</td><td><strong>0／4</strong></td><td>1／15</td></tr>
+<tr><td>稼働ガイド 中央／P90</td><td>2／5</td><td><strong>1／5</strong></td><td>7／15</td></tr>
+<tr><td><strong>月営業利益 中央</strong></td><td><strong>6万</strong></td><td><strong>0.0万</strong></td><td><strong>0.8万</strong></td></tr>
+<tr><td>同 P90</td><td>28万</td><td><strong>2.2万</strong></td><td><strong>21.6万</strong></td></tr>
+<tr><td>期待値</td><td>約10万</td><td><strong>0.7万</strong></td><td>7.1万</td></tr>
+<tr><td>24ヶ月の累計催行 中央／P90</td><td>—</td><td><strong>1本／40本</strong></td><td>4本／64本</td></tr>
+<tr><td>24ヶ月の累計利益 中央／P90</td><td>—</td><td><strong>0万／24万</strong></td><td>3万／98万</td></tr>
+</tbody></table>
+<p><strong>中央の世界では、24ヶ月で催行が1本（＝モニター催行だけ）です。</strong> これが「中央6万」との差の正体で、原因は<strong>参加人数ではなく需要の立ち上がり</strong>（レビュー0件の新規出品に予約が入らない → 催行がない → レビューが増えない → 予約が入らない）。<strong>鶏と卵は「ガイド」ではなく「レビュー」で詰まります。</strong></p>
+<p><strong>タケシの2つの置き値は妥当でした</strong>（ここは差し戻しません）：</p>
+<p style="margin-left:1em">・<strong>P(段1到達)=55%</strong> → 私の測定 <strong>62%</strong>（2027-03までにガイド1人＋催行1本）。妥当。</p>
+<p style="margin-left:1em">・<strong>「P10：30%の世界は催行ゼロ」</strong> → 私の測定 <strong>25%</strong>。妥当。</p>
+<h3>3-3. 月工数8.7h固定は、上側の世界で崩れる</h3>
+<table><thead><tr><th>月の催行数</th><th>私の見積（管理2.0＋打診1.5＋催行1.0h/本）</th><th>8.7h固定との差</th><th>時間単価（タケシの粗利25,900円）</th><th>同（私の粗利10,245円）</th></tr></thead><tbody>
+<tr><td>0</td><td>3.5h</td><td>▲5.2h</td><td>—</td><td>—</td></tr>
+<tr><td>2</td><td>5.5h</td><td>▲3.2h</td><td>9,400円/h</td><td>3,700円/h</td></tr>
+<tr><td>6</td><td>9.5h</td><td>+0.8h</td><td>16,400円/h</td><td>6,500円/h</td></tr>
+<tr><td><strong>10（彼のP90）</strong></td><td><strong>13.5h</strong></td><td><strong>+4.8h</strong></td><td><strong>19,200円/h</strong></td><td>7,600円/h</td></tr>
+<tr><td>15</td><td>18.5h</td><td>+9.8h</td><td>21,000円/h</td><td>8,300円/h</td></tr>
+</tbody></table>
+<p><strong>「上側32,000円/h」は出ません。</strong>上側は催行が増えた世界で、そこでは工数も増えます。<strong>繁忙期（3〜5月・10〜11月）に8.7hで収まるのは月4催行まで</strong>です。予約変更・ガイドの穴埋め・クレームは本人に来る（ハルオ 02 の段1は当社が旅行者と直接契約する形なので、<strong>責任の受け皿は社長です</strong>）。</p>
+<hr>
+<h2>4. ④の成立確率（依頼③への答え）</h2>
+<table><thead><tr><th>論点</th><th>私の読み</th><th>起きた後の④の中央</th></tr></thead><tbody>
+<tr><td><strong>ガイドが集まらない世界</strong></td><td><strong>13%</strong>（2026-11 末までに稼働合意0人が39%、24ヶ月を通して1人も立たないのが13%）。先人は全員どちらかを先に持っていた（自分が300回ガイド／資本金3,761万の研修体制）。社長はどちらも持たないが、<strong>「他社が検品した人を借りる」で代替できている</strong>（母数が有限という代償つき・§5）</td><td>0万</td></tr>
+<tr><td><strong>客が来ない世界</strong></td><td><strong>こちらが主犯。催行0本のまま24ヶ月＝25%／累計5本以下＝70%。</strong>新規出品のコールドスタートが解けない</td><td>0万</td></tr>
+<tr><td><strong>ガイドに客を持っていかれる（中抜き）</strong></td><td><strong>24ヶ月で32%</strong>（催行が立った世界に限る）。ただし<strong>被害は小さい</strong>：客は訪日客＝一度きりで、<strong>持って行かれるのは顧客名簿ではなくガイド本人とコース設計</strong>。レビュー資産は当社の出品に残る。予約と決済を握る設計（タケシの記載どおり）で十分</td><td>▲20%（1人抜けるごと）</td></tr>
+<tr><td><strong>1件の炎上でOTA掲載が止まる</strong></td><td><strong>★3以下が1件以上出る世界 34%。うち掲載停止に至るのは5%</strong>（全体で1.7%）。<strong>掲載停止よりも「G4 の条項で自分がガイドを切ってしまう」方が10倍効きます</strong>（§6）</td><td>掲載停止なら3ヶ月0万</td></tr>
+<tr><td><strong>PFの契約構造がC（無登録営業）</strong></td><td><strong>20%</strong>（構造を読んで回避できる前提）。読まずに出品する世界では<strong>5年の登録禁止リスク</strong>（ハルオ 02 §8）。W7 に規約読解を置いたのは正しい</td><td>42,000円の投資ゲートに当たり、0円縛りでは進めない</td></tr>
+<tr><td><strong>想定外</strong></td><td><strong>10%</strong></td><td>—</td></tr>
+</tbody></table>
+<hr>
+<h2>5. 検品の必須条件（依頼④への答え）</h2>
+<h3>5-1. 母集団は何人いるか（推定・確度低）</h3>
+<table><thead><tr><th>情報源</th><th>ガイド個人単位の「星＋レビュー件数」が公開されているか</th><th>標的都市（東京）の該当人数（推定）</th></tr></thead><tbody>
+<tr><td><strong>GoWithGuide</strong></td><td><strong>○</strong>（ガイド個人のプロフィールにレビュー）</td><td>80〜250人</td></tr>
+<tr><td><strong>Airbnb体験</strong></td><td><strong>○</strong>（ホスト単位）</td><td>50〜150人（ただし<strong>本人が自分の出品を運営中＝競合</strong>）</td></tr>
+<tr><td><strong>Viator / Tripadvisor</strong></td><td><strong>✕。レビューは「商品（体験）」に付き、ガイド個人には付きません。</strong>本文に名前が出るだけ</td><td>0人（数えられない）</td></tr>
+<tr><td>MagicalTrip / Localized の稼働歴</td><td><strong>✕</strong>（個人のレビュー件数は非公開。自己申告に依存）</td><td>検証不能</td></tr>
+</tbody></table>
+<p><strong>タケシが挙げた4つの情報源のうち、彼の判定方法（「星とレビュー件数を数えるだけ」）が実際に使えるのは2つだけです。</strong> 母集団は標的都市で <strong>80〜300人（中央150人）</strong>と置きました（推定・実測日＝W2 のリスト化20人が何人目で枯れるか）。</p>
+<h3>5-2. 応募の動機（3手先）</h3>
+<p><strong>うちが「3.5時間 8,855円」で打診する → レビューを持つガイドの多くは自分で 40,000〜80,000円/日（二次）を取っているので断る → 応じるのは「レビューはあるが予約が埋まっていないガイド」→ その人は他社の客付けで選ばれていない人</strong>。</p>
+<p><strong>条件1は「検品の代替」として機能しますが、機能の強さは落ちます。</strong> 私の測定では、<strong>打診に応じた人だけを採った世界でも★3以下が34%の世界で出ます</strong>。条件1を外した世界（無名ガイドも採る）では47%。<strong>差は13ptで、条件1は有効だが決定的ではありません</strong>（タケシの「1が取れれば成立」は過大評価・確度70%）。</p>
+<p><strong>母数は有限で、撃つほど劣化します。</strong> メーカー名簿と同じ性質です（memory：名簿は撃つほど劣化する有限資源）。月10件の打診を24ヶ月続けると240件＝母集団150人を超えるので、<strong>2027年後半には母数が尽きます</strong>。<strong>母数を増やす手（2都市目・大学の留学生・JGA）を先に確保しない限り、④は自然に止まります。</strong></p>
+<hr>
+<h2>6. 判定線 G1〜G4 の性能（申し送り4への答え）</h2>
+<p>成功の定義＝<strong>④が立つ＝24ヶ月で累計6催行以上</strong>（全体の30%）。G1 の降格を外した世界で測っています（n=6,000）。</p>
+<table><thead><tr><th>判定線</th><th>タケシの申告</th><th><strong>全体で踏む率</strong></th><th><strong>偽陰性（立つ世界で踏む）</strong></th><th>踏んだ世界のP(立つ)</th><th>採否</th></tr></thead><tbody>
+<tr><td><strong>G1 打診10件未満 or 返信0（2026-11-23）</strong></td><td>40%</td><td><strong>4%</strong></td><td>3%</td><td>19%</td><td><strong>不可（情報量ほぼゼロ）。</strong>ほぼ全世界が通過する＝判定になっていない</td></tr>
+<tr><td>G1′ 打診20件で返信0（2027-01 へ延期）</td><td>—</td><td>4%</td><td>3%</td><td>19%</td><td>不可（同じ）</td></tr>
+<tr><td><strong>G1″ 稼働合意が0人（2026-11-23）</strong></td><td>—</td><td><strong>39%</strong></td><td><strong>33%</strong></td><td>25%</td><td><strong>条件付き採用。</strong>偽陰性33%は高いので<strong>降格ではなく「打診を月20件に増やす」トリガーにする</strong></td></tr>
+<tr><td><strong>G2 初催行が0本（2027-03）</strong></td><td>45%</td><td><strong>86%</strong></td><td><strong>56%</strong></td><td>19%</td><td><strong>不可。</strong>中央の世界が踏む＝<strong>同型失敗5回目</strong></td></tr>
+<tr><td><strong>G3 ガイド2人未満 or 月催行4本未満（2027-09）</strong></td><td>50%</td><td><strong>99%</strong></td><td><strong>96%</strong></td><td>29%</td><td><strong>不可。</strong>ほぼ全世界で発動＝情報量ゼロ（<strong>6回目</strong>）</td></tr>
+<tr><td>G3′ 月催行が1本未満（2027-09）</td><td>—</td><td>82%</td><td>38%</td><td>14%</td><td>不可</td></tr>
+<tr><td><strong>G4 ★3以下が1件（随時）→ そのガイドを切る</strong></td><td>35%</td><td><strong>35%</strong></td><td><strong>94%</strong></td><td><strong>80%</strong></td><td><strong>不可。</strong>踏んだ世界の80%は④が立っている世界＝<strong>これは失敗検出器ではなく成功検出器です</strong></td></tr>
+</tbody></table>
+<h3>6-1. 入れ替え案（4本）</h3>
+<table><thead><tr><th>元</th><th>差し替え後</th><th>根拠</th></tr></thead><tbody>
+<tr><td>G1</td><td><strong>【新G1】2027-01-31：稼働合意が0人</strong>なら、降格ではなく<strong>打診を月10→20件に増やす</strong>（0円）。<strong>2027-03-31 に合意0人なら補助へ降格</strong></td><td>返信は「丁重な辞退」を含むので信号にならない。合意で測る。打診20件でも返信0の確率は返信率12%なら7.8%＝ここで初めて情報になる</td></tr>
+<tr><td>G2</td><td><strong>【新G2】2027-06-30：OTA経由の有料予約が1件も入らない</strong>（モニター催行は数えない）→ 集客経路を入れ替える</td><td>認証レビューが付くのは有料予約だけ。判定日を3ヶ月後ろにずらすと0円で情報が増える</td></tr>
+<tr><td>G3</td><td><strong>【新G3】2027-09-30：24ヶ月換算の累計催行が3本未満</strong>→「1コース1ガイドの小商い」に固定</td><td>月次スナップショットは季節で振れる。累計で測る</td></tr>
+<tr><td>G4</td><td><strong>【新G4】★1が1件／★3以下が2件／安全・ハラスメント事由は即</strong>。1件目は<strong>そのガイドを切らず、コースと引き継ぎ資料を直す</strong></td><td>現行のG4は、母集団が有限な状況で唯一のガイドを94%の確率で失わせる。<strong>G4で切らない世界は④のP90が2.2万→4.6万（2倍）</strong></td></tr>
+</tbody></table>
+<h3>6-2. 「G1〜G4 は全部0円で判定できる」は半分だけ正しい</h3>
+<p><strong>金銭は0円です。ただし4本のうち3本は §4.1 の社長承認が前提です。</strong></p>
+<table><thead><tr><th>判定線</th><th>判定に必要な前提行為</th><th>§4.1</th></tr></thead><tbody>
+<tr><td>G1</td><td>ガイド候補への打診10件</td><td><strong>第三者連絡＝承認必須</strong></td></tr>
+<tr><td>G2</td><td>OTAへの出品公開</td><td><strong>外部発信＝承認必須</strong></td></tr>
+<tr><td>G3/G4</td><td>業務委託契約・催行</td><td><strong>契約＝承認必須</strong></td></tr>
+</tbody></table>
+<p><strong>つまり G1 の「打診10件未満」が発動したとき、それは市場の答えではなく社長の承認が間に合わなかったという答えです。</strong>2つの別の事象を1本の線に混ぜているので、<strong>新G1 では「合意0人」だけで測ります</strong>。</p>
+<hr>
+<h2>7. 90日プランと現金（依頼⑤への答え）</h2>
+<h3>7-1. 週14〜18h・総支出0円は維持できているか</h3>
+<p><strong>できています。ここは v2 から大きく改善しました。</strong></p>
+<table><thead><tr><th>時点</th><th>v2 の時間負荷（需要÷可能時間）</th><th><strong>v3 案A</strong></th></tr></thead><tbody>
+<tr><td>2026-12</td><td>—</td><td>P50 0.80倍／P90 1.20倍</td></tr>
+<tr><td>2027-06（ピーク）</td><td><strong>P50 1.9倍・超過100%</strong></td><td><strong>P50 1.05倍／P90 1.38倍・超過57%</strong></td></tr>
+<tr><td>2028-08</td><td>—</td><td>P50 1.04倍／P90 1.29倍</td></tr>
+</tbody></table>
+<p><strong>返信対応を先に時間予約した設計（W3）が効いています。</strong> 残る穴は2つ。</p>
+<table><thead><tr><th>穴</th><th>内容</th></tr></thead><tbody>
+<tr><td><strong>W11 のモニター客</strong></td><td>「モニター客1〜2人」の<strong>集め方が書かれていません</strong>。OTA出品は W7 で下書き・公開は社長承認待ち。<strong>客の出どころが無い状態で W11 に催行日を置くのは実行不能</strong>（60%）</td></tr>
+<tr><td><strong>W8・W11 の重なり</strong></td><td>W8＝初回発注4h＋G1判定、W11＝モニター催行＋ココナラ。<strong>どちらも「相手から返ってくる作業」が読めない週</strong>。18h の申告は下振れで22h</td></tr>
+</tbody></table>
+<h3>7-2. 現金の谷は 2027-03 のままか</h3>
+<p><strong>ほぼそのままです。中央は 2027-02（m4）で、2027-03（m5）が最多の45%。</strong>④は0円なので谷は動きません（私の指摘どおり）。</p>
+<table><thead><tr><th>世界</th><th>最薄月の現金 中央</th><th>P(現金&lt;0)</th><th>谷の中央</th></tr></thead><tbody>
+<tr><td>案A 既定（本業からの注入 月10万・借入300万）</td><td>73万</td><td><strong>1%</strong></td><td>2027-02</td></tr>
+<tr><td>案A 注入なし</td><td>17万</td><td><strong>29%</strong></td><td>2027-03</td></tr>
+<tr><td>案A 借入なし</td><td>70万</td><td>2%</td><td>2027-03</td></tr>
+<tr><td><strong>案A 注入なし＋借入なし</strong></td><td><strong>▲25万</strong></td><td><strong>68%</strong></td><td>2027-09</td></tr>
+<tr><td>案B（物販単線＋⑥）</td><td>54万</td><td>3%</td><td>2027-03</td></tr>
+</tbody></table>
+<p><strong>借入申込を2027-01に前倒しする（v2 の私の指摘）は v3 でも維持してください。</strong>谷（2027-02〜03）と申込が同月に来ない形です。</p>
+<hr>
+<h2>8. 最も価値が高い修正 — 空いた時間は④ではなく送信に戻す</h2>
+<p>2段オファー化で時間が余りました。その使い道を並べます（n=4,000）。</p>
+<table><thead><tr><th>構成</th><th>中央</th><th>P90</th><th>P(100万)</th><th>2028-03 P(≥53.4万)</th><th>2027-06 の時間負荷 P50</th><th>最薄現金 中央／P(&lt;0)</th></tr></thead><tbody>
+<tr><td><strong>案A 週26通（タケシ v3）</strong></td><td><strong>56.4</strong></td><td><strong>90.1</strong></td><td>5.6%</td><td>24%</td><td>1.05倍</td><td>73万／0%</td></tr>
+<tr><td>案A 週30通</td><td>60.3</td><td>95.2</td><td>7.5%</td><td>30%</td><td>1.12倍</td><td>68万／1%</td></tr>
+<tr><td>案A 週36通</td><td>64.5</td><td>97.3</td><td>8.4%</td><td>35%</td><td>1.19倍</td><td>60万／1%</td></tr>
+<tr><td>案A 週40通</td><td>65.4</td><td>98.4</td><td>9.2%</td><td>35%</td><td>1.24倍</td><td>59万／1%</td></tr>
+<tr><td>①②のみ 週36通</td><td>68.6</td><td>108.1</td><td>14.9%</td><td>43%</td><td>1.11倍</td><td>49万／7%</td></tr>
+<tr><td><strong>①②のみ 週40通</strong></td><td><strong>70.7</strong></td><td><strong>108.9</strong></td><td><strong>16.4%</strong></td><td><strong>45%</strong></td><td>1.15倍</td><td>45万／<strong>8%</strong></td></tr>
+<tr><td>①②⑥ 週40通（④⑤を落とす）</td><td>69.4</td><td>104.9</td><td>13.3%</td><td>42%</td><td>1.19倍</td><td>47万／5%</td></tr>
+<tr><td>案A 週40通＋④をタケシ寄り置き値</td><td>71.0</td><td>106.8</td><td>14.7%</td><td>42%</td><td>1.26倍</td><td>60万／1%</td></tr>
+</tbody></table>
+<p><strong>読み</strong></p>
+<p>1. <strong>送信量が律速です。</strong>週26→40通で中央 +9万・P(100万) +3.6pt（案A のまま）。<strong>④の期待寄与0.7万の10倍以上。</strong></p>
+<p>2. <strong>レーンを削るとさらに伸びます。</strong>①②のみ 週40通で中央70.7万・P(100万)16.4%。<strong>④⑤⑥を持つ代償は、同じ送信量で中央▲5万・P90▲10万・P(100万)▲7pt</strong>です。</p>
+<p>3. <strong>ただし送信を増やすと現金が薄くなります</strong>（最薄現金 73万→45万・P(現金&lt;0) 0%→8%）。仕入れが増えるからで、<strong>これは借入300万で買える範囲</strong>です。トレードは「利益の中央値 +14万 ↔ 現金の余裕 ▲28万」。</p>
+<p>4. <strong>⑤は今すぐ閉じるのが正しいです。</strong>案A週40通から⑤を外すと中央 65.4→67.2万。<strong>⑤は融資審査の材料（事業収入の実績）としてだけ、応募を月1回に落として残す</strong>（タケシの用途限定は正しいが、2027-09 まで待つ理由はありません）。</p>
+<p>5. <strong>④を持つ理由は「数字」では出ません。</strong>私の置き値で▲2万、タケシ寄りの置き値で+1.6万。<strong>どちらにしても案の当否を動かす額ではない。</strong>持つ根拠は「社長が抜けても売上が立つ型を1つ実測したい」という<strong>情報の価値</strong>で、そこは正当です。<strong>ただし主力ではなく、0円の実験として週1.5〜2hに固定するのが正しい扱いです。</strong></p>
+<hr>
+<h2>9. ヒデアキのHTML向け — 動く数字の一覧</h2>
+<table><thead><tr><th>箇所</th><th>タケシ v3 の値</th><th><strong>差し替え後</strong></th></tr></thead><tbody>
+<tr><td>2028-09 月営業利益 中央</td><td>57万（v2から変わらず）</td><td><strong>61万</strong>（幅 45〜75万）</td></tr>
+<tr><td>同 P90</td><td>約130万</td><td><strong>約108万</strong></td></tr>
+<tr><td>同 P10</td><td>32万</td><td><strong>28万</strong></td></tr>
+<tr><td><strong>P(月200万)</strong></td><td><strong>8%（4〜12%）</strong></td><td><strong>約1%（0〜2%）</strong></td></tr>
+<tr><td>P(月100万)</td><td>26%</td><td><strong>14%</strong></td></tr>
+<tr><td>内訳 ①Amazon物販</td><td>50万／90万</td><td><strong>41万（中央）／80万（P90）</strong></td></tr>
+<tr><td>内訳 ④観光ガイド手配</td><td><strong>6万／28万</strong></td><td><strong>0〜1万（中央）／2〜22万（P90）</strong>。期待値 0.7〜7.1万</td></tr>
+<tr><td>内訳 ②BtoB</td><td>0万／30万</td><td><strong>9万（中央）／21万（P90）</strong>（②は中央でも1社立ちます。ここは彼より強気）</td></tr>
+<tr><td>内訳 ⑤コンサル</td><td>1万／3万</td><td><strong>1.6万／2.1万</strong>（ただし持つと合計が▲1.8万。<strong>今閉じる</strong>）</td></tr>
+<tr><td>内訳 ⑥動画</td><td>0万／9万</td><td><strong>0万（中央）／7.7万（P90）</strong>（未収益化55%）</td></tr>
+<tr><td>④ 月催行本数 中央／P90</td><td>2〜3本／10本</td><td><strong>0本／4本</strong>（タケシ寄り置き値なら1本／15本）</td></tr>
+<tr><td>④ 稼働ガイド 中央／P90</td><td>2人／5人</td><td><strong>1人／5人</strong></td></tr>
+<tr><td>④ 24ヶ月の累計催行</td><td>（記載なし）</td><td><strong>中央1本／P90 40本</strong>（中央はモニター1本だけ）</td></tr>
+<tr><td>④ 社長の月工数</td><td><strong>8.7h 固定</strong></td><td><strong>催行比例。</strong>3.5h（0催行）／5.5h（2催行）／<strong>13.5h（10催行）</strong></td></tr>
+<tr><td>④ 時間単価</td><td>中央6,900／上側32,000円/h</td><td><strong>中央3,700／上側7,600〜19,200円/h</strong></td></tr>
+<tr><td>④ 1催行の運営粗利</td><td>25,900円</td><td><strong>10,245円（参加3.5人）</strong>。参加2人=1,545円／6人=24,745円。<strong>ガイドの交通/飲食1,200円が抜けています</strong></td></tr>
+<tr><td>P(段1到達・2027-03)</td><td>55%</td><td><strong>62%（妥当。差し戻しません）</strong></td></tr>
+<tr><td>④ 催行ゼロの世界</td><td>30%</td><td><strong>25%（妥当）</strong></td></tr>
+<tr><td>2028-03 の退職条件（53.4万）</td><td>約35%</td><td><strong>33%（妥当）</strong></td></tr>
+<tr><td>送信30→26通の持ち出し</td><td>中央▲5万</td><td><strong>▲6.7万。合計P90は改善しない</strong></td></tr>
+<tr><td><strong>週の送信通数</strong></td><td><strong>26通</strong></td><td><strong>36〜40通</strong>（中央 +9万・P(100万) +3.6pt。現金は▲14万・P(&lt;0) 0→1%）</td></tr>
+<tr><td>現金の谷</td><td>（v2 の 2027-03 を継承）</td><td><strong>2027-02（中央）／2027-03 が最多45%。</strong>借入申込 2027-01 は維持</td></tr>
+<tr><td>G1 発動率</td><td>40%</td><td><strong>4%（情報量ゼロ）→ 新G1「2027-01 に稼働合意0人なら打診を月20件へ／2027-03 に0人なら降格」</strong></td></tr>
+<tr><td>G2 発動率</td><td>45%</td><td><strong>86%（不可）→ 新G2「2027-06 に OTA経由の有料予約が0件」</strong></td></tr>
+<tr><td>G3 発動率</td><td>50%</td><td><strong>99%（不可）→ 新G3「2027-09 に累計催行3本未満」</strong></td></tr>
+<tr><td>G4</td><td>★3以下1件でそのガイドを切る（35%）</td><td><strong>④が立つ世界の94%で発動＝成功検出器。</strong>→ <strong>★1が1件／★3以下が2件／安全事由は即。</strong>1件目は切らずコースを直す</td></tr>
+<tr><td>段1の到達条件</td><td>モニター催行1本でレビュー1件目</td><td><strong>OTA経由の有料予約1本。</strong>モニター催行では<strong>認証レビューが付かない</strong>（PFの予約を通らないため）</td></tr>
+<tr><td>90日プラン W11</td><td>モニター催行を実施</td><td><strong>モニター客の集め方が未記載。</strong>OTA公開（社長承認）→有料1本（導入価格）に置き換え</td></tr>
+<tr><td>「G1〜G4 は全部0円で判定できる」</td><td>そのまま</td><td><strong>金銭は0円。ただし3本は §4.1（第三者連絡・外部発信・契約）の社長承認が前提</strong></td></tr>
+<tr><td>会社KPI 利益率21〜22%</td><td>④が月6本立つと乗る</td><td><strong>前提の「月6本」は P75〜85 の世界。</strong>中央では乗りません。<strong>総額計上か純額計上かも未確定（ハジメ待ち）</strong></td></tr>
+</tbody></table>
+<hr>
+<h2>10. 注釈 — 推定と実測日、読みようがない領域</h2>
+<table><thead><tr><th>置き値（すべて推定・当社の観測ゼロ）</th><th>私の値</th><th><strong>実測できる日</strong></th></tr></thead><tbody>
+<tr><td>④ 1催行の参加人数</td><td>三角 2／3.5／7人</td><td><strong>OTA経由の有料予約1本目</strong>（モニターでは測れない）</td></tr>
+<tr><td>④ 1催行の運営粗利</td><td>10,245円（1,545〜36,345円）</td><td>同上</td></tr>
+<tr><td>④ ガイド打診の返信率／稼働合意率</td><td>対数正規 中央12%（s0.55）／三角 0.15/0.35/0.60</td><td><strong>2026-11-23（打診10件）</strong></td></tr>
+<tr><td>④ レビュー持ちガイドの母数（標的都市）</td><td>三角 80／150／300人</td><td>W2 のリスト化が何人目で枯れるか</td></tr>
+<tr><td>④ ガイドの月次離脱率</td><td>8%</td><td>2027-06（ガイド1人目の3ヶ月後）</td></tr>
+<tr><td>④ 掲載初月の月間予約人数</td><td>対数正規 中央1.2人（s0.90）</td><td>出品公開の翌月</td></tr>
+<tr><td>④ 0円OTAに掲載できる確率（1回）</td><td>50%（四半期ごとに再挑戦・最大4回）</td><td>W7 の実申請</td></tr>
+<tr><td>④ PFの契約構造がA/B</td><td>80%</td><td><strong>W7 の規約読解（出品前）</strong></td></tr>
+<tr><td>④ 1催行あたり★3以下が出る率</td><td>10%（無名ガイドなら22%）</td><td>初回3催行</td></tr>
+<tr><td>④ 中抜きの月次発生率／人</td><td>1.2%（催行が立った世界のみ）</td><td>2027-09</td></tr>
+<tr><td>② 成約率／単価／工数</td><td>0.12%／月5-10-20万×0.8（実装外注）／10-20-35h</td><td>1社目</td></tr>
+<tr><td>2段オファーの希釈倍率</td><td>三角 0.90／0.96／1.00</td><td>2026-12-21（累計338通）</td></tr>
+<tr><td>退職後の可用時間</td><td>87h → 174h/月（<strong>楽観</strong>）</td><td>—</td></tr>
+</tbody></table>
+<p><strong>読みようがない領域（追加調査でも埋まりません）</strong></p>
+<p style="margin-left:1em">・<strong>手配側7社の粗利・催行本数・マージン率は全社非公開。</strong>④の数字は原理的に当社の実測でしか埋まりません。</p>
+<p style="margin-left:1em">・<strong>AIで英語力を判定した先行事例は0件</strong>（サトルが探して未取得）。録画課題のAI採点は下限を切る用途に限定するのが正しい（タケシの記載どおり）。</p>
+<p style="margin-left:1em">・<strong>Viator/Tripadvisor のレビューはガイド個人に紐づかない</strong>ので、母集団の正確な人数は数えられません（GoWithGuide とAirbnbのみ）。</p>
+<p style="margin-left:1em">・<strong>モニター催行で認証レビューが付くかは PF 規約次第</strong>（私は「付かない」と読みましたが、確度70%。W7 の規約読解で一緒に確認してください）。</p>
+<p><strong>モデルの限界</strong></p>
+<p style="margin-left:1em">・④の上側（都市×コース×ガイドの積）は、出品を最大3.4本相当・2都市目を2028Q2 までしかモデルに入れていません。<strong>24ヶ月の窓では複製が効かない</strong>という判断が入っています（確度75%）。窓を36ヶ月に伸ばせば④の評価は上がります。</p>
+<p style="margin-left:1em">・借入300万を入れても中央値は動きません（v2 と同じ）。<strong>借入は谷を越える保険としてしか評価できません。</strong></p>
+<p style="margin-left:1em">・事故（アカウント停止・保留）は24ヶ月で15%。社長の停止歴を踏まえると楽観の可能性。</p>
+<p style="margin-left:1em">・<strong>想定外の残余確率 10%。</strong></p>
+<p><strong>§4.1 該当（公庫への申込・メーカーへの送信・ガイド候補への打診・OTAへの出品・業務委託契約・課金）は一件も実行していません。</strong></p>
+<hr>
+<h2>11. タケシへ差し戻す4点／社長に上げてよい4点</h2>
+<table><thead><tr><th>差し戻す（タケシ）</th><th>上げてよい（社長）</th></tr></thead><tbody>
+<tr><td>① <strong>P(200万)=8% と P90 130万を撤回</strong>。P(200万) 約1%・P90 約108万へ。<strong>内訳のP90合計が160万で200万に届かない</strong>ので、彼の表からは再構成できない</td><td>① <strong>評価軸の入れ替え（社長が抜けても売上が立つか／天井は何で閉じているか）は正しい。</strong>⑤を落とす理由を時間単価から天井に書き換えたのも正しい</td></tr>
+<tr><td>② <strong>④の中央6万を 0〜1万に。</strong>工数8.7h固定を催行比例に。1催行の粗利にガイドの交通/飲食1,200円を入れる。<strong>段1の到達条件を「モニター催行」から「OTA経由の有料予約1本」に書き換える</strong></td><td>② <strong>②③統合は正解。</strong>中央が上がり（+11万）、時間負荷が1.9倍→1.05倍に落ちた。<strong>ただし功績は2段オファー化と③除去で、④ではない</strong></td></tr>
+<tr><td>③ <strong>週の送信を26通→36〜40通に戻す。</strong>2段オファーで空いた時間の使い道は④ではなく送信（中央+9万・P(100万)+3.6pt）</td><td>③ <strong>④を「0円の実験」として週1.5〜2h持つこと自体は正当。</strong>社長が抜けても回る型を実測できるレーンは他に無い。<strong>ただし主力ではない</strong></td></tr>
+<tr><td>④ <strong>判定線を4本入れ替える（§6-1）。</strong>現行は G1 が4%（情報量ゼロ）・G2 86%・G3 99%・G4 は成功検出器</td><td>④ <strong>90日プランの実行可能性は v2 から大きく改善</strong>（時間負荷 1.9倍 → 1.05倍）。<strong>W11 のモニター客の出どころだけ埋めれば走れる</strong></td></tr>
+</tbody></table>
+<p><strong>収束の可否：条件付きで収束。</strong> 上の4点は<strong>書き換えで済み、再計算は不要</strong>です（数字は §9 にそろえました）。<strong>2周目は価値が出ません（確度80%）。</strong>秘書が §9 を当ててヒデアキに渡せば、社長承認に上げてよい状態になります。</p>
+<p><strong>社長に判断していただく論点は1つだけです：「週の送信を26通に抑えて④に週2h置くか、送信を36〜40通に戻して現金の余裕を28万削るか」。</strong> 前者は中央56万・現金73万、後者は中央65〜70万・現金45〜59万。<strong>私の推奨は後者（送信40通・④は週1.5hで維持・⑤は今閉じる）。中央65万・P90 103万・P(現金&lt;0)4%。</strong></p>
+</body></html>
