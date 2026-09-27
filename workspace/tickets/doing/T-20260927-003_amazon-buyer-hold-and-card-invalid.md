@@ -47,6 +47,7 @@ related_tickets: [T-20260920-001, T-20260909-001, T-20260726-003]
 - 2026-09-27 カズヨ: CA の Contact us に **書類添付つきの窓口**（Account health > Reactivate your account > "I need to submit documents to verify my selling account"）を発見。社長判断 **B案（文面＋書類2点添付）**。ヒデアキが B 版文面を作成
 - 2026-09-27 23:11 カズヨが件名・本文を入力、**社長が2点添付して Send** → **新ケース 22309188941**（Work in progress）。受付表示「We answer most emails in less than 24 hours」、Attachments に Amazon_01_ID_passport_v3.jpg / Amazon_02_bank_statement.pdf を確認。送信台帳 #7・#8 に記録
 - 次の確認: 2026-09-28 にケース 22309188941 と satoyukinori1018 のメールを確認（カズヨ）。社長の番ではないため doing のまま
+- 2026-09-27 マリエ: 同期。owner-tasks.md 更新68（更新66 のカナダ出し直し承認を解消・🔴 は2件のまま・新規社長タスクなし）。Notion カード（本チケット）の Description・結果要約・成果物・UpdatedAt を更新（Status=doing のまま）。T-20260909-001 の Notion カードにも「後継=新ケース22309188941／以後 T-20260927-003 で管理」を先頭に追記。カタログに 01_canada_new_case_draft.md を1行追記しシート同期（941行×15列）。
 
 ## 対応方針（カズヨ判断）
 1. 購入アカウントの保留解除が最優先（24時間審査・書類提出）。出品用の課金カード判定もこれに連動している可能性が高い
