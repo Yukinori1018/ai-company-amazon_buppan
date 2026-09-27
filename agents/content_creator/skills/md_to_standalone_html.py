@@ -127,11 +127,16 @@ def is_sep_row(line: str) -> bool:
 
 
 class Builder:
-    def __init__(self, lines, boxes=(), reftable="", refwidths=()):
+    def __init__(self, lines, boxes=(), reftable="", refwidths=(), colwidths=None):
         self.boxes = list(boxes)   # [(見出しに含まれる文字列, "conclusion"|"alert")]
         self.reftable = reftable   # この h2 節の表を「出典一覧」として扱う
         self.refwidths = list(refwidths)
         self.in_reftable = False
+        # --colwidths: {h2見出し: [列幅...]}。その節の最初の表にだけ colgroup を当てる。
+        # 自動レイアウトは内容量で幅を決めるため、長文列が1つあると短い列が
+        # 「縦1文字の帯」まで潰れる（07 の実働列で実際に起きた）。
+        self.colwidths = dict(colwidths or {})
+        self.cur_widths = []
         self.lines = lines
         self.i = 0
         self.out = []
@@ -207,6 +212,7 @@ class Builder:
                 self.h3n = 0
                 hid = f"s{self.h2n}"
                 self.in_reftable = bool(self.reftable) and title == self.reftable
+                self.cur_widths = list(self.colwidths.get(title, []))
                 self.close_section()
                 scls = self.sec_class(title)
                 self.out.append(f'<section id="{hid}" class="sec{scls}">')
@@ -253,7 +259,14 @@ class Builder:
         head = split_row(rows[0])
         body = [split_row(r) for r in rows[1:] if not is_sep_row(r)]
         ref = self.in_reftable
-        t = ['<div class="tw" tabindex="0"><table' + (' class="reftable"' if ref else "") + ">"]
+        fixed = bool(self.cur_widths) and len(self.cur_widths) == len(head)
+        cls = " class=\"reftable\"" if ref else (" class=\"fixedcols\"" if fixed else "")
+        t = ['<div class="tw" tabindex="0"><table' + cls + ">"]
+        if fixed:
+            t.append("<colgroup>"
+                     + "".join(f'<col style="width:{w}">' for w in self.cur_widths)
+                     + "</colgroup>")
+            self.cur_widths = []       # 同じ節の2つ目以降の表には当てない
         if ref and len(self.refwidths) == len(head):
             # 列幅を指定しないと、自動計算が URL 列に幅を持っていかれて
             # 要旨の列が縦長の1文字帯になる（実際にそうなった）
@@ -531,6 +544,8 @@ tbody tr.row-danger td{background:color-mix(in srgb, var(--alert-bg) 70%, transp
 
 /* ---------- 出典一覧（--reftable） ---------- */
 table.reftable:has(colgroup){table-layout:fixed; min-width:600px;}
+/* --colwidths で列幅を固定した表。狭い画面の溢れは .tw の横スクロールが受ける */
+table.fixedcols{table-layout:fixed; min-width:620px;}
 /* 狭い画面で列が1〜2文字幅に潰れるのを防ぐ。溢れは .tw の横スクロールが受ける */
 table.reftable td:first-child{
   min-width:2.6em; width:2.6em; text-align:right; white-space:nowrap;
@@ -728,6 +743,9 @@ def main():
                     help="出典一覧として扱う h2 見出し（本文の [#n] が該当行へリンクする）")
     ap.add_argument("--reftable-widths", default="",
                     help="出典表の列幅をカンマ区切りで指定（例 3em,28%,22%,15%,8%,23%）")
+    ap.add_argument("--colwidths", action="append", default=[],
+                    metavar="見出し=w1,w2,...",
+                    help="その h2 節の最初の表の列幅を固定する（列数が一致した時だけ適用）")
     ap.add_argument("--note", default="", help="末尾に置く出所注記（任意）")
     a = ap.parse_args()
 
@@ -739,7 +757,11 @@ def main():
         REFIDS.update(scan_reftable(lines, a.reftable))
 
     widths = [w.strip() for w in a.reftable_widths.split(",") if w.strip()]
-    b = Builder(lines, a.box, a.reftable, widths).run()
+    colw = {}
+    for spec in a.colwidths:
+        k, _, v = spec.partition("=")
+        colw[k.strip()] = [x.strip() for x in v.split(",") if x.strip()]
+    b = Builder(lines, a.box, a.reftable, widths, colw).run()
     body = b.out
 
     # 先頭の1段落を lead に格上げし、H1 直下（目次の前）へ移す
