@@ -127,7 +127,7 @@ def is_sep_row(line: str) -> bool:
 
 
 class Builder:
-    def __init__(self, lines, boxes=(), reftable="", refwidths=(), colwidths=None):
+    def __init__(self, lines, boxes=(), reftable="", refwidths=(), colwidths=None, kpi=()):
         self.boxes = list(boxes)   # [(見出しに含まれる文字列, "conclusion"|"alert")]
         self.reftable = reftable   # この h2 節の表を「出典一覧」として扱う
         self.refwidths = list(refwidths)
@@ -137,6 +137,10 @@ class Builder:
         # 「縦1文字の帯」まで潰れる（07 の実働列で実際に起きた）。
         self.colwidths = dict(colwidths or {})
         self.cur_widths = []
+        # --kpi: その h2 節の「1行だけの表」を KPIカード（ラベル＋大きな数字）にする。
+        # 表の羅列で始めると社長が最初の数字に辿り着けないため（2026-09-28 / T-20260927-002）。
+        self.kpi = set(kpi or ())
+        self.kpi_here = False
         self.lines = lines
         self.i = 0
         self.out = []
@@ -213,6 +217,8 @@ class Builder:
                 hid = f"s{self.h2n}"
                 self.in_reftable = bool(self.reftable) and title == self.reftable
                 self.cur_widths = list(self.colwidths.get(title, []))
+                self.kpi_here = title in self.kpi or any(
+                    title.startswith(k) for k in self.kpi)
                 self.close_section()
                 scls = self.sec_class(title)
                 self.out.append(f'<section id="{hid}" class="sec{scls}">')
@@ -258,6 +264,17 @@ class Builder:
             self.i += 1
         head = split_row(rows[0])
         body = [split_row(r) for r in rows[1:] if not is_sep_row(r)]
+        # KPIカード: 見出し行＝ラベル／本文1行＝値。1行表のときだけ当てる
+        # （2行以上ある表をカードにすると対応が読めなくなるので、表のまま出す）
+        if self.kpi_here and len(body) == 1 and len(body[0]) == len(head):
+            cards = []
+            for lab, val in zip(head, body[0]):
+                v, _ = cell(val)
+                l, _ = cell(lab)       # ラベルにも --cellmark を効かせる（「仮置き」ピル用）
+                cards.append('<div class="kpi"><p class="kpi-l">' + l
+                             + '</p><p class="kpi-v">' + v + "</p></div>")
+            self.out.append('<div class="kpis">' + "".join(cards) + "</div>")
+            return
         ref = self.in_reftable
         fixed = bool(self.cur_widths) and len(self.cur_widths) == len(head)
         cls = " class=\"reftable\"" if ref else (" class=\"fixedcols\"" if fixed else "")
@@ -415,6 +432,23 @@ h1{
 .lead{
   margin:0; color:var(--muted); font-size:15px; line-height:1.8;
   border-left:3px solid var(--border-strong); padding:2px 0 2px 14px;
+}
+
+/* ---------- kpi カード ---------- */
+.kpis{display:flex; flex-wrap:wrap; gap:10px; margin:1.1em 0 1.2em;}
+.kpi{
+  flex:1 1 150px; min-width:150px;
+  border:1px solid var(--border-strong); border-radius:10px;
+  background:var(--bg); padding:12px 14px 13px;
+}
+.kpi-l{margin:0; font-size:13px; line-height:1.5; color:var(--muted); letter-spacing:.02em;}
+.kpi-v{
+  margin:.1em 0 0; font-size:32px; line-height:1.25; font-weight:700;
+  letter-spacing:-.01em; font-variant-numeric:tabular-nums;
+}
+@media (max-width:520px){
+  .kpi{flex:1 1 100%;}
+  .kpi-v{font-size:27px;}
 }
 
 /* ---------- toc ---------- */
@@ -666,6 +700,8 @@ tbody tr[id]:target td:first-child{box-shadow:inset 4px 0 0 var(--accent); color
   h1.part,h2,h3{break-after:avoid; page-break-after:avoid;}
   .tw,blockquote,tr{break-inside:avoid; page-break-inside:avoid;}
   .toc{border:1px solid #999; background:#fff;}
+  .kpi{border:1pt solid #000; background:#fff; break-inside:avoid;}
+  .kpi-v{font-size:16pt;}
 }
 """
 
@@ -746,6 +782,10 @@ def main():
     ap.add_argument("--colwidths", action="append", default=[],
                     metavar="見出し=w1,w2,...",
                     help="その h2 節の最初の表の列幅を固定する（列数が一致した時だけ適用）")
+    ap.add_argument("--kpi", action="append", default=[], metavar="見出し",
+                    help="その h2 節の『1行だけの表』をKPIカードにする（完全一致 or 前方一致）")
+    ap.add_argument("--no-toc", action="store_true",
+                    help="目次を出さない（1画面で読み切る短い資料用）")
     ap.add_argument("--note", default="", help="末尾に置く出所注記（任意）")
     a = ap.parse_args()
 
@@ -761,7 +801,7 @@ def main():
     for spec in a.colwidths:
         k, _, v = spec.partition("=")
         colw[k.strip()] = [x.strip() for x in v.split(",") if x.strip()]
-    b = Builder(lines, a.box, a.reftable, widths, colw).run()
+    b = Builder(lines, a.box, a.reftable, widths, colw, a.kpi).run()
     body = b.out
 
     # 先頭の1段落を lead に格上げし、H1 直下（目次の前）へ移す
@@ -796,7 +836,7 @@ def main():
 {kicker}
 <h1>{inline(b.h1)}</h1>
 {lead_html}
-{render_toc(b.toc)}
+{"" if a.no_toc else render_toc(b.toc)}
 {chr(10).join(body)}
 {note}
 </div>

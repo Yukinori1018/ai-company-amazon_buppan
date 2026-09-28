@@ -130,9 +130,9 @@ T-20260920-001（本人確認書類の提出・期限 9/22）が実質この期�
 - **§4.1 該当操作は一切していません**（申請・課金・第三者連絡・規約同意・削除）
 
 ## 成果物
-- [workspace/output/deliverables/T-20260920-003/16_買い物リスト_上限価格つき.md](../../output/deliverables/T-20260920-003/16_買い物リスト_上限価格つき.md)
-- [workspace/output/deliverables/T-20260920-003/16_買い物リスト_上限価格つき.html](../../output/deliverables/T-20260920-003/16_買い物リスト_上限価格つき.html)（社長はこちら）
-- [workspace/output/deliverables/T-20260920-003/16_買い物リスト.csv](../../output/deliverables/T-20260920-003/16_買い物リスト.csv)（機械照合用・全20列）
+- [workspace/output/deliverables/T-20260920-003/17_買い物リスト_上限価格つき.md](../../output/deliverables/T-20260920-003/17_買い物リスト_上限価格つき.md)
+- [workspace/output/deliverables/T-20260920-003/17_買い物リスト_上限価格つき.html](../../output/deliverables/T-20260920-003/17_買い物リスト_上限価格つき.html)（社長はこちら）
+- [workspace/output/deliverables/T-20260920-003/17_買い物リスト.csv](../../output/deliverables/T-20260920-003/17_買い物リスト.csv)（機械照合用・全20列）
 
 - [workspace/output/deliverables/T-20260920-003/02_SD店舗情報_お店紹介文と選択肢.md](../../output/deliverables/T-20260920-003/02_SD店舗情報_お店紹介文と選択肢.md)
 - [workspace/output/deliverables/T-20260920-003/02_SD店舗情報_お店紹介文と選択肢.html](../../output/deliverables/T-20260920-003/02_SD店舗情報_お店紹介文と選択肢.html)
