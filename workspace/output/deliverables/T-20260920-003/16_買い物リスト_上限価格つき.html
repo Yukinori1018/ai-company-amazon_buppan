@@ -1,0 +1,110 @@
+<!doctype html><html lang='ja'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>買い物リスト（仕入れ上限つき）— T-20260920-003</title><style>body{font-family:-apple-system,'Hiragino Sans','Noto Sans JP',sans-serif;max-width:1150px;margin:2em auto;padding:0 1em;line-height:1.65;color:#222;font-size:14.5px}table{border-collapse:collapse;margin:.8em 0;font-size:.92em}th,td{border:1px solid #bbb;padding:.35em .6em;vertical-align:top}th{background:#eef2f8}tr:nth-child(even) td{background:#fafafa}h1{font-size:1.5em;border-bottom:2px solid #444}h2{font-size:1.25em;border-left:5px solid #25b;padding-left:8px;margin-top:1.8em}h3{font-size:1.05em;margin-top:1.4em}blockquote{border-left:4px solid #ccc;margin:.8em 0;padding:.2em 1em;color:#444}code{background:#f3f3f3;padding:1px 4px;border-radius:3px}hr{border:0;border-top:1px solid #ccc;margin:1.6em 0}</style></head><body>
+<h1>買い物リスト（仕入れ上限つき）— T-20260920-003</h1>
+<blockquote><strong>この上限以下で仕入れられれば買ってよい。</strong> 上限を超えるなら、その商品は買わない。</blockquote>
+<p>作成 2026-09-28 ／ タカシ（IT エンジニア）</p>
+<h2>使い方（3手）</h2>
+<ol>
+<li style='margin-left:0.0em'>卸サイト（SD / NETSEA）で下表の商品を探す。<strong>見るのは1つだけ＝「買ってよい上限（税込）」以下で買えるか</strong></li>
+<li style='margin-left:0.0em'>上限以下なら発注。数量は「初回推奨点数」（最大10点。ゲート解除の請求書要件が10点以上のため）</li>
+<li style='margin-left:0.0em'>上限を超える、または卸に無い → その行は捨てて次へ。粘らない</li>
+</ol>
+<p>機械照合用の CSV は <code>16_買い物リスト.csv</code>（列が多いのでこちら）。</p>
+<h2>上限価格の出しかた（1円もごまかしていません）</h2>
+<pre>販売手数料（税込） = 売価 × 手数料率 ÷ 100 × 1.1      ← 手数料率は税抜表示なので ×1.1
+Amazon 側費用     = 販売手数料（税込） + FBA配送代行
+粗利500円の上限   = 売価 − Amazon側費用 − 500
+利益率20%の上限   = 売価 − Amazon側費用 − 売価 × 0.20
+買ってよい上限    = 上の2つの 厳しい側（小さい方）</pre>
+<ul>
+<li style='margin-left:0.0em'><strong>仕入の消費税は控除できない</strong>（免税事業者）ので、上限はすべて<strong>税込</strong>で書いてあります。卸サイトの表示が税抜なら ×1.1 して比べてください</li>
+<li style='margin-left:0.0em'>FBA配送代行は ASIN 別の Keepa 実測値。取れない商品だけ固定 415円（立体）で計算し、注意欄に明記</li>
+<li style='margin-left:0.0em'>計算は <code>calc/profit.py</code> に切り出してあります（UI にも抽出処理にも埋め込んでいません）</li>
+</ul>
+<h2>買い物リスト（30件）</h2>
+<table><thead><tr><th>#</th><th>ASIN</th><th>商品名</th><th>ブランド</th><th>カート価格</th><th>monthlySold</th><th>出品者</th><th><strong>買ってよい上限(税込)</strong></th><th>粗利500円の上限</th><th>利益率20%の上限</th><th>想定月間取り分</th><th>初回推奨点数</th><th>卸見込み</th><th>注意</th></tr></thead><tbody>
+<tr><td>1</td><td><a href="https://www.amazon.co.jp/dp/B0C3QNT4XX" target="_blank" rel="noopener">B0C3QNT4XX</a></td><td>日本香堂 お線香 （贈答品）【包装品・御供のし付 】宇野千代のお線香薄墨の桜</td><td>日本香堂(Nippon Kodo)</td><td>3,180</td><td>300</td><td>2</td><td><strong>1,574</strong></td><td>1,710</td><td>1,574</td><td>100</td><td>10</td><td>高</td><td>—</td></tr>
+<tr><td>2</td><td><a href="https://www.amazon.co.jp/dp/B0C4X9TW9C" target="_blank" rel="noopener">B0C4X9TW9C</a></td><td>[マーナ] Shupatto 保冷バッグ (20L/ホワイトバーチ) シュパ</td><td>マーナ(Marna)</td><td>4,180</td><td>200</td><td>2</td><td><strong>2,354</strong></td><td>2,690</td><td>2,354</td><td>67</td><td>10</td><td>高</td><td>—</td></tr>
+<tr><td>3</td><td><a href="https://www.amazon.co.jp/dp/B0DQCKVLPT" target="_blank" rel="noopener">B0DQCKVLPT</a></td><td>マイヤー(Meyer) フライパンプレス RED 18cm</td><td>マイヤー(Meyer)</td><td>4,400</td><td>200</td><td>2</td><td><strong>2,349</strong></td><td>2,729</td><td>2,349</td><td>67</td><td>10</td><td>高</td><td>—</td></tr>
+<tr><td>4</td><td><a href="https://www.amazon.co.jp/dp/B0DP248MVP" target="_blank" rel="noopener">B0DP248MVP</a></td><td>テスコム ミキサー ジュースミキサー ミル付き [ウェット&amp;ドライ対応] ガ</td><td>テスコム</td><td>7,120</td><td>200</td><td>3</td><td><strong>4,207</strong></td><td>5,131</td><td>4,207</td><td>50</td><td>10</td><td>高</td><td>PSE要確認 / 出品者3社＝上限ぎりぎり</td></tr>
+<tr><td>5</td><td><a href="https://www.amazon.co.jp/dp/B0B8RWJ4WY" target="_blank" rel="noopener">B0B8RWJ4WY</a></td><td>ナイキ バッグ メンズ レディース NIKE Mサイズ 60リットル DH7</td><td>NIKE(ナイキ)</td><td>7,480</td><td>200</td><td>3</td><td><strong>4,181</strong></td><td>5,177</td><td>4,181</td><td>50</td><td>10</td><td>高</td><td>ブランド系＝制限の可能性高 / 出品者3社＝上限ぎりぎり</td></tr>
+<tr><td>6</td><td><a href="https://www.amazon.co.jp/dp/B0DM9M67TW" target="_blank" rel="noopener">B0DM9M67TW</a></td><td>iFace BeBling Wave MagSafe対応 スマホリング Ma</td><td>Hamee(ハミィ)</td><td>3,150</td><td>200</td><td>3</td><td><strong>1,841</strong></td><td>1,971</td><td>1,841</td><td>50</td><td>10</td><td>高</td><td>出品者3社＝上限ぎりぎり</td></tr>
+<tr><td>7</td><td><a href="https://www.amazon.co.jp/dp/B0DNQBBLY7" target="_blank" rel="noopener">B0DNQBBLY7</a></td><td>nishikawa ごろ寝マット スイート (グリーン) お昼寝 ごろ寝クッ</td><td>西川(Nishikawa)</td><td>12,785</td><td>100</td><td>2</td><td><strong>7,281</strong></td><td>9,338</td><td>7,281</td><td>33</td><td>10</td><td>高</td><td>—</td></tr>
+<tr><td>8</td><td><a href="https://www.amazon.co.jp/dp/B0DNT3N6XD" target="_blank" rel="noopener">B0DNT3N6XD</a></td><td>[モンベル] バック メンズ レディース ショルダーバッグ ナイロン ポケッ</td><td>Mont-bell(モンベル)</td><td>7,979</td><td>100</td><td>2</td><td><strong>4,931</strong></td><td>6,027</td><td>4,931</td><td>33</td><td>10</td><td>高</td><td>ブランド系＝制限の可能性高 / PSE要確認</td></tr>
+<tr><td>9</td><td><a href="https://www.amazon.co.jp/dp/B0F9JCYXMP" target="_blank" rel="noopener">B0F9JCYXMP</a></td><td>[ビームスボーイ] キャンパス・バッグ ARC’TERYX MANTIS1</td><td>BEAMS BOY(ビームスボーイ)</td><td>6,820</td><td>100</td><td>2</td><td><strong>4,100</strong></td><td>4,964</td><td>4,100</td><td>33</td><td>10</td><td>高</td><td>ブランド系＝制限の可能性高</td></tr>
+<tr><td>10</td><td><a href="https://www.amazon.co.jp/dp/B0G2SJ2YNB" target="_blank" rel="noopener">B0G2SJ2YNB</a></td><td>オウルテック 燃えにくい準固体/半固体電池 モバイルバッテリー 5000mA</td><td>オウルテック</td><td>3,280</td><td>100</td><td>2</td><td><strong>1,900</strong></td><td>2,056</td><td>1,900</td><td>33</td><td>10</td><td>高</td><td>PSE要確認 / FBA危険物＝SDS要</td></tr>
+<tr><td>11</td><td><a href="https://www.amazon.co.jp/dp/B0CHHQFBV2" target="_blank" rel="noopener">B0CHHQFBV2</a></td><td>[ニューエラ] 無地 キャップ NewEra 9FORTY 99Headwe</td><td>NEW ERA(ニューエラ)</td><td>3,385</td><td>100</td><td>2</td><td><strong>1,791</strong></td><td>1,968</td><td>1,791</td><td>33</td><td>10</td><td>高</td><td>ブランド系＝制限の可能性高</td></tr>
+<tr><td>12</td><td><a href="https://www.amazon.co.jp/dp/B0FH3B7HKS" target="_blank" rel="noopener">B0FH3B7HKS</a></td><td>MARY QUANT (マリークヮント) 洗える エコバッグ/マイバッグ（大</td><td>MARY QUANT(マリークワント)</td><td>2,200</td><td>100</td><td>2</td><td><strong>1,081</strong></td><td>1,081</td><td>1,141</td><td>33</td><td>10</td><td>高</td><td>ブランド系＝制限の可能性高</td></tr>
+<tr><td>13</td><td><a href="https://www.amazon.co.jp/dp/B0FD3PCQKH" target="_blank" rel="noopener">B0FD3PCQKH</a></td><td>shobido 粧美堂 ちいかわ 吸水マルチケース トラベルシリーズ chi</td><td>SHOBIDO(ショービドー)</td><td>2,400</td><td>100</td><td>3</td><td><strong>1,100</strong></td><td>1,100</td><td>1,120</td><td>25</td><td>10</td><td>高</td><td>ブランド系＝制限の可能性高 / 出品者3社＝上限ぎりぎり / キャラクター＝知財リスク</td></tr>
+<tr><td>14</td><td><a href="https://www.amazon.co.jp/dp/B0D9LD96QV" target="_blank" rel="noopener">B0D9LD96QV</a></td><td>【まとめ買い】 スクラビングバブル 流せるトイレブラシ ホワイトブロッサムの</td><td>ノーブランド品</td><td>2,980</td><td>500</td><td>2</td><td><strong>1,571</strong></td><td>1,667</td><td>1,571</td><td>167</td><td>10</td><td>中</td><td>—</td></tr>
+<tr><td>15</td><td><a href="https://www.amazon.co.jp/dp/B0D8KPJ18N" target="_blank" rel="noopener">B0D8KPJ18N</a></td><td>シーリングファンライト E26 【壁スイッチ断電記憶 】ファン付き照明 4.</td><td>慧光 (EKOU)</td><td>2,380</td><td>500</td><td>2</td><td><strong>1,135</strong></td><td>1,135</td><td>1,159</td><td>167</td><td>10</td><td>中</td><td>PSE要確認</td></tr>
+<tr><td>16</td><td><a href="https://www.amazon.co.jp/dp/B0FHQ3PDGV" target="_blank" rel="noopener">B0FHQ3PDGV</a></td><td>防災NET 携帯浄水器 防災グッズ 防災 災害用 備蓄 【日本正規品】</td><td>防災NET</td><td>3,980</td><td>400</td><td>2</td><td><strong>2,308</strong></td><td>2,604</td><td>2,308</td><td>133</td><td>10</td><td>中</td><td>—</td></tr>
+<tr><td>17</td><td><a href="https://www.amazon.co.jp/dp/B0FLJZ2M2G" target="_blank" rel="noopener">B0FLJZ2M2G</a></td><td>【快適な眠りへ・介護専門家推薦】 Tillmulya 三角クッション 三角枕</td><td>Tillmulya(ティルマヤ)</td><td>4,980</td><td>500</td><td>3</td><td><strong>2,881</strong></td><td>3,377</td><td>2,881</td><td>125</td><td>10</td><td>中</td><td>出品者3社＝上限ぎりぎり</td></tr>
+<tr><td>18</td><td><a href="https://www.amazon.co.jp/dp/B0D9N9231T" target="_blank" rel="noopener">B0D9N9231T</a></td><td>WAQ High Power Air Pump 電動ポンプ エアポンプ 電動</td><td>WAQ(ワック)</td><td>4,482</td><td>300</td><td>2</td><td><strong>2,406</strong></td><td>2,802</td><td>2,406</td><td>100</td><td>10</td><td>中</td><td>PSE要確認</td></tr>
+<tr><td>19</td><td><a href="https://www.amazon.co.jp/dp/B0FMXLFN4V" target="_blank" rel="noopener">B0FMXLFN4V</a></td><td>【プロ品質の万能肥料】観葉植物 水耕栽培 粉末 肥料 栄養剤 液体肥料 自然</td><td>自然暮らし</td><td>2,533</td><td>300</td><td>3</td><td><strong>1,182</strong></td><td>1,188</td><td>1,182</td><td>75</td><td>10</td><td>中</td><td>出品者3社＝上限ぎりぎり / FBA危険物＝SDS要</td></tr>
+<tr><td>20</td><td><a href="https://www.amazon.co.jp/dp/B0B7RQ1VWS" target="_blank" rel="noopener">B0B7RQ1VWS</a></td><td>害虫害獣まとめて解決！「ヒトデdeでんでん」2袋 1kg 忌避剤 忌避 害獣</td><td>快適生活</td><td>3,800</td><td>200</td><td>2</td><td><strong>1,971</strong></td><td>2,231</td><td>1,971</td><td>67</td><td>10</td><td>中</td><td>FBA危険物＝SDS要</td></tr>
+<tr><td>21</td><td><a href="https://www.amazon.co.jp/dp/B0FWCJMNNN" target="_blank" rel="noopener">B0FWCJMNNN</a></td><td>[魔法小屋] 椅子クッション チェアパッド お尻が痛くならない座布団 いす用</td><td>魔法小屋</td><td>3,116</td><td>200</td><td>2</td><td><strong>1,492</strong></td><td>1,616</td><td>1,492</td><td>67</td><td>10</td><td>中</td><td>—</td></tr>
+<tr><td>22</td><td><a href="https://www.amazon.co.jp/dp/B0BTY927CB" target="_blank" rel="noopener">B0BTY927CB</a></td><td>[あめてまり] たとう紙 10枚 83cm 大サイズ 日本製 金菊柄 薄紙付</td><td>あめてまり</td><td>2,450</td><td>200</td><td>2</td><td><strong>1,251</strong></td><td>1,251</td><td>1,261</td><td>67</td><td>10</td><td>中</td><td>—</td></tr>
+<tr><td>23</td><td><a href="https://www.amazon.co.jp/dp/B09SP8LYFS" target="_blank" rel="noopener">B09SP8LYFS</a></td><td>八番屋 マキタ掃除機スタンド クリーナースタンド 掃除機スタンド 掃除機収納</td><td>八番屋</td><td>2,150</td><td>200</td><td>2</td><td><strong>931</strong></td><td>931</td><td>1,001</td><td>67</td><td>10</td><td>中</td><td>PSE要確認</td></tr>
+<tr><td>24</td><td><a href="https://www.amazon.co.jp/dp/B0BSKW371H" target="_blank" rel="noopener">B0BSKW371H</a></td><td>コダック コンパクトデジタルカメラ FZ45 単三電池式 (ブラック, 電池</td><td>ノーブランド品</td><td>19,800</td><td>100</td><td>2</td><td><strong>13,580</strong></td><td>17,040</td><td>13,580</td><td>33</td><td>10</td><td>中</td><td>—</td></tr>
+<tr><td>25</td><td><a href="https://www.amazon.co.jp/dp/B0BSKXSK6V" target="_blank" rel="noopener">B0BSKXSK6V</a></td><td>Kodak コダック デジタルカメラ FZ45 単三電池式 (ブラック)</td><td>ノーブランド品</td><td>17,700</td><td>100</td><td>2</td><td><strong>12,109</strong></td><td>15,149</td><td>12,109</td><td>33</td><td>10</td><td>中</td><td>—</td></tr>
+<tr><td>26</td><td><a href="https://www.amazon.co.jp/dp/B0FJ2PMDM9" target="_blank" rel="noopener">B0FJ2PMDM9</a></td><td>【 接触冷感 夏用 】 ヒツジのいらないシーツ ーアイス・ブレイク 爽涼ー</td><td>ヒツジのいらない枕</td><td>16,000</td><td>100</td><td>2</td><td><strong>9,465</strong></td><td>12,165</td><td>9,465</td><td>33</td><td>10</td><td>中</td><td>—</td></tr>
+<tr><td>27</td><td><a href="https://www.amazon.co.jp/dp/B0FWBK6TWR" target="_blank" rel="noopener">B0FWBK6TWR</a></td><td>ヒツジのいらない尻枕 椅子 クッション 厚め 座布団 2層構造 ジェルクッシ</td><td>ヒツジのいらない枕</td><td>15,800</td><td>100</td><td>2</td><td><strong>9,182</strong></td><td>11,842</td><td>9,182</td><td>33</td><td>10</td><td>中</td><td>—</td></tr>
+<tr><td>28</td><td><a href="https://www.amazon.co.jp/dp/B0F1C4Z55X" target="_blank" rel="noopener">B0F1C4Z55X</a></td><td>子ヒツジのいらない枕 子供用枕 枕 低め 子供 大人兼用 低い枕 ジュニア</td><td>ヒツジのいらない枕</td><td>12,800</td><td>100</td><td>2</td><td><strong>7,396</strong></td><td>9,456</td><td>7,396</td><td>33</td><td>10</td><td>中</td><td>—</td></tr>
+<tr><td>29</td><td><a href="https://www.amazon.co.jp/dp/B0FC1MSSMK" target="_blank" rel="noopener">B0FC1MSSMK</a></td><td>EPA認証済み ＵＤＡＰ 熊撃退スプレー ホルスター付 （アメリカ森林警備隊</td><td>スペシャルギフト</td><td>9,000</td><td>100</td><td>2</td><td><strong>5,750</strong></td><td>7,050</td><td>5,750</td><td>33</td><td>10</td><td>中</td><td>FBA危険物＝SDS要</td></tr>
+<tr><td>30</td><td><a href="https://www.amazon.co.jp/dp/B0BY84LRVB" target="_blank" rel="noopener">B0BY84LRVB</a></td><td>パワーブリーズ POWERbreathe PLUS 呼吸筋トレーニング器具</td><td>パワーブリーズ(POWER BREATHE)</td><td>8,999</td><td>100</td><td>2</td><td><strong>5,749</strong></td><td>7,049</td><td>5,749</td><td>33</td><td>10</td><td>中</td><td>—</td></tr>
+</tbody></table>
+<p>列の意味：<strong>カート価格</strong>＝現在の新品カート価格（取れない場合は新品最安）／<strong>想定月間取り分</strong>＝monthlySold ÷（出品者数+1）／<strong>卸見込み</strong>＝高（一般流通の国内メーカー）・中（国内中小メーカー層）。<strong>低（Amazon専業ブランドの疑い）は載せていません</strong>。<strong>ゲート確認は全件「要」</strong>（出品制限は実機で確かめる以外に判定手段が無いため。CSV に列があります）</p>
+<h2>前提の修正：本体不在の判定を当て直しました</h2>
+<p>既存の <code>04_候補ASIN_ゲート実機確認リスト.csv</code>（N=68）は <strong><code>availabilityAmazon = -1</code>（いまの在庫状況）</strong>で絞ったものです。</p>
+<p>本体が今日たまたま在庫切れでも、1年ずっと売っていた商品は<strong>復活してカートを奪う</strong>ので、この条件では候補が過大に残ります（実測で93%過大）。</p>
+<p>本リストは <strong><code>outOfStockPercentage365</code>（過去365日のうち本体が在庫切れだった割合）が95%以上</strong>を通過条件にしています。表の全30件が <strong>100%</strong>、つまり<strong>1年間ずっと Amazon 本体が不在</strong>です。</p>
+<h2>絞り込みの通過数（母集団 4,002 ASIN）</h2>
+<table><thead><tr><th>段</th><th>条件</th><th>残った件数</th></tr></thead><tbody>
+<tr><td>1</td><td>全件</td><td>4,002</td></tr>
+<tr><td>2</td><td>対象カテゴリ</td><td>3,141</td></tr>
+<tr><td>3</td><td>実売2000+</td><td>2,748</td></tr>
+<tr><td>4</td><td>monthlySold100+</td><td>381</td></tr>
+<tr><td>5</td><td>本体365日不在</td><td>351</td></tr>
+<tr><td>6</td><td>出品者3社以下</td><td>310</td></tr>
+<tr><td>7</td><td>上限が正</td><td>306</td></tr>
+<tr><td>8</td><td>対象カテゴリ（日用品・キッチン・雑貨・文具・小型家電・肌着/衣類雑貨）に限定</td><td>237</td></tr>
+<tr><td>9</td><td>卸に載る見込みが 高/中 のものだけ＋色サイズ違いの重複を1本に寄せる</td><td>30</td></tr>
+</tbody></table>
+<h2>感度（条件を緩めると何件になるか）</h2>
+<p>対象カテゴリに限定した状態で、条件を1つだけ動かしたときの件数です。<strong>社長の判断材料</strong>として置きます。</p>
+<table><thead><tr><th>動かす条件</th><th>件数</th></tr></thead><tbody>
+<tr><td>基準どおり（この成果物の条件）</td><td>237</td></tr>
+<tr><td>新品出品者 3社 → 6社</td><td>264</td></tr>
+<tr><td>monthlySold 100 → 50</td><td>502</td></tr>
+<tr><td>本体の365日在庫率 95% → 80%</td><td>238</td></tr>
+<tr><td>本体の条件をまるごと外す</td><td>243</td></tr>
+<tr><td>粗利 500円 → 300円</td><td>237</td></tr>
+<tr><td>実売 2,000円 → 1,500円</td><td>292</td></tr>
+<tr><td>対象カテゴリの限定をやめる（全カテゴリ）</td><td>354</td></tr>
+</tbody></table>
+<p>いちばん効くのは<strong>出品者数</strong>と<strong>カテゴリ限定</strong>です。母数を増やしたいなら「出品者6社まで許す」が最も素直で、逆に<strong>本体の条件を緩めるのは勧めません</strong>（復活リスクを買うことになり、上の93%過大がそのまま戻ります）。</p>
+<h2>正直な穴（4つ）</h2>
+<ol>
+<li style='margin-left:0.0em'><strong>価格と出品者数は 2026-08-21 時点</strong>です。トークン上限300の制約で、母集団は既存の保存データ（4,002 ASIN・8/21取得）を再集計して作りました。<strong>発注前に対象行だけカート価格と出品者数を見直してください</strong>（5週間で価格は動きます）。上限価格は売価から機械的に出るので、売価を入れ直せば <code>calc/profit.py</code> がそのまま再計算します</li>
+<li style='margin-left:0.0em'><strong><code>monthlySold</code> は階級値の下限</strong>です（100 は「100〜199」）。想定月間取り分は<strong>下限見積り</strong>で、上振れはしても下振れはしにくい側です</li>
+<li style='margin-left:0.0em'><strong>卸サイト側の在庫は照合していません。</strong> 本成果物の仕事は「Amazon 側で条件を通る棚を名指しする」ところまでです。「卸見込み」はブランドの流通形態からの<strong>推定（主観）</strong>で、実在確認ではありません</li>
+<li style='margin-left:0.0em'><strong>ゲート（出品制限）は未確認</strong>です。表の「卸見込み 高」のうちブランド系（ナイキ／ニューエラ／モンベル／ビームスボーイ／マリークヮント／粧美堂）は制限に当たる可能性が高い側です。<strong>セラーセントラルの実機確認が先</strong>です</li>
+</ol>
+<h2>Keepa トークン</h2>
+<table><thead><tr><th>項目</th><th>値</th></tr></thead><tbody>
+<tr><td>使用</td><td><strong>298</strong>（上限300以内）</td></tr>
+<tr><td>残（実行後）</td><td>891</td></tr>
+<tr><td>内訳</td><td>フィールド名の実測検証 222 ／ Product Finder 11 ／ 商品詳細 65件 65</td></tr>
+</tbody></table>
+<p>フィールド名の検証に222トークンを使ったのは、<strong>綴りを間違えたフィルタは Keepa がエラーを返さず黙って無視する</strong>ためです（<code>totalResults</code> の変化で1つずつ確かめました）。判明した事実を2つ残します。</p>
+<ul>
+<li style='margin-left:0.0em'><code>current_AMAZON_lte = -1</code> <strong>だけでは0件になる</strong>。<code>gte</code> と <code>lte</code> を両方 -1 にする必要がある</li>
+<li style='margin-left:0.0em'><code>outOfStockPercentage365</code> 系・<code>availabilityAmazon</code> 系は <strong>Product Finder では効かない</strong>（存在しないフィールドと同じ挙動）。365日の在庫率で絞るには、Finder で前絞りしてから商品詳細を取って後段で判定するしかない</li>
+</ul>
+<h2>次の一手</h2>
+<ol>
+<li style='margin-left:0.0em'>上表を SD / NETSEA で上から照合（上限以下で買えるか）。1件でも通れば初回発注へ</li>
+<li style='margin-left:0.0em'>通った行だけ、カート価格と出品者数を再取得して上限を引き直す（Keepa 契約は 10/3 まで）</li>
+<li style='margin-left:0.0em'>ゲート確認をセラーセントラルで実施（全件「要」）</li>
+</ol>
+</body></html>
