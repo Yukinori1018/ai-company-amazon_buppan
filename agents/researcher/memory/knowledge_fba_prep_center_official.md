@@ -43,3 +43,8 @@
 - Studio.Design（`<meta name="generator" content="Studio.Design">`）製サイトは本文がJS生成。**Googlebot UA／Nuxt `_payload.json`／`storage.googleapis.com/studio-publish/...` バケット／Wayback の4経路すべて失敗**。この generator を見たら早期に「機械取得不可」と判定して時間を使わない。
 - 一方 WordPress 系（タイシン・FBA代行センター・Hakata B-Logi）は素の curl + 正規表現タグ剥がしで全文取れる。
 - 各社の「よくある質問」は料金ページより情報量が多い（最低ロット・契約種別・対応不可品目・免責は大抵FAQにある）。**料金ページだけ見て終わらない。**
+
+
+## 追記（2026-09-30）
+- 「Studio.Design は機械取得不可」は誤り。Mac の Chrome を headless で `--dump-dom` すれば取れた。最新の14社比較は knowledge_fba_prep_center_selection_2026-09.md。
+- びーぷらすの荷受確認は 2026-08-24 に 30円/SKU へ改定。上の表の10円は古い。

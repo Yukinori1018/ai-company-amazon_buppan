@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FBA納品代行 公式値ファクトシート（14社＋自社ルート）</title>
+<meta name="robots" content="noindex, nofollow">
+<style>
+:root{
+  color-scheme: light dark;
+  --bg:#ffffff; --surface:#f5f7f9; --surface2:#eceff3;
+  --text:#1b1f24; --muted:#525b66; --faint:#6c7681;
+  --border:#d5dae1; --border-strong:#b8c0ca;
+  --accent:#1c5b86; --accent-bg:#eef5fa;
+  --warn:#8a4b00; --warn-bg:#fdf1df; --warn-border:#dd9a3c;
+  --alert:#7d2b2b; --alert-bg:#fbeeee; --alert-border:#d08b8b;
+  --ok:#1b6144; --ok-bg:#eaf4ef; --ok-border:#8ab9a3;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#15181c; --surface:#1d2126; --surface2:#252a31;
+    --text:#e4e8ec; --muted:#aab4bf; --faint:#949eaa;
+    --border:#333a43; --border-strong:#48515c;
+    --accent:#79b4dc; --accent-bg:#1a2a36;
+    --warn:#f0b866; --warn-bg:#332616; --warn-border:#7a5a2a;
+    --alert:#e79a9a; --alert-bg:#331e1e; --alert-border:#6e4040;
+    --ok:#84cfa9; --ok-bg:#17281f; --ok-border:#3c6450;
+  }
+}
+*{box-sizing:border-box;}
+html{ -webkit-text-size-adjust:100%; }
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic Medium","Yu Gothic",
+              "Noto Sans JP","Meiryo",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:16px; line-height:1.85;
+  font-feature-settings:"palt" 1;
+  text-align:left;
+}
+.wrap{max-width:900px; margin:0 auto; padding:32px 20px 96px;}
+
+/* ---------- header ---------- */
+.kicker{
+  font-size:12px; letter-spacing:.14em; color:var(--faint);
+  margin:0 0 10px; font-variant-numeric:tabular-nums;
+}
+h1{
+  font-size:27px; line-height:1.5; margin:0 0 20px;
+  letter-spacing:.01em; font-weight:700; text-wrap:balance;
+}
+.lead{
+  margin:0; color:var(--muted); font-size:15px; line-height:1.8;
+  border-left:3px solid var(--border-strong); padding:2px 0 2px 14px;
+}
+
+/* ---------- kpi カード ---------- */
+.kpis{display:flex; flex-wrap:wrap; gap:10px; margin:1.1em 0 1.2em;}
+.kpi{
+  flex:1 1 150px; min-width:150px;
+  border:1px solid var(--border-strong); border-radius:10px;
+  background:var(--bg); padding:12px 14px 13px;
+}
+.kpi-l{margin:0; font-size:13px; line-height:1.5; color:var(--muted); letter-spacing:.02em;}
+.kpi-v{
+  margin:.1em 0 0; font-size:32px; line-height:1.25; font-weight:700;
+  letter-spacing:-.01em; font-variant-numeric:tabular-nums;
+}
+@media (max-width:520px){
+  .kpi{flex:1 1 100%;}
+  .kpi-v{font-size:27px;}
+}
+
+/* ---------- toc ---------- */
+.toc{
+  margin:30px 0 8px; padding:18px 22px 20px;
+  background:var(--surface); border:1px solid var(--border); border-radius:10px;
+}
+.toc-h{
+  margin:0 0 10px; font-size:13px; font-weight:700;
+  letter-spacing:.1em; color:var(--muted);
+}
+.toc ul.toc-list{margin:0; padding:0; list-style:none;}
+.toc li{margin:.26em 0; line-height:1.65;}
+.toc li.toc-lv1{margin:.85em 0 .3em; font-weight:700;}
+.toc li.toc-lv1:first-child{margin-top:0;}
+.toc li.toc-lv2{padding-left:1.1em;}
+.toc li.toc-lv3{padding-left:2.5em; font-size:14.5px; color:var(--muted); margin:.16em 0;}
+.toc li.toc-lv3::before{content:"–"; color:var(--faint); margin-right:.45em;}
+.toc a{color:var(--accent); text-decoration:none; border-bottom:1px solid transparent;}
+.toc a:hover{border-bottom-color:currentColor;}
+
+/* ---------- part ---------- */
+h1.part{
+  font-size:24px; line-height:1.5; font-weight:700; letter-spacing:.02em;
+  margin:64px 0 8px; padding:14px 0 0; border-top:4px solid var(--text);
+  scroll-margin-top:16px;
+}
+
+/* ---------- sections ---------- */
+.sec{margin:0;}
+.sec>*:last-child{margin-bottom:0;}
+h2{
+  font-size:21px; line-height:1.5; margin:46px 0 16px; padding-bottom:9px;
+  border-bottom:2px solid var(--border-strong); font-weight:700;
+  scroll-margin-top:16px;
+}
+h3{
+  font-size:17px; line-height:1.6; margin:32px 0 12px; font-weight:700;
+  color:var(--text); scroll-margin-top:16px;
+}
+h3::before{content:""; display:inline-block; width:4px; height:1em;
+  background:var(--accent); margin-right:9px; vertical-align:-.13em; border-radius:2px;}
+p{margin:0 0 1.1em;}
+ul,ol{margin:0 0 1.2em; padding-left:1.6em;}
+li{margin:.4em 0;}
+li>ul{margin:.45em 0 .2em;}
+blockquote{
+  margin:0 0 1.2em; padding:14px 18px;
+  background:var(--surface); border-left:4px solid var(--accent); border-radius:0 8px 8px 0;
+}
+blockquote p{margin:0;}
+hr.rule{
+  border:0; border-top:1px solid var(--border);
+  margin:40px 0 0; opacity:.55;
+}
+hr.rule:has(+ .sec-box),hr.rule:has(+ h1.part){display:none;}
+
+/* ---------- tables ---------- */
+.tw{
+  overflow-x:auto; -webkit-overflow-scrolling:touch;
+  margin:0 0 1.4em; border:1px solid var(--border); border-radius:9px;
+  background:
+    linear-gradient(to right, var(--bg) 30%, rgba(0,0,0,0)) left / 28px 100% no-repeat local,
+    linear-gradient(to left,  var(--bg) 30%, rgba(0,0,0,0)) right / 28px 100% no-repeat local,
+    radial-gradient(farthest-side at 0 50%, rgba(90,110,130,.28), rgba(0,0,0,0)) left / 12px 100% no-repeat scroll,
+    radial-gradient(farthest-side at 100% 50%, rgba(90,110,130,.28), rgba(0,0,0,0)) right / 12px 100% no-repeat scroll;
+}
+.tw:focus{outline:2px solid var(--accent); outline-offset:2px;}
+table{border-collapse:collapse; width:100%; font-size:14.5px; line-height:1.72;}
+thead th{
+  background:var(--surface2); text-align:left; font-weight:700;
+  padding:11px 14px; border-bottom:2px solid var(--border-strong);
+  white-space:nowrap; vertical-align:bottom;
+}
+tbody td{padding:11px 14px; border-bottom:1px solid var(--border); vertical-align:top;
+  overflow-wrap:anywhere;}
+tbody tr:last-child td{border-bottom:0;}
+tbody tr:nth-child(even){background:color-mix(in srgb, var(--surface) 55%, transparent);}
+tbody td:first-child{font-weight:600;}
+thead th:first-child,tbody td:first-child{min-width:7.5em;}
+thead th:last-child,tbody td:last-child{white-space:normal;}
+
+/* ---------- inline markers ---------- */
+.ref{
+  font-size:.75em; color:var(--faint); margin-left:.15em;
+  white-space:nowrap; font-variant-numeric:tabular-nums;
+  letter-spacing:.01em; vertical-align:.06em;
+}
+/* [#n] は出典表に行がある時だけリンクになる。見た目は span と同じにして
+   本文の印象を変えない（追加したのは移動手段だけで、文字は足していない） */
+a.ref{text-decoration:none;}
+a.ref:hover,a.ref:focus{color:var(--accent); text-decoration:underline;}
+.chk{
+  display:inline-block; font-size:.75em; line-height:1.5;
+  padding:0 .5em; margin:0 .12em; border-radius:4px;
+  background:var(--warn-bg); color:var(--warn);
+  border:1px solid var(--warn-border); font-weight:700;
+  white-space:nowrap; vertical-align:.09em;
+}
+
+/* ---------- inline emphasis ---------- */
+strong{font-weight:700; color:var(--text);}
+td strong,th strong{font-weight:700;}
+pre.codeblock{white-space:pre-wrap; word-break:break-all; background:rgba(127,127,127,.10); border:1px solid rgba(127,127,127,.35); border-radius:6px; padding:14px 16px; line-height:1.7; font-size:14px; overflow-x:auto;}
+pre.codeblock code{background:none; border:0; padding:0; font-size:inherit;}
+code{
+  font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+  font-size:.9em; padding:.05em .35em; border-radius:4px;
+  background:var(--surface2); border:1px solid var(--border);
+}
+code .chk{font-family:inherit;}
+
+/* ---------- 表セル内の語ハイライト ---------- */
+.pill{
+  display:inline-block; padding:0 .45em; border-radius:4px;
+  font-weight:700; white-space:nowrap;
+}
+.pill-danger{background:var(--alert); color:#fff; border:1px solid var(--alert);}
+.pill-warn{background:var(--warn-bg); color:var(--warn); border:1px solid var(--warn-border);}
+.pill-ok{background:var(--ok-bg); color:var(--ok); border:1px solid var(--ok-border);}
+.pill-info{background:var(--accent-bg); color:var(--accent); border:1px solid var(--accent);}
+/* muted は「検証していない」を表す。塗らず・破線で、済んだものと視覚的に別系統にする */
+.pill-muted{background:transparent; color:var(--faint);
+  border:1px dashed var(--border-strong); font-weight:600;}
+tbody tr.row-danger td:first-child{box-shadow:inset 4px 0 0 var(--alert);}
+tbody tr.row-danger td{background:color-mix(in srgb, var(--alert-bg) 70%, transparent);}
+
+/* ---------- 出典一覧（--reftable） ---------- */
+table.reftable:has(colgroup){table-layout:fixed; min-width:600px;}
+/* --colwidths で列幅を固定した表。狭い画面の溢れは .tw の横スクロールが受ける */
+table.fixedcols{table-layout:fixed; min-width:620px;}
+/* 狭い画面で列が1〜2文字幅に潰れるのを防ぐ。溢れは .tw の横スクロールが受ける */
+table.reftable td:first-child{
+  min-width:2.6em; width:2.6em; text-align:right; white-space:nowrap;
+  font-variant-numeric:tabular-nums; color:var(--muted);
+}
+table.reftable th:first-child{min-width:2.6em; width:2.6em; text-align:right;}
+tbody tr[id]{scroll-margin-top:14px;}
+tbody tr[id]:target td{background:var(--accent-bg);}
+tbody tr[id]:target td:first-child{box-shadow:inset 4px 0 0 var(--accent); color:var(--accent);}
+
+/* ---------- emphasised sections ---------- */
+.sec-box{
+  margin:28px 0 0; padding:6px 26px 20px;
+  border:1px solid var(--border-strong); border-radius:10px;
+}
+.sec-box h2{margin-top:26px;}
+.sec-box .tw{background-color:var(--bg);}
+.sec-conclusion{background:var(--accent-bg); border-left:6px solid var(--accent);}
+.sec-conclusion h2{border-bottom-color:var(--accent);}
+.sec-alert{background:var(--alert-bg); border-color:var(--alert-border);
+  border-left:6px solid var(--alert);}
+.sec-alert h2{border-bottom-color:var(--alert-border);}
+.sec-danger{background:var(--alert-bg); border:2px solid var(--alert);
+  border-left:10px solid var(--alert);}
+.sec-danger h2{border-bottom-color:var(--alert);}
+.sec-warn{background:var(--warn-bg); border-color:var(--warn-border);
+  border-left:6px solid var(--warn-border);}
+.sec-warn h2{border-bottom-color:var(--warn-border);}
+.sec-checklist{background:var(--surface); border:2px solid var(--border-strong);
+  border-left:10px solid var(--accent);}
+.sec-checklist h2{border-bottom-color:var(--accent);}
+/* チェックリストは印刷して手元で使う。番号は原稿どおり残し、記入欄だけ CSS で足す */
+.sec-checklist ol{list-style:decimal; padding-left:1.9em;}
+.sec-checklist ol>li{margin:.7em 0; padding-left:2.1em; position:relative;}
+.sec-checklist ol>li::before{
+  content:""; position:absolute; left:0; top:.25em;
+  width:1.15em; height:1.15em; border:1.5px solid var(--border-strong);
+  border-radius:3px; background:var(--bg);
+}
+
+/* ---------- toc: 囲み枠の節は目次でも色を付ける ---------- */
+.toc a.toc-danger,.toc a.toc-alert{color:var(--alert); font-weight:700;}
+.toc a.toc-warn{color:var(--warn); font-weight:700;}
+.toc a.toc-checklist{color:var(--accent); font-weight:700;}
+
+/* ---------- footer / nav ---------- */
+.prov{
+  margin:56px 0 0; padding-top:16px; border-top:1px solid var(--border);
+  font-size:12.5px; line-height:1.8; color:var(--faint); word-break:break-all;
+}
+.top{
+  position:fixed; right:18px; bottom:18px; z-index:5;
+  display:block; width:42px; height:42px; line-height:40px; text-align:center;
+  border-radius:50%; text-decoration:none; font-size:17px;
+  background:var(--surface); color:var(--muted);
+  border:1px solid var(--border-strong);
+  box-shadow:0 2px 8px rgba(0,0,0,.14);
+}
+.top:hover{color:var(--accent); border-color:var(--accent);}
+
+/* ---------- narrow screens ---------- */
+@media (max-width:640px){
+  body{font-size:15.5px;}
+  .wrap{padding:22px 14px 88px;}
+  h1{font-size:22px;}
+  h1.part{font-size:20px; margin-top:46px;}
+  h2{font-size:19px;}
+  h3{font-size:16.5px;}
+  .toc{padding:14px 16px 16px;}
+  .sec-box{padding:4px 14px 14px;}
+  table{font-size:14px;}
+  thead th,tbody td{padding:9px 11px;}
+}
+
+/* ---------- print ---------- */
+@media print{
+  :root{
+    --bg:#fff; --surface:#fff; --surface2:#fff; --text:#000; --muted:#333; --faint:#555;
+    --border:#999; --border-strong:#555; --accent:#000; --accent-bg:#fff;
+    --warn:#000; --warn-bg:#fff; --warn-border:#000;
+    --alert:#000; --alert-bg:#fff; --alert-border:#000;
+  }
+  body{background:#fff; color:#000; font-size:10.5pt; line-height:1.7;}
+  .wrap{max-width:none; padding:0;}
+  a{color:#000; text-decoration:none;}
+  .top{display:none;}
+  .tw{overflow:visible; background:none; border:1px solid #999;}
+  table{font-size:9pt;}
+  thead th{background:#fff; border-bottom:1.5pt solid #000;}
+  tbody tr:nth-child(even){background:#fff;}
+  .sec-box{background:#fff; border:1.5pt solid #000;}
+  .sec-danger{border:2.5pt solid #000; border-left:2.5pt solid #000;}
+  .chk{background:#fff; color:#000; border:1pt solid #000;}
+  pre.codeblock{background:#fff; border:1px solid #999; break-inside:avoid;}
+  code{background:#fff; border:1px solid #999;}
+  .pill{background:#fff!important; color:#000!important; border:1.2pt solid #000!important;}
+  /* 未検証は印刷でも「済んだもの」と別に見えなければ意味がない。
+     モノクロでは色が消えるので、破線と濃度で差を残す */
+  .pill-muted{border:1pt dashed #666!important; color:#555!important; font-weight:400!important;}
+  /* 長いURLは印刷で紙幅を超える。折り返しを許可して溢れを止める */
+  .tw{overflow:hidden;}
+  table{table-layout:auto; width:100%;}
+  tbody td{overflow-wrap:anywhere; word-break:break-word;}
+  thead th{white-space:normal;}
+  table.reftable{font-size:7.6pt; line-height:1.5;}
+  table.reftable thead th,table.reftable tbody td{padding:5px 6px;}
+  tbody tr[id]:target td{background:#fff;}
+  tbody tr.row-danger td{background:#fff;}
+  tbody tr.row-danger td:first-child{box-shadow:inset 3pt 0 0 #000;}
+  /* チェックリストは1枚で手元に置けるよう独立ページにする */
+  .sec-checklist{break-before:page; page-break-before:always;
+    border:1.5pt solid #000; border-left:1.5pt solid #000;}
+  .sec-checklist ol>li::before{border:1.2pt solid #000;}
+  .ref{color:#555; opacity:1;}
+  blockquote{background:#fff; border-left:3pt solid #000;}
+  h1.part{break-before:page; page-break-before:always; border-top:2.5pt solid #000;
+    font-size:15pt; margin-top:0;}
+  h1.part,h2,h3{break-after:avoid; page-break-after:avoid;}
+  .tw,blockquote,tr{break-inside:avoid; page-break-inside:avoid;}
+  .toc{border:1px solid #999; background:#fff;}
+  .kpi{border:1pt solid #000; background:#fff; break-inside:avoid;}
+  .kpi-v{font-size:16pt;}
+}
+</style>
+</head>
+<body id="top">
+<div class="wrap">
+<p class="kicker">T-20260929-001</p>
+<h1>FBA納品代行 公式値ファクトシート（14社＋自社ルート）</h1>
+
+<nav class="toc" aria-label="目次"><p class="toc-h">目次</p><ul class="toc-list"><li class="toc-lv2"><a href="#s1">0. イシューと打ち切り条件</a></li><li class="toc-lv2"><a href="#s2" class="toc-conclusion">1. 結論（3行）</a></li><li class="toc-lv2"><a href="#s3">2. 8/21 から変わった事実</a></li><li class="toc-lv2"><a href="#s4">3. 候補一覧（要約）</a></li><li class="toc-lv2"><a href="#s5">4. 詳細比較（公式記載のみ）</a></li><li class="toc-lv3"><a href="#s5-1">4-1. 費用</a></li><li class="toc-lv3"><a href="#s5-2">4-2. FC までの送料の扱い</a></li><li class="toc-lv3"><a href="#s5-3">4-3. 受け入れ条件・品目・加工</a></li><li class="toc-lv3"><a href="#s5-4">4-4. 運用（連携方式・日数・受け取り・納品書）</a></li><li class="toc-lv2"><a href="#s6">5. 初回ロットの着地コスト（12点・1SKU・1箱）</a></li><li class="toc-lv3"><a href="#s6-1">5-1. 初回（1回目）</a></li><li class="toc-lv3"><a href="#s6-2">5-2. 規模が上がった場合（月100点・5SKU・2箱・継続月）</a></li><li class="toc-lv3"><a href="#s6-3">5-3. 初回ロットだけにかかる制約</a></li><li class="toc-lv2"><a href="#s7">6. 成功者が実際に使っている型</a></li><li class="toc-lv2"><a href="#s8" class="toc-alert">7. 取れなかった・確認できなかった項目</a></li><li class="toc-lv2"><a href="#s9">8. 出典一覧（取得日 2026-09-29〜30）</a></li></ul></nav>
+<ul><li>チケット：T-20260929-001（T-20260826-003 を吸収）</li><li>作成：サトル（リサーチャー）／2026-09-30</li><li>取得日：各社公式サイトはすべて <strong>2026-09-29〜30 取得</strong>（Amazon ラベル貼付料金のみ 2026-07-27 社長画面確認の既存記録）</li><li>出典の方針：<strong>各社の公式サイトのみ</strong>。第三者の比較記事・アグリゲータは値の出典にしていません。業者への問い合わせ・見積依頼・会員登録は一切していません（CLAUDE.md §4.1）</li><li>取得 HTML・画像の原本：<code>workspace/output/agent_output/T-20260929-001/sources/</code>（Git 管理外）</li></ul>
+<hr class="rule">
+<section id="s1" class="sec">
+<h2>0. イシューと打ち切り条件</h2>
+<ul><li><strong>イシュー</strong>：大口・初回12点（SD 経由・鍋1SKU）の当社が「主力1社＋併用枠」を選ぶのに必要な公式事実は揃っているか。どこが欠けているか。</li><li><strong>スコープ</strong>：既存9社の最新化（8/21 に未取得だったラクロジ・ロジスピを含む）＋新規5社。</li><li><strong>打ち切り</strong>：公式に書いていない項目は「記載なし」、見積制は「見積制」、取れなかったものは「未取得」で確定し、推測で埋めない。</li></ul>
+</section>
+<hr class="rule">
+<section id="s2" class="sec sec-box sec-conclusion">
+<h2>1. 結論（3行）</h2>
+<ol><li><strong>12点の初回は、社長宅受け（約1,390円・116円/点）と関東の就労支援2社（びーぷらす約1,290円・おりおん約1,400円）がほぼ同額。</strong>月額・登録料のある業者（福富・サポートBB・ラクロジ・ユニストック）は初回550〜890円/点で桁が違う。</li><li><strong>初回には固有の制約が2つある。</strong>①出品許可が下りるまで FBA 納品プランが作れない（推論・確度高）ので、仕入先から FC への直送は初回は成立しない。②SD の納品書は商品に同梱される（SD 公式）ので、代行倉庫に送ると申請書類が代行業者の手元に届く。<strong>納品書の回収を公式に料金化しているのは糸星（200円）と FBA代行センター（500円/回）だけ。</strong></li><li><strong>月100点規模では「仕入先→FC直送＋Amazonラベル貼付」22円/点が最安</strong>で、代行はびーぷらす36円・おりおん42円・タイシン57円/点が続く。メーカー仕入れの実践者（EC STARs Lab.）の推奨順も「メーカーにFBA直送 → 地元の就労支援施設 → 専門業者」。主力と併用の役割設計はタケシの領分です。</li></ol>
+</section>
+<hr class="rule">
+<section id="s3" class="sec">
+<h2>2. 8/21 から変わった事実</h2>
+<div class="tw" tabindex="0"><table><thead><tr><th>#</th><th>対象</th><th>8/21</th><th>9/29 公式</th><th>影響</th></tr></thead><tbody><tr><td>1</td><td>びーぷらすFBA</td><td>荷受確認 10円/SKU</td><td><strong>30円/SKU</strong>（ページ更新日 2026.08.24）</td><td>公開していた比較表の値が古くなっていた。本日修正</td></tr><tr><td>2</td><td>ラクロジ</td><td>未取得（JS描画で取れず）</td><td><strong>月額2,000円＋代行手数料が月5,000円未満なら+3,000円</strong>、単品40円</td><td>headless Chrome で取得できた</td></tr><tr><td>3</td><td>ロジスピ</td><td>未取得</td><td>保管4.5円/1,000cm³/月、FBA/RSL納品690円（単位の記載なし）、他は見積制</td><td>同上</td></tr><tr><td>4</td><td>当社の契約</td><td>小口</td><td><strong>大口（2026-09-12 切替）</strong></td><td>FBA代行センター・糸星の「大口のみ」は障害でなくなった</td></tr><tr><td>5</td><td>e-fba（当社の損益モデルが「月額0円」で採用中）</td><td>未調査</td><td><strong>月額0円だが保管料3,000円/月（基本スペース）の記載あり</strong></td><td>経理の前提（月額0円）は要確認。同じページ内でラベル単価も12円と50円の2表記</td></tr><tr><td>6</td><td>他6社（おりおん・糸星・タイシン・Hakata B-Logi・ユニストック・FBA代行センター）</td><td>—</td><td><strong>本文に差分なし</strong>（8/21 取得の HTML と行単位で照合）</td><td>8/21 の値をそのまま使える</td></tr></tbody></table></div>
+</section>
+<hr class="rule">
+<section id="s4" class="sec">
+<h2>3. 候補一覧（要約）</h2>
+<p>税の表記は各社の公式どおり。「—」は該当なし、「記載なし」は公式ページを確認したが書かれていないもの。</p>
+<div class="tw" tabindex="0"><table><thead><tr><th>業者</th><th>型・所在地</th><th>初期</th><th>月額固定</th><th>1点の作業費（何を含むか）</th><th>初回12点の着地</th><th>大口/小口</th><th>備考</th></tr></thead><tbody><tr><td>びーぷらすFBA</td><td>B型・東京杉並</td><td>なし</td><td>なし</td><td>ラベル10円＋荷受30円/SKU＋箱300円＋プラン10円/SKU、全額に<strong>5%加算</strong>（税別）</td><td>約1,290円</td><td>記載なし</td><td>権限付与でプラン作成</td></tr><tr><td>おりおんFBA</td><td>A型・東京立川</td><td>なし</td><td>なし</td><td>ラベル11円＋荷受22円/SKU＋箱370円〜＋プラン55円/SKU（税別）</td><td>約1,400円</td><td>記載なし</td><td>簡易検品は11円</td></tr><tr><td>糸星</td><td>B型・愛知</td><td>記載なし</td><td><strong>パレット3,000円（荷受に必須・初月無料）</strong></td><td>50円（プラン・ラベル・荷受込み）＋段ボール150/250円</td><td>約1,750円（2回目以降は約5,050円）</td><td>FAQで矛盾（Q2大口のみ／Q22小口可）</td><td>納品書をデータ化200円</td></tr><tr><td>タイシンFBA</td><td>斡旋・東京本部＋13事業所</td><td><strong>保証金50,000円（返還）</strong></td><td>なし</td><td>31.5円〜（検品・ラベル・箱詰・出荷込み）＋梱包250円/箱＋プラン150円</td><td>約1,620円</td><td>「内容による」</td><td>目安「140サイズ5箱×月2回以上」、少量は断る場合あり</td></tr><tr><td>Hakata B-Logi</td><td>B型・福岡</td><td>なし</td><td>なし</td><td><strong>見積制</strong>（掲載PDFは「表示確認用サンプル」）</td><td>未算出</td><td>記載なし</td><td>縛りなし・1箱数点可と明記</td></tr><tr><td>ユニストック</td><td>一般・福岡</td><td>記載なし</td><td><strong>5,000円</strong></td><td>100円（プラン・入荷・検品・ラベル・梱包込み）</td><td>約7,940円</td><td>記載なし</td><td>中古・温度管理品は不可</td></tr><tr><td>FBA代行センター</td><td>一般・埼玉</td><td>記載なし</td><td>一般会員0円（プレミアム4,900円）</td><td>100円（検品・値札剥がし・出品登録・プラン・ラベル込み、税抜）</td><td>約2,810円</td><td><strong>大口のみ</strong></td><td>納品書返送500円/回</td></tr><tr><td>ラクロジ（LOGEX）</td><td>一般・本社川崎／提携倉庫11拠点</td><td>記載なし</td><td><strong>2,000円（＋代行手数料5,000円未満なら3,000円）</strong></td><td>40円（検品・シール貼り込み）</td><td>約6,630円</td><td>記載なし</td><td>保管30日無料、支払は銀行振込</td></tr><tr><td>ロジスピ（ウィズリンクス）</td><td>一般・所在地記載なし</td><td>記載なし</td><td>記載なし</td><td><strong>見積制</strong>（FBA/RSL納品690円のみ掲載）</td><td>未算出</td><td>記載なし</td><td>FBA自動納品のシステム連携</td></tr><tr><td><strong>福富サポート</strong>（新規）</td><td>運送会社・大阪豊中</td><td><strong>3,000円</strong></td><td><strong>3,980円</strong></td><td>ラベル18円＋納品代行500円/ケース（税抜）</td><td>約10,670円（2回目以降は約7,370円）</td><td>記載なし</td><td>自社便で関西FCが安い</td></tr><tr><td><strong>サポートBB</strong>（新規）</td><td>一般・大阪摂津</td><td><strong>5,000円</strong></td><td><strong>2,480円</strong></td><td>ラベル18円＋納品代行300円/ケース</td><td>約10,230円（2回目以降は約4,730円）</td><td>記載なし</td><td>全国一律の自社送料</td></tr><tr><td><strong>JCC</strong>（新規）</td><td>一般・福岡大野城</td><td>スポット0円</td><td>スポット0円</td><td>スポット：44円（検品・ラベル込み）＋825円/ケース</td><td>約2,870円</td><td>記載なし</td><td><strong>セラセン権限付与が必須</strong></td></tr><tr><td><strong>e-fba</strong>（新規）</td><td>一般・愛知一宮</td><td>記載なし</td><td>0円（ただし保管3,000円/月の記載）</td><td>12円（資材込み・料金表）／50円（同ページ別記載）</td><td>約4,840円（保管料なしなら約1,540円）</td><td>記載なし</td><td>納品は「届いてから最長1か月以内」</td></tr><tr><td><strong>オープンロジ</strong>（新規）</td><td>一般・複数倉庫</td><td>0円</td><td>0円</td><td><strong>見積制</strong></td><td>未算出</td><td>記載なし</td><td>危険物・中古・生鮮は不可</td></tr></tbody></table></div>
+<blockquote><p>実践者の利用実績：福富サポートとサポートBBは EC STARs Lab. 公式ブログ（2026-08-03）が「比較的利用者が多い」と書いた2社です（§6）。月利100万円以上の実践者が業者名を挙げた一次発信は見つかりませんでした。</p></blockquote>
+</section>
+<hr class="rule">
+<section id="s5" class="sec">
+<h2>4. 詳細比較（公式記載のみ）</h2>
+<h3 id="s5-1">4-1. 費用</h3>
+<div class="tw" tabindex="0"><table><thead><tr><th>業者</th><th>初期</th><th>月額固定</th><th>保証金</th><th>検品</th><th>ラベル</th><th>箱・梱包</th><th>プラン作成</th><th>税</th></tr></thead><tbody><tr><td>びーぷらす</td><td>登録料なし</td><td>なし</td><td>記載なし</td><td>簡易無料／詳細20円</td><td>10円</td><td>300円/箱(〜15kg)・400円(〜25kg)、リサイクル箱無料、有料箱120:200/140:280/160:350円</td><td>10円/SKU</td><td>税別＋物価対応調整金5%</td></tr><tr><td>おりおん</td><td>登録料なし</td><td>なし</td><td>記載なし</td><td>簡易11円／詳細35円</td><td>11円</td><td>370/480/590/700円（〜10/15/20/25kg）</td><td>55円/SKU</td><td>税別</td></tr><tr><td>糸星</td><td>記載なし</td><td>パレット3,000円（必須）＋任意プランA500/B1,500/C5,000円</td><td>記載なし</td><td>単価に内包</td><td>単価に内包</td><td>段ボール100:150円・140:250円（リサイクル原則不可）</td><td>単価に内包</td><td>記載なし</td></tr><tr><td>タイシン</td><td>記載なし</td><td>なし（滞留在庫が多いと2,000円/月）</td><td><strong>50,000円（返還）</strong></td><td>単価に内包</td><td>25円（単体）／31.5円〜に内包</td><td>梱包250円/箱</td><td>150円/出荷</td><td>税別</td></tr><tr><td>Hakata B-Logi</td><td>登録料なし</td><td>なし</td><td>記載なし</td><td>見積制</td><td>見積制</td><td>見積制</td><td>見積制</td><td>—</td></tr><tr><td>ユニストック</td><td>記載なし</td><td>5,000円</td><td>記載なし</td><td>100円に内包</td><td>100円に内包</td><td>100円に内包</td><td>100円に内包</td><td>記載なし</td></tr><tr><td>FBA代行センター</td><td>記載なし</td><td>0円／プレミアム4,900円</td><td>記載なし（1回1万円超で前金の場合あり）</td><td>100円に内包</td><td>100円に内包</td><td>荷受50円/箱、段ボール200/250/300円</td><td>100円に内包</td><td>税抜</td></tr><tr><td>ラクロジ</td><td>記載なし</td><td>2,000円（＋条件付き3,000円）</td><td>記載なし</td><td>40円に内包</td><td>40円に内包</td><td>記載なし</td><td>無料</td><td>送料は税別と明記</td></tr><tr><td>ロジスピ</td><td>記載なし</td><td>記載なし</td><td>記載なし</td><td>見積制</td><td>見積制</td><td>見積制</td><td>システムで自動</td><td>—</td></tr><tr><td>福富サポート</td><td>3,000円</td><td>3,980円（利用なしでも請求）</td><td>記載なし</td><td>20種類まで無料</td><td>18円</td><td>500円/ケース（50点・25kgまで）、段ボール100〜220円</td><td>客が作成（B/Cプランは福富が作成・到着リスト20〜60円/個）</td><td>税抜</td></tr><tr><td>サポートBB</td><td>入会金5,000円</td><td>2,480円</td><td>記載なし</td><td>外観目視無料／開封20円〜</td><td>18円</td><td>300円/ケースまたは50点</td><td>客が作成</td><td>税抜（PC手数料欄に明記）</td></tr><tr><td>JCC</td><td>スポット0円／継続3,300円</td><td>スポット0円／継続3,080円</td><td>記載なし</td><td>44円（スポット）／39円（継続）に内包</td><td>同左</td><td>825円/ケース（スポット）／715円（継続）</td><td>JCCが作成</td><td>記載なし（3,080＝2,800×1.1 なので税込と推定）</td></tr><tr><td>e-fba</td><td>記載なし</td><td>0円＋保管3,000円/月</td><td>記載なし</td><td>記載なし</td><td>12円（資材込み）／別記50円</td><td>段ボール100・120:200円、140:350円、160:400円</td><td>記載なし</td><td>税別</td></tr><tr><td>オープンロジ</td><td>0円</td><td>0円</td><td>記載なし</td><td>見積制</td><td>見積制</td><td>見積制</td><td>客がセラセンで作成</td><td>—</td></tr></tbody></table></div>
+<h3 id="s5-2">4-2. FC までの送料の扱い</h3>
+<div class="tw" tabindex="0"><table><thead><tr><th>業者</th><th>送料</th><th>パートナーキャリア（PC）</th></tr></thead><tbody><tr><td>びーぷらす／おりおん</td><td>別途。「ヤマトPCを推奨、料金はAmazonで確認を」</td><td>推奨</td></tr><tr><td>糸星</td><td>佐川またはヤマトPCで事業所が選ぶ</td><td>可（PC利用は1箱50円）</td></tr><tr><td>タイシン</td><td>客負担。FCへの発送ラベルは客が発行してPDF送付</td><td>当社アカウントで発行する方式</td></tr><tr><td>Hakata B-Logi</td><td>記載なし</td><td>記載なし</td></tr><tr><td>ユニストック</td><td>「FBAパートナーキャリアに基づく」</td><td>ヤマトPCを推奨</td></tr><tr><td>FBA代行センター</td><td>自社料金：関東 620/670/750/1,000/2,280円（〜100/120/140/160/200サイズ）、東海関西 870〜2,810円、九州 1,120〜4,650円</td><td>可（出荷手数料+200円）</td></tr><tr><td>ラクロジ</td><td>西濃運輸。参考 60サイズ45円〜／80:100円〜／100:200円〜／120:350円〜／140:550円〜（税別・数量で変動）</td><td>記載なし</td></tr><tr><td>ロジスピ</td><td>FBA/RSL納品690円（単位の記載なし）</td><td>記載なし</td></tr><tr><td>福富サポート</td><td>自社料金（税抜）：関東FC 60:950〜160:1,780円／関西FC 790〜1,430円／東海FC 890〜1,660円</td><td>記載なし</td></tr><tr><td>サポートBB</td><td>全国一律 60:600／80:700／100:800／120:950／140:1,100／160:1,300円</td><td>可（1ケース150円）</td></tr><tr><td>JCC</td><td>地域別：関東等 60:660〜160:1,518円／関西等 660〜1,298円／九州 660〜1,078円</td><td>記載なし</td></tr><tr><td>e-fba</td><td>佐川。関東・中部・関西・中国・四国 140:750円／160:860円、北九州 810/940円（税別）</td><td>記載なし</td></tr><tr><td>オープンロジ</td><td>見積制</td><td>記載なし</td></tr></tbody></table></div>
+<p>参考（ヤマト公式・税込）：FBAパートナーキャリア 140サイズ 関東→関東608円・関東→関西857円／160サイズ 関東→関東762円・関東→関西1,121円。60〜120サイズは公式に掲載なし。</p>
+<h3 id="s5-3">4-3. 受け入れ条件・品目・加工</h3>
+<div class="tw" tabindex="0"><table><thead><tr><th>業者</th><th>最少受付量・縛り</th><th>要期限・危険物</th><th>大型・その他不可</th><th>セット組・袋詰め</th></tr></thead><tbody><tr><td>びーぷらす</td><td>記載なし。3か月連絡なしで契約解除・着払い返送または破棄</td><td>各+10円</td><td>ビンは「度々割れる」と明記</td><td>2〜5点40円／6〜10点50円、OPP袋40円</td></tr><tr><td>おりおん</td><td>同上</td><td>各+11円</td><td>同上</td><td>2点50円＋1点ごと5円、袋45円</td></tr><tr><td>糸星</td><td>1点から可</td><td>費用なし（料金表に「無料」と列挙）</td><td>中古・カタログ無し・200cm超・30kg以上・避妊具・海外</td><td>+15/30/45円（種類数）</td></tr><tr><td>タイシン</td><td>設定なし。ただし「140サイズ5箱×月2回以上」を依頼、少量は断る場合あり</td><td>記載なし</td><td>記載なし</td><td>52.5円〜</td></tr><tr><td>Hakata B-Logi</td><td>数量・期間の縛りなし、1箱数点可</td><td>記載なし</td><td>海外発送不可</td><td>見積制</td></tr><tr><td>ユニストック</td><td>記載なし</td><td>温度管理品は不可</td><td>中古不可</td><td>30円/セット、同梱10円/枚</td></tr><tr><td>FBA代行センター</td><td>1点から可</td><td>要期限+50円。危険物は Amazon 承認済みのみ・単独プラン</td><td>冷蔵冷凍・200サイズ以上・30kg以上・カタログ無し・海外直送は不可。<strong>中古は可</strong></td><td>小200円/大400円、OPP袋100/200円</td></tr><tr><td>ラクロジ</td><td>記載なし（月額の下限5,000円相当）</td><td>各+10円</td><td>中古は基本不可。大型100円</td><td>80円（何個でも同額）</td></tr><tr><td>ロジスピ</td><td>スポット配送は「月契約や最低ロットなし」</td><td>記載なし</td><td>記載なし</td><td>対応（料金記載なし）</td></tr><tr><td>福富サポート</td><td>1点から可。休止制度なし（退会・再登録）</td><td>可（プラン備考に記載）</td><td>中古の開封検品・動作確認は不可</td><td>セットアップ12円/作業、OPP20〜70円</td></tr><tr><td>サポートBB</td><td>記載なし</td><td>期限・危険ラベル30円</td><td>記載なし</td><td>2点20円＋1点ごと5円、袋10/20円</td></tr><tr><td>JCC</td><td>スポット：条件なし／継続：月1,000pcs以上の実績</td><td>要期限+22円。FBA禁止品以外は原則可、食品物流の実績を明記</td><td>中古不可</td><td>ピッキング44円×点数＋梱包11円/セット</td></tr><tr><td>e-fba</td><td>契約書の締結が必要</td><td>要期限は通常と同額（12/25円）</td><td>記載なし</td><td>透明袋セット50円、ラップ100/300円</td></tr><tr><td>オープンロジ</td><td>記載なし</td><td>危険物不可</td><td>生鮮・中古・30万円超・医薬品は不可</td><td>流通加工あり（見積制）</td></tr></tbody></table></div>
+<h3 id="s5-4">4-4. 運用（連携方式・日数・受け取り・納品書）</h3>
+<div class="tw" tabindex="0"><table><thead><tr><th>業者</th><th>セラセン連携</th><th>通常の処理日数（繁忙期）</th><th>受け取りの宛名・着払い</th><th>同梱の納品書</th></tr></thead><tbody><tr><td>びーぷらす</td><td>権限付与でプラン作成。「アカウント閉鎖等は一切責任を負えない」</td><td>記載なし</td><td>記載なし</td><td>記載なし</td></tr><tr><td>おりおん</td><td>同上</td><td>記載なし</td><td>記載なし</td><td>記載なし</td></tr><tr><td>糸星</td><td><strong>権限付与が前提</strong>（全在庫の管理・納品管理・FBA在庫・商品の追加の4権限）</td><td>FAQ 2〜3営業日（本文は2営業日と表記ゆれ）。土日祝・年末年始除く</td><td>宛名に客名か「月虹株式会社◯◯」。元払い（着払いは事前入金）</td><td><strong>データ化200円・郵送200円。現物は1か月保管後に廃棄</strong></td></tr><tr><td>タイシン</td><td>プラン作成を依頼するか選べる。依頼しない場合は客がラベルPDFを送付</td><td>原則3営業日以内</td><td>着払い・代引き対応（客負担）</td><td>記載なし</td></tr><tr><td>Hakata B-Logi</td><td>記載なし</td><td>記載なし（見積回答は3営業日、集中時最大5営業日）</td><td>記載なし</td><td>記載なし</td></tr><tr><td>ユニストック</td><td>一部権限付与で一括依頼も可</td><td>出荷指示から中2〜3営業日</td><td>仕入れた商品を倉庫へ直送可</td><td>記載なし</td></tr><tr><td>FBA代行センター</td><td><strong>ユーザー権限必須（大口のみ）</strong></td><td>到着翌営業日から72時間以内。GW・お盆・年末年始はFC受領が遅延と注記</td><td>客名宛て必須。ネットショップからの直送可</td><td><strong>返送サービス500円/回</strong></td></tr><tr><td>ラクロジ</td><td>プラン作成代行無料（権限の方式は記載なし）。LINE/Chatwork</td><td>記載なし</td><td>卸商品に対応と記載</td><td>記載なし</td></tr><tr><td>ロジスピ</td><td>システム連携で FBA 自動納品</td><td>入荷は原則1〜2営業日</td><td>記載なし</td><td>記載なし</td></tr><tr><td>福富サポート</td><td>客がプランを作りファイルをアップロード（権限付与の記載なし）。連絡はメールのみ</td><td>到着翌営業日から最大2営業日（繁忙期は遅延あり）</td><td>住所に会員ID、宛名は会員名か屋号。着払い200円（5万円まで）</td><td>記載なし</td></tr><tr><td>サポートBB</td><td>客がセラセンで手続き→ラベルPDFを送付（権限付与の記載なし）</td><td>記載なし</td><td>宛名「サポートBB＋自分の名前」。代引き・着払い立替可</td><td>記載なし</td></tr><tr><td>JCC</td><td><strong>権限付与が必須</strong>（新UI移行のため）</td><td>揃ってから最短1営業日・通常2営業日</td><td>着払い220円（3万円まで）</td><td>記載なし</td></tr><tr><td>e-fba</td><td>記載なし</td><td><strong>届いてから最長1か月以内</strong></td><td>着払い手数料は地域で変動</td><td><strong>返送サービス（応相談）</strong></td></tr><tr><td>オープンロジ</td><td>API 連携（FNSKU を連携、プランは客が作成）</td><td>未調査</td><td>記載なし</td><td>記載なし</td></tr></tbody></table></div>
+</section>
+<hr class="rule">
+<section id="s6" class="sec">
+<h2>5. 初回ロットの着地コスト（12点・1SKU・1箱）</h2>
+<p><strong>前提</strong>：12点を160サイズ1箱（約9.8kg）に詰める〔推定・商品台帳 L001〕／関東発・関東FC着／仕入先から最初の受け取り場所までの送料は、どのルートでも同じなので除外。</p>
+<h3 id="s6-1">5-1. 初回（1回目）</h3>
+<div class="tw" tabindex="0"><table><thead><tr><th>ルート</th><th>合計（税込）</th><th>1点</th><th>2回目以降</th><th>内訳</th></tr></thead><tbody><tr><td>R1 仕入先→FC直送＋Amazonラベル貼付</td><td>264円</td><td>22円</td><td>264円</td><td>22円×12。<strong>初回はゲートで不成立</strong>（§5-3）</td></tr><tr><td><strong>びーぷらすFBA</strong></td><td><strong>1,293円</strong></td><td><strong>108円</strong></td><td>1,293円</td><td>作業(30+120+300+10)×1.05×1.1＋PC 762円</td></tr><tr><td>R0 社長宅で受け、貼付・箱詰→PC</td><td>1,392円</td><td>116円</td><td>1,392円</td><td>PC 762円＋資材630円〔推定〕＋社長の作業約40分</td></tr><tr><td>おりおんFBA</td><td>1,399円</td><td>117円</td><td>1,399円</td><td>作業(22+132+370+55)×1.1＋PC 762円</td></tr><tr><td>タイシンFBA</td><td>1,618円</td><td>135円</td><td>1,618円</td><td>＋保証金5万円（返還）。少量は断られうる</td></tr><tr><td>R0' 社長宅で受け、箱詰のみ＋Amazonラベル</td><td>1,656円</td><td>138円</td><td>1,656円</td><td>R0＋22円×12</td></tr><tr><td>糸星</td><td>1,752円</td><td>146円</td><td>5,052円</td><td>初月はパレット無料。PC は関東→関東762円で仮置き〔推定〕</td></tr><tr><td>FBA代行センター</td><td>2,805円</td><td>234円</td><td>2,805円</td><td>100×12＋荷受50＋段ボール300＋関東FC160 1,000円、×1.1</td></tr><tr><td>JCC スポット</td><td>2,871円</td><td>239円</td><td>2,871円</td><td>825＋44×12＋関東FC160 1,518円（税込と推定）</td></tr><tr><td>e-fba</td><td>4,844円</td><td>404円</td><td>4,844円</td><td>保管3,000円/月を含む。含まなければ1,544円</td></tr><tr><td>ラクロジ</td><td>6,633円</td><td>553円</td><td>6,633円</td><td>月額2,000＋3,000＋40×12＋140サイズ550円〜、×1.1</td></tr><tr><td>ユニストック</td><td>7,941円</td><td>662円</td><td>7,941円</td><td>PC は関東→関西1,121円で仮置き〔推定〕</td></tr><tr><td>サポートBB</td><td>10,226円</td><td>852円</td><td>4,726円</td><td>入会金5,000円を含む</td></tr><tr><td>福富サポート</td><td>10,666円</td><td>889円</td><td>7,366円</td><td>登録料3,000円を含む</td></tr><tr><td>Hakata B-Logi／ロジスピ／オープンロジ</td><td>未算出</td><td>—</td><td>—</td><td>見積制</td></tr></tbody></table></div>
+<ul><li>PC＝ヤマトFBAパートナーキャリア 160サイズ 関東→関東 762円（ヤマト公式・税込）。</li><li>箱が140サイズに収まれば PC は608円になり、PC を使うルートはすべて154円下がる。</li><li>Amazon の新規出品者特典「FBA納品配送料 15,000円割引」（公式ページのバナー・memory 記録 2026-07-26）が当社に使えるなら、PC を使うルートの送料はしばらく0円になる。<strong>当社アカウントが対象かは未確認。</strong></li></ul>
+<h3 id="s6-2">5-2. 規模が上がった場合（月100点・5SKU・2箱・継続月）</h3>
+<div class="tw" tabindex="0"><table><thead><tr><th>ルート</th><th>月額合計</th><th>1点</th></tr></thead><tbody><tr><td>R1 仕入先→FC直送＋Amazonラベル貼付</td><td>2,200円</td><td>22円</td></tr><tr><td>R0 社長宅で自分で貼付（作業時間は含まない）</td><td>2,784円</td><td>28円</td></tr><tr><td>びーぷらす</td><td>3,603円</td><td>36円</td></tr><tr><td>おりおん</td><td>4,214円</td><td>42円</td></tr><tr><td>R0' 社長宅＋Amazonラベル</td><td>4,984円</td><td>50円</td></tr><tr><td>タイシン</td><td>5,704円</td><td>57円</td></tr><tr><td>e-fba</td><td>7,392円</td><td>74円</td></tr><tr><td>サポートBB</td><td>8,228円</td><td>82円</td></tr><tr><td>JCC スポット</td><td>9,086円</td><td>91円</td></tr><tr><td>糸星</td><td>10,984円</td><td>110円</td></tr><tr><td>ラクロジ</td><td>11,110円</td><td>111円</td></tr><tr><td>福富サポート</td><td>11,858円</td><td>119円</td></tr><tr><td>FBA代行センター</td><td>13,970円</td><td>140円</td></tr><tr><td>ユニストック</td><td>18,742円</td><td>187円</td></tr></tbody></table></div>
+<p>〔推定〕を含む前提：1箱50点・15kg以下、資材は1箱630円、SKU ごとの荷受・プラン費は5SKU分。</p>
+<h3 id="s6-3">5-3. 初回ロットだけにかかる制約</h3>
+<div class="tw" tabindex="0"><table><thead><tr><th>区分</th><th>内容</th><th>根拠</th></tr></thead><tbody><tr><td>事実</td><td>和平フレイズはブランド登録済みで、出品には許可申請が要る。書類は納品書または領収書・宛名がアカウント情報と一致・10点以上・180日以内</td><td>T-20260920-003（2026-09-29 セラセン実画面）</td></tr><tr><td>事実</td><td>SD の納品書は出展企業が発行し、商品に同梱される</td><td>SD ヘルプ「納品書」</td></tr><tr><td>事実</td><td>SD の配送先は25件まで追加できる</td><td>SD ヘルプ「配送先」</td></tr><tr><td>事実</td><td>今回の注文は予約販売で出荷は10月上旬</td><td>T-20260920-003</td></tr><tr><td>推論（確度高）</td><td>許可が下りるまでその ASIN の出品（SKU）を作れず、FBA 納品プランも作れない。<strong>許可待ちの間、商品はどこかに置いておく必要がある</strong></td><td>出品許可の仕組みから。セラセンでの実証はしていない</td></tr><tr><td>推論（確度高）</td><td>代行倉庫宛てに送ると、同梱の納品書は代行業者に届く。申請に使うには回収が必要</td><td>上の2つの事実から</td></tr><tr><td>未確認</td><td>配送先を代行倉庫にしたとき、納品書の宛名が当社名のままか</td><td>SD 公式に記載なし</td></tr><tr><td>事実</td><td>無料の保管期間：ラクロジ30日／サポートBB 14日未満／JCC 7日／福富 5営業日／糸星はパレット初月無料／その他は記載なし</td><td>各社公式</td></tr></tbody></table></div>
+</section>
+<hr class="rule">
+<section id="s7" class="sec">
+<h2>6. 成功者が実際に使っている型</h2>
+<div class="tw" tabindex="0"><table><thead><tr><th>区分</th><th>内容</th><th>出典</th></tr></thead><tbody><tr><td>事実</td><td>EC STARs Lab.（メーカー仕入れの実践者・スクール運営）は、専門業者6社として 福富サポート・サポートBB・ラクロジ・オープンロジ・JCC・おりおんFBA を挙げている。福富は「Amazon物販を行っている人で比較的利用者が多い」、サポートBBは「私の周りでは比較的利用者が多い」</td><td>EC STARs Lab. 公式ブログ（2026-08-03）</td></tr><tr><td>事実</td><td>同記事の推奨：「最低でも月利10万円を超えてから外注」「メーカー仕入れならメーカーにFBA直送を交渉」「より安くは最寄りの就労支援施設（WAMNET で探す）にラベル貼りを外注」</td><td>同上</td></tr><tr><td>事実</td><td>同社セミナー：受講者の8〜9割が最終的に就労支援施設へ移行。1商品5〜10円程度。訪問して作業説明、約1か月のテスト。月利50万円の受講生事例あり</td><td>当社受講記録 docs/reference/maker-shiire/seminar-20260610-realtime-notes.md（2026-06-10）</td></tr><tr><td>事実</td><td>ロジスピの導入事例（株式会社Bright First）：月商100万円を超えた時点で倉庫委託を開始。月間出荷500〜1,000件</td><td>ロジスピ公式 導入事例</td></tr><tr><td>未確認</td><td>月利100万円以上の実践者が業者名を挙げて「使っている」と書いた一次発信</td><td>見つからず</td></tr></tbody></table></div>
+<p>注：同記事の料金表は公式と一部ずれている（福富の納品代行料 450円→公式500円、ラベル16円→公式18円／JCC の月額 2,480円→公式3,080円）。業者名の出典としてだけ使い、金額は各社公式から取り直した。</p>
+</section>
+<hr class="rule">
+<section id="s8" class="sec sec-box sec-alert">
+<h2>7. 取れなかった・確認できなかった項目</h2>
+<div class="tw" tabindex="0"><table><thead><tr><th>項目</th><th>状態</th><th>埋め方（いずれも §4.1 の範囲外で可能か）</th></tr></thead><tbody><tr><td>Hakata B-Logi・ロジスピ・オープンロジの単価</td><td>見積制</td><td>見積依頼＝第三者連絡（§4.1）。社長承認が要る</td></tr><tr><td>各社の「繁忙期の実日数」</td><td>公式に数字があるのは FBA代行センター（遅延の注記のみ）・福富（遅延の注記のみ）</td><td>見積時に質問（§4.1）</td></tr><tr><td>代行倉庫宛てにした時の SD 納品書の宛名</td><td>未確認</td><td>SD 出展企業への質問（§4.1）、または初回注文の現物で確認</td></tr><tr><td>出品許可前に FBA 納品プランが作れないこと</td><td>推論</td><td>セラセンで ASIN を出品しようとすれば確認できる（送信なし・§4.1 非該当）</td></tr><tr><td>Amazon ラベル貼付サービスの料金（22円/51円）</td><td>2026-07-27 の画面確認。今回は再取得できず（ログインが要る）</td><td>セラセンのヘルプ G200483750 をカズヨがブラウザで開けば確認できる</td></tr><tr><td>Amazon 新規出品者の FBA 納品配送料15,000円割引の当社への適用</td><td>未確認</td><td>セラセンの特典ページで確認できる</td></tr><tr><td>PC の60〜120サイズ料金、関東以外発の料金</td><td>ヤマト公式に掲載なし</td><td>セラセンの納品プラン画面でのみ表示</td></tr><tr><td>JCC の会員登録料の金額（継続プラン）</td><td>料金表に3,300円、申込ページは「請求のご案内」のみ</td><td>—</td></tr><tr><td>e-fba の保管料3,000円/月が常にかかるか・ラベル単価が12円か50円か</td><td>公式ページ内で2表記</td><td>見積時に質問（§4.1）</td></tr><tr><td>所在地：ロジスピの倉庫・オープンロジの倉庫</td><td>記載なし／未調査</td><td>—</td></tr></tbody></table></div>
+</section>
+<hr class="rule">
+<section id="s9" class="sec">
+<h2>8. 出典一覧（取得日 2026-09-29〜30）</h2>
+<div class="tw" tabindex="0"><table><thead><tr><th>#</th><th>ページタイトル</th><th>URL</th></tr></thead><tbody><tr><td>1</td><td>格安 Amazon FBA納品代行 びーぷらすFBA（ページ更新 2026.08.24）</td><td>http://fba.bplus-tokyo.com/</td></tr><tr><td>2</td><td>格安 Amazon FBA納品代行 おりおんFBA</td><td>http://fba.aptus-tokyo.co.jp/</td></tr><tr><td>3</td><td>納品代行業務(FBA) – 就労継続支援B型事業所 糸星</td><td>https://itoboshi.gekkou-company.jp/delivery-agency/</td></tr><tr><td>4</td><td>EC・FBA納品代行 タイシンFBA</td><td>https://taishinfba.com/</td></tr><tr><td>5</td><td>ご利用案内・料金プラン｜Hakata B-Logi</td><td>https://www.hakata-b-logi.jp/guide/</td></tr><tr><td>6</td><td>Amazon FBA納品代行サービス – 株式会社ユニストック</td><td>https://unistock.co.jp/fba_deliveryagency/</td></tr><tr><td>7</td><td>料金システム｜FBA代行センター</td><td>https://amazon-fbadaikou.jp/price/</td></tr><tr><td>8</td><td>Q&amp;A｜FBA代行センター</td><td>https://amazon-fbadaikou.jp/qa/</td></tr><tr><td>9</td><td>AmazonFBA納品代行「ラクロジ」</td><td>https://logex.jp/rakulogi-fba</td></tr><tr><td>10</td><td>Amazonセラー物流代行「ラクロジMini＋」</td><td>https://logex.jp/rakulogi-fba-mini</td></tr><tr><td>11</td><td>会社概要／提携倉庫一覧｜LOGEX</td><td>https://logex.jp/about ／ https://logex.jp/partner</td></tr><tr><td>12</td><td>ロジスピ発送代行サービス（トップ・機能サービス・利用規約・導入事例）</td><td>https://logisp.jp/ ／ /service ／ /user-agreemenu ／ /case/bright-first_01</td></tr><tr><td>13</td><td>料金一覧｜福富サポート（料金は画像で掲載）</td><td>http://fukutomi-support.com/ryoukin</td></tr><tr><td>14</td><td>FBA納品代行(国内)／Q&amp;A｜福富サポート</td><td>http://fukutomi-support.com/m/kokunai ／ http://fukutomi-support.com/question</td></tr><tr><td>15</td><td>FBA納品代行｜サポートBB（会社概要の会社名：株式会社大黒）</td><td>https://www.logi-support.com/service-fba/</td></tr><tr><td>16</td><td>株式会社JCC Amazon作業代行</td><td>https://www.e-jcc.jp/fba-service/</td></tr><tr><td>17</td><td>JCCのAmazon作業代行の流れ（料金一覧）</td><td>https://e-jcc.jp/fba-service/flow/</td></tr><tr><td>18</td><td>FBA納品代行（e-fba・株式会社彩陽）／会社情報／特定商取引法に基づく表記</td><td>https://e-fba.com/ ／ /company/ ／ /tokushoho/</td></tr><tr><td>19</td><td>利用料金のご案内｜オープンロジ</td><td>https://service.openlogi.com/pricing/</td></tr><tr><td>20</td><td>FBA納品 × オープンロジ</td><td>https://service.openlogi.com/fba-lp/</td></tr><tr><td>21</td><td>Amazon出品者さま限定プログラムのご案内｜ヤマト運輸</td><td>https://business.kuronekoyamato.co.jp/promotion/toAmazonseller2024/index.html</td></tr><tr><td>22</td><td>納品書／配送先 - ヘルプ・使い方｜スーパーデリバリー</td><td>https://faq.superdelivery.com/（「納品書」「配送先」の各ページ）</td></tr><tr><td>23</td><td>FBA納品代行のおすすめ業者6選と2つの裏技｜EC STARs Lab. 公式ブログ（2026-08-03 更新）※業者名と実践者の推奨の出典としてのみ使用</td><td>https://ecstarslab.com/blog/fba-delivery-agent/</td></tr><tr><td>24</td><td>FBA商品ラベル貼付サービス 公式ヘルプ G200483750（2026-07-27 社長画面確認・memory <code>knowledge_fba_label_service</code>）</td><td>セラーセントラル（要ログイン）</td></tr></tbody></table></div>
+</section>
+<p class="prov">HTML版。内容の唯一の正は 01_FBA納品代行_公式値ファクトシート.md です。</p>
+</div>
+<a class="top" href="#top" aria-label="先頭へ戻る">&#8593;</a>
+</body>
+</html>
