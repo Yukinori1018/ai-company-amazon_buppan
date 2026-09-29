@@ -1,0 +1,65 @@
+<!doctype html><html lang='ja'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>カート保持者の機械判定 — B0DJNX12KZ / B0FN3NWKYZ</title><style>body{font-family:-apple-system,'Hiragino Sans','Noto Sans JP',sans-serif;max-width:1150px;margin:2em auto;padding:0 1em;line-height:1.65;color:#222;font-size:14.5px}table{border-collapse:collapse;margin:.8em 0;font-size:.92em}th,td{border:1px solid #bbb;padding:.35em .6em;vertical-align:top}th{background:#eef2f8}tr:nth-child(even) td{background:#fafafa}h1{font-size:1.5em;border-bottom:2px solid #444}h2{font-size:1.25em;border-left:5px solid #25b;padding-left:8px;margin-top:1.8em}h3{font-size:1.05em;margin-top:1.4em}blockquote{border-left:4px solid #ccc;margin:.8em 0;padding:.2em 1em;color:#444}code{background:#f3f3f3;padding:1px 4px;border-radius:3px}hr{border:0;border-top:1px solid #ccc;margin:1.6em 0}</style></head><body>
+<h1>カート保持者の機械判定 — B0DJNX12KZ / B0FN3NWKYZ</h1>
+<ul>
+<li style='margin-left:0.0em'>チケット: T-20260920-003</li>
+<li style='margin-left:0.0em'>担当: IT エンジニア タカシ</li>
+<li style='margin-left:0.0em'>判定日: <strong>2026-09-30</strong></li>
+<li style='margin-left:0.0em'>判定に使ったもの: <strong>Keepa API（Product / <code>stats=365</code> <code>history=1</code> <code>buybox=1</code> <code>offers=20</code>）2026-09-30 取得</strong></li>
+<li style='margin-left:0.0em'>使ったツール: [<code>24_カート保持者ガード/</code>](24_カート保持者ガード/README.md)（本チケットで新規作成）</li>
+</ul>
+<hr>
+<h2>0. 結論（誰がカートを持っているか）</h2>
+<blockquote><strong>2件とも、カートを持っているのは第三者セラーです。Amazon.co.jp 本体ではありません。</strong><br>機械判定は <strong>2件とも GO</strong>。ただし §3.3 が求める<strong>実画面での確認は未実施</strong>です（§3）。</blockquote>
+<p>対照として、**事故を起こした B0FVL8QST6（和平フレイズ 燕三 よせしゃぶ鍋）を同じツールに通したところ、</p>
+<p>3点すべてで落ちて NO-GO** になりました。発注前にこれを通していれば止まっていました。</p>
+<h2>1. 判定結果</h2>
+<h3>B0DJNX12KZ — 不二貿易 洗えるバスケット カトラリー収納 2点セット</h3>
+<table><thead><tr><th>確認項目</th><th>結果</th></tr></thead><tbody>
+<tr><td><strong>① カートの販売元</strong></td><td>○ <strong>第三者セラー</strong>。独立3根拠（<code>buyBoxIsAmazon</code> / <code>buyBoxSellerId</code> / カート保持者の直近履歴）が一致</td></tr>
+<tr><td><strong>② 本体の在庫履歴</strong></td><td>○ <strong>本体は直近1年ずっと在庫なし</strong>。直近90日も在庫なし</td></tr>
+<tr><td><strong>③ 出品一覧の実数</strong></td><td>○ ライブの新品オファー <strong>2本</strong>（出品者2／FBA 1・自己発送 1）。<strong>本体は含まれない</strong></td></tr>
+<tr><td><strong>総合</strong></td><td>✅ <strong>GO</strong></td></tr>
+</tbody></table>
+<h3>B0FN3NWKYZ — サンワダイレクト LEDライト 作業灯 充電式（800-LED096BK）</h3>
+<table><thead><tr><th>確認項目</th><th>結果</th></tr></thead><tbody>
+<tr><td><strong>① カートの販売元</strong></td><td>○ <strong>第三者セラー</strong>。独立3根拠が一致</td></tr>
+<tr><td><strong>② 本体の在庫履歴</strong></td><td>○ <strong>本体は直近1年ずっと在庫なし</strong>。直近90日も在庫なし</td></tr>
+<tr><td><strong>③ 出品一覧の実数</strong></td><td>○ ライブの新品オファー <strong>1本</strong>（出品者1／自己発送）。<strong>本体は含まれない</strong></td></tr>
+<tr><td><strong>総合</strong></td><td>✅ <strong>GO</strong></td></tr>
+</tbody></table>
+<p>カート保持者は<strong>自己発送</strong>の1社のみです。FBA で入ればカート獲得の位置取りは有利ですが、</p>
+<p><strong>出品者が1社しかいない棚は、当社が入った瞬間に値下げ合戦の相手が1社に特定されます</strong>。</p>
+<p>在庫を持つのは当社と相手の2社だけなので、相手が降りなければ価格は下がり続けます。</p>
+<h3>対照: B0FVL8QST6（発注済み・和平フレイズ）</h3>
+<p>3点すべて FAIL。カート保持者は Amazon.co.jp 本体、本体は直近1年の大半で在庫を持ち、</p>
+<p>ライブの新品オファー7本に本体が混ざっていました。</p>
+<h2>2. §3.2 の必須列（この確認の結果を載せる欄）</h2>
+<table><thead><tr><th>#</th><th>ASIN</th><th>商品</th><th>過去1ヶ月の販売数</th><th>セラー数（新品オファー）</th><th>Amazon 本体の有無</th><th>Amazon の URL</th><th>購入元の名前</th></tr></thead><tbody>
+<tr><td>1</td><td>B0DJNX12KZ</td><td>不二貿易 洗えるバスケット2点セット</td><td><strong>表示なし（月50個未満）</strong></td><td><strong>2社</strong>（うち Amazon 本体 <strong>0社</strong>）</td><td><strong>なし</strong>（カート保持者＝第三者・直近1年在庫なし）</td><td>https://www.amazon.co.jp/dp/B0DJNX12KZ</td><td>不二貿易株式会社</td></tr>
+<tr><td>2</td><td>B0FN3NWKYZ</td><td>サンワダイレクト LED作業灯</td><td><strong>表示なし（月50個未満）</strong></td><td><strong>1社</strong>（うち Amazon 本体 <strong>0社</strong>）</td><td><strong>なし</strong>（カート保持者＝第三者・直近1年在庫なし）</td><td>https://www.amazon.co.jp/dp/B0FN3NWKYZ</td><td>合同会社ウェルフェア</td></tr>
+</tbody></table>
+<blockquote>購入先の卸サイト URL は会員限定の取引条件に当たるため、成果物には載せていません<br>（CLAUDE.md §3.2 の注記）。秘書への報告と <code>agent_output/</code> 側にあります。</blockquote>
+<p><strong>販売数が2件とも「表示なし」＝月50個未満</strong>です。これは §3.2 の列としては正しく埋まっていますが、</p>
+<p>社長の既定（月100個以上）には届いていません。<strong>カート保持者の判定とは別の論点</strong>として、</p>
+<p>仕入れ判断の前に見てください。</p>
+<h2>3. まだ残っている確認（機械では代替できない）</h2>
+<p>CLAUDE.md §3.3 は「<strong>社長の Chrome（キーゾン入り）で実画面を見る。API だけで済ませない</strong>」と</p>
+<p>定めています。今回の判定は <strong>API 側の3点のみ</strong>で、実画面確認は未実施です。</p>
+<table><thead><tr><th>残作業</th><th>誰が</th><th>内容</th></tr></thead><tbody>
+<tr><td>実画面のカート保持者</td><td>秘書カズヨ</td><td>商品ページの「販売元」とキーゾンの「アマゾン直販」表示</td></tr>
+<tr><td>出品一覧の目視</td><td>秘書カズヨ</td><td><code>/gp/offer-listing/&lt;ASIN&gt;/?f_new=true</code> を開いて数える</td></tr>
+</tbody></table>
+<p>Keepa の値は「Keepa がその ASIN を最後に巡回した時点」のものです。**発注の直前に実画面を見る</p>
+<p>理由はここにあります。**このツールは実画面確認を置き換えるものではなく、</p>
+<p><strong>実画面を見る前に候補を落とすための関門</strong>です。</p>
+<h2>4. 再発防止として何が変わったか</h2>
+<table><thead><tr><th>前</th><th>後</th></tr></thead><tbody>
+<tr><td>商品ページの <code>#merchant-info</code> 1要素だけを読む</td><td><strong>独立3根拠が2本以上一致して初めて</strong>「第三者」と判定</td></tr>
+<tr><td>根拠が取れなければ暗黙に「本体なし」扱い</td><td><strong>UNKNOWN として明示し、絶対に GO にしない</strong>（fail-closed）</td></tr>
+<tr><td>オファー本数だけを見る</td><td>ライブの新品オファーを<strong>出品者単位</strong>で数え、<strong>本体の有無を内訳で出す</strong>。一覧が打ち切られていたら UNKNOWN</td></tr>
+<tr><td>人が毎回目視</td><td><strong>コマンド1本で何件でも。判定基準はテスト15件で固定</strong></td></tr>
+</tbody></table>
+<p>判定ロジックは <code>verdict.py</code> に純関数で切り出してあり、<code>python3 test_verdict.py</code> で</p>
+<p>全分岐を検証できます（ネットワーク・Keepa トークンを使いません）。</p>
+<p>「本体が居るのに GO」「データが無いのに GO」を落とすテストが入っています。</p>
+</body></html>
