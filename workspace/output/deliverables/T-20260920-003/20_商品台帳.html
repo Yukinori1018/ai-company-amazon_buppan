@@ -1,0 +1,136 @@
+<!doctype html><html lang='ja'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>商品台帳（仕入れロット単位）— 初版 2026-09-29</title><style>body{font-family:-apple-system,'Hiragino Sans','Noto Sans JP',sans-serif;max-width:1150px;margin:2em auto;padding:0 1em;line-height:1.65;color:#222;font-size:14.5px}table{border-collapse:collapse;margin:.8em 0;font-size:.92em}th,td{border:1px solid #bbb;padding:.35em .6em;vertical-align:top}th{background:#eef2f8}tr:nth-child(even) td{background:#fafafa}h1{font-size:1.5em;border-bottom:2px solid #444}h2{font-size:1.25em;border-left:5px solid #25b;padding-left:8px;margin-top:1.8em}h3{font-size:1.05em;margin-top:1.4em}blockquote{border-left:4px solid #ccc;margin:.8em 0;padding:.2em 1em;color:#444}code{background:#f3f3f3;padding:1px 4px;border-radius:3px}hr{border:0;border-top:1px solid #ccc;margin:1.6em 0}</style></head><body>
+<h1>商品台帳（仕入れロット単位）— 初版 2026-09-29</h1>
+<h2>運用手順（3行）</h2>
+<ol>
+<li style='margin-left:0.0em'><strong>発注した日に、社長 or 担当が1行起票する</strong>（仕入日〜クーポンまで／<code>状態</code>＝発注済み）。<code>20_商品台帳.csv</code> が正、<code>.md</code>/<code>.html</code> は読む用のミラー。</li>
+<li style='margin-left:0.0em'><strong>入荷・検品・FBA納品のたびに同じ行を更新する</strong>（入荷日／検品日／納品日／出品可否／在庫残／状態）。行は増やさず上書き。<strong>同一ロットは1行</strong>。</li>
+<li style='margin-left:0.0em'><strong>売価が動いたら経理が採算列を引き直す</strong>（実売価・販売手数料・粗利・利益率・損益分岐売価）。月末に <code>在庫残</code> と <code>状態</code> を締めて、赤字行は撤退判断にかける。</li>
+</ol>
+<hr>
+<h2>1. 結論（3行）</h2>
+<ul>
+<li style='margin-left:0.0em'><strong>1個あたり実原価は 1,639円</strong>（税込・SD送料込・クーポン按分後）。現在のAmazon価格 2,896円 で <strong>1個粗利 88円・利益率 3.0%</strong>（FBA・中央シナリオ）。12点で <strong>1,056円</strong>。</li>
+<li style='margin-left:0.0em'><strong>赤字ではないが、利益率20%には 3,674円 必要</strong>。今の価格では届きません。損益分岐は <strong>2,790円</strong> で、<strong>今の価格から106円下がると赤字</strong>に転じます。</li>
+<li style='margin-left:0.0em'>最大の変更点：<strong>販売手数料は 10% ではなく 15.4%</strong>（ホーム＆キッチン・公式表で確認）。チケットの「粗利380円・利益率13%」はこの誤りと配送代行550円（実際は472円）から来ています。<strong>正しくは 88円・3.0%</strong>。</li>
+</ul>
+<hr>
+<h2>2. 台帳（L001）</h2>
+<table><thead><tr><th>列</th><th>値</th></tr></thead><tbody>
+<tr><td>ロットID</td><td>L001</td></tr>
+<tr><td>仕入日</td><td>2026-09-29</td></tr>
+<tr><td>仕入先 / 受付番号</td><td>スーパーデリバリー / 94478096</td></tr>
+<tr><td>メーカー</td><td>和平フレイズ</td></tr>
+<tr><td>商品名</td><td>燕三 IH対応よせしゃぶ鍋22cm EM-103</td></tr>
+<tr><td>仕入先品番 / JAN / ASIN</td><td>10208306S8 / 4903779138287 / B0FVL8QST6</td></tr>
+<tr><td>数量</td><td>12点（ケース単位）</td></tr>
+<tr><td>仕入単価（税抜）</td><td>1,649円（卸率41%・初回限定割引3%込み）</td></tr>
+<tr><td>商品小計（税抜）</td><td>19,788円</td></tr>
+<tr><td>消費税</td><td>1,978円</td></tr>
+<tr><td>仕入送料</td><td>900円（見込み）</td></tr>
+<tr><td>クーポン</td><td>−3,000円（3,000円OFF・送料無料券より有利）</td></tr>
+<tr><td><strong>ロット実原価（税込・送料込）</strong></td><td><strong>19,666円</strong></td></tr>
+<tr><td><strong>1個実原価</strong></td><td><strong>1,639円</strong></td></tr>
+<tr><td>出品可否（ゲート）</td><td><strong>申請準備中</strong>。和平フレイズはブランド登録済み＝要許可。納品書（10月上旬）が届いてから申請</td></tr>
+<tr><td>出荷予定</td><td>2026年10月上旬（<strong>予約販売</strong>）</td></tr>
+<tr><td>販売方法</td><td><strong>FBA</strong>（自宅で受け取り→検品→FBA倉庫へ納品）</td></tr>
+<tr><td>想定売価</td><td>2,896円（2026-09-29 実測。過去価格3,230円）</td></tr>
+<tr><td>1個粗利 / 利益率</td><td><strong>88円 / 3.0%</strong></td></tr>
+<tr><td>損益分岐売価 / 利益率20%売価</td><td><strong>2,790円 / 3,674円</strong></td></tr>
+<tr><td>在庫残 / 状態</td><td>12 / 発注済み（SMS認証待ち）</td></tr>
+</tbody></table>
+<p><strong>掲載方針</strong>：本ロットは当社自身の購入記録なので仕入単価・送料・クーポンの実額を記載しています。ただし仕入先サイトの<strong>参考上代は会員限定の表示</strong>なので載せず、卸率（41%）だけで表現しました（<code>workspace/source-ledger.md</code> の区分に従う）。</p>
+<p>〔確定〕仕入金額・数量・JAN・ASIN・売価。〔実測〕手数料3種の料率・料金表（下記）。〔推定〕梱包後の寸法、納品送料、資材費、保管月数。</p>
+<hr>
+<h2>3. 1個あたり原価の内訳（税込・送料込）</h2>
+<table><thead><tr><th>項目</th><th>金額</th><th>計算</th></tr></thead><tbody>
+<tr><td>商品代（税抜）</td><td>1,649円</td><td>SD 実額</td></tr>
+<tr><td>消費税</td><td>165円</td><td>1,978 ÷ 12。<strong>免税事業者なので控除できず費用</strong></td></tr>
+<tr><td>SD送料</td><td>75円</td><td>900 ÷ 12</td></tr>
+<tr><td>クーポン按分</td><td>−250円</td><td>−3,000 ÷ 12</td></tr>
+<tr><td><strong>1個実原価</strong></td><td><strong>1,639円</strong></td><td>19,666 ÷ 12</td></tr>
+</tbody></table>
+<p>送料が見込み900円でなく990円で確定した場合は <strong>1,646円</strong>（+7円）。判定は動きません。</p>
+<hr>
+<h2>4. FBA の採算（売価2,896円・中央シナリオ）</h2>
+<table><thead><tr><th>項目</th><th>金額</th><th>根拠・確度</th></tr></thead><tbody>
+<tr><td>売上</td><td>2,896円</td><td>〔実測〕2026-09-29</td></tr>
+<tr><td>1個実原価</td><td>−1,639円</td><td>〔確定〕</td></tr>
+<tr><td>販売手数料</td><td>−491円</td><td>〔実測〕<strong>ホーム＆キッチン 15.4%</strong>（750円超）＝446円、手数料は税抜表示のため＋消費税45円</td></tr>
+<tr><td>FBA配送代行手数料</td><td>−472円</td><td>〔実測〕<strong>標準サイズ区分7</strong>（三辺80cm以下・5kg以下／価格1,000円超）。税込</td></tr>
+<tr><td>FBA在庫保管手数料</td><td>−87円</td><td>〔推定〕6.728L × 繁忙期込み平均8.617円/L/月 × 1.5ヶ月</td></tr>
+<tr><td>自宅→FBA倉庫 納品送料</td><td>−64円</td><td>〔推定〕12点を1箱（160サイズ・約9.8kg）／FBAパートナーキャリア ヤマト 関東-関東 762円 ÷ 12</td></tr>
+<tr><td>梱包資材費</td><td>−55円</td><td>〔推定〕160サイズ段ボール400円＋緩衝材200円＋テープ30円 ÷ 12＝53円、＋FNSKUラベル用紙2円</td></tr>
+<tr><td><strong>1個粗利</strong></td><td><strong>+88円</strong></td><td></td></tr>
+<tr><td><strong>利益率</strong></td><td><strong>3.0%</strong></td><td></td></tr>
+<tr><td><strong>12点合計</strong></td><td><strong>+1,056円</strong></td><td></td></tr>
+</tbody></table>
+<h3>サイズ区分の確定（ここがチケットの550円との差）</h3>
+<ul>
+<li style='margin-left:0.0em'>Amazon商品ページの実測寸法：<strong>27 × 27 × 6.2 cm・520g</strong>（蓋なし・浅型）。</li>
+<li style='margin-left:0.0em'>梱包後は <strong>29 × 29 × 8 cm ＝ 三辺66cm</strong> と推定（公式注記「寸法＝梱包済み商品の長さ、幅、高さの合計」）。</li>
+<li style='margin-left:0.0em'>三辺66cm・重量1kg未満 → <strong>標準サイズ区分7（80cm以下・5kg以下）＝ 472円</strong>。</li>
+<li style='margin-left:0.0em'><strong>商品単体で既に 27+27+6.2＝60.2cm</strong> なので、どんな箱でも 60cm 区分（430円）には入りません。<strong>472円は下げられない固定費</strong>です。100cm区分（532円）に落ちない限り、ここの誤差は±0円。</li>
+</ul>
+<h3>大口プラン月額の扱い</h3>
+<p>月額4,900円（税抜）＝5,390円（税込）は<strong>固定費</strong>なので上表には入れていません。ただし <strong>このSKU単独では回収できません</strong>（粗利88円 × 12点 ＝ 1,056円）。月額を粗利で賄うには <strong>同等品を月61点</strong>売る必要があります。</p>
+<hr>
+<h2>5. 3シナリオ</h2>
+<table><thead><tr><th></th><th>楽観</th><th><strong>中央（推奨値）</strong></th><th>悲観</th></tr></thead><tbody>
+<tr><td>売価</td><td>3,230円（過去価格まで戻る）</td><td><strong>2,896円</strong></td><td>2,600円（値下げ競争）</td></tr>
+<tr><td>販売手数料</td><td>547円</td><td>491円</td><td>440円</td></tr>
+<tr><td>配送代行</td><td>472円</td><td>472円</td><td>472円</td></tr>
+<tr><td>保管料</td><td>38円（通常期・2ヶ月完売）</td><td>87円</td><td>174円（6ヶ月消化＝3.0ヶ月計上）</td></tr>
+<tr><td>納品送料</td><td>0円（新規出品者のFBA納品配送料15,000円割引が適用）</td><td>64円</td><td>88円（関東-関西）</td></tr>
+<tr><td>資材費</td><td>55円</td><td>55円</td><td>55円</td></tr>
+<tr><td><strong>1個粗利</strong></td><td><strong>+479円</strong></td><td><strong>+88円</strong></td><td><strong>−268円</strong></td></tr>
+<tr><td><strong>利益率</strong></td><td><strong>14.8%</strong></td><td><strong>3.0%</strong></td><td><strong>−10.3%</strong></td></tr>
+<tr><td>12点合計</td><td>+5,748円</td><td><strong>+1,056円</strong></td><td>−3,216円</td></tr>
+</tbody></table>
+<p><strong>推奨値は中央の 1個88円・3.0%</strong>。楽観でも14.8%で、<strong>利益率20%には到達しません</strong>。</p>
+<hr>
+<h2>6. 損益分岐と目標売価</h2>
+<table><thead><tr><th>条件</th><th>必要売価</th></tr></thead><tbody>
+<tr><td>粗利ゼロ（損益分岐）</td><td><strong>2,790円</strong></td></tr>
+<tr><td>利益率10%</td><td><strong>3,171円</strong></td></tr>
+<tr><td><strong>利益率20%</strong></td><td><strong>3,674円</strong></td></tr>
+<tr><td>利益率30%</td><td><strong>4,367円</strong></td></tr>
+</tbody></table>
+<p>式：<code>売価 ×（1 − 0.154×1.1）− 2,317円 = 目標利益率 × 売価</code>。固定原価2,317円 ＝ 実原価1,639＋配送代行472＋保管87＋納品送料64＋資材55。</p>
+<ul>
+<li style='margin-left:0.0em'>現在価格 2,896円 と損益分岐 2,790円 の差は <strong>106円（3.7%）</strong>。カート価格が1回下がれば赤字です。</li>
+<li style='margin-left:0.0em'><strong>利益率20%を取るには売価3,674円が必要で、これは過去価格3,230円より高い</strong>。この商品を値上げして20%を達成する経路はありません。20%を狙うなら、売価2,896円のままで <strong>1個実原価を1,148円以下</strong>にする必要があります。今回は1,639円なので <strong>あと491円（30%）の引き下げ</strong>が必要で、同じ仕入条件では構造的に届きません。</li>
+</ul>
+<hr>
+<h2>7. 社長の作業時間（費用計上なし・判断材料）</h2>
+<table><thead><tr><th>作業</th><th>時間</th></tr></thead><tbody>
+<tr><td>検品（12点・開封→外観確認→再梱包）</td><td>25〜35分（1点2〜3分）</td></tr>
+<tr><td>FNSKUラベル印刷・貼付（12点）</td><td>10分</td></tr>
+<tr><td>納品プラン作成・箱詰め・集荷手配</td><td>30分</td></tr>
+<tr><td><strong>合計</strong></td><td><strong>約1時間15分</strong></td></tr>
+</tbody></table>
+<p>粗利1,056円 ÷ 1.25時間 ＝ <strong>時間当たり845円</strong>。<strong>このロットは「利益を取る取引」ではなく「ゲート解除の書類を取る取引」として評価すべき</strong>です（社長判断「初回は損してでも試す」と整合）。</p>
+<hr>
+<h2>8. リスク（4つ）</h2>
+<ol>
+<li style='margin-left:0.0em'><strong>出品許可が下りるまで在庫はゼロ円資産</strong>。12点＝19,666円が動かせません。申請は納品書到着後（10月上旬以降）、審査は数日〜2週間。<strong>10月下旬〜11月上旬まで1円も回収できない</strong>前提で見てください。</li>
+<li style='margin-left:0.0em'><strong>許可が下りなかった場合の最大損失</strong>。Amazon以外（メルカリ等）で処分すると、2,500円で売れても手数料10%＋自己発送送料（80サイズ約1,100円）＋梱包130円で <strong>1個△630円</strong>。12点で <strong>△7,560円</strong>。これが本ロットの最大損失額です。</li>
+<li style='margin-left:0.0em'><strong>予約販売のため出荷が10月上旬。繁忙期（10〜12月）の保管料に丸ごとかかる</strong>（通常期の1.78倍）。売れ残ると保管料が粗利88円を1.5ヶ月で食い切ります。</li>
+<li style='margin-left:0.0em'><strong>在庫の置き場と検品義務</strong>。SDの取引条件で検品は購入者側の義務です（今回はメーカー直送だが免除ではありません）。自宅保管スペースは <strong>160サイズ1箱ぶん（約60×50×50cm）</strong>。開封検品後は個装を戻して納品するため、<strong>元の個装箱を捨てないこと</strong>（捨てるとOPP袋＋15円/個が発生）。</li>
+</ol>
+<hr>
+<h2>9. いま無料でできる不確実性つぶし（3手）</h2>
+<table><thead><tr><th>手</th><th>潰せる不確実性</th><th>時間</th></tr></thead><tbody>
+<tr><td><strong>セラーセントラルのFBA料金シミュレーターに B0FVL8QST6 を投入</strong></td><td>販売手数料15.4%と配送代行472円の確定（当社の推定を1円単位で検算できる）</td><td>5分</td></tr>
+<tr><td><strong>SDの注文確定画面で送料の実額を確認</strong>（900円 or 990円）</td><td>1個原価 1,639 vs 1,646円</td><td>1分</td></tr>
+<tr><td><strong>入荷したら個装箱の三辺を実測</strong></td><td>配送代行が472円で固定か、532円（100cm区分）に落ちないか</td><td>2分</td></tr>
+</tbody></table>
+<hr>
+<h2>出典（すべて2026-09-29 取得）</h2>
+<ul>
+<li style='margin-left:0.0em'>販売手数料・FBA配送代行手数料・在庫保管手数料：<a href="https://sell.amazon.co.jp/pricing" target="_blank" rel="noopener">sell.amazon.co.jp/pricing</a>（公式・原文をcurlで取得）</li>
+<li style='margin-left:0.0em'>商品寸法・重量・売価・ランキング：Amazon商品ページ B0FVL8QST6</li>
+<li style='margin-left:0.0em'>仕入条件：スーパーデリバリー 注文内容（受付番号 94478096）／SD品番は掲載していません（会員限定）</li>
+<li style='margin-left:0.0em'>宅配運賃の参考：<a href="https://www.post.japanpost.jp/service/domestic/charge/list/yu-pack/13.html" target="_blank" rel="noopener">ゆうパック基本運賃表（東京）</a>・<a href="https://www.kuronekoyamato.co.jp/ytc/customer/send/services/inc/pricelist.html" target="_blank" rel="noopener">ヤマト運輸 同一都道府県内運賃</a>（80サイズ 1,089〜1,810円）</li>
+<li style='margin-left:0.0em'>FBAパートナーキャリア運賃：当社実測値（140サイズ関東-関東608円／160サイズ関東-関東762円）</li>
+</ul>
+</body></html>
