@@ -1,0 +1,108 @@
+<!doctype html><html lang='ja'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>発注する3SKU — カズヨがカートへ、確定は社長</title><style>body{font-family:-apple-system,'Hiragino Sans','Noto Sans JP',sans-serif;max-width:1150px;margin:2em auto;padding:0 1em;line-height:1.65;color:#222;font-size:14.5px}table{border-collapse:collapse;margin:.8em 0;font-size:.92em}th,td{border:1px solid #bbb;padding:.35em .6em;vertical-align:top}th{background:#eef2f8}tr:nth-child(even) td{background:#fafafa}h1{font-size:1.5em;border-bottom:2px solid #444}h2{font-size:1.25em;border-left:5px solid #25b;padding-left:8px;margin-top:1.8em}h3{font-size:1.05em;margin-top:1.4em}blockquote{border-left:4px solid #ccc;margin:.8em 0;padding:.2em 1em;color:#444}code{background:#f3f3f3;padding:1px 4px;border-radius:3px}hr{border:0;border-top:1px solid #ccc;margin:1.6em 0}</style></head><body>
+<h1>発注する3SKU — カズヨがカートへ、確定は社長</h1>
+<ul>
+<li style='margin-left:0.0em'>作成: 2026-09-30 タカシ（IT）／T-20260920-003</li>
+<li style='margin-left:0.0em'>社長判断（本日）: <strong>入口を多く持つ</strong>／利益が少なくても量で何とかする／<strong>テスト予算10万円</strong>（初回ロット19,756円を除き<strong>約8万円</strong>）／<strong>売れ残りはメルカリで処分</strong></li>
+<li style='margin-left:0.0em'>数値はすべて本日の実測。売価・ランク・オファー数・手数料率・FBA は Keepa、卸値・ロット・送料は NETSEA API。Keepa 消費 <strong>36トークン</strong>（本日累計323）</li>
+</ul>
+<h2>結論</h2>
+<p><strong>入口は60件あります。そのうち、この3つを買ってください。合計 67,660円（税込・送料込み／予算8万円の85%）。</strong></p>
+<table><thead><tr><th>#</th><th>ASIN</th><th>商品</th><th>ブランド</th><th>卸元</th><th>点数</th><th>発注額</th></tr></thead><tbody>
+<tr><td>1</td><td>B0DJNX12KZ</td><td>不二貿易 洗えるバスケット2点セット</td><td>不二貿易</td><td>不二貿易株式会社</td><td>12点</td><td>12,144円</td></tr>
+<tr><td>2</td><td>B0FN3NWKYZ</td><td>サンワダイレクト LED作業灯（充電式）</td><td>サンワダイレクト</td><td>合同会社 ウェルフェア</td><td>10点</td><td>27,820円</td></tr>
+<tr><td>3</td><td>B0171AC6PI</td><td>富士パックス 万能包丁「楽」</td><td>富士パックス販売</td><td>有限会社 アイ・エス・エム</td><td>12点</td><td>27,696円</td></tr>
+<tr><td></td><td></td><td></td><td></td><td></td><td><strong>34点</strong></td><td><strong>67,660円</strong></td></tr>
+</tbody></table>
+<p>余る <strong>12,340円</strong> の使い方は §5 に2案出しました。</p>
+<h2>1. 推奨3SKU の数字</h2>
+<table><thead><tr><th>項目</th><th>① 不二貿易 バスケット</th><th>② サンワダイレクト 作業灯</th><th>③ 富士パックス 包丁</th></tr></thead><tbody>
+<tr><td>ASIN</td><td>B0DJNX12KZ</td><td>B0FN3NWKYZ</td><td>B0171AC6PI</td></tr>
+<tr><td>ゲートの型</td><td><strong>ブランド型</strong>（9/30 確認済）</td><td><strong>ブランド型</strong>（9/30 確認済）</td><td><strong>未確認</strong>（無料・検索1回）</td></tr>
+<tr><td>発注点数 / 額</td><td>12点 / 12,144円</td><td>10点 / 27,820円</td><td>12点 / 27,696円</td></tr>
+<tr><td>1個あたり実原価（税込）</td><td>1,012円</td><td>2,782円</td><td>2,308円</td></tr>
+<tr><td>Amazon 売価</td><td>2,980円</td><td>5,980円</td><td>6,237円</td></tr>
+<tr><td>販売手数料（<strong>ASIN 別の実測率</strong>）</td><td>15.4% = 505円</td><td>15.4% = 1,013円</td><td>15.39% = 1,056円</td></tr>
+<tr><td>FBA 配送代行（実測）</td><td>472円</td><td>415円</td><td>430円</td></tr>
+<tr><td><strong>1個あたり粗利 / 利益率</strong></td><td><strong>991円 / 33.3%</strong></td><td><strong>1,770円 / 29.6%</strong></td><td><strong>2,443円 / 39.2%</strong></td></tr>
+<tr><td>卸率（売価に占める仕入れ）</td><td>34.0%</td><td>46.5%</td><td>37.0%</td></tr>
+<tr><td>売れ筋ランク</td><td>20,748位</td><td>33,252位</td><td>147,077位</td></tr>
+<tr><td>新品オファー数</td><td>2本</td><td>1本</td><td>3本</td></tr>
+<tr><td>カートを持っているのは</td><td>第三者（FBA）</td><td>第三者（<strong>自己発送</strong>）</td><td>第三者（<strong>自己発送</strong>）</td></tr>
+<tr><td>Amazon 本体</td><td>365日ベースで不在（在庫率0%）</td><td>同左</td><td>同左</td></tr>
+<tr><td>売り切る月数の目安</td><td>約3ヶ月</td><td>約3ヶ月</td><td>読めない（長い）</td></tr>
+<tr><td>全部売れたときの粗利</td><td>11,892円</td><td>17,700円</td><td>29,316円</td></tr>
+<tr><td><strong>全損したときの損失</strong></td><td>12,144円</td><td>27,820円</td><td>27,696円</td></tr>
+<tr><td><strong>メルカリで半値処分できたときの損失</strong></td><td><strong>2,052円</strong></td><td><strong>5,910円</strong></td><td><strong>12円</strong></td></tr>
+</tbody></table>
+<ul>
+<li style='margin-left:0.0em'><strong>②③のカートは自己発送の出品者</strong>が持っています。<strong>FBA で出せばカートを取れる可能性が高い</strong>位置です（Amazon 本体が持っている棚は避けました。ぺんてる ケリーが見送りになった理由と同じ）</li>
+<li style='margin-left:0.0em'>処分の置き方は経理と揃えました：<strong>メルカリ出品価格＝売価の50%・手数料10%・送料500円/個</strong>。3つとも<strong>卸率が50%以下</strong>なので、<strong>半値で処分しても仕入れをほぼ回収できます</strong>（③は12円）。ここが低卸率の品を選ぶ理由です</li>
+<li style='margin-left:0.0em'>⚠️ 「メルカリで半値なら必ず売れる」という前提は強めです。出品の手間も別途かかります。全損側の数字も併記しました</li>
+<li style='margin-left:0.0em'><strong>送料は総額に乗りません</strong>（3社とも当社の発送先あてで上乗せなし。北海道・沖縄・離島は別扱い）。条件の詳細は会員限定のため非掲載</li>
+<li style='margin-left:0.0em'>⚠️ <strong>不二貿易はカート画面で送料が仮の高い金額で表示され、受注確認後に修正される運用</strong>です。カズヨはその表示で止まらないでください</li>
+</ul>
+<h2>2. なぜこの3つなのか（1行ずつ）</h2>
+<ol>
+<li style='margin-left:0.0em'><strong>① 不二貿易</strong> — <strong>ゲートの型が確定済み</strong>で、ランク2万位・3ヶ月で売り切る見込み。<strong>卸率34.0%は60件で最良クラス</strong>＝処分しても損が小さい。不二貿易は入口60件のうち<strong>8件</strong>を出しており、<strong>量を伸ばすときの本命</strong></li>
+<li style='margin-left:0.0em'><strong>② サンワダイレクト</strong> — <strong>ゲートの型が確定済み・オファー1本＝競合がいない棚</strong>。卸元のウェルフェアは入口60件のうち<strong>12件</strong>で最多。<strong>同じ卸元でまとめて量を打てます</strong></li>
+<li style='margin-left:0.0em'><strong>③ 富士パックス</strong> — <strong>粗利2,443円・利益率39.2%で60件の最良</strong>。回転は読めませんが、<strong>半値処分でも損失12円</strong>。出口が決まった今、ここは取りに行く価値があります</li>
+</ol>
+<h2>3. 入口リスト（通過60件）</h2>
+<p>「売価2,000円以上／Amazon 本体が365日不在／オファー6本以下／発注額1万〜3万円／<strong>1個あたり粗利がプラス</strong>／現在ランクあり」を全部通ったものです。<strong>利益率の下限は設けていません</strong>（社長条件）。全件は [22_発注する3SKU_入口60件.csv](22_発注する3SKU_入口60件.csv)。</p>
+<p>推奨3件を除く上位22件：</p>
+<table><thead><tr><th>ASIN</th><th>商品名</th><th>ブランド</th><th>卸元</th><th>売価</th><th>ランク</th><th>オファー</th><th>卸率</th><th>点数</th><th>発注額</th><th>粗利/個</th><th>利益率</th><th>半値処分時の損失</th></tr></thead><tbody>
+<tr><td>B07DTWXF39</td><td>SOLCION 折りたたみ椅子 PATATTO (180ブラ</td><td>SOLCION ソルシオ</td><td>株式会社 八大</td><td>2,200円</td><td>2,981位</td><td>2本</td><td>51.0%</td><td>10点</td><td>11,220円</td><td>233円</td><td>10.6%</td><td>6,320円</td></tr>
+<tr><td>B0D6GBWXPR</td><td>Born of Bread (ボーンオブブレッド)- Swi</td><td>オーイズミ・アミュージオ</td><td>合同会社 ウェルフェア</td><td>3,300円</td><td>3,960位</td><td>6本</td><td>43.0%</td><td>10点</td><td>14,190円</td><td>1,034円</td><td>31.3%</td><td>4,340円</td></tr>
+<tr><td>B005LIEBEC</td><td>不二貿易(Fujiboeki) シューズラック 4段 幅63</td><td>不二貿易(Fujiboe</td><td>不二貿易株式会社</td><td>2,750円</td><td>28,560位</td><td>3本</td><td>53.6%</td><td>16点</td><td>23,584円</td><td>135円</td><td>4.9%</td><td>11,776円</td></tr>
+<tr><td>B077D7MGBF</td><td>フィッシャープライス スイートドリーム・ベア・ミュージカルジ</td><td>Fisher-Price</td><td>合同会社 ウェルフェア</td><td>4,422円</td><td>32,701位</td><td>3本</td><td>27.4%</td><td>10点</td><td>12,100円</td><td>1,686円</td><td>38.1%</td><td>0円</td></tr>
+<tr><td>B0D3TYTQTN</td><td>卓上 湯せん式 酒燗器 酒呑み大将 1合徳利・カップ酒用</td><td>タマハシ(Tamahas</td><td>株式会社 八大</td><td>3,575円</td><td>63,649位</td><td>5本</td><td>70.2%</td><td>10点</td><td>25,080円</td><td>186円</td><td>5.2%</td><td>13,990円</td></tr>
+<tr><td>B01BEH1OAC</td><td>【正規品】H2OスチームFX　8点デラックスセット　(レッド</td><td>H2O STEAMFX</td><td>合同会社 ウェルフェア</td><td>4,800円</td><td>68,583位</td><td>2本</td><td>53.2%</td><td>10点</td><td>25,560円</td><td>1,071円</td><td>22.3%</td><td>8,960円</td></tr>
+<tr><td>B07Y3G59PG</td><td>エレコム ゲーミングヘッドセット 両耳オーバーヘッド PS5</td><td>エレコム(ELECOM)</td><td>合同会社 ウェルフェア</td><td>2,280円</td><td>70,460位</td><td>6本</td><td>59.9%</td><td>10点</td><td>13,650円</td><td>224円</td><td>9.8%</td><td>8,390円</td></tr>
+<tr><td>B0F6Y34BKJ</td><td>Dolce duo 抹茶碗 抹茶 茶碗 桜富士 日本製 美濃</td><td>Dolce duo</td><td>株式会社 二幸</td><td>2,778円</td><td>74,815位</td><td>2本</td><td>59.4%</td><td>10点</td><td>16,500円</td><td>237円</td><td>8.5%</td><td>9,000円</td></tr>
+<tr><td>B09JNS2F2G</td><td>スリーアップ 蓄熱式 エコ湯たんぽ ぬくぬく(アニマル) ウ</td><td>スリーアップ(Three</td><td>合同会社 ウェルフェア</td><td>3,650円</td><td>87,154位</td><td>6本</td><td>70.2%</td><td>10点</td><td>25,640円</td><td>196円</td><td>5.4%</td><td>14,220円</td></tr>
+<tr><td>B0F6WD58FR</td><td>Dolce duo 抹茶碗 抹茶 茶碗 舞桜 日本製 美濃焼</td><td>Dolce duo</td><td>株式会社 二幸</td><td>2,778円</td><td>95,351位</td><td>2本</td><td>59.4%</td><td>10点</td><td>16,500円</td><td>237円</td><td>8.5%</td><td>9,000円</td></tr>
+<tr><td>B00ST2DNXC</td><td>アサヒ興洋 アンパンマン レジャーシート 4~5人用 手提げ</td><td>アサヒ興洋</td><td>株式会社 アサヒ興洋</td><td>2,503円</td><td>109,717位</td><td>3本</td><td>42.2%</td><td>24点</td><td>25,344円</td><td>552円</td><td>22.1%</td><td>10,320円</td></tr>
+<tr><td>B0G39HF5VG</td><td>手元で聞こえるスピーカー HDL-0598 テレビ用 集音マ</td><td>ヒロ・コーポレーション</td><td>ダイアモンドヘッド 株式</td><td>2,180円</td><td>111,490位</td><td>2本</td><td>55.5%</td><td>24点</td><td>29,040円</td><td>290円</td><td>13.3%</td><td>17,496円</td></tr>
+<tr><td>B07SQ1TNK2</td><td>ナカバヤシ くらしのファイル A4 おでかけ CLAF-A4</td><td>ナカバヤシ(Nakaba</td><td>株式会社 トキワカメラ</td><td>2,495円</td><td>128,431位</td><td>2本</td><td>53.7%</td><td>10点</td><td>13,400円</td><td>261円</td><td>10.5%</td><td>7,170円</td></tr>
+<tr><td>B0F93DM4D2</td><td>後藤 (GOTO) ミストシャワー ミストdeクールシャワー</td><td>GOTO</td><td>通販商品のGOTO（ゴト</td><td>2,200円</td><td>204,473位</td><td>3本</td><td>63.0%</td><td>10点</td><td>13,860円</td><td>21円</td><td>1.0%</td><td>8,960円</td></tr>
+<tr><td>B01D12TA5O</td><td>[クーコ] トートバッグ レディース A3 折りたたみ エコ</td><td>COOCO(クーコ)</td><td>株式会社 クー</td><td>5,375円</td><td>265,880位</td><td>2本</td><td>50.1%</td><td>10点</td><td>26,950円</td><td>1,272円</td><td>23.7%</td><td>7,760円</td></tr>
+<tr><td>B01M2CJ7S2</td><td>不二貿易 木製曲木チェア スタッキング ナチュラル 1283</td><td>不二貿易(Fujiboe</td><td>不二貿易株式会社</td><td>3,099円</td><td>273,941位</td><td>6本</td><td>56.4%</td><td>12点</td><td>20,988円</td><td>44円</td><td>1.4%</td><td>10,248円</td></tr>
+<tr><td>B003G7XKTW</td><td>NEC PR-L9100C-11 トナー イエロー NE-T</td><td>NEC</td><td>合同会社 ウェルフェア</td><td>19,128円</td><td>298,988位</td><td>1本</td><td>13.4%</td><td>10点</td><td>25,680円</td><td>14,378円</td><td>75.2%</td><td>0円</td></tr>
+<tr><td>B0BW9QNRFX</td><td>[C/D:37189] [セット数:4pcs] アニマルドア</td><td>不二貿易(Fujiboe</td><td>不二貿易株式会社</td><td>2,260円</td><td>315,692位</td><td>1本</td><td>47.7%</td><td>12点</td><td>12,936円</td><td>369円</td><td>16.3%</td><td>6,732円</td></tr>
+<tr><td>B0BW9PXF69</td><td>不二貿易 ドアストッパー 幅17.5×奥行23×高さ22cm</td><td>不二貿易(Fujiboe</td><td>不二貿易株式会社</td><td>2,260円</td><td>315,692位</td><td>1本</td><td>47.7%</td><td>12点</td><td>12,936円</td><td>267円</td><td>11.8%</td><td>6,732円</td></tr>
+<tr><td>B0BW9NZ31D</td><td>不二貿易 ドアストッパー 幅14×奥行30×高さ26.5cm</td><td>不二貿易(Fujiboe</td><td>不二貿易株式会社</td><td>2,118円</td><td>315,692位</td><td>2本</td><td>50.9%</td><td>12点</td><td>12,936円</td><td>6円</td><td>0.3%</td><td>7,500円</td></tr>
+<tr><td>B0C773Y6SK</td><td>Life on Products エアダスター ダークウッド</td><td>Life on Prod</td><td>ダイアモンドヘッド 株式</td><td>2,880円</td><td>345,170位</td><td>3本</td><td>35.9%</td><td>24点</td><td>24,816円</td><td>1,044円</td><td>36.2%</td><td>5,712円</td></tr>
+<tr><td>B0C7713R4C</td><td>Life on Products エアダスター ナチュラルウ</td><td>Life on Prod</td><td>ダイアモンドヘッド 株式</td><td>2,600円</td><td>345,170位</td><td>2本</td><td>39.8%</td><td>24点</td><td>24,816円</td><td>844円</td><td>32.5%</td><td>8,736円</td></tr>
+</tbody></table>
+<ul>
+<li style='margin-left:0.0em'>卸元の内訳：<strong>合同会社ウェルフェア12件・株式会社クー12件・不二貿易8件・かわ畑貿易6件・トキワカメラ5件</strong>。<strong>1社でまとめれば送料と手間が圧縮できます</strong></li>
+<li style='margin-left:0.0em'>粗利が数百円の行が多いのは、利益率の下限を外したためです。<strong>量で取りに行く枠</strong>として見てください</li>
+</ul>
+<h2>4. 落とした候補（件数と理由）</h2>
+<table><thead><tr><th>理由</th><th>件数</th></tr></thead><tbody>
+<tr><td>まとめ買いの単位が大きく、発注額が3万円を超える</td><td>9</td></tr>
+<tr><td>NETSEA から掲載が消えた</td><td>2</td></tr>
+<tr><td><strong>カテゴリー型のゲート</strong>（B077D7MGBF・学習玩具。ブランド申請では開かない）</td><td>1</td></tr>
+<tr><td><strong>オファー本数では基準内だが、実際の競合が基準外</strong>（B0D6GBWXPR／B01BEH1OAC）</td><td>2</td></tr>
+<tr><td>1個あたりが赤字</td><td>前段で除外（粗利プラスのみ通過）</td></tr>
+</tbody></table>
+<p><strong>今日の教訓：オファー本数だけで競合の数を判断しないこと。</strong>発注を決める1回だけは <code>offers</code> を引いて確かめます。ランク3,960位で最有力だった Switch ゲームは、これで落ちました。</p>
+<h2>5. 余る12,340円の使い方（社長判断）</h2>
+<table><thead><tr><th>案</th><th>中身</th><th>総額</th><th>効果</th></tr></thead><tbody>
+<tr><td><strong>A（推奨）</strong></td><td>3SKU のまま。残りは<strong>価格変動と追加発注の余力</strong>に残す</td><td>67,660円</td><td>堅い。①が3ヶ月で売れたら同じ品を積み増す</td></tr>
+<tr><td>B</td><td>①を12点 → 24点に倍増</td><td>79,804円</td><td>一番回転の良い品を厚くする。売り切りは約6ヶ月に伸びる</td></tr>
+</tbody></table>
+<p><strong>推奨は A です。</strong>理由は、①②③とも<strong>まだ1個も売ったことがない品</strong>だからです。8万円を使い切るより、<strong>3ブランド分の申請書類を取り、実際に売れた事実を見てから積み増す</strong>ほうが、次の判断が正確になります。</p>
+<h2>6. 発注後の段取り</h2>
+<ol>
+<li style='margin-left:0.0em'>3社それぞれから<strong>納品書</strong>が届く（発行元＝出展企業名義かを必ず確認・写真かPDFで保存）</li>
+<li style='margin-left:0.0em'><strong>①②は申請をすぐ出せます</strong>（ゲートの型が確定済み）。③はゲート確認から</li>
+<li style='margin-left:0.0em'>申請要件：納品書または領収書・180日以内・宛名は出品用アカウントと一致・発行元の名前と住所・<strong>合計10点以上</strong>・価格は省略可</li>
+<li style='margin-left:0.0em'>🔴 <strong>納品書が出展企業名義でなかった場合</strong>、3件とも申請が通りません。どれか1社の納品書が届いた時点で分かります</li>
+</ol>
+<hr>
+<ul>
+<li style='margin-left:0.0em'>元データ・卸値の実額・送料設定（Git 追跡外）: <code>workspace/output/agent_output/T-20260920-003/apply21/</code></li>
+<li style='margin-left:0.0em'>候補リスト（厳しい基準版・26件）: [21_申請前提の仕入れ候補リスト.md](21_申請前提の仕入れ候補リスト.md)</li>
+</ul>
+</body></html>
