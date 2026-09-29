@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FBA納品代行の選定案の仮想実行（プレモーテム＋3シナリオ）</title>
+<meta name="robots" content="noindex, nofollow">
+<style>
+:root{
+  color-scheme: light dark;
+  --bg:#ffffff; --surface:#f5f7f9; --surface2:#eceff3;
+  --text:#1b1f24; --muted:#525b66; --faint:#6c7681;
+  --border:#d5dae1; --border-strong:#b8c0ca;
+  --accent:#1c5b86; --accent-bg:#eef5fa;
+  --warn:#8a4b00; --warn-bg:#fdf1df; --warn-border:#dd9a3c;
+  --alert:#7d2b2b; --alert-bg:#fbeeee; --alert-border:#d08b8b;
+  --ok:#1b6144; --ok-bg:#eaf4ef; --ok-border:#8ab9a3;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#15181c; --surface:#1d2126; --surface2:#252a31;
+    --text:#e4e8ec; --muted:#aab4bf; --faint:#949eaa;
+    --border:#333a43; --border-strong:#48515c;
+    --accent:#79b4dc; --accent-bg:#1a2a36;
+    --warn:#f0b866; --warn-bg:#332616; --warn-border:#7a5a2a;
+    --alert:#e79a9a; --alert-bg:#331e1e; --alert-border:#6e4040;
+    --ok:#84cfa9; --ok-bg:#17281f; --ok-border:#3c6450;
+  }
+}
+*{box-sizing:border-box;}
+html{ -webkit-text-size-adjust:100%; }
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic Medium","Yu Gothic",
+              "Noto Sans JP","Meiryo",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:16px; line-height:1.85;
+  font-feature-settings:"palt" 1;
+  text-align:left;
+}
+.wrap{max-width:900px; margin:0 auto; padding:32px 20px 96px;}
+
+/* ---------- header ---------- */
+.kicker{
+  font-size:12px; letter-spacing:.14em; color:var(--faint);
+  margin:0 0 10px; font-variant-numeric:tabular-nums;
+}
+h1{
+  font-size:27px; line-height:1.5; margin:0 0 20px;
+  letter-spacing:.01em; font-weight:700; text-wrap:balance;
+}
+.lead{
+  margin:0; color:var(--muted); font-size:15px; line-height:1.8;
+  border-left:3px solid var(--border-strong); padding:2px 0 2px 14px;
+}
+
+/* ---------- kpi カード ---------- */
+.kpis{display:flex; flex-wrap:wrap; gap:10px; margin:1.1em 0 1.2em;}
+.kpi{
+  flex:1 1 150px; min-width:150px;
+  border:1px solid var(--border-strong); border-radius:10px;
+  background:var(--bg); padding:12px 14px 13px;
+}
+.kpi-l{margin:0; font-size:13px; line-height:1.5; color:var(--muted); letter-spacing:.02em;}
+.kpi-v{
+  margin:.1em 0 0; font-size:32px; line-height:1.25; font-weight:700;
+  letter-spacing:-.01em; font-variant-numeric:tabular-nums;
+}
+@media (max-width:520px){
+  .kpi{flex:1 1 100%;}
+  .kpi-v{font-size:27px;}
+}
+
+/* ---------- toc ---------- */
+.toc{
+  margin:30px 0 8px; padding:18px 22px 20px;
+  background:var(--surface); border:1px solid var(--border); border-radius:10px;
+}
+.toc-h{
+  margin:0 0 10px; font-size:13px; font-weight:700;
+  letter-spacing:.1em; color:var(--muted);
+}
+.toc ul.toc-list{margin:0; padding:0; list-style:none;}
+.toc li{margin:.26em 0; line-height:1.65;}
+.toc li.toc-lv1{margin:.85em 0 .3em; font-weight:700;}
+.toc li.toc-lv1:first-child{margin-top:0;}
+.toc li.toc-lv2{padding-left:1.1em;}
+.toc li.toc-lv3{padding-left:2.5em; font-size:14.5px; color:var(--muted); margin:.16em 0;}
+.toc li.toc-lv3::before{content:"–"; color:var(--faint); margin-right:.45em;}
+.toc a{color:var(--accent); text-decoration:none; border-bottom:1px solid transparent;}
+.toc a:hover{border-bottom-color:currentColor;}
+
+/* ---------- part ---------- */
+h1.part{
+  font-size:24px; line-height:1.5; font-weight:700; letter-spacing:.02em;
+  margin:64px 0 8px; padding:14px 0 0; border-top:4px solid var(--text);
+  scroll-margin-top:16px;
+}
+
+/* ---------- sections ---------- */
+.sec{margin:0;}
+.sec>*:last-child{margin-bottom:0;}
+h2{
+  font-size:21px; line-height:1.5; margin:46px 0 16px; padding-bottom:9px;
+  border-bottom:2px solid var(--border-strong); font-weight:700;
+  scroll-margin-top:16px;
+}
+h3{
+  font-size:17px; line-height:1.6; margin:32px 0 12px; font-weight:700;
+  color:var(--text); scroll-margin-top:16px;
+}
+h3::before{content:""; display:inline-block; width:4px; height:1em;
+  background:var(--accent); margin-right:9px; vertical-align:-.13em; border-radius:2px;}
+p{margin:0 0 1.1em;}
+ul,ol{margin:0 0 1.2em; padding-left:1.6em;}
+li{margin:.4em 0;}
+li>ul{margin:.45em 0 .2em;}
+blockquote{
+  margin:0 0 1.2em; padding:14px 18px;
+  background:var(--surface); border-left:4px solid var(--accent); border-radius:0 8px 8px 0;
+}
+blockquote p{margin:0;}
+hr.rule{
+  border:0; border-top:1px solid var(--border);
+  margin:40px 0 0; opacity:.55;
+}
+hr.rule:has(+ .sec-box),hr.rule:has(+ h1.part){display:none;}
+
+/* ---------- tables ---------- */
+.tw{
+  overflow-x:auto; -webkit-overflow-scrolling:touch;
+  margin:0 0 1.4em; border:1px solid var(--border); border-radius:9px;
+  background:
+    linear-gradient(to right, var(--bg) 30%, rgba(0,0,0,0)) left / 28px 100% no-repeat local,
+    linear-gradient(to left,  var(--bg) 30%, rgba(0,0,0,0)) right / 28px 100% no-repeat local,
+    radial-gradient(farthest-side at 0 50%, rgba(90,110,130,.28), rgba(0,0,0,0)) left / 12px 100% no-repeat scroll,
+    radial-gradient(farthest-side at 100% 50%, rgba(90,110,130,.28), rgba(0,0,0,0)) right / 12px 100% no-repeat scroll;
+}
+.tw:focus{outline:2px solid var(--accent); outline-offset:2px;}
+table{border-collapse:collapse; width:100%; font-size:14.5px; line-height:1.72;}
+thead th{
+  background:var(--surface2); text-align:left; font-weight:700;
+  padding:11px 14px; border-bottom:2px solid var(--border-strong);
+  white-space:nowrap; vertical-align:bottom;
+}
+tbody td{padding:11px 14px; border-bottom:1px solid var(--border); vertical-align:top;
+  overflow-wrap:anywhere;}
+tbody tr:last-child td{border-bottom:0;}
+tbody tr:nth-child(even){background:color-mix(in srgb, var(--surface) 55%, transparent);}
+tbody td:first-child{font-weight:600;}
+thead th:first-child,tbody td:first-child{min-width:7.5em;}
+thead th:last-child,tbody td:last-child{white-space:normal;}
+
+/* ---------- inline markers ---------- */
+.ref{
+  font-size:.75em; color:var(--faint); margin-left:.15em;
+  white-space:nowrap; font-variant-numeric:tabular-nums;
+  letter-spacing:.01em; vertical-align:.06em;
+}
+/* [#n] は出典表に行がある時だけリンクになる。見た目は span と同じにして
+   本文の印象を変えない（追加したのは移動手段だけで、文字は足していない） */
+a.ref{text-decoration:none;}
+a.ref:hover,a.ref:focus{color:var(--accent); text-decoration:underline;}
+.chk{
+  display:inline-block; font-size:.75em; line-height:1.5;
+  padding:0 .5em; margin:0 .12em; border-radius:4px;
+  background:var(--warn-bg); color:var(--warn);
+  border:1px solid var(--warn-border); font-weight:700;
+  white-space:nowrap; vertical-align:.09em;
+}
+
+/* ---------- inline emphasis ---------- */
+strong{font-weight:700; color:var(--text);}
+td strong,th strong{font-weight:700;}
+pre.codeblock{white-space:pre-wrap; word-break:break-all; background:rgba(127,127,127,.10); border:1px solid rgba(127,127,127,.35); border-radius:6px; padding:14px 16px; line-height:1.7; font-size:14px; overflow-x:auto;}
+pre.codeblock code{background:none; border:0; padding:0; font-size:inherit;}
+code{
+  font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+  font-size:.9em; padding:.05em .35em; border-radius:4px;
+  background:var(--surface2); border:1px solid var(--border);
+}
+code .chk{font-family:inherit;}
+
+/* ---------- 表セル内の語ハイライト ---------- */
+.pill{
+  display:inline-block; padding:0 .45em; border-radius:4px;
+  font-weight:700; white-space:nowrap;
+}
+.pill-danger{background:var(--alert); color:#fff; border:1px solid var(--alert);}
+.pill-warn{background:var(--warn-bg); color:var(--warn); border:1px solid var(--warn-border);}
+.pill-ok{background:var(--ok-bg); color:var(--ok); border:1px solid var(--ok-border);}
+.pill-info{background:var(--accent-bg); color:var(--accent); border:1px solid var(--accent);}
+/* muted は「検証していない」を表す。塗らず・破線で、済んだものと視覚的に別系統にする */
+.pill-muted{background:transparent; color:var(--faint);
+  border:1px dashed var(--border-strong); font-weight:600;}
+tbody tr.row-danger td:first-child{box-shadow:inset 4px 0 0 var(--alert);}
+tbody tr.row-danger td{background:color-mix(in srgb, var(--alert-bg) 70%, transparent);}
+
+/* ---------- 出典一覧（--reftable） ---------- */
+table.reftable:has(colgroup){table-layout:fixed; min-width:600px;}
+/* --colwidths で列幅を固定した表。狭い画面の溢れは .tw の横スクロールが受ける */
+table.fixedcols{table-layout:fixed; min-width:620px;}
+/* 狭い画面で列が1〜2文字幅に潰れるのを防ぐ。溢れは .tw の横スクロールが受ける */
+table.reftable td:first-child{
+  min-width:2.6em; width:2.6em; text-align:right; white-space:nowrap;
+  font-variant-numeric:tabular-nums; color:var(--muted);
+}
+table.reftable th:first-child{min-width:2.6em; width:2.6em; text-align:right;}
+tbody tr[id]{scroll-margin-top:14px;}
+tbody tr[id]:target td{background:var(--accent-bg);}
+tbody tr[id]:target td:first-child{box-shadow:inset 4px 0 0 var(--accent); color:var(--accent);}
+
+/* ---------- emphasised sections ---------- */
+.sec-box{
+  margin:28px 0 0; padding:6px 26px 20px;
+  border:1px solid var(--border-strong); border-radius:10px;
+}
+.sec-box h2{margin-top:26px;}
+.sec-box .tw{background-color:var(--bg);}
+.sec-conclusion{background:var(--accent-bg); border-left:6px solid var(--accent);}
+.sec-conclusion h2{border-bottom-color:var(--accent);}
+.sec-alert{background:var(--alert-bg); border-color:var(--alert-border);
+  border-left:6px solid var(--alert);}
+.sec-alert h2{border-bottom-color:var(--alert-border);}
+.sec-danger{background:var(--alert-bg); border:2px solid var(--alert);
+  border-left:10px solid var(--alert);}
+.sec-danger h2{border-bottom-color:var(--alert);}
+.sec-warn{background:var(--warn-bg); border-color:var(--warn-border);
+  border-left:6px solid var(--warn-border);}
+.sec-warn h2{border-bottom-color:var(--warn-border);}
+.sec-checklist{background:var(--surface); border:2px solid var(--border-strong);
+  border-left:10px solid var(--accent);}
+.sec-checklist h2{border-bottom-color:var(--accent);}
+/* チェックリストは印刷して手元で使う。番号は原稿どおり残し、記入欄だけ CSS で足す */
+.sec-checklist ol{list-style:decimal; padding-left:1.9em;}
+.sec-checklist ol>li{margin:.7em 0; padding-left:2.1em; position:relative;}
+.sec-checklist ol>li::before{
+  content:""; position:absolute; left:0; top:.25em;
+  width:1.15em; height:1.15em; border:1.5px solid var(--border-strong);
+  border-radius:3px; background:var(--bg);
+}
+
+/* ---------- toc: 囲み枠の節は目次でも色を付ける ---------- */
+.toc a.toc-danger,.toc a.toc-alert{color:var(--alert); font-weight:700;}
+.toc a.toc-warn{color:var(--warn); font-weight:700;}
+.toc a.toc-checklist{color:var(--accent); font-weight:700;}
+
+/* ---------- footer / nav ---------- */
+.prov{
+  margin:56px 0 0; padding-top:16px; border-top:1px solid var(--border);
+  font-size:12.5px; line-height:1.8; color:var(--faint); word-break:break-all;
+}
+.top{
+  position:fixed; right:18px; bottom:18px; z-index:5;
+  display:block; width:42px; height:42px; line-height:40px; text-align:center;
+  border-radius:50%; text-decoration:none; font-size:17px;
+  background:var(--surface); color:var(--muted);
+  border:1px solid var(--border-strong);
+  box-shadow:0 2px 8px rgba(0,0,0,.14);
+}
+.top:hover{color:var(--accent); border-color:var(--accent);}
+
+/* ---------- narrow screens ---------- */
+@media (max-width:640px){
+  body{font-size:15.5px;}
+  .wrap{padding:22px 14px 88px;}
+  h1{font-size:22px;}
+  h1.part{font-size:20px; margin-top:46px;}
+  h2{font-size:19px;}
+  h3{font-size:16.5px;}
+  .toc{padding:14px 16px 16px;}
+  .sec-box{padding:4px 14px 14px;}
+  table{font-size:14px;}
+  thead th,tbody td{padding:9px 11px;}
+}
+
+/* ---------- print ---------- */
+@media print{
+  :root{
+    --bg:#fff; --surface:#fff; --surface2:#fff; --text:#000; --muted:#333; --faint:#555;
+    --border:#999; --border-strong:#555; --accent:#000; --accent-bg:#fff;
+    --warn:#000; --warn-bg:#fff; --warn-border:#000;
+    --alert:#000; --alert-bg:#fff; --alert-border:#000;
+  }
+  body{background:#fff; color:#000; font-size:10.5pt; line-height:1.7;}
+  .wrap{max-width:none; padding:0;}
+  a{color:#000; text-decoration:none;}
+  .top{display:none;}
+  .tw{overflow:visible; background:none; border:1px solid #999;}
+  table{font-size:9pt;}
+  thead th{background:#fff; border-bottom:1.5pt solid #000;}
+  tbody tr:nth-child(even){background:#fff;}
+  .sec-box{background:#fff; border:1.5pt solid #000;}
+  .sec-danger{border:2.5pt solid #000; border-left:2.5pt solid #000;}
+  .chk{background:#fff; color:#000; border:1pt solid #000;}
+  pre.codeblock{background:#fff; border:1px solid #999; break-inside:avoid;}
+  code{background:#fff; border:1px solid #999;}
+  .pill{background:#fff!important; color:#000!important; border:1.2pt solid #000!important;}
+  /* 未検証は印刷でも「済んだもの」と別に見えなければ意味がない。
+     モノクロでは色が消えるので、破線と濃度で差を残す */
+  .pill-muted{border:1pt dashed #666!important; color:#555!important; font-weight:400!important;}
+  /* 長いURLは印刷で紙幅を超える。折り返しを許可して溢れを止める */
+  .tw{overflow:hidden;}
+  table{table-layout:auto; width:100%;}
+  tbody td{overflow-wrap:anywhere; word-break:break-word;}
+  thead th{white-space:normal;}
+  table.reftable{font-size:7.6pt; line-height:1.5;}
+  table.reftable thead th,table.reftable tbody td{padding:5px 6px;}
+  tbody tr[id]:target td{background:#fff;}
+  tbody tr.row-danger td{background:#fff;}
+  tbody tr.row-danger td:first-child{box-shadow:inset 3pt 0 0 #000;}
+  /* チェックリストは1枚で手元に置けるよう独立ページにする */
+  .sec-checklist{break-before:page; page-break-before:always;
+    border:1.5pt solid #000; border-left:1.5pt solid #000;}
+  .sec-checklist ol>li::before{border:1.2pt solid #000;}
+  .ref{color:#555; opacity:1;}
+  blockquote{background:#fff; border-left:3pt solid #000;}
+  h1.part{break-before:page; page-break-before:always; border-top:2.5pt solid #000;
+    font-size:15pt; margin-top:0;}
+  h1.part,h2,h3{break-after:avoid; page-break-after:avoid;}
+  .tw,blockquote,tr{break-inside:avoid; page-break-inside:avoid;}
+  .toc{border:1px solid #999; background:#fff;}
+  .kpi{border:1pt solid #000; background:#fff; break-inside:avoid;}
+  .kpi-v{font-size:16pt;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>FBA納品代行の選定案の仮想実行（プレモーテム＋3シナリオ）</h1>
+<ul>
+<li>チケット：T-20260929-001</li>
+<li>作成：マサル（シミュレーター）／2026-09-30</li>
+<li>入力：01 公式値（サトル）、02 論点（サトル）、03 選定案（タケシ）、T-20260920-003 の商品台帳 20・初回発注の記録</li>
+<li>表記：〔事実〕は出典あり、〔推定〕は当方の置き値。確率はすべて主観確率で、答え合わせの日付を §9 に置いています</li>
+<li>計算：<code>workspace/output/agent_output/T-20260929-001/sim/01_timeline_mc.py</code>（工程のモンテカルロ・20万回）</li>
+</ul>
+<hr>
+<h2>0. 結論</h2>
+<ol>
+<li><strong>A案（主力びーぷらす・予備おりおん）は収束しています（確度75%）。</strong> 継続確率を60%から50%に下げても、権限事故の確率を見直しても、B案・C案には逆転しません。</li>
+<li><strong>初回の社長宅受けは妥当です。ただし 1a を「1a'」に直してください。</strong> Amazon のラベル貼付サービス（22円×12点）を使い、届いたケース箱を流用し、PC 側の作業はカズヨがブラウザで代行します。社長の手は物理作業だけになり、15〜25分で済みます。1b（代行へ転送）は勧めません。</li>
+<li><strong>未収束は §5-2（2周目以降の新ブランド初回ロットをどこで受けるか）です。</strong> 初回を社長宅で受けても、「配送先が代行のとき納品書の宛名がどうなるか」は観測できません（観測できない確率 約80%）。このままだと社長宅受けが常態になります。期限を付け、検証の手を別に打つ必要があります。</li>
+</ol>
+<p><strong>判定：R1〜R7 を本文に反映すれば、社長承認に上げてよい。</strong> 2周目の仮想実行は不要です。修正は文面だけで済みます。</p>
+<hr>
+<h2>1. 前提の抽出と崩れる確率</h2>
+<table><thead><tr><th>#</th><th>A案が成立する前提</th><th>崩れる確率</th><th>根拠</th></tr></thead><tbody>
+<tr><td>P1</td><td>燕三12点の注文が確定し、10月上旬に出荷される</td><td>15%</td><td>〔事実〕9/29時点でカート投入のみ。確定には社長の SMS 認証が要る。予約品なので出荷が延びる余地もある</td></tr>
+<tr><td>P2</td><td>納品書の宛名が Amazon の登録情報と一致する</td><td><strong>25%</strong></td><td>〔事実〕SD の会員名は「【開業前】Satoy Select」。Amazon 側の登録名（法的名義）と一致しない可能性がある。受け場所では直せない</td></tr>
+<tr><td>P3</td><td>出品許可が出る（再申請込み）</td><td>35%</td><td>置き値：1回目50%、却下後の再申請で30%〔推定〕</td></tr>
+<tr><td>P4</td><td>びーぷらすが問い合わせに5営業日以内に答え、条件（権限の範囲・許可待ちの保管・処理日数）が合う</td><td>35%</td><td>就労支援B型の小規模事業所。公式に処理日数の記載がない〔事実〕</td></tr>
+<tr><td>P5</td><td>主力を6か月続けられる</td><td>50%</td><td>03 は60%。下の §5-3</td></tr>
+<tr><td>P6</td><td>権限付与が原因の健全性事故が起きない</td><td>97〜99%（年）</td><td>下の §5-4</td></tr>
+<tr><td>P7</td><td>燕三鍋に割れ物のリスクがある</td><td><strong>前提そのものが誤り</strong></td><td>〔事実〕EM-103 はステンレス一枚絞り・蓋なし・浅型（商品台帳 20）。ガラス蓋は付いていない。ビン破損の記載は今後の割れ物SKUの論点で、L001 には当たらない</td></tr>
+</tbody></table>
+<p>P7 は検証依頼の3番目に含まれていた「燕三鍋のガラス蓋リスク」への回答です。L001 にガラス蓋はありません。代わりに見るべきは、12個重ねたステンレス鍋の擦り傷です。メーカーのケース梱包のまま動かせば、確率は2%程度〔推定〕に収まります。</p>
+<hr>
+<h2>2. プレモーテム：「12月末、この代行選定は失敗していた。なぜか」</h2>
+<table><thead><tr><th>順位</th><th>失敗の筋</th><th>確率</th><th>何が起きたか</th></tr></thead><tbody>
+<tr><td><strong>1</strong></td><td><strong>社長宅受けが常態になった</strong></td><td><strong>30%</strong></td><td>「10点買って申請する」を横に広げた結果、11〜12月の仕入れの大半が新ブランドの初回ロットになった。§5-2 の判定は初回の納品書では決まらず、「宛名がお届け先になる」側の扱い（社長宅受け・月2件）がそのまま続いた。3件目からは上限を超え、社長の物理作業が月2〜3時間に膨らんだ</td></tr>
+<tr><td><strong>2</strong></td><td><strong>納品書の名義が合わず、1a の目的が果たせなかった</strong></td><td><strong>20〜25%</strong></td><td>書類は確実に手元に残った。しかし宛名が「【開業前】Satoy Select」で、Amazon 登録名と一致せず却下された。受け場所を決める議論に時間を使い、名義の照合をしていなかった</td></tr>
+<tr><td><strong>3</strong></td><td><strong>2周目に代行が間に合わず、鍋シーズンを逃した</strong></td><td><strong>15%</strong></td><td>問い合わせの承認・送信・回答・登録（規約同意）が直列に並び、11月上旬のリピート発注に間に合わなかった。予備のおりおんには問い合わせていなかった</td></tr>
+<tr><td>4</td><td>登録したのに使う場面が来なかった</td><td>15%</td><td>L001 が不許可になり、横展開も止まった。3か月連絡なしの規定で解除された。実害は小さい</td></tr>
+<tr><td>5</td><td>ラベル・権限起因の事故</td><td>3%</td><td>初回の社長宅納品で受領差異が出た。あるいは権限付与の後に健全性の警告が出た</td></tr>
+</tbody></table>
+<p>1〜5は同時に起きうるので、合計は100%になりません。</p>
+<h3>撤退条件への落とし込み（上位3つ）</h3>
+<table><thead><tr><th>失敗の筋</th><th>撤退・切替の条件</th><th>判定日</th></tr></thead><tbody>
+<tr><td>1 社長宅の常態化</td><td>社長宅受けは <strong>2026-12-31 または新ブランド初回ロット累計3件の早い方で終了</strong>。4件目からは、納品書の回収を公式に料金化している業者（糸星 200円／FBA代行センター 500円〔事実〕）へ直送する</td><td>12/31・3件目の発注時</td></tr>
+<tr><td>2 名義不一致</td><td><strong>SD 出荷前（10月上旬）に、SD 会員名・登録住所と Amazon の登録名・住所を照合する。</strong> 不一致なら、出展企業へ宛名の指定か再発行を依頼する（SD 公式：再発行は出展企業へメッセージで依頼〔事実〕。第三者連絡のため §4.1）</td><td>10/3</td></tr>
+<tr><td>3 代行が間に合わない</td><td>問い合わせは<strong>びーぷらすとおりおんに同時に送る</strong>（登録ではないため「使う前に登録しない」に反しない）。5営業日で両方未回答なら、2周目のリピートも 1a' で受ける（期限内・件数に数えない）</td><td>送信から5営業日</td></tr>
+</tbody></table>
+<hr>
+<h2>3. 3シナリオ（10〜12月・4軸）</h2>
+<table><thead><tr><th>軸</th><th>楽観（25%）</th><th><strong>中央（45%）</strong></th><th>悲観（20%）</th></tr></thead><tbody>
+<tr><td>① 12月の月間納品点数</td><td>80〜150点（燕三リピート24点＋新ブランド3〜5件）</td><td><strong>20〜60点</strong>（リピート1回＋新ブランド2〜3件）</td><td>0〜15点（不許可・横展開停止）</td></tr>
+<tr><td>② 価格（代行単価／L001 売価）</td><td>36円/点のまま／3,000〜3,230円</td><td><strong>36円/点のまま／2,790〜2,900円</strong>（損益分岐付近）</td><td>36円/点のまま／2,600円（相乗りが増え価格が下がる）</td></tr>
+<tr><td>③ 競合・外部（許可・FC・代行）</td><td>許可まで1週間。FC 受領は通常。代行の回答は3営業日</td><td><strong>再申請1回。FC 受領は10日前後。代行の回答は1〜2週間</strong></td><td>不許可、または FC 受領25日。びーぷらすは繁忙期に5営業日超え</td></tr>
+<tr><td>④ 現金と社長の時間</td><td>L001 は12月上旬に回収（+1,000円前後）。社長の物理作業は月20分</td><td><strong>L001 の回収は12月中〜1月（±0円）。物理作業は月40〜90分</strong></td><td>L001 は処分で最大 −7,560円〔事実・台帳〕。物理作業は月2〜3時間（初回ロット4件以上が社長宅に届く）</td></tr>
+</tbody></table>
+<p><strong>想定外：10%。</strong> 本人確認の再審査・出品前審査の再発（9/20に復帰したばかり）、ブランド所有者からの相乗りへの苦情、予約品の出荷が11月にずれ込む、など。</p>
+<h3>工程の読み（L001・1a'）</h3>
+<table><thead><tr><th>項目</th><th>値</th></tr></thead><tbody>
+<tr><td>出品許可が出ない確率（再申請込み）</td><td>35%</td></tr>
+<tr><td>10/31 までに FBA で販売可能</td><td>45%</td></tr>
+<tr><td>11/15 までに販売可能</td><td>63%</td></tr>
+<tr><td>許可が出た世界での販売可能日 P10／P50／P90</td><td>10/19／<strong>10/26</strong>／11/9</td></tr>
+</tbody></table>
+<p><strong>12月の繁忙期は律速ではありません。</strong> 許可が出る世界では、ほぼ全量が11月上旬までに FC に入ります。律速は許可そのもの（35%）と名義（P2）です。</p>
+<p>許可が長引いた場合の在庫滞留も軽いものです。社長宅なら保管料は0円で、拘束される現金は約2万円（運転資金の2%）です。不許可なら社長宅からそのまま処分に回せます。代行に置いていた場合は、返送の着払い（約1,700円〔推定〕）と保管料（記載なし）が乗ります。</p>
+<p><strong>判断の日付：11/15 までに許可が出なければ、L001 は処分へ回す。</strong> 11月後半に許可が出ても、FC 受領が繁忙期に入り、販売開始は12月中旬になります。鍋の売れ時の半分を失います。</p>
+<hr>
+<h2>4. 応手の読み（3手先）</h2>
+<p><strong>連鎖A：初回を社長宅で受ける</strong></p>
+<ol>
+<li>当社：1a' で受け、10月下旬に FBA へ納品する</li>
+<li>相手：同じ ASIN の第三者セラーが新規の相乗りに気づき、2,790〜2,850円まで下げる（確度40%〔推定〕）。損益分岐 2,790円〔事実・台帳〕なので、利益はほぼ0になる</li>
+<li>顧客・結果：カートは最安に寄る。12点は捌けるが利益は0円近辺。<strong>このロットは書類代として評価する</strong>（台帳の方針どおり）。代行選定には影響しない</li>
+</ol>
+<p><strong>連鎖B：1回うまくいった社長宅受けが既定になる</strong></p>
+<ol>
+<li>当社：1a' が20分で終わる。「次も家で」が楽な選択になる</li>
+<li>横展開：申請前提の候補26件（A群5件）から、11月に2〜4件の初回ロットを発注する</li>
+<li>社長：月2件の上限に達する。「あと1件だけ」が続き、物理作業が常態になる。<strong>本丸（メーカー開拓）の週20時間が削られる</strong></li>
+</ol>
+<p>連鎖Bが失敗の筋1です。上限（月2件）だけでは止まりません。<strong>期限（12/31）と累計（3件）で閉じ、代替の受け場所を先に用意しておく</strong>ことが必要です。</p>
+<p><strong>連鎖C：権限を渡す</strong></p>
+<ol>
+<li>当社：びーぷらすにユーザー権限（納品関連のみ）を付与する</li>
+<li>Amazon：別住所からの二次ユーザーのログインは、正規機能の範囲の動きである。単独で停止に至った公開事例は見つからない</li>
+<li>結果：事故の主因は権限そのものより、代行側の誤操作（数量・ラベル）。<strong>撤退条件①②で拾える</strong></li>
+</ol>
+<hr>
+<h2>5. タケシの6論点への回答</h2>
+<h3>5-1. 初回1a は回るか（道具・箱・貼り間違い）</h3>
+<p><strong>回ります。ただし 1a のままでは3点が甘く、1a' に直すべきです。</strong></p>
+<table><thead><tr><th>項目</th><th>03 の想定</th><th>当方の読み</th><th>直し方</th></tr></thead><tbody>
+<tr><td>社長の作業時間</td><td>40分</td><td><strong>40〜75分</strong>（ハジメの台帳は検品込みで1時間15分〔事実〕）</td><td>検品は数量と外観だけ（5分）。PC の作業はカズヨが代行する</td></tr>
+<tr><td>ラベル印刷</td><td>前提なし</td><td><strong>家庭用プリンタとラベル用紙の有無は未確認</strong>（資産台帳に記載なし）</td><td>FNSKU は <strong>Amazon ラベル貼付サービス（22円×12＝264円）</strong> に任せる。箱ラベルは普通紙でも可〔推定・要確認〕。プリンタがなければコンビニのネットプリントを使う</td></tr>
+<tr><td>箱</td><td>160サイズを新規に用意（資材630円）</td><td>12点のケース単位で届くため、<strong>メーカーのケース箱を流用できる見込み</strong>（70%〔推定〕）</td><td>古いバーコードを隠して流用する。サイズ上限の確認は要る</td></tr>
+<tr><td>貼り間違い</td><td>—</td><td><strong>1SKU なので SKU の取り違えは起きない。</strong> 起きうるのは JAN の隠し忘れと数量差異で、確率は8%程度〔推定〕</td><td>ラベル貼付サービスを使えば、JAN を隠す作業自体がなくなる（3%程度）</td></tr>
+</tbody></table>
+<p><strong>1a' の着地費用：約1,080円</strong>（パートナーキャリア 762円＋ラベル貼付 264円＋テープ等50円〔推定〕）。1a の 1,392円より安くなります。ケース箱が使えなければ 1,480円前後です。</p>
+<p><strong>社長の手：</strong> 荷受け（在宅1回）、開封・数量確認・納品書を抜いてスマホで撮影（5〜10分）、箱ラベルの貼付（5分）、集荷（在宅1回、または営業所へ持ち込み）。申請フォームと納品プランの作成は、カズヨがブラウザで操作します（社長はログインだけ）。</p>
+<h3>5-2. 1c の「納品書を失う確率30〜40%」は妥当か</h3>
+<p><strong>数字は妥当な範囲です。ただし中身を2つに分けて書き直すべきです。</strong></p>
+<table><thead><tr><th>分解</th><th>確率〔推定〕</th></tr></thead><tbody>
+<tr><td>宛名がお届け先（代行の住所・社名）で印字される</td><td>20〜25%</td></tr>
+<tr><td>代行が納品書を捨てる・紛失する・スキャンの品質が足りない（びーぷらすは扱いの記載なし〔事実〕）</td><td>10〜15%</td></tr>
+<tr><td>住所欄の不一致で審査に落ちる</td><td>5〜10%</td></tr>
+<tr><td><strong>初回の書類が使えない（合計）</strong></td><td><strong>30%（25〜40%）</strong></td></tr>
+<tr><td><strong>最終的に書類を失う（再発行後も使えない）</strong></td><td><strong>5〜10%</strong></td></tr>
+</tbody></table>
+<p>SD の公式ヘルプには「納品書の再発行は出展企業へメッセージで依頼」とあります〔事実〕。紛失は致命傷ではなく、1〜2週間の遅れです。03 §5-1 の「10点の買い直し（約2万円）」は過大です。</p>
+<p><strong>それでも初回に 1c を選ばない理由は、書類とは別のところにあります。</strong> 1c を成立させるには、SD の出荷（10月上旬）までに、問い合わせの承認・送信・回答・規約同意・登録を終える必要があります。<strong>間に合う確率は30%程度</strong>〔推定〕です。1c は初回には実行できません。</p>
+<h3>5-3. 6か月の継続確率60%は楽観か</h3>
+<p><strong>やや楽観です。50%（35〜65%）と置きます。ただし結論は変わりません。</strong></p>
+<ul>
+<li>下げる理由：①撤退条件③（5営業日超を2回連続）は、11〜12月の繁忙期に当たりやすい。②撤退条件①（貼り間違い1回で即停止）は厳しく、月2回・6か月の納品で1回起きる確率が10〜20%ある〔推定〕。③当社側の仕入れが途切れ、3か月連絡なしの規定に触れる筋がある（15%）。</li>
+<li>ビンの破損は、L001 と当面の候補には当たりません（§1 P7）。</li>
+<li>期待費用を置き直すと、継続50%×3,603円＋おりおん35%×4,214円＋別の型15%×8,228円＝<strong>月約4,510円</strong>。03 の約4,250円からの増加は260円で、B（約9,140円）との差は残ります。</li>
+<li>03 に抜けていた乗り換え費用：社長の時間1〜2時間（登録・権限の付け替え）と、止まった代行にある仕掛かり在庫の引き取り。これを足しても順位は変わりません。</li>
+</ul>
+<h3>5-4. 権限起因の事故「年5%未満」</h3>
+<p><strong>保守的すぎるくらいで、置き値として安全側です。</strong></p>
+<table><thead><tr><th>事象</th><th>年あたりの確率〔推定〕</th></tr></thead><tbody>
+<tr><td>権限の範囲内で代行が誤操作する（数量・プラン）</td><td>5〜8%（撤退条件①②の領域。健全性への影響は軽微）</td></tr>
+<tr><td>健全性の指標に響く事故</td><td>1〜3%</td></tr>
+<tr><td>停止に至る</td><td>1%未満</td></tr>
+</tbody></table>
+<p><strong>B案に逆転する閾値：</strong> A と B の年間差は、月100点の段階で約5.5万円、月1,000点の段階で約28万円です。停止時の損失を、今の段階で50万円、月1,000点の段階で300万円と置くと、逆転には<strong>年9〜11%</strong>の事故確率が要ります。当方の読み（1〜3%）とは3倍以上の開きがあるので、置き値が崩れても逆転はしません。</p>
+<p>付け方のルールは足してください。付与は初回に代行を使う直前にする。範囲は納品関連だけにする（出品・価格・支払いの権限は外す）。3か月使わなければ権限を外す。</p>
+<h3>5-5. 問い合わせが遅れ、2周目に間に合わない世界線</h3>
+<p><strong>確率15%、影響は小さいと読みます。</strong></p>
+<p>2周目の中身は2つです。①L001 のリピート：許可が出てから、早くて11月上旬。②新ブランドの初回ロット：§5-2 の設計では、どのみち代行を使いません。代行が本当に要るのは①だけです。</p>
+<p>対策は §2 の撤退条件3のとおりです。びーぷらすとおりおんに同時に問い合わせ、両方とも未回答ならリピートも 1a' で受けます。問い合わせは無料で、登録でもありません。</p>
+<h3>5-6. 社長宅受けの上限（月2件・60分）</h3>
+<p><strong>時間の上限は妥当です。件数の上限は「月あたり」では閉じず、期限と累計が要ります。</strong></p>
+<ul>
+<li>1a' なら1件あたり15〜25分です。月2件なら30〜50分で、60分に収まります。</li>
+<li>問題は §4 の連鎖Bです。月あたりの上限は毎月リセットされるので、常態化を止められません。<strong>2026-12-31 または累計3件の早い方で終了</strong>にしてください。3件あれば「宛名の出方」と「審査の通り方」の実測がそろい、4件目以降を代行直送に切り替える判断ができます。</li>
+</ul>
+<hr>
+<h2>6. カズヨの観点：社長方針と社長宅受けの是非</h2>
+<p>社長方針は「PC 完結・物理作業は外注・労働集約型は目指さない」です。評価の物差しは「社長の時間単価」ではなく、<strong>「社長が抜けても回るか」</strong>です（2026-09-27）。</p>
+<table><thead><tr><th>案</th><th>社長の物理作業</th><th>着地費用（期待値）</th><th>不許可のとき</th><th>方針との整合</th></tr></thead><tbody>
+<tr><td><strong>1a'（推奨）</strong></td><td>15〜25分＋在宅2回</td><td>約700円（許可が出た世界だけ発生）</td><td>そのまま自宅から処分</td><td>1回限り・期限付きなら可</td></tr>
+<tr><td>1a（03 原案）</td><td>40〜75分＋在宅2回</td><td>約900円</td><td>同上</td><td>可。ただし道具の準備が要る</td></tr>
+<tr><td>1d（家で保管→許可後にびーぷらすへ転送）</td><td>10〜15分＋在宅2回</td><td>約1,950円</td><td>転送しないで済む</td><td>1a' より物理作業が少ない</td></tr>
+<tr><td>1b（03 原案：抜いてすぐ転送）</td><td>10〜15分＋在宅2回</td><td>約3,100円</td><td>着払いで返送させ、保管料もかかる</td><td>1d に劣る</td></tr>
+<tr><td>1c（代行へ直送）</td><td>0分</td><td>—</td><td>—</td><td>方針に最も合うが、<strong>初回は時間的に成立しない</strong>（§5-2）</td></tr>
+</tbody></table>
+<p>期待値は、各案の費用に許可が出る確率65%を掛けて出しています。1b と 1d は転送送料を約1,700円〔推定〕と置きました。</p>
+<p><strong>マサルの読み：</strong></p>
+<ul>
+<li><strong>1b は物理作業ゼロではありません。</strong> 荷受け・開封・納品書の抜き取り・再梱包・集荷の手配が残ります。1a' との差は10分程度です。「PC 完結」を理由に 1b を選んでも、方針は守れません。</li>
+<li>物理作業ゼロの案（1c）は、初回には実行できません。初回に限れば、どの案でも社長の物理作業は発生します。</li>
+<li>したがって論点は「社長宅で受けるか」ではなく、<strong>「いつ終わらせるか」</strong>です。1a' を1回限りの例外にし、期限と代替の受け場所（R3）を先に決めておけば、方針と両立します。</li>
+<li>社長が「物理作業は1分でも少なく」を優先するなら、<strong>1b ではなく 1d</strong> を選んでください。費用は約1,250円増えます。不許可の世界（35%）では転送費を払わずに済みます。</li>
+</ul>
+<hr>
+<h2>7. タケシへの修正点（R1〜R7）</h2>
+<table><thead><tr><th>#</th><th>修正</th><th>対象</th><th>優先</th></tr></thead><tbody>
+<tr><td><strong>R1</strong></td><td>1a を <strong>1a'</strong> に変える。Amazon ラベル貼付サービス（264円）を使い、ケース箱を流用し、PC の作業はカズヨが代行する。社長の作業は15〜25分。社長宅での保管は許可が出るまで。物理作業を減らしたい場合の代替は 1b ではなく <strong>1d</strong></td><td>03 §5-1・§9 お願い1</td><td>高</td></tr>
+<tr><td><strong>R2</strong></td><td>§5-2 の学習の組み方を直す。初回の納品書では「配送先が代行のときの宛名」は約80%の確率で判別できない。判定手段を2つ足す。①出展企業へ「配送先を別住所にした場合の納品書の宛名」を問い合わせる（§4.1）。②新ブランドの初回ロットの1件を、納品書の回収サービスがある代行（糸星 200円）へ直送して実測する</td><td>03 §5-2</td><td>高</td></tr>
+<tr><td><strong>R3</strong></td><td>社長宅受けに期限を付ける。<strong>12/31 または累計3件の早い方で終了</strong>。「月2件」はその期間中の上限として残す</td><td>03 §5-2・§6・§7-3</td><td>高</td></tr>
+<tr><td>R4</td><td>1c の確率を「初回で使えない30%（25〜40%）／最終的に失う5〜10%」に分けて書く。SD の再発行ルールを事実として加える。1c を採らない理由の主軸は「初回に時間的に成立しない（間に合う確率30%）」</td><td>03 §5-1</td><td>中</td></tr>
+<tr><td>R5</td><td>A の継続確率を50%（35〜65%）に下げ、期待費用を月約4,510円にする。乗り換え費用に社長の時間1〜2時間を足す。権限事故は「健全性に響く事故 年1〜3%・停止1%未満、B逆転の閾値は年9〜11%」に置き換え、権限の付け方のルールを足す</td><td>03 §3・§7-5</td><td>中</td></tr>
+<tr><td>R6</td><td>問い合わせはびーぷらすとおりおんに同時に送る。問い合わせ文に2問を足す。「繁忙期の受付停止・受入制限の有無」と「納品書を開封前に抜き取り、PDF 化できるか」（Q2 を具体化）</td><td>03 §4・§9</td><td>中</td></tr>
+<tr><td><strong>R7</strong></td><td><strong>（別チケットへの申し送り・最優先）</strong> SD 会員名「【開業前】Satoy Select」と住所を、Amazon の登録名・住所と照合する。<strong>SD の出荷前（10/3 まで）</strong>に行う。不一致なら出展企業に宛名の指定を依頼する（§4.1）。あわせて SD 注文が確定済みか（SMS 認証）を確認する</td><td>T-20260920-003</td><td><strong>最高</strong></td></tr>
+</tbody></table>
+<p>R7 は代行選定の外にありますが、1a の目的（書類を確実に取る）を直接左右します。受け場所をどれだけ工夫しても、名義が合わなければ書類は使えません。</p>
+<hr>
+<h2>8. 収束判定</h2>
+<table><thead><tr><th>部分</th><th>判定</th><th>確度</th></tr></thead><tbody>
+<tr><td>主力＝びーぷらす・予備＝おりおん・2社目以降はトリガー方式</td><td><strong>収束</strong></td><td>75%</td></tr>
+<tr><td>撤退条件・KPI</td><td>収束（R3・R5 を反映）</td><td>70%</td></tr>
+<tr><td>初回 L001 の受け場所</td><td>収束（R1 を反映）</td><td>80%</td></tr>
+<tr><td>2周目以降の新ブランド初回ロットの受け場所</td><td><strong>未収束</strong>。R2・R3 で「期限付きの暫定＋検証の手」に直せば、承認に上げてよい</td><td>60%</td></tr>
+</tbody></table>
+<p><strong>この案は、R1〜R3 と R7 を反映した上で社長承認に上げてよいと判断します。</strong> タケシへの差し戻しは本文の修正だけで足ります。2周目の仮想実行は要りません。</p>
+<p>社長へのお願いは2つのまま変わりません。①初回を 1a' で受けることの承認（1d との二択に推奨を付けて）。②問い合わせの送信承認（宛先をびーぷらす・おりおんの2社に広げる）。R7 の照合はカズヨの作業です。出展企業への連絡が要る場合だけ、承認のお願いが1つ増えます。</p>
+<hr>
+<h2>9. 答え合わせ（後で採点する予測）</h2>
+<table><thead><tr><th>#</th><th>予測</th><th>確度</th><th>照合日</th></tr></thead><tbody>
+<tr><td>1</td><td>L001 の出品許可が出る（再申請込み）</td><td>65%</td><td>2026-11-15</td></tr>
+<tr><td>2</td><td>許可が出た場合、FBA で販売可能になるのが 11/9 以前</td><td>90%</td><td>2026-11-15</td></tr>
+<tr><td>3</td><td>初回の納品書だけでは「配送先が代行のときの宛名」が判別できない</td><td>80%</td><td>L001 の納品書が届いた日</td></tr>
+<tr><td>4</td><td>納品書の宛名が Amazon 登録名と一致しない（R7 を打たなかった場合）</td><td>25%</td><td>納品書が届いた日</td></tr>
+<tr><td>5</td><td>びーぷらすが問い合わせに5営業日以内に回答する</td><td>65%</td><td>送信日＋5営業日</td></tr>
+<tr><td>6</td><td>びーぷらすを主力として6か月（2027-04-30）使い続ける</td><td>50%</td><td>2027-04-30</td></tr>
+<tr><td>7</td><td>1a' の社長の物理作業が25分以内に収まる</td><td>70%</td><td>L001 の納品日</td></tr>
+<tr><td>8</td><td>12月の月間納品点数が20〜60点（中央シナリオ）</td><td>45%</td><td>2026-12-31</td></tr>
+<tr><td>9</td><td>社長宅受けの新ブランド初回ロットが 12/31 までに累計3件を超える（R3 がない場合）</td><td>30%</td><td>2026-12-31</td></tr>
+<tr><td>10</td><td>モデルの外の事態（再審査・苦情・出荷遅延）で計画が崩れる</td><td>10%</td><td>2026-12-31</td></tr>
+</tbody></table>
+<hr>
+<h2>10. 前提・確度</h2>
+<table><thead><tr><th>区分</th><th>内容</th></tr></thead><tbody>
+<tr><td>事実</td><td>各社の料金・条件は 01（公式・9/29〜30取得）。EM-103 の寸法・蓋なし・採算は商品台帳 20。SD の会員名は T-20260920-003。SD の納品書は出展企業が発行・同梱し、再発行は出展企業へメッセージで依頼（SD 公式ヘルプ「納品書」・9/30 取得）</td></tr>
+<tr><td>推定</td><td>許可確率・工程日数・各案の作業時間・転送送料・ケース箱流用の可否・継続確率・権限事故の確率</td></tr>
+<tr><td>読めない領域</td><td>就労支援事業所の実際の処理日数と繁忙期の受入制限（問い合わせで埋める）。Amazon の審査が住所欄をどこまで照合するか。SD の出展企業ごとの納品書の書式差</td></tr>
+</tbody></table>
+<p>出典：<a href="https://faq.superdelivery.com/%E7%B4%8D%E5%93%81%E6%9B%B8-637f401832cc2d001d51fc20">スーパーデリバリー ヘルプ「納品書」</a>、<a href="https://item.rakuten.co.jp/s-zakka-show/25414/">楽天市場 燕三 よせしゃぶ鍋（ステンレス一枚絞り）</a></p>
+</div>
+</body>
+</html>
