@@ -122,8 +122,23 @@ def _from_pool_row(r: dict, source: str) -> Candidate | None:
 
 
 def load_pool(pool_dir: Path = POOL_DIR, deliv_dir: Path = DELIV_DIR) -> list[Candidate]:
-    """プール全部を読み、ASIN で重複排除して返す（先に読んだものを優先）。"""
+    """プール全部を読み、ASIN で重複排除して返す（先に読んだものを優先）。
+
+    **発掘済みの候補（`discover.py` のキャッシュ）を最優先で読みます。**
+    あちらは「今の Amazon 価格 × 今の卸値で黒字」まで確認済みの、いちばん新しい母数です。
+    """
     out: dict[str, Candidate] = {}
+
+    disc = pool_dir / "pipeline/discovered.json"
+    if disc.exists():
+        try:
+            data = json.loads(disc.read_text(encoding="utf-8"))
+            for row in (data.get("candidates") or {}).values():
+                c = Candidate(**row)
+                if ASIN_RE.match(c.asin):
+                    out.setdefault(c.asin, c)
+        except (OSError, ValueError, TypeError):
+            pass
 
     for name in POOL_JSON_FILES:
         path = pool_dir / name

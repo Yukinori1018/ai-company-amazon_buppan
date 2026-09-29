@@ -139,16 +139,36 @@ def economics_status(econ, monthly_sold) -> tuple[str, str]:
         return (UNKNOWN, "売価・手数料・FBA・原価のどれかが揃わず、採算を計算できません。")
     if econ.gross_per_unit <= 0:
         return (FAIL, f"1個粗利が {econ.gross_per_unit:,}円（赤字）です。")
+    if econ.net_per_unit <= 0:
+        # 販売手数料と FBA 配送代行だけでは黒字に見えても、保管料・納品送料・梱包資材
+        # （実測206円/個）を引くと沈む棚。**社長は「利益が少なくても量で」と言っていますが、
+        # マイナスは量を増やすほど損が増えます。**
+        return (FAIL,
+                f"1個粗利 {econ.gross_per_unit:,}円から保管料・納品送料・梱包資材 "
+                f"{econ.other_unit_costs}円を引くと手残り {econ.net_per_unit:,}円（実質赤字）です。")
     if not monthly_sold:
-        return (UNKNOWN,
-                f"1個粗利 {econ.gross_per_unit:,}円・利益率 {econ.margin_pct}% ですが、"
-                "月販が取れず回転が読めません（キーゾンで実数を確認してください）。")
+        # ⚠️ **月販が取れないことを理由に落とさない。**（2026-09-30 カズヨ訂正 / CLAUDE.md §3.1）
+        # 社長は「最初は入口を多く持ちたい。利益が少なくても、量を増やせば何とかなる可能性が
+        # あるかもしれない。やった後で評価し、継続判断を行う」と条件を緩めています。
+        # `monthlySold` は月50個未満だと Amazon が表示しないだけで、「売れていない」ではありません
+        # （社長が発注を決めた B0DJNX12KZ はキーゾン実測で月10個）。
+        # 列には出す。しかしそれだけでは GO を止めない。
+        return (PASS,
+                f"1個粗利 {econ.gross_per_unit:,}円・利益率 {econ.margin_pct}%"
+                f"（保管/納品/梱包 {econ.other_unit_costs}円を引いた手残り "
+                f"{econ.net_per_unit:,}円・{econ.net_margin_pct}%）。"
+                "月販は Keepa 非表示（月50個未満）で回転は未確認ですが、"
+                "これだけでは落としません（キーゾンで実数を確認してください）。")
     if econ.months_to_sell and econ.months_to_sell > MAX_MONTHS_TO_SELL:
+        # 月販が判っていて、なお最小ロットが大きすぎて捌けない場合だけ落とす。
+        # これは「売れていない」ではなく「ロットが合わない」＝事実として動かせない制約です。
         return (FAIL,
                 f"売り切るのに約{econ.months_to_sell}ヶ月かかります"
                 f"（上限{MAX_MONTHS_TO_SELL:.0f}ヶ月・最小ロットが大きすぎる）。")
     return (PASS,
-            f"1個粗利 {econ.gross_per_unit:,}円・利益率 {econ.margin_pct}%・"
+            f"1個粗利 {econ.gross_per_unit:,}円・利益率 {econ.margin_pct}%"
+            f"（保管/納品/梱包 {econ.other_unit_costs}円を引いた手残り "
+            f"{econ.net_per_unit:,}円・{econ.net_margin_pct}%）・"
             f"約{econ.months_to_sell}ヶ月で売り切る見込み。")
 
 
@@ -290,10 +310,14 @@ def main(argv: list[str] | None = None) -> int:
             return 0
 
     # 2. 候補を集めて、まだ判定していないものに絞る
+    pool = sources.load_pool()
     if args.asins:
-        pool = [sources.Candidate(asin=a, source="--asins") for a in args.asins]
-    else:
-        pool = sources.load_pool()
+        # ⚠️ ASIN を直接指定しても **プールの卸値・手数料は引き継ぐ**。
+        # 引き継がないと採算が計算できず、GO だった行を UNKNOWN に落として上書きします
+        # （2026-09-30 に一度やって、GO 20件を消しました）。
+        by_asin = {c.asin: c for c in pool}
+        pool = [by_asin.get(a) or sources.Candidate(asin=a, source="--asins")
+                for a in args.asins]
     known = set(state.asins) if state and not args.update_existing else set()
     remaining = [c for c in pool if c.asin not in known]
     if args.order == "volume":

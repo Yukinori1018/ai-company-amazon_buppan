@@ -140,9 +140,15 @@ class TestEconomicsGate(unittest.TestCase):
         self.assertEqual(status, md.FAIL)
         self.assertIn("ヶ月", reason)
 
-    def test_unknown_monthly_sold_is_unknown_not_go(self):
-        status, _r = pipe.economics_status(self._e(monthly_sold=None), None)
-        self.assertEqual(status, md.UNKNOWN)
+    def test_unknown_monthly_sold_does_not_block_go(self):
+        """月販が取れないことを理由に落とさない（2026-09-30 カズヨ訂正・CLAUDE.md §3.1）。
+
+        `monthlySold` は月50個未満だと表示されないだけ。社長が発注を決めた B0DJNX12KZ は
+        キーゾン実測で月10個。落とすのは①本体カート②メーカー直販③赤字の3つだけ。
+        """
+        status, reason = pipe.economics_status(self._e(monthly_sold=None), None)
+        self.assertEqual(status, md.PASS)
+        self.assertIn("落としません", reason)
 
     def test_missing_economics_is_unknown(self):
         status, _r = pipe.economics_status(None, 10)
@@ -183,6 +189,28 @@ class TestProfit(unittest.TestCase):
         self.assertEqual(profit.order_qty(monthly_sold=100, pack=1), 10)   # 10点で足りる
         self.assertEqual(profit.order_qty(monthly_sold=1, pack=1), 6)      # 6ヶ月ぶんで打ち止め
         self.assertEqual(profit.order_qty(monthly_sold=100, pack=4), 12)   # ロットの倍数へ
+
+    def test_other_unit_costs_flip_thin_margins(self):
+        """保管料・納品送料・梱包資材（実測206円/個）を引くと沈む棚を落とす。
+
+        2026-09-30、1個粗利72円・利益率2.1%の候補を GO として台帳に出しかけた。
+        `gross_per_unit` は成果物22・23 と同じ定義のまま、`net_per_unit` を別に持つ。
+        """
+        e = profit.compute(sell=3492, fee_pct=15.4, fba_yen=500,
+                           unit_cost_incl=2328, qty=10, monthly_sold=None)
+        self.assertGreater(e.gross_per_unit, 0)
+        self.assertEqual(e.other_unit_costs, 206)
+        self.assertLess(e.net_per_unit, e.gross_per_unit)
+        status, reason = pipe.economics_status(e, None)
+        self.assertEqual(status, md.FAIL)
+        self.assertIn("実質赤字", reason)
+
+    def test_healthy_margin_survives_other_costs(self):
+        e = profit.compute(sell=2980, fee_pct=15.4, fba_yen=472,
+                           unit_cost_incl=1012, qty=12, monthly_sold=10)
+        self.assertEqual(e.gross_per_unit, 991)       # 台帳と同じ（定義は変えない）
+        self.assertEqual(e.net_per_unit, 785)
+        self.assertEqual(pipe.economics_status(e, 10)[0], md.PASS)
 
     def test_margin_never_flattered(self):
         """赤字は赤字のまま返す（UI の都合で 0 に丸めない）。"""

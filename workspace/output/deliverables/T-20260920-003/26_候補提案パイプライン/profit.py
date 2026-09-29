@@ -26,6 +26,13 @@ HALF_DISPOSAL_SHIPPING_YEN = 500
 # 出品許可申請の書類要件（納品書10点以上）。発注点数の下限に使う。
 MIN_QTY_FOR_UNGATING = 10
 
+# 販売手数料・FBA配送代行のほかに1個あたりかかる費用（円）。
+# 商品台帳 L001（2026-09-29 実測）の内訳: FBA保管料 87 + 納品送料 64 + 梱包資材 55 = 206。
+# 成果物22・23 の「1個粗利」はこれを**含んでいません**。利益率30%の商品では誤差ですが、
+# 利益率2%の商品では符号が変わります（粗利72円の候補を GO に出しかけました）。
+# だから `gross_per_unit`（22・23 と同じ定義）とは別に `net_per_unit` を持ちます。
+OTHER_UNIT_COSTS_YEN = 206
+
 
 @dataclass
 class Economics:
@@ -33,8 +40,11 @@ class Economics:
     unit_cost_incl: int            # 1個あたり原価（税込・卸値×1.1）
     referral_fee_yen: int          # 販売手数料（円・税込）
     fba_yen: int                   # FBA 配送代行手数料（円）
-    gross_per_unit: int            # 1個粗利
+    gross_per_unit: int            # 1個粗利（成果物22・23 と同じ定義。保管/納品/梱包を含まない）
     margin_pct: float              # 利益率（売価比）
+    other_unit_costs: int          # 保管料+納品送料+梱包資材（実測206円/個）
+    net_per_unit: int              # 1個あたりの手残り（gross - other_unit_costs）
+    net_margin_pct: float          # 手残りの率
     qty: int                       # 発注点数
     order_total: int               # 発注額（税込）
     months_to_sell: float | None   # 売り切る月数（月販から）
@@ -88,7 +98,8 @@ def order_qty(monthly_sold: int | None, pack: int = 1,
 
 def compute(sell: float, fee_pct: float, fba_yen: float,
             unit_cost_incl: float, qty: int,
-            monthly_sold: int | None = None) -> Economics:
+            monthly_sold: int | None = None,
+            other_unit_costs: int = OTHER_UNIT_COSTS_YEN) -> Economics:
     """1 SKU ぶんの採算。すべて円・整数に丸めて返す（報告と同じ粒度）。"""
     sell_i = int(round(sell))
     cost_i = int(round(unit_cost_incl))
@@ -108,6 +119,9 @@ def compute(sell: float, fee_pct: float, fba_yen: float,
     )
     half_loss = order_total - half_net_per_unit * qty
 
+    other = int(round(other_unit_costs))
+    net = gross - other
+
     return Economics(
         sell=sell_i,
         unit_cost_incl=cost_i,
@@ -115,6 +129,9 @@ def compute(sell: float, fee_pct: float, fba_yen: float,
         fba_yen=fba_i,
         gross_per_unit=gross,
         margin_pct=round(gross / sell_i * 100, 1) if sell_i else 0.0,
+        other_unit_costs=other,
+        net_per_unit=net,
+        net_margin_pct=round(net / sell_i * 100, 1) if sell_i else 0.0,
         qty=qty,
         order_total=order_total,
         months_to_sell=months,
