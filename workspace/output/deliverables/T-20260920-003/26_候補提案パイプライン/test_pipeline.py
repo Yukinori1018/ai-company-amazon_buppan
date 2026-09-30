@@ -565,6 +565,42 @@ class TestContentVolume(unittest.TestCase):
         self.assertIn("600粒", pipe.volume_prefix("玉葱エキス粒 600粒"))
 
 
+class TestProductFinderSelection(unittest.TestCase):
+    """B案の入口条件。**ネットワークには触らず、組み立てた selection を検査する。**
+
+    Keepa Product Finder は**知らないフィールドを黙って無視する**（綴り違いに気づけない）。
+    だから `product_finder.probe()` で実測確認したフィールドだけを使う。
+    """
+
+    def setUp(self):
+        import product_finder
+        self.pf = product_finder
+        self.sel = product_finder.selling_shelves()
+
+    def test_monthly_sold_is_the_entry_condition(self):
+        """実売の積極的な根拠を入口に置く（唯一の積極条件）。"""
+        self.assertEqual(self.sel["monthlySold_gte"], 50)
+
+    def test_rank_bounds_match_the_liveness_gate(self):
+        self.assertEqual(self.sel["current_SALES_lte"], pipe.ALIVE_RANK)
+        self.assertEqual(self.sel["current_SALES_gte"], 1)
+
+    def test_broken_amazon_field_is_not_used(self):
+        """`current_AMAZON_lte=-1` は実測で該当0件。**使わない**（過去メモが誤り）。"""
+        self.assertNotIn("current_AMAZON_lte", self.sel)
+        self.assertNotIn("current_AMAZON_gte", self.sel)
+
+    def test_regulated_categories_are_excluded_at_the_entry(self):
+        """落とせる場所のうち一番早いところで落とす。食品・ドラッグストアは入口で除外。"""
+        for root in (57239051, 160384011):
+            self.assertIn(root, self.sel["categories_exclude"])
+
+    def test_per_page_never_exceeds_the_measured_cap(self):
+        """perPage は1000まで。課金は 10＋件数/100 なので小さく刻むと11倍損する。"""
+        sel = self.pf.selling_shelves(per_page=99999)
+        self.assertEqual(sel["perPage"], self.pf.MAX_PER_PAGE)
+
+
 class TestPrioritize(unittest.TestCase):
     """同じトークンで GO が出やすい順に使う。"""
 

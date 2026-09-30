@@ -359,3 +359,54 @@ if __name__ == "__main__":
     print(f"\n新規候補 {len(cands)}件 / 消費トークン {tokens}")
     for c in cands[:20]:
         print(f"  {c.asin} 売価{c.sell} 月販{c.monthly_sold} {c.title[:44]}")
+
+
+# ── NETSEA の JAN 索引（B案の突合先）──────────────────────────────────────
+
+# ⚠️ 2026-09-30 の反省: `discover()` は JAN 14,672件を集めたのに、**保存していなかった**
+# （`candidates` だけ保存していた）。B案（Amazon → NETSEA）では、この JAN 索引が突合先そのもの。
+# 集めたものは捨てない。Keepa トークンは1つも使わないので、作り直しは時間だけで済む。
+INDEX = REPO / "workspace/output/agent_output/T-20260920-003/pipeline/netsea_jan_index.json"
+
+
+def load_index(path: Path = INDEX) -> dict:
+    if path.exists():
+        try:
+            return json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            pass
+    return {"indexed_shops": [], "jans": {}}
+
+
+def build_netsea_index(shops_per_run: int = 30, path: Path = INDEX, log=print) -> dict:
+    """承認済みサプライヤーを順に回り、JAN → 卸情報の索引を作る（Keepa トークン0）。
+
+    前回の続きから走ります。`jans` には卸値が入るので **`agent_output/` にだけ**置きます
+    （このリポは PUBLIC）。
+    """
+    idx = load_index(path)
+    client, why = netsea_client()
+    if client is None:
+        log(f"索引づくりをスキップ: {why}")
+        return idx
+
+    all_ids = [int(s["id"]) for s in client.list_suppliers() if str(s.get("id", "")).isdigit()]
+    done = set(idx.get("indexed_shops") or [])
+    todo = [i for i in all_ids if i not in done][:shops_per_run]
+    log(f"承認済みサプライヤー {len(all_ids)}社（索引済 {len(done)}社）→ 今回 {len(todo)}社")
+    if not todo:
+        log("全社を索引済みです。")
+        return idx
+
+    # **1社ごとに保存する。**60社を回してから最後に1回だけ保存する設計にしていたため、
+    # 途中で止めると30分ぶんの NETSEA 取得が丸ごと消えました（2026-09-30）。
+    # 「あとでまとめて保存」は、途中で止まる可能性を無視した設計です。
+    path.parent.mkdir(parents=True, exist_ok=True)
+    for shop_id in todo:
+        found = scan_suppliers(client, [shop_id], log=log)
+        idx.setdefault("jans", {}).update(found)
+        done.add(shop_id)
+        idx["indexed_shops"] = sorted(done)
+        path.write_text(json.dumps(idx, ensure_ascii=False), encoding="utf-8")
+    log(f"索引: JAN {len(idx['jans']):,}件 / {len(idx['indexed_shops'])}社ぶん → {path.name}")
+    return idx
