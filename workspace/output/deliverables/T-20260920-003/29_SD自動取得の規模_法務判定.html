@@ -3,44 +3,52 @@
 <ul>
 <li style='margin-left:0.0em'>判定日：2026-09-30 ／ 判定者：法務ハルオ ／ チケット：T-20260920-003</li>
 <li style='margin-left:0.0em'>依頼者：IT タカシ（秘書カズヨ経由）</li>
-<li style='margin-left:0.0em'>上位判定：T-20260914-004 T-2（2026-09-14・登録前の手作業規模を可とした回）</li>
-<li style='margin-left:0.0em'>前提の変化：<strong>当社は SD 会員になった</strong>（お客様番号 3166793・【開業前】区分・利用停止条件 2026-11-30 付き）</li>
+<li style='margin-left:0.0em'>上位判定：T-20260914-004 T-2（2026-09-14・<strong>登録前</strong>の手作業規模を可とした回）→ <strong>本判定で置き換えます</strong></li>
+<li style='margin-left:0.0em'>前提の変化：<strong>① 当社は SD 会員になった</strong>（お客様番号 3166793・【開業前】区分・<strong>利用停止条件 2026-11-30 付き</strong>）／<strong>② SD は 2026-09-30 に当社へ HTTP 429 を返した</strong></li>
 </ul>
 <hr>
-<h2>1. 結論（線は3本）</h2>
-<table><thead><tr><th>案</th><th>規模</th><th>判定</th><th>必須条件</th></tr></thead><tbody>
-<tr><td><strong>①</strong></td><td>種語 100語・約700回</td><td><strong>可</strong></td><td>間隔 <strong>2.0 秒以上</strong>・1回の実行 <strong>700回まで</strong>・<strong>人が在席している時間帯</strong>に実行</td></tr>
-<tr><td><strong>②</strong></td><td>種語 1,000語・約7,000回</td><td><strong>条件つきで可。ただし1晩では不可</strong></td><td>間隔 <strong>10.0 秒以上</strong>・<strong>1日 2,000回まで</strong>・1晩 <strong>6時間まで</strong> → 7,000回は <strong>4夜に分割</strong>（所要は4時間ではなく約20時間）</td></tr>
-<tr><td><strong>③</strong></td><td>取引企業 2,175社の企業内検索を全社網羅</td><td><strong>不可</strong></td><td>代替案は §6</td></tr>
+<h2>1. 結論</h2>
+<h3>🔴 ①②③は、提案された形のいずれも不可です。線を引く前に、前提が崩れています。</h3>
+<p><strong>2026-09-30、SD は当社に <code>HTTP 429 Too Many Requests</code> を返しました。</strong>累計125リクエストの時点で、<strong>4秒間隔・64秒バックオフでも復帰しませんでした</strong>（チケット 1890行・1938行）。</p>
+<p>429 は「Too Many Requests」＝<strong>相手が「お前の要求量は多すぎる」と明示的に述べた通信</strong>です。<strong>規約に自動取得の禁止条項が無いことは、もはや論点ではありません。</strong>当社は SD 本人から、当社の取得量について直接の意思表示を受け取りました。<strong>これを受け取った後に総量を5倍・50倍にする行為は、「禁止と知らずにやった」という最大の防御を自ら捨てる行為です。</strong></p>
+<table><thead><tr><th>案</th><th>規模</th><th>判定</th><th>理由</th></tr></thead><tbody>
+<tr><td><strong>①</strong></td><td>種語100語・約700回</td><td><strong>不可（提案された形では）</strong></td><td>429 が出た水準（1日125回）の <strong>5.6倍</strong>。§5 に縮小案あり</td></tr>
+<tr><td><strong>②</strong></td><td>種語1,000語・約7,000回</td><td><strong>不可</strong></td><td>同 <strong>56倍</strong>。無人・連続。429 の解除条件が不明なまま夜間に回すのは制御不能</td></tr>
+<tr><td><strong>③</strong></td><td>取引企業2,175社・数万回</td><td><strong>不可</strong></td><td>同 上。加えて <code>/p/do/dpsl/</code>（企業内検索）は SD が名指しクローラに全面 Disallow した唯一のパス</td></tr>
+<tr><td><strong>④</strong>（依頼外・チケット1890行）</td><td><strong>ログイン済みブラウザの同一オリジン iframe で 2,176社を1ページ/秒</strong></td><td><strong>🔴 不可。3案より悪い。§7 で単独に論じます</strong></td><td><strong>429 を回避する目的で経路を替える行為</strong>＋<strong>会員アカウントの使用</strong>＋<strong>1リクエスト/秒</strong></td></tr>
 </tbody></table>
-<p><strong>全案に共通する上限：1日あたり 2,000回。</strong> これを超える取得は、規模の如何を問わず再判定が必要です。</p>
-<p><strong>あわせて1点、既存実装の是正を求めます。</strong> 2026-09-14 の判定書には「SD が robots.txt で示した <code>Crawl-delay: 10</code> に当社も合わせる」と書いてあります。現行実装は 2.0 秒です。①の規模（人の在席下・数百回）であれば 2.0 秒で正当化できますが、<strong>②の無人・連続・数千回では 10.0 秒に戻してください。</strong>根拠は §3。</p>
+<h3>進める道はあります（§5・§6）</h3>
+<ul>
+<li style='margin-left:0.0em'><strong>1日30リクエストまで・間隔10秒以上・人の在席下</strong>の「レーンB（Amazon 起点・1 JAN = 1 リクエスト）」は、3点セット付きで<strong>条件つき可</strong>とします。索引づくり（レーンA）は不可です。</li>
+<li style='margin-left:0.0em'><strong>2,176社の Amazon 可否を先に全部確定する必要はありません。</strong>発注する社だけを、発注の直前に人が読む（既存の「出展者ゲート」設計）。これが最短かつ唯一安全な道です（§6-A）。</li>
+<li style='margin-left:0.0em'><strong>SD への照会</strong>（429 の解除条件・許容頻度・データ提供の有無）が本件の本筋です。<strong>§4.1 該当（第三者連絡）なので実行しません。</strong>社長承認を取る材料を §6-C に整えました。</li>
+</ul>
 <hr>
 <h2>2. 規約の実測（2026-09-30 取得・全文確認済み）</h2>
-<h3>2.1 会員規約に「自動取得の禁止」は無い — が、これは白ではない</h3>
+<h3>2.1 会員規約に「自動取得の禁止」は無い — が、これは白ではありません</h3>
 <p>会員規約（<code>https://www.superdelivery.com/p/contents/guide/rules.jsp</code>・改訂 2023.9.1・全17条）の全文に対し</p>
 <p><code>自動</code> <code>ロボット</code> <code>BOT</code> <code>クロー</code> <code>スクレ</code> <code>プログラム</code> <code>収集</code> <code>データベース</code> <code>名簿</code> <code>競業</code> <code>過度</code> <code>負荷</code> <code>サーバ</code> <code>アクセス</code> <code>情報取得</code></p>
 <p>を全文検索しました。<strong>自動取得・取得量・アクセス頻度を制約する条項は1つもありません。</strong>該当したのは第6条2項・第9条・第17条だけです。</p>
-<p>したがって本件の論点は「禁止されているか」ではなく、<strong>「どこから第10条が発動するか」</strong>です。ここを取り違えると「明文禁止が無いから無制限に可」という誤った結論になります。</p>
+<p>したがって本件の論点は「禁止されているか」ではなく、<strong>「どこから第10条が発動するか」</strong>です。ここを取り違えると「明文禁止が無いから可」という誤った結論になります。</p>
 <h3>2.2 危険な条項は第10条 — 白紙委任です</h3>
 <blockquote><strong>第10条（会員規約違反等について）</strong> （1）会員につき本規約違反がある、（2）<strong>会員として不適切な行為がある</strong>、（3）…（5）<strong>その他やむを得ない事由があると当社が判断した場合</strong>、当社は、<strong>直ちに</strong>、又は一定の予告期間の後に、会員の当サイト利用を停止し、又は会員登録を抹消することができます。当社は、…<strong>何ら責任を負うものではありません。</strong></blockquote>
 <ul>
 <li style='margin-left:0.0em'>(2) と (5) は<strong>規約違反を要件にしていません。</strong>SD の裁量判断だけで、<strong>予告なく・即時に</strong>利用停止・登録抹消ができます。</li>
-<li style='margin-left:0.0em'>第11条1項で <strong>抹消による損害の賠償責任も否定</strong>されています。<strong>争う足場がありません。</strong></li>
+<li style='margin-left:0.0em'>第11条1項で<strong>抹消による損害の賠償責任も否定</strong>されています。<strong>争う足場がありません。</strong></li>
 <li style='margin-left:0.0em'>つまり本件のリスクは「訴えられるか」ではなく「<strong>黙って切られるか</strong>」です。<strong>発生確率は低い／影響度は大／不可逆性は最大</strong>の類型で、当社の3軸評価では最もアラートを上げるべき形です。</li>
 </ul>
-<p><strong>当社は既に 2026-11-30 の利用停止条件（サイトオープン未確認）を背負っています。</strong>停止事由を自分から1つ増やす行為は、単独で見た確率が低くても取るべきではありません。③を不可とする実質的な理由はここです。</p>
-<h3>2.3 第17条（著作権等）— 既判定どおり、外部発信は不可</h3>
+<p><strong>当社は既に 2026-11-30 の利用停止条件（サイトオープン未確認）を背負っています。</strong>停止事由を自分から1つ増やす行為は、単独で見た確率が低くても取るべきではありません。</p>
+<h3>2.3 第17条（著作権等）— 社内利用は可・外部発信は不可</h3>
 <blockquote><strong>第17条1項</strong> 当サイト（当サイトにおける出展者個別の画面を含みます）に掲載されている画像・文章・マーク・標章等<strong>一切の情報</strong>（その全部か一部かを問いません）を、当社の**事前の同意なく、他のサイトに複製・転用又は発信することを禁じます。<br><strong>第17条3項</strong> <strong>他のサイトが、当サイトとのリンクを貼る場合には、当社の事前の同意を要する</strong>ものとします。</blockquote>
 <ul>
-<li style='margin-left:0.0em'>禁止の対象は「<strong>他のサイトに</strong>複製・転用又は発信」です。<strong>社内の非公開台帳（Googleシート）・<code>agent_output/</code> への保存は「他のサイトへの発信」に当たりません。</strong>自社の仕入れ判断に使うだけなら第17条1項に触れません。<strong>タカシの理解は正しいです。</strong></li>
+<li style='margin-left:0.0em'>禁止の対象は「<strong>他のサイトに</strong>複製・転用又は発信」です。<strong>社内の非公開台帳（Googleシート）・<code>agent_output/</code> への保存は「他のサイトへの発信」に当たりません。</strong>自社の仕入れ判断に使うだけなら第17条1項に触れません。<strong>タカシの理解（論点2）は正しいです。</strong></li>
 <li style='margin-left:0.0em'><strong>PUBLIC リポへの commit は「発信」に当たります。</strong>従来どおり不可。</li>
 <li style='margin-left:0.0em'><strong>3項は新しい根拠です。</strong>SD の商品ページ URL を PUBLIC リポの成果物に書かないルール（CLAUDE.md §3.2）は、これまで NETSEA 側の条項を横引きしていましたが、<strong>SD については第17条3項が直接の明文根拠</strong>になります。リンクは事前同意が要る、と SD 自身が書いています。</li>
 </ul>
 <h3>2.4 「非ログインで取ったから会員規約の外」という主張は採れません</h3>
 <p>タカシの見立て（論点1）は正しいです。第1条2項は「会員は、本規約、当社の定める購入方法<strong>その他当社が必要に応じて定める規定・規則・条件等に従い</strong>、当サービスを利用する」と定めており、義務の主体は会員です。<strong>非ログインでの取得は、会員である当社の行為であることを変えません。</strong>会員は非会員より軽い義務を負うわけではなく、<strong>重い義務を負います</strong>（第10条の停止権の対象になるのは会員だけです）。</p>
-<p>→ 2026-09-14 の判定（登録前・手作業規模）は、<strong>そのままでは今の当社に使えません。</strong>本判定で置き換えます。</p>
-<h3>2.5 出展企業名の扱い（論点6）— NETSEA と決定的に違う</h3>
+<p>→ <strong>2026-09-14 の判定（登録前・手作業規模）は、そのままでは今の当社に使えません。</strong></p>
+<h3>2.5 出展企業名の扱い（論点6）— NETSEA とは決定的に違います</h3>
 <table><thead><tr><th></th><th>NETSEA</th><th>スーパーデリバリー</th></tr></thead><tbody>
 <tr><td>社名の名簿化・外部での連絡を禁じる条項</td><td><strong>あり</strong>（第7条2項5号／第19条3項）</td><td><strong>無い</strong></td></tr>
 <tr><td>違約金条項</td><td><strong>あり</strong>（定額＋代金比例＋事業者名公表）</td><td><strong>無い</strong></td></tr>
@@ -53,96 +61,146 @@
 <p>  &gt; メッセージ内でのやり取りにつきましては、スーパーデリバリー内のお取引についてのみのご連絡をお願いいたします。<strong>直接取引の相談や自社の営業行為についてはご遠慮ください。</strong></p>
 <p>  とあります。「ご遠慮ください」は努力義務の書き方ですが、<strong>第1条2項（当社が必要に応じて定める規定・規則・条件等に従う）により契約内容を構成しえます。</strong>加えて、SD 経由で知った出展企業に<strong>サイト外で</strong>直接取引を持ちかける行為は、第10条(2)「会員として不適切な行為」に十分あたります。</p>
 <p>  → <strong>SD で見つけた出展企業への、SD を通さない直接営業は不可。</strong>これは取得規模とは別に守ってください。</p>
-<h3>2.6 アクセス回数を制約する条項（論点3）— ありません</h3>
-<p>第3条は「規約の変更」であり、アクセス回数の制約ではありません。<strong>規約上、当社のアクセス回数に上限はありません。</strong>したがって②の総量が規約の数値に触れることはありません。②を縛るのは規約ではなく §3（robots.txt の意思表示）と §4（刑事）です。</p>
-<h3>2.7 第3条は一方的変更を許しています（実装に効く）</h3>
+<h3>2.6 アクセス回数を制約する条項（論点3）— 規約にはありません</h3>
+<p>第3条は「規約の変更」であり、アクセス回数の制約ではありません。<strong>規約上、当社のアクセス回数に上限はありません。</strong></p>
+<p><strong>しかし SD は規約ではなく HTTP で上限を示しました。</strong>これが §4 です。<strong>「規約に書いていない」は、もはや反論になりません。</strong></p>
+<h3>2.7 第3条は一方的変更を許しています（②が制御不能になる理由）</h3>
 <blockquote>第3条：当社は、本規約を<strong>いつでも当社の裁量により変更することができる</strong>。…<strong>当サイトに掲載した時点から、効力を生じます。</strong>…変更後、<strong>会員が当サイトを利用したことをもって、当該会員は当該本規約の変更を承認したものとします。</strong></blockquote>
-<p><strong>通知はサイト掲載のみ・掲載した瞬間に有効・アクセスしたら同意扱い。</strong>②のような長期の無人運転では、<strong>知らないうちに禁止条項が追加され、それに同意したことにされる</strong>経路が開いています。§5 の条件6（実行前の差分検知）は、この条項への直接の対策です。</p>
+<p><strong>通知はサイト掲載のみ・掲載した瞬間に有効・アクセスしたら同意扱い。</strong>②のような数夜にわたる無人運転では、<strong>知らないうちに禁止条項が追加され、それに同意したことにされる</strong>経路が開いています。</p>
 <hr>
-<h2>3. robots.txt の意思表示が、線を引く根拠です（2026-09-30 実測）</h2>
+<h2>3. robots.txt の意思表示（2026-09-30 実測）</h2>
 <p><code>https://www.superdelivery.com/robots.txt</code> の構造は次のとおりです。</p>
-<table><thead><tr><th>User-agent</th><th>検索パス <code>/p/do/psl/</code></th><th>Crawl-delay</th></tr></thead><tbody>
-<tr><td><code>*</code>（当社がここ）</td><td><strong>許可</strong>（絞り込み <code>as=</code> <code>br=</code> <code>ed=</code> <code>so=pricedown</code> <code>exw=</code> と <code>/p/prelogin/wishlist/search.do</code> 等は Disallow）</td><td><strong>指定なし</strong></td></tr>
-<tr><td><code>meta-externalagent</code> / <code>meta-webindexer</code></td><td><strong><code>/p/do/psl/</code> <code>/p/do/dpsl/</code> を全面 Disallow</strong></td><td><strong>10</strong></td></tr>
-<tr><td><code>PetalBot</code></td><td>主要カテゴリ配下と絞り込みを Disallow</td><td><strong>10</strong></td></tr>
+<table><thead><tr><th>User-agent</th><th>検索パス <code>/p/do/psl/</code></th><th>企業内検索 <code>/p/do/dpsl/</code></th><th>Crawl-delay</th></tr></thead><tbody>
+<tr><td><code>*</code>（当社がここ）</td><td><strong>許可</strong>（絞り込み <code>as=</code> <code>br=</code> <code>ed=</code> <code>so=pricedown</code> <code>exw=</code>、<code>/p/prelogin/wishlist/search.do</code> 等は Disallow）</td><td>絞り込み組み合わせのみ Disallow</td><td><strong>指定なし</strong></td></tr>
+<tr><td><code>meta-externalagent</code> / <code>meta-webindexer</code></td><td><strong>全面 Disallow</strong></td><td><strong>全面 Disallow</strong></td><td><strong>10</strong></td></tr>
+<tr><td><code>PetalBot</code></td><td>主要カテゴリ配下を Disallow</td><td>絞り込みを Disallow</td><td><strong>10</strong></td></tr>
 </tbody></table>
 <p>商品ページ <code>/p/r/pd_p/</code> に Disallow 指定はありません。<strong>タカシの遵守状況（許可パスのみ・禁止パス未取得）は robots.txt に照らして正しいです。</strong></p>
 <p>読み取れる SD の意思表示はこうです。</p>
 <blockquote><strong>一般の利用者が検索の素 URL を開くことは許す。しかし「サイトを機械で網羅的に索引化する者」には、検索パスそのものを使わせない。</strong></blockquote>
-<p>ここが線引きの根拠です。当社は現時点で <code>*</code> に属しますが、**総量と継続時間を上げるほど、挙動は <code>*</code> から <code>meta-externalagent</code> の側へ近づきます。<strong>SD が明示的に拒んでいるのは「網羅的索引化」であり、</strong>タカシの言う「索引として使える量まで増やしたい」という目的語は、SD が名指しで拒んでいる用途と表現が一致します。**</p>
 <ul>
-<li style='margin-left:0.0em'><strong>①（人の在席下・数百回・単発）</strong> は「利用者の閲覧」として説明できます。<code>*</code> の枠内。間隔2秒可。</li>
-<li style='margin-left:0.0em'><strong>②（無人・夜間・連続・数千回）</strong> は「利用者の閲覧」と主張できません。<strong>SD が数値で示した唯一の基準は <code>Crawl-delay: 10</code> です。明文主義に従い、この数字に合わせます。</strong></li>
-<li style='margin-left:0.0em'><strong>③（2,175社の企業内検索を全社網羅）</strong> は <code>/p/do/dpsl/</code>（企業内検索）を使います。<strong><code>/p/do/dpsl/</code> は SD が名指しクローラに対し「全面 Disallow」とした唯一のパスです。</strong>当社の UA が <code>*</code> であることは、SD の意思表示を回避する理由になりません。<strong>不可。</strong></li>
+<li style='margin-left:0.0em'>当社の UA は <code>*</code> ですが、<strong>総量と継続時間を上げるほど、挙動は <code>meta-externalagent</code> の側へ寄ります。</strong></li>
+<li style='margin-left:0.0em'><strong>③が使う <code>/p/do/dpsl/</code>（企業内検索）は、SD が名指しクローラに対し「全面 Disallow」とした唯一のパスです。</strong>当社の UA が <code>*</code> であることは、この意思表示を回避する理由になりません。</li>
+<li style='margin-left:0.0em'><strong>SD が数値で示した唯一の基準は <code>Crawl-delay: 10</code> です。</strong>明文主義に従い、無人・機械的な取得はこの数字に合わせます。前回（2026-09-14）の判定にも「当社も10秒に合わせる」と書いてあります。<strong>現行実装の 2.0 秒は、この条件を満たしていません。</strong></li>
 </ul>
 <hr>
-<h2>4. 規約の外にある2つのリスク（論点4の実質）</h2>
-<h3>4.1 刑事 — 岡崎市立中央図書館事件（Librahack、2010年）</h3>
-<p>公開ページの取得であっても、<strong>偽計業務妨害（刑法233条）・電子計算機損壊等業務妨害（234条の2）</strong>の立件例があります。同事件では、<strong>約1秒間隔</strong>でアクセスするプログラムを書いた者が2010年5月に逮捕され、<strong>20日間勾留</strong>の後に<strong>起訴猶予</strong>となりました。事後の検証で、真因は図書館側システムの不具合であったとされています。</p>
-<p><strong>実行者に攻撃の意図が無く、真因が相手側にあっても、逮捕・勾留は起きています。</strong>発生確率は極小ですが、不可逆性は最大級です。②を10秒間隔に落とす実質的な理由の半分はここにあり、<strong>§5 の条件5（エラー・遅延を検知したら即中止）が最重要の防御</strong>です。「相手が重くなったら自分から止めた」というログは、故意を否定する最良の証跡になります。</p>
-<h3>4.2 民事 — データベースの複製（翼システム事件）</h3>
+<h2>4. 決定的な事実 — 429 は「相手の意思表示」です</h2>
+<h3>4.1 何が起きたか</h3>
+<table><thead><tr><th>項目</th><th>実績（2026-09-30・チケット1890/1938行）</th></tr></thead><tbody>
+<tr><td>429 が出た累計</td><td><strong>125リクエスト</strong>（間隔2秒）</td></tr>
+<tr><td>復帰の試み</td><td><strong>4秒間隔・64秒バックオフでも復帰せず</strong></td></tr>
+<tr><td>解除条件</td><td><strong>不明</strong>（時間か IP か会員か、解除の窓が何分・何時間・何日かを当社は知りません）</td></tr>
+</tbody></table>
+<h3>4.2 なぜこれが判定を変えるのか</h3>
+<ol>
+<li style='margin-left:0.0em'><strong>「禁止と知らなかった」という防御が消えます。</strong>規約に明文が無いことを根拠に「禁止されていない」と主張する余地は、429 を受け取った時点で失われました。<strong>相手は当社の取得量について直接、拒否を通知しました。</strong></li>
+<li style='margin-left:0.0em'><strong>故意の評価が変わります。</strong>§4.3 の刑事リスクにおいて、Librahack 事件の行為者には「相手が拒んでいるという通知」がありませんでした。<strong>当社にはあります。</strong>429 の後に総量を上げた記録は、後から見て最も不利な証跡になります。</li>
+<li style='margin-left:0.0em'><strong>第10条(2)「会員として不適切な行為」の評価が変わります。</strong>「レート制限を受けた後も継続した」は、SD の裁量判断において決定的な材料です。</li>
+<li style='margin-left:0.0em'><strong>解除条件が分からないまま無人運転はできません。</strong>②は夜間に4時間〜20時間回す案です。<strong>429 が出たら即停止する実装（タカシが修正済み）が正しく動いても、429 を1回引いた時点でその夜は終わります。</strong>費用対効果の点でも成立しません。</li>
+</ol>
+<h3>4.3 刑事リスク — 岡崎市立中央図書館事件（Librahack、2010年）</h3>
+<p>公開ページの取得であっても、<strong>偽計業務妨害（刑法233条）・電子計算機損壊等業務妨害（234条の2）</strong>の立件例があります。同事件では<strong>約1秒間隔</strong>でアクセスするプログラムを書いた者が2010年5月に逮捕され、<strong>20日間勾留</strong>の後に<strong>起訴猶予</strong>となりました。事後の検証で、真因は図書館側システムの不具合であったとされています。</p>
+<p><strong>攻撃の意図が無く、真因が相手側にあっても、逮捕・勾留は起きています。</strong>発生確率は極小ですが、不可逆性は最大級です。</p>
+<p><strong>そして本件では、当社は既に 429 という拒否の通知を受けています。</strong>この状態で1リクエスト/秒の走行（§7 の④）を選ぶことは、同事件の行為者より不利な立場を自ら作ることになります。</p>
+<h3>4.4 民事 — データベースの複製（翼システム事件）</h3>
 <p>JAN・メーカー品番・上代・入り数は<strong>事実データであり著作物ではありません</strong>。データベースとしての著作物性（著作権法12条の2）も、商品カタログ型では創作性が否定される類型です（東京地判 平成13年5月25日・自動車整備業用データベース＝翼システム事件）。</p>
-<p>ただし同判決は、<strong>当該データベースを大量に複製して競合販売した行為に、民法709条の一般不法行為を認めています。</strong>当社は (a) 内部の仕入れ判断にのみ使い (b) 再配布・販売をせず (c) SD と競合しない、という3点でこの要件を満たしません。<strong>①②は不法行為を構成しません。</strong></p>
+<p>ただし同判決は、<strong>当該データベースを大量に複製して競合販売した行為に、民法709条の一般不法行為を認めています。</strong>当社は (a) 内部の仕入れ判断にのみ使い (b) 再配布・販売をせず (c) SD と競合しない、という3点でこの要件を満たしません。<strong>§5 の縮小案は不法行為を構成しません。</strong></p>
 <p>逆に言えば、<strong>外部へ出した瞬間に第17条1項違反と709条の射程に同時に入ります。</strong>PUBLIC リポ禁止のルールはここでも裏打ちされます。</p>
-<h3>4.3 当たらない法令（念のため明示）</h3>
+<h3>4.5 当たらない法令（過大に脅さないために明示します）</h3>
 <ul>
-<li style='margin-left:0.0em'><strong>不正アクセス禁止法</strong>：認証の突破・回避がないため不該当。ログイン後の領域を非ログインで取ろうとしていない点が効いています。</li>
+<li style='margin-left:0.0em'><strong>不正アクセス禁止法</strong>：不該当。当社は認証を突破・回避していません。自社の正当な ID でログインした領域を自動で読むことも、同法の「アクセス制御機能による制限を免れる」には当たりません。<strong>§7 の④を不可とする理由は、同法ではなく契約（第10条）と刑法233条／234条の2です。</strong></li>
 <li style='margin-left:0.0em'><strong>著作権法（画像）</strong>：画像を1枚も取っていないため論点が立ちません。<strong>この自主規制は維持してください</strong>（SD は「購入前の画像転載禁止」を商品ページに明記しています）。</li>
 </ul>
 <hr>
-<h2>5. 必須条件（機械で守れる形）</h2>
-<p><strong>①②の両方に、全11項目が必須です。</strong>1つでも外すなら再判定です。</p>
-<table><thead><tr><th>#</th><th>条件</th><th>実装</th></tr></thead><tbody>
-<tr><td>1</td><td>間隔：①は <strong>2.0 秒以上</strong>／②は <strong>10.0 秒以上</strong></td><td><code>SLEEP_SEC</code> を呼び出し側から必ず明示的に渡す（既定値に頼らない）</td></tr>
-<tr><td>2</td><td><strong>1日の総量 2,000回まで</strong>（①②合算）</td><td>日付キーの永続カウンタをファイルに持つ。プロセスが変わっても積算する</td></tr>
-<tr><td>3</td><td>1回の実行上限：①700／②2,000</td><td>既存 <code>DEFAULT_FETCH_CAP</code> を引数で上書き</td></tr>
-<tr><td>4</td><td>連続実行は <strong>1晩6時間まで</strong>。実行開始時刻から6時間で無条件終了</td><td>経過時間でも打ち切る</td></tr>
-<tr><td>5</td><td>🔴 <strong>HTTP 4xx / 5xx / タイムアウト／応答時間がセッション中央値の3倍を超えた</strong> → 即時全停止し、<strong>その日は再開しない</strong></td><td>例外を投げて終了。再開は翌日以降</td></tr>
-<tr><td>6</td><td>🔴 実行の冒頭で <code>robots.txt</code> を取得・保存し、<strong>前回のハッシュと差分があれば実行せず停止</strong>。会員規約ページも同様</td><td>第3条（掲載即時・利用で同意）への対策</td></tr>
-<tr><td>7</td><td>🔴 <strong>User-Agent に当社を特定できる識別子と連絡先を入れる</strong>。現行の <code>Mozilla/5.0 (T-20260920-003 manual-scale lookup)</code> は当社を特定できません</td><td>例：<code>SatoySelect-lookup/1.0 (SD member 3166793; contact: satoyselect@gmail.com)</code></td></tr>
-<tr><td>8</td><td>robots.txt の Disallow を<strong>パーサで機械的に当てる</strong>（目視遵守は数百回規模でもたない）</td><td>許可判定を通らない URL は組み立てない</td></tr>
-<tr><td>9</td><td>画像ゼロ・卸価格ゼロを維持。生 HTML の保存は <code>agent_output/</code> のみ・<strong>90日で削除</strong></td><td>現状維持</td></tr>
-<tr><td>10</td><td>SD 由来の値・<strong>商品 URL</strong> を PUBLIC リポに書かない（第17条1項＋<strong>3項</strong>）。出展企業名は社内台帳と社長報告まで</td><td>現状維持</td></tr>
-<tr><td>11</td><td>SD で知った出展企業に、<strong>SD を通さない直接営業をしない</strong>（§2.5）</td><td>運用ルール</td></tr>
+<h2>5. 進めてよい範囲（条件つき可）— レーンB のみ・1日30回</h2>
+<p>索引づくり（レーンA・種語で広く当てる）は<strong>不可</strong>です。429 の水準に対して規模が過大で、かつ「網羅的索引化」という SD が名指しで拒んでいる用途と目的語が一致します。</p>
+<p><strong>Amazon 起点の突合（レーンB・1 JAN = 1リクエスト）に限り、次の全条件のもとで可とします。</strong></p>
+<table><thead><tr><th>#</th><th>条件</th><th>数値／実装</th></tr></thead><tbody>
+<tr><td>1</td><td><strong>1日の総リクエスト数</strong></td><td><strong>30回まで</strong>（429 が出た 125 の 4分の1未満）。日付キーの<strong>永続カウンタ</strong>をファイルに持ち、プロセスが変わっても積算する</td></tr>
+<tr><td>2</td><td><strong>間隔</strong></td><td><strong>10.0 秒以上</strong>（SD が示した唯一の数値 <code>Crawl-delay: 10</code>）。<code>SLEEP_SEC</code> は呼び出し側から必ず明示的に渡す</td></tr>
+<tr><td>3</td><td><strong>実行時間帯</strong></td><td><strong>人が在席していて、すぐ止められる時間帯のみ。</strong>夜間自走・<code>/loop</code> からの実行は禁止</td></tr>
+<tr><td>4</td><td>1回の実行上限</td><td>30回（<code>DEFAULT_FETCH_CAP</code> を引数で上書き）</td></tr>
+<tr><td>5</td><td>🔴 <strong>停止トリガ</strong></td><td><strong>429 / 403 / 5xx / タイムアウト／応答時間がセッション中央値の3倍を超えた → 即時全停止。自動再試行しない。バックオフもしない。</strong>（タカシが実装済みの <code>Fetcher.RateLimited</code> ＋終了コード2 は法務上も正しい修正です）</td></tr>
+<tr><td>6</td><td>🔴 <strong>429 を1回引いたら</strong></td><td><strong>7日間、SD への自動取得を全面停止。</strong>8日目以降に再開する場合は1日10回から。<strong>2回目の429が出たら、§6-C の照会をするまで再開しない</strong></td></tr>
+<tr><td>7</td><td>🔴 <strong>実行前の差分検知</strong></td><td>冒頭で <code>robots.txt</code> と会員規約ページを取得・保存し、<strong>前回とのハッシュ差分があれば実行せず停止</strong>（第3条＝掲載即時・利用で同意への対策）</td></tr>
+<tr><td>8</td><td>🔴 <strong>User-Agent に当社を名乗る</strong></td><td>現行 <code>Mozilla/5.0 (T-20260920-003 manual-scale lookup)</code> は当社を特定できません。例：<code>SatoySelect-lookup/1.0 (SD member 3166793; contact: satoyselect@gmail.com)</code></td></tr>
+<tr><td>9</td><td>robots.txt の遵守を機械化</td><td>Disallow を<strong>パーサで当てる</strong>。許可判定を通らない URL は組み立てない（数百回規模で目視はもたない）</td></tr>
+<tr><td>10</td><td>取得項目</td><td><strong>画像ゼロ・卸価格ゼロを維持。</strong>生 HTML の保存は <code>agent_output/</code> のみ・<strong>90日で削除</strong></td></tr>
+<tr><td>11</td><td>公開</td><td>SD 由来の値・<strong>商品 URL</strong> を PUBLIC リポに書かない（第17条1項＋<strong>3項</strong>）。出展企業名は社内台帳と社長報告まで</td></tr>
+<tr><td>12</td><td>取得ログの保全</td><td>URL・時刻・間隔・応答コード・UA を全件記録。<strong>提出できる形で保全する</strong>（故意を否定する最良の証跡）</td></tr>
 </tbody></table>
-<h3>条件7について — 隠れるより名乗ってください</h3>
-<p>偽装 UA で数千回を取るのは、後から経緯を説明する立場になったときに最悪の絵になります。<strong>名乗った上でブロックされたら、条件5で即座に止まる</strong>のが正しい設計です。「ブロックされるかもしれないから隠す」は、この場面で最もやってはいけない判断です。</p>
-<h3>3点セット（グレーゾーンを進めるための必須要件）</h3>
+<h3>条件8について — 隠れるより名乗ってください</h3>
+<p>偽装 UA で大量に取るのは、後から経緯を説明する立場になったときに最悪の絵になります。<strong>名乗った上でブロックされたら条件5で即座に止まる</strong>のが正しい設計です。「ブロックされるかもしれないから隠す」は、この場面で最もやってはいけない判断です。</p>
+<h3>3点セット</h3>
 <table><thead><tr><th></th><th>内容</th></tr></thead><tbody>
-<tr><td><strong>リスクシナリオ</strong></td><td>(i) SD が IP／会員単位でアクセスを遮断 (ii) 第10条により利用停止・登録抹消（<strong>予告なし・即時・賠償なし</strong>。2026-11-30 の停止条件と重なる） (iii) 業務妨害としての刑事リスク（確率極小・不可逆性最大）</td></tr>
-<tr><td><strong>発生時の対応策</strong></td><td>①即座に全停止 ②取得ログ（URL・時刻・間隔・件数・応答コード・UA）を提出できる形で保全 ③SD へ自発的に用途を説明し是正を申し出る（<strong>第三者連絡＝§4.1。カズヨ経由で社長承認</strong>）</td></tr>
-<tr><td><strong>撤退条件</strong></td><td>①<strong>403 / 429 を1回でも受けたら即日停止</strong>し、再判定まで再開しない ②SD から何らかの照会・警告が来たら全停止 ③会員規約の改訂が掲載されたら全停止・再判定 ④2026-11-30 の利用停止条件が未解消のまま11月に入ったら、<strong>②は中止</strong>（停止事由を増やさない）</td></tr>
+<tr><td><strong>リスクシナリオ</strong></td><td>(i) IP／会員単位でのアクセス遮断（<strong>429 で既に一度発生</strong>） (ii) 第10条による利用停止・登録抹消（<strong>予告なし・即時・賠償なし</strong>。2026-11-30 の停止条件と重なる） (iii) 業務妨害としての刑事リスク（確率極小・不可逆性最大・<strong>429 の通知を受けた後は故意の評価が悪化</strong>）</td></tr>
+<tr><td><strong>発生時の対応策</strong></td><td>①即座に全停止 ②取得ログを提出できる形で保全 ③SD へ自発的に用途を説明し是正を申し出る（<strong>第三者連絡＝§4.1。カズヨ経由で社長承認</strong>）</td></tr>
+<tr><td><strong>撤退条件</strong></td><td>①<strong>429/403 を1回受けたら7日停止</strong>（条件6） ②2回目で §6-C の照会まで全面停止 ③SD から照会・警告が来たら全面停止 ④会員規約の改訂が掲載されたら全面停止・再判定 ⑤<strong>2026-11-30 の利用停止条件が未解消のまま11月に入ったら、SD への自動取得は全面中止</strong>（停止事由を増やさない）</td></tr>
 </tbody></table>
 <hr>
-<h2>6. ③をやるための代替案（CLAUDE.md §3.1）</h2>
-<p><strong>「不可」で終わらせません。</strong>目的（索引として使える量の JAN 対応表を作る）は、次の4案で達成できます。上から順に摩擦が小さい。</p>
+<h2>6. 目的を達成する代替案（CLAUDE.md §3.1）</h2>
+<p><strong>「不可」で終わらせません。</strong>目的（2,176社の Amazon 可否を確定し、仕入れ判断に使える索引を持つ）は、次の4案で達成できます。上から順に摩擦が小さい。</p>
 <table><thead><tr><th>案</th><th>内容</th><th>規約上の位置</th><th>§4.1</th></tr></thead><tbody>
-<tr><td><strong>A（推奨・即着手可）</strong></td><td>取得対象を <strong>「当社が既に卸価格の閲覧承認を得た出展企業」に限定</strong>する。承認済み＝取引関係のある相手であり、網羅索引ではなく自社取引先の情報取得になる。社数が数十なら総量は①の枠に収まる</td><td>「利用者の閲覧」として説明できる。第10条(2) のリスクが実質的に消える</td><td>不要</td></tr>
-<tr><td><strong>B（推奨・即着手可）</strong></td><td><strong>SD が自ら提供する経路を使う。</strong>「出展企業製品カタログ」（<code>/p/do/psl/6484/</code>）、売れ筋ランキング（<code>/p/do/wr/</code>）、ログイン後の一覧・CSV 系機能</td><td>SD が用意した経路の利用＝摩擦最小</td><td>不要</td></tr>
-<tr><td><strong>C</strong></td><td><strong>SD に書面で許諾を求める。</strong>第17条1項・3項は「当社の事前の同意」で解除される設計になっており、<strong>同意を取れば外部発信すら可</strong>になる。窓口は <code>/i/r/help/</code>。聞く内容は「非ログイン公開ページからの自動取得の可否・許容頻度・許容総量」の3点</td><td>同意が取れれば全部が白になる。取れなくても「聞いた」記録が残り、第10条(2) の評価が有利になる</td><td><strong>該当（第三者連絡）。実行しない</strong></td></tr>
-<tr><td><strong>D</strong></td><td><strong>SD ファクトリー／資料請求の窓口にデータ連携（API・商品データ提供）の有無を問う</strong></td><td>公式経路が存在すれば①②の議論自体が不要になる</td><td><strong>該当（第三者連絡）。実行しない</strong></td></tr>
+<tr><td><strong>A（最推奨・即着手可）</strong></td><td><strong>母数を先に全部確定しない。</strong>「2,176社の Amazon 可否を機械で読む」のではなく、<strong>発注する社だけを、発注ボタンの手前で人が読む</strong>（既存の「出展者ゲート＋台帳」設計。<code>agents/legal/memory/knowledge_wholesale_platforms_terms_2026.md</code> §3）。台帳列＝`supplier_id / supplier_name / amazon_ok(ok\</td><td>ng\</td><td>要確認) / 原文の該当箇所 / screenshot_path / confirmed_at`。<strong>「要確認」は ng と同じ扱い</strong></td><td>通常の利用者の閲覧。摩擦ゼロ</td><td>不要</td></tr>
+<tr><td><strong>B（推奨・即着手可）</strong></td><td>取得対象を<strong>「当社が既に卸価格の閲覧承認を得た出展企業」に限定</strong>する。承認済み＝取引関係のある相手であり、網羅索引ではなく自社取引先の情報取得になる。社数が数十なら §5 の30回/日でも数日で終わる</td><td>「利用者の閲覧」として説明でき、第10条(2) のリスクが実質的に消える</td><td>不要</td></tr>
+<tr><td><strong>C（本筋・要承認）</strong></td><td><strong>SD に照会する。</strong>聞くのは3点だけ：①<strong>429 の解除条件と許容頻度</strong>（これを聞かない限り、当社はずっと手探りです） ②非ログイン公開ページからの自動取得の可否 ③商品データの提供・API・CSV の有無。窓口 <code>/i/r/help/</code>。<strong>第17条1項・3項は「当社の事前の同意」で解除される設計</strong>なので、同意が取れれば外部発信まで白になります。取れなくても<strong>「聞いた」記録が第10条(2) の評価を有利にします</strong></td><td>同意が取れれば全部が白</td><td><strong>該当（第三者連絡）。実行しません</strong></td></tr>
+<tr><td><strong>D</strong></td><td>SD が自ら提供する経路を使う。「出展企業製品カタログ」（<code>/p/do/psl/6484/</code>）、売れ筋ランキング（<code>/p/do/wr/</code>）、ログイン後の一覧・CSV 系機能</td><td>SD が用意した経路＝摩擦最小</td><td>不要</td></tr>
 </tbody></table>
-<p><strong>推奨の組み合わせ：A＋B で即着手し、並行して C を社長承認に上げる。</strong>C の回答が来る前でも A・B は動きます。</p>
-<p><strong>②を4夜に分ける前に、A・B で足りないかを先に確認してください。</strong>②は20時間の無人運転と引き換えに第10条のリスクを買う選択であり、A・B で目的が達成できるなら買う必要がありません。</p>
+<p><strong>推奨の組み合わせ：A＋D で即着手し、B を §5 の枠内で回しながら、C を社長承認に上げる。</strong></p>
+<p><strong>A が本命です。</strong>サトルの実測（仕入れ先起点の歩留まり15%・チケット27 §9）を前提にすれば、<strong>2,176社を読む作業のうち85%は捨てる作業</strong>です。発注する社だけ読めば、総量は法務上も事業上も成立します。<strong>「先に全部の索引を作る」という設計そのものが、この案件の無理の出所です。</strong></p>
 <hr>
-<h2>7. 既に実施した125回について</h2>
-<p><strong>是正は不要です。</strong>人が在席する時間帯・1回の実行60回上限・合計125回・許可パスのみ・画像ゼロという実績は、①の枠内として事後的にも正当化できます。<strong>ログ（URL・時刻・件数）は保全してください。</strong></p>
-<p><strong>ただし2.0 秒のままで②に進むのは認められません。</strong>2026-09-14 判定の「10秒に合わせる」は、無人・大量の局面のために書かれた条件です。</p>
+<h2>7. 依頼外ですが黙って通せません — ログイン済みブラウザで 2,176社を1ページ/秒（<code>SDX.terms()</code>）</h2>
+<p>チケット1890行・1926行に次の記載があります。</p>
+<blockquote>🔴 SD は HTTP からの連続取得を 429 で止める（4秒間隔・64秒バックオフでも復帰せず／2026-09-30 実測）。<strong>大量スキャンはログイン済みブラウザの同一オリジン iframe で回すのが唯一の道</strong>（カズヨ実測で1ページ約1秒）。<br><strong>2,176社の取引条件は1社も取れていない。</strong>SD が HTTP からの連続取得を 429 で止めるため。<strong>ブラウザ（<code>SDX.terms()</code>）で回してください。所要約40分の見込み。</strong></blockquote>
+<h3>🔴 法務判定：不可。①②③より悪い案です。実行しないでください。</h3>
+<p>理由を4つ、重い順に述べます。</p>
+<ol>
+<li style='margin-left:0.0em'><strong>「429 を回避する目的で経路を替えた」という事実が記録に残ります。</strong></li>
+</ol>
+<p>   チケットの記述そのものが、<strong>HTTP が 429 で止められたことを理由にブラウザ経路を選んだ</strong>と述べています。これは技術的な工夫ではなく、<strong>相手が明示した拒否を別の入口で迂回する行為</strong>です。第10条(2)「会員として不適切な行為」の認定において、これ以上に分かりやすい材料はありません。<strong>当社の側が、自分の手で「意図的だった」という証拠を作ります。</strong></p>
+<ol>
+<li style='margin-left:0.0em'><strong>会員アカウントを使います。</strong></li>
+</ol>
+<p>   非ログインの取得は、最悪でも IP 単位の遮断で済む可能性があります。<strong>ログイン済みセッションからの走行は、当社の会員 ID に直接紐づきます。</strong>SD は第10条により<strong>予告なく即時に</strong>利用停止・登録抹消でき、第11条1項により<strong>賠償責任を負いません。</strong>当社は 2026-11-30 の停止条件を既に背負っています。<strong>不可逆性が最大の経路を、最も不利なタイミングで選ぶことになります。</strong></p>
+<ol>
+<li style='margin-left:0.0em'><strong>1リクエスト/秒 × 2,176ページは、Librahack 事件と同一の速度域です。</strong></li>
+</ol>
+<p>   同事件は約1秒間隔で逮捕・20日勾留に至りました。<strong>しかも同事件の行為者は、相手からの拒否通知を受けていません。当社は受けています。</strong>「429 を受けた後、1秒間隔で2,176ページを40分で走った」という事実関係は、故意の評価において当社に不利にしか働きません。</p>
+<ol>
+<li style='margin-left:0.0em'><strong>取得物の扱いが、非ログインより厳しくなります。</strong></li>
+</ol>
+<p>   当社の公開判定ルール（<code>knowledge_public_page_terms_rule_and_leak_detection.md</code>）は「<strong>非ログイン表示を取得当日に実測</strong>」を第1の足にしています。<strong>ログイン後の領域から取った情報は、この足が立ちません。</strong>第17条1項の「当サイトに掲載されている一切の情報」そのものであり、社内台帳に留める運用が今より厳格に要求されます。</p>
+<p><strong>なお、不正アクセス禁止法には当たりません</strong>（自社の正当な ID です）。<strong>過大に脅すつもりはありません。</strong>止める理由は契約（第10条）と刑法233条／234条の2、そして不可逆性です。</p>
+<h3>代替（<code>SDX.terms()</code> を捨てる必要はありません）</h3>
+<p><code>SDX.terms()</code> の実装自体は価値があります。<strong>使い方を変えてください。</strong></p>
+<table><thead><tr><th>変更前</th><th>変更後</th></tr></thead><tbody>
+<tr><td>2,176社を1ページ/秒で40分・無人</td><td><strong>発注候補に挙がった社だけ</strong>を、<strong>人が在席している画面で、1社ずつ</strong>。<strong>間隔は最低3秒</strong>、<strong>1セッション20社まで</strong>、<strong>1日50社まで</strong></td></tr>
+<tr><td>母数を先に全部確定する</td><td>§6-A の出展者ゲート。<strong>発注の直前に1社読む</strong></td></tr>
+</tbody></table>
+<p>この形なら「会員が自分の取引先の取引条件を、自分のブラウザで確認している」という、<strong>説明に一切の無理が無い行為</strong>になります。</p>
 <hr>
-<h2>8. 残った不確実性（明示します）</h2>
+<h2>8. 既に実施した125回について</h2>
+<p><strong>是正は不要です。</strong>人が在席する時間帯・1回の実行60回上限・許可パスのみ・画像ゼロ・卸価格ゼロという実績は、事後的にも正当化できます。<strong>取得ログ（URL・時刻・件数・応答コード）は保全してください</strong>（条件12）。</p>
+<p><strong>タカシの実装修正は法務上も正しいです。</strong>429 を「1件ずつの失敗」として飲み込んでいた状態は、<strong>「相手に無い」と「こちらが止められた」を混同する</strong>という点で、法務上も最も危険な形でした。<strong>拒否の通知を受け取ったことに気づかないまま走り続ける実装</strong>だったからです。専用例外での全体即停止・自動再試行なし・終了コード2 への変更は、§5 の条件5そのものです。</p>
+<hr>
+<h2>9. 残った不確実性（明示します）</h2>
 <table><thead><tr><th>#</th><th>内容</th><th>影響</th></tr></thead><tbody>
-<tr><td>1</td><td><strong>ヘルプサイト（<code>faq.superdelivery.com</code>）の全文を網羅確認できていません。</strong>Helpfeel 製の SPA で、記事一覧が HTML に無く、<code>sitemap.xml</code> は 404、<code>/search?q=</code> はサーバ側で 404 を返します。第1条2項により<strong>ヘルプの記載は契約内容を構成しえます</strong></td><td>自動取得を禁じる記載がヘルプにあれば、<strong>結論は①も含めて不可に反転します。</strong>②の実行前に「ご利用ガイド・ルール」カテゴリの全記事を取得し、<code>自動</code> <code>プログラム</code> <code>ロボット</code> <code>複製</code> <code>収集</code> で検索してください（①の実行には影響しません。①は既に同規模を実施済みで実害がないため）</td></tr>
-<tr><td>2</td><td>出展企業ごとの個別取引条件（第6条2項）に取得制限が書かれている可能性</td><td>③の代替案 A を採る場合、承認済み企業の取引条件を読む工程で同時に確認できます</td></tr>
-<tr><td>3</td><td>会員規約は改訂 2023.9.1 版。<strong>第3条により掲載のみで即時変更されます</strong></td><td>条件6（実行前のハッシュ差分検知）で担保</td></tr>
+<tr><td>1</td><td><strong>429 の解除条件が分かりません。</strong>時間か IP か会員か、窓が何分・何時間・何日か</td><td>§5 の「1日30回・10秒間隔」は <strong>429 が出た125回から逆算した安全側の推定</strong>であり、SD が示した数値ではありません。<strong>§6-C の照会でしか確定できません</strong></td></tr>
+<tr><td>2</td><td><strong>ヘルプサイト（<code>faq.superdelivery.com</code>）の全文を網羅確認できていません。</strong>Helpfeel 製の SPA で記事一覧が HTML に無く、<code>sitemap.xml</code> は 404、<code>/search?q=</code> もサーバ側 404。<strong>第1条2項によりヘルプの記載は契約内容を構成しえます</strong></td><td>自動取得を禁じる記載がヘルプにあれば、<strong>§5 の縮小案も不可に反転します。</strong>「ご利用ガイド・ルール」カテゴリの全記事を取得し <code>自動</code> <code>プログラム</code> <code>ロボット</code> <code>複製</code> <code>収集</code> で検索してください</td></tr>
+<tr><td>3</td><td>出展企業ごとの個別取引条件（第6条2項）に取得制限が書かれている可能性</td><td>§6-A・B を採る場合、取引条件を読む工程で同時に確認できます</td></tr>
+<tr><td>4</td><td>会員規約は改訂 2023.9.1 版。<strong>第3条により掲載のみで即時変更されます</strong></td><td>§5 の条件7（実行前のハッシュ差分検知）で担保</td></tr>
 </tbody></table>
 <p><strong>再確認期限：2027-03-31、または上記いずれかの事象が起きた時点。</strong></p>
 <hr>
-<h2>9. タカシへの申し送り（実装に落とす順）</h2>
+<h2>10. タカシへの申し送り（実装に落とす順）</h2>
 <ol>
-<li style='margin-left:0.0em'><strong>条件5・6・7・8 を先に実装してください。</strong>この4つが無い状態では、①も「人が在席しているから大丈夫」以上の根拠を持ちません。特に<strong>条件5（エラー時の即時全停止）が単独で最も効きます。</strong></li>
-<li style='margin-left:0.0em'><strong>条件2（日次2,000回の永続カウンタ）</strong>を入れてください。1回の実行上限だけでは、実行を2回起動すれば無制限になります。</li>
-<li style='margin-left:0.0em'><strong>①は上記が入り次第、着手可。</strong>間隔2.0秒・1回700回まで・人の在席時間帯。</li>
-<li style='margin-left:0.0em'><strong>②は「A・B で足りないか」をカズヨに確認してから。</strong>進める場合は間隔10.0秒・1日2,000回・4夜分割・6時間打ち切り。着手前に残課題1（ヘルプ全文）を潰してください。</li>
-<li style='margin-left:0.0em'><strong>③は実装しないでください。</strong>代替は §6。C・D は §4.1 なので、判断材料としてカズヨへ上げます。</li>
+<li style='margin-left:0.0em'><strong>①②③は実装しないでください。</strong>理由は §4（429 は相手の意思表示）。線を引き直したのが §5 です。</li>
+<li style='margin-left:0.0em'><strong><code>SDX.terms()</code> の 2,176社一括走行は実行しないでください。</strong>§7 の4点。<strong>これはカズヨとサトルの申し送り（チケット1890/1926行）に対する明確な NO です。</strong>カズヨへ差し戻してください。</li>
+<li style='margin-left:0.0em'><strong>§5 の条件1・5・6・7・8・9・12 を先に実装してください。</strong>この7つが無い状態では、レーンB も「人が在席しているから大丈夫」以上の根拠を持ちません。</li>
+<li style='margin-left:1.7999999999999998em'><strong>とくに条件1（日次30回の永続カウンタ）と条件6（429を引いたら7日停止）です。</strong>1回の実行上限だけでは、実行を2回起動すれば無制限になります。</li>
+<li style='margin-left:1.7999999999999998em'>条件5はタカシが既に実装済みです（<code>Fetcher.RateLimited</code>）。<strong>バックオフして再試行する経路が残っていないかだけ確認してください。</strong>4秒間隔・64秒バックオフでの復帰試行は、もう行わないでください。</li>
+<li style='margin-left:0.0em'><strong>§5 が入り次第、レーンB を1日30回で着手可。</strong>間隔10.0秒・人の在席下。</li>
+<li style='margin-left:0.0em'><strong>並行して §6-A（出展者ゲート台帳）を組んでください。</strong>これが本命です。母数を先に全部確定する設計を捨てるのが、この案件の解です。</li>
+<li style='margin-left:0.0em'><strong>§6-C（SD への照会）は §4.1 なので、判断材料としてカズヨへ上げます。</strong>429 の解除条件を聞かない限り、当社はずっと手探りのままです。<strong>本件で最も費用対効果が高い一手はこれです。</strong></li>
 </ol>
 </body></html>
