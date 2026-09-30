@@ -6,6 +6,7 @@
 <li style='margin-left:0.0em'>上位判定：T-20260914-004 T-2（2026-09-14・<strong>登録前</strong>の手作業規模を可とした回）→ <strong>本判定で置き換えます</strong></li>
 <li style='margin-left:0.0em'>前提の変化：<strong>① 当社は SD 会員になった</strong>（お客様番号 3166793・【開業前】区分・<strong>利用停止条件 2026-11-30 付き</strong>）／<strong>② SD は 2026-09-30 に当社へ HTTP 429 を返した</strong></li>
 </ul>
+<blockquote>🔴 <strong>2026-09-30 同日に一部差し替えました。→ [30_SD自動取得_再判定_429の再検証.md](30_SD自動取得_再判定_429の再検証.md)</strong><br><strong>結論（①②③④は不可）は維持</strong>ですが、本書 §4 の「429 は当社の<strong>総量</strong>に対する拒否」という読みは<strong>根拠が入れ替わりました</strong>。<br>実測で<strong>同一URL・12秒間隔の2回目だけが429</strong>（先攻 urllib=200／後攻 curl=429）＝<strong>JA3 指紋説は反証</strong>、かつ<strong>10秒間隔でも足りない可能性</strong>が出ました。<br>したがって本書 §5 の「1日30回・間隔10.0秒」は<strong>根拠を失っています。緩めるのではなく、SD への照会（§6-C）まで全面停止</strong>が現在の推奨です。<br>本書 §2（規約の実測）・§6（代替案）・§7（ログイン済みブラウザは不可）は<strong>そのまま有効</strong>です。</blockquote>
 <hr>
 <h2>1. 結論</h2>
 <h3>🔴 ①②③は、提案された形のいずれも不可です。線を引く前に、前提が崩れています。</h3>
