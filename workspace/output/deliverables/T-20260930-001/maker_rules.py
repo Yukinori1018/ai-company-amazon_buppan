@@ -71,9 +71,12 @@ nintendo 任天堂 capcom カプコン bandainamco バンダイナムコ kewpie 
 morinaga 森永 nissin 日清 kikkoman キッコーマン kirin キリン asahi アサヒ ito-en 伊藤園 itoen
 kobayashi 小林製薬 rohto ロート製薬 taisho 大正製薬 kose コーセー kanebo カネボウ pola ポーラ
 fancl ファンケル dhc orbis オルビス mandom マンダム kracie クラシエ earth アース製薬 fumakilla フマキラー
-kinchou 金鳥 sc johnson reckitt pg procter ピーアンドジー unilever ユニリーバ nestle ネスレ
+kinchou 金鳥 reckitt procter ピーアンドジー unilever ユニリーバ nestle ネスレ
 nivea ニベア loreal ロレアル gillette ジレット oralb braun schick シック
 tanita タニタ omron オムロン terumo テルモ
+santen 参天製薬 bayer バイエル バイエル薬品 otsuka 大塚製薬 bauschlomb ボシュロム alcon アルコン iwatani 岩谷産業 イワタニ
+kirkland カークランド ballantines バランタイン milbon ミルボン lebel ルベル タカラベルモント 北の達人コーポレーション
+ine アイエヌイー hoyu ホーユー ホーユープロフェッショナル
 """.split()
 
 
@@ -84,15 +87,19 @@ def _n(s: str) -> str:
 EXTRA_BIG_N = {_n(x) for x in EXTRA_BIG if _n(x)}
 
 
+CORP = re.compile(r"(株式会社|有限会社|合同会社|㈱|㈲|\(株\)|（株）)")
+
+
 def known_big(brand: str, maker: str) -> str:
     hit = bb.known_big(brand, maker)
     if hit:
         return hit
     for name in (brand, maker):
-        n = _n(name)
-        for k in EXTRA_BIG_N:
-            if n == k or (len(k) >= 4 and n.startswith(k)):
-                return k
+        name = CORP.sub("", name or "")  # 「株式会社◯◯」→「◯◯」
+        for n in bb._parts(name):  # 「サンリオ(SANRIO)」→ サンリオ / sanrio / 全体
+            for k in EXTRA_BIG_N:
+                if n == k or (len(k) >= 6 and n.startswith(k)):
+                    return k
     return ""
 
 
@@ -111,7 +118,7 @@ _SIZE_P = T1 / "t1_gbiz_cache" / "size_by_maker.json"
 SIZE = {_n(k): v for k, v in json.loads(_SIZE_P.read_text(encoding="utf-8")).items()} if _SIZE_P.exists() else {}
 
 # manufacturer 欄に入る「社名でないもの」の典型
-NOT_COMPANY = re.compile(r"^(不明|unknown|none|n/?a|その他|other|-+)$", re.I)
+NOT_COMPANY = re.compile(r"^(不明|非公開|unknown|none|n/?a|その他|other|-+)$", re.I)
 
 
 def maker_key(p: dict) -> tuple[str, str]:

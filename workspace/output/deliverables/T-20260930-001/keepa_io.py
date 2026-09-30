@@ -83,8 +83,8 @@ def finder(selection: dict, tag: str, offline: bool = False) -> dict:
     return d
 
 
-def products(asins: list[str], tag: str, offline: bool = False, log=print) -> list[dict]:
-    """product を 100件ずつ取得（stats=365・history=0・offers なし＝1 token/ASIN）。
+def products(asins: list[str], tag: str, offline: bool = False, log=print, buybox: int = 0) -> list[dict]:
+    """product を 100件ずつ取得（stats=365・history=0・offers なし＝1 token/ASIN。buybox=1 は 3 token/ASIN）。
     キャッシュ済みのバッチは読むだけ。"""
     out: list[dict] = []
     for i in range(0, len(asins), 100):
@@ -95,9 +95,9 @@ def products(asins: list[str], tag: str, offline: bool = False, log=print) -> li
         else:
             if offline:
                 continue
-            wait_for(len(chunk) + 5, log)
+            wait_for(len(chunk) * (3 if buybox else 1) + 5, log)
             d = _get("product", {"domain": DOMAIN_JP, "asin": ",".join(chunk),
-                                 "stats": 365, "history": 0, "buybox": 1})
+                                 "stats": 365, "history": 0, "buybox": buybox})
             if d.get("error"):
                 raise RuntimeError(f"product error: {d['error']}")
             _save(p, d)
@@ -105,6 +105,30 @@ def products(asins: list[str], tag: str, offline: bool = False, log=print) -> li
                 f"consumed {d.get('tokensConsumed')} left {d.get('tokensLeft')}")
         out.extend(d.get("products") or [])
     return out
+
+
+def products_buybox(asins: list[str], offline: bool = False, log=print) -> dict[str, dict]:
+    """代表 ASIN だけを buybox=1（3 token/ASIN）で取る。カート保持セラーID が要るため。
+    対象が実行ごとに変わるので、キャッシュは ASIN 単位で持つ（取得済みは二度と取らない）。
+    戻り値はキャッシュ済みの全 ASIN → product。"""
+    have: dict[str, dict] = {}
+    for f in sorted(RAW.glob("prodbb_*.json.gz")):
+        for p in _load(f).get("products") or []:
+            have[p["asin"]] = p
+    need = [a for a in dict.fromkeys(asins) if a not in have]
+    for i in range(0, 0 if offline else len(need), 100):
+        chunk = need[i:i + 100]
+        wait_for(len(chunk) * 3 + 5, log)
+        d = _get("product", {"domain": DOMAIN_JP, "asin": ",".join(chunk),
+                             "stats": 365, "history": 0, "buybox": 1})
+        if d.get("error"):
+            raise RuntimeError(f"product error: {d['error']}")
+        h = hashlib.sha1(",".join(chunk).encode()).hexdigest()[:10]
+        _save(_cache(f"prodbb_{h}.json.gz"), d)
+        for p in d.get("products") or []:
+            have[p["asin"]] = p
+        log(f"  buybox {len(chunk)}件 consumed {d.get('tokensConsumed')} left {d.get('tokensLeft')}")
+    return have
 
 
 def sellers(ids: list[str], offline: bool = False, log=print) -> dict[str, str]:

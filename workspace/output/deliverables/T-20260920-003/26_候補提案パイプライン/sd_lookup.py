@@ -139,8 +139,19 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--seed-words", default="",
                     help="**仕入れ先起点**で SD を索引する（カンマ区切りの語）。"
                          "既定の語は SEED_WORDS。JAN での当て込みはしない")
+    ap.add_argument("--build-netsea-index", type=int, metavar="社数", default=0,
+                    help="NETSEA の JAN 索引を作る／続ける（Keepa トークン0・前回の続きから）。"
+                         "1社ずつ保存するので、途中で止めても失われません")
     a = ap.parse_args(argv)
     WORK.mkdir(parents=True, exist_ok=True)
+
+    # ── NETSEA の JAN 索引を作る／続ける（0トークン・時間だけ）
+    if a.build_netsea_index:
+        import discover
+        idx = discover.build_netsea_index(shops_per_run=a.build_netsea_index)
+        print(f"索引: {len(idx.get('indexed_shops') or [])}社・JAN {len(idx.get('jans') or {}):,}件")
+        print("→ 続きは同じコマンドで走ります。シートへ入れるのは --from-netsea-index")
+        return 0
 
     # ── 仕入れ先起点で SD を索引する（社長指示②）
     if a.seed_words:

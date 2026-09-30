@@ -106,9 +106,26 @@ def test_parse_product():
 
 
 def test_parse_product_logged_in():
-    rows = sd.parse_product(LOGGED_IN_HTML)
+    rows = sd.parse_product(LOGGED_IN_HTML, logged_in=True)
     ok(rows[0].wholesale_price_excl == 620, "ログイン済みの HTML なら金額を読む")
     ok(rows[0].approval == "承認済み", "金額が読めた行は承認済み")
+    ok(rows[1].approval == "卸価格未承認",
+       "ログイン済みで金額が無い行だけを未承認と書く")
+
+
+def test_sold_out_is_not_unapproved():
+    """🔴 品切れ（SOLD OUT）を「卸価格未承認」と読まない。
+
+    品切れの行は卸価格の欄に SOLD OUT が入り、「会員のみ公開」が出ません。
+    以前はそれを未承認として書き、非ログインの10件が未承認に化けていました（2026-09-30 実測）。
+    """
+    html = PRODUCT_HTML.replace(
+        '<td class="stock-info co-align-center border-t"><span>卸価格は</span>会員のみ公開</td>',
+        '<td class="stock-info co-align-center border-t">SOLD OUT</td>')
+    rows = sd.parse_product(html)                    # logged_in=False（既定）
+    ok(rows[0].approval == "未確認", "非ログインの品切れは未確認（未承認と書かない）")
+    ok(rows[0].stock == "在庫なし", "品切れは在庫なしとして記録する")
+    ok(rows[0].wholesale_price_excl is None, "金額は作らない")
 
 
 def test_parse_search():
@@ -198,6 +215,13 @@ def test_approval_requests_does_not_apply():
     ok(reqs[0]["出展企業"] == "ブライエンタープライズ", "企業名が入る")
     ok(reqs[0]["該当商品数"] == 2, "該当商品数を数える")
     ok("申請したい理由" in reqs[0], "なぜ申請したいかが付く")
+    ok("突合はまだ取れていない" in reqs[0]["申請したい理由"],
+       "🔴 突合していないのに『Amazon で一致』と書かない（優先順位を読み違えるので）")
+    ok(reqs[0]["Amazon突合済み"] == 0, "突合0件を0件と書く")
+    with_asin = sd.approval_requests(rows, asin_by_jan={"4992272443363": "B0TEST0001"})
+    ok(with_asin[0]["Amazon突合済み"] == 2, "突合できていれば数える")
+    ok("実売のある棚" in with_asin[0]["申請したい理由"], "突合できた企業は理由が変わる")
+    ok(len(reqs[0]["JAN例"]) == 1, "同じ JAN を JAN例に2回入れない")
     # 承認済みの行は申請対象にしない
     sd.merge_wholesale(rows, {"13681795S1": {"卸価格": 620}, "13681795S2": {"卸価格": 600}})
     ok(sd.approval_requests(rows) == [], "承認済みだけなら申請対象は0件")
@@ -248,6 +272,21 @@ def test_from_netsea_index_tax_and_fields():
     idx["4901234567890"]["tax_class"] = 1
     ok(any("税区分" in n for n in cat.from_netsea_index(idx)[0].notes),
        "軽減税率の疑いは備考に残す（1.08 と推測しない）")
+
+
+def test_jan_stays_text():
+    """🔴 JAN は数字の並びであって数ではない。**先頭の0を落とさない。**
+
+    2026-09-30、シートに `USER_ENTERED` で書いたら 088381753180 が 88381753180 になり、
+    冪等の鍵が一致せず**同じ商品を二重登録しました**（59件が桁落ち・12組が重複）。
+    列の TEXT 指定はシート側（`ensure_header`）で、ここでは値が文字列で通ることを見ます。
+    """
+    cells = cat.Row(source="NETSEA", jan="0088381753180").to_cells(today="2026-09-30")
+    j = cells[cat.I_JAN]
+    ok(isinstance(j, str) and j == "0088381753180", "先頭の0が残る")
+    a = cat.Row(source="NETSEA", jan="0088381753180")
+    b = cat.Row(source="NETSEA", jan="88381753180")
+    ok(a.key != b.key, "桁落ちした JAN は別の鍵になる（＝重複として通さない）")
 
 
 def test_dedupe_keeps_smallest_set():

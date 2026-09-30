@@ -171,12 +171,24 @@ def _parse_restrictions(html: str) -> dict[str, str]:
     return out
 
 
-def parse_product(html: str, url: str = "") -> list[SDSet]:
+def parse_product(html: str, url: str = "", logged_in: bool = False) -> list[SDSet]:
     """商品ページ → 規格（セット）ごとの行。
 
     **卸価格は非ログインでは取れません**（「会員のみ公開」）。その場合 `approval='未確認'` で返し、
     `wholesale_price_excl` は None のままにします。ログイン済みの HTML を渡せば、
     同じ関数が金額を読んで `approval='承認済み'` にします。
+
+    `logged_in` を呼び出し側が宣言するのは、**「金額が無い」の意味が文脈で変わる**からです。
+
+    | 文脈 | 金額が無い | 意味 |
+    |---|---|---|
+    | 非ログイン | 当たり前 | **未確認**（承認済みか未承認かは判らない） |
+    | ログイン済み | 情報 | **卸価格未承認**（申請すれば見える） |
+
+    ⚠️ 2026-09-30: `logged_in` を作る前は「会員のみ公開の文字が無ければ未承認」と読んでいて、
+    **品切れ（SOLD OUT）の行10件を「卸価格未承認」と書いていました**。品切れの行では
+    卸価格の欄に SOLD OUT が入るので「会員のみ公開」が出ません。
+    **画面に出ていない理由を1つに決めつけると、未確認が未承認に化けます。**
     """
     product_id = (re.search(r"SD品番[：:]\s*(\d+)", _text(html)) or [None, ""])[1]
     sup = re.search(r'class="dl-name-txt"\s+href="/p/do/dpsl/(\d+)/"[^>]*>(.*?)</a>', html, re.S)
@@ -213,13 +225,16 @@ def parse_product(html: str, url: str = "") -> list[SDSet]:
         price = None
         approval = "未確認"
         notes: list[str] = []
-        if "会員のみ公開" in cell or (not cell and "会員のみ公開" in tx):
+        m = re.search(r"¥\s*([\d,]+)", cell)
+        price = _int(m.group(1)) if m else None
+        if price:
+            approval = "承認済み"
+        elif logged_in:
+            # ログイン済みで金額が無い＝この企業の卸価格をまだ見せてもらえていない。
+            approval = "卸価格未承認"
+        else:
             # 非ログイン。**承認の有無はここでは判りません**（未承認と同じ表示になる）。
             notes.append("非ログイン取得のため卸価格は不明")
-        else:
-            m = re.search(r"¥\s*([\d,]+)", cell)
-            price = _int(m.group(1)) if m else None
-            approval = "承認済み" if price else "卸価格未承認"
         stock = "在庫なし" if "SOLD OUT" in (cell or tx).upper() else "未確認"
 
         rows.append(SDSet(
@@ -435,12 +450,17 @@ def merge_wholesale(rows: list[SDSet], filled: dict) -> list[SDSet]:
     return rows
 
 
-def approval_requests(rows: list[SDSet]) -> list[dict]:
+def approval_requests(rows: list[SDSet], asin_by_jan: dict | None = None) -> list[dict]:
     """卸価格の承認申請をしたい出展企業を、**申請理由つき**でまとめる。
 
     ⛔ **申請そのものは実行しません**（出展企業への連絡＝CLAUDE.md §4.1）。
     社長承認はカズヨが取ります。ここが作るのは「誰に・なぜ」の一覧だけです。
+
+    ⚠️ **理由は事実に合わせて書き分けます。**`asin_by_jan` で Amazon 側の突合が
+    取れている企業は「実売のある棚と一致」、取れていない企業は「品揃えが当社の棚に近い」。
+    突合していないのに「Amazon で一致」と書くと、**申請の優先順位を社長が読み違えます。**
     """
+    asin_by_jan = asin_by_jan or {}
     by: dict[str, dict] = {}
     for r in rows:
         if r.approval == "承認済み" or not r.supplier:
@@ -448,18 +468,27 @@ def approval_requests(rows: list[SDSet]) -> list[dict]:
         e = by.setdefault(r.supplier.supplier_id,
                           {"出展企業": r.supplier.name,
                            "supplier_id": r.supplier.supplier_id,
-                           "該当商品数": 0, "扱い商品の傾向": [], "ネット販売": r.net_sales_ok,
+                           "該当商品数": 0, "Amazon突合済み": 0,
+                           "扱い商品の傾向": [], "ネット販売": r.net_sales_ok,
                            "消費者直送": r.direct_ship_ok, "JAN例": []})
         e["該当商品数"] += 1
-        if r.name and len(e["扱い商品の傾向"]) < 5:
+        if asin_by_jan.get(r.jan):
+            e["Amazon突合済み"] += 1
+        if r.name and r.name[:40] not in e["扱い商品の傾向"] and len(e["扱い商品の傾向"]) < 5:
             e["扱い商品の傾向"].append(r.name[:40])
-        if r.jan and len(e["JAN例"]) < 3:
+        if r.jan and r.jan not in e["JAN例"] and len(e["JAN例"]) < 3:
             e["JAN例"].append(r.jan)
-    out = sorted(by.values(), key=lambda e: -e["該当商品数"])
+    out = sorted(by.values(), key=lambda e: (-e["Amazon突合済み"], -e["該当商品数"]))
     for e in out:
-        e["申請したい理由"] = (
-            f"Amazon 側で実売のある棚 {e['該当商品数']}件が、この企業の出品と JAN 一致。"
-            f"卸価格が見えないと採算が確定できない（ネット販売 {e['ネット販売']}）")
+        if e["Amazon突合済み"]:
+            e["申請したい理由"] = (
+                f"Amazon 側で実売のある棚 {e['Amazon突合済み']}件が、この企業の出品と JAN 一致。"
+                f"卸価格が見えないと採算が確定できない（ネット販売 {e['ネット販売']}）")
+        else:
+            e["申請したい理由"] = (
+                f"当社が狙う棚（生活雑貨・インテリア系）の品揃えが {e['該当商品数']}件。"
+                f"**Amazon 側との突合はまだ取れていない**ので、卸価格が見えれば"
+                f"採算のあたりを付けられる（ネット販売 {e['ネット販売']}）")
     return out
 
 

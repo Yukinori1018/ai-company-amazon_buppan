@@ -256,6 +256,15 @@ def ensure_header(ws=None) -> None:
                 "textFormat": {"bold": True},
                 "backgroundColor": {"red": .92, "green": .92, "blue": .92}}},
             "fields": "userEnteredFormat(textFormat,backgroundColor)"}},
+        # 🔴 JAN 列は必ず TEXT。**数値として入ると先頭の0が消えます。**
+        # 2026-09-30、`USER_ENTERED` で 088381753180 が 88381753180 になり、
+        # 冪等の鍵が一致せず**同じ商品を二重登録しました**（59件が桁落ち・12件が重複）。
+        # 「JAN は数字だから数値でいい」は間違いで、**JAN は数字の並びであって数ではありません**。
+        {"repeatCell": {
+            "range": {"sheetId": ws.id, "startColumnIndex": I_JAN,
+                      "endColumnIndex": I_JAN + 1},
+            "cell": {"userEnteredFormat": {"numberFormat": {"type": "TEXT"}}},
+            "fields": "userEnteredFormat.numberFormat"}},
     ]})
 
 
@@ -269,11 +278,18 @@ def read_keys(ws=None) -> dict[tuple[str, str], int]:
     if header[:len(COLUMNS)] != COLUMNS:
         raise SystemExit(f"列が想定と違います。\n想定: {COLUMNS}\n実際: {header}")
     keys: dict[tuple[str, str], int] = {}
+    malformed: list[str] = []
     for i, row in enumerate(values[1:], start=2):
         src = (row[I_SOURCE] if len(row) > I_SOURCE else "").strip()
         jan = (row[I_JAN] if len(row) > I_JAN else "").strip()
         if src and jan:
             keys.setdefault((src, jan), i)
+            if len(jan) not in (12, 13) or not jan.isdigit():
+                malformed.append(jan)
+    if malformed:
+        # **黙って通さない。**桁落ちした JAN は冪等の鍵として使えず、二重登録になります。
+        print(f"⚠️ JAN の形が壊れている行が {len(malformed)}件あります（例 {malformed[:3]}）。"
+              "JAN 列が TEXT になっているか確認してください（数値化で先頭の0が消えます）")
     return keys
 
 
