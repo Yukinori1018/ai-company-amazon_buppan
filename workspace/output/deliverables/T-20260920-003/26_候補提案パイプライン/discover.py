@@ -113,13 +113,25 @@ def scan_suppliers(client, shop_ids: list[int], max_items: int = 5000,
                 prev = found.get(jan)
                 if prev and prev["unit_price_excl"] <= price:
                     continue
+                # 🔴 2026-09-30 修正: フィールド名を2つ間違えていました。
+                #    `item_url` → 正しくは **`product_url`**（公式スキーマ）。
+                #    そのため `supplier_url` が全件空になり、§3.3-6（購入先URL が未確認なら
+                #    GO にしない）で**全件が UNKNOWN に落ちていました**。
+                #    `stock_quantity` → 正しくは **`set[].sold_out_flag`**（Y=品切れ/N=在庫あり）。
+                #    在庫も全件 None でした。**列名から意味を推測した典型**
+                #    （memory: knowledge_verify_field_semantics_not_names）。
+                sold_out = (st.get("sold_out_flag") or it.get("sold_out_flag") or "").upper()
                 found[jan] = {
                     "jan": jan,
                     "unit_price_excl": price,                       # ※1個の値段（税抜）
                     "min_lot_units": _int(st.get("set_num") or it.get("set_num")) or 1,
-                    "stock": st.get("stock_quantity", it.get("stock_quantity")),
-                    "supplier_name": it.get("supplier_name") or it.get("shop_name") or "",
-                    "supplier_url": it.get("item_url") or "",
+                    "stock": {"N": "在庫あり", "Y": "品切れ"}.get(sold_out, "未確認"),
+                    "title": (it.get("product_name") or "").strip(),
+                    "tax_class": st.get("consumption_tax_class",
+                                        it.get("consumption_tax_class")),
+                    "reference_price": _int(st.get("reference_price")),   # 上代（税抜）
+                    "supplier_name": it.get("shop_name") or it.get("supplier_name") or "",
+                    "supplier_url": it.get("product_url") or "",
                     "shop_id": shop_id,
                 }
                 added += 1
