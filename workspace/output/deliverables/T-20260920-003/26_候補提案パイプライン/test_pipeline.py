@@ -413,6 +413,98 @@ class TestSetCount(unittest.TestCase):
         self.assertEqual(set_count.order_lot_in_amazon_units(12, 1), 12)
 
 
+class TestSupplyReality(unittest.TestCase):
+    """CLAUDE.md §3.3-6「仕入れが実在することを確認するまで GO にしない」。"""
+
+    def _c(self, **kw):
+        import candidate_sources as cs
+        base = dict(asin="B0TEST0001", supplier_url="https://example.invalid/item/1")
+        base.update(kw)
+        return cs.Candidate(**base)
+
+    def test_missing_supplier_url_is_unknown(self):
+        """URL が無い＝在庫・入り数・卸値のどれも裏が取れていない（B0015XNJMW の型）。"""
+        status, reason = pipe.supply_status(self._c(supplier_url=""), "ホーム＆キッチン")
+        self.assertEqual(status, md.UNKNOWN)
+        self.assertIn("裏が取れていない", reason)
+        self.assertEqual(pipe.combine(GO, md.PASS, md.PASS, status), UNKNOWN)
+
+    def test_supplier_url_present_passes(self):
+        status, _r = pipe.supply_status(self._c(), "ホーム＆キッチン > 家具")
+        self.assertEqual(status, md.PASS)
+
+    def test_perishable_categories_need_date_management(self):
+        """サプリ・食品・ドラッグストアは要期限管理で初回には不適。"""
+        for cat in ("ドラッグストア > 栄養補助食品 > サプリメント",
+                    "食品・飲料・お酒 > 食品",
+                    "ドラッグストア"):
+            status, reason = pipe.supply_status(self._c(), cat)
+            self.assertEqual(status, md.UNKNOWN, cat)
+            self.assertIn("要期限管理", reason)
+
+    def test_perishable_beats_url_check(self):
+        """URL があっても期限管理が要るなら GO にしない。"""
+        status, reason = pipe.supply_status(self._c(), "ドラッグストア > サプリメント")
+        self.assertEqual(status, md.UNKNOWN)
+        self.assertIn("45日", reason)
+
+
+class TestErrorBand(unittest.TestCase):
+    """手残りが誤差幅を下回る行は GO にしない（UNKNOWN）。"""
+
+    def _e(self, sell, cost):
+        return profit.compute(sell=sell, fee_pct=15.4, fba_yen=472,
+                              unit_cost_incl=cost, qty=10, monthly_sold=10)
+
+    def test_band_applies_even_when_monthly_sold_unknown(self):
+        """月販が不明でも誤差幅は効く。**順番の間違いでゲートが空振りしていた**（9/30）。"""
+        e = self._e(2280, 1188)
+        self.assertEqual(pipe.economics_status(e, None)[0], md.UNKNOWN)
+
+    def test_thin_margin_is_unknown_not_go(self):
+        """手残り28円の候補を GO として出した（2026-09-30）。誤差幅が結論を超えている。"""
+        e = self._e(2280, 1188)                  # 手残り 28円・誤差幅 360円
+        self.assertEqual(e.net_per_unit, 28)
+        self.assertGreater(e.net_per_unit, 0)     # 赤字ではない。**読み切れていない**
+        status, reason = pipe.economics_status(e, 10)
+        self.assertEqual(status, md.UNKNOWN)
+        self.assertIn("誤差幅", reason)
+
+    def test_error_band_scales_with_price(self):
+        """高額品は誤差幅も大きい（26,800円の売価で手残り355円は読み切れていない）。"""
+        e = self._e(26800, 21000)
+        band = round(26800 * pipe.ERROR_BAND_PCT / 100) + pipe.ERROR_BAND_FIXED
+        self.assertGreater(band, 1800)
+        self.assertGreater(e.net_per_unit, 0)
+        self.assertLess(e.net_per_unit, band)
+        self.assertEqual(pipe.economics_status(e, 10)[0], md.UNKNOWN)
+
+    def test_healthy_margin_still_passes(self):
+        e = self._e(2980, 1012)                  # 手残り785円・誤差幅409円
+        self.assertEqual(pipe.economics_status(e, 10)[0], md.PASS)
+
+
+class TestContentVolume(unittest.TestCase):
+    """内容量は機械では突き合わせられないが、**人の目に入るようにする**（§3.3-7）。"""
+
+    def test_supplement_volume(self):
+        self.assertEqual(
+            set_count.extract_content_volume("オリヒロ 玉葱エキス粒 徳用 約60日分 600粒"),
+            "60日分 / 600粒")
+
+    def test_dimensions_are_not_volume(self):
+        """寸法（cm）や電気仕様（W/V/ルーメン）は内容量ではない。"""
+        for title in ("ファミリー・ライフ キャビネット 幅70×奥行32×高さ70cm",
+                      "サンワダイレクト LEDライト 作業灯 1300ルーメン 800-LED096BK"):
+            self.assertEqual(set_count.extract_content_volume(title), "", title)
+
+    def test_prefix_is_always_written(self):
+        """表記が無い行も「表記なし」と書く（空欄を作らない・§3.2）。"""
+        self.assertEqual(pipe.volume_prefix("ソファカバー 肘付き右コーナー"),
+                         "【内容量 表記なし】")
+        self.assertIn("600粒", pipe.volume_prefix("玉葱エキス粒 600粒"))
+
+
 class TestPrioritize(unittest.TestCase):
     """同じトークンで GO が出やすい順に使う。"""
 

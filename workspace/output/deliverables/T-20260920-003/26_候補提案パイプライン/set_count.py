@@ -133,3 +133,39 @@ def order_lot_in_amazon_units(netsea_set_num: int, amazon_set_count: int) -> int
     set_num = max(1, int(netsea_set_num or 1))
     per = max(1, int(amazon_set_count or 1))
     return max(1, -(-set_num // per))
+
+
+# ── 内容量（人が目で突き合わせるための表示）────────────────────────────────
+
+# 機械では卸と突き合わせられないが、**人が見るときに目に入る**ようにする（§3.3-7）。
+# 「卸は300粒・Amazon は600粒」型のずれは商品名だけでは判定できず、人が両方を見るしかない。
+VOLUME_RE = re.compile(
+    r"(\d+(?:\.\d+)?)\s*"
+    r"(粒|錠|包|カプセル|袋|枚|本|回分|日分|食|膳|人前|ml|mL|L|l|g|kg|cc|m|cm|mm|畳|W|V|A|lm|ルーメン)"
+    r"(?![\dA-Za-z])")
+
+# 内容量として意味のあるもの（サイズ・電気仕様は除く）。
+VOLUME_UNITS = ("粒", "錠", "包", "カプセル", "袋", "枚", "本", "回分", "日分",
+                "食", "膳", "人前", "ml", "mL", "L", "l", "g", "kg", "cc")
+
+
+def extract_content_volume(title: str | None, limit: int = 3) -> str:
+    """商品名から内容量らしい表記を拾って、人が読める1行にする。
+
+    「600粒」「約60日分」「200g」「1L」など。寸法（cm）や電気仕様（W/V/lm）は入れません。
+    見つからなければ空文字（台帳には「表記なし」と書きます）。
+    """
+    if not title:
+        return ""
+    t = unicodedata.normalize("NFKC", str(title))
+    out: list[str] = []
+    for m in VOLUME_RE.finditer(t):
+        num, unit = m.group(1), m.group(2)
+        if unit not in VOLUME_UNITS:
+            continue
+        s = f"{num}{unit}"
+        if s not in out:
+            out.append(s)
+        if len(out) >= limit:
+            break
+    return " / ".join(out)

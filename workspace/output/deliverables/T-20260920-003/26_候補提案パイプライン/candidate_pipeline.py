@@ -59,6 +59,24 @@ TOKENS_PER_ASIN = 8
 
 # オファー取得数の上限。ここを下げると §3.3 のチェック3が UNKNOWN になるので下げない。
 OFFERS = 20
+
+# 賞味期限・消費期限の管理が要るカテゴリ（FBA の残存期間要件・混合在庫の制約が絡む）。
+# 残存60日以上でないと納品できず、45日を切ると販売不可になる（memory: FBA納品 実務決定版）。
+# さらにサプリ・食品は**カテゴリー型ゲート**でブランド申請では開かない。
+# 初回の SKU には不適なので、GO ではなく UNKNOWN＋「要期限管理」に落とす（§3.3-6 / 2026-09-30）。
+PERISHABLE_CATEGORY_WORDS = (
+    "ドラッグストア", "食品", "飲料", "サプリメント", "栄養補助食品", "健康食品",
+    "ビール", "ワイン", "お酒", "アルコール", "ベビー&マタニティ > ベビーフード",
+)
+
+# 手残りの誤差幅 = 売価 × ERROR_BAND_PCT + ERROR_BAND_FIXED。
+# **手残りがこれを下回る行は GO にしない**（UNKNOWN＝「読み切れていない」）。
+#   売価比 7% の内訳: BuyBox 価格の振れ ±5% ＋ 販売手数料の読みの差 1.4%（税抜/税込）＋ 端数
+#   固定 200円の内訳: 保管料・納品送料・梱包資材の 206円は**商品台帳 L001 の1点の観測**を
+#                     全商品に当てている。大型・重量物では数倍になるので、全額を誤差と見る
+# 2026-09-30、手残り28円の候補を GO として出した。**誤差幅が結論を超えているなら GO ではない。**
+ERROR_BAND_PCT = 7.0
+ERROR_BAND_FIXED = 200
 # ──────────────────────────────────────────────────────────────────────────
 
 # 作業ファイル（Git 追跡外）。卸値・卸URL を含むのでここ以外に書かない。
@@ -71,6 +89,24 @@ def _n(v, suffix: str = "") -> str:
     if v is None or v == "":
         return ledger_sheet.UNKNOWN_CELL
     return f"{v}{suffix}"
+
+
+def _category_path(product: dict) -> str:
+    """Keepa の `categoryTree` を「親 > 子 > 孫」に畳む。期限管理の判定に使う。"""
+    tree = product.get("categoryTree")
+    if not isinstance(tree, list):
+        return ""
+    return " > ".join(str((c or {}).get("name") or "") for c in tree if isinstance(c, dict))
+
+
+def volume_prefix(title: str | None) -> str:
+    """判定理由の先頭に出す内容量の注記（§3.3-7・カズヨ依頼 2026-09-30）。
+
+    台帳は**32列で固定**（条件付き書式が列位置に紐づく）ため列を増やせません。
+    人が最初に読む `判定理由` の先頭に置いて、目に入るようにします。
+    """
+    v = set_count.extract_content_volume(title)
+    return f"【内容量 {v}】" if v else "【内容量 表記なし】"
 
 
 def extract_facts(product: dict, cand: sources.Candidate) -> dict:
@@ -118,6 +154,7 @@ def extract_facts(product: dict, cand: sources.Candidate) -> dict:
         "fee_pct": fee_pct,
         "fba_yen": fba,
         "monthly_sold": ms,
+        "category": _category_path(product) or cand.category,
         "cart_seller_id": st.get("buyBoxSellerId"),
         "live_offer_count": len(live),
         "seller_ids": seller_ids,
@@ -127,6 +164,28 @@ def extract_facts(product: dict, cand: sources.Candidate) -> dict:
 
 # 回転の上限。これを超える在庫は社長既定で「生成も提示もしない」（6ヶ月）。
 MAX_MONTHS_TO_SELL = 6.0
+
+
+def supply_status(cand: sources.Candidate, category: str) -> tuple[str, str]:
+    """仕入れが実在するか・扱える品目かを見る（CLAUDE.md §3.3-6）。
+
+    **卸サイトの商品ページ URL が特定できていない行は GO にしません。**
+    URL が無い＝在庫・入り数・卸値のどれも裏が取れていない、という意味です。
+    2026-09-30、利益率64.7%で断トツだった B0015XNJMW は、Amazon の2つの JAN が
+    NETSEA に1件も無く、**仕入れ自体が存在しませんでした**。`購入先URL` が「未確認」がサインでした。
+    """
+    cat = category or ""
+    if any(w in cat for w in PERISHABLE_CATEGORY_WORDS):
+        return (UNKNOWN,
+                f"**要期限管理**。カテゴリが「{cat}」で、FBA の賞味期限要件"
+                "（残存60日以上で納品・45日で販売不可）と混合在庫の制約が絡みます。"
+                "カテゴリー型ゲートでブランド申請では開かない可能性も高く、初回の SKU には不適です。")
+    if not cand.supplier_url:
+        return (UNKNOWN,
+                "卸サイトの商品ページが特定できていません（`購入先URL` 未確認）。"
+                "在庫・入り数・卸値のどれも裏が取れていないので GO にしません。"
+                "人が卸サイトで JAN を探してください。")
+    return (PASS, "卸サイトの商品ページを特定済み（在庫・入り数・卸値の裏が取れる）。")
 
 
 def economics_status(econ, monthly_sold, set_note: str = "") -> tuple[str, str]:
@@ -149,6 +208,14 @@ def economics_status(econ, monthly_sold, set_note: str = "") -> tuple[str, str]:
         return (FAIL,
                 f"1個粗利 {econ.gross_per_unit:,}円から保管料・納品送料・梱包資材 "
                 f"{econ.other_unit_costs}円を引くと手残り {econ.net_per_unit:,}円（実質赤字）です。")
+    band = int(round(econ.sell * ERROR_BAND_PCT / 100)) + ERROR_BAND_FIXED
+    if econ.net_per_unit < band:
+        # 「読み切れていない」ので NO-GO ではなく UNKNOWN。人が実額で詰めれば GO になりえます。
+        return (UNKNOWN,
+                f"手残り {econ.net_per_unit:,}円が誤差幅 {band:,}円"
+                f"（売価の{ERROR_BAND_PCT:.0f}%＋{ERROR_BAND_FIXED}円）を下回ります。"
+                "価格の振れ・手数料の読み・大型品の送料で結論が反転しうるので GO にしません。")
+
     if not monthly_sold:
         # ⚠️ **月販が取れないことを理由に落とさない。**（2026-09-30 カズヨ訂正 / CLAUDE.md §3.1）
         # 社長は「最初は入口を多く持ちたい。利益が少なくても、量を増やせば何とかなる可能性が
@@ -175,15 +242,17 @@ def economics_status(econ, monthly_sold, set_note: str = "") -> tuple[str, str]:
             f"約{econ.months_to_sell}ヶ月で売り切る見込み。")
 
 
-def combine(base_verdict: str, maker_status: str, econ_status: str = PASS) -> str:
-    """§3.3 の3点チェック・5番目（メーカー直販）・採算ゲートを合成する。
+def combine(base_verdict: str, maker_status: str, econ_status: str = PASS,
+            supply: str = PASS) -> str:
+    """§3.3 の3点チェック・5番目（メーカー直販）・採算・仕入れの実在を合成する。
 
     FAIL が1つでもあれば NO-GO、UNKNOWN が残れば UNKNOWN、全部 PASS で初めて GO。
     **UNKNOWN を GO に畳まない**のがこのパイプラインの芯です。
     """
-    if base_verdict == NO_GO or maker_status == FAIL or econ_status == FAIL:
+    statuses = (base_verdict, maker_status, econ_status, supply)
+    if NO_GO in statuses or FAIL in statuses:
         return NO_GO
-    if base_verdict == UNKNOWN or maker_status == UNKNOWN or econ_status == UNKNOWN:
+    if UNKNOWN in statuses:
         return UNKNOWN
     return GO
 
@@ -217,7 +286,8 @@ def build_row(cand: sources.Candidate, facts: dict, judgment, maker: tuple,
     """32列ぶんのセルを作る。列の並びは ledger_sheet.COLUMNS のとおり。"""
     maker_status, maker_reason, _maker_ev = maker
     econ_status, econ_reason = economics_status(econ, facts.get("monthly_sold"), set_note)
-    verdict = combine(judgment.verdict, maker_status, econ_status)
+    sup_status, sup_reason = supply_status(cand, facts.get("category") or cand.category)
+    verdict = combine(judgment.verdict, maker_status, econ_status, sup_status)
 
     check2 = next((c for c in judgment.checks if c.number == 2), None)
     instock = (check2.evidence.get("amazon_instock_365_pct") if check2 else None)
@@ -242,6 +312,8 @@ def build_row(cand: sources.Candidate, facts: dict, judgment, maker: tuple,
         reasons.append(f"5. {maker_reason}")
     if econ_status != PASS:
         reasons.append(f"採算. {econ_reason}")
+    if sup_status != PASS:
+        reasons.append(f"仕入れ. {sup_reason}")
     if set_note and "単品" not in set_note:
         reasons.append(f"単位. {set_note}")
     if not reasons:
@@ -275,7 +347,8 @@ def build_row(cand: sources.Candidate, facts: dict, judgment, maker: tuple,
         _n(econ.months_to_sell if econ else None),
         _n(econ.half_disposal_loss if econ else None),
         verdict,
-        " ／ ".join(reasons)[:1000],
+        (volume_prefix(facts.get("title") or cand.title)
+         + " ／ ".join(reasons))[:1000],
         ledger_sheet.MACHINE_ONLY,
         "タカシ（candidate_pipeline.py）",
         "未発注（提案のみ・社長判断前）",
@@ -396,7 +469,8 @@ def main(argv: list[str] | None = None) -> int:
             j = judge_missing(c.asin)
             facts = {"title": c.title, "brand": c.brand, "manufacturer": "", "sell": c.sell,
                      "fee_pct": c.fee_pct, "fba_yen": c.fba_yen,
-                     "monthly_sold": c.monthly_sold, "cart_seller_id": None,
+                     "monthly_sold": c.monthly_sold, "category": c.category,
+                     "cart_seller_id": None,
                      "live_offer_count": None, "seller_ids": [], "rank": None}
             maker = (UNKNOWN, "Keepa が商品を返さず、セラー名も取れませんでした。", {})
             cart_name = None
@@ -450,6 +524,8 @@ def main(argv: list[str] | None = None) -> int:
         for ch in j.checks:
             print(f"    {ch.status[:1]} {ch.number}. {ch.reason}")
         print(f"    {maker[0][:1]} 5. {maker[1]}")
+        ss, sr = supply_status(c, facts.get("category") or c.category)
+        print(f"    {ss[:1]} 仕入れ. {sr}")
         es, er = economics_status(econ, facts.get("monthly_sold"), set_note)
         print(f"    {es[:1]} 採算. {er}")
         if "単品" not in set_note:
