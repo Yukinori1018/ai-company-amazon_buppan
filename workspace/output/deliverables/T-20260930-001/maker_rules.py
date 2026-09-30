@@ -83,6 +83,10 @@ kingston キングストンテクノロジー yubico ユビコ titleist タイ�
 maisonmargiela メゾンマルジェラ aesop イソップ avene アベンヌ aramis アラミス umbro アンブロ avirex アヴィレックス optimumnutrition オプティマムニュートリション
 doterra ドテラ spam スパム laphroaig ラフロイグ cuervo クエルボ compassbox コンパスボックス kirkland lanvin ランバン chloe クロエ nars ナーズ
 レミーコアントロー remycointreau championpetfoods チャンピオンペットフーズ orijen 野村不動産ライフスポーツ
+chanel シャネル bvlgari ブルガリ hermes エルメス gucci グッチ prada プラダ armani アルマーニ versace ヴェルサーチェ jomalone ジョーマローン
+lancome ランコム esteelauder エスティローダー clinique クリニーク clarins クラランス diptyque ディプティック tomford トムフォード guerlain ゲラン
+shuuemura シュウウエムラ skii sk-ii cledepeaubeaute クレドポーボーテ ysl yvessaintlaurent イヴサンローラン dior ディオール christiandior
+ウーノ オージュア aujua milbon ファイントゥデイ finetoday costco コストコ
 """.split()
 
 
@@ -159,6 +163,11 @@ def classify(p: dict) -> tuple[str, str]:
     """1商品のメーカー判定。戻り値 (除外理由 or '', 根拠)。空なら残す。"""
     brand, maker = p.get("brand") or "", p.get("manufacturer") or ""
     seg, why = c1.segment(p)
+    # 過去台帳で「連絡候補」と判定済みの社は、機械の区分より優先して残す（例：BURTLE は JAN 無し英字で OEM 疑いに落ちる）
+    for name in (maker, brand):
+        r = LEDGER.get(_n(name))
+        if r and r["判定"] == "連絡候補" and r.get("理由コード") not in ("L1", "L2"):
+            return "", "T-20260831-004 台帳で連絡候補"
     if seg in ("海外ブランド", "中国系OEM", "中国系OEM疑い", "版元", "ブランド不明"):
         return seg, why
     kb = known_big(brand, maker)
