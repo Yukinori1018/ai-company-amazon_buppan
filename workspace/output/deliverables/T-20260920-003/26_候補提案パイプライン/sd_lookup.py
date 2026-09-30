@@ -1,0 +1,213 @@
+#!/usr/bin/env python3
+"""SD 突合 CLI — Amazon 側の「売れている棚」を SD で買えるか当て、仕入れ先商品リストに積む。
+
+    python3 sd_lookup.py --limit 8                   # 既定：非ログイン・取得60回まで
+    python3 sd_lookup.py --limit 8 --dry-run          # 何を何語で投げるか見るだけ（通信0）
+    python3 sd_lookup.py --from-netsea-index          # NETSEA の JAN 索引をシートへ流し込む
+    python3 sd_lookup.py --approval-list              # 卸価格の申請をしたい出展企業の一覧を出す
+
+入力（Amazon 側）
+---------------
+`agent_output/.../unmatched_selling.json` ── `discover_selling.py`（B案）が
+**「売れている棚のうち NETSEA に無かったもの」**として残したリストです。
+NETSEA で買えなかったものを SD で当てるのが、いちばん素直な順番になります。
+
+🔴 正直な見積り（2026-09-30 実測）
+--------------------------------
+SD は **JAN で検索できません**（`superdelivery.py` 冒頭）。だから1件当てるのに
+「検索1〜4回 ＋ 商品ページ 最大4枚」＝**最大8リクエスト・2秒間隔で約16秒**かかります。
+216件を全部投げると最大1,700リクエスト。**これは人が手で見る規模を超えます。**
+
+だから SD の正しい使い方は逆で、**仕入れ先起点で索引を積むこと**です（社長指示②）。
+一度 JAN が仕入れ先商品リストに入れば、次からの突合は**0リクエスト**です。
+この CLI は「Amazon 起点の当て込み」もできますが、既定の上限（60回）で必ず止まります。
+**上限に当たったことは必ず表示します**（黙って0件にしない）。
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import sys
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE))
+
+import superdelivery as sd                          # noqa: E402
+import supplier_catalog as cat                      # noqa: E402
+from candidate_sources import REPO                  # noqa: E402
+
+WORK = REPO / "workspace/output/agent_output/T-20260920-003/pipeline"
+SELLING = WORK / "unmatched_selling.json"
+SD_ROWS = WORK / "sd_rows.json"                     # 取れた SD の行（卸価格は入らない）
+SD_TRACE = WORK / "sd_trace.json"                   # 何語で何回投げたか
+SD_WHOLESALE = WORK / "sd_wholesale.json"           # ★カズヨがブラウザで埋める口
+APPROVALS = WORK / "sd_approval_requests.json"      # 申請したい出展企業（申請はしない）
+
+# 仕入れ先起点の種語。**SD が実際に強い棚**にしてあります（ファッション・生活雑貨・
+# インテリア・什器）。Amazon 起点で出てくる「売れている棚」は国内大手ブランドの化粧品・
+# 日用品に偏り、実測で SD とほとんど重なりませんでした（10件投げて一致0件）。
+SEED_WORDS = [
+    "珪藻土マット", "ステンレス保存容器", "収納ボックス", "キッチンマット", "アロマディフューザー",
+    "ランチボックス", "スリッパ", "タオルケット", "水切りかご", "折りたたみ傘",
+    "ペットベッド", "掛け時計", "ガーデニング 鉢", "ラッピング袋", "食器 プレート",
+]
+
+
+def ser(s) -> dict:
+    """SDSet を JSON に落とす（`supplier` は入れ子の dataclass なので手で開く）。"""
+    d = dict(s.__dict__)
+    d["supplier"] = s.supplier.__dict__ if s.supplier else None
+    return d
+
+
+def merge_and_save(rows: list, path=None) -> list[dict]:
+    """取れた SD 行を `sd_rows.json` に**足し込む**（前回ぶんを消さない）。
+
+    上書き保存にしていると、走らせ直すたびに申請候補の企業リストが縮みます。
+    索引は積み上げる資産なので、キー（SD品番）で畳んで足します。
+    """
+    path = path or SD_ROWS
+    have = {r["sd_code"]: r for r in (json.loads(path.read_text(encoding="utf-8"))
+                                     if path.exists() else [])}
+    for r in rows:
+        have[r.sd_code] = ser(r)
+    out = list(have.values())
+    path.write_text(json.dumps(out, ensure_ascii=False, indent=1), encoding="utf-8")
+    return out
+
+
+def load_targets(limit: int) -> list[dict]:
+    """Amazon 側の対象。**JAN が無いものは投げません**（一致の確認ができないので）。"""
+    if not SELLING.exists():
+        raise SystemExit(f"{SELLING} がありません。先に discover_selling.py を走らせてください。")
+    rows = json.loads(SELLING.read_text(encoding="utf-8"))
+    out = []
+    for r in rows:
+        jans = [j for j in (r.get("jans") or []) if sd.JAN_RE.match(str(j))]
+        if not jans:
+            continue
+        out.append({"asin": r["asin"], "jan": jans[0], "title": r.get("title") or "",
+                    "brand": r.get("brand") or "", "maker_code": r.get("maker_code") or "",
+                    "monthlySold": r.get("monthlySold")})
+        if len(out) >= limit:
+            break
+    return out
+
+
+def run_lookup(targets: list[dict], cap: int, dry_run: bool, log=print):
+    """1件ずつ SD に当てる。取得上限に当たったら止め、**止まったことを返します。**"""
+    fetcher = sd.Fetcher(cap=cap)
+    rows: list = []
+    traces: list[dict] = []
+    asin_by_jan: dict[str, str] = {}
+    stopped = None
+
+    for t in targets:
+        plan = sd.lookup_plan(t["jan"], t["maker_code"], t["brand"], t["title"])
+        log(f"  {t['asin']} 月販{t['monthlySold']} JAN {t['jan']} → 検索語 {plan}")
+        if dry_run:
+            traces.append({"asin": t["asin"], "plan": plan})
+            continue
+        hits, trace = sd.find_by_identity(t["jan"], t["maker_code"], t["brand"], t["title"],
+                                          fetch=fetcher, log=log)
+        trace["asin"] = t["asin"]
+        traces.append(trace)
+        for h in hits:
+            asin_by_jan[h.jan] = t["asin"]
+        rows.extend(hits)
+        if trace.get("stopped"):
+            stopped = trace["stopped"]
+            log(f"  ⚠️ {stopped} で打ち切りました（{fetcher.used}/{cap} 回）。"
+                "残りは未確認です（SD に無いという意味ではありません）")
+            break
+    return rows, traces, asin_by_jan, fetcher.used, stopped
+
+
+def main(argv: list[str] | None = None) -> int:
+    ap = argparse.ArgumentParser(description="SD 突合 ＋ 仕入れ先商品リストへの積み上げ")
+    ap.add_argument("--limit", type=int, default=8, help="当てにいく Amazon 側の件数")
+    ap.add_argument("--cap", type=int, default=sd.DEFAULT_FETCH_CAP,
+                    help="SD への取得回数の上限（既定60・2秒間隔）")
+    ap.add_argument("--dry-run", action="store_true", help="検索語だけ見る（通信0）")
+    ap.add_argument("--no-sheet", action="store_true", help="シートに書かない")
+    ap.add_argument("--from-netsea-index", action="store_true",
+                    help="NETSEA の JAN 索引を仕入れ先商品リストへ流し込む（SD には触らない）")
+    ap.add_argument("--approval-list", action="store_true",
+                    help="保存済みの SD 行から、卸価格を申請したい出展企業の一覧を作る")
+    ap.add_argument("--seed-words", default="",
+                    help="**仕入れ先起点**で SD を索引する（カンマ区切りの語）。"
+                         "既定の語は SEED_WORDS。JAN での当て込みはしない")
+    a = ap.parse_args(argv)
+    WORK.mkdir(parents=True, exist_ok=True)
+
+    # ── 仕入れ先起点で SD を索引する（社長指示②）
+    if a.seed_words:
+        words = [w.strip() for w in a.seed_words.split(",") if w.strip()]
+        words = SEED_WORDS if words == ["default"] else words
+        print(f"SD を仕入れ先起点で索引します（語 {len(words)}件・取得上限 {a.cap}回）")
+        rows, trace = sd.index_by_words(words, fetch=sd.Fetcher(cap=a.cap))
+        SD_TRACE.write_text(json.dumps(trace, ensure_ascii=False, indent=1), encoding="utf-8")
+        merge_and_save(rows)
+        print(f"\nSD の行 {len(rows)}件（JAN 付き）／取得 {trace['fetched']}回"
+              f"{'・' + trace['stopped'] + 'で打ち切り' if trace.get('stopped') else ''}")
+        if not a.no_sheet and rows:
+            n = cat.append(cat.from_sd_sets(rows))
+            print(f"仕入れ先商品リストへ {n}行 追記 → {cat.sheet_url()}")
+        return 0
+
+    # ── NETSEA の JAN 索引を資産化する（社長指示②。Keepa トークン0・SD への通信0）
+    if a.from_netsea_index:
+        import discover
+        idx = discover.load_index()
+        rows = cat.from_netsea_index(idx.get("jans") or {})
+        print(f"NETSEA 索引: {len(idx.get('indexed_shops') or [])}社ぶん・JAN {len(rows):,}件")
+        if a.no_sheet:
+            return 0
+        n = cat.append(rows)
+        print(f"仕入れ先商品リストへ {n:,}行 追記 → {cat.sheet_url()}")
+        return 0
+
+    # ── 申請したい出展企業の一覧（⛔ 申請は実行しない。§4.1）
+    if a.approval_list:
+        saved = json.loads(SD_ROWS.read_text(encoding="utf-8")) if SD_ROWS.exists() else []
+        sets = [sd.SDSet(**{**r, "supplier": sd.SDSupplier(**r["supplier"])
+                            if r.get("supplier") else None}) for r in saved]
+        reqs = sd.approval_requests(sets)
+        APPROVALS.write_text(json.dumps(reqs, ensure_ascii=False, indent=1), encoding="utf-8")
+        print(f"卸価格を申請したい出展企業 {len(reqs)}社 → {APPROVALS}")
+        for r in reqs:
+            print(f"  {r['出展企業']}（商品{r['該当商品数']}件・ネット販売{r['ネット販売']}）")
+        print("\n⛔ 申請は実行していません（出展企業への連絡＝CLAUDE.md §4.1）。"
+              "社長承認はカズヨが取ります。")
+        return 0
+
+    # ── Amazon 起点の SD 突合
+    targets = load_targets(a.limit)
+    print(f"Amazon 側の対象 {len(targets)}件（売れている棚で NETSEA に無かったもの）")
+    rows, traces, asin_by_jan, used, stopped = run_lookup(targets, a.cap, a.dry_run)
+    SD_TRACE.write_text(json.dumps(traces, ensure_ascii=False, indent=1), encoding="utf-8")
+    if a.dry_run:
+        print(f"\n（dry-run）検索語だけ出しました。通信 0 回。→ {SD_TRACE.name}")
+        return 0
+
+    # カズヨがブラウザで見た卸価格があれば流し込む（無ければ「未確認」のまま積む）
+    filled = sd.load_json(SD_WHOLESALE)
+    if filled:
+        sd.merge_wholesale(rows, filled)
+        print(f"卸価格を人の確認から {len(filled)}件 流し込みました")
+
+    merge_and_save(rows)
+    print(f"\nSD で JAN 一致 {len(rows)}件 / SD への取得 {used}回"
+          f"{'（' + stopped + 'で打ち切り）' if stopped else ''}")
+
+    cat_rows = cat.from_sd_sets(rows, asin_by_jan)
+    if not a.no_sheet and cat_rows:
+        n = cat.append(cat_rows)
+        print(f"仕入れ先商品リストへ {n}行 追記 → {cat.sheet_url()}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -205,17 +205,22 @@ def parse_product(html: str, url: str = "") -> list[SDSet]:
                                 block, re.S) or [None, ""])[1])
         name = re.split(r"[（(]", name)[0].strip()
 
+        # 卸価格は「卸価格」列＝`class="stock-info"` のセルだけを見ます。
+        # 行全体から `¥` を拾うと**上代（メーカー希望小売価格）を卸価格として読みます**。
+        # 上代は卸価格より高いので、読み違えると「儲かる」方向に間違えます ── いちばん危ない向き。
+        cell = _text((re.search(r'<td class="stock-info[^"]*"[^>]*>(.*?)</td>', block, re.S)
+                      or [None, ""])[1])
         price = None
         approval = "未確認"
         notes: list[str] = []
-        if "会員のみ公開" in tx:
+        if "会員のみ公開" in cell or (not cell and "会員のみ公開" in tx):
             # 非ログイン。**承認の有無はここでは判りません**（未承認と同じ表示になる）。
             notes.append("非ログイン取得のため卸価格は不明")
         else:
-            m = re.search(r"¥\s*([\d,]+)", tx.split("メーカー希望小売価格")[-1])
+            m = re.search(r"¥\s*([\d,]+)", cell)
             price = _int(m.group(1)) if m else None
             approval = "承認済み" if price else "卸価格未承認"
-        stock = "在庫なし" if "SOLD OUT" in tx.upper() else "未確認"
+        stock = "在庫なし" if "SOLD OUT" in (cell or tx).upper() else "未確認"
 
         rows.append(SDSet(
             sd_code=code, product_id=product_id or code.split("S")[0], name=name,
@@ -246,8 +251,11 @@ def lookup_plan(jan: str = "", maker_code: str = "", brand: str = "",
         plan.append(f"{brand.strip()} {words[0]}")
     if brand:
         plan.append(brand.strip())
+    # 語を減らしながら広げる。**広い語から始めると商品ページを開く枚数が無駄に増えます。**
     if len(words) >= 2:
         plan.append(" ".join(words[:2]))
+    if words:
+        plan.append(words[0])
     return [p for p in dict.fromkeys(plan) if p]
 
 
@@ -293,6 +301,12 @@ class Fetcher:
         return body.decode("utf-8", errors="replace")
 
 
+# 検索が広すぎるときは商品ページを開きません。
+# 実測（2026-09-30）: 「ライオン」で25社93件、「La」で25社97件。先頭4枚を開いても当たりません。
+# **広い語の先頭4枚は当てずっぽう**で、1枚2秒を捨てるだけです。
+TOO_BROAD_SUPPLIERS = 8
+
+
 def find_by_identity(jan: str = "", maker_code: str = "", brand: str = "", title: str = "",
                      fetch=None, max_products_per_query: int = 4,
                      log=print) -> tuple[list[SDSet], dict]:
@@ -318,6 +332,10 @@ def find_by_identity(jan: str = "", maker_code: str = "", brand: str = "", title
         trace["queries"].append({"q": q, "suppliers": len(sups), "products": len(pids),
                                  "total_suppliers": total})
         log(f"    SD 検索「{q}」→ 企業 {len(sups)}社・商品 {len(pids)}件")
+        if (total or len(sups)) > TOO_BROAD_SUPPLIERS:
+            trace["queries"][-1]["skipped"] = "広すぎる（商品ページを開かない）"
+            log(f"      広すぎるので商品ページは開きません（{total or len(sups)}社）")
+            continue
         for pid in pids[:max_products_per_query]:
             try:
                 page = fetch(product_url(pid))
@@ -339,6 +357,50 @@ def find_by_identity(jan: str = "", maker_code: str = "", brand: str = "", title
                                           "name": r.name[:60],
                                           "supplier": r.supplier.name if r.supplier else ""})
     return [], trace
+
+
+def index_by_words(words: list[str], fetch=None, products_per_word: int = 6,
+                   log=print) -> tuple[list[SDSet], dict]:
+    """**仕入れ先起点**で積む（社長指示②）。JAN での当て込みはしません。
+
+    「Amazon で売れている棚を SD で当てる」向きは、SD が JAN で引けないぶん高くつきます
+    （実測: 10件に48リクエスト・一致0件）。逆向き ── **SD にある商品をとにかく索引に入れる** ──
+    なら、1リクエストで数件ぶんの JAN が取れ、**次からの突合は0リクエスト**になります。
+
+    引数の `words` は「当社が扱いたい棚」の語（SD が得意な生活雑貨・キッチン・インテリア等）。
+    戻り値の行は卸価格が空（非ログイン）ですが、**JAN・入り数・販売規制は埋まります**。
+    """
+    fetch = fetch or Fetcher()
+    rows: list[SDSet] = []
+    trace = {"words": [], "fetched": 0}
+    for w in words:
+        try:
+            html = fetch(search_url(w))
+        except Fetcher.CapReached:
+            trace["stopped"] = "取得上限"
+            break
+        except OSError as e:                             # noqa: BLE001
+            trace["words"].append({"word": w, "error": str(e)})
+            continue
+        sups, pids, total = parse_search(html)
+        got = 0
+        for pid in pids[:products_per_word]:
+            try:
+                page = fetch(product_url(pid))
+            except Fetcher.CapReached:
+                trace["stopped"] = "取得上限"
+                trace["words"].append({"word": w, "suppliers": total, "indexed": got})
+                return rows, trace
+            except OSError:
+                continue
+            trace["fetched"] += 1
+            new = [r for r in parse_product(page, product_url(pid)) if r.jan]
+            rows.extend(new)
+            got += len(new)
+        trace["words"].append({"word": w, "suppliers": total, "products": len(pids),
+                               "indexed": got})
+        log(f"    SD「{w}」→ 企業 {total}社・商品 {len(pids)}件 → JAN 付き {got}件を索引")
+    return rows, trace
 
 
 # ── ログインが要る値を呼び出し側から埋める ────────────────────────────────

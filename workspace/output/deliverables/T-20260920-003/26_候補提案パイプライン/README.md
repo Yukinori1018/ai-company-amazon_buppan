@@ -13,7 +13,8 @@
 |---|---|
 | **入れた** | 候補プールから未判定 ASIN を取る（483件）／§3.3 の3点チェック（成果物24 を再利用）／**メーカー直販の検出（§3.3 の5番目・新規）**／採算計算（成果物22・23 と同じ式）／判定台帳シートへ冪等追記／GO 30件で停止／トークン上限／ネットワーク不要のテスト37本 |
 | **入れた（A案・2026-09-30 追加）** | **NETSEA → Keepa の JAN 逆引きで新規 ASIN を発掘する段**（`discover.py`）。承認済みサプライヤー220社を少しずつスキャンし、0トークンで絞ってから Keepa に投げる |
-| **入れなかった** | ゲート（出品許可）の実機確認／実画面の確認（Chrome＋キーゾン。**人の仕事**）／自動スケジューリング（フック化は供給が安定してから） |
+| **入れた（2026-09-30 夕・SD 対応）** | **突合先に スーパーデリバリー（SD）を追加**（`superdelivery.py`・`sd_lookup.py`）／**仕入れ先起点の商品台帳**を新しいシートに積む（`supplier_catalog.py`）／NETSEA の JAN 索引を資産化（`discover.build_netsea_index`）／テスト71本 |
+| **入れなかった** | ゲート（出品許可）の実機確認／実画面の確認（Chrome＋キーゾン。**人の仕事**）／自動スケジューリング（フック化は供給が安定してから）／**SD の卸価格の承認申請（＝出展企業への連絡。CLAUDE.md §4.1。申請先の一覧を作るところまで）** |
 
 **このスクリプトは発注しません。提案までです（CLAUDE.md §4.1）。**
 
@@ -29,6 +30,14 @@ python3 candidate_pipeline.py --no-sheet       # シートに書かず標準出�
 python3 candidate_pipeline.py --asins B0XXXXXXXX  # ASIN 直指定
 python3 test_pipeline.py                       # テスト（ネットワーク不要・72本）
 python3 discover.py --shops 20 --tokens 250    # 供給の蛇口（NETSEA→Keepa で新規 ASIN を発掘）
+python3 test_supply.py                         # SD と仕入れ先商品リストのテスト（71本・通信0）
+
+# ── 仕入れ先側（SD 追加ぶん・2026-09-30）
+python3 sd_lookup.py --from-netsea-index       # NETSEA の JAN 索引 → 仕入れ先商品リストへ（Keepa 0・SD 0）
+python3 sd_lookup.py --seed-words default      # 仕入れ先起点で SD を索引する（社長指示②）
+python3 sd_lookup.py --limit 8                 # Amazon 起点で SD に当てにいく（高い。下記の経済性を読んで）
+python3 sd_lookup.py --limit 8 --dry-run       # 何語を投げるか見るだけ（通信0）
+python3 sd_lookup.py --approval-list           # 卸価格を申請したい出展企業の一覧（⛔申請はしない）
 ```
 
 出力（実行ごとの1行サマリ）:
@@ -36,6 +45,32 @@ python3 discover.py --shops 20 --tokens 250    # 供給の蛇口（NETSEA→Keep
 ```
 新規判定 14件・GO 0件・NO-GO 8件・UNKNOWN 6件／台帳書き込み 14行／累計GO 0件／30／消費トークン 93（商品 81＋セラー名 12、残 1006）
 ```
+
+## 標準手順：**外部 API のフィルタは、使う前にプローブする**
+
+Keepa Product Finder は**知らないフィールドをエラーにせず黙って無視します**。
+`{"bogusField_gte":1}` でも HTTP 200・`error:null` で返り、件数は無条件検索と同じ。
+**綴りを1文字間違えると、フィルタが効かないまま「条件どおり抽出できた」と誤認します。**
+
+```bash
+python3 product_finder.py --probe 'monthlySold_gte=50' 'current_SALES_lte=100000' 'bogusField_gte=1'
+#   monthlySold_gte     有効  baseline 265,341,900 → 443,300
+#   current_SALES_lte   有効  baseline 265,340,200 → 12,086,900
+#   bogusField_gte      ★無視されている★  265,340,000 → 265,340,000   ← 対照
+```
+
+**やり方**：ベースラインの `totalResults` を取り、フィールドを1つ足して件数が動くかを見る。
+動かなければ無視されています。**必ず「効かないはずの対照フィールド」も1本混ぜる**
+（対照が「有効」と出たら、プローブ自体が壊れています）。1プローブ約11トークン。
+
+これで実際に2つの誤りを見つけました。
+- 🔴 `current_AMAZON_lte=-1`（本体不在）は **該当0件**。**私の過去メモが誤っていました。**
+  Keepa は -1 を「データなし」の印に使っており、価格として比較できません。
+  本体の有無は後段の `outOfStockPercentage365` で判定します（それが正しい方法でもある）
+- `monthlySold_gte` は**有効**（2.65億件 → 443,300件）。入口条件に使えることを確認
+
+**この手順は Keepa に限りません。**「フィルタを指定したのに件数が減らない」は、
+黙って無視される API すべてで起きます。**減ったことを確かめるまで、絞れたと思わないこと。**
 
 ## 判定は GO / NO-GO / UNKNOWN の3値
 
