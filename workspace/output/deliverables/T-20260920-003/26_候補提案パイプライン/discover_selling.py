@@ -58,6 +58,9 @@ from keepa_client import KEEPA_DOMAIN_JP, load_api_key  # noqa: E402
 
 WORK = REPO / "workspace/output/agent_output/T-20260920-003/pipeline"
 UNMATCHED = WORK / "unmatched_selling.json"
+# Finder＋安い取得の生レスポンス。**索引が育つたびに0トークンで突合し直せる**ようにする
+# （memory: 条件変更のたびに Keepa を叩き直す設計にしてはいけない）。
+RAW = WORK / "selling_raw.json"
 
 # 1リクエストに載せる ASIN 数（Keepa の上限）。
 ASIN_BATCH = 100
@@ -241,6 +244,11 @@ def to_candidates(products: list[dict], matched: dict, log=print) -> tuple[list[
     return out, tally
 
 
+def args_from_raw(a) -> bool:
+    """`--from-raw` が指定され、かつ生レスポンスが在るか。"""
+    return bool(getattr(a, "from_raw", False)) and RAW.exists()
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="B案: 売れている棚 → NETSEA で買えるか")
     ap.add_argument("--asins", type=int, default=200, help="Finder から詳細を引く ASIN 数")
@@ -254,9 +262,30 @@ def main(argv: list[str] | None = None) -> int:
                     help="（使えません。既定0のまま）共有アダプタの JAN 照会は "
                          "supplier_ids の上限違反で必ず 400 → サンプルへ黙ってフォールバックする")
     ap.add_argument("--dry-run", action="store_true", help="件数だけ見て終了")
+    ap.add_argument("--from-raw", action="store_true",
+                    help="保存済みの生レスポンスで突合だけやり直す（**Keepa トークン0**）。"
+                         "NETSEA 索引が育つたびにこれを回せばよい")
     a = ap.parse_args(argv)
 
     WORK.mkdir(parents=True, exist_ok=True)
+
+    if args_from_raw(a):
+        raw = json.loads(RAW.read_text(encoding="utf-8"))
+        products = raw.get("products") or []
+        print(f"保存済みの生レスポンス {len(products)}件で突合し直します（トークン0）")
+        index = discover.load_index()
+        matched, unmatched = match_netsea(products, index)
+        cands, _tally = to_candidates(products, matched)
+        cache = discover.load_cache()
+        for c in cands:
+            cache.setdefault("candidates", {})[c.asin] = c.__dict__
+        discover.save_cache(cache)
+        UNMATCHED.write_text(json.dumps(unmatched, ensure_ascii=False, indent=1),
+                             encoding="utf-8")
+        print(f"\n候補 {len(cands)}件 / 消費トークン 0")
+        for c in cands[:20]:
+            print(f"  {c.asin} 売価{c.sell} 月販{c.monthly_sold} {c.title[:44]}")
+        return 0
 
     # 1. Finder で「売れている棚」を抽出
     sel = product_finder.selling_shelves(
@@ -274,8 +303,19 @@ def main(argv: list[str] | None = None) -> int:
     asins = [x for x in asins if x not in known][:a.asins]
     print(f"未判定 {len(asins)}件を対象にします")
 
-    # 2. 安く引いて JAN を得る
+    # 2. 安く引いて JAN を得る（生レスポンスは必ず保存する）
     products, tok_cheap = fetch_cheap(asins, a.tokens - tok_finder)
+    prev = []
+    if RAW.exists():
+        try:
+            prev = (json.loads(RAW.read_text(encoding="utf-8")) or {}).get("products") or []
+        except (OSError, ValueError):
+            prev = []
+    keep = {p.get("asin"): p for p in prev}
+    keep.update({p.get("asin"): p for p in products})
+    RAW.write_text(json.dumps({"products": list(keep.values()), "selection": sel},
+                              ensure_ascii=False), encoding="utf-8")
+    print(f"  生レスポンスを {RAW.name} に保存（累計 {len(keep)}件・--from-raw で0トークン再突合）")
 
     # 3. NETSEA に突合（0トークン）
     index = discover.load_index()
