@@ -30,7 +30,8 @@ BASE = "https://www.superdelivery.com"
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from _fetch import Blocked, Failed, fetch  # noqa: E402
-from _budget import Budget, BudgetExceeded, NotAttended, MAX_PER_DAY, MIN_INTERVAL  # noqa: E402
+from _budget import (Budget, BudgetExceeded, NotAttended, Suspended,  # noqa: E402
+                     MAX_PER_DAY, MIN_INTERVAL)
 
 UA = ""  # 実際の User-Agent は _fetch.py が持つ
 
@@ -92,6 +93,9 @@ def main() -> int:
     state_dir = args.state_dir or (os.path.dirname(os.path.abspath(args.out)) if args.out else ".")
     try:
         budget = Budget(state_dir, attended=args.attended, label="sd_jan")
+    except Suspended as exc:
+        print(f"■ {exc}", file=sys.stderr)
+        return 4
     except NotAttended as exc:
         print(f"■ {exc}", file=sys.stderr)
         return 1
