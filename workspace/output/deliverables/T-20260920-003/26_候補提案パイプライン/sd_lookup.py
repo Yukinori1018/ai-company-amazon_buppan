@@ -62,6 +62,50 @@ def ser(s) -> dict:
     return d
 
 
+# SD 担当（別チケット作業）がカズヨの実機で取得した「取引企業」一覧。
+# **一括申請済みなので、ここに載っている企業は卸価格が既に見えます** ＝ 申請の必要がない。
+TRADING_TSV = (REPO / "workspace/output/agent_output/T-20260920-003/sd"
+               / "sd_trading_partners_20260930.tsv")
+
+
+def _norm_company(s: str) -> str:
+    """社名の名寄せ。法人格と記号・空白を落として NFKC で畳む。"""
+    import re
+    import unicodedata
+    s = unicodedata.normalize("NFKC", s or "").strip()
+    s = re.sub(r"株式会社|有限会社|\(株\)|\(有\)|Co\.,?\s*Ltd\.?|㈱|㈲", "", s, flags=re.I)
+    return re.sub(r"[\s　・,，\.\-（）\(\)]", "", s)
+
+
+def mark_already_trading(reqs: list[dict], tsv=None) -> list[dict]:
+    """既に取引中の企業に印を付ける。**申請リストに混ぜない**のが目的。
+
+    ⚠️ **突合は出展企業ID を第一、社名の名寄せを第二**にします。社名だけで当てると
+    別会社を同一視します（`knowledge_maker_name_normalization`）。
+    リストが無ければ**全社を「申請が要る」扱いにはせず、判定不能として印を付けません**
+    （無いことを「取引していない」の根拠にしない）。
+    """
+    import csv
+    tsv = tsv or TRADING_TSV
+    reqs = [dict(r) for r in reqs]              # 呼び出し側の dict を書き換えない
+    if not tsv.exists():
+        for r in reqs:
+            r["取引中の判定"] = "未確認（取引企業リストが手元に無い）"
+        return reqs
+    rows = list(csv.DictReader(tsv.open(encoding="utf-8"), delimiter="\t"))
+    by_id = {r["dealer_id"]: r["name"] for r in rows}
+    by_name = {_norm_company(r["name"]): r["dealer_id"] for r in rows}
+    for r in reqs:
+        hit = by_id.get(str(r["supplier_id"])) or by_name.get(_norm_company(r["出展企業"]))
+        r["既に取引中"] = bool(hit)
+        r["取引中の判定"] = (f"取引企業リストに一致（{len(rows)}社中）" if hit
+                             else f"取引企業リスト（{len(rows)}社）に無し＝申請が要る")
+        if hit:
+            r["申請したい理由"] = ("既に取引中なので申請は不要。"
+                                   "カズヨがブラウザで卸価格を読めば採算が出ます")
+    return reqs
+
+
 def merge_and_save(rows: list, path=None) -> list[dict]:
     """取れた SD 行を `sd_rows.json` に**足し込む**（前回ぶんを消さない）。
 
@@ -185,11 +229,14 @@ def main(argv: list[str] | None = None) -> int:
         saved = json.loads(SD_ROWS.read_text(encoding="utf-8")) if SD_ROWS.exists() else []
         sets = [sd.SDSet(**{**r, "supplier": sd.SDSupplier(**r["supplier"])
                             if r.get("supplier") else None}) for r in saved]
-        reqs = sd.approval_requests(sets)
+        reqs = mark_already_trading(sd.approval_requests(sets))
         APPROVALS.write_text(json.dumps(reqs, ensure_ascii=False, indent=1), encoding="utf-8")
-        print(f"卸価格を申請したい出展企業 {len(reqs)}社 → {APPROVALS}")
+        need = [r for r in reqs if not r.get("既に取引中")]
+        print(f"SD の出展企業 {len(reqs)}社 → うち**申請が要る {len(need)}社** → {APPROVALS}")
         for r in reqs:
-            print(f"  {r['出展企業']}（商品{r['該当商品数']}件・ネット販売{r['ネット販売']}）")
+            tag = "【既に取引中＝画面で卸価格が見えます】" if r.get("既に取引中") else "【申請が要る】"
+            print(f"  {tag} {r['出展企業']}（商品{r['該当商品数']}件・"
+                  f"ネット販売{r['ネット販売']}・直送{r['消費者直送']}）")
         print("\n⛔ 申請は実行していません（出展企業への連絡＝CLAUDE.md §4.1）。"
               "社長承認はカズヨが取ります。")
         return 0

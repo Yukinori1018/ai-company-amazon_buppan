@@ -301,6 +301,34 @@ def test_dedupe_keeps_smallest_set():
     ok(cat.dedupe([cat.Row(source="SD", jan="")]) == [], "JAN が無い行は積まない")
 
 
+def test_mark_already_trading():
+    """既に取引中の企業を申請リストに混ぜない。**リストが無いことを根拠にしない。**"""
+    import sd_lookup
+    tsv = Path(__file__).resolve().parent / "_test_trading.tsv"
+    tsv.write_text("dealer_id\tname\n205398\t株式会社ブライエンタープライズ\n"
+                   "999999\tよその会社\n", encoding="utf-8")
+    try:
+        reqs = [{"出展企業": "ブライエンタープライズ", "supplier_id": "205398",
+                 "該当商品数": 2, "申請したい理由": "x"},
+                {"出展企業": "知らない商店", "supplier_id": "111111",
+                 "該当商品数": 1, "申請したい理由": "y"}]
+        out = sd_lookup.mark_already_trading(list(reqs), tsv=tsv)
+        ok(out[0]["既に取引中"] is True, "出展企業ID で一致すれば取引中")
+        ok("申請は不要" in out[0]["申請したい理由"], "取引中なら理由が書き換わる")
+        ok(out[1]["既に取引中"] is False, "リストに無ければ申請が要る")
+        # 社名の名寄せ（法人格を落として当てる）
+        out = sd_lookup.mark_already_trading(
+            [{"出展企業": "株式会社ブライエンタープライズ", "supplier_id": "000",
+              "該当商品数": 1, "申請したい理由": "x"}], tsv=tsv)
+        ok(out[0]["既に取引中"] is True, "ID が違っても社名の名寄せで当たる")
+        # リストが無いときは「取引していない」と決めない
+        out = sd_lookup.mark_already_trading(list(reqs), tsv=tsv.with_name("_nope.tsv"))
+        ok("既に取引中" not in out[0], "リストが無ければ取引の有無を名乗らない")
+        ok("未確認" in out[0]["取引中の判定"], "判定不能と書く")
+    finally:
+        tsv.unlink(missing_ok=True)
+
+
 def main():
     for name, fn in sorted(globals().items()):
         if name.startswith("test_") and callable(fn):
