@@ -301,6 +301,20 @@ def test_dedupe_keeps_smallest_set():
     ok(cat.dedupe([cat.Row(source="SD", jan="")]) == [], "JAN が無い行は積まない")
 
 
+def test_append_uses_raw_not_user_entered():
+    """🔴 書き込みは RAW。`USER_ENTERED` は JAN の先頭0を落とす。
+
+    列を TEXT 形式にするだけでは足りない（追記した行に効かない）ことを実測したので、
+    **呼び出し方そのもの**をテストで固定する。
+    """
+    import inspect
+    # コメントは落とす（なぜ RAW なのかの説明に USER_ENTERED が出てくるので）
+    code = "\n".join(line.split("#")[0] for line in
+                     inspect.getsource(cat.append).splitlines())
+    ok('value_input_option="RAW"' in code, "append は RAW で書く")
+    ok("USER_ENTERED" not in code, "append のコードに USER_ENTERED が残っていない")
+
+
 def test_mark_already_trading():
     """既に取引中の企業を申請リストに混ぜない。**リストが無いことを根拠にしない。**"""
     import sd_lookup

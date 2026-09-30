@@ -307,7 +307,12 @@ def append(rows: list[Row], ws=None, chunk: int = 2000, log=print) -> int:
     today = dt.date.today().isoformat()
     for i in range(0, len(fresh), chunk):
         batch = [r.to_cells(today) for r in fresh[i:i + chunk]]
-        ws.append_rows(batch, value_input_option="USER_ENTERED",
+        # 🔴 **`RAW` です。`USER_ENTERED` にしてはいけません。**
+        # `USER_ENTERED` は書き手の意図を推測する機能で、`0088381753180` を数値と読んで
+        # **先頭の0を落とします**。冪等の鍵が壊れ、同じ商品を二重登録します（2026-09-30 実害70件）。
+        # JAN 列を TEXT 形式にするだけでは足りませんでした ── **追記した行には効きません**。
+        # `RAW` なら渡した型のまま入ります（文字列は文字列・整数は数値）。
+        ws.append_rows(batch, value_input_option="RAW",
                        insert_data_option="INSERT_ROWS", table_range="A1")
         log(f"  {i + len(batch):,}/{len(fresh):,} 行 書き込み")
     return len(fresh)
