@@ -261,6 +261,10 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--live-lookups", type=int, default=0,
                     help="（使えません。既定0のまま）共有アダプタの JAN 照会は "
                          "supplier_ids の上限違反で必ず 400 → サンプルへ黙ってフォールバックする")
+    ap.add_argument("--sd-friendly", action="store_true",
+                    help="**SD が強いカテゴリに絞る**。Amazon 起点で SD に当てるときはこれ。"
+                         "2026-09-30 の実測で、絞らないと国内大手の化粧品・日用品に偏り"
+                         "SD と一致しません（10件で0件）")
     ap.add_argument("--dry-run", action="store_true", help="件数だけ見て終了")
     ap.add_argument("--from-raw", action="store_true",
                     help="保存済みの生レスポンスで突合だけやり直す（**Keepa トークン0**）。"
@@ -288,10 +292,14 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     # 1. Finder で「売れている棚」を抽出
-    sel = product_finder.selling_shelves(
+    build = (product_finder.sd_friendly_shelves if a.sd_friendly
+             else product_finder.selling_shelves)
+    sel = build(
         monthly_sold_min=a.monthly_sold_min, rank_max=a.rank_max,
         price_min=a.price_min, price_max=a.price_max,
         max_new_offers=a.max_new_offers, per_page=min(a.asins, product_finder.MAX_PER_PAGE))
+    # **絞ったつもりで絞れていない**のを黙って通さない（Finder は未知の項目を無視する）
+    product_finder.warn_if_unproven(sel)
     asins, total, tok_finder = product_finder.find(sel)
     print(f"Product Finder: 該当 {total:,}件 → 取得 {len(asins)}件（{tok_finder}トークン）")
     if a.dry_run:

@@ -44,6 +44,7 @@ SD_ROWS = WORK / "sd_rows.json"                     # 取れた SD の行（卸�
 SD_TRACE = WORK / "sd_trace.json"                   # 何語で何回投げたか
 SD_WHOLESALE = WORK / "sd_wholesale.json"           # ★カズヨがブラウザで埋める口
 APPROVALS = WORK / "sd_approval_requests.json"      # 申請したい出展企業（申請はしない）
+PRICE_WORKLIST = WORK / "sd_price_worklist.json"    # ★カズヨが卸価格を拾うための作業リスト
 
 # 仕入れ先起点の種語。**SD が実際に強い棚**にしてあります（ファッション・生活雑貨・
 # インテリア・什器）。Amazon 起点で出てくる「売れている棚」は国内大手ブランドの化粧品・
@@ -104,6 +105,96 @@ def mark_already_trading(reqs: list[dict], tsv=None) -> list[dict]:
             r["申請したい理由"] = ("既に取引中なので申請は不要。"
                                    "カズヨがブラウザで卸価格を読めば採算が出ます")
     return reqs
+
+
+def report_stop(trace: dict) -> int:
+    """打ち切りの理由を**標準出力に出し、終了コードに反映する**。
+
+    「0件でした」だけを返すと、**SD に無かった**のか**こちらが止められた**のかが区別できません。
+    2026-09-30 に実際にこれで判断を誤りかけました（429 を1件ずつの失敗として飲み込んでいた）。
+    レート制限のときは終了コード 2 を返し、呼び出し側（ルーチン・フック）も気づけるようにします。
+    """
+    why = trace.get("stopped")
+    if not why:
+        return 0
+    if "レート制限" in why:
+        print(f"\n🔴 打ち切り: {why}")
+        print("   **自動で再試行しません。**SD への取得を止め、間隔と総量の判定"
+              "（法務ハルオへ依頼中）を待ってください。")
+        return 2
+    print(f"\n打ち切り: {why}（SD に無いという意味ではありません）")
+    return 0
+
+
+def load_trading_names(tsv=None) -> dict[str, str]:
+    """取引企業 2,175社の {出展企業ID: 社名}。無ければ空（**無いことを根拠にしない**）。"""
+    import csv
+    tsv = tsv or TRADING_TSV
+    if not tsv.exists():
+        return {}
+    return {r["dealer_id"]: r["name"]
+            for r in csv.DictReader(tsv.open(encoding="utf-8"), delimiter="\t")}
+
+
+def resolve_dealer(token: str, names: dict[str, str]) -> str | None:
+    """`--dealers` の指定を出展企業ID に解く。数字ならそのまま、社名なら名寄せで引く。
+
+    **当たらなければ None を返して黙って別の会社を使いません**（社名の名寄せは
+    当たらないことがある。`knowledge_maker_name_normalization`）。
+    """
+    if token.isdigit():
+        return token
+    want = _norm_company(token)
+    hits = [i for i, n in names.items() if _norm_company(n) == want]
+    if len(hits) == 1:
+        return hits[0]
+    print(f"  ⚠️ 「{token}」は出展企業IDに解けませんでした"
+          f"（候補 {len(hits)}件）。ID を直接指定してください")
+    return None
+
+
+def write_price_worklist(rows: list, names: dict[str, str], path=None) -> Path:
+    """**カズヨがブラウザで卸価格を拾うための作業リスト。**
+
+    `sd_wholesale.json` は「埋めた結果」を入れる口で、こちらは「何を見ればよいか」の側です。
+    企業ごと・商品ページごとにまとめてあるので、1ページ開けば複数の規格を一度に埋められます。
+    **卸価格と商品URL が入るので `agent_output/` にだけ置きます**（このリポは PUBLIC）。
+    """
+    path = path or PRICE_WORKLIST
+    if not rows:
+        # **空で上書きしない。**前回ぶんの作業リストを消すと、カズヨの手が戻ります。
+        print("卸価格の作業リスト: 対象0件だったので書き換えません")
+        return path
+    by_dealer: dict[str, dict] = {}
+    for r in rows:
+        did = r.supplier.supplier_id if r.supplier else "?"
+        d = by_dealer.setdefault(did, {
+            "出展企業": (r.supplier.name if r.supplier else "未確認"),
+            "supplier_id": did,
+            "取引中": did in names,
+            "商品ページ": {},
+        })
+        page = d["商品ページ"].setdefault(r.product_id, {
+            "商品URL": r.url, "商品名": r.name, "規格": []})
+        page["規格"].append({
+            "sd_code": r.sd_code, "JAN": r.jan, "入り数": r.units_per_set,
+            "メーカー品番": r.maker_code, "上代(税抜)": r.retail_excl,
+            "在庫": r.stock, "ネット販売": r.net_sales_ok,
+            "卸価格": None, "承認状態": r.approval,
+        })
+    out = {
+        "使い方": ("各 商品URL をログイン済みブラウザで開き、規格ごとの卸価格（1点・税抜）を読んで "
+                   "sd_wholesale.json に {\"<sd_code>\": {\"卸価格\": 620, "
+                   "\"承認状態\": \"承認済み\"}} の形で入れてください。"
+                   "見えなければ {\"承認状態\": \"卸価格未承認\"} と入れてください（NO-GO ではありません）"),
+        "企業": sorted(by_dealer.values(),
+                       key=lambda d: (not d["取引中"], -len(d["商品ページ"]))),
+    }
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(out, ensure_ascii=False, indent=1), encoding="utf-8")
+    pages = sum(len(d["商品ページ"]) for d in by_dealer.values())
+    print(f"卸価格の作業リスト: {len(by_dealer)}社・商品ページ {pages}枚 → {path}")
+    return path
 
 
 def merge_and_save(rows: list, path=None) -> list[dict]:
@@ -183,6 +274,11 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--seed-words", default="",
                     help="**仕入れ先起点**で SD を索引する（カンマ区切りの語）。"
                          "既定の語は SEED_WORDS。JAN での当て込みはしない")
+    ap.add_argument("--dealers", default="",
+                    help="**企業を指名して索引する**（カンマ区切りの出展企業IDか社名）。"
+                         "卸価格が既に見える先＝取引中の企業に使う")
+    ap.add_argument("--per-dealer", type=int, default=14,
+                    help="1社あたり開く商品ページの枚数（既定14）")
     ap.add_argument("--build-netsea-index", type=int, metavar="社数", default=0,
                     help="NETSEA の JAN 索引を作る／続ける（Keepa トークン0・前回の続きから）。"
                          "1社ずつ保存するので、途中で止めても失われません")
@@ -197,6 +293,26 @@ def main(argv: list[str] | None = None) -> int:
         print("→ 続きは同じコマンドで走ります。シートへ入れるのは --from-netsea-index")
         return 0
 
+    # ── 企業を指名して索引する（卸価格が既に見える先＝取引中の企業）
+    if a.dealers:
+        names = load_trading_names()
+        ids = [d.strip() for d in a.dealers.split(",") if d.strip()]
+        ids = [i for i in (resolve_dealer(x, names) for x in ids) if i]
+        print(f"SD の出展企業 {len(ids)}社を指名して索引します（取得上限 {a.cap}回）")
+        for i in ids:
+            print(f"  {i}: {names.get(i, '（取引企業リストに無し）')}")
+        rows, trace = sd.index_by_dealer(ids, fetch=sd.Fetcher(cap=a.cap),
+                                         products_per_dealer=a.per_dealer)
+        SD_TRACE.write_text(json.dumps(trace, ensure_ascii=False, indent=1), encoding="utf-8")
+        merge_and_save(rows)
+        write_price_worklist(rows, names)
+        print(f"\nSD の行 {len(rows)}件（JAN 付き）／取得 {trace['fetched']}回")
+        rc = report_stop(trace)
+        if not a.no_sheet and rows:
+            n = cat.append(cat.from_sd_sets(rows))
+            print(f"仕入れ先商品リストへ {n}行 追記 → {cat.sheet_url()}")
+        return rc
+
     # ── 仕入れ先起点で SD を索引する（社長指示②）
     if a.seed_words:
         words = [w.strip() for w in a.seed_words.split(",") if w.strip()]
@@ -205,12 +321,12 @@ def main(argv: list[str] | None = None) -> int:
         rows, trace = sd.index_by_words(words, fetch=sd.Fetcher(cap=a.cap))
         SD_TRACE.write_text(json.dumps(trace, ensure_ascii=False, indent=1), encoding="utf-8")
         merge_and_save(rows)
-        print(f"\nSD の行 {len(rows)}件（JAN 付き）／取得 {trace['fetched']}回"
-              f"{'・' + trace['stopped'] + 'で打ち切り' if trace.get('stopped') else ''}")
+        print(f"\nSD の行 {len(rows)}件（JAN 付き）／取得 {trace['fetched']}回")
+        rc = report_stop(trace)
         if not a.no_sheet and rows:
             n = cat.append(cat.from_sd_sets(rows))
             print(f"仕入れ先商品リストへ {n}行 追記 → {cat.sheet_url()}")
-        return 0
+        return rc
 
     # ── NETSEA の JAN 索引を資産化する（社長指示②。Keepa トークン0・SD への通信0）
     if a.from_netsea_index:

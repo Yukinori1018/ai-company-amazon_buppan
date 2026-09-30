@@ -46,19 +46,68 @@ QUERY_URL = "https://api.keepa.com/query"
 # perPage の上限（実測で1000まで通る）。
 MAX_PER_PAGE = 1000
 
-# 除外するルートカテゴリ（規制・期限管理・危険物が絡むもの）。
-# 本・DVD・ソフトウェア・ゲーム・食品・ドラッグストア・アルコール・ベビーフード。
+# ── ルートカテゴリID ────────────────────────────────────────────────────────
+#
+# 🔴 **ここの ID は推測ではありません。**手元の Keepa 取得結果 1,424商品の
+# `categoryTree[0]` を集計して得た**実データ由来の値**です（2026-09-30・0トークン）。
+# Keepa が -116 で止まっていて `/category` を叩けなかったので、この方法で確かめました。
+#
+# 確かめた結果、**それまでこのファイルに書いてあった ID のうち3つが実データと合いませんでした**
+# （どれも私が過去に推測で書いたもの）。**カテゴリIDを名前から推測してはいけません**
+# （memory: knowledge_verify_field_semantics_not_names）。
+#
+# | 以前の値 | 実データのルート | 備考 |
+# |---|---|---|
+# | `562002`（ミュージック） | **`561956`** | 562002 は実データに1件も出ない |
+# | `637630`（テレビゲーム） | **`637394`** は「ゲーム」 | 637394 を「ソフトウェア」と書いていたのも誤り |
+# | `161669011`（ビューティー） | **`52374051`** | 161669011 は実データに1件も出ない |
+#
+# 誤った ID を `categories_exclude` に入れても**エラーになりません**。
+# 「除外したつもりで除外できていない」状態になります（= 静かに効く誤り）。
+
+# 除外するルートカテゴリ（規制・期限管理・薬機法が絡むもの）。
 # 期限管理と出品制限は後段のゲートでも見ますが、**入口で落とせるものは入口で落とす**。
 EXCLUDE_ROOT_CATEGORIES = [
     465392,      # 本
-    562002,      # ミュージック
+    561956,      # ミュージック
     561958,      # DVD
-    637394,      # ソフトウェア
-    637630,      # テレビゲーム
+    637394,      # ゲーム
     57239051,    # 食品・飲料・お酒
     160384011,   # ドラッグストア
-    161669011,   # ビューティー（化粧品は期限・薬機法が絡む）
+    52374051,    # ビューティー（化粧品は期限・薬機法が絡む）
 ]
+
+# SD が実際に強いルートカテゴリ（＝ SD 突合を狙うときに **含める** 側）。
+#
+# なぜ要るか（2026-09-30 実測）: Amazon 起点で「売れている棚」を10件 SD に当てて
+# **一致0件**でした。理由は品揃えのズレです ── `monthlySold >= 50` ／ 2,000〜20,000円で
+# 抽出すると**国内大手ブランドの化粧品・日用品**が上位に来ますが、SD が強いのは
+# 生活雑貨・インテリア・キッチン・ファッション雑貨です。**これは条件の問題**（CLAUDE.md §3.1）。
+#
+# SD 自身のジャンル（ファッション／家具・インテリア／生活雑貨／電化製品／
+# 食品・菓子・飲料・酒／什器・店舗資材／本）を Amazon のルートに寄せ、
+# **当社が避けるもの（食品・ドラッグストア・ビューティー・本）は入れていません**。
+SD_FRIENDLY_ROOT_CATEGORIES = [
+    3828871,     # ホーム＆キッチン ← SD の「生活雑貨」「家具・インテリア」の本体
+    2229202051,  # ファッション
+    86731051,    # 文房具・オフィス用品 ← SD の「ステーショナリー・クラフト」
+    2016929051,  # DIY・工具・ガーデン ← SD の「ガーデニング」「工具」
+    14304371,    # スポーツ＆アウトドア ← SD の「レジャー・スポーツ用品」
+    13299531,    # おもちゃ ← SD の「玩具・ホビー」
+    2277721051,  # ホビー
+]
+
+# ⚠️ **SD の「ペット用品」「什器・店舗資材」に当たる Amazon ルートは入れていません。**
+# 手元の 1,424商品に1件も出てこなかったので **ID を確かめられませんでした**。
+# 名前から推測して入れる方が、入れないより害が大きいです（上の表のとおり）。
+# Keepa が回復したら `/category` で引いて足してください。
+
+# ── フィールドが本当に効いたかの記録 ────────────────────────────────────────
+#
+# Product Finder は**知らないフィールドを黙って無視する**ので、
+# 「一度プローブして有効だと確かめた」記録を残し、未確認のフィールドを使うときは警告します。
+PROBE_LOG = (HERE.parents[3] / "workspace/output/agent_output/T-20260920-003/pipeline"
+             / "finder_probes.json")
 
 
 def _get(url: str, timeout: int = 300) -> dict:
@@ -174,6 +223,64 @@ def selling_shelves(
     return sel
 
 
+def sd_friendly_shelves(**kwargs) -> dict:
+    """**SD が強い棚**に絞った抽出条件。`selling_shelves()` に include を足すだけです。
+
+    生存（`monthlySold`）は入口の条件のまま残します。落としているのは**カテゴリだけ**で、
+    「売れている」という積極条件は緩めていません（CLAUDE.md §3.3-8）。
+
+    ⚠️ `categories_include` は **Keepa が回復してから1回プローブしてください**。
+    無効なフィールドは黙って無視されるので、**絞ったつもりで絞れていない**ことが起こります。
+
+        python3 product_finder.py --probe 'categories_include=[3828871]'
+    """
+    sel = selling_shelves(**kwargs)
+    sel["categories_include"] = SD_FRIENDLY_ROOT_CATEGORIES
+    return sel
+
+
+def load_probes(path: Path | None = None) -> dict:
+    """プローブの記録（field → 有効だったか）。"""
+    path = path or PROBE_LOG
+    if path.exists():
+        try:
+            return json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            pass
+    return {}
+
+
+def save_probe(field: str, result: dict, path: Path | None = None) -> None:
+    path = path or PROBE_LOG
+    log = load_probes(path)
+    log[field] = {"effective": bool(result.get("effective")),
+                  "baseline": result.get("baseline"),
+                  "with_field": result.get("with_field")}
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(log, ensure_ascii=False, indent=1), encoding="utf-8")
+
+
+def unproven_fields(selection: dict, path: Path | None = None) -> list[str]:
+    """抽出条件のうち、**有効だと確かめていないフィールド**を挙げる。
+
+    「無効だと分かっているもの」も返します ── 無効なフィールドを入れたまま回すと、
+    **絞ったつもりで絞れていない結果**を「条件どおり抽出できた」と誤認します。
+    """
+    log = load_probes(path)
+    skip = {"productType", "perPage", "sort", "isAdultProduct"}
+    return [f for f in selection
+            if f not in skip and not (log.get(f) or {}).get("effective")]
+
+
+def warn_if_unproven(selection: dict, path: Path | None = None, log=print) -> list[str]:
+    bad = unproven_fields(selection, path)
+    if bad:
+        log("⚠️ 有効だと確かめていない抽出フィールドがあります: " + ", ".join(bad))
+        log("   Product Finder は知らないフィールドを黙って無視します。"
+            "`--probe <field>=<値>` で1つずつ確かめてください（1本約11トークン）")
+    return bad
+
+
 if __name__ == "__main__":
     import argparse
 
@@ -181,6 +288,8 @@ if __name__ == "__main__":
     ap.add_argument("--probe", nargs="*", default=[],
                     help="フィールドを field=value の形で並べる（有効かどうかを確かめる）")
     ap.add_argument("--count", action="store_true", help="抽出条件の該当件数だけ見る")
+    ap.add_argument("--sd-friendly", action="store_true",
+                    help="SD が強いカテゴリに絞った条件で数える")
     a = ap.parse_args()
 
     if a.probe:
@@ -193,11 +302,14 @@ if __name__ == "__main__":
                 val = v
             r = probe(f, val)
             total += r["tokens"]
+            save_probe(f, r)                       # 確かめた結果を残す（次回の警告に使う）
             mark = "有効" if r["effective"] else "★無視されている★"
             print(f'{f:28} {mark}  baseline {r["baseline"]:,} → {r["with_field"]:,}')
         print(f"消費トークン {total}")
     if a.count:
-        sel = selling_shelves(per_page=50)
+        sel = (sd_friendly_shelves(per_page=50) if a.sd_friendly
+               else selling_shelves(per_page=50))
+        warn_if_unproven(sel)
         asins, total, tok = find(sel)
         print(f"該当 {total:,}件 / 取得 {len(asins)}件 / 消費 {tok}")
         print(json.dumps(sel, ensure_ascii=False))

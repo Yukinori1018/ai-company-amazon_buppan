@@ -159,6 +159,49 @@ def test_fetcher_cap_raises():
         ok(True, "上限に当たったら例外（黙って0件を返さない）")
 
 
+def test_rate_limit_is_a_hard_stop():
+    """🔴 429 は1件の失敗ではなく、全体を止める理由。
+
+    2026-09-30、SD が本当に 429 を返した。最初の実装はこれを1件ずつの失敗として飲み込み、
+    「JAN 付き0件」という**無害そうな結果**を返していた（原因は trace の中だけ）。
+    「SD に無かった」と「こちらが止められた」を混ぜてはいけない。
+    """
+    ok(issubclass(sd.Fetcher.RateLimited, RuntimeError), "専用の例外型がある")
+    ok(sd.Fetcher.RateLimited is not sd.Fetcher.CapReached,
+       "上限到達とレート制限は別物（意味が違う）")
+
+    # 検索ループ: 429 で即止まり、理由が trace に残る
+    rows, trace = sd.index_by_words(["a", "b", "c"], fetch=_raise_429,
+                                    log=lambda *a: None)
+    ok(rows == [], "行は返らない")
+    ok("レート制限" in (trace.get("stopped") or ""), "止まった理由が レート制限 と残る")
+    ok(len(trace["words"]) == 0, "1語ずつ失敗として積まない（全体を止める）")
+
+    # 企業ループでも同じ
+    rows, trace = sd.index_by_dealer(["1", "2"], fetch=_raise_429, log=lambda *a: None)
+    ok("レート制限" in (trace.get("stopped") or ""), "企業ループでも全体を止める")
+    ok(len(trace["dealers"]) == 0, "企業ごとの error として飲み込まない")
+
+    # 突合ループでも同じ
+    hits, trace = sd.find_by_identity(jan="4992272443363", maker_code="x",
+                                      fetch=_raise_429, log=lambda *a: None)
+    ok(hits == [], "突合でも行は返らない")
+    ok("レート制限" in (trace.get("stopped") or ""), "突合ループでも理由が残る")
+
+
+def _raise_429(url):
+    raise sd.Fetcher.RateLimited("SD が HTTP 429 を返しました（テスト）")
+
+
+def test_report_stop_exit_code():
+    """レート制限のときは終了コードで知らせる（0件と区別できるように）。"""
+    import sd_lookup
+    ok(sd_lookup.report_stop({}) == 0, "打ち切りが無ければ 0")
+    ok(sd_lookup.report_stop({"stopped": "取得上限"}) == 0, "上限は 0（異常ではない）")
+    ok(sd_lookup.report_stop({"stopped": "SD のレート制限: 429"}) == 2,
+       "レート制限は 2（呼び出し側が気づける）")
+
+
 def test_find_by_identity_confirms_by_jan():
     """検索が当たっても、**JAN が違えば一致にしない**。"""
     pages = {sd.search_url("mrs-2215051000"): SEARCH_HTML,
@@ -341,6 +384,59 @@ def test_mark_already_trading():
         ok("未確認" in out[0]["取引中の判定"], "判定不能と書く")
     finally:
         tsv.unlink(missing_ok=True)
+
+
+# ── Product Finder の抽出条件（SD 向け）──────────────────────────────────
+
+
+def test_sd_friendly_categories():
+    """SD が強いカテゴリに絞る。**生存の条件は緩めない。**"""
+    import product_finder as pf
+    sel = pf.sd_friendly_shelves(per_page=50)
+    ok(sel["categories_include"] == pf.SD_FRIENDLY_ROOT_CATEGORIES, "include が入る")
+    ok(3828871 in sel["categories_include"], "ホーム＆キッチンが入る（SD の本体）")
+    ok(sel["monthlySold_gte"] == 50, "🔴 生存（実売）の条件は緩めない（§3.3-8）")
+    ok("current_SALES_lte" in sel, "ランク上限も残る")
+    # 避けるカテゴリを include と exclude の両方に入れない（矛盾する条件を投げない）
+    ok(not (set(sel["categories_include"]) & set(sel["categories_exclude"])),
+       "include と exclude が重ならない")
+    for cid in (57239051, 160384011, 52374051, 465392):
+        ok(cid not in sel["categories_include"],
+           f"期限管理・薬機法が絡むカテゴリ {cid} を include に入れない")
+
+
+def test_exclude_ids_match_real_data():
+    """除外IDが実データのルートと一致していること（推測で書いた3件を直した回帰テスト）。
+
+    以前は 562002（ミュージック）・637630（テレビゲーム）・161669011（ビューティー）と
+    書いてあり、**手元の1,424商品のどれにも出てこない ID** でした。
+    誤った ID を渡してもエラーにならないので、除外できていないことに気づけません。
+    """
+    import product_finder as pf
+    for wrong in (562002, 637630, 161669011):
+        ok(wrong not in pf.EXCLUDE_ROOT_CATEGORIES,
+           f"実データに無い ID {wrong} を使っていない")
+    for right in (561956, 637394, 52374051):
+        ok(right in pf.EXCLUDE_ROOT_CATEGORIES, f"実データ由来の ID {right} を使っている")
+
+
+def test_unproven_fields_flags_silently_ignored():
+    """プローブしていないフィールドを挙げる。**Finder は未知の項目を黙って無視する。**"""
+    import product_finder as pf
+    log = Path(__file__).resolve().parent / "_test_probes.json"
+    log.write_text('{"monthlySold_gte": {"effective": true},'
+                   ' "bogusField": {"effective": false}}', encoding="utf-8")
+    try:
+        sel = {"productType": [0], "perPage": 50, "monthlySold_gte": 50,
+               "bogusField": 1, "categories_include": [1]}
+        bad = pf.unproven_fields(sel, log)
+        ok("monthlySold_gte" not in bad, "有効だと確かめた項目は挙げない")
+        ok("bogusField" in bad, "無効だと分かっている項目を挙げる（黙って通さない）")
+        ok("categories_include" in bad, "未確認の項目を挙げる")
+        ok("perPage" not in bad and "productType" not in bad,
+           "絞り込みでない項目は対象外")
+    finally:
+        log.unlink(missing_ok=True)
 
 
 def main():

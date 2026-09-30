@@ -51,6 +51,7 @@ import json
 import re
 import time
 import unicodedata
+import urllib.error
 import urllib.parse
 import urllib.request
 from dataclasses import dataclass, field
@@ -301,6 +302,21 @@ class Fetcher:
     class CapReached(RuntimeError):
         pass
 
+    class RateLimited(RuntimeError):
+        """🔴 SD が 429 を返した。**相手が「やめてくれ」と言っている状態。**
+
+        2026-09-30、この日の125リクエストのあとに 429 が出ました。
+        最初の実装ではこれを**1件ずつの失敗として飲み込み**、
+        「JAN 付き0件」という**無害そうな結果**を返していました。
+        原因は trace の中だけにあり、標準出力からは「SD に何も無かった」ように見えます。
+
+        **429 は1件の失敗ではなく、全体を止める理由です。**
+        飲み込んで回し続けると、規約違反ではなく**行儀の問題**として
+        アクセス制限や会員資格に跳ね返ります（当社は 11/30 のサイトオープン条件を背負っている）。
+        だから専用の例外にして、**その場で全体を止め、標準出力に出す**ようにしました。
+        自動の再試行はしません ── 待つ以外に正しい対処がないので、人が判断します。
+        """
+
     def __init__(self, cap: int = DEFAULT_FETCH_CAP, sleep: float = SLEEP_SEC):
         self.cap = cap
         self.sleep = sleep
@@ -310,7 +326,15 @@ class Fetcher:
         if self.used >= self.cap:
             raise self.CapReached(f"取得上限 {self.cap} 回に達しました（使用 {self.used}）")
         req = urllib.request.Request(url, headers=UA)
-        body = urllib.request.urlopen(req, timeout=40).read()
+        try:
+            body = urllib.request.urlopen(req, timeout=40).read()
+        except urllib.error.HTTPError as e:
+            if e.code in (429, 503):
+                raise self.RateLimited(
+                    f"SD が HTTP {e.code} を返しました（この実行で {self.used}回・"
+                    "本日の累計はもっと多い）。**自動で再試行しません。**"
+                    "間隔と総量を見直すまで SD への取得を止めてください") from e
+            raise
         self.used += 1
         time.sleep(self.sleep)
         return body.decode("utf-8", errors="replace")
@@ -340,6 +364,11 @@ def find_by_identity(jan: str = "", maker_code: str = "", brand: str = "", title
         except Fetcher.CapReached:
             trace["stopped"] = "取得上限"
             break
+        except Fetcher.RateLimited as e:
+            # 相手が止めてくれと言っている。**1件の失敗として飲み込まない。**
+            trace["stopped"] = f"SD のレート制限: {e}"
+            log(f"    🔴 {e}")
+            break
         except OSError as e:                             # noqa: BLE001 - 1語で全体を止めない
             trace["queries"].append({"q": q, "error": str(e)})
             continue
@@ -356,6 +385,10 @@ def find_by_identity(jan: str = "", maker_code: str = "", brand: str = "", title
                 page = fetch(product_url(pid))
             except Fetcher.CapReached:
                 trace["stopped"] = "取得上限"
+                return [], trace
+            except Fetcher.RateLimited as e:
+                trace["stopped"] = f"SD のレート制限: {e}"
+                log(f"    🔴 {e}")
                 return [], trace
             except OSError:
                 continue
@@ -394,6 +427,10 @@ def index_by_words(words: list[str], fetch=None, products_per_word: int = 6,
         except Fetcher.CapReached:
             trace["stopped"] = "取得上限"
             break
+        except Fetcher.RateLimited as e:
+            trace["stopped"] = f"SD のレート制限: {e}"
+            log(f"    🔴 {e}")
+            break
         except OSError as e:                             # noqa: BLE001
             trace["words"].append({"word": w, "error": str(e)})
             continue
@@ -406,6 +443,10 @@ def index_by_words(words: list[str], fetch=None, products_per_word: int = 6,
                 trace["stopped"] = "取得上限"
                 trace["words"].append({"word": w, "suppliers": total, "indexed": got})
                 return rows, trace
+            except Fetcher.RateLimited as e:
+                trace["stopped"] = f"SD のレート制限: {e}"
+                log(f"    🔴 {e}")
+                return rows, trace
             except OSError:
                 continue
             trace["fetched"] += 1
@@ -415,6 +456,67 @@ def index_by_words(words: list[str], fetch=None, products_per_word: int = 6,
         trace["words"].append({"word": w, "suppliers": total, "products": len(pids),
                                "indexed": got})
         log(f"    SD「{w}」→ 企業 {total}社・商品 {len(pids)}件 → JAN 付き {got}件を索引")
+    return rows, trace
+
+
+def dealer_url(dealer_id: str) -> str:
+    """出展企業の商品一覧。**1リクエストで商品ID 約120件**が取れます（実測）。"""
+    return f"{BASE}/p/do/dpsl/{dealer_id}/"
+
+
+def index_by_dealer(dealer_ids: list[str], fetch=None, products_per_dealer: int = 14,
+                    log=print) -> tuple[list[SDSet], dict]:
+    """**企業を指名して索引する。**卸価格が既に見える先（取引中）に使います。
+
+    語で検索するより効率が良いです（実測）:
+
+    | 入口 | 1リクエストで得る商品ID |
+    |---|---|
+    | 語の検索（`?word=`） | 約6〜36件（語の広さ次第） |
+    | **企業の一覧（`/p/do/dpsl/<id>/`）** | **約120件** |
+
+    商品ページを開かないと JAN と入り数が取れないので、そこが律速です
+    （1商品＝1リクエスト・2秒）。`products_per_dealer` で上限を切ります。
+    """
+    fetch = fetch or Fetcher()
+    rows: list[SDSet] = []
+    trace = {"dealers": [], "fetched": 0}
+    for did in dealer_ids:
+        try:
+            html = fetch(dealer_url(did))
+        except Fetcher.CapReached:
+            trace["stopped"] = "取得上限"
+            break
+        except Fetcher.RateLimited as e:
+            trace["stopped"] = f"SD のレート制限: {e}"
+            log(f"    🔴 {e}")
+            break
+        except OSError as e:                             # noqa: BLE001
+            trace["dealers"].append({"dealer_id": did, "error": str(e)})
+            continue
+        pids = list(dict.fromkeys(re.findall(r"/p/r/pd_p/(\d+)/", html)))
+        got = 0
+        for pid in pids[:products_per_dealer]:
+            try:
+                page = fetch(product_url(pid))
+            except Fetcher.CapReached:
+                trace["stopped"] = "取得上限"
+                trace["dealers"].append({"dealer_id": did, "listed": len(pids),
+                                         "indexed": got})
+                return rows, trace
+            except Fetcher.RateLimited as e:
+                trace["stopped"] = f"SD のレート制限: {e}"
+                log(f"    🔴 {e}")
+                return rows, trace
+            except OSError:
+                continue
+            trace["fetched"] += 1
+            new = [r for r in parse_product(page, product_url(pid)) if r.jan]
+            rows.extend(new)
+            got += len(new)
+        trace["dealers"].append({"dealer_id": did, "listed": len(pids), "indexed": got})
+        log(f"    SD 企業 {did} → 一覧に商品 {len(pids)}件 → "
+            f"開いた {min(len(pids), products_per_dealer)}件 → JAN 付き {got}件")
     return rows, trace
 
 
