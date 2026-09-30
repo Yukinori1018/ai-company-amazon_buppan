@@ -104,7 +104,25 @@ def main() -> int:
     ap.add_argument("--limit", type=int, default=0, help="今回処理する企業数（0=全部）")
     ap.add_argument("--sleep", type=float, default=4.0,
                     help="リクエスト間隔（秒）。2.0 では 429 を踏んだ（2026-09-30 実測）")
+    ap.add_argument("--approved-by-secretary", action="store_true",
+                    help="秘書の判断で全件スキャンを再開する場合にだけ付ける（既定では起動しない）")
     args = ap.parse_args()
+
+    # 🔴 2026-09-30 使用停止（法務判定・成果物29）
+    #   このスクリプトは /p/do/dpsl/ を企業数ぶん連続で叩く＝母数の全件スキャン。
+    #   法務の推奨Aに従い「発注候補に挙がった社だけを、発注の手前で読む」方針に切り替えたため、
+    #   既定では起動しない。再開には秘書（と必要なら社長）の判断が要る。
+    if not getattr(args, "approved_by_secretary", False):
+        print("■ このスクリプトは 2026-09-30 に使用停止しました（法務判定・成果物29）。\n"
+              "  理由: /p/do/dpsl/ を企業数ぶん連続取得する＝母数の全件スキャン。\n"
+              "        名指しクローラ向けの robots.txt が同パスを全面 Disallow しており、\n"
+              "        会員規約 第10条(2)(5) で予告なし即時の利用停止・登録抹消が可能・\n"
+              "        第11条1項で賠償責任も否定されている（争う足場がない）。\n"
+              "  代わりに: 発注候補に挙がった社だけを発注の手前で読む／Amazon 起点の\n"
+              "        sd_jan_lookup.py（1日30回・間隔10秒・在席下）を使う。\n"
+              "  それでも必要なら --approved-by-secretary を付けて、判断した人と根拠をチケットに残すこと。",
+              file=sys.stderr)
+        return 3
 
     os.makedirs(args.out, exist_ok=True)
     items_path = os.path.join(args.out, "sd_products.jsonl")

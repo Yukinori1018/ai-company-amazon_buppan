@@ -8,11 +8,17 @@ Amazon 側で生存を確認した ASIN の JAN を投げると、SD 側の商�
 - **ログイン不要。**検証済み：JAN 3件で 3/3 ヒット・無関係商品の混入なし（2026-09-30）。
 - **卸価格は返らない**（非ログインでは「卸価格は会員のみ公開」）。ヒットした商品だけ
   sd_price_fill.js またはブラウザで価格を見る。ここで母数が2〜3桁減る。
-- 429 は指数バックオフ。**SD には同時に2本走らせないこと**（2026-09-30、別スキャンと並走させて 429 を連発した）。
+- 🔴 **法務判定（成果物29 §5）により、実行は次の枠内に限る。**この3つは `_budget.py` の定数で
+  機械的に縛られており、引数では緩められない。超えたら例外で止まる。
+    * **1日30回**まで（日付ごとにカウンタを残す。プロセスを再起動しても戻らない）
+    * **間隔10.0秒**（robots.txt の Crawl-delay は `*` グループには無いが、名指しクローラ向けに
+      10 が示されているのでその値に合わせる）
+    * **人（秘書カズヨ）の在席下のみ。`--attended` を明示しないと起動しない。無人運転は不可**
+- SD には**同時に2本走らせない**（2026-09-30、別スキャンと並走させて 429 を連発した）。
 
 使い方:
-    python3 sd_jan_lookup.py --jan-file jans.txt --out out.jsonl [--sleep 4.0]
-    python3 sd_jan_lookup.py --jan 4903779138287
+    python3 sd_jan_lookup.py --jan-file jans.txt --out out.jsonl --attended
+    python3 sd_jan_lookup.py --jan 4903779138287 --attended
 """
 from __future__ import annotations
 import argparse, gzip, html, json, os, re, sys, time, urllib.error, urllib.request
@@ -24,6 +30,7 @@ BASE = "https://www.superdelivery.com"
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from _fetch import Blocked, Failed, fetch  # noqa: E402
+from _budget import Budget, BudgetExceeded, NotAttended, MAX_PER_DAY, MIN_INTERVAL  # noqa: E402
 
 UA = ""  # 実際の User-Agent は _fetch.py が持つ
 
@@ -75,8 +82,20 @@ def main() -> int:
     ap.add_argument("--jan")
     ap.add_argument("--jan-file", help="1行1JAN のテキスト。# で始まる行は無視")
     ap.add_argument("--out", help="JSONL の出力先。既にある JAN はスキップ（再開できる）")
-    ap.add_argument("--sleep", type=float, default=4.0)
+    ap.add_argument("--attended", action="store_true",
+                    help="秘書が在席していることを明示する。**付けないと動かない**（法務判定・成果物29 §5）")
+    ap.add_argument("--state-dir", default=None,
+                    help="1日の回数カウンタの置き場。既定は --out と同じ場所")
     args = ap.parse_args()
+
+    # 🔴 回数・間隔・在席は定数で縛る。引数で緩められない（_budget.py）
+    state_dir = args.state_dir or (os.path.dirname(os.path.abspath(args.out)) if args.out else ".")
+    try:
+        budget = Budget(state_dir, attended=args.attended, label="sd_jan")
+    except NotAttended as exc:
+        print(f"■ {exc}", file=sys.stderr)
+        return 1
+    print(f"本日の残り {budget.remaining} / {MAX_PER_DAY} 回・間隔 {MIN_INTERVAL:.1f} 秒", flush=True)
 
     jans: list[str] = []
     if args.jan:
@@ -103,9 +122,18 @@ def main() -> int:
 
     sink = open(args.out, "a", encoding="utf-8") if args.out else None
     found = 0
+    if len(todo) > budget.remaining:
+        print(f"■ 本日の残り {budget.remaining} 回を超えるので、先頭 {budget.remaining} 件だけ実行します",
+              flush=True)
+        todo = todo[: budget.remaining]
+    n = 0
     for n, jan in enumerate(todo, 1):
         try:
+            budget.take()
             res = lookup(jan)
+        except BudgetExceeded as exc:
+            print(f"■ {exc}", flush=True)
+            break
         except Blocked:
             print("■ Cloudflare に止められました。ここまでを保存して終了します。", flush=True)
             break
@@ -119,11 +147,10 @@ def main() -> int:
             sink.flush()
         else:
             print(line)
-        print(f"  {n}/{len(todo)} {jan}: {res['hit_count']}件", flush=True)
-        time.sleep(args.sleep)
+        print(f"  {n}/{len(todo)} {jan}: {res['hit_count']}件（本日の残り {budget.remaining}）", flush=True)
     if sink:
         sink.close()
-    print(f"ヒットした JAN: {found} / 走らせた {min(n if todo else 0, len(todo))}", flush=True)
+    print(f"ヒットした JAN: {found} / 走らせた {n}。本日の残り {budget.remaining} 回", flush=True)
     return 0
 
 

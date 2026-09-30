@@ -123,6 +123,10 @@
 
     /** 予算内で回して、今回ぶんの行を返す。done:false が返る限り呼び直す */
     run: async function (budgetMs) {
+      throw new Error('SDX.run は 2026-09-30 に使用中止（法務判定・成果物29）。'
+        + '卸価格は「発注候補に挙がった商品だけ」を、人が画面で見て記録してください。');
+    },
+    _run_deprecated: async function (budgetMs) {
       var s = load();
       if (!s) return { error: 'seed していません。SDX.seed([[dealer_id,name],...]) を先に呼んでください' };
       var budget = budgetMs || BUDGET_MS;
@@ -171,6 +175,15 @@
     }
   };
 
+  /* ------------------------------------------------------------------
+   * 🔴 2026-09-30 使用中止（DEPRECATED）。呼び出さないこと。
+   *   法務判定（成果物29）により、SD への自動取得は停止。とくにこの関数は
+   *   「429 で止められたので別経路（ログイン済みブラウザ）で取り直す」という
+   *   形の記録を残すため、**会員規約 第10条(2)「会員として不適切な行為」の
+   *   認定材料になりうる**。記録を読む第三者は、429 が TLS 指紋判定だったという
+   *   当社の内部事情を知らない。
+   *   関数は参考として残すが、`SDX.terms()` は呼び出すと即エラーで止まる。
+   * ------------------------------------------------------------------ */
   /* ------------------------------------------------------------------
    * 取引条件スキャン（SDX.terms）
    *   /p/do/dpsl/dcc/<dealer_id>/ を読み、Amazon で売ってよい社を切り出す。
@@ -230,6 +243,10 @@
   SDX.termsStatus = function () { var s = load2(); return s ? { i: s.i, of: s.dealers.length } : { seeded: false }; };
   SDX.termsReset = function () { localStorage.removeItem(TKEY); return { reset: true }; };
   SDX.terms = async function (budgetMs) {
+    throw new Error('SDX.terms は 2026-09-30 に使用中止（法務判定・成果物29）。'
+      + 'SD への自動取得は停止しています。発注候補に挙がった社だけを発注の手前で読んでください。');
+  };
+  SDX._terms_deprecated = async function (budgetMs) {
     var s = load2();
     if (!s) return { error: 'SDX.termsSeed([[id,name],...]) を先に呼んでください' };
     var budget = budgetMs || BUDGET_MS, t0 = Date.now(), rows = [], note = [];
