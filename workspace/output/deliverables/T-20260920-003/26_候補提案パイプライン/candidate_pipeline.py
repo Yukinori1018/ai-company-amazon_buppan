@@ -69,6 +69,22 @@ PERISHABLE_CATEGORY_WORDS = (
     "ビール", "ワイン", "お酒", "アルコール", "ベビー&マタニティ > ベビーフード",
 )
 
+# ── 生存ゲート（2026-09-30 カズヨ実画面確認を受けて新設）──────────────────
+# それまでのゲートは**全部が消極条件**（地雷を踏んでいないこと）で、
+# 「売れている」という積極条件が1つも無かった。結果、**誰も売っていない棚だけが
+# 全部のゲートを通り抜けた**。Amazon 本体もメーカーも競合も来ないのは、そこに市場が無いから。
+#
+# 実測の校正（2026-09-30・Keepa stats=180）:
+#   |    ランク(90日平均) | 実際の売れ方                          |
+#   |--------------------|---------------------------------------|
+#   |   2,900 /  3,600位 | 月200個 / 月500個（monthlySold 表示あり）|
+#   |  24,150位          | **月10個**（キーゾン実測・社長が発注を決めた B0DJNX12KZ）|
+#   | 680,000〜1,650,000位| **3か月で 0〜3個**（カズヨ実測の GO 5件）|
+#
+# ここから2本の線を引く。
+ALIVE_RANK = 100_000       # これより上位なら「死んでいない」（月10個の実例が24,150位）
+DEAD_RANK = 500_000        # これより下位なら「直近3ヶ月の実績が実質ゼロ」
+
 # 手残りの誤差幅 = 売価 × ERROR_BAND_PCT + ERROR_BAND_FIXED。
 # **手残りがこれを下回る行は GO にしない**（UNKNOWN＝「読み切れていない」）。
 #   売価比 7% の内訳: BuyBox 価格の振れ ±5% ＋ 販売手数料の読みの差 1.4%（税抜/税込）＋ 端数
@@ -89,6 +105,28 @@ def _n(v, suffix: str = "") -> str:
     if v is None or v == "":
         return ledger_sheet.UNKNOWN_CELL
     return f"{v}{suffix}"
+
+
+def _at_index(seq, i: int):
+    """Keepa の配列の i 番目。-1（データなし）は None にする。"""
+    if not isinstance(seq, list) or i >= len(seq):
+        return None
+    v = seq[i]
+    return None if v in (None, -1) else v
+
+
+def rank_prefix(rank_now, rank_avg90) -> str:
+    """判定理由の先頭に出すランクの注記（カズヨ依頼 2026-09-30）。
+
+    人が最初に読む欄に置きます。**ランクは「死んでいないこと」の確認用**で、
+    売れている根拠にはなりません（バリエーションは family でランクを共有する）。
+    """
+    if rank_avg90:
+        now = f"・現在 {rank_now:,}位" if rank_now else ""
+        return f"【ランク 90日平均 {rank_avg90:,}位{now}】"
+    if rank_now:
+        return f"【ランク 現在 {rank_now:,}位・90日平均なし】"
+    return "【ランク なし】"
 
 
 def _category_path(product: dict) -> str:
@@ -159,11 +197,55 @@ def extract_facts(product: dict, cand: sources.Candidate) -> dict:
         "live_offer_count": len(live),
         "seller_ids": seller_ids,
         "rank": at(3),
+        "rank_avg90": _at_index(st.get("avg90"), 3),
     }
 
 
 # 回転の上限。これを超える在庫は社長既定で「生成も提示もしない」（6ヶ月）。
 MAX_MONTHS_TO_SELL = 6.0
+
+
+def liveness_status(monthly_sold, rank_now, rank_avg90) -> tuple[str, str]:
+    """その棚に市場があるか（生存ゲート）。**唯一の積極条件です。**
+
+    ⚠️ **ランクは「死んでいないこと」の確認に使い、「売れている」の根拠にはしません。**
+    バリエーションのランクは family 共有なので、兄弟が売れていれば死んだ子でも順位が付きます
+    （memory: knowledge_keepa_dropcount_is_polling）。ドロップ数は観測回数であって販売数ではないので使いません。
+
+    **「月100個以上」のフィルタとは別物です。**社長が緩めたのは**閾値**の話で、
+    **ゼロは閾値ではありません。**量を増やしても、ゼロは何倍してもゼロです。
+    """
+    r90 = rank_avg90 if rank_avg90 and rank_avg90 > 0 else None
+    rnow = rank_now if rank_now and rank_now > 0 else None
+    r = r90 or rnow
+
+    if monthly_sold:
+        return (PASS, f"月販 {monthly_sold}個（Keepa に表示あり＝実際に売れている）。")
+
+    if r is None:
+        return (UNKNOWN,
+                "売れ筋ランクが取れません（ランク自体が付いていない＝売れた記録がない可能性）。"
+                "キーゾンで直近3ヶ月の実数を見てください。")
+
+    if r > DEAD_RANK:
+        if rnow and rnow <= ALIVE_RANK:
+            return (UNKNOWN,
+                    f"90日平均ランク {r90:,}位は圏外ですが、現在 {rnow:,}位まで上がっています"
+                    "（新規で伸びている途中かもしれません）。キーゾンで3ヶ月の実数を見てください。")
+        return (FAIL,
+                f"売れ筋ランク {r:,}位（90日平均）。直近3ヶ月の販売実績が実質ゼロの棚です。"
+                f"実測では 68万位で3か月1個・180万位で3か月0個でした。"
+                "本体もメーカーも競合が来ないのは、そこに市場が無いからです。")
+
+    if r <= ALIVE_RANK:
+        return (PASS,
+                f"売れ筋ランク {r:,}位（90日平均）。**死んではいません**"
+                f"（{ALIVE_RANK:,}位以内。月10個の実例が24,150位）。"
+                "ただしランクは売れている根拠ではないので、キーゾンで実数を確認してください。")
+
+    return (UNKNOWN,
+            f"売れ筋ランク {r:,}位（90日平均）。{ALIVE_RANK:,}〜{DEAD_RANK:,}位は"
+            "売れているとも死んでいるとも言えません。キーゾンで直近3ヶ月の実数を見てください。")
 
 
 def supply_status(cand: sources.Candidate, category: str) -> tuple[str, str]:
@@ -243,13 +325,13 @@ def economics_status(econ, monthly_sold, set_note: str = "") -> tuple[str, str]:
 
 
 def combine(base_verdict: str, maker_status: str, econ_status: str = PASS,
-            supply: str = PASS) -> str:
-    """§3.3 の3点チェック・5番目（メーカー直販）・採算・仕入れの実在を合成する。
+            supply: str = PASS, liveness: str = PASS) -> str:
+    """§3.3 の3点チェック・メーカー直販・採算・仕入れの実在・**生存**を合成する。
 
     FAIL が1つでもあれば NO-GO、UNKNOWN が残れば UNKNOWN、全部 PASS で初めて GO。
     **UNKNOWN を GO に畳まない**のがこのパイプラインの芯です。
     """
-    statuses = (base_verdict, maker_status, econ_status, supply)
+    statuses = (base_verdict, maker_status, econ_status, supply, liveness)
     if NO_GO in statuses or FAIL in statuses:
         return NO_GO
     if UNKNOWN in statuses:
@@ -287,7 +369,9 @@ def build_row(cand: sources.Candidate, facts: dict, judgment, maker: tuple,
     maker_status, maker_reason, _maker_ev = maker
     econ_status, econ_reason = economics_status(econ, facts.get("monthly_sold"), set_note)
     sup_status, sup_reason = supply_status(cand, facts.get("category") or cand.category)
-    verdict = combine(judgment.verdict, maker_status, econ_status, sup_status)
+    live_status, live_reason = liveness_status(
+        facts.get("monthly_sold"), facts.get("rank"), facts.get("rank_avg90"))
+    verdict = combine(judgment.verdict, maker_status, econ_status, sup_status, live_status)
 
     check2 = next((c for c in judgment.checks if c.number == 2), None)
     instock = (check2.evidence.get("amazon_instock_365_pct") if check2 else None)
@@ -312,6 +396,8 @@ def build_row(cand: sources.Candidate, facts: dict, judgment, maker: tuple,
         reasons.append(f"5. {maker_reason}")
     if econ_status != PASS:
         reasons.append(f"採算. {econ_reason}")
+    if live_status != PASS:
+        reasons.append(f"生存. {live_reason}")
     if sup_status != PASS:
         reasons.append(f"仕入れ. {sup_reason}")
     if set_note and "単品" not in set_note:
@@ -347,7 +433,8 @@ def build_row(cand: sources.Candidate, facts: dict, judgment, maker: tuple,
         _n(econ.months_to_sell if econ else None),
         _n(econ.half_disposal_loss if econ else None),
         verdict,
-        (volume_prefix(facts.get("title") or cand.title)
+        (rank_prefix(facts.get("rank"), facts.get("rank_avg90"))
+         + volume_prefix(facts.get("title") or cand.title)
          + " ／ ".join(reasons))[:1000],
         ledger_sheet.MACHINE_ONLY,
         "タカシ（candidate_pipeline.py）",
@@ -470,8 +557,8 @@ def main(argv: list[str] | None = None) -> int:
             facts = {"title": c.title, "brand": c.brand, "manufacturer": "", "sell": c.sell,
                      "fee_pct": c.fee_pct, "fba_yen": c.fba_yen,
                      "monthly_sold": c.monthly_sold, "category": c.category,
-                     "cart_seller_id": None,
-                     "live_offer_count": None, "seller_ids": [], "rank": None}
+                     "rank": None, "rank_avg90": None, "cart_seller_id": None,
+                     "live_offer_count": None, "seller_ids": []}
             maker = (UNKNOWN, "Keepa が商品を返さず、セラー名も取れませんでした。", {})
             cart_name = None
         else:
@@ -524,6 +611,9 @@ def main(argv: list[str] | None = None) -> int:
         for ch in j.checks:
             print(f"    {ch.status[:1]} {ch.number}. {ch.reason}")
         print(f"    {maker[0][:1]} 5. {maker[1]}")
+        ls, lr = liveness_status(facts.get("monthly_sold"), facts.get("rank"),
+                                 facts.get("rank_avg90"))
+        print(f"    {ls[:1]} 生存. {lr}")
         ss, sr = supply_status(c, facts.get("category") or c.category)
         print(f"    {ss[:1]} 仕入れ. {sr}")
         es, er = economics_status(econ, facts.get("monthly_sold"), set_note)

@@ -413,6 +413,66 @@ class TestSetCount(unittest.TestCase):
         self.assertEqual(set_count.order_lot_in_amazon_units(12, 1), 12)
 
 
+class TestLiveness(unittest.TestCase):
+    """生存ゲート — **唯一の積極条件**（2026-09-30 カズヨの実画面確認を受けて新設）。
+
+    それまでのゲートは全部が消極条件（地雷を踏んでいないこと）で、
+    「売れている」という積極条件が1つも無かった。結果 **誰も売っていない棚だけが
+    全部のゲートを通り抜けた**。GO 5件はキーゾン実測で3か月 0〜3個だった。
+    """
+
+    def test_dead_shelves_are_no_go(self):
+        """カズヨが実画面で落とした5件の実ランク（90日平均）。すべて NO-GO になること。"""
+        measured = {
+            "B0DSR19X7T": (1_800_677, 1_645_738),   # 3か月 0個
+            "B0DC4RTXG9": (1_362_072,   996_144),   # キーゾン表示なし
+            "B0DCMVV58Q": (1_354_613,   989_263),   # 3か月 0個
+            "B0BSDZ71YG": (  856_448,   680_355),   # 3か月 1個・856,448位
+            "B08VWS9GHD": (1_196_088,   985_403),   # 3か月 3個
+        }
+        for asin, (now, avg90) in measured.items():
+            status, reason = pipe.liveness_status(None, now, avg90)
+            self.assertEqual(status, md.FAIL, asin)
+            self.assertIn("実質ゼロ", reason)
+            self.assertEqual(pipe.combine(GO, md.PASS, md.PASS, md.PASS, status), NO_GO)
+
+    def test_real_seller_at_20k_rank_passes(self):
+        """B0DJNX12KZ は **キーゾン実測で月10個**・ランク20,748位／90日平均24,150位。
+
+        `monthlySold` は出ないが死んでいない。**ここを落とすと社長が発注を決めた実例が消える。**
+        """
+        status, _r = pipe.liveness_status(None, 20_748, 24_150)
+        self.assertEqual(status, md.PASS)
+
+    def test_monthly_sold_is_the_positive_evidence(self):
+        status, reason = pipe.liveness_status(200, 2_978, 2_910)
+        self.assertEqual(status, md.PASS)
+        self.assertIn("実際に売れている", reason)
+
+    def test_middle_band_is_unknown(self):
+        """10万〜50万位は売れているとも死んでいるとも言えない → 人がキーゾンで見る。"""
+        status, reason = pipe.liveness_status(None, 300_000, 300_000)
+        self.assertEqual(status, md.UNKNOWN)
+        self.assertIn("キーゾン", reason)
+
+    def test_no_rank_is_unknown_not_pass(self):
+        self.assertEqual(pipe.liveness_status(None, None, None)[0], md.UNKNOWN)
+
+    def test_riser_is_unknown_not_no_go(self):
+        """90日平均は圏外でも現在が上位なら、新規で伸びている途中かもしれない。"""
+        status, _r = pipe.liveness_status(None, 20_689, 700_000)
+        self.assertEqual(status, md.UNKNOWN)
+
+    def test_zero_is_not_a_threshold(self):
+        """「月100個以上」を緩めた話とは別物。**ゼロは何倍してもゼロ。**"""
+        self.assertEqual(pipe.liveness_status(None, 1_800_677, 1_645_738)[0], md.FAIL)
+        self.assertEqual(pipe.liveness_status(10, 1_800_677, 1_645_738)[0], md.PASS)
+
+    def test_rank_prefix_is_always_written(self):
+        self.assertEqual(pipe.rank_prefix(None, None), "【ランク なし】")
+        self.assertIn("24,150位", pipe.rank_prefix(20_748, 24_150))
+
+
 class TestSupplyReality(unittest.TestCase):
     """CLAUDE.md §3.3-6「仕入れが実在することを確認するまで GO にしない」。"""
 

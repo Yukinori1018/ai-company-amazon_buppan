@@ -213,8 +213,13 @@ def to_candidates(netsea: dict[str, dict], by_jan: dict[str, list[dict]],
     ①②は `offers` が要るので後段（cart_guard）。ここでは③だけを 0 追加トークンで落とします。
     **月販が取れないことを理由には落としません。**
     """
+    # 生存ゲートを**発掘の段でも掛ける**。売れていない棚をプールに入れてしまうと、
+    # 後段の §3.3 判定で 6トークン/ASIN を払ってから落とすことになる。
+    # ここで落とせば追加トークンは0（ランクは既に取れている）。
+    from candidate_pipeline import DEAD_RANK, ALIVE_RANK  # noqa: E402 - 定数の単一情報源
+
     out: list[Candidate] = []
-    tally = {"jan": 0, "asin": 0, "no_price": 0, "loss": 0, "kept": 0}
+    tally = {"jan": 0, "asin": 0, "no_price": 0, "loss": 0, "dead": 0, "kept": 0}
 
     for jan, w in netsea.items():
         group = by_jan.get(jan)
@@ -238,6 +243,16 @@ def to_candidates(netsea: dict[str, dict], by_jan: dict[str, list[dict]],
         ms = p.get("monthlySold")
         ms = None if ms in (None, -1) else ms
 
+        rank_now = at(3)
+        rank90 = (st.get("avg90") or [])
+        rank90 = rank90[3] if isinstance(rank90, list) and len(rank90) > 3 else None
+        rank90 = None if rank90 in (None, -1) else rank90
+        r = rank90 or rank_now
+        if not ms and r and r > DEAD_RANK and not (rank_now and rank_now <= ALIVE_RANK):
+            # 直近3ヶ月の販売実績が実質ゼロの棚。**消極条件だけでは落ちない**ので、ここで落とす。
+            tally["dead"] += 1
+            continue
+
         if not sell or fee_pct in (None, -1) or not fba:
             # Amazon に商品ページはあるが**誰も売っていない**（売価が付いていない）棚。
             # 競合ゼロに見えますが、値段の目安も需要の証拠も無いので、今は候補にしません。
@@ -248,6 +263,7 @@ def to_candidates(netsea: dict[str, dict], by_jan: dict[str, list[dict]],
         # 倍率が読めない（セット品らしいが個数不明）ものは**ここでは落とさず**候補に残し、
         # 後段で UNKNOWN にして人に回す（0トークンで落とせるのは「確実に赤字」だけ）。
         multiplier, _note = set_count.cost_multiplier(p.get("title"))
+        ms_keep = ms
         unit_cost = profit.unit_cost_incl_tax(w["unit_price_excl"])
         if multiplier is not None:
             e = profit.compute(sell, fee_pct, fba, unit_cost * multiplier, qty=1,
@@ -266,9 +282,11 @@ def to_candidates(netsea: dict[str, dict], by_jan: dict[str, list[dict]],
             source="discover/netsea",
         ))
 
-    log(f"  JAN が Amazon に当たった {tally['jan']}件 → うち出品があって売価が付くもの "
-        f"{tally['asin'] - tally['no_price']}件（出品なし {tally['no_price']}件）"
-        f" → 黒字 {tally['kept']}件（赤字で落とした {tally['loss']}件）")
+    log(f"  JAN が Amazon に当たった {tally['jan']}件 → "
+        f"生きている棚 {tally['asin'] - tally['dead']}件（売れていない棚 {tally['dead']}件）→ "
+        f"出品があって売価が付く {tally['asin'] - tally['dead'] - tally['no_price']}件"
+        f"（出品なし {tally['no_price']}件）→ "
+        f"**候補 {tally['kept']}件**（赤字で落とした {tally['loss']}件）")
     return out, tally
 
 
