@@ -83,6 +83,11 @@ kingston キングストンテクノロジー yubico ユビコ titleist タイ�
 maisonmargiela メゾンマルジェラ aesop イソップ avene アベンヌ aramis アラミス umbro アンブロ avirex アヴィレックス optimumnutrition オプティマムニュートリション
 doterra ドテラ spam スパム laphroaig ラフロイグ cuervo クエルボ compassbox コンパスボックス kirkland lanvin ランバン chloe クロエ nars ナーズ
 レミーコアントロー remycointreau championpetfoods チャンピオンペットフーズ orijen 野村不動産ライフスポーツ
+wizardsofthecoast ウィザーズオブザコースト yazaki 矢崎エナジーシステム 矢崎
+富士通クライアントコンピューティング fujitsu 資生堂薬品 資生堂 アサヒグループ食品 アサヒフードアンドヘルスケア 日本ハム 住化エンバイロメンタルサイエンス
+エヌテイテイドコモ nttdocomo ドコモ acer エイサー ヤクルトヘルスフーズ ヤクルト balmuda バルミューダ suqqu スック takeokikuchi タケオキクチ
+waterpik ウォーターピック koss topps トップス jimmychoo ジミーチュウ olaplex オラプレックス soundpeats サウンドピーツ ルネサンス 東急スポーツオアシス
+hobbywing ucloudlink ソリッドゴールド solidgold マイヤー meyer
 chanel シャネル bvlgari ブルガリ hermes エルメス gucci グッチ prada プラダ armani アルマーニ versace ヴェルサーチェ jomalone ジョーマローン
 lancome ランコム esteelauder エスティローダー clinique クリニーク clarins クラランス diptyque ディプティック tomford トムフォード guerlain ゲラン
 shuuemura シュウウエムラ skii sk-ii cledepeaubeaute クレドポーボーテ ysl yvessaintlaurent イヴサンローラン dior ディオール christiandior
@@ -128,7 +133,7 @@ _SIZE_P = T1 / "t1_gbiz_cache" / "size_by_maker.json"
 SIZE = {_n(k): v for k, v in json.loads(_SIZE_P.read_text(encoding="utf-8")).items()} if _SIZE_P.exists() else {}
 
 # manufacturer 欄に入る「社名でないもの」の典型
-NOT_COMPANY = re.compile(r"^(不明|非公開|unknown|none|n/?a|その他|other|-+)$", re.I)
+NOT_COMPANY = re.compile(r"^(不明|非公開|国内メーカー|unknown|none|n/?a|その他|other|-+)$", re.I)
 
 
 def maker_key(p: dict) -> tuple[str, str]:
@@ -163,12 +168,13 @@ def classify(p: dict) -> tuple[str, str]:
     """1商品のメーカー判定。戻り値 (除外理由 or '', 根拠)。空なら残す。"""
     brand, maker = p.get("brand") or "", p.get("manufacturer") or ""
     seg, why = c1.segment(p)
+    # manufacturer に商品説明が入っている行（「マタインク for キヤノン用インク…」）は、
+    # 説明中の他社名（キヤノン）で大手判定しないよう、社名としては使わない
+    if c1.DESC.search(maker):
+        maker = ""
     # 過去台帳で「連絡候補」と判定済みの社は、機械の区分より優先して残す（例：BURTLE は JAN 無し英字で OEM 疑いに落ちる）
-    for name in (maker, brand):
-        r = LEDGER.get(_n(name))
-        if r and r["判定"] == "連絡候補" and r.get("理由コード") not in ("L1", "L2"):
-            return "", "T-20260831-004 台帳で連絡候補"
-    if seg in ("海外ブランド", "中国系OEM", "中国系OEM疑い", "版元", "ブランド不明"):
+    rescued = any((LEDGER.get(_n(n)) or {}).get("判定") == "連絡候補" for n in (maker, brand))
+    if seg in ("海外ブランド", "中国系OEM", "中国系OEM疑い", "版元", "ブランド不明") and not rescued:
         return seg, why
     kb = known_big(brand, maker)
     if kb:
@@ -180,8 +186,10 @@ def classify(p: dict) -> tuple[str, str]:
     # 表示名がカタカナでも海外ブランドは多い（例：タイトリスト・イソップ）。国内でも JAN を持たない社はあるので、
     # 除外行は公開版 CSV に理由つきで残す（人が戻せる）。
     cc = c1.ean_cc(p.get("eanList"))
-    if cc in ("OTHER", "US") and not c1.JP_CORP.search(maker):
+    if cc in ("OTHER", "US") and not c1.JP_CORP.search(maker) and not rescued:
         return "海外ブランド疑い（JANが国内でない）", f"EAN={cc}"
+    if rescued:
+        return "", "T-20260831-004 台帳で連絡候補（機械区分より優先）"
     if seg == "代理店":
         return "", "代理店（輸入元。国内窓口として残す）"
     return "", ""
