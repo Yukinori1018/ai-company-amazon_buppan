@@ -48,6 +48,7 @@ sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(HERE.parent / "24_カート保持者ガード"))
 
 import profit                                    # noqa: E402
+import set_count                                 # noqa: E402
 from candidate_sources import REPO, Candidate, _int  # noqa: E402
 from keepa_client import KEEPA_DOMAIN_JP, load_api_key  # noqa: E402
 
@@ -243,11 +244,17 @@ def to_candidates(netsea: dict[str, dict], by_jan: dict[str, list[dict]],
             tally["no_price"] += 1
             continue
 
+        # **単位を揃えてから採算を見る。**Amazon の1個が卸のN点なら原価はN倍。
+        # 倍率が読めない（セット品らしいが個数不明）ものは**ここでは落とさず**候補に残し、
+        # 後段で UNKNOWN にして人に回す（0トークンで落とせるのは「確実に赤字」だけ）。
+        multiplier, _note = set_count.cost_multiplier(p.get("title"))
         unit_cost = profit.unit_cost_incl_tax(w["unit_price_excl"])
-        e = profit.compute(sell, fee_pct, fba, unit_cost, qty=1, monthly_sold=ms)
-        if e.gross_per_unit <= 0:
-            tally["loss"] += 1
-            continue
+        if multiplier is not None:
+            e = profit.compute(sell, fee_pct, fba, unit_cost * multiplier, qty=1,
+                               monthly_sold=ms)
+            if e.net_per_unit <= 0:
+                tally["loss"] += 1
+                continue
 
         tally["kept"] += 1
         out.append(Candidate(

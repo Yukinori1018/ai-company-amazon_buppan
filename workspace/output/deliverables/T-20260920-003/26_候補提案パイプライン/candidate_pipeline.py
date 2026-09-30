@@ -36,6 +36,7 @@ import candidate_sources as sources          # noqa: E402
 import ledger_sheet                          # noqa: E402
 import maker_direct                           # noqa: E402
 import profit                                 # noqa: E402
+import set_count                              # noqa: E402
 from keepa_client import KeepaClient, KeepaError  # noqa: E402
 from keepa_sellers import SellerNames         # noqa: E402
 from verdict import (AMAZON_JP_SELLER_ID, FAIL, GO, NO_GO, PASS,  # noqa: E402
@@ -128,7 +129,7 @@ def extract_facts(product: dict, cand: sources.Candidate) -> dict:
 MAX_MONTHS_TO_SELL = 6.0
 
 
-def economics_status(econ, monthly_sold) -> tuple[str, str]:
+def economics_status(econ, monthly_sold, set_note: str = "") -> tuple[str, str]:
     """採算のゲート。(status, reason) を返す。
 
     カートが第三者でも、**赤字**や**捌けない在庫**は提案してはいけません。
@@ -136,7 +137,9 @@ def economics_status(econ, monthly_sold) -> tuple[str, str]:
     （キーゾンの列は人が埋めます）。
     """
     if econ is None:
-        return (UNKNOWN, "売価・手数料・FBA・原価のどれかが揃わず、採算を計算できません。")
+        return (UNKNOWN,
+                "売価・手数料・FBA・原価のどれかが揃わず、採算を計算できません。"
+                + (f" {set_note}" if set_note else ""))
     if econ.gross_per_unit <= 0:
         return (FAIL, f"1個粗利が {econ.gross_per_unit:,}円（赤字）です。")
     if econ.net_per_unit <= 0:
@@ -209,10 +212,11 @@ def prioritize(candidates: list) -> list:
 
 
 def build_row(cand: sources.Candidate, facts: dict, judgment, maker: tuple,
-              econ, cart_seller_name: str | None, today: str) -> list:
+              econ, cart_seller_name: str | None, today: str,
+              set_note: str = "") -> list:
     """32列ぶんのセルを作る。列の並びは ledger_sheet.COLUMNS のとおり。"""
     maker_status, maker_reason, _maker_ev = maker
-    econ_status, econ_reason = economics_status(econ, facts.get("monthly_sold"))
+    econ_status, econ_reason = economics_status(econ, facts.get("monthly_sold"), set_note)
     verdict = combine(judgment.verdict, maker_status, econ_status)
 
     check2 = next((c for c in judgment.checks if c.number == 2), None)
@@ -238,6 +242,8 @@ def build_row(cand: sources.Candidate, facts: dict, judgment, maker: tuple,
         reasons.append(f"5. {maker_reason}")
     if econ_status != PASS:
         reasons.append(f"採算. {econ_reason}")
+    if set_note and "単品" not in set_note:
+        reasons.append(f"単位. {set_note}")
     if not reasons:
         reasons = ([f"{c.number}. {c.reason}" for c in judgment.checks]
                    + [f"5. {maker_reason}", f"採算. {econ_reason}"])
@@ -412,13 +418,22 @@ def main(argv: list[str] | None = None) -> int:
             unit_cost = profit.unit_cost_incl_tax(fj["unit_price_excl"])
             pack = fj.get("min_lot_units") or pack     # 卸はこの倍数でしか売らない
 
+        # ⚠️ **単位を揃える。** 卸は「1点あたり」、Amazon は「N点セット」で売っている。
+        # Amazon の1個が卸のN点なら原価はN倍（2026-09-30 カズヨが B0DJNX12KZ で発見）。
+        multiplier, set_note = set_count.cost_multiplier(facts.get("title") or c.title)
+        if multiplier is None:
+            unit_cost = None                           # → 採算 UNKNOWN（人が見る）
+        elif unit_cost:
+            unit_cost = unit_cost * multiplier
+            pack = set_count.order_lot_in_amazon_units(pack, multiplier)
+
         econ = None
         if unit_cost and facts.get("sell") and facts.get("fee_pct") and facts.get("fba_yen"):
             qty = profit.order_qty(facts.get("monthly_sold"), pack)
             econ = profit.compute(facts["sell"], facts["fee_pct"], facts["fba_yen"],
                                   unit_cost, qty, facts.get("monthly_sold"))
 
-        row = build_row(c, facts, j, maker, econ, cart_name, today)
+        row = build_row(c, facts, j, maker, econ, cart_name, today, set_note)
         rows.append(row)
         tally[row[ledger_sheet.COL_VERDICT]] += 1
         details.append({
@@ -435,8 +450,10 @@ def main(argv: list[str] | None = None) -> int:
         for ch in j.checks:
             print(f"    {ch.status[:1]} {ch.number}. {ch.reason}")
         print(f"    {maker[0][:1]} 5. {maker[1]}")
-        es, er = economics_status(econ, facts.get("monthly_sold"))
+        es, er = economics_status(econ, facts.get("monthly_sold"), set_note)
         print(f"    {es[:1]} 採算. {er}")
+        if "単品" not in set_note:
+            print(f"    ! 単位. {set_note}")
 
     # 8. 台帳へ（冪等）
     written = 0

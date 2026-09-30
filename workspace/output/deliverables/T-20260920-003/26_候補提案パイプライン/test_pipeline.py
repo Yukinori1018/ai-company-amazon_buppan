@@ -20,6 +20,7 @@ import candidate_pipeline as pipe   # noqa: E402
 import ledger_sheet                 # noqa: E402
 import maker_direct as md           # noqa: E402
 import profit                       # noqa: E402
+import set_count                    # noqa: E402
 from verdict import GO, NO_GO, UNKNOWN  # noqa: E402
 
 
@@ -311,6 +312,105 @@ class TestStopCondition(unittest.TestCase):
     def test_token_cap_limits_batch_size(self):
         """1回の実行で上限トークンを超えない件数しか取らない。"""
         self.assertEqual(pipe.MAX_KEEPA_TOKENS_PER_RUN // pipe.TOKENS_PER_ASIN, 25)
+
+
+class TestSetCount(unittest.TestCase):
+    """卸は「1点あたり」、Amazon は「N点セット」。**突き合わせの前に単位を揃える。**
+
+    2026-09-30、B0DJNX12KZ（Amazon 側が2点セット）の原価を卸単価そのままで計算し、
+    利益率33.3%・GO と出した。正しくは原価2倍で ▲181円/個。
+    """
+
+    def test_fujiboeki_two_piece_set(self):
+        self.assertEqual(set_count.parse_amazon_set_count(
+            "【2点セット】不二貿易 洗えるバスケット カトラリー収納 仕切り付き×2点セット"), 2)
+
+    def test_single_item_is_one(self):
+        for title in ("タテ・ヨコ伸縮式ソファカバー(クレア)肘付き右コーナーベージュ",
+                      "ファミリー・ライフ キャビネット ホワイト 幅70×奥行32×高さ70cm",
+                      "不二貿易(Fujiboeki) シューズラック 4段 幅63cm ブラウン 木製"):
+            self.assertEqual(set_count.parse_amazon_set_count(title), 1, title)
+
+    def test_capsule_count_is_not_a_set(self):
+        """「600粒」は600セットではない。助数詞を白リストで持つ。"""
+        self.assertEqual(set_count.parse_amazon_set_count(
+            "オリヒロ 玉葱エキス粒 徳用 約60日分 600粒"), 1)
+
+    def test_dimensions_are_not_a_set(self):
+        """「幅30×奥行30×高さ45cm」の × を個数に読まない。"""
+        self.assertEqual(set_count.parse_amazon_set_count(
+            "不二貿易 座椅子 幅30×奥行30×高さ45cm ブルー スタッキング"), 1)
+
+    def test_headset_is_not_a_set(self):
+        """「ヘッドセット」の「セット」に反応しない（母数を静かに削る型のバグ）。"""
+        self.assertEqual(set_count.parse_amazon_set_count(
+            "エレコム ゲーミングヘッドセット 両耳オーバーヘッド PS5 PS4 Switch"), 1)
+
+    def test_unreadable_set_is_none_not_one(self):
+        """個数が読めないセット品は **1 と決め打たない**（原価をN分の1に見誤る）。"""
+        self.assertIsNone(set_count.parse_amazon_set_count(
+            "【まとめ買い】 スクラビングバブル 流せるトイレブラシ 本体+付け替え"))
+        self.assertIsNone(set_count.parse_amazon_set_count("【2点セット】…×3点セット"))
+
+    def test_company_name_is_not_a_set(self):
+        """「富士パックス販売」の包丁を「個数不明のセット品」と読んでいた。"""
+        self.assertEqual(set_count.parse_amazon_set_count(
+            "富士パックス販売 トッププロダクツ 万能包丁 楽 TH-78 刃渡り17cm"), 1)
+
+    def test_assembly_word_is_not_a_set(self):
+        """「簡単組立」の「組」に反応しない。"""
+        self.assertEqual(set_count.parse_amazon_set_count(
+            "不二貿易(Fujiboeki) シューズラック 4段 幅63cm ブラウン 木製 簡単組立"), 1)
+
+    def test_pcs_and_pair(self):
+        self.assertEqual(set_count.parse_amazon_set_count(
+            "[C/D:37189] [セット数:4pcs] アニマルドアストッパー"), 4)
+        self.assertEqual(set_count.parse_amazon_set_count(
+            "小倉陶器 ビアタンブラー 420ml ペアセット IE NOMI BEER"), 2)
+
+    def test_large_multipacks(self):
+        self.assertEqual(set_count.parse_amazon_set_count(
+            "サンカ 芝の根止め レギュラー (幅16cm×高さ13.7cm) 【35枚組】 ブラック"), 35)
+
+    def test_standalone_bags_count(self):
+        self.assertEqual(set_count.parse_amazon_set_count(
+            "ウルフピー4袋[オオカミ尿100％] WOLFPEE 動物除け"), 4)
+
+    def test_multiplier_none_makes_economics_unknown(self):
+        """倍率が読めなければ GO にしない（採算は UNKNOWN）。"""
+        mult, note = set_count.cost_multiplier("【まとめ買い】お得パック")
+        self.assertIsNone(mult)
+        status, reason = pipe.economics_status(None, 10, note)
+        self.assertEqual(status, md.UNKNOWN)
+        self.assertIn("個数が読めません", reason)
+
+    def test_set_count_flips_fujiboeki_to_loss(self):
+        """B0DJNX12KZ: 原価2,024円/個で赤字。結論はカズヨの実画面確認と同じ。
+
+        手数料の見方が3通りあり、**どれでも赤字**になります（結論は動きません）:
+          15.4%（税抜のまま）      → 手数料459円 → 手残り ▲181円  ← カズヨの計算
+          15%×1.1 = 16.5%          → 手数料492円 → 手残り ▲214円  ← カズヨの別案
+          **15.4%×1.1 = 16.94%**   → 手数料505円 → 手残り ▲227円  ← 本実装
+        本実装は「Keepa の率は税抜表示なので ×1.1 する」という当リポの既定
+        （成果物22・23、商品台帳 L001）に合わせた**いちばん保守的な**読みです。
+        """
+        unit = profit.unit_cost_incl_tax(920) * 2          # 1,012 × 2点
+        self.assertEqual(unit, 2024)
+        e = profit.compute(sell=2980, fee_pct=15.4, fba_yen=472,
+                           unit_cost_incl=unit, qty=12, monthly_sold=10)
+        self.assertEqual(e.referral_fee_yen, 505)
+        self.assertEqual(e.net_per_unit, -227)
+        self.assertEqual(pipe.economics_status(e, 10)[0], md.FAIL)
+
+        # 税抜のまま見てもやはり赤字（カズヨの ▲181円）。
+        e2 = profit.compute(sell=2980, fee_pct=14.0, fba_yen=472,
+                            unit_cost_incl=unit, qty=12, monthly_sold=10)
+        self.assertLess(e2.net_per_unit, 0)
+
+    def test_order_lot_converted_to_amazon_units(self):
+        """卸が3点単位・Amazon が2点セット → Amazon 2個単位で発注（切り上げ）。"""
+        self.assertEqual(set_count.order_lot_in_amazon_units(3, 2), 2)
+        self.assertEqual(set_count.order_lot_in_amazon_units(12, 1), 12)
 
 
 class TestPrioritize(unittest.TestCase):
