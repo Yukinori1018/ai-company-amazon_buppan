@@ -77,6 +77,12 @@ tanita タニタ omron オムロン terumo テルモ
 santen 参天製薬 bayer バイエル バイエル薬品 otsuka 大塚製薬 bauschlomb ボシュロム alcon アルコン iwatani 岩谷産業 イワタニ
 kirkland カークランド ballantines バランタイン milbon ミルボン lebel ルベル タカラベルモント 北の達人コーポレーション
 ine アイエヌイー hoyu ホーユー ホーユープロフェッショナル
+mtg エムティージー ricoh リコー p&g pg ピーアンドジー 日清食品 sunstar サンスター 三菱ケミカル necプラットフォームズ nec 富士ソフト fujisoft
+curel キュレル ドクターシーラボ drcilabo ジルスチュアート jillstuart レキットベンキーザー menicon メニコン maxell マクセル マクセルイズミ hololive ホロライブ
+kingston キングストンテクノロジー yubico ユビコ titleist タイトリスト calvinklein カルバンクライン arcteryx アークテリクス burberry バーバリー
+maisonmargiela メゾンマルジェラ aesop イソップ avene アベンヌ aramis アラミス umbro アンブロ avirex アヴィレックス optimumnutrition オプティマムニュートリション
+doterra ドテラ spam スパム laphroaig ラフロイグ cuervo クエルボ compassbox コンパスボックス kirkland lanvin ランバン chloe クロエ nars ナーズ
+レミーコアントロー remycointreau championpetfoods チャンピオンペットフーズ orijen 野村不動産ライフスポーツ
 """.split()
 
 
@@ -161,6 +167,12 @@ def classify(p: dict) -> tuple[str, str]:
     pv, pwhy = prior_verdict(brand, maker)
     if pv:
         return pv, pwhy
+    # 日本の JAN（45/49）を持たない＝輸入品の典型。manufacturer に日本の法人格が無ければ海外ブランドの疑いとして外す。
+    # 表示名がカタカナでも海外ブランドは多い（例：タイトリスト・イソップ）。国内でも JAN を持たない社はあるので、
+    # 除外行は公開版 CSV に理由つきで残す（人が戻せる）。
+    cc = c1.ean_cc(p.get("eanList"))
+    if cc in ("OTHER", "US") and not c1.JP_CORP.search(maker):
+        return "海外ブランド疑い（JANが国内でない）", f"EAN={cc}"
     if seg == "代理店":
         return "", "代理店（輸入元。国内窓口として残す）"
     return "", ""

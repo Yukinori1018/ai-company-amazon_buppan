@@ -23,35 +23,10 @@ BASE = "https://www.superdelivery.com"
 PER_PAGE = 120
 
 
-class Blocked(RuntimeError):
-    """Cloudflare チャレンジに落ちた。"""
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from _fetch import Blocked, Failed, fetch  # noqa: E402
 
-
-def fetch(url: str, timeout: int = 40, retries: int = 4) -> str:
-    """1 URL を取る。429（レート制限）は指数バックオフで粘る。
-
-    SD は 2秒間隔でも 429 を返すことがある（2026-09-30 実測）。429 は「止まれ」ではなく
-    「待て」なので、失敗として記録せず待ち直す。Cloudflare チャレンジだけは即あきらめる。
-    """
-    wait = 8.0
-    for attempt in range(retries + 1):
-        req = urllib.request.Request(url, headers={"User-Agent": UA, "Accept-Language": "ja"})
-        try:
-            raw = urllib.request.urlopen(req, timeout=timeout).read()
-        except urllib.error.HTTPError as exc:
-            if exc.code in (429, 503) and attempt < retries:
-                print(f"    {exc.code} → {wait:.0f}秒待って再試行 ({attempt + 1}/{retries})", flush=True)
-                time.sleep(wait)
-                wait *= 2
-                continue
-            raise
-        if raw[:2] == b"\x1f\x8b":
-            raw = gzip.decompress(raw)
-        text = raw.decode("utf-8", "replace")
-        if "Just a moment" in text or "cf-challenge" in text:
-            raise Blocked(url)
-        return text
-    raise urllib.error.URLError("429 が続いたため中断")
+UA = ""  # 実際の User-Agent は _fetch.py が持つ
 
 
 def parse_total(page_html: str) -> int | None:
@@ -156,7 +131,7 @@ def main() -> int:
                 print(f"\n■ Cloudflare に止められました（{exc}）。ここまでを保存して終了します。", flush=True)
                 json.dump(progress, open(prog_path, "w"), ensure_ascii=False, indent=1)
                 return 2
-            except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError) as exc:
+            except Failed as exc:
                 progress["failed"][did] = str(exc)[:200]
                 print(f"  × {did} {name}: {exc}", flush=True)
                 json.dump(progress, open(prog_path, "w"), ensure_ascii=False, indent=1)

@@ -22,29 +22,10 @@ UA = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
 BASE = "https://www.superdelivery.com"
 
 
-class Blocked(RuntimeError):
-    pass
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from _fetch import Blocked, Failed, fetch  # noqa: E402
 
-
-def fetch(url: str, timeout: int = 40, retries: int = 4) -> str:
-    wait = 8.0
-    for attempt in range(retries + 1):
-        req = urllib.request.Request(url, headers={"User-Agent": UA, "Accept-Language": "ja"})
-        try:
-            raw = urllib.request.urlopen(req, timeout=timeout).read()
-        except urllib.error.HTTPError as exc:
-            if exc.code in (429, 503) and attempt < retries:
-                time.sleep(wait)
-                wait *= 2
-                continue
-            raise
-        if raw[:2] == b"\x1f\x8b":
-            raw = gzip.decompress(raw)
-        text = raw.decode("utf-8", "replace")
-        if "Just a moment" in text or "cf-challenge" in text:
-            raise Blocked(url)
-        return text
-    raise urllib.error.URLError("429 が続いたため中断")
+UA = ""  # 実際の User-Agent は _fetch.py が持つ
 
 
 ITEM_RE = re.compile(r'<div class="itembox-parts.*?(?=<div class="itembox-parts|<div class="dvs-loading|\Z)', re.S)
@@ -128,7 +109,7 @@ def main() -> int:
         except Blocked:
             print("■ Cloudflare に止められました。ここまでを保存して終了します。", flush=True)
             break
-        except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError) as exc:
+        except Failed as exc:
             res = {"jan": jan, "hit_count": None, "hits": [], "error": str(exc)[:200]}
         if res["hit_count"]:
             found += 1
