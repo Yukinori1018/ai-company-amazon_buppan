@@ -5,7 +5,7 @@ status: waiting
 assignee: secretary
 priority: high
 created_at: 2026-08-04
-updated_at: 2026-08-04
+updated_at: 2026-09-30
 next_check_at: 2026-08-27
 requires_approval: false
 labels: [maker-shiire, research, keepa, spreadsheet, overnight]
@@ -85,3 +85,36 @@ Amazon売れ筋商品の**メーカー**をナレッジ基準で選別し、連�
   - [`wholesale_probe_run.log`](../../output/deliverables/T-20260804-001/wholesale_probe_run.log) — 実行ログ（606B）
   - [`損益分岐シミュレータ_メーカー仕入れ.xlsx`](../../output/deliverables/T-20260804-001/損益分岐シミュレータ_メーカー仕入れ.xlsx) — Excel（14.8KB）
 - 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260804-001/`
+
+---
+
+## 🔴 2026-09-30 注記（マリエ）— **このチケットの「NETSEA はゼロ件」という結論を前提にしないでください**
+
+`SOURCE.md` に書かれている次の結論は、**根拠になりません。**
+
+> 「NETSEA から戻ってきた値はゼロ件（全行が NETSEA該当なし＝実卸はメーカー見積が必要）」
+
+### なぜ根拠にならないか
+
+`adapters/netsea.py` の不具合によるものでした（T-20260920-003 / IT タカシが 2026-09-30 に発見）。
+
+| # | 不具合 | 結果 |
+|---|---|---|
+| 1 | `search(jan_code=...)` が NETSEA `/items` の `supplier_ids`（**1件しか受け付けない**）に **10件で投げていた** | **全バッチが必ず 400**（`400 too many supplier_ids.`） |
+| 2 | 失敗時に**サンプルデータへ暗黙フォールバック**していた | エラーが表に出ず「該当なし」に見えた |
+| 3 | 承認済みサプライヤーのページングが 100社で打ち切り | 照会先そのものが足りていなかった（実際は221社） |
+
+サンプルの JAN は `49000000000xx` の placeholder で実在 JAN と衝突しないため、返ってきたのは常に0件でした。
+**捏造価格が流れたわけではありません**が、これは偶然であり設計の安全性ではありません。
+
+### 修正と再検証
+
+- 修正済み：**commit `8251ca02`**（`supplier_ids` 10→1／暗黙フォールバック削除／ページング 100→221社・テスト192本）
+- 修正後、実在 JAN `4953980278777` が **0件 → 1件**（920円 税抜・不二貿易株式会社）。カズヨが NETSEA 実画面で見た卸単価と一致
+- **再検証は Keepa トークン回復後**（2026-09-30 時点で残高マイナス・429）。T-20260920-003 で実施
+
+### 当面の扱い
+
+1. **「NETSEA では卸が取れない／実卸はメーカー見積が必要」を前提にした判断をしないでください。** 同じ理由で、`discovery/pipeline.py` の JAN 突合（Yahoo+楽天+NETSEA 合成）に基づく「卸で最安が取れない」系の結論も NETSEA を過小評価しています
+2. 影響を受けないのは `list_supplier_items[_raw]` を使う経路（T-20260831-006・T-20260705-001・T-20260915-001・`discover_from_netsea`）です
+3. `wholesale_probe.csv` の `netsea_*` 列が空であることは、**NETSEA に無いことを意味しません**（照会が届いていなかっただけ）
