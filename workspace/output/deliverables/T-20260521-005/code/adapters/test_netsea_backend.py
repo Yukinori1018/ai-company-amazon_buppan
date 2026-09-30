@@ -5,7 +5,8 @@
   2. set[] から「在庫あり×卸価格最安」の規格を採用する。
   3. 全規格品切れの商品は price=0（突合対象外）になる。
   4. トークン未設定でサンプルへ正直にフォールバック（last_error に理由）。
-  5. 本番経路: 200正常 / 401・error フォーマット時にサンプルへフォールバックし last_error を残す。
+  5. 本番経路: 200正常／**失敗時は NetseaError を投げる**（サンプルで埋めない・2026-09-30 修正）。
+     supplier_ids は **1リクエスト1件**（実測。10件だと 400 too many supplier_ids.）。
   6. JAN無しキーワードは本番でもサンプル粗集め（/items にフリーワード検索が無いため）。
   7. MultiSupplierClient が Yahoo+楽天+NETSEA の3本で同JAN最安を採用（卸が最安で勝つ）。
 """
@@ -13,7 +14,7 @@
 import pytest
 
 from adapters.multi_supplier import MultiSupplierClient
-from adapters.netsea import NetseaClient
+from adapters.netsea import NetseaClient, NetseaError
 from adapters.yahoo_shopping import YahooItem
 
 
@@ -123,13 +124,14 @@ class _FakeResp:
         return self._payload
 
 
-def _default_fake_get(url, headers=None, timeout=None):
+def _default_fake_get(url, headers=None, timeout=None, params=None):
     """GET /suppliers の既定スタブ（承認済みサプライヤー2社を返す）。
 
     /items は jan_code 単独だと 400 になるため、アダプタは先に /suppliers を引いて
     supplier_ids を埋める。本番経路テストはこの GET も必要。
     """
     assert url.endswith("/buyer/v1/suppliers")
+    # /suppliers はページングする（next_supplier_id）。ここでは1ページで打ち切る。
     return _FakeResp(200, {"data": [
         {"id": 1000, "corp_name": "卸A", "trade_name": "卸A 株式会社"},
         {"id": 2000, "corp_name": "卸B", "trade_name": "卸B 株式会社"},
@@ -154,6 +156,8 @@ def test_live_200_normalizes(monkeypatch):
         assert data["jan_code"] == "4900000000024"
         # jan_code 単独は 400 になるため supplier_ids が同時指定されること。
         assert data.get("supplier_ids")
+        # 🔴 supplier_ids は **1件だけ**（実測: 3件以上で 400 too many supplier_ids.）
+        assert "," not in data["supplier_ids"], "supplier_ids は1リクエスト1件"
         return _FakeResp(200, {"data": [
             {"product_name": "卸水筒", "product_url": "https://www.netsea.jp/x",
              "shop_name": "卸店", "jan_code": "4900000000024",
@@ -164,34 +168,38 @@ def test_live_200_normalizes(monkeypatch):
     c = NetseaClient(token="tok123")
     assert c.is_live is True
     items = c.search(jan_code="4900000000024")
-    assert len(items) == 1
+    # 承認済み2社をそれぞれ1件ずつ問い合わせるので、同じ JAN が2社から返る。
+    # 実務でも同じ JAN を複数社が扱うのは普通で、最安を選ぶのは呼び出し側の仕事。
+    assert len(items) == 2
     assert items[0].price == 650
     assert items[0].source == "NETSEA"
     assert items[0].is_sample is False
     assert c.last_error is None
 
 
-def test_live_401_falls_back_with_honest_error(monkeypatch):
+def test_live_401_raises_instead_of_sampling(monkeypatch):
+    """401 で**サンプルに逃げない**。呼び出し側が嘘の卸価格を受け取らないため。"""
     def fake_post(url, data=None, headers=None, timeout=None):
         return _FakeResp(401, {"error": {"code": 1, "subcode": 401,
                                          "message": "Unauthenticated."}})
 
     _install_fake_requests(monkeypatch, fake_post)
     c = NetseaClient(token="bad")
-    items = c.search(jan_code="4900000000024")
-    assert all(it.is_sample for it in items)  # 401 → サンプルへ正直に
+    with pytest.raises(NetseaError):
+        c.search(jan_code="4900000000024")
     assert "401" in (c.last_error or "")
 
 
-def test_live_error_payload_falls_back(monkeypatch):
+def test_live_error_payload_raises(monkeypatch):
+    """200 でも error ペイロードなら失敗。**「エラーで取れなかった」と「0件」を混ぜない。**"""
     def fake_post(url, data=None, headers=None, timeout=None):
         return _FakeResp(200, {"error": {"code": 2, "subcode": 400,
                                          "message": "param error"}})
 
     _install_fake_requests(monkeypatch, fake_post)
     c = NetseaClient(token="tok")
-    items = c.search(jan_code="9999999999999")
-    assert all(it.is_sample for it in items)
+    with pytest.raises(NetseaError):
+        c.search(jan_code="9999999999999")
     assert "param error" in (c.last_error or "")
 
 
@@ -207,9 +215,9 @@ def test_live_empty_list_payload_returns_empty(monkeypatch):
     assert c.last_error is None
 
 
-def test_suppliers_failure_falls_back_to_sample(monkeypatch):
-    """GET /suppliers が落ちたら（権限/通信）サンプルへ正直にフォールバック。"""
-    def fake_get(url, headers=None, timeout=None):
+def test_suppliers_failure_raises(monkeypatch):
+    """GET /suppliers が落ちたら **NetseaError**。仕入れ値の経路にサンプルを混ぜない。"""
+    def fake_get(url, headers=None, timeout=None, params=None):
         return _FakeResp(401, {"error": {"code": 1, "message": "Unauthenticated."}})
 
     def fake_post(url, data=None, headers=None, timeout=None):
@@ -217,9 +225,32 @@ def test_suppliers_failure_falls_back_to_sample(monkeypatch):
 
     _install_fake_requests(monkeypatch, fake_post, fake_get=fake_get)
     c = NetseaClient(token="tok")
-    items = c.search(jan_code="4900000000024")
-    assert all(it.is_sample for it in items)
+    with pytest.raises(NetseaError):
+        c.search(jan_code="4900000000024")
     assert "401" in (c.last_error or "")
+
+
+def test_approved_supplier_ids_follows_paging(monkeypatch):
+    """/suppliers のページングを辿る（旧実装は先頭100社で打ち切り、121社を取りこぼした）。"""
+    pages = [
+        {"data": [{"id": i, "corp_name": f"卸{i}"} for i in range(1, 101)],
+         "next_supplier_id": 101},
+        {"data": [{"id": i, "corp_name": f"卸{i}"} for i in range(101, 222)]},
+    ]
+    seen = {"n": 0}
+
+    def fake_get(url, headers=None, timeout=None, params=None):
+        i = seen["n"]; seen["n"] += 1
+        if i == 1:
+            assert params.get("next_supplier_id") == 101
+        return _FakeResp(200, pages[min(i, 1)])
+
+    def fake_post(url, data=None, headers=None, timeout=None):
+        raise AssertionError("このテストでは /items を呼ばない")
+
+    _install_fake_requests(monkeypatch, fake_post, fake_get=fake_get)
+    c = NetseaClient(token="tok")
+    assert len(c._approved_supplier_ids()) == 221
 
 
 def test_live_keyword_without_jan_uses_sample(monkeypatch):

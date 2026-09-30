@@ -133,7 +133,12 @@ NETSEA_SUPPLIERS_ENDPOINT = NETSEA_BASE_URL + "/suppliers"
 NETSEA_TARIFFS_ENDPOINT = NETSEA_BASE_URL + "/tariffs"
 
 # /items は supplier_ids をカンマ区切りで最大10件まで受け付ける（仕様）。
-_MAX_SUPPLIER_IDS_PER_REQUEST = 10
+# NETSEA /items の supplier_ids の上限。**実測1件**（2026-09-30 / T-20260920-003）。
+# 1件 → 200 OK ／ 3件・5件・10件・20件 → いずれも `400 too many supplier_ids.`
+# ⚠️ ここが 10 だったため `search(jan_code=...)` は**全バッチ400で必ず失敗**していた。
+# しかも失敗時にサンプルへ黙って落ちていたので、**NETSEA に実在する JAN でも「0件」**が返っていた
+# （実在確認済みの 4953980278777 等で検算して発覚）。
+_MAX_SUPPLIER_IDS_PER_REQUEST = 1
 
 # GET /suppliers の1ページ取得件数。既定は100件で打ち切られる（OpenAPI 仕様に記載なし）。
 # 実機確認（2026-08-31）で `limit` と `next_supplier_id` が効くことを確認した。
@@ -186,6 +191,16 @@ def assert_procurement_use(purpose: str) -> None:
     )
 
 
+class NetseaError(RuntimeError):
+    """NETSEA API の呼び出しが失敗した。**サンプルで埋めずにここで止める。**
+
+    2026-09-30 まで、本番呼び出しが失敗すると黙ってサンプルデータへ落ちていた。
+    呼び出し側はそれを本物の卸価格として受け取りうる（＝下流に嘘を配る）ので、
+    **失敗は失敗として投げる**ことにした。デモ用のサンプルが欲しいときは
+    `force_sample=True` かトークン未設定で明示的に使う。
+    """
+
+
 class NetseaClient:
     """NETSEA Buyer API クライアント（Yahoo/楽天と同一の .search() インターフェース）。
 
@@ -234,6 +249,13 @@ class NetseaClient:
     ) -> list[YahooItem]:
         """JAN（またはカテゴリ／キーワードでの粗フィルタ）で卸の仕入れ候補を検索する。
 
+        🔴 **`jan_code` 指定の照会は実用になりません（2026-09-30 実測）。**
+        `/items` の `supplier_ids` は **1件しか受け付けない**ので、承認済み221社に対して
+        **1 JAN あたり221リクエスト**かかります。JAN 突合が必要なときは
+        **サプライヤー単位で全商品を1回引いて JAN 索引を作る**方式を使ってください。
+        実装例: `workspace/output/deliverables/T-20260920-003/26_候補提案パイプライン/discover.py`
+        の `build_netsea_index()`（1社ごとに保存・Keepa トークン0）。
+
         NETSEA /items は**フリーワード検索を持たない**ため:
           - jan_code 指定時 → 本番では jan_code パラメータで直接取得（mode(い) の本丸）。
           - query のみ（JAN無し）→ 本番でも当てにいけないので**サンプルを商品名で粗フィルタ**して返す
@@ -243,8 +265,13 @@ class NetseaClient:
         if not self.is_live:
             self.last_error = self._why_not_live()
             return self._search_sample(query, jan_code, results, price_from, price_to)
-        # 本番でもフリーワード（JAN/カテゴリ無し）は仕様上当てられない → サンプルで正直に粗集め。
+        # 本番でもフリーワード（JAN/カテゴリ無し）は仕様上当てられない → サンプルで粗集め。
+        # **サンプルであることを last_error にも書く**（返り値の is_sample だけでは
+        # 呼び出し側が見落とす。黙って本物と混ぜない）。
         if not jan_code:
+            self.last_error = (
+                "NETSEA /items にフリーワード検索は無いため、キーワード検索は"
+                "サンプルデータでの粗集めです（is_sample=True）。実データではありません。")
             return self._search_sample(query, jan_code, results, price_from, price_to)
         return self._search_live(
             jan_code=jan_code, results=results,
@@ -281,16 +308,55 @@ class NetseaClient:
         if self._supplier_ids_cache is not None:
             return self._supplier_ids_cache
 
+        # ⚠️ 以前はここで /suppliers を1回だけ叩いており、**先頭100社しか取れていなかった**。
+        # `/suppliers` は1レスポンス100件で打ち切り、続きは `next_supplier_id` で辿る
+        # （2026-08-31 に list_suppliers() 側だけ修正され、こちらが取り残されていた）。
+        # 実測: 当社の承認済みサプライヤーは **221社**。100社のままだと121社を静かに取りこぼす。
+        #
+        # `list_suppliers()` を呼ばずに自分で辿るのは、あちらが**失敗時にサンプルの
+        # サプライヤー一覧へ黙って落ちる**ため。ここは仕入れ値の取得経路なので、
+        # サンプルが混ざると下流に嘘が流れる。**失敗は NetseaError で止める。**
+        import time
+
         import requests  # 遅延 import
 
-        try:
-            resp = requests.get(
-                NETSEA_SUPPLIERS_ENDPOINT, headers=self._headers(), timeout=15
-            )
-        except requests.RequestException as e:
-            self.last_error = f"NETSEA /suppliers 通信失敗: {e}"
-            self._supplier_ids_cache = []
-            return []
+        collected: list = []
+        next_id = None
+        for _ in range(50):                          # 保険の上限（221社なら3周で終わる）
+            params = {"limit": _SUPPLIERS_PAGE_LIMIT}
+            if next_id is not None:
+                params["next_supplier_id"] = next_id
+            try:
+                resp = requests.get(NETSEA_SUPPLIERS_ENDPOINT, headers=self._headers(),
+                                    params=params, timeout=30)
+            except requests.RequestException as e:
+                self.last_error = f"NETSEA /suppliers 通信失敗: {e}"
+                if collected:
+                    break                            # 部分結果は正直に使う
+                raise NetseaError(self.last_error) from e
+            if resp.status_code != 200:
+                self.last_error = self._explain_http_error(resp)
+                if collected:
+                    break
+                raise NetseaError(self.last_error)
+            try:
+                payload = resp.json()
+            except ValueError as e:
+                self.last_error = "NETSEA /suppliers が非JSONを返却"
+                if collected:
+                    break
+                raise NetseaError(self.last_error) from e
+            page = payload.get("data", []) if isinstance(payload, dict) else (payload or [])
+            collected.extend(page)
+            next_id = payload.get("next_supplier_id") if isinstance(payload, dict) else None
+            if not next_id:
+                break
+            time.sleep(0.3)
+
+        ids = [int(x["id"]) for x in collected if str(x.get("id", "")).isdigit()]
+        self._supplier_ids_cache = ids
+        return ids
+
         if resp.status_code != 200:
             self.last_error = self._explain_http_error(resp)
             self._supplier_ids_cache = []
@@ -323,9 +389,10 @@ class NetseaClient:
 
         supplier_ids = self._approved_supplier_ids()
         if not supplier_ids:
-            # 承認済みサプライヤーが取れない（401/権限/通信失敗）→ サンプルへ正直に。
-            # last_error は _approved_supplier_ids が既に設定済み。
-            return self._search_sample("", jan_code, results, price_from, price_to)
+            # 承認済みサプライヤーが取れない（401/権限/通信失敗）。
+            # **サンプルで埋めない。**埋めると呼び出し側が嘘の卸価格を受け取る。
+            raise NetseaError(
+                f"承認済みサプライヤーを取得できませんでした: {self.last_error}")
 
         headers = self._headers()
         collected: list = []
@@ -353,12 +420,10 @@ class NetseaClient:
                     )
                 except requests.RequestException as e:
                     self.last_error = f"NETSEA API通信失敗: {e}"
-                    # 通信失敗時、ここまでに集めた分があればそれを返す。なければサンプル。
+                    # ここまでに集めた分があればそれを返す。無ければ**失敗として投げる**。
                     if collected:
                         break
-                    return self._search_sample(
-                        "", jan_code, results, price_from, price_to
-                    )
+                    raise NetseaError(self.last_error) from e
                 if resp.status_code == 429 and attempt == 0:
                     time.sleep(1.0)  # レート制限 → 1秒待って一度だけ再試行
                     continue
@@ -393,12 +458,13 @@ class NetseaClient:
                 break
 
         if not collected:
-            # 1件も取れなかった（全バッチ空 or 全バッチエラー）。
-            # 全バッチがエラーだった場合は last_error が立っているのでサンプルへ。
-            # 全バッチ正常で単にヒット0なら、それは正直に空（でっち上げない）。
+            # 1件も取れなかった。**「エラーで取れなかった」と「本当に0件」を混ぜない。**
+            #   - 全バッチ正常で単にヒット0 → 正直に空（でっち上げない）
+            #   - エラーが立っている      → NetseaError（サンプルで埋めない）
             if last_resp is not None and last_resp.status_code == 200 and not self.last_error:
                 return []
-            return self._search_sample("", jan_code, results, price_from, price_to)
+            raise NetseaError(
+                f"NETSEA /items が失敗しました（ヒット0と区別できません）: {self.last_error}")
 
         self.last_error = None
         items = self._normalize(collected, is_sample=False)
