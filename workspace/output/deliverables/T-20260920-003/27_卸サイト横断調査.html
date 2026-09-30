@@ -1,0 +1,181 @@
+<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>卸・仕入れプラットフォーム横断調査（T-20260920-003）</title><style>body{font-family:-apple-system,'Hiragino Sans','Noto Sans JP',sans-serif;max-width:1400px;margin:24px auto;padding:0 20px;line-height:1.6;color:#222;font-size:14px}
+h1{font-size:1.5em;border-bottom:2px solid #333;padding-bottom:6px}h2{font-size:1.25em;margin-top:2em;border-left:5px solid #2b5;padding-left:8px}h3{font-size:1.05em;margin-top:1.5em}
+table{border-collapse:collapse;margin:10px 0 18px;width:100%;font-size:12.5px}th,td{border:1px solid #bbb;padding:5px 7px;vertical-align:top;text-align:left}th{background:#f0f4f0}tr:nth-child(even) td{background:#fafafa}
+code{background:#f3f3f3;padding:1px 4px;border-radius:3px;font-size:0.92em}hr{border:0;border-top:1px solid #ccc;margin:24px 0}li{margin:2px 0}</style></head><body>
+<h1>卸・仕入れプラットフォーム横断調査</h1>
+<p>チケット: T-20260920-003 ／ 担当: リサーチャー サトル ／ 作成日: 2026-09-30</p>
+<p>調査方式: 公式サイト・公式FAQ・会員規約を<strong>非ログイン</strong>で HTTP 実取得。<strong>登録・申請・照会・課金は一切していません</strong>（CLAUDE.md §4.1）。</p>
+<hr>
+<h2>0. このリサーチのイシュー</h2>
+<p>&gt; <strong>「仕入れ先が NETSEA だけになっていたのは、道具の都合か、事業上の合理性か。SD の方が得策という社長の感覚は正しいか。」</strong></p>
+<h3>調査スコープと打ち切り条件（先に宣言）</h3>
+<table><thead><tr><th>項目</th><th>内容</th></tr></thead><tbody>
+<tr><td>対象</td><td>国内卸プラットフォーム 13サービス＋中国系2サイト</td></tr>
+<tr><td>測る軸</td><td>①JAN／型番で引けるか ②卸価格が見えるまでの手続き ③掛け率 ④Amazon 転売の可否 ⑤書類の名義 ＋⑥当社が今使えるか</td></tr>
+<tr><td>打ち切り線</td><td><strong>会員登録の内側にある情報は「未確認」と書いて止める。</strong>推測で埋めない</td></tr>
+<tr><td>打ち切り線</td><td>承認率・審査通過率は各社が公開していないので<strong>測らない</strong>。代わりに「相手が事前に掲げている条件」を率で出す</td></tr>
+</tbody></table>
+<hr>
+<h2>1. 結論（3行）</h2>
+<p>1. <strong>「NETSEA だけ」は事業判断ではなく道具の都合でした。</strong>NETSEA Buyer API は <code>jan_code</code> 単独では 400 を返し、<code>supplier_ids</code> の同時指定が必須です。つまり<strong>機械で探せる範囲が「当社が承認を取り終えた220社」に閉じていた</strong>（NETSEA の出店企業は実測 622社）。母集団の 1/3 だけを見て「NETSEA には無い」と言っていたことになります。</p>
+<p>2. <strong>社長の「SD の方が得策」は、当たっています。根拠は2つ。</strong>①<strong>母数</strong>：SD の一括申請の結果、<strong>卸価格が見える取引先が 2,176社</strong>（2026-09-30 カズヨが全件吸い出し）。NETSEA の承認済み 221社の<strong>約10倍</strong>です。②<strong>突合の精度</strong>：JAN 記載率 SD 71% / NETSEA 48%、会社情報が非ログインで読める、上代が全件表示。</p>
+<p>   <strong>ただし1軸だけ逆です。Amazon への寛容さ</strong>は、<strong>SD は態度が判明した48社中17社（35%）が Amazon を名指しで不可</strong>、NETSEA は実測25商品中1件（4%）。<strong>2,176社のうち約3分の1は Amazon 不可と見込まれます（推測・確度中／根拠は N=55 の人気順サンプル）。申請が通っていても売ってよいとは限りません。</strong></p>
+<p>3. <strong>仮説「SD＝メーカー直販／NETSEA＝転売業者混在」は、NETSEA 側だけ裏が取れました。</strong>NETSEA 自身の「業態」で当社の承認済み210社を数えると<strong>メーカーは25社＝11.9%</strong>、<strong>卸および小売業（＝小売も兼ねる＝同じ棚の競合になりうる）が98社＝46.7%</strong>。一方 SD も公式には「メーカー・卸事業者向け」であって<strong>メーカー専業ではありません</strong>（下の §4 で定量）。</p>
+<hr>
+<h2>2. 比較表（主要6サービス）</h2>
+<p>空白は作らず、<strong>「未確認」＝調べたが会員内側で見えない／「該当なし」＝仕組み上存在しない</strong>を書き分けています。</p>
+<table><thead><tr><th>軸</th><th><strong>スーパーデリバリー</strong></th><th><strong>NETSEA</strong></th><th><strong>問屋 国分ネット卸</strong></th><th><strong>ザッカネット</strong></th><th><strong>orosy</strong></th><th><strong>TopSeller</strong></th></tr></thead><tbody>
+<tr><td>運営</td><td>株式会社ラクーンコマース（東証プライム 3031 の100%子会社）</td><td>株式会社SynaBiz（オークファングループ）</td><td>国分首都圏株式会社</td><td>株式会社クロスクリエイション（zakka.net）</td><td>株式会社orosy</td><td>株式会社もしも</td></tr>
+<tr><td><strong>① JAN で引けるか</strong></td><td><strong>○ 非ログインで可。</strong><code>/p/do/psl/?word=&lt;JAN13&gt;</code> が当該商品だけを返す（JAN 3件で検証・3/3 ヒット・無関係商品の混入なし）。商品ページの <strong>JAN 記載率 71%（27/38）</strong></td><td><strong>○ 非ログインで可。</strong><code>/search?keyword=&lt;JAN13&gt;</code>（JAN 2件で検証・ヒット）。商品ページの <strong>JAN 記載率 48%（12/25）</strong>。ただし <strong>Buyer API は <code>jan_code</code> 単独で 400。<code>supplier_ids</code> 必須＝機械検索は承認済み220社の中だけ</strong></td><td><strong>未確認</strong>（非ログインでは商品一覧・検索結果に商品が出ない）</td><td><strong>× JAN 欄が無い。</strong>商品ページは品番のみ、希望小売価格は「オープン」表示。<strong>Amazon 起点の突合ができない</strong></td><td>未確認（バイヤーAPI は JAN 完全一致検索を持つ／2026-08-31 実測）。ただし④で当社は入れない</td><td>未確認（商品一覧は要ログイン）</td></tr>
+<tr><td><strong>② 卸価格が見えるまで</strong></td><td>会員登録＋審査（最短当日〜2営業日）→ <strong>出展企業ごとに「卸価格を見る(申請)」の承認</strong>。一括申請あり（キャンセル不可・各社1〜3営業日）</td><td>会員登録（無料・審査軽い）→ <strong>サプライヤーごとに取引申請・承認</strong>。承認前でも価格が見える商品もある</td><td>会員登録のみ。<strong>FAQ に「審査なしでご利用いただけます」と明記</strong></td><td>会員登録（無料）→ 商品ページの「この商品を扱うサプライヤー」→ <strong>サプライヤーが承認</strong>して卸価格表示</td><td>アカウント作成→<strong>3営業日で審査</strong>。審査結果の理由は非開示</td><td>会員登録→プラン契約</td></tr>
+<tr><td><strong>③ 掛け率の水準</strong></td><td>公式に<strong>「平均の目安価格は上代の4〜6掛け」</strong>と明記</td><td><strong>公表なし</strong>（サプライヤー個別）</td><td>公表なし</td><td>公表なし</td><td>公表なし</td><td>公表なし（当社が売価を決める無在庫モデル）</td></tr>
+<tr><td><strong>④ Amazon 転売の可否</strong></td><td><strong>プラットフォームは禁止していない</strong>（FAQ 154本＋会員規約に「Amazon」0件）。<strong>禁止するのは出展企業</strong>。実測 N=55社：ネット販売 ○31／△11／×6／表記なし7。<strong>態度が判明した48社中17社＝35% が Amazon 名指し不可</strong></td><td><strong>プラットフォームは禁止していない</strong>（バイヤー会員規約 645行に「Amazon」0件）。禁止は商品ページの注意事項に個別記載。実測 N=25商品：ネット販売○ 25/25、<strong>Amazon 名指し NG 1件＝4%</strong></td><td><strong>記載なし</strong>（公式7ページ全文で「Amazon／転売／再販／モール」0件）＝可否不明。酒類は酒類小売業免許が必須</td><td><strong>記載なし</strong>（FAQ・ガイド全文）＝可否不明</td><td><strong>× 審査基準で不可。</strong>「ご利用頂けません：ネットショップのうち、オープン前、ドロップシッピング、フリマ、<strong>モール</strong>、オークション、アフィリエイト」</td><td>運営ガイドラインで「その他のショッピングモールやショッピングカートを利用して自由に販売いただけます」＝<strong>可</strong>。名指し禁止はメルカリ・ラクマ・PayPayフリマ・ヤフオク！の4社のみ</td></tr>
+<tr><td><strong>⑤ 納品書・請求書の名義</strong></td><td><strong>納品書＝出展企業名義</strong>／適格請求書・領収書＝<strong>ラクーンコマース名義</strong>（登録番号 T9010001196084・「SD が販売元」）／請求書＝Paid 払いのときだけラクーンフィナンシャル。<strong>カード払い・代引きでは請求書が出ない</strong></td><td><strong>発行者はサプライヤー</strong>（運営は売買契約の当事者にならない・規約16条1項）。<strong>掛け払いの請求書は GMOペイメントサービス発行＝卸の請求書として使えない</strong>。直送注文の納品書は宛先が消費者・価格なし</td><td><strong>マイページから「納品明細書兼領収書」を自分で印刷（国分首都圏名義）</strong>。掛け払いの請求書は N クレジットファイナンス名義</td><td>未確認（直接取引型が多く、書類はサプライヤー発行と推測）</td><td><strong>納品書＝サプライヤーのインボイス（orosy が代理交付・サプライヤーの登録番号を掲載）</strong>。領収書と掛け払い請求書は orosy 発行でインボイス不可</td><td><strong>請求書は「もしも」発行</strong>（規約20条：毎月末締め・翌月15日までに発行）</td></tr>
+<tr><td><strong>⑥ 当社が今使えるか</strong></td><td><strong>登録済み＋一括申請済み。卸価格が見える取引先 2,176社</strong>（2026-09-30 実測）。<strong>2026-11-30 までのサイトオープン条件つき</strong></td><td><strong>登録済み</strong>・承認済みサプライヤー 220社・Buyer API 実装済み</td><td><strong>要登録</strong>（無料・審査なし・個人事業主可）</td><td><strong>要登録</strong>（無料）</td><td><strong>要登録だが審査で落ちる見込み</strong>（当社の販路は Amazon＝モール）</td><td><strong>要登録＋月額</strong>。ただし<strong>顧客直送専用の無在庫</strong>で、FBA 前提の当社には仕入れ経路にならない</td></tr>
+<tr><td>費用（当社＝買い手側）</td><td>入会金0・フリー0円/月（スタンダード 2,200円/月 は任意）</td><td>0円（NETSEAプライムは任意の有料）</td><td>0円（加盟料・月額基本料なし）</td><td>0円</td><td>0円（手数料10%はサプライヤー側負担）</td><td><strong>0円〜27,800円/月（税抜）</strong>。おためし0円は5商品まで</td></tr>
+<tr><td>規模</td><td>2,213,533商品／3,446社（2026-09-20 実測）</td><td>商品URL 3,536,926／ユニーク出店企業ID 622（2026-08-31 sitemap 実測）</td><td>16,000アイテム以上（公称）</td><td>国内1,495社（2026-08-31 実測）</td><td>199,394件（2026-07）</td><td>最大 約277,363商品（プレミアム＋特別配送プラン）</td></tr>
+</tbody></table>
+<hr>
+<h2>3. 該当サイトを特定できなかったもの</h2>
+<table><thead><tr><th>名称</th><th>結果</th></tr></thead><tbody>
+<tr><td><strong>Btob-eマーケット</strong></td><td><strong>特定できず。</strong><code>btobemarket.jp</code> <code>b-mart.jp</code> ほか到達不能。検索でも該当サービスなし。<strong>名称の誤りと推測（確度：中）</strong></td></tr>
+<tr><td><strong>ハッピーストアー</strong></td><td><strong>特定できず。</strong><code>happystore.jp</code> <code>happy-store.jp</code> 到達不能</td></tr>
+<tr><td><strong>ミツモア卸</strong></td><td><strong>特定できず。</strong>ミツモア（mitsumor）は事業者マッチングで、卸プラットフォームは確認できない</td></tr>
+<tr><td><strong>卸の達人</strong></td><td>サイトは実在（<code>oroshi-tatsujin.com</code>）。ただし<strong>会員規約に「本サイトに取引登録ができるのは店舗又はインターネット販売サイトを所有する法人のみ」→ 個人事業主の当社は不可</strong>（2026-09-30 再確認）。取扱はサプリ・健康食品中心</td></tr>
+</tbody></table>
+<p>&gt; <strong>ここは「無い」と書けることが成果です。</strong>この3件に時間を使うのは、存在しないものを探す作業になります。</p>
+<hr>
+<h2>4. SD と NETSEA の構造の違い — 社長の感覚を検証する</h2>
+<h3>4-1. 仮説の検証結果</h3>
+<table><thead><tr><th>仮説（秘書）</th><th>判定</th><th>根拠</th></tr></thead><tbody>
+<tr><td>NETSEA は転売業者の混在が多い</td><td><strong>事実として確認</strong></td><td>NETSEA 自身が付与する「業態」で当社の承認済み210社を集計：<strong>メーカー 25社＝11.9%／卸専業 73社＝34.8%／卸および小売業 98社＝46.7%／その他・空欄 14社</strong>。<strong>約半数が小売を兼ねる＝同じ棚で競合しうる</strong>（一次情報＝NETSEA バイヤー管理画面「取引申請状況」CSV。当社アカウントの実データ）</td></tr>
+<tr><td>SD は出展企業＝メーカーの直販型</td><td><strong>言い過ぎ。半分外れ</strong></td><td>SD の出展募集ページは<strong>「メーカー・卸事業者向け」</strong>と明記。SD 出展企業 N=40 の公開「事業内容」に製造／企画／デザイン／生産／OEM／開発のいずれかを含むのは <strong>25社＝62.5%</strong>。NETSEA の「事業内容／商品PR」で同じ語を含むのは N=40 で <strong>20社＝50%</strong>。<strong>差は12.5ポイントしかなく、しかも尺度が違う</strong>（SD は会社情報の事実欄、NETSEA は自由記述のPR欄）。<strong>この数字で「SD はメーカー直販」と断定してはいけません</strong></td></tr>
+<tr><td>SD の方が得策</td><td><strong>軸によって逆転する</strong></td><td>下表</td></tr>
+</tbody></table>
+<h3>4-2. 軸ごとにどちらが強いか</h3>
+<table><thead><tr><th>軸</th><th>SD</th><th>NETSEA</th><th>当社にとっての意味</th></tr></thead><tbody>
+<tr><td><strong>JAN 記載率</strong>（Amazon 起点の突合に直結）</td><td><strong>71%</strong>（27/38）</td><td>48%（12/25）</td><td><strong>SD 優位。</strong>§3.3-9「売れている棚を卸で買えるか」を回すには JAN が無い行は捨てるしかない</td></tr>
+<tr><td><strong>取引相手の身元</strong></td><td><strong>会社名・所在地・電話・設立・資本金・年商・従業員数・自社サイトが非ログインで公開</strong></td><td><strong>会社名・所在地・電話・資本金・年商・代表者・登録番号・主な販売先がすべて「会員のみ公開」</strong></td><td><strong>SD 優位。</strong>申請する前に相手を見極められる</td></tr>
+<tr><td><strong>取引条件の事前開示</strong></td><td><strong>非ログインで○△×表が読める</strong>（ネット販売／消費者直送／仕入れ前の販売／画像転載／代引）</td><td>商品ページの販売条件表と注意事項。企業ページの取引条件は会員限定のことがある</td><td>SD 優位</td></tr>
+<tr><td><strong>上代（参考小売価格）</strong></td><td>全件表示（38/38）</td><td>商品により表示</td><td>SD 優位（利益率の当たりを先に付けられる）</td></tr>
+<tr><td><strong>Amazon への寛容さ</strong></td><td>35% が名指しで不可（48社中17社）</td><td>4%（25商品中1件）</td><td><strong>NETSEA 優位。社長の感覚とは逆</strong></td></tr>
+<tr><td><strong>承認済みの母数</strong></td><td><strong>2,176社</strong>（一括申請の結果・2026-09-30 実測）</td><td>220社</td><td><strong>SD 優位。約10倍。</strong>「NETSEA だけ」だった判断は、母数の観点でも合理性がありませんでした</td></tr>
+<tr><td><strong>機械で読めるか</strong></td><td>API なし。サイト内検索は可（ただし数十件の連続取得で Cloudflare に落ちる）</td><td><strong>Buyer API あり。ただし <code>supplier_ids</code> 必須＝承認済み220社の中だけ</strong></td><td>引き分け。<strong>どちらも「全数を機械で舐める」ことはできない</strong></td></tr>
+<tr><td><strong>買い手の費用</strong></td><td>0円（任意で2,200円/月）</td><td>0円</td><td>引き分け</td></tr>
+<tr><td><strong>書類の名義</strong></td><td>納品書＝出展企業名義（ゲート申請に使いやすい）／適格請求書はラクーンコマース名義</td><td>サプライヤー名義。ただし<strong>掛け払いを選ぶと GMO 名義になり使えない</strong></td><td>SD やや優位。ただし<strong>どちらも決済方法の選び方で書類が変わる</strong></td></tr>
+</tbody></table>
+<h3>4-3. なぜこの差が生まれるのか（出展側の構造）</h3>
+<table><thead><tr><th>項目</th><th>SD（出展側）</th><th>NETSEA（出展側）</th></tr></thead><tbody>
+<tr><td>誰が出せるか</td><td>「メーカー・卸事業者向け」</td><td><strong>個人事業主でも出展可</strong>（コンタクトレンズ・古物・酒・指定ブランドのみ出品不可）</td></tr>
+<tr><td>手数料</td><td>初期費用0・固定費0・<strong>システム利用料＝取引金額の10〜15%</strong>（SD export 利用時 +3%）</td><td>成約手数料は規約上「当社の定める金額」＝<strong>非公開</strong></td></tr>
+<tr><td>入るまで</td><td>出展審査 約7日 ＋ <strong>契約締結</strong> → 販売開始まで<strong>約1ヶ月</strong></td><td>審査 約10営業日（規約同意型）</td></tr>
+<tr><td>売り手に提供する機能</td><td><strong>「取引先は1社ずつ詳細情報を確認し、取引可否を判断できます。ブランドイメージを守り、取引先のバッティングを防ぐ」</strong></td><td>「取引承認したバイヤーのみに卸価格を公開することも可能」</td></tr>
+<tr><td>出展事例として掲げる社</td><td>アイリスオーヤマ（法人営業部）、業務用食器メーカー等</td><td><strong>「楽天市場やAmazonなどで約10店舗運営」しているEC事業者が卸出展した事例を公式に掲載</strong></td></tr>
+</tbody></table>
+<p><strong>事実として言えること</strong>：SD は<strong>10〜15%の従量手数料＋契約締結</strong>という入口なので、薄利で回す転売業者は構造的に入りづらい。NETSEA は<strong>個人事業主でも規約同意で出展でき、EC運営者が卸に回る導線を公式に宣伝している</strong>。</p>
+<p><strong>推測（確度：中）</strong>：この入口の差が、業態構成と「Amazon への態度」の差を生んでいる。SD の出展企業は既存の卸先・ブランド価値を守る動機が強いので Amazon を嫌い、NETSEA の出展企業は販路を問わず数を出したいので Amazon を嫌わない。<strong>つまり「SD の方が良い企業が多い」ことと「SD の方が当社にとって使いやすい」は、同じ理由で両立しません。</strong></p>
+<hr>
+<h2>5. 過去に一次情報で判定済みの先（2026-09-04 時点・未再検証）</h2>
+<p>再検証していないので<strong>日付つきで引用</strong>します。判断に使う前に再取得してください。</p>
+<table><thead><tr><th>卸</th><th>当時の判定</th><th>決め手</th></tr></thead><tbody>
+<tr><td>グッズステーション（NEXT ONE）</td><td>○</td><td>規約に審査条項なし・全国一律送料無料・FBA直送対応。ただし中国輸入品主体</td></tr>
+<tr><td>卸問屋.com（イトウ）</td><td>○</td><td>登録無料・法人限定条項なし。<strong>「商品ご購入後の掲載をお願いいたします」＝購入前出品は禁止</strong></td></tr>
+<tr><td>卸売ドットコム（カネイシ）</td><td>△</td><td>「出展URL（代表：1件）」の登録必須。規約の法人条項が不整合</td></tr>
+<tr><td>マルモトネット（丸元商事）</td><td>△</td><td>規約5(3)＝発見用途の禁止</td></tr>
+<tr><td>SMASELL（ウィファブリック）</td><td>△</td><td>開業準備中を明示的に許容。審査基準は非開示</td></tr>
+<tr><td>TEN TO TEN MARKET</td><td>×</td><td>「店舗を持たない運営方法…お断り」「サイトオープン前の入会はお断り」</td></tr>
+<tr><td>goooods</td><td>×</td><td><strong>バイヤー利用規約 第6条9「ご登録NG×なECサイト ・Amazon」</strong></td></tr>
+<tr><td>ビューティガレージ</td><td>×</td><td>美容サロン従事者限定</td></tr>
+<tr><td>Mマート</td><td>到達不能</td><td>入会案内・規約に到達できず</td></tr>
+</tbody></table>
+<hr>
+<h2>6. ラクーン系の他サービス（SD 以外に仕入れに使えるものはない）</h2>
+<table><thead><tr><th>サービス</th><th>中身</th><th>当社の仕入れに使えるか</th></tr></thead><tbody>
+<tr><td>SD export</td><td>SD の越境版（海外バイヤーへ売る側の機能）</td><td><strong>該当なし</strong>（売る側の機能）</td></tr>
+<tr><td>COREC</td><td>クラウド受発注ツール</td><td><strong>該当なし</strong>（既存取引先との受発注。仕入れ先の発見には使えない）</td></tr>
+<tr><td>Paid</td><td>BtoB 掛け払い（ラクーンフィナンシャル）</td><td>SD 入会時に登録済み。<strong>審査あり</strong>。開業前は限度額70万円に増額中（公称）</td></tr>
+<tr><td>URIHO</td><td>売掛保証</td><td>該当なし</td></tr>
+<tr><td>SD factory</td><td>縫製工場と依頼主のマッチング</td><td>③OEM の経路としてのみ可能性あり（未調査）</td></tr>
+</tbody></table>
+<hr>
+<h2>7. 中国系（1688 / 義烏購）</h2>
+<p><strong>事実</strong>：両サイトとも到達可（HTTP 200・2026-09-30）。</p>
+<p><strong>当社の目的に対する構造的な不一致</strong>：</p>
+<table><thead><tr><th>論点</th><th>内容</th></tr></thead><tbody>
+<tr><td>JAN</td><td><strong>中国国内向け商品には JAN が付かないものが主体。</strong>Amazon の既存 ASIN（JAN 起点）に当てられない → §3.3-9 の「売れている棚を卸で買えるか」に<strong>使えない</strong></td></tr>
+<tr><td>使えるとしたら</td><td>③簡易OEM／新規 ASIN 作成の経路。①既存棚への相乗りではない</td></tr>
+<tr><td>輸入者責任</td><td>電気用品（PSE）・無線（技適）・食品（食品衛生法）・化粧品/サプリ（薬機法）で<strong>当社が輸入者＝責任者</strong>になる</td></tr>
+<tr><td>関税・消費税</td><td>課税対象。<strong>原価は「卸値＋国際送料＋関税＋消費税＋国内送料」で見ないと必ず外れる</strong></td></tr>
+<tr><td>真贋</td><td>ブランド品の真贋リスク。知財申立てで ASIN ごと失う</td></tr>
+<tr><td>Amazon 出品許可申請</td><td><strong>中国語の請求書が受理されるかは未確認</strong>（Amazon の公開要件に言語の明記を見つけられませんでした）</td></tr>
+</tbody></table>
+<p><strong>この領域は事実収集が浅いままです。</strong>本格的にやるなら別チケットで、関税率・実効原価・代行業者の手数料を実額で取る必要があります。</p>
+<hr>
+<h2>8. 当社が次に登録／申請すべき先 — 3つ</h2>
+<p><strong>3件すべて費用0円です。新たに発生する金銭はありません。</strong></p>
+<p><strong>①は §4.1 に該当しません</strong>（非ログインの公開ページを読むだけ）。<strong>②は利用規約への同意、③は第三者への連絡</strong>なので §4.1 に該当し、<strong>サトルは実行しません。社長承認の上で秘書が操作してください。</strong></p>
+<p>&gt; 2026-09-30 追記：当初この表の1位は「SD の卸価格の一括申請」でしたが、<strong>カズヨから「既に一括申請済み・2,176社ぶん承認あり」との報告を受けたため差し替えました。</strong>§4.1 の承認案件は1件減っています。</p>
+<table><thead><tr><th>#</th><th>先</th><th>やること</th><th>費用</th><th>理由（なぜ今これか）</th><th>前提・注意</th></tr></thead><tbody>
+<tr><td><strong>1</strong></td><td><strong>スーパーデリバリー（登録済み・申請も完了）</strong></td><td><strong>登録・申請は不要。次は「2,176社のうち Amazon 可の社」を切り出すこと</strong></td><td><strong>0円</strong></td><td><strong>一括申請は完了しており、卸価格が見える取引先は2,176社。</strong>残っている穴は<strong>「そのうちどの社が Amazon を認めているか」が未判定</strong>なこと。人気順 N=55 のサンプルでは<strong>態度が判明した48社の35%が Amazon 名指し不可</strong>で、2,176社に当てると<strong>700社前後が不可の見込み（推測・確度中）</strong>。ここを先に落とさないと、仕入れ直前に取引中止・ASIN削除申請を食らう</td><td><code>/p/do/dpsl/dcc/&lt;企業コード&gt;/</code> が<strong>非ログインで取引条件の○△×を返す</strong>。2,176社ぶん取れば判定が確定する（1社1リクエスト）。<strong>ただし SD は 4秒間隔でも 429 を返すので、他のスキャンと並走させないこと</strong>（2026-09-30 実測）</td></tr>
+<tr><td><strong>2</strong></td><td><strong>問屋 国分ネット卸（netton.kokubu.jp）</strong></td><td><strong>会員登録</strong></td><td><strong>0円</strong>（加盟料・月額基本料なし）</td><td><strong>「審査なしでご利用いただけます」と公式明記・個人事業主可</strong>＝当社が確実に通る数少ない先。かつ<strong>「納品明細書兼領収書」をマイページから自分で印刷でき、名義は国分首都圏（＝300年の実在の卸）</strong>＝Amazon の出品許可申請に使える形が自力で揃う。食品・飲料・日用品・雑貨16,000点以上</td><td><strong>送料無料ラインが存在しない</strong>（少額仕入れで送料負けする）。<strong>酒類は酒類小売業免許が必須</strong>。<strong>非ログインでは商品が見えないので、JAN で引けるかは登録後にしか確認できない</strong>（ここが未確認の唯一の穴）</td></tr>
+<tr><td><strong>3</strong></td><td><strong>NETSEA（登録済み）</strong></td><td><strong>未承認サプライヤーへの取引申請を広げる</strong></td><td><strong>0円</strong></td><td>「NETSEA だけ」だった本当の問題は<strong>NETSEA の全部を見ていなかったこと</strong>。Buyer API が <code>supplier_ids</code> 必須のため、機械検索は<strong>承認済み220社＝出店企業622社の35%</strong>に閉じている。承認を増やすことは、新しいサイトを1つ増やすより効く</td><td>申請は第三者への連絡（§4.1）。<strong>業態「メーカー」を優先</strong>（承認済み210社中 25社＝11.9% しかいない）。「卸および小売業」は小売も兼ねる＝同じ棚の競合になりうる</td></tr>
+</tbody></table>
+<h3>登録しなくてよい先（理由つき）</h3>
+<table><thead><tr><th>先</th><th>却下理由</th></tr></thead><tbody>
+<tr><td>orosy</td><td><strong>審査基準で「モール」が明確に不可。</strong>当社の販路は Amazon のみ＝落ちる。申請の手間が無駄になる</td></tr>
+<tr><td>卸の達人</td><td><strong>会員規約で法人のみ。</strong>当社は個人事業主</td></tr>
+<tr><td>TopSeller</td><td><strong>顧客直送専用の無在庫</strong>（「梱包、顧客への配送は弊社で行います」）。FBA 前提の当社には仕入れ経路にならない。月額もかかる</td></tr>
+<tr><td>goooods</td><td>バイヤー規約に「ご登録NG×なECサイト ・Amazon」（2026-09-04 確認）</td></tr>
+<tr><td>ザッカネット</td><td><strong>登録は0円で害はないが、JAN 欄が無いので Amazon 起点には使えない。</strong>②メーカー直取引の入口としては有効なので、<strong>本丸を動かすときに登録する</strong>のが正しい順序</td></tr>
+</tbody></table>
+<hr>
+<h2>9. ここから先はタケシ（プランナー）の領分です</h2>
+<p>事実は出しました。<strong>戦略判断が必要な論点を3つ、そのまま渡します。</strong></p>
+<p>1. <strong>SD と NETSEA の役割分担をどう決めるか。</strong> 事実は「SD＝突合の精度が高いが承認の壁とAmazon NG 35%／NETSEA＝壁が低くAmazon NG 4% だが JAN が半分しかない」。<strong>どちらを主にするかは戦略判断</strong>です。</p>
+<p>2. <strong>SD の 11/30 サイトオープン条件と、一括申請の順序。</strong> 事実は「一括申請は事業紹介と店舗画像を更新しないと押せない／キャンセル不可」。<strong>押す前にどこまで店舗情報を磨くかはトレードオフ</strong>です。</p>
+<p>3. <strong>上代の4〜6掛けと利益率20%は両立するのか。</strong> SD 公式の目安は4〜6掛け。<strong>6掛けでは利益率20%が数学的に成立しない</strong>ことは既に社内で確定済み（<code>knowledge_bottleneck_is_suppliers_not_capital</code>）。<strong>4掛け側の商品だけを狙うのか、単価を上げるのか、条件交渉に行くのかは戦略判断</strong>です。</p>
+<hr>
+<h2>10. 出典（すべて 2026-09-30 取得。特記のあるものを除く）</h2>
+<table><thead><tr><th>#</th><th>ページタイトル</th><th>URL</th></tr></thead><tbody>
+<tr><td>1</td><td>事業者専用卸売サイト「スーパーデリバリー」（出展案内LP）</td><td>https://www.superdelivery.com/i/lp/dealer_lp/</td></tr>
+<tr><td>2</td><td>開業準備中の方のご入会について（掛け率「上代の4〜6掛け」）</td><td>https://www.superdelivery.com/p/contents/open-business/open-business.jsp</td></tr>
+<tr><td>3</td><td>スーパーデリバリーへの出展（FAQ）</td><td>https://faq.superdelivery.com/---637f401932cc2d001d51fcb6</td></tr>
+<tr><td>4</td><td>卸・仕入れサイト スーパーデリバリー（サイト内検索。JAN 検索の検証に使用）</td><td>https://www.superdelivery.com/p/do/psl/</td></tr>
+<tr><td>5</td><td>各出展企業の企業情報ページ（N=40・事業内容の集計に使用）</td><td>https://www.superdelivery.com/p/do/dpsl/di/&amp;lt;企業コード&amp;gt;/</td></tr>
+<tr><td>6</td><td>株式会社ラクーンコマース（会社情報・グループ事業一覧）</td><td>https://www.raccoon.ne.jp/commerce/</td></tr>
+<tr><td>7</td><td>サプライヤー資料請求（NETSEA 出展要件・個人事業主の出品制限・審査約10営業日）</td><td>https://www.netsea.jp/document/request_d</td></tr>
+<tr><td>8</td><td>NETSEA バイヤー会員規約（645行。「Amazon」0件を確認）</td><td>https://www.netsea.jp/agreement/statement</td></tr>
+<tr><td>9</td><td>NETSEA サプライヤー会員規約</td><td>https://supplier.netsea.jp/agreement/statement</td></tr>
+<tr><td>10</td><td>NETSEA 検索結果（JAN 検索の検証に使用）</td><td>https://www.netsea.jp/search?keyword=&amp;lt;JAN13&amp;gt;</td></tr>
+<tr><td>11</td><td>各サプライヤーの会社情報ページ（N=40・事業内容／商品PRの集計に使用）</td><td>https://www.netsea.jp/company/&amp;lt;supplier_id&amp;gt;</td></tr>
+<tr><td>12</td><td>【問屋 国分ネット卸】よくあるご質問（審査なし・個人事業主可・納品明細書兼領収書）</td><td>https://netton.kokubu.jp/shop/contents3/faq.aspx</td></tr>
+<tr><td>13</td><td>【問屋 国分ネット卸】ご利用規約</td><td>https://netton.kokubu.jp/shop/contents3/agreement.aspx</td></tr>
+<tr><td>14</td><td>【問屋 国分ネット卸】はじめての方へ（会員登録0円・加盟料月額0円）</td><td>https://netton.kokubu.jp/shop/contents3/about.aspx</td></tr>
+<tr><td>15</td><td>TopSeller 利用規約（請求書の発行者・利用料）</td><td>https://top-seller.jp/www/document/term</td></tr>
+<tr><td>16</td><td>TopSeller 運営ガイドライン（対応モール・フリマ4社の名指し禁止）</td><td>https://top-seller.jp/www/document/guideline</td></tr>
+<tr><td>17</td><td>TopSeller（料金プラン 0円〜27,800円/月・顧客直送）</td><td>https://top-seller.jp/www/index</td></tr>
+<tr><td>18</td><td>ザッカネット よくあるご質問（卸価格はサプライヤー承認後・ニーズ機能）</td><td>https://www.zakka.net/guide/faq.php</td></tr>
+<tr><td>19</td><td>卸の達人 会員規約（「法人のみ」）</td><td>https://www.oroshi-tatsujin.com/e-commex/cgi-bin/ex_top_disp_page.cgi?kind=3</td></tr>
+<tr><td>20</td><td>orosy ヘルプ「バイヤーの利用審査基準について」（モール不可）</td><td>https://help.orosy.com/hc/ja/articles/4403961908505</td></tr>
+<tr><td>21</td><td>orosy ヘルプ「誰が利用できますか？」</td><td>https://help.orosy.com/hc/ja/articles/900006343423</td></tr>
+<tr><td>22</td><td>orosy ヘルプ「orosyでのインボイス制度の対応」（納品書＝サプライヤーのインボイス）</td><td>https://help.orosy.com/hc/ja/articles/23727081425817</td></tr>
+<tr><td>23</td><td>1688.com</td><td>https://www.1688.com/</td></tr>
+<tr><td>24</td><td>義烏購（yiwugo）</td><td>https://www.yiwugo.com/</td></tr>
+</tbody></table>
+<p><strong>社内の一次データ（当社アカウント由来）</strong></p>
+<table><thead><tr><th>#</th><th>内容</th><th>所在</th></tr></thead><tbody>
+<tr><td>25</td><td>NETSEA 承認済みサプライヤー210社の業態内訳</td><td><code>workspace/output/deliverables/T-20260831-006/out/suppliers.csv</code>（業態は NETSEA バイヤー管理画面「取引申請状況」CSV 由来）</td></tr>
+<tr><td>26</td><td>NETSEA Buyer API の <code>jan_code</code> 単独 400／<code>supplier_ids</code> 必須</td><td><code>workspace/output/deliverables/T-20260521-005/code/adapters/netsea.py</code>（実 API 応答に基づく）</td></tr>
+<tr><td>27</td><td>SD 出展企業 N=55 の取引条件実測（Amazon 名指し NG 35%）・商品ページ JAN 記載率 71%</td><td><code>agents/researcher/memory/knowledge_superdelivery_operations_2026-09.md</code>（2026-09-20 実測）</td></tr>
+<tr><td>28</td><td>SD の書類発行元（納品書＝出展企業／適格請求書＝ラクーンコマース）</td><td><code>agents/researcher/memory/knowledge_superdelivery_membership_requirements.md</code>（2026-09-14 実測）</td></tr>
+<tr><td>29</td><td>NETSEA の書類（サプライヤー発行・掛け払いは GMO 名義）</td><td><code>agents/researcher/memory/knowledge_netsea_invoice_and_maker_terms.md</code>（2026-09-12 実測）</td></tr>
+<tr><td>30</td><td>今回の生データ（SD/NETSEA 各40社の抽出結果・規約全文・orosy FAQ 全件）</td><td><code>workspace/output/agent_output/T-20260920-003/27_src/</code></td></tr>
+</tbody></table>
+<hr>
+<h2>付記：この調査で意図的に書かなかったこと</h2>
+<ul>
+<li><strong>会員限定の取引条件の実額</strong>（卸値・送料無料ライン・品番・上代・ロット）。このリポジトリは PUBLIC で、SD は会員規約17条1項により一切の情報が対象です。実額は <code>workspace/output/agent_output/T-20260920-003/</code> にあります。</li>
+<li><strong>卸サイトの商品ページ URL</strong>。法務判定 E に該当するため成果物には書きません。</li>
+<li><strong>承認率・審査通過率</strong>。どの社も公開しておらず、推測で書くと数字が独り歩きします。</li>
+</ul>
+</body></html>
