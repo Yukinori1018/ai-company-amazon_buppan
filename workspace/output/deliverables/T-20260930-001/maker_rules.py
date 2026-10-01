@@ -92,6 +92,7 @@ chanel シャネル bvlgari ブルガリ hermes エルメス gucci グッチ pra
 lancome ランコム esteelauder エスティローダー clinique クリニーク clarins クラランス diptyque ディプティック tomford トムフォード guerlain ゲラン
 shuuemura シュウウエムラ skii sk-ii cledepeaubeaute クレドポーボーテ ysl yvessaintlaurent イヴサンローラン dior ディオール christiandior
 ウーノ オージュア aujua milbon ファイントゥデイ finetoday costco コストコ
+google グーグル corsair コルセア dolcegabbana ドルチェアンドガッバーナ wella ウエラ ウエラジャパン albion アルビオン francfranc フランフラン
 """.split()
 
 
@@ -164,35 +165,92 @@ def prior_verdict(brand: str, maker: str) -> tuple[str, str]:
     return "", ""
 
 
-def classify(p: dict) -> tuple[str, str]:
-    """1商品のメーカー判定。戻り値 (除外理由 or '', 根拠)。空なら残す。"""
+# ---- 救済（2026-10-01 追加）----
+# 「中国系OEM疑い」「海外ブランド疑い（JANが国内でない）」は代表 ASIN 1本の機械判定で、国内の英字ブランドを巻き込む
+# （BURTLE・CIO 型）。メーカー単位（同じ社に寄せた全 ASIN）で日本の実体シグナルを探し、1つでもあれば区分の除外を打ち消す。
+# **救済は区分の除外だけを打ち消す。大手判定は救済の後でも必ず当てる**（memory: amazon_first_maker_extraction の罠1）。
+RESCUABLE = ("中国系OEM疑い", "海外ブランド疑い（JANが国内でない）")
+_GBIZ_P = REPO / "workspace/output/agent_output/T-20260930-001/gbiz/exact_by_name.json"
+GBIZ_EXACT = json.loads(_GBIZ_P.read_text(encoding="utf-8")) if _GBIZ_P.exists() else {}
+
+
+# gBiz で偶然一致しやすい「社名でない」ブランド表記（Generic → 有限会社ＧＥＮＥＲＩＣ）
+NOT_NAME = {"generic", "ノーブランド", "noname", "nobrand", "unknown", "不明"}
+
+
+def _jp_ledger(name: str) -> str:
+    """過去台帳での日本実体。**「manufacturer が日本語」だけは使わない**（中国系セラーも日本語で書く：LEACCO公式店）。
+    使うのは JAN45/49・日本の法人格・法人番号・人が卸の証拠まで見た「連絡候補」だけ。"""
+    r = LEDGER.get(_n(name))
+    if not r or r["判定"].startswith(("除外（海外", "除外（日本実体", "除外（会社名")):
+        return ""
+    sig = r.get("日本実体シグナル") or ""
+    if r["判定"] == "連絡候補" or r.get("法人番号") or "JAN45/49" in sig or "日本法人格" in sig:
+        return f"T-20260831-004台帳（{r['判定']}・{sig}）"
+    return ""
+
+
+def _jp_gbiz(name: str) -> str:
+    if _n(name) in {_n(x) for x in NOT_NAME}:
+        return ""
+    s = SIZE.get(_n(name))
+    if s and s.get("法人番号"):
+        return f"gBiz完全一致1社（{s.get('gBiz商号') or ''}）"
+    g = GBIZ_EXACT.get(name)
+    if g and len(g) == 1:
+        return f"gBiz完全一致1社（{g[0]['name']}）"
+    return ""
+
+
+def rescue_signals(group: list[dict]) -> list[str]:
+    """メーカー単位の日本実体シグナル。group = 同じ社に寄せた product の list。"""
+    sig: list[str] = []
+    if any(c1.ean_cc(p.get("eanList")) == "JP" for p in group):
+        sig.append("JAN45/49の商品あり")
+    makers = {(p.get("manufacturer") or "").strip() for p in group} - {""}
+    if any(c1.JP_CORP.search(m) and not c1.DESC.search(m) for m in makers):
+        sig.append("manufacturerに日本の法人格")
+    names = makers | {(p.get("brand") or "").strip() for p in group} - {""}
+    for n in sorted(names):
+        for f in (_jp_ledger, _jp_gbiz):
+            w = f(n)
+            if w and w not in sig:
+                sig.append(w)
+    return sig
+
+
+def classify(p: dict, group: list[dict] | None = None) -> tuple[str, str, str]:
+    """1社の判定（代表 product ＋同じ社の全 product）。戻り値 (除外理由 or '', 根拠, 救済理由)。除外理由が空なら残す。"""
+    group = group or [p]
     brand, maker = p.get("brand") or "", p.get("manufacturer") or ""
     seg, why = c1.segment(p)
-    # manufacturer に商品説明が入っている行（「マタインク for キヤノン用インク…」）は、
-    # 説明中の他社名（キヤノン）で大手判定しないよう、社名としては使わない
-    if c1.DESC.search(maker):
+    if c1.DESC.search(maker):  # 「マタインク for キヤノン用…」の説明中の他社名で大手判定しない
         maker = ""
-    # 過去台帳で「連絡候補」と判定済みの社は、機械の区分より優先して残す（例：BURTLE は JAN 無し英字で OEM 疑いに落ちる）
-    rescued = any((LEDGER.get(_n(n)) or {}).get("判定") == "連絡候補" for n in (maker, brand))
-    if seg in ("海外ブランド", "中国系OEM", "中国系OEM疑い", "版元", "ブランド不明") and not rescued:
-        return seg, why
+    sig = rescue_signals(group)
+    rescue = "・".join(sig)
+    if seg in ("海外ブランド", "中国系OEM", "版元", "ブランド不明"):
+        return seg, why, ""
+    if seg == "中国系OEM疑い" and not sig:
+        return seg, why, ""
     kb = known_big(brand, maker)
     if kb:
-        return "大手（既知リスト）", kb
+        return "大手（既知リスト）", kb, ""
     pv, pwhy = prior_verdict(brand, maker)
     if pv:
-        return pv, pwhy
-    # 日本の JAN（45/49）を持たない＝輸入品の典型。manufacturer に日本の法人格が無ければ海外ブランドの疑いとして外す。
-    # 表示名がカタカナでも海外ブランドは多い（例：タイトリスト・イソップ）。国内でも JAN を持たない社はあるので、
-    # 除外行は公開版 CSV に理由つきで残す（人が戻せる）。
+        return pv, pwhy, ""
     cc = c1.ean_cc(p.get("eanList"))
-    if cc in ("OTHER", "US") and not c1.JP_CORP.search(maker) and not rescued:
-        return "海外ブランド疑い（JANが国内でない）", f"EAN={cc}"
-    if rescued:
-        return "", "T-20260831-004 台帳で連絡候補（機械区分より優先）"
+    if cc in ("OTHER", "US") and not c1.JP_CORP.search(maker) and not sig:
+        return "海外ブランド疑い（JANが国内でない）", f"EAN={cc}", ""
+    rescued_from = ""
+    if seg == "中国系OEM疑い":
+        rescued_from = "中国系OEM疑い"
+    elif cc in ("OTHER", "US") and not c1.JP_CORP.search(maker):
+        rescued_from = "海外ブランド疑い（JANが国内でない）"
+    if rescued_from:
+        return "", f"救済（元：{rescued_from}）", rescue
     if seg == "代理店":
-        return "", "代理店（輸入元。国内窓口として残す）"
-    return "", ""
+        return "", "代理店（輸入元。国内窓口として残す）", ""
+    return "", "", ""
 
 
 if __name__ == "__main__":

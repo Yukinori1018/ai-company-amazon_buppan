@@ -137,7 +137,7 @@ def build(fetch_bb: bool = False) -> None:
         a_items = [x for x in items if (x[1]["ms"] or 0) >= A_MS and (x[1]["price"] or 0) >= A_PRICE]
         pool = a_items or items
         rep_p, rep_f, name = max(pool, key=lambda x: ((x[1]["ms"] or 0), -(x[1]["rank"] or 10**9)))
-        excl, why = R.classify(rep_p)
+        excl, why, rescue = R.classify(rep_p, [x[0] for x in items])
         marks = sorted({R.MARK_ROOTS[f["root"]] for _, f, _ in items if f["root"] in R.MARK_ROOTS})
         rows.append({
             "_p": rep_p,
@@ -163,6 +163,7 @@ def build(fetch_bb: bool = False) -> None:
             "要確認": "",
             "除外理由": excl,
             "判定の根拠": why,
+            "救済の根拠": rescue,
         })
 
     # 代表 ASIN のカート保持者（残す社だけ）
@@ -179,6 +180,11 @@ def build(fetch_bb: bool = False) -> None:
         r["カート保持セラー(代表)"] = seller
         r["要確認"] = self_cart(seller, p.get("brand") or "", p.get("manufacturer") or "", r["代表の新品オファー数"])
 
+    # gBiz で引き直す対象（区分で落ちた／救済された社の名前）。35_gbiz_rescue.py が読む
+    sus = sorted({n for r in rows if r["除外理由"] in R.RESCUABLE or r["判定の根拠"].startswith("救済")
+                  for n in [r["メーカー名"], *r["ブランド"].split(" / ")] if n})
+    (WORK / "suspect_names.json").write_text(json.dumps(sus, ensure_ascii=False))
+
     rank = {"A": 0, "B": 1, "": 2}
     rows.sort(key=lambda r: (rank[r["優先度"]], -r["該当ASIN数"], -(r["過去1ヶ月の販売数(代表)"] or 0)))
     for r in rows:
@@ -189,10 +195,12 @@ def build(fetch_bb: bool = False) -> None:
         w = csv.DictWriter(fh, fieldnames=cols); w.writeheader(); w.writerows(rows)
     # 公開版：A クラス（Amazon の現在表示）と当社の判定だけ。Keepa の履歴・派生値（在庫切れ率・90日比）は出さない
     pub_cols = ["優先度", "メーカー名", "ブランド", "代表ASIN", "代表商品名", "Amazon URL", "該当ASIN数",
-                "過去1ヶ月の販売数(代表)", "カテゴリ", "印", "要確認", "除外理由"]
+                "過去1ヶ月の販売数(代表)", "カテゴリ", "印", "要確認", "除外理由", "救済の根拠"]
     with open(HERE / "03_メーカー候補_公開版.csv", "w", encoding="utf-8-sig", newline="") as fh:
         w = csv.DictWriter(fh, fieldnames=pub_cols, extrasaction="ignore"); w.writeheader(); w.writerows(rows)
 
+    write_additions(rows)
+    keep = [r for r in rows if r["優先度"]]
     summ = {
         "funnel": funnel,
         "メーカー数": len(rows),
@@ -201,9 +209,34 @@ def build(fetch_bb: bool = False) -> None:
         "要確認(残す社)": sum(1 for r in rows if r["優先度"] and r["要確認"].startswith("要確認")),
         "カート保持者未取得(残す社)": sum(1 for r in rows if r["優先度"] and r["要確認"] == "カート保持者 未取得"),
         "印(残す社)": dict(Counter(r["印"] for r in rows if r["優先度"] and r["印"])),
+        "印あり(残す社)": sum(1 for r in keep if r["印"]),
+        "印なし(残す社)": sum(1 for r in keep if not r["印"]),
+        "印なし・要確認なし(残す社)": sum(1 for r in keep if not r["印"] and not r["要確認"]),
+        "救済で残した社": dict(Counter(r["判定の根拠"] for r in keep if r["判定の根拠"].startswith("救済"))),
+        "該当ASIN数の合計(残す社)": sum(r["該当ASIN数"] for r in keep),
+        "残す社を作ったASIN数(全社)": sum(r["該当ASIN数"] for r in rows),
     }
     (WORK / "funnel_post.json").write_text(json.dumps(summ, ensure_ascii=False, indent=1))
     print(json.dumps(summ, ensure_ascii=False, indent=1))
+
+
+def write_additions(rows: list[dict]) -> None:
+    """連絡先台帳の50社（30_最終_50社.csv）に無い、残した社の一覧 → agent_output/11_追加候補.csv。
+    50社側は手で統合した行があるので、社名（正規化）と ASIN（代表・統合した行）の両方で突き合わせる。"""
+    p50 = WORK / "30_最終_50社.csv"
+    names, asins = set(), set()
+    if p50.exists():
+        for r in csv.DictReader(p50.open(encoding="utf-8-sig")):
+            names.add(R._n(r["メーカー名(タカシ)"]))
+            for a in (r.get("代表ASIN(タカシ)", "") + " " + r.get("統合した行のASIN", "")).replace(",", " ").replace("/", " ").split():
+                asins.add(a.strip())
+    add = [r for r in rows if r["優先度"] and R._n(r["メーカー名"]) not in names and r["代表ASIN"] not in asins]
+    cols = ["優先度", "メーカー名", "ブランド", "代表ASIN", "代表商品名", "Amazon URL", "該当ASIN数", "A条件のASIN数",
+            "過去1ヶ月の販売数(代表)", "代表の売価", "代表のFBA数", "代表の新品オファー数", "カテゴリ", "印",
+            "カート保持セラー(代表)", "要確認", "判定の根拠", "救済の根拠"]
+    with open(WORK / "11_追加候補.csv", "w", encoding="utf-8-sig", newline="") as fh:
+        w = csv.DictWriter(fh, fieldnames=cols, extrasaction="ignore"); w.writeheader(); w.writerows(add)
+    print(f"11_追加候補.csv: {len(add)} 社（50社台帳 {len(names)} 社を除く）")
 
 
 if __name__ == "__main__":
