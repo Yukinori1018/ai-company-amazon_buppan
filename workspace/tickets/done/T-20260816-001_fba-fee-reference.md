@@ -1,0 +1,51 @@
+---
+ticket_id: T-20260816-001
+title: FBA料金 完全リファレンス（費目×最新単価）＋早見表＋具体商品シミュレーション
+status: done
+assignee: researcher
+requires_approval: false
+created_at: 2026-08-16
+updated_at: 2026-10-01
+next_check_at: 2026-08-17
+related_tickets:
+  - knowledge_seller_operations_basics
+  - knowledge_fba_features_fees_overview
+  - knowledge_fba_label_service
+  - knowledge_seller_official_operations
+---
+
+## 背景
+社長より「Aを可能な範囲でやり、できない部分を明確化。その上で①早見表 ②具体商品の販売価格シミュレーション（内訳）を出せ」との指示（2026-08-16）。
+既存ナレッジ（2026-07時点収集）は費目・計算式・代表単価まで網羅済み。本チケットは最新公式値へのリフレッシュと、実用アウトプット（早見表＋シミュレーション）化。
+
+## ゴール
+- A: 公式一次情報から FBA料金の「費目 × 最新単価」を可能な限り引き直す
+- できないこと（アカウント固有の実額＝ログイン必須のFBA料金シミュレーター等）を明示
+- 早見表（費目別・サイズ別・カテゴリ別）を1枚に
+- 具体商品を複数例、販売価格→手数料内訳→利益/利益率/ROI までシミュレーション
+
+## 担当
+サトル（リサーチャー）＝事実収集。ハジメ（経理）＝損益内訳の妥当性。ヒデアキ（制作）＝資料化。
+
+## メモ
+- §4.1 非該当（調査・社内資料のみ）。自律進行。
+</invoke>
+
+## ログ
+
+- 2026-08-21 frontmatter修復（マリエ）: assignee=researcher を補完（`id:`→`ticket_id:` / `owner:`→`assignee:` へテンプレ準拠に統一）
+
+## 成果物
+
+- 📁 **[T-20260816-001/](../../output/deliverables/T-20260816-001/)** — 成果物フォルダ（2件）
+  - [`fba-fee-reference.html`](../../output/deliverables/T-20260816-001/fba-fee-reference.html) — FBA料金 完全リファレンス＋早見表＋商品シミュレーション（15.0KB）
+  - [`storage-fee-risk.html`](../../output/deliverables/T-20260816-001/storage-fee-risk.html) — FBA保管料リスク・シミュレーション（売れ残り期間別）（11.0KB）
+- 社長の閲覧口（Finder）：`~/Documents/AI Company Outputs/Amazon物販事業/T-20260816-001/`
+
+## 現在地（2026-10-01 棚卸し後・最新）
+
+done（2026-10-01・秘書判断／T-20261001-001 棚卸し）。理由：納品済み・§6 レビュー期限超過（小口前提の一部は大口切替 9/12 で古くなった点に注意）
+
+## ログ（2026-10-01 追記）
+
+- 2026-10-01 秘書判断で done（T-20261001-001 棚卸し・CLAUDE.md §4.5）。理由：納品済み・§6 レビュー期限超過（小口前提の一部は大口切替 9/12 で古くなった点に注意）（マリエ記録）
