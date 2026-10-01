@@ -49,6 +49,7 @@ sys.path.insert(0, str(HERE.parent / "24_カート保持者ガード"))
 
 import profit                                    # noqa: E402
 import set_count                                 # noqa: E402
+import seasonality                               # noqa: E402
 import set_family                                # noqa: E402
 from candidate_sources import REPO, Candidate, _int  # noqa: E402
 from keepa_client import KEEPA_DOMAIN_JP, load_api_key  # noqa: E402
@@ -183,7 +184,14 @@ def resolve_to_asins(jans: list[str], token_budget: int, api_key: str | None = N
         i += len(chunk)
         url = ("https://api.keepa.com/product?"
                + urllib.parse.urlencode({"key": key, "domain": KEEPA_DOMAIN_JP,
-                                         "code": ",".join(chunk), "stats": 90}))
+                                         "code": ",".join(chunk), "stats": 90,
+                                         # ⚠️ `history=1`。**課金は「返ってきた商品数」なので
+                                         # トークンは増えません**（レスポンスは重くなる）。
+                                         # これで `csv[3]`＝ランクの12ヶ月履歴が入り、
+                                         # 「死んでいる棚」と「今が季節外の棚」を
+                                         # **この段（追加トークン0）で区別できます**。
+                                         # 入れないと、栽培キット型の棚をここで捨てます。
+                                         "history": 1}))
         data = _get(url)
         if data.get("error"):
             log(f"  Keepa エラー: {data['error']}")
@@ -246,7 +254,7 @@ def to_candidates(netsea: dict[str, dict], by_jan: dict[str, list[dict]],
 
     out: list[Candidate] = []
     tally = {"jan": 0, "asin": 0, "no_price": 0, "loss": 0, "dead": 0, "kept": 0,
-             "set_members": 0, "set_unknown": 0}
+             "set_members": 0, "set_unknown": 0, "season_saved": 0}
 
     for jan, w in netsea.items():
         group = by_jan.get(jan)
@@ -263,8 +271,15 @@ def to_candidates(netsea: dict[str, dict], by_jan: dict[str, list[dict]],
             if (not m.monthly_sold and r and r > DEAD_RANK
                     and not (m.rank_now and m.rank_now <= ALIVE_RANK)):
                 # 直近3ヶ月の販売実績が実質ゼロの口。**消極条件だけでは落ちない**ので、ここで落とす。
-                tally["dead"] += 1
-                continue
+                # 🔴 ただし**「今が季節外」なだけの棚を混ぜない**（2026-10-01 カズヨ）。
+                # ランクの12ヶ月履歴でピークが11〜1月なら、残して後段の人の確認に回す。
+                sea = m.season
+                if (sea is not None and sea.verdict == seasonality.SEASONAL
+                        and sea.peaks_in_target()):
+                    tally["season_saved"] += 1
+                else:
+                    tally["dead"] += 1
+                    continue
             if not m.sell or m.fee_pct is None or not m.fba_yen:
                 # 商品ページはあるが**誰も売っていない**口（売価・手数料・FBA のどれかが空）。
                 # ⚠️ 手数料と FBA は**推定で埋めません**。埋めると採算が嘘になります。
@@ -299,6 +314,10 @@ def to_candidates(netsea: dict[str, dict], by_jan: dict[str, list[dict]],
                        "set_sources": sc.sources,
                        "package_quantity": m.package_quantity,
                        "number_of_items": m.number_of_items,
+                       "season": (m.season.verdict if m.season else None),
+                       "season_peaks": (list(m.season.peak_months) if m.season else []),
+                       "season_label": (m.season.label() if m.season else ""),
+                       "review_count": m.review_count,
                        "family_jan": jan, "family_size": len(members),
                        "parent_asin": m.parent_asin,
                        "wholesale_per_point_incl": unit_cost_1pt},
@@ -310,7 +329,8 @@ def to_candidates(netsea: dict[str, dict], by_jan: dict[str, list[dict]],
         f"売価が付く {tally['asin'] - tally['dead'] - tally['no_price']}件"
         f"（出品なし {tally['no_price']}件）→ "
         f"**候補 {tally['kept']}件**（赤字で落とした {tally['loss']}件・"
-        f"セット数が読めず人に回す {tally['set_unknown']}件）")
+        f"セット数が読めず人に回す {tally['set_unknown']}件・"
+        f"🔴季節外として残した {tally['season_saved']}件）")
     return out, tally
 
 

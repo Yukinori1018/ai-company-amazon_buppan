@@ -40,6 +40,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
+import seasonality
 import set_count
 
 # packageQuantity / numberOfItems として受け付ける上限。
@@ -145,6 +146,8 @@ class Member:
     fba_yen: int | None = None          # FBA 配送代行（円）。None なら未取得
     package_quantity: int | None = None  # Keepa の生値（0 / -1 は「データなし」）
     number_of_items: int | None = None   # Keepa の生値（参考。1 が既定値として入る）
+    season: object | None = None         # seasonality.Season。履歴が無ければ「判定不能」
+    review_count: int | None = None      # COUNT_REVIEWS（rating=1 が無いと -1）
 
 
 def family_members(products: list[dict]) -> list[Member]:
@@ -186,6 +189,8 @@ def family_members(products: list[dict]) -> list[Member]:
             fee_pct=fee, fba_yen=fba,
             package_quantity=p.get("packageQuantity"),
             number_of_items=p.get("numberOfItems"),
+            season=seasonality.from_product(p),
+            review_count=at(cur, 17),
         ))
     # 大きい口から見る（固定費を割れるのは大きい口なので、当たりが先に出る）。
     out.sort(key=lambda m: -(m.set_count.n or 0))

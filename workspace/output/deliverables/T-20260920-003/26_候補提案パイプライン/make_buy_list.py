@@ -113,6 +113,19 @@ def rank_of(reason: str) -> str:
     return "不明"
 
 
+def bracket(reason: str, key: str) -> str:
+    """`判定理由` の先頭に積んである `【<key> …】` を1つ取り出す。
+
+    台帳は32列固定（条件付き書式が列位置に紐づく）ので、季節・レビュー・内容量は
+    `判定理由` の先頭に文字列として入っています。CSV 側では列に起こします。
+    **見つからなければ「不明」**（空欄を作らない・§3.2）。
+    """
+    tag = f"【{key} "
+    if tag in reason:
+        return reason.split(tag, 1)[1].split("】", 1)[0].strip()
+    return "不明"
+
+
 def load_rows():
     state_ws = ledger_sheet.open_tab()
     values = state_ws.get_all_values()
@@ -151,6 +164,9 @@ def load_rows():
             "supplier": clean_name(r[C["購入元の名前"]]),
             "supplier_url": r[C["購入先URL"]],
             "reason": r[C["判定理由"]],
+            # 季節とレビュー数は `判定理由` の先頭から起こす（台帳は32列固定）
+            "season": bracket(r[C["判定理由"]], "季節"),
+            "reviews": bracket(r[C["判定理由"]], "レビュー"),
             # 卸値・入り数は台帳には率でしか無いので、発掘キャッシュ（agent_output）から取る
             "wholesale_incl": cand.get("unit_cost_incl"),
             "pack": cand.get("pack"),
@@ -205,7 +221,7 @@ def plans(go: list[dict]) -> list[tuple[str, str, list[dict], int, int]]:
 
 MD_COLS = ["#", "判定", "商品名", "ブランド", "Amazon", "売価", "過去1ヶ月の販売数",
            "セラー数", "Amazon本体", "カートの販売元", "本体365日在庫率", "売れ筋ランク",
-           "Amazon側は何個セットか", "買う卸の口", "何口買うか",
+           "季節", "レビュー数", "Amazon側は何個セットか", "買う卸の口", "何口買うか",
            "卸率", "発注点数(Amazon何個)", "発注額の帯", "1個手残り", "利益率", "売り切る月数",
            "ゲート種別", "購入元の名前", "購入先URL"]
 
@@ -229,7 +245,7 @@ def md_table(rows: list[dict]) -> str:
             f"[dp/{r['asin']}]({r['url']})",
             f"{int(r['sell']):,}円" if r["sell"] else "不明",
             r["sold"], r["sellers"], r["amazon"], r["cart"][:32], r["instock365"],
-            r["rank"],
+            r["rank"], r["season"][:34], r["reviews"][:14],
             set_label(r),
             r["wholesale_mouth"] or "未確認", r["wholesale_sets"] or "未算定",
             r["cost_ratio"], r["qty"], band(r["order_total"]),
@@ -248,6 +264,7 @@ def write_private_csv(rows: list[dict], path: Path) -> None:
     # 「Amazon 何個を買うか」と「そのために卸を何点買うか」を**別の列**にする。
     cols = ["ASIN", "判定", "商品名", "ブランド", "AmazonURL", "JAN", "売価", "過去1ヶ月の販売数",
             "セラー数", "Amazon本体の有無", "カートの販売元", "本体365日在庫率", "売れ筋ランク",
+            "季節(ランク12ヶ月履歴)", "レビュー数",
             "卸の1点あたり原価(税込)", "Amazon側のセット数(Amazon1個=卸何点か)",
             "Amazon1個あたり原価(税込)", "卸の最小ロット(点)",
             "セット数の確度", "セット数の情報源", "同じJANの口の数",
@@ -262,7 +279,7 @@ def write_private_csv(rows: list[dict], path: Path) -> None:
         for r in rows:
             w.writerow([r["asin"], r["verdict"], r["title"], r["brand"], r["url"], r["jan"],
                         r["sell"], r["sold"], r["sellers"], r["amazon"], r["cart"],
-                        r["instock365"], r["rank"],
+                        r["instock365"], r["rank"], r["season"], r["reviews"],
                         r["wholesale_incl"], r["set_count"], r["amazon_unit_cost"], r["pack"],
                         r["set_confidence"], json.dumps(r["set_sources"], ensure_ascii=False),
                         r["family_size"],

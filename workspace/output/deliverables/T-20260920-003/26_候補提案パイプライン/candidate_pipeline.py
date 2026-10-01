@@ -38,6 +38,7 @@ import maker_direct                           # noqa: E402
 import profit                                 # noqa: E402
 import set_count                              # noqa: E402
 import set_family                             # noqa: E402
+import seasonality                            # noqa: E402
 import trading_terms                          # noqa: E402
 from keepa_client import KeepaClient, KeepaError  # noqa: E402
 from keepa_sellers import SellerNames         # noqa: E402
@@ -154,6 +155,22 @@ def _category_path(product: dict) -> str:
     return " > ".join(str((c or {}).get("name") or "") for c in tree if isinstance(c, dict))
 
 
+def season_prefix(facts: dict) -> str:
+    """判定理由の先頭に出す季節とレビュー数の注記（カズヨ依頼 2026-10-01）。
+
+    台帳は**32列で固定**（条件付き書式が列位置に紐づく）ため列を増やせません。
+    人が最初に読む `判定理由` の先頭に置きます。**空欄を作りません**（§3.2）。
+    """
+    s = facts.get("season")
+    label = s.label() if s is not None else "【季節 未判定】"
+    rc = facts.get("review_count")
+    if rc and rc > 0:
+        label += f"【レビュー {rc:,}件＝過去に売れた証拠】"
+    else:
+        label += "【レビュー 未確認（Keepa は rating=1 を付けないと返しません）】"
+    return label
+
+
 def volume_prefix(title: str | None) -> str:
     """判定理由の先頭に出す内容量の注記（§3.3-7・カズヨ依頼 2026-09-30）。
 
@@ -219,6 +236,12 @@ def extract_facts(product: dict, cand: sources.Candidate) -> dict:
         # 2本が一致したときだけ「確定」にできる（CLAUDE.md §3.3-17）。追加トークンは0。
         "package_quantity": product.get("packageQuantity"),
         "number_of_items": product.get("numberOfItems"),
+        # 🔴 季節。**ランク履歴（csv[3]）は同じレスポンスに入っているので追加トークン0。**
+        # 「年間を通して売れていない」と「今が端境期」を区別する唯一の材料です。
+        "season": seasonality.from_product(product, dead_rank=DEAD_RANK),
+        # レビュー数＝「過去は売れていた」証拠。`rating=1` を付けないと -1 のままです
+        # （実測 2026-10-01: 23件中22件が -1）。無理に埋めず「未確認」と書きます。
+        "review_count": _at_index(st.get("current"), 17),
     }
 
 
@@ -226,7 +249,7 @@ def extract_facts(product: dict, cand: sources.Candidate) -> dict:
 MAX_MONTHS_TO_SELL = 6.0
 
 
-def liveness_status(monthly_sold, rank_now, rank_avg90) -> tuple[str, str]:
+def liveness_status(monthly_sold, rank_now, rank_avg90, season=None) -> tuple[str, str]:
     """その棚に市場があるか（生存ゲート）。**唯一の積極条件です。**
 
     ⚠️ **ランクは「死んでいないこと」の確認に使い、「売れている」の根拠にはしません。**
@@ -249,6 +272,22 @@ def liveness_status(monthly_sold, rank_now, rank_avg90) -> tuple[str, str]:
                 "キーゾンで直近3ヶ月の実数を見てください。")
 
     if r > DEAD_RANK:
+        # 🔴 **「死んでいる棚」と「今が季節外の棚」を混ぜない**（2026-10-01 カズヨ）。
+        # ナガクラ 栽培キット B001LOOR4E は卸480円→Amazon 2,680円・オファー1社・本体なしで
+        # 利益率33%だったが、キーゾンで3か月0個。**レビュー153件＝過去は売れていた。**
+        # 栽培キットは春物で7〜9月が端境期だった。90日平均ランクはこれを区別できない。
+        # 区別できるのは**ランクの12ヶ月履歴**だけで、それは追加トークン0で手元にある。
+        if season is not None and getattr(season, "verdict", "") == seasonality.SEASONAL:
+            if season.peaks_in_target():
+                return (UNKNOWN,
+                        f"90日平均ランク {r:,}位ですが、**これは今が季節外だからです。** "
+                        f"{season.reason}（振れ幅 {season.swing:.1f}倍・最良月 "
+                        f"{season.best_rank:,}位）。**ピークが11〜1月＝いま仕入れて売る月**なので "
+                        "NO-GO にしません。キーゾンでピーク月の実数を見てください。")
+            return (FAIL,
+                    f"売れ筋ランク {r:,}位（90日平均）。季節商品ですが"
+                    f"**ピークが {'・'.join(f'{m}月' for m in season.peak_months)}** で、"
+                    "いま仕入れると売れるまで在庫を抱えます（回転6ヶ月の既定を超える）。")
         if rnow and rnow <= ALIVE_RANK:
             return (UNKNOWN,
                     f"90日平均ランク {r90:,}位は圏外ですが、現在 {rnow:,}位まで上がっています"
@@ -256,7 +295,9 @@ def liveness_status(monthly_sold, rank_now, rank_avg90) -> tuple[str, str]:
         return (FAIL,
                 f"売れ筋ランク {r:,}位（90日平均）。直近3ヶ月の販売実績が実質ゼロの棚です。"
                 f"実測では 68万位で3か月1個・180万位で3か月0個でした。"
-                "本体もメーカーも競合が来ないのは、そこに市場が無いからです。")
+                "本体もメーカーも競合が来ないのは、そこに市場が無いからです。"
+                + (f" 季節で救えるかも見ましたが、{season.reason}でした。"
+                   if season is not None and season.verdict != seasonality.SEASONAL else ""))
 
     if r <= ALIVE_RANK:
         return (PASS,
@@ -419,7 +460,8 @@ def build_row(cand: sources.Candidate, facts: dict, judgment, maker: tuple,
     econ_status, econ_reason = economics_status(econ, facts.get("monthly_sold"), set_note)
     sup_status, sup_reason = supply_status(cand, facts.get("category") or cand.category)
     live_status, live_reason = liveness_status(
-        facts.get("monthly_sold"), facts.get("rank"), facts.get("rank_avg90"))
+        facts.get("monthly_sold"), facts.get("rank"), facts.get("rank_avg90"),
+        facts.get("season"))
     verdict = combine(judgment.verdict, maker_status, econ_status, sup_status, live_status)
 
     check2 = next((c for c in judgment.checks if c.number == 2), None)
@@ -483,6 +525,7 @@ def build_row(cand: sources.Candidate, facts: dict, judgment, maker: tuple,
         _n(econ.half_disposal_loss if econ else None),
         verdict,
         (rank_prefix(facts.get("rank"), facts.get("rank_avg90"))
+         + season_prefix(facts)
          + volume_prefix(facts.get("title") or cand.title)
          + " ／ ".join(reasons))[:1000],
         ledger_sheet.MACHINE_ONLY,
@@ -666,7 +709,7 @@ def main(argv: list[str] | None = None) -> int:
             print(f"    {ch.status[:1]} {ch.number}. {ch.reason}")
         print(f"    {maker[0][:1]} 5. {maker[1]}")
         ls, lr = liveness_status(facts.get("monthly_sold"), facts.get("rank"),
-                                 facts.get("rank_avg90"))
+                                 facts.get("rank_avg90"), facts.get("season"))
         print(f"    {ls[:1]} 生存. {lr}")
         ss, sr = supply_status(c, facts.get("category") or c.category)
         print(f"    {ss[:1]} 仕入れ. {sr}")

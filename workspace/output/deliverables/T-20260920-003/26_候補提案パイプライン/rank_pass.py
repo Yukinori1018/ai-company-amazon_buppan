@@ -33,6 +33,7 @@ sys.path.insert(0, str(GUARD))
 import ledger_sheet                               # noqa: E402
 import profit                                      # noqa: E402
 import set_count                                   # noqa: E402
+import seasonality                                 # noqa: E402
 from candidate_pipeline import ALIVE_RANK, DEAD_RANK  # noqa: E402
 from keepa_client import KEEPA_DOMAIN_JP, load_api_key  # noqa: E402
 
@@ -76,7 +77,11 @@ def main() -> int:
         chunk = want[i:i + max(1, min(100, left - 10))]
         i += len(chunk)
         d = get("https://api.keepa.com/product?" + urllib.parse.urlencode(
-            {"key": key, "domain": KEEPA_DOMAIN_JP, "asin": ",".join(chunk), "stats": 90}))
+            # ⚠️ `history=1` を足しました。**課金は「返ってきた商品数」なので増えません**
+            # （実測 1.00/ASIN のまま）。これで `csv[3]`＝ランクの12ヶ月履歴が入り、
+            # 「死んでいる棚」と「今が季節外の棚」を**追加トークン0で**区別できます。
+            {"key": key, "domain": KEEPA_DOMAIN_JP, "asin": ",".join(chunk),
+             "stats": 90, "history": 1}))
         if d.get("error"):
             print(f"Keepa エラー: {d['error']}")
             break
@@ -91,14 +96,22 @@ def main() -> int:
                 return None if v in (None, -1) else v
             ms = p.get("monthlySold")
             c["monthly_sold"] = None if ms in (None, -1) else ms
+            season = seasonality.from_product(p, dead_rank=DEAD_RANK)
             c.setdefault("extra", {}).update(
-                {"rank_now": at(cur, 3), "rank_avg90": at(avg, 3)})
+                {"rank_now": at(cur, 3), "rank_avg90": at(avg, 3),
+                 "season": season.verdict, "season_peaks": list(season.peak_months),
+                 "season_label": season.label(),
+                 "review_count": at(cur, 17)})
         print(f"  {i}/{len(want)} 消費 {d.get('tokensConsumed')} 残 {d.get('tokensLeft')}",
               flush=True)
         CACHE.write_text(json.dumps(data, ensure_ascii=False, indent=1), encoding="utf-8")
         time.sleep(1)
 
-    # 段Bの順番を引き直す: 生存 PASS → 手残りが大きい順。社ごとのラウンドロビンは維持。
+    # 段Bの順番を引き直す。
+    # 🔴 **第1キーは季節**（2026-10-01 カズヨ指示）。今日が10/1 で、仕入れ→納品→販売に
+    # 2〜4週間かかるので、狙うのは **11〜1月に売れるもの**。春物（栽培キット・園芸）は
+    # 在庫6ヶ月になるので初回には使いません。
+    # 第2キーが生存、第3キーが手残り。社ごとのラウンドロビンは維持。
     import collections
     scored = []
     for asin, c in cands.items():
@@ -114,20 +127,30 @@ def main() -> int:
             e = profit.compute(c["sell"], c["fee_pct"], c["fba_yen"],
                                c["unit_cost_incl"] * mult, qty=1)
             net = e.net_per_unit - (int(round(e.sell * 0.07)) + 200)
-        scored.append((alive, -net, asin, c.get("supplier") or "?"))
+        sv = ex.get("season")
+        season_obj = (seasonality.Season(sv, tuple(ex.get("season_peaks") or ()))
+                      if sv else None)
+        season_rank = seasonality.order_key(season_obj, c.get("title"), c.get("category"))
+        scored.append((season_rank, alive, -net, asin, c.get("supplier") or "?"))
     scored.sort()
     q = collections.OrderedDict()
     for row in scored:
-        q.setdefault(row[3], []).append(row[2])
+        q.setdefault(row[4], []).append(row[3])
     order = []
     while any(q.values()):
         for k in list(q):
             if q[k]:
                 order.append(q[k].pop(0))
     ORDER.write_text(json.dumps(order), encoding="utf-8")
-    alive_n = sum(1 for s in scored if s[0] == 0)
-    print(f"\n段Bの順番を引き直しました: {len(order)}件（生存 PASS 見込み {alive_n}件・"
-          f"灰色 {sum(1 for s in scored if s[0] == 1)}件・死 {sum(1 for s in scored if s[0] == 2)}件）")
+    alive_n = sum(1 for s in scored if s[1] == 0)
+    winter_n = sum(1 for s in scored if s[0] == 0)
+    hint_winter = sum(1 for s in scored if s[0] == 1)
+    spring_summer = sum(1 for s in scored if s[0] == 5)
+    print(f"\n段Bの順番を引き直しました: {len(order)}件")
+    print(f"  生存 PASS 見込み {alive_n}件・灰色 {sum(1 for s in scored if s[1] == 1)}件・"
+          f"死 {sum(1 for s in scored if s[1] == 2)}件")
+    print(f"  🔴 季節: 履歴のピークが11〜1月 {winter_n}件・商品名が冬物 {hint_winter}件・"
+          f"春夏（後回し）{spring_summer}件")
     return 0
 
 
