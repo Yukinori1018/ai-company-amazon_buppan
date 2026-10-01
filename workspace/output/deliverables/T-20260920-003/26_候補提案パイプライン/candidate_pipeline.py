@@ -93,6 +93,21 @@ DEAD_RANK = 500_000        # これより下位なら「直近3ヶ月の実績�
 # 2026-09-30、手残り28円の候補を GO として出した。**誤差幅が結論を超えているなら GO ではない。**
 ERROR_BAND_PCT = 7.0
 ERROR_BAND_FIXED = 200
+
+# ── 単位ずれの番兵（2026-10-01 カズヨが実画面で再発を見つけて新設）──────────
+# B0FNWB76NG（カップ麺 110g・18食入り）を「卸率5.2%・利益率75.5%・手残り+3,706円」と出した。
+# 正しくは Amazon の1個 ＝ 卸18点で、原価は 268円ではなく 4,824円＝**▲778円/個**。
+# 原因は商品名の「18食入り」を単品と読んだことだが、**読み間違いは今後も起きる。**
+# だから「数字そのものが異常なら止める」番兵を別に置く。
+#   - 卸が売価の15%未満 … 卸は普通 売価の40〜70%。5%は単位がずれているサイン
+#   - 利益率が50%超    … 同じサインの裏側
+# §3.3-6「利益率が突出して良い行は、まず仕入れの実在を疑う」を機械で効かせたもの。
+MIN_PLAUSIBLE_COST_RATIO = 15.0
+MAX_PLAUSIBLE_MARGIN_PCT = 50.0
+
+# 1 SKU の発注額の上限。テスト予算10万円・消化19,756円 → 残枠約8万円（2026-10-01 カズヨ）。
+# これを超える案は「生成も提示もしない」（§3.1・回転上限と同じ扱い）。
+MAX_ORDER_TOTAL_YEN = 80_000
 # ──────────────────────────────────────────────────────────────────────────
 
 # 作業ファイル（Git 追跡外）。卸値・卸URL を含むのでここ以外に書かない。
@@ -281,6 +296,24 @@ def economics_status(econ, monthly_sold, set_note: str = "") -> tuple[str, str]:
         return (UNKNOWN,
                 "売価・手数料・FBA・原価のどれかが揃わず、採算を計算できません。"
                 + (f" {set_note}" if set_note else ""))
+    # ── 単位ずれの番兵。**黒字判定より先に置く**（嘘の黒字を落とすため）。
+    if econ.cost_ratio_pct < MIN_PLAUSIBLE_COST_RATIO:
+        return (UNKNOWN,
+                f"卸率が売価の {econ.cost_ratio_pct}% しかありません"
+                f"（{MIN_PLAUSIBLE_COST_RATIO:.0f}% 未満）。"
+                "卸は普通 売価の40〜70%です。**単位がずれている疑いが濃厚**で、"
+                "『Amazon の1個 ＝ 卸の何点か』を人が両方の画面で確認してください。"
+                "2026-10-01、カップ麺18食入りで同じ形の誤りを出しました（実際は赤字）。")
+    if econ.margin_pct > MAX_PLAUSIBLE_MARGIN_PCT:
+        return (UNKNOWN,
+                f"利益率 {econ.margin_pct}% は高すぎます"
+                f"（{MAX_PLAUSIBLE_MARGIN_PCT:.0f}% 超）。"
+                "単位ずれ・終売・仕入れの不存在のどれかのサインです（§3.3-6）。"
+                "人が卸サイトと Amazon の両方を見てください。")
+    if econ.order_total > MAX_ORDER_TOTAL_YEN:
+        return (FAIL,
+                f"1 SKU の発注額が {econ.order_total:,}円で、残枠 "
+                f"{MAX_ORDER_TOTAL_YEN:,}円を超えます（最小ロットを割れません）。")
     if econ.gross_per_unit <= 0:
         return (FAIL, f"1個粗利が {econ.gross_per_unit:,}円（赤字）です。")
     if econ.net_per_unit <= 0:

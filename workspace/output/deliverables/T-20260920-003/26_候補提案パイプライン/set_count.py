@@ -73,6 +73,19 @@ PATTERNS = (
 # 「ペアセット」「ペア組」は2点。
 PAIR_RE = re.compile(r"ペア\s*(?:セット|組み?)")
 
+# 「N〈単位〉入り」の〈単位〉が**内容量とも個数とも読める**もの。
+# 2026-10-01 の事故: 「カップ麺 110g、18食入り」を**単品**と読み、原価を18分の1に見誤った
+# （卸268円/点 × 18 = 4,824円が正しい原価。1個手残りを +3,706円と報告したが実際は ▲778円）。
+#   「18食入り」＝カップ麺18個（＝卸18点）
+#   「90包入り」＝青汁1箱の中身（＝卸1点）
+# **同じ書き方で意味が逆になるので、機械では決められない。**だから 1 とも N とも決めずに
+# None（UNKNOWN）を返し、人に見せる。CLAUDE.md §3.3-7。
+AMBIGUOUS_RE = re.compile(r"(\d+)\s*(?:食|包|缶|杯|玉|丁|尾|房|株|輪|カット|パウチ)\s*入り?")
+
+# 「2P」「4P」のようなパック表記。**卸の1点が1枚なのか1パックなのかは商品名から分からない。**
+# 2026-10-01: 「いいタオル バスタオル2P」を単品と読んでいた。
+AMBIGUOUS_PACK_RE = re.compile(r"(?<![A-Za-z0-9])(\d+)\s*[Pp](?![A-Za-z0-9])")
+
 # 現実的な上限。これを超える数は「600粒」型の誤読なので採らない。
 MAX_PLAUSIBLE = 60
 
@@ -90,6 +103,12 @@ def parse_amazon_set_count(title: str | None) -> int | None:
     t = unicodedata.normalize("NFKC", str(title))
     for w in NON_SET_WORDS:
         t = t.replace(w, "")
+
+    # **曖昧な表記を先に見る。**読めるふりをしないのが一番安全（下流は UNKNOWN になる）。
+    for pat in (AMBIGUOUS_RE, AMBIGUOUS_PACK_RE):
+        m = pat.search(t)
+        if m and 1 < int(m.group(1)) <= MAX_PLAUSIBLE:
+            return None
 
     found: set[int] = set()
     for pat in PATTERNS + (STANDALONE_RE,):
@@ -118,7 +137,10 @@ def cost_multiplier(title: str | None) -> tuple[int | None, str]:
     """(原価の倍率, 人が読める理由) を返す。倍率が None なら UNKNOWN。"""
     n = parse_amazon_set_count(title)
     if n is None:
-        return (None, "商品名がセット品らしいのに個数が読めません（原価の倍率が確定できない）。")
+        return (None,
+                "商品名から「Amazon の1個 ＝ 卸の何点か」が確定できません"
+                "（『18食入り』型は中身の数とも個数とも読めます）。原価の倍率が決まらないので"
+                "**卸サイトと Amazon の両方を人が見てください。**")
     if n == 1:
         return (1, "単品（Amazon の1個 ＝ 卸の1点）。")
     return (n, f"Amazon の1個 ＝ 卸の{n}点（原価は卸単価の{n}倍）。")

@@ -34,6 +34,37 @@ BUDGET_LEFT = 80_000            # テスト予算10万 − 消化19,756 ≒ 8万
 C = {name: i for i, name in enumerate(ledger_sheet.COLUMNS)}
 
 
+def unit_columns(title: str, wholesale_incl, qty: int, order_total) -> dict:
+    """単位の3列と整合チェックを作る。**ここが今回の事故の現場。**
+
+    - `set_count`          … Amazon の1個 ＝ 卸の何点か（読めなければ「未確定」）
+    - `amazon_unit_cost`   … Amazon 1個あたりの原価 ＝ 卸の1点 × set_count
+    - `wholesale_points`   … 発注で買う卸の点数 ＝ Amazon の個数 × set_count
+    - `unit_check`         … `発注額 ≒ Amazon1個あたり原価 × 発注点数` が成り立つか
+
+    不変条件が崩れていたら **数字を黙って直さず「NG」と書く**。
+    黙って直すと、どちらが正しいか分からないまま辻褄だけが合います。
+    """
+    import set_count as sc
+    mult, _note = sc.cost_multiplier(title)
+    if not wholesale_incl:
+        return {"set_count": "未確定" if mult is None else mult,
+                "amazon_unit_cost": "", "wholesale_points": "",
+                "unit_check": "原価が空（UNKNOWN）"}
+    if mult is None:
+        return {"set_count": "未確定", "amazon_unit_cost": "",
+                "wholesale_points": "",
+                "unit_check": "NG: Amazon のセット数が読めない（人が両方の画面を見る）"}
+    unit = int(wholesale_incl) * mult
+    points = qty * mult
+    check = "OK"
+    if order_total and abs(unit * qty - int(order_total)) > max(2, int(order_total) * 0.01):
+        check = (f"NG: 発注額 {int(order_total):,} ≠ Amazon1個原価 {unit:,} × 発注点数 {qty}"
+                 f" = {unit * qty:,}（単位が揃っていません）")
+    return {"set_count": mult, "amazon_unit_cost": unit,
+            "wholesale_points": points, "unit_check": check}
+
+
 def clean_name(name: str) -> str:
     """セラー名・企業名から宣伝文を落として、**identity だけ**を残す。
 
@@ -84,7 +115,7 @@ def load_rows():
         asin = r[C["ASIN"]]
         gross = _num(r[C["1個粗利(円)"]])
         cand = cands.get(asin, {})
-        qty = _num(r[C["発注点数"]]) or 0
+        qty = _num(r[C["発注点数"]])
         total = _num(r[C["発注額(円・税込)"]])
         out.append({
             "asin": asin,
@@ -100,8 +131,8 @@ def load_rows():
             "instock365": r[C["本体365日在庫率"]],
             "rank": rank_of(r[C["判定理由"]]),
             "cost_ratio": r[C["卸率(売価比)"]],
-            "qty": int(qty),
-            "order_total": total,
+            "qty": int(qty) if qty is not None else "",
+            "order_total": int(total) if total is not None else "",
             "date": r[C["判定日"]],
             "gross": int(gross) if gross is not None else None,
             "net": int(gross - OTHER_UNIT_COSTS) if gross is not None else None,
@@ -115,6 +146,9 @@ def load_rows():
             "wholesale_incl": cand.get("unit_cost_incl"),
             "pack": cand.get("pack"),
             "jan": cand.get("jan", ""),
+            **unit_columns(r[C["商品名"]], cand.get("unit_cost_incl"),
+                           int(qty) if qty is not None else 0,
+                           int(total) if total is not None else None),
         })
     out.sort(key=lambda r: (-(r["verdict"] == "GO"), -(r["net"] if r["net"] is not None else -10 ** 9)))
     return out
@@ -179,10 +213,17 @@ def md_table(rows: list[dict]) -> str:
 
 def write_private_csv(rows: list[dict], path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
+    # ⚠️ **単位を列名に書く。**2026-10-01、`原価(税込・1個あたり)` が「卸の1点」なのに
+    # `発注点数` が「Amazon の個数」で、同じ CSV の中で単位が揃っていなかった
+    # （カップ麺18食入りを 利益率75.5% と報告。実際は ▲778円/個）。
+    # 「Amazon 何個を買うか」と「そのために卸を何点買うか」を**別の列**にする。
     cols = ["ASIN", "判定", "商品名", "ブランド", "AmazonURL", "JAN", "売価", "過去1ヶ月の販売数",
             "セラー数", "Amazon本体の有無", "カートの販売元", "本体365日在庫率", "売れ筋ランク",
-            "原価(税込・1個あたり)", "入り数(点)", "卸率(売価比)", "発注点数",
-            "発注額(円・税込)", "1個粗利(円)", "1個手残り(円)", "利益率(%)", "売り切る月数",
+            "卸の1点あたり原価(税込)", "Amazon側のセット数(Amazon1個=卸何点か)",
+            "Amazon1個あたり原価(税込)", "卸の最小ロット(点)",
+            "発注点数(Amazon何個)", "発注する卸の点数", "発注額(円・税込)",
+            "卸率(売価比)", "1個粗利(円)", "1個手残り(円)", "利益率(%)", "売り切る月数",
+            "単位の整合チェック",
             "ゲート種別", "購入元の名前", "購入先URL", "判定理由"]
     with path.open("w", encoding="utf-8-sig", newline="") as f:
         w = csv.writer(f)
@@ -190,10 +231,12 @@ def write_private_csv(rows: list[dict], path: Path) -> None:
         for r in rows:
             w.writerow([r["asin"], r["verdict"], r["title"], r["brand"], r["url"], r["jan"],
                         r["sell"], r["sold"], r["sellers"], r["amazon"], r["cart"],
-                        r["instock365"], r["rank"], r["wholesale_incl"], r["pack"],
-                        r["cost_ratio"], r["qty"], r["order_total"], r["gross"], r["net"],
-                        r["margin"], r["months"], r["gate"], r["supplier"],
-                        r["supplier_url"], r["reason"]])
+                        r["instock365"], r["rank"],
+                        r["wholesale_incl"], r["set_count"], r["amazon_unit_cost"], r["pack"],
+                        r["qty"], r["wholesale_points"], r["order_total"],
+                        r["cost_ratio"], r["gross"], r["net"], r["margin"], r["months"],
+                        r["unit_check"],
+                        r["gate"], r["supplier"], r["supplier_url"], r["reason"]])
 
 
 def main() -> int:

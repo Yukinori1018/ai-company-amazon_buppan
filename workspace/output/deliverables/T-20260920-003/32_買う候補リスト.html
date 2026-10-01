@@ -2,9 +2,21 @@
 <h1>買う候補リスト（NETSEA 起点・2026-10-01）</h1>
 <p><strong>候補 0件</strong>（CLAUDE.md §3.3 のゲートを全部通り、初回の分散として使える系列のもの）。</p>
 <ul>
-<li style='margin-left:0.0em'><strong>今日判定した ASIN: 212件</strong>（GO 0・NO-GO 183・UNKNOWN 29）</li>
-<li style='margin-left:0.0em'>判定台帳の本チケット累計: 412件（GO 0・NO-GO 314・UNKNOWN 98）</li>
+<li style='margin-left:0.0em'><strong>今日判定した ASIN: 212件</strong>（GO 0・NO-GO 186・UNKNOWN 26）</li>
+<li style='margin-left:0.0em'>判定台帳の本チケット累計: 412件（GO 0・NO-GO 325・UNKNOWN 87）</li>
 </ul>
+<h2>🔴 訂正（2026-10-01 夕方）</h2>
+<p><strong>カズヨが6件を実画面で確認し、1件の数字の誤りが見つかりました。直して全行を引き直しました。</strong></p>
+<p><code>B0FNWB76NG</code>（カップ麺 110g・18食入り）を <strong>利益率75.5%・1個手残り +3,706円</strong> と出していました。正しくは <strong>Amazon の1個 ＝ 卸18点</strong>で、原価は268円ではなく <strong>4,824円</strong>。5,180 − 販売手数料456 − FBA 472 − 206 − 4,824 ＝ <strong>▲778円/個の赤字</strong>です。</p>
+<table><thead><tr><th>直したこと</th><th>内容</th></tr></thead><tbody>
+<tr><td>商品名の読み取り</td><td>「N食入り」「2P」型は<strong>1 と決め打たず UNKNOWN</strong>（『18食入り』は中身の数とも個数とも読めるため）</td></tr>
+<tr><td>番兵（新設）</td><td><strong>卸率15%未満 / 利益率50%超は UNKNOWN。</strong>卸は普通 売価の40〜70%で、5%は単位がずれているサイン</td></tr>
+<tr><td>予算のゲート（新設）</td><td><strong>1 SKU の発注額が8万円を超えたら NO-GO。</strong>残枠を超える案は生成も提示もしない</td></tr>
+<tr><td>列の単位</td><td>「Amazon 何個を買うか」と「そのために卸を何点買うか」を<strong>別の列</strong>にし、<code>発注額 ＝ Amazon1個あたり原価 × 発注点数</code> の<strong>整合チェック列</strong>を足した</td></tr>
+<tr><td>テスト</td><td><code>test_units.py</code>（24項目）で4つの不変条件を固定。既存77項目と合わせて全部通ります</td></tr>
+<tr><td>台帳</td><td><strong>全240行を引き直しました</strong>（Keepa は再取得せず、原価だけ差し替え。売価・手数料は台帳の値のまま）</td></tr>
+</tbody></table>
+<p><strong>カズヨが見た6件は全部 NO-GO</strong> として台帳に記録し、確認者と実数を入れました。以後この6件は機械判定で上書きされません（＝二度と候補に出ません）。</p>
 <blockquote><strong>この表は機械判定だけです。実画面（Chrome＋キーゾン）の確認はしていません。</strong>§3.3 の3点確認（カートの販売元・本体の在庫履歴・出品一覧の実数）は人の仕事で、<strong>発注の直前に必ず人が見てください。</strong></blockquote>
 <h2>1. 候補</h2>
 <p><strong>0件です。</strong>水増しはしません。内訳は §3 を見てください。</p>
@@ -18,29 +30,26 @@
 <tr><td>発注額の帯</td><td>実額は会員限定の取引条件そのものなので帯で出します。実額は社長宛のフル版 CSV にあります</td></tr>
 <tr><td>購入先URL</td><td>このリポジトリは PUBLIC なので書けません。フル版 CSV にあります</td></tr>
 </tbody></table>
-<h2>1b. 人が見れば確定する行（判定 UNKNOWN・19件）— カズヨが見る</h2>
+<h2>1b. 人が見れば確定する行（判定 UNKNOWN・16件）— カズヨが見る</h2>
 <p><strong>判定が UNKNOWN の行</strong>です。落ちたのではなく「機械では読み切れなかった」行で、Chrome＋キーゾンで実画面を見れば<strong>確定します</strong>。<strong>まだ買ってよい行ではありません。</strong></p>
 <blockquote>NO-GO の行は §1c に回しました。NO-GO には<strong>実画面でも覆らない事実</strong>（本体がカートを取った履歴・赤字・ランク50万位より下）が1本以上入っているので、見ても結論は変わりません。</blockquote>
 <table><thead><tr><th>商品名</th><th>Amazon</th><th>売価</th><th>過去1ヶ月の販売数</th><th>セラー数</th><th>Amazon本体</th><th>カートの販売元</th><th>売れ筋ランク</th><th>1個手残り</th><th>利益率</th><th>購入元の名前</th><th>読み切れなかったところ／落ちた理由</th></tr></thead><tbody>
-<tr><td>いいタオル・ふっくらふわふわ バスタオル2P PIG-81100</td><td><a href="https://www.amazon.co.jp/dp/B00Z9IMWKO" target="_blank" rel="noopener">dp/B00Z9IMWKO</a></td><td>11,000円</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>未確認</td><td>未確認</td><td>第三者セラー（A2RXC0REH5RF4D）</td><td>なし</td><td>3,277円</td><td>31.7</td><td>株式会社 白菊</td><td>3. オファー一覧が取得できませんでした（offers パラメータを付けて再取得）。 ／ 5. カート保持者のセラー名が取得できず、メーカー直販かを判定できません。 ／ 生存. 売れ筋ランクが取れませ</td></tr>
-<tr><td>静岡銘茶 深むし茶 FMB-30</td><td><a href="https://www.amazon.co.jp/dp/B0078HLN40" target="_blank" rel="noopener">dp/B0078HLN40</a></td><td>3,240円</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>1社（Keepa offers の実数・画面未確認）</td><td>なし</td><td>暮らしのデパート（A2RXC0REH5RF4D）</td><td>なし</td><td>702円</td><td>28</td><td>株式会社 白菊</td><td>5. 新品オファーが1社（『暮らしのデパート』）だけです。ブランド名とは一致しませんが、卸を1社に限定している棚の可能性があります。実画面で確認を。 ／ 生存. 売れ筋ランクが取れません（ランク自体が</td></tr>
-<tr><td>いいタオル・ふっくらふわふわ フェイスタオル2P PIG-8130</td><td><a href="https://www.amazon.co.jp/dp/B00Z9HVLAW" target="_blank" rel="noopener">dp/B00Z9HVLAW</a></td><td>3,300円</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>1社（Keepa offers の実数・画面未確認）</td><td>なし</td><td>暮らしのデパート（A2RXC0REH5RF4D）</td><td>なし</td><td>527円</td><td>22.2</td><td>株式会社 白菊</td><td>5. 新品オファーが1社（『暮らしのデパート』）だけです。ブランド名とは一致しませんが、卸を1社に限定している棚の可能性があります。実画面で確認を。 ／ 生存. 売れ筋ランクが取れません（ランク自体が</td></tr>
-<tr><td>FOCAL(フォーカル) ステンレス聴診器 フォーカルトーン エキスパート ロイ</td><td><a href="https://www.amazon.co.jp/dp/B07SJGDZ1G" target="_blank" rel="noopener">dp/B07SJGDZ1G</a></td><td>11,517円</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>4社（Keepa offers の実数・画面未確認）</td><td>なし</td><td>サイバーステーション（A2WUCUZ7VIQR28）</td><td>なし</td><td>336円</td><td>4.7</td><td>Drop-カネイシ(株) -顧客直送専門-</td><td>採算. 手残り 336円が誤差幅 1,006円（売価の7%＋200円）を下回ります。価格の振れ・手数料の読み・大型品の送料で結論が反転しうるので GO にしません。 ／ 生存. 売れ筋ランクが取れませ</td></tr>
-<tr><td>FOCAL(フォーカル) ステンレス聴診器 フォーカルトーン エキスパート ブラ</td><td><a href="https://www.amazon.co.jp/dp/B07SJGC92L" target="_blank" rel="noopener">dp/B07SJGC92L</a></td><td>11,480円</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>4社（Keepa offers の実数・画面未確認）</td><td>なし</td><td>即納ドラッグ 金太郎SHOP（A33YST6SR7S</td><td>90日平均 274,801位・現在 293,988位</td><td>303円</td><td>4.4</td><td>Drop-カネイシ(株) -顧客直送専門-</td><td>採算. 手残り 303円が誤差幅 1,004円（売価の7%＋200円）を下回ります。価格の振れ・手数料の読み・大型品の送料で結論が反転しうるので GO にしません。 ／ 生存. 売れ筋ランク 274,</td></tr>
-<tr><td>FOCAL(フォーカル) ライトウェイト聴診器 フォーカルトーン エキスパート</td><td><a href="https://www.amazon.co.jp/dp/B07SKJP8KN" target="_blank" rel="noopener">dp/B07SKJP8KN</a></td><td>8,363円</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>4社（Keepa offers の実数・画面未確認）</td><td>なし</td><td>サイバーステーション（A2WUCUZ7VIQR28）</td><td>90日平均 231,834位・現在 386,262位</td><td>219円</td><td>5.1</td><td>Drop-カネイシ(株) -顧客直送専門-</td><td>採算. 手残り 219円が誤差幅 785円（売価の7%＋200円）を下回ります。価格の振れ・手数料の読み・大型品の送料で結論が反転しうるので GO にしません。 ／ 生存. 売れ筋ランク 231,83</td></tr>
-<tr><td>FOCAL(フォーカル) ライトウェイト聴診器 フォーカルトーン エキスパート</td><td><a href="https://www.amazon.co.jp/dp/B07SNSH1PY" target="_blank" rel="noopener">dp/B07SNSH1PY</a></td><td>8,363円</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>4社（Keepa offers の実数・画面未確認）</td><td>なし</td><td>サイバーステーション（A2WUCUZ7VIQR28）</td><td>なし</td><td>219円</td><td>5.1</td><td>Drop-カネイシ(株) -顧客直送専門-</td><td>採算. 手残り 219円が誤差幅 785円（売価の7%＋200円）を下回ります。価格の振れ・手数料の読み・大型品の送料で結論が反転しうるので GO にしません。 ／ 生存. 売れ筋ランクが取れません（</td></tr>
-<tr><td>リソー販売 アロエ&amp;カタツムリクリームEX 160g</td><td><a href="https://www.amazon.co.jp/dp/B00PNDU3HY" target="_blank" rel="noopener">dp/B00PNDU3HY</a></td><td>2,110円</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>1社（Keepa offers の実数・画面未確認）</td><td>なし</td><td>不明</td><td>なし</td><td>43円</td><td>11.8</td><td>有限会社 アイ・エス・エム</td><td>1. 根拠が 1 本しか取れませんでした（2本以上の一致が必要）。 ／ 5. 新品オファーが1社だけですが、そのセラー名が取れませんでした。「オファーが少ない」はメーカー1社販売のサインのことがありま</td></tr>
-<tr><td>プレーリードッグ フロッシュ キッチン洗剤ギフト FRS-K40</td><td><a href="https://www.amazon.co.jp/dp/B0CQX561SH" target="_blank" rel="noopener">dp/B0CQX561SH</a></td><td>3,056円</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>4社（Keepa offers の実数・画面未確認）</td><td>なし</td><td>ミーニャ 簡易梱包、衣類ぬいぐるみ等は圧縮後発送とな</td><td>90日平均 289,913位・現在 309,315位</td><td>16円</td><td>7.3</td><td>株式会社 白菊</td><td>採算. 手残り 16円が誤差幅 414円（売価の7%＋200円）を下回ります。価格の振れ・手数料の読み・大型品の送料で結論が反転しうるので GO にしません。 ／ 生存. 売れ筋ランク 289,913</td></tr>
-<tr><td>サージカルテープ 不織布 12mm×9ｍ×24巻 1箱(医家向品 医療用) コメ</td><td><a href="https://www.amazon.co.jp/dp/B0753DY5KJ" target="_blank" rel="noopener">dp/B0753DY5KJ</a></td><td>1,500円</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>13社（Keepa offers の実数・画面未確認）</td><td>なし</td><td>第三者セラー（A2YIIVSNGIUGVA）</td><td>90日平均 68,518位・現在 128,623位</td><td>未算定</td><td>未確認</td><td>Drop-カネイシ(株) -顧客直送専門-</td><td>5. カート保持者のセラー名が取得できず、メーカー直販かを判定できません。 ／ 採算. 売価・手数料・FBA・原価のどれかが揃わず、採算を計算できません。 商品名がセット品らしいのに個数が読めません（</td></tr>
-<tr><td>サージカルテープ 不織布 25mm×9ｍ×12巻 1箱(医家向品 医療用) コメ</td><td><a href="https://www.amazon.co.jp/dp/B0753DRTS7" target="_blank" rel="noopener">dp/B0753DRTS7</a></td><td>1,478円</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>11社（Keepa offers の実数・画面未確認）</td><td>なし</td><td>ティーズマルシェ（A2YIIVSNGIUGVA）</td><td>90日平均 93,427位・現在 82,682位</td><td>未算定</td><td>未確認</td><td>Drop-カネイシ(株) -顧客直送専門-</td><td>採算. 売価・手数料・FBA・原価のどれかが揃わず、採算を計算できません。 商品名がセット品らしいのに個数が読めません（原価の倍率が確定できない）。 ／ 仕入れ. <strong>要期限管理</strong>。カテゴリが「ドラ</td></tr>
-<tr><td>サージカルテープ プラスチック半透明 25mm×9ｍ×12巻 1箱(医家向品 医</td><td><a href="https://www.amazon.co.jp/dp/B0753DRYCC" target="_blank" rel="noopener">dp/B0753DRYCC</a></td><td>1,800円</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>7社（Keepa offers の実数・画面未確認）</td><td>なし</td><td>🇫【年中無休】健康美容用品専門店Frontrunne</td><td>90日平均 42,237位・現在 50,088位</td><td>未算定</td><td>未確認</td><td>Drop-カネイシ(株) -顧客直送専門-</td><td>採算. 売価・手数料・FBA・原価のどれかが揃わず、採算を計算できません。 商品名がセット品らしいのに個数が読めません（原価の倍率が確定できない）。 ／ 仕入れ. <strong>要期限管理</strong>。カテゴリが「ドラ</td></tr>
-<tr><td>いいタオル・ふっくらふわふわ タオルセット PIG-8165</td><td><a href="https://www.amazon.co.jp/dp/B00Z9IBFFM" target="_blank" rel="noopener">dp/B00Z9IBFFM</a></td><td>7,150円</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>1社（Keepa offers の実数・画面未確認）</td><td>なし</td><td>暮らしのデパート（A2RXC0REH5RF4D）</td><td>なし</td><td>未算定</td><td>未確認</td><td>株式会社 白菊</td><td>5. 新品オファーが1社（『暮らしのデパート』）だけです。ブランド名とは一致しませんが、卸を1社に限定している棚の可能性があります。実画面で確認を。 ／ 採算. 売価・手数料・FBA・原価のどれかが揃</td></tr>
-<tr><td>プレーリードッグ(Prairiedog) タオルギフトセット 今治タオル タオル</td><td><a href="https://www.amazon.co.jp/dp/B07G57L8JK" target="_blank" rel="noopener">dp/B07G57L8JK</a></td><td>3,300円</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>4社（Keepa offers の実数・画面未確認）</td><td>なし</td><td>A1 ショップ</td><td>なし</td><td>未算定</td><td>未確認</td><td>株式会社 白菊</td><td>採算. 売価・手数料・FBA・原価のどれかが揃わず、採算を計算できません。 商品名がセット品らしいのに個数が読めません（原価の倍率が確定できない）。 ／ 生存. 売れ筋ランクが取れません（ランク自体が</td></tr>
-<tr><td>中久 静岡銘茶詰合せ ST-40</td><td><a href="https://www.amazon.co.jp/dp/B07P54GS4R" target="_blank" rel="noopener">dp/B07P54GS4R</a></td><td>2,332円</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>1社（Keepa offers の実数・画面未確認）</td><td>なし</td><td>暮らしのデパート（A2RXC0REH5RF4D）</td><td>なし</td><td>未算定</td><td>未確認</td><td>株式会社 白菊</td><td>5. 新品オファーが1社（『暮らしのデパート』）だけです。ブランド名とは一致しませんが、卸を1社に限定している棚の可能性があります。実画面で確認を。 ／ 採算. 売価・手数料・FBA・原価のどれかが揃</td></tr>
-<tr><td>中西工芸 MAKOTO japan ファミーユ オーバルプレート ペアBセット(</td><td><a href="https://www.amazon.co.jp/dp/B09NLKT3ZP" target="_blank" rel="noopener">dp/B09NLKT3ZP</a></td><td>5,500円</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>1社（Keepa offers の実数・画面未確認）</td><td>なし</td><td>暮らしのデパート（A2RXC0REH5RF4D）</td><td>なし</td><td>未算定</td><td>未確認</td><td>株式会社 白菊</td><td>5. 新品オファーが1社（『暮らしのデパート』）だけです。ブランド名とは一致しませんが、卸を1社に限定している棚の可能性があります。実画面で確認を。 ／ 採算. 売価・手数料・FBA・原価のどれかが揃</td></tr>
-<tr><td>nishikawa 【 西川 】 フェイス・ウォッシュタオルセット 9894-0</td><td><a href="https://www.amazon.co.jp/dp/B0CDZN54BN" target="_blank" rel="noopener">dp/B0CDZN54BN</a></td><td>1,716円</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>12社（Keepa offers の実数・画面未確認）</td><td>なし</td><td>シロとクロ（A61P4HWZIPZN7）</td><td>なし</td><td>未算定</td><td>未確認</td><td>株式会社 白菊</td><td>採算. 売価・手数料・FBA・原価のどれかが揃わず、採算を計算できません。 商品名がセット品らしいのに個数が読めません（原価の倍率が確定できない）。 ／ 生存. 売れ筋ランクが取れません（ランク自体が</td></tr>
-<tr><td>nishikawa 【 西川 】 タオルセット 9894-062</td><td><a href="https://www.amazon.co.jp/dp/B0CDZRZCJ2" target="_blank" rel="noopener">dp/B0CDZRZCJ2</a></td><td>2,288円</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>10社（Keepa offers の実数・画面未確認）</td><td>なし</td><td>シロとクロ（A61P4HWZIPZN7）</td><td>なし</td><td>未算定</td><td>未確認</td><td>株式会社 白菊</td><td>採算. 売価・手数料・FBA・原価のどれかが揃わず、採算を計算できません。 商品名がセット品らしいのに個数が読めません（原価の倍率が確定できない）。 ／ 生存. 売れ筋ランクが取れません（ランク自体が</td></tr>
-<tr><td>nishikawa 【 西川 】 フェイス・ウォッシュタオルセット 9894-0</td><td><a href="https://www.amazon.co.jp/dp/B0CDZWM55Z" target="_blank" rel="noopener">dp/B0CDZWM55Z</a></td><td>3,777円</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>13社（Keepa offers の実数・画面未確認）</td><td>なし</td><td>A1 ショップ</td><td>なし</td><td>未算定</td><td>未確認</td><td>株式会社 白菊</td><td>採算. 売価・手数料・FBA・原価のどれかが揃わず、採算を計算できません。 商品名がセット品らしいのに個数が読めません（原価の倍率が確定できない）。 ／ 生存. 売れ筋ランクが取れません（ランク自体が</td></tr>
+<tr><td>静岡銘茶 深むし茶 FMB-30</td><td><a href="https://www.amazon.co.jp/dp/B0078HLN40" target="_blank" rel="noopener">dp/B0078HLN40</a></td><td>3,240円</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>1社（Keepa offers の実数・画面未確認）</td><td>なし</td><td>暮らしのデパート（A2RXC0REH5RF4D）</td><td>なし</td><td>703円</td><td>28.1</td><td>株式会社 白菊</td><td>5. 新品オファーが1社（『暮らしのデパート』）だけです。ブランド名とは一致しませんが、卸を1社に限定している棚の可能性があります。実画面で確認を。 ／ 生存. 売れ筋ランクが取れません（ランク自体が</td></tr>
+<tr><td>FOCAL(フォーカル) ライトウェイト聴診器 フォーカルトーン エキスパート</td><td><a href="https://www.amazon.co.jp/dp/B07SKJP8KN" target="_blank" rel="noopener">dp/B07SKJP8KN</a></td><td>8,363円</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>4社（Keepa offers の実数・画面未確認）</td><td>なし</td><td>サイバーステーション（A2WUCUZ7VIQR28）</td><td>不明</td><td>223円</td><td>5.1</td><td>Drop-カネイシ(株) -顧客直送専門-</td><td>生存. 売れ筋ランク 231,834位（90日平均）。100,000〜500,000位は売れているとも死んでいるとも言えません。キーゾンで直近3ヶ月の実数を見てください。 ／ 採算. 手残り 223円</td></tr>
+<tr><td>FOCAL(フォーカル) ライトウェイト聴診器 フォーカルトーン エキスパート</td><td><a href="https://www.amazon.co.jp/dp/B07SNSH1PY" target="_blank" rel="noopener">dp/B07SNSH1PY</a></td><td>8,363円</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>4社（Keepa offers の実数・画面未確認）</td><td>なし</td><td>サイバーステーション（A2WUCUZ7VIQR28）</td><td>不明</td><td>223円</td><td>5.1</td><td>Drop-カネイシ(株) -顧客直送専門-</td><td>生存. 売れ筋ランクが取れません（ランク自体が付いていない＝売れた記録がない可能性）。キーゾンで直近3ヶ月の実数を見てください。 ／ 採算. 手残り 223円が誤差幅 785円（売価の7%＋200円）</td></tr>
+<tr><td>リソー販売 アロエ&amp;カタツムリクリームEX 160g</td><td><a href="https://www.amazon.co.jp/dp/B00PNDU3HY" target="_blank" rel="noopener">dp/B00PNDU3HY</a></td><td>2,110円</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>1社（Keepa offers の実数・画面未確認）</td><td>なし</td><td>不明</td><td>なし</td><td>41円</td><td>11.7</td><td>有限会社 アイ・エス・エム</td><td>1. 根拠が 1 本しか取れませんでした（2本以上の一致が必要）。 ／ 5. 新品オファーが1社だけですが、そのセラー名が取れませんでした。「オファーが少ない」はメーカー1社販売のサインのことがありま</td></tr>
+<tr><td>プレーリードッグ フロッシュ キッチン洗剤ギフト FRS-K40</td><td><a href="https://www.amazon.co.jp/dp/B0CQX561SH" target="_blank" rel="noopener">dp/B0CQX561SH</a></td><td>3,056円</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>4社（Keepa offers の実数・画面未確認）</td><td>なし</td><td>ミーニャ 簡易梱包、衣類ぬいぐるみ等は圧縮後発送とな</td><td>不明</td><td>18円</td><td>7.3</td><td>株式会社 白菊</td><td>生存. 売れ筋ランク 289,913位（90日平均）。100,000〜500,000位は売れているとも死んでいるとも言えません。キーゾンで直近3ヶ月の実数を見てください。 ／ 仕入れ. **要期限管理</td></tr>
+<tr><td>サージカルテープ 不織布 12mm×9ｍ×24巻 1箱(医家向品 医療用) コメ</td><td><a href="https://www.amazon.co.jp/dp/B0753DY5KJ" target="_blank" rel="noopener">dp/B0753DY5KJ</a></td><td>1,500円</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>13社（Keepa offers の実数・画面未確認）</td><td>なし</td><td>第三者セラー（A2YIIVSNGIUGVA）</td><td>90日平均 68,518位・現在 128,623位</td><td>未算定</td><td>未算定</td><td>Drop-カネイシ(株) -顧客直送専門-</td><td>5. カート保持者のセラー名が取得できず、メーカー直販かを判定できません。 ／ 仕入れ. <strong>要期限管理</strong>。カテゴリが「ドラッグストア &gt; 衛生用品・ヘルスケア &gt; 救急・応急用具 &gt; サージカルテ</td></tr>
+<tr><td>サージカルテープ 不織布 25mm×9ｍ×12巻 1箱(医家向品 医療用) コメ</td><td><a href="https://www.amazon.co.jp/dp/B0753DRTS7" target="_blank" rel="noopener">dp/B0753DRTS7</a></td><td>1,478円</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>11社（Keepa offers の実数・画面未確認）</td><td>なし</td><td>ティーズマルシェ（A2YIIVSNGIUGVA）</td><td>不明</td><td>未算定</td><td>未算定</td><td>Drop-カネイシ(株) -顧客直送専門-</td><td>仕入れ. <strong>要期限管理</strong>。カテゴリが「ドラッグストア &gt; 衛生用品・ヘルスケア &gt; 救急・応急用具 &gt; サージカルテープ」で、FBA の賞味期限要件（残存60日以上で納品・45日で販売不可）と混合</td></tr>
+<tr><td>サージカルテープ プラスチック半透明 25mm×9ｍ×12巻 1箱(医家向品 医</td><td><a href="https://www.amazon.co.jp/dp/B0753DRYCC" target="_blank" rel="noopener">dp/B0753DRYCC</a></td><td>1,800円</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>7社（Keepa offers の実数・画面未確認）</td><td>なし</td><td>🇫【年中無休】健康美容用品専門店Frontrunne</td><td>不明</td><td>未算定</td><td>未算定</td><td>Drop-カネイシ(株) -顧客直送専門-</td><td>仕入れ. <strong>要期限管理</strong>。カテゴリが「ドラッグストア &gt; 衛生用品・ヘルスケア &gt; 救急・応急用具 &gt; サージカルテープ」で、FBA の賞味期限要件（残存60日以上で納品・45日で販売不可）と混合</td></tr>
+<tr><td>いいタオル・ふっくらふわふわ フェイスタオル2P PIG-8130</td><td><a href="https://www.amazon.co.jp/dp/B00Z9HVLAW" target="_blank" rel="noopener">dp/B00Z9HVLAW</a></td><td>3,300円</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>1社（Keepa offers の実数・画面未確認）</td><td>なし</td><td>暮らしのデパート（A2RXC0REH5RF4D）</td><td>なし</td><td>未算定</td><td>未算定</td><td>株式会社 白菊</td><td>5. 新品オファーが1社（『暮らしのデパート』）だけです。ブランド名とは一致しませんが、卸を1社に限定している棚の可能性があります。実画面で確認を。 ／ 生存. 売れ筋ランクが取れません（ランク自体が</td></tr>
+<tr><td>いいタオル・ふっくらふわふわ タオルセット PIG-8165</td><td><a href="https://www.amazon.co.jp/dp/B00Z9IBFFM" target="_blank" rel="noopener">dp/B00Z9IBFFM</a></td><td>7,150円</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>1社（Keepa offers の実数・画面未確認）</td><td>なし</td><td>暮らしのデパート（A2RXC0REH5RF4D）</td><td>なし</td><td>未算定</td><td>未算定</td><td>株式会社 白菊</td><td>5. 新品オファーが1社（『暮らしのデパート』）だけです。ブランド名とは一致しませんが、卸を1社に限定している棚の可能性があります。実画面で確認を。 ／ 生存. 売れ筋ランクが取れません（ランク自体が</td></tr>
+<tr><td>プレーリードッグ(Prairiedog) タオルギフトセット 今治タオル タオル</td><td><a href="https://www.amazon.co.jp/dp/B07G57L8JK" target="_blank" rel="noopener">dp/B07G57L8JK</a></td><td>3,300円</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>4社（Keepa offers の実数・画面未確認）</td><td>なし</td><td>A1 ショップ</td><td>不明</td><td>未算定</td><td>未算定</td><td>株式会社 白菊</td><td>生存. 売れ筋ランクが取れません（ランク自体が付いていない＝売れた記録がない可能性）。キーゾンで直近3ヶ月の実数を見てください。 ／ 採算. 売価・手数料・FBA・原価のどれかが揃わず、採算を計算でき</td></tr>
+<tr><td>中久 静岡銘茶詰合せ ST-40</td><td><a href="https://www.amazon.co.jp/dp/B07P54GS4R" target="_blank" rel="noopener">dp/B07P54GS4R</a></td><td>2,332円</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>1社（Keepa offers の実数・画面未確認）</td><td>なし</td><td>暮らしのデパート（A2RXC0REH5RF4D）</td><td>なし</td><td>未算定</td><td>未算定</td><td>株式会社 白菊</td><td>5. 新品オファーが1社（『暮らしのデパート』）だけです。ブランド名とは一致しませんが、卸を1社に限定している棚の可能性があります。実画面で確認を。 ／ 生存. 売れ筋ランクが取れません（ランク自体が</td></tr>
+<tr><td>中西工芸 MAKOTO japan ファミーユ オーバルプレート ペアBセット(</td><td><a href="https://www.amazon.co.jp/dp/B09NLKT3ZP" target="_blank" rel="noopener">dp/B09NLKT3ZP</a></td><td>5,500円</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>1社（Keepa offers の実数・画面未確認）</td><td>なし</td><td>暮らしのデパート（A2RXC0REH5RF4D）</td><td>なし</td><td>未算定</td><td>未算定</td><td>株式会社 白菊</td><td>5. 新品オファーが1社（『暮らしのデパート』）だけです。ブランド名とは一致しませんが、卸を1社に限定している棚の可能性があります。実画面で確認を。 ／ 生存. 売れ筋ランクが取れません（ランク自体が</td></tr>
+<tr><td>nishikawa 【 西川 】 フェイス・ウォッシュタオルセット 9894-0</td><td><a href="https://www.amazon.co.jp/dp/B0CDZN54BN" target="_blank" rel="noopener">dp/B0CDZN54BN</a></td><td>1,716円</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>12社（Keepa offers の実数・画面未確認）</td><td>なし</td><td>シロとクロ（A61P4HWZIPZN7）</td><td>不明</td><td>未算定</td><td>未算定</td><td>株式会社 白菊</td><td>生存. 売れ筋ランクが取れません（ランク自体が付いていない＝売れた記録がない可能性）。キーゾンで直近3ヶ月の実数を見てください。 ／ 採算. 売価・手数料・FBA・原価のどれかが揃わず、採算を計算でき</td></tr>
+<tr><td>nishikawa 【 西川 】 タオルセット 9894-062</td><td><a href="https://www.amazon.co.jp/dp/B0CDZRZCJ2" target="_blank" rel="noopener">dp/B0CDZRZCJ2</a></td><td>2,288円</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>10社（Keepa offers の実数・画面未確認）</td><td>なし</td><td>シロとクロ（A61P4HWZIPZN7）</td><td>不明</td><td>未算定</td><td>未算定</td><td>株式会社 白菊</td><td>生存. 売れ筋ランクが取れません（ランク自体が付いていない＝売れた記録がない可能性）。キーゾンで直近3ヶ月の実数を見てください。 ／ 採算. 売価・手数料・FBA・原価のどれかが揃わず、採算を計算でき</td></tr>
+<tr><td>nishikawa 【 西川 】 フェイス・ウォッシュタオルセット 9894-0</td><td><a href="https://www.amazon.co.jp/dp/B0CDZWM55Z" target="_blank" rel="noopener">dp/B0CDZWM55Z</a></td><td>3,777円</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>13社（Keepa offers の実数・画面未確認）</td><td>なし</td><td>A1 ショップ</td><td>不明</td><td>未算定</td><td>未算定</td><td>株式会社 白菊</td><td>生存. 売れ筋ランクが取れません（ランク自体が付いていない＝売れた記録がない可能性）。キーゾンで直近3ヶ月の実数を見てください。 ／ 採算. 売価・手数料・FBA・原価のどれかが揃わず、採算を計算でき</td></tr>
 </tbody></table>
 <p><strong>見るところ（この順で）</strong></p>
 <ol>
@@ -48,7 +57,7 @@
 <li style='margin-left:0.0em'><strong>出品一覧</strong> <code>https://www.amazon.co.jp/gp/offer-listing/&lt;ASIN&gt;/?f_new=true</code> を開いて新品出品者を数える。<strong>Amazon 本体が混ざっていないかの内訳</strong>を書く</li>
 <li style='margin-left:0.0em'><strong>「Amazon の1個 ＝ 卸の何点か」</strong>（⑤で落ちた行だけ）。Amazon の商品名と卸サイトの商品ページの両方を人が見る。ここを間違えると原価がN分の1になります（9/30 の B0DJNX12KZ）</li>
 </ol>
-<h2>1c. 見ても覆らない行（判定 NO-GO・42件）— 画面確認の対象外</h2>
+<h2>1c. 見ても覆らない行（判定 NO-GO・45件）— 画面確認の対象外</h2>
 <p>参考として残します。<strong>カズヨの画面確認の対象外です。</strong></p>
 <p><strong>判定が NO-GO の行</strong>です。参考として残します。</p>
 <ul>
@@ -56,18 +65,18 @@
 <li style='margin-left:0.0em'><strong>⑤赤字・⑥手残りが誤差幅以下</strong> … 見ても数字は変わりません。動かせるのは仕入れ値か売価で、どちらも画面確認の話ではありません</li>
 <li style='margin-left:0.0em'><strong>⑧売れ筋ランクが50万位より下</strong> … 直近3ヶ月の実績が実質ゼロの棚です</li>
 </ul>
-<p>（42件あります。手残りの大きい上位10件だけ載せます）</p>
+<p>（45件あります。手残りの大きい上位10件だけ載せます）</p>
 <table><thead><tr><th>商品名</th><th>Amazon</th><th>売価</th><th>過去1ヶ月の販売数</th><th>セラー数</th><th>Amazon本体</th><th>カートの販売元</th><th>売れ筋ランク</th><th>1個手残り</th><th>利益率</th><th>購入元の名前</th><th>読み切れなかったところ／落ちた理由</th></tr></thead><tbody>
-<tr><td>永井興産 ローテーブル 折りたたみ 幅60m×奥行45cm ホワイト 鏡面加工</td><td><a href="https://www.amazon.co.jp/dp/B0CX8PLLNK" target="_blank" rel="noopener">dp/B0CX8PLLNK</a></td><td>6,857円</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>3社（Keepa offers の実数・画面未確認）</td><td>あり</td><td>Amazon.co.jp（AN1VRQENFRJN5</td><td>90日平均 265,386位・現在 281,529位</td><td>1,659円</td><td>27.2</td><td>株式会社 永井興産</td><td>1. カート保持者が Amazon.co.jp 本体です。値下げしてもカートは取れません。 ／ 2. 本体が直近1年の 100.0% の期間で在庫を持っています。 ／ 3. ライブの新品オファー 3</td></tr>
-<tr><td>ニッポ/DNL エースラインランプ T6 ランプ長:1073mm 3波長形昼光色</td><td><a href="https://www.amazon.co.jp/dp/B008FIR2KU" target="_blank" rel="noopener">dp/B008FIR2KU</a></td><td>9,966円</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>2社（Keepa offers の実数・画面未確認）</td><td>あり</td><td>スター☆彡（A4KZRVTB8UZLV）</td><td>なし</td><td>1,403円</td><td>16.1</td><td>株式会社 ヤザワコーポレーション</td><td>1. いまは第三者ですが、統計期間中に本体がカートを 1.2% 取っています。 ／ 2. 本体が直近1年の 86.0% の期間で在庫を持っています。 ／ 3. ライブの新品オファー 2 本に Amaz</td></tr>
+<tr><td>永井興産 ローテーブル 折りたたみ 幅60m×奥行45cm ホワイト 鏡面加工</td><td><a href="https://www.amazon.co.jp/dp/B0CX8PLLNK" target="_blank" rel="noopener">dp/B0CX8PLLNK</a></td><td>6,857円</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>3社（Keepa offers の実数・画面未確認）</td><td>あり</td><td>Amazon.co.jp（AN1VRQENFRJN5</td><td>90日平均 265,386位・現在 281,529位</td><td>1,657円</td><td>27.2</td><td>株式会社 永井興産</td><td>1. カート保持者が Amazon.co.jp 本体です。値下げしてもカートは取れません。 ／ 2. 本体が直近1年の 100.0% の期間で在庫を持っています。 ／ 3. ライブの新品オファー 3</td></tr>
+<tr><td>ニッポ/DNL エースラインランプ T6 ランプ長:1073mm 3波長形昼光色</td><td><a href="https://www.amazon.co.jp/dp/B008FIR2KU" target="_blank" rel="noopener">dp/B008FIR2KU</a></td><td>9,966円</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>2社（Keepa offers の実数・画面未確認）</td><td>あり</td><td>スター☆彡（A4KZRVTB8UZLV）</td><td>なし</td><td>1,399円</td><td>16.1</td><td>株式会社 ヤザワコーポレーション</td><td>1. いまは第三者ですが、統計期間中に本体がカートを 1.2% 取っています。 ／ 2. 本体が直近1年の 86.0% の期間で在庫を持っています。 ／ 3. ライブの新品オファー 2 本に Amaz</td></tr>
 <tr><td>いいタオル・ふっくらふわふわ バスタオル PIG-8150</td><td><a href="https://www.amazon.co.jp/dp/B00Z9I3H08" target="_blank" rel="noopener">dp/B00Z9I3H08</a></td><td>5,500円</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>2社（Keepa offers の実数・画面未確認）</td><td>あり</td><td>暮らしのデパート（A2RXC0REH5RF4D）</td><td>なし</td><td>1,329円</td><td>27.9</td><td>株式会社 白菊</td><td>1. いまは第三者ですが、統計期間中に本体がカートを 8.1% 取っています。 ／ 2. 本体が直近1年の 100.0% の期間で在庫を持っています。 ／ 3. ライブの新品オファー 2 本に Ama</td></tr>
-<tr><td>【DN】 FLR34T6EX-L25 エースラインランプ G13口金 受注生産品</td><td><a href="https://www.amazon.co.jp/dp/B00J3FMK8I" target="_blank" rel="noopener">dp/B00J3FMK8I</a></td><td>9,130円</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>2社（Keepa offers の実数・画面未確認）</td><td>あり</td><td>スター☆彡（A4KZRVTB8UZLV）</td><td>なし</td><td>946円</td><td>12.6</td><td>株式会社 ヤザワコーポレーション</td><td>1. いまは第三者ですが、統計期間中に本体がカートを 22.6% 取っています。 ／ 2. 本体が直近1年の 100.0% の期間で在庫を持っています。 ／ 3. ライブの新品オファー 2 本に Am</td></tr>
-<tr><td>レ・フィーユ スイーツコレクション LC-E</td><td><a href="https://www.amazon.co.jp/dp/B0GTGBLW42" target="_blank" rel="noopener">dp/B0GTGBLW42</a></td><td>3,240円</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>3社（Keepa offers の実数・画面未確認）</td><td>あり</td><td>Amazon.co.jp（AN1VRQENFRJN5</td><td>なし</td><td>928円</td><td>35</td><td>株式会社 八大</td><td>1. カート保持者が Amazon.co.jp 本体です。値下げしてもカートは取れません。 ／ 2. 本体が直近1年の 100.0% の期間で在庫を持っています。 ／ 3. ライブの新品オファー 3</td></tr>
-<tr><td>AV01321 エコラインランプ（蛍光灯） ランプ長３０３ｍｍ ３波長形電球色</td><td><a href="https://www.amazon.co.jp/dp/B00Q64SLE6" target="_blank" rel="noopener">dp/B00Q64SLE6</a></td><td>8,470円</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>2社（Keepa offers の実数・画面未確認）</td><td>あり</td><td>スター☆彡（A4KZRVTB8UZLV）</td><td>なし</td><td>756円</td><td>11.4</td><td>株式会社 ヤザワコーポレーション</td><td>2. 本体が直近1年の 100.0% の期間で在庫を持っています。 ／ 3. ライブの新品オファー 2 本に Amazon 本体が混ざっています。 ／ 採算. 手残り 756円が誤差幅 793円（売価</td></tr>
-<tr><td>揖保乃糸・つゆ付き YKC-30 R211-02</td><td><a href="https://www.amazon.co.jp/dp/B0DRF5RG38" target="_blank" rel="noopener">dp/B0DRF5RG38</a></td><td>3,289円</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>3社（Keepa offers の実数・画面未確認）</td><td>あり</td><td>Amazon.co.jp（AN1VRQENFRJN5</td><td>なし</td><td>740円</td><td>28.8</td><td>株式会社 白菊</td><td>1. カート保持者が Amazon.co.jp 本体です。値下げしてもカートは取れません。 ／ 2. 本体が直近1年の 100.0% の期間で在庫を持っています。 ／ 3. ライブの新品オファー 3</td></tr>
-<tr><td>内海産業(Utsumi) 貯金箱 自動挿入 紙幣 お札 ＆ 小銭 パスワード 暗</td><td><a href="https://www.amazon.co.jp/dp/B0FNCR89SY" target="_blank" rel="noopener">dp/B0FNCR89SY</a></td><td>2,813円</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>1社（Keepa offers の実数・画面未確認）</td><td>あり</td><td>Amazon.co.jp（AN1VRQENFRJN5</td><td>90日平均 304,797位・現在 77,744位</td><td>619円</td><td>29.3</td><td>株式会社 サージュ</td><td>1. カート保持者が Amazon.co.jp 本体です。値下げしてもカートは取れません。 ／ 2. 本体が直近1年の 100.0% の期間で在庫を持っています。 ／ 3. ライブの新品オファー 1</td></tr>
-<tr><td>プレーリードッグ フロッシュ キッチン洗剤ギフト FRS-K50</td><td><a href="https://www.amazon.co.jp/dp/B0CQX4NPH7" target="_blank" rel="noopener">dp/B0CQX4NPH7</a></td><td>3,867円</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>5社（Keepa offers の実数・画面未確認）</td><td>あり</td><td>ECJOY! [創業24年インボイスT7011001</td><td>90日平均 290,202位・現在 308,848位</td><td>179円</td><td>10</td><td>株式会社 白菊</td><td>1. いまは第三者ですが、統計期間中に本体がカートを 3.7% 取っています。 ／ 2. 本体が直近1年の 100.0% の期間で在庫を持っています。 ／ 3. ライブの新品オファー 5 本に Ama</td></tr>
-<tr><td>揖保乃糸・つゆ付き YKC-50 R211-04</td><td><a href="https://www.amazon.co.jp/dp/B0DRF4VCB2" target="_blank" rel="noopener">dp/B0DRF4VCB2</a></td><td>3,784円</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>3社（Keepa offers の実数・画面未確認）</td><td>あり</td><td>ココノワール（A2E9JHR538UFPB）</td><td>なし</td><td>147円</td><td>9.3</td><td>株式会社 白菊</td><td>2. 本体が直近1年の 100.0% の期間で在庫を持っています。 ／ 3. ライブの新品オファー 3 本に Amazon 本体が混ざっています。 ／ 採算. 手残り 147円が誤差幅 465円（売価</td></tr>
+<tr><td>【DN】 FLR34T6EX-L25 エースラインランプ G13口金 受注生産品</td><td><a href="https://www.amazon.co.jp/dp/B00J3FMK8I" target="_blank" rel="noopener">dp/B00J3FMK8I</a></td><td>9,130円</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>2社（Keepa offers の実数・画面未確認）</td><td>あり</td><td>スター☆彡（A4KZRVTB8UZLV）</td><td>なし</td><td>950円</td><td>12.7</td><td>株式会社 ヤザワコーポレーション</td><td>1. いまは第三者ですが、統計期間中に本体がカートを 22.6% 取っています。 ／ 2. 本体が直近1年の 100.0% の期間で在庫を持っています。 ／ 3. ライブの新品オファー 2 本に Am</td></tr>
+<tr><td>レ・フィーユ スイーツコレクション LC-E</td><td><a href="https://www.amazon.co.jp/dp/B0GTGBLW42" target="_blank" rel="noopener">dp/B0GTGBLW42</a></td><td>3,240円</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>3社（Keepa offers の実数・画面未確認）</td><td>あり</td><td>Amazon.co.jp（AN1VRQENFRJN5</td><td>なし</td><td>926円</td><td>34.9</td><td>株式会社 八大</td><td>1. カート保持者が Amazon.co.jp 本体です。値下げしてもカートは取れません。 ／ 2. 本体が直近1年の 100.0% の期間で在庫を持っています。 ／ 3. ライブの新品オファー 3</td></tr>
+<tr><td>AV01321 エコラインランプ（蛍光灯） ランプ長３０３ｍｍ ３波長形電球色</td><td><a href="https://www.amazon.co.jp/dp/B00Q64SLE6" target="_blank" rel="noopener">dp/B00Q64SLE6</a></td><td>8,470円</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>2社（Keepa offers の実数・画面未確認）</td><td>あり</td><td>スター☆彡（A4KZRVTB8UZLV）</td><td>なし</td><td>756円</td><td>11.4</td><td>株式会社 ヤザワコーポレーション</td><td>2. 本体が直近1年の 100.0% の期間で在庫を持っています。 ／ 3. ライブの新品オファー 2 本に Amazon 本体が混ざっています。 ／ 生存. 売れ筋ランクが取れません（ランク自体が付</td></tr>
+<tr><td>揖保乃糸・つゆ付き YKC-30 R211-02</td><td><a href="https://www.amazon.co.jp/dp/B0DRF5RG38" target="_blank" rel="noopener">dp/B0DRF5RG38</a></td><td>3,289円</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>3社（Keepa offers の実数・画面未確認）</td><td>あり</td><td>Amazon.co.jp（AN1VRQENFRJN5</td><td>なし</td><td>741円</td><td>28.8</td><td>株式会社 白菊</td><td>1. カート保持者が Amazon.co.jp 本体です。値下げしてもカートは取れません。 ／ 2. 本体が直近1年の 100.0% の期間で在庫を持っています。 ／ 3. ライブの新品オファー 3</td></tr>
+<tr><td>内海産業(Utsumi) 貯金箱 自動挿入 紙幣 お札 ＆ 小銭 パスワード 暗</td><td><a href="https://www.amazon.co.jp/dp/B0FNCR89SY" target="_blank" rel="noopener">dp/B0FNCR89SY</a></td><td>2,813円</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>1社（Keepa offers の実数・画面未確認）</td><td>あり</td><td>Amazon.co.jp（AN1VRQENFRJN5</td><td>90日平均 304,797位・現在 77,744位</td><td>621円</td><td>29.4</td><td>株式会社 サージュ</td><td>1. カート保持者が Amazon.co.jp 本体です。値下げしてもカートは取れません。 ／ 2. 本体が直近1年の 100.0% の期間で在庫を持っています。 ／ 3. ライブの新品オファー 1</td></tr>
+<tr><td>FOCAL(フォーカル) ステンレス聴診器 フォーカルトーン エキスパート ロイ</td><td><a href="https://www.amazon.co.jp/dp/B07SJGDZ1G" target="_blank" rel="noopener">dp/B07SJGDZ1G</a></td><td>11,517円</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>4社（Keepa offers の実数・画面未確認）</td><td>なし</td><td>サイバーステーション（A2WUCUZ7VIQR28）</td><td>不明</td><td>346円</td><td>4.8</td><td>Drop-カネイシ(株) -顧客直送専門-</td><td>生存. 売れ筋ランクが取れません（ランク自体が付いていない＝売れた記録がない可能性）。キーゾンで直近3ヶ月の実数を見てください。 ／ 採算. 1 SKU の発注額が 92,780円で、残枠 80,00</td></tr>
+<tr><td>FOCAL(フォーカル) ステンレス聴診器 フォーカルトーン エキスパート ブラ</td><td><a href="https://www.amazon.co.jp/dp/B07SJGC92L" target="_blank" rel="noopener">dp/B07SJGC92L</a></td><td>11,480円</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>4社（Keepa offers の実数・画面未確認）</td><td>なし</td><td>即納ドラッグ 金太郎SHOP（A33YST6SR7S</td><td>不明</td><td>299円</td><td>4.4</td><td>Drop-カネイシ(株) -顧客直送専門-</td><td>生存. 売れ筋ランク 274,801位（90日平均）。100,000〜500,000位は売れているとも死んでいるとも言えません。キーゾンで直近3ヶ月の実数を見てください。 ／ 採算. 1 SKU の発</td></tr>
 </tbody></table>
 <h2>1d. 初回の候補から外した系列</h2>
 <p><strong>DNライティングの直管蛍光灯（14件）を外しました。</strong>生存 PASS 18件のうち14件が<strong>同一シリーズ・同一出展企業</strong>で、これを買っても分散が効きません（1商品に8万円を賭けるのと同じ）。蛍光灯が水俣条約で製造終了予定という推測もありますが、<strong>その当否に関わらず偏りだけで外す</strong>判断です（カズヨ 2026-10-01）。</p>
@@ -87,21 +96,71 @@
 <tr><td>✅ 候補として段Bへ</td><td>225</td></tr>
 </tbody></table>
 <h3>段B — §3.3 のゲート（6〜8トークン/ASIN）</h3>
-<p>判定した ASIN <strong>212件</strong>（うち GO 0件・NO-GO 183件・UNKNOWN 29件）。落ちた理由の内訳（下の 212件ぶん。1件で複数該当あり）:</p>
+<p>判定した ASIN <strong>212件</strong>（うち GO 0件・NO-GO 186件・UNKNOWN 26件）。落ちた理由の内訳（下の 212件ぶん。1件で複数該当あり）:</p>
 <table><thead><tr><th>落ちた理由</th><th>件数</th></tr></thead><tbody>
+<tr><td>再計算. 2026-10-01 単位ずれの是正で原価だけ引き直し（売価・手数料は</td><td>212</td></tr>
 <tr><td>⑧生存（売れている根拠がない）</td><td>193</td></tr>
 <tr><td>②本体の在庫履歴がある</td><td>177</td></tr>
 <tr><td>②本体がカートを取った履歴がある</td><td>134</td></tr>
 <tr><td>②出品一覧に本体が混ざっている</td><td>59</td></tr>
 <tr><td>④メーカー直販かを機械で判定できない</td><td>49</td></tr>
-<tr><td>⑥手残りが誤差幅以下</td><td>45</td></tr>
+<tr><td>⑥手残りが誤差幅以下</td><td>43</td></tr>
 <tr><td>④メーカー直販の疑い</td><td>42</td></tr>
 <tr><td>⑤赤字</td><td>39</td></tr>
-<tr><td>⑤採算が計算できない（Amazon 側のセット数が読めない）</td><td>37</td></tr>
-<tr><td>⑤Amazon 側のセット数が商品名から読めない</td><td>37</td></tr>
+<tr><td>⑤採算が計算できない（Amazon 側のセット数が読めない）</td><td>39</td></tr>
+<tr><td>単位. 商品名から「Amazon の1個 ＝ 卸の何点か」が確定できません（『1</td><td>39</td></tr>
 <tr><td>⑦賞味期限管理が要るカテゴリ</td><td>35</td></tr>
 <tr><td>②本体がカートを持っている</td><td>19</td></tr>
+<tr><td>採算. 1個粗利 3,611円・利益率 30.4%（保管/納品/梱包 206円を</td><td>8</td></tr>
 <tr><td>①カート保持者を機械で確定できない</td><td>7</td></tr>
+<tr><td>採算. 1個粗利 2,419円・利益率 23.1%（保管/納品/梱包 206円を</td><td>6</td></tr>
+<tr><td>採算. 1個粗利 3,778円・利益率 33.2%（保管/納品/梱包 206円を</td><td>5</td></tr>
+<tr><td>採算. 1個粗利 3,539円・利益率 31.1%（保管/納品/梱包 206円を</td><td>4</td></tr>
+<tr><td>採算. 1個粗利 3,293円・利益率 24.7%（保管/納品/梱包 206円を</td><td>4</td></tr>
+<tr><td>採算. 1個粗利 2,341円・利益率 23.5%（保管/納品/梱包 206円を</td><td>4</td></tr>
+<tr><td>採算. 1個粗利 2,237円・利益率 24.5%（保管/納品/梱包 206円を</td><td>4</td></tr>
+<tr><td>採算. 1個粗利 1,763円・利益率 16.9%（保管/納品/梱包 206円を</td><td>4</td></tr>
+<tr><td>採算. 1個粗利 3,299円・利益率 23.6%（保管/納品/梱包 206円を</td><td>3</td></tr>
+<tr><td>採算. 1個粗利 2,131円・利益率 23.3%（保管/納品/梱包 206円を</td><td>3</td></tr>
+<tr><td>採算. 1個粗利 2,094円・利益率 24.7%（保管/納品/梱包 206円を</td><td>3</td></tr>
+<tr><td>採算. 1個粗利 4,492円・利益率 29.1%（保管/納品/梱包 206円を</td><td>2</td></tr>
+<tr><td>採算. 1個粗利 2,867円・利益率 29.0%（保管/納品/梱包 206円を</td><td>2</td></tr>
+<tr><td>採算. 1個粗利 2,580円・利益率 25.9%（保管/納品/梱包 206円を</td><td>2</td></tr>
+<tr><td>採算. 1個粗利 2,241円・利益率 24.5%（保管/納品/梱包 206円を</td><td>2</td></tr>
+<tr><td>採算. 1個粗利 1,156円・利益率 12.7%（保管/納品/梱包 206円を</td><td>2</td></tr>
+<tr><td>採算. 1個粗利 900円・利益率 13.5%（保管/納品/梱包 206円を引い</td><td>2</td></tr>
+<tr><td>採算. 1 SKU の発注額が 92,780円で、残枠 80,000円を超えます</td><td>2</td></tr>
+<tr><td>機械判定の記録: 【実画面確認 2026-10-01】キーゾンにデータなし。**</td><td>2</td></tr>
+<tr><td>採算. 1個粗利 4,486円・利益率 30.4%（保管/納品/梱包 206円を</td><td>1</td></tr>
+<tr><td>採算. 1個粗利 4,382円・利益率 34.2%（保管/納品/梱包 206円を</td><td>1</td></tr>
+<tr><td>採算. 1個粗利 3,619円・利益率 32.3%（保管/納品/梱包 206円を</td><td>1</td></tr>
+<tr><td>採算. 1個粗利 3,428円・利益率 31.2%（保管/納品/梱包 206円を</td><td>1</td></tr>
+<tr><td>採算. 1個粗利 3,299円・利益率 24.7%（保管/納品/梱包 206円を</td><td>1</td></tr>
+<tr><td>採算. 1個粗利 3,218円・利益率 28.2%（保管/納品/梱包 206円を</td><td>1</td></tr>
+<tr><td>採算. 1個粗利 3,179円・利益率 26.7%（保管/納品/梱包 206円を</td><td>1</td></tr>
+<tr><td>採算. 1個粗利 3,099円・利益率 28.5%（保管/納品/梱包 206円を</td><td>1</td></tr>
+<tr><td>採算. 1個粗利 3,069円・利益率 23.0%（保管/納品/梱包 206円を</td><td>1</td></tr>
+<tr><td>採算. 1個粗利 3,041円・利益率 32.9%（保管/納品/梱包 206円を</td><td>1</td></tr>
+<tr><td>採算. 1個粗利 3,034円・利益率 28.9%（保管/納品/梱包 206円を</td><td>1</td></tr>
+<tr><td>採算. 1個粗利 2,889円・利益率 29.0%（保管/納品/梱包 206円を</td><td>1</td></tr>
+<tr><td>採算. 1個粗利 2,840円・利益率 24.7%（保管/納品/梱包 206円を</td><td>1</td></tr>
+<tr><td>採算. 1個粗利 2,771円・利益率 26.4%（保管/納品/梱包 206円を</td><td>1</td></tr>
+<tr><td>採算. 1個粗利 2,447円・利益率 25.0%（保管/納品/梱包 206円を</td><td>1</td></tr>
+<tr><td>採算. 1個粗利 2,288円・利益率 25.1%（保管/納品/梱包 206円を</td><td>1</td></tr>
+<tr><td>採算. 1個粗利 2,129円・利益率 25.1%（保管/納品/梱包 206円を</td><td>1</td></tr>
+<tr><td>採算. 1個粗利 2,043円・利益率 24.1%（保管/納品/梱包 206円を</td><td>1</td></tr>
+<tr><td>採算. 1個粗利 1,863円・利益率 27.2%（保管/納品/梱包 206円を</td><td>1</td></tr>
+<tr><td>採算. 1個粗利 1,605円・利益率 16.1%（保管/納品/梱包 206円を</td><td>1</td></tr>
+<tr><td>採算. 1個粗利 1,552円・利益率 18.7%（保管/納品/梱包 206円を</td><td>1</td></tr>
+<tr><td>採算. 1個粗利 1,535円・利益率 27.9%（保管/納品/梱包 206円を</td><td>1</td></tr>
+<tr><td>採算. 1個粗利 1,363円・利益率 14.1%（保管/納品/梱包 206円を</td><td>1</td></tr>
+<tr><td>採算. 1個粗利 1,352円・利益率 15.9%（保管/納品/梱包 206円を</td><td>1</td></tr>
+<tr><td>採算. 1個粗利 1,318円・利益率 17.3%（保管/納品/梱包 206円を</td><td>1</td></tr>
+<tr><td>採算. 1個粗利 1,132円・利益率 34.9%（保管/納品/梱包 206円を</td><td>1</td></tr>
+<tr><td>採算. 1個粗利 947円・利益率 28.8%（保管/納品/梱包 206円を引い</td><td>1</td></tr>
+<tr><td>採算. 1個粗利 909円・利益率 28.1%（保管/納品/梱包 206円を引い</td><td>1</td></tr>
+<tr><td>採算. 1個粗利 827円・利益率 29.4%（保管/納品/梱包 206円を引い</td><td>1</td></tr>
+<tr><td>キーゾンにデータなし。<strong>バスタオル2枚で11,000円</strong>は相場から外れており</td><td>1</td></tr>
 <tr><td>③オファー一覧が取れない</td><td>1</td></tr>
 </tbody></table>
 <h2>4. 正直に言っておくこと</h2>
@@ -120,6 +179,16 @@
 <tr><td>3</td><td><strong>ゲートの閾値はいじらない</strong>（§6 に根拠）。緩めても候補は1件も増えません</td><td>—</td><td>一度「本体の在庫率を何%まで許すか決めれば候補が増える」と書こうとしましたが、数えたら<strong>本体の条件だけで落ちた行は0件</strong>でした</td></tr>
 <tr><td>4</td><td><strong>§1b の行を人が見る</strong>（カートの販売元・出品一覧の実数・Amazon 側のセット数）</td><td>カズヨの Chrome＋キーゾン</td><td>0件を1〜2件にする最短路。NO-GO の行は見なくてよい</td></tr>
 </tbody></table>
+<h2>5b. カズヨが実画面で見た6件（全部 NO-GO）</h2>
+<table><thead><tr><th>ASIN</th><th>キーゾンの実数</th><th>見て分かったこと</th></tr></thead><tbody>
+<tr><td>B003G7XKTW NEC トナー黄</td><td><strong>3ヶ月0個</strong></td><td>ランク299,573位。死んでいる</td></tr>
+<tr><td>B003G7XKVK NEC トナー黒</td><td><strong>3ヶ月2個</strong></td><td>月0.7個。12点で17ヶ月</td></tr>
+<tr><td>B00Z9IMWKO いいタオル バスタオル2P</td><td>データなし</td><td>バスタオル2枚で11,000円＝売価が吊り上がっている（終売か転売価格）</td></tr>
+<tr><td>B01M01H03P キャビネット</td><td>データなし</td><td>利益率8.2%・10点で約19万円＝残枠8万円を大幅超過</td></tr>
+<tr><td>B0GR4C7TFH アルミコンテナ</td><td>月4個</td><td>原価欄が空・10点で約22万円＝残枠超過</td></tr>
+<tr><td>B0FNWB76NG カップ麺18食</td><td>月5個</td><td>🔴 <strong>単位ずれ。実際は ▲778円/個の赤字</strong>（上の訂正）</td></tr>
+</tbody></table>
+<p><strong>機械が『本体なし・第三者がカート・黒字』まで通した行が、実画面では全部だめでした。</strong>キーゾンの実数（3ヶ月0個・2個）は Keepa の <code>monthlySold</code> 非表示では区別できません。§3.3-8 の積極条件は、<strong>最後は人がキーゾンで数を見るまで確定しない</strong>ということです。</p>
 <h2>6. ゲートを緩めても候補は増えません（数えた）</h2>
 <p>「本体の在庫履歴が少しでもあれば落とす」のは厳しすぎるのではないか、と疑いました。<strong>疑いは外れました。</strong>今日判定した212件のうち、<strong>本体に関する条件だけで落ちた行は0件</strong>です。本体で落ちた行は、例外なく<strong>生存（売れている根拠がない）や採算でも落ちています。</strong></p>
 <table><thead><tr><th>本体の存在感</th><th>1年の在庫率</th><th>統計期間のカート獲得率</th></tr></thead><tbody>

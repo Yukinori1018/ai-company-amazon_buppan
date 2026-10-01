@@ -382,7 +382,7 @@ class TestSetCount(unittest.TestCase):
         self.assertIsNone(mult)
         status, reason = pipe.economics_status(None, 10, note)
         self.assertEqual(status, md.UNKNOWN)
-        self.assertIn("個数が読めません", reason)
+        self.assertIn("卸の何点か", reason)
 
     def test_set_count_flips_fujiboeki_to_loss(self):
         """B0DJNX12KZ: 原価2,024円/個で赤字。結論はカズヨの実画面確認と同じ。
@@ -512,9 +512,9 @@ class TestSupplyReality(unittest.TestCase):
 class TestErrorBand(unittest.TestCase):
     """手残りが誤差幅を下回る行は GO にしない（UNKNOWN）。"""
 
-    def _e(self, sell, cost):
+    def _e(self, sell, cost, qty=10):
         return profit.compute(sell=sell, fee_pct=15.4, fba_yen=472,
-                              unit_cost_incl=cost, qty=10, monthly_sold=10)
+                              unit_cost_incl=cost, qty=qty, monthly_sold=10)
 
     def test_band_applies_even_when_monthly_sold_unknown(self):
         """月販が不明でも誤差幅は効く。**順番の間違いでゲートが空振りしていた**（9/30）。"""
@@ -532,7 +532,11 @@ class TestErrorBand(unittest.TestCase):
 
     def test_error_band_scales_with_price(self):
         """高額品は誤差幅も大きい（26,800円の売価で手残り355円は読み切れていない）。"""
-        e = self._e(26800, 21000)
+        # qty=3 にしてあるのは、2026-10-01 に入れた**予算のゲート**（1 SKU 8万円超は NO-GO）が
+        # 先に効いて、誤差幅のテストが空振りするのを避けるため。
+        # 誤差幅は「1個あたり」の話で、発注点数とは独立であることもここで固定している。
+        e = self._e(26800, 21000, qty=3)
+        self.assertLessEqual(e.order_total, pipe.MAX_ORDER_TOTAL_YEN)
         band = round(26800 * pipe.ERROR_BAND_PCT / 100) + pipe.ERROR_BAND_FIXED
         self.assertGreater(band, 1800)
         self.assertGreater(e.net_per_unit, 0)

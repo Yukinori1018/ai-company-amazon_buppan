@@ -137,5 +137,37 @@ def update_row(row_number: int, row: list, ws=None, state: "LedgerState | None" 
     ws.update(f"A{row_number}:AF{row_number}", [row], value_input_option="USER_ENTERED")
 
 
+def update_rows(updates: list[tuple[int, list]], ws=None,
+                state: "LedgerState | None" = None, chunk: int = 100,
+                sleep: float = 2.0, log=print) -> int:
+    """複数行をまとめて上書きする。**1行ずつ API を叩かないこと。**
+
+    Google Sheets の書き込みは **60リクエスト/分/ユーザー** で、240行を1行ずつ送ると
+    途中で 429 になります（2026-10-01 に実際に止まり、半分だけ書けた状態になりました）。
+    `batch_update` なら1リクエストで何行でも送れます。
+
+    人が実画面で確認した行は `update_row` と同じく**上書きしません**。
+    """
+    import time
+
+    ws = ws or open_tab()
+    safe = []
+    for row_no, row in updates:
+        asin = row[COL_ASIN] if len(row) > COL_ASIN else ""
+        if state is not None and state.is_human_verified(asin):
+            log(f"上書きせず（人が確認済み）: {asin}")
+            continue
+        safe.append({"range": f"A{row_no}:AF{row_no}", "values": [row]})
+
+    done = 0
+    for i in range(0, len(safe), chunk):
+        batch = safe[i:i + chunk]
+        ws.batch_update(batch, value_input_option="USER_ENTERED")
+        done += len(batch)
+        if i + chunk < len(safe):
+            time.sleep(sleep)
+    return done
+
+
 def sheet_url() -> str:
     return f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/edit"
