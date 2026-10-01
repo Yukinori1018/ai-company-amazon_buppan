@@ -651,3 +651,60 @@ python3 sd_lookup.py --from-netsea-index        # シートへ（既にある行
 | `test_supply.py` | **SD と仕入れ先商品リストのテスト82本。ネットワークもシートも不要** |
 
 シークレット: `KEEPA_API_KEY`（`~/.config/ai-company-amazon-buppan/keepa.env`）、`NETSEA_API_TOKEN`（同 `.env`）、Google SA 鍵（`~/.config/claude-session-sheets/credentials.json`）。**どれもリポには置いていません。**
+
+---
+
+## 仕入れ先起点（NETSEA → Amazon）の夜間走行（2026-10-01 追加）
+
+### 使い方
+
+```bash
+./nightly.sh                 # 1日6,000トークン・最長5時間
+./nightly.sh 3000 180        # 1日3,000トークン・最長180分
+./nightly.sh stop            # 止める（STOP ファイルを置く）
+./nightly.sh start           # 再開する
+./nightly.sh status          # 今日の消費と、既に投げた JAN の数
+```
+
+### 中で何が走るか（**二段構えを崩さないこと**）
+
+| 段 | スクリプト | 実測の単価 | 役割 |
+|---|---|---|---|
+| 索引づくり | `discover.build_netsea_index` | **0** | NETSEA の JAN → 卸情報。Keepa を使わない |
+| 段A | `run_supplier_first.py` | **1.17 / JAN** | JAN → ASIN。ハズレ JAN は0トークン。ここで「死んでいる棚・売価なし・赤字」を0追加トークンで落とす |
+| 安い段 | `rank_pass.py` | **1.00 / ASIN** | ランクと月販。**段Bの順番を決めるためだけ**に使う |
+| 段B | `run_stage_b.py` | **6.9 / ASIN** | §3.3 のゲート（offers が要る①②③と、メーカー直販④） |
+| 報告 | `write_report.py` | 0 | 成果物 32（md/html）＋ 卸値つきフル版 CSV |
+
+**1段でまとめて `stats + offers` を取ると 6.9/ASIN、二段なら `1 + 通過率×6.9`。**
+2026-10-01 の実測で通過率（生存 PASS）は **8.8%** だったので、二段のほうが**約6倍安い**。
+`nightly.sh` が予算を 段A 2/3・それ以外 1/3 に割っているのはこのため。
+
+### 自動で止まる条件（4つ）
+
+1. **1日のトークン上限**（`daily_token_budget.json` に**バッチごとに**記録。プロセスを跨いで守る）
+2. 通算時間の上限
+3. 未投入の JAN が尽きた
+4. **`STOP` ファイル**（`./nightly.sh stop`）。起動時に見つけたら**起動を断り、消し方を案内する**（勝手に消さない）
+
+**完走フラグ（`FINISHED`）は書きません。**`--total-tokens` を切った回は「全部やり切った」ではないからです
+（memory: `knowledge_keepa_token_ceiling_and_unattended_scan` §9 — 試走の `FINISHED` が本番を14日間止めた前例）。
+
+### 二度払わない仕組み
+
+`agent_output/T-20260920-003/pipeline/tried_jans.json` に**投げた JAN** を記録します。
+⚠️ **渡す単位は1リクエスト分（100件）。** 300件渡すと予算切れで途中停止したときに
+**投げていない JAN まで「既投」に記録**され、二度と拾えません（2026-10-01 に134件そうした。復旧済み）。
+
+### 🔴 走らせる時間帯について
+
+**Keepa の API キーは全チケット共有の1本で、補充は 20/分しかありません。**
+この夜間走行が動いている間、他のチケットは Keepa をほぼ使えません。
+2026-10-01、T-20260930-001 の取得（9,756 ASIN）と本件が同時に走り、**どちらも進みませんでした**。
+**昼に走らせないこと。** 残高が増えないときは、まず `ps -eo pid,etime,command | grep python`。
+
+### launchd への登録
+
+**していません。**常設の設定変更は社長の許可が要ります（2026-09-06 に自動で止められた前例）。
+登録するなら `com.aicompany.amazon-buppan.list-builder.plist` を雛形にして、
+`StartCalendarInterval` で深夜に1回だけ起動する形にしてください（`KeepAlive` は付けない）。
