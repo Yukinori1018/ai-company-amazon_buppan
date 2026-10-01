@@ -98,9 +98,10 @@ def read_jans(args) -> list[str]:
         jans.append(re.sub(r"\D", "", args.jan))
     if args.jan_file:
         for line in open(args.jan_file, encoding="utf-8"):
-            s = line.strip()
-            if s and not s.startswith("#"):
-                jans.append(re.sub(r"\D", "", s))
+            # 行は `JAN` か `JAN<TAB># メモ`。**行末のメモの数字を JAN に混ぜない**
+            head = re.split(r"[\s,#]", line.strip(), maxsplit=1)[0]
+            if head and not line.lstrip().startswith("#"):
+                jans.append(re.sub(r"\D", "", head))
     return [j for j in dict.fromkeys(jans) if 8 <= len(j) <= 13]
 
 

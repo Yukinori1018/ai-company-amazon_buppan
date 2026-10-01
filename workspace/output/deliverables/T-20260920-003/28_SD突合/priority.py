@@ -4,7 +4,10 @@
 材料は `/p/do/psl/<genre_id>/?pg=<n>`（25社/ページ・**サーバー描画なので curl で取れる**）。
 出力:
   - `sd_dealer_priority.csv` … dealer_id, name, priority, genres
-  - `sd_dealer_order.txt`    … dealer_id を優先順に1行1件（sd_dealer_index.py --order に渡す）
+  - `sd_dealer_order.txt`    … dealer_id を優先順に1行1件
+    🔴 2026-10-01: `sd_dealer_index.py --order` は**無くなりました**（全件スキャン＝レーンCを廃止）。
+    この出力は「どの候補社から人が見るか」の並べ替えにだけ使ってください。
+    取得するのは `--dealer-ids` で明示した社だけです。
 
 優先順（2026-09-30 カズヨ指示）
   1 … 丸進(102452) と 和平フレイズ(21321)。取引実績・承認あり
