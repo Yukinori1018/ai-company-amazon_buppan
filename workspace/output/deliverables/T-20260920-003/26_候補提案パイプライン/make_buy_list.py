@@ -34,7 +34,8 @@ BUDGET_LEFT = 80_000            # テスト予算10万 − 消化19,756 ≒ 8万
 C = {name: i for i, name in enumerate(ledger_sheet.COLUMNS)}
 
 
-def unit_columns(title: str, wholesale_incl, qty: int, order_total) -> dict:
+def unit_columns(title: str, wholesale_incl, qty: int, order_total,
+                 package_quantity=None, number_of_items=None, pack: int = 1) -> dict:
     """単位の3列と整合チェックを作る。**ここが今回の事故の現場。**
 
     - `set_count`          … Amazon の1個 ＝ 卸の何点か（読めなければ「未確定」）
@@ -45,24 +46,32 @@ def unit_columns(title: str, wholesale_incl, qty: int, order_total) -> dict:
     不変条件が崩れていたら **数字を黙って直さず「NG」と書く**。
     黙って直すと、どちらが正しいか分からないまま辻褄だけが合います。
     """
-    import set_count as sc
-    mult, _note = sc.cost_multiplier(title)
+    import set_family as sf
+    sc = sf.resolve(title, package_quantity, number_of_items)
+    mult = sc.n
+    base = {"set_confidence": sc.confidence, "set_sources": sc.sources,
+            "wholesale_sets": "", "wholesale_mouth": ""}
     if not wholesale_incl:
-        return {"set_count": "未確定" if mult is None else mult,
+        return {**base, "set_count": "未確定" if mult is None else mult,
                 "amazon_unit_cost": "", "wholesale_points": "",
                 "unit_check": "原価が空（UNKNOWN）"}
-    if mult is None:
-        return {"set_count": "未確定", "amazon_unit_cost": "",
-                "wholesale_points": "",
-                "unit_check": "NG: Amazon のセット数が読めない（人が両方の画面を見る）"}
+    if not sc.is_decided():
+        return {**base, "set_count": "未確定" if mult is None else f"{mult}?",
+                "amazon_unit_cost": "", "wholesale_points": "",
+                "unit_check": f"NG: セット数が確定していない（{sc.confidence}）。{sc.reason}"}
     unit = int(wholesale_incl) * mult
-    points = qty * mult
+    points = qty * mult                        # 卸で買う点数（Amazon の個数 × セット数）
+    lot = max(1, int(pack or 1))               # 卸はこの点数の倍数でしか売らない
+    sets_ = -(-points // lot)                  # 卸で何口（何セット）買うか
     check = "OK"
     if order_total and abs(unit * qty - int(order_total)) > max(2, int(order_total) * 0.01):
         check = (f"NG: 発注額 {int(order_total):,} ≠ Amazon1個原価 {unit:,} × 発注点数 {qty}"
                  f" = {unit * qty:,}（単位が揃っていません）")
-    return {"set_count": mult, "amazon_unit_cost": unit,
-            "wholesale_points": points, "unit_check": check}
+    return {**base, "set_count": mult, "amazon_unit_cost": unit,
+            "wholesale_points": points,
+            "wholesale_sets": sets_,
+            "wholesale_mouth": f"1口{lot}点",
+            "unit_check": check}
 
 
 def clean_name(name: str) -> str:
@@ -148,7 +157,13 @@ def load_rows():
             "jan": cand.get("jan", ""),
             **unit_columns(r[C["商品名"]], cand.get("unit_cost_incl"),
                            int(qty) if qty is not None else 0,
-                           int(total) if total is not None else None),
+                           int(total) if total is not None else None,
+                           (cand.get("extra") or {}).get("package_quantity"),
+                           (cand.get("extra") or {}).get("number_of_items"),
+                           cand.get("pack") or 1),
+            # セット品ファミリの情報（どの口か・同じ JAN に何口あるか）
+            "family_jan": (cand.get("extra") or {}).get("family_jan", ""),
+            "family_size": (cand.get("extra") or {}).get("family_size", ""),
         })
     out.sort(key=lambda r: (-(r["verdict"] == "GO"), -(r["net"] if r["net"] is not None else -10 ** 9)))
     return out
@@ -190,7 +205,8 @@ def plans(go: list[dict]) -> list[tuple[str, str, list[dict], int, int]]:
 
 MD_COLS = ["#", "判定", "商品名", "ブランド", "Amazon", "売価", "過去1ヶ月の販売数",
            "セラー数", "Amazon本体", "カートの販売元", "本体365日在庫率", "売れ筋ランク",
-           "卸率", "発注点数", "発注額の帯", "1個手残り", "利益率", "売り切る月数",
+           "Amazon側は何個セットか", "買う卸の口", "何口買うか",
+           "卸率", "発注点数(Amazon何個)", "発注額の帯", "1個手残り", "利益率", "売り切る月数",
            "ゲート種別", "購入元の名前", "購入先URL"]
 
 
@@ -203,7 +219,11 @@ def md_table(rows: list[dict]) -> str:
             f"[dp/{r['asin']}]({r['url']})",
             f"{int(r['sell']):,}円" if r["sell"] else "不明",
             r["sold"], r["sellers"], r["amazon"], r["cart"][:32], r["instock365"],
-            r["rank"], r["cost_ratio"], r["qty"], band(r["order_total"]),
+            r["rank"],
+            (f"{r['set_count']}個セット" if r["set_count"] not in ("", "未確定", 1)
+             else ("単品" if r["set_count"] == 1 else "未確定")),
+            r["wholesale_mouth"] or "未確認", r["wholesale_sets"] or "未算定",
+            r["cost_ratio"], r["qty"], band(r["order_total"]),
             (f"{r['net']:,}円" if r["net"] is not None else "未算定"), r["margin"], r["months"],
             r["gate"] or "未確認", r["supplier"] or "不明",
             "※非公開（卸サイトURL）",
@@ -221,7 +241,9 @@ def write_private_csv(rows: list[dict], path: Path) -> None:
             "セラー数", "Amazon本体の有無", "カートの販売元", "本体365日在庫率", "売れ筋ランク",
             "卸の1点あたり原価(税込)", "Amazon側のセット数(Amazon1個=卸何点か)",
             "Amazon1個あたり原価(税込)", "卸の最小ロット(点)",
-            "発注点数(Amazon何個)", "発注する卸の点数", "発注額(円・税込)",
+            "セット数の確度", "セット数の情報源", "同じJANの口の数",
+            "発注点数(Amazon何個)", "発注する卸の点数", "買う卸の口", "買う卸の口数(セット)",
+            "発注額(円・税込)",
             "卸率(売価比)", "1個粗利(円)", "1個手残り(円)", "利益率(%)", "売り切る月数",
             "単位の整合チェック",
             "ゲート種別", "購入元の名前", "購入先URL", "判定理由"]
@@ -233,7 +255,10 @@ def write_private_csv(rows: list[dict], path: Path) -> None:
                         r["sell"], r["sold"], r["sellers"], r["amazon"], r["cart"],
                         r["instock365"], r["rank"],
                         r["wholesale_incl"], r["set_count"], r["amazon_unit_cost"], r["pack"],
-                        r["qty"], r["wholesale_points"], r["order_total"],
+                        r["set_confidence"], json.dumps(r["set_sources"], ensure_ascii=False),
+                        r["family_size"],
+                        r["qty"], r["wholesale_points"], r["wholesale_mouth"],
+                        r["wholesale_sets"], r["order_total"],
                         r["cost_ratio"], r["gross"], r["net"], r["margin"], r["months"],
                         r["unit_check"],
                         r["gate"], r["supplier"], r["supplier_url"], r["reason"]])

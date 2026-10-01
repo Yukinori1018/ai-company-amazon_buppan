@@ -37,6 +37,8 @@ import ledger_sheet                          # noqa: E402
 import maker_direct                           # noqa: E402
 import profit                                 # noqa: E402
 import set_count                              # noqa: E402
+import set_family                             # noqa: E402
+import trading_terms                          # noqa: E402
 from keepa_client import KeepaClient, KeepaError  # noqa: E402
 from keepa_sellers import SellerNames         # noqa: E402
 from verdict import (AMAZON_JP_SELLER_ID, FAIL, GO, NO_GO, PASS,  # noqa: E402
@@ -213,6 +215,10 @@ def extract_facts(product: dict, cand: sources.Candidate) -> dict:
         "seller_ids": seller_ids,
         "rank": at(3),
         "rank_avg90": _at_index(st.get("avg90"), 3),
+        # ⚠️ セット数の**2本目の情報源**。商品名の正規表現とは独立しているので、
+        # 2本が一致したときだけ「確定」にできる（CLAUDE.md §3.3-17）。追加トークンは0。
+        "package_quantity": product.get("packageQuantity"),
+        "number_of_items": product.get("numberOfItems"),
     }
 
 
@@ -282,7 +288,17 @@ def supply_status(cand: sources.Candidate, category: str) -> tuple[str, str]:
                 "卸サイトの商品ページが特定できていません（`購入先URL` 未確認）。"
                 "在庫・入り数・卸値のどれも裏が取れていないので GO にしません。"
                 "人が卸サイトで JAN を探してください。")
-    return (PASS, "卸サイトの商品ページを特定済み（在庫・入り数・卸値の裏が取れる）。")
+    # 🔴 **第0問より前のゲート**（CLAUDE.md §3.3-12）。売れる棚で黒字でも、
+    # 出してはいけない先から買えば意味がありません。SD は 163社のうち 46社が Amazon 不可。
+    try:
+        tt_status, tt_why = trading_terms.gate(cand.source, cand.supplier)
+    except Exception as e:                             # noqa: BLE001 - 表が読めなくても止めない
+        return (UNKNOWN, f"取引条件（Amazon 出品可否）を確認できませんでした: {e}")
+    if tt_status == "FAIL":
+        return (FAIL, f"**この仕入れ先からは Amazon に出せません。** {tt_why}")
+    if tt_status == "UNKNOWN":
+        return (UNKNOWN, f"仕入れ先の Amazon 出品可否が確定していません。{tt_why}")
+    return (PASS, "卸サイトの商品ページを特定済み／取引条件も Amazon 出品可（○）。")
 
 
 def economics_status(econ, monthly_sold, set_note: str = "") -> tuple[str, str]:
@@ -614,8 +630,13 @@ def main(argv: list[str] | None = None) -> int:
 
         # ⚠️ **単位を揃える。** 卸は「1点あたり」、Amazon は「N点セット」で売っている。
         # Amazon の1個が卸のN点なら原価はN倍（2026-09-30 カズヨが B0DJNX12KZ で発見）。
-        multiplier, set_note = set_count.cost_multiplier(facts.get("title") or c.title)
-        if multiplier is None:
+        # 商品名 ×`packageQuantity` の**独立2本**で決める（`set_family`）。
+        # 2本が一致＝確定、食い違い＝大きい方で計算して UNKNOWN、片方だけ＝単品なら可。
+        sc = set_family.resolve(facts.get("title") or c.title,
+                                facts.get("package_quantity"),
+                                facts.get("number_of_items"))
+        multiplier, set_note = sc.n, sc.reason
+        if not sc.is_decided():
             unit_cost = None                           # → 採算 UNKNOWN（人が見る）
         elif unit_cost:
             unit_cost = unit_cost * multiplier

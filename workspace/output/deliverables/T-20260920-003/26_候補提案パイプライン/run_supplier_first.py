@@ -38,6 +38,7 @@ sys.path.insert(0, str(PIPE))
 sys.path.insert(0, str(GUARD))
 
 import discover                       # noqa: E402
+import set_family                    # noqa: E402
 from keepa_client import load_api_key  # noqa: E402
 
 WORK = REPO / "workspace/output/agent_output/T-20260920-003/pipeline"
@@ -84,36 +85,65 @@ EXCLUDE_WORDS = (
     "ペットフード", "ドッグフード", "キャットフード", "おやつ",
 )
 
-# 採算の下限を 0トークンで見るための式（profit.py と同じ前提）。
-#   net = 0.9076*sell - 621 - cost      （販売手数料9.24%税込・FBA415・保管等206）
-#   GO 条件: net >= 0.07*sell + 200     （誤差幅）
-# → sell >= (821 + 1.1*w) / 0.8376
-def required_sell(wholesale_excl: float) -> float:
-    return (821 + 1.1 * float(wholesale_excl)) / 0.8376
+# 採算の下限を 0トークンで見るための式。**セット数 n を入れられる形**に直しました
+# （`set_family.required_sell`）。固定費821円は Amazon の1個につき1回なので、
+# n を増やすと1点あたりの必要売価が下がります。
+#   sell >= (821 + 1.1 × 卸値 × n) / 0.8376
+def required_sell(wholesale_excl: float, n: int = 1) -> float:
+    return set_family.required_sell(wholesale_excl, n)
+
+
+# まとめ売りとして現実的なセット数の上限。これを超える口は Amazon 側にほぼ存在しません
+# （実測で ×200 の ASIN はありましたが、1 SKU 発注額が残枠8万円を超えます）。
+PLAUSIBLE_MAX_SET = 20
+
+# 卸1点あたりの価格帯。
+# 🔴 2026-10-01 に下限を 300円 → 30円に下げました。**それまでの下限が、まとめ売りで
+# 黒字になる商品を入口で全部捨てていました。**卸178円のたわしは単品では必要売価1,214円で
+# 成立しませんが、×10点セットなら1点あたり332円で済みます。
+# 下限300円は「単品でしか考えていなかった時代」の遺物です（CLAUDE.md §3.1 条件は変数）。
+MIN_WHOLESALE, MAX_WHOLESALE = 30, 9000
 
 
 def tier(rec: dict) -> int | None:
-    """判定する優先度。None なら今回は投げない。"""
+    """判定する優先度。None なら今回は投げない。
+
+    **上代を「1点あたりいくらで売れるか」の代理**として、黒字になるセット数の下限
+    （`min_profitable_set_count`）を 0トークンで出し、その小ささで並べます。
+    上代は Amazon の実売より高めに出るので**あくまで並べ替えの材料**で、
+    採算の結論は後段（実売価・実手数料）で出します。
+    """
     w = rec.get("unit_price_excl")
-    if not w or not (300 <= w <= 9000):
+    if not w or not (MIN_WHOLESALE <= w <= MAX_WHOLESALE):
         return None
     if str(rec.get("stock")) == "品切れ":
         return None
-    lot = int(rec.get("min_lot_units") or 1)
     title = rec.get("title") or ""
     if any(word in title for word in EXCLUDE_WORDS):
         return None
-    if lot > 24:
-        return None                     # ロットが大きすぎて6ヶ月で捌けない／予算に載らない
+
     rp = rec.get("reference_price")
-    if rp and rp >= required_sell(w):
-        return 0 if lot <= 12 else 1    # 上代ベースで黒字が見込める
-    if rp and rp < required_sell(w):
-        return 4                        # 上代でも届かない＝Amazon 価格でも厳しい（最後）
-    # 上代が無い。必要な倍率が小さい価格帯（卸1,000〜6,000円）を優先する。
+    n_min = set_family.min_profitable_set_count(w, rp, max_n=60) if rp else None
+
+    # 卸のロット上限は**セット数に応じて緩める**。Amazon の1個が卸10点なら、
+    # 1口100点でも Amazon 10個ぶんにしかならず、回転も予算も収まります。
+    lot = int(rec.get("min_lot_units") or 1)
+    lot_cap = min(240, 24 * max(1, n_min or 1))
+    if lot > lot_cap:
+        return None
+
+    if n_min == 1:
+        return 0                            # 単品でも黒字が見込める（いちばん楽）
+    if n_min and n_min <= PLAUSIBLE_MAX_SET:
+        return 1                            # 🔴 まとめ売りで黒字になる本線
+    if n_min and n_min <= 60:
+        return 3                            # 大口セットが要る（Amazon 側にあるか薄い）
+    if rp:
+        return 5                            # 上代でも黒字にならない（最後）
+    # 上代が無い。必要な倍率が小さい価格帯を優先する。
     if 1000 <= w <= 6000:
-        return 2 if lot <= 12 else 3
-    return 3
+        return 2 if lot <= 12 else 4
+    return 4
 
 
 def plan(index: dict, tried: set[str]) -> list[tuple[int, str, dict]]:

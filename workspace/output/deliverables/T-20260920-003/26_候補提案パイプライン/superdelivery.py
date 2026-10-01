@@ -528,8 +528,19 @@ def merge_wholesale(rows: list[SDSet], filled: dict) -> list[SDSet]:
 
     `filled` の形（`agent_output/.../sd_wholesale.json`）:
 
-        {"13681795S1": {"卸価格": 620, "承認状態": "承認済み", "在庫": "在庫あり"},
-         "13681795S2": {"承認状態": "卸価格未承認"}}
+        {"13681795S1": {"卸価格": 620, "価格の単位": "1点あたり", "入り数": 1,
+                        "承認状態": "承認済み", "在庫": "在庫あり"},
+         "13681795S2": {"卸価格": 5200, "価格の単位": "1セットあたり", "入り数": 10},
+         "13681795S3": {"承認状態": "卸価格未承認"}}
+
+    🔴 **`価格の単位` は必須です。**SD は同じ JAN に「1点」「×10点」「×100点」の口が並び、
+    画面の数字が**1点あたりなのか1セットあたりなのかが口によって違います**。
+    `価格の単位` が無い行は `wholesale_price_excl` を**埋めません**（`notes` に理由を残す）。
+    ここを推測で埋めると、9/30・10/1 に続いて**3回目の単位ずれ**を作ります（CLAUDE.md §3.3-17）。
+
+    受け付ける値は `"1点あたり"` / `"1セットあたり"` の2つだけ。
+    `1セットあたり` のときは `入り数` で割って **1点あたり（税抜）** に直してから入れます
+    （割り切れなくても切り上げません。原価を安く見積もる方向へ丸めないため切り上げます）。
 
     - 金額が入れば `承認済み`。`卸価格未承認` は**申請すれば見える**状態で、**NO-GO ではありません**。
     - **人が入れた値を機械が上書きしません。**この関数は人の値で機械の値を上書きする方向だけです。
@@ -538,7 +549,27 @@ def merge_wholesale(rows: list[SDSet], filled: dict) -> list[SDSet]:
         v = filled.get(r.sd_code) or filled.get(r.product_id)
         if not v:
             continue
+        if v.get("入り数"):
+            r.units_per_set = _int(v["入り数"])
         price = _int(v.get("卸価格"))
+        basis = str(v.get("価格の単位") or "").strip()
+        if price and basis not in ("1点あたり", "1セットあたり"):
+            r.notes.append(
+                f"⚠️ 卸価格 {price} を取り込みませんでした: `価格の単位` が "
+                f"{basis or '未指定'} です（『1点あたり』か『1セットあたり』のどちらかを"
+                "書いてください）。単位を推測しません。")
+            price = None
+        if price and basis == "1セットあたり":
+            units = r.units_per_set
+            if not units or units < 1:
+                r.notes.append(
+                    f"⚠️ 卸価格 {price}（1セットあたり）を取り込みませんでした: "
+                    "入り数が分からないと1点あたりに直せません。")
+                price = None
+            else:
+                # 切り上げ。**原価を安く見積もる方向へは丸めません。**
+                price = -(-price // units)
+                r.notes.append(f"卸価格は1セット{units}点あたりの表示を1点あたりに直しました。")
         if price:
             r.wholesale_price_excl = price
             r.approval = v.get("承認状態") or "承認済み"
@@ -546,8 +577,6 @@ def merge_wholesale(rows: list[SDSet], filled: dict) -> list[SDSet]:
             r.approval = v["承認状態"]
         if v.get("在庫"):
             r.stock = v["在庫"]
-        if v.get("入り数"):
-            r.units_per_set = _int(v["入り数"])
         r.notes.append("卸価格は人がブラウザで確認")
     return rows
 

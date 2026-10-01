@@ -49,6 +49,7 @@ sys.path.insert(0, str(HERE.parent / "24_カート保持者ガード"))
 
 import profit                                    # noqa: E402
 import set_count                                 # noqa: E402
+import set_family                                # noqa: E402
 from candidate_sources import REPO, Candidate, _int  # noqa: E402
 from keepa_client import KEEPA_DOMAIN_JP, load_api_key  # noqa: E402
 
@@ -203,10 +204,16 @@ def resolve_to_asins(jans: list[str], token_budget: int, api_key: str | None = N
 
 
 def _pick_best(products: list[dict]) -> dict:
-    """1つの JAN に複数 ASIN がぶら下がったときの選び方。
+    """1つの JAN に複数 ASIN がぶら下がったときに1件だけ選ぶ（**もう本線では使いません**）。
 
-    **最初の1件を採るのはただのくじ引き**（実測で150件中15件が複数 ASIN）。
-    「売れ筋ランクが付いていて、一番上位のもの」を採ります。ランクが無い ASIN は死んでいます。
+    🔴 2026-10-01: この関数が**まとめ売り突合を壊していた犯人**でした。
+    JAN は単品とセット品で同一なので、`code` 逆引きは「×1 / ×3 / ×10 / ×200」の
+    **ファミリを全部返しています**（実測: 4901670106107 の1リクエストで10 ASIN）。
+    ここで1件だけ採ると、**固定費を割れる大きい口を全部捨てる**ことになります。
+    しかも課金は「返ってきた商品数」なので、捨てた9件もすでに払っています。
+
+    `to_candidates()` は `set_family.family_members()` で**全員を候補にします**。
+    この関数はランク順の参考値が要る場所のために残してあるだけです。
     """
     def key(p):
         st = p.get("stats") or {}
@@ -218,93 +225,92 @@ def _pick_best(products: list[dict]) -> dict:
 
 def to_candidates(netsea: dict[str, dict], by_jan: dict[str, list[dict]],
                   log=print) -> tuple[list[Candidate], dict[str, int]]:
-    """JAN×商品 → Candidate。**ここで落とすのは「赤字」だけ**です。
+    """JAN×商品 → Candidate。**セット品ファミリの全員を候補にします。**
 
-    落とす条件は3つだけという既定（2026-09-30 カズヨ）に従います:
-      ① カート保持者が Amazon 本体  ② カート保持者がメーカー本人／ブランド公式  ③ 赤字
-    ①②は `offers` が要るので後段（cart_guard）。ここでは③だけを 0 追加トークンで落とします。
-    **月販が取れないことを理由には落としません。**
+    🔴 2026-10-01 の作り直し。それまでは `_pick_best()` で **1 JAN = 1 ASIN** に絞っていました。
+    ところが JAN は単品とセットで同一なので、絞った先はいつも単品でした。
+    日用消耗品の単品は**構造的に赤字**です（固定費 821円/個 ＞ 粗利）。
+    つまり「まとめ売りの口があるのに、必ず赤字の口だけを見て落としていた」という作りでした。
+
+    `code` 逆引きの1レスポンスにファミリ全員が入っていて、**課金もすでに済んでいます**。
+    だから `set_family.family_members()` で全員を候補にし、ゲートは**口ごとに**掛けます
+    （単品が売れていてもセット品が売れていないことがあり、逆もあるため）。
+
+    ここで落とすのは **0 追加トークンで落とせるものだけ**:
+      - 生存（90日平均ランクが 50万位より下で月販も無い）… その口は死んでいる
+      - 売価が付いていない（誰も売っていない）
+      - 今の売価 × 今の卸値 × その口のセット数で**赤字**
+    ①②（カート保持者・本体）は `offers` が要るので後段（cart_guard）です。
     """
-    # 生存ゲートを**発掘の段でも掛ける**。売れていない棚をプールに入れてしまうと、
-    # 後段の §3.3 判定で 6トークン/ASIN を払ってから落とすことになる。
-    # ここで落とせば追加トークンは0（ランクは既に取れている）。
     from candidate_pipeline import DEAD_RANK, ALIVE_RANK  # noqa: E402 - 定数の単一情報源
 
     out: list[Candidate] = []
-    tally = {"jan": 0, "asin": 0, "no_price": 0, "loss": 0, "dead": 0, "kept": 0}
+    tally = {"jan": 0, "asin": 0, "no_price": 0, "loss": 0, "dead": 0, "kept": 0,
+             "set_members": 0, "set_unknown": 0}
 
     for jan, w in netsea.items():
         group = by_jan.get(jan)
         if not group:
             continue
         tally["jan"] += 1
-        p = _pick_best(group)
-        tally["asin"] += 1
-        st = p.get("stats") or {}
-        cur = st.get("current") or []
+        members = set_family.family_members(group)
+        tally["set_members"] += max(0, len(members) - 1)
+        unit_cost_1pt = profit.unit_cost_incl_tax(w["unit_price_excl"])
 
-        def at(i):
-            v = cur[i] if isinstance(cur, list) and i < len(cur) else None
-            return None if v in (None, -1) else v
-
-        sell = next((v for v in (st.get("buyBoxPrice"), at(1), at(0)) if v and v > 0), None)
-        fee_pct = p.get("referralFeePercent")
-        if fee_pct in (None, -1):
-            fee_pct = p.get("referralFeePercentage")
-        fba = (p.get("fbaFees") or {}).get("pickAndPackFee")
-        ms = p.get("monthlySold")
-        ms = None if ms in (None, -1) else ms
-
-        rank_now = at(3)
-        rank90 = (st.get("avg90") or [])
-        rank90 = rank90[3] if isinstance(rank90, list) and len(rank90) > 3 else None
-        rank90 = None if rank90 in (None, -1) else rank90
-        r = rank90 or rank_now
-        if not ms and r and r > DEAD_RANK and not (rank_now and rank_now <= ALIVE_RANK):
-            # 直近3ヶ月の販売実績が実質ゼロの棚。**消極条件だけでは落ちない**ので、ここで落とす。
-            tally["dead"] += 1
-            continue
-
-        if not sell or fee_pct in (None, -1) or not fba:
-            # Amazon に商品ページはあるが**誰も売っていない**（売価が付いていない）棚。
-            # 競合ゼロに見えますが、値段の目安も需要の証拠も無いので、今は候補にしません。
-            tally["no_price"] += 1
-            continue
-
-        # **単位を揃えてから採算を見る。**Amazon の1個が卸のN点なら原価はN倍。
-        # 倍率が読めない（セット品らしいが個数不明）ものは**ここでは落とさず**候補に残し、
-        # 後段で UNKNOWN にして人に回す（0トークンで落とせるのは「確実に赤字」だけ）。
-        multiplier, _note = set_count.cost_multiplier(p.get("title"))
-        ms_keep = ms
-        unit_cost = profit.unit_cost_incl_tax(w["unit_price_excl"])
-        if multiplier is not None:
-            e = profit.compute(sell, fee_pct, fba, unit_cost * multiplier, qty=1,
-                               monthly_sold=ms)
-            if e.net_per_unit <= 0:
-                tally["loss"] += 1
+        for m in members:
+            tally["asin"] += 1
+            r = m.rank_avg90 or m.rank_now
+            if (not m.monthly_sold and r and r > DEAD_RANK
+                    and not (m.rank_now and m.rank_now <= ALIVE_RANK)):
+                # 直近3ヶ月の販売実績が実質ゼロの口。**消極条件だけでは落ちない**ので、ここで落とす。
+                tally["dead"] += 1
+                continue
+            if not m.sell or m.fee_pct is None or not m.fba_yen:
+                # 商品ページはあるが**誰も売っていない**口（売価・手数料・FBA のどれかが空）。
+                # ⚠️ 手数料と FBA は**推定で埋めません**。埋めると採算が嘘になります。
+                tally["no_price"] += 1
                 continue
 
-        tally["kept"] += 1
-        out.append(Candidate(
-            asin=p.get("asin", ""), jan=jan, title=(p.get("title") or "")[:120],
-            brand=p.get("brand") or "", category="",
-            sell=sell, monthly_sold=ms, fee_pct=float(fee_pct), fba_yen=int(fba),
-            unit_cost_incl=unit_cost, pack=w["min_lot_units"],
-            supplier=w["supplier_name"], supplier_url=w["supplier_url"],
-            source="discover/netsea",
-            # ⚠️ 2026-10-01 追加。ランクはこの段で**既に手元にある**のに捨てていたため、
-            # 後段の生存ゲート（ランク10万位以内で PASS）を掛ける順番を決められず、
-            # 6トークン/ASIN を払ってから UNKNOWN になる候補に予算を使っていた。
-            # **払って得た数字は捨てない。**
-            extra={"rank_now": rank_now, "rank_avg90": rank90,
-                   "amazon_set_count": multiplier},
-        ))
+            sc = m.set_count
+            if sc.n is None:
+                tally["set_unknown"] += 1
+            else:
+                # **単位を揃えてから採算を見る。**Amazon の1個が卸の n 点なら原価は n 倍。
+                e = profit.compute(m.sell, m.fee_pct, m.fba_yen,
+                                   unit_cost_1pt * sc.n, qty=1,
+                                   monthly_sold=m.monthly_sold)
+                if e.net_per_unit <= 0 and sc.is_decided():
+                    # 倍率が確定していて、なお赤字。ここは落としてよい。
+                    tally["loss"] += 1
+                    continue
+
+            tally["kept"] += 1
+            out.append(Candidate(
+                asin=m.asin, jan=jan, title=m.title[:120],
+                brand="", category="",
+                sell=m.sell, monthly_sold=m.monthly_sold,
+                fee_pct=float(m.fee_pct), fba_yen=int(m.fba_yen),
+                unit_cost_incl=unit_cost_1pt, pack=w["min_lot_units"],
+                supplier=w["supplier_name"], supplier_url=w["supplier_url"],
+                source="discover/netsea",
+                extra={"rank_now": m.rank_now, "rank_avg90": m.rank_avg90,
+                       "amazon_set_count": sc.n,
+                       "set_confidence": sc.confidence,
+                       "set_sources": sc.sources,
+                       "package_quantity": m.package_quantity,
+                       "number_of_items": m.number_of_items,
+                       "family_jan": jan, "family_size": len(members),
+                       "parent_asin": m.parent_asin,
+                       "wholesale_per_point_incl": unit_cost_1pt},
+            ))
 
     log(f"  JAN が Amazon に当たった {tally['jan']}件 → "
-        f"生きている棚 {tally['asin'] - tally['dead']}件（売れていない棚 {tally['dead']}件）→ "
-        f"出品があって売価が付く {tally['asin'] - tally['dead'] - tally['no_price']}件"
+        f"セット品ファミリを含む口 {tally['asin']}件（単品以外 {tally['set_members']}件）→ "
+        f"生きている口 {tally['asin'] - tally['dead']}件（死んでいる {tally['dead']}件）→ "
+        f"売価が付く {tally['asin'] - tally['dead'] - tally['no_price']}件"
         f"（出品なし {tally['no_price']}件）→ "
-        f"**候補 {tally['kept']}件**（赤字で落とした {tally['loss']}件）")
+        f"**候補 {tally['kept']}件**（赤字で落とした {tally['loss']}件・"
+        f"セット数が読めず人に回す {tally['set_unknown']}件）")
     return out, tally
 
 

@@ -55,6 +55,10 @@ B=$((DAILY / 3))            # ランク取り直し + §3.3 ゲート
 
 {
   echo "===== $(date '+%F %T') 夜間走行 開始（1日上限 ${DAILY} / 最長 ${MINUTES}分）====="
+  # 取引条件の表（SD 163社）を取り直す。Keepa トークンは使いません。
+  # ⚠️ 失敗しても止めません。`trading_terms` は「読めなかった」を UNKNOWN として返すので、
+  #    表が無い晩に全件 ○ 扱いで走ることはありません。
+  python3 -u "$HERE/trading_terms.py" --refresh || echo "（取引条件の表は読めませんでした。UNKNOWN で進みます）"
   python3 -u "$HERE/run_supplier_first.py" --total-tokens "$A" --daily-tokens "$DAILY" \
       --floor 0 --minutes $((MINUTES / 2))
   python3 -u "$HERE/rank_pass.py" --minutes $((MINUTES / 6))
