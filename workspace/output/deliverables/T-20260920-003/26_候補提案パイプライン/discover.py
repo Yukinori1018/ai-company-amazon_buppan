@@ -292,6 +292,12 @@ def to_candidates(netsea: dict[str, dict], by_jan: dict[str, list[dict]],
             unit_cost_incl=unit_cost, pack=w["min_lot_units"],
             supplier=w["supplier_name"], supplier_url=w["supplier_url"],
             source="discover/netsea",
+            # ⚠️ 2026-10-01 追加。ランクはこの段で**既に手元にある**のに捨てていたため、
+            # 後段の生存ゲート（ランク10万位以内で PASS）を掛ける順番を決められず、
+            # 6トークン/ASIN を払ってから UNKNOWN になる候補に予算を使っていた。
+            # **払って得た数字は捨てない。**
+            extra={"rank_now": rank_now, "rank_avg90": rank90,
+                   "amazon_set_count": multiplier},
         ))
 
     log(f"  JAN が Amazon に当たった {tally['jan']}件 → "

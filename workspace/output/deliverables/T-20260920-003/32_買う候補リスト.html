@@ -1,0 +1,81 @@
+<!doctype html><html lang='ja'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>買う候補リスト（NETSEA 起点・2026-10-01）</title><style>body{font-family:-apple-system,'Hiragino Sans','Noto Sans JP',sans-serif;max-width:1150px;margin:2em auto;padding:0 1em;line-height:1.65;color:#222;font-size:14.5px}table{border-collapse:collapse;margin:.8em 0;font-size:.92em}th,td{border:1px solid #bbb;padding:.35em .6em;vertical-align:top}th{background:#eef2f8}tr:nth-child(even) td{background:#fafafa}h1{font-size:1.5em;border-bottom:2px solid #444}h2{font-size:1.25em;border-left:5px solid #25b;padding-left:8px;margin-top:1.8em}h3{font-size:1.05em;margin-top:1.4em}blockquote{border-left:4px solid #ccc;margin:.8em 0;padding:.2em 1em;color:#444}code{background:#f3f3f3;padding:1px 4px;border-radius:3px}hr{border:0;border-top:1px solid #ccc;margin:1.6em 0}</style></head><body>
+<h1>買う候補リスト（NETSEA 起点・2026-10-01）</h1>
+<p><strong>候補 0件</strong>（CLAUDE.md §3.3 のゲートを全部通ったもの）。このほか判定が固まらなかったものが 80件、落としたものが 161件あります。</p>
+<blockquote><strong>この表は機械判定だけです。実画面（Chrome＋キーゾン）の確認はしていません。</strong>§3.3 の3点確認（カートの販売元・本体の在庫履歴・出品一覧の実数）は人の仕事で、<strong>発注の直前に必ず人が見てください。</strong></blockquote>
+<h2>1. 候補</h2>
+<p><strong>0件です。</strong>水増しはしません。内訳は §3 を見てください。</p>
+<h3>列の意味</h3>
+<table><thead><tr><th>列</th><th>中身</th></tr></thead><tbody>
+<tr><td>過去1ヶ月の販売数</td><td>Keepa の <code>monthlySold</code>。<strong>「未確認」は「売れていない」ではなく「月50個未満で Amazon が表示しない」</strong>という意味です。キーゾンで実数を見てください</td></tr>
+<tr><td>セラー数</td><td>Keepa の <code>offers</code> から数えた新品出品者の実数。画面の出品一覧とは配送先で件数が変わります</td></tr>
+<tr><td>Amazon本体の有無</td><td>本体の365日在庫率（スナップショットでは判定しません）</td></tr>
+<tr><td>売れ筋ランク</td><td>90日平均。<strong>「死んでいないこと」の確認にしか使いません</strong>（バリエーションは family でランクを共有）</td></tr>
+<tr><td>1個手残り</td><td>1個粗利 − 206円（FBA保管料 87＋納品送料 64＋梱包資材 55・商品台帳 L001 の実測）</td></tr>
+<tr><td>発注額の帯</td><td>実額は会員限定の取引条件そのものなので帯で出します。実額は社長宛のフル版 CSV にあります</td></tr>
+<tr><td>購入先URL</td><td>このリポジトリは PUBLIC なので書けません。フル版 CSV にあります</td></tr>
+</tbody></table>
+<h2>1b. あと1つで通る候補（人が1点だけ見れば判断できる）</h2>
+<p>落ちたゲートが<strong>ちょうど1本だけ</strong>の行です。<strong>まだ買ってよい行ではありません。</strong>その1本が人の目で解消できるなら候補になります。</p>
+<table><thead><tr><th>商品名</th><th>Amazon</th><th>売価</th><th>過去1ヶ月の販売数</th><th>セラー数</th><th>Amazon本体</th><th>カートの販売元</th><th>売れ筋ランク</th><th>1個手残り</th><th>利益率</th><th>購入元の名前</th><th>落ちた1本</th></tr></thead><tbody>
+<tr><td>FOCAL(フォーカル) ステンレス聴診器 フォーカルトーン エキスパート ロイ</td><td><a href="https://www.amazon.co.jp/dp/B07SJGDZ1G" target="_blank" rel="noopener">dp/B07SJGDZ1G</a></td><td>11,517円</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>4社（Keepa offers の実数・画面未確認）</td><td>なし</td><td>サイバーステーション（A2WUCUZ7VIQR28）</td><td>なし</td><td>336円</td><td>4.7</td><td>Drop-カネイシ(株)　-顧客直送専門-</td><td>⑥ 手残り 336円が誤差幅以下</td></tr>
+<tr><td>FOCAL(フォーカル) ステンレス聴診器 フォーカルトーン エキスパート ブラ</td><td><a href="https://www.amazon.co.jp/dp/B07SJGC92L" target="_blank" rel="noopener">dp/B07SJGC92L</a></td><td>11,480円</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>4社（Keepa offers の実数・画面未確認）</td><td>なし</td><td>即納ドラッグ　金太郎SHOP（A33YST6SR7S</td><td>90日平均 274,801位・現在 293,988位</td><td>303円</td><td>4.4</td><td>Drop-カネイシ(株)　-顧客直送専門-</td><td>⑥ 手残り 303円が誤差幅以下</td></tr>
+<tr><td>FOCAL(フォーカル) ライトウェイト聴診器 フォーカルトーン エキスパート</td><td><a href="https://www.amazon.co.jp/dp/B07SKJP8KN" target="_blank" rel="noopener">dp/B07SKJP8KN</a></td><td>8,363円</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>4社（Keepa offers の実数・画面未確認）</td><td>なし</td><td>サイバーステーション（A2WUCUZ7VIQR28）</td><td>90日平均 231,834位・現在 386,262位</td><td>219円</td><td>5.1</td><td>Drop-カネイシ(株)　-顧客直送専門-</td><td>⑥ 手残り 219円が誤差幅以下</td></tr>
+<tr><td>FOCAL(フォーカル) ライトウェイト聴診器 フォーカルトーン エキスパート</td><td><a href="https://www.amazon.co.jp/dp/B07SNSH1PY" target="_blank" rel="noopener">dp/B07SNSH1PY</a></td><td>8,363円</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>4社（Keepa offers の実数・画面未確認）</td><td>なし</td><td>サイバーステーション（A2WUCUZ7VIQR28）</td><td>なし</td><td>219円</td><td>5.1</td><td>Drop-カネイシ(株)　-顧客直送専門-</td><td>⑥ 手残り 219円が誤差幅以下</td></tr>
+<tr><td>プレーリードッグ フロッシュ キッチン洗剤ギフト FRS-K40</td><td><a href="https://www.amazon.co.jp/dp/B0CQX561SH" target="_blank" rel="noopener">dp/B0CQX561SH</a></td><td>3,056円</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>4社（Keepa offers の実数・画面未確認）</td><td>なし</td><td>ミーニャ 簡易梱包、衣類ぬいぐるみ等は圧縮後発送とな</td><td>90日平均 289,913位・現在 309,315位</td><td>16円</td><td>7.3</td><td>株式会社 白菊</td><td>⑥ 手残り 16円が誤差幅以下</td></tr>
+<tr><td>サージカルテープ 不織布 25mm×9ｍ×12巻 1箱(医家向品 医療用) コメ</td><td><a href="https://www.amazon.co.jp/dp/B0753DRTS7" target="_blank" rel="noopener">dp/B0753DRTS7</a></td><td>不明</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>11社（Keepa offers の実数・画面未確認）</td><td>なし</td><td>ティーズマルシェ（A2YIIVSNGIUGVA）</td><td>90日平均 93,427位・現在 82,682位</td><td>未算定</td><td>未確認</td><td>Drop-カネイシ(株)　-顧客直送専門-</td><td>⑤ 採算が計算できない（Amazon 側のセット数が読めない等）</td></tr>
+<tr><td>サージカルテープ プラスチック半透明 25mm×9ｍ×12巻 1箱(医家向品 医</td><td><a href="https://www.amazon.co.jp/dp/B0753DRYCC" target="_blank" rel="noopener">dp/B0753DRYCC</a></td><td>不明</td><td>未確認（Keepa 非表示＝月50個未満）</td><td>7社（Keepa offers の実数・画面未確認）</td><td>なし</td><td>🇫【年中無休】健康美容用品専門店Frontrunne</td><td>90日平均 42,237位・現在 50,088位</td><td>未算定</td><td>未確認</td><td>Drop-カネイシ(株)　-顧客直送専門-</td><td>⑤ 採算が計算できない（Amazon 側のセット数が読めない等）</td></tr>
+</tbody></table>
+<p><strong>購入先URL は書けません</strong>（PUBLIC リポ）。フル版 CSV にあります。</p>
+<h2>2. 予算8万円で何を買うか（3案）</h2>
+<p>テスト予算10万円・消化19,756円・<strong>残枠約8万円</strong>。発注・決済は社長の判断です（§4.1）。</p>
+<p>候補が0件なので案を出せません。<strong>無い候補で案を作ることはしません。</strong></p>
+<h2>3. 何件を判定して、どこで落ちたか</h2>
+<h3>段A — JAN を Amazon に当てる（0.9〜1.5トークン/JAN）</h3>
+<table><thead><tr><th>段</th><th>件数</th></tr></thead><tbody>
+<tr><td>NETSEA の JAN 索引（承認済み221社）</td><td>67,662</td></tr>
+<tr><td>0トークンの前段フィルタを通った（在庫あり・価格帯・期限管理カテゴリ語なし・まとめ単位が大きすぎない）</td><td>33,807</td></tr>
+<tr><td>今回 Keepa に投げた（黒字が見込める順）</td><td>766</td></tr>
+<tr><td>Amazon に商品ページがあった</td><td>619</td></tr>
+<tr><td>⛔ 生存ゲートで落ちた（90日平均ランクが50万位より下＝直近3ヶ月の実績が実質ゼロ）</td><td>210</td></tr>
+<tr><td>⛔ 売価が付かない（商品ページはあるが誰も売っていない）</td><td>40</td></tr>
+<tr><td>⛔ 赤字（Amazon 側のセット数を掛けた原価で手残りマイナス）</td><td>144</td></tr>
+<tr><td>✅ 候補として段Bへ</td><td>225</td></tr>
+</tbody></table>
+<h3>段B — §3.3 のゲート（6〜8トークン/ASIN）</h3>
+<p>判定した ASIN <strong>41件</strong>（うち GO 0件・NO-GO 30件・UNKNOWN 11件）。落ちた理由の内訳（下の 34件ぶん。1件で複数該当あり）:</p>
+<table><thead><tr><th>落ちた理由</th><th>件数</th></tr></thead><tbody>
+<tr><td>②Amazon 本体の在庫履歴あり</td><td>27</td></tr>
+<tr><td>①カート保持者が第三者と確認できない</td><td>25</td></tr>
+<tr><td>⑤採算が計算できない（単位・手数料のどれかが欠ける）</td><td>13</td></tr>
+<tr><td>③新品オファーが読めない</td><td>12</td></tr>
+<tr><td>⑥手残りが誤差幅以下</td><td>9</td></tr>
+<tr><td>⑤手残りがマイナス</td><td>8</td></tr>
+<tr><td>④メーカー本人／ブランド公式の疑い</td><td>5</td></tr>
+</tbody></table>
+<h2>4. 正直に言っておくこと</h2>
+<ol>
+<li style='margin-left:0.0em'><strong>判定は機械だけです。</strong>カートの販売元は Keepa の <code>buyBoxSellerId</code> と履歴で見ています。2026-09-30 の事故（Amazon 本体がカートを持つ ASIN を発注させた）と同じ型を避けるため、<strong>発注前に社長の Chrome ＋キーゾンで実画面を見てください</strong>（§3.3）。</li>
+<li style='margin-left:0.0em'><strong>仕入れ先が偏っています。</strong>今回当たった候補の出所は8社に集中しています。索引221社のうち、黒字が見込める JAN を多く持つ社に先に当てたためです。残りの33,000件はまだ投げていないので、母数は増やせます。</li>
+<li style='margin-left:0.0em'><strong>Keepa のトークンを他のチケットと取り合いました。</strong>同じ API キーで T-20260930-001 の取得（9,756 ASIN）が同時に走っており、本件が使えたのは漏れてきた分だけです。判定件数が伸びなかった主因はこれです。</li>
+<li style='margin-left:0.0em'><strong>生存 PASS は205件中18件（8.8%）、しかもその14件が同一シリーズでした</strong>（DNライティングの直管蛍光灯・同じ出展企業）。候補の見かけの数は、実質は2〜3商品です。さらに蛍光灯は<strong>水銀に関する水俣条約で製造終了が決まっている品目</strong>のはずで（推定・今日は裏取りしていません）、6ヶ月在庫を持つ商品としては勧めません。</li>
+<li style='margin-left:0.0em'><strong>会員限定の取引条件（価格・まとめ単位）と購入先URL はこのファイルに書いていません。</strong>このリポジトリは PUBLIC で、会員限定の取引条件は公開できません（法務判定16）。実額つきのフル版は <code>agent_output/T-20260920-003/pipeline/buy_list_private.csv</code> にあります。</li>
+</ol>
+<h2>5. 次の1手（推奨）</h2>
+<p><strong>パイプラインは動いています。足りないのは仕入れ先の品揃えです。</strong></p>
+<table><thead><tr><th>#</th><th>やること</th><th>誰が</th><th>効果</th></tr></thead><tbody>
+<tr><td>1</td><td><strong>Keepa のトークンの取り合いを解く。</strong> 同じ API キーで T-20260930-001 の取得（9,756 ASIN・6時間ぶん）が同時に走っており、本件は漏れた分しか使えませんでした。向こうは再開可能な設計なので、45分だけ止めれば本件は残り187件を判定し切れます</td><td>社長/秘書の判定</td><td>今日の作業の律速そのもの</td></tr>
+<tr><td>2</td><td>残り <strong>33,000件の JAN</strong> を投げる（今日投げたのは766件・2.3%）</td><td>夜間の無人走行</td><td>1.17トークン/JAN＝約39,000トークン＝補充33時間ぶん。数日で回せる</td></tr>
+<tr><td>3</td><td><strong>取引条件の開示申請先を増やす。</strong> 承認済み221社の品揃えでは、Amazon で売れている棚と重なりません（売れ筋 monthlySold≥50 の250件を67,662 JAN に当てて、当たったのは<strong>1件</strong>）</td><td>第三者連絡＝§4.1・社長承認</td><td>母数の天井を上げる唯一の手</td></tr>
+<tr><td>4</td><td>§1b の7件を人が見る（カート保持者と、Amazon 側のセット数）</td><td>社長の Chrome＋キーゾン</td><td>0件を1〜2件にする最短路</td></tr>
+</tbody></table>
+<h3>今日使った Keepa トークン</h3>
+<table><thead><tr><th>用途</th><th>消費</th><th>単価（実測）</th></tr></thead><tbody>
+<tr><td>段A JAN→ASIN（766 JAN）</td><td>899</td><td>1.17 / JAN</td></tr>
+<tr><td>ランク取り直し（205 ASIN）</td><td>205</td><td>1.00 / ASIN</td></tr>
+<tr><td>段B §3.3 ゲート（34 ASIN）</td><td>約236</td><td>6.9 / ASIN</td></tr>
+<tr><td><strong>合計</strong></td><td><strong>約1,340</strong></td><td>上限1,200・補充20/分なので実時間で約67分ぶん</td></tr>
+</tbody></table>
+<hr>
+<p>判定日 2026-10-01 ／ タカシ（IT エンジニア）／ チケット T-20260920-003  </p>
+<p>判定台帳（32列・購入先URL つき）: https://docs.google.com/spreadsheets/d/1ppyXCnp2S_9Xwi3vJHGOT6iJCfsEqt88n30aqUFtX3I/edit</p>
+</body></html>
