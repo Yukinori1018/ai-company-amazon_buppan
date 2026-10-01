@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>初回から代行へ直送し、かつ出品許可の書類を取る</title>
+<meta name="robots" content="noindex, nofollow">
+<style>
+:root{
+  color-scheme: light dark;
+  --bg:#ffffff; --surface:#f5f7f9; --surface2:#eceff3;
+  --text:#1b1f24; --muted:#525b66; --faint:#6c7681;
+  --border:#d5dae1; --border-strong:#b8c0ca;
+  --accent:#1c5b86; --accent-bg:#eef5fa;
+  --warn:#8a4b00; --warn-bg:#fdf1df; --warn-border:#dd9a3c;
+  --alert:#7d2b2b; --alert-bg:#fbeeee; --alert-border:#d08b8b;
+  --ok:#1b6144; --ok-bg:#eaf4ef; --ok-border:#8ab9a3;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#15181c; --surface:#1d2126; --surface2:#252a31;
+    --text:#e4e8ec; --muted:#aab4bf; --faint:#949eaa;
+    --border:#333a43; --border-strong:#48515c;
+    --accent:#79b4dc; --accent-bg:#1a2a36;
+    --warn:#f0b866; --warn-bg:#332616; --warn-border:#7a5a2a;
+    --alert:#e79a9a; --alert-bg:#331e1e; --alert-border:#6e4040;
+    --ok:#84cfa9; --ok-bg:#17281f; --ok-border:#3c6450;
+  }
+}
+*{box-sizing:border-box;}
+html{ -webkit-text-size-adjust:100%; }
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic Medium","Yu Gothic",
+              "Noto Sans JP","Meiryo",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:16px; line-height:1.85;
+  font-feature-settings:"palt" 1;
+  text-align:left;
+}
+.wrap{max-width:900px; margin:0 auto; padding:32px 20px 96px;}
+
+/* ---------- header ---------- */
+.kicker{
+  font-size:12px; letter-spacing:.14em; color:var(--faint);
+  margin:0 0 10px; font-variant-numeric:tabular-nums;
+}
+h1{
+  font-size:27px; line-height:1.5; margin:0 0 20px;
+  letter-spacing:.01em; font-weight:700; text-wrap:balance;
+}
+.lead{
+  margin:0; color:var(--muted); font-size:15px; line-height:1.8;
+  border-left:3px solid var(--border-strong); padding:2px 0 2px 14px;
+}
+
+/* ---------- kpi カード ---------- */
+.kpis{display:flex; flex-wrap:wrap; gap:10px; margin:1.1em 0 1.2em;}
+.kpi{
+  flex:1 1 150px; min-width:150px;
+  border:1px solid var(--border-strong); border-radius:10px;
+  background:var(--bg); padding:12px 14px 13px;
+}
+.kpi-l{margin:0; font-size:13px; line-height:1.5; color:var(--muted); letter-spacing:.02em;}
+.kpi-v{
+  margin:.1em 0 0; font-size:32px; line-height:1.25; font-weight:700;
+  letter-spacing:-.01em; font-variant-numeric:tabular-nums;
+}
+@media (max-width:520px){
+  .kpi{flex:1 1 100%;}
+  .kpi-v{font-size:27px;}
+}
+
+/* ---------- toc ---------- */
+.toc{
+  margin:30px 0 8px; padding:18px 22px 20px;
+  background:var(--surface); border:1px solid var(--border); border-radius:10px;
+}
+.toc-h{
+  margin:0 0 10px; font-size:13px; font-weight:700;
+  letter-spacing:.1em; color:var(--muted);
+}
+.toc ul.toc-list{margin:0; padding:0; list-style:none;}
+.toc li{margin:.26em 0; line-height:1.65;}
+.toc li.toc-lv1{margin:.85em 0 .3em; font-weight:700;}
+.toc li.toc-lv1:first-child{margin-top:0;}
+.toc li.toc-lv2{padding-left:1.1em;}
+.toc li.toc-lv3{padding-left:2.5em; font-size:14.5px; color:var(--muted); margin:.16em 0;}
+.toc li.toc-lv3::before{content:"–"; color:var(--faint); margin-right:.45em;}
+.toc a{color:var(--accent); text-decoration:none; border-bottom:1px solid transparent;}
+.toc a:hover{border-bottom-color:currentColor;}
+
+/* ---------- part ---------- */
+h1.part{
+  font-size:24px; line-height:1.5; font-weight:700; letter-spacing:.02em;
+  margin:64px 0 8px; padding:14px 0 0; border-top:4px solid var(--text);
+  scroll-margin-top:16px;
+}
+
+/* ---------- sections ---------- */
+.sec{margin:0;}
+.sec>*:last-child{margin-bottom:0;}
+h2{
+  font-size:21px; line-height:1.5; margin:46px 0 16px; padding-bottom:9px;
+  border-bottom:2px solid var(--border-strong); font-weight:700;
+  scroll-margin-top:16px;
+}
+h3{
+  font-size:17px; line-height:1.6; margin:32px 0 12px; font-weight:700;
+  color:var(--text); scroll-margin-top:16px;
+}
+h3::before{content:""; display:inline-block; width:4px; height:1em;
+  background:var(--accent); margin-right:9px; vertical-align:-.13em; border-radius:2px;}
+p{margin:0 0 1.1em;}
+ul,ol{margin:0 0 1.2em; padding-left:1.6em;}
+li{margin:.4em 0;}
+li>ul{margin:.45em 0 .2em;}
+blockquote{
+  margin:0 0 1.2em; padding:14px 18px;
+  background:var(--surface); border-left:4px solid var(--accent); border-radius:0 8px 8px 0;
+}
+blockquote p{margin:0;}
+hr.rule{
+  border:0; border-top:1px solid var(--border);
+  margin:40px 0 0; opacity:.55;
+}
+hr.rule:has(+ .sec-box),hr.rule:has(+ h1.part){display:none;}
+
+/* ---------- tables ---------- */
+.tw{
+  overflow-x:auto; -webkit-overflow-scrolling:touch;
+  margin:0 0 1.4em; border:1px solid var(--border); border-radius:9px;
+  background:
+    linear-gradient(to right, var(--bg) 30%, rgba(0,0,0,0)) left / 28px 100% no-repeat local,
+    linear-gradient(to left,  var(--bg) 30%, rgba(0,0,0,0)) right / 28px 100% no-repeat local,
+    radial-gradient(farthest-side at 0 50%, rgba(90,110,130,.28), rgba(0,0,0,0)) left / 12px 100% no-repeat scroll,
+    radial-gradient(farthest-side at 100% 50%, rgba(90,110,130,.28), rgba(0,0,0,0)) right / 12px 100% no-repeat scroll;
+}
+.tw:focus{outline:2px solid var(--accent); outline-offset:2px;}
+table{border-collapse:collapse; width:100%; font-size:14.5px; line-height:1.72;}
+thead th{
+  background:var(--surface2); text-align:left; font-weight:700;
+  padding:11px 14px; border-bottom:2px solid var(--border-strong);
+  white-space:nowrap; vertical-align:bottom;
+}
+tbody td{padding:11px 14px; border-bottom:1px solid var(--border); vertical-align:top;
+  overflow-wrap:anywhere;}
+tbody tr:last-child td{border-bottom:0;}
+tbody tr:nth-child(even){background:color-mix(in srgb, var(--surface) 55%, transparent);}
+tbody td:first-child{font-weight:600;}
+thead th:first-child,tbody td:first-child{min-width:7.5em;}
+thead th:last-child,tbody td:last-child{white-space:normal;}
+
+/* ---------- inline markers ---------- */
+.ref{
+  font-size:.75em; color:var(--faint); margin-left:.15em;
+  white-space:nowrap; font-variant-numeric:tabular-nums;
+  letter-spacing:.01em; vertical-align:.06em;
+}
+/* [#n] は出典表に行がある時だけリンクになる。見た目は span と同じにして
+   本文の印象を変えない（追加したのは移動手段だけで、文字は足していない） */
+a.ref{text-decoration:none;}
+a.ref:hover,a.ref:focus{color:var(--accent); text-decoration:underline;}
+.chk{
+  display:inline-block; font-size:.75em; line-height:1.5;
+  padding:0 .5em; margin:0 .12em; border-radius:4px;
+  background:var(--warn-bg); color:var(--warn);
+  border:1px solid var(--warn-border); font-weight:700;
+  white-space:nowrap; vertical-align:.09em;
+}
+
+/* ---------- inline emphasis ---------- */
+strong{font-weight:700; color:var(--text);}
+td strong,th strong{font-weight:700;}
+pre.codeblock{white-space:pre-wrap; word-break:break-all; background:rgba(127,127,127,.10); border:1px solid rgba(127,127,127,.35); border-radius:6px; padding:14px 16px; line-height:1.7; font-size:14px; overflow-x:auto;}
+pre.codeblock code{background:none; border:0; padding:0; font-size:inherit;}
+code{
+  font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+  font-size:.9em; padding:.05em .35em; border-radius:4px;
+  background:var(--surface2); border:1px solid var(--border);
+}
+code .chk{font-family:inherit;}
+
+/* ---------- 表セル内の語ハイライト ---------- */
+.pill{
+  display:inline-block; padding:0 .45em; border-radius:4px;
+  font-weight:700; white-space:nowrap;
+}
+.pill-danger{background:var(--alert); color:#fff; border:1px solid var(--alert);}
+.pill-warn{background:var(--warn-bg); color:var(--warn); border:1px solid var(--warn-border);}
+.pill-ok{background:var(--ok-bg); color:var(--ok); border:1px solid var(--ok-border);}
+.pill-info{background:var(--accent-bg); color:var(--accent); border:1px solid var(--accent);}
+/* muted は「検証していない」を表す。塗らず・破線で、済んだものと視覚的に別系統にする */
+.pill-muted{background:transparent; color:var(--faint);
+  border:1px dashed var(--border-strong); font-weight:600;}
+tbody tr.row-danger td:first-child{box-shadow:inset 4px 0 0 var(--alert);}
+tbody tr.row-danger td{background:color-mix(in srgb, var(--alert-bg) 70%, transparent);}
+
+/* ---------- 出典一覧（--reftable） ---------- */
+table.reftable:has(colgroup){table-layout:fixed; min-width:600px;}
+/* --colwidths で列幅を固定した表。狭い画面の溢れは .tw の横スクロールが受ける */
+table.fixedcols{table-layout:fixed; min-width:620px;}
+/* 狭い画面で列が1〜2文字幅に潰れるのを防ぐ。溢れは .tw の横スクロールが受ける */
+table.reftable td:first-child{
+  min-width:2.6em; width:2.6em; text-align:right; white-space:nowrap;
+  font-variant-numeric:tabular-nums; color:var(--muted);
+}
+table.reftable th:first-child{min-width:2.6em; width:2.6em; text-align:right;}
+tbody tr[id]{scroll-margin-top:14px;}
+tbody tr[id]:target td{background:var(--accent-bg);}
+tbody tr[id]:target td:first-child{box-shadow:inset 4px 0 0 var(--accent); color:var(--accent);}
+
+/* ---------- emphasised sections ---------- */
+.sec-box{
+  margin:28px 0 0; padding:6px 26px 20px;
+  border:1px solid var(--border-strong); border-radius:10px;
+}
+.sec-box h2{margin-top:26px;}
+.sec-box .tw{background-color:var(--bg);}
+.sec-conclusion{background:var(--accent-bg); border-left:6px solid var(--accent);}
+.sec-conclusion h2{border-bottom-color:var(--accent);}
+.sec-alert{background:var(--alert-bg); border-color:var(--alert-border);
+  border-left:6px solid var(--alert);}
+.sec-alert h2{border-bottom-color:var(--alert-border);}
+.sec-danger{background:var(--alert-bg); border:2px solid var(--alert);
+  border-left:10px solid var(--alert);}
+.sec-danger h2{border-bottom-color:var(--alert);}
+.sec-warn{background:var(--warn-bg); border-color:var(--warn-border);
+  border-left:6px solid var(--warn-border);}
+.sec-warn h2{border-bottom-color:var(--warn-border);}
+.sec-checklist{background:var(--surface); border:2px solid var(--border-strong);
+  border-left:10px solid var(--accent);}
+.sec-checklist h2{border-bottom-color:var(--accent);}
+/* チェックリストは印刷して手元で使う。番号は原稿どおり残し、記入欄だけ CSS で足す */
+.sec-checklist ol{list-style:decimal; padding-left:1.9em;}
+.sec-checklist ol>li{margin:.7em 0; padding-left:2.1em; position:relative;}
+.sec-checklist ol>li::before{
+  content:""; position:absolute; left:0; top:.25em;
+  width:1.15em; height:1.15em; border:1.5px solid var(--border-strong);
+  border-radius:3px; background:var(--bg);
+}
+
+/* ---------- toc: 囲み枠の節は目次でも色を付ける ---------- */
+.toc a.toc-danger,.toc a.toc-alert{color:var(--alert); font-weight:700;}
+.toc a.toc-warn{color:var(--warn); font-weight:700;}
+.toc a.toc-checklist{color:var(--accent); font-weight:700;}
+
+/* ---------- footer / nav ---------- */
+.prov{
+  margin:56px 0 0; padding-top:16px; border-top:1px solid var(--border);
+  font-size:12.5px; line-height:1.8; color:var(--faint); word-break:break-all;
+}
+.top{
+  position:fixed; right:18px; bottom:18px; z-index:5;
+  display:block; width:42px; height:42px; line-height:40px; text-align:center;
+  border-radius:50%; text-decoration:none; font-size:17px;
+  background:var(--surface); color:var(--muted);
+  border:1px solid var(--border-strong);
+  box-shadow:0 2px 8px rgba(0,0,0,.14);
+}
+.top:hover{color:var(--accent); border-color:var(--accent);}
+
+/* ---------- narrow screens ---------- */
+@media (max-width:640px){
+  body{font-size:15.5px;}
+  .wrap{padding:22px 14px 88px;}
+  h1{font-size:22px;}
+  h1.part{font-size:20px; margin-top:46px;}
+  h2{font-size:19px;}
+  h3{font-size:16.5px;}
+  .toc{padding:14px 16px 16px;}
+  .sec-box{padding:4px 14px 14px;}
+  table{font-size:14px;}
+  thead th,tbody td{padding:9px 11px;}
+}
+
+/* ---------- print ---------- */
+@media print{
+  :root{
+    --bg:#fff; --surface:#fff; --surface2:#fff; --text:#000; --muted:#333; --faint:#555;
+    --border:#999; --border-strong:#555; --accent:#000; --accent-bg:#fff;
+    --warn:#000; --warn-bg:#fff; --warn-border:#000;
+    --alert:#000; --alert-bg:#fff; --alert-border:#000;
+  }
+  body{background:#fff; color:#000; font-size:10.5pt; line-height:1.7;}
+  .wrap{max-width:none; padding:0;}
+  a{color:#000; text-decoration:none;}
+  .top{display:none;}
+  .tw{overflow:visible; background:none; border:1px solid #999;}
+  table{font-size:9pt;}
+  thead th{background:#fff; border-bottom:1.5pt solid #000;}
+  tbody tr:nth-child(even){background:#fff;}
+  .sec-box{background:#fff; border:1.5pt solid #000;}
+  .sec-danger{border:2.5pt solid #000; border-left:2.5pt solid #000;}
+  .chk{background:#fff; color:#000; border:1pt solid #000;}
+  pre.codeblock{background:#fff; border:1px solid #999; break-inside:avoid;}
+  code{background:#fff; border:1px solid #999;}
+  .pill{background:#fff!important; color:#000!important; border:1.2pt solid #000!important;}
+  /* 未検証は印刷でも「済んだもの」と別に見えなければ意味がない。
+     モノクロでは色が消えるので、破線と濃度で差を残す */
+  .pill-muted{border:1pt dashed #666!important; color:#555!important; font-weight:400!important;}
+  /* 長いURLは印刷で紙幅を超える。折り返しを許可して溢れを止める */
+  .tw{overflow:hidden;}
+  table{table-layout:auto; width:100%;}
+  tbody td{overflow-wrap:anywhere; word-break:break-word;}
+  thead th{white-space:normal;}
+  table.reftable{font-size:7.6pt; line-height:1.5;}
+  table.reftable thead th,table.reftable tbody td{padding:5px 6px;}
+  tbody tr[id]:target td{background:#fff;}
+  tbody tr.row-danger td{background:#fff;}
+  tbody tr.row-danger td:first-child{box-shadow:inset 3pt 0 0 #000;}
+  /* チェックリストは1枚で手元に置けるよう独立ページにする */
+  .sec-checklist{break-before:page; page-break-before:always;
+    border:1.5pt solid #000; border-left:1.5pt solid #000;}
+  .sec-checklist ol>li::before{border:1.2pt solid #000;}
+  .ref{color:#555; opacity:1;}
+  blockquote{background:#fff; border-left:3pt solid #000;}
+  h1.part{break-before:page; page-break-before:always; border-top:2.5pt solid #000;
+    font-size:15pt; margin-top:0;}
+  h1.part,h2,h3{break-after:avoid; page-break-after:avoid;}
+  .tw,blockquote,tr{break-inside:avoid; page-break-inside:avoid;}
+  .toc{border:1px solid #999; background:#fff;}
+  .kpi{border:1pt solid #000; background:#fff; break-inside:avoid;}
+  .kpi-v{font-size:16pt;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>初回から FBA 代行へ直送し、かつ出品許可の書類を取る — 事実シート</h1>
+<ul>
+<li>チケット：T-20260929-001（04 までの続き。<strong>社長方針の変更 2026-10-01 に対応</strong>）</li>
+<li>作成：サトル（リサーチャー）／2026-10-01</li>
+<li>取得日：卸サイト側のヘルプは 2026-10-01 取得。代行8社の公式値は 2026-09-29〜30 取得分の再読（01 と同一ソース。原本は <code>workspace/output/agent_output/T-20260929-001/sources/</code>）</li>
+<li><strong>業者・卸・Amazon への問い合わせ・登録・申請は一切していません</strong>（CLAUDE.md §4.1）</li>
+<li><strong>スーパーデリバリー本体（<code>www.superdelivery.com</code>）へのリクエストは0件</strong>です。ヘルプは別ホスト <code>faq.superdelivery.com</code> と Web 検索のみを使いました（CLAUDE.md §3.3-15）</li>
+</ul>
+<hr>
+<h2>0. イシューと打ち切り条件</h2>
+<p><strong>イシュー</strong>：初回ロットを仕入れ先から FBA 代行へ直送しても、Amazon の出品許可申請に使える書類（4要件を満たすもの）を手元に残せるか。残せるなら、どの経路が一番確実か。</p>
+<p><strong>スコープ</strong></p>
+<ol>
+<li>代行8社（03 で採点した8社）について「最小ロット／直送の荷受け／同梱書類の扱い／保管」の公式記載を当て直す</li>
+<li>スーパーデリバリー（SD）と NETSEA の会員ページから、<strong>荷物とは別に</strong>書類を単独で取得できるか</li>
+<li>その書類が Amazon の4要件を満たすか</li>
+</ol>
+<p><strong>打ち切り条件</strong></p>
+<ul>
+<li>公式サイトに書いていないものは「記載なし」で確定し、推測で埋めない</li>
+<li>実物の PDF を見ないと決まらないことは「未確認（実機で確定）」とし、カズヨが手で見る箇所として列挙する</li>
+<li>業者への確認が必要なものは問い合わせ項目として列挙するだけで、連絡はしない</li>
+</ul>
+<hr>
+<h2>1. 結論（5行）</h2>
+<ol>
+<li>🔴 <strong>本命（5つ目）は成立します。SD も NETSEA も、荷物が自宅に来なくても会員ページから書類を取れます。</strong> SD は「出荷明細」から<strong>領収書</strong>と<strong>適格請求書</strong>を発行でき（発行元は<strong>スーパーデリバリー</strong>）、NETSEA は注文詳細の「納品書等を印刷する」から<strong>納品書・請求書・領収書</strong>を PDF で出せます（発行元は<strong>サプライヤー</strong>）。いずれも出荷確定後にボタン1つで、何度でも出せます。</li>
+<li><strong>ただし「4要件を満たすか」は実物を1枚見るまで確定しません。</strong>欠けるおそれがあるのは「出品者の<strong>住所</strong>」と「卸業者の<strong>住所</strong>」の2つです（どちらも公式ヘルプに記載なし）。これは<strong>カズヨが会員ページを開いて1枚出せば確定します</strong>（§5-1）。</li>
+<li><strong>SD の納品書だけは分離できません。</strong>納品書の発行元は出展企業で、商品に同梱されます。再発行はメッセージで出展企業に依頼する方式＝第三者連絡（§4.1）。→ <strong>SD で使う書類は「領収書」か「適格請求書」に寄せる</strong>のが筋です。</li>
+<li>🔴 <strong>NETSEA には踏んではいけない設定が1つあります。</strong>注文時に「<strong>直送用納品書</strong>」を指定すると、<strong>納品書にサプライヤー情報が表示されません</strong>（NETSEA 公式）。要件②（卸業者の名前と住所）が構造的に欠けます。<strong>代行への直送であっても「直送用納品書」は選ばない。</strong>支払いも掛け払いにしない（請求書が GMO 名義になる。既知・T-20260912-001）。</li>
+<li><strong>代行8社のうち、直送・小口・同梱書類の扱いを公式に明文化しているのは2社だけです。FBA代行センター</strong>（1点から可・ネットショップからの直送可・納品書/領収書の<strong>返送500円/回</strong>・160サイズ以下1ヶ月以内の保管は無料）と<strong>糸星</strong>（1点から可・納品書の<strong>データ化200円</strong>／郵送200円）。<strong>03 で主力に選んだびーぷらすFBA は、今回の4軸すべてが「記載なし」です。</strong>選定の見直しが必要かどうかはタケシの領分です。</li>
+</ol>
+<hr>
+<h2>2. 比較表：代行8社 × 新しい4軸</h2>
+<p>既存の比較表（01 §4）を作り直さず、列を足す形にしています。「記載なし」＝公式ページを確認したが書かれていない。「—」＝該当なし。</p>
+<h3>2-1. ① 最小ロット・最低料金</h3>
+<div class="tw"><table><thead><tr><th>業者</th><th>1点・小口を受けるか</th><th>月額・入会金</th><th>最低量の条件</th></tr></thead><tbody>
+<tr><td>びーぷらすFBA</td><td><strong>記載なし</strong></td><td>なし／なし</td><td>記載なし。ただし「3ヶ月以上ご連絡が無い場合は契約を解除、お預かり商品は全て着払いにて返送もしくは破棄」</td></tr>
+<tr><td>おりおんFBA</td><td><strong>記載なし</strong></td><td>なし／なし</td><td>記載なし（同文）</td></tr>
+<tr><td>糸星</td><td><strong>1点から可</strong>（料金表に明記）</td><td>パレット3,000円/月（荷受けに必須・初月無料）／記載なし</td><td>1点から</td></tr>
+<tr><td>タイシンFBA</td><td>「1点のみの依頼で、ある程度まとまってからの配送も可能。ただし商品の大きさ・量による」</td><td>なし／保証金50,000円（返還）</td><td>「<strong>最低ロットは設けていないが、量が少ないと弊社が判断した場合はお断りする場合がある</strong>。概ね140サイズ5箱程度を月2回以上出荷していただけるようお願いしている」</td></tr>
+<tr><td>FBA代行センター</td><td><strong>「1点のみの依頼でも大丈夫ですか？」→「はい。1点からでもお受けしております」</strong>（Q&amp;A）</td><td>一般会員0円（プレミアム4,900円）／記載なし</td><td>なし。<strong>大口契約のみ</strong>。1回の利用が1万円超で前金の場合あり</td></tr>
+<tr><td>福富サポート</td><td>1点から可（料金表の単位が1点・1ケース）</td><td>3,980円（税抜・利用がない月も請求）／3,000円（税抜）</td><td>なし。<strong>休止制度なし</strong>（退会→再登録）</td></tr>
+<tr><td>サポートBB</td><td><strong>記載なし</strong></td><td>2,480円（税抜）／入会金5,000円</td><td>記載なし</td></tr>
+<tr><td>JCC（スポット）</td><td>記載なし（スポットプランは条件の記載なし）</td><td>0円／0円（継続プランは3,080円・3,300円）</td><td>スポットは条件なし。<strong>継続プランは月1,000pcs 以上の実績</strong></td></tr>
+</tbody></table></div>
+<h3>2-2. ② 仕入れ先からの直送を受けられるか</h3>
+<div class="tw"><table><thead><tr><th>業者</th><th>直送の可否（公式記載）</th><th>荷受けの宛名</th><th>事前連絡</th><th>荷受け料・着払い</th></tr></thead><tbody>
+<tr><td>びーぷらすFBA</td><td><strong>記載なし</strong></td><td>記載なし</td><td>記載なし</td><td>荷受確認30円/SKU</td></tr>
+<tr><td>おりおんFBA</td><td><strong>記載なし</strong></td><td>記載なし</td><td>記載なし</td><td>荷受確認22円/SKU</td></tr>
+<tr><td>糸星</td><td>記載なし（荷受け自体はパレット前提で明文化）</td><td>客名、または「月虹株式会社 ◯◯（客名）」</td><td>記載なし</td><td>元払い。着払いは事前入金が必要</td></tr>
+<tr><td>タイシンFBA</td><td>「1回1回の配送ではなく、まとまってからの配送も可能」</td><td>記載なし</td><td>記載なし</td><td>着払い・代引き対応（客負担）</td></tr>
+<tr><td>FBA代行センター</td><td>🔴 <strong>可。「仕入れた商品全てをFBA代行センターに直送して頂き」「特に電脳せどりをやっている方は1点、2点と小さく仕入れる場合が多いです」</strong>（Q&amp;A）。海外からの発送元は不可。直接持ち込みは不可</td><td><strong>客名必須</strong>（「お荷物の受取人に必ず会員様ご自身のお名前」）</td><td>「一度ご相談下さい」。到着後はチャットワークで到着連絡あり</td><td>荷受手数料50円/箱（メール便・普通郵便も対象）。着払い可（手数料200円）。<strong>代金引換は受取拒否</strong></td></tr>
+<tr><td>福富サポート</td><td>記載あり（海外転送会社・運送会社からの到着を前提にした記述）</td><td>会員名または屋号。<strong>住所の末尾に会員ID</strong></td><td>「<strong>スルー倉庫のため到着連絡はしない。トラッキング番号をご自身で管理</strong>」</td><td>着払い200円（5万円まで）</td></tr>
+<tr><td>サポートBB</td><td>記載あり（送り状の記載例を公開）</td><td><strong>「サポートBB ◯◯ ◯◯（ご自身のお名前）」</strong>、電話番号は客自身の番号</td><td>荷受け可能日は月〜土（日祝は受取不可）</td><td>代引き・着払いは立替可</td></tr>
+<tr><td>JCC</td><td>可（「宛名について変更をご希望の場合はご相談ください」）。<strong>購入者への直送にも対応</strong>（見積制）</td><td><strong>客名必須</strong></td><td>出荷依頼メールに追跡番号を記載して送る運用</td><td>着払い荷受手数料220円/件（上限3万円）。<strong>代金引換は不可</strong></td></tr>
+</tbody></table></div>
+<h3>2-3. 🔴 ③ 同梱の納品書・送り状を当社へ渡してくれるか</h3>
+<div class="tw"><table><thead><tr><th>業者</th><th>公式サービスの有無</th><th>形式</th><th>費用</th><th>所要・注意</th></tr></thead><tbody>
+<tr><td>びーぷらすFBA</td><td><strong>記載なし</strong></td><td>—</td><td>—</td><td>—</td></tr>
+<tr><td>おりおんFBA</td><td><strong>記載なし</strong></td><td>—</td><td>—</td><td>—</td></tr>
+<tr><td>糸星</td><td>🔴 <strong>あり（「納品書・保証書について」）</strong></td><td>①<strong>データ便</strong>（ギガファイル便で共有グループへ送付）②郵送（レターパックまたは段ボール）</td><td><strong>各200円</strong></td><td>⚠️ <strong>「送付は、月末にまとめてお送りします」</strong>。順不同。データ納品後、現物は1ヶ月保管し、その後シュレッダー。不要と伝えれば即シュレッダー。<strong>Cプラン（5,000円/月）なら納品書送付料金が無料</strong></td></tr>
+<tr><td>タイシンFBA</td><td><strong>記載なし</strong></td><td>—</td><td>—</td><td>—</td></tr>
+<tr><td>FBA代行センター</td><td>🔴 <strong>あり（「納品書・領収書 返送サービス」）</strong>。説明文が直送を前提にしている：「<strong>ネットショップから直送納品した場合、納品書や領収書が入っている場合が有ります。そちらをお客様に返送するサービスです</strong>」</td><td><strong>現物の返送</strong>（郵送）。画像・PDF での共有は記載なし</td><td><strong>500円/1回</strong></td><td>郵送のため日数がかかる（公式に日数の記載なし）</td></tr>
+<tr><td>福富サポート</td><td><strong>記載なし</strong></td><td>—</td><td>—</td><td>—</td></tr>
+<tr><td>サポートBB</td><td><strong>記載なし</strong></td><td>—</td><td>—</td><td>—</td></tr>
+<tr><td>JCC</td><td><strong>記載なし</strong>（会員規約に「外観、<strong>納品書</strong>および依頼シートから確認できる範囲での検品」とあり、納品書の存在は前提にしている）</td><td>—</td><td>—</td><td>—</td></tr>
+<tr><td>（参考）e-fba</td><td>あり：「納品書・領収書 返送サービス」＝<strong>応相談</strong>（金額の記載なし）</td><td>記載なし</td><td>記載なし</td><td>03 の採点対象外</td></tr>
+</tbody></table></div>
+<p><strong>事実</strong>：8社のうち<strong>書類の扱いを料金表に載せているのは糸星と FBA代行センターの2社だけ</strong>です。他6社は「記載なし」で、やってもらえるかどうかは問い合わせでしか分かりません（§6）。</p>
+<h3>2-4. ④ 許可が下りるまで預かってくれるか（保管）</h3>
+<div class="tw"><table><thead><tr><th>業者</th><th>無料期間</th><th>有料時の料金</th><th>溜め置き（箱が埋まるまで待つ）</th></tr></thead><tbody>
+<tr><td>びーぷらすFBA</td><td><strong>記載なし</strong></td><td><strong>記載なし</strong></td><td>記載なし。3ヶ月連絡なしで契約解除・着払い返送または破棄</td></tr>
+<tr><td>おりおんFBA</td><td><strong>記載なし</strong></td><td><strong>記載なし</strong></td><td>記載なし（同文）</td></tr>
+<tr><td>糸星</td><td>荷受け〜納品までの一時保管はパレット料金（3,000円/月・初月無料）に含む</td><td>🔴 <strong>2週間以内に発送見込みがない商品は「自己発送用パレット」へ移動＝3,000円/月。「140サイズを満たすまでの間、追加荷物をお待ちの場合」「お客様からの発送・プラン作成のご指示がない商品」は&quot;お客様都合&quot;と定義</strong></td><td>可だが上の長期保管料の対象になる</td></tr>
+<tr><td>タイシンFBA</td><td>記載なし</td><td>滞留在庫が多い場合2,000円/月</td><td>「基本的には可能。ただしスペースに限りがある」</td></tr>
+<tr><td>FBA代行センター</td><td>🔴 <strong>無料。「保管目安は160サイズ以下、1ヶ月以内」</strong></td><td>記載なし（目安超過時の料金は非公開）</td><td>🔴 <strong>可。「100サイズ段ボールに満タンになったら発送して下さい」などのご要望は受け付ける</strong>（Q&amp;A）</td></tr>
+<tr><td>福富サポート</td><td>記載なし</td><td>「物量に応じて弊社規定の保管料」＝<strong>金額非公開</strong>。利用がない月も月額4,378円（税込）＋保管料</td><td>可（「商品を一旦保管し、出荷依頼をもとにピッキング・発送」）。規約10条：所定の保管期限を超えると任意に処分・売却できる</td></tr>
+<tr><td>サポートBB</td><td><strong>14日間</strong>（「14日間以上保管が必要な場合は保管料が発生」）</td><td><strong>1.5㎥／4,500円</strong></td><td>記載なし</td></tr>
+<tr><td>JCC</td><td><strong>7日間</strong>（商品到着日を含む）</td><td><strong>1パレット3,300円/月</strong>（110×110×110〜150cm）</td><td>可（「売れる個数だけFBA倉庫に送り、その他はJCCで保管」を公式に提案）</td></tr>
+</tbody></table></div>
+<p><strong>初回の文脈での意味</strong>：出品許可の申請〜審査は書類審査で<strong>3〜7営業日、厳しいカテゴリーで最長2週間</strong>（memory <code>knowledge_listing_restrictions_ungating</code>）。<strong>JCC の7日無料は足りない可能性があり、サポートBB の14日は境界、FBA代行センターの「1ヶ月」が最も余裕があります。</strong></p>
+<hr>
+<h2>3. 🔴 本命：卸サイトの会員ページから書類だけを取れるか</h2>
+<h3>3-1. スーパーデリバリー（SD）</h3>
+<p><strong>公式の発行元の一覧</strong>（faq.superdelivery.com「書類の発行元について」）</p>
+<div class="tw"><table><thead><tr><th>書類</th><th>発行元</th></tr></thead><tbody>
+<tr><td>納品書</td><td><strong>出展企業</strong></td></tr>
+<tr><td>適格請求書</td><td><strong>スーパーデリバリー</strong></td></tr>
+<tr><td>領収書</td><td><strong>スーパーデリバリー</strong></td></tr>
+<tr><td>請求書</td><td><strong>Paid</strong>（支払い方法として Paid を利用する場合のみ）</td></tr>
+</tbody></table></div>
+<p><strong>荷物と分離して取れるか</strong></p>
+<div class="tw"><table><thead><tr><th>書類</th><th>分離取得</th><th>取得場所・条件（公式）</th></tr></thead><tbody>
+<tr><td>納品書</td><td>🔴 <strong>できない</strong></td><td>「納品書は出展企業が発行し、<strong>商品発送時に同梱されます</strong>」。同梱されていない場合・再発行を希望する場合は「<strong>メッセージにて出展企業へご連絡</strong>」＝第三者連絡（§4.1）</td></tr>
+<tr><td>領収書</td><td>✅ <strong>できる</strong></td><td>購入履歴 → <strong>出荷明細</strong> → 「<strong>領収書発行</strong>」ボタン。<strong>Paid（掛け）とクレジットカードは発行可、代金引換は発行しない</strong>（代わりに送り状の伝票を使う）。「領収書発行」ボタンから<strong>何度でも表示可</strong>。2回目以降は「<strong>(再発行)</strong>」と記載され、<strong>発行日もその都度更新される</strong></td></tr>
+<tr><td>適格請求書（商品代金）</td><td>✅ <strong>できる</strong></td><td>「出荷明細」ページ内の「<strong>適格請求書発行</strong>」ボタン。<strong>各出展企業の出荷ごとに発行可</strong>。「仕入税額控除に必要となる適格請求書は、スーパーデリバリーが発行する適格請求書をご利用ください」</td></tr>
+<tr><td>適格請求書（会費）</td><td>✅ できる</td><td>「会費の支払い状況」→「領収書発行」→「領収書（会費明細書）」。月ごと。<strong>これは会費の書類なので仕入れの証憑にはならない</strong></td></tr>
+<tr><td>請求書</td><td>—</td><td><strong>出展企業も SD も発行しない。</strong>Paid 利用時のみ Paid が請求書を郵送／口座引落通知書をダウンロード。カード決済は「クレジット会社の明細書＋出荷明細」で代用</td></tr>
+</tbody></table></div>
+<p><strong>配送先</strong>：「配送先は25件まで追加できます」。会員情報の変更ページから追加・変更・削除。<strong>代行倉庫の宛名をどう書けるか（会社名を入れられるか）は公式に記載なし＝未確認。</strong></p>
+<p><strong>推測（確度：中）</strong>：領収書は何度でも再発行でき、<strong>再発行のたびに発行日が更新される</strong>ので、Amazon の「過去180日以内に発行」は自分で満たし直せます。根拠は上記ヘルプの明文。ただし Amazon が取引日で見るか発行日で見るかは確認していません。</p>
+<h3>3-2. NETSEA</h3>
+<div class="tw"><table><thead><tr><th>書類</th><th>分離取得</th><th>取得場所・条件（公式）</th></tr></thead><tbody>
+<tr><td>納品書・請求書・領収書</td><td>✅ <strong>できる</strong></td><td>マイページトップ → <strong>注文履歴</strong> → 注文詳細 → 「<strong>納品書等を印刷する</strong>」で3種の PDF をダウンロード。<strong>商品が出荷確定されてから</strong>。従来はサプライヤーへ依頼してメール送付してもらう必要があった機能を 2019-01-30 にリリース</td></tr>
+<tr><td>発行元</td><td>—</td><td><strong>サプライヤー</strong>（NETSEA 運営ではない）。2015-08-03 から表示名は「商号(店舗名)」ではなく<strong>法人名に統一</strong></td></tr>
+<tr><td>適格請求書</td><td>条件付き</td><td>「サプライヤーが登録番号を入力していれば表示されます」</td></tr>
+<tr><td>NETSEAプライムの領収書</td><td>✅</td><td>マイページ内 NETSEAプライム欄 →「NETSEAプライムご利用明細はこちら」→ 月ごとに「領収書ダウンロード」</td></tr>
+<tr><td>掛け払いの請求</td><td>✕</td><td><strong>GMOペイメントサービス発行</strong>＝卸の請求書として使えない（既知・T-20260912-001）</td></tr>
+</tbody></table></div>
+<p>🔴 <strong>踏んではいけない設定（3パターンの納品書）</strong></p>
+<div class="tw"><table><thead><tr><th>パターン</th><th>中身</th><th>出品許可申請への適性</th></tr></thead><tbody>
+<tr><td>通常納品書</td><td>住所変更なし</td><td>○（これを使う）</td></tr>
+<tr><td>変更先送付納品書</td><td><strong>価格記載なし</strong></td><td>△（Amazon は価格を伏せてよいので致命的ではない。ただし宛先が変更先になる）</td></tr>
+<tr><td><strong>直送用納品書</strong></td><td>送付先は消費者、連絡先はバイヤー、<strong>価格記載なし</strong>。🔴 <strong>「注文時に直送用納品書を指定している場合は、納品書にサプライヤー情報は表示されません」</strong></td><td>✕ <strong>要件②（卸業者の名前と住所）が構造的に欠ける。選ばない</strong></td></tr>
+</tbody></table></div>
+<p>⚠️ <strong>2つの注意書き（公式）</strong></p>
+<ul>
+<li>「ダウンロードできる書類は、<strong>社内管理用としてご利用ください</strong>。書式や項目の変更が必要な場合は各サプライヤーへご相談ください」</li>
+<li>「NETSEA 上の機能による納品書・請求書・領収書の利用は<strong>各サプライヤーの選択</strong>であり、すべての取引で使用されているわけではありません」→ <strong>サプライヤーによっては発行されない</strong></li>
+</ul>
+<hr>
+<h2>4. Amazon の4要件 × 各経路（充足マトリクス）</h2>
+<p>Amazon の要件（申請画面原文・memory <code>knowledge_listing_restrictions_ungating</code>）：①過去180日以内に発行 ②出品者の名前と住所 ③メーカーまたは卸業者の名前と住所 ④合計10点以上の購入。価格は伏せてよい。<strong>判定は書類の名称ではなく記載が4要件を満たすかで決まる。</strong></p>
+<div class="tw"><table><thead><tr><th>要件</th><th>SD 領収書／適格請求書（会員ページ）</th><th>NETSEA 通常納品書（会員ページ）</th><th>代行から現物を転送してもらう</th></tr></thead><tbody>
+<tr><td>① 180日以内</td><td>✅ 発行日は再発行で更新される（公式）→ 期限切れの心配がない</td><td>✅ 出荷確定後いつでも発行可</td><td>△ 同梱された日付で固定。転送に日数がかかる分だけ不利</td></tr>
+<tr><td>② 出品者の名前と住所</td><td><strong>未確認</strong>（宛名の表示項目は公式に記載なし）</td><td><strong>未確認</strong>（2015年に法人名統一の記述はあるが<strong>住所の記載は公式にない</strong>）</td><td>同梱物そのまま＝NETSEA/SD の様式と同じなので、①②は左2列と同じ条件</td></tr>
+<tr><td>③ 卸業者の名前と住所</td><td>△ 発行元は<strong>ラクーンコマース（SD 運営）</strong>。出展企業名が載るかは<strong>未確認</strong>。「卸業者」として SD 名義が通るかは Amazon 側の判断</td><td>✅ 名称は載る（サプライヤーの<strong>法人名</strong>・公式）／<strong>住所は未確認</strong></td><td>✅ SD の納品書は<strong>出展企業名義</strong>（既知・T-20260920-003）</td></tr>
+<tr><td>④ 10点以上</td><td>✅ 注文内容で決まる（商品名と内訳が表示される）</td><td>✅ 同</td><td>✅ 同</td></tr>
+<tr><td>実務での通過率</td><td>事例 N=1：SD の書類で<strong>却下</strong>（理由「改ざんの可能性」・2025年10月頃）</td><td>事例 N=3：却下→後日承認1件、結果不明1件、「どの卸業者の書類でも通るわけではない」1件</td><td>同じ書類なので同じ</td></tr>
+</tbody></table></div>
+<p><strong>事実</strong>：ネット卸の書類は「通りにくい」が 2025〜2026 年の実務側の一致した見方です（T-20260912-001 §2、N=5）。確実性の序列は「メーカー／正規卸 ＞ ネット卸」のまま変わっていません。</p>
+<p><strong>推測（確度：中）</strong>：②と③の「住所」が欠けていても、Amazon の審査は4要件のうち欠けた項目を個別に指摘して再提出を求める運用です（却下理由「請求書番号がございません」の事例あり）。したがって<strong>1回で通らなくても致命的ではなく、再提出で通る余地があります</strong>。根拠は上記事例#1（却下→後日承認）。</p>
+<hr>
+<h2>5. 分かっていないこと（埋め方つき）</h2>
+<h3>5-1. カズヨが手で見れば確定すること（§4.1 非該当・0円）</h3>
+<div class="tw"><table><thead><tr><th>#</th><th>見る場所</th><th>確定すること</th><th>優先</th></tr></thead><tbody>
+<tr><td>1</td><td>SD 会員ページ：購入履歴 → 出荷明細 → 「領収書発行」／「適格請求書発行」で<strong>実際に1枚出して表示項目を見る</strong></td><td>宛名に<strong>当社名と住所</strong>が入るか、<strong>出展企業名と住所</strong>が入るか。→ ②③が埋まる</td><td>🔴 最優先</td></tr>
+<tr><td>2</td><td>SD 会員ページ：会員情報の変更 → 配送先の追加画面</td><td>配送先に<strong>会社名（代行倉庫名）＋当社名</strong>の形で登録できるか。文字数制限の有無</td><td>🔴 最優先</td></tr>
+<tr><td>3</td><td>NETSEA マイページ：注文履歴 → 注文詳細 → 「納品書等を印刷する」</td><td>3種の PDF の表示項目。②③が埋まる。<strong>当社に NETSEA の購入実績がないため、注文が1件入るまでは見られない可能性あり</strong></td><td>高</td></tr>
+<tr><td>4</td><td>NETSEA の注文画面</td><td>「直送用納品書」の指定がどこにあるか（<strong>選ばないため</strong>に場所を知る必要がある）</td><td>高</td></tr>
+<tr><td>5</td><td>セラーセントラル：出品許可申請の画面</td><td>申請時に求められる書類の種類の選択肢（ブランドによって変わる）</td><td>中</td></tr>
+<tr><td>6</td><td>セラーセントラル：納品プラン作成</td><td>出品許可が下りる前に納品プランを作れるか（01 §5-3 では推論のまま）</td><td>中</td></tr>
+</tbody></table></div>
+<blockquote>⚠️ #1・#2 は SD 会員ページでの手作業です。<strong>自動取得は恒久停止（CLAUDE.md §3.3-15）なので、カズヨがブラウザで1件ずつ見ること。</strong></blockquote>
+<h3>5-2. 業者に聞かないと分からないこと（§4.1 該当・社長承認が必要）</h3>
+<p>文面はヒデアキの領分です。<strong>どの社に何を聞くか</strong>だけ挙げます。</p>
+<div class="tw"><table><thead><tr><th>社</th><th>聞くこと</th></tr></thead><tbody>
+<tr><td><strong>びーぷらすFBA</strong>（03 の主力）</td><td>①1点・1箱でも受けるか、最低料金はあるか ②<strong>卸サイトから倉庫へ直送できるか</strong>。宛名の書き方・事前連絡の要否・荷受け料 ③<strong>同梱の納品書を返送または撮影して送ってもらえるか</strong>。費用と所要日数 ④出品許可が下りるまでの預かりの可否・無料期間・保管料</td></tr>
+<tr><td><strong>おりおんFBA</strong></td><td>同上（公式ページがびーぷらすと同一フォーマットで、同じ4点が記載なし）</td></tr>
+<tr><td><strong>FBA代行センター</strong></td><td>①「納品書・領収書 返送サービス（500円/回）」を<strong>画像または PDF での共有に替えられるか</strong>（郵送だと申請が数日遅れる） ②保管「160サイズ以下1ヶ月以内」を超えた場合の料金 ③1回1万円超の前金の条件</td></tr>
+<tr><td><strong>糸星</strong></td><td>①納品書のデータ便が「<strong>月末にまとめて</strong>」送付となっているが、<strong>申請を急ぐ場合に個別・即時に送ってもらえるか</strong>（月末待ちだと最大1ヶ月遅れる） ②「140サイズを満たすまで待つ」が客都合＝長期保管料3,000円/月の対象になる条件</td></tr>
+<tr><td><strong>サポートBB／JCC／福富サポート</strong></td><td>同梱納品書の返送・画像共有の可否と費用（3社とも記載なし）</td></tr>
+<tr><td><strong>タイシンFBA</strong></td><td>「140サイズ5箱×月2回以上」に届かない規模でも受けてもらえるか。保証金5万円の返還条件</td></tr>
+</tbody></table></div>
+<hr>
+<h2>6. 手順書：初回から代行へ直送し、かつ書類を確実に取る（本線）</h2>
+<p><strong>設計の考え方</strong>：書類を1本に賭けません。<strong>卸サイトの会員ページから自分で取る（主）＋ 代行から現物を転送してもらう（保険）の二重取り</strong>にします。会員ページ経由は0円・即時・荷物の所在に依存しないので、これを主にします。</p>
+<h3>前提（ここだけタケシの判断が必要）</h3>
+<p>直送・小口・書類・保管の4軸すべてに公式の答えがあるのは <strong>FBA代行センター</strong> だけです（1点から可／直送可／書類返送500円／1ヶ月無料保管／ただし月100点で140円/点＝びーぷらすの約4倍）。<strong>03 の主力（びーぷらすFBA）は4軸すべて「記載なし」</strong>です。主力を差し替えるか、問い合わせで埋めてから決めるかは<strong>タケシ（プランナー）の領分</strong>です。以下の手順は業者名に依存しない形で書きます。</p>
+<h3>手順</h3>
+<div class="tw"><table><thead><tr><th>#</th><th>いつ</th><th>すること</th><th>誰が</th><th>根拠・注意</th></tr></thead><tbody>
+<tr><td>0</td><td>発注前</td><td>その ASIN にゲートがあるか、セラーセントラルの商品登録画面で確認する。「出品許可を申請」ボタンならゲートあり</td><td>カズヨ</td><td>ゲートがなければ以下は不要。実機確認のみ・§4.1 非該当</td></tr>
+<tr><td>1</td><td>発注前</td><td><strong>ワンクリック解除が使えるか確認</strong>。使えれば書類は要らない</td><td>カズヨ→社長</td><td>申請の送信は §4.1。承認を取る</td></tr>
+<tr><td>2</td><td>発注前</td><td>卸サイト側で<strong>書類が出る設定か</strong>を確認。NETSEA はサプライヤーが書類発行機能を使っているか（使っていない場合がある・公式明記）、SD は出荷明細に発行ボタンがあるか</td><td>カズヨ</td><td>§5-1 #1・#3</td></tr>
+<tr><td>3</td><td>発注前</td><td>代行に<strong>荷受け・直送・書類返送・預かりの4点を確認</strong>（§5-2）</td><td>社長承認の上でヒデアキが文面</td><td>§4.1 該当</td></tr>
+<tr><td>4</td><td>注文時</td><td><strong>配送先に代行倉庫を登録</strong>。宛名は各社の指定形式で書く（例：サポートBB＝「サポートBB＋当社名」／福富＝住所末尾に会員ID・宛名は当社名か屋号／FBA代行センター・JCC・糸星＝当社名）</td><td>カズヨ（SD は手作業）</td><td>宛名が当社名でない荷物を受けない社がある</td></tr>
+<tr><td>5</td><td>注文時</td><td>🔴 <strong>NETSEA では「直送用納品書」を選ばない。支払いを掛け払いにしない</strong>（カードまたは PayPal）</td><td>カズヨ</td><td>直送用＝サプライヤー情報が消える／掛け払い＝GMO 名義</td></tr>
+<tr><td>6</td><td>注文時</td><td>注文は<strong>10点以上</strong>にする。1SKU で10点に届かない場合は同一サプライヤーの別商品を足して1注文にまとめる（要件④は「合計10点以上」）</td><td>カズヨ</td><td>要件④</td></tr>
+<tr><td>7</td><td>発送前</td><td>代行に追跡番号と到着予定を連絡。「同梱の納品書は<strong>返送（またはデータ化）</strong>してほしい」「出品許可が下りるまで<strong>預かってほしい</strong>」を伝える</td><td>カズヨ</td><td>福富はスルー倉庫で到着連絡がない＝自分で追跡する</td></tr>
+<tr><td>8</td><td><strong>出荷確定後すぐ</strong></td><td>🔴 <strong>卸サイトの会員ページから書類 PDF を取得する。</strong>SD＝出荷明細→領収書発行／適格請求書発行。NETSEA＝注文詳細→「納品書等を印刷する」</td><td>カズヨ</td><td><strong>これが本線。</strong>荷物が代行に行っていても取れる</td></tr>
+<tr><td>9</td><td>同時</td><td>代行に現物の納品書を返送（糸星200円／FBA代行センター500円）させる</td><td>カズヨ</td><td>保険。会員ページの書類が4要件を満たさなかった場合に使う</td></tr>
+<tr><td>10</td><td>書類が揃ったら</td><td>出品許可を申請（4要件：180日以内・当社名と住所・卸の名前と住所・10点以上）。価格は伏せてよい</td><td>社長承認の上でカズヨ</td><td>申請の送信は §4.1</td></tr>
+<tr><td>11</td><td>許可が出たら</td><td>代行に納品プラン作成・ラベル貼付・FC 発送を依頼</td><td>カズヨ</td><td>無料保管期間内に収める（JCC 7日／サポートBB 14日／FBA代行センター1ヶ月）</td></tr>
+<tr><td>12</td><td>却下されたら</td><td>却下理由に書かれた<strong>欠けている項目だけ</strong>を補って再提出。§7 の代替案に移る</td><td>カズヨ</td><td>却下→後日承認の事例あり</td></tr>
+</tbody></table></div>
+<p><strong>この手順で消える作業</strong>：社長宅での受け取り・検品・箱詰め・集荷の立ち会い（01 §5-1 の R0 ルート＝約1,392円＋社長の作業40分）。<strong>社長宅に荷物は届きません。</strong></p>
+<p><strong>この手順で増える費用</strong>：書類の転送（0〜500円/回）＋許可待ちの保管（無料枠に収まれば0円）。</p>
+<hr>
+<h2>7. 代替案：会員ページの書類が4要件を満たさなかった場合</h2>
+<h3>代替案A（推奨する代替）— 代行からの現物転送1本に切り替える</h3>
+<div class="tw"><table><thead><tr><th>項目</th><th>内容</th></tr></thead><tbody>
+<tr><td>やること</td><td>卸サイトの書類は使わず、<strong>代行に届いた同梱の納品書の現物を転送してもらい、それで申請する</strong></td></tr>
+<tr><td>使える社</td><td><strong>糸星</strong>（データ便200円／郵送200円）、<strong>FBA代行センター</strong>（返送500円/回）。他6社は要問い合わせ</td></tr>
+<tr><td>利点</td><td>SD の納品書は<strong>出展企業名義</strong>（既知）＝要件③の「卸業者」として最も素直。卸サイト運営名義より確実性の序列が上</td></tr>
+<tr><td>欠点</td><td>①<strong>時間がかかる</strong>。糸星は「月末にまとめて送付」＝最大1ヶ月遅れ。FBA代行センターは郵送（日数非公開）。②その間ずっと代行に在庫を預けるので、無料保管期間を超えると保管料がかかる（糸星3,000円/月・JCC 3,300円/月・サポートBB 4,500円/1.5㎥）</td></tr>
+<tr><td>費用の増分</td><td>書類200〜500円 ＋ 保管料0〜3,300円</td></tr>
+</tbody></table></div>
+<h3>代替案B（さらに外れた場合）— ゲートのない ASIN に初回を振る</h3>
+<p>書類の経路が2つとも塞がったら、<strong>初回ロットをゲートのない ASIN に差し替える</strong>のが最も安い逃げ道です（書類が要らない）。ただし「どの商品を初回にするか」は戦略判断なので<strong>タケシの領分</strong>です。事実として置いておくと、ゲートの有無は Keepa 等では事前に機械判定できず、セラーセントラルで1件ずつ見るしかありません（memory <code>knowledge_listing_restrictions_ungating</code>）。</p>
+<hr>
+<h2>8. 既存成果物（01〜04）との差分</h2>
+<div class="tw"><table><thead><tr><th>#</th><th>01〜04 の記述</th><th>今回の事実</th></tr></thead><tbody>
+<tr><td>1</td><td>「初回は社長宅で受けて納品書を回収する」（03 §3.4・04）</td><td><strong>社長方針の変更（2026-10-01）で上書き。</strong>書類は会員ページから分離取得できるので、書類のために社長宅で受ける必要はない</td></tr>
+<tr><td>2</td><td>「配送先を代行にしたときの納品書の宛名は未確認。出展企業への問い合わせが必要」（01 §5-3）</td><td>SD については<strong>納品書に頼らず領収書／適格請求書（SD 発行）に寄せれば問い合わせ不要</strong>。NETSEA はマイページから3種とも出せる</td></tr>
+<tr><td>3</td><td>「糸星（納品書の PDF 化）を既定にする案は取り下げ」（03 §5）</td><td><strong>取り下げの前提が消えた。</strong>糸星と FBA代行センターは、今回の4軸で唯一公式の答えを持つ2社</td></tr>
+<tr><td>4</td><td>主力＝びーぷらすFBA（03 §2 加重点4.10）</td><td><strong>今回の4軸はすべて「記載なし」。</strong>加点も減点もできない状態。選定の再評価が必要かはタケシの判断</td></tr>
+<tr><td>5</td><td>「許可が下りるまで FBA 納品プランが作れない（推論・確度高）」</td><td>変わらず推論。<strong>代行に預ける期間の長さを決める変数</strong>なので、§5-1 #6 で実機確認すべき</td></tr>
+<tr><td>6</td><td>CLAUDE.md §3.4（初回は社長宅で検品）</td><td><strong>社長方針と衝突しています。</strong>ルール本文の改訂は秘書・社長の領分です。サトルは書き換えません</td></tr>
+</tbody></table></div>
+<hr>
+<h2>9. ここから先はタケシ（プランナー）の領分です</h2>
+<p>事実としてここまでです。次の3つは戦略判断なので渡します。</p>
+<ol>
+<li><strong>主力を差し替えるか</strong>。費用（びーぷらす36円/点 vs FBA代行センター140円/点・月100点）と、書類・直送・保管の明文化（FBA代行センターと糸星だけ）のどちらを取るか。</li>
+<li><strong>問い合わせを1社に絞るか、2社に出すか</strong>（§4.1 の承認回数と、初回の着手日のトレードオフ）。</li>
+<li><strong>初回ロットをゲートのある商品にするか</strong>。ゲートなしに振れば書類の問題そのものが消えます。</li>
+</ol>
+<hr>
+<h2>10. 出典一覧</h2>
+<h3>卸サイト（取得日 2026-10-01）</h3>
+<div class="tw"><table><thead><tr><th>#</th><th>ページタイトル</th><th>URL</th></tr></thead><tbody>
+<tr><td>S1</td><td>書類の発行元について - ヘルプ・使い方｜スーパーデリバリー</td><td>https://faq.superdelivery.com/書類の発行元について-6970a2e9ef481ad7a7a69559</td></tr>
+<tr><td>S2</td><td>領収書 - ヘルプ・使い方｜スーパーデリバリー</td><td>https://faq.superdelivery.com/領収書-66b56ba6a9375e001c91bc6a</td></tr>
+<tr><td>S3</td><td>適格請求書の発行方法 - ヘルプ・使い方｜スーパーデリバリー</td><td>https://faq.superdelivery.com/適格請求書の発行方法-64faa02752b0b9001c7ce27c</td></tr>
+<tr><td>S4</td><td>納品書 - ヘルプ・使い方｜スーパーデリバリー</td><td>https://faq.superdelivery.com/納品書-637f401832cc2d001d51fc20</td></tr>
+<tr><td>S5</td><td>請求書 - ヘルプ・使い方｜スーパーデリバリー</td><td>https://faq.superdelivery.com/請求書-637f401832cc2d001d51fc17</td></tr>
+<tr><td>S6</td><td>配送先 - ヘルプ・使い方｜スーパーデリバリー</td><td>https://faq.superdelivery.com/配送先-637f401832cc2d001d51fc47</td></tr>
+<tr><td>N1</td><td>納品書について｜NETSEA ヘルプ</td><td>https://www.netsea.jp/help/manual/invoice.html</td></tr>
+<tr><td>N2</td><td>新機能リリースのお知らせ（マイページ納品書発行機能）｜NETSEA（2019-01-30）</td><td>https://www.netsea.jp/form/newsB20190207_01</td></tr>
+<tr><td>N3</td><td>納品書・請求書・領収書の表示内容変更のお知らせ｜NETSEA（2015-08-03 適用）</td><td>https://www.netsea.jp/form/newsB20150729_02</td></tr>
+<tr><td>N4</td><td>機能改修のお知らせ（NETSEAプライム領収書発行機能）｜NETSEA</td><td>https://www.netsea.jp/form/newsB20240626_01</td></tr>
+</tbody></table></div>
+<blockquote>SD 本体（<code>www.superdelivery.com</code>）へのリクエストは0件。S1〜S6 はすべて別ホストのヘルプです。</blockquote>
+<h3>代行8社（取得日 2026-09-29〜30・01 と同一ソース／原本は <code>agent_output/T-20260929-001/sources/</code>）</h3>
+<div class="tw"><table><thead><tr><th>#</th><th>ページタイトル</th><th>URL</th></tr></thead><tbody>
+<tr><td>1</td><td>格安 Amazon FBA納品代行 びーぷらすFBA</td><td>http://fba.bplus-tokyo.com/</td></tr>
+<tr><td>2</td><td>格安 Amazon FBA納品代行 おりおんFBA</td><td>http://fba.aptus-tokyo.co.jp/</td></tr>
+<tr><td>3</td><td>納品代行業務(FBA)｜就労継続支援B型事業所 糸星</td><td>https://itoboshi.gekkou-company.jp/delivery-agency/</td></tr>
+<tr><td>4</td><td>EC・FBA納品代行 タイシンFBA</td><td>https://taishinfba.com/</td></tr>
+<tr><td>5</td><td>料金システム／Q&amp;A｜FBA代行センター</td><td>https://amazon-fbadaikou.jp/price/ ／ https://amazon-fbadaikou.jp/qa/</td></tr>
+<tr><td>6</td><td>FBA納品代行(国内)／Q&amp;A｜福富サポート</td><td>http://fukutomi-support.com/m/kokunai ／ http://fukutomi-support.com/question ／ 利用規約</td></tr>
+<tr><td>7</td><td>FBA納品代行｜サポートBB</td><td>https://www.logi-support.com/service-fba/</td></tr>
+<tr><td>8</td><td>Amazon作業代行の流れ／Q&amp;A／会員規約｜株式会社JCC</td><td>https://e-jcc.jp/fba-service/flow/ ／ https://www.e-jcc.jp/fba-service/</td></tr>
+</tbody></table></div>
+<h3>当社内の既存記録</h3>
+<div class="tw"><table><thead><tr><th>#</th><th>出典</th><th>使った内容</th></tr></thead><tbody>
+<tr><td>R1</td><td>memory <code>knowledge_listing_restrictions_ungating</code>（2026-08-17）</td><td>出品許可の4要件、判定は名称でなく記載、審査3〜7営業日、確実性の序列、却下の主因</td></tr>
+<tr><td>R2</td><td><code>workspace/output/deliverables/T-20260912-001/01_S1_NETSEA請求書とゲート解除.md</code>（2026-09-12）</td><td>NETSEA の書類の発行元・未確認項目・事例 N=5・掛け払い GMO</td></tr>
+<tr><td>R3</td><td><code>workspace/output/deliverables/T-20260920-003/01_SD利用開始の段取りと利用停止条件.md</code>（2026-09-29）</td><td>SD 納品書＝出展企業名義／適格請求書＝ラクーンコマース</td></tr>
+<tr><td>R4</td><td><code>workspace/output/deliverables/T-20260929-001/01_FBA納品代行_公式値ファクトシート.md</code>（2026-09-30）</td><td>代行14社の費用・送料・受入条件（本資料は列を足す形で参照）</td></tr>
+</tbody></table></div>
+</div>
+</body>
+</html>
