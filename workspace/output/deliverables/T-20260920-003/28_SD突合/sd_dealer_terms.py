@@ -1,39 +1,55 @@
 #!/usr/bin/env python3
-"""取引企業ごとの「取引条件」を非ログインで取り、Amazon で売ってよい社だけを切り出す。
+"""【レーンB・併用】**発注候補に挙がった社だけ**の「取引条件」を人が在席して1社ずつ読む。
 
-なぜこれを最初にやるのか
+なぜこれが要るのか
     一括申請で卸価格が見える取引先は 2,176社ある（2026-09-30）。しかし**申請が通ったことと
     Amazon で売ってよいことは別**。人気順 N=55 のサンプルでは、態度が判明した48社のうち
     **17社（35%）が「Amazon.co.jp はご遠慮ください」と名指し**していた。
-    2,176社に当てると 700社前後が不可の見込み。**商品を列挙する前にここを落とす**のが安い。
+    **仕入れ判定の第0問より前**にある確認（CLAUDE.md §3.3-12）。
 
-取るページ（いずれも非ログインで 200）
+🔴 2026-10-01、**全件スキャン（レーンC）の経路を削除した。**
+    2,176社を舐めるのではなく、**発注候補に挙がった社の dealer_id を引数で明示して引く**。
+    歩留まり15%なら、網羅の85%は捨てるための作業（CLAUDE.md §3.3-18）。
+    `--dealers <TSV>` で全社リストを渡す口はもう無い。`--dealer-ids` で明示した社だけが対象。
+
+🔴 上限（`_budget.py` の `LANE_B` で定数固定。**引数では緩められない**）
+    * **間隔3.0秒から**（429 が出たら翌日は 6→12→24→48 秒）
+    * **1セッション20リクエスト・1日50リクエスト**
+    * **`--attended` 必須。**無人運転は不可
+
+取るページ（非ログインで 200）
     /p/do/dpsl/dcc/<dealer_id>/   取引条件の○△×表・販売規制・注意事項
 
 🔴 出力の置き場
     このページには**送料表の実額が載っている**。SD 会員規約17条1項により会員限定情報なので、
     **出力は必ず `workspace/output/agent_output/` の下に置く**（Git 追跡外）。
     PUBLIC リポの deliverables には**判定（○/△/×/不明）と率だけ**を書く。
-    そのため本スクリプトは送料表を保存しない（`--keep-raw` を付けたときだけ保存する）。
 
 使い方
-    python3 sd_dealer_terms.py --dealers <TSV> --out <agent_output/.../sd> [--limit 300] [--sleep 4.0]
-    同じコマンドで再開する（1社ごとに保存）。
+    python3 sd_dealer_terms.py --dealer-ids 12345,67890 --out <agent_output/.../sd> --attended
+    python3 sd_dealer_terms.py --dealer-ids @candidates.txt --out ... --attended
+
+終了コード
+    0 正常 / 1 引数か在席の不備 / 2 Cloudflare / 4 停止中 / 5 429 でその日を打ち切った
 """
 from __future__ import annotations
-import argparse, gzip, html, json, os, re, sys, time, urllib.error, urllib.request
 
-UA = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
-      "(KHTML, like Gecko) Chrome/129.0 Safari/537.36")
+import argparse
+import html
+import json
+import os
+import re
+import sys
+import time
+
 BASE = "https://www.superdelivery.com"
 LABELS = ["ネット販売", "消費者への直送", "仕入れ前の販売", "画像転載", "代金引換"]
 AMZ = re.compile(r"Amazon|amazon|アマゾン|ＡＭＡＺＯＮ")
 
-
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from _fetch import Blocked, Failed, fetch  # noqa: E402
-
-UA = ""  # 実際の User-Agent は _fetch.py が持つ
+from _fetch import Blocked, Failed, RateLimited, fetch               # noqa: E402
+from _budget import (LANE_B, Budget, BudgetExceeded, DayCutOff,      # noqa: E402
+                     NotAttended, SessionLimitReached, Suspended)
 
 
 def mark_of(cell_html: str) -> str:
@@ -69,7 +85,7 @@ def judge(terms: dict, amz_ctx: list[str]) -> str:
     ×          … ネット販売が× もしくは Amazon を名指しで不可としている
     要確認     … ネット販売が△（多くは Amazon 名指し）。文脈を人が読む
     ○          … ネット販売が○ かつ Amazon の名指しなし
-    不明        … ネット販売の記載がない
+    不明        … ネット販売の記載がない（**○に畳まない**。CLAUDE.md §3.3-12）
     """
     net = terms.get("ネット販売", "")
     named_ng = any(re.search(r"(遠慮|不可|禁止|お断り|NG)", c) for c in amz_ctx)
@@ -82,84 +98,126 @@ def judge(terms: dict, amz_ctx: list[str]) -> str:
     return "不明"
 
 
-def main() -> int:
+def read_dealer_ids(spec: str) -> list[str]:
+    """`12345,67890` か `@file`（1行1ID）。**全社リストを渡す口は作らない。**"""
+    if spec.startswith("@"):
+        path = spec[1:]
+        raw = [l.split("\t")[0].strip() for l in open(path, encoding="utf-8")]
+    else:
+        raw = spec.replace("\n", ",").split(",")
+    ids = [re.sub(r"\D", "", s) for s in raw]
+    return [i for i in dict.fromkeys(ids) if i]
+
+
+def read_names(path: str | None) -> dict[str, str]:
+    names: dict[str, str] = {}
+    if not path or not os.path.exists(path):
+        return names
+    for line in open(path, encoding="utf-8"):
+        p = line.rstrip("\n").split("\t")
+        if len(p) >= 2 and p[0] not in ("dealer_id", ""):
+            names[p[0].strip()] = p[1].strip()
+    return names
+
+
+def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--dealers", required=True)
+    ap.add_argument("--dealer-ids", required=True,
+                    help="発注候補に挙がった社の dealer_id。`12345,67890` か `@file`。"
+                         "**明示した社だけが対象**（全件スキャンの経路は無い）")
     ap.add_argument("--out", required=True, help="agent_output 配下のディレクトリ")
-    ap.add_argument("--limit", type=int, default=0)
-    ap.add_argument("--sleep", type=float, default=4.0)
+    ap.add_argument("--names-tsv", help="dealer_id<TAB>name の TSV（表示名の補完にだけ使う）")
+    ap.add_argument("--attended", action="store_true",
+                    help="人が在席していることを明示する。**付けないと動かない**")
     ap.add_argument("--keep-raw", action="store_true",
                     help="送料表を含む本文も保存する（agent_output 限定・PUBLIC リポには出さない）")
-    ap.add_argument("--approved-by-secretary", action="store_true",
-                    help="秘書の判断で全件スキャンを再開する場合にだけ付ける（既定では起動しない）")
-    args = ap.parse_args()
-
-    # 🔴 2026-09-30 使用停止（法務判定・成果物29）
-    #   このスクリプトは /p/do/dpsl/ を企業数ぶん連続で叩く＝母数の全件スキャン。
-    #   法務の推奨Aに従い「発注候補に挙がった社だけを、発注の手前で読む」方針に切り替えたため、
-    #   既定では起動しない。再開には秘書（と必要なら社長）の判断が要る。
-    if not getattr(args, "approved_by_secretary", False):
-        print("■ このスクリプトは 2026-09-30 に使用停止しました（法務判定・成果物29）。\n"
-              "  理由: /p/do/dpsl/ を企業数ぶん連続取得する＝母数の全件スキャン。\n"
-              "        名指しクローラ向けの robots.txt が同パスを全面 Disallow しており、\n"
-              "        会員規約 第10条(2)(5) で予告なし即時の利用停止・登録抹消が可能・\n"
-              "        第11条1項で賠償責任も否定されている（争う足場がない）。\n"
-              "  代わりに: 発注候補に挙がった社だけを発注の手前で読む／Amazon 起点の\n"
-              "        sd_jan_lookup.py（1日30回・間隔10秒・在席下）を使う。\n"
-              "  それでも必要なら --approved-by-secretary を付けて、判断した人と根拠をチケットに残すこと。",
-              file=sys.stderr)
-        return 3
+    args = ap.parse_args(argv)
 
     if "agent_output" not in os.path.abspath(args.out):
         print("■ --out は agent_output 配下にしてください（送料表は会員限定情報）", file=sys.stderr)
         return 1
     os.makedirs(args.out, exist_ok=True)
+
+    try:
+        budget = Budget(args.out, attended=args.attended, lane=LANE_B)
+    except Suspended as exc:
+        print(f"■ {exc}", file=sys.stderr)
+        return 4
+    except NotAttended as exc:
+        print(f"■ {exc}", file=sys.stderr)
+        return 1
+    except DayCutOff as exc:
+        print(f"■ {exc}", file=sys.stderr)
+        return 5
+    print(budget.describe(), flush=True)
+
     sink_path = os.path.join(args.out, "sd_dealer_terms.jsonl")
     prog_path = os.path.join(args.out, "sd_terms_progress.json")
-    prog = json.load(open(prog_path)) if os.path.exists(prog_path) else {"done": {}, "failed": {}}
+    prog = (json.load(open(prog_path, encoding="utf-8")) if os.path.exists(prog_path)
+            else {"done": {}, "failed": {}})
+    prog.setdefault("done", {})
+    prog.setdefault("failed", {})
 
-    dealers = []
-    for line in open(args.dealers, encoding="utf-8"):
-        p = line.rstrip("\n").split("\t")
-        if len(p) >= 2 and p[0] not in ("dealer_id", ""):
-            dealers.append((p[0].strip(), p[1].strip()))
-    todo = [d for d in dealers if d[0] not in prog["done"]]
-    if args.limit:
-        todo = todo[: args.limit]
-    print(f"対象 {len(todo)}社（済 {len(prog['done'])} / 全 {len(dealers)}）", flush=True)
+    names = read_names(args.names_tsv)
+    wanted = read_dealer_ids(args.dealer_ids)
+    todo = [d for d in wanted if d not in prog["done"]]
+    print(f"指定 {len(wanted)}社・未取得 {len(todo)}社（済 {len(prog['done'])}）", flush=True)
+    if not todo:
+        budget.finish()
+        print("取るものがありません", flush=True)
+        return 0
 
-    with open(sink_path, "a", encoding="utf-8") as sink:
-        for n, (did, name) in enumerate(todo, 1):
-            try:
-                page = fetch(f"{BASE}/p/do/dpsl/dcc/{did}/")
-            except Blocked as exc:
-                print(f"■ Cloudflare に止められました（{exc}）。保存して終了します。", flush=True)
-                json.dump(prog, open(prog_path, "w"), ensure_ascii=False, indent=1)
-                return 2
-            except Failed as exc:
-                prog["failed"][did] = str(exc)[:200]
-                json.dump(prog, open(prog_path, "w"), ensure_ascii=False, indent=1)
-                print(f"  × {did} {name}: {exc}", flush=True)
-                time.sleep(args.sleep)
-                continue
-            terms = parse_terms(page)
-            flat = plain(page)
-            ctx = [m.group(0) for m in re.finditer(r".{70}(?:Amazon|amazon|アマゾン).{90}", flat)][:4]
-            rec = {"dealer_id": did, "dealer_name": name, **terms,
-                   "amazon_mentioned": bool(AMZ.search(flat)),
-                   "amazon_context": ctx,
-                   "judge": judge(terms, ctx),
-                   "at": time.strftime("%Y-%m-%dT%H:%M:%S")}
-            if args.keep_raw:
-                rec["raw_text"] = flat[:6000]
-            sink.write(json.dumps(rec, ensure_ascii=False) + "\n")
-            sink.flush()
-            prog["done"][did] = rec["judge"]
-            json.dump(prog, open(prog_path, "w"), ensure_ascii=False, indent=1)
-            print(f"  {n}/{len(todo)} {did} {name}: ネット販売={terms['ネット販売']} 判定={rec['judge']}", flush=True)
-            time.sleep(args.sleep)
-    print("完了", flush=True)
-    return 0
+    rate_limited = False
+    try:
+        with open(sink_path, "a", encoding="utf-8") as sink:
+            for n, did in enumerate(todo, 1):
+                name = names.get(did, "")
+                try:
+                    budget.take()
+                    page = fetch(f"{BASE}/p/do/dpsl/dcc/{did}/")
+                except SessionLimitReached as exc:
+                    print(f"■ {exc}", flush=True)
+                    break
+                except BudgetExceeded as exc:
+                    print(f"■ {exc}", flush=True)
+                    break
+                except RateLimited as exc:
+                    # 🔴 1件の失敗として飲み込まない
+                    nxt = budget.note_rate_limited()
+                    rate_limited = True
+                    print(f"■ {exc}\n  → 本日はここで打ち切ります。明日は間隔 {nxt:.1f} 秒で再開します。",
+                          flush=True)
+                    break
+                except Blocked as exc:
+                    print(f"■ Cloudflare に止められました（{exc}）。保存して終了します。", flush=True)
+                    break
+                except Failed as exc:
+                    prog["failed"][did] = str(exc)[:200]
+                    print(f"  × {did} {name}: {exc}", flush=True)
+                    continue
+                terms = parse_terms(page)
+                flat = plain(page)
+                ctx = [m.group(0) for m in
+                       re.finditer(r".{70}(?:Amazon|amazon|アマゾン).{90}", flat)][:4]
+                rec = {"dealer_id": did, "dealer_name": name, **terms,
+                       "amazon_mentioned": bool(AMZ.search(flat)),
+                       "amazon_context": ctx,
+                       "judge": judge(terms, ctx),
+                       "at": time.strftime("%Y-%m-%dT%H:%M:%S")}
+                if args.keep_raw:
+                    rec["raw_text"] = flat[:6000]
+                sink.write(json.dumps(rec, ensure_ascii=False) + "\n")
+                sink.flush()
+                prog["done"][did] = rec["judge"]
+                print(f"  {n}/{len(todo)} {did} {name}: "
+                      f"ネット販売={terms['ネット販売']} 判定={rec['judge']}", flush=True)
+    finally:
+        with open(prog_path, "w", encoding="utf-8") as fh:
+            json.dump(prog, fh, ensure_ascii=False, indent=1)
+        if budget.finish():
+            print(f"■ 429 なしが続いたので間隔を1段戻しました → {budget.interval:.1f} 秒", flush=True)
+    print(f"完了。{budget.describe()}", flush=True)
+    return 5 if rate_limited else 0
 
 
 if __name__ == "__main__":

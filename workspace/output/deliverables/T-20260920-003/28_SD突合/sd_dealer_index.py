@@ -1,32 +1,47 @@
 #!/usr/bin/env python3
-"""SD 企業 → 商品（商品名・商品コード）の索引を、非ログインの HTTP だけで作る。
+"""【レーンB・併用】**発注候補に挙がった社だけ**の商品一覧（商品名・商品コード）を取る。
+
+🔴 2026-10-01、**全件スキャン（レーンC）の経路を削除した。**
+    以前は `--dealers <TSV>` に 2,176社を渡して舐める作りだった。それはもう無い。
+    **`--dealer-ids` で明示した社だけ**が対象（CLAUDE.md §3.3-18）。
+
+🔴 上限（`_budget.py` の `LANE_B` で定数固定。**引数では緩められない**）
+    * **間隔3.0秒から**（429 が出たら翌日は 6→12→24→48 秒）
+    * **1セッション20リクエスト・1日50リクエスト**
+      上限の単位は **リクエスト**。1社でページ送りが複数枚あれば複数回ぶん消費する
+      （安全側。`--max-pages` で1社あたりの枚数を縛る）
+    * **`--attended` 必須。**無人運転は不可
 
 - 1社ごとに JSONL へ追記し、進捗を別ファイルに保存する。**中断したら同じコマンドで再開する。**
-- Cloudflare チャレンジ（"Just a moment"）を検知したらその場で保存して終了コード 2 で抜ける。
-  www は連続取得で落ちる（2026-09-20 実測：190件で失敗・2秒間隔でも復帰せず）。日を分ける前提。
-- **JAN は取らない。**一覧ページの HTML に JAN は1件も無い（2026-09-30 実測）。JAN が要るなら
-  sd_jan_lookup.py（Amazon 起点）を使う。
-- 卸価格も取らない（非ログインでは「卸価格は会員のみ公開」）。卸価格は sd_price_fill.js が上書きする。
+- **JAN は取らない。**一覧ページの HTML に JAN は1件も無い（2026-09-30 実測）。
+  JAN が要るなら `sd_jan_lookup.py`（レーンA・Amazon 起点）を使う。
+- 卸価格も取らない（非ログインでは「卸価格は会員のみ公開」）。
 
 使い方:
-    python3 sd_dealer_index.py --dealers <TSV> --out <dir> [--limit 50] [--sleep 2.2]
+    python3 sd_dealer_index.py --dealer-ids 12345,67890 --out <dir> --attended
+    python3 sd_dealer_index.py --dealer-ids @candidates.txt --out <dir> --attended --max-pages 2
 
-TSV は `dealer_id<TAB>name` のヘッダ付き（カズヨ取得の sd_trading_partners_*.tsv）。
---limit は「今回処理する企業数」。優先順位は priority.py が付けた順（--order で渡す）。
+終了コード:
+    0 正常 / 1 引数か在席の不備 / 2 Cloudflare / 4 停止中 / 5 429 でその日を打ち切った
 """
 from __future__ import annotations
-import argparse, gzip, html, io, json, os, re, sys, time, urllib.error, urllib.request
 
-UA = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
-      "(KHTML, like Gecko) Chrome/129.0 Safari/537.36")
+import argparse
+import html
+import json
+import os
+import re
+import sys
+import time
+
 BASE = "https://www.superdelivery.com"
 PER_PAGE = 120
 
-
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from _fetch import Blocked, Failed, fetch  # noqa: E402
-
-UA = ""  # 実際の User-Agent は _fetch.py が持つ
+from _fetch import Blocked, Failed, RateLimited, fetch               # noqa: E402
+from _budget import (LANE_B, Budget, BudgetExceeded, DayCutOff,      # noqa: E402
+                     NotAttended, SessionLimitReached, Suspended)
+from sd_dealer_terms import read_dealer_ids, read_names             # noqa: E402
 
 
 def parse_total(page_html: str) -> int | None:
@@ -65,17 +80,22 @@ def parse_items(page_html: str) -> list[dict]:
     return out
 
 
-def dealer_pages(dealer_id: str, sleep: float) -> tuple[list[dict], int | None]:
-    """1社の全商品を返す。1ページ目で総件数を読み、必要なページ数だけ回す。"""
+def dealer_pages(dealer_id: str, budget, max_pages: int) -> tuple[list[dict], int | None]:
+    """1社の商品を返す。**ページ送りの1枚ごとに budget を消費する。**
+
+    例外（`RateLimited` / `BudgetExceeded` / `Blocked` / `Failed`）はそのまま呼び出し側へ上げる。
+    **ここで握って部分結果を「全部」として返さない**（0件に化けるのが一番危ない）。
+    """
+    budget.take()
     first = fetch(f"{BASE}/p/do/dpsl/{dealer_id}/")
     total = parse_total(first)
     items = parse_items(first)
     if total is None:
         return items, None
-    pages = (total + PER_PAGE - 1) // PER_PAGE
+    pages = min((total + PER_PAGE - 1) // PER_PAGE, max_pages)
     seen = {i["product_code"] for i in items}
     for pg in range(2, pages + 1):
-        time.sleep(sleep)
+        budget.take()
         page = fetch(f"{BASE}/p/do/dpsl/{dealer_id}/all/{pg}/")
         new = [i for i in parse_items(page) if i["product_code"] not in seen]
         if not new:
@@ -85,90 +105,93 @@ def dealer_pages(dealer_id: str, sleep: float) -> tuple[list[dict], int | None]:
     return items, total
 
 
-def load_dealers(tsv: str) -> list[tuple[str, str]]:
-    rows: list[tuple[str, str]] = []
-    with open(tsv, encoding="utf-8") as fh:
-        for line in fh:
-            parts = line.rstrip("\n").split("\t")
-            if len(parts) < 2 or parts[0] in ("dealer_id", ""):
-                continue
-            rows.append((parts[0].strip(), parts[1].strip()))
-    return rows
-
-
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--dealers", required=True, help="dealer_id<TAB>name の TSV")
+    ap.add_argument("--dealer-ids", required=True,
+                    help="発注候補に挙がった社の dealer_id。`12345,67890` か `@file`。"
+                         "**明示した社だけが対象**（全件スキャンの経路は無い）")
     ap.add_argument("--out", required=True, help="出力ディレクトリ（agent_output/.../sd/）")
-    ap.add_argument("--order", help="優先順（dealer_id を1行1件・priority.py の出力）")
-    ap.add_argument("--limit", type=int, default=0, help="今回処理する企業数（0=全部）")
-    ap.add_argument("--sleep", type=float, default=4.0,
-                    help="リクエスト間隔（秒）。2.0 では 429 を踏んだ（2026-09-30 実測）")
-    ap.add_argument("--approved-by-secretary", action="store_true",
-                    help="秘書の判断で全件スキャンを再開する場合にだけ付ける（既定では起動しない）")
-    args = ap.parse_args()
-
-    # 🔴 2026-09-30 使用停止（法務判定・成果物29）
-    #   このスクリプトは /p/do/dpsl/ を企業数ぶん連続で叩く＝母数の全件スキャン。
-    #   法務の推奨Aに従い「発注候補に挙がった社だけを、発注の手前で読む」方針に切り替えたため、
-    #   既定では起動しない。再開には秘書（と必要なら社長）の判断が要る。
-    if not getattr(args, "approved_by_secretary", False):
-        print("■ このスクリプトは 2026-09-30 に使用停止しました（法務判定・成果物29）。\n"
-              "  理由: /p/do/dpsl/ を企業数ぶん連続取得する＝母数の全件スキャン。\n"
-              "        名指しクローラ向けの robots.txt が同パスを全面 Disallow しており、\n"
-              "        会員規約 第10条(2)(5) で予告なし即時の利用停止・登録抹消が可能・\n"
-              "        第11条1項で賠償責任も否定されている（争う足場がない）。\n"
-              "  代わりに: 発注候補に挙がった社だけを発注の手前で読む／Amazon 起点の\n"
-              "        sd_jan_lookup.py（1日30回・間隔10秒・在席下）を使う。\n"
-              "  それでも必要なら --approved-by-secretary を付けて、判断した人と根拠をチケットに残すこと。",
-              file=sys.stderr)
-        return 3
+    ap.add_argument("--names-tsv", help="dealer_id<TAB>name の TSV（表示名の補完にだけ使う）")
+    ap.add_argument("--max-pages", type=int, default=3,
+                    help="1社あたりに開く一覧ページの枚数（既定3）。上限は回数で縛られる")
+    ap.add_argument("--attended", action="store_true",
+                    help="人が在席していることを明示する。**付けないと動かない**")
+    args = ap.parse_args(argv)
 
     os.makedirs(args.out, exist_ok=True)
+    try:
+        budget = Budget(args.out, attended=args.attended, lane=LANE_B)
+    except Suspended as exc:
+        print(f"■ {exc}", file=sys.stderr)
+        return 4
+    except NotAttended as exc:
+        print(f"■ {exc}", file=sys.stderr)
+        return 1
+    except DayCutOff as exc:
+        print(f"■ {exc}", file=sys.stderr)
+        return 5
+    print(budget.describe(), flush=True)
+
     items_path = os.path.join(args.out, "sd_products.jsonl")
     prog_path = os.path.join(args.out, "sd_index_progress.json")
-    progress = json.load(open(prog_path)) if os.path.exists(prog_path) else {"done": {}, "failed": {}}
+    progress = (json.load(open(prog_path, encoding="utf-8")) if os.path.exists(prog_path)
+                else {"done": {}, "failed": {}})
+    progress.setdefault("done", {})
+    progress.setdefault("failed", {})
 
-    dealers = load_dealers(args.dealers)
-    names = dict(dealers)
-    if args.order and os.path.exists(args.order):
-        order = [l.strip() for l in open(args.order, encoding="utf-8") if l.strip()]
-        rank = {d: i for i, d in enumerate(order)}
-        dealers.sort(key=lambda d: rank.get(d[0], 10 ** 9))
+    names = read_names(args.names_tsv)
+    wanted = read_dealer_ids(args.dealer_ids)
+    todo = [d for d in wanted if d not in progress["done"]]
+    print(f"指定 {len(wanted)}社・未取得 {len(todo)}社（済 {len(progress['done'])}）", flush=True)
+    if not todo:
+        budget.finish()
+        print("取るものがありません", flush=True)
+        return 0
 
-    todo = [d for d in dealers if d[0] not in progress["done"]]
-    if args.limit:
-        todo = todo[: args.limit]
-    print(f"対象 {len(todo)}社（済 {len(progress['done'])}社 / 全 {len(dealers)}社）", flush=True)
-
-    with open(items_path, "a", encoding="utf-8") as sink:
-        for n, (did, name) in enumerate(todo, 1):
-            try:
-                items, total = dealer_pages(did, args.sleep)
-            except Blocked as exc:
-                print(f"\n■ Cloudflare に止められました（{exc}）。ここまでを保存して終了します。", flush=True)
-                json.dump(progress, open(prog_path, "w"), ensure_ascii=False, indent=1)
-                return 2
-            except Failed as exc:
-                progress["failed"][did] = str(exc)[:200]
-                print(f"  × {did} {name}: {exc}", flush=True)
-                json.dump(progress, open(prog_path, "w"), ensure_ascii=False, indent=1)
-                time.sleep(args.sleep)
-                continue
-            for it in items:
-                sink.write(json.dumps(
-                    {"dealer_id": did, "dealer_name": names.get(did, name),
-                     "product_code": it["product_code"], "name": it["name"]},
-                    ensure_ascii=False) + "\n")
-            sink.flush()
-            progress["done"][did] = {"items": len(items), "total": total,
-                                     "at": time.strftime("%Y-%m-%dT%H:%M:%S")}
-            json.dump(progress, open(prog_path, "w"), ensure_ascii=False, indent=1)
-            print(f"  {n}/{len(todo)} {did} {name}: {len(items)}件"
-                  f"{'' if total in (None, len(items)) else f'（公称{total}件）'}", flush=True)
-            time.sleep(args.sleep)
-    print("完了", flush=True)
-    return 0
+    rate_limited = False
+    try:
+        with open(items_path, "a", encoding="utf-8") as sink:
+            for n, did in enumerate(todo, 1):
+                name = names.get(did, "")
+                try:
+                    items, total = dealer_pages(did, budget, args.max_pages)
+                except SessionLimitReached as exc:
+                    print(f"■ {exc}", flush=True)
+                    break
+                except BudgetExceeded as exc:
+                    print(f"■ {exc}", flush=True)
+                    break
+                except RateLimited as exc:
+                    nxt = budget.note_rate_limited()
+                    rate_limited = True
+                    print(f"■ {exc}\n  → 本日はここで打ち切ります。明日は間隔 {nxt:.1f} 秒で再開します。",
+                          flush=True)
+                    break
+                except Blocked as exc:
+                    print(f"\n■ Cloudflare に止められました（{exc}）。保存して終了します。", flush=True)
+                    break
+                except Failed as exc:
+                    progress["failed"][did] = str(exc)[:200]
+                    print(f"  × {did} {name}: {exc}", flush=True)
+                    continue
+                for it in items:
+                    sink.write(json.dumps(
+                        {"dealer_id": did, "dealer_name": name,
+                         "product_code": it["product_code"], "name": it["name"]},
+                        ensure_ascii=False) + "\n")
+                sink.flush()
+                progress["done"][did] = {"items": len(items), "total": total,
+                                         "pages_cap": args.max_pages,
+                                         "at": time.strftime("%Y-%m-%dT%H:%M:%S")}
+                more = "" if total in (None, len(items)) else f"（公称{total}件・先頭だけ取得）"
+                print(f"  {n}/{len(todo)} {did} {name}: {len(items)}件{more}", flush=True)
+    finally:
+        with open(prog_path, "w", encoding="utf-8") as fh:
+            json.dump(progress, fh, ensure_ascii=False, indent=1)
+        if budget.finish():
+            print(f"■ 429 なしが続いたので間隔を1段戻しました → {budget.interval:.1f} 秒", flush=True)
+    print(f"完了。{budget.describe()}", flush=True)
+    return 5 if rate_limited else 0
 
 
 if __name__ == "__main__":
