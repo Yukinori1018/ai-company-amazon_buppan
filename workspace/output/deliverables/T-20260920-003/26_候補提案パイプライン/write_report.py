@@ -285,8 +285,13 @@ def main() -> int:
             w(f"- 発注額 **{spend:,}円**（残り {M.BUDGET_LEFT - spend:,}円）／SKU **{len(chosen)}件**"
               f"／全部売れたときの手残り見込み **{net:,}円**")
             for r in chosen:
+                # **「Amazon 何個セットか／卸は何点の口を／何口買うか」を必ず書く。**
+                # ここが欠けた行は、社長が卸サイトで何をカートに入れるか決められません。
                 w(f"  - {r['title'][:46]}（[{r['asin']}]({r['url']})）"
-                  f" {r['qty']}点・{M.band(r['order_total'])}・1個手残り {r['net']:,}円")
+                  f" … Amazon は{M.set_label(r)}／卸は{r['wholesale_mouth'] or '未確認'}の口を"
+                  f"{r['wholesale_sets'] or '未算定'}口（＝{r['wholesale_points'] or '未算定'}点）"
+                  f"／Amazon {r['qty']}個ぶん・{M.band(r['order_total'])}"
+                  f"・1個手残り {r['net']:,}円")
             w("")
     else:
         w("候補が0件なので案を出せません。**無い候補で案を作ることはしません。**")

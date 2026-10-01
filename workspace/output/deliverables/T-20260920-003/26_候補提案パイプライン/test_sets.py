@@ -149,7 +149,32 @@ eq(tt.classify("不明（ネット販売の記載なし）"), tt.NEEDS_CHECK, "�
 eq(tt.classify(""), tt.NEEDS_CHECK, "空欄を ○ に畳まない")
 eq(tt.classify("○"), tt.OK, "○ は OK")
 
-print("\n6. 単品では黒字にならないことを、この家族で確かめる")
+print("\n6. SD の卸価格は「1点あたり / 1セットあたり」を書かないと取り込まない")
+import superdelivery as sd      # noqa: E402
+
+
+def _row(code, units=None):
+    return sd.SDSet(sd_code=code, product_id="13681795", units_per_set=units)
+
+
+rows = [_row("A1", 1), _row("A2", 10), _row("A3", 10), _row("A4"), _row("A5", 3)]
+sd.merge_wholesale(rows, {
+    "A1": {"卸価格": 178, "価格の単位": "1点あたり"},
+    "A2": {"卸価格": 1600, "価格の単位": "1セットあたり", "入り数": 10},
+    "A3": {"卸価格": 1600},                                   # 単位なし
+    "A4": {"卸価格": 1600, "価格の単位": "1セットあたり"},      # 入り数なし
+    "A5": {"卸価格": 1000, "価格の単位": "1セットあたり", "入り数": 3},
+})
+got = {r.sd_code: r.wholesale_price_excl for r in rows}
+eq(got["A1"], 178, "1点あたりはそのまま")
+eq(got["A2"], 160, "1セット10点1,600円 → 1点160円")
+eq(got["A3"], None, "`価格の単位` が無い行は取り込まない（推測しない）")
+eq(got["A4"], None, "1セットあたりなのに入り数が無ければ取り込まない")
+eq(got["A5"], 334, "割り切れないときは**切り上げ**（原価を安く見積もらない）")
+check(any("価格の単位" in n for n in next(r for r in rows if r.sd_code == "A3").notes),
+      "取り込まなかった理由が notes に残る（黙って空にしない）")
+
+print("\n7. 単品では黒字にならないことを、この家族で確かめる")
 # 卸178円/点（税抜）と仮定。実在する口の売価と必要売価を突き合わせる。
 for m in members:
     if not m.sell or m.set_count.n is None:

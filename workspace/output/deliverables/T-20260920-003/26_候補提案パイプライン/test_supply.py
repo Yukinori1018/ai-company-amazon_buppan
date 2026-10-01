@@ -242,10 +242,18 @@ def test_find_by_identity_skips_broad_queries():
 
 def test_merge_wholesale():
     rows = sd.parse_product(PRODUCT_HTML)
-    sd.merge_wholesale(rows, {"13681795S1": {"卸価格": 620, "在庫": "在庫あり"},
+    # 🔴 2026-10-01 から `価格の単位` が必須です（同じ JAN に「1点」「×10点」の口が並び、
+    #    画面の建て付けが口ごとに違うため）。単位が無い行は取り込みません。
+    sd.merge_wholesale(rows, {"13681795S1": {"卸価格": 620, "価格の単位": "1点あたり",
+                                             "在庫": "在庫あり"},
                               "13681795S2": {"承認状態": "卸価格未承認"}})
     ok(rows[0].wholesale_price_excl == 620, "人が見た卸価格が入る")
     ok(rows[0].approval == "承認済み", "金額が入れば承認済み")
+    no_basis = sd.parse_product(PRODUCT_HTML)
+    sd.merge_wholesale(no_basis, {"13681795S1": {"卸価格": 620}})
+    ok(no_basis[0].wholesale_price_excl is None,
+       "`価格の単位` が無い行は卸価格を取り込まない（推測しない）")
+    ok(any("価格の単位" in n for n in no_basis[0].notes), "取り込まなかった理由を残す")
     ok(rows[0].stock == "在庫あり", "在庫も人の値で埋まる")
     ok(rows[1].wholesale_price_excl is None, "未承認の行に金額を作らない")
     ok(rows[1].approval == "卸価格未承認", "未承認は未承認として残す（NO-GO ではない）")
@@ -266,7 +274,8 @@ def test_approval_requests_does_not_apply():
     ok("実売のある棚" in with_asin[0]["申請したい理由"], "突合できた企業は理由が変わる")
     ok(len(reqs[0]["JAN例"]) == 1, "同じ JAN を JAN例に2回入れない")
     # 承認済みの行は申請対象にしない
-    sd.merge_wholesale(rows, {"13681795S1": {"卸価格": 620}, "13681795S2": {"卸価格": 600}})
+    sd.merge_wholesale(rows, {"13681795S1": {"卸価格": 620, "価格の単位": "1点あたり"},
+                              "13681795S2": {"卸価格": 600, "価格の単位": "1点あたり"}})
     ok(sd.approval_requests(rows) == [], "承認済みだけなら申請対象は0件")
 
 

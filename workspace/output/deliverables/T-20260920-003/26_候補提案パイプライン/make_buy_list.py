@@ -210,6 +210,16 @@ MD_COLS = ["#", "判定", "商品名", "ブランド", "Amazon", "売価", "過�
            "ゲート種別", "購入元の名前", "購入先URL"]
 
 
+def set_label(r: dict) -> str:
+    """「単品」か「N個セット」か「未確定」か。**空文字を返しません**（§3.2 空欄を作らない）。"""
+    n = r.get("set_count")
+    if n == 1:
+        return "単品（Amazon 1個＝卸1点）"
+    if isinstance(n, int) and n > 1:
+        return f"{n}個セット（Amazon 1個＝卸{n}点）"
+    return "セット数 未確定（人が両方の画面を見る）"
+
+
 def md_table(rows: list[dict]) -> str:
     out = ["| " + " | ".join(MD_COLS) + " |",
            "|" + "---|" * len(MD_COLS)]
@@ -220,8 +230,7 @@ def md_table(rows: list[dict]) -> str:
             f"{int(r['sell']):,}円" if r["sell"] else "不明",
             r["sold"], r["sellers"], r["amazon"], r["cart"][:32], r["instock365"],
             r["rank"],
-            (f"{r['set_count']}個セット" if r["set_count"] not in ("", "未確定", 1)
-             else ("単品" if r["set_count"] == 1 else "未確定")),
+            set_label(r),
             r["wholesale_mouth"] or "未確認", r["wholesale_sets"] or "未算定",
             r["cost_ratio"], r["qty"], band(r["order_total"]),
             (f"{r['net']:,}円" if r["net"] is not None else "未算定"), r["margin"], r["months"],
@@ -281,8 +290,11 @@ def main() -> int:
         lines.append(f"- 発注額 **{spend:,}円**／残り {BUDGET_LEFT - spend:,}円"
                      f"／SKU {len(chosen)}件／売り切ったときの手残り見込み **{net:,}円**")
         for r in chosen:
-            lines.append(f"  - {r['title'][:40]}（{r['asin']}）"
-                         f"{r['qty']}点・{band(r['order_total'])}・1個手残り{r['net']:,}円")
+            lines.append(f"  - {r['title'][:40]}（{r['asin']}）… Amazon は{set_label(r)}"
+                         f"／卸は{r['wholesale_mouth'] or '未確認'}の口を"
+                         f"{r['wholesale_sets'] or '未算定'}口（＝{r['wholesale_points'] or '未算定'}点）"
+                         f"／Amazon {r['qty']}個ぶん・{band(r['order_total'])}"
+                         f"・1個手残り{r['net']:,}円")
         lines.append("")
     (WORK / "buy_list_plans.md").write_text("\n".join(lines), encoding="utf-8")
     print(f"素材: {WORK / 'buy_list_table.md'} / {WORK / 'buy_list_plans.md'}")
