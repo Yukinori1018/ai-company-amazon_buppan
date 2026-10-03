@@ -1,0 +1,265 @@
+<!doctype html><html lang='ja'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>低単価帯で成立させる型 — 実践者は何をしているか／当社の計算のどこが間違っていたか</title><style>body{font-family:-apple-system,'Hiragino Sans','Noto Sans JP',sans-serif;max-width:1150px;margin:2em auto;padding:0 1em;line-height:1.65;color:#222;font-size:14.5px}table{border-collapse:collapse;margin:.8em 0;font-size:.92em}th,td{border:1px solid #bbb;padding:.35em .6em;vertical-align:top}th{background:#eef2f8}tr:nth-child(even) td{background:#fafafa}h1{font-size:1.5em;border-bottom:2px solid #444}h2{font-size:1.25em;border-left:5px solid #25b;padding-left:8px;margin-top:1.8em}h3{font-size:1.05em;margin-top:1.4em}blockquote{border-left:4px solid #ccc;margin:.8em 0;padding:.2em 1em;color:#444}code{background:#f3f3f3;padding:1px 4px;border-radius:3px}hr{border:0;border-top:1px solid #ccc;margin:1.6em 0}</style></head><body>
+<h1>低単価帯で成立させる型 — 実践者は何をしているか／当社の計算のどこが間違っていたか</h1>
+<p>リサーチャー サトル／2026-10-04／チケット T-20260920-003</p>
+<blockquote><strong>ロードマップ上の位置</strong>：4日間candidate0件の原因切り分け。ここで原価前提を正すと、既存プール648件の判定をやり直すだけで候補が復活する（新規スキャン不要）。</blockquote>
+<hr>
+<h2>イシュー</h2>
+<p><strong>月100万以上を稼ぐ実践者は、卸サイトの主力である低単価帯を「どの型で」成立させているのか。そして当社の原価前提のどこが間違っているのか。</strong></p>
+<h2>スコープと打ち切り条件（着手時に宣言）</h2>
+<table><thead><tr><th>区分</th><th>内容</th></tr></thead><tbody>
+<tr><td>調べた</td><td>実践者の発信のうち<strong>具体的な数字が出ているもの</strong>／Amazon公式料金ページ（HTML直取得）／ヤマトMSS公式料金表PDF／日本郵便公式／当社の既存データ再集計（N=648・N=665）</td></tr>
+<tr><td>調べない</td><td>「稼げます」だけの宣伝記事／会員ログインが必要な卸値の網羅／<strong>スーパーデリバリーへのリクエスト（§3.3-18 遵守・1件も投げていない）</strong></td></tr>
+<tr><td>打ち切り</td><td>原価前提が一次情報で確定した時点。<strong>「このセラーの実際の仕入れ値」は推測になるライン</strong>で、当社が見える NETSEA 卸値を代理に使い推定と明記</td></tr>
+</tbody></table>
+<hr>
+<h2>結論（3行）</h2>
+<ol>
+<li style='margin-left:0.0em'>🔴 <strong>社長の指摘が正しいです。成り立たないのは計算のほうでした。</strong> 「FBA配送代行415円＋その他206円を全商品に適用」は、小型商品で<strong>1個あたり371円の過大計上</strong>（売価750円なら売価の49.5%）。この1点で卸率上限が <strong>−8%（成立不能）→ 41%（卸の実勢の下端）</strong> に変わります。</li>
+<li style='margin-left:0.0em'>🔴 <strong>実践者が使っている「低単価の本体」は、単価ではなくサイズ区分と750円の崖です。</strong> Amazon公式の逐語で、<strong>売価750円以下は販売手数料5%</strong>（750円超は15.4%＝3倍）、<strong>FBA配送代行は小型222円</strong>（当社が置いた415円の54%）。実践者の実例は「売価750円・手数料38円・配送222円・入金490円」。</li>
+<li style='margin-left:0.0em'><strong>当社648件のうち、利益率が計算できた503件中385件がプラス・200件が利益率20%以上。それでも Yes が0件。</strong> 落としているのは採算ではなく、<strong>単位ずれ疑い357件・ランク343件・「Amazon本体の存在」335件</strong>です。とくに本体あり373件のうち<strong>295件（79%）はカートを第三者が持っています</strong>。</li>
+</ol>
+<blockquote>ここから先の「どの型を採るか」は戦略判断＝<strong>タケシ（プランナー）の領分</strong>です。本書は事実と差分までで止めます。</blockquote>
+<hr>
+<h2>1. 実践者は低単価帯をどう成立させているか（型 × 実例 × 数字 × 当社で使えるか）</h2>
+<table><thead><tr><th>#</th><th>型</th><th>実践者の実例と数字</th><th>一次/二次</th><th>当社で使えるか</th></tr></thead><tbody>
+<tr><td>①</td><td><strong>売価を750円以下に収めて販売手数料5%を取る</strong></td><td>ちゃんやま（Amazon物販情報発信）の計算例：<strong>販売額750円 − 手数料38円 − 配送料222円 ＝ 入金490円</strong>。「仕入440円以下なら利益50円以上」。狙うのは<strong>25×18×2cm・250g以下の小型区分</strong>。15%カテゴリ（文房具・ホーム&amp;キッチン・DIY工具）が5%に落ちる点を機会と呼んでいる</td><td>二次（数字は公式と一致を確認）</td><td><strong>使える。最優先。</strong> 当社は一度も使っていない</td></tr>
+<tr><td>②</td><td><strong>独自カタログ（異種セット品）で売価を自分で決める</strong></td><td>「販売価格は2,000円前後〜4,000円が売れやすい」「<strong>利益率40〜50%も可能</strong>（物販平均20%に対し）」「1個売れたら最低1,000円の利益を目安」「1万円の利益になる商品を30個作れば月30万」</td><td>二次（スクール運営側＝利益相反あり）</td><td><strong>条件つきで使える。</strong> ただし§2の規約リスクと<strong>広告費約15%</strong>が乗る</td></tr>
+<tr><td>③</td><td><strong>セット品のASIN量産をツールで回す</strong></td><td>雷神の「ニコイチ」：ASIN2つ以上を入れるとAIが画像・商品名・説明文・キーワードを自動生成。<strong>手作業30分 → 10分</strong>。雷神で月3カタログ、雷神極で月10カタログまで</td><td>二次</td><td><strong>今は不要。</strong> 作る候補が無い段階でツールを増やすのは順序が逆</td></tr>
+<tr><td>④</td><td><strong>FBMをMSSのネコポスで回す</strong></td><td>Amazon公式：<strong>ネコポス 全国一律185円（税込）・沖縄222円・契約不要・追跡つき・出荷通知自動</strong>。宅急便コンパクト392〜680円。箱数条件は2025-08-06以降なし</td><td><strong>一次（Amazon公式料金表PDF）</strong></td><td><strong>当社では採れない。</strong> 社長はPC完結が前提で、発送代行は1件319〜442円（当社memory実測）＝FBA小型274円より高い</td></tr>
+<tr><td>⑤</td><td><strong>大口の月額4,900円を量で薄める</strong></td><td>計算（当社）：月10個→539円/個、月50個→108円、<strong>月100個→54円</strong>、月500個→11円</td><td><strong>一次（公式：月額4,900円税抜固定）</strong></td><td><strong>使える。</strong> ただし効くのは月額だけで、FBA配送代行と販売手数料は1個ごとの固定費なので量では薄まらない</td></tr>
+<tr><td>⑥</td><td><strong>数量を積んで卸値を下げる</strong></td><td>EC STARs Lab. の実体験：「<strong>400個で7〜8%の利益が出たが、1年以上の在庫が必要</strong>」。別例でDHCサプリは Amazon 1,699円(3個セット)に対し仕入れ 516円×3×1.08＝1,672円で<strong>大赤字</strong></td><td>二次（実体験の記述）</td><td><strong>採らない。</strong> 回転上限6ヶ月に反する。社長の既定どおり</td></tr>
+<tr><td>⑦</td><td><strong>（参考）TopSeller等のドロップシッピング</strong></td><td>TopSeller公式の対応モールは<strong>楽天・Yahoo!・MakeShop・カラーミー・独自システム店舗。Amazonは記載なし</strong>。料金は0〜27,800円/月（掲載点数別）</td><td><strong>一次（TopSeller公式）</strong></td><td><strong>使えない。</strong>販路がAmazonの当社には対象外</td></tr>
+</tbody></table>
+<h3>実践者が口を揃えて言う「卸サイト単品相乗りは負ける」理由</h3>
+<table><thead><tr><th>出典</th><th>原文の要点</th><th>数字</th></tr></thead><tbody>
+<tr><td>EC STARs Lab.（ネッシー仕入れは稼げない4つの理由）</td><td>仕入れた商品の出品者が「瞬く間に1週間ほどで5人から20人に激増」し価格競争で赤字化</td><td>1週間で4倍</td></tr>
+<tr><td>NETSEA仕入れラボ（NETSEA公式メディア）</td><td>利益を出すコツとして「独自カタログを作成してセット品を販売」を挙げている</td><td>—</td></tr>
+<tr><td>ちゃんやま</td><td>「大企業が見れば利益商品は殆ど無いが、個人なら探し方次第で十分見つかる」。手段として<strong>並行リサーチ・独自カタログ・ツール</strong></td><td>—</td></tr>
+</tbody></table>
+<p><strong>事実：</strong> 低単価帯を単品の相乗りで取る型を、数字つきで示している実践者は<strong>1人も見つかりませんでした（N=9記事）</strong>。</p>
+<p><strong>推測（確度 高）：</strong> 低単価の単品相乗りは、売価を他人に決められるため卸率を下げられず、原理的に成立しない。実践者が低単価帯で成立させているのは <strong>①750円以下に収める</strong> か <strong>②売価を自分で決められる独自カタログにする</strong> のどちらかです。</p>
+<hr>
+<h2>2. FBA固定費の処理法 — 考えられる型を全部挙げて実例で裏を取る</h2>
+<h3>2-1. 公式の料金構造（一次情報・逐語）</h3>
+<p><strong>販売手数料</strong>（<a href="https://sell.amazon.co.jp/pricing" target="_blank" rel="noopener">sell.amazon.co.jp/pricing</a>・2026-10-04 HTML直取得）</p>
+<blockquote>商品1点あたりの売上の合計が750円以下の場合は商品代金の5%<br>商品1点あたりの売上の合計が750円を超える場合は商品代金の15.4%<br>（最低販売手数料 30円）<br>注: 手数料はすべて税抜き表示となっており、下記に記載の金額に加えて税金が課金されます。</blockquote>
+<ul>
+<li style='margin-left:0.0em'>🔴 <strong>段階制ではなく閾値判定。</strong> 750円以下なら<strong>全額に5%</strong>、1円超えたら<strong>全額に15.4%</strong>。当社の実測でも裏が取れています（成果物10：売価1,100円のおもちゃで Keepa Referral Fee ¥114 ＝ 10.36%＝全額課金。段階制なら¥74のはず）</li>
+<li style='margin-left:0.0em'>🔴 <strong>「売上の合計」＝商品の価格＋配送料＋ギフト包装料＋税</strong>（公式脚注1）。FBMで送料を別取りすると送料にも手数料がかかり、750円判定も超える</li>
+<li style='margin-left:0.0em'><strong>崖は750円だけではない。</strong> 食品&amp;飲料・業務用医療用品は750超〜1,500以下が<strong>8.4%</strong>／1,500超で10.4%。ペット用品・ベビーは750超〜1,500以下 8.4%／1,500超 15.4%。ビューティ・ヘルスは750超〜1,500以下 8.4%／1,500超 10.4%</li>
+</ul>
+<p><strong>FBA配送代行手数料</strong>（同ページ・税込）</p>
+<table><thead><tr><th>サイズ区分</th><th>寸法・重量</th><th>価格1,000円超</th><th><strong>価格1,000円以下</strong></th></tr></thead><tbody>
+<tr><td>小型</td><td>25×18×2.0cm以下、250g以下</td><td>288円</td><td><strong>222円</strong></td></tr>
+<tr><td>標準1</td><td>35×30×3.3cm以下、1kg以下</td><td>318円</td><td><strong>252円</strong></td></tr>
+<tr><td>標準2</td><td>20cm以下、2kg以下</td><td>410円</td><td>344円</td></tr>
+<tr><td>標準3</td><td>30cm以下、2kg以下</td><td>415円</td><td>358円</td></tr>
+<tr><td>標準7</td><td>80cm以下、5kg以下</td><td>472円</td><td>427円</td></tr>
+</tbody></table>
+<p>※寸法は<strong>梱包済み商品の三辺合計</strong>（公式注記）。小型・標準1だけ3辺の個別上限がある。</p>
+<p><strong>当社の候補プールでの実測（Keepa・N=665／うち売価1,000円以下 N=68）</strong></p>
+<table><thead><tr><th>FBA配送代行（Keepa実測）</th><th>売価1,000円以下の件数</th></tr></thead><tbody>
+<tr><td>222円（小型）</td><td><strong>27件（40%）</strong></td></tr>
+<tr><td>252円（標準1）</td><td>14件（21%）</td></tr>
+<tr><td>379円・371円・358円</td><td>21件</td></tr>
+<tr><td>318円</td><td>1件</td></tr>
+<tr><td><strong>415円</strong></td><td><strong>0件</strong></td></tr>
+</tbody></table>
+<p>→ <strong>事実：当社が低単価帯の前提に置いた415円は、低単価帯には1件も存在しません。</strong></p>
+<h3>2-2. 2つの崖（計算結果・ホーム&amp;キッチン・小型区分）</h3>
+<table><thead><tr><th>売価</th><th>販売手数料（税込）</th><th>FBA配送代行</th><th>手数料+配送を引いた残り</th></tr></thead><tbody>
+<tr><td>750円</td><td>41円（5%）</td><td>222円</td><td><strong>487円</strong></td></tr>
+<tr><td>751円</td><td>127円（15.4%）</td><td>222円</td><td>402円 ← <strong>1円の値上げで85円の損</strong></td></tr>
+<tr><td>854円</td><td>145円</td><td>222円</td><td>487円 ← 750円と等価になる点</td></tr>
+<tr><td>999円</td><td>169円</td><td>222円</td><td>608円</td></tr>
+<tr><td>1,000円</td><td>169円</td><td>222円</td><td><strong>609円</strong></td></tr>
+<tr><td>1,001円</td><td>170円</td><td>288円</td><td>543円 ← <strong>1円の値上げで66円の損</strong></td></tr>
+<tr><td>1,079円</td><td>183円</td><td>288円</td><td>608円 ← 1,000円と等価になる点</td></tr>
+</tbody></table>
+<p><strong>事実：売価751〜854円と1,001〜1,079円は、値下げした方が手残りが増える「死に帯」です。</strong> 実践者が価格を750円・999円に置くのは、感覚ではなく構造です。</p>
+<h3>2-3. セット組（マルチパック／異種セット）— 規約と実務</h3>
+<table><thead><tr><th>論点</th><th>事実</th><th>出典</th></tr></thead><tbody>
+<tr><td>同一商品の複数個パック</td><td><strong>既存カタログへの相乗りに限る。</strong> 新規に作るなら「まとめ売り」扱いで、バンドル（異種セット）としては登録できない</td><td>Amazonセラーフォーラム（二次扱い）＋当社の法務判定（成果物12・ハルオ）：Product Bundling Policy 逐語「If an item is a variation of a parent product, list it as a variation within the parent product's family and not as a bundle.」</td></tr>
+<tr><td>異種セットの新規カタログ</td><td><strong>「異なる商品」の組み合わせのみ可。</strong> 各商品が単品で既に出品されていること。ブランド名は<strong>「ノーブランド品」</strong>で登録し、<strong>製品コード免除申請</strong>が必要（JANが無いため）</td><td>実践者ブログ複数（二次）。日本語版ヘルプ G201645990 の本文は非ログインで取得不能</td></tr>
+<tr><td>リスク</td><td>「Amazonの判断ひとつで、セット商品が削除されたり、最悪アカウント停止もある」。<strong>ファッション・家電ではノーブランド承認が下りにくくなっている</strong></td><td>二次</td></tr>
+<tr><td>実務（梱包）</td><td>バッグシーラー本体 約2,880円・シールテープ 約165円/巻。<strong>元のバーコードは隠す</strong>（余ったラベルを切って貼る）。賞味期限は外から読める位置に、混在ロットは<strong>最短の日付</strong>を表示。円筒形は<strong>縦向き</strong>にラベル</td><td>二次（実践者の手順）</td></tr>
+<tr><td>FBA上の利点</td><td>「1個分の手数料で複数個を売る」＝<strong>配送代行を点数で割れる</strong></td><td>二次＋当社計算（下表）</td></tr>
+</tbody></table>
+<p><strong>セット組の効果（当社計算・鍋L001の実測を体積で按分）</strong></p>
+<table><thead><tr><th>元商品</th><th>構成</th><th>売価</th><th>区分</th><th>手数料</th><th>FBA</th><th>その他</th><th>元商品1個あたりの固定費</th></tr></thead><tbody>
+<tr><td>小型（0.9L）・単品750円</td><td>1個口</td><td>750</td><td>小型</td><td>41</td><td>222</td><td>28</td><td><strong>291円</strong></td></tr>
+<tr><td>同</td><td>2個口</td><td>1,500</td><td>標準1</td><td>254</td><td>318</td><td>106</td><td>339円</td></tr>
+<tr><td>立体（3.0L）・単品1,200円</td><td>1個口</td><td>1,200</td><td>標準1</td><td>203</td><td>318</td><td>92</td><td><strong>613円</strong></td></tr>
+<tr><td>同</td><td>2個口</td><td>2,400</td><td>標準3</td><td>407</td><td>415</td><td>184</td><td><strong>503円</strong></td></tr>
+<tr><td>同</td><td>3個口</td><td>3,600</td><td>標準3</td><td>610</td><td>415</td><td>276</td><td><strong>434円</strong></td></tr>
+</tbody></table>
+<p>🔴 <strong>事実：セット組が効くのは「立体で体積が大きい商品」だけです。</strong> 小型・薄型で既に750円以下に収まっている商品は、セットにすると<strong>手数料が5%→15.4%に跳ね上がるため、かえって悪化します</strong>（291円→339円）。</p>
+<p>「低単価だからセット組」は誤り。正しくは<strong>「体積が大きいからセット組」</strong>です。</p>
+<h3>2-4. FBM（自己発送）の実額</h3>
+<table><thead><tr><th>手段</th><th>料金（税込）</th><th>条件</th><th>当社での可否</th></tr></thead><tbody>
+<tr><td><strong>MSS ネコポス</strong></td><td><strong>185円</strong>（沖縄222円）</td><td>三辺60cm以内・長辺34cm以内・厚さ3cm以内。<strong>ヤマトとの契約不要・追跡つき・出荷通知自動</strong></td><td>送料は最安。だが<strong>発送作業が社長の手に乗る</strong></td></tr>
+<tr><td>MSS 宅急便コンパクト</td><td>392〜680円（発着地別）</td><td>専用箱</td><td>—</td></tr>
+<tr><td>クリックポスト</td><td><strong>240円</strong>（2026-10-01に185円から改定）</td><td>長さ34cm以内・三辺60cm以内・2kg以内・厚さ目安3cm</td><td>追跡あり。ただしネコポスより高い</td></tr>
+<tr><td>ゆうパケット</td><td>一律360円（2026-10-01改定）</td><td>—</td><td>不利</td></tr>
+<tr><td>発送代行（PC完結の場合）</td><td><strong>319〜442円/件</strong>（STOCKCREW 約319〜341円、ロジモプロ 約429〜442円。入庫・保管1〜2ヶ月・資材・出荷込み）</td><td>月額0円プラン</td><td><strong>FBA小型（222+28＝250円）より高い</strong></td></tr>
+</tbody></table>
+<p>🔴 <strong>結論：当社ではFBMは採れません。</strong> 社長の前提（PC完結・物理作業は外注）では、発送代行319〜442円がFBA小型250円を上回ります。「FBA手数料を送料に充当すれば黒字」（物販ナレッジ1 Part3の教え）は、<strong>自分で梱包・発送する人の算段</strong>であり、当社の制約では逆に悪化します。</p>
+<h3>2-5. 大口月額の薄まり方</h3>
+<table><thead><tr><th>月間販売個数</th><th>大口月額4,900円（税抜）の1個あたり</th></tr></thead><tbody>
+<tr><td>10個</td><td>539円</td></tr>
+<tr><td>30個</td><td>180円</td></tr>
+<tr><td>50個</td><td>108円</td></tr>
+<tr><td><strong>100個</strong></td><td><strong>54円</strong></td></tr>
+<tr><td>300個</td><td>18円</td></tr>
+<tr><td>500個</td><td>11円</td></tr>
+</tbody></table>
+<p>🔴 <strong>社長の「量を増やせば薄まる」は、ここでは完全に正しいです。</strong> ただし薄まるのは<strong>大口月額・納品送料・（回転が速ければ）保管料</strong>だけで、<strong>FBA配送代行と販売手数料は1個ごとの固定費なので量では薄まりません</strong>。両者を混ぜると判断を誤ります。</p>
+<p>※小口は100円/商品なので、売価750円では13.3%。低単価帯を狙うなら大口は必須条件です（日本ストアは2026-09-12に大口へ切替済み）。</p>
+<hr>
+<h2>3. 実践者の仕入れ基準（とくに「単価の下限」）</h2>
+<table><thead><tr><th>実践者／出典</th><th>利益額の下限</th><th>利益率の下限</th><th>単価の下限</th><th>備考</th></tr></thead><tbody>
+<tr><td>くりすぷ（中古メディアせどり・11年）</td><td>初期300円 → 在庫安定期700円 → <strong>外注化後1,000円</strong>（外注費が約400円/個） → 現在は<strong>仕入れ1,000円未満の高回転品なら約400円</strong></td><td>明示なし</td><td><strong>仕入れ値1,000円未満という「上限」で語っており、下限は置いていない</strong></td><td>「大事なのは今の自分に合った基準を持つこと」</td></tr>
+<tr><td>朝野拓也（物販総合研究所）コンサル</td><td><strong>500円</strong>（基準緩和の推奨値）</td><td><strong>5%</strong></td><td>置いていない</td><td>「利益率50%×利益10万 &lt; 利益率5%×売上100万」。<strong>60点の行動を量産</strong></td></tr>
+<tr><td>ツキシロ（note）</td><td>「回転がよければ<strong>500円以上</strong>」</td><td>—</td><td>—</td><td>過去は700円</td></tr>
+<tr><td>50代サラリーマンの副業体験（実績10,000件超）</td><td>—</td><td><strong>15%を標準</strong>。想定10〜14.9%の実績が最良（実績15.5%・黒字率94.7%）</td><td>明示なし</td><td>「利益率だけをみて仕入れるのは危険」</td></tr>
+<tr><td>独自カタログ系</td><td><strong>1,000円</strong>（1個売れたら最低）</td><td>25〜50%</td><td><strong>売価2,000〜4,000円が売れやすい</strong></td><td>広告費約15%が乗る</td></tr>
+<tr><td>卸仕入れ一般（EC STARs 等）</td><td>—</td><td>ROI30〜50%／ROS20〜25%</td><td>—</td><td>—</td></tr>
+</tbody></table>
+<p>🔴 <strong>事実：「単価の下限」を数字で置いている実践者は、調べた範囲（N=6人）で1人もいませんでした。</strong> 置いているのは<strong>利益額（400〜1,000円）と利益率（5〜30%）と回転</strong>です。</p>
+<p><strong>推測（確度 中）：</strong> 低単価を避けるかどうかは、<strong>本人が自分で梱包するか（＝1個あたりの手間が効くか）</strong> で分かれます。外注・FBA前提なら単価の下限は要らず、効くのは「利益額」と「サイズ区分」です。</p>
+<p><strong>当社との関係</strong>：社長の既定「月100個以上売れている商品」「単価下限あり」は、<strong>接触（メーカーへのアプローチ）と仕入れの二段構え</strong>として既に定義済み（memory <code>feedback_volume_sellers_only</code>）。本書はこれを変える材料を持っていません。<strong>単価下限を動かすかはタケシの判断です。</strong></p>
+<hr>
+<h2>4. 当社の前提 vs 実践者・公式の前提 — どれが間違っているか</h2>
+<table><thead><tr><th>#</th><th>当社の前提</th><th>正しい値</th><th>誤差</th><th>判定</th></tr></thead><tbody>
+<tr><td>1</td><td><strong>FBA配送代行 415円</strong>（「鍋の実測」として全商品に適用）</td><td>小型 <strong>222円</strong>（1,000円以下）／標準1 <strong>252円</strong>。<strong>鍋L001の実測は472円</strong>（標準区分7・体積6.728L・成果物20）</td><td>小型で<strong>−193円</strong></td><td>🔴 <strong>誤り。しかも出典が混ざっている。</strong> 415円は成果物10（別商品・標準区分3）の値</td></tr>
+<tr><td>2</td><td><strong>保管料87＋納品送料64＋梱包資材55＝206円/個</strong></td><td>鍋L001（6.728L）の実測値としては正しい。<strong>体積で按分すると小型0.9Lは28円・標準1の3.465Lは106円</strong></td><td>小型で<strong>−178円</strong></td><td>🔴 <strong>値は正しいが適用範囲が誤り。</strong> 保管料も納品送料も<strong>体積比例</strong>で、小型に鍋の数字を当てるのは物理的に不整合</td></tr>
+<tr><td>3</td><td><strong>販売手数料 約16.24%</strong></td><td>750円超は 15.4%（税抜）×1.1＝<strong>16.9%</strong>。<strong>750円以下は5%×1.1＝5.5%（最低30円税抜）</strong></td><td>750円超は<strong>ほぼ正しい</strong>（−0.7pt）。750円以下は<strong>3倍の過大</strong></td><td>🟡 <strong>750円超では妥当。750円以下では誤り</strong></td></tr>
+<tr><td>4</td><td><strong>回転上限6ヶ月</strong></td><td>実践者は明示しないが、EC STARsは「400個で1年在庫」を失敗例として挙げる</td><td>—</td><td>✅ <strong>正しい。変える材料なし</strong></td></tr>
+<tr><td>5</td><td><strong>Amazon本体がカートを持つ棚は避ける</strong></td><td>公式規定どおり（CLAUDE.md §3.2）。<strong>ただし当社の実装は「本体が存在するか」で落としている</strong></td><td>本体あり373件のうち<strong>295件（79%）はカートが第三者</strong></td><td>🔴 <strong>ルールは正しいが実装の粒度が誤り。</strong> 「存在」ではなく「カート保持者」で判定すべき</td></tr>
+<tr><td>6</td><td>メーカー直販がカートを持つ棚も避ける</td><td>当社データでは115件がこの理由で NO-GO</td><td>未検証</td><td>🟡 <strong>未調査。</strong> カート保持者が実際にメーカー本人かの確認が各件で取れていない</td></tr>
+<tr><td>7</td><td>（暗黙）<strong>単価1,000〜2,000円帯は固定費で成立しない</strong></td><td>小型区分なら 売価750円で<strong>卸率上限41.2%</strong>、売価1,500円で<strong>42.0%</strong>。卸の実勢（売価の40〜70%）の<strong>下端と重なる</strong></td><td>—</td><td>🔴 <strong>誤り。「原理的に不可能」ではなく「卸率40%を切る相手を選べば可能」</strong></td></tr>
+</tbody></table>
+<h3>原価上限（利益率20%を取るための1個あたり原価・税込）</h3>
+<table><thead><tr><th>サイズ区分</th><th>売価750円</th><th>売価999円</th><th>売価1,200円</th><th>売価1,500円</th><th>売価2,000円</th></tr></thead><tbody>
+<tr><td><strong>小型</strong>（0.9L）</td><td>309円（卸率41.2%）</td><td>380円（38.1%）</td><td>441円（36.8%）</td><td>630円（42.0%）</td><td>946円（47.3%）</td></tr>
+<tr><td><strong>標準1</strong>（3.465L・薄型）</td><td>201円（26.8%）</td><td>272円（27.2%）</td><td>333円（27.7%）</td><td>522円（34.8%）</td><td>837円（41.9%）</td></tr>
+<tr><td><strong>標準3</strong>（9L・立体）</td><td><strong>−75円（不可）</strong></td><td><strong>−4円（不可）</strong></td><td>66円（5.5%）</td><td>255円（17.0%）</td><td>571円（28.5%）</td></tr>
+<tr><td>旧前提（415＋206を一律）</td><td><strong>−62円（不可）</strong></td><td>9円（0.9%）</td><td>—</td><td>325円（21.7%）</td><td>640円（32.0%）</td></tr>
+</tbody></table>
+<p><strong>読み方</strong>：旧前提は、実際には小型である商品を<strong>標準3より悪い条件で評価していました</strong>。売価750円では差が<strong>371円＝売価の49.5%</strong>。</p>
+<p>🔴 <strong>効いているのは単価ではなくサイズ区分です。</strong> 小型なら売価2,000円で卸率47%まで許容でき、立体（標準3）なら売価1,000円以下は何をしても不可能。</p>
+<hr>
+<h2>5. 「皆が仕入れられている」の実態確認</h2>
+<h3>5-1. 当社の既存データ（N=648・NETSEA卸値と突合済み）の再集計</h3>
+<table><thead><tr><th>指標</th><th>件数</th></tr></thead><tbody>
+<tr><td>総件数</td><td>648</td></tr>
+<tr><td>利益率が計算できた</td><td>503</td></tr>
+<tr><td><strong>うち利益率がプラス</strong></td><td><strong>385（76.5%）</strong></td></tr>
+<tr><td><strong>うち利益率20%以上</strong></td><td><strong>200（39.8%）</strong></td></tr>
+<tr><td>判定が Yes（買ってよい）</td><td><strong>0</strong></td></tr>
+</tbody></table>
+<p><strong>NO-GO 479件の理由（重複カウント）</strong></p>
+<table><thead><tr><th>落とした理由</th><th>件数</th></tr></thead><tbody>
+<tr><td>単位ずれ疑い（Amazonの1個＝卸の何点かが未確定）</td><td>357</td></tr>
+<tr><td>ランク（売れ筋順位）</td><td>343</td></tr>
+<tr><td><strong>Amazon本体がカート／本体の存在</strong></td><td>335</td></tr>
+<tr><td>メーカー直販</td><td>115</td></tr>
+<tr><td>利益率不足</td><td>91</td></tr>
+<tr><td>セラー数</td><td>75</td></tr>
+<tr><td><strong>卸率（採算そのもの）</strong></td><td><strong>4</strong></td></tr>
+</tbody></table>
+<p>🔴 <strong>事実：採算（卸率）を理由に落ちたのは479件中4件です。</strong> 当社の候補は固定費で死んでいません。<strong>単位ずれ（データ整備）と、本体の存在での一括除外（判定ロジック）</strong>で死んでいます。</p>
+<p>🔴 <strong>事実：Amazon本体あり373件のうち295件（79%）はカートを第三者が持っています。</strong> 「本体あり」で落とすと、第三者が現に取れている棚を自ら捨てることになります。</p>
+<h3>5-2. NETSEA商品をAmazonで売っているセラーの特定（実名・一次＝Amazonの出品画面由来のKeepa offers）</h3>
+<p><strong>カート保持者の上位（N=648）</strong></p>
+<table><thead><tr><th>カート保持者</th><th>件数</th></tr></thead><tbody>
+<tr><td>Amazon.co.jp</td><td>78</td></tr>
+<tr><td><strong>スター☆彡</strong>（A4KZRVTB8UZLV）</td><td><strong>65</strong></td></tr>
+<tr><td>第三者（本体が出入りしている）</td><td>61</td></tr>
+<tr><td>電材堂・旧電電市場（A1X7TYMSXUQ9D7）</td><td>27</td></tr>
+<tr><td>マジ・モービレ（A2BHL9KOOQW8J0）</td><td>19</td></tr>
+<tr><td>暮らしのデパート（A2RXC0REH5RF4D）</td><td>19</td></tr>
+<tr><td>D-Park（AGPK73QRBS9ZN）</td><td>16</td></tr>
+<tr><td>ランプワン（A1PGH6O2A799VN）</td><td>16</td></tr>
+</tbody></table>
+<p>→ <strong>事実：卸サイトで買える商品のカートを、Amazon本体ではなく第三者セラーが取っている例を実名で特定できます。</strong> 「皆が仕入れられている」は当社データで裏が取れます。</p>
+<h3>5-3. 低単価帯（売価1,600円以下）で第三者がカートを取っている実例</h3>
+<p>N=74件のうち、カート保持者が特定できた第三者は52件。<strong>当社の（過大な）前提のままでも利益率がプラスなのは17件。</strong>上位を挙げます（卸率は売価比・卸値の実額は非公開メモに保管）。</p>
+<table><thead><tr><th>ASIN</th><th>商品</th><th>売価</th><th>卸率</th><th>当社前提での1個手残り</th><th>利益率</th><th>新品セラー</th><th>Amazon本体</th><th>カート保持者</th><th>購入元</th></tr></thead><tbody>
+<tr><td><a href="https://www.amazon.co.jp/dp/B0CDR4RV75" target="_blank" rel="noopener">B0CDR4RV75</a></td><td>ナガクラ アロマディッシュ 国産ヒノキポマンダー 袋入</td><td>1,500円</td><td>26.4%</td><td>332円</td><td>35.9%</td><td>1社</td><td>なし</td><td>ユズリンショップ</td><td>株式会社ナガクラ</td></tr>
+<tr><td><a href="https://www.amazon.co.jp/dp/B0CDR3R9D4" target="_blank" rel="noopener">B0CDR3R9D4</a></td><td>ナガクラ アロマディッシュ 国産ヒノキポマンダー</td><td>1,280円</td><td>23.2%</td><td>278円</td><td>37.8%</td><td>1社</td><td>なし</td><td>ユズリンショップ</td><td>株式会社ナガクラ</td></tr>
+<tr><td><a href="https://www.amazon.co.jp/dp/B00NLXLNKE" target="_blank" rel="noopener">B00NLXLNKE</a></td><td>昔なつかし玩具 だるま落とし</td><td>1,580円</td><td>39.2%</td><td>160円</td><td>23.2%</td><td>1社</td><td>なし</td><td>ＪＯＹアイランド</td><td>株式会社ファースト・アロー</td></tr>
+<tr><td><a href="https://www.amazon.co.jp/dp/B099NCLWZF" target="_blank" rel="noopener">B099NCLWZF</a></td><td>サカモト チェルシー スライドメモ</td><td>990円</td><td>27.3%</td><td>129円</td><td>33.8%</td><td>1社</td><td>なし</td><td>きたマーケット</td><td>スーパーPコ</td></tr>
+<tr><td><a href="https://www.amazon.co.jp/dp/B004NHSYS6" target="_blank" rel="noopener">B004NHSYS6</a></td><td>2WAY パワーライト</td><td>1,335円</td><td>33.8%</td><td>43円</td><td>18.7%</td><td>1社</td><td>なし</td><td>three-P</td><td>株式会社白菊</td></tr>
+<tr><td><a href="https://www.amazon.co.jp/dp/B0841YNK75" target="_blank" rel="noopener">B0841YNK75</a></td><td>紀陽除虫菊 クエン酸 120g 3個セット</td><td>989円</td><td>29.4%</td><td>47円</td><td>25.6%</td><td>2社</td><td>なし</td><td>Kagawa Select</td><td>中日物産株式会社</td></tr>
+<tr><td><a href="https://www.amazon.co.jp/dp/B08DY1Z35Q" target="_blank" rel="noopener">B08DY1Z35Q</a></td><td>Nishida ドアにも高い場所にもかけやすいフック</td><td>750円</td><td>33.1%</td><td>3円</td><td>27.9%</td><td>2社</td><td>なし</td><td>PrimeTreasure</td><td>中央物産株式会社</td></tr>
+<tr><td><a href="https://www.amazon.co.jp/dp/B0B86W4HDF" target="_blank" rel="noopener">B0B86W4HDF</a></td><td>銀鳥産業 わくわくゲームセット プラレール</td><td>890円</td><td>37.1%</td><td>53円</td><td>29.1%</td><td>7社</td><td>なし</td><td>☆初耳の家</td><td>銀鳥産業株式会社</td></tr>
+<tr><td><a href="https://www.amazon.co.jp/dp/B007741TN4" target="_blank" rel="noopener">B007741TN4</a></td><td>銀鳥産業 工作板・カッターマット兼用</td><td>1,027円</td><td>32.1%</td><td>4円</td><td>20.4%</td><td>6社</td><td><strong>あり</strong></td><td>ARROWS-ONE</td><td>銀鳥産業株式会社</td></tr>
+<tr><td><a href="https://www.amazon.co.jp/dp/B01GE2X7Y8" target="_blank" rel="noopener">B01GE2X7Y8</a></td><td>よこやま スコップスプーン 日本製</td><td>1,064円</td><td>15.9%</td><td>225円</td><td>40.5%</td><td>3社</td><td><strong>あり</strong></td><td>第三者（本体が出入り）</td><td>株式会社白菊</td></tr>
+</tbody></table>
+<p>※過去1ヶ月の販売数は全件「表示なし（月50個未満）」。社長の既定「月100個以上」には<strong>どれも届きません</strong>（＝接触基準ではなく仕入れ基準では落ちる）。この列を空欄にしていないことを明記します。</p>
+<p>※卸率が20%を切る行（B01GE2X7Y8 等）は<strong>単位ずれの疑いが濃厚</strong>です（Amazonの1個＝卸の何点かが未確定）。信頼できるのは卸率23〜39%の行です。</p>
+<h3>5-4. 「その人がいくらで仕入れていくらで売っているか」の推定</h3>
+<p><strong>推定（確度 中）</strong>：上表のセラーは、当社と同じ NETSEA／卸サイトで仕入れている可能性が高い（JAN一致・ブランド名と出品者名が別・新品出品者1〜2社）。</p>
+<ul>
+<li style='margin-left:0.0em'>例：ナガクラ アロマディッシュ（B0CDR4RV75）。<strong>ユズリンショップ</strong>が単独でカートを保持。売価1,500円に対し卸率26.4%。</li>
+<li style='margin-left:0.0em'>その人の手残り（当社の過大前提で332円／小型・標準1に当て直せば<strong>400〜480円</strong>）→ <strong>利益率27〜32%</strong>。</li>
+<li style='margin-left:0.0em'><strong>根拠の限界</strong>：①この人が同じ卸値で買っている保証はない（直取引でさらに安い可能性）②サイズ区分が未確定 ③月販が50個未満なので月の利益額は小さい（月10個なら月4,000円程度）。</li>
+</ul>
+<p>🔴 <strong>正直な穴</strong>：<strong>本人の仕入れ値は確認できません。</strong> 分かるのは「当社が買える卸値で買っても27〜38%の利益率が出る棚で、第三者が単独でカートを取り続けている」という事実までです。</p>
+<hr>
+<h2>6. 当社が明日から変えるべきこと3つ（数字つき）</h2>
+<table><thead><tr><th>#</th><th>変えること</th><th>数字</th><th>工数</th></tr></thead><tbody>
+<tr><td><strong>1</strong></td><td><strong>原価前提を「鍋の実測の一律適用」から「サイズ区分別」に差し替える。</strong> FBA配送代行は Keepa のASIN別実測を使い（既にパイプラインはそうしている）、その他費用（保管+納品+資材）は206円固定でなく<strong>体積按分</strong>にする：小型28円・標準1は106円・標準3は276円・標準7は206円</td><td>小型商品で<strong>1個あたり371円（売価750円なら売価の49.5%）</strong>の回復。卸率上限が <strong>−8% → 41.2%</strong></td><td><code>profit.py</code> の <code>OTHER_UNIT_COSTS_YEN = 206</code> を体積依存の関数に替える。<strong>1時間</strong>。再スキャン不要（既存648件の再計算のみ）</td></tr>
+<tr><td><strong>2</strong></td><td><strong>「Amazon本体の存在」で落とすのをやめ、「カート保持者が本体か」だけで落とす。</strong> 併せて、本体の365日在庫率が低い棚は本体が出入りしている扱いにする（CLAUDE.md §3.2 の規定どおり）</td><td>NO-GO 335件のうち、<strong>本体ありでカートが第三者の295件（79%）が判定対象に復帰</strong></td><td>判定フラグの条件を1本変えるだけ。<strong>30分</strong></td></tr>
+<tr><td><strong>3</strong></td><td><strong>売価750円以下の帯を初めてスキャン対象に入れる。</strong> 販売手数料が5%（最低30円）になるため、小型区分なら<strong>卸率41.2%まで許容</strong>。あわせて「売価751〜854円」「売価1,001〜1,079円」の2つの死に帯に入っている候補は、<strong>値下げ提案つきで</strong>出す</td><td>売価750円以下の商品は現プール648件中<strong>22件しかない</strong>（3.4%）。NETSEA側の母数は<strong>売価300〜999円帯が23,421件／67,667件＝34.6%</strong>（卸値税抜ベース）＝母数の3分の1を未着手のまま捨てている</td><td>Product Finder の価格下限を撤廃し、サイズ区分（小型・標準1）で絞る。<strong>夜間スキャン1回</strong></td></tr>
+</tbody></table>
+<p><strong>この3つの合計効果（推定・確度 中）</strong>：既存648件の再判定だけで、<strong>Yes が0件から数十件に動く</strong>見込みです。根拠＝①で復活する採算、②で復活する295件、③で加わる母数。<strong>確定した数字ではありません。</strong>①と②は再計算だけで検算できるので、<strong>数えてから社長に出すべきです。</strong></p>
+<hr>
+<h2>7. 分かっていること／分かっていないこと／分かりようがないこと</h2>
+<table><thead><tr><th>区分</th><th>内容</th></tr></thead><tbody>
+<tr><td><strong>分かっている（一次）</strong></td><td>公式の料金構造（750円の閾値・5%・最低30円・税抜表示・サイズ別配送代行）／MSSネコポス185円／クリックポスト240円／大口4,900円／当社プールのFBA実測分布／当社648件の落ち方</td></tr>
+<tr><td><strong>分かっていない（調べれば分かる）</strong></td><td>①候補ASINごとの梱包後の三辺と重量（→FBA料金シミュレーターにASINを入れれば0円で確定。§4.1 非該当）②「単位ずれ疑い357件」の実際の入り数（→商品ページの内容量表記と卸の口数を人が突合）③メーカー直販で落とした115件のカート保持者が本当にメーカー本人か</td></tr>
+<tr><td><strong>分かりようがない</strong></td><td>他セラーの実際の仕入れ値・仕入れ経路・在庫量。独自カタログがいつ削除されるかの基準（「Amazonの判断ひとつ」）</td></tr>
+</tbody></table>
+<hr>
+<h2>8. タケシ（プランナー）への論点</h2>
+<p>事実は上記で尽きています。ここから先は戦略判断です。</p>
+<ol>
+<li style='margin-left:0.0em'><strong>低単価帯を取るなら、①750円以下の小型単品 と ②独自カタログ（セット）のどちらを先に試すか。</strong> ①は規約リスクゼロ・利益額が小さい（1個50〜300円）。②は利益率40〜50%・売価を自分で決められるが、<strong>ノーブランド承認が下りない／削除／アカウント停止</strong>のリスクがあり、当社は4ストア停止明け（2026-09-20復活）で取ってよいリスクか要判断。</li>
+<li style='margin-left:0.0em'><strong>社長の既定「月100個以上」と低単価帯は両立するか。</strong> 本書の低単価実例は全件が月50個未満です。既定を守るなら低単価帯は仕入れ対象になりません。既定を動かすか、低単価帯を捨てるか。</li>
+<li style='margin-left:0.0em'><strong>「単価の下限」は要るか。</strong> 実践者は誰も置いておらず、置いているのは利益額（400〜1,000円）とサイズ区分です。当社の下限を「単価」から「利益額×サイズ区分」に置き換える案。</li>
+</ol>
+<hr>
+<h2>出典一覧</h2>
+<table><thead><tr><th>#</th><th>出典</th><th>URL</th><th>取得日</th><th>区分</th></tr></thead><tbody>
+<tr><td>1</td><td>Amazon出品サービス 料金プラン（販売手数料・FBA配送代行・保管料の公式表／逐語）</td><td>https://sell.amazon.co.jp/pricing</td><td>2026-10-04</td><td><strong>一次</strong></td></tr>
+<tr><td>2</td><td>マーケットプレイス配送サービス（公式ページ・ネコポス185円）</td><td>https://sell.amazon.co.jp/grow/programs/buy-shipping</td><td>2026-10-04</td><td><strong>一次</strong></td></tr>
+<tr><td>3</td><td>マーケットプレイス配送サービス料金表（2025-08-06以降・PDF）</td><td>https://m.media-amazon.com/images/G/09/amazonservices/mfn/MSS_rate_card_update_Aug_6th_2025._CB789960254_.pdf</td><td>2026-10-04</td><td><strong>一次</strong></td></tr>
+<tr><td>4</td><td>日本郵便 クリックポスト（240円・サイズ条件）</td><td>https://www.post.japanpost.jp/service/send/domestic/delivery/clickpost/</td><td>2026-10-04</td><td><strong>一次</strong></td></tr>
+<tr><td>5</td><td>TopSeller 公式（対応モールにAmazonなし・料金プラン）</td><td>https://top-seller.jp/</td><td>2026-10-04</td><td><strong>一次</strong></td></tr>
+<tr><td>6</td><td>ちゃんやま「Amazon｜低価格商品の販売手数料値下げでやっておくべきこと」（750円/38円/222円/490円の計算例）</td><td>https://chanyama.info/amazon-low-price-items/</td><td>2026-10-04</td><td>二次</td></tr>
+<tr><td>7</td><td>アグザルファ「低価格商品の販売手数料引き下げが開始！」（2024-06-01開始・対象外カテゴリ）</td><td>https://www.axalpha.com/blog/低価格商品の販売手数料引き下げ/</td><td>2026-10-04</td><td>二次</td></tr>
+<tr><td>8</td><td>ネットショップ担当者フォーラム「Amazon、750円未満商品の販売手数料を5％に引き下げ」</td><td>https://netshop.impress.co.jp/node/12335</td><td>2026-10-04</td><td>二次</td></tr>
+<tr><td>9</td><td>ネットショップ担当者フォーラム「ヤマト運輸、MSS料金を一部値上げへ。ネコポスは税込185円を維持」（2026-10-21改定）</td><td>https://netshop.impress.co.jp/n/2026/07/21/16428</td><td>2026-10-04</td><td>二次</td></tr>
+<tr><td>10</td><td>EC STARs Lab.「ネッシー(NETSEA)仕入れは稼げない4つの理由」（DHCサプリの赤字例・400個1年在庫・1週間で5→20社）</td><td>https://ecstarslab.com/blog/netsea-purchase/</td><td>2026-10-04</td><td>二次</td></tr>
+<tr><td>11</td><td>NETSEA仕入れラボ（NETSEA公式メディア）「Amazonのセット販売で利益を最大化する方法」</td><td>https://www.netsea.jp/media/amazon_set/</td><td>2026-10-04</td><td>一次（運営者発信）だが数字なし</td></tr>
+<tr><td>12</td><td>ちゃんやま「NETSEAは個人で仕入れ出来ても稼げないとの評判に対する考え」</td><td>https://note.com/chanyama7/n/n483e11b8048c</td><td>2026-10-04</td><td>二次</td></tr>
+<tr><td>13</td><td>「Amazon物販の独自カタログとは？月30万稼ぐやり方」（利益率40〜50%・売価2,000〜4,000円・利益1,000円/個）</td><td>https://lifestylecoordinate.com/amazon-originalcatalogue-4539</td><td>2026-10-04</td><td>二次</td></tr>
+<tr><td>14</td><td>せどり屋本舗「雷神の独自カタログ自動生成AIツール『ニコイチ』」（30分→10分・月3/10カタログ）</td><td>https://sedoriyahonpo.com/tool/2773/</td><td>2026-10-04</td><td>二次</td></tr>
+<tr><td>15</td><td>「Amazon独自カタログ作成せどりは危険？ノーブランドのルールとアカウント停止のリスク」</td><td>https://sedori.co.jp/amazon-nobrand-catalog-risk/</td><td>2026-10-04</td><td>二次</td></tr>
+<tr><td>16</td><td>「【Amazon】セットカタログの作成方法（製品コードの免除申請）」</td><td>https://mobilog-mrn.com/create-set-product-page-2645/</td><td>2026-10-04</td><td>二次</td></tr>
+<tr><td>17</td><td>ちゃんやま「【Amazon FBA梱包要件】複数個セット商品を素早く作成する方法」（バッグシーラー2,880円・テープ165円・バーコード隠し・賞味期限）</td><td>https://chanyama.info/amazon-fba-set/</td><td>2026-10-04</td><td>二次</td></tr>
+<tr><td>18</td><td>Amazonセラーフォーラム「同一商品の複数セット販売に関して」（SKU/FNSKU/ASIN別・混合在庫不可）</td><td>https://sellercentral.amazon.co.jp/seller-forums/discussions/t/f063fa1b-2be4-4021-b4d9-a8d644c560ef</td><td>2026-10-04</td><td>二次扱い</td></tr>
+<tr><td>19</td><td>くりすぷ「利益300円の商品は仕入れる？薄利商品の判断基準」（300→700→1,000→400円の変遷・外注費400円/個）</td><td>https://note.com/crisp_trick/n/n2f7d93597266</td><td>2026-10-04</td><td>二次</td></tr>
+<tr><td>20</td><td>50代サラリーマンの副業体験「せどりの利益率は何％？15％目安で仕入れた実績を公開」（10,000件超の実績分布）</td><td>https://www.roadtookuribito.blog/riekiritsumeyasu/</td><td>2026-10-04</td><td>二次</td></tr>
+<tr><td>21</td><td>ツキシロ「せどりは『何を仕入れるか』が9割」（回転がよければ利益500円以上）</td><td>https://note.com/tukishiro555/n/nf9492187ab64</td><td>2026-10-04</td><td>二次</td></tr>
+<tr><td>22</td><td>当社 成果物20「商品台帳」（鍋L001：体積6.728L・配送代行472円・保管87/納品64/資材55＝206円の内訳）</td><td>workspace/output/deliverables/T-20260920-003/20_商品台帳.md</td><td>2026-09-29</td><td><strong>当社実測</strong></td></tr>
+<tr><td>23</td><td>当社 成果物10「FBA配送代行手数料415円の内訳と削減策」</td><td>workspace/output/deliverables/T-20260920-003/10_FBA配送代行手数料415円の内訳と削減策.md</td><td>2026-09-20</td><td><strong>当社実測</strong></td></tr>
+<tr><td>24</td><td>当社 成果物12「同シリーズキャラ違いセットの可否」（法務ハルオ・Product Bundling Policy 逐語）</td><td>workspace/output/deliverables/T-20260920-003/12_同シリーズキャラ違いセットの可否.md</td><td>2026-09-20</td><td><strong>当社法務判定</strong></td></tr>
+<tr><td>25</td><td>当社 <code>pipeline/buy_list_private.csv</code>（N=648）・<code>discovered.json</code>（N=665・Keepa実測FBA手数料）・<code>netsea_jan_index.json</code>（N=67,667）</td><td>workspace/output/agent_output/T-20260920-003/pipeline/</td><td>2026-10-01〜02</td><td><strong>当社データ</strong></td></tr>
+<tr><td>26</td><td>社内 memory <code>knowledge_fulfillment_and_prep_unit_fees_2026-09</code>（発送代行319〜442円/件の実額）</td><td>agents/researcher/memory/</td><td>2026-09-15</td><td><strong>当社調査</strong></td></tr>
+<tr><td>27</td><td>社内 memory <code>knowledge_buppan_consulting_session_1</code>（朝野拓也コンサル：利益500円・利益率5%・月5個への基準緩和／FBA手数料を送料に充当）</td><td>社長提供ナレッジ</td><td>2026-05-22</td><td>二次</td></tr>
+</tbody></table>
+<blockquote><strong>卸値の実額・ロット・卸サイトの商品URLは本書に記載していません</strong>（会員限定の取引条件。当リポジトリは PUBLIC）。実額は <code>workspace/output/agent_output/T-20260920-003/</code> 配下の非公開メモにあります。企業名は公開情報です。</blockquote>
+</body></html>

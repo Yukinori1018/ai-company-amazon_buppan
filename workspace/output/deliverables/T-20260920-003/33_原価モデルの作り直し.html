@@ -1,0 +1,406 @@
+<!doctype html><html lang='ja'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>原価モデルの作り直し — 821円は間違いでした</title><style>body{font-family:-apple-system,'Hiragino Sans','Noto Sans JP',sans-serif;max-width:1150px;margin:2em auto;padding:0 1em;line-height:1.65;color:#222;font-size:14.5px}table{border-collapse:collapse;margin:.8em 0;font-size:.92em}th,td{border:1px solid #bbb;padding:.35em .6em;vertical-align:top}th{background:#eef2f8}tr:nth-child(even) td{background:#fafafa}h1{font-size:1.5em;border-bottom:2px solid #444}h2{font-size:1.25em;border-left:5px solid #25b;padding-left:8px;margin-top:1.8em}h3{font-size:1.05em;margin-top:1.4em}blockquote{border-left:4px solid #ccc;margin:.8em 0;padding:.2em 1em;color:#444}code{background:#f3f3f3;padding:1px 4px;border-radius:3px}hr{border:0;border-top:1px solid #ccc;margin:1.6em 0}</style></head><body>
+<h1>原価モデルの作り直し — 821円は間違いでした</h1>
+<p>経理ハジメ / 2026-10-04 / T-20260920-003</p>
+<hr>
+<h2>0. 結論（先に3行）</h2>
+<ol>
+<li style='margin-left:0.0em'><strong>社長の指摘は正しい。</strong>821円は、22cm土鍋1点の実測値＋費用でない安全マージン200円の合算で、<strong>小型雑貨の実額は351円</strong>（売価1,000円以下なら 285円）でした。<strong>470円（57%）が架空</strong>です。内訳：誤差幅 200円（そもそも費用ではない）／FBA配送代行の過大 127円（415→288）／保管料の過大 82円（87→5.1）／納品送料の過大 44円（64→20.3）／梱包資材の過大 42円（55→12.8）。※外注費25円は旧モデルに無かったので新モデル側で足しています。</li>
+<li style='margin-left:0.0em'><strong>1点の原価を税込220円と置くと、小型区分・ホーム&amp;キッチンの単品は売価600円から黒字、750円で利益率27.1%です。</strong>旧モデルが同条件に引いた線は <strong>1,369円</strong>。正しい損益分岐（535円）の <strong>2.6倍</strong>でした。</li>
+<li style='margin-left:0.0em'>ただし <strong>648件が0件になった主因は原価モデルではありません。</strong>648件のうち採算の線をクリアしていたのは <strong>226件</strong>（44.9%）。その226件を落としたのは〔単位ずれ疑い83件／売れ筋ランクによる生存判定181件／Amazon本体の存在／1SKU発注額が予算枠超過〕です。<strong>原価モデルを直すだけでは GO は出ません。</strong>次に直すのはセット数（単位）の確定と予算枠の置き方です。</li>
+</ol>
+<hr>
+<h2>1. 821円の内訳と、どこが間違っていたか</h2>
+<h3>1.1 旧モデルの式（<code>set_family.py</code> / README 720行）</h3>
+<pre>必要な売価の下限 = (821 + 1.1 × 仕入原価〔税抜〕 × n) ÷ 0.8376
+  821円  = FBA配送代行 415 ＋ 保管 87 ＋ 納品送料 64 ＋ 梱包資材 55（=206） ＋ 誤差幅 200
+  0.8376 = 1 − 販売手数料 8.4%×1.1（=9.24%） − 誤差幅 7%</pre>
+<h3>1.2 誤りの一覧（金額つき）</h3>
+<table><thead><tr><th>#</th><th>項目</th><th>旧</th><th>正</th><th>差</th><th>誤りの性質</th></tr></thead><tbody>
+<tr><td>①</td><td>誤差幅（固定ぶん）</td><td>200円を<strong>費用として加算</strong></td><td>0円</td><td><strong>−200円</strong></td><td>判定の不確実性を原価に混ぜた。二重に厳しい</td></tr>
+<tr><td>①</td><td>誤差幅（率）</td><td>7% を<strong>分母から引く</strong></td><td>0pt</td><td><strong>分母 +0.07</strong></td><td>同じ。売価500円では誤差幅が売価の47%になる（後述 §6）</td></tr>
+<tr><td>②</td><td>FBA配送代行</td><td>415円（全商品）</td><td>小型 <strong>222〜288円</strong>／標準1 252〜318円／標準3 358〜415円</td><td><strong>−127〜−193円</strong>（小型）</td><td>22cm土鍋の実測値を全商品に当てた</td></tr>
+<tr><td>③</td><td>保管料</td><td>87円</td><td>小型雑貨 <strong>5.1円</strong></td><td><strong>−82円</strong></td><td>同じ。鍋は13,500cm³、小型雑貨は600cm³（22.5倍）</td></tr>
+<tr><td>③</td><td>納品送料</td><td>64円</td><td>1箱30個で <strong>20.3円</strong>／100個で6.1円</td><td><strong>−44〜−58円</strong></td><td>箱単位の費用を按分していなかった＝「量で薄まる」が入っていない</td></tr>
+<tr><td>③</td><td>梱包資材</td><td>55円</td><td>1箱30個で <strong>12.8円</strong></td><td><strong>−42円</strong></td><td>同じ</td></tr>
+<tr><td>④</td><td>販売手数料率</td><td>8.4%</td><td><strong>ホーム&amp;キッチン/文房具/DIY/家具は15.4%</strong></td><td><strong>逆に +7pt 厳しくなる</strong></td><td>誰も気づいていなかった4つ目の誤り。8.4%は服&amp;ファッション小物の率</td></tr>
+</tbody></table>
+<ul>
+<li style='margin-left:0.0em'>①②③の合計で旧モデルは <strong>470円/個 厳しすぎ</strong>（小型区分。外注費25円を新たに足した後の純差）、④で <strong>売価の7.7pt（税込）甘すぎ</strong>。向きが逆の誤りが同居していました。</li>
+<li style='margin-left:0.0em'>社長の「固定費がかかると言っても、量を増やせば薄まる」は③について正しく、<strong>納品送料・梱包資材・外注費は箱の入り数で薄まります</strong>。一方 <strong>保管料は薄まりません</strong>（体積比例）。<strong>FBA配送代行も薄まりません</strong>（1個につき1回。ただしセットにすれば「Amazonの1個」の数が減る＝後述 §7）。</li>
+</ul>
+<h3>1.3 正しい式</h3>
+<pre>必要な売価の下限 P
+  = ( FBA配送代行(区分, Pが1,000円以下か)
+    + 保管料(体積 × 料率 × 計上月数)
+    + FC納品送料(箱代 ÷ 1箱の入り数)
+    + 梱包資材(1個固定 + 箱代 ÷ 入り数)
+    + 外注費
+    + 仕入原価〔税抜〕 × 1.1 × n )
+  ÷ ( 1 − 販売手数料率 × 1.1 − 目標利益率 )</pre>
+<p>誤差幅はこの式に入れません（§6 で別建てにします）。</p>
+<hr>
+<h2>2. FBA配送代行手数料（公式・全区分）</h2>
+<p>出典：<a href="https://sell.amazon.co.jp/pricing" target="_blank" rel="noopener">sell.amazon.co.jp/pricing</a>（2026-10-04 に <code>curl</code> で HTML 原文を取得。該当表の原文を転記）。</p>
+<p>公式注記の原文：<strong>「上記の手数料には10％の消費税が含まれます。」「寸法＝梱包済み商品の長さ、幅、高さの合計です。」</strong></p>
+<table><thead><tr><th>サイズ区分</th><th>寸法・重量</th><th>価格が1,000円を超える商品</th><th>価格が1,000円以下の商品</th><th>差</th></tr></thead><tbody>
+<tr><td>小型</td><td>25cm × 18cm × 2.0cm以下、250g以下</td><td>288円</td><td><strong>222円</strong></td><td>−66円</td></tr>
+<tr><td>標準 1</td><td>35cm × 30cm × 3.3cm以下、1kg以下</td><td>318円</td><td><strong>252円</strong></td><td>−66円</td></tr>
+<tr><td>標準 2</td><td>三辺合計20cm以下、2kg以下</td><td>410円</td><td>344円</td><td>−66円</td></tr>
+<tr><td>標準 3</td><td>三辺合計30cm以下、2kg以下</td><td>415円</td><td>358円</td><td>−57円</td></tr>
+<tr><td>標準 4</td><td>三辺合計40cm以下、2kg以下</td><td>420円</td><td>371円</td><td>−49円</td></tr>
+<tr><td>標準 5</td><td>三辺合計50cm以下、2kg以下</td><td>425円</td><td>379円</td><td>−46円</td></tr>
+<tr><td>標準 6</td><td>三辺合計60cm以下、2kg以下</td><td>430円</td><td>391円</td><td>−39円</td></tr>
+<tr><td>標準 7</td><td>三辺合計80cm以下、5kg以下</td><td>472円</td><td>427円</td><td>−45円</td></tr>
+<tr><td>標準 8</td><td>三辺合計100cm以下、9kg以下</td><td>532円</td><td>466円</td><td>−66円</td></tr>
+<tr><td>大型 1</td><td>三辺合計60cm以下、2kg以下</td><td>589円</td><td>523円</td><td>−66円</td></tr>
+<tr><td>大型 2</td><td>80cm以下、5kg以下</td><td>624円</td><td>558円</td><td>−66円</td></tr>
+<tr><td>大型 3</td><td>100cm以下、10kg以下</td><td>675円</td><td>609円</td><td>−66円</td></tr>
+<tr><td>大型 4</td><td>120cm以下、15kg以下</td><td>781円</td><td>715円</td><td>−66円</td></tr>
+<tr><td>大型 5</td><td>140cm以下、20kg以下</td><td>1,020円</td><td>954円</td><td>−66円</td></tr>
+<tr><td>大型 6</td><td>160cm以下、25kg以下</td><td>1,100円</td><td>1,034円</td><td>−66円</td></tr>
+<tr><td>大型 7</td><td>180cm以下、30kg以下</td><td>1,532円</td><td>1,466円</td><td>−66円</td></tr>
+<tr><td>大型 8</td><td>200cm以下、40kg以下</td><td>1,756円</td><td>1,690円</td><td>−66円</td></tr>
+<tr><td>特大型</td><td>200cm以下50kg以下 ／ 220cm ／ 240cm ／ 260cm</td><td>2,755／3,573／4,496／5,625円</td><td>2,689／3,507／4,430／5,559円</td><td>−66円</td></tr>
+</tbody></table>
+<p><strong>読み方の注意（2点）</strong></p>
+<ul>
+<li style='margin-left:0.0em'><strong>小型区分に入るには「厚さ2.0cm以下」が必須です。</strong>たわし・スポンジ・小物雑貨は厚みで弾かれ、三辺合計で 標準2〜3（344〜415円）になります。立体物が 288円に入ることはありません。</li>
+<li style='margin-left:0.0em'><strong>標準1（318円）は「薄く大きい」区分です</strong>（35×30×3.3cm）。三辺合計は68cmありますが、厚さ3.3cm以下なら標準2〜8より安くなります。<strong>台紙付き・袋入りの平たい商品は標準1を狙えます。</strong></li>
+</ul>
+<hr>
+<h2>3. 🔴 低価格商品の優遇 — 社長の質問の核心</h2>
+<h3>3.1 結論：優遇は2つあり、どちらも「売価を下げる」ことで取れます</h3>
+<table><thead><tr><th>優遇</th><th>内容</th><th>効き方</th><th>出典</th></tr></thead><tbody>
+<tr><td><strong>① 価格1,000円以下のFBA配送代行</strong></td><td>全サイズ区分に安い料金表が併設（上表の右列）</td><td>小型・標準1なら <strong>−66円/個</strong></td><td><a href="https://sell.amazon.co.jp/pricing" target="_blank" rel="noopener">sell.amazon.co.jp/pricing</a></td></tr>
+<tr><td><strong>② 売上合計750円以下の販売手数料 5%</strong></td><td>ほぼ全カテゴリーで、750円以下は一律5%。750円超は10.4〜15.4%</td><td>ホーム&amp;キッチンなら <strong>−10.4pt</strong>。750円の商品で <strong>−78円/個</strong></td><td>同上</td></tr>
+</tbody></table>
+<p><strong>②のインパクトが①より大きい。</strong>これが今回いちばん重要な数字です。</p>
+<h3>3.2 存在しなかったもの（調べた結果・「分からない」も含む）</h3>
+<table><thead><tr><th>確認対象</th><th>結果</th></tr></thead><tbody>
+<tr><td>「低価格商品向けFBA配送代行手数料」という別枠プログラム</td><td><strong>存在しません。</strong>日本では「価格1,000円以下の列」がそれに当たります（2024年4月導入。小型軽量商品プログラムの後継）</td></tr>
+<tr><td>小型軽量商品プログラム</td><td><strong>2024年3月31日で廃止済み。</strong>後継は上記の1,000円以下列</td></tr>
+<tr><td>SIPP（Ships in Product Packaging）</td><td><strong>日本の公開ページに記載がありません。</strong>米国・カナダ・英国・独仏伊西では稼働中（商品の個装のまま出荷して最大$1.32/個の割引）。<strong>日本での提供有無は未確認</strong>＝調べきれていません</td></tr>
+<tr><td>IPI スコア連動の保管料割引</td><td>米国では IPI 500超で保管料最大25%割引。<strong>日本の公開ページに記載なし＝未確認</strong></td></tr>
+<tr><td>FBA新商品特典プログラム（2026）</td><td>実在。最初の100点に<strong>手数料クレジット10%</strong>、最初の200点・120日間は<strong>保管料・低在庫レベル手数料が全額免除</strong>。ただし <strong>「ブランド登録済み対象親ASIN」が条件</strong>。<strong>転売（他社ブランドの相乗り出品）では使えません。</strong>出典：<a href="https://sell.amazon.co.jp/fulfill/fulfillment-by-amazon/new-selection" target="_blank" rel="noopener">sell.amazon.co.jp/fulfill/.../new-selection</a></td></tr>
+<tr><td>「FBA納品配送料15,000円割引」（公式サイトのバナー）</td><td>文言は実在するが、<strong>リンク先が404</strong>で条件が読めませんでした。文脈は新規出品者向け特典（ブランド売上基準）で、<strong>転売に使えるかは未確認</strong></td></tr>
+</tbody></table>
+<h3>3.3 価格の崖 — 750円と1,000円で手残りが落ちます</h3>
+<p>1点あたりの原価を 220円（消費税込み。免税事業者なので仕入消費税も費用）と置いた場合／小型区分／ホーム&amp;キッチン。</p>
+<table><thead><tr><th>売価</th><th>販売手数料率</th><th>販売手数料(税込)</th><th>FBA配送代行</th><th>FBA以外の固定費</th><th>仕入原価(税込)</th><th>手残り</th><th>利益率</th></tr></thead><tbody>
+<tr><td>500円</td><td>5.0%</td><td>33円</td><td>222円</td><td>63円</td><td>220円</td><td><strong>-38円</strong></td><td>-7.6%</td></tr>
+<tr><td>600円</td><td>5.0%</td><td>33円</td><td>222円</td><td>63円</td><td>220円</td><td><strong>+62円</strong></td><td>10.3%</td></tr>
+<tr><td>700円</td><td>5.0%</td><td>38円</td><td>222円</td><td>63円</td><td>220円</td><td><strong>+156円</strong></td><td>22.3%</td></tr>
+<tr><td>750円</td><td>5.0%</td><td>41円</td><td>222円</td><td>63円</td><td>220円</td><td><strong>+204円</strong></td><td>27.1%</td></tr>
+<tr><td>751円🔴</td><td>15.4%</td><td>127円</td><td>222円</td><td>63円</td><td>220円</td><td><strong>+119円</strong></td><td>15.8%</td></tr>
+<tr><td>800円</td><td>15.4%</td><td>136円</td><td>222円</td><td>63円</td><td>220円</td><td><strong>+159円</strong></td><td>19.9%</td></tr>
+<tr><td>900円</td><td>15.4%</td><td>152円</td><td>222円</td><td>63円</td><td>220円</td><td><strong>+242円</strong></td><td>26.9%</td></tr>
+<tr><td>1,000円</td><td>15.4%</td><td>169円</td><td>222円</td><td>63円</td><td>220円</td><td><strong>+325円</strong></td><td>32.5%</td></tr>
+<tr><td>1,001円🔴</td><td>15.4%</td><td>170円</td><td>288円</td><td>63円</td><td>220円</td><td><strong>+260円</strong></td><td>26.0%</td></tr>
+<tr><td>1,100円</td><td>15.4%</td><td>186円</td><td>288円</td><td>63円</td><td>220円</td><td><strong>+342円</strong></td><td>31.1%</td></tr>
+<tr><td>1,200円</td><td>15.4%</td><td>203円</td><td>288円</td><td>63円</td><td>220円</td><td><strong>+426円</strong></td><td>35.5%</td></tr>
+<tr><td>1,500円</td><td>15.4%</td><td>254円</td><td>288円</td><td>63円</td><td>220円</td><td><strong>+675円</strong></td><td>45.0%</td></tr>
+<tr><td>2,000円</td><td>15.4%</td><td>339円</td><td>288円</td><td>63円</td><td>220円</td><td><strong>+1090円</strong></td><td>54.5%</td></tr>
+</tbody></table>
+<p><strong>読み取れること</strong></p>
+<ul>
+<li style='margin-left:0.0em'><strong>売価750円が最良の点です。</strong>利益率27.1%。751円にすると販売手数料が5%→15.4%に飛び、手残りが <strong>85円（売価の11.3pt）落ちます。</strong>900円まで上げてやっと750円の水準に戻ります。</li>
+<li style='margin-left:0.0em'>1,000円 → 1,001円でも <strong>65円（6.5pt）落ちます。</strong>1,100円でようやく回復します。</li>
+<li style='margin-left:0.0em'>したがって <strong>値付けの禁止ゾーンは〔751〜900円〕と〔1,001〜1,100円〕</strong>です。この帯に入るなら、下の崖（750円 / 1,000円）に下げた方が手残りが増えます。</li>
+<li style='margin-left:0.0em'><strong>この条件なら売価600円で黒字に入ります。</strong>旧モデルが引いた線は 1,369円。正しい線（535円）の <strong>2.6倍</strong>でした。</li>
+</ul>
+<hr>
+<h2>4. 保管料・納品送料・梱包資材 — 「量で薄まる」の実額</h2>
+<h3>4.1 保管料（公式）</h3>
+<p>出典：<a href="https://sell.amazon.co.jp/pricing" target="_blank" rel="noopener">sell.amazon.co.jp/pricing</a>。式の原文は</p>
+<p><strong>「5.676円 × （[商品サイズ（cm³）]）÷（10cm × 10cm × 10cm）× [保管日数] / [当月の日数]」</strong>。</p>
+<table><thead><tr><th>区分</th><th>1月〜9月</th><th><strong>10月〜12月</strong></th><th>倍率</th></tr></thead><tbody>
+<tr><td>小型／標準（服&amp;ファッション小物・シューズ&amp;バッグを除く）</td><td>5.676円 /1,000cm³/月</td><td><strong>10.087円</strong></td><td>1.78倍</td></tr>
+<tr><td>大型／特大型（同）</td><td>3.278円</td><td>6.984円</td><td>2.13倍</td></tr>
+<tr><td>小型／標準・大型／特大型（服&amp;ファッション小物、シューズ&amp;バッグ）</td><td>3.10円</td><td>5.50円</td><td>1.77倍</td></tr>
+</tbody></table>
+<p><strong>社長のご指摘どおり10〜12月は上がります（1.78倍）。</strong>いま10月なので、今から年末までの納品はこの料率です。</p>
+<p><strong>計上する月数 = 消化月数 ÷ 2。</strong>保管料は月次の平均在庫に課されるので、3ヶ月で線形に売り切るなら平均在庫は初期数量の1/2＝1.5ヶ月ぶん。</p>
+<h3>4.2 小型雑貨1個あたりの保管料（サイズ例3つ）</h3>
+<table><thead><tr><th>例</th><th>寸法（梱包済み）</th><th>体積</th><th>FBAサイズ区分</th><th>保管料/月（1〜9月）</th><th>保管料/月（10〜12月）</th><th>3ヶ月消化なら（1.5ヶ月計上・通常期）</th></tr></thead><tbody>
+<tr><td><strong>例A ボールペン（台紙入り）</strong></td><td>19 × 6 × 1.5cm</td><td>171cm³</td><td>小型（厚さ2.0cm以下）</td><td><strong>1.0円</strong></td><td>1.7円</td><td><strong>1.5円</strong></td></tr>
+<tr><td><strong>例B キーホルダー（OPP袋）</strong></td><td>12 × 8 × 2.0cm</td><td>192cm³</td><td>小型</td><td><strong>1.1円</strong></td><td>1.9円</td><td><strong>1.6円</strong></td></tr>
+<tr><td><strong>例C たわし（立体・袋入り）</strong></td><td>12 × 8 × 4.0cm</td><td>384cm³</td><td>標準3（厚さ2cm超・三辺合計24cm）</td><td><strong>2.2円</strong></td><td>3.9円</td><td><strong>3.3円</strong></td></tr>
+<tr><td>（比較）22cm土鍋 — 旧モデルの87円の出どころ</td><td>30 × 30 × 15cm</td><td>13,500cm³</td><td>標準8相当</td><td>76.6円</td><td>136.2円</td><td><strong>115円</strong></td></tr>
+</tbody></table>
+<p><strong>旧モデルの保管料87円は、小型雑貨の実額（1.5〜3.3円）の 26〜58倍でした。</strong></p>
+<h3>4.3 FC納品送料 — 箱あたり → 1個あたり</h3>
+<p><strong>箱あたりの実額</strong>（FBAパートナーキャリア ヤマト・関東→関東・ヤマト公式の法人料金。社内 memory に記録済みの実測値）</p>
+<table><thead><tr><th>箱</th><th>料金（箱あたり）</th><th>箱の内容積（例）</th><th>実装率70%での使える容積</th></tr></thead><tbody>
+<tr><td>140サイズ（60×45×35cm）</td><td><strong>608円</strong></td><td>94,500cm³</td><td>66,150cm³</td></tr>
+<tr><td>160サイズ</td><td><strong>762円</strong></td><td>128,000cm³</td><td>89,600cm³</td></tr>
+</tbody></table>
+<p><strong>140サイズ（608円/箱）を1個あたりに割った表</strong></p>
+<table><thead><tr><th>サイズ区分</th><th>代表体積</th><th>140サイズ 608円 の1個あたり（10個）</th><th>同（30個）</th><th>同（100個）</th><th>140箱に物理的に入る数</th><th>満載したときの1個あたり</th></tr></thead><tbody>
+<tr><td>小型</td><td>600cm³</td><td>60.8円</td><td>20.3円</td><td>6.1円</td><td>110個</td><td>5.5円</td></tr>
+<tr><td>標準1</td><td>1,980cm³</td><td>60.8円</td><td>20.3円</td><td>18.4円 ← 100個は入らない（上限33個）</td><td>33個</td><td>18.4円</td></tr>
+<tr><td>標準2</td><td>280cm³</td><td>60.8円</td><td>20.3円</td><td>6.1円</td><td>236個</td><td>2.6円</td></tr>
+<tr><td>標準3</td><td>840cm³</td><td>60.8円</td><td>20.3円</td><td>7.8円 ← 100個は入らない（上限78個）</td><td>78個</td><td>7.8円</td></tr>
+<tr><td>標準4</td><td>2,106cm³</td><td>60.8円</td><td>20.3円</td><td>19.6円 ← 100個は入らない（上限31個）</td><td>31個</td><td>19.6円</td></tr>
+<tr><td>標準5</td><td>4,224cm³</td><td>60.8円</td><td>40.5円 ← 30個は入らない（上限15個）</td><td>40.5円 ← 100個は入らない（上限15個）</td><td>15個</td><td>40.5円</td></tr>
+<tr><td>標準6</td><td>7,280cm³</td><td>67.6円 ← 10個は入らない（上限9個）</td><td>67.6円 ← 30個は入らない（上限9個）</td><td>67.6円 ← 100個は入らない（上限9個）</td><td>9個</td><td>67.6円</td></tr>
+<tr><td>標準7</td><td>17,010cm³</td><td>202.7円 ← 10個は入らない（上限3個）</td><td>202.7円 ← 30個は入らない（上限3個）</td><td>202.7円 ← 100個は入らない（上限3個）</td><td>3個</td><td>202.7円</td></tr>
+<tr><td>標準8</td><td>32,912cm³</td><td>304.0円 ← 10個は入らない（上限2個）</td><td>304.0円 ← 30個は入らない（上限2個）</td><td>304.0円 ← 100個は入らない（上限2個）</td><td>2個</td><td>304.0円</td></tr>
+</tbody></table>
+<p><strong>社長のご指摘が最も効くのがここです。</strong>小型品なら 1箱に110個入り、<strong>1個あたり5.5円</strong>。旧モデルの64円は 11.6倍の過大でした。一方、標準6以上の大物は1箱に9個しか入らず <strong>薄まりません</strong>（67.6〜304円）。</p>
+<h3>4.4 梱包資材 — 箱あたり → 1個あたり</h3>
+<p><strong>⚠️ ここは公式値がありません。すべて推定です。</strong>内訳：OPP袋（テープ付）3円/枚・FNSKUラベル用紙1.5円/枚・段ボール140サイズ 250円/枚。<strong>実額は初回仕入れ時に領収書で確定してください（宿題）。</strong></p>
+<table><thead><tr><th>1箱の入り数</th><th>OPP袋+ラベル（1個固定）</th><th>段ボール140サイズ 250円の按分</th><th>1個あたり 合計</th></tr></thead><tbody>
+<tr><td>10個</td><td>4.5円</td><td>25.0円</td><td><strong>29.5円</strong></td></tr>
+<tr><td>30個</td><td>4.5円</td><td>8.3円</td><td><strong>12.8円</strong></td></tr>
+<tr><td>100個</td><td>4.5円</td><td>2.5円</td><td><strong>7.0円</strong></td></tr>
+<tr><td>200個</td><td>4.5円</td><td>1.2円</td><td><strong>5.8円</strong></td></tr>
+</tbody></table>
+<p><strong>旧モデルの55円は、1箱30個なら12.8円。</strong>量で薄まります（100個入れれば7.0円）。</p>
+<h3>4.5 外注費（社長は物理作業を外注する前提）</h3>
+<table><thead><tr><th>規模</th><th>納品代行の単価（検品・ラベル貼り・梱包）</th><th>出典</th></tr></thead><tbody>
+<tr><td>月100点・継続月</td><td>楽観36円 / <strong>中央42〜50円</strong> / 悲観74円（e-fba はラック保管3,300円/月込み）</td><td>社内 memory <code>knowledge_first_purchase_cost_model_2026-09</code> §7（14社の公開料金で検算済み）</td></tr>
+<tr><td>初回12点・1箱</td><td>楽観108円 / 中央116円 / 悲観404円</td><td>同上</td></tr>
+</tbody></table>
+<p><strong>本モデルでは 25円/個（税込）を置いています</strong>（ラベル貼付12円＋検品・梱包13円の内訳を仮定）。上記の中央値42〜50円は<strong>FC納品送料を含んだ合算値</strong>なので、送料を別建てにした本モデルでは二重計上を避けるため 25円を採りました。<strong>仮定です。</strong></p>
+<hr>
+<h2>5. 販売手数料 — 0.8376 の根拠を検証した結果</h2>
+<h3>5.1 0.8376 は2箇所で間違っていました</h3>
+<pre>旧: 0.8376 = 1 − 8.4% × 1.1 − 誤差幅7%</pre>
+<table><thead><tr><th>論点</th><th>旧モデル</th><th>公式原文での確認</th><th>判定</th></tr></thead><tbody>
+<tr><td><strong>×1.1 は必要か</strong></td><td>×1.1 している</td><td>公式注記の原文：<strong>「注: 手数料はすべて税抜き表示となっており、下記に記載の金額に加えて税金が課金されます。」</strong></td><td><strong>✅ 正しい</strong></td></tr>
+<tr><td><strong>何に掛けるか</strong></td><td>Amazon 表示売価</td><td>公式脚注の原文：<strong>「商品あたりの売上の合計とは、商品の価格、配送料、ギフト包装料、および当該商品について購入者によって支払われた適用のある税金額の合計をいいます。」</strong>→ 日本の表示価格（税込）が基準。2026-09-30 の実測（ぺんてる案件：売価1,100円に対し Keepa の Referral Fee 114円＝1,100×10.4%）と1円単位で一致</td><td><strong>✅ 正しい</strong></td></tr>
+<tr><td><strong>料率 8.4%</strong></td><td>全商品に 8.4%</td><td>8.4%は<strong>服&amp;ファッション小物（750〜2,500円）／エレクトロニクス／パソコン周辺機器／小型・大型家電</strong>の率。<strong>日用雑貨・たわし・文房具は 15.4%</strong></td><td><strong>🔴 誤り。7pt 甘い</strong></td></tr>
+<tr><td><strong>誤差幅 7% を分母から引く</strong></td><td>引いている</td><td>料金ではない</td><td><strong>🔴 誤り（§6）</strong></td></tr>
+</tbody></table>
+<h3>5.2 カテゴリー別の料率（公式・当社が触る範囲）</h3>
+<table><thead><tr><th>カテゴリー</th><th>750円以下</th><th>750円超</th><th>備考</th></tr></thead><tbody>
+<tr><td>ホーム&amp;キッチン</td><td>5%</td><td><strong>15.4%</strong></td><td>キッチン雑貨・掃除用品</td></tr>
+<tr><td>文房具・オフィス用品</td><td>5%</td><td><strong>15.4%</strong></td><td>ぺんてる等</td></tr>
+<tr><td>DIY・工具 / ガーデニング / 家具 / その他のカテゴリー</td><td>5%</td><td><strong>15.4%</strong></td><td></td></tr>
+<tr><td>ペット用品</td><td>5%</td><td>8.4%（〜1,500円）→ <strong>15.4%</strong></td><td></td></tr>
+<tr><td>ベビー&amp;マタニティ</td><td>5%</td><td>8.4%（〜1,500円）→ <strong>15.4%</strong></td><td></td></tr>
+<tr><td>おもちゃ&amp;ホビー / スポーツ&amp;アウトドア / カー&amp;バイク / ホーム&amp;キッチン家電</td><td>5%</td><td><strong>10.4%</strong></td><td></td></tr>
+<tr><td>ビューティ・ヘルス・パーソナルケア / 食品&amp;飲料</td><td>5%</td><td>8.4%（〜1,500円）→ <strong>10.4%</strong></td><td></td></tr>
+<tr><td>エレクトロニクス / パソコン・周辺機器 / 小型・大型家電</td><td>5%</td><td><strong>8.4%</strong></td><td>最安</td></tr>
+<tr><td>服&amp;ファッション小物</td><td>5%</td><td><strong>8.4%</strong>（〜2,500円）→12.4%（〜3,000円）→段階式</td><td><strong>保管料も45%安い</strong>（3.10円）</td></tr>
+<tr><td>最低販売手数料</td><td><strong>30円（税抜）＝33円（税込）</strong></td><td></td><td>メディア・TVゲーム系以外の全カテゴリー</td></tr>
+</tbody></table>
+<p><strong>料率はブラウズツリーのカテゴリーではなく商品属性（Product Group）で決まります。</strong>2026-09-30 に Root=ファッションの商品に おもちゃ&amp;ホビー 10.4% が課金された実測があります。<strong>推定で当てず、Keepa の Referral Fee 実額から逆算するか FBA料金シミュレーターで確認してください。</strong></p>
+<hr>
+<h2>6. 🔴 誤差幅は費用と分けてどう扱うべきか（私の意見）</h2>
+<h3>6.1 いまのやり方の問題</h3>
+<p>旧モデルは誤差幅を <strong>売価の7% + 200円</strong> と置き、それを<strong>必要売価の分子・分母の両方に入れていました</strong>。結果：</p>
+<table><thead><tr><th>売価</th><th>誤差幅</th><th>売価に対する比率</th></tr></thead><tbody>
+<tr><td>500円</td><td>235円</td><td><strong>47.0%</strong></td></tr>
+<tr><td>800円</td><td>256円</td><td><strong>32.0%</strong></td></tr>
+<tr><td>1,000円</td><td>270円</td><td><strong>27.0%</strong></td></tr>
+<tr><td>2,000円</td><td>340円</td><td>17.0%</td></tr>
+<tr><td>5,000円</td><td>550円</td><td>11.0%</td></tr>
+</tbody></table>
+<p><strong>低単価商品では「誤差幅が利益の全部を食う」設計です。</strong>社長が狙いたい低単価・高回転の棚だけを狙い撃ちで落とす形になっていました。</p>
+<p>加えて、率（7%）と定額（200円）を足す形は、<strong>定額ぶんが単価の小さい側で暴れます</strong>（社内 memory <code>knowledge_first_purchase_cost_model_2026-09</code> §2 で同じ事故を記録済み。前回は率が高単価側で暴れました。今回は定額が低単価側で暴れています。構造は同じ）。</p>
+<h3>6.2 推奨：誤差幅は「原価」ではなく「GOの等級」に使う</h3>
+<p><strong>① 必要売価の式から誤差幅を外す。</strong>式は実費だけで組む。</p>
+<p><strong>② 不確実性は費目ごとに悲観値を当てて、感度分析にする。</strong>「誤差幅」という1本の数字をやめ、どの前提がどれだけ結論を動かすかを出す。</p>
+<table><thead><tr><th>前提</th><th>中央</th><th>悲観の当て方（根拠のある幅）</th><th>手残りへの効き</th></tr></thead><tbody>
+<tr><td>売価</td><td>直近のBuyBox価格</td><td><strong>90日平均と現在値の低い方</strong></td><td>直接</td></tr>
+<tr><td>FBAサイズ区分</td><td>実寸から当てた区分</td><td><strong>1段上の区分</strong>（寸法未確定なら）</td><td>最大 +66円</td></tr>
+<tr><td>販売手数料率</td><td>Keepa の実測率</td><td><strong>そのカテゴリーの最高段（15.4%）</strong></td><td>最大 +7.7pt</td></tr>
+<tr><td>保管月数</td><td>消化月数÷2</td><td><strong>消化月数 × 1.0</strong>（＝2倍）</td><td>小型で+3円、大型で+115円</td></tr>
+<tr><td>1箱の入り数</td><td>容積から計算した満載数</td><td><strong>その7割</strong></td><td>送料・資材が1.43倍</td></tr>
+<tr><td>セット数 n</td><td>商品名＋<code>packageQuantity</code> の一致</td><td><strong>一致しないなら計算しない（UNKNOWN）</strong></td><td>符号が変わる</td></tr>
+</tbody></table>
+<p><strong>③ GOを3等級に分ける。</strong></p>
+<table><thead><tr><th>等級</th><th>条件</th><th>行動</th></tr></thead><tbody>
+<tr><td><strong>A</strong></td><td>中央・悲観の<strong>両方</strong>で利益率20%以上</td><td>発注してよい</td></tr>
+<tr><td><strong>B</strong></td><td>中央で黒字、悲観で赤字</td><td>最小のロットで一度だけ実際に買って確かめる（落とさない。社長は小さく試したい）</td></tr>
+<tr><td><strong>C</strong></td><td>中央で赤字</td><td>落とす</td></tr>
+</tbody></table>
+<p><strong>④「単位ずれ」は誤差幅で扱ってはいけません。</strong>これは幅ではなく<strong>真偽</strong>です。Amazonの1個が卸の何点かが確定していない行は、金額を幅で膨らませるのではなく <strong>計算しない（UNKNOWN）</strong> のが正しい。いまのパイプラインは誤差幅で潰していますが、それだと「単位が確定した安い商品」まで一緒に落ちます。</p>
+<blockquote>ひとことで言うと、<strong>誤差幅は「いくら損しうるか」ではなく「どれを人間が確かめるか」を決める道具</strong>です。原価に足すと、確かめるべき候補が見えなくなります。</blockquote>
+<hr>
+<h2>7. 新モデル — サイズ区分 × 仕入原価 × セット数</h2>
+<p><strong>共通の前提（すべて仮定・変えれば結果は動きます）</strong>：1箱30個で納品／消化3ヶ月（保管計上1.5ヶ月）／通常期（1〜9月）料率／外注25円/個／ホーム&amp;キッチン（750円超15.4%）／免税事業者なので仕入消費税は控除できず費用（＝税抜額を1.1倍して原価にする）。</p>
+<h4>A. 固定費の内訳（1個あたり・税込・1箱30個納品・消化3ヶ月・通常期）</h4>
+<table><thead><tr><th>サイズ区分</th><th>寸法・重量（公式）</th><th>FBA配送代行 売価1,000円超</th><th>同 1,000円以下</th><th>代表体積（仮定）</th><th>140箱の容量</th><th>保管料</th><th>FC納品送料</th><th>梱包資材</th><th>外注費</th><th>FBA以外 計</th><th>固定費 合計（1,000円超）</th></tr></thead><tbody>
+<tr><td>小型</td><td>25×18×2.0cm以下・250g以下</td><td>288円</td><td>222円</td><td>600cm³</td><td>110個</td><td>5.1円</td><td>20.3円</td><td>12.8円</td><td>25円</td><td><strong>63円</strong></td><td><strong>351円</strong></td></tr>
+<tr><td>標準1</td><td>35×30×3.3cm以下・1kg以下</td><td>318円</td><td>252円</td><td>1,980cm³</td><td>33個</td><td>16.9円</td><td>20.3円</td><td>12.8円</td><td>25円</td><td><strong>75円</strong></td><td><strong>393円</strong></td></tr>
+<tr><td>標準2</td><td>三辺合計20cm以下・2kg以下</td><td>410円</td><td>344円</td><td>280cm³</td><td>236個</td><td>2.4円</td><td>20.3円</td><td>12.8円</td><td>25円</td><td><strong>60円</strong></td><td><strong>470円</strong></td></tr>
+<tr><td>標準3</td><td>三辺合計30cm以下・2kg以下</td><td>415円</td><td>358円</td><td>840cm³</td><td>78個</td><td>7.2円</td><td>20.3円</td><td>12.8円</td><td>25円</td><td><strong>65円</strong></td><td><strong>480円</strong></td></tr>
+<tr><td>標準4</td><td>三辺合計40cm以下・2kg以下</td><td>420円</td><td>371円</td><td>2,106cm³</td><td>31個</td><td>17.9円</td><td>20.3円</td><td>12.8円</td><td>25円</td><td><strong>76円</strong></td><td><strong>496円</strong></td></tr>
+<tr><td>標準5</td><td>三辺合計50cm以下・2kg以下</td><td>425円</td><td>379円</td><td>4,224cm³</td><td>15個</td><td>36.0円</td><td>40.5円</td><td>21.2円</td><td>25円</td><td><strong>123円</strong></td><td><strong>548円</strong></td></tr>
+<tr><td>標準6</td><td>三辺合計60cm以下・2kg以下</td><td>430円</td><td>391円</td><td>7,280cm³</td><td>9個</td><td>62.0円</td><td>67.6円</td><td>32.3円</td><td>25円</td><td><strong>187円</strong></td><td><strong>617円</strong></td></tr>
+<tr><td>標準7</td><td>三辺合計80cm以下・5kg以下</td><td>472円</td><td>427円</td><td>17,010cm³</td><td>3個</td><td>144.8円</td><td>202.7円</td><td>87.8円</td><td>25円</td><td><strong>460円</strong></td><td><strong>932円</strong></td></tr>
+<tr><td>標準8</td><td>三辺合計100cm以下・9kg以下</td><td>532円</td><td>466円</td><td>32,912cm³</td><td>2個</td><td>280.2円</td><td>304.0円</td><td>129.5円</td><td>25円</td><td><strong>739円</strong></td><td><strong>1271円</strong></td></tr>
+</tbody></table>
+<h4>B. 必要な売価の下限 — 損益分岐（利益率0%）</h4>
+<table><thead><tr><th>サイズ区分</th><th>原価100円</th><th>原価200円</th><th>原価300円</th><th>原価500円</th><th>原価800円</th><th>原価1,200円</th><th>原価2,000円</th></tr></thead><tbody>
+<tr><td>小型</td><td>418円</td><td>535円</td><td>651円</td><td>1,085円</td><td>1,482円</td><td>2,012円</td><td>3,072円</td></tr>
+<tr><td>標準1</td><td>462円</td><td>579円</td><td>695円</td><td>1,135円</td><td>1,533円</td><td>2,062円</td><td>3,122円</td></tr>
+<tr><td>標準2</td><td>544円</td><td>661円</td><td>884円</td><td>1,229円</td><td>1,626円</td><td>2,156円</td><td>3,215円</td></tr>
+<tr><td>標準3</td><td>564円</td><td>681円</td><td>907円</td><td>1,240円</td><td>1,638円</td><td>2,167円</td><td>3,227円</td></tr>
+<tr><td>標準4</td><td>589円</td><td>706円</td><td>936円</td><td>1,259円</td><td>1,657円</td><td>2,186円</td><td>3,246円</td></tr>
+<tr><td>標準5</td><td>647円</td><td>869円</td><td>1,057円</td><td>1,322円</td><td>1,719円</td><td>2,249円</td><td>3,308円</td></tr>
+<tr><td>標準6</td><td>728円</td><td>961円</td><td>1,140円</td><td>1,405円</td><td>1,802円</td><td>2,332円</td><td>3,391円</td></tr>
+</tbody></table>
+<h4>C. 必要な売価の下限 — 利益率20%（KPI）</h4>
+<table><thead><tr><th>サイズ区分</th><th>原価100円</th><th>原価200円</th><th>原価300円</th><th>原価500円</th><th>原価800円</th><th>原価1,200円</th><th>原価2,000円</th></tr></thead><tbody>
+<tr><td>小型</td><td>530円</td><td>678円</td><td>976円</td><td>1,429円</td><td>1,952円</td><td>2,650円</td><td>4,046円</td></tr>
+<tr><td>標準1</td><td>587円</td><td>734円</td><td>1,146円</td><td>1,495円</td><td>2,019円</td><td>2,716円</td><td>4,112円</td></tr>
+<tr><td>標準2</td><td>691円</td><td>990円</td><td>1,269円</td><td>1,618円</td><td>2,142円</td><td>2,839円</td><td>4,235円</td></tr>
+<tr><td>標準3</td><td>716円</td><td>1,110円</td><td>1,285円</td><td>1,634円</td><td>2,157円</td><td>2,855円</td><td>4,250円</td></tr>
+<tr><td>標準4</td><td>748円</td><td>1,135円</td><td>1,310円</td><td>1,659円</td><td>2,182円</td><td>2,880円</td><td>4,275円</td></tr>
+<tr><td>標準5</td><td>970円</td><td>1,217円</td><td>1,392円</td><td>1,741円</td><td>2,264円</td><td>2,962円</td><td>4,357円</td></tr>
+<tr><td>標準6</td><td>1,153円</td><td>1,327円</td><td>1,501円</td><td>1,850円</td><td>2,374円</td><td>3,071円</td><td>4,467円</td></tr>
+</tbody></table>
+<h4>D. カテゴリーを変えたら（1点の原価を税込220円と置いた場合・n=1・損益分岐）</h4>
+<table><thead><tr><th>サイズ区分</th><th>ホーム&amp;キッチン 15.4%</th><th>おもちゃ&amp;ホビー 10.4%</th><th>エレクトロニクス 8.4%</th><th>服&amp;ファッション小物 8.4%（保管料も安い）</th></tr></thead><tbody>
+<tr><td>小型</td><td>535円</td><td>535円</td><td>535円</td><td>532円</td></tr>
+<tr><td>標準1</td><td>579円</td><td>579円</td><td>579円</td><td>571円</td></tr>
+<tr><td>標準3</td><td>681円</td><td>681円</td><td>681円</td><td>677円</td></tr>
+<tr><td>標準6</td><td>961円</td><td>901円</td><td>879円</td><td>848円</td></tr>
+</tbody></table>
+<h3>表の読み方（社長向け・1行）</h3>
+<p><strong>「この仕入原価なら、この売価以上の棚でないと買ってはいけない」</strong>という線です。表Bが赤字ライン、表Cが利益率20%ラインです。</p>
+<p><strong>ここから言える3つ</strong></p>
+<ol>
+<li style='margin-left:0.0em'><strong>仕入原価500円以上の単品は、売価1,400円以上の棚でないと利益率20%に届きません。</strong>原価800円なら売価約2,000円以上。<strong>「仕入が安い」はそれ自体が条件ではなく、売価との比で見るしかありません。</strong></li>
+<li style='margin-left:0.0em'><strong>サイズ区分の差より、売価750円/1,000円の崖の方が大きい。</strong>小型と標準6の固定費差は266円ですが、750円の崖だけで85円、1,000円の崖で65円動きます。<strong>寸法の最適化より値付けの方が効きます。</strong></li>
+<li style='margin-left:0.0em'><strong>表Dを見ると、必要売価が750円を下回る帯ではカテゴリー差がほぼ消えます</strong>（全カテゴリー5%だから）。カテゴリー選びが効くのは売価750円超の棚だけです。</li>
+</ol>
+<h3>セット数の効き方 — 「まとめ売りで固定費を割る」は旧モデルが思ったほど効きません</h3>
+<table><thead><tr><th>セット数 n</th><th>単品が小型（600cm³）のとき 区分</th><th>必要売価</th><th>1点あたり</th><th>単品が標準3（840cm³）のとき 区分</th><th>必要売価</th><th>1点あたり</th><th>旧モデル（15.4%で引き直し）</th><th>旧の1点あたり</th></tr></thead><tbody>
+<tr><td>1</td><td>小型</td><td>535円</td><td><strong>535円</strong></td><td>標準3</td><td>681円</td><td><strong>681円</strong></td><td>1,369円</td><td>1,369円</td></tr>
+<tr><td>2</td><td>標準1</td><td>923円</td><td><strong>462円</strong></td><td>標準1</td><td>923円</td><td><strong>462円</strong></td><td>1,658円</td><td>829円</td></tr>
+<tr><td>3</td><td>標準1</td><td>1,268円</td><td><strong>423円</strong></td><td>標準5</td><td>1,454円</td><td><strong>485円</strong></td><td>1,947円</td><td>649円</td></tr>
+<tr><td>5</td><td>標準5</td><td>1,984円</td><td><strong>397円</strong></td><td>標準5</td><td>1,984円</td><td><strong>397円</strong></td><td>2,526円</td><td>505円</td></tr>
+<tr><td>10</td><td>標準6</td><td>3,391円</td><td><strong>339円</strong></td><td>標準7</td><td>3,771円</td><td><strong>377円</strong></td><td>3,972円</td><td>397円</td></tr>
+<tr><td>20</td><td>標準7</td><td>6,420円</td><td><strong>321円</strong></td><td>標準7</td><td>6,420円</td><td><strong>321円</strong></td><td>6,864円</td><td>343円</td></tr>
+</tbody></table>
+<p><strong>🔴 旧モデルの「固定費821円は1個につき1回だから n で割れる」は不正確です。</strong>セットにすると<strong>体積が n 倍になり、サイズ区分が上がって保管料・納品送料・梱包資材が増えます</strong>。割れるのは FBA配送代行と外注費だけ。</p>
+<table><thead><tr><th>n</th><th>1点あたりの必要売価（新・単品が標準3）</th><th>旧モデル（15.4%で引き直し）</th><th>新/旧</th></tr></thead><tbody>
+<tr><td>1</td><td>681円</td><td>1,369円</td><td><strong>50%（線が半分になった）</strong></td></tr>
+<tr><td>3</td><td>485円</td><td>649円</td><td>75%</td></tr>
+<tr><td>10</td><td>377円</td><td>397円</td><td><strong>95%（ほぼ同じ）</strong></td></tr>
+<tr><td>20</td><td>321円</td><td>343円</td><td>94%</td></tr>
+</tbody></table>
+<p><strong>つまり旧モデルの誤りは、単品ほど大きく効いていました。</strong>「単品は成立しないからセットにするしかない」という旧結論は、<strong>誤った前提から出た結論</strong>です。<strong>単品の方が、むしろ成立しやすい</strong>（固定費が小さい区分に収まるため）。</p>
+<p>※ n=2 で区分が「標準1」に下がって逆に安くなる行があります。これは <strong>平たい2枚重ねが 35×30×3.3cm（318円）に収まる</strong>という計算で、嘘ではありませんが、形状によっては入りません。<strong>セットの寸法は現物で測るまで確定しません。</strong></p>
+<hr>
+<h2>8. 自己発送（FBM）との比較</h2>
+<p><strong>送料は公式値です。</strong>出典：<a href="https://www.post.japanpost.jp/send/domestic/charge/list/pdf/kanto.pdf" target="_blank" rel="noopener">日本郵便 国内料金表（2026年10月1日現在・税込）</a>、<a href="https://clickpost.jp/" target="_blank" rel="noopener">クリックポスト</a>。</p>
+<blockquote>🔴 <strong>クリックポストは2026年10月1日に 185円 → 240円 に値上げされました</strong>（3日前）。公式告知の原文：「2026年10月1日（木）より、クリックポストの運賃を185円(税込)から240円(税込)に改定します。」古い185円で計算した資料は全部直す必要があります。</blockquote>
+<p>小型品（売価1,000円以下を想定）での比較：</p>
+<table><thead><tr><th>発送手段</th><th>送料（公式・税込）</th><th>梱包資材(推定)</th><th>出荷作業の外注(推定)</th><th>保管</th><th>FBA配送代行</th><th>1個あたり固定費 計</th><th>FBA小型(1,000円以下枝)との差</th></tr></thead><tbody>
+<tr><td><strong>FBA 小型・売価1,000円以下</strong></td><td>—</td><td>12.8円</td><td>25.0円（納品代行）</td><td>5.1円</td><td>222円</td><td><strong>285円</strong></td><td>—</td></tr>
+<tr><td><strong>FBA 小型・売価1,000円超</strong></td><td>—</td><td>12.8円</td><td>25.0円（納品代行）</td><td>5.1円</td><td>288円</td><td><strong>351円</strong></td><td>+66円</td></tr>
+<tr><td>自己発送 定形外郵便 規格内 50g以内（外注 150円/件）</td><td>140円</td><td>15円</td><td>150円</td><td>0円（自宅）</td><td>—</td><td><strong>305円</strong></td><td>+20円</td></tr>
+<tr><td>自己発送 定形外郵便 規格内 50g以内（社長が自分で発送）</td><td>140円</td><td>15円</td><td>0円</td><td>0円（自宅）</td><td>—</td><td><strong>155円</strong></td><td>-130円</td></tr>
+<tr><td>自己発送 定形外郵便 規格内 100g以内（外注 150円/件）</td><td>180円</td><td>15円</td><td>150円</td><td>0円（自宅）</td><td>—</td><td><strong>345円</strong></td><td>+60円</td></tr>
+<tr><td>自己発送 定形外郵便 規格内 100g以内（社長が自分で発送）</td><td>180円</td><td>15円</td><td>0円</td><td>0円（自宅）</td><td>—</td><td><strong>195円</strong></td><td>-90円</td></tr>
+<tr><td>自己発送 スマートレター（A5・厚さ2cm・1kg）（外注 150円/件）</td><td>210円</td><td>15円</td><td>150円</td><td>0円（自宅）</td><td>—</td><td><strong>375円</strong></td><td>+90円</td></tr>
+<tr><td>自己発送 スマートレター（A5・厚さ2cm・1kg）（社長が自分で発送）</td><td>210円</td><td>15円</td><td>0円</td><td>0円（自宅）</td><td>—</td><td><strong>225円</strong></td><td>-60円</td></tr>
+<tr><td>自己発送 クリックポスト（2026-10-01に240円へ改定）（外注 150円/件）</td><td>240円</td><td>15円</td><td>150円</td><td>0円（自宅）</td><td>—</td><td><strong>405円</strong></td><td>+120円</td></tr>
+<tr><td>自己発送 クリックポスト（2026-10-01に240円へ改定）（社長が自分で発送）</td><td>240円</td><td>15円</td><td>0円</td><td>0円（自宅）</td><td>—</td><td><strong>255円</strong></td><td>-30円</td></tr>
+<tr><td>自己発送 定形外郵便 規格内 250g以内（外注 150円/件）</td><td>320円</td><td>15円</td><td>150円</td><td>0円（自宅）</td><td>—</td><td><strong>485円</strong></td><td>+200円</td></tr>
+<tr><td>自己発送 定形外郵便 規格内 250g以内（社長が自分で発送）</td><td>320円</td><td>15円</td><td>0円</td><td>0円（自宅）</td><td>—</td><td><strong>335円</strong></td><td>+50円</td></tr>
+<tr><td>自己発送 ゆうパケット（厚さ3cm以内）（外注 150円/件）</td><td>360円</td><td>15円</td><td>150円</td><td>0円（自宅）</td><td>—</td><td><strong>525円</strong></td><td>+240円</td></tr>
+<tr><td>自己発送 ゆうパケット（厚さ3cm以内）（社長が自分で発送）</td><td>360円</td><td>15円</td><td>0円</td><td>0円（自宅）</td><td>—</td><td><strong>375円</strong></td><td>+90円</td></tr>
+<tr><td>自己発送 レターパックライト（A4・厚さ3cm・4kg）（外注 150円/件）</td><td>430円</td><td>15円</td><td>150円</td><td>0円（自宅）</td><td>—</td><td><strong>595円</strong></td><td>+310円</td></tr>
+<tr><td>自己発送 レターパックライト（A4・厚さ3cm・4kg）（社長が自分で発送）</td><td>430円</td><td>15円</td><td>0円</td><td>0円（自宅）</td><td>—</td><td><strong>445円</strong></td><td>+160円</td></tr>
+</tbody></table>
+<h3>結論：<strong>外注前提では FBM に優位はありません</strong></h3>
+<table><thead><tr><th>ケース</th><th>判定</th></tr></thead><tbody>
+<tr><td><strong>社長の既定方針（物理作業は外注・PC完結）</strong></td><td><strong>FBM は全手段で FBA より高い</strong>（+20〜+310円/個）。<strong>FBA が正解。</strong></td></tr>
+<tr><td>社長が自分で発送する場合</td><td>定形外規格内50g（155円）なら FBA より <strong>130円/個 安い</strong>。100g（195円）でも 90円安い</td></tr>
+<tr><td>大型品</td><td><strong>比較になりません。</strong>FBA 大型6（160cm・25kg）が 1,034〜1,100円。宅急便160サイズ 関東→関東の通常価格は <strong>3,020円</strong>（社内 memory にヤマト公式からの実測記録あり）。<strong>FBA が圧勝</strong></td></tr>
+</tbody></table>
+<p><strong>FBMで安くなる条件は3つ全部を満たすときだけです。</strong>①重量50〜100g以下、②厚さ3cm以下、③社長自身が梱包・発送する。</p>
+<p>③は社長の方針（<code>owner_not_labor_intensive_build_systems</code>：労働集約型は目指さない）と正面から衝突します。</p>
+<p><strong>FBMの非金銭コスト（費用表に出ないが効くもの）</strong></p>
+<ul>
+<li style='margin-left:0.0em'><strong>プライムマークが付かない＝カートボックス獲得で不利。</strong>Amazonの購買の約8割はカート経由なので、1個130円の節約よりカート喪失の方が大きい可能性が高い（定量化できていません＝未確認）。</li>
+<li style='margin-left:0.0em'>出荷遅延率・追跡可能率がアカウント健全性指標に直撃する。社長は過去にアカウント停止を経験しており、ここのリスクは金額換算しない方がよい。</li>
+<li style='margin-left:0.0em'>返品対応が自社負担になる。</li>
+</ul>
+<blockquote><strong>推奨：FBA 一本。</strong>FBM は「FBAに入らない商品（危険物・寸法超過）」の逃げ道としてだけ持ち、原価モデルの主系統には入れません。</blockquote>
+<hr>
+<h2>9. 旧モデル vs 新モデル — 648件での検算</h2>
+<p>データ：<code>workspace/output/agent_output/T-20260920-003/pipeline/buy_list_private.csv</code>（648行・NO-GO 479／UNKNOWN 169）。</p>
+<p>採算を計算できたのは <strong>503行</strong>（残り145行は売価または粗利が欠損）。</p>
+<h3>9.1 まず事実 — 「原価モデルが0件の原因」ではありませんでした</h3>
+<p><strong>🔴 648件のパイプラインは、固定費821円の式を使っていません。</strong>調べた結果：</p>
+<table><thead><tr><th>どこ</th><th>何を使っていたか</th></tr></thead><tbody>
+<tr><td><code>candidate_pipeline.py</code>（648件の判定本体）</td><td><strong>Keepa の ASIN別実測値</strong>（<code>fbaFees.pickAndPackFee</code> と <code>referralFeePercent</code>）。415円固定ではない</td></tr>
+<tr><td>同・その他費用</td><td><strong>206円を全商品に固定</strong>（🔴 ここは誤り。鍋の実測）</td></tr>
+<tr><td>同・誤差幅</td><td>売価7%+200円を<strong>NO-GO ではなく UNKNOWN の線</strong>として使用（費用には足していない）</td></tr>
+<tr><td><code>set_family.py</code> / <code>run_supplier_first.py</code>（卸起点のふるい）</td><td><strong>821円の式を使用</strong>（🔴 ここが全面的に誤り）</td></tr>
+<tr><td>README 720行の結論「日用消耗品の単品は構造的に赤字」</td><td><strong>821円の式が根拠</strong>（🔴 結論が誤り）</td></tr>
+</tbody></table>
+<h3>9.2 503行の分布</h3>
+<table><thead><tr><th>旧モデルでの位置</th><th>件数</th><th>構成比</th></tr></thead><tbody>
+<tr><td>誤差幅を越えて黒字（採算クリア）</td><td><strong>226件</strong></td><td>44.9%</td></tr>
+<tr><td>黒字だが誤差幅の内側（UNKNOWN 扱い）</td><td>132件</td><td>26.2%</td></tr>
+<tr><td>赤字</td><td>145件</td><td>28.8%</td></tr>
+</tbody></table>
+<p><strong>採算をクリアしていた226件が、何で落ちたか</strong></p>
+<table><thead><tr><th>落とした理由</th><th>件数（重複あり）</th></tr></thead><tbody>
+<tr><td>生存判定（売れ筋ランクが下位・直近実績が読めない）</td><td>181件</td></tr>
+<tr><td>単位ずれの疑い（Amazonの1個＝卸の何点か未確定）</td><td>83件</td></tr>
+<tr><td>Amazon本体がカートを持つ／本体の存在</td><td>上記に重複して計上</td></tr>
+<tr><td>採算（1SKUの発注額が予算枠8万円を超過など）</td><td>37件</td></tr>
+<tr><td>仕入れの実在性（最小ロット・在庫）</td><td>16件</td></tr>
+</tbody></table>
+<blockquote><strong>つまり「0件」の主因は、原価モデルではなく〔売れ筋ランクによる生存判定〕と〔セット数（単位）の未確定〕です。</strong>原価モデルを直しても、この2つを直さないと GO は増えません。</blockquote>
+<h3>9.3 その他費用 206円 → 区分別に直した効果</h3>
+<table><thead><tr><th>シナリオ</th><th>その他費用</th><th>旧(206円)で赤字 → 新で黒字に反転</th></tr></thead><tbody>
+<tr><td>小型相当</td><td>63円</td><td><strong>17件</strong></td></tr>
+<tr><td>標準3相当</td><td>65円</td><td><strong>17件</strong></td></tr>
+<tr><td>標準6相当（大物）</td><td>187円</td><td>3件</td></tr>
+</tbody></table>
+<p>反転した17件はいずれも <strong>旧手残り −9円〜−62円</strong> の薄い行で、新モデルでも手残りは +80〜133円（利益率1〜6%）です。<strong>GOにはなりません（等級B＝小ロットで実測する層）。</strong></p>
+<h3>9.4 821円の式を使っていた「仕入れ起点のふるい」での効果</h3>
+<p>カズヨが実画面で見た日用消耗品（Amazon 単品 売価330円／10個セット 2,576円、<strong>仕入原価は売価の59.4%</strong>＝原価率が高い商品）で検算：</p>
+<table><thead><tr><th></th><th>旧モデル（821円式）</th><th>新モデル（標準3→セット時は標準7）</th><th>実際のAmazon売価</th><th>判定</th></tr></thead><tbody>
+<tr><td>単品（n=1）</td><td>必要売価 <strong>1,214円</strong>（旧式は fee 8.4% で計算していた）／15.4%で引き直すと 1,337円</td><td><strong>必要売価 655円</strong></td><td>330円</td><td><strong>どちらも赤字</strong></td></tr>
+<tr><td>10個セット（n=10）</td><td>必要売価 3,318円／15.4%なら 3,654円</td><td><strong>必要売価 3,480円</strong></td><td>2,576円</td><td><strong>どちらも赤字</strong></td></tr>
+</tbody></table>
+<p><strong>この商品は新モデルでも成立しません。</strong>理由は固定費ではなく <strong>原価率59.4%に対して販売手数料が15.4%</strong>だから。粗利が構造的に足りません。</p>
+<p><strong>ただし線は大きく動きました。</strong>単品の必要売価が 1,214円 → 655円（<strong>46%下がった</strong>）。<strong>この線の下にある棚＝「原価率45%以下・売価600〜1,000円・小型/標準1」の帯が、旧モデルでは丸ごと見えていませんでした。</strong></p>
+<hr>
+<h2>10. 次にやること（優先順・インパクト順）</h2>
+<table><thead><tr><th>#</th><th>やること</th><th>効果</th><th>誰</th></tr></thead><tbody>
+<tr><td>1</td><td><code>set_family.required_sell()</code> の 821円式を廃止し、本モデル（区分別）に差し替える</td><td>卸起点のふるいが機能しはじめる。単品の線が半分に</td><td>IT／経理</td></tr>
+<tr><td>2</td><td><code>profit.py</code> の <code>OTHER_UNIT_COSTS_YEN = 206</code> を<strong>区分別の関数</strong>に差し替える</td><td>648件の判定が正しくなる（反転17件＋UNKNOWN 132件の再評価）</td><td>同</td></tr>
+<tr><td>3</td><td>誤差幅（7%+200円）を撤去し、§6.2 のA/B/C等級に差し替える</td><td>低単価の棚が見えるようになる</td><td>同</td></tr>
+<tr><td>4</td><td><strong>候補の絞り込み条件を「売価600〜1,000円・小型/標準1・原価率45%以下」に振り直して再スキャン</strong></td><td>旧モデルで見えなかった帯を拾う</td><td>リサーチャー</td></tr>
+<tr><td>5</td><td><strong>販売手数料率を ASIN ごとに Keepa 実測で当てる</strong>（カテゴリー名からの推定をやめる）</td><td>最大7.7pt の読み違いをなくす</td><td>同</td></tr>
+<tr><td>6</td><td>梱包資材の実額を領収書で確定する（現在すべて推定）</td><td>推定を実測へ。影響は小さい（±10円/個）</td><td>庶務</td></tr>
+<tr><td>7</td><td>SIPP と IPI連動保管料割引が日本にあるか、セラーセントラルのログイン先で確認</td><td>不明を潰す。効果は未知</td><td>秘書（ブラウザ）</td></tr>
+</tbody></table>
+<hr>
+<h2>11. この資料で「分からない」と書いたこと（埋めていません）</h2>
+<table><thead><tr><th>項目</th><th>状態</th></tr></thead><tbody>
+<tr><td>SIPP の日本提供有無</td><td>公開ページに記載なし。米英独仏伊西加では稼働</td></tr>
+<tr><td>IPIスコア連動の保管料割引（日本）</td><td>公開ページに記載なし</td></tr>
+<tr><td>「FBA納品配送料15,000円割引」の条件</td><td>公式サイトのバナーは実在するがリンク先が404</td></tr>
+<tr><td>梱包資材の実額</td><td>公式値なし。すべて推定（OPP袋3円・ラベル1.5円・段ボール250円）</td></tr>
+<tr><td>FBAパートナーキャリアの60〜120サイズ料金</td><td><strong>セラーセントラルの納品プラン作成画面でしか見られない</strong>（ヤマト公式にもAmazon公開資料にもない）。本モデルは140サイズ608円で代用</td></tr>
+<tr><td>出荷代行（FBM）の単価150円/件</td><td>推定。見積りを取っていない</td></tr>
+<tr><td>低在庫レベル手数料（5〜30円/点）の免除条件</td><td>未確認。本モデルには計上していない</td></tr>
+<tr><td>返品率</td><td>本モデルには計上していない（2%で見るなら売価の2%を引いてください）</td></tr>
+</tbody></table>
+<hr>
+<h2>12. 出典一覧</h2>
+<table><thead><tr><th>内容</th><th>URL</th><th>取得日</th></tr></thead><tbody>
+<tr><td>FBA配送代行手数料・在庫保管手数料・販売手数料（全カテゴリー）</td><td>https://sell.amazon.co.jp/pricing</td><td>2026-10-04（curl で HTML 原文）</td></tr>
+<tr><td>FBA新商品特典プログラム（2026）</td><td>https://sell.amazon.co.jp/fulfill/fulfillment-by-amazon/new-selection</td><td>2026-10-04</td></tr>
+<tr><td>2026年FBA改定概要</td><td>https://sellercentral.amazon.co.jp/help/hub/reference/external/GC89AGMVW8QBZJBK</td><td>2026-10-04・<strong>ログイン壁で読めず</strong></td></tr>
+<tr><td>日本郵便 国内料金表（2026年10月1日現在）</td><td>https://www.post.japanpost.jp/send/domestic/charge/list/pdf/kanto.pdf</td><td>2026-10-04</td></tr>
+<tr><td>クリックポスト運賃改定（185→240円）</td><td>https://clickpost.jp/</td><td>2026-10-04</td></tr>
+<tr><td>ゆうパケット（厚さ3cm以内・360円）</td><td>https://www.post.japanpost.jp/service/yu_packet/</td><td>2026-10-04</td></tr>
+<tr><td>FBAパートナーキャリア ヤマト料金（140サイズ 608円）</td><td>社内 memory <code>knowledge_first_purchase_cost_model_2026-09</code>（ヤマト公式 business.kuronekoyamato.co.jp 由来）</td><td>2026-09-04</td></tr>
+<tr><td>納品代行の単価分布（14社）</td><td>社内 memory 同上 §7</td><td>2026-09-30</td></tr>
+</tbody></table>
+<p>計算スクリプトは <code>workspace/output/agent_output/T-20260920-003/cost_model_v2/model.py</code>（モデル本体）と <code>backtest.py</code>（648件の検算）に置いてあります。</p>
+</body></html>
