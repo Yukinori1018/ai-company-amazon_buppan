@@ -1,14 +1,23 @@
 #!/usr/bin/env python3
 """まとめ売り突合 — 「卸の1点」と「Amazon の1個」をつなぐ1枚（純関数）。
 
-なぜ要るか（2026-10-01 カズヨが SD の実画面で確定させたこと）
+なぜ要るか（卸の「1点」と Amazon の「1個」は別の単位だから）
 -------------------------------------------------------------
-日用消耗品は**単品では構造的に黒字になりません**。固定費（FBA 配送代行 + 保管/納品/資材 +
-誤差幅）が1個あたり 821円かかるので、卸178円のたわしでも必要売価が **1,214円**になります。
-1個1,214円のたわしは売れません。
+卸は1点あたりで売り、Amazon は「N点セット」で売ります。原価は**卸単価 × Amazon 側のセット数**で、
+ここを取り違えると符号が変わります（2026-09-30・10-01 に同じ単位ずれを2回出しました）。
 
-だから「×10点セット」等の**まとめ売りを1商品として出し、固定費を10個で割る**のが前提です。
-`required_sell()` の第2引数 `n` がその「何個で割るか」です。
+🔴 **2026-10-04 に、ここに書いてあった前提を取り下げました。**
+旧文：「日用消耗品は単品では構造的に黒字にならない。固定費が1個821円かかるので、卸178円の
+たわしでも必要売価が1,214円になる。だからまとめ売りが前提」
+
+**821円が間違いでした**（成果物33）。小型区分の実額は **351円**（売価1,000円以下なら285円）で、
+卸178円のたわしの損益分岐は **約500円**です。**単品の方がむしろ成立しやすい**
+（体積が小さい区分に収まるので、保管・納品送料・資材が安い）。
+
+そして **セットを組む理由は「単価が低いから」ではなく「体積が大きいから」** です。
+n で割れるのは FBA配送代行と外注費だけで、保管・納品送料・資材は体積比例で増えます。
+さらに **小型で既に750円以下の商品をセットにすると、売価が750円を超えて販売手数料が
+5% → 15.4% に跳ねます**（750円の崖）。判定は `fba_cost.bundle_advice()` に任せてください。
 
 🔴 そして **JAN は単品とセットで同一**です（旭化成 ズビズバ あみたわし 4901670106107 は
 SD の「1点」「×10点」「×200点」すべて同じ JAN）。**JAN 突合はいつも単品 ASIN に当たります。**
@@ -40,6 +49,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
+import fba_cost
 import seasonality
 import set_count
 
@@ -221,39 +231,50 @@ def extra_asins(products: list[dict]) -> list[str]:
 
 # ── 「黒字になるセット数の下限」を逆から攻める ──────────────────────────────
 
-# 既定値。実額が分かっているときは必ず実額を渡してください（ここは目安の計算用）。
-DEFAULT_FEE_PCT = 8.4            # 販売手数料率（税抜表示）。×1.1 で税込
-DEFAULT_FBA_YEN = 415            # FBA 配送代行（小型〜標準の目安）
-OTHER_UNIT_COSTS_YEN = 206       # 保管87 + 納品送料64 + 梱包資材55（商品台帳 L001 実測）
-BAND_PCT = 7.0                   # 手残りの誤差幅（売価比）
-BAND_FIXED = 200                 # 手残りの誤差幅（固定ぶん）
+# 🔴 **2026-10-04 に「固定費821円」を撤去しました（成果物33 / 34）。**
+#
+# 旧: `required_sell = (821 + 1.1×卸値×n) / 0.8376`
+#     821 = FBA配送代行 415（**別商品・標準区分3の値**）＋ その他 206（**土鍋1点の実測**）
+#           ＋ **誤差幅 200（そもそも費用ではない）**
+#     0.8376 = 1 − 8.4%×1.1（**服&ファッション小物の率**） − **誤差幅 7%**
+#
+# 誤りは3つありました。
+#   ① 誤差幅（売価7% + 200円）を費用として足していた。**売価500円では売価の47%**になり、
+#      社長が狙いたい低単価帯だけを狙い撃ちで落としていた → `fba_cost.grade()` の等級へ移動
+#   ② FBA配送代行・保管・納品送料・資材をサイズ区分を見ずに1つの数字にしていた
+#      → `fba_cost.other_costs()` が区分別に引く（小型63円〜標準8 739円）
+#   ③ 販売手数料8.4%は**甘すぎた**（ホーム&キッチン/文房具/DIY/家具は15.4%）
+#      → `fba_cost.referral_pct()` が750円の崖つきで引く
+#
+# 計算は `fba_cost` に1本化しました。既定の区分は小型（当社が狙う低単価帯の本線）です。
+DEFAULT_TIER = "小型"
 TAX = 1.1
 
 
 def required_sell(wholesale_excl_per_point: float, n: int = 1,
-                  fee_pct: float = DEFAULT_FEE_PCT, fba_yen: float = DEFAULT_FBA_YEN,
-                  other: float = OTHER_UNIT_COSTS_YEN,
-                  band_pct: float = BAND_PCT, band_fixed: float = BAND_FIXED
-                  ) -> float | None:
+                  tier: str = DEFAULT_TIER, margin: float = 0.0,
+                  category: str | None = None, keepa_pct: float | None = None,
+                  months_to_sell: float = 3.0, **kw) -> float | None:
     """**「n点セットとして出すなら、いくらで売れていないと駄目か」。**
 
-        手残り = 売価 − 販売手数料 − FBA − 原価 − その他
-        GO 条件: 手残り ≥ 売価 × band_pct% + band_fixed
+        手残り = 売価 − 販売手数料 − FBA配送代行 − 原価 − その他固定費
+        GO 条件: 手残り ≥ 売価 × margin
 
-      → 売価 ≥ (FBA + その他 + band_fixed + 1.1 × 卸値 × n) / (1 − 0.011×fee_pct − band_pct/100)
+    `margin=0` で損益分岐、`0.20` で利益率20%。**誤差幅は入れません**（等級で扱う）。
 
-    既定値（fee 8.4% / FBA 415）だと分母 0.8376・分子の固定ぶん 821 で、
-    カズヨが SD の実画面から出した式 `(821 + 1.1×卸値) ÷ 0.8376` と一致します。
-
-    **固定費（FBA + その他 + 誤差幅 = 821円）は Amazon の1個につき1回しかかかりません。**
-    だから n を増やすと1点あたりの必要売価は下がります（`required_sell_per_point`）。
-    分母が 0 以下（手数料率が極端）なら None。
+    ⚠️ **セットにすると固定費が n で割れる、ではありません。**
+    n で割れるのは **FBA配送代行と外注費だけ**です。保管料・納品送料・梱包資材は**体積比例**
+    なので、セットにすると体積が n 倍になって区分が上がり、**増えます**。
+    どちらが勝つかは `fba_cost.bundle_advice()` が実額で判定します。
     """
-    denom = 1.0 - (fee_pct * TAX / 100.0) - (band_pct / 100.0)
-    if denom <= 0:
-        return None
-    fixed = float(fba_yen) + float(other) + float(band_fixed)
-    return (fixed + TAX * float(wholesale_excl_per_point) * max(1, int(n))) / denom
+    n = max(1, int(n))
+    vol = fba_cost.VOL[tier] * n
+    t = fba_cost.tier_from_volume(vol) if n > 1 else tier
+    cost = TAX * float(wholesale_excl_per_point) * n
+    return fba_cost.required_sell(cost, t, margin, category=category,
+                                  keepa_pct=keepa_pct,
+                                  months_to_sell=months_to_sell,
+                                  volume_cm3=vol, **kw)
 
 
 def required_sell_per_point(wholesale_excl_per_point: float, n: int = 1, **kw) -> float | None:

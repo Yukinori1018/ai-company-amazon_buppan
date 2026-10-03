@@ -255,7 +255,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--tokens", type=int, default=400, help="Keepa トークンの上限")
     ap.add_argument("--monthly-sold-min", type=int, default=50, help="月販の下限（実売の根拠）")
     ap.add_argument("--rank-max", type=int, default=100_000)
-    ap.add_argument("--price-min", type=int, default=2_000)
+    ap.add_argument("--price-min", type=int, default=500,
+                    help="売価の下限（円）。750円以下は販売手数料が5%なので捨てない")
     ap.add_argument("--price-max", type=int, default=20_000)
     ap.add_argument("--max-new-offers", type=int, default=6)
     ap.add_argument("--live-lookups", type=int, default=0,

@@ -191,26 +191,45 @@ class TestProfit(unittest.TestCase):
         self.assertEqual(profit.order_qty(monthly_sold=1, pack=1), 6)      # 6ヶ月ぶんで打ち止め
         self.assertEqual(profit.order_qty(monthly_sold=100, pack=4), 12)   # ロットの倍数へ
 
-    def test_other_unit_costs_flip_thin_margins(self):
-        """保管料・納品送料・梱包資材（実測206円/個）を引くと沈む棚を落とす。
+    def test_other_unit_costs_come_from_size_tier(self):
+        """🔴 2026-10-04: その他固定費は**一律206円ではなくサイズ区分別**。
 
-        2026-09-30、1個粗利72円・利益率2.1%の候補を GO として台帳に出しかけた。
-        `gross_per_unit` は成果物22・23 と同じ定義のまま、`net_per_unit` を別に持つ。
+        206円は 22cm土鍋 L001（標準区分7・体積6,728cm³）1点の実測を全商品に当てたもので、
+        小型雑貨（600cm³）の実額は 63円でした（成果物33）。
+        区分は Keepa の FBA配送代行手数料から逆引きします。
         """
-        e = profit.compute(sell=3492, fee_pct=15.4, fba_yen=500,
-                           unit_cost_incl=2328, qty=10, monthly_sold=None)
+        small = profit.compute(sell=1500, fee_pct=15.4, fba_yen=288,
+                               unit_cost_incl=400, qty=10, monthly_sold=None)
+        self.assertEqual(small.size_tier, "小型")
+        self.assertLess(small.other_unit_costs, 100)        # 63円前後
+        big = profit.compute(sell=5000, fee_pct=15.4, fba_yen=472,
+                             unit_cost_incl=400, qty=10, monthly_sold=None)
+        self.assertEqual(big.size_tier, "標準7")            # 鍋 L001 と同じ区分
+        self.assertGreater(big.other_unit_costs, 206)       # 旧206円より重い
+        self.assertLess(small.net_per_unit, small.gross_per_unit)
+
+    def test_tier_unknown_is_not_guessed(self):
+        """区分が決まらない行は**推測で埋めず** UNKNOWN（222〜1,756円まで動く）。"""
+        e = profit.compute(sell=1500, fee_pct=15.4, fba_yen=999,
+                           unit_cost_incl=400, qty=10, monthly_sold=None)
+        self.assertIsNone(e.size_tier)
+        self.assertEqual(e.grade, "UNKNOWN")
+        self.assertEqual(pipe.economics_status(e, None)[0], md.UNKNOWN)
+
+    def test_thin_margin_sinks_after_other_costs(self):
+        """粗利は黒字でも、区分別の固定費を引くと沈む棚は落とす（等級 C）。"""
+        e = profit.compute(sell=3492, fee_pct=15.4, fba_yen=472,
+                           unit_cost_incl=2200, qty=10, monthly_sold=None)
         self.assertGreater(e.gross_per_unit, 0)
-        self.assertEqual(e.other_unit_costs, 206)
-        self.assertLess(e.net_per_unit, e.gross_per_unit)
-        status, reason = pipe.economics_status(e, None)
-        self.assertEqual(status, md.FAIL)
-        self.assertIn("実質赤字", reason)
+        self.assertLess(e.net_per_unit, 0)
+        self.assertEqual(e.grade, "C")
+        self.assertEqual(pipe.economics_status(e, None)[0], md.FAIL)
 
     def test_healthy_margin_survives_other_costs(self):
         e = profit.compute(sell=2980, fee_pct=15.4, fba_yen=472,
                            unit_cost_incl=1012, qty=12, monthly_sold=10)
         self.assertEqual(e.gross_per_unit, 991)       # 台帳と同じ（定義は変えない）
-        self.assertEqual(e.net_per_unit, 785)
+        self.assertGreater(e.net_per_unit, 500)
         self.assertEqual(pipe.economics_status(e, 10)[0], md.PASS)
 
     def test_margin_never_flattered(self):
@@ -399,7 +418,10 @@ class TestSetCount(unittest.TestCase):
         e = profit.compute(sell=2980, fee_pct=15.4, fba_yen=472,
                            unit_cost_incl=unit, qty=12, monthly_sold=10)
         self.assertEqual(e.referral_fee_yen, 505)
-        self.assertEqual(e.net_per_unit, -227)
+        # 🔴 2026-10-04: その他固定費が 206円 → 標準7 の実額（約390円。消化1ヶ月ぶん）に
+        # 変わったので、赤字の額は深くなりました。**結論（赤字）は動きません。**
+        self.assertLess(e.net_per_unit, 0)
+        self.assertEqual(e.grade, "C")
         self.assertEqual(pipe.economics_status(e, 10)[0], md.FAIL)
 
         # 税抜のまま見てもやはり赤字（カズヨの ▲181円）。
@@ -509,42 +531,72 @@ class TestSupplyReality(unittest.TestCase):
         self.assertIn("45日", reason)
 
 
-class TestErrorBand(unittest.TestCase):
-    """手残りが誤差幅を下回る行は GO にしない（UNKNOWN）。"""
+class TestGrade(unittest.TestCase):
+    """🔴 2026-10-04: 誤差幅（売価7%＋200円）を撤去し、A/B/C 等級に置き換えました。
 
-    def _e(self, sell, cost, qty=10):
-        return profit.compute(sell=sell, fee_pct=15.4, fba_yen=472,
+    旧実装は「手残り < 売価×7% + 200円 なら UNKNOWN」としていました。これが
+    **社長が狙いたい低単価帯だけを狙い撃ちで落としていました**（売価500円では
+    誤差幅が売価の47%）。しかも誤差幅は**費用ではありません**。
+    いまは中央値と悲観値の2本を出し、**どれを人が確かめるか**を等級で決めます。
+    """
+
+    def _e(self, sell, cost, qty=10, fba=472):
+        return profit.compute(sell=sell, fee_pct=15.4, fba_yen=fba,
                               unit_cost_incl=cost, qty=qty, monthly_sold=10)
 
-    def test_band_applies_even_when_monthly_sold_unknown(self):
-        """月販が不明でも誤差幅は効く。**順番の間違いでゲートが空振りしていた**（9/30）。"""
+    def test_band_is_gone(self):
+        self.assertFalse(hasattr(pipe, "ERROR_BAND_PCT"))
+        self.assertFalse(hasattr(pipe, "ERROR_BAND_FIXED"))
+
+    def test_thin_margin_is_c_not_unknown(self):
+        """旧テストの「手残り28円」の行。区分別の固定費を引くと**赤字**で、C になる。
+
+        旧モデルは「黒字だが誤差幅未満」＝UNKNOWN と言っていました。実際は赤字です
+        （標準7 の固定費は206円ではなく約390円）。**嘘の黒字が消えたのが正しい向き。**
+        """
         e = self._e(2280, 1188)
-        self.assertEqual(pipe.economics_status(e, None)[0], md.UNKNOWN)
+        self.assertLess(e.net_per_unit, 0)
+        self.assertEqual(e.grade, "C")
+        self.assertEqual(pipe.economics_status(e, 10)[0], md.FAIL)
 
-    def test_thin_margin_is_unknown_not_go(self):
-        """手残り28円の候補を GO として出した（2026-09-30）。誤差幅が結論を超えている。"""
-        e = self._e(2280, 1188)                  # 手残り 28円・誤差幅 360円
-        self.assertEqual(e.net_per_unit, 28)
-        self.assertGreater(e.net_per_unit, 0)     # 赤字ではない。**読み切れていない**
-        status, reason = pipe.economics_status(e, 10)
-        self.assertEqual(status, md.UNKNOWN)
-        self.assertIn("誤差幅", reason)
+    def test_low_price_shelf_is_no_longer_killed_by_a_band(self):
+        """🔴 これが今回の本題。売価750円・原価220円の小型雑貨。
 
-    def test_error_band_scales_with_price(self):
-        """高額品は誤差幅も大きい（26,800円の売価で手残り355円は読み切れていない）。"""
-        # qty=3 にしてあるのは、2026-10-01 に入れた**予算のゲート**（1 SKU 8万円超は NO-GO）が
-        # 先に効いて、誤差幅のテストが空振りするのを避けるため。
-        # 誤差幅は「1個あたり」の話で、発注点数とは独立であることもここで固定している。
-        e = self._e(26800, 21000, qty=3)
-        self.assertLessEqual(e.order_total, pipe.MAX_ORDER_TOTAL_YEN)
-        band = round(26800 * pipe.ERROR_BAND_PCT / 100) + pipe.ERROR_BAND_FIXED
-        self.assertGreater(band, 1800)
+        旧モデル: 誤差幅 252円 >  手残り → UNKNOWN（低単価帯が全部これで消えていた）
+        新モデル: 中央 27%・悲観 18% → **等級 B（最小ロットで1回実測）＝落とさない**
+        """
+        e = profit.compute(sell=750, fee_pct=15.4, fba_yen=222,
+                           unit_cost_incl=220, qty=10, monthly_sold=10)
+        self.assertEqual(e.size_tier, "小型")
         self.assertGreater(e.net_per_unit, 0)
-        self.assertLess(e.net_per_unit, band)
+        self.assertIn(e.grade, ("A", "B"))          # どちらも「落とさない」側
+        self.assertEqual(pipe.economics_status(e, 10)[0], md.PASS)
+        # 旧の誤差幅は売価の33%以上だった（それを費用として足していた）
+        self.assertGreater(round(750 * 0.07) + 200, e.net_per_unit)
+
+    def test_grade_a_needs_pessimistic_to_clear_twenty_percent(self):
+        e = profit.compute(sell=1500, fee_pct=15.4, fba_yen=288,
+                           unit_cost_incl=396, qty=10, monthly_sold=10)
+        self.assertEqual(e.grade, "A")
+        self.assertGreaterEqual(e.worst_margin_pct, 20.0)
+
+    def test_unit_mismatch_is_truth_not_a_band(self):
+        """単位ずれは「幅」ではなく「真偽」。金額を膨らませず計算しない。"""
+        e = profit.compute(sell=1500, fee_pct=15.4, fba_yen=288,
+                           unit_cost_incl=396, qty=10, monthly_sold=10,
+                           unit_decided=False)
+        self.assertEqual(e.grade, "UNKNOWN")
         self.assertEqual(pipe.economics_status(e, 10)[0], md.UNKNOWN)
 
+    def test_dead_band_advice(self):
+        """売価が751〜900円 / 1,001〜1,100円なら「下げた方が手残りが増える」と言う。"""
+        e = profit.compute(sell=800, fee_pct=15.4, fba_yen=222,
+                           unit_cost_incl=220, qty=10, monthly_sold=10)
+        self.assertIn("750円に下げる", e.cliff_note)
+        self.assertIn("750円に下げる", pipe.economics_status(e, 10)[1])
+
     def test_healthy_margin_still_passes(self):
-        e = self._e(2980, 1012)                  # 手残り785円・誤差幅409円
+        e = self._e(2980, 1012)
         self.assertEqual(pipe.economics_status(e, 10)[0], md.PASS)
 
 

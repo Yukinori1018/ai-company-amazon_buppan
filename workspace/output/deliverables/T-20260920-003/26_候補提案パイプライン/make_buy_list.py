@@ -29,7 +29,11 @@ sys.path.insert(0, str(PIPE))
 import ledger_sheet  # noqa: E402  (同じフォルダ)
 
 TICKET = "T-20260920-003"
-OTHER_UNIT_COSTS = 206          # 保管料+納品送料+梱包資材（商品台帳 L001 実測）
+# 🔴 2026-10-04: ここにあった `OTHER_UNIT_COSTS = 206` は廃止しました（成果物33）。
+# 土鍋1点の実測を全商品に当てていた数字で、小型雑貨の実額は63円でした。
+# **この台帳ダンプにはサイズ区分が無いので、1個手残りはここで計算しません。**
+# 区分別の手残り・A/B/C 等級が要るときは `regrade.py` / `write_buy_list_v2.py` を使ってください
+# （Keepa 0トークンで引き直せます）。
 BUDGET_LEFT = 80_000            # テスト予算10万 − 消化19,756 ≒ 8万円
 C = {name: i for i, name in enumerate(ledger_sheet.COLUMNS)}
 
@@ -157,7 +161,8 @@ def load_rows():
             "order_total": int(total) if total is not None else "",
             "date": r[C["判定日"]],
             "gross": int(gross) if gross is not None else None,
-            "net": int(gross - OTHER_UNIT_COSTS) if gross is not None else None,
+            # サイズ区分が無いので手残りは出さない（206円を当てると嘘になる）
+            "net": None,
             "margin": r[C["利益率(%)"]],
             "months": r[C["売り切る月数"]],
             "gate": r[C["ゲート種別"]],

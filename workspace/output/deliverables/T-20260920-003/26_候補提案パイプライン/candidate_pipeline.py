@@ -33,6 +33,7 @@ sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(GUARD))
 
 import candidate_sources as sources          # noqa: E402
+import fba_cost                                # noqa: E402
 import ledger_sheet                          # noqa: E402
 import maker_direct                           # noqa: E402
 import profit                                 # noqa: E402
@@ -88,14 +89,21 @@ PERISHABLE_CATEGORY_WORDS = (
 ALIVE_RANK = 100_000       # これより上位なら「死んでいない」（月10個の実例が24,150位）
 DEAD_RANK = 500_000        # これより下位なら「直近3ヶ月の実績が実質ゼロ」
 
-# 手残りの誤差幅 = 売価 × ERROR_BAND_PCT + ERROR_BAND_FIXED。
-# **手残りがこれを下回る行は GO にしない**（UNKNOWN＝「読み切れていない」）。
-#   売価比 7% の内訳: BuyBox 価格の振れ ±5% ＋ 販売手数料の読みの差 1.4%（税抜/税込）＋ 端数
-#   固定 200円の内訳: 保管料・納品送料・梱包資材の 206円は**商品台帳 L001 の1点の観測**を
-#                     全商品に当てている。大型・重量物では数倍になるので、全額を誤差と見る
-# 2026-09-30、手残り28円の候補を GO として出した。**誤差幅が結論を超えているなら GO ではない。**
-ERROR_BAND_PCT = 7.0
-ERROR_BAND_FIXED = 200
+# 🔴 **誤差幅（売価7% + 200円）は 2026-10-04 に撤去しました（成果物33 §6）。**
+#
+# 旧実装は「手残り < 売価×7% + 200円 なら UNKNOWN」としていました。これが
+# **社長が狙いたい低単価帯だけを狙い撃ちで落としていました**。売価500円では誤差幅が
+# 売価の47%（235円）、800円でも32%。率と定額を足す形は、定額ぶんが単価の小さい側で暴れます。
+#
+# 代わりに `fba_cost.grade()` の **A / B / C / UNKNOWN** を使います。
+#   A … 中央でも悲観でも利益率20%以上 → 発注候補（PASS）
+#   B … 中央で黒字だが悲観で20%未満 → **最小ロットで1回だけ実測**（UNKNOWN。落とさない）
+#   C … 中央で赤字 → 落とす（FAIL）
+#   UNKNOWN … 原価・サイズ区分・セット数が確定していない → **計算しない**（UNKNOWN）
+#
+# 悲観の当て方（ハジメ定義）: サイズ区分を1段上／料率をカテゴリー最高段15.4%／
+# 保管月数を2倍／箱の入り数を7割。
+# **単位ずれは「幅」ではなく「真偽」です。**確定していない行は金額を膨らませず UNKNOWN。
 
 # ── 単位ずれの番兵（2026-10-01 カズヨが実画面で再発を見つけて新設）──────────
 # B0FNWB76NG（カップ麺 110g・18食入り）を「卸率5.2%・利益率75.5%・手残り+3,706円」と出した。
@@ -371,22 +379,28 @@ def economics_status(econ, monthly_sold, set_note: str = "") -> tuple[str, str]:
         return (FAIL,
                 f"1 SKU の発注額が {econ.order_total:,}円で、残枠 "
                 f"{MAX_ORDER_TOTAL_YEN:,}円を超えます（最小ロットを割れません）。")
+    # ⚠️ サイズ区分やセット数が決まっていない行は、**赤字と断定してはいけません**
+    # （Keepa の生の FBA 手数料で粗利が沈んで見えるだけのことがある）。
+    # だから「等級 UNKNOWN」の判定を粗利の符号より**先**に置きます。
+    if econ.grade == fba_cost.GRADE_UNKNOWN:
+        note = f"【等級 UNKNOWN】{econ.grade_reason}"
+        return (UNKNOWN, note)
     if econ.gross_per_unit <= 0:
         return (FAIL, f"1個粗利が {econ.gross_per_unit:,}円（赤字）です。")
-    if econ.net_per_unit <= 0:
-        # 販売手数料と FBA 配送代行だけでは黒字に見えても、保管料・納品送料・梱包資材
-        # （実測206円/個）を引くと沈む棚。**社長は「利益が少なくても量で」と言っていますが、
+    # ── 等級（A/B/C/UNKNOWN）。旧「誤差幅」の置き換え（成果物33 §6.2）。
+    grade_note = f"【等級 {econ.grade}】{econ.grade_reason}"
+    if econ.cliff_note:
+        grade_note += f" {econ.cliff_note}"
+    if econ.grade == fba_cost.GRADE_UNKNOWN:
+        return (UNKNOWN, grade_note)
+    if econ.grade == fba_cost.GRADE_C:
+        # 中央値で赤字。**社長は「利益が少なくても量で」と言っていますが、
         # マイナスは量を増やすほど損が増えます。**
-        return (FAIL,
-                f"1個粗利 {econ.gross_per_unit:,}円から保管料・納品送料・梱包資材 "
-                f"{econ.other_unit_costs}円を引くと手残り {econ.net_per_unit:,}円（実質赤字）です。")
-    band = int(round(econ.sell * ERROR_BAND_PCT / 100)) + ERROR_BAND_FIXED
-    if econ.net_per_unit < band:
-        # 「読み切れていない」ので NO-GO ではなく UNKNOWN。人が実額で詰めれば GO になりえます。
-        return (UNKNOWN,
-                f"手残り {econ.net_per_unit:,}円が誤差幅 {band:,}円"
-                f"（売価の{ERROR_BAND_PCT:.0f}%＋{ERROR_BAND_FIXED}円）を下回ります。"
-                "価格の振れ・手数料の読み・大型品の送料で結論が反転しうるので GO にしません。")
+        return (FAIL, grade_note)
+    # 🔴 **B は落としません。**「中央で黒字・悲観で20%未満」＝**最小ロットで1回だけ実測する**
+    # 候補です（社長は小さく試したい）。採算ゲートとしては PASS にし、**どれだけ買うかの
+    # 違いは等級の列**で出します。「計算できなかった UNKNOWN」と混ぜると、
+    # 次に何をすればよいのかが消えます。等級は `判定理由` の先頭に【等級 X】で入ります。
 
     if not monthly_sold:
         # ⚠️ **月販が取れないことを理由に落とさない。**（2026-09-30 カズヨ訂正 / CLAUDE.md §3.1）
@@ -396,9 +410,9 @@ def economics_status(econ, monthly_sold, set_note: str = "") -> tuple[str, str]:
         # （社長が発注を決めた B0DJNX12KZ はキーゾン実測で月10個）。
         # 列には出す。しかしそれだけでは GO を止めない。
         return (PASS,
-                f"1個粗利 {econ.gross_per_unit:,}円・利益率 {econ.margin_pct}%"
-                f"（保管/納品/梱包 {econ.other_unit_costs}円を引いた手残り "
-                f"{econ.net_per_unit:,}円・{econ.net_margin_pct}%）。"
+                f"{grade_note} 1個粗利 {econ.gross_per_unit:,}円・利益率 {econ.margin_pct}%"
+                f"（サイズ区分 {econ.size_tier}・その他固定費 {econ.other_unit_costs}円を"
+                f"引いた手残り {econ.net_per_unit:,}円・{econ.net_margin_pct}%）。"
                 "月販は Keepa 非表示（月50個未満）で回転は未確認ですが、"
                 "これだけでは落としません（キーゾンで実数を確認してください）。")
     if econ.months_to_sell and econ.months_to_sell > MAX_MONTHS_TO_SELL:
@@ -408,9 +422,9 @@ def economics_status(econ, monthly_sold, set_note: str = "") -> tuple[str, str]:
                 f"売り切るのに約{econ.months_to_sell}ヶ月かかります"
                 f"（上限{MAX_MONTHS_TO_SELL:.0f}ヶ月・最小ロットが大きすぎる）。")
     return (PASS,
-            f"1個粗利 {econ.gross_per_unit:,}円・利益率 {econ.margin_pct}%"
-            f"（保管/納品/梱包 {econ.other_unit_costs}円を引いた手残り "
-            f"{econ.net_per_unit:,}円・{econ.net_margin_pct}%）・"
+            f"{grade_note} 1個粗利 {econ.gross_per_unit:,}円・利益率 {econ.margin_pct}%"
+            f"（サイズ区分 {econ.size_tier}・その他固定費 {econ.other_unit_costs}円を"
+            f"引いた手残り {econ.net_per_unit:,}円・{econ.net_margin_pct}%）・"
             f"約{econ.months_to_sell}ヶ月で売り切る見込み。")
 
 

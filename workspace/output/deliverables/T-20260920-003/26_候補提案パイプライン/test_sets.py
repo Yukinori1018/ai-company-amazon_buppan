@@ -4,7 +4,7 @@
 固定したいのは次の4つです。
 1. JAN 1本に対して**セット品 ASIN を全部拾う**（`_pick_best` に戻らない）
 2. セット数は**商品名 × packageQuantity の2本**で決め、食い違ったら UNKNOWN（大きい方で計算）
-3. 必要売価は **(821 + 1.1×卸値×n) ÷ 0.8376**。n を増やすと1点あたりが下がる
+3. 必要売価は **区分別の実費だけ**で解く（2026-10-04 に「固定費821円」を撤去）
 4. 取引条件の表が**読めない**ことを「載っていない」と混ぜない
 
 実データは 2026-10-01 に Keepa から取った旭化成 ズビズバ あみたわし（JAN 4901670106107）の
@@ -103,18 +103,26 @@ eq(sf.resolve("×200個セット", 200, -1).n, 200,
 eq(sf.resolve("あみたわし", 99999, -1).confidence, sf.SINGLE,
    "pq が上限超なら読まない（商品名だけが残る）")
 
-print("\n3. 必要売価 =（821 + 1.1×卸値×n）÷ 0.8376")
-eq(round(sf.required_sell(178, 1)), 1214, "卸178円の単品は売価1,214円ないと駄目（カズヨの実計算と一致）")
+print("\n3. 必要売価（区分別の実費だけ。誤差幅は入れない）")
+# 🔴 旧テストは「卸178円の単品は売価1,214円ないと駄目」を固定していました。
+# **その1,214円が間違い**でした（固定費821円の内訳のうち470円が架空・成果物33）。
+# 正しい損益分岐は約514円です。**単品でも成立します。**
+eq(round(sf.required_sell(178, 1)), 514, "卸178円の単品の損益分岐は約514円（旧1,214円）")
 t = dict((n, (s, per)) for n, s, per in sf.required_sell_table(178))
-eq(t[10][0], 3318, "×10点セットなら3,318円")
-eq(t[10][1], 332, "1点あたりに直すと332円（単品の1,214円から下がる）")
 check(t[1][1] > t[2][1] > t[5][1] > t[10][1] > t[20][1],
-      "n を増やすほど1点あたりの必要売価は単調に下がる（固定費821円を n で割る）")
-eq(sf.min_profitable_set_count(178, 300), 15, "1点300円で売れる棚なら15点セットから黒字")
+      "n を増やすと1点あたりは下がる（ただし下がるのは FBA配送代行と外注費のぶんだけ）")
+check(t[10][0] < 1214 * 10,
+      "まとめ売りの必要売価も旧モデルより安い（固定費821円が誤りだったので全体が下がる）")
+eq(sf.min_profitable_set_count(178, 300), 12, "1点300円で売れる棚なら12点セットから黒字")
 eq(sf.min_profitable_set_count(178, 50), None, "1点50円では何点まとめても黒字にならない")
-eq(sf.required_sell(178, 1, fee_pct=15.0, fba_yen=781),
-   sf.required_sell(178, 1, fee_pct=15.0, fba_yen=781), "実額を渡せる（既定値に固定しない）")
-check(sf.required_sell(178, 1, fee_pct=85.0) is None, "分母が0以下なら None（0除算で嘘を出さない）")
+# 実額を渡す口は「カテゴリー」と「Keepa の実測率」に変わりました（FBA は区分から引く）。
+eq(sf.required_sell(178, 1, category="エレクトロニクス"),
+   sf.required_sell(178, 1, category="エレクトロニクス"), "カテゴリーを渡せる（既定に固定しない）")
+check(sf.required_sell(178, 1, category="ホーム&キッチン")
+      >= sf.required_sell(178, 1, category="エレクトロニクス"),
+      "料率が高いカテゴリーほど必要売価が高い（15.4% ≥ 8.4%）")
+check(sf.required_sell(178, 1, tier="標準7") > sf.required_sell(178, 1, tier="小型"),
+      "大きい区分ほど必要売価が高い（固定費は区分で決まる）")
 
 print("\n4. 卸の口を選ぶ")
 mouths = [sf.Mouth("S1", 1, 178, "1点"), sf.Mouth("S2", 10, 160, "×10点"),
@@ -174,18 +182,21 @@ eq(got["A5"], 334, "割り切れないときは**切り上げ**（原価を安�
 check(any("価格の単位" in n for n in next(r for r in rows if r.sd_code == "A3").notes),
       "取り込まなかった理由が notes に残る（黙って空にしない）")
 
-print("\n7. 単品では黒字にならないことを、この家族で確かめる")
+print("\n7. この家族の各口が必要売価に届くかを確かめる")
 # 卸178円/点（税抜）と仮定。実在する口の売価と必要売価を突き合わせる。
+# 🔴 旧テストの見出しは「単品では黒字にならないことを確かめる」でした。
+# **その前提は取り下げました。**単品の損益分岐は514円で、売価330円の口が届かないのは
+# 「単品だから」ではなく「330円では固定費（FBA222円＋その他63円）を割れないから」です。
 for m in members:
     if not m.sell or m.set_count.n is None:
         continue
-    need = sf.required_sell(178, m.set_count.n, fee_pct=m.fee_pct or sf.DEFAULT_FEE_PCT,
-                            fba_yen=m.fba_yen or sf.DEFAULT_FBA_YEN)
+    need = sf.required_sell(178, m.set_count.n, keepa_pct=m.fee_pct)
     print(f"  {m.asin} n={m.set_count.n:>3} 売価{m.sell:>6,}円 / 必要{int(need):>6,}円 "
           f"→ {'黒字' if m.sell >= need else '届かない'}")
 single = next(m for m in members if m.asin == "B0052T0CE8")
-need1 = sf.required_sell(178, 1, fee_pct=single.fee_pct, fba_yen=single.fba_yen)
-check(single.sell < need1, "単品（売価330円）は必要売価に届かない＝構造的に赤字")
+need1 = sf.required_sell(178, 1, keepa_pct=single.fee_pct)
+check(single.sell < need1, "売価330円の単品は必要売価（約514円）に届かない")
+check(need1 < 1214, "ただし必要売価は旧モデルの1,214円ではない（470円が架空だった）")
 
 print(f"\n{ok} passed, {fail} failed")
 raise SystemExit(1 if fail else 0)

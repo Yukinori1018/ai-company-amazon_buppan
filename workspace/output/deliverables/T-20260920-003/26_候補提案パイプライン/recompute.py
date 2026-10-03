@@ -37,6 +37,7 @@ import candidate_pipeline as CP            # noqa: E402
 import candidate_sources as sources        # noqa: E402
 import json                                # noqa: E402
 import ledger_sheet                        # noqa: E402
+import fba_cost
 import profit                              # noqa: E402
 import set_count                           # noqa: E402
 from verdict import FAIL, GO, NO_GO, PASS, UNKNOWN  # noqa: E402
@@ -93,19 +94,24 @@ def recompute_one(cand: dict, row: list) -> tuple[list, str] | None:
         cost_new = wholesale * mult
         qty = profit.order_qty(ms, set_count.order_lot_in_amazon_units(pack, mult))
         gross_new = int(round(sell - fees - cost_new))
-        other = profit.OTHER_UNIT_COSTS_YEN
+        # 🔴 2026-10-04: その他固定費は一律206円ではなく**サイズ区分別**（成果物33）。
+        # ここは台帳から「販売手数料＋FBA」を合算で復元しているのでサイズ区分が分かりません。
+        # **推測で埋めず、`fba_cost.grade()` に区分 None を渡して UNKNOWN にします**
+        # （区分で 222円〜1,756円まで動くため）。区分が要るなら `regrade.py` を使ってください。
+        g = fba_cost.grade(sell, cost_new, None)
         econ = profit.Economics(
             sell=int(round(sell)), unit_cost_incl=int(round(cost_new)),
             referral_fee_yen=int(round(fees)), fba_yen=0,
             gross_per_unit=gross_new,
             margin_pct=round(gross_new / sell * 100, 1),
-            other_unit_costs=other, net_per_unit=gross_new - other,
-            net_margin_pct=round((gross_new - other) / sell * 100, 1),
+            other_unit_costs=0, net_per_unit=gross_new,
+            net_margin_pct=round(gross_new / sell * 100, 1),
             qty=qty, order_total=int(round(cost_new)) * qty,
             months_to_sell=round(qty / ms, 1) if ms else None,
             half_disposal_loss=int(round(cost_new)) * qty
             - max(0, int(round(sell / 2 * 0.9 - 500))) * qty,
             cost_ratio_pct=round(cost_new / sell * 100, 1),
+            size_tier=None, grade=g.grade, grade_reason=g.reason,
         )
 
     econ_status, econ_reason = CP.economics_status(econ, ms, set_note)

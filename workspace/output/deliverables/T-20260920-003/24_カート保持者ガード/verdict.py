@@ -5,6 +5,21 @@
 だけで、ネットワークにも環境変数にも触りません。だから test_verdict.py で全分岐をテストできます。
 外部 API の差し替え（SP-API など）は keepa_client.py 側だけを書き換えれば済みます。
 
+🔴 2026-10-04 の修正 — **落とすのは「カートを本体が持っている」行だけ**
+--------------------------------------------------------------------
+CLAUDE.md §3.3-1 の規定は「**カート保持者が `Amazon.co.jp` なら発注しない**」です。
+ところが実装は **チェック2（本体の在庫履歴）とチェック3（出品一覧に本体が混ざる）でも
+FAIL を出していました**。規定より粒度が粗く、「本体が出品している」だけで落としていました。
+
+実測（N=648・2026-10-04）: **本体あり373件のうち 295件（79%）は、カートを第三者が
+持っていました。**本体が在庫を持っていることと、本体がカートを取っていることは別です。
+
+以後：
+- **チェック1（カート保持者）だけが FAIL を出します。**
+- **チェック2・3 は補助情報**（`status=PASS`＋注記）に格下げしました。数字は消しません
+  （`evidence` にそのまま入れ、報告の列にも出す）。**隠すのではなく、落とさないだけ**です。
+- 「カート保持者が決まらない」は**今も UNKNOWN**（fail-closed）。ここは緩めません。
+
 設計の芯（2026-09-30 の事故から）
 --------------------------------
 商品ページの `#merchant-info` という **1つの要素だけ**を読んで「販売元＝第三者」と判定し、
@@ -48,16 +63,18 @@ UNKNOWN = "UNKNOWN"
 GO = "GO"
 NO_GO = "NO-GO"
 
-# Amazon 本体の年間在庫率がこの%を超えたら FAIL。
-# 0 より大きく閾値以下なら「警告つき PASS」。棚卸し・短期の直販テストで
-# 数日だけ本体が出ることはあり、それで全件 NO-GO にすると使い物にならないため。
-AMAZON_INSTOCK_FAIL_PCT = 2.0
+# 本体の在庫率の「注意」ライン。**FAIL ではありません**（2026-10-04 に格下げ）。
+# 在庫を持っていることと、カートを取っていることは別です。
+AMAZON_INSTOCK_WARN_PCT = 2.0
+AMAZON_INSTOCK_90D_WARN_PCT = 1.0
 
-# 直近90日に本体の在庫が1%でもあれば FAIL（現役で本体が動いている棚）。
-AMAZON_INSTOCK_90D_FAIL_PCT = 1.0
-
-# buyBoxStats に本体が居て、この%以上カートを取っていたら FAIL。
-AMAZON_BUYBOX_WON_FAIL_PCT = 1.0
+# buyBoxStats で本体が統計期間中にカートを取っていた割合。
+#   `FAIL` … 本体が期間の過半でカートを持っている＝実質「本体の棚」
+#   `WARN` … 出入りはしているが過半ではない（第三者が主にカートを持っている）
+# 旧実装は 1% で FAIL にしていました。実測では 1.7〜2.7% の行が多数あり、
+# それらは**第三者が98%以上カートを持っている棚**です（§3.3-1 の対象ではない）。
+AMAZON_BUYBOX_WON_FAIL_PCT = 50.0
+AMAZON_BUYBOX_WON_WARN_PCT = 1.0
 
 
 @dataclass
@@ -181,8 +198,9 @@ def check_cart_holder(product: dict) -> tuple[Check, str]:
 
     if amazon_won is not None and amazon_won >= AMAZON_BUYBOX_WON_FAIL_PCT:
         return (Check(1, "カートの販売元", FAIL,
-                      f"いまは第三者ですが、統計期間中に本体がカートを {amazon_won:.1f}% 取っています。",
-                      evidence), "第三者（ただし本体が出入りしている）")
+                      f"統計期間中に本体がカートを {amazon_won:.1f}% 取っています"
+                      f"（過半＝実質『本体の棚』）。",
+                      evidence), "Amazon.co.jp（期間の過半でカート保持）")
 
     if len(known) < 2:
         return (Check(1, "カートの販売元", UNKNOWN,
@@ -195,18 +213,31 @@ def check_cart_holder(product: dict) -> tuple[Check, str]:
                       evidence), "不明（根拠が食い違い）")
 
     warn = ""
-    if amazon_won is not None:
+    holder = f"第三者セラー（{bb_seller}）"
+    if amazon_won is not None and amazon_won >= AMAZON_BUYBOX_WON_WARN_PCT:
+        warn = (f"（⚠️ 本体が統計期間中に {amazon_won:.1f}% だけカートを取っています。"
+                f"過半ではないので落としませんが、実画面で見てください）")
+        holder = f"第三者セラー（{bb_seller}）／本体の期間カート獲得 {amazon_won:.1f}%"
+    elif amazon_won is not None:
         warn = f"（本体の期間カート獲得 {amazon_won:.1f}%）"
     return (Check(1, "カートの販売元", PASS,
                   f"根拠 {len(known)} 本が一致して第三者です{warn}。",
-                  evidence), f"第三者セラー（{bb_seller}）")
+                  evidence), holder)
 
 
 # --- チェック2: Amazon 本体の在庫履歴 ---------------------------------------
 
 
 def check_amazon_stock_history(product: dict) -> Check:
-    """`outOfStockPercentage365` で本体の在庫履歴を見る。90日も突き合わせる。"""
+    """`outOfStockPercentage365` で本体の在庫履歴を見る。90日も突き合わせる。
+
+    🔴 **2026-10-04 に「補助情報」へ格下げしました。このチェックは FAIL を出しません。**
+    本体が在庫を持っていることと、本体がカートを取っていることは別です
+    （実測：本体あり373件のうち295件＝79%はカートを第三者が持っていた）。
+    落とす判断はチェック1（カート保持者）だけが持ちます。
+    数字は `evidence` と `reason` に残すので、報告の列・社長の実画面確認に使ってください。
+    取得できなかった場合だけ UNKNOWN（＝「調べきれていない」を GO に畳まない）。
+    """
     st = _stats(product)
     oos365 = _at(st.get("outOfStockPercentage365"), IDX_AMAZON)
     oos90 = _at(st.get("outOfStockPercentage90"), IDX_AMAZON)
@@ -215,7 +246,7 @@ def check_amazon_stock_history(product: dict) -> Check:
                 "outOfStockPercentage90[AMAZON]": oos90}
 
     if oos365 is None:
-        return Check(2, "本体の在庫履歴", UNKNOWN,
+        return Check(2, "本体の在庫履歴（補助情報）", UNKNOWN,
                      "365日の在庫切れ率が取得できませんでした（stats=365 を付けて再取得）。",
                      evidence)
 
@@ -224,22 +255,27 @@ def check_amazon_stock_history(product: dict) -> Check:
     evidence["amazon_instock_365_pct"] = round(instock365, 2)
     evidence["amazon_instock_90_pct"] = None if instock90 is None else round(instock90, 2)
 
-    if instock365 > AMAZON_INSTOCK_FAIL_PCT:
-        return Check(2, "本体の在庫履歴", FAIL,
-                     f"本体が直近1年の {instock365:.1f}% の期間で在庫を持っています。",
+    # ↓ ここは全部 PASS（補助情報）。**落とすのはチェック1だけ**。
+    if instock365 > AMAZON_INSTOCK_WARN_PCT:
+        return Check(2, "本体の在庫履歴（補助情報）", PASS,
+                     f"⚠️ 本体が直近1年の {instock365:.1f}% の期間で在庫を持っています"
+                     f"（90日は{'未取得' if instock90 is None else f'{instock90:.1f}%'}）。"
+                     "**在庫を持つことと、カートを取ることは別です。**"
+                     "ここでは落としません。カート保持者はチェック1を見てください。",
                      evidence)
 
-    if instock90 is not None and instock90 > AMAZON_INSTOCK_90D_FAIL_PCT:
-        return Check(2, "本体の在庫履歴", FAIL,
-                     f"直近90日に本体の在庫があります（{instock90:.1f}%）。現役の本体棚です。",
+    if instock90 is not None and instock90 > AMAZON_INSTOCK_90D_WARN_PCT:
+        return Check(2, "本体の在庫履歴（補助情報）", PASS,
+                     f"⚠️ 直近90日に本体の在庫があります（{instock90:.1f}%）。"
+                     "カートを誰が持っているかはチェック1で判定します。",
                      evidence)
 
     if instock365 > 0:
-        return Check(2, "本体の在庫履歴", PASS,
-                     f"本体はほぼ不在ですが、1年で {instock365:.1f}% だけ在庫がありました（要注意）。",
+        return Check(2, "本体の在庫履歴（補助情報）", PASS,
+                     f"本体はほぼ不在ですが、1年で {instock365:.1f}% だけ在庫がありました。",
                      evidence)
 
-    return Check(2, "本体の在庫履歴", PASS,
+    return Check(2, "本体の在庫履歴（補助情報）", PASS,
                  "本体は直近1年ずっと在庫なしです。", evidence)
 
 
@@ -250,7 +286,13 @@ def check_offer_listing(product: dict, offers_requested: int) -> Check:
     """ライブの新品オファーを数え、本体が混ざっていないかの内訳を出す。
 
     `offers_requested` は API に投げた offers パラメータ（返る上限）。
-    上限に張り付いていたら一覧は打ち切られており、「本体が居ない」と言い切れない。
+
+    🔴 **2026-10-04 に「補助情報」へ格下げしました。このチェックは FAIL を出しません。**
+    旧実装は「ライブの新品オファーに本体が混ざっている」だけで FAIL にしていましたが、
+    §3.3-1 が禁じているのは「**本体がカートを持つ棚に発注すること**」です。
+    本体が1本出品していてもカートを第三者が持っているなら、その棚は取れます。
+    一覧の打ち切りも、カート保持者の判定には影響しません（打ち切りは**セラー数の精度**の話）。
+    だから打ち切り時は「セラー数は下限値」と注記して PASS にします。
     """
     st = _stats(product)
     count_new = _at(st.get("current"), IDX_COUNT_NEW)
@@ -259,7 +301,7 @@ def check_offer_listing(product: dict, offers_requested: int) -> Check:
     evidence = {"stats.current[COUNT_NEW]": count_new, "offers_requested": offers_requested}
 
     if live is None:
-        return Check(3, "出品一覧の実数", UNKNOWN,
+        return Check(3, "出品一覧の実数（補助情報）", UNKNOWN,
                      "オファー一覧が取得できませんでした（offers パラメータを付けて再取得）。",
                      evidence)
 
@@ -276,25 +318,24 @@ def check_offer_listing(product: dict, offers_requested: int) -> Check:
         "fbm_offers": len(live) - fba,
     })
 
-    if amazon_ids or amazon_flagged:
-        return Check(3, "出品一覧の実数", FAIL,
-                     f"ライブの新品オファー {len(live)} 本に Amazon 本体が混ざっています。",
-                     evidence)
-
-    # 一覧が打ち切られていないか。上限ちょうどは「もっとある」可能性が高い。
+    truncated = ""
     if count_new is not None and count_new > offers_requested:
-        return Check(3, "出品一覧の実数", UNKNOWN,
-                     f"新品オファー {count_new} 本に対し {offers_requested} 本しか取得していません。"
-                     "一覧が打ち切られており、本体不在と言い切れません。",
-                     evidence)
-    if len(live) >= offers_requested:
-        return Check(3, "出品一覧の実数", UNKNOWN,
-                     f"取得上限 {offers_requested} 本に張り付いています。一覧が打ち切られている可能性。",
-                     evidence)
+        truncated = (f" ⚠️ 新品オファー {count_new} 本に対し {offers_requested} 本しか"
+                     f"取得していません（**セラー数は下限値**）。")
+    elif len(live) >= offers_requested:
+        truncated = (f" ⚠️ 取得上限 {offers_requested} 本に張り付いています"
+                     f"（**セラー数は下限値**）。")
 
-    return Check(3, "出品一覧の実数", PASS,
+    if amazon_ids or amazon_flagged:
+        return Check(3, "出品一覧の実数（補助情報）", PASS,
+                     f"⚠️ ライブの新品オファー {len(live)} 本（出品者 {len(seller_ids)}）に "
+                     "Amazon 本体が混ざっています。**カートを持っているかはチェック1が判定します。**"
+                     "本体が出品しているだけでは落としません（実測で79%はカートが第三者）。"
+                     + truncated, evidence)
+
+    return Check(3, "出品一覧の実数（補助情報）", PASS,
                  f"ライブの新品オファー {len(live)} 本（出品者 {len(seller_ids)} / "
-                 f"FBA {fba}・自己発送 {len(live) - fba}）。本体は含まれません。",
+                 f"FBA {fba}・自己発送 {len(live) - fba}）。本体は含まれません。" + truncated,
                  evidence)
 
 
@@ -308,6 +349,9 @@ def judge(product: dict, offers_requested: int = 20) -> Judgment:
       - 1つでも FAIL があれば **NO-GO**（調べた結果、駄目だと分かった）
       - FAIL は無いが UNKNOWN があれば **UNKNOWN**（調べきれていない。GO ではない）
       - 3点すべて PASS で初めて **GO**
+
+    🔴 2026-10-04 以降、**FAIL を出すのはチェック1（カート保持者）だけ**です。
+    チェック2・3 は補助情報で、取得できなかったときだけ UNKNOWN を出します。
     """
     c1, cart_holder = check_cart_holder(product)
     c2 = check_amazon_stock_history(product)

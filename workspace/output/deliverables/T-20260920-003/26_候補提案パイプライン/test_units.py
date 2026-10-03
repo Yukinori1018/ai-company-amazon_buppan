@@ -98,13 +98,21 @@ check("卸率10%は UNKNOWN", CP.economics_status(high, 50)[0], UNKNOWN)
 # まともな行は通す（番兵が母数を削らないこと）。
 # 卸率45%・利益率30%・手残り1,347円（誤差幅 550円を十分に超える）。
 ok = profit.compute(5000, 15.0, 430, 2250, 10, monthly_sold=60)
-check("卸率45%・利益率30%は PASS", CP.economics_status(ok, 60)[0], PASS)
-check("  手残りが誤差幅を超えている", ok.net_per_unit > int(ok.sell * 0.07) + 200, True)
+check("卸率45%の行は番兵に引っかからない", CP.economics_status(ok, 60)[0], PASS)
+# 🔴 2026-10-04: 旧テストはここで「手残りが誤差幅（売価7%+200円）を超えている」ことを
+# 確かめていました。**誤差幅は撤去**したので、代わりに等級が候補側（A か B）であることを
+# 確かめます。等級 B は「最小ロットで1回だけ実測する」＝落とさない候補です。
+check("  等級は A か B（落とさない）", ok.grade in ("A", "B"), True)
+check("  理由に等級が入る", "【等級" in CP.economics_status(ok, 60)[1], True)
 # 番兵の境界。利益率50.0%ちょうどは通す（超えたら落とす）。
-edge = profit.compute(5000, 15.0, 430, 1245, 10, monthly_sold=60)
+# 原価は**モデルから逆算**します（販売手数料の率を直すと必要原価が動くので、
+# マジックナンバーで固定すると毎回ずれます）。
+_fee = profit.fba_cost.referral_yen(5000, None, 15.0)
+_edge_cost = 5000 - _fee - 430 - int(5000 * CP.MAX_PLAUSIBLE_MARGIN_PCT / 100)
+edge = profit.compute(5000, 15.0, 430, _edge_cost, 10, monthly_sold=60)
 check("  境界: 利益率50.0%ちょうど", edge.margin_pct, 50.0)
 check("  境界は UNKNOWN でない", CP.economics_status(edge, 60)[0] != UNKNOWN, True)
-over = profit.compute(5000, 15.0, 430, 1200, 10, monthly_sold=60)
+over = profit.compute(5000, 15.0, 430, _edge_cost - 50, 10, monthly_sold=60)
 check("  50%超は UNKNOWN", CP.economics_status(over, 60)[0], UNKNOWN)
 
 # 2つの番兵は独立ではない。**卸率が低ければ利益率は必ず高くなる**（同じ式の裏表）。

@@ -13,7 +13,9 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+
+import fba_cost
 
 # 消費税。販売手数料（税抜表示）と仕入れ（税抜）の両方に効く。
 TAX = 1.1
@@ -26,12 +28,18 @@ HALF_DISPOSAL_SHIPPING_YEN = 500
 # 出品許可申請の書類要件（納品書10点以上）。発注点数の下限に使う。
 MIN_QTY_FOR_UNGATING = 10
 
-# 販売手数料・FBA配送代行のほかに1個あたりかかる費用（円）。
-# 商品台帳 L001（2026-09-29 実測）の内訳: FBA保管料 87 + 納品送料 64 + 梱包資材 55 = 206。
-# 成果物22・23 の「1個粗利」はこれを**含んでいません**。利益率30%の商品では誤差ですが、
-# 利益率2%の商品では符号が変わります（粗利72円の候補を GO に出しかけました）。
-# だから `gross_per_unit`（22・23 と同じ定義）とは別に `net_per_unit` を持ちます。
-OTHER_UNIT_COSTS_YEN = 206
+# 🔴 **旧 `OTHER_UNIT_COSTS_YEN = 206` は廃止しました（2026-10-04 / 成果物33）。**
+#
+# 206円は 22cm土鍋 L001（体積 6,728cm³・FBA標準区分7）1点の実測を**全商品に当てた**
+# ものでした。小型雑貨（600cm³）の実額は **63円**で、3.3倍の過大計上です。内訳の誤り：
+#   保管料   87円 → 小型 **5.1円**（体積比例。土鍋の26〜58倍だった）
+#   納品送料 64円 → 1箱30個で **20.3円**（箱あたりの費用を按分していなかった）
+#   梱包資材 55円 → 1箱30個で **12.8円**（同じ）
+# さらに外注費25円が旧モデルには入っていませんでした。
+#
+# 以後、FBA配送代行以外の固定費は **サイズ区分から `fba_cost.other_costs()` で引きます。**
+# サイズ区分は Keepa の `fbaFees.pickAndPackFee` から逆引きできます（`fba_cost.tier_from_fba_fee`）。
+# **区分が決まらないときは推測で埋めず UNKNOWN にしてください**（222円〜1,756円まで動きます）。
 
 
 @dataclass
@@ -42,7 +50,7 @@ class Economics:
     fba_yen: int                   # FBA 配送代行手数料（円）
     gross_per_unit: int            # 1個粗利（成果物22・23 と同じ定義。保管/納品/梱包を含まない）
     margin_pct: float              # 利益率（売価比）
-    other_unit_costs: int          # 保管料+納品送料+梱包資材（実測206円/個）
+    other_unit_costs: int          # 保管料+納品送料+梱包資材+外注（**サイズ区分別**）
     net_per_unit: int              # 1個あたりの手残り（gross - other_unit_costs）
     net_margin_pct: float          # 手残りの率
     qty: int                       # 発注点数
@@ -50,6 +58,14 @@ class Economics:
     months_to_sell: float | None   # 売り切る月数（月販から）
     half_disposal_loss: int        # 半値処分したときの損失（円）
     cost_ratio_pct: float          # 卸率（売価比）
+    # ── ここから下は 2026-10-04 に追加（原価モデル v2）────────────────────
+    size_tier: str | None = None   # FBA サイズ区分。None なら**決まっていない**（推測しない）
+    other_breakdown: dict = field(default_factory=dict)  # その他固定費の内訳
+    grade: str = fba_cost.GRADE_UNKNOWN                  # A / B / C / UNKNOWN
+    grade_reason: str = ""                               # 等級の根拠（中央値と悲観値）
+    worst_net_per_unit: int | None = None                # 悲観シナリオの手残り
+    worst_margin_pct: float | None = None                # 悲観シナリオの利益率
+    cliff_note: str = ""                                 # 750円 / 1,000円 の崖の助言
 
     def as_dict(self) -> dict:
         return self.__dict__.copy()
@@ -99,12 +115,28 @@ def order_qty(monthly_sold: int | None, pack: int = 1,
 def compute(sell: float, fee_pct: float, fba_yen: float,
             unit_cost_incl: float, qty: int,
             monthly_sold: int | None = None,
-            other_unit_costs: int = OTHER_UNIT_COSTS_YEN) -> Economics:
-    """1 SKU ぶんの採算。すべて円・整数に丸めて返す（報告と同じ粒度）。"""
+            size_tier: str | None = None,
+            category: str | None = None,
+            unit_decided: bool = True,
+            peak: bool = False, apparel: bool = False) -> Economics:
+    """1 SKU ぶんの採算。すべて円・整数に丸めて返す（報告と同じ粒度）。
+
+    2026-10-04 に変わったところ（成果物33 / 34）
+    --------------------------------------------
+    1. **その他固定費は固定206円ではなく、サイズ区分から引く**（小型63円〜標準8 739円）。
+       `size_tier` を渡さなければ **Keepa の FBA配送代行手数料から逆引き**します。
+       逆引きできなければ `size_tier=None` のままで、等級は UNKNOWN になります。
+    2. **販売手数料は750円の崖を効かせる**（売上の合計が750円以下なら一律5%・最低30円税抜）。
+       `fee_pct`（Keepa の丸めた率）は公式の段へ**切り上げ**て使います。
+    3. **誤差幅（売価7%＋200円）は撤去**し、`grade`（A/B/C/UNKNOWN）に置き換えました。
+    """
     sell_i = int(round(sell))
     cost_i = int(round(unit_cost_incl))
-    fee_i = referral_fee_yen(sell_i, fee_pct)
-    fba_i = int(round(fba_yen))
+    tier = size_tier or fba_cost.tier_from_fba_fee(int(fba_yen or 0) or None, sell_i)
+    # 販売手数料は 750円の崖つきで引き直す（Keepa の率は「切り上げの手がかり」として渡す）。
+    fee_i = fba_cost.referral_yen(sell_i, category, fee_pct)
+    # FBA配送代行は区分が判ればそちらを使う（売価1,000円以下の安い列が効く）。
+    fba_i = fba_cost.fba_fee_yen(tier, sell_i) if tier else int(round(fba_yen))
     gross = sell_i - fee_i - fba_i - cost_i
     order_total = cost_i * qty
 
@@ -119,8 +151,16 @@ def compute(sell: float, fee_pct: float, fba_yen: float,
     )
     half_loss = order_total - half_net_per_unit * qty
 
-    other = int(round(other_unit_costs))
+    # 消化月数は保管料の計上月数（＝消化月数÷2）に効く。読めなければ3ヶ月を置く。
+    months_for_storage = months if months else 3.0
+    oc = (fba_cost.other_costs(tier, months_for_storage, peak, apparel)
+          if tier else None)
+    other = int(round(oc.total)) if oc else 0
     net = gross - other
+
+    g = fba_cost.grade(sell_i, cost_i, tier, category=category, keepa_pct=fee_pct,
+                       months_to_sell=months_for_storage, peak=peak, apparel=apparel,
+                       unit_decided=unit_decided)
 
     return Economics(
         sell=sell_i,
@@ -137,4 +177,11 @@ def compute(sell: float, fee_pct: float, fba_yen: float,
         months_to_sell=months,
         half_disposal_loss=half_loss,
         cost_ratio_pct=round(cost_i / sell_i * 100, 1) if sell_i else 0.0,
+        size_tier=tier,
+        other_breakdown=(oc.as_dict() if oc else {}),
+        grade=g.grade,
+        grade_reason=g.reason,
+        worst_net_per_unit=g.worst.get("手残り"),
+        worst_margin_pct=g.worst.get("利益率(%)"),
+        cliff_note=g.cliff,
     )

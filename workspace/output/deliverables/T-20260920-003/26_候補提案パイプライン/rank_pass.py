@@ -126,7 +126,11 @@ def main() -> int:
         if mult and all(c.get(k) for k in ("sell", "fee_pct", "fba_yen", "unit_cost_incl")):
             e = profit.compute(c["sell"], c["fee_pct"], c["fba_yen"],
                                c["unit_cost_incl"] * mult, qty=1)
-            net = e.net_per_unit - (int(round(e.sell * 0.07)) + 200)
+            # 🔴 2026-10-04: 旧実装は「手残り − 誤差幅（売価7%＋200円）」で並べていました。
+            # 誤差幅は費用ではないので撤去し、**悲観シナリオの手残り**で並べます
+            # （区分1段上・料率15.4%・保管2倍・箱7割。成果物33 §6.2）。
+            # 悲観が取れない行は中央の手残りで並べます。
+            net = e.worst_net_per_unit if e.worst_net_per_unit is not None else e.net_per_unit
         sv = ex.get("season")
         season_obj = (seasonality.Season(sv, tuple(ex.get("season_peaks") or ()))
                       if sv else None)
