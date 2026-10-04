@@ -128,6 +128,26 @@ payload_multi "$P" "本文A" "| B0TEST0005 | 未確認 |" "# 発注案" "# 発�
 printf '%s\n' "# 旧い発注案（マーカー無し）" "本文A" >"$D/05_発注案.md"
 payload_edit "$D/05_発注案.md" "本文A" "本文B" >"$T/p.json"; expect "マーカー無しの既存発注案は、部分 Edit でもブロック" 2 "order-asins"
 
+echo "== 鮮度は項目ごと（v2: 市場3日／属性14日／生産終了7日）=="
+ago() { python3 -c 'import datetime,sys;print((datetime.date.today()-datetime.timedelta(days=int(sys.argv[1]))).isoformat())' "$1"; }
+setd() { python3 "$CR" set B0TEST0007 "$1" --value "確認済み" --result PASS --source https://example.test --by test --date "$2" >/dev/null; }
+all_pass B0TEST0007
+setd supplier_amazon_permission "$(ago 10)"
+payload_write "$P" "<!-- order-asins: B0TEST0007 -->" >"$T/p.json"; expect "14日項目を10日前に確認 → 通す" 0
+setd supplier_amazon_permission "$(ago 15)"
+expect "14日項目を15日前に確認 → 期限切れでブロック" 2 "supplier_amazon_permission"
+setd supplier_amazon_permission "$TODAY"; setd discontinued_check "$(ago 6)"
+expect "7日項目（生産終了）を6日前に確認 → 通す" 0
+setd discontinued_check "$(ago 8)"
+expect "7日項目（生産終了）を8日前に確認 → ブロック" 2 "discontinued_check"
+python3 - "$REPO/scripts/sourcing_gate/checklist_spec.json" <<'PY' && ok "本番 spec は21項目・v1 の12 id を全部含む" || ng "本番 spec は21項目・v1 の12 id を全部含む"
+import json, sys
+ids = [i["id"] for i in json.load(open(sys.argv[1]))["items"]]
+v1 = {"gate_type","listing_button","buybox_seller","amazon_stock_history","actual_sales","new_offer_count",
+      "price_median90","price_trend","amazon_set_count","wholesale_terms","season_window","timeline"}
+assert len(ids) == 21 and len(set(ids)) == 21 and v1 <= set(ids), ids
+PY
+
 echo "== check_record.py =="
 python3 "$CR" set B0TEST0006 gate_type --value "要確認" --result PASS --source x --by test >/dev/null 2>&1
 [ $? -ne 0 ] && ok "値が要確認のまま PASS は記録させない" || ng "値が要確認のまま PASS は記録させない"
@@ -142,11 +162,11 @@ python3 "$CR" set B0TEST0005 gate_type --value "再確認" --result PASS --sourc
 python3 -c 'import json,sys;d=json.load(open(sys.argv[1]));assert d["history"][-1]["value"]=="確認済み"' "$T/checks/B0TEST0005.json" \
   && ok "上書き時は前の値を history に残す" || ng "上書き時は前の値を history に残す"
 
-echo "== spec に項目を足しても動く（プランナーの17項目化に備える）=="
+echo "== spec に項目を足しても動く（今後の項目追加に備える）=="
 python3 - "$T/scripts/sourcing_gate/checklist_spec.json" <<'PY'
 import json, sys
 p = sys.argv[1]; d = json.load(open(p))
-d["items"].append({"id": "maker_direct_seller", "no": 13, "name": "メーカー直販の有無（追加項目）",
+d["items"].append({"id": "maker_direct_seller", "no": 99, "name": "メーカー直販の有無（追加項目）",
                    "how": "テスト用", "fail_if": "テスト用", "max_age_days": 3, "required": True})
 json.dump(d, open(p, "w"), ensure_ascii=False)
 PY
