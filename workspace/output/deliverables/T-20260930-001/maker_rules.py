@@ -142,6 +142,10 @@ def maker_key(p: dict) -> tuple[str, str]:
     brand = (p.get("brand") or "").strip()
     maker = (p.get("manufacturer") or "").strip()
     name = maker if maker and not NOT_COMPANY.match(maker) and not c1.DESC.search(maker) else brand
+    # 「マタインク CRG-051H」「マタインク 29J TN29J…」のように manufacturer にブランド＋型番が入る行は、
+    # 型番ごとに別の社に割れる（2026-10-04 の抜き取りで同じ社が3行に割れていた）。ブランドで始まり型番が続く形はブランドに寄せる
+    if brand and name != brand and name.startswith(brand) and re.search(r"[0-9A-Z]{2,}[-0-9A-Z]*", name[len(brand):]):
+        name = brand
     return (_n(name) or "(空)"), name
 
 
@@ -210,6 +214,10 @@ def rescue_signals(group: list[dict]) -> list[str]:
     makers = {(p.get("manufacturer") or "").strip() for p in group} - {""}
     if any(c1.JP_CORP.search(m) and not c1.DESC.search(m) for m in makers):
         sig.append("manufacturerに日本の法人格")
+    # 「日本オスモ」「◯◯ジャパン」＝海外ブランドの日本法人・輸入総代理店の典型（2026-10-04 抜き取りで取りこぼしを確認）。
+    # 日本語表記つきに限る（英字の "xxx-JP" は中国系セラーも名乗るので使わない）
+    if any(re.search(r"(日本|ジャパン)", m) and not c1.DESC.search(m) for m in makers):
+        sig.append("manufacturerが日本法人名（日本◯◯／◯◯ジャパン）")
     names = makers | {(p.get("brand") or "").strip() for p in group} - {""}
     for n in sorted(names):
         for f in (_jp_ledger, _jp_gbiz):

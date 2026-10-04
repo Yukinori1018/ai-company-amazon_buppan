@@ -13,6 +13,7 @@ import json
 import os
 import time
 import urllib.parse
+import urllib.error
 import urllib.request
 from pathlib import Path
 
@@ -33,7 +34,16 @@ def api_key() -> str:
 
 def _get(path: str, params: dict, timeout: int = 300) -> dict:
     q = urllib.parse.urlencode({"key": api_key(), **params})
-    b = urllib.request.urlopen(f"https://api.keepa.com/{path}?{q}", timeout=timeout).read()
+    for attempt in range(6):
+        try:
+            b = urllib.request.urlopen(f"https://api.keepa.com/{path}?{q}", timeout=timeout).read()
+            break
+        except urllib.error.HTTPError as e:
+            # 2026-10-04: 残高が足りない瞬間の大きな Finder（perPage 10000）で 400 が返った。同じ呼び出しは数分後に通る
+            if e.code not in (400, 429, 500, 502, 503) or attempt == 5:
+                raise
+            print(f"  HTTP {e.code} → {120 * (attempt + 1)}秒待って再試行", flush=True)
+            time.sleep(120 * (attempt + 1))
     if b[:2] == b"\x1f\x8b":  # Content-Encoding が付かない gzip がある（memory: keepa_api_gotchas）
         b = gzip.decompress(b)
     return json.loads(b)
