@@ -50,6 +50,16 @@ PRACTITIONER_NOTES = [
 ]
 
 
+def gate_messages(path: Path, text: str) -> list[str]:
+    """発注ゲートの判定。判定モジュールが読めなければ止める（fail-closed）。"""
+    try:
+        sys.path.insert(0, str(REPO / "scripts/sourcing_gate"))
+        import gate  # noqa: E402
+    except Exception as e:  # 判定できない＝確認していないのと同じ
+        return [f"判定モジュール scripts/sourcing_gate/gate.py が読めません（{e}）"]
+    return gate.check_document(str(path), text)
+
+
 def split_verdict(lv, ledger_price: int) -> str:
     """🔴 「一時的に安いだけ」か「恒常的に下がった」かを**データから**書く。
 
@@ -494,8 +504,20 @@ def main() -> int:
     A("- **卸値・卸率・卸サイトの商品 URL はこの成果物に書いていません**（法務判定E）。"
       "実額は `agent_output/.../score20261004/top30_private.csv` にあります。")
 
+    # 🔴 発注ゲート（T-20261004-001）。この経路は Bash から書くので PreToolUse フックを
+    # 通らない。同じ判定（scripts/sourcing_gate/gate.py）をここで当て、1件でも
+    # 仕入れ前チェック（CLAUDE.md §3.5）が埋まっていなければ**ファイルを書かずに**止める。
+    order_asins = sorted({pk.asin for pl in plans for pk in pl.picks})
+    L.insert(0, f"<!-- order-asins: {', '.join(order_asins)} -->")
     md = "\n".join(L) + "\n"
-    (DELIV / "35_発注案.md").write_text(md, encoding="utf-8")
+    out_md = DELIV / "35_発注案.md"
+    msgs = gate_messages(out_md, md)
+    if msgs:
+        print("🛑 発注ゲート：仕入れ前チェックが埋まっていないので 35_発注案.md を書きません。",
+              file=sys.stderr)
+        print("\n".join("  " + m for m in msgs), file=sys.stderr)
+        return 1
+    out_md.write_text(md, encoding="utf-8")
     OUT.mkdir(parents=True, exist_ok=True)
     # シート用（§3.2 の必須6列を含む全列）
     with (OUT / "sheet_買う候補_20261004.csv").open("w", encoding="utf-8-sig",

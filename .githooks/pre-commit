@@ -387,9 +387,56 @@ warn_untracked() {
 }
 warn_untracked
 
+# --- 発注ゲート（2026-10-04 / T-20261004-001）----------------------------------
+# PreToolUse の order-gate-guard.py は Write/Edit しか見ない。Bash や Python から書いた
+# 発注案はフックを通らないので、commit の時点でもう一度同じ判定（scripts/sourcing_gate/gate.py）を当てる。
+# 対象:
+#   - 新規追加（A。リネームも --no-renames で A として見る）の文書で、gate が「発注案」と判定したもの
+#   - 変更（M）の文書のうち、`order-asins` マーカーを持つもの
+#     （マーカーの無い旧い発注案＝35・36 などの編集では止めない。既存ファイルの編集で
+#       止める作りにすると自動同期が止まり続けるため。上の main と同じ思想）
+# 判定できないとき（python3 / gate.py が無い）は fail-open。検知したときだけ止める。
+order_gate() {
+  command -v python3 >/dev/null 2>&1 || return 0
+  [ -f scripts/sourcing_gate/gate.py ] || return 0
+  local list f st ng=0
+  list="$(mktemp -t precommit-ordergate)" || return 0
+  git diff --cached --no-renames --name-status --diff-filter=AM -z >"$list" 2>/dev/null || { rm -f "$list"; return 0; }
+  while IFS= read -r -d '' st && IFS= read -r -d '' f; do
+    case "$(printf '%s' "${f##*.}" | tr 'A-Z' 'a-z')" in
+      md|html|htm|csv|tsv|txt) : ;;
+      *) continue ;;
+    esac
+    if [ "${st:0:1}" = "M" ]; then
+      git show ":$f" 2>/dev/null | grep -q 'order-asins' || continue
+    fi
+    if ! git show ":$f" 2>/dev/null | python3 scripts/sourcing_gate/gate.py check-file "$f" --stdin; then
+      ng=1
+    fi
+  done <"$list"
+  rm -f "$list"
+  if [ "$ng" = "1" ]; then
+    cat >&2 <<'MSG'
+
+╔══════════════════════════════════════════════════════════════════════╗
+║  commit を中止しました — 仕入れ前チェックが埋まっていない発注案です  ║
+╚══════════════════════════════════════════════════════════════════════╝
+  CLAUDE.md §3.5 の全項目を確認して記録してから commit してください:
+    python3 scripts/sourcing_gate/check_record.py items
+    python3 scripts/sourcing_gate/check_record.py set <ASIN> <項目id> --value … --result PASS --source … --by …
+    python3 scripts/sourcing_gate/check_record.py verify <ASIN>...
+
+MSG
+    return 2
+  fi
+  return 0
+}
+
 main
 rc=$?
-if [ "$rc" -eq 2 ]; then
+order_gate
+org=$?
+if [ "$rc" -eq 2 ] || [ "$org" -eq 2 ]; then
   exit 1            # 検知 → commit 中止
 elif [ "$rc" -ne 0 ]; then
   echo "pre-commit: 検査を完了できませんでした（rc=$rc）。commit は続行します。" >&2
