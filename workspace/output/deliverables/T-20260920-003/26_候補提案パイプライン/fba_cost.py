@@ -386,6 +386,20 @@ GRADE_UNKNOWN = "UNKNOWN"
 
 TARGET_MARGIN = 0.20          # 会社KPI（利益率20%）
 
+# 🔴 **1個あたりの手残りの下限（円）。単価では切りません。**
+# 根拠：成果物34（サトル）§1。月100万以上の実践者 N=6 は**全員が単価の下限を置いておらず**、
+# 置いているのは「**1個あたり利益額 400〜1,000円**」と「利益率 5〜30%」でした。
+# 当社も単価ではなく利益額で切ります（2026-10-04 社長指示「単価ではなく利益額で切る」）。
+# 下端の400円を採るのは、実績ゼロの段階では母数を優先するためです（CLAUDE.md §3.1）。
+#
+# ⚠️ **これは単独の下限ではありません。**同じ成果物34 に出てくる「750円の崖」の実践者は
+# **手残り50円**（売価750円・仕入440円）で回しています。実践者の基準は型によって割れていて、
+# 片方だけを下限にすると他方の型を全部落とします。だから判定は
+#   **「利益率 20% 以上」 または 「手残り 400円 以上」** の **OR** です（`grade()` の `ok()`）。
+# 率の線を実践者の下端（5%）ではなく当社KPIの20%に置いているのは、**厳しい側**に寄せる
+# ためです。ここを5%に緩めると候補が何件増えるかは成果物35の感度表に出します。
+MIN_PROFIT_YEN = 400
+
 
 @dataclass
 class Grade:
@@ -415,9 +429,10 @@ def _scenario(sell: float, unit_cost_incl: float, tier: str, *, worst: bool,
     """1シナリオぶんの手残り。悲観はハジメの定義（成果物33 §6.2）に合わせます。
 
     悲観の当て方: サイズ区分を**1段上**／料率を**カテゴリー最高段**／保管月数を**2倍**／
-    箱の入り数を**7割**。
-    ⚠️ 売価の悲観（90日平均と現在値の低い方）は**本データに価格履歴が無いので当てていません**。
-    取れるようになったら `sell` 側に入れてください（ここで勝手に割り引くと嘘になります）。
+    箱の入り数を**7割**／**売価を90日の下位25%**（呼び出し側が `sell` に渡す）。
+
+    売価の悲観は 2026-10-04 に入りました（`price_history.PriceLevel.sell_pessimistic`）。
+    **ここで勝手に割り引きません。**呼び出し側が履歴から出した値を渡します。
     """
     t = tier_up(tier) if worst else tier
     oth = other_costs(t, months_to_sell * (2.0 if worst else 1.0), peak, apparel,
@@ -435,8 +450,19 @@ def _scenario(sell: float, unit_cost_incl: float, tier: str, *, worst: bool,
 def grade(sell: float | None, unit_cost_incl: float | None, tier: str | None,
           *, category: str | None = None, keepa_pct: float | None = None,
           months_to_sell: float = 3.0, peak: bool = False, apparel: bool = False,
-          unit_decided: bool = True, note: str = "") -> Grade:
-    """A / B / C / UNKNOWN を返す。**UNKNOWN を GO に畳みません。**"""
+          unit_decided: bool = True, note: str = "",
+          sell_worst: float | None = None) -> Grade:
+    """A / B / C / UNKNOWN を返す。**UNKNOWN を GO に畳みません。**
+
+    `sell`        … 中央ケースの売価（**90日中央値**。現在価格ではない）
+    `sell_worst`  … 悲観ケースの売価（**90日の下位25%**）。省略すると `sell` と同じ
+
+    切り方（2026-10-04 改訂・社長指示）
+      A … 中央でも悲観でも「利益率20%以上 **または** 手残り MIN_PROFIT_YEN 以上」
+      B … 中央は MIN_PROFIT_YEN 以上あるが、悲観で割れる → **最小ロットで1回だけ実測**
+      C … 中央の手残りが MIN_PROFIT_YEN 未満（赤字 or 薄すぎる）
+    **単価では切りません**（実践者 N=6 全員が単価の下限を置いていない・成果物34）。
+    """
     if not unit_decided:
         return Grade(GRADE_UNKNOWN,
                      "Amazon の1個が卸の何点かが確定していません。**単位ずれは「幅」ではなく"
@@ -455,24 +481,35 @@ def grade(sell: float | None, unit_cost_incl: float | None, tier: str | None,
     kw = dict(category=category, keepa_pct=keepa_pct,
               months_to_sell=months_to_sell, peak=peak, apparel=apparel)
     mid = _scenario(sell, unit_cost_incl, tier, worst=False, **kw)
-    bad = _scenario(sell, unit_cost_incl, tier, worst=True, **kw)
+    # 悲観は**売価も下げる**（90日の下位25%）。費目だけ悲観にしても売価が中央のままだと、
+    # 「価格が下がったときに赤字になる棚」を A に通してしまいます（2026-10-04 の差し戻し）。
+    bad = _scenario(sell_worst if sell_worst else sell, unit_cost_incl, tier,
+                    worst=True, **kw)
     adv = cliff_advice(sell, unit_cost_incl, tier, category=category,
                        keepa_pct=keepa_pct, months_to_sell=months_to_sell,
                        peak=peak, apparel=apparel)
 
-    if mid["手残り"] <= 0:
-        g, why = GRADE_C, (f"中央値でも手残り {mid['手残り']:,}円（赤字）です。"
-                           f"必要売価は "
-                           f"{int(round(required_sell(unit_cost_incl, tier, TARGET_MARGIN, **kw) or 0)):,}円"
-                           f"（利益率20%）。")
-    elif bad["利益率(%)"] >= TARGET_MARGIN * 100:
-        g, why = GRADE_A, (f"中央 {mid['利益率(%)']}%・悲観 {bad['利益率(%)']}% で"
-                           f"どちらも20%以上です（悲観＝区分を1段上 {bad['サイズ区分']}・"
-                           f"料率15.4%・保管2倍・箱7割）。")
+    def ok(sc: dict) -> bool:
+        """そのシナリオが「買う価値がある」か。**率と額のどちらかを満たせばよい。**"""
+        return (sc["利益率(%)"] >= TARGET_MARGIN * 100
+                or sc["手残り"] >= MIN_PROFIT_YEN)
+
+    if not ok(mid):
+        need = required_sell(unit_cost_incl, tier, TARGET_MARGIN, **kw) or 0
+        g, why = GRADE_C, (
+            f"中央値（売価 {mid['売価']:,}円）で手残り {mid['手残り']:,}円・"
+            f"{mid['利益率(%)']}% です。利益率20%にも手残り {MIN_PROFIT_YEN}円にも届きません。"
+            f"利益率20%に必要な売価は {int(round(need)):,}円 です。")
+    elif ok(bad):
+        g, why = GRADE_A, (
+            f"中央（売価 {mid['売価']:,}円）で手残り {mid['手残り']:,}円・{mid['利益率(%)']}%、"
+            f"悲観（売価 {bad['売価']:,}円・区分1段上 {bad['サイズ区分']}・料率15.4%・"
+            f"保管2倍・箱7割）でも {bad['手残り']:,}円・{bad['利益率(%)']}% あります。")
     else:
-        g, why = GRADE_B, (f"中央 {mid['利益率(%)']}%（手残り {mid['手残り']:,}円）ですが、"
-                           f"悲観では {bad['利益率(%)']}%（{bad['手残り']:,}円）に落ちます。"
-                           f"**最小ロットで1回だけ実測してください**（落としません）。")
+        g, why = GRADE_B, (
+            f"中央（売価 {mid['売価']:,}円）で手残り {mid['手残り']:,}円・{mid['利益率(%)']}% ですが、"
+            f"悲観（売価 {bad['売価']:,}円）では {bad['手残り']:,}円・{bad['利益率(%)']}% に落ちます。"
+            f"**最小ロットで1回だけ実測してください**（落としません）。")
     if note:
         why = f"{why} {note}"
     return Grade(g, why, mid, bad, adv)
