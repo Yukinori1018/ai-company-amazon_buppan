@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>採算列の計算式（メーカー連絡先台帳）</title><style>
+:root{--fg:#1b1f23;--mut:#5b6570;--line:#e3e7eb;--acc:#0b5fff;--warn:#b45309;--bad:#b91c1c;--ok:#047857;}
+*{box-sizing:border-box}
+body{margin:0;background:#f6f7f9;color:var(--fg);
+ font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",Meiryo,sans-serif;
+ line-height:1.85;font-size:15.5px;-webkit-text-size-adjust:100%;}
+.wrap{max-width:1000px;margin:0 auto;padding:32px 22px 96px;background:#fff;
+ box-shadow:0 1px 3px rgba(0,0,0,.06);}
+h1{font-size:1.75rem;line-height:1.4;margin:.2em 0 .6em;padding-bottom:.4em;border-bottom:3px solid var(--acc);}
+h2{font-size:1.3rem;margin:2.2em 0 .7em;padding:.35em .6em;background:#eef3ff;border-left:5px solid var(--acc);border-radius:3px;}
+h3{font-size:1.1rem;margin:1.8em 0 .5em;padding-bottom:.25em;border-bottom:1px solid var(--line);}
+p{margin:.7em 0}
+hr{border:0;border-top:1px solid var(--line);margin:2.2em 0}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:.92em;display:block;overflow-x:auto;}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top;}
+th{background:#f0f3f7;font-weight:600;white-space:nowrap;}
+tbody tr:nth-child(even){background:#fafbfc}
+blockquote{margin:1.1em 0;padding:.8em 1em;background:#fffbeb;border-left:5px solid var(--warn);border-radius:3px;color:#463a1a;}
+code{background:#f1f3f5;padding:.12em .4em;border-radius:3px;font-size:.9em;
+ font-family:"SFMono-Regular",Menlo,Consolas,monospace;}
+pre{background:#1e2430;color:#e6edf3;padding:14px 16px;border-radius:6px;overflow-x:auto;font-size:.86em;line-height:1.6;}
+pre code{background:none;color:inherit;padding:0}
+ul,ol{margin:.7em 0;padding-left:1.6em}
+li{margin:.3em 0}
+a{color:var(--acc)}
+@media print{body{background:#fff}.wrap{box-shadow:none;max-width:none}}
+</style></head><body><div class="wrap"><h1>41 採算列の計算式（メーカー連絡先台帳）</h1>
+<p>T-20260930-001 / 経理ハジメ / 2026-10-04</p>
+<p><strong>目的</strong>：メーカーに電話・メールする前に「いくらで卸してもらえれば儲かるか」を1行で読めるようにする。<br>計算は代表ASIN単位。スクリプトは同フォルダ <code>40_profit_cols.py</code>、出力は <code>agent_output/T-20260930-001/40_採算列.csv</code>（Keepa の値を含むのでリポ外）。</p>
+<hr>
+<h2>1. 列と式</h2>
+<p>すべて 1個あたり・円・<strong>消費税込み</strong>。P＝平時売価。</p>
+<table><thead><tr><th>#</th><th>列</th><th>式</th><th>出典</th></tr></thead><tbody>
+<tr><td>1</td><td>平時売価 P</td><td>直近90日のカート価格の平均。無ければ新品最安の90日平均。<strong>現在価格は使わない</strong></td><td>〔Keepa実測〕</td></tr>
+<tr><td>2a</td><td>販売手数料率</td><td>Keepa の率を公式の段（5.0/8.4/10.4/12.4/15.4%）に寄せる。価格で段が変わるカテゴリ（ビューティー・ドラッグ・食品・ペット・ベビー）は P で引き直し、<strong>高い方</strong>を採る。P≦750円は一律5%</td><td>〔Keepa実測〕＋〔公式〕</td></tr>
+<tr><td>2b</td><td>販売手数料（円）</td><td>max(P × 率, 30円) × 1.1（率は税抜表示のため）</td><td>〔公式〕</td></tr>
+<tr><td>2c</td><td>FBA配送代行</td><td>Keepa の <code>pickAndPackFee</code> から公式表のサイズ区分を逆引きし、P が1,000円以下か超かで列を選び直す</td><td>〔Keepa実測〕＋〔公式〕</td></tr>
+<tr><td>—</td><td>保管料</td><td>パッケージ実寸の体積 × 10.087円/1,000cm³/月（10〜12月単価）× 計上月数（＝消化月数÷2）</td><td>〔公式〕＋〔実寸〕</td></tr>
+<tr><td>3</td><td>納品・その他</td><td>§2 の置き値</td><td>〔推定〕</td></tr>
+<tr><td>—</td><td>Amazon側コスト計 C</td><td>2b ＋ 2c ＋ 保管料 ＋ 納品・その他</td><td></td></tr>
+<tr><td>4</td><td>上限（利益率20%）</td><td><strong>P × 0.80 − C</strong>。これ以下の原価なら会社KPIの20%を取れる</td><td></td></tr>
+<tr><td>5</td><td>上限（利益率10%）</td><td><strong>P × 0.90 − C</strong>。初回の妥協ライン（中村本：初回は5〜8%でも可。安全側に10%で置いた）</td><td></td></tr>
+<tr><td>6</td><td>損益分岐</td><td><strong>P − C</strong>。これを超えると1個売るごとに赤字</td><td></td></tr>
+<tr><td>7</td><td>20%が取れる掛け（目標）</td><td>列4 ÷ P。「この掛け以下なら20%」と読む</td><td></td></tr>
+<tr><td>8</td><td>想定月販</td><td>月販下限 ÷（新品出品者数＋1）</td><td>実画面（無ければ Keepa）</td></tr>
+<tr><td>9</td><td>想定月利益</td><td>想定月販 × P × 0.20（20%で仕入れられた場合）</td><td></td></tr>
+<tr><td>10</td><td>初回仕入れ</td><td>個数＝max(5, 想定月販の1ヶ月分・切り上げ)、金額＝個数 × 4</td><td></td></tr>
+<tr><td>11</td><td>価格の安定</td><td>現在価格 ÷ P。0.95未満＝値下がり中、1.05超＝値上がり中</td><td>〔Keepa実測〕</td></tr>
+<tr><td>12</td><td>採算メモ</td><td>掛けの判定／単価2,200円未満／値下がり中／取り分が月5個未満／料率補正の有無</td><td></td></tr>
+</tbody></table>
+<ul><li><strong>月販の下限</strong>：実画面の「過去1か月で◯点以上購入」の階級の下限値（100点以上→100）。保守側。</li><li><strong>新品出品者数</strong>：実画面で数えた数。実画面が「未確認」の36行は Keepa の新品出品数で代用（出典列に明記）。</li></ul>
+<h3>計算例（架空の数字）</h3>
+<p>P＝5,000円・料率10.4%・FBA標準7（472円）・保管料50円・納品その他150円 の場合</p>
+<table><thead><tr><th>項目</th><th>金額</th></tr></thead><tbody>
+<tr><td>販売手数料 5,000 × 10.4% × 1.1</td><td>572円</td></tr>
+<tr><td>Amazon側コスト計 C</td><td>1,244円</td></tr>
+<tr><td>利益率20%の上限 4,000 − 1,244</td><td>2,756円（5.5掛け）</td></tr>
+<tr><td>利益率10%の上限 4,500 − 1,244</td><td>3,256円</td></tr>
+<tr><td>損益分岐 5,000 − 1,244</td><td>3,756円</td></tr>
+</tbody></table>
+<hr>
+<h2>2. 置き値と根拠</h2>
+<table><thead><tr><th>費目</th><th>置き値</th><th>根拠</th><th>確度</th></tr></thead><tbody>
+<tr><td>FC納品送料</td><td>1箱608円 ÷ 1箱に入る個数</td><td>FBAパートナーキャリア ヤマト140サイズ（関東→関東）。個数＝min(初回個数, 140サイズに容積70%で入る数)</td><td>〔実測〕送料・〔仮定〕充填率</td></tr>
+<tr><td>段ボール</td><td>1箱250円 ÷ 同上</td><td>公式値なし</td><td>〔推定〕</td></tr>
+<tr><td>袋など</td><td>4.5円</td><td>OPP袋＋α</td><td>〔推定〕</td></tr>
+<tr><td>ラベル</td><td>22円（大型51円）</td><td>Amazon 商品ラベル貼付サービス</td><td>〔公式〕</td></tr>
+<tr><td><strong>納品・その他の下限</strong></td><td><strong>100円</strong></td><td>上4つの合計が100円を下回っても100円で置く。初回は社長宅から少数の箱で送る（§3.4）ため薄まりにくい</td><td>〔推定〕</td></tr>
+<tr><td>保管料の単価</td><td>10〜12月の10.087円</td><td>初回在庫は年内に置かれるため繁忙期単価。1〜9月は5.676円（約0.56倍）</td><td>〔公式〕</td></tr>
+<tr><td>計上月数</td><td>初回個数 ÷ 想定月販 ÷ 2</td><td>公式式「保管日数÷当月日数」の平均在庫。月販不明は3ヶ月</td><td>〔公式〕＋〔仮定〕</td></tr>
+</tbody></table>
+<p>結果として、納品・その他は199行中107行が下限の100円、最大は大型品で約910円（140サイズに1個しか入らない扱い）。</p>
+<hr>
+<h2>3. 税の扱い</h2>
+<ul><li>当社は<strong>免税事業者</strong>（セラーセントラル「消費税の設定」＝納税義務いいえ・2026-09-09 確認）。仕入れにかかった消費税は控除できない。</li><li>したがって上限は<strong>消費税込みの支払額</strong>で持つ。メーカーの見積りは通常税抜なので、20%の列だけ <strong>税抜換算（÷1.1）</strong> も並べた。見積りと比べるときは税抜換算の列を使う。</li><li>上限は<strong>着値</strong>（メーカーから社長宅までの送料を含む）として読む。送料が別途なら、その分を差し引いて比べる。</li><li>税務の個別判断は税理士確認を推奨。</li></ul>
+<hr>
+<h2>4. 読み方の注意</h2>
+<ol><li><strong>列7の掛けは「Amazon の実売価格」に対する比率。</strong>メーカーが言う掛け率は希望小売価格に対する比率。実売が希望小売価格より安い商品では、メーカー基準の掛けはさらに低く必要になる。</li><li>199行の中央値は5.7掛け（20%が取れる掛け）。<strong>6掛けで20%が取れるのは55行（28%）。</strong>メーカー卸の相場（6〜7掛け）では、大半が5掛け台の交渉になる。これは既知の結論（「6掛けでは20%は不可能」）と整合する。</li><li>初回仕入れ金額は「想定月販の1ヶ月分」なので、売れ筋の行は1社で数十万〜約100万円になる。<strong>資金100万円の範囲に収まるかは、行ごとではなく合計で見ること。</strong>最初の数社は最小5個から入るのが現実的。</li><li>想定月利益の合計は、全社が20%で卸してくれた場合の上限であり、見込みではない。</li></ol>
+<hr>
+<h2>5. 既知の甘さ（入れていないもの）</h2>
+<table><thead><tr><th>入れていないもの</th><th>向き</th><th>影響の目安</th></tr></thead><tbody>
+<tr><td>返品・返金</td><td>甘い</td><td>返品1件で FBA配送代行は戻らない＋返金手数料。再販不可なら原価が丸損</td></tr>
+<tr><td>広告費</td><td>甘い</td><td>新規出品でカートを取るまで広告が要る場合、売価の5〜15%（推定）</td></tr>
+<tr><td>値下がり</td><td>甘い</td><td>参入で価格が下がる。16行は既に値下がり中（現在価格で再計算が要る）</td></tr>
+<tr><td>大口出品の月額</td><td>甘い</td><td>4,900円/月（税抜）。SKU単位では入れず、月次の損益で引く</td></tr>
+<tr><td>長期保管・廃棄</td><td>甘い</td><td>売れ残りは月20円/点（365日超）＋廃棄手数料</td></tr>
+<tr><td>社長宅までの送料</td><td>甘い</td><td>上限を着値として読むことで吸収（§3）</td></tr>
+<tr><td>カート価格の取得</td><td>—</td><td>199行すべてカート価格の90日平均が取れた（新品最安への代用は0行）</td></tr>
+<tr><td>FBA区分</td><td>—</td><td>198行は公式表に逆引きできた。1行は表に無い額のため Keepa の額をそのまま使用</td></tr>
+</tbody></table>
+<p><strong>この欄の数字は「交渉の上限」であり、発注の可否ではない。</strong>発注前には CLAUDE.md §3.3 の確認（カート保持者・本体の在庫履歴・出品一覧の実数）と §3.5 のチェックを別途通す。</p>
+<hr>
+<h2>6. 実行</h2>
+<pre><code>python3 workspace/output/deliverables/T-20260930-001/40_profit_cols.py            # 不足 ASIN だけ Keepa から取得（上限300 token）
+python3 workspace/output/deliverables/T-20260930-001/40_profit_cols.py --offline  # 取得しない</code></pre>
+<ul><li>入力は <code>30_最終_50社.csv</code>・<code>22_連絡先_印付き.csv</code>・<code>24_連絡先_*.csv</code>（増えたら自動で拾う）。代表ASINで重複を除く。</li><li>Keepa は <code>raw/</code> の既存キャッシュを先に読む。無い ASIN だけ取得し <code>raw/prod_profit_*.json.gz</code> に保存（二度と取らない）。取得前に残量を確認する。</li><li>置き値を変えるときはスクリプト冒頭の定数と、この文書の §2 を一緒に直す。</li></ul></div></body></html>
