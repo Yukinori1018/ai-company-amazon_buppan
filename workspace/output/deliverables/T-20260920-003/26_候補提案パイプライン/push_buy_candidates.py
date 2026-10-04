@@ -98,7 +98,7 @@ def main(argv=None) -> int:
     a = ap.parse_args(argv)
 
     scored = SC.score_all()
-    go, pend = SC.candidates(scored)
+    go, pend, _over = SC.candidates(scored)
     cands = go + pend
     top = cands[:a.top]
     print(f"機械判定 GO {len(go)}件 ／ 実売だけ人の確認待ち {len(pend)}件")

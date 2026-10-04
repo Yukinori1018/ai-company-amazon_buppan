@@ -5,8 +5,8 @@
 <hr>
 <h2>結論（3行）</h2>
 <ol>
-<li style='margin-left:0.0em'><strong>候補は 12件</strong>です（＝人が実画面で見る価値のある行。§3.3-16）。内訳は<strong>機械判定 GO が 2件</strong>と、<strong>実売だけをキーゾンで見れば決まる行が 10件</strong>。台帳 648件のうち今日の値で取り直せたのは 580件。</li>
-<li style='margin-left:0.0em'>🔴 <strong>候補が増えない主因は原価でも売価でもなく「実売の根拠が無いこと」でした。</strong><code>monthlySold</code> が取れている行は取り直せた行の <strong>6%</strong> しかなく、代用していたランクは <strong>196件が兄弟 ASIN との共有値</strong>で、ASIN 単位の「売れている根拠」になりません。</li>
+<li style='margin-left:0.0em'><strong>候補は 12件</strong>です（＝人が実画面で見る価値のある行。§3.3-16）。内訳は<strong>機械判定 GO が 2件</strong>と、<strong>実売だけをキーゾンで見れば決まる行が 10件</strong>。台帳 648件のうち今日の値で取り直せたのは 648件。</li>
+<li style='margin-left:0.0em'>🔴 <strong>候補が増えない主因は原価でも売価でもなく「実売の根拠が無いこと」でした。</strong><code>monthlySold</code> が取れている行は取り直せた行の <strong>7%</strong> しかなく、代用していたランクは <strong>219件が兄弟 ASIN との共有値</strong>で、ASIN 単位の「売れている根拠」になりません。</li>
 <li style='margin-left:0.0em'><strong>入口が逆です。</strong>既存プールは卸（NETSEA）から入って Amazon に当てたので、「仕入れはあるが売れていない棚」ばかりになりました。<strong>売れている棚から入る</strong>向き（<code>lane_selling_first.py</code>）を用意し、下の節で<strong>実際に当たる率を測りました</strong>。</li>
 </ol>
 <h2>社長の5件を履歴で切り分けました（「一時的に安い」か「恒常的に下がった」か）</h2>
@@ -27,17 +27,16 @@
 <p>という形にしました。<strong>上位候補の実画面確認は、ゲートだけでなく価格も見てください。</strong></p>
 <h2>🔴 どのゲートで何件落ちたか</h2>
 <table><thead><tr><th>最初に落ちた／決まらなかったゲート</th><th>件数</th></tr></thead><tbody>
-<tr><td>実売（FAIL）</td><td>139件</td></tr>
-<tr><td>価格の動き（UNKNOWN）</td><td>107件</td></tr>
+<tr><td>実売（FAIL）</td><td>149件</td></tr>
+<tr><td>価格の動き（UNKNOWN）</td><td>116件</td></tr>
 <tr><td>採算（FAIL）</td><td>90件</td></tr>
-<tr><td>取り直し（UNKNOWN）</td><td>68件</td></tr>
-<tr><td>仕入れ（UNKNOWN）</td><td>57件</td></tr>
-<tr><td>実売（UNKNOWN）</td><td>48件</td></tr>
-<tr><td>カート保持者（FAIL）</td><td>45件</td></tr>
-<tr><td>季節の窓（FAIL）</td><td>32件</td></tr>
-<tr><td>価格の動き（FAIL）</td><td>26件</td></tr>
-<tr><td>カート保持者（UNKNOWN）</td><td>15件</td></tr>
-<tr><td>セット数（UNKNOWN）</td><td>13件</td></tr>
+<tr><td>カート保持者（FAIL）</td><td>63件</td></tr>
+<tr><td>仕入れ（UNKNOWN）</td><td>56件</td></tr>
+<tr><td>実売（UNKNOWN）</td><td>55件</td></tr>
+<tr><td>季節の窓（FAIL）</td><td>33件</td></tr>
+<tr><td>セット数（UNKNOWN）</td><td>33件</td></tr>
+<tr><td>価格の動き（FAIL）</td><td>28件</td></tr>
+<tr><td>カート保持者（UNKNOWN）</td><td>17件</td></tr>
 <tr><td>仕入れ（FAIL）</td><td>4件</td></tr>
 <tr><td>季節の窓（UNKNOWN）</td><td>1件</td></tr>
 <tr><td>採算（UNKNOWN）</td><td>1件</td></tr>
@@ -46,8 +45,8 @@
 <p><strong>原価でも売価でも条件の厳しさでもありません。『実売の根拠が機械では取れない』という、プールそのものの性質です。</strong>下の感度表を見てください ──</p>
 <p><strong>ランクの上限を10万位から50万位まで動かしても、候補はほとんど増えません。</strong></p>
 <table><thead><tr><th>事実</th><th>数</th></tr></thead><tbody>
-<tr><td><code>monthlySold</code>（Amazon が表示する実売数）が取れている行</td><td><strong>35件 / 580件（6%）</strong></td></tr>
-<tr><td>ランクが<strong>兄弟 ASIN と共有</strong>で ASIN 単位の根拠にならない行</td><td><strong>196件</strong></td></tr>
+<tr><td><code>monthlySold</code>（Amazon が表示する実売数）が取れている行</td><td><strong>43件 / 648件（7%）</strong></td></tr>
+<tr><td>ランクが<strong>兄弟 ASIN と共有</strong>で ASIN 単位の根拠にならない行</td><td><strong>219件</strong></td></tr>
 <tr><td>同じブランド×購入元の行</td><td><strong>1リストあたり 4件まで</strong>に制限（切る前は上位30件のうち25件がDNライティングの直管蛍光灯・仕入れ先1社でした）</td></tr>
 </tbody></table>
 <h3>だから、増やし方は3つしかありません（緩めることではない）</h3>
@@ -57,9 +56,9 @@
 <tr><td>③</td><td>同じブランド×購入元の上限（4件）を上げる</td><td>見かけ上は増えるが<strong>同じ棚</strong>。発注案の分散が作れない</td><td>なし（非推奨）</td></tr>
 </tbody></table>
 <h2>条件をこう緩めれば何件増えるか</h2>
-<p>今日の値で取り直せた 580件のうち、全ゲート PASS は 2件。</p>
+<p>今日の値で取り直せた 648件のうち、全ゲート PASS は 2件。</p>
 <table><thead><tr><th>無視する条件</th><th>候補数</th><th>その条件だけで落ちている件数</th></tr></thead><tbody>
-<tr><td>価格の動き</td><td>4件</td><td>2件</td></tr>
+<tr><td>価格の動き</td><td>3件</td><td>1件</td></tr>
 <tr><td>カート保持者</td><td>3件</td><td>1件</td></tr>
 <tr><td>実売</td><td>46件</td><td>44件</td></tr>
 <tr><td>仕入れ</td><td>3件</td><td>1件</td></tr>
@@ -67,7 +66,7 @@
 <tr><td>採算</td><td>19件</td><td>17件</td></tr>
 <tr><td>季節の窓</td><td>6件</td><td>4件</td></tr>
 </tbody></table>
-<p><strong>実売（ランクの上限）を動かしたとき</strong>（他の条件はそのまま／<strong>兄弟 ASIN とランクを共有している 196件は、どの上限でも根拠として数えません</strong>）</p>
+<p><strong>実売（ランクの上限）を動かしたとき</strong>（他の条件はそのまま／<strong>兄弟 ASIN とランクを共有している 219件は、どの上限でも根拠として数えません</strong>）</p>
 <table><thead><tr><th>ランク上限</th><th>候補数</th><th>想定手残り合計</th></tr></thead><tbody>
 <tr><td>100,000位以内</td><td>0件</td><td>0円</td></tr>
 <tr><td>150,000位以内</td><td>2件</td><td>24,988円</td></tr>
@@ -150,6 +149,26 @@
 <tr><td>B00Z9I3H08</td><td>10/04</td><td>10/09</td><td>10/20</td><td>10/27</td><td>未確定（月販非表示・3ヶ月で仮置き）</td><td>2027-01</td><td>○（通年）</td><td>3週</td><td>在庫あり</td></tr>
 </tbody></table>
 <blockquote><strong>リードタイムは推定です。</strong>NETSEA / SD の商品ページには出荷目安が出ますが、当社の JAN 索引はそれを取っていません。<strong>発注直前に商品ページで実際の出荷目安を見て上書きしてください</strong>（<code>schedule.build(lead_bdays=…)</code>）。祝日は計算に入っていないので、11/3・11/23・年末年始ぶん数日は遅れます。</blockquote>
+<h2>同じ棚の兄弟 14件（代表1件を見れば全部決まる）</h2>
+<p>上のリストは<strong>同じブランド×購入元を4件まで</strong>に絞っています。溢れたのがこれで、<strong>落ちた行ではありません。</strong></p>
+<p>🔴 <strong>この兄弟たちは売れ筋ランクを共有しています。</strong>だから<strong>代表1件をキーゾンで見れば、全部まとめて GO/NO-GO が決まります。</strong>人の30手を同じ棚に18回使う必要はありません。</p>
+<h3>DNライティング（購入元: 株式会社 ヤザワコーポレーション）… 他 14件</h3>
+<table><thead><tr><th>ASIN</th><th>商品名</th><th>等級</th><th>売れ筋ランク</th><th>販売価格(90日中央値)</th><th>1個手残り</th><th>利益率(%)</th><th>発注点数(Amazon何個)</th><th>発注額(円・税込)</th><th>手残り合計</th></tr></thead><tbody>
+<tr><td>B008FIPMP2</td><td>DNライティング エースライン スリム蛍光灯 FLR1212T6EXD</td><td>A</td><td>278,883位</td><td>11,396</td><td>2,159</td><td>18.9</td><td>10</td><td>49,570</td><td>21,590</td></tr>
+<tr><td>B009SY9GYA</td><td>DNライティング エースライン スリム蛍光灯 FLR48T6EXD</td><td>A</td><td>189,232位</td><td>11,396</td><td>2,159</td><td>18.9</td><td>10</td><td>49,570</td><td>21,590</td></tr>
+<tr><td>B00J3FMSS0</td><td>DNライティング エコライン スリム蛍光灯 FHA42T5ED</td><td>A</td><td>223,802位</td><td>10,560</td><td>2,111</td><td>20.0</td><td>10</td><td>47,160</td><td>21,110</td></tr>
+<tr><td>B00J3FMT70</td><td>DNライティング エコライン スリム蛍光灯 FHA42T5EL</td><td>A</td><td>223,802位</td><td>10,560</td><td>2,111</td><td>20.0</td><td>10</td><td>47,160</td><td>21,110</td></tr>
+<tr><td>B00J3FMTHA</td><td>DNライティング エコライン スリム蛍光灯 FHA42T5EL25</td><td>A</td><td>223,802位</td><td>10,560</td><td>2,111</td><td>20.0</td><td>10</td><td>47,160</td><td>21,110</td></tr>
+<tr><td>B00Q64UWES</td><td>DNライティング エースラインランプ FLR1667T6EX-L30</td><td>A</td><td>未取得</td><td>14,762</td><td>2,075</td><td>14.1</td><td>10</td><td>63,130</td><td>20,750</td></tr>
+<tr><td>B008FIRBSI</td><td>DNライティング エースライン スリム蛍光灯 FLR57T6EXD</td><td>A</td><td>278,880位</td><td>11,891</td><td>2,037</td><td>17.1</td><td>10</td><td>52,130</td><td>20,370</td></tr>
+<tr><td>B008FIPYV4</td><td>DNライティング エースライン スリム蛍光灯 FLR1515T6EX-WW</td><td>A</td><td>239,411位</td><td>11,891</td><td>2,037</td><td>17.1</td><td>10</td><td>52,130</td><td>20,370</td></tr>
+<tr><td>B008FIQLLQ</td><td>DNライティング エースライン スリム蛍光灯 FLR32T6EX-L</td><td>A</td><td>130,394位</td><td>9,240</td><td>2,026</td><td>21.9</td><td>10</td><td>43,540</td><td>20,260</td></tr>
+<tr><td>B004OCCBGQ</td><td>DNライティング エースライン スリム蛍光灯 FLR60T6EX-L</td><td>B</td><td>239,410位</td><td>11,800</td><td>1,961</td><td>16.6</td><td>10</td><td>52,130</td><td>19,610</td></tr>
+<tr><td>B004OCCBI4</td><td>DNライティング エースライン スリム蛍光灯 FLR54T6EX-L</td><td>A</td><td>278,883位</td><td>10,870</td><td>1,722</td><td>15.8</td><td>10</td><td>49,570</td><td>17,220</td></tr>
+<tr><td>B004OCCBE8</td><td>DNライティング エースライン スリム蛍光灯 FLR64T6EX-L</td><td>B</td><td>239,411位</td><td>11,480</td><td>1,017</td><td>8.9</td><td>10</td><td>52,130</td><td>10,170</td></tr>
+<tr><td>B00Q64UE6O</td><td>DNライティング エースラインランプ FLR1515T6EX-L30</td><td>B</td><td>未取得</td><td>11,891</td><td>791</td><td>6.7</td><td>10</td><td>52,130</td><td>7,910</td></tr>
+<tr><td>B00Q64TPLY</td><td>DNライティング エースラインランプ FLR1365T6EX-L30</td><td>B</td><td>未取得</td><td>11,891</td><td>791</td><td>6.7</td><td>10</td><td>52,130</td><td>7,910</td></tr>
+</tbody></table>
 <h2>発注案（残枠8万円・3SKU）</h2>
 <h3>① 手残り最大</h3>
 <p>予算内で想定手残りがいちばん大きい組み合わせ。</p>

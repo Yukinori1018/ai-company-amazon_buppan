@@ -390,7 +390,7 @@ def gate_status(s: dict, name: str) -> str:
 SCREEN_RESOLVABLE = ("実売",)
 
 
-def candidates(scored: list[dict]) -> tuple[list[dict], list[dict]]:
+def candidates(scored: list[dict]) -> tuple[list[dict], list[dict], dict]:
     """(機械判定 GO, 人の確認待ち) を手残りの大きい順で返す。
 
     「人の確認待ち」＝ **実売以外のすべてのゲートを通っていて、実売だけが UNKNOWN** の行。
@@ -406,11 +406,37 @@ def candidates(scored: list[dict]) -> tuple[list[dict], list[dict]]:
             and all(gate_status(s, g) == "PASS"
                     for g in REQUIRED_GATES if g not in SCREEN_RESOLVABLE)
             and all(gate_status(s, g) == "UNKNOWN" for g in SCREEN_RESOLVABLE)]
-    return sorted(go, key=key), cap_per_family(sorted(pend, key=key))
+    kept, over = split_by_family(sorted(pend, key=key))
+    return sorted(go, key=key), kept, over
 
 
 # 同じブランド×購入元の行を、1リストにこれ以上入れない。
 MAX_PER_FAMILY = 4
+
+
+def split_by_family(rows: list[dict], cap: int = MAX_PER_FAMILY
+                    ) -> tuple[list[dict], dict[tuple, list[dict]]]:
+    """(上限まで残した行, 溢れた行をブランド×購入元でまとめたもの) を返す。
+
+    🔴 **溢れた行は「落ちた行」ではありません。**
+    2026-10-04 の実測で、候補26件のうち **18件が DNライティングの直管蛍光灯1本**でした
+    （仕入れ先も1社）。しかもこの18件は**売れ筋ランクを共有しています**。
+
+    → つまり **1件キーゾンで見れば18件まとめて決まります。**
+    人の30手を同じ棚に18回使わせるのは無駄なので、代表を `cap` 件だけ上のリストに出し、
+    残りは「同じ1手で決まる兄弟」として別表に出します。
+    """
+    seen: Counter = Counter()
+    kept: list[dict] = []
+    over: dict[tuple, list[dict]] = {}
+    for s in rows:
+        k = (s["row"].get("ブランド") or "", s["row"].get("購入元の名前") or "")
+        if seen[k] >= cap:
+            over.setdefault(k, []).append(s)
+            continue
+        seen[k] += 1
+        kept.append(s)
+    return kept, over
 
 
 def cap_per_family(rows: list[dict], cap: int = MAX_PER_FAMILY) -> list[dict]:
@@ -528,11 +554,16 @@ def main(argv=None) -> int:
         print(f"   {name:10s} PASS {c['PASS']:4d} / UNKNOWN {c['UNKNOWN']:4d} / "
               f"FAIL {c['FAIL']:4d}")
 
-    go, pend = candidates(scored)
+    go, pend, over = candidates(scored)
     cands = (go + pend)[:TOP_N]
     print(f"\n🔴 人が実画面で見る価値のある候補: {len(go) + len(pend)}件")
     print(f"   うち機械判定 GO（実売の根拠もある）      {len(go):4d}件")
     print(f"   うち実売だけ人の確認待ち（キーゾン1手）  {len(pend):4d}件")
+    if over:
+        n = sum(len(v) for v in over.values())
+        print(f"   ＋ 同じブランド×購入元の兄弟（代表1件を見れば決まる） {n:4d}件")
+        for (b, sup), v in sorted(over.items(), key=lambda kv: -len(kv[1])):
+            print(f"      {b} / {sup}: 他 {len(v)}件")
 
     OUT.mkdir(parents=True, exist_ok=True)
     write_csv(cands[:TOP_N], OUT / "top30.csv")

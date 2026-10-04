@@ -148,7 +148,7 @@ def status_of(s: dict) -> str:
 def build() -> tuple[list[str], list[dict], list[order_plan.Plan], dict]:
     scored = SC.score_all()
     live = [s for s in scored if s.get("product")]
-    go, pend = SC.candidates(scored)
+    go, pend, over = SC.candidates(scored)
     cands = go + pend
     top = cands[:TOP_N]
 
@@ -168,7 +168,7 @@ def build() -> tuple[list[str], list[dict], list[order_plan.Plan], dict]:
         r = SC.as_row(s)
         r["次の一手"] = status_of(s)
         rows.append(r)
-    return SC.relax_table(scored), rows, plans, stats | {
+    return SC.relax_table(scored), rows, plans, stats | {"over": over,
         "scored": scored, "top": top}
 
 
@@ -344,6 +344,26 @@ def main() -> int:
           "見て上書きしてください**（`schedule.build(lead_bdays=…)`）。"
           "祝日は計算に入っていないので、11/3・11/23・年末年始ぶん数日は遅れます。")
     A("")
+    over = stats.get("over") or {}
+    if over:
+        n = sum(len(v) for v in over.values())
+        A(f"## 同じ棚の兄弟 {n}件（代表1件を見れば全部決まる）")
+        A("")
+        A("上のリストは**同じブランド×購入元を4件まで**に絞っています。溢れたのがこれで、"
+          "**落ちた行ではありません。**")
+        A("")
+        A("🔴 **この兄弟たちは売れ筋ランクを共有しています。**"
+          "だから**代表1件をキーゾンで見れば、全部まとめて GO/NO-GO が決まります。**"
+          "人の30手を同じ棚に18回使う必要はありません。")
+        A("")
+        for (b, sup), v in sorted(over.items(), key=lambda kv: -len(kv[1])):
+            A(f"### {b}（購入元: {sup}）… 他 {len(v)}件")
+            A("")
+            L.extend(md_table([SC.as_row(x) | {"次の一手": status_of(x)} for x in v],
+                              ["ASIN", "商品名", "等級", "売れ筋ランク",
+                               "販売価格(90日中央値)", "1個手残り", "利益率(%)",
+                               "発注点数(Amazon何個)", "発注額(円・税込)", "手残り合計"]))
+            A("")
     A("## 発注案（残枠8万円・3SKU）")
     A("")
     if not plans:
