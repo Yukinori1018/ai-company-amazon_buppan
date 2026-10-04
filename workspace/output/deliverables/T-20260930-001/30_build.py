@@ -17,6 +17,7 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import re
 from collections import Counter, defaultdict
 from pathlib import Path
 
@@ -73,7 +74,9 @@ POST = [
     ("1 monthlySold ≥ 50（product 再判定）", lambda f: (f["ms"] or 0) >= MS_MIN),
     ("2 本体の365日在庫切れ率 ≥ 90%", lambda f: f["oos_amz"] >= OOS_MIN),
     ("4 大カテゴリーランク ≤ 50,000（再判定）", lambda f: f["rank"] is not None and f["rank"] <= RANK_MAX),
-    ("3 FBA出品者 ≥ 2（再判定）", lambda f: f["fba"] is not None and f["fba"] >= FBA_MIN),
+    # 2026-10-04 入口(a)を採用：FBA≥2、または FBA≥1 かつ新品オファー≥2（FBM 出品者もメーカーが卸している証拠）
+    ("3 FBA出品者 ≥ 2、または FBA ≥ 1 かつ新品オファー ≥ 2（再判定）",
+     lambda f: f["fba"] is not None and (f["fba"] >= FBA_MIN or (f["fba"] >= 1 and (f["offers"] or 0) >= 2))),
     ("6 売価（カート価格・無ければ新品最安）≥ 2,200円", lambda f: f["price"] is not None and f["price"] >= PRICE_MIN),
     ("7 除外ルート（再判定）", lambda f: f["root"] not in R.EXCLUDE_ROOTS),
 ]
@@ -107,20 +110,34 @@ def self_cart(seller: str, brand: str, maker: str, offers) -> str:
     return "要確認：" + " / ".join(dict.fromkeys(why)) if why else ""
 
 
+# 入口（ASIN の出どころ）。raw/order*.json と product のキャッシュタグの対応。
+#   base   … 10_funnel.py の全条件（段2b まで）
+#   wideA  … 入口(a)：FBA≥2 を「新品オファー≥2 かつ FBA≥1」に緩めて増えた分（50_expand.py）
+#   seller … 本書 Ch.5-04 のセラーリサーチ：台帳のカート保持セラーが扱う商品（50_expand.py）
+SOURCES = [("base", "order.json", "all"), ("wideA", "order_wideA.json", "wideA"), ("seller", "order_seller.json", "seller")]
+SRC_LABEL = {"base": "基本条件", "wideA": "入口(a) FBA1+オファー2", "seller": "セラーリサーチ"}
+
+
 def load_products() -> list[dict]:
-    order = json.loads((keepa_io.RAW / "order.json").read_text())
-    ps = keepa_io.products(order, "all", offline=True)
+    """全入口の product（取得済みのものだけ）。先に出た入口を優先し、ASIN の重複は落とす。p["_src"] に入口を付ける。"""
     seen, out = set(), []
-    for p in ps:
-        if p["asin"] not in seen:
-            seen.add(p["asin"]); out.append(p)
+    for src, fn, tag in SOURCES:
+        f = keepa_io.RAW / fn
+        if not f.exists():
+            continue
+        for p in keepa_io.products(json.loads(f.read_text()), tag, offline=True):
+            if p["asin"] not in seen:
+                seen.add(p["asin"]); p["_src"] = src; out.append(p)
     return out
 
 
 def build(fetch_bb: bool = False) -> None:
     ps = load_products()
     order = json.loads((keepa_io.RAW / "order.json").read_text())
-    funnel = [("Finder 一覧（段2b まで）", len(order)), ("product 取得済み", len(ps))]
+    funnel = [("Finder 一覧（段2b まで）", len(order))]
+    for src, _, _ in SOURCES:
+        funnel.append((f"product 取得済み：{SRC_LABEL[src]}", sum(1 for p in ps if p["_src"] == src)))
+    funnel.append(("product 取得済み 計", len(ps)))
     alive = [(p, facts(p)) for p in ps]
     for label, ok in POST:
         alive = [(p, f) for p, f in alive if ok(f)]
@@ -164,6 +181,7 @@ def build(fetch_bb: bool = False) -> None:
             "除外理由": excl,
             "判定の根拠": why,
             "救済の根拠": rescue,
+            "入口": "・".join(SRC_LABEL[s] for s in dict.fromkeys(p["_src"] for p, _, _ in items)),
         })
 
     # 代表 ASIN のカート保持者（残す社だけ）
@@ -199,7 +217,7 @@ def build(fetch_bb: bool = False) -> None:
     with open(HERE / "03_メーカー候補_公開版.csv", "w", encoding="utf-8-sig", newline="") as fh:
         w = csv.DictWriter(fh, fieldnames=pub_cols, extrasaction="ignore"); w.writeheader(); w.writerows(rows)
 
-    write_additions(rows)
+    n_add = write_additions(rows)
     keep = [r for r in rows if r["優先度"]]
     summ = {
         "funnel": funnel,
@@ -215,6 +233,8 @@ def build(fetch_bb: bool = False) -> None:
         "救済で残した社": dict(Counter(r["判定の根拠"] for r in keep if r["判定の根拠"].startswith("救済"))),
         "該当ASIN数の合計(残す社)": sum(r["該当ASIN数"] for r in keep),
         "残す社を作ったASIN数(全社)": sum(r["該当ASIN数"] for r in rows),
+        "入口別(残す社)": dict(Counter(r["入口"] for r in keep)),
+        "追加候補(台帳外の残す社)": n_add,
     }
     (WORK / "funnel_post.json").write_text(json.dumps(summ, ensure_ascii=False, indent=1))
     print(json.dumps(summ, ensure_ascii=False, indent=1))
@@ -223,20 +243,28 @@ def build(fetch_bb: bool = False) -> None:
 def write_additions(rows: list[dict]) -> None:
     """連絡先台帳の50社（30_最終_50社.csv）に無い、残した社の一覧 → agent_output/11_追加候補.csv。
     50社側は手で統合した行があるので、社名（正規化）と ASIN（代表・統合した行）の両方で突き合わせる。"""
-    p50 = WORK / "30_最終_50社.csv"
+    # 台帳（シート）の行の出どころ＝sync_ledger.py と同じ3種（30_最終_50社 / 22_連絡先_印付き / 24_連絡先_*）
     names, asins = set(), set()
-    if p50.exists():
+    srcs = [WORK / "30_最終_50社.csv", WORK / "22_連絡先_印付き.csv", *sorted(WORK.glob("24_連絡先_*.csv"))]
+    for p50 in srcs:
+        if not p50.exists():
+            continue
         for r in csv.DictReader(p50.open(encoding="utf-8-sig")):
-            names.add(R._n(r["メーカー名(タカシ)"]))
-            for a in (r.get("代表ASIN(タカシ)", "") + " " + r.get("統合した行のASIN", "")).replace(",", " ").replace("/", " ").split():
-                asins.add(a.strip())
+            for k in ("メーカー名(タカシ)", "メーカー名"):
+                for part in [r.get(k) or "", *(r.get(k) or "").split("／")]:  # 統合行は「A／B／C」
+                    if R._n(part):
+                        names.add(R._n(part))
+            for k in ("代表ASIN(タカシ)", "代表ASIN", "統合した行のASIN"):
+                for a in re.split(r"[\s,/／;、]+", r.get(k) or ""):
+                    asins.add(a.strip())
     add = [r for r in rows if r["優先度"] and R._n(r["メーカー名"]) not in names and r["代表ASIN"] not in asins]
     cols = ["優先度", "メーカー名", "ブランド", "代表ASIN", "代表商品名", "Amazon URL", "該当ASIN数", "A条件のASIN数",
             "過去1ヶ月の販売数(代表)", "代表の売価", "代表のFBA数", "代表の新品オファー数", "カテゴリ", "印",
-            "カート保持セラー(代表)", "要確認", "判定の根拠", "救済の根拠"]
+            "カート保持セラー(代表)", "要確認", "判定の根拠", "救済の根拠", "入口"]
     with open(WORK / "11_追加候補.csv", "w", encoding="utf-8-sig", newline="") as fh:
         w = csv.DictWriter(fh, fieldnames=cols, extrasaction="ignore"); w.writeheader(); w.writerows(add)
-    print(f"11_追加候補.csv: {len(add)} 社（50社台帳 {len(names)} 社を除く）")
+    print(f"11_追加候補.csv: {len(add)} 社（台帳 {len(names)} 社名・{len(asins)} ASIN と重複するものを除く）")
+    return len(add)
 
 
 if __name__ == "__main__":
