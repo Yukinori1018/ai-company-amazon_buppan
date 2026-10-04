@@ -44,16 +44,18 @@ def _known() -> set[str]:
 
 
 def _list(sel: dict, tag: str) -> list[str]:
-    """Finder の一覧を全ページ取る（perPage 10000）。"""
-    asins: list[str] = []
-    page = 0
-    while True:
-        d = keepa_io.finder({**sel, "perPage": 10000, "page": page, "sort": [["monthlySold", "desc"]]}, f"{tag}p{page}")
-        got = d.get("asinList") or []
-        asins += got
-        if len(got) < 10000 or len(asins) >= (d.get("totalResults") or 0):
-            return asins
-        page += 1
+    """Finder の一覧を全件取る。**Keepa の Finder は先頭 10,000 件までしか返さない**（page=1 は 400 Bad Request・
+    2026-10-04 実測）。10,000 件を超えるときは monthlySold の降順と昇順で1本ずつ取り、和集合にする（20,000 件まで）。"""
+    d = keepa_io.finder({**sel, "perPage": 10000, "page": 0, "sort": [["monthlySold", "desc"]]}, f"{tag}p0")
+    asins = list(d.get("asinList") or [])
+    total = d.get("totalResults") or 0
+    if total > 10000:
+        d2 = keepa_io.finder({**sel, "perPage": 10000, "page": 0, "sort": [["monthlySold", "asc"]]}, f"{tag}asc")
+        seen = set(asins)
+        asins += [a for a in (d2.get("asinList") or []) if a not in seen]
+        if total > 20000:
+            print(f"  警告: {tag} は {total} 件。20,000 件を超えた分は取れていない", flush=True)
+    return asins
 
 
 def seller_rank() -> list[tuple[str, int, str]]:
