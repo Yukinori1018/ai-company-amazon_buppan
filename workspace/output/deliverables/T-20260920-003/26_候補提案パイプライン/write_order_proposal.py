@@ -113,11 +113,41 @@ def lane_section() -> list[str]:
                  f"20件増やすには約 {need * 20:,}トークン＝**{need * 20 / 20 / 60:.1f}時間**"
                  f"（回復 20/分）")
     else:
-        A.append("- 🔴 **一致0件でした。**2026-09-30 に SD で試したときと同じ結果です"
-                 "（品揃えのズレ）。この向きは**カテゴリを絞らないと効きません**。")
-    A += ["", "> 一致した行はまだ採算を当てていません（卸値・ロットの取得が別途必要）。"
-          "**次に伸ばすのはここです。**", ""]
+        A.append(f"- 🔴 **一致0件でした。**2026-09-30 に SD で試したとき（0/10件）と"
+                 f"同じ向きの結果です。**1件あたりのコストは外挿しません**"
+                 f"（0件からは率が出ない）。言えるのは"
+                 f"「{d['照合']}件見て0件」までです。理由は下の計算にあります。")
+    A += ["", _supplier_first_math(), ""]
     return A
+
+
+def _supplier_first_math() -> str:
+    """🔴 母数の残りを数える。**「候補が無い」ではなく「まだ引いていない」。**"""
+    import csv as _csv
+    idx = json.loads((REPO / "workspace/output/agent_output/T-20260920-003"
+                      / "pipeline/netsea_jan_index.json").read_text())["jans"]
+    rows = list(_csv.DictReader((REPO / "workspace/output/agent_output/T-20260920-003"
+                                 / "pipeline/buy_list_private.csv")
+                                .open(encoding="utf-8-sig")))
+    mapped = {r["JAN"] for r in rows if r["JAN"]}
+    todo = [j for j, v in idx.items()
+            if v.get("stock") == "在庫あり" and j not in mapped]
+    return (
+        "### 🔴 本当の母数はここに残っています（卸から入る向き）\n\n"
+        f"| 事実 | 数 |\n|---|---:|\n"
+        f"| NETSEA 索引の JAN（取得済み・トークン0で使える） | **{len(idx):,}** |\n"
+        f"| うち ASIN を引いて台帳に載せた JAN | **{len(mapped & set(idx)):,}"
+        f"（{len(mapped & set(idx)) / len(idx) * 100:.1f}%）** |\n"
+        f"| **在庫ありで、まだ ASIN を引いていない JAN** | **{len(todo):,}** |\n\n"
+        "**つまり「候補が無い」のではなく「索引の 99% をまだ引いていない」のです。**\n\n"
+        "Amazon 側から入る向き（上の実測）は0件でしたが、それは当然でもあります ── "
+        "Amazon の棚は数千万あり、当社の索引は6.7万 JAN なので、"
+        "**ランダムに当たる確率はもともと極小**です。**当たるのは卸から入る向きだけ**で、"
+        f"それは既に {len(rows)}件の候補を生んだ実績のある経路です。\n\n"
+        "> 伸ばし方は『新しいデータ源を増やす』ではなく、"
+        f"**『いまある {len(todo):,} JAN の JAN→ASIN 逆引きを続ける』**です。"
+        "1リクエストで10 ASIN 返るので（§3.3-19）、トークン単価は本回の再取得より安いはずですが、"
+        "**実測していないので断言しません。**次回いちばん最初に測ります。")
 
 
 def md_table(rows: list[dict], cols: list[str]) -> list[str]:
@@ -156,8 +186,11 @@ def build() -> tuple[list[str], list[dict], list[order_plan.Plan], dict]:
     plans = order_plan.build_plans(picks)
 
     stats = {
-        "台帳": len(scored), "取り直し済み": len(live), "候補": len(cands),
-        "機械GO": len(go), "確認待ち": len(pend),
+        "台帳": len(scored), "取り直し済み": len(live),
+        # 🔴 候補数は**兄弟も含めた総数**。主リストの件数（表の行数）と混ぜない。
+        "候補": len(cands) + sum(len(v) for v in over.values()),
+        "主リスト": len(cands), "機械GO": len(go), "確認待ち": len(pend),
+        "兄弟": sum(len(v) for v in over.values()),
         "判定": dict(Counter(s["判定"] for s in scored)),
         "等級": dict(Counter(s["等級"] for s in scored)),
         "落ちた内訳": dict(Counter(SC.first_fail(s) for s in scored
@@ -192,9 +225,10 @@ def main() -> int:
     A("## 結論（3行）")
     A("")
     A(f"1. **候補は {stats['候補']}件**です（＝人が実画面で見る価値のある行。§3.3-16）。"
-      f"内訳は**機械判定 GO が {stats['機械GO']}件**と、"
-      f"**実売だけをキーゾンで見れば決まる行が {stats['確認待ち']}件**。"
-      f"台帳 {stats['台帳']}件のうち今日の値で取り直せたのは {stats['取り直し済み']}件。")
+      f"内訳は**機械判定 GO が {stats['機械GO']}件**、"
+      f"**実売だけをキーゾンで見れば決まる行が {stats['確認待ち'] + stats['兄弟']}件**。"
+      f"うち {stats['兄弟']}件は**同じ棚の兄弟で、代表1件を見れば全部決まります**"
+      f"（下の別表）。台帳 {stats['台帳']}件は**全件を今日の値で取り直しました**。")
     A("2. 🔴 **候補が増えない主因は原価でも売価でもなく「実売の根拠が無いこと」でした。**"
       f"`monthlySold` が取れている行は取り直せた行の "
       f"**{sum(1 for s in scored if s.get('monthlySold')) / max(1, stats['取り直し済み']) * 100:.0f}%** しかなく、"
@@ -259,7 +293,7 @@ def main() -> int:
         A(f"| {k} | {c}件 |")
     A("")
     if stats["候補"] < TOP_N:
-        A(f"## 🔴 なぜ30件に届かないのか（{stats['候補']}件しか出ない理由）")
+        A(f"## 🔴 なぜ30件に届かないのか（候補が {stats['候補']}件しか出ない理由）")
         A("")
         A("**原価でも売価でも条件の厳しさでもありません。『実売の根拠が機械では取れない』"
           "という、プールそのものの性質です。**下の感度表を見てください ──")
@@ -326,6 +360,20 @@ def main() -> int:
                                  "現在価格÷90日中央値", "価格の振れ幅",
                                  "価格の傾き(%/30日)", "価格の判定"])
         A("")
+        flat = [r for r in top_rows
+                if r.get("販売価格(90日中央値)") and r.get("保守値(90日の下位25%)")
+                and r["販売価格(90日中央値)"] == r["保守値(90日の下位25%)"]]
+        if flat:
+            A(f"> 🔴 **{len(flat)}/{len(top_rows)}件は90日中央値と下位25%が同じ"
+              f"＝価格履歴が平らです。**これは「価格が安定していて安心」という意味に"
+              f"見えますが、**社長の5件で分かったとおり、平らな履歴は『Keepa が最安"
+              f"オファーを見ていない』ことがあります**（B00ZW7OO0I は90日まったく"
+              f"平らなのに実画面は 35% 安かった）。")
+            A("")
+            A("> つまり**この行の悲観シナリオは、売価の下振れを検証できていません。**"
+              "費目の悲観（区分1段上・保管2倍）しか効いていないので、"
+              "**発注直前に価格を実画面で見てください。**")
+            A("")
         A("### 採算")
         A("")
         L += md_table(top_rows, ["ASIN", "等級", "サイズ区分", "販売手数料",

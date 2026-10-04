@@ -130,10 +130,17 @@ def main(argv=None) -> int:
     rate = (len(hits) / checked * 100) if checked else 0.0
     print(f"\n照合 {checked}件 → NETSEA 一致 {len(hits)}件（{rate:.1f}%）")
     print(f"消費トークン {spent}")
-    if checked:
-        need = int(round(100 / max(rate, 0.01) * COST_PER_PRODUCT))
+    if checked and rate > 0:
+        need = int(round(100 / rate * COST_PER_PRODUCT))
         print(f"一致1件あたり約 {need} トークン ＝ 20件増やすのに約 {need * 20:,} トークン"
               f"（20/分なので約 {need * 20 / 20 / 60:.1f}時間）")
+    elif checked:
+        # 🔴 **一致0件から「1件あたり何トークン」を外挿してはいけません。**
+        # 2026-10-04 に max(rate, 0.01) で割って「30,000トークン／件・500時間」という
+        # **根拠のない数字**を出しました。0件は「率が小さい」ではなく「測れていない」です。
+        print(f"一致0件です。**1件あたりのコストは外挿しません**（0件からは率が出ない）。"
+              f"言えるのは『{checked}件見て0件＝率は {3 / checked * 100:.1f}% 未満の可能性が高い』"
+              f"までです。")
     json.dump({"照合": checked, "一致": len(hits), "一致率(%)": round(rate, 1),
                "消費トークン": spent,
                "hits": [{k: v for k, v in h.items() if k != "product"} for h in hits]},

@@ -5,7 +5,7 @@
 <hr>
 <h2>結論（3行）</h2>
 <ol>
-<li style='margin-left:0.0em'><strong>候補は 12件</strong>です（＝人が実画面で見る価値のある行。§3.3-16）。内訳は<strong>機械判定 GO が 2件</strong>と、<strong>実売だけをキーゾンで見れば決まる行が 10件</strong>。台帳 648件のうち今日の値で取り直せたのは 648件。</li>
+<li style='margin-left:0.0em'><strong>候補は 26件</strong>です（＝人が実画面で見る価値のある行。§3.3-16）。内訳は<strong>機械判定 GO が 2件</strong>、<strong>実売だけをキーゾンで見れば決まる行が 24件</strong>。うち 14件は<strong>同じ棚の兄弟で、代表1件を見れば全部決まります</strong>（下の別表）。台帳 648件は<strong>全件を今日の値で取り直しました</strong>。</li>
 <li style='margin-left:0.0em'>🔴 <strong>候補が増えない主因は原価でも売価でもなく「実売の根拠が無いこと」でした。</strong><code>monthlySold</code> が取れている行は取り直せた行の <strong>7%</strong> しかなく、代用していたランクは <strong>219件が兄弟 ASIN との共有値</strong>で、ASIN 単位の「売れている根拠」になりません。</li>
 <li style='margin-left:0.0em'><strong>入口が逆です。</strong>既存プールは卸（NETSEA）から入って Amazon に当てたので、「仕入れはあるが売れていない棚」ばかりになりました。<strong>売れている棚から入る</strong>向き（<code>lane_selling_first.py</code>）を用意し、下の節で<strong>実際に当たる率を測りました</strong>。</li>
 </ol>
@@ -41,7 +41,7 @@
 <tr><td>季節の窓（UNKNOWN）</td><td>1件</td></tr>
 <tr><td>採算（UNKNOWN）</td><td>1件</td></tr>
 </tbody></table>
-<h2>🔴 なぜ30件に届かないのか（12件しか出ない理由）</h2>
+<h2>🔴 なぜ30件に届かないのか（候補が 26件しか出ない理由）</h2>
 <p><strong>原価でも売価でも条件の厳しさでもありません。『実売の根拠が機械では取れない』という、プールそのものの性質です。</strong>下の感度表を見てください ──</p>
 <p><strong>ランクの上限を10万位から50万位まで動かしても、候補はほとんど増えません。</strong></p>
 <table><thead><tr><th>事実</th><th>数</th></tr></thead><tbody>
@@ -118,6 +118,8 @@
 <tr><td>B0CVX7YCKS</td><td>4,385</td><td>4,385</td><td>4,385</td><td>4,385</td><td>4,385</td><td>1.0</td><td>0.0</td><td>-0.0</td><td>使える</td></tr>
 <tr><td>B00Z9I3H08</td><td>4,778</td><td>4,639</td><td>4,611</td><td>4,778</td><td>4,259</td><td>0.891</td><td>0.035</td><td>-3.1</td><td>使える</td></tr>
 </tbody></table>
+<blockquote>🔴 <strong>9/12件は90日中央値と下位25%が同じ＝価格履歴が平らです。</strong>これは「価格が安定していて安心」という意味に見えますが、<strong>社長の5件で分かったとおり、平らな履歴は『Keepa が最安オファーを見ていない』ことがあります</strong>（B00ZW7OO0I は90日まったく平らなのに実画面は 35% 安かった）。</blockquote>
+<blockquote>つまり<strong>この行の悲観シナリオは、売価の下振れを検証できていません。</strong>費目の悲観（区分1段上・保管2倍）しか効いていないので、<strong>発注直前に価格を実画面で見てください。</strong></blockquote>
 <h3>採算</h3>
 <table><thead><tr><th>ASIN</th><th>等級</th><th>サイズ区分</th><th>販売手数料</th><th>FBA配送代行</th><th>その他固定費</th><th>1個手残り</th><th>利益率(%)</th><th>悲観の手残り</th><th>悲観の利益率(%)</th><th>発注点数(Amazon何個)</th><th>発注額(円・税込)</th><th>手残り合計</th></tr></thead><tbody>
 <tr><td>B081T1NY2T</td><td>B</td><td>標準7</td><td>748</td><td>472</td><td>460</td><td>1,308</td><td>20.0</td><td>-100</td><td>-1.5</td><td>16</td><td>56,832</td><td>20,928</td></tr>
@@ -245,8 +247,20 @@
 </ul>
 <blockquote>これは<strong>ゲートにしていません</strong>。商品名のキーワードで落とす/残すを決めるのは§3.3-20 が禁じている型（「土」で土鍋を春物にした事故）なので、<strong>論点として出すだけ</strong>にしています。</blockquote>
 <h2>母数を取りに行くレーン（売れている棚から入る）の実測</h2>
-<p><strong>未実施です。</strong>Keepa のトークンがプール648件の再取得で尽きました（1件3トークン × 648件 ＝ 1,944トークン／回復は20/分）。</p>
-<p><code>python3 lane_selling_first.py --budget 400</code> で走ります。</p>
+<ul>
+<li style='margin-left:0.0em'><code>monthlySold &gt;= 50</code> の棚から <strong>120件</strong>を取り、NETSEA 索引（67,667 JAN）に当てました</li>
+<li style='margin-left:0.0em'><strong>一致 0件（0.0%）</strong>／消費 470トークン</li>
+<li style='margin-left:0.0em'>🔴 <strong>一致0件でした。</strong>2026-09-30 に SD で試したとき（0/10件）と同じ向きの結果です。<strong>1件あたりのコストは外挿しません</strong>（0件からは率が出ない）。言えるのは「120件見て0件」までです。理由は下の計算にあります。</li>
+</ul>
+<h3>🔴 本当の母数はここに残っています（卸から入る向き）</h3>
+<table><thead><tr><th>事実</th><th>数</th></tr></thead><tbody>
+<tr><td>NETSEA 索引の JAN（取得済み・トークン0で使える）</td><td><strong>67,667</strong></td></tr>
+<tr><td>うち ASIN を引いて台帳に載せた JAN</td><td><strong>466（0.7%）</strong></td></tr>
+<tr><td><strong>在庫ありで、まだ ASIN を引いていない JAN</strong></td><td><strong>59,575</strong></td></tr>
+</tbody></table>
+<p><strong>つまり「候補が無い」のではなく「索引の 99% をまだ引いていない」のです。</strong></p>
+<p>Amazon 側から入る向き（上の実測）は0件でしたが、それは当然でもあります ── Amazon の棚は数千万あり、当社の索引は6.7万 JAN なので、<strong>ランダムに当たる確率はもともと極小</strong>です。<strong>当たるのは卸から入る向きだけ</strong>で、それは既に 648件の候補を生んだ実績のある経路です。</p>
+<blockquote>伸ばし方は『新しいデータ源を増やす』ではなく、<strong>『いまある 59,575 JAN の JAN→ASIN 逆引きを続ける』</strong>です。1リクエストで10 ASIN 返るので（§3.3-19）、トークン単価は本回の再取得より安いはずですが、<strong>実測していないので断言しません。</strong>次回いちばん最初に測ります。</blockquote>
 <h2>やっていないこと（境界）</h2>
 <ul>
 <li style='margin-left:0.0em'><strong>発注・購入・決済・第三者連絡はしていません</strong>（§4.1）。発注の手前で止めています。</li>
