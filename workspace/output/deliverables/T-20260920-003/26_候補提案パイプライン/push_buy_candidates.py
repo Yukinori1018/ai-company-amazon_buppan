@@ -65,7 +65,10 @@ def to_row(rank: int, s: dict) -> list:
         "ゲート種別": r.get("ゲート種別"), "購入元の名前": r.get("購入元の名前"),
         "購入先URL": r.get("購入先URL"),
         # 🔴 機械が埋めてよいのは「機械判定のみ」。人の確認結果は人が書きます。
-        "実画面確認": ledger_sheet.MACHINE_ONLY,
+        # 🔴 機械が埋めてよいのは「機械判定のみ」。そこに**次に人が何を見ればよいか**を
+        #    添える。人の確認結果（ゲートの根拠・キーゾンの実数）は人が書く欄のまま。
+        "実画面確認": (ledger_sheet.MACHINE_ONLY if s["判定"] == "GO"
+                       else f"{ledger_sheet.MACHINE_ONLY}／🔴実売をキーゾンで確認"),
         "判定理由(新)": " ／ ".join(f"{n}. {why}" for n, st, why in s["gates"]
                                    if st != "PASS")[:900] or "全ゲート PASS",
         "最低価格(10/4実測)": SC.SCREEN_PRICES.get(s["asin"], ""),
@@ -95,9 +98,10 @@ def main(argv=None) -> int:
     a = ap.parse_args(argv)
 
     scored = SC.score_all()
-    cands = [s for s in scored if s["判定"] == "GO" and s["等級"] in ("A", "B")]
-    cands.sort(key=lambda s: -(s["手残り合計"] or 0))
+    go, pend = SC.candidates(scored)
+    cands = go + pend
     top = cands[:a.top]
+    print(f"機械判定 GO {len(go)}件 ／ 実売だけ人の確認待ち {len(pend)}件")
     rows = [to_row(i + 1, s) for i, s in enumerate(top)]
     print(f"候補 {len(cands)}件 → 上に差し込むのは {len(rows)}行")
 
