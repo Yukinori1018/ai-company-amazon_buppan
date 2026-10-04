@@ -97,7 +97,10 @@ _i = BASE_COLS.index('代表の売価') + 1
 _OLD_PROFIT = [C_P, C_UP_HI, C_UP_HI_EX, O_UP_LO, C_BE, C_RATE, O_MS, O_MP, O_MIN5, O_1M,
                C_STAB, C_MEMO, C_DROP, C_STORE]
 OLD_COLS = BASE_COLS[:2] + [O_ORDER] + BASE_COLS[2:_i] + _OLD_PROFIT + BASE_COLS[_i:]
-COLS = BASE_COLS[:2] + [C_ORDER, C_DIST] + BASE_COLS[2:_i] + PROFIT_COLS + BASE_COLS[_i:]
+PREV_COLS = BASE_COLS[:2] + [C_ORDER, C_DIST] + BASE_COLS[2:_i] + PROFIT_COLS + BASE_COLS[_i:]
+# 2026-10-04 夜（サトル）：商品×社名の紐付け確認の4列を末尾に追加。直前の46列（PREV_COLS）からの移行を許す
+LINK_COLS = ['紐付けの判定', '紐付け根拠URL', 'Amazon上のブランド表記', 'Amazon上のメーカー表記']
+COLS = PREV_COLS + LINK_COLS
 
 OWNER_COLS = ['接触ステータス', '接触日', 'メモ']
 STATUS_OPTIONS = ["未接触", "送信済", "返信あり", "見積りあり", "成約", "お断り"]
@@ -116,6 +119,12 @@ JUDGE = ('【見積り判定表】メーカーから見積りが来たら、こ�
          f'見積り（着値・税込）が利益率{TE}%の上限以下なら、§3.3/§3.5 の地雷確認を通したうえで5〜10個テスト仕入れ。'
          '売れる量・儲かる額の予測はしない（テストの実績が唯一の正）。\n')
 NOTES = {
+    '紐付けの判定': ('代表ASINの商品が、この社の製造・販売品であることを公式ページで確かめた結果（サトル 2026-10-04）。\n'
+                    '一致＝公式に同じ商品（商品名・容量・型番）あり／一致（表記ゆれ）＝Amazonのブランド欄が原料メーカー・ブランド名・海外製造元など（理由を併記）／'
+                    '不一致＝別会社の商品／未確認＝公式に同商品のページなし。不一致・未確認は判定を「要確認」にして送信キューから外す。'),
+    '紐付け根拠URL': '上の判定の根拠にした公式サイト・公式通販・ブランド公式のページ（取得 2026-10-04）。',
+    'Amazon上のブランド表記': '代表ASINの Amazon 上のブランド欄（Keepa の brand。取得 2026-09-30〜10-04）。製造販売元と違うことがある。',
+    'Amazon上のメーカー表記': '代表ASINの Amazon 上のメーカー欄（Keepa の manufacturer）。販売店名・旧社名・ブランド名が入ることがある。',
     C_ORDER: ('送信キューの順番（成約しやすさ順。儲かる順ではない）。\n'
               '① 流通形態 直販・取引可＞不明＞代理店制＞会員制・専売・酒類 ② 窓口 メール＞電話のみ＞フォームのみ '
               '③ 規模 中小（従業員300名以下・資本金3億円以下・不明）＞中堅 ④ 代表商品の新品出品者数が多い ⑤ 該当ASIN数が多い。\n'
@@ -365,6 +374,8 @@ def main():
     head = cur[0] if cur else []
     if head[:len(COLS)] == COLS:
         mode, cur_cols = '通常', COLS
+    elif head[:len(PREV_COLS)] == PREV_COLS and len([h for h in head if h]) == len(PREV_COLS):
+        mode, cur_cols = '移行（46列→紐付け4列追加・初回のみ）', PREV_COLS
     elif head[:len(OLD_COLS)] == OLD_COLS and len([h for h in head if h]) == len(OLD_COLS):
         mode, cur_cols = '移行（旧46列→送信キュー型・初回のみ）', OLD_COLS
     else:
