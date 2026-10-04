@@ -136,10 +136,18 @@ class TestEconomicsGate(unittest.TestCase):
         self.assertIn("赤字", reason)
 
     def test_slow_turnover_is_fail(self):
-        """最小ロットが大きく6ヶ月で捌けない在庫は NO-GO（社長既定）。"""
-        status, reason = pipe.economics_status(self._e(qty=24, monthly_sold=2), 2)
+        """最小ロットが大きく6ヶ月で捌けない在庫は NO-GO（社長既定）。
+
+        ⚠️ **黒字の行で試すこと。**2026-10-04 に等級の線を「利益率20% または 手残り400円」に
+        変えたら、それまでのフィクスチャ（原価1,500・手残り96円）が**先に C で落ちる**ように
+        なり、このテストは回転の判定を通らなくなった（それでも FAIL なので気づきにくい）。
+        回転の上限を試したいなら、**採算では落ちない行**を渡さないと意味がない。
+        """
+        status, reason = pipe.economics_status(
+            self._e(unit_cost_incl=600, qty=24, monthly_sold=2), 2)
         self.assertEqual(status, md.FAIL)
         self.assertIn("ヶ月", reason)
+        self.assertIn("上限6ヶ月", reason)
 
     def test_unknown_monthly_sold_does_not_block_go(self):
         """月販が取れないことを理由に落とさない（2026-09-30 カズヨ訂正・CLAUDE.md §3.1）。
