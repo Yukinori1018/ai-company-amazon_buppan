@@ -1,0 +1,114 @@
+<!doctype html><html lang='ja'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>発注案 — 価格履歴で採り直した候補と、残枠8万円で買う3案</title><style>body{font-family:-apple-system,'Hiragino Sans','Noto Sans JP',sans-serif;max-width:1150px;margin:2em auto;padding:0 1em;line-height:1.65;color:#222;font-size:14.5px}table{border-collapse:collapse;margin:.8em 0;font-size:.92em}th,td{border:1px solid #bbb;padding:.35em .6em;vertical-align:top}th{background:#eef2f8}tr:nth-child(even) td{background:#fafafa}h1{font-size:1.5em;border-bottom:2px solid #444}h2{font-size:1.25em;border-left:5px solid #25b;padding-left:8px;margin-top:1.8em}h3{font-size:1.05em;margin-top:1.4em}blockquote{border-left:4px solid #ccc;margin:.8em 0;padding:.2em 1em;color:#444}code{background:#f3f3f3;padding:1px 4px;border-radius:3px}hr{border:0;border-top:1px solid #ccc;margin:1.6em 0}</style></head><body>
+<h1>発注案 — 価格履歴で採り直した候補と、残枠8万円で買う3案</h1>
+<p>IT エンジニア タカシ／2026-10-04／チケット T-20260920-003</p>
+<blockquote><strong>ロードマップ上の位置</strong>：4日間 候補0件だった原因を「価格の陳腐化」ではなく「<strong>普段いくらで売れているかを見ていなかったこと</strong>」として直し、<strong>発注と出品申請の手前まで</strong>持っていく回です。発注は社長判断（§4.1）。</blockquote>
+<hr>
+<h2>結論（3行）</h2>
+<ol>
+<li style='margin-left:0.0em'><strong>候補は 2件</strong>です（人が実画面で見る価値のある行）。台帳 648件のうち今日の値で取り直せたのは 500件。</li>
+<li style='margin-left:0.0em'>🔴 <strong>候補が増えない主因は原価でも売価でもなく「実売の根拠が無いこと」でした。</strong><code>monthlySold</code> が取れている行は取り直せた行の <strong>2%</strong> しかなく、代用していたランクは <strong>266件が兄弟 ASIN との共有値</strong>で、ASIN 単位の「売れている根拠」になりません。</li>
+<li style='margin-left:0.0em'><strong>入口が逆です。</strong>既存プールは卸（NETSEA）から入って Amazon に当てたので、「仕入れはあるが売れていない棚」ばかりになりました。<code>lane_selling_first.py</code> で<strong>売れている棚から入る</strong>向きに変えた測定を併走させています。</li>
+</ol>
+<h2>社長の5件を履歴で切り分けました（「一時的に安い」か「恒常的に下がった」か）</h2>
+<table><thead><tr><th>ASIN</th><th>商品</th><th>台帳の売価</th><th>10/4 実画面</th><th>90日中央値</th><th>下位25%</th><th>履歴の判定</th><th>切り分け</th></tr></thead><tbody>
+<tr><td>B003181XQ8</td><td>ナカイ 股関節サポート</td><td>12,100</td><td>8,318</td><td>7,990</td><td>7,990</td><td>高値</td><td><strong>水準は動いていません</strong>（180日中央 7,990円・90日中央 7,990円）。直近90日の傾きは +28.3%/30日。実画面 8,318円 は90日の幅の中＝<strong>普段の値どおり</strong>。台帳の売価 12,100円 は90日中央値より +51%。</td></tr>
+<tr><td>B00ZW7OO0I</td><td>パールホワイト</td><td>1,991</td><td>1,300</td><td>1,991</td><td>1,991</td><td>使える</td><td><strong>水準は動いていません</strong>（180日中央 1,991円・90日中央 1,991円）。直近90日の傾きは +0.1%/30日。実画面 1,300円 は90日の下位25%（1,991円）より下＝<strong>履歴に出ていない安値</strong>。一時的な下げか、履歴に乗らない出品かのどちらかで、<strong>人が実画面で要確認</strong>。台帳の売価 1,991円 は90日中央値より +0%。</td></tr>
+<tr><td>B01N5Q61K6</td><td>オリヒロ フコイダン</td><td>4,250</td><td>3,250</td><td>4,250</td><td>4,250</td><td>使える</td><td><strong>水準は動いていません</strong>（180日中央 4,153円・90日中央 4,250円）。直近90日の傾きは +0.4%/30日。実画面 3,250円 は90日の下位25%（4,250円）より下＝<strong>履歴に出ていない安値</strong>。一時的な下げか、履歴に乗らない出品かのどちらかで、<strong>人が実画面で要確認</strong>。台帳の売価 4,250円 は90日中央値より +0%。</td></tr>
+<tr><td>B004PXZAFI</td><td>日本アンテナ</td><td>5,897</td><td>5,017</td><td>3,400</td><td>3,400</td><td>使える</td><td><strong>水準は動いていません</strong>（180日中央 3,400円・90日中央 3,400円）。直近90日の傾きは +0.3%/30日。実画面 5,017円 は上位25%より上＝いまは高値。台帳の売価 5,897円 は90日中央値より +73%。</td></tr>
+<tr><td>B086LB3LH6</td><td>マルフク クエン酸</td><td>1,980</td><td>1,580</td><td>1,980</td><td>1,980</td><td>使える</td><td><strong>水準は動いていません</strong>（180日中央 1,980円・90日中央 1,980円）。直近90日の傾きは -0.3%/30日。実画面 1,580円 は90日の下位25%（1,980円）より下＝<strong>履歴に出ていない安値</strong>。一時的な下げか、履歴に乗らない出品かのどちらかで、<strong>人が実画面で要確認</strong>。台帳の売価 1,980円 は90日中央値より +0%。</td></tr>
+</tbody></table>
+<blockquote>🔴 <strong>3/5件で、社長が実画面で見た価格が90日の下位25%より下でした</strong>＝履歴に出ていない安値です。履歴は「普段いくらで売れているか」を教えてくれますが、<strong>この5件は履歴と実画面が食い違います。</strong>片方を黙って採らず、<code>price_history.PriceLevel.disagreement</code> に残し、<strong>採算は低いほう（実画面）で</strong>計算しています（§3.3-1「食い違ったら食い違いごと出す」）。</blockquote>
+<h2>🔴 どのゲートで何件落ちたか</h2>
+<table><thead><tr><th>最初に落ちた／決まらなかったゲート</th><th>件数</th></tr></thead><tbody>
+<tr><td>取り直し（UNKNOWN）</td><td>148件</td></tr>
+<tr><td>価格の動き（UNKNOWN）</td><td>120件</td></tr>
+<tr><td>採算（FAIL）</td><td>99件</td></tr>
+<tr><td>実売（FAIL）</td><td>73件</td></tr>
+<tr><td>仕入れ（UNKNOWN）</td><td>50件</td></tr>
+<tr><td>実売（UNKNOWN）</td><td>44件</td></tr>
+<tr><td>カート保持者（FAIL）</td><td>40件</td></tr>
+<tr><td>季節の窓（FAIL）</td><td>28件</td></tr>
+<tr><td>価格の動き（FAIL）</td><td>20件</td></tr>
+<tr><td>カート保持者（UNKNOWN）</td><td>19件</td></tr>
+<tr><td>仕入れ（FAIL）</td><td>3件</td></tr>
+<tr><td>季節の窓（UNKNOWN）</td><td>1件</td></tr>
+<tr><td>採算（UNKNOWN）</td><td>1件</td></tr>
+</tbody></table>
+<h2>条件をこう緩めれば何件増えるか</h2>
+<p>今日の値で取り直せた 500件のうち、全ゲート PASS は 2件。</p>
+<table><thead><tr><th>無視する条件</th><th>候補数</th><th>その条件だけで落ちている件数</th></tr></thead><tbody>
+<tr><td>価格の動き</td><td>4件</td><td>2件</td></tr>
+<tr><td>カート保持者</td><td>3件</td><td>1件</td></tr>
+<tr><td>実売</td><td>46件</td><td>44件</td></tr>
+<tr><td>仕入れ</td><td>2件</td><td>0件</td></tr>
+<tr><td>セット数</td><td>2件</td><td>0件</td></tr>
+<tr><td>採算</td><td>20件</td><td>18件</td></tr>
+<tr><td>季節の窓</td><td>6件</td><td>4件</td></tr>
+</tbody></table>
+<p><strong>実売（ランクの上限）を動かしたとき</strong>（他の条件はそのまま）</p>
+<table><thead><tr><th>ランク上限</th><th>候補数</th><th>想定手残り合計</th></tr></thead><tbody>
+<tr><td>100,000位以内</td><td>0件</td><td>0円</td></tr>
+<tr><td>150,000位以内</td><td>5件</td><td>100,448円</td></tr>
+<tr><td>200,000位以内</td><td>6件</td><td>122,038円</td></tr>
+<tr><td>300,000位以内</td><td>17件</td><td>329,438円 ←いまここ</td></tr>
+<tr><td>500,000位以内</td><td>25件</td><td>396,664円</td></tr>
+</tbody></table>
+<h2>先人のどの型を使ったか</h2>
+<ul>
+<li style='margin-left:0.0em'><strong>売価750円以下は販売手数料5%</strong>（ちゃんやま氏の計算例：販売750円−手数料38円−配送222円＝入金490円）。<code>fba_cost.referral_pct</code> の750円の崖として実装し、<strong>この帯を候補から外していません</strong>。</li>
+<li style='margin-left:0.0em'><strong>単価の下限は置かない</strong>（実践者 N=6 全員が置いていない）。判定は<strong>利益額</strong>で切り、<code>fba_cost.MIN_PROFIT_YEN = 400</code>（実践者の下端）<strong>または</strong>利益率20%の OR にしました。</li>
+<li style='margin-left:0.0em'><strong>「低単価だからセット組」は誤り。体積が大きいからセット組</strong>（<code>fba_cost.bundle_advice</code>）。小型で既に750円以下の商品をセットにすると手数料が5%→15.4%に跳ねます。</li>
+<li style='margin-left:0.0em'><strong>仕入れ数＝月販÷(出品者+1)</strong>（うみぞう氏／<code>knowledge_keepa_operation_umizou</code>）を<code>profit.order_qty</code> の回転上限6ヶ月と合わせて使っています。</li>
+</ul>
+<blockquote>出典は成果物34「低単価帯で成立させる型」（リサーチャー サトル・2026-10-04）。<strong>自分で一から設計した判定基準はありません。</strong></blockquote>
+<h2>上位 2件（手残りの大きい順）</h2>
+<h3>社長が現物を確認する列（§3.2 必須6列）</h3>
+<table><thead><tr><th>ASIN</th><th>商品名</th><th>過去1ヶ月の販売数</th><th>セラー数</th><th>Amazon本体の有無</th><th>カートの販売元</th><th>購入元の名前</th><th>AmazonURL</th></tr></thead><tbody>
+<tr><td>B081T1NY2T</td><td>ウォーターゲーム 海のなかま 2色アソート 24個入りBOX レトロゲーム 輪投げ</td><td>表示なし（月50個未満）</td><td>2社（Keepa offers の実数・画面未確認）</td><td>なし</td><td>株式会社テンマヤ（AEW203409RTTT）</td><td>株式会社 ファースト・アロー</td><td>https://www.amazon.co.jp/dp/B081T1NY2T</td></tr>
+<tr><td>B08432J49S</td><td>エレット マルチコンパクトラジオ ET-14</td><td>表示なし（月50個未満）</td><td>6社（Keepa offers の実数・画面未確認）</td><td>あり</td><td>D-Park【株式会社デジタルパーク インボイス対応/適格事業者】（AGPK73QRBS9ZN）</td><td>株式会社 白菊</td><td>https://www.amazon.co.jp/dp/B08432J49S</td></tr>
+</tbody></table>
+<h3>価格履歴（採算の土台）</h3>
+<table><thead><tr><th>ASIN</th><th>販売価格(90日中央値)</th><th>販売価格(180日中央値)</th><th>保守値(90日の下位25%)</th><th>上位25%</th><th>現在価格</th><th>現在価格÷90日中央値</th><th>価格の振れ幅</th><th>価格の傾き(%/30日)</th><th>価格の判定</th></tr></thead><tbody>
+<tr><td>B081T1NY2T</td><td>6,540</td><td>6,540</td><td>6,540</td><td>6,540</td><td>6,540</td><td>1.0</td><td>0.0</td><td>-0.1</td><td>使える</td></tr>
+<tr><td>B08432J49S</td><td>4,416</td><td>4,416</td><td>4,336</td><td>4,416</td><td>4,427</td><td>1.002</td><td>0.018</td><td>-0.9</td><td>使える</td></tr>
+</tbody></table>
+<h3>採算</h3>
+<table><thead><tr><th>ASIN</th><th>等級</th><th>サイズ区分</th><th>販売手数料</th><th>FBA配送代行</th><th>その他固定費</th><th>1個手残り</th><th>利益率(%)</th><th>悲観の手残り</th><th>悲観の利益率(%)</th><th>発注点数(Amazon何個)</th><th>発注額(円・税込)</th><th>手残り合計</th></tr></thead><tbody>
+<tr><td>B081T1NY2T</td><td>B</td><td>標準7</td><td>748</td><td>472</td><td>460</td><td>1,308</td><td>20.0</td><td>-100</td><td>-1.5</td><td>16</td><td>56,832</td><td>20,928</td></tr>
+<tr><td>B08432J49S</td><td>B</td><td>標準3</td><td>505</td><td>415</td><td>65</td><td>406</td><td>9.2</td><td>50</td><td>1.1</td><td>10</td><td>30,250</td><td>4,060</td></tr>
+</tbody></table>
+<h3>🔴 いつ買って、いつ売るか</h3>
+<table><thead><tr><th>ASIN</th><th>発注日</th><th>着荷の見込み</th><th>FBA納品完了の見込み</th><th>販売開始日</th><th>売り切る月数</th><th>売り切り目標月</th><th>季節の窓</th><th>発注→販売開始</th><th>卸の在庫</th></tr></thead><tbody>
+<tr><td>B081T1NY2T</td><td>10/04</td><td>10/09</td><td>10/20</td><td>10/27</td><td>未確定（月販非表示・3ヶ月で仮置き）</td><td>2027-01</td><td>○</td><td>3週</td><td>在庫あり</td></tr>
+<tr><td>B08432J49S</td><td>10/04</td><td>10/09</td><td>10/20</td><td>10/27</td><td>未確定（月販非表示・3ヶ月で仮置き）</td><td>2027-01</td><td>○（通年）</td><td>3週</td><td>在庫あり</td></tr>
+</tbody></table>
+<blockquote><strong>リードタイムは推定です。</strong>NETSEA / SD の商品ページには出荷目安が出ますが、当社の JAN 索引はそれを取っていません。<strong>発注直前に商品ページで実際の出荷目安を見て上書きしてください</strong>（<code>schedule.build(lead_bdays=…)</code>）。祝日は計算に入っていないので、11/3・11/23・年末年始ぶん数日は遅れます。</blockquote>
+<h2>発注案（残枠8万円・3SKU）</h2>
+<p><strong>組めません。</strong>候補が 2件 しかなく、3SKU の組み合わせが予算 80,000円 に収まりません。</p>
+<p>候補のうち予算内で買えるものだけを単独で挙げます。</p>
+<table><thead><tr><th>ASIN</th><th>商品名</th><th>等級</th><th>発注点数(Amazon何個)</th><th>発注額(円・税込)</th><th>手残り合計</th><th>販売開始日</th><th>売り切り目標月</th></tr></thead><tbody>
+<tr><td>B081T1NY2T</td><td>ウォーターゲーム 海のなかま 2色アソート 24個入りBOX レトロゲーム 輪投げ</td><td>B</td><td>16</td><td>56,832</td><td>20,928</td><td>10/27</td><td>2027-01</td></tr>
+<tr><td>B08432J49S</td><td>エレット マルチコンパクトラジオ ET-14</td><td>B</td><td>10</td><td>30,250</td><td>4,060</td><td>10/27</td><td>2027-01</td></tr>
+</tbody></table>
+<h2>この表を100件にスケールするとき、どの列が機械で埋まるか</h2>
+<table><thead><tr><th>列</th><th>埋まり方</th></tr></thead><tbody>
+<tr><td>ASIN・商品名・ブランド・AmazonURL</td><td><strong>機械</strong>（Keepa）</td></tr>
+<tr><td>販売価格の中央値/下位25%/傾き/振れ幅</td><td><strong>機械</strong>（Keepa の価格履歴・追加トークン0）</td></tr>
+<tr><td>カートの販売元</td><td><strong>機械</strong>（<code>buybox=1</code>・1件3トークン）</td></tr>
+<tr><td>過去1ヶ月の販売数</td><td><strong>機械</strong>（<code>monthlySold</code>）。ただし<strong>取れるのは2%だけ</strong></td></tr>
+<tr><td>売れ筋ランク・季節のピーク月</td><td><strong>機械</strong>（<code>csv[3]</code>・追加トークン0）</td></tr>
+<tr><td>サイズ区分・手数料・FBA配送代行・その他固定費</td><td><strong>機械</strong>（<code>fba_cost</code>）</td></tr>
+<tr><td>セット数（Amazon1個=卸何点か）</td><td><strong>機械＋人</strong>。商品名と <code>packageQuantity</code> が一致した行だけ機械で確定。食い違いは人</td></tr>
+<tr><td>卸値・最小ロット・在庫</td><td><strong>機械</strong>（NETSEA API）／<strong>SD は人</strong>（§3.3-18）</td></tr>
+<tr><td>卸の出荷リードタイム</td><td>🔴 <strong>人</strong>（索引に無い。発注直前に商品ページを見る）</td></tr>
+<tr><td>ゲート（申請ボタンが押せるか）</td><td>🔴 <strong>人</strong>（セラーセントラル・§3.3-25）</td></tr>
+<tr><td>3か月の実売数（キーゾン）</td><td>🔴 <strong>人</strong>（§3.3-16）</td></tr>
+</tbody></table>
+<h2>やっていないこと（境界）</h2>
+<ul>
+<li style='margin-left:0.0em'><strong>発注・購入・決済・第三者連絡はしていません</strong>（§4.1）。発注の手前で止めています。</li>
+<li style='margin-left:0.0em'><strong>出品許可の申請もしていません。</strong>上位候補の ASIN を出すところまでです。</li>
+<li style='margin-left:0.0em'><strong>スーパーデリバリーへの自動リクエストは1件も投げていません</strong>（§3.3-18）。</li>
+<li style='margin-left:0.0em'><strong>卸値・卸率・卸サイトの商品 URL はこの成果物に書いていません</strong>（法務判定E）。実額は <code>agent_output/.../score20261004/top30_private.csv</code> にあります。</li>
+</ul>
+</body></html>

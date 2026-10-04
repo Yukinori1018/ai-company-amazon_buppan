@@ -32,14 +32,49 @@ class Pick:
     net_per_unit: int
     worst_net_per_unit: int
     half_disposal_loss: int
+    # 🔴 発注の前に人が実画面で確かめることが残っているか（空なら残っていない）。
     months_to_sell: float
     listing_starts_on: date
     sellout_month: str
     season_window: str
+    # 🔴 発注の前に人が実画面で確かめることが残っているか（空なら残っていない）。
+    pending: str = ""
+
+    min_lot: int = 1          # 卸がこれ未満では売ってくれない Amazon 個数
 
     @property
     def net_total(self) -> int:
         return self.net_per_unit * self.qty
+
+    def shrink(self) -> "Pick":
+        """🔴 **発注点数を卸の最小ロットまで落とした版**を返す。
+
+        なぜ要るか（2026-10-04・§3.3-19 の再演）: 発注点数を全 SKU で10個に固定していた
+        （`profit.MIN_QTY_FOR_UNGATING = 10`＝出品許可申請の「納品書10点以上」）。
+        ところが **10点は納品書の合計に対する要件**で、SKU ごとではありません
+        （`profit.order_qty` の docstring にそう書いてある）。
+        1個3,000円の SKU を10個ずつ買うと1 SKU で3万円になり、**予算8万円に3 SKU が
+        ほぼ入らない**（実測：候補12件で予算内の組み合わせは2通りだけ）。
+        最小ロットまで落とせば、**3 SKU 合計で10点**を満たしつつ小さく試せます
+        （社長の既定「小さく試したい」）。
+
+        金額は点数に比例するので、丸めずに計算できます。
+        """
+        q = max(1, min(self.qty, self.min_lot))
+        if q == self.qty:
+            return self
+        r = q / self.qty
+        return Pick(
+            asin=self.asin, title=self.title, supplier=self.supplier,
+            grade=self.grade, qty=q,
+            order_total=int(round(self.order_total * r)),
+            net_per_unit=self.net_per_unit,
+            worst_net_per_unit=self.worst_net_per_unit,
+            half_disposal_loss=int(round(self.half_disposal_loss * r)),
+            months_to_sell=round(self.months_to_sell * r, 1) or 0.5,
+            listing_starts_on=self.listing_starts_on,
+            sellout_month=self.sellout_month, season_window=self.season_window,
+            pending=self.pending, min_lot=self.min_lot)
 
     @property
     def worst_total(self) -> int:
@@ -118,6 +153,7 @@ class Plan:
             "SKU": [{"ASIN": p.asin, "商品名": p.title, "購入元": p.supplier,
                      "等級": p.grade, "発注数": p.qty, "発注額": p.order_total,
                      "1個手残り": p.net_per_unit, "手残り合計": p.net_total,
+                     "次の一手": (p.pending or "—"),
                      "販売開始": p.listing_starts_on.strftime("%m/%d"),
                      "売り切り目標": p.sellout_month, "季節の窓": p.season_window}
                     for p in self.picks],
@@ -155,6 +191,13 @@ def build_plans(picks: list[Pick], budget: int = BUDGET_YEN,
                 f"**1社が品切れ・取引不可になると案が丸ごと倒れます。**")
         if any(x.season_window == "△" for x in p.picks):
             p.warnings.append("季節の窓が△の SKU が入っています（1週遅れると外します）。")
+        need = [x for x in p.picks if x.pending]
+        if need:
+            what = "／".join(sorted({x.pending for x in need}))
+            p.warnings.append(
+                f"🔴 **発注の前に実画面の確認が残っています**: "
+                f"{'・'.join(x.asin for x in need)} ← {what}。"
+                f"**確認せずに発注しないでください**（§3.3-16）。")
         if any(x.grade == "B" for x in p.picks):
             p.warnings.append("等級Bの SKU は**最小ロットで1回だけ**実測してください。")
         if p.months_to_clear > 6:
@@ -162,22 +205,69 @@ def build_plans(picks: list[Pick], budget: int = BUDGET_YEN,
                 f"捌けるまで {p.months_to_clear:.1f}ヶ月＝回転上限6ヶ月を超えます。")
         return p
 
-    best_net = max(valid, key=lambda c: sum(p.net_total for p in c))
-    best_div = min(valid, key=lambda c: (
-        -len({p.supplier for p in c}),
-        max(sum(p.order_total for p in c if p.supplier == s)
-            for s in {p.supplier for p in c}) / max(1, sum(p.order_total for p in c)),
-        -sum(p.net_total for p in c)))
-    best_worst = max(valid, key=lambda c: (sum(p.worst_total for p in c),
-                                           sum(1 for p in c if p.grade == "A")))
-    return [
-        mk("① 手残り最大", best_net, "予算内で想定手残りがいちばん大きい組み合わせ。"),
-        mk("② 分散重視", best_div,
-           "購入元をできるだけ割った組み合わせ。1社が倒れても残りが生きます。"),
-        mk("③ 下振れ耐性重視", best_worst,
-           "悲観シナリオ（売価が90日の下位25%・区分1段上・保管2倍）でも"
-           "手残りがいちばん残る組み合わせ。"),
+    # 🔴 **3案が同じ組み合わせになってはいけません。**
+    # 候補が少ないと3つの狙いが同じ1組に収束します（2026-10-04、候補12件で実際に
+    # 3案すべて同一になった）。同じものを3回見せるのは判断材料になりません。
+    # そこで、狙いごとに **まだ採っていない組み合わせの中から** 最良を採ります。
+    objectives = [
+        ("① 手残り最大", "予算内で想定手残りがいちばん大きい組み合わせ。",
+         lambda c: (sum(p.net_total for p in c),)),
+        ("② 分散重視",
+         "購入元をできるだけ割った組み合わせ。1社が倒れても残りが生きます。",
+         lambda c: (len({p.supplier for p in c}),
+                    -max(sum(p.order_total for p in c if p.supplier == s)
+                         for s in {p.supplier for p in c})
+                    / max(1, sum(p.order_total for p in c)),
+                    sum(p.net_total for p in c))),
+        ("③ 下振れ耐性重視",
+         "悲観シナリオ（売価が90日の下位25%・区分1段上・保管2倍）でも"
+         "手残りがいちばん残る組み合わせ。",
+         lambda c: (sum(p.worst_total for p in c),
+                    sum(1 for p in c if p.grade == "A"))),
     ]
+    # ④ 最小ロット版。**予算に3 SKU が入らないのは発注点数のせい**なので、
+    #    点数を落とした組み合わせも必ず1案出します（§3.1「条件を緩める案を出す」）。
+    small = [p.shrink() for p in picks]
+    small_valid = [c for c in combinations(small, sku_per_plan)
+                   if sum(p.order_total for p in c) <= budget]
+
+    out: list[Plan] = []
+    used: set[frozenset] = set()
+    for name, reason, score in objectives:
+        pool = [c for c in valid if frozenset(p.asin for p in c) not in used]
+        if not pool:
+            break
+        combo = max(pool, key=score)
+        used.add(frozenset(p.asin for p in combo))
+        out.append(mk(name, combo, reason))
+
+    if small_valid:
+        combo = max(small_valid, key=lambda c: sum(p.net_total for p in c))
+        tot_pts = sum(p.qty for p in combo)
+        p4 = mk("④ 小さく試す（各SKU最小ロット）",
+                combo,
+                f"**発注点数を卸の最小ロットまで落とした案。**"
+                f"出品許可申請の「納品書10点以上」は**合計**に対する要件なので、"
+                f"3 SKU 合計 {tot_pts}点 で満たせます"
+                f"（{'満たします' if tot_pts >= 10 else '🔴 10点に足りないので申請には別途合算が必要'}）。"
+                f"1件目は小さく試して実測する、という社長の既定に合わせた案です。")
+        out.append(p4)
+    return out
+
+
+def _min_lot_in_amazon_units(r: dict, s: dict) -> int:
+    """卸の最小ロット（**点**）→ Amazon の**個**数。
+
+    卸は「点」で、Amazon は「N点セットで1個」。だから
+    `Amazon の個数 = ceil(卸の最小ロット ÷ セット数)`。
+    セット数が決まっていない行はここに来ません（採算ゲートで UNKNOWN になる）。
+    """
+    try:
+        lot = int(float(r.get("卸の最小ロット(点)") or 1))
+    except (TypeError, ValueError):
+        lot = 1
+    n = int(s.get("n_set") or 1) or 1
+    return max(1, -(-lot // n))
 
 
 def pick_from_row(s: dict) -> Pick | None:
@@ -191,6 +281,8 @@ def pick_from_row(s: dict) -> Pick | None:
         qty=e.qty, order_total=e.order_total, net_per_unit=e.net_per_unit,
         worst_net_per_unit=e.worst_net_per_unit or 0,
         half_disposal_loss=e.half_disposal_loss,
+        pending=("実売をキーゾンで確認" if s.get("判定") != "GO" else ""),
+        min_lot=_min_lot_in_amazon_units(r, s),
         months_to_sell=e.months_to_sell or 3.0,
         listing_starts_on=pl.listing_starts_on,
         sellout_month=pl.sellout_month, season_window=pl.season_window)

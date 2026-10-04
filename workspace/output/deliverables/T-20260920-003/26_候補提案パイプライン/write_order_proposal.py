@@ -105,11 +105,18 @@ def md_table(rows: list[dict], cols: list[str]) -> list[str]:
     return out
 
 
+def status_of(s: dict) -> str:
+    """その行が**次に誰の一手**を待っているか。表の1列目に出す。"""
+    if s["判定"] == "GO":
+        return "機械判定 GO（実売の根拠あり）"
+    return "🔴 実売をキーゾンで確認（人の1手）"
+
+
 def build() -> tuple[list[str], list[dict], list[order_plan.Plan], dict]:
     scored = SC.score_all()
     live = [s for s in scored if s.get("product")]
-    cands = [s for s in scored if s["判定"] == "GO" and s["等級"] in ("A", "B")]
-    cands.sort(key=lambda s: -(s["手残り合計"] or 0))
+    go, pend = SC.candidates(scored)
+    cands = go + pend
     top = cands[:TOP_N]
 
     picks = [p for p in (order_plan.pick_from_row(s) for s in top) if p]
@@ -117,12 +124,18 @@ def build() -> tuple[list[str], list[dict], list[order_plan.Plan], dict]:
 
     stats = {
         "台帳": len(scored), "取り直し済み": len(live), "候補": len(cands),
+        "機械GO": len(go), "確認待ち": len(pend),
         "判定": dict(Counter(s["判定"] for s in scored)),
         "等級": dict(Counter(s["等級"] for s in scored)),
         "落ちた内訳": dict(Counter(SC.first_fail(s) for s in scored
                                  if s["判定"] != "GO")),
     }
-    return SC.relax_table(scored), [SC.as_row(s) for s in top], plans, stats | {
+    rows = []
+    for s in top:
+        r = SC.as_row(s)
+        r["次の一手"] = status_of(s)
+        rows.append(r)
+    return SC.relax_table(scored), rows, plans, stats | {
         "scored": scored, "top": top}
 
 
@@ -145,7 +158,9 @@ def main() -> int:
     A("")
     A("## 結論（3行）")
     A("")
-    A(f"1. **候補は {stats['候補']}件**です（人が実画面で見る価値のある行）。"
+    A(f"1. **候補は {stats['候補']}件**です（＝人が実画面で見る価値のある行。§3.3-16）。"
+      f"内訳は**機械判定 GO が {stats['機械GO']}件**と、"
+      f"**実売だけをキーゾンで見れば決まる行が {stats['確認待ち']}件**。"
       f"台帳 {stats['台帳']}件のうち今日の値で取り直せたのは {stats['取り直し済み']}件。")
     A("2. 🔴 **候補が増えない主因は原価でも売価でもなく「実売の根拠が無いこと」でした。**"
       "`monthlySold` が取れている行は取り直せた行の **2%** しかなく、"
@@ -207,6 +222,35 @@ def main() -> int:
     for k, c in sorted(stats["落ちた内訳"].items(), key=lambda kv: -kv[1]):
         A(f"| {k} | {c}件 |")
     A("")
+    if stats["候補"] < TOP_N:
+        A(f"## 🔴 なぜ30件に届かないのか（{stats['候補']}件しか出ない理由）")
+        A("")
+        A("**原価でも売価でも条件の厳しさでもありません。『実売の根拠が機械では取れない』"
+          "という、プールそのものの性質です。**下の感度表を見てください ──")
+        A("**ランクの上限を10万位から50万位まで動かしても、候補は2〜6件のまま動きません。**")
+        A("")
+        A("| 事実 | 数 |")
+        A("|---|---|")
+        A(f"| `monthlySold`（Amazon が表示する実売数）が取れている行 | "
+          f"**{sum(1 for s in scored if s.get('monthlySold'))}件 / "
+          f"{stats['取り直し済み']}件（約2%）** |")
+        A(f"| ランクが**兄弟 ASIN と共有**で ASIN 単位の根拠にならない行 | "
+          f"**{sum(1 for s in scored if (s.get('rank_shared') or 1) > 1)}件** |")
+        A(f"| 同じブランド×購入元の行 | **1リストあたり "
+          f"{SC.MAX_PER_FAMILY}件まで**に制限（切る前は上位30件のうち25件が"
+          f"DNライティングの直管蛍光灯・仕入れ先1社でした） |")
+        A("")
+        A("### だから、増やし方は3つしかありません（緩めることではない）")
+        A("")
+        A("| # | 手段 | 増える数 | 要るもの |")
+        A("|---|---|---|---|")
+        A("| ① | **キーゾンで実売を人が見る**（本リストの『次の一手』欄） | "
+          "確認した数だけ GO/NO-GO が確定 | 1件あたり1分程度 × 30件 |")
+        A("| ② | **売れている棚から入る**（`lane_selling_first.py`） | "
+          "測定中（下の節） | Keepa トークン |")
+        A("| ③ | 同じブランド×購入元の上限（4件）を上げる | "
+          "見かけ上は増えるが**同じ棚**。発注案の分散が作れない | なし（非推奨） |")
+        A("")
     A("## 条件をこう緩めれば何件増えるか")
     A("")
     L += relax
@@ -221,14 +265,22 @@ def main() -> int:
     A("")
     A(f"## 上位 {len(top_rows)}件（手残りの大きい順）")
     A("")
+    A("**1列目の「次の一手」を見てください。**")
+    A("")
+    A("- `機械判定 GO` … 実売の根拠（`monthlySold` か 単独ランク）まで揃っている行。"
+      "**ゲートと価格だけ実画面で見れば発注判断に入れます。**")
+    A("- `🔴 実売をキーゾンで確認` … **実売以外のすべてを通っている行。**"
+      "`monthlySold` が非表示で、ランクが兄弟 ASIN と共有なので、"
+      "**機械ではこれ以上進めません。**キーゾンで3か月の実数を見る1手で GO/NO-GO が決まります。")
+    A("")
     if not top_rows:
         A("**0件です。**上の2つの表（落ちた内訳・緩めたときの件数）が理由です。")
     else:
         A("### 社長が現物を確認する列（§3.2 必須6列）")
         A("")
-        L += md_table(top_rows, ["ASIN", "商品名", "過去1ヶ月の販売数", "セラー数",
-                                 "Amazon本体の有無", "カートの販売元", "購入元の名前",
-                                 "AmazonURL"])
+        L += md_table(top_rows, ["ASIN", "次の一手", "商品名", "過去1ヶ月の販売数",
+                                 "売れ筋ランク", "セラー数", "Amazon本体の有無",
+                                 "カートの販売元", "購入元の名前", "AmazonURL"])
         A("")
         A("### 価格履歴（採算の土台）")
         A("")
@@ -274,9 +326,9 @@ def main() -> int:
         A("")
         A(f"{d['狙い']}")
         A("")
-        L += md_table(d["SKU"], ["ASIN", "商品名", "購入元", "等級", "発注数",
-                                 "発注額", "1個手残り", "手残り合計", "販売開始",
-                                 "売り切り目標", "季節の窓"])
+        L += md_table(d["SKU"], ["ASIN", "商品名", "購入元", "等級", "次の一手",
+                                 "発注数", "発注額", "1個手残り", "手残り合計",
+                                 "販売開始", "売り切り目標", "季節の窓"])
         A("")
         A(f"- **合計発注額 {d['合計発注額']:,}円**（残枠 {order_plan.BUDGET_YEN:,}円）")
         A(f"- **想定手残り合計 {d['想定手残り合計']:,}円**"

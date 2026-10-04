@@ -187,6 +187,15 @@ def velocity_of(product: dict, shared_ranks: dict[int, int] | None = None
     if ms:
         return ("PASS", f"過去1ヶ月に {ms}個 売れています（Keepa monthlySold）。", ms, rank)
     n_share = (shared_ranks or {}).get(rank or -1, 1)
+    if n_share > 1 and rank and rank > RANK_OK:
+        # 共有ランクでも、**その値そのものが遅い**なら family 全体が売れていません。
+        # 兄弟の誰かが売れていればランクは上がるので、605,794位 の共有ランクは
+        # 「この子が売れていないかもしれない」ではなく「**一族が売れていない**」。
+        return ("FAIL",
+                f"売れ筋ランク {rank:,}位 を他の {n_share - 1} ASIN と共有していますが、"
+                f"**その共有ランク自体が {RANK_OK:,}位より下**です。"
+                f"兄弟の誰かが売れていればランクは上がるので、**一族ごと売れていません。**",
+                None, rank)
     if n_share > 1:
         return ("UNKNOWN",
                 f"売れ筋ランク {rank:,}位 を**他の {n_share - 1} ASIN と共有**しています"
@@ -327,7 +336,9 @@ def build(row: dict, cand: dict, product: dict, idx: dict, names: dict,
     return {"asin": asin, "row": row, "product": product, "price": lv, "season": season,
             "plan": plan, "econ": e, "gates": g, "判定": verdict,
             "等級": e.grade if e else "UNKNOWN", "カート保持者": cart_who,
-            "monthlySold": ms, "rank": rank, "n_set": n_set, "セット数の確度": conf,
+            "monthlySold": ms, "rank": rank,
+            "rank_shared": (shared_ranks or {}).get(rank or -1, 1),
+            "n_set": n_set, "セット数の確度": conf,
             "pinned": pinned, "在庫": stock or "索引なし", "channel": channel,
             "手残り合計": (e.net_per_unit * e.qty) if e else None}
 
@@ -368,6 +379,59 @@ def gate_status(s: dict, name: str) -> str:
             return st
     return "PASS"
 
+# 🔴 **人が実画面を見れば決まるゲート。**ここが UNKNOWN の行は「落とす」のではなく
+# 「**人の確認待ち**」です。機械判定の GO は「買ってよい」ではなく
+# 「**人が実画面で見る価値がある**」の意味（CLAUDE.md §3.3-16）なので、
+# 候補リストの目的からすると**この行こそ渡すべき**ものです。
+#
+# 2026-10-04 の実測：プールの `monthlySold` が取れるのは2%、ランクは194件が兄弟 ASIN と
+# 共有＝ASIN単位の根拠にならない。**つまり実売は機械では決まりません。**
+# 閾値をどこに置いても候補は2件のままで、**緩める/締めるの問題ではありません**。
+SCREEN_RESOLVABLE = ("実売",)
+
+
+def candidates(scored: list[dict]) -> tuple[list[dict], list[dict]]:
+    """(機械判定 GO, 人の確認待ち) を手残りの大きい順で返す。
+
+    「人の確認待ち」＝ **実売以外のすべてのゲートを通っていて、実売だけが UNKNOWN** の行。
+    `monthlySold` が非表示でランクが兄弟共有だと機械ではこれ以上進めないので、
+    キーゾンで3か月の実数を人が見る1手で GO/NO-GO が決まります。
+    """
+    def key(s):
+        return -(s["手残り合計"] or 0)
+
+    go = [s for s in scored if s["判定"] == "GO" and s["等級"] in ("A", "B")]
+    pend = [s for s in scored
+            if s["判定"] == "UNKNOWN" and s["等級"] in ("A", "B")
+            and all(gate_status(s, g) == "PASS"
+                    for g in REQUIRED_GATES if g not in SCREEN_RESOLVABLE)
+            and all(gate_status(s, g) == "UNKNOWN" for g in SCREEN_RESOLVABLE)]
+    return sorted(go, key=key), cap_per_family(sorted(pend, key=key))
+
+
+# 同じブランド×購入元の行を、1リストにこれ以上入れない。
+MAX_PER_FAMILY = 4
+
+
+def cap_per_family(rows: list[dict], cap: int = MAX_PER_FAMILY) -> list[dict]:
+    """🔴 **同じブランド×購入元の行でリストを埋めない。**
+
+    2026-10-04、上位30件のうち25件が「DNライティング の直管蛍光灯・仕入れ先は
+    ヤザワコーポレーション1社・カート保持者も同一」になりました。これは
+    **人が実画面で見る30手のうち25手を、ほぼ同じ1つの棚に使わせる**ことで、
+    発注案の分散（社長要求）も作れません。上位 `cap` 件だけ残し、残りは切ります
+    （切った行は消えたのではなく、**同じ判定の兄弟がリストに載っている**という意味です）。
+    """
+    seen: Counter = Counter()
+    out: list[dict] = []
+    for s in rows:
+        k = (s["row"].get("ブランド") or "", s["row"].get("購入元の名前") or "")
+        if seen[k] >= cap:
+            continue
+        seen[k] += 1
+        out.append(s)
+    return out
+
 
 def relax_table(scored: list[dict]) -> list[str]:
     """🔴 「条件をこう緩めればN件増える」を**数字で**出す（CLAUDE.md §3.1）。
@@ -388,13 +452,22 @@ def relax_table(scored: list[dict]) -> list[str]:
              if all(gate_status(s, m) == "PASS" for m in REQUIRED_GATES if m != n)]
         out.append(f"| {n} | {len(k)}件 | {len(k) - len(full)}件 |")
 
-    out += ["", "**実売（ランクの上限）を動かしたとき**（他の条件はそのまま）", "",
+    n_shared = sum(1 for s in live if s.get("rank_shared", 1) > 1)
+    out += ["",
+            f"**実売（ランクの上限）を動かしたとき**（他の条件はそのまま／"
+            f"**兄弟 ASIN とランクを共有している {n_shared}件は、どの上限でも"
+            f"根拠として数えません**）", "",
             "| ランク上限 | 候補数 | 想定手残り合計 |", "|---|---:|---:|"]
     base = [s for s in live
             if all(gate_status(s, m) == "PASS" for m in REQUIRED_GATES if m != "実売")]
+    # ⚠️ ここは**実際のゲートと同じ規則**で数えます（`velocity_of` と同じ）。
+    # 共有ランクを根拠として数えると、感度表だけが甘く出て人を誤解させます
+    # （2026-10-04 に一度「30万位で17件」と出したが、実際の判定は2件だった）。
     for lim in (100_000, 150_000, 200_000, 300_000, 500_000):
         k = [s for s in base
-             if s.get("monthlySold") or (s.get("rank") and s["rank"] <= lim)]
+             if s.get("monthlySold")
+             or (s.get("rank") and s["rank"] <= lim
+                 and s.get("rank_shared", 1) <= 1)]
         tot = sum(x["手残り合計"] or 0 for x in k)
         mark = " ←いまここ" if lim == RANK_OK else ""
         out.append(f"| {lim:,}位以内 | {len(k)}件 | {tot:,}円{mark} |")
@@ -455,9 +528,11 @@ def main(argv=None) -> int:
         print(f"   {name:10s} PASS {c['PASS']:4d} / UNKNOWN {c['UNKNOWN']:4d} / "
               f"FAIL {c['FAIL']:4d}")
 
-    cands = [s for s in scored if s["判定"] == "GO" and s["等級"] in ("A", "B")]
-    cands.sort(key=lambda s: -(s["手残り合計"] or 0))
-    print(f"\n🔴 人が実画面で見る価値のある候補: {len(cands)}件（上位{TOP_N}件を出します）")
+    go, pend = candidates(scored)
+    cands = (go + pend)[:TOP_N]
+    print(f"\n🔴 人が実画面で見る価値のある候補: {len(go) + len(pend)}件")
+    print(f"   うち機械判定 GO（実売の根拠もある）      {len(go):4d}件")
+    print(f"   うち実売だけ人の確認待ち（キーゾン1手）  {len(pend):4d}件")
 
     OUT.mkdir(parents=True, exist_ok=True)
     write_csv(cands[:TOP_N], OUT / "top30.csv")
