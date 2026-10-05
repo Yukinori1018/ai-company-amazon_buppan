@@ -316,3 +316,8 @@ python3 -c "raw=open('<CSV>','rb').read(); print('CRLF',raw.count(b'\r\n'),'lone
 - 手順（今回）：build_catalog.py → 要記入の行を Python で埋める（ローカル実ファイルの冒頭を読んで1文要約）→ CRLF 検算 → sync_catalog_to_sheet.py（650行×15列・HTTP 200）。
 - 要記入には自分の依頼分以外（別チケットの新成果物）も混ざる。定常責務なのでまとめて埋める（今回は T-20260909-004 の2件、T-20260908-002 の1件）。
 - 追跡状態の確認：`git ls-files <dir>` に出れば追跡済み。`--check-untracked` の既知3件（T-20260904-004 の卸値CSV）は `*.csv` による意図的な除外なので触らない。
+
+## 2026-10-05 T-20260929-001 09〜13 追記で踏みかけた罠：CSV の CRLF と引用符
+- マスターCSVは**一部の行だけ CRLF**（13行）。Python で `open()` 既定（newline=None）で読んで書き戻すと CRLF→LF に化け、無関係な行が diff に出る。さらに csv.writer で全行を書き直すと引用符の付き方が変わり、同様に無関係行が動く。
+- 正しい手順：**`open(p, newline="")` で生テキストのまま読む → 変更行だけ文字列置換 → 新規行だけ csv.writer で末尾に足す → `newline=""` で書く**。`git diff --stat` で「変更行数＝意図した行数」を確かめてから同期する（今回は +13/−3 ＝新規10行＋README・08×2の状態更新）。
+- 別チケットの staged ファイル（T-20260930-001 batchE）が index にあったので、commit は `git commit -- <自分のパス>` でパス指定し、他人の staged を巻き込まない。
