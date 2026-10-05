@@ -348,6 +348,18 @@ def listed_check():
     return f
 
 
+def load_contacts() -> dict:
+    """サトルの窓口採取（15_contacts/contacts_*.csv）を「窓口」列の要約に戻す。作り直しで「未採取」に戻さないため（2026-10-05 追加）。"""
+    out = {}
+    for p in sorted((WORK / "15_contacts").glob("contacts_*.csv")):
+        for x in csv.DictReader(open(p, encoding="utf-8-sig")):
+            out[(x["経路"], x["名簿の社名"])] = x["判定"] + (("：" + x["窓口の種類"]) if x["窓口の種類"] else "") + "（名簿拡張_窓口 " + x["ID"] + "）"
+    return out
+
+
+CONTACTS = load_contacts()
+
+
 def merge(parts: list[list[dict]], ex: Index) -> tuple[list[dict], dict]:
     stat = Counter()
     is_listed = listed_check()
@@ -374,7 +386,7 @@ def merge(parts: list[list[dict]], ex: Index) -> tuple[list[dict], dict]:
                 if not prev.get("法人番号") and r.get("法人番号"):
                     prev["法人番号"] = r["法人番号"]
                 stat[f"{r['経路']} 先の経路と重複"] += 1; continue
-            r.setdefault("他の経路", ""); r["窓口"] = "未採取（各社の公式サイトから採る）"
+            r.setdefault("他の経路", ""); r["窓口"] = CONTACTS.get((r["経路"], r["社名"]), "未採取（各社の公式サイトから採る）")
             r["_n"] = n
             out.append(r)
             by_name[n] = r
