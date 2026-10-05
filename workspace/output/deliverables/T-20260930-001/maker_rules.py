@@ -92,6 +92,8 @@ chanel シャネル bvlgari ブルガリ hermes エルメス gucci グッチ pra
 lancome ランコム esteelauder エスティローダー clinique クリニーク clarins クラランス diptyque ディプティック tomford トムフォード guerlain ゲラン
 shuuemura シュウウエムラ skii sk-ii cledepeaubeaute クレドポーボーテ ysl yvessaintlaurent イヴサンローラン dior ディオール christiandior
 ウーノ オージュア aujua milbon ファイントゥデイ finetoday costco コストコ
+kagome カゴメ starbucks スターバックス アミノバイタル コーセーコスメポート riketechnos リケンテクノス kahlua カルーア
+stdupont エステーデュポン デュポン kaytee ケイティー
 google グーグル corsair コルセア dolcegabbana ドルチェアンドガッバーナ wella ウエラ ウエラジャパン albion アルビオン francfranc フランフラン
 """.split()
 
@@ -201,7 +203,8 @@ def _jp_gbiz(name: str) -> str:
     if s and s.get("法人番号"):
         return f"gBiz完全一致1社（{s.get('gBiz商号') or ''}）"
     g = GBIZ_EXACT.get(name)
-    if g and len(g) == 1:
+    # 一般社団法人・財団法人はメーカーでない（harness → 一般社団法人Ｈａｒｎｅｓｓ の偶然一致・2026-10-04 抜き取り）
+    if g and len(g) == 1 and not any(x in g[0]["name"] for x in ("社団法人", "財団法人", "ＬＬＣ", "LLC")):
         return f"gBiz完全一致1社（{g[0]['name']}）"
     return ""
 
