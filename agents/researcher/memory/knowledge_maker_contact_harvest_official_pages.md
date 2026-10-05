@@ -278,8 +278,8 @@
 **順位500番台は「規模不明」層の最下部＝大手（海外ブランド・上場）21%、本人カート/自社Amazon店11%、既存台帳との重複9%。**使える社は約1/3。
 
 ### 新しく効いた手・ハマりどころ
-1. **Yahoo!検索HTML（yj.py）は並行担当が叩いた後は「ページを表示できません」で全滅していた**（開始時点で0件）。回避はしない。WebSearch（共有上限）を社名不明の社だけに使い、残りは推定ドメイン＋dig で当てた（約80件 dig→約40件解決、うち同名別会社が8件）
-2. **同名別会社のドメイン8件**：unix-co.jp（測量）、stayfree.co.jp／stay-free.co.jp／stayfree-inc.co.jp（広告・人材・Webコンサル）、abby.co.jp（ソフト開発）、sanwatsusho.com（理化学機器）、showa-kagaku.co.jp（沖縄の化学工業）、japangateway.co.jp（アート研究所）、medicom.co.jp（通信工事）、equals.co.jp（Web制作）、ballpark.co.jp（ユニフォーム）。**「社名.co.jp が引けた」は当たりではない。タイトルと事業内容を1行見る**
+1. **Yahoo!検索HTML（yj.py）は並行担当が叩いた後は「ページを表示できません」で全滅していた**（開始時点で0件）。回避はしない。WebSearch（共有上限）を社名不明の社だけに使い、残りは推定ドメイン＋dig で当てた（約80件 dig→約40件解決、うち同名別会社が11件）
+2. **同名別会社のドメイン11件**：unix-co.jp（測量）、stayfree.co.jp／stay-free.co.jp／stayfree-inc.co.jp（広告・人材・Webコンサル）、abby.co.jp（ソフト開発）、sanwatsusho.com（理化学機器）、showa-kagaku.co.jp（沖縄の化学工業）、japangateway.co.jp（アート研究所）、medicom.co.jp（通信工事）、equals.co.jp（Web制作）、ballpark.co.jp（ユニフォーム）。**「社名.co.jp が引けた」は当たりではない。タイトルと事業内容を1行見る**
 3. **公式サイトのAmazonリンクは3種類あり、意味が違う**：①出品者ページ `amazon.co.jp/s?me=…`＝自社出品が確定（ALTROSE・グローバルアーク・エヌ・シー）→除外 ②ブランドストア `amazon.co.jp/stores/…`＝ブランド登録の証拠で自社出品は未確定（CLAYGE・AVIOT・トーヨ・collagem・酒豪伝説）→要確認に倒した ③商品ページ直リンク（ISSHI）→判定材料にしない。`grep -oE 'href="https?://(www\.)?(amazon\.co\.jp|amzn\.(to|asia))[^"]*"'` で全取得ページを一括確認でき、amzn.to は `curl -sI` の Location で展開
 4. **「新規取引の一律停止」「直営以外は全て転売品」は会社概要に無く、法人向けページ・「転売について」ページにある**（ユニフレーム `/for-company/`、日本自然発酵 `/resale/`）。ナビに「転売」「法人様向け」があれば必ず開く
 5. **キューのメーカー名が旧代理店・旧社名・小売店のことがある**：サハラ・インターナショナル→現正規代理店ネイチャーズウェイ（Dr.Bronner's）、日本薬品開発→ケンプリア（推測）、ママパン＝製菓材料の通販店（輸入者はリードオフジャパン＝推測）
