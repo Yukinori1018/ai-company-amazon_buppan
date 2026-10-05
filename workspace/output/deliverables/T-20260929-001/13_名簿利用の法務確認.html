@@ -1,0 +1,199 @@
+<!doctype html><html lang='ja'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>13 名簿利用の法務確認（12 §7 論点5）</title><style>body{font-family:-apple-system,'Hiragino Sans','Noto Sans JP',sans-serif;max-width:1150px;margin:2em auto;padding:0 1em;line-height:1.65;color:#222;font-size:14.5px}table{border-collapse:collapse;margin:.8em 0;font-size:.92em}th,td{border:1px solid #bbb;padding:.35em .6em;vertical-align:top}th{background:#eef2f8}tr:nth-child(even) td{background:#fafafa}h1{font-size:1.5em;border-bottom:2px solid #444}h2{font-size:1.25em;border-left:5px solid #25b;padding-left:8px;margin-top:1.8em}h3{font-size:1.05em;margin-top:1.4em}blockquote{border-left:4px solid #ccc;margin:.8em 0;padding:.2em 1em;color:#444}code{background:#f3f3f3;padding:1px 4px;border-radius:3px}hr{border:0;border-top:1px solid #ccc;margin:1.6em 0}</style></head><body>
+<h1>13 名簿利用の法務確認（12 §7 論点5）</h1>
+<p>T-20260929-001 ／ 2026-10-05 ／ 法務 ハルオ</p>
+<p>対象：12_名簿拡張の見積り の4経路を、メーカーへの仕入れ打診（メール・フォーム・電話）に使ってよいか。</p>
+<p>方法：規約・robots.txt・ページ表示・法令の原文を当職が自分で取得した（取得日はすべて 2026-10-05）。主催者・事務局への問い合わせはしていない。</p>
+<hr>
+<h2>0. 結論</h2>
+<ol>
+<li style='margin-left:0.0em'><strong>ギフトショー・RX・ものづくり補助金の3経路は、仕入れ打診に使えます</strong>（ギフトショーと RX は条件付き、補助金は共通条件のみ）。12 の名簿倍率 約4.4〜4.6倍はそのまま使えます。</li>
+<li style='margin-left:0.0em'><strong>ザ・ビジネスモールは NG です。</strong>ページの注記は「売り込み・テレマーケティング禁止」だけですが、利用規約 第17条は「掲載情報を自社の営業活動<strong>その他の理由</strong>で利用する行為」まで禁じています。買い手の打診も文言に入ります。使い道は「商談モールに買いたい案件を出す」ことです。</li>
+<li style='margin-left:0.0em'>4経路とも、送る側の法令（特定電子メール法・個人情報保護法）の条件は同じです。量が数千社になるので、<strong>仕入れ打診でも特定電子メールとして表示義務を満たして送る</strong>（9/16 判定の維持）。</li>
+</ol>
+<h3>経路別の判定</h3>
+<table><thead><tr><th>経路</th><th>判定</th><th>決め手（原文）</th><th>条件</th></tr></thead><tbody>
+<tr><td>① ギフトショー出展社PDF</td><td><strong>条件付き OK</strong></td><td>PDF の表示は「無断掲載及び他のメディアへの加工を禁止します」のみ。営業利用の禁止は無い。サイトに利用規約なし・robots.txt 404</td><td>名簿を公開しない／Gift Net に登録したら再判定／連絡先は各社の公式サイトから取る</td></tr>
+<tr><td>② RX ライフスタイルWeek（sitemap）</td><td><strong>条件付き OK</strong></td><td>RX NOW 利用規約 3.2(v)「自動化ツール、ボット、またはスクレイピング技術を使用して…データを抽出すること」禁止。3.3「本来の目的以外の目的で利用してはなりません」。出展社への商談申込みは本来の目的に合う</td><td>sitemap.xml の取得（1展1回）に留め、出展社詳細ページは機械で巡回しない／PDF は取らない（robots.txt で Disallow）／来場登録したら同規約に拘束される</td></tr>
+<tr><td>③ ものづくり補助金 採択一覧PDF</td><td><strong>OK（共通条件のみ）</strong></td><td>採択一覧PDF・採択結果ページに利用制限の記載なし。robots.txt 404。著作権表示のみ（全国中小企業団体中央会）</td><td>「認定支援機関名」列（個人名を含む）は保存しない</td></tr>
+<tr><td>④ ザ・ビジネスモール 企業詳細</td><td><strong>NG</strong></td><td>利用規約 第17条(12)(13)(14)(16)(17)(カ)。対象は「本サービスにアクセスする全ての利用者」</td><td>名簿としては使わない。代替は §4</td></tr>
+</tbody></table>
+<hr>
+<h2>1. 経路別の検討</h2>
+<h3>1-1. ① ギフトショー出展社PDF — 条件付き OK</h3>
+<p><strong>実測した事実</strong></p>
+<table><thead><tr><th>項目</th><th>結果</th></tr></thead><tbody>
+<tr><td>PDF</td><td><code>giftshow.co.jp/tigs/102tigs/pdf/list.pdf</code> HTTP 200。ログイン・同意画面なし</td></tr>
+<tr><td>PDF の表示</td><td>フッタに1回「（C）2026 BUSINESS GUIDE-SHA,INC. 無断掲載及び他のメディアへの加工を禁止します。」</td></tr>
+<tr><td>サイトの利用規約</td><td>トップから辿れるのは個人情報保護方針だけ。サイトの利用規約は無い</td></tr>
+<tr><td>robots.txt</td><td>404（拒否の意思表示が無い。許可でもない）</td></tr>
+</tbody></table>
+<p><strong>判定の理由</strong></p>
+<ul>
+<li style='margin-left:0.0em'>PDF の表示は<strong>契約ではありません</strong>。取得前に同意する手続きが無いからです（民法522条の申込み・承諾がない）。8/31 判定（T-20260831-005/04）と同じです。</li>
+<li style='margin-left:0.0em'>表示が禁じているのは「掲載」と「他のメディアへの加工」です。<strong>営業・仕入れへの利用は禁じていません。</strong></li>
+<li style='margin-left:0.0em'>社名は事実です。著作物ではありません（著作権法2条1項1号）。社内での分類・突合は30条の4第2号で説明できます。</li>
+<li style='margin-left:0.0em'>出展社は、小売・通販の買い手と商談するために出展しています。買い手からの仕入れ打診は<strong>名簿の公表目的に合っています</strong>。</li>
+</ul>
+<p><strong>条件</strong></p>
+<ol>
+<li style='margin-left:0.0em'>名簿（社名の一覧）を PUBLIC リポに置かない。置き場は <code>agent_output/</code>、社長所有の非公開シートまで（著作権法21条・23条、個人情報保護法27条。屋号だけの個人事業主が混ざる）。</li>
+<li style='margin-left:0.0em'><strong>Gift Net（オンライン事前登録）に登録したら、この判定をやり直す。</strong>Gift Net 利用規約 第5条は「出展社情報を本サービス利用以外の目的で利用する行為」を禁じています。来場は当日登録（名刺持参・無料）にすれば、この規約に同意せずに済みます。</li>
+<li style='margin-left:0.0em'>連絡先（メール・フォーム・電話）は、PDF ではなく<strong>各社の公式サイトから取る</strong>。</li>
+<li style='margin-left:0.0em'>打診文で接点を偽らない。「展示会でお見かけした」は来場していなければ書かない。「出展社一覧で拝見しました」は事実なので書いてよい。</li>
+</ol>
+<p><strong>リスク3軸</strong>：発生確率 低／影響度 小（主催者から削除を求められる程度）／不可逆性 低。</p>
+<h3>1-2. ② RX ライフスタイルWeek — 条件付き OK</h3>
+<p><strong>実測した事実</strong></p>
+<table><thead><tr><th>項目</th><th>結果</th></tr></thead><tbody>
+<tr><td>サイトの「ご利用条件」</td><td>フッタのリンク先は「RX NOW 利用規約」（最終更新 2026-05-12）</td></tr>
+<tr><td>RX NOW の範囲</td><td>定義集（2026-02-19 更新）で「Customer Profile/Directories」＝<strong>出展社ディレクトリを含む</strong></td></tr>
+<tr><td>合意の作り方</td><td>1.1「RX NOWへの登録、アクセス、ログイン、および／または利用…を行うことにより…同意したものとみなされます」</td></tr>
+<tr><td>禁止事項</td><td>3.2(iii)「RX NOWの全部または一部を複製すること」／3.2(v)「自動化ツール、ボット、またはスクレイピング技術を使用して、RX NOWからデータを抽出すること」</td></tr>
+<tr><td>利用の仕方</td><td>3.3「適用されるスパム防止法および迷惑メッセージ防止法」の遵守。「本来の目的以外の目的で利用してはなりません」</td></tr>
+<tr><td>アクセス方法</td><td>6.1「RX NOWには参加者のみアクセスできます」（メール認証かバッジ）</td></tr>
+<tr><td>robots.txt</td><td>200。<code>/*.pdf$</code>・<code>/*exhibitor-hub</code> などを Disallow。<strong>出展社詳細ページと sitemap は Disallow されていない</strong>。<code>Sitemap:</code> 行で sitemap.xml を案内している</td></tr>
+</tbody></table>
+<p><strong>判定の理由</strong></p>
+<ul>
+<li style='margin-left:0.0em'>非登録者がログインなしで見る出展社ページに、この規約が契約として及ぶかは<strong>はっきりしません</strong>。6.1 は「参加者のみアクセスできる」と書いており、ログイン不要の公開ページは想定していない読み方もできます。ただし、フッタで「ご利用条件」として示されているので、<strong>及ぶ前提で動きます</strong>（明文主義）。</li>
+<li style='margin-left:0.0em'>sitemap.xml は、robots.txt が機械に読ませるために案内しているファイルです。1展1回取るのは、3.2(v) の「スクレイピング」の典型（詳細ページを巡回して中身を抜く）とは違います。ただし<strong>グレーは残ります</strong>。だから詳細ページの機械巡回はしない、を条件にします。</li>
+<li style='margin-left:0.0em'>出展社に商談を申し込むのは、ディレクトリの本来の目的（3.3）に合います。</li>
+<li style='margin-left:0.0em'>来場登録（事前登録）をすると、展示会・セミナー参加ポリシーと RX NOW 規約に<strong>明確に同意したことになります</strong>。その後は 3.2 違反が契約違反として効きます。</li>
+</ul>
+<p><strong>条件</strong></p>
+<ol>
+<li style='margin-left:0.0em'>取るのは sitemap.xml（<code>&lt;展&gt;/ja-jp.exhibitors-sitemap.xml</code>）だけ。1展1回。社名は URL から読む。</li>
+<li style='margin-left:0.0em'>出展社詳細ページを機械で巡回しない。プロフィール文・画像・連絡先を写さない（3.2(iii)(v)）。</li>
+<li style='margin-left:0.0em'>PDF は取らない（robots.txt で Disallow）。</li>
+<li style='margin-left:0.0em'>連絡先は各社の公式サイトから取る。</li>
+<li style='margin-left:0.0em'>名簿を PUBLIC リポに置かない。</li>
+</ol>
+<p><strong>リスク3軸</strong>：発生確率 低／影響度 小〜中（規約違反と判断されると、RX のアカウント・入場バッジの停止＝4.2(v)。RX の展示会に来場できなくなる）／不可逆性 中。条件1〜2を守れば確率はさらに下がる。</p>
+<h3>1-3. ③ ものづくり補助金 採択一覧 — OK（共通条件のみ）</h3>
+<p><strong>問題ない根拠</strong></p>
+<table><thead><tr><th>項目</th><th>結果</th></tr></thead><tbody>
+<tr><td>採択結果ページ</td><td>「審査を行った結果を公表いたします」。利用の制限・禁止の記載なし</td></tr>
+<tr><td>採択一覧PDF（23次で確認）</td><td>列は受付番号・都道府県・商号・法人番号・事業計画名・認定支援機関名。禁止・無断転載の表示なし</td></tr>
+<tr><td>サイトの表示</td><td>「Copyright (C) 2020 全国中小企業団体中央会」のみ。利用規約・サイトポリシーへのリンクなし</td></tr>
+<tr><td>robots.txt</td><td>404</td></tr>
+</tbody></table>
+<ul>
+<li style='margin-left:0.0em'>公表の目的は補助事業の透明性です。営業・仕入れへの利用を禁じる記載はありません。</li>
+<li style='margin-left:0.0em'>商号・法人番号は事実です。著作物ではありません。社内での抽出・分類は著作権法30条の4第2号で説明できます。</li>
+<li style='margin-left:0.0em'><strong>「認定支援機関名」列には個人名（税理士など）が入っています。</strong>打診に要らない個人情報なので、取得・保存しない（個人情報保護法の取得の必要性を超えるため）。</li>
+<li style='margin-left:0.0em'>法人番号の無い行（約5,400行）は個人事業主の可能性が高い。個人情報として扱う（§2-2）。</li>
+</ul>
+<p><strong>打診文の注意</strong>：「補助金に採択されたのを見て」は書かなくてよい。補助金の採択者には営業連絡が多く、警戒されます。事業計画名から読める<strong>商品</strong>に触れる方が自然です（法的な義務ではなく、通報を招かないための推奨）。</p>
+<p><strong>より安全な取り方（任意）</strong>：gBizINFO にも補助金の交付情報が載っています。gBizINFO は「CC BY と互換」「商用利用も可能」と明記されています（9/20 判定済み）。ものづくり補助金の分がどこまで載っているかは未確認です。</p>
+<p><strong>リスク3軸</strong>：発生確率 低／影響度 小／不可逆性 低。</p>
+<h3>1-4. ④ ザ・ビジネスモール — NG</h3>
+<p><strong>ご質問への答え</strong>：企業詳細ページの注記「売り込みやテレマーケティングに利用することは禁止します」だけを読めば、買い手からの仕入れ打診は文言に入りません（「売り込み」は売る行為）。<strong>しかし利用規約の禁止は注記よりずっと広い。</strong>判定は規約で決まります。</p>
+<p><strong>利用規約（<code>b-mall.ne.jp/memberyakkan/</code>・平成16年施行・令和6年4月19日改定）第17条</strong></p>
+<p>柱書：「本サービスにアクセスする<strong>全ての利用者</strong>について、本サービス上ならびにその後の商談において…行うことはできません」</p>
+<table><thead><tr><th>号</th><th>原文</th><th>仕入れ打診への当たり方</th></tr></thead><tbody>
+<tr><td>(12)</td><td>「『ザ・商談モール』における『質問』や『応募』を除き、本サービスに掲載されている企業に対する広告・宣伝・PR・<strong>勧誘</strong>等の電話、FAX、電子メールを送信する行為」</td><td>「当社と取引しませんか」は取引の勧誘と読める。グレー</td></tr>
+<tr><td>(13)</td><td>「本人または事務局および登録団体の同意を得ることなく…他者の企業情報を収集する行為」</td><td>名簿化＝収集。<strong>該当</strong></td></tr>
+<tr><td>(14)</td><td>「本サービスに掲載されている情報を自社の営業活動<strong>またはその他の理由を含め</strong>利用する行為」</td><td>仕入れは自社の営業活動。「その他の理由」まで含む。<strong>該当</strong></td></tr>
+<tr><td>(16)</td><td>「本サービスを本来の趣旨から逸脱して利用する行為」</td><td>名簿として使うのは趣旨外</td></tr>
+<tr><td>(17)(カ)</td><td>「自動化された手段（ロボット、スクレイピング等…）を用いて本サービスにアクセスする行為（robot.txtファイルの定めによる場合を除く）」</td><td>機械取得は原則禁止</td></tr>
+</tbody></table>
+<p>あわせて第16条（入手したデータ等を私的利用の範囲を超えて利用しない）。robots.txt は電話番号の表示 API（<code>/telno/api/</code>・<code>/link/CompanyTelNoApi.aspx</code>）を Disallow しています。電話番号は「表示する」ボタンの奥にあり、その横に例の注記があります。</p>
+<p><strong>判定の理由</strong></p>
+<ul>
+<li style='margin-left:0.0em'>非会員には同意の手続きが無いので、規約が契約として及ぶかは弱いです（民法548条の2の定型約款の合意も、非会員の閲覧には当てはめにくい）。<strong>それでも NG にします。</strong>理由は3つです。</li>
+<li style='margin-left:1.2em'>運営者の意思が明文で示されている。注記を読んだうえで使えば、故意と評価されます。</li>
+<li style='margin-left:1.2em'>規約に反した取得は、個人情報保護法20条1項「偽りその他不正の手段」による取得と評価される余地があります（個人事業主の情報について）。</li>
+<li style='margin-left:1.2em'><strong>不可逆性が高い。</strong>本当の制裁は訴訟ではなく、第9条（利用の不承認）・第25条（利用取消）です。商工会議所の会員になっても、ザ・ビジネスモールの本命である「商談モールへの案件投稿」（12 §4：1案件で提案5.1件）を使えなくなるおそれがあります。地元の商工会議所との関係にも響きます（推測）。</li>
+</ul>
+<p><strong>リスク3軸</strong>：発生確率 中（「ビジネスモールで見た」と書く、電話番号を機械で取る、で発覚する）／影響度 中（商談モールの経路を失う）／不可逆性 高。</p>
+<hr>
+<h2>2. 4経路に共通する法令</h2>
+<h3>2-1. 特定電子メール法 — 表示義務を満たして送る</h3>
+<p><strong>仕入れ打診は「広告・宣伝」に当たるか</strong></p>
+<ul>
+<li style='margin-left:0.0em'><strong>原則は当たりません。</strong>法2条2号の特定電子メールは「自己又は他人の営業につき広告又は宣伝を行うための手段として送信をする電子メール」です。買う申込みは自社の営業の宣伝ではありません。総務省ガイドライン p.2 の非該当例ア）（取引上の条件を案内する事務連絡で、広告宣伝を含まず、サイトへ誘導もしないもの）とも合います（9/4 判定）。</li>
+<li style='margin-left:0.0em'><strong>ただし、次のどれかが入ると当たります。</strong>自社サイト・Amazon ストアの URL（GL p.1 該当例ア）の「誘導」）／「当社なら貴社商品の売上を伸ばせます」など自社の販売力の売り込み。数千通の型で全通をこの外に保つのは難しい。</li>
+<li style='margin-left:0.0em'><strong>だから量産では、当たる前提で義務を満たします</strong>（9/16 判定 T-20260915-002/10 の維持）。費用は署名の5行だけです。</li>
+</ul>
+<p><strong>守ること</strong></p>
+<table><thead><tr><th>#</th><th>条件</th><th>根拠</th></tr></thead><tbody>
+<tr><td>1</td><td>送り先のアドレスは、<strong>相手企業が自社サイトで公表しているもの</strong>に限る。展示会・DB の画面に載ったアドレスは使わない</td><td>法3条1項4号、施行規則3条本文（「自己の電子メールアドレスをインターネットを利用して公衆が閲覧することができる状態に置く」）</td></tr>
+<tr><td>2</td><td>アドレスの近くに「広告メールお断り」等の表示がある会社には、<strong>メールで送らない</strong>。フォームか電話に回す</td><td>施行規則3条ただし書（表示があると4号の例外が消える）</td></tr>
+<tr><td>3</td><td>本文に、送信者の氏名又は名称・受信拒否の連絡先・住所・苦情や問い合わせの受付先を書く</td><td>法4条1号・2号・3号、施行規則</td></tr>
+<tr><td>4</td><td>受信拒否・「不要」の返信が来たら、<strong>その会社には全経路で即日、永久に送らない</strong></td><td>法3条3項</td></tr>
+<tr><td>5</td><td>URL は貼らない。貼るなら取引先向けの <code>satoy-select.com/partners</code> 1本だけ</td><td>GL p.1 該当例ア）</td></tr>
+</tbody></table>
+<p><strong>特定電子メール法がかからない手段</strong>：問い合わせフォーム（HTTP 送信は同法の「電子メール」でない。平成21年総務省令85号）・電話（特商法の電話勧誘販売は売る側の規制で、当社は買う側）・FAX（同法の対象外）。ただし拒否された後の繰り返しは、民法709条・刑法234条（業務妨害）に近づきます。<strong>断られたら二度と連絡しない</strong>で足ります。</p>
+<h3>2-2. 個人情報保護法</h3>
+<table><thead><tr><th>論点</th><th>結論</th><th>根拠</th></tr></thead><tbody>
+<tr><td>法人の社名・代表番号・代表アドレス</td><td>個人情報ではない</td><td>法2条1項（生存する個人に関する情報）</td></tr>
+<tr><td>個人事業主の屋号・氏名、担当者名入りのアドレス、補助金PDFの個人名</td><td><strong>個人情報</strong></td><td>同上</td></tr>
+<tr><td>当社は義務を負うか</td><td>負う。名簿をシートで検索できる形にした時点で「個人情報データベース等」を事業に使っている</td><td>法16条</td></tr>
+<tr><td>公開情報を取ってよいか</td><td>よい。ただし規約に反した取得は「不正の手段」と言われる余地がある（④を NG にした理由の1つ）</td><td>法20条1項</td></tr>
+<tr><td>利用目的の通知・公表</td><td>当社サイトに個人情報の方針が無い（<code>/privacy</code> 404・2026-10-05 確認）。<strong>初回の連絡文に1行入れる</strong>（例：「頂いたご連絡先は、仕入れのご相談にのみ使います」）</td><td>法21条1項。同条4項4号（取得の状況から目的が明らか）でも足りる余地はあるが、1行で済むので書く</td></tr>
+<tr><td>PUBLIC リポへの commit</td><td>しない。個人事業主の一覧を公開＝第三者提供にあたり得る</td><td>法27条1項</td></tr>
+<tr><td>利用停止の求め</td><td>応じる。2-1 の4と同じ運用で足りる</td><td>法35条</td></tr>
+</tbody></table>
+<h3>2-3. 著作権・PUBLIC リポ</h3>
+<p>4経路とも、<strong>社名の一覧（名簿そのもの）は PUBLIC リポに置かない</strong>。成果物に書くのは件数・割合などの集計だけ。12 はこの形になっている（会社名入りの一覧は <code>agent_output/</code> のみ）。2-2 と合わせ、現在の運用で満たしています。</p>
+<hr>
+<h2>3. 共通の遵守条件（チェックリスト）</h2>
+<p>送信の担当（マリエ／ヒデアキ／タカシ）は、次の8点を満たしてから送る。</p>
+<ol>
+<li style='margin-left:0.0em'>名簿は <code>agent_output/</code> と社長所有の非公開シートだけに置く。PUBLIC リポに入れない</li>
+<li style='margin-left:0.0em'>連絡先は各社の公式サイトから取る（展示会・DB の画面から取らない）</li>
+<li style='margin-left:0.0em'>メールの宛先は、自社サイトで公表されたアドレスだけ。「広告メールお断り」併記の会社はフォームか電話へ</li>
+<li style='margin-left:0.0em'>署名に、名称・住所・受信拒否の連絡先・問い合わせ先の4点</li>
+<li style='margin-left:0.0em'>URL は貼らない（貼るなら /partners だけ）。自社の販売力の売り込みを書かない</li>
+<li style='margin-left:0.0em'>初回の文面に、連絡先の利用目的を1行</li>
+<li style='margin-left:0.0em'>断り・受信拒否は会社単位・全経路で即日停止。再連絡しない</li>
+<li style='margin-left:0.0em'>接点を偽らない（来場していない展示会を「お会いした」と書かない）。Amazon での販売状況も事実どおりに書く</li>
+</ol>
+<hr>
+<h2>4. ザ・ビジネスモールの代わり（NG だが選択肢から外さない）</h2>
+<table><thead><tr><th>案</th><th>中身</th><th>規約上</th><th>費用・手間</th><th>推奨</th></tr></thead><tbody>
+<tr><td>A</td><td><strong>商談モールに「買いたい案件」を投稿する</strong>（本来の使い方）</td><td>第17条(12)が「質問」「応募」を例外として明記。正面から適法</td><td>商工会議所の入会 加入金3,000円＋年会費10,000円〜（§4.1・2026-09-27 社長却下済み）。再提示の条件は 09 のとおり</td><td><strong>◎（再提示の条件が来たら）</strong></td></tr>
+<tr><td>B</td><td>事務局の同意を書面で取って名簿として使う</td><td>第16条・第17条(13)が「事務局の同意」を例外にしている</td><td>第三者連絡＝§4.1。同意が出る見込みは低い（推測）</td><td>△</td></tr>
+<tr><td>C</td><td>同じ会社を適法な経路で拾う：gBizINFO（CC BY 互換・9/20 判定）、業界団体の会員名簿（9/20 判定）、①〜③</td><td>各経路の判定どおり</td><td>0円</td><td><strong>◎（今すぐ）</strong></td></tr>
+</tbody></table>
+<p><strong>それでも名簿として使う場合の3点セット</strong>（法務としては推奨しません）</p>
+<table><thead><tr><th>項目</th><th>内容</th></tr></thead><tbody>
+<tr><td>リスクシナリオ</td><td>打診先が地元の商工会議所に相談 → 事務局が当社を特定 → 入会時に不承認（第9条）または利用取消（第25条）。商談モールの経路を失う</td></tr>
+<tr><td>発生時の対応</td><td>直ちに利用をやめ、取得した情報を消去したうえで事務局に経緯を説明する（消去は §4.1 の不可逆な削除にあたるので社長承認）</td></tr>
+<tr><td>撤退条件</td><td>事務局・商工会議所・打診先のどこからでも、ザ・ビジネスモールの利用について指摘が1件来たら全停止</td></tr>
+</tbody></table>
+<hr>
+<h2>5. 09 §3-0-1 論点5への差し込み文</h2>
+<blockquote><strong>ハルオ判定（13・2026-10-05）</strong>：①ギフトショー＝条件付き OK、②RX＝条件付き OK、③ものづくり補助金＝OK、④ザ・ビジネスモール＝NG（利用規約 第17条(13)(14)で掲載情報の営業利用・収集を禁止。代わりは商談モールへの案件投稿）。①〜③は12の数字に含まれ、④は含まれていないので、<strong>名簿の倍率 約4.4〜4.6倍は変わらない</strong>。送信は13 §3 の8条件を満たすこと。</blockquote>
+<hr>
+<h2>6. 確度と未確認</h2>
+<table><thead><tr><th>区分</th><th>中身</th></tr></thead><tbody>
+<tr><td>実測（原文を取得）</td><td>ギフトショーPDFの表示・robots.txt 4本・RX NOW 利用規約（日本語）と定義集（英語）・参加ポリシー・ものづくり補助金の採択ページと23次PDF・ザ・ビジネスモール利用規約全文と企業詳細ページ・特定電子メール法3条/4条・施行規則2条/3条・個人情報保護法20条/21条（e-Gov API）・当社サイト <code>/privacy</code> 404</td></tr>
+<tr><td>推測</td><td>RX NOW 規約が非登録者の公開ページ閲覧に及ぶか（及ぶ前提で条件を付けた）／ザ・ビジネスモールでの制裁が商工会議所との関係に及ぶか／事務局の同意が出る見込み</td></tr>
+<tr><td>未確認</td><td>ギフトショー第103回のPDFの表示（第102回と同じと推定。公開されたら1行確認）／gBizINFO にものづくり補助金がどこまで載っているか／RX の各出展社詳細ページの個別表示（機械で巡回しない条件なので取りに行っていない）</td></tr>
+</tbody></table>
+<p>判例の原文には当たっていません。今回の判定は規約と条文の文言で決めています。</p>
+<hr>
+<h2>7. 出典（取得日はすべて 2026-10-05）</h2>
+<table><thead><tr><th>#</th><th>出典</th><th>URL</th></tr></thead><tbody>
+<tr><td>1</td><td>第102回 東京インターナショナル・ギフト・ショー 出展社リスト</td><td>https://www.giftshow.co.jp/tigs/102tigs/pdf/list.pdf</td></tr>
+<tr><td>2</td><td>ギフトショー robots.txt（404）</td><td>https://www.giftshow.co.jp/robots.txt</td></tr>
+<tr><td>3</td><td>Gift Net 利用規約（8/31 取得・第5条）</td><td>https://giftnet.jp/terms/</td></tr>
+<tr><td>4</td><td>ライフスタイルWeek robots.txt</td><td>https://www.lifestyle-expo.jp/robots.txt</td></tr>
+<tr><td>5</td><td>RX NOW 利用規約（日本語・2026-05-12 更新）</td><td>https://legal.rxglobal.com/ja-jp/rx-now-tc.html</td></tr>
+<tr><td>6</td><td>RX 定義集（英語・2026-02-19 更新）</td><td>https://legal.rxglobal.com/en-gb/rx-terms-definitions.html</td></tr>
+<tr><td>7</td><td>RX 展示会・セミナー参加ポリシー</td><td>https://legal.rxglobal.com/ja-jp/participation-terms.html</td></tr>
+<tr><td>8</td><td>ものづくり補助金 採択結果</td><td>https://portal.monodukuri-hojo.jp/saitaku.html</td></tr>
+<tr><td>9</td><td>同 23次 採択者リスト（PDF）</td><td>https://portal.monodukuri-hojo.jp/common/bunsho/ippan/23th/採択者リスト_23次締切.pdf</td></tr>
+<tr><td>10</td><td>ザ・ビジネスモール 利用規約</td><td>https://www.b-mall.ne.jp/memberyakkan/</td></tr>
+<tr><td>11</td><td>同 企業詳細ページ（注記の確認）</td><td>https://www.b-mall.ne.jp/CompanyDetail-EYbqCQdvKXcr.html</td></tr>
+<tr><td>12</td><td>同 robots.txt</td><td>https://www.b-mall.ne.jp/robots.txt</td></tr>
+<tr><td>13</td><td>特定電子メール法（e-Gov API）</td><td>https://laws.e-gov.go.jp/api/1/lawdata/414AC0100000026</td></tr>
+<tr><td>14</td><td>同 施行規則</td><td>https://laws.e-gov.go.jp/api/1/lawdata/414M60000008066</td></tr>
+<tr><td>15</td><td>個人情報保護法</td><td>https://laws.e-gov.go.jp/api/1/lawdata/415AC0000000057</td></tr>
+<tr><td>16</td><td>総務省「特定電子メールの送信等に関するガイドライン」（9/4・9/16 判定で参照）</td><td>https://www.soumu.go.jp/main_sosiki/joho_tsusin/d_syohi/pdf/m_mail_081114_1.pdf</td></tr>
+<tr><td>17</td><td>社内：ギフトショー・NETSEA 判定</td><td>workspace/output/deliverables/T-20260831-005/04_出展社リストとNETSEAの適法性判定.md</td></tr>
+<tr><td>18</td><td>社内：大量送信の法規と苦情ルール</td><td>workspace/output/deliverables/T-20260915-002/10_大量送信の法規と苦情ルール.md</td></tr>
+</tbody></table>
+<p>規約・ページの取得原本は <code>workspace/output/agent_output/T-20260929-001/legal13/</code> にあります（Git 管理外）。</p>
+</body></html>
