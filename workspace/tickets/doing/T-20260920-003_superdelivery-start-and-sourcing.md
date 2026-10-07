@@ -3127,3 +3127,30 @@ Amazon の棚は数千万あるので、6.7万 JAN の索引をランダムに�
   実測0/120件で効きません）。トークン単価は未測定なので、次回いちばん最初に測ります。
 - `score_20261004.py --relax` で「どの条件が候補を殺しているか」が1コマンドで出ます。
   **次に0件になったらまずこれを打ってください。**
+
+## 2026-10-07 和平フレイズ ゲート解除後の棚の実数（サトル）
+
+**イシュー**：和平フレイズの出品許可が通ったら、当社が使える棚は何件あるのか。
+
+**スコープと打ち切り条件**（着手時に宣言）：Keepa の brand 完全一致で引ける全 ASIN を母集団とし、
+件数ベースのクロス集計 → 該当 ASIN の実取得（buybox=1）まで。実画面確認・卸の実在確認は範囲外。
+トークンは 300 を上限の目安として宣言し、実績 556（件数クエリの試行が想定より多かった）。
+
+**結論**：**第三者がカートを持ち、かつ月販表示がある棚は 54件 / 全 7,039件（0.77%）。**
+機械判定（Finder）では 77件だが、実取得で 1件が Amazon 本体に反転・22件はカート保持者が空。
+54件は **36の親ASIN**に属する兄弟集合＝独立な棚は36グループ。
+本体の365日在庫率が20%以下なのは **3件だけ**（B091HQMSW9 / B086DVVBKP / B01MT6DU8R）。
+`monthlySold` が付く 455件のうち **378件（83%）は Amazon 本体がカートを保持**。
+
+🔴 **Finder の `buyBoxIsAmazon` は実取得より古い。**B0FVL8QST6（9/30 に12点発注した鍋）は
+Finder では「本体以外」だが実取得では **Amazon 本体がカート**。発注判定に Finder のカート条件を使わない。
+
+🔴 **既存 all.csv との突合：依頼文の「7件中5件が本体」は 4件**（5件目は「不明」）。
+B0F93P2DHB は 10/04「第三者」→ 10/07「カート保持者なし」。
+
+**成果物（agent_output・Keepa 加工値を含むため PUBLIC な deliverables には出さない）**
+- workspace/output/agent_output/T-20260920-003/wahei/01_和平フレイズ_棚の実数.md
+- workspace/output/agent_output/T-20260920-003/wahei/d_list.csv（83行・54件の一覧つき）
+- 同 counts.json / counts2.json / d_asinlist.json / d_products_raw.json / brand_probe.json / kp.py
+
+**memory**: agents/researcher/memory/knowledge_brand_shelf_inventory_keepa_finder.md
