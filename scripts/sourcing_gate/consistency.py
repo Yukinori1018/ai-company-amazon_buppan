@@ -78,6 +78,8 @@ class COLS:
     fba = "FBA配送代行"
     other = "その他固定費"
     unit_cost = "Amazon1個あたり原価(税込)"
+    #: 同じ意味で使われている別の列名。**どちらでも読む**（表ごとに違う）。
+    unit_cost_alt = "Amazon1個あたり仕入原価(税込)"
     set_count = "Amazon側のセット数(Amazon1個=卸何点か)"
     set_conf = "セット数の確度"
     net = "1個手残り"
@@ -397,10 +399,17 @@ def _c_fba_fee(row: dict, ctx: dict) -> Optional[Finding]:
     exp = F.fba_fee_yen(tier, sell)
     if abs(fba - exp) <= YEN_TOL:
         return None
+    col = ("安い列（売価1,000円以下）" if sell <= F.FBA_LOW_PRICE_CLIFF_YEN
+           else "通常の列（売価1,000円超）")
+    other = F.FBA[tier][1] if sell > F.FBA_LOW_PRICE_CLIFF_YEN else F.FBA[tier][0]
+    hint = ("。**表の額は安い列の値です＝1,000円の崖を逆向きに踏んでいます**"
+            if abs(fba - other) <= YEN_TOL else "")
     return Finding("fba_fee", NG,
-                   f"FBA配送代行が合いません。区分 {tier}・売価 {sell:,.0f}円 なら "
-                   f"{exp:,.0f}円（1,000円以下は安い列）ですが、表は {fba:,.0f}円 です。",
-                   {"区分": tier, "売価": sell, "計算値": exp, "表の額": fba})
+                   f"FBA配送代行が合いません。区分 {tier}・売価 {sell:,.0f}円 は"
+                   f"{col}なので {exp:,.0f}円 ですが、表は {fba:,.0f}円 です"
+                   f"（{exp - fba:+,.0f}円 の差）{hint}。",
+                   {"区分": tier, "売価": sell, "計算値": exp, "表の額": fba,
+                    "適用される列": col})
 
 
 def _c_other_costs(row: dict, ctx: dict) -> Optional[Finding]:
@@ -571,12 +580,28 @@ _MD_RE = re.compile(r"^(\d{1,2})\s*[/月-]\s*(\d{1,2})")
 _YM_RE = re.compile(r"^(\d{4})\s*[-/年]\s*(\d{1,2})")
 
 
-def _resolve_md(s: str, base: date) -> Optional[date]:
-    """「10/04」のような年なしの日付を、`base` に最も近い年で解決する。
+_ISO_RE = re.compile(r"^(\d{4})\s*[-/年]\s*(\d{1,2})\s*[-/月]\s*(\d{1,2})")
 
-    年末年始をまたぐ鎖（12/28 → 01/05）を正しく並べるため、前の日付を `base` に渡して順に解く。
+
+def _resolve_md(s: str, base: date) -> Optional[date]:
+    """日付を解決する。`YYYY-MM-DD`（年つき）と `10/04`（年なし）の両方を受ける。
+
+    年なしは `base` に最も近い年で解く。年末年始をまたぐ鎖（12/28 → 01/05）を正しく
+    並べるため、前の日付を `base` に渡して順に解く。
+
+    ⚠️ **当社の表は書式が揃っていません。**自分の生成物だけで試すと、他のエージェントが
+    作った表（ISO 形式）を「日付として読めません」と誤検知する
+    （2026-10-09：サトルの SD 起点候補 375行のうち **305行を誤検知した**）。
+    **検査は、当社が実際に使っている書式を全部受けること。**
     """
-    m = _MD_RE.match((s or "").strip())
+    txt = (s or "").strip()
+    m = _ISO_RE.match(txt)
+    if m:
+        try:
+            return date(int(m.group(1)), int(m.group(2)), int(m.group(3)))
+        except ValueError:
+            return None
+    m = _MD_RE.match(txt)
     if not m:
         return None
     mo, da = int(m.group(1)), int(m.group(2))
@@ -704,7 +729,7 @@ def check_row(row: dict, *, today: Optional[date] = None,
         "referral": num(get(row, COLS.referral)),
         "fba": num(get(row, COLS.fba)),
         "other": num(get(row, COLS.other)),
-        "cost": num(get(row, COLS.unit_cost)),
+        "cost": num(get(row, COLS.unit_cost) or get(row, COLS.unit_cost_alt)),
         "set_count": num(get(row, COLS.set_count)),
         "net": num(get(row, COLS.net)),
         "margin": num(get(row, COLS.margin)),
