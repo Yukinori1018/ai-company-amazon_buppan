@@ -69,6 +69,7 @@ class COLS:
     sell_worst = "保守値(90日の下位25%)"
     price_now = "現在価格"
     price_src = "価格の出どころ"
+    buybox = "カートの販売元"
     tier = "サイズ区分"
     referral = "販売手数料"
     fba = "FBA配送代行"
@@ -761,15 +762,27 @@ def run(path: Path, *, private: Optional[Path] = None, today: Optional[date] = N
     return cols, rows, results
 
 
-def summarize(results: Iterable[RowResult]) -> dict:
+def summarize(results: Iterable[RowResult], rows: Optional[list[dict]] = None) -> dict:
+    """集計。`rows` を渡すと「前回の NG の印が残っている行」も数える。
+
+    ★ 是正した CSV をもう一度 check にかけると、採算欄が空なので**所見は0件**になる。
+      そこだけ見ると「表は健全」と読めてしまうので、**印に残っている NG を必ず併記する**。
+    """
     results = list(results)
     by_check: dict[str, dict[str, int]] = {}
     for res in results:
         for f in res.findings:
             by_check.setdefault(f.check, {"NG": 0, "WARN": 0, "UNKNOWN": 0})
             by_check[f.check][f.severity] = by_check[f.check].get(f.severity, 0) + 1
+    carried = 0
+    if rows is not None:
+        for row in rows:
+            ng, _ = _parse_mark(get(row, COLS.result))
+            if ng:
+                carried += 1
     return {
         "母集団": len(results),
+        "印にNGが残っている行": carried,
         "NG(採算欄を空にした行)": sum(1 for r in results if r.blocking),
         "うち番兵のみ": sum(1 for r in results
                        if r.blocking and not r.of(NG)),
@@ -782,7 +795,10 @@ def summarize(results: Iterable[RowResult]) -> dict:
 # ── CLI ───────────────────────────────────────────────────────────────────
 def _print_summary(s: dict) -> None:
     print(f"母集団 {s['母集団']}行")
-    print(f"  NG（採算欄を空にする）  {s['NG(採算欄を空にした行)']}行"
+    if s.get("印にNGが残っている行"):
+        print(f"  🔴 前回の NG の印が残っている行  {s['印にNGが残っている行']}行"
+              f"（採算欄は空のまま。所見が0件でも健全ではありません）")
+    print(f"  今回の所見で NG（採算欄を空にする）  {s['NG(採算欄を空にした行)']}行"
           f"（うち番兵のみ {s['うち番兵のみ']}行）")
     print(f"  WARN のみ               {s['WARNのみ']}行")
     print(f"  問題なし                {s['問題なし']}行")
@@ -795,7 +811,7 @@ def _print_summary(s: dict) -> None:
 def cmd_check(a) -> int:
     cols, rows, results = run(Path(a.csv), private=Path(a.private) if a.private else None,
                               today=a.today, base_date=a.base_date)
-    s = summarize(results)
+    s = summarize(results, rows)
     _print_summary(s)
     if a.show:
         for res in results:
@@ -803,7 +819,7 @@ def cmd_check(a) -> int:
                 print(f"\n● {res.asin}")
                 for f in res.findings:
                     print(f"    {f.severity:8} {f.line()}")
-    return 1 if s["NG(採算欄を空にした行)"] else 0
+    return 1 if (s["NG(採算欄を空にした行)"] or s["印にNGが残っている行"]) else 0
 
 
 def cmd_fix(a) -> int:
@@ -837,7 +853,7 @@ def cmd_fix(a) -> int:
         w.writeheader()
         for row in rows:
             w.writerow({(k or "").lstrip("﻿"): v for k, v in row.items()})
-    s = summarize(results)
+    s = summarize(results, rows)
     _print_summary(s)
     print(f"\n書き換えた行: {changed_rows}行 → {out}")
     if a.report:

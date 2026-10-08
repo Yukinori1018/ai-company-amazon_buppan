@@ -156,6 +156,19 @@ def evaluate(asin: str, today: Optional[date] = None,
         return GateResult(a, [Problem("-", "記録ファイル", "読めない", str(e))])
     items = rec.get("items") or {}
     res = GateResult(a)
+
+    # 整合性検査（consistency.py）の結果が NG なら、項目が全部 PASS でも発注させない。
+    # 当社は「単位ずれで赤字を黒字と報告」を3回やっている。21項目の○は**人が見た事実**の
+    # 記録であって、**表の算術が合っていることの保証ではない**。別の軸なので別に止める。
+    # 記録が無いときは止めない（従来の21項目で既に止まる。ここで二重に fail-closed にすると
+    # 過去の記録が全部無効になり、ゲートを外す圧力になる）。
+    cons = rec.get("consistency") or {}
+    if str(cons.get("result", "")).upper() == "NG":
+        res.problems.append(Problem(
+            "consistency", "整合性検査", "NG",
+            f"{cons.get('detail', '')}（検査日 {cons.get('checked_at', '不明')}・"
+            f"やり直し: python3 scripts/sourcing_gate/consistency.py check <候補CSV>）"))
+
     for it in spec:
         if not it.get("required", True):
             continue
@@ -299,7 +312,16 @@ def check_document(path: str, text: str, today: Optional[date] = None) -> List[s
         for p in r.problems:
             msgs.append(f"    - [{p.item_id}] {p.name}: {p.reason}"
                         + (f"（{p.detail}）" if p.detail else ""))
-        first = next((p.item_id for p in r.problems if p.item_id != "-"), None)
+        # 整合性検査は「人が確認して記録する項目」ではないので、set の打ち方を案内しない
+        # （`consistency` は spec に無い id なので check_record.py 側でも弾かれるが、
+        #   手で PASS に書き換える道があるように読めてしまう）。
+        if any(p.item_id == "consistency" for p in r.problems):
+            msgs.append("    整合性検査の直しかた: 候補CSVの算術を直してから "
+                        "`python3 scripts/sourcing_gate/consistency.py check <候補CSV>` が"
+                        "通ることを確かめ、`autofill.py` で記録を取り直してください。"
+                        "**数字を黙って合わせずに、どちらが正しいかを確かめること。**")
+        first = next((p.item_id for p in r.problems
+                      if p.item_id not in ("-", "consistency")), None)
         if first:
             msgs.append(f"    記録のしかた: {set_command(r.asin, first)}")
     rows = unresolved_rows(path, text, asins)
