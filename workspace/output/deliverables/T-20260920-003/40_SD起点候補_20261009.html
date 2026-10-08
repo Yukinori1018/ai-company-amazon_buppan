@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html lang="ja"><head><meta charset="utf-8">
+<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>SD起点候補 2026-10-09 — T-20260920-003</title><style>
 :root{--fg:#1d2129;--mut:#6b7280;--line:#e3e6ea;--bg:#fff;--acc:#0b6fb4;--warn:#fff7ed;--warnb:#f59e0b;--th:#f6f8fa}
@@ -41,7 +40,7 @@ strong{color:#0a2540}
 <h2>結論（3行）</h2>
 <ol><li><strong>SD 起点で「Amazon 側は全部通った・あとは仕入価格だけ」の行は 58行（ユニーク45 ASIN）。</strong><br>うち <strong>Amazon に月販表示があるのは19行（16 ASIN）</strong>＝売れている根拠が機械で取れている行。</li><li><strong>候補が止まっていた主因は 429 ではありません。</strong>SD の仕入価格が<strong>非ログインでは1件も取れない</strong><br>（手元167行すべて空＝実測）ことで、採算が確定できないまま放置されていました。<br>本日は仕入価格を推定で埋めず、**「Amazon 1個あたりの仕入原価が何円以下なら A／B 等級か」を<br>Keepa の価格履歴（実額はこのリポに書けません）と公式手数料から逆算**して列に出しました。ここに実額を1つ入れれば採算は即確定します。</li><li><strong>今日、SD への取得は枠を使い切りました（レーンA 30/30・レーンB 50/50）。429 は1回も出ていません。</strong><br>明日の続きは <code>agent_output/.../sd_buylist20261009/明日の続き.md</code> に書いてあります。</li></ol>
 <h2>母集団（数字は必ず分母つきで）</h2>
-<div class='tw'><table><thead><tr><th>段</th><th>件数</th></tr></thead><tbody><tr><td>SD 商品行（9/30 索引 127 ＋ 10/09 ラウンドロビン 40）</td><td><strong>167行 / 120 JAN / 11社</strong></td></tr><tr><td>① 取引条件で落とした行（Amazon 名指し不可・△・記載なし）</td><td><strong>64行</strong>（9社のうち4社：コモライフ・クレエ・折兼・森川産業）</td></tr><tr><td>取引条件 PASS</td><td><strong>103行</strong>（カネイシ・ハリマ共和物産・ブライエンタープライズ・志成販売・ニッパン）</td></tr><tr><td>Keepa に当てた JAN</td><td><strong>120 / 120（100%）</strong>。JAN が Amazon に無かったのは6行</td></tr><tr><td>ASIN まで展開した行（1 JAN が複数 ASIN を返したら全部残す）</td><td><strong>375行</strong></td></tr><tr><td><strong>Amazon 側 全ゲート PASS（＝仕入価格だけ待ち）</strong></td><td><strong>58行 / 45 ASIN</strong></td></tr></tbody></table></div>
+<div class='tw'><table><thead><tr><th>段</th><th>件数</th></tr></thead><tbody><tr><td>SD 商品行（9/30 索引 127 ＋ 10/09 ラウンドロビン 40）</td><td><strong>167行 / 120 JAN / 9社</strong></td></tr><tr><td>① 取引条件で落とした行（Amazon 名指し不可・△・記載なし）</td><td><strong>64行</strong>（9社のうち4社：コモライフ・クレエ・折兼・森川産業）</td></tr><tr><td>取引条件 PASS</td><td><strong>103行</strong>（カネイシ・ハリマ共和物産・ブライエンタープライズ・志成販売・ニッパン）</td></tr><tr><td>Keepa に当てた JAN</td><td><strong>120 / 120（100%）</strong>。JAN が Amazon に無かったのは6行</td></tr><tr><td>ASIN まで展開した行（1 JAN が複数 ASIN を返したら全部残す）</td><td><strong>375行</strong></td></tr><tr><td><strong>Amazon 側 全ゲート PASS（＝仕入価格だけ待ち）</strong></td><td><strong>58行 / 45 ASIN</strong></td></tr></tbody></table></div>
 <h2>落ちた理由（重複カウント・母集団375行）</h2>
 <div class='tw'><table><thead><tr><th>理由</th><th>件数</th></tr></thead><tbody><tr><td>① 取引条件（Amazon 不可／△／記載なし）</td><td><strong>64</strong></td></tr><tr><td>④ 実売（月販表示なし＋ランク50万位より下、または family 共有ランク）</td><td><strong>56</strong></td></tr><tr><td>④ 採算の天井（売価が低すぎて原価0円でも赤字＝死に帯）</td><td><strong>35</strong></td></tr><tr><td>④ 季節の窓（販売開始がピークを過ぎる）</td><td><strong>27</strong></td></tr><tr><td>④ カート保持者（Amazon 本体）</td><td><strong>22</strong></td></tr><tr><td>④ 価格の動き（下落トレンド）</td><td><strong>8</strong></td></tr><tr><td>③ JAN が Amazon のカタログに無い</td><td><strong>6</strong></td></tr></tbody></table></div>
 <p>→ <strong>採算（固定費）で死んでいるのは35行で、最大の殺し手は「実売の根拠がない」56行</strong>です<br>（2026-10-04 の集計と同じ向き）。</p>
