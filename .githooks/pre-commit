@@ -432,10 +432,76 @@ MSG
   return 0
 }
 
+# ── 採算の表は「検算済み」でないと commit させない（2026-10-09・T-20260920-003）────
+# order_gate は「発注案」という名前のファイルだけを見る。ところが採算の数字は
+# 「買う候補リスト」「候補」「top30」など**別の名前でいくらでも出せる**。
+# §3.3-30 の「名前を変えて回避する道を塞ぐ」ために、**採算の列を持つ表**を名前で
+# はなく**中身で**見つけて consistency.py に通す。
+#
+# 判定は「採算の列（1個手残り／利益率／Amazon1個あたり原価）が揃っている表か」。
+# 揃っていなければ何もしない（説明用の表・他事業の CSV を止めないため）。
+profit_table_gate() {
+  command -v python3 >/dev/null 2>&1 || return 0
+  [ -f scripts/sourcing_gate/consistency.py ] || return 0
+  local list f st tmp ng=0
+  list="$(mktemp -t precommit-profit)" || return 0
+  git diff --cached --no-renames --name-status --diff-filter=AM -z >"$list" 2>/dev/null \
+    || { rm -f "$list"; return 0; }
+  while IFS= read -r -d '' st && IFS= read -r -d '' f; do
+    case "$(printf '%s' "${f##*.}" | tr 'A-Z' 'a-z')" in
+      csv|tsv) : ;;
+      *) continue ;;
+    esac
+    # ゲート自身のテストデータは対象外（自分で自分を止めないため）
+    case "$f" in
+      scripts/sourcing_gate/*|.claude/*) continue ;;
+    esac
+    # 採算の列が揃っているかをヘッダだけで見る
+    git show ":$f" 2>/dev/null | head -1 | grep -q '1個手残り' || continue
+    git show ":$f" 2>/dev/null | head -1 | grep -q 'Amazon1個あたり原価' || continue
+    tmp="$(mktemp -t precommit-profit-csv)" || continue
+    git show ":$f" >"$tmp" 2>/dev/null
+    if ! python3 scripts/sourcing_gate/consistency.py check "$tmp" >/dev/null 2>&1; then
+      printf '  - %s … 整合性検査で NG（採算の数字が検算を通っていません）\n' "$f" >&2
+      python3 scripts/sourcing_gate/consistency.py check "$tmp" 2>&1 \
+        | sed -n '1,12p' | sed 's/^/      /' >&2
+      ng=1
+    fi
+    rm -f "$tmp"
+  done <"$list"
+  rm -f "$list"
+  if [ "$ng" = "1" ]; then
+    cat >&2 <<'MSG'
+
+╔══════════════════════════════════════════════════════════════════════════╗
+║  commit を中止しました — 採算の表が整合性検査を通っていません            ║
+╚══════════════════════════════════════════════════════════════════════════╝
+
+当社は単位ずれで赤字を黒字と報告したことが3回あります（CLAUDE.md §3.3-7・17）。
+**数字を黙って合わせないこと。**どちらが正しいか確かめてから直してください。
+
+  1. どこが崩れているかを読む:
+       python3 scripts/sourcing_gate/consistency.py check <その CSV> --show
+  2. 直せないなら、採算欄を空にして NG の印を立てる（数字を独り歩きさせない）:
+       python3 scripts/sourcing_gate/consistency.py fix <その CSV> --out <同じCSV> --report <JSON>
+  3. 生成元のスクリプトが原因なら、そこを直してから作り直す
+
+※ この検査は「1個手残り」と「Amazon1個あたり原価」の列を持つ CSV だけを見ます。
+   ファイル名は見ません（別の名前にしても回避できません＝§3.3-30）。
+
+MSG
+    return 2
+  fi
+  return 0
+}
+
 main
 rc=$?
 order_gate
 org=$?
+profit_table_gate
+pfg=$?
+if [ "$pfg" -eq 2 ]; then org=2; fi
 if [ "$rc" -eq 2 ] || [ "$org" -eq 2 ]; then
   exit 1            # 検知 → commit 中止
 elif [ "$rc" -ne 0 ]; then

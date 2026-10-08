@@ -70,6 +70,9 @@ class COLS:
     price_now = "現在価格"
     price_src = "価格の出どころ"
     buybox = "カートの販売元"
+    category = "カテゴリー"
+    sell_basis = "採算の基準売価"
+    sell_basis_src = "基準売価の出どころ"
     tier = "サイズ区分"
     referral = "販売手数料"
     fba = "FBA配送代行"
@@ -115,8 +118,11 @@ STEP_TOL = 0.15      # 販売手数料の段に当てるときの許容
 
 #: 番兵①：原価が売価に対して異常に安い行。2026-09-30 に「利益率64.7%」で断トツだった
 #: オリヒロ 玉葱エキス粒は**仕入れが存在せず**、同日の「75.5%」は**単位ずれで実は赤字**だった。
-#: どちらも「安すぎる原価」が共通のサイン。10% は仮置き（実測の2件は 4.0% と 8.4%）。
-COST_RATIO_FLOOR_PCT = 10.0
+#: どちらも「安すぎる原価」が共通のサイン。
+#: ★ 15.0 は `score_20261004.MIN_PLAUSIBLE_COST_RATIO` と**同じ値**。
+#:   最初 10.0 で書いたが、生成側に既にある線と二重定義になっていた（別々の線を持つと、
+#:   生成側が落とした行を検査側が通すことが起きる）。**既にある会社の線に揃える**（§3.1）。
+COST_RATIO_FLOOR_PCT = 15.0
 #: 番兵②：利益率が異常に高い行。上の2件（64.7% / 75.5%）を確実に拾う線として 60%。
 MARGIN_CEIL_PCT = 60.0
 #: 回転の上限（§3.3「回転上限6ヶ月は既定」）。発注日→売り切り目標月末。
@@ -340,13 +346,29 @@ def _c_referral_cliff(row: dict, ctx: dict) -> Optional[Finding]:
                        f"売価 {sell:,.0f}円 は750円を**超えている**のに、販売手数料が5%"
                        f"（{fee:,.0f}円）で計算されています。崖の向きが逆です。",
                        {"売価": sell, "逆算した料率": round(pct, 2)})
+    # カテゴリーが取れている行は、**どの段かまで完全一致で**検査する。
+    cat = get(row, COLS.category).strip()
+    if cat and cat in F.CATEGORY_OVER_750:
+        exp_pct = F.CATEGORY_OVER_750[cat]
+        exp = F.referral_yen(sell, category=cat)
+        if abs(fee - exp) <= YEN_TOL:
+            return None
+        return Finding("referral_cliff", NG,
+                       f"販売手数料がカテゴリーの料率と合いません。「{cat}」は {exp_pct}% なので "
+                       f"売価 {sell:,.0f}円 なら {exp:,.0f}円（税込）ですが、表は {fee:,.0f}円 "
+                       f"（割り戻すと {pct:.2f}%）です。",
+                       {"カテゴリー": cat, "公式の料率": exp_pct, "計算値": exp,
+                        "表の手数料": fee, "逆算した料率": round(pct, 2)})
     steps = [s for s in F.OFFICIAL_STEPS if s > 5.0]
     if any(abs(pct - s) < STEP_TOL for s in steps):
         return None
     return Finding("referral_cliff", NG,
                    f"販売手数料 {fee:,.0f}円 を売価 {sell:,.0f}円 で割り戻すと {pct:.2f}% で、"
-                   f"公式の段（{' / '.join(f'{s}' for s in steps)}）のどれにも当たりません。",
-                   {"売価": sell, "表の手数料": fee, "逆算した料率": round(pct, 2)})
+                   f"公式の段（{' / '.join(f'{s}' for s in steps)}）のどれにも当たりません。"
+                   f"（カテゴリー列が{'空' if not cat else f'「{cat}」で料率表に無い'}ので"
+                   f"段の特定はできていません）",
+                   {"売価": sell, "表の手数料": fee, "逆算した料率": round(pct, 2),
+                    "カテゴリー": cat})
 
 
 def _c_death_band(row: dict, ctx: dict) -> Optional[Finding]:
@@ -396,30 +418,54 @@ def _c_other_costs(row: dict, ctx: dict) -> Optional[Finding]:
                    {"区分": tier, "消化月数": months, "計算値": round(exp, 1), "表の額": oth})
 
 
-def _c_price_basis(row: dict, ctx: dict) -> Optional[Finding]:
-    """採算が **90日中央値** で計算されているか（§3.3-28）。現在価格で計算していたら NG。
+#: 採算の基準として認める売価の出どころ。**現在価格は認めない**（§3.3-28）。
+ALLOWED_BASIS = ("90日中央値", "180日中央値", "実画面")
 
-    手残りから逆算した売価が、90日中央値より現在価格に近ければ「現在価格で計算した」と判る。
+
+def _c_price_basis(row: dict, ctx: dict) -> Optional[Finding]:
+    """採算を**どの売価で計算したか**を検査する（§3.3-28）。
+
+    認めるのは「90日中央値」「180日中央値」「人が実画面で見た価格」。
+    **現在価格で計算していたら NG**（スナップショットで判定するのが誤り）。
+
+    生成側が `採算の基準売価` を渡していればそれで検算し、渡していなければ
+    90日中央値を基準と見なして、現在価格で計算していないかを逆算で見る。
     """
-    sell, now, fee, fba, oth, cost, net = (
-        ctx["sell"], ctx["price_now"], ctx["referral"], ctx["fba"],
-        ctx["other"], ctx["cost"], ctx["net"])
+    fee, fba, oth, cost, net = (ctx["referral"], ctx["fba"], ctx["other"],
+                                ctx["cost"], ctx["net"])
     if None in (fee, fba, oth, cost, net):
         return None
     implied = net + fee + fba + oth + cost
-    if sell is None:
+    basis, src, median90, now = (ctx["sell_basis"], ctx["sell_basis_src"],
+                                 ctx["sell_median90"], ctx["price_now"])
+
+    if basis is not None:
+        if src and not any(a in src for a in ALLOWED_BASIS):
+            return Finding("price_basis", NG,
+                           f"採算の基準売価の出どころが「{src}」です。認めるのは "
+                           f"{' / '.join(ALLOWED_BASIS)} だけで、**現在価格では判定しません**"
+                           f"（§3.3-28）。", {"出どころ": src, "基準売価": basis})
+        if abs(implied - basis) > YEN_TOL:
+            return Finding("price_basis", NG,
+                           f"採算の基準売価は {basis:,.0f}円 と書いてありますが、"
+                           f"手残りから逆算した売価は {implied:,.0f}円 です。"
+                           f"**宣言した基準で計算されていません。**",
+                           {"宣言した基準": basis, "逆算した売価": implied})
+        return None
+
+    if median90 is None:
         return Finding("price_basis", NG,
-                       f"90日中央値が空欄なのに採算が計算されています"
+                       f"90日中央値も基準売価も空欄なのに採算が計算されています"
                        f"（手残りから逆算した売価 {implied:,.0f}円）。"
                        f"採算の基準は90日中央値です（§3.3-28）。",
                        {"逆算した売価": implied})
-    if now is None or abs(now - sell) <= YEN_TOL:
+    if now is None or abs(now - median90) <= YEN_TOL:
         return None
-    if abs(implied - now) <= YEN_TOL and abs(implied - sell) > YEN_TOL:
+    if abs(implied - now) <= YEN_TOL and abs(implied - median90) > YEN_TOL:
         return Finding("price_basis", NG,
                        f"採算が**現在価格 {now:,.0f}円**で計算されています。"
-                       f"基準は90日中央値 {sell:,.0f}円 です（§3.3-28）。",
-                       {"90日中央値": sell, "現在価格": now, "逆算した売価": implied})
+                       f"基準は90日中央値 {median90:,.0f}円 です（§3.3-28）。",
+                       {"90日中央値": median90, "現在価格": now, "逆算した売価": implied})
     return None
 
 
@@ -437,6 +483,27 @@ def _c_set_count_decided(row: dict, ctx: dict) -> Optional[Finding]:
                    f"セット数の確度が「{conf}」なのに採算が計算されています。"
                    f"Amazon の1個が卸の何点かが決まらない行は計算しません。",
                    {"確度": conf})
+
+
+def _c_grade_unknown_with_numbers(row: dict, ctx: dict) -> Optional[Finding]:
+    """等級が UNKNOWN なのに採算の金額が入っている行は UNKNOWN（金額を独り歩きさせない）。
+
+    等級 UNKNOWN ＝ サイズ区分・単位・売価のどれかが決まらず**判定できなかった**行。
+    印を付けながら数字を出すと、解けなかった行が必ず利益率の上位に来る
+    （2026-09-07 の事故）。等級 C は「計算できた上での不合格」なので対象にしない。
+    """
+    g = get(row, COLS.grade).strip().upper()
+    if g != "UNKNOWN":
+        return None
+    nums = {c: num(get(row, c)) for c in (COLS.net, COLS.margin, COLS.unit_cost)}
+    if all(v is None for v in nums.values()):
+        return None
+    tier = get(row, COLS.tier).strip()
+    return Finding("grade_unknown_with_numbers", SENTINEL,
+                   f"等級が UNKNOWN（判定できなかった行）なのに採算の金額が入っています"
+                   f"（手残り {nums[COLS.net]}・利益率 {nums[COLS.margin]}・"
+                   f"サイズ区分 {tier or '空'}）。**印を付けることと、数字を出さないことは別です。**",
+                   {k: v for k, v in nums.items() if v is not None})
 
 
 def _c_sentinel_cost_ratio(row: dict, ctx: dict) -> Optional[Finding]:
@@ -605,6 +672,7 @@ CHECKS: tuple[Callable[[dict, dict], Optional[Finding]], ...] = (
     _c_other_costs,
     _c_price_basis,
     _c_set_count_decided,
+    _c_grade_unknown_with_numbers,
     _c_sentinel_cost_ratio,
     _c_sentinel_margin,
     _c_grade_rule,
@@ -621,8 +689,16 @@ def check_row(row: dict, *, today: Optional[date] = None,
     """候補1行を全検査に通す。`wholesale` は {卸の1点あたり原価, 卸の最小ロット} の辞書（任意）。"""
     today = today or date.today()
     wholesale = wholesale or {}
+    # 🔴 **算術の検算は「採算を計算した売価」で行う。**生成側がそれを渡してくれるなら
+    #    その値を使う。90日中央値の列で検算すると、**人が実画面で見た価格で計算した行を
+    #    「算術が崩れている」と誤検知する**（2026-10-09 に実際に5行を誤検知した）。
+    basis = num(get(row, COLS.sell_basis))
+    median90 = num(get(row, COLS.sell))
     ctx = {
-        "sell": num(get(row, COLS.sell)),
+        "sell": basis if basis is not None else median90,
+        "sell_median90": median90,
+        "sell_basis": basis,
+        "sell_basis_src": get(row, COLS.sell_basis_src).strip(),
         "sell_worst": num(get(row, COLS.sell_worst)),
         "price_now": num(get(row, COLS.price_now)),
         "referral": num(get(row, COLS.referral)),
@@ -638,8 +714,12 @@ def check_row(row: dict, *, today: Optional[date] = None,
         "amount": num(get(row, COLS.amount)),
         "net_total": num(get(row, COLS.net_total)),
         "months": num(get(row, COLS.months)),
-        "wholesale_unit": num(wholesale.get(COLS.wholesale_unit)),
-        "wholesale_lot": num(wholesale.get(COLS.wholesale_lot)),
+        # 卸の条件は ①同じ行（full=True のCSV）→ ②--private の突き合わせ の順に探す。
+        # ①が入るようになったので、648行すべてで単位ずれを検算できる（2026-10-09）。
+        "wholesale_unit": num(get(row, COLS.wholesale_unit)
+                              or wholesale.get(COLS.wholesale_unit)),
+        "wholesale_lot": num(get(row, COLS.wholesale_lot)
+                             or wholesale.get(COLS.wholesale_lot)),
         "today": today,
         "base_date": base_date or today,
     }

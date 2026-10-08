@@ -27,6 +27,7 @@ import csv
 import json
 import os
 import re
+import subprocess
 import sys
 from collections import Counter
 from datetime import date, datetime, timezone
@@ -50,7 +51,11 @@ SELLER_NAMES = WORK / "pipeline/seller_names.json"
 RAW = WORK / "refetch20261004/raw.jsonl"
 OUT = WORK / "score20261004"
 
-TODAY = date(2026, 10, 4)
+# 🔴 実行日を起点にする。固定値にすると予定表が腐ったまま出続ける
+#    （2026-10-09 実測：648行すべての発注日が 10/04 のままで、全行の予定が過去だった）。
+#    再現が要るときだけ SCORE_TODAY=YYYY-MM-DD で固定する。
+TODAY = (date.fromisoformat(os.environ["SCORE_TODAY"])
+         if os.environ.get("SCORE_TODAY") else date.today())
 MAX_ORDER_TOTAL_YEN = 80_000        # 1 SKU の発注額の上限（残枠）
 # 実売の代理：ランクがこれ以内なら「売れている」とみなす。
 # 🔴 **300,000 は当社のプールを作ったときの基準そのものです**（memory
@@ -271,10 +276,33 @@ def build(row: dict, cand: dict, product: dict, idx: dict, names: dict,
     # ── 採算
     sell = lv.sell_for_profit
     sell_bad = lv.sell_pessimistic
-    unit_cost = _num(row.get("Amazon1個あたり原価(税込)"))
-    if not unit_cost:
-        per_pt = _num(row.get("卸の1点あたり原価(税込)")) or (ni.get("unit_price_excl") or 0) * 1.1
-        unit_cost = per_pt * n_set if (per_pt and n_set) else None
+    # 🔴 **原価は「卸の1点あたり × セット数」からだけ作る**（CLAUDE.md §3.3-17）。
+    #    当社はこの単位ずれで赤字を黒字と誤認したことが3回ある。Amazon 1個あたりの原価だけを
+    #    受け取ると、それが「卸1点ぶん」なのか「セットぶん」なのか**後から検算できない**。
+    #    卸の1点あたりの値段が無い行は、原価があっても採算を計算しない（＝候補に出さない）。
+    per_pt = _num(row.get("卸の1点あたり原価(税込)"))
+    per_pt_src = "台帳"
+    if not per_pt and ni.get("unit_price_excl"):
+        per_pt = float(ni["unit_price_excl"]) * 1.1
+        per_pt_src = f"索引（取得日 {idx_day}）"
+    if not per_pt:
+        per_pt_src = ""
+    min_lot = _num(row.get("卸の最小ロット(点)")) or _num(ni.get("min_lot_units"))
+    ledger_unit = _num(row.get("Amazon1個あたり原価(税込)"))
+    unit_cost, unit_note = None, ""
+    if per_pt and n_set:
+        unit_cost = per_pt * n_set
+        # 台帳の Amazon1個あたり原価と食い違うなら、**どちらが正しいか決めずに計算を止める**。
+        # 黙ってどちらかを採ると、辻褄だけ合って嘘が一段深くなる。
+        if ledger_unit and abs(ledger_unit - unit_cost) > 1.5:
+            unit_note = (f"台帳の Amazon1個あたり原価 {ledger_unit:,.0f}円 と、"
+                         f"卸の1点 {per_pt:,.0f}円 × セット数 {n_set:g} = {unit_cost:,.0f}円 が"
+                         f"食い違います。**単位ずれは「幅」ではなく「真偽」です。**")
+            unit_cost = None
+    elif ledger_unit:
+        unit_note = ("Amazon1個あたりの原価はありますが、**卸の1点あたりの値段が無く"
+                     "「Amazon 1個 ＝ 卸 何点」の検算ができません**（§3.3-17）。"
+                     "単位の出どころが無い原価は使いません。")
     qty = int(_num(row.get("発注点数(Amazon何個)")) or 0) or 10
     fba_yen = (product.get("fbaFees") or {}).get("pickAndPackFee") or cand.get("fba_yen")
     fee_pct = product.get("referralFeePercentage") or cand.get("fee_pct")
@@ -286,7 +314,8 @@ def build(row: dict, cand: dict, product: dict, idx: dict, names: dict,
                                ("FBA配送代行", fba_yen), ("セット数", decided)) if not v]
         g.append(("採算", "UNKNOWN",
                   f"計算しません（{' / '.join(miss)} が決まっていない）。"
-                  f"**金額を膨らませず UNKNOWN にします。**"))
+                  f"**金額を膨らませず UNKNOWN にします。**"
+                  + (f" {unit_note}" if unit_note else "")))
     else:
         months = _num(row.get("売り切る月数"))
         ms_for_qty = ms or (int(round(qty / months)) if months else None)
@@ -311,6 +340,12 @@ def build(row: dict, cand: dict, product: dict, idx: dict, names: dict,
             g.append(("採算", "FAIL",
                       f"発注額 {e.order_total:,}円 が残枠 {MAX_ORDER_TOTAL_YEN:,}円 を"
                       f"超えます。{e.grade_reason}"))
+        elif e.grade not in ("A", "B"):
+            # 🔴 等級が UNKNOWN（寸法が取れずサイズ区分が決まらない等）の行を PASS に
+            #    していた（2026-10-09 サトル報告・43件中6件）。**判定できないものを可にしない。**
+            g.append(("採算", "UNKNOWN",
+                      f"等級が {e.grade} です。サイズ区分や単位が決まらないと固定費が"
+                      f"222円〜1,756円まで動くので、**推測で埋めません。**{e.grade_reason}"))
         else:
             g.append(("採算", "PASS", f"【等級 {e.grade}】{e.grade_reason}"))
 
@@ -339,6 +374,9 @@ def build(row: dict, cand: dict, product: dict, idx: dict, names: dict,
             "monthlySold": ms, "rank": rank,
             "rank_shared": (shared_ranks or {}).get(rank or -1, 1),
             "n_set": n_set, "セット数の確度": conf,
+            # 単位ずれの検算に要る値。**full=True のCSV（agent_output）にだけ書く。**
+            "per_pt": per_pt, "per_pt_src": per_pt_src, "min_lot": min_lot,
+            "category": cat, "idx_day": idx_day,
             "pinned": pinned, "在庫": stock or "索引なし", "channel": channel,
             "手残り合計": (e.net_per_unit * e.qty) if e else None}
 
@@ -576,13 +614,46 @@ def main(argv=None) -> int:
                "候補": len(cands)},
               (OUT / "summary.json").open("w"), ensure_ascii=False, indent=1)
     print(f"書き出し: {OUT}")
+    run_consistency(OUT / "all.csv", OUT / "consistency_report.json")
     return 0
+
+
+def run_consistency(csv_path: Path, report_path: Path) -> None:
+    """候補表を書いたら、**その場で整合性検査に通して是正する**（CLAUDE.md §3.3-17）。
+
+    「候補表は必ず検算済み」にするための締めの一手（2026-10-09 カズヨ判断で常設化）。
+    崩れている行は数字を直さず**採算欄を空にして NG の印を立てる**。捨てた値は
+    `consistency_report.json` に原本ごと残るので、何を落としたかは後から読めます。
+
+    検査が落ちても候補表の書き出し自体は成功扱いにします（表はもう書けている）。
+    ただし**何行を空にしたかは必ず画面に出す**。黙って直すのが一番まずい。
+    """
+    gate_dir = REPO / "scripts/sourcing_gate"
+    if not (gate_dir / "consistency.py").exists():
+        print(f"⚠️ 整合性検査が見つかりません（{gate_dir}）。**検算していない表です。**")
+        return
+    cmd = [sys.executable, str(gate_dir / "consistency.py"), "fix", str(csv_path),
+           "--out", str(csv_path), "--report", str(report_path)]
+    print("\n── 整合性検査（§3.3-17）" + "─" * 46)
+    r = subprocess.run(cmd, capture_output=True, text=True)
+    print(r.stdout.rstrip() or r.stderr.rstrip())
+    # 2回目を走らせて 0行（収束）を確認する。ここが崩れると是正が暴れている合図。
+    r2 = subprocess.run(cmd[:-2] + ["--out", str(csv_path)], capture_output=True, text=True)
+    if "書き換えた行: 0行" not in r2.stdout:
+        print("🔴 2回目の是正が0行になりません。consistency.py の収束が壊れています "
+              "（§3.3-17）。表の採算欄を信用しないでください。")
+    else:
+        print("検算: 2回目は0行（収束を確認）")
 
 
 COLS = ["ASIN", "商品名", "ブランド", "AmazonURL", "判定", "等級",
         "過去1ヶ月の販売数", "セラー数", "Amazon本体の有無", "カートの販売元",
         "売れ筋ランク", "販売価格(90日中央値)", "販売価格(180日中央値)",
         "保守値(90日の下位25%)", "上位25%", "現在価格", "現在価格÷90日中央値",
+        # 🔴 **採算をどの売価で計算したかを必ず渡す。**列名に「90日中央値」と書いてあるのに
+        #    実画面で見た価格で計算していると、読む人も検査も食い違いを誤解する
+        #    （§3.3-19「2つのデータ源をつなぐ口は、単位を渡させる設計にする」）。
+        "採算の基準売価", "基準売価の出どころ",
         "価格の振れ幅", "価格の傾き(%/30日)", "価格の判定", "価格の出どころ",
         "サイズ区分", "販売手数料", "FBA配送代行", "その他固定費",
         "Amazon1個あたり原価(税込)", "Amazon側のセット数(Amazon1個=卸何点か)",
@@ -593,15 +664,29 @@ COLS = ["ASIN", "商品名", "ブランド", "AmazonURL", "判定", "等級",
         "卸の在庫", "卸値の鮮度", "購入元の名前", "ゲート種別", "判定理由"]
 
 
+#: `full=True` のときだけ足す列。**会員限定の取引条件と Keepa のカテゴリーを含む。**
+#: 置き場は `workspace/output/agent_output/`（.gitignore 済み）だけ。
+#: このリポジトリは PUBLIC なので、**追跡されるCSVには絶対に足さないこと**（CLAUDE.md §6）。
+COLS_PRIVATE = ["卸の1点あたり原価(税込)", "卸の1点の出どころ", "卸の最小ロット(点)",
+                "カテゴリー", "索引の取得日"]
+
+
 def write_csv(scored: list[dict], path: Path, full: bool = False) -> None:
+    """`full=True` で単位ずれの検算に要る列（卸の1点あたり・最小発注数・カテゴリー）も書く。
+
+    ★ 以前は `full` を受け取るだけで**使っていなかった**ので、全件CSVにも卸の1点あたりの
+      値段が載らず、`consistency.py` の単位ずれ検査が 648行中12行にしか効いていなかった
+      （2026-10-09 実測）。「値が無いから検査できない」を作らないために、ここで必ず書く。
+    """
+    cols = COLS + COLS_PRIVATE if full else COLS
     with path.open("w", encoding="utf-8-sig", newline="") as f:
-        w = csv.DictWriter(f, fieldnames=COLS, extrasaction="ignore")
+        w = csv.DictWriter(f, fieldnames=cols, extrasaction="ignore")
         w.writeheader()
         for s in scored:
-            w.writerow(as_row(s))
+            w.writerow(as_row(s, full=full))
 
 
-def as_row(s: dict) -> dict:
+def as_row(s: dict, full: bool = False) -> dict:
     r, lv, e, pl = s["row"], s.get("price"), s.get("econ"), s.get("plan")
     out = {
         "ASIN": s["asin"], "商品名": r["商品名"][:70], "ブランド": r.get("ブランド"),
@@ -620,14 +705,36 @@ def as_row(s: dict) -> dict:
                                if st != "PASS")[:900] or "全ゲート PASS",
     }
     if lv:
+        # ⚠️ 価格が1つも取れていない行に「現在価格」と書かない。**出どころを偽らない。**
+        #    （2026-10-09：146行が「現在価格」と表示されたが、現在価格すら空の行だった）
+        if not lv.sell_for_profit:
+            basis_src = "価格が取れていない（採算を計算しない）"
+        elif lv.screen_price:
+            basis_src = "実画面（人が見た価格・機械で上書きしない）"
+        elif lv.median90:
+            basis_src = "90日中央値"
+        elif lv.median180:
+            basis_src = "180日中央値"
+        else:
+            # ここに来たら 90日/180日の中央値が無く現在価格しか無い＝§3.3-28 違反。
+            # 生成側では止めず、宣言だけして consistency.py に落としてもらう
+            # （「宣言する側」と「止める側」を分ける。両方で止めると理由が二重になる）。
+            basis_src = "現在価格"
         out.update({
+            "採算の基準売価": lv.sell_for_profit, "基準売価の出どころ": basis_src,
             "販売価格(90日中央値)": lv.median90, "販売価格(180日中央値)": lv.median180,
             "保守値(90日の下位25%)": lv.p25_90, "上位25%": lv.p75_90,
             "現在価格": lv.current, "現在価格÷90日中央値": lv.current_over_median,
             "価格の振れ幅": lv.spread, "価格の傾き(%/30日)": lv.slope_pct_per_30d,
             "価格の判定": lv.verdict, "価格の出どころ": lv.source,
         })
-    if e:
+    # 🔴 **等級が UNKNOWN の行には金額を書かない**（2026-10-09）。
+    #    等級 UNKNOWN ＝ サイズ区分や単位が決まらず採算を判定できない行。それでも
+    #    `profit.compute` は数字を返すので、素朴に書くと「判定できなかった行」が
+    #    利益率つきで表に並ぶ。**印を付けることと、数字を出さないことは別**
+    #    （2026-09-07 の事故：印だけ付けて数字を出し、まぼろしの利益率が上位を独占した）。
+    #    等級 C は「計算できた上での不合格」なので数字を残す。
+    if e and s.get("等級") in ("A", "B", "C"):
         out.update({
             "サイズ区分": e.size_tier, "販売手数料": e.referral_fee_yen,
             "FBA配送代行": e.fba_yen, "その他固定費": e.other_unit_costs,
@@ -646,6 +753,16 @@ def as_row(s: dict) -> dict:
     if pl:
         out.update(pl.as_row())
         out["卸値の鮮度"] = pl.as_row().get("カレンダーの前提", "")
+    if full:
+        # 単位ずれの検算（Amazon1個あたり原価 ＝ 卸の1点 × セット数）に要る値。
+        # 無い行は空にする＝`consistency.py` が「対象外」ではなく**原価そのものが空**になる。
+        out.update({
+            "卸の1点あたり原価(税込)": (round(s["per_pt"], 1) if s.get("per_pt") else ""),
+            "卸の1点の出どころ": s.get("per_pt_src") or "",
+            "卸の最小ロット(点)": (int(s["min_lot"]) if s.get("min_lot") else ""),
+            "カテゴリー": s.get("category") or "",
+            "索引の取得日": s.get("idx_day") or "",
+        })
     return out
 
 
