@@ -1,0 +1,223 @@
+<!doctype html><html lang='ja'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>38_整合性検査 — 当社の数字を機械で検算する</title><style>body{font-family:-apple-system,'Hiragino Sans','Noto Sans JP',sans-serif;max-width:1150px;margin:2em auto;padding:0 1em;line-height:1.65;color:#222;font-size:14.5px}table{border-collapse:collapse;margin:.8em 0;font-size:.92em}th,td{border:1px solid #bbb;padding:.35em .6em;vertical-align:top}th{background:#eef2f8}tr:nth-child(even) td{background:#fafafa}h1{font-size:1.5em;border-bottom:2px solid #444}h2{font-size:1.25em;border-left:5px solid #25b;padding-left:8px;margin-top:1.8em}h3{font-size:1.05em;margin-top:1.4em}blockquote{border-left:4px solid #ccc;margin:.8em 0;padding:.2em 1em;color:#444}code{background:#f3f3f3;padding:1px 4px;border-radius:3px}hr{border:0;border-top:1px solid #ccc;margin:1.6em 0}</style></head><body>
+<h1>38_整合性検査 — 当社の数字を機械で検算する</h1>
+<p>T-20260920-003 / 2026-10-09 / タカシ（IT）</p>
+<blockquote>社長の指示：「自分でチェックリストを作って、チェックしていけ。(…) 必ず、自分がやったことが整合性があるのか、<br>妥当性があるのかはチェックしろよ。何度も言わせるなよ。」</blockquote>
+<p>当社の失敗は<strong>人の注意力で防げる種類のものではなかった</strong>ので、機械の検査にしました。</p>
+<p>単位ずれで赤字を黒字と報告（3回）、原価の57%が架空（1回）、カート保持者の規定と実装の粒度ずれで79%を誤って落とす（1回）。</p>
+<p>どれも<strong>表を1行ずつ検算すれば数秒で分かること</strong>です。人は毎回それをやりません。機械は毎回やります。</p>
+<h2>結論（先に数字）</h2>
+<table><thead><tr><th></th><th>件数</th></tr></thead><tbody>
+<tr><td>検査した候補</td><td><strong>648行</strong>（<code>score20261004/all.csv</code>・2026-10-04 生成）</td></tr>
+<tr><td>算術が崩れていた行</td><td><strong>5行</strong>（0.8%）</td></tr>
+<tr><td>番兵に掛かった行</td><td><strong>3行</strong>（0.5%）</td></tr>
+<tr><td>合わせて採算欄を空にした行</td><td><strong>8行</strong>（1.2%）</td></tr>
+<tr><td>うち <strong>等級 A（＝社長に推奨しうる行）</strong></td><td><strong>3行</strong></td></tr>
+<tr><td>警告だけ（落とさない）</td><td>648行（うち死に帯 6行）</td></tr>
+<tr><td><strong>確認記録がある ASIN</strong></td><td>2件 → <strong>648件</strong></td></tr>
+<tr><td><strong>発注ゲートを通る ASIN</strong></td><td><strong>0件</strong>（12項目は人が実画面で見るしかないため）</td></tr>
+</tbody></table>
+<p><strong>一番大事な数字は「8行」ではなく「0件」です。</strong> 算術はおおむね合っていました。</p>
+<p>足りないのは計算ではなく、<strong>人が実画面で確認した記録</strong>です。</p>
+<h2>1. 21項目の仕分け（機械 6 / 一部 3 / 人 12）</h2>
+<p><code>checklist_spec.json</code> の各項目に <code>decidable</code> と <code>decidable_why</code> を足しました（<code>gate.py</code> は未知のキーを無視するので判定は変わりません）。</p>
+<h3>機械で決まる（6項目）</h3>
+<table><thead><tr><th>#</th><th>項目</th><th>根拠</th></tr></thead><tbody>
+<tr><td>6</td><td>Amazon 本体の在庫履歴</td><td>数値で取れており、判定は補助情報（単独では落とさない）と決まっている</td></tr>
+<tr><td>11</td><td>季節の窓</td><td>ランク12ヶ月履歴から出した窓と季節区分が候補CSVにある</td></tr>
+<tr><td>13</td><td>販売価格（90日中央値）</td><td>中央値と下位25%がCSVにあり、現在価格で計算していないかも検査できる</td></tr>
+<tr><td>14</td><td>価格の傾き</td><td>傾き(%/30日)と振れ幅がCSVにあり、落とす条件が数値で書ける</td></tr>
+<tr><td>18</td><td>総原価と採算等級</td><td>公式料金表の関数で再計算して突き合わせられる。<strong>整合性検査の本体</strong></td></tr>
+<tr><td>21</td><td>いつ買っていつ売るか</td><td>5つの日付がCSVにあり、順序と6ヶ月以内を機械で検査できる</td></tr>
+</tbody></table>
+<h3>機械は「落とす」だけ、「通す」には人が要る（3項目）</h3>
+<table><thead><tr><th>#</th><th>項目</th><th>機械でできること／できないこと</th></tr></thead><tbody>
+<tr><td>5</td><td>カートの販売元</td><td>「Amazon.co.jp なら FAIL」は機械。<strong>メーカー本人・ブランド公式かどうかは人</strong>（社名とブランド名の関係は語の一致では決まらない）。本体でない行は UNKNOWN</td></tr>
+<tr><td>10</td><td>自分の取り分と在庫月数</td><td>式は機械。入力（実売・出品者の内訳）が<strong>どちらも人</strong>なので埋まらない</td></tr>
+<tr><td>15</td><td>Amazon 側のセット構成</td><td>確度が「確定・単独」なら通す。「不一致・不明・食い違い」は<strong>1 と決め打たず</strong> UNKNOWN</td></tr>
+</tbody></table>
+<h3>人が実画面・書類・現物で見るしかない（12項目）</h3>
+<p>ゲート種別／出品ボタンの状態／ゲート書類の成立／仕入れ先が Amazon 出品を許しているか／新品出品者数と内訳／</p>
+<p>知財申立てのサイン／実売（ASIN単位）／生産終了でないか／カタログ JAN と納品物の一致／卸の取引条件／</p>
+<p>FBA 可否・危険物・法令表示／期限・温度管理</p>
+<p>理由は3つに分かれます。<strong>①ログインの先にしか無い</strong>（セラーセントラル・卸の会員画面）、</p>
+<p><strong>②形の読み取りが要る</strong>（出品者数グラフの崖落ち、価格線が水平、条件文の「△」）、</p>
+<p><strong>③現物が来ないと分からない</strong>（納品物の JAN、期限の表記）。</p>
+<blockquote>🔴 <strong>#9 実売は、データがあっても人に回します。</strong>§3.3-16 で「最後は人が実数を見るまで確定しない」と決まっており、<br>月販の表示が無いのと3か月0個は機械では区別できません。</blockquote>
+<h2>2. 実装した整合性検査（17本）</h2>
+<p><code>scripts/sourcing_gate/consistency.py</code>。1つでも崩れたら<strong>その行を NG にして採算欄を空にします</strong>（§3.3-17）。</p>
+<table><thead><tr><th>検査</th><th>見ていること</th><th>重さ</th></tr></thead><tbody>
+<tr><td><code>order_amount</code></td><td>発注額 ＝ Amazon1個あたり原価 × 発注点数（±1円）</td><td>NG</td></tr>
+<tr><td><code>unit_cost_from_wholesale</code></td><td>Amazon1個あたり原価 ＝ 卸の1点あたり原価 × セット数</td><td>NG</td></tr>
+<tr><td><code>min_lot</code></td><td>発注点数 × セット数 が卸の最小発注数を満たすか</td><td>NG</td></tr>
+<tr><td><code>net_per_unit</code></td><td>1個手残り ＝ 売価 − 販売手数料 − FBA − その他固定費 − 原価</td><td>NG</td></tr>
+<tr><td><code>net_total</code></td><td>手残り合計 ＝ 1個手残り × 発注点数</td><td>NG</td></tr>
+<tr><td><code>margin_pct</code></td><td>利益率 ＝ 1個手残り ÷ 売価</td><td>NG</td></tr>
+<tr><td><code>referral_cliff</code></td><td><strong>750円の崖</strong>。750円以下は一律5%・最低30円／750円超は公式の段のどれか</td><td>NG</td></tr>
+<tr><td><code>fba_fee</code></td><td>FBA配送代行を区分と売価（1,000円以下は安い列）から引き直す</td><td>NG</td></tr>
+<tr><td><code>other_costs</code></td><td>保管・納品送料・梱包資材・外注を区分と消化月数から引き直す</td><td>NG</td></tr>
+<tr><td><code>price_basis</code></td><td>採算が<strong>90日中央値</strong>で計算されているか（現在価格で組んでいないか）</td><td>NG</td></tr>
+<tr><td><code>set_count_undecided</code></td><td>セット数が決まらないのに採算を計算していないか</td><td>番兵</td></tr>
+<tr><td><code>sentinel_cost_ratio</code></td><td>原価が売価の10%未満＝安すぎる原価</td><td>番兵</td></tr>
+<tr><td><code>sentinel_margin</code></td><td>利益率が60%以上＝高すぎる利益</td><td>番兵</td></tr>
+<tr><td><code>grade_rule</code></td><td>等級 A/B/C が中央・悲観の数字から導けるか</td><td>NG</td></tr>
+<tr><td><code>timeline</code></td><td>発注日 &lt; 着荷 &lt; FBA納品 &lt; 販売開始 ≦ 売り切り目標月末・6ヶ月以内</td><td>NG</td></tr>
+<tr><td><code>death_band</code></td><td>売価が 751〜900円 / 1,001〜1,100円 に入っていないか</td><td>警告</td></tr>
+<tr><td><code>timeline_stale</code></td><td>発注日が過去になっていないか</td><td>警告</td></tr>
+</tbody></table>
+<h3>設計で意識的に決めたこと</h3>
+<ol>
+<li style='margin-left:0.0em'><strong>入力が無い検査は「不合格」ではなく「対象外」。</strong> 空欄を NG にすると、2回目の実行で自分が空けた欄を</li>
+</ol>
+<p>   自分が NG にし続けて永久に収束しません。</p>
+<ol>
+<li style='margin-left:0.0em'><strong>数字を黙って直さない。</strong> どちらが正しいか分からないので、NG の行は<strong>採算欄を空にする</strong>だけです。</li>
+</ol>
+<p>   捨てた値は <code>consistency_report.json</code> に原本ごと残します（<strong>隠すのではなく、独り歩きを止める</strong>）。</p>
+<ol>
+<li style='margin-left:0.0em'><strong>番兵も採算欄を空にします。</strong> 印を付けながら数字を出し続けると、解けなかった行が必ず利益率の上位に来ます</li>
+</ol>
+<p>   （2026-09-07 に実際にそれで上位10件が全滅しました）。</p>
+<ol>
+<li style='margin-left:0.0em'><strong>売価と日付は消しません。</strong> 採算の*入力*であって結果ではなく、消すと「なぜ落ちたか」が読めなくなります。</li>
+<li style='margin-left:0.0em'><strong><code>timeline_stale</code> は警告に留めました。</strong> NG にすると、表が1日古くなるだけで648行ぜんぶの数字が消えます。</li>
+</ol>
+<p>   §3.3-17 の「空にする」は<strong>算術が崩れている行</strong>への処置です。鮮度は発注ゲート側が ASIN ごとに見ています。</p>
+<ol>
+<li style='margin-left:0.0em'><strong>料率は「どの段か」を当てません。</strong> カテゴリーがCSVに無いので、<strong>どの段でもないこと</strong>と</li>
+</ol>
+<p>   <strong>崖の向きを間違えていること</strong>だけを見ます（出所に依存しない検査にする）。</p>
+<h2>3. 648行に当てた結果</h2>
+<h3>NG の内訳（母集団 648行）</h3>
+<table><thead><tr><th>検査</th><th>件数</th><th>中身</th></tr></thead><tbody>
+<tr><td><code>net_per_unit</code></td><td>5</td><td><strong>表に印字した売価と、採算を計算した売価が違う。</strong> 例：印字 7,990円 ↔ 内部 8,318円（9/30→10/4 の価格取り直しが採算欄に反映されていない）</td></tr>
+<tr><td><code>margin_pct</code></td><td>4</td><td>上と同じ原因。利益率だけ別の売価で計算されていた</td></tr>
+<tr><td><code>referral_cliff</code></td><td>3</td><td>料率が 10.83% / 6.80% / 7.96% で、公式の段のどれにも当たらない。上と同じ原因</td></tr>
+<tr><td><code>sentinel_margin</code></td><td>3</td><td>利益率 68.3% / 66.1% / 63.3%</td></tr>
+<tr><td><code>sentinel_cost_ratio</code></td><td>2</td><td>原価が売価の 4.0% / 8.4%</td></tr>
+<tr><td><code>death_band</code>（警告）</td><td>6</td><td>売価 818 / 821 / 825 / 882 / 1,050 / 1,100 円</td></tr>
+<tr><td><code>timeline_stale</code>（警告）</td><td>648</td><td>発注日が 10/04 のまま。<strong>予定表は全行引き直しが必要</strong></td></tr>
+</tbody></table>
+<p>実数は5行・3行で、<strong>算術そのものは思ったより壊れていませんでした</strong>（264行の採算のうち崩れは5行）。</p>
+<p>ただし崩れ方が悪く、<strong>印字した売価と計算に使った売価が違う</strong>という、表を読む人が絶対に気づけない形でした。</p>
+<h3>等級Aを3行落としました</h3>
+<table><thead><tr><th>ASIN</th><th>空にした値</th><th>落とした理由</th></tr></thead><tbody>
+<tr><td>B08BLJVY5R</td><td>等級A・手残り 14,985円・利益率 68.3%</td><td>原価が売価の <strong>4.0%</strong>。安すぎる</td></tr>
+<tr><td>B084RZYDDX</td><td>等級A・手残り 7,257円・利益率 66.1%</td><td>原価が売価の <strong>8.4%</strong>。安すぎる</td></tr>
+<tr><td><strong>B0015XNJMW</strong></td><td>等級A・手残り 4,243円・利益率 63.3%</td><td>利益率 63.3%</td></tr>
+</tbody></table>
+<blockquote>🔴 <strong>B0015XNJMW は、CLAUDE.md §3.3-6 に「仕入れ自体が存在しなかった」と名前で書いてある ASIN</strong> です<br>（オリヒロ 玉葱エキス粒。2026-09-30 に利益率64.7%で断トツだったが、JAN が卸に1件も無かった）。<br><strong>その行が、9日後の候補表でまだ等級A・利益率63.3%で生きていました。</strong><br>文章でナレッジに書いても、次の表から自動では消えません。番兵がこれを拾ったことが、<br>この仕組みが要る一番の証拠です。</blockquote>
+<h2>4. 確認記録を 2件 → 648件 に</h2>
+<p><code>scripts/sourcing_gate/autofill.py</code>。候補CSVから<strong>機械で決まる項目だけ</strong>を記録します。</p>
+<pre>対象 648 ASIN × 21項目 = 13,608件の判定
+  PASS 2,723件（20%） / FAIL 302件（2%） / UNKNOWN 10,583件（78%）</pre>
+<ul>
+<li style='margin-left:0.0em'><strong>human の12項目を PASS にしません。</strong> UNKNOWN ＋「なぜ決まらないか」＋「取り方」を書きます。<strong>空欄で埋めません。</strong></li>
+<li style='margin-left:0.0em'>🔴 <strong>人が付けた記録を機械が上書きしません。</strong> <code>checked_by</code> が <code>autofill</code> 以外の記録は触りません。</li>
+</ul>
+<p>  実際に B008FIPMP2（カズヨの20項目）と B01DBGGW8S（12項目）はそのまま残り、空いていた項目だけが埋まりました。</p>
+<ul>
+<li style='margin-left:0.0em'><strong>整合性検査が NG の行は、採算の項目を PASS にしません。</strong></li>
+<li style='margin-left:0.0em'><strong>PASS は「買ってよい」ではなく「人が実画面で見る価値がある」の意味</strong>です（§3.3-16）。</li>
+</ul>
+<p><strong>発注ゲートを通る ASIN は 648件中 0件です。</strong> 未充足は最小15項目・最大20項目。</p>
+<p>これは仕組みの失敗ではなく、<strong>当社がまだ1件も人の確認を終えていないという事実</strong>がそのまま出ただけです。</p>
+<h2>5. 発注ゲートに繋ぎました</h2>
+<p><code>gate.py</code> が記録の <code>consistency</code> キーを見るようにしました。</p>
+<p><strong>21項目が全部 PASS でも、整合性検査が NG なら発注案を書けません。</strong></p>
+<p>21項目の○は「人が見た事実」の記録であって、「表の算術が合っている」ことの保証ではない ── 別の軸なので別に止めます。</p>
+<p>実機で確認済み：</p>
+<ul>
+<li style='margin-left:0.0em'>21項目を全部 PASS にして <code>consistency: NG</code> を入れると、<code>order-gate-guard.py</code> が <strong>exit 2</strong> で書き込みを止める</li>
+<li style='margin-left:0.0em'><code>check_record.py set &lt;ASIN&gt; consistency --result PASS</code> で手から通す道は<strong>無い</strong>（<code>consistency</code> は spec に無い id なので弾かれる）</li>
+<li style='margin-left:0.0em'>既存のフック回帰テスト <strong>53件</strong> は全部通ったまま（ゲートを緩めていない）</li>
+</ul>
+<h2>6. 検算（§3.3-17「2回目で0行になるまで完成していない」）</h2>
+<table><thead><tr><th>回</th><th>書き換えた行</th></tr></thead><tbody>
+<tr><td>1回目</td><td>648行（<code>整合性検査</code> 列が新規なので全行）</td></tr>
+<tr><td><strong>2回目</strong></td><td><strong>0行</strong></td></tr>
+<tr><td>3回目</td><td>0行。1回目の出力とバイト一致</td></tr>
+</tbody></table>
+<p>収束のしかけ：採算欄を空にすると、その欄を使っていた検査は次回「対象外」になって所見が消えます。</p>
+<p>素朴に印を書き直すと毎回変わって収束しないので、<strong>既にある印と詳細を読み戻して新しい所見と和を取る</strong>ようにしました。</p>
+<p>消えた所見は「前回こう落ちた」として残り、新しい所見だけが増えます。<strong>印が消えて行が健全に見えることは起きません。</strong></p>
+<p>さらに、是正後のCSVを <code>check</code> にかけると所見は0件になりますが、それを「健全」と読み違えないよう</p>
+<p><strong>「🔴 前回の NG の印が残っている行 8行」を必ず併記</strong>するようにしました。</p>
+<h2>7. テスト（80件・全件通過）</h2>
+<p><code>python3 scripts/sourcing_gate/test_consistency.py</code></p>
+<ul>
+<li style='margin-left:0.0em'>検査ごとに「崩れている行で鳴る」「正しい行で鳴らない」の<strong>両方</strong>を見ます。片方だけだと、常に鳴る検査と絶対鳴らない検査が緑のまま通ります</li>
+<li style='margin-left:0.0em'><strong>縮退した入力</strong>（§3.3-20）：全項目が空欄／全項目が同じ値（1）／1行だけ／ヘッダだけ／採算の列が無いCSV／セット数が不明で採算を止めている行。いずれも化けず、NG にもなりません</li>
+<li style='margin-left:0.0em'>年末年始をまたぐ日付の鎖（12/28 → 01/05）を逆順と誤判定しない</li>
+<li style='margin-left:0.0em'><code>num()</code> が <strong>「未確定（月販非表示・3ヶ月で仮置き）」を 3 と読まない</strong>（仮置きが確定値に化ける事故を防ぐ）</li>
+<li style='margin-left:0.0em'>金額はすべて架空の合成値。PUBLIC リポなので実際の取引条件は1つも書いていません</li>
+</ul>
+<h3>テストを書いて見つけた自分の間違い</h3>
+<p>最初に「<code>good_row()</code> の正しい等級は B」と書いてテストが6件落ちました。</p>
+<p>実際は<strong>悲観の手残り 1,500円 が下限400円を超えるので A が正しい</strong>。コードではなくテストの前提が誤りでした。</p>
+<p>ここで<strong>規定と実装の食い違い</strong>を1つ見つけました（§3.3-22 の型）。</p>
+<blockquote>**CLAUDE.md §3.5 の等級の定義は「A＝中央値も悲観値も利益率20%以上」ですが、実装は<br>「利益率20%以上 <strong>または</strong> 手残り400円以上」の OR です。**<br>OR は 2026-10-04 の社長指示（「単価ではなく利益額で切る」・実践者N=6は全員が単価の下限を置いていない）に基づくもので、<br><strong>実装の方が正しく、文書が追いついていません。</strong><br>検査は実装＝社長指示に合わせました。<strong>§3.5 の表の修正をお願いします</strong>（下の「社長判断」参照）。</blockquote>
+<h2>8. 使い方</h2>
+<pre># 検査するだけ（何も書き換えない）
+python3 scripts/sourcing_gate/consistency.py check &lt;候補CSV&gt; [--private &lt;卸値つきCSV&gt;] [--show]
+
+# 是正する（NG行の採算欄を空にし、印を立てる）。必ず2回走らせて0行を確認する
+python3 scripts/sourcing_gate/consistency.py fix &lt;候補CSV&gt; --out &lt;出力&gt; --report &lt;JSON&gt;
+
+# 機械で決まる項目を記録する（人の記録は上書きしない）
+python3 scripts/sourcing_gate/autofill.py &lt;候補CSV&gt; [--private &lt;...&gt;] [--coverage] [--dry-run]
+
+# 発注してよいか
+python3 scripts/sourcing_gate/check_record.py verify &lt;ASIN&gt;...</pre>
+<p><code>--private</code> には卸の取引条件を持つCSV（<code>agent_output/</code> 専用）を渡します。</p>
+<p><strong>卸値・卸率・最小発注数・卸サイトのURLはコードにもテストにも書いていません。</strong></p>
+<h2>9. 残っている穴（正直に）</h2>
+<ol>
+<li style='margin-left:0.0em'><strong><code>unit_cost_from_wholesale</code> と <code>min_lot</code> は、卸値が手元にある12行しか検査できていません。</strong></li>
+</ol>
+<p>   残り636行は卸の1点あたりの値段が候補CSVに無く、<strong>当社が3回踏んだ単位ずれを検査できない状態</strong>です。</p>
+<p>   → パイプラインが候補CSVを書くときに、卸の1点あたり原価と最小発注数を（<code>agent_output</code> 側の私用CSVに）</p>
+<p>   必ず書き出すようにするのが筋です。別チケットの価値があります。</p>
+<ol>
+<li style='margin-left:0.0em'><strong>料率の段は「どの段か」を当てていません。</strong> カテゴリーがCSVに無いためです。</li>
+</ol>
+<p>   カテゴリー列を足せば <code>referral_yen</code> の完全一致検査にできます。</p>
+<ol>
+<li style='margin-left:0.0em'><strong><code>other_costs</code> の再計算は消化月数を 3.0 と仮定しています</strong>（CSVの「売り切る月数」が</li>
+</ol>
+<p>   「未確定（…3ヶ月で仮置き）」という文のため）。仮置きが確定値に化けないよう <code>num()</code> は</p>
+<p>   この文を読みませんが、結果として既定値を使っています。</p>
+<ol>
+<li style='margin-left:0.0em'><strong><code>timeline_stale</code> が648行すべてで鳴っています。</strong> 候補表そのものが 2026-10-04 のもので、</li>
+</ol>
+<p>   価格も卸値も発注日も引き直しが必要です（§3.3-26「判定データは4日で陳腐化」）。</p>
+<h2>10. 社長判断が要るもの</h2>
+<table><thead><tr><th>#</th><th>事項</th><th>推奨</th></tr></thead><tbody>
+<tr><td>1</td><td><strong>CLAUDE.md §3.5 の等級の定義</strong>に OR 条件（または手残り400円以上）が落ちている</td><td>文書を実装に合わせて直す。実装＝2026-10-04 の社長指示なので、直すのは文書側</td></tr>
+<tr><td>2</td><td><strong>番兵の線</strong>（原価が売価の10%未満／利益率60%以上）は仮置き</td><td>いまは実測の誤検知2件（64.7% / 75.5%）を確実に拾う線。実績が出たら動かす（§3.1）</td></tr>
+<tr><td>3</td><td>常設化（<code>consistency.py</code> を候補生成の後ろに自動で挟む・pre-commit に足す）</td><td>§4.1 相当なので<strong>実行していません</strong>。やり方は下に書きました</td></tr>
+</tbody></table>
+<h3>常設化のやり方（未実行）</h3>
+<ol>
+<li style='margin-left:0.0em'><strong>候補生成の締めに1行足す</strong> — <code>score_*.py</code> / <code>write_buy_list_v2.py</code> の最後に</li>
+</ol>
+<p>   <code>consistency.py fix &lt;出力CSV&gt; --out &lt;同じCSV&gt; --report &lt;...&gt;</code> を呼ぶ。</p>
+<p>   これで「候補表は必ず検算済み」になります。</p>
+<ol>
+<li style='margin-left:0.0em'><strong>pre-commit に足す</strong> — <code>.githooks/pre-commit</code> の <code>order_gate()</code> の隣に、</li>
+</ol>
+<p>   成果物CSVを <code>consistency.py check</code> に通す関数を足す。</p>
+<ol>
+<li style='margin-left:0.0em'><strong>autofill を夜間に回す</strong> — 候補CSVが更新されたら <code>autofill.py</code> を走らせて記録を取り直す。</li>
+</ol>
+<p>いずれも<strong>既存のフックを外したり、名前を変えて回避したりはしていません</strong>。</p>
+<hr>
+<h2>検証の再現</h2>
+<pre>python3 scripts/sourcing_gate/test_consistency.py                      # 80件
+bash   .claude/hooks/tests/test_order_gate_guard.sh                    # 53件（既存・回帰）
+python3 scripts/sourcing_gate/consistency.py check \
+  workspace/output/agent_output/T-20260920-003/score20261004/all.csv \
+  --today 2026-10-09 --base-date 2026-10-04 --show</pre>
+<p>成果物（途中経過・卸値を含むので <code>agent_output</code> 側）:</p>
+<p><code>workspace/output/agent_output/T-20260920-003/consistency20261009/all_checked.csv</code> と</p>
+<p><code>consistency_report.json</code>（空にする前の値の原本つき）。</p>
+</body></html>

@@ -1,0 +1,200 @@
+<!doctype html><html lang='ja'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>買う候補リスト（2026-10-09・サトル）</title><style>body{font-family:-apple-system,'Hiragino Sans','Noto Sans JP',sans-serif;max-width:1150px;margin:2em auto;padding:0 1em;line-height:1.65;color:#222;font-size:14.5px}table{border-collapse:collapse;margin:.8em 0;font-size:.92em}th,td{border:1px solid #bbb;padding:.35em .6em;vertical-align:top}th{background:#eef2f8}tr:nth-child(even) td{background:#fafafa}h1{font-size:1.5em;border-bottom:2px solid #444}h2{font-size:1.25em;border-left:5px solid #25b;padding-left:8px;margin-top:1.8em}h3{font-size:1.05em;margin-top:1.4em}blockquote{border-left:4px solid #ccc;margin:.8em 0;padding:.2em 1em;color:#444}code{background:#f3f3f3;padding:1px 4px;border-radius:3px}hr{border:0;border-top:1px solid #ccc;margin:1.6em 0}</style></head><body>
+<h1>買う候補リスト（2026-10-09・サトル）</h1>
+<p><strong>イシュー</strong>：いま実際に発注できる候補は、品目を散らして何件そろうのか。</p>
+<blockquote><strong>これは発注案ではありません。</strong>43件すべてに「人が実画面で見る項目」が残っています（CLAUDE.md §3.3-16：機械判定の GO は「買ってよい」ではなく「人が実画面で見る価値がある」の意味）。<br>使った型：中村裕紀『Amazon国内メーカー直取引完全ガイド』の「地雷を確認して利益率5%以上ならテスト仕入れ」（§3.5）。採算の等級と悲観値は成果物33・34 の原価モデル v2。</blockquote>
+<hr>
+<h2>1. 結論</h2>
+<table><thead><tr><th>項目</th><th>値</th></tr></thead><tbody>
+<tr><td>母集団（機械判定した ASIN）</td><td><strong>1,538件</strong>（旧プール 648＋新規逆引き 890）</td></tr>
+<tr><td>買う候補</td><td><strong>43件</strong></td></tr>
+<tr><td>候補の想定売上（90日中央値×発注点数）</td><td>408.6万円</td></tr>
+<tr><td>候補の想定粗利（手残り合計）</td><td><strong>65.4万円</strong>（粗利率 16.0%）</td></tr>
+<tr><td>発注額合計</td><td>約187万円（テスト枠30万円の<strong>6.2倍</strong>。全部は買えません）</td></tr>
+<tr><td>30万円枠の推奨サブセット</td><td><strong>8件</strong>・想定売上 57.2万円・想定粗利 <strong>11.7万円</strong>（粗利率 20.4%）</td></tr>
+</tbody></table>
+<p>🔴 <strong>経路が1本に偏っています：43件中43件（100%）が NETSEA。</strong>80%を超えています。</p>
+<p>理由は §4 に書きます（今日の私のツールで卸値まで確認できた経路が NETSEA だけだった）。</p>
+<p>🔴 <strong>月販が Amazon に表示されている候補は 43件中 0件です。</strong>全件が「売れている根拠が弱い」側で、</p>
+<p><strong>キーゾンの実測が1件ごとに必要</strong>です（§3.3-29：代表1件で判断しない）。</p>
+<hr>
+<h2>2. 候補の構成比</h2>
+<h3>経路別</h3>
+<table><thead><tr><th>経路</th><th>件数</th><th>割合</th></tr></thead><tbody>
+<tr><td>NETSEA</td><td>43</td><td>100%</td></tr>
+<tr><td>その他（国分ネット卸・量販店・メーカー直）</td><td>0</td><td>0%</td></tr>
+</tbody></table>
+<h3>ブランド別（上限は設けていません。偏りは実測の結果です）</h3>
+<table><thead><tr><th>ブランド</th><th>件数</th><th>割合</th></tr></thead><tbody>
+<tr><td>DNライティング</td><td>21</td><td>49%</td></tr>
+<tr><td>ぷるんと蒟蒻 / COOCO / お部屋の消臭元</td><td>各3</td><td>各7%</td></tr>
+<tr><td>コジット / ORIHIRO</td><td>各2</td><td>各5%</td></tr>
+<tr><td>ファースト・アロー / Petitor / タマハシ / 旭電機化成 / CRAY-PAS / かわ畑 / 本多タオル / 永光 / ノーブランド</td><td>各1</td><td>各2%</td></tr>
+</tbody></table>
+<blockquote>DNライティングの21件は<strong>直管蛍光灯</strong>で、<strong>売れ筋ランクを兄弟 ASIN と共有</strong>しています。<br>代表1件をキーゾンで見れば21件まとめて決まります（人の手数は1手）。<br>件数を減らす操作はしていません（社長指示 2026-10-09）。</blockquote>
+<h3>実売の根拠の強さ別</h3>
+<table><thead><tr><th>等級</th><th>意味</th><th>件数</th><th>割合</th></tr></thead><tbody>
+<tr><td>A</td><td>Keepa の月販が表示されている</td><td><strong>0</strong></td><td>0%</td></tr>
+<tr><td>B</td><td>売れ筋ランクが30万位以内・兄弟と共有していない</td><td>8</td><td>19%</td></tr>
+<tr><td>C</td><td>ランクはあるが兄弟 ASIN と共有（キーゾン1手で決まる）</td><td>18</td><td>42%</td></tr>
+<tr><td>D</td><td><strong>売れ筋ランクが付いていない</strong>（最弱）</td><td>17</td><td>40%</td></tr>
+</tbody></table>
+<h3>採算の等級別</h3>
+<table><thead><tr><th>等級</th><th>意味</th><th>件数</th></tr></thead><tbody>
+<tr><td>A</td><td>中央値も悲観値も利益率20%以上</td><td>19</td></tr>
+<tr><td>B</td><td>中央値で5%以上</td><td>18</td></tr>
+<tr><td>UNKNOWN</td><td><strong>寸法・重量が Keepa に無く FBA のサイズ区分が決まらない</strong>＝採算未確定</td><td>6</td></tr>
+</tbody></table>
+<hr>
+<h2>3. 候補43件</h2>
+<p>（売価は <strong>90日中央値</strong>。現在価格では計算していません＝§3.3-28。発注額は帯で出します＝会員限定の取引条件のため。実額・卸率・購入先URLは <strong>Googleスプレッドシート『商品判定台帳_Amazon物販事業』</strong>と <code>agent_output/T-20260920-003/buylist20261009/</code> にあります）</p>
+<table><thead><tr><th>#</th><th>ASIN</th><th>商品名</th><th>ブランド</th><th>等級</th><th>実売の根拠</th><th>売価(90日中央値)</th><th>1個手残り</th><th>利益率</th><th>悲観利益率</th><th>発注点数</th><th>発注額の帯</th><th>カートの販売元</th><th>経路</th><th>購入元</th><th>ゲート</th></tr></thead><tbody>
+<tr><td>1</td><td><a href="https://www.amazon.co.jp/dp/B081T1NY2T" target="_blank" rel="noopener">B081T1NY2T</a></td><td>ウォーターゲーム 海のなかま 2色アソート 24個入りBOX レトロゲーム</td><td>ファースト・アロー(FIRST ARROW)</td><td>B</td><td>B</td><td>6,540円</td><td>1,308円</td><td>20.0%</td><td>-1.5%</td><td>16個</td><td>5〜6万円</td><td>株式会社テンマヤ（AEW203409RTTT）</td><td>NETSEA</td><td>株式会社 ファースト・アロー</td><td>未確認</td></tr>
+<tr><td>2</td><td><a href="https://www.amazon.co.jp/dp/B00HPK3K9G" target="_blank" rel="noopener">B00HPK3K9G</a></td><td>日本製 ネイルマシーン ネイルオフ プチトル L シルバー KRD2001S</td><td>Petitor</td><td>B</td><td>B</td><td>5,245円</td><td>666円</td><td>12.7%</td><td>5.3%</td><td>10個</td><td>3〜4万円</td><td>A1YXKCHG2B0FTB（A1YXKCHG2B0</td><td>NETSEA</td><td>株式会社ビューティフルエンジェル</td><td>未確認</td></tr>
+<tr><td>3</td><td><a href="https://www.amazon.co.jp/dp/B001CNHI8G" target="_blank" rel="noopener">B001CNHI8G</a></td><td>オリヒロ アミノボディ粒【３本セット】</td><td>ぷるんと蒟蒻</td><td>B</td><td>B</td><td>3,670円</td><td>528円</td><td>14.4%</td><td>7.9%</td><td>10個</td><td>2〜3万円</td><td>シアノ神戸（A3GFBEVN09WJWO）</td><td>NETSEA</td><td>オリヒロ株式会社</td><td>未確認</td></tr>
+<tr><td>4</td><td><a href="https://www.amazon.co.jp/dp/B08432J49S" target="_blank" rel="noopener">B08432J49S</a></td><td>エレット マルチコンパクトラジオ ET-14</td><td>タマハシ(Tamahashi)</td><td>B</td><td>B</td><td>4,416円</td><td>406円</td><td>9.2%</td><td>1.1%</td><td>10個</td><td>3〜4万円</td><td>D-Park【株式会社デジタルパーク インボイス対応</td><td>NETSEA</td><td>株式会社 白菊</td><td>未確認</td></tr>
+<tr><td>5</td><td><a href="https://www.amazon.co.jp/dp/B0054PJJJ4" target="_blank" rel="noopener">B0054PJJJ4</a></td><td>単4が単3になる電池アダプター ブルー 1パック（2個入）</td><td>旭電機化成(Asahi Denki Kasei)</td><td>B</td><td>B</td><td>932円</td><td>301円</td><td>32.3%</td><td>16.9%</td><td>10個</td><td>0〜1万円</td><td>AYQOPLXJCTCZT（AYQOPLXJCTCZ</td><td>NETSEA</td><td>株式会社 ヤザワコーポレーション</td><td>未確認</td></tr>
+<tr><td>6</td><td><a href="https://www.amazon.co.jp/dp/B00158WPYU" target="_blank" rel="noopener">B00158WPYU</a></td><td>オリヒロ アミノボディ 250粒</td><td>ぷるんと蒟蒻</td><td>UNKNOWN</td><td>B</td><td>2,042円</td><td>118円</td><td>5.8%</td><td>—%</td><td>10個</td><td>0〜1万円</td><td>不明</td><td>NETSEA</td><td>オリヒロ株式会社</td><td>未確認</td></tr>
+<tr><td>7</td><td><a href="https://www.amazon.co.jp/dp/B0B249SBVZ" target="_blank" rel="noopener">B0B249SBVZ</a></td><td>背中も拭ける大判ウェットタオル×3個</td><td>コジット</td><td>UNKNOWN</td><td>B</td><td>3,303円</td><td>64円</td><td>1.9%</td><td>—%</td><td>16個</td><td>3〜4万円</td><td>AA8TERWRG15GI（AA8TERWRG15G</td><td>NETSEA</td><td>中央物産 株式会社</td><td>未確認</td></tr>
+<tr><td>8</td><td><a href="https://www.amazon.co.jp/dp/B004ORT9J8" target="_blank" rel="noopener">B004ORT9J8</a></td><td>サクラクレパス 油性マーカー マイネーム 細字 黒 １０本入</td><td>CRAY-PAS</td><td>UNKNOWN</td><td>B</td><td>1,179円</td><td>40円</td><td>3.4%</td><td>—%</td><td>10個</td><td>0〜1万円</td><td>A37AHJR2UK57OI（A37AHJR2UK5</td><td>NETSEA</td><td>株式会社 ヤマニ物産</td><td>未確認</td></tr>
+<tr><td>9</td><td><a href="https://www.amazon.co.jp/dp/B008FIN7NQ" target="_blank" rel="noopener">B008FIN7NQ</a></td><td>DNライティング エースライン スリム蛍光灯 FLR910T6EX-WW</td><td>DNライティング</td><td>A</td><td>C</td><td>10,560円</td><td>2,760円</td><td>26.1%</td><td>17.4%</td><td>10個</td><td>4〜5万円</td><td>スター☆彡（A4KZRVTB8UZLV）</td><td>NETSEA</td><td>株式会社 ヤザワコーポレーション</td><td>未確認</td></tr>
+<tr><td>10</td><td><a href="https://www.amazon.co.jp/dp/B00Q64QHII" target="_blank" rel="noopener">B00Q64QHII</a></td><td>DNライティング エースライン スリム蛍光灯 FLR910T6EXL30</td><td>DNライティング</td><td>A</td><td>C</td><td>10,560円</td><td>2,760円</td><td>26.1%</td><td>17.4%</td><td>10個</td><td>4〜5万円</td><td>スター☆彡（A4KZRVTB8UZLV）</td><td>NETSEA</td><td>株式会社 ヤザワコーポレーション</td><td>未確認</td></tr>
+<tr><td>11</td><td><a href="https://www.amazon.co.jp/dp/B008FIQ26U" target="_blank" rel="noopener">B008FIQ26U</a></td><td>DNライティング エースライン スリム蛍光灯 FLR1667T6EX-WW</td><td>DNライティング</td><td>A</td><td>C</td><td>14,762円</td><td>2,643円</td><td>17.9%</td><td>5.7%</td><td>10個</td><td>6〜8万円</td><td>スター☆彡（A4KZRVTB8UZLV）</td><td>NETSEA</td><td>株式会社 ヤザワコーポレーション</td><td>未確認</td></tr>
+<tr><td>12</td><td><a href="https://www.amazon.co.jp/dp/B008FIPMP2" target="_blank" rel="noopener">B008FIPMP2</a></td><td>DNライティング エースライン スリム蛍光灯 FLR1212T6EXD</td><td>DNライティング</td><td>A</td><td>C</td><td>11,396円</td><td>2,159円</td><td>18.9%</td><td>10.9%</td><td>10個</td><td>4〜5万円</td><td>スター☆彡（A4KZRVTB8UZLV）</td><td>NETSEA</td><td>株式会社 ヤザワコーポレーション</td><td>未確認</td></tr>
+<tr><td>13</td><td><a href="https://www.amazon.co.jp/dp/B009SY9GYA" target="_blank" rel="noopener">B009SY9GYA</a></td><td>DNライティング エースライン スリム蛍光灯 FLR48T6EXD</td><td>DNライティング</td><td>A</td><td>C</td><td>11,396円</td><td>2,159円</td><td>18.9%</td><td>10.9%</td><td>10個</td><td>4〜5万円</td><td>スター☆彡（A4KZRVTB8UZLV）</td><td>NETSEA</td><td>株式会社 ヤザワコーポレーション</td><td>未確認</td></tr>
+<tr><td>14</td><td><a href="https://www.amazon.co.jp/dp/B00J3FMSS0" target="_blank" rel="noopener">B00J3FMSS0</a></td><td>DNライティング エコライン スリム蛍光灯 FHA42T5ED</td><td>DNライティング</td><td>A</td><td>C</td><td>10,560円</td><td>2,111円</td><td>20.0%</td><td>12.0%</td><td>10個</td><td>4〜5万円</td><td>A2GFQ33KR7KHKA（A2GFQ33KR7K</td><td>NETSEA</td><td>株式会社 ヤザワコーポレーション</td><td>未確認</td></tr>
+<tr><td>15</td><td><a href="https://www.amazon.co.jp/dp/B00J3FMT70" target="_blank" rel="noopener">B00J3FMT70</a></td><td>DNライティング エコライン スリム蛍光灯 FHA42T5EL</td><td>DNライティング</td><td>A</td><td>C</td><td>10,560円</td><td>2,111円</td><td>20.0%</td><td>12.0%</td><td>10個</td><td>4〜5万円</td><td>A2GFQ33KR7KHKA（A2GFQ33KR7K</td><td>NETSEA</td><td>株式会社 ヤザワコーポレーション</td><td>未確認</td></tr>
+<tr><td>16</td><td><a href="https://www.amazon.co.jp/dp/B00J3FMTHA" target="_blank" rel="noopener">B00J3FMTHA</a></td><td>DNライティング エコライン スリム蛍光灯 FHA42T5EL25</td><td>DNライティング</td><td>A</td><td>C</td><td>10,560円</td><td>2,111円</td><td>20.0%</td><td>12.0%</td><td>10個</td><td>4〜5万円</td><td>スター☆彡（A4KZRVTB8UZLV）</td><td>NETSEA</td><td>株式会社 ヤザワコーポレーション</td><td>未確認</td></tr>
+<tr><td>17</td><td><a href="https://www.amazon.co.jp/dp/B007VAV330" target="_blank" rel="noopener">B007VAV330</a></td><td>DNライティング エースライン スリム蛍光灯 FLR1515T6EX-L</td><td>DNライティング</td><td>A</td><td>C</td><td>11,891円</td><td>2,037円</td><td>17.1%</td><td>4.0%</td><td>10個</td><td>5〜6万円</td><td>不明</td><td>NETSEA</td><td>株式会社 ヤザワコーポレーション</td><td>未確認</td></tr>
+<tr><td>18</td><td><a href="https://www.amazon.co.jp/dp/B008FIRBSI" target="_blank" rel="noopener">B008FIRBSI</a></td><td>DNライティング エースライン スリム蛍光灯 FLR57T6EXD</td><td>DNライティング</td><td>A</td><td>C</td><td>11,891円</td><td>2,037円</td><td>17.1%</td><td>4.0%</td><td>10個</td><td>5〜6万円</td><td>スター☆彡（A4KZRVTB8UZLV）</td><td>NETSEA</td><td>株式会社 ヤザワコーポレーション</td><td>未確認</td></tr>
+<tr><td>19</td><td><a href="https://www.amazon.co.jp/dp/B008FIPYV4" target="_blank" rel="noopener">B008FIPYV4</a></td><td>DNライティング エースライン スリム蛍光灯 FLR1515T6EX-WW</td><td>DNライティング</td><td>A</td><td>C</td><td>11,891円</td><td>2,037円</td><td>17.1%</td><td>4.0%</td><td>10個</td><td>5〜6万円</td><td>スター☆彡（A4KZRVTB8UZLV）</td><td>NETSEA</td><td>株式会社 ヤザワコーポレーション</td><td>未確認</td></tr>
+<tr><td>20</td><td><a href="https://www.amazon.co.jp/dp/B008FIQLLQ" target="_blank" rel="noopener">B008FIQLLQ</a></td><td>DNライティング エースライン スリム蛍光灯 FLR32T6EX-L</td><td>DNライティング</td><td>A</td><td>C</td><td>9,240円</td><td>2,026円</td><td>21.9%</td><td>11.9%</td><td>10個</td><td>4〜5万円</td><td>スター☆彡（A4KZRVTB8UZLV）</td><td>NETSEA</td><td>株式会社 ヤザワコーポレーション</td><td>未確認</td></tr>
+<tr><td>21</td><td><a href="https://www.amazon.co.jp/dp/B008FIR55M" target="_blank" rel="noopener">B008FIR55M</a></td><td>DNライティング エースライン スリム蛍光灯 FLR45T6EX-WW</td><td>DNライティング</td><td>A</td><td>C</td><td>10,504円</td><td>1,824円</td><td>17.4%</td><td>5.6%</td><td>10個</td><td>4〜5万円</td><td>不明</td><td>NETSEA</td><td>株式会社 ヤザワコーポレーション</td><td>未確認</td></tr>
+<tr><td>22</td><td><a href="https://www.amazon.co.jp/dp/B008FIPJR8" target="_blank" rel="noopener">B008FIPJR8</a></td><td>DNライティング エースライン スリム蛍光灯 FLR1060T6EX-L</td><td>DNライティング</td><td>A</td><td>C</td><td>10,000円</td><td>1,405円</td><td>14.1%</td><td>5.6%</td><td>10個</td><td>4〜5万円</td><td>不明</td><td>NETSEA</td><td>株式会社 ヤザワコーポレーション</td><td>未確認</td></tr>
+<tr><td>23</td><td><a href="https://www.amazon.co.jp/dp/B004OCCBGQ" target="_blank" rel="noopener">B004OCCBGQ</a></td><td>DNライティング エースライン スリム蛍光灯 FLR60T6EX-L</td><td>DNライティング</td><td>B</td><td>C</td><td>11,800円</td><td>1,961円</td><td>16.6%</td><td>3.4%</td><td>10個</td><td>5〜6万円</td><td>あぼ照明（A3NY24V6JKHJ2F）</td><td>NETSEA</td><td>株式会社 ヤザワコーポレーション</td><td>未確認</td></tr>
+<tr><td>24</td><td><a href="https://www.amazon.co.jp/dp/B004OCCBE8" target="_blank" rel="noopener">B004OCCBE8</a></td><td>DNライティング エースライン スリム蛍光灯 FLR64T6EX-L</td><td>DNライティング</td><td>B</td><td>C</td><td>11,480円</td><td>1,017円</td><td>8.9%</td><td>-6.8%</td><td>10個</td><td>5〜6万円</td><td>あぼ照明（A3NY24V6JKHJ2F）</td><td>NETSEA</td><td>株式会社 ヤザワコーポレーション</td><td>未確認</td></tr>
+<tr><td>25</td><td><a href="https://www.amazon.co.jp/dp/B009SY9K46" target="_blank" rel="noopener">B009SY9K46</a></td><td>DNライティング エースライン スリム蛍光灯 FLR48T6EX-WW</td><td>DNライティング</td><td>B</td><td>C</td><td>9,966円</td><td>971円</td><td>9.7%</td><td>0.6%</td><td>10個</td><td>4〜5万円</td><td>不明</td><td>NETSEA</td><td>株式会社 ヤザワコーポレーション</td><td>未確認</td></tr>
+<tr><td>26</td><td><a href="https://www.amazon.co.jp/dp/B0CVX7YCKS" target="_blank" rel="noopener">B0CVX7YCKS</a></td><td>[クーコ] メタリック柄編みミニショルダーバッグ 2413112011 ブラ</td><td>COOCO(クーコ)</td><td>B</td><td>C</td><td>4,385円</td><td>831円</td><td>19.0%</td><td>5.2%</td><td>10個</td><td>2〜3万円</td><td>風船唐綿（A33UDEQFJ4ULS1）</td><td>NETSEA</td><td>株式会社 クー</td><td>未確認</td></tr>
+<tr><td>27</td><td><a href="https://www.amazon.co.jp/dp/B00GIFMACC" target="_blank" rel="noopener">B00GIFMACC</a></td><td>[ドリテック] 音波式電動歯ブラシ 「ドクター・ソニック」 ホワイト</td><td>ノーブランド品</td><td>A</td><td>D</td><td>2,113円</td><td>620円</td><td>29.3%</td><td>19.5%</td><td>60個</td><td>5〜6万円</td><td>不明</td><td>NETSEA</td><td>エノキ商事株式会社</td><td>未確認</td></tr>
+<tr><td>28</td><td><a href="https://www.amazon.co.jp/dp/B00J3FMNJO" target="_blank" rel="noopener">B00J3FMNJO</a></td><td>DNライティング エコライン スリム蛍光灯 FHA36T5ED</td><td>DNライティング</td><td>A</td><td>D</td><td>9,900円</td><td>2,212円</td><td>22.3%</td><td>13.0%</td><td>10個</td><td>4〜5万円</td><td>スター☆彡（A4KZRVTB8UZLV）</td><td>NETSEA</td><td>株式会社 ヤザワコーポレーション</td><td>未確認</td></tr>
+<tr><td>29</td><td><a href="https://www.amazon.co.jp/dp/B00Q64UWES" target="_blank" rel="noopener">B00Q64UWES</a></td><td>DNライティング エースラインランプ FLR1667T6EX-L30</td><td>DNライティング</td><td>A</td><td>D</td><td>14,762円</td><td>2,075円</td><td>14.1%</td><td>5.7%</td><td>10個</td><td>6〜8万円</td><td>スター☆彡（A4KZRVTB8UZLV）</td><td>NETSEA</td><td>株式会社 ヤザワコーポレーション</td><td>未確認</td></tr>
+<tr><td>30</td><td><a href="https://www.amazon.co.jp/dp/B0D9J6WR46" target="_blank" rel="noopener">B0D9J6WR46</a></td><td>[クーコ] メタリック柄編みロングハンドルトートバッグ 2413112010</td><td>COOCO(クーコ)</td><td>A</td><td>D</td><td>6,989円</td><td>1,578円</td><td>22.6%</td><td>7.6%</td><td>10個</td><td>3〜4万円</td><td>0101マルイ（丸井）（A1QU2DNZL384TI</td><td>NETSEA</td><td>株式会社 クー</td><td>未確認</td></tr>
+<tr><td>31</td><td><a href="https://www.amazon.co.jp/dp/B0D9J7S94S" target="_blank" rel="noopener">B0D9J7S94S</a></td><td>[クーコ] メタリック柄編みロングハンドルトートバッグ 2413112010</td><td>COOCO(クーコ)</td><td>A</td><td>D</td><td>6,989円</td><td>1,578円</td><td>22.6%</td><td>7.6%</td><td>10個</td><td>3〜4万円</td><td>0101マルイ（丸井）（A1QU2DNZL384TI</td><td>NETSEA</td><td>株式会社 クー</td><td>未確認</td></tr>
+<tr><td>32</td><td><a href="https://www.amazon.co.jp/dp/B081N8F9NG" target="_blank" rel="noopener">B081N8F9NG</a></td><td>【8個セット】お部屋の消臭元 癒しをはこぶキンモクセイ 400ml</td><td>お部屋の消臭元</td><td>B</td><td>D</td><td>5,047円</td><td>830円</td><td>16.4%</td><td>-5.9%</td><td>45個</td><td>6〜8万円</td><td>不明</td><td>NETSEA</td><td>NETSEA Direct</td><td>未確認</td></tr>
+<tr><td>33</td><td><a href="https://www.amazon.co.jp/dp/B081N7PCJF" target="_blank" rel="noopener">B081N7PCJF</a></td><td>【7個セット】お部屋の消臭元 癒しをはこぶキンモクセイ 400ml</td><td>お部屋の消臭元</td><td>B</td><td>D</td><td>4,641円</td><td>682円</td><td>14.7%</td><td>-9.1%</td><td>45個</td><td>6〜8万円</td><td>不明</td><td>NETSEA</td><td>NETSEA Direct</td><td>未確認</td></tr>
+<tr><td>34</td><td><a href="https://www.amazon.co.jp/dp/B081N7JZZY" target="_blank" rel="noopener">B081N7JZZY</a></td><td>【6個セット】お部屋の消臭元 癒しをはこぶキンモクセイ 400ml</td><td>お部屋の消臭元</td><td>B</td><td>D</td><td>4,135円</td><td>446円</td><td>10.8%</td><td>-15.2%</td><td>45個</td><td>5〜6万円</td><td>不明</td><td>NETSEA</td><td>NETSEA Direct</td><td>未確認</td></tr>
+<tr><td>35</td><td><a href="https://www.amazon.co.jp/dp/B017SK20A2" target="_blank" rel="noopener">B017SK20A2</a></td><td>かわ畑 モダンテイスト アイアン傘立て ブラック 1306IFH003</td><td>かわ畑(Kawahata)</td><td>B</td><td>D</td><td>7,871円</td><td>1,218円</td><td>15.5%</td><td>3.8%</td><td>10個</td><td>2〜3万円</td><td>マジ・モービレ（A2BHL9KOOQW8J0）</td><td>NETSEA</td><td>株式会社 かわ畑貿易</td><td>未確認</td></tr>
+<tr><td>36</td><td><a href="https://www.amazon.co.jp/dp/B078X35J1D" target="_blank" rel="noopener">B078X35J1D</a></td><td>永光 センサーライト マルチ 16×16×16 0</td><td>永光</td><td>B</td><td>D</td><td>3,440円</td><td>494円</td><td>14.4%</td><td>9.2%</td><td>24個</td><td>4〜5万円</td><td>ポニーショップ（A1VTZS28QY1UW）</td><td>NETSEA</td><td>有限会社 アイ・エス・エム</td><td>未確認</td></tr>
+<tr><td>37</td><td><a href="https://www.amazon.co.jp/dp/B00Q64UE6O" target="_blank" rel="noopener">B00Q64UE6O</a></td><td>DNライティング エースラインランプ FLR1515T6EX-L30</td><td>DNライティング</td><td>B</td><td>D</td><td>11,891円</td><td>791円</td><td>6.7%</td><td>-17.2%</td><td>10個</td><td>5〜6万円</td><td>スター☆彡（A4KZRVTB8UZLV）</td><td>NETSEA</td><td>株式会社 ヤザワコーポレーション</td><td>未確認</td></tr>
+<tr><td>38</td><td><a href="https://www.amazon.co.jp/dp/B00Q64TPLY" target="_blank" rel="noopener">B00Q64TPLY</a></td><td>DNライティング エースラインランプ FLR1365T6EX-L30</td><td>DNライティング</td><td>B</td><td>D</td><td>11,891円</td><td>791円</td><td>6.7%</td><td>-17.2%</td><td>10個</td><td>5〜6万円</td><td>スター☆彡（A4KZRVTB8UZLV）</td><td>NETSEA</td><td>株式会社 ヤザワコーポレーション</td><td>未確認</td></tr>
+<tr><td>39</td><td><a href="https://www.amazon.co.jp/dp/B071CY5LNN" target="_blank" rel="noopener">B071CY5LNN</a></td><td>シトルリンＭＡＸＰＯＷＥＲ【３本セット】</td><td>ぷるんと蒟蒻</td><td>B</td><td>D</td><td>5,594円</td><td>537円</td><td>9.6%</td><td>-0.5%</td><td>10個</td><td>3〜4万円</td><td>通販できるみんなのお薬（みんなのお薬）（A1YKUC</td><td>NETSEA</td><td>オリヒロ株式会社</td><td>未確認</td></tr>
+<tr><td>40</td><td><a href="https://www.amazon.co.jp/dp/B00Z9I3H08" target="_blank" rel="noopener">B00Z9I3H08</a></td><td>いいタオル・ふっくらふわふわ バスタオル PIG-8150</td><td>本多タオル</td><td>B</td><td>D</td><td>4,778円</td><td>452円</td><td>9.5%</td><td>-16.5%</td><td>10個</td><td>2〜3万円</td><td>暮らしのデパート（A2RXC0REH5RF4D）</td><td>NETSEA</td><td>株式会社 白菊</td><td>未確認</td></tr>
+<tr><td>41</td><td><a href="https://www.amazon.co.jp/dp/B08CK6ZL3L" target="_blank" rel="noopener">B08CK6ZL3L</a></td><td>オリヒロ シトルリン MegaPower1000 240粒×4個</td><td>ORIHIRO</td><td>UNKNOWN</td><td>D</td><td>8,048円</td><td>924円</td><td>11.5%</td><td>—%</td><td>10個</td><td>5〜6万円</td><td>通販できるみんなのお薬（みんなのお薬）（A1YKUC</td><td>NETSEA</td><td>オリヒロ株式会社</td><td>未確認</td></tr>
+<tr><td>42</td><td><a href="https://www.amazon.co.jp/dp/B0B24CL1CT" target="_blank" rel="noopener">B0B24CL1CT</a></td><td>背中も拭ける大判ウェットタオル×5個</td><td>コジット</td><td>UNKNOWN</td><td>D</td><td>5,605円</td><td>519円</td><td>9.3%</td><td>—%</td><td>16個</td><td>6〜8万円</td><td>サイバーステーション（A2WUCUZ7VIQR28）</td><td>NETSEA</td><td>中央物産 株式会社</td><td>未確認</td></tr>
+<tr><td>43</td><td><a href="https://www.amazon.co.jp/dp/B07W87PSGK" target="_blank" rel="noopener">B07W87PSGK</a></td><td>オリヒロ ぷるんと蒟蒻ゼリースタンディング　ピーチ 130ｇ 5コ入り</td><td>ORIHIRO</td><td>UNKNOWN</td><td>D</td><td>739円</td><td>-336円</td><td>-45.5%</td><td>—%</td><td>16個</td><td>0〜1万円</td><td>不明</td><td>NETSEA</td><td>問屋 国分ネット卸</td><td>未確認</td></tr>
+</tbody></table>
+<h3>30万円枠の推奨サブセット（等級A/B・利益率5%以上から詰めた8件）</h3>
+<table><thead><tr><th>#</th><th>ASIN</th><th>ブランド</th><th>売価(90日中央値)</th><th>1個手残り</th><th>利益率</th><th>発注点数</th></tr></thead><tbody>
+<tr><td>1</td><td>B081T1NY2T</td><td>ファースト・アロー</td><td>6,540円</td><td>1,308円</td><td>20.0%</td><td>16個</td></tr>
+<tr><td>2</td><td>B00HPK3K9G</td><td>Petitor</td><td>5,245円</td><td>666円</td><td>12.7%</td><td>10個</td></tr>
+<tr><td>3</td><td>B001CNHI8G</td><td>ぷるんと蒟蒻（オリヒロ）</td><td>3,670円</td><td>528円</td><td>14.4%</td><td>10個</td></tr>
+<tr><td>4</td><td>B08432J49S</td><td>タマハシ</td><td>4,416円</td><td>406円</td><td>9.2%</td><td>10個</td></tr>
+<tr><td>5</td><td>B0054PJJJ4</td><td>旭電機化成</td><td>932円</td><td>301円</td><td>32.3%</td><td>10個</td></tr>
+<tr><td>6</td><td>B008FIN7NQ</td><td>DNライティング</td><td>10,560円</td><td>2,760円</td><td>26.1%</td><td>10個</td></tr>
+<tr><td>7</td><td>B00Q64QHII</td><td>DNライティング</td><td>10,560円</td><td>2,760円</td><td>26.1%</td><td>10個</td></tr>
+<tr><td>8</td><td>B008FIPMP2</td><td>DNライティング</td><td>11,396円</td><td>2,159円</td><td>18.9%</td><td>10個</td></tr>
+</tbody></table>
+<p>発注額合計 約29.0万円／想定売上 57.2万円／想定粗利 11.7万円（粗利率 20.4%）。</p>
+<p><strong>6ブランド・3カテゴリーに散っています。</strong></p>
+<hr>
+<h2>4. 経路が NETSEA 100% になった理由（事実）</h2>
+<p><strong>今日、素の HTTP と API だけで「卸値まで」確認できた経路は NETSEA（バイヤーAPI・保有）だけでした。</strong></p>
+<table><thead><tr><th>経路</th><th>今日の実測</th><th>卸値が見えるか</th></tr></thead><tbody>
+<tr><td>NETSEA</td><td>バイヤーAPI 保有・索引 67,667 JAN</td><td><strong>見える</strong></td></tr>
+<tr><td>問屋 国分ネット卸（netton.kokubu.jp）</td><td>非ログインで 200。カテゴリーページに価格表示なし</td><td>会員限定</td></tr>
+<tr><td>ザッカネット（zakka.net）</td><td>商品ページ 200・sitemap 45,000件×4。「卸価格・発注情報はログイン後に表示されます」</td><td>会員限定</td></tr>
+<tr><td>モノタロウ</td><td><strong>HTTP 403</strong></td><td>不可</td></tr>
+<tr><td>ヨドバシ.com</td><td>接続不可（000）</td><td>不可</td></tr>
+<tr><td>ふわマーケットB2B（fuwamarket-b2b.com）</td><td>公開価格あり（Shopify products.json・robots Allow）</td><td><strong>見える</strong>。ただし<strong>51商品すべて barcode が空</strong>＝JAN が無く Amazon と突合できない</td></tr>
+<tr><td>スーパーデリバリー</td><td>別インスタンスが担当（触っていません）</td><td>—</td></tr>
+</tbody></table>
+<blockquote>🔴 TLS/JA3 の偽装は一切していません（§3.3-14）。403・000 は403・000として記録しています。</blockquote>
+<h3>§3.1-1 に従った2案（0件で終わらせない）</h3>
+<p><strong>① 条件を緩める案（費用0円・今日できる）</strong></p>
+<p>他経路の「実在確認」を *卸値まで* から *「①その経路の取扱カテゴリーに実在し、②会員登録が無料・審査なし」* に緩める。</p>
+<p>→ 国分ネット卸が今日から候補経路になる（<strong>16,000アイテム以上</strong>・食品/飲料/酒類/菓子/日用品/雑貨／出典：about.aspx 2026-10-09取得）。卸値は登録後1画面で取れます。</p>
+<p><strong>② 障害そのものを取り除く案（費用0円・社長の1クリック）</strong></p>
+<table><thead><tr><th>やること</th><th>費用</th><th>所要</th><th>誰が</th></tr></thead><tbody>
+<tr><td>問屋 国分ネット卸 の無料会員登録</td><td><strong>会員登録0円・加盟料0円・月額基本料0円</strong>（出典：about.aspx）</td><td>5分</td><td><strong>利用規約への同意＝§4.1 → 社長</strong></td></tr>
+<tr><td>ザッカネット の無料会員登録（国内1,475社）</td><td>0円</td><td>5分</td><td>同上</td></tr>
+</tbody></table>
+<p><strong>国分ネット卸の調査済み事実</strong>（一次・2026-10-09 取得）</p>
+<ul>
+<li style='margin-left:0.0em'>運営：国分首都圏株式会社。<strong>会員制・事業者向け</strong>。小ロット可</li>
+<li style='margin-left:0.0em'>送料（税抜・関東）：商品代金合計 4,000円未満 <strong>790円</strong> ／ 4,000〜8,000円未満 <strong>1,480円</strong> ／ 8,000円以上 <strong>1,970円</strong>。🔴 <strong>買うほど送料が上がる体系</strong>。原価按分の式が NETSEA と違う</li>
+<li style='margin-left:0.0em'>代引手数料：9,260円未満 300円／27,778円未満 400円／27,778円以上 当社負担</li>
+<li style='margin-left:0.0em'>1回の注文は税込<strong>30万円まで・50アイテムまで</strong></li>
+<li style='margin-left:0.0em'>支払い：クレジットカード／代引き／掛け払い（Nクレジットファイナンス・<strong>審査あり</strong>）</li>
+<li style='margin-left:0.0em'>🔴 <strong>利用規約（令和4年4月6日最終改訂・本文4,097字）に「転売」「再販」「モール」「Amazon」の語は0件。</strong>ネット販売を禁じる条項は見当たりません（<strong>全文検索の事実。可否の最終判定はハルオ（法務）の領分</strong>）</li>
+<li style='margin-left:0.0em'>酒類・冷凍食品あり → 酒類販売免許・FBA 禁止区分・温度管理は別途確認が必要</li>
+</ul>
+<hr>
+<h2>5. 落ちた理由（母集団 N=1,538）</h2>
+<p>ゲートごとの PASS / UNKNOWN / FAIL。<strong>1行も捨てていません</strong>（全行は <code>agent_output/.../all_rows.csv</code>）。</p>
+<table><thead><tr><th>ゲート</th><th>PASS</th><th>UNKNOWN</th><th>FAIL</th></tr></thead><tbody>
+<tr><td>価格の動き</td><td>867</td><td>597</td><td>74</td></tr>
+<tr><td>カート保持者</td><td>483</td><td>891</td><td>164</td></tr>
+<tr><td>実売</td><td>522</td><td>650</td><td>366</td></tr>
+<tr><td>仕入れ</td><td>1,364</td><td>170</td><td>4</td></tr>
+<tr><td>セット数</td><td>1,358</td><td>180</td><td>0</td></tr>
+<tr><td>採算</td><td>135</td><td>899</td><td>504</td></tr>
+<tr><td>季節の窓</td><td>1,352</td><td>28</td><td>158</td></tr>
+</tbody></table>
+<h3>拾い直せる行は何件あるか</h3>
+<table><thead><tr><th>種類</th><th>件数</th><th>拾い方</th><th>費用</th></tr></thead><tbody>
+<tr><td><strong>カート保持者 UNKNOWN</strong>（Keepa の <code>code</code> 逆引きでは <code>buyBoxSellerId</code> が入らない）</td><td>新規890件中795件</td><td><code>buybox=1</code> で取り直す（<strong>1件3トークン</strong>）。今日14件取り直して <strong>9件が第三者・5件がカート空・Amazon本体は0件</strong></td><td>795件で約2,385トークン＝約2時間の回復分</td></tr>
+<tr><td><strong>実売 UNKNOWN（ランク共有・C）</strong></td><td>18件が候補入り／母集団では 650件</td><td>キーゾンで3か月の実数を人が見る。兄弟はランク共有なので代表1手で一族が決まる</td><td>人の手</td></tr>
+<tr><td><strong>採算 UNKNOWN（寸法なしで区分未定）</strong></td><td>候補6件／母集団 899件のうち 297件が「FBA配送代行が決まらない」</td><td><strong>寸法から公式料金表を引く実装を足したが、0件しか回復しなかった</strong>（寸法が無い行は fbaFees も無い＝同じ行）</td><td>商品ページの寸法を人が見る</td></tr>
+<tr><td><strong>価格履歴なし</strong></td><td>453件</td><td>90日に新品オファーの価格が1点も無い＝値が決まらない。<strong>拾えません</strong></td><td>—</td></tr>
+</tbody></table>
+<p>🔴 <strong>自分のコードを疑った結果の記録（§3.3-19）</strong></p>
+<p>「Keepa の <code>fbaFees</code> が無い302件は、寸法から区分を引けば復活する」と考えて実装しましたが、</p>
+<p><strong>回復は0件</strong>でした。<code>fbaFees</code> が無い行は寸法も無い行とほぼ同じ集合でした。</p>
+<p>仮説は外れでしたが、<strong>実装は残してあります</strong>（別のデータ源で寸法が入れば効きます）。</p>
+<hr>
+<h2>6. 人が実画面で確認すべき項目（次工程の作業リスト）</h2>
+<p>43件 × 下の項目を <code>agent_output/.../human_checks.csv</code> に ASIN × 項目の行で出しました（合計 <strong>264行</strong>）。</p>
+<table><thead><tr><th>#</th><th>項目</th><th>取り方</th><th>対象</th></tr></thead><tbody>
+<tr><td>1</td><td><strong>実売</strong>（3か月の実数・型番ごと）</td><td>キーゾン。代表1件で判断しない（§3.3-29）</td><td><strong>43件全部</strong></td></tr>
+<tr><td>2</td><td><strong>ゲート</strong>（出品ボタンの色）</td><td>セラセン <code>productsearch/keywords/search?q=&lt;ASIN&gt;</code> →コンディション「新規」</td><td><strong>43件全部</strong>（全件「未確認」）</td></tr>
+<tr><td>3</td><td><strong>カート保持者</strong>（販売元の実読み）</td><td>購入者アカウントで「出荷元/販売元」</td><td>43件全部（Keepa は補助）</td></tr>
+<tr><td>4</td><td><strong>新品出品者数の内訳</strong></td><td><code>/gp/offer-listing/&lt;ASIN&gt;/?f_new=true</code> を数える</td><td>43件全部</td></tr>
+<tr><td>5</td><td><strong>仕入れ先の Amazon 出品可否</strong></td><td>卸の取引条件表＋商品ページの注意事項</td><td>43件全部</td></tr>
+<tr><td>6</td><td><strong>卸値・在庫・入り数の引き直し</strong></td><td>卸サイト（索引は 2026-10-01 取得＝8日前）</td><td>43件全部</td></tr>
+<tr><td>7</td><td><strong>サイズ区分</strong>（寸法・重量）</td><td>商品ページ／現物</td><td>等級 UNKNOWN の6件</td></tr>
+</tbody></table>
+<hr>
+<h2>7. 事実と推測の分離</h2>
+<p><strong>事実</strong></p>
+<ul>
+<li style='margin-left:0.0em'>母集団 1,538件を同一のゲートで判定した（旧プールは 10/04 取得値、新規は 10/09 取得値）</li>
+<li style='margin-left:0.0em'>新規に起こした ASIN は 890件（NETSEA 索引の未解決 JAN 600件を Keepa の <code>code</code> で逆引き・消費 1,083トークン・<strong>実測 2.24トークン/JAN</strong>）</li>
+<li style='margin-left:0.0em'>逆引き（<code>buybox</code> なし）では <code>buyBoxSellerId</code> が入るのは 890件中95件だけで、<strong>その95件は全部 Amazon 本体</strong>だった</li>
+<li style='margin-left:0.0em'><code>buybox=1</code> で取り直した14件は <strong>Amazon 本体 0件／第三者 9件／カート空 5件</strong></li>
+<li style='margin-left:0.0em'>国分ネット卸・ザッカネットの卸値は非ログインでは見えない（実測）</li>
+</ul>
+<p><strong>推測（根拠と確度）</strong></p>
+<ul>
+<li style='margin-left:0.0em'>候補の歩留まりは <strong>890 ASIN あたり14件（1.6%）</strong>。この率が続くなら、候補を+50件増やすには約 3,100 ASIN＝約1,400 JAN＝約<strong>3,100トークン</strong>（確度：中。1回の実測のみ）</li>
+<li style='margin-left:0.0em'>DNライティング21件は兄弟ランク共有なので、キーゾン1手の結果が<strong>21件に同じ向きで効く</strong>（確度：中。ランク共有の事実は確定、売れ方が同じとは限らない）</li>
+<li style='margin-left:0.0em'>実売根拠 D（ランクなし）の17件は、キーゾンでも0個になる確度が高い（確度：中。10/01 に同型6件を実画面で見て全部だめだった前例）</li>
+</ul>
+<hr>
+<h2>8. ここから先は他の担当の領分</h2>
+<ul>
+<li style='margin-left:0.0em'><strong>戦略判断（どの候補から何件買うか・経路を増やすか）</strong> → タケシ（プランナー）</li>
+<li style='margin-left:0.0em'><strong>資金繰り・30万円枠の割り当て</strong> → ハジメ（経理）</li>
+<li style='margin-left:0.0em'><strong>国分ネット卸・ザッカネットの規約判定（Amazon 出品可否）</strong> → ハルオ（法務）</li>
+<li style='margin-left:0.0em'><strong>会員登録（利用規約への同意＝§4.1）</strong> → 社長の1クリック</li>
+<li style='margin-left:0.0em'><strong>Keepa トークンの取り合い</strong> → 🔴 <strong>会社のトークンは1本（20/分・上限1,200）。SD レーンと私が同時に引いて両方が止まりました。</strong>レーンごとの時間帯割りが要ります（カズヨ）</li>
+</ul>
+</body></html>

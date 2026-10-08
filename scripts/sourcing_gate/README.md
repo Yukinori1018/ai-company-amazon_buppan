@@ -12,6 +12,9 @@ CLAUDE.md §3.5 の仕入れ前チェック（**v2・21項目**）が**全部埋
 | `check_record.py` | 確認結果を記録・表示・検査する CLI |
 | `.claude/hooks/order-gate-guard.py` | PreToolUse（Write/Edit/MultiEdit）。発注案を書く瞬間に止める |
 | `.githooks/pre-commit` の `order_gate` | Bash/Python で書いた発注案を commit 時に止める |
+| `consistency.py` | **整合性検査**。候補CSVの算術を公式料金表の関数で引き直して検算する（17本）。崩れていたら数字を直さず**採算欄を空にする** |
+| `autofill.py` | 候補CSVから**機械で決まる項目だけ**を記録する。human 項目は UNKNOWN ＋ 取り方。**人の記録は上書きしない** |
+| `test_consistency.py` | consistency / autofill / ゲート連携のテスト（80件） |
 | `.claude/hooks/tests/test_order_gate_guard.sh` | 回帰テスト |
 
 記録の置き場：`workspace/output/agent_output/_sourcing_checks/<ASIN>.json`（.gitignore 済み。worktree から使っても**メインの作業ツリー側**の1か所に集まる）。卸値や購入先 URL を書いてよい。
@@ -61,3 +64,37 @@ python3 scripts/sourcing_gate/check_record.py verify B01DBGGW8S B008FIPMP2  # �
 - **商品名だけの表**（ASIN を書かない行）は「要確認」検査に掛からない。ASIN の照合はマーカー側で効く
 - 旧スクリプト（`T-20260909-002/order_set.py` `T-20260904-004/build_order_sets.py` 等）は未対応。再実行したら新規ファイル扱いになる名前なら pre-commit で止まる
 - `git commit --no-verify` は止められない
+
+
+## 整合性検査（2026-10-09 追加・T-20260920-003）
+
+21項目の○は「**人が見た事実**」の記録であって、「**表の算術が合っている**」ことの保証ではありません。
+当社は単位ずれで赤字を黒字と報告したことが3回、原価の57%が架空だったことが1回あります。別の軸なので別に止めます。
+
+```bash
+python3 scripts/sourcing_gate/consistency.py check <候補CSV> [--private <卸の条件つきCSV>] [--show]
+python3 scripts/sourcing_gate/consistency.py fix   <候補CSV> --out <出力> --report <JSON>
+python3 scripts/sourcing_gate/autofill.py          <候補CSV> [--coverage] [--dry-run]
+python3 scripts/sourcing_gate/test_consistency.py
+```
+
+`gate.evaluate()` は記録の `consistency` キーを見ます。**`result: "NG"` なら21項目が全部 PASS でも発注案を書けません。**
+記録が無いときは止めません（21項目で既に止まるため。ここで二重に fail-closed にすると過去の記録が全部無効になり、
+ゲートを外す圧力になります）。`consistency` は spec に無い id なので `check_record.py set` で手から PASS にはできません。
+
+### 守っている約束（崩すと意味が無くなる）
+
+1. **入力が無い検査は「不合格」ではなく「対象外」。** 空欄を NG にすると、2回目の実行で自分が空けた欄を
+   自分が NG にし続けて収束しません。
+2. **数字を黙って直さない。**NG の行は採算欄を空にするだけ。捨てた値は `--report` の JSON に原本ごと残す。
+3. **番兵も採算欄を空にする。**印だけ付けて数字を出すと、解けなかった行が必ず利益率の上位に来ます。
+4. **売価と日付は消さない。**採算の入力であって結果ではなく、消すと「なぜ落ちたか」が読めなくなります。
+5. **是正は2回目で0行になるまで完成していない**（§3.3-17）。既にある印と詳細を読み戻して和を取ることで収束させています。
+   是正後のCSVを `check` にかけると所見は0件になるので、**「前回の NG の印が残っている行」を必ず併記**します。
+
+### 項目の仕分け
+
+`checklist_spec.json` の各項目に `decidable`（`machine` 6件 / `partial` 3件 / `human` 12件）と `decidable_why` があります。
+`gate.py` は未知のキーを無視するので判定には効きません。`autofill.py` だけがこれを読みます。
+
+設計と実測は [workspace/output/deliverables/T-20260920-003/38_整合性検査.md](../../workspace/output/deliverables/T-20260920-003/37_整合性検査.md)。
