@@ -1,0 +1,151 @@
+<!doctype html><html lang='ja'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>15 おりおんFBA実額への差し替え ― 1点あたりの納品コスト・初回の必要資金・許可待ちの保管料</title><style>body{font-family:-apple-system,'Hiragino Sans',sans-serif;max-width:980px;margin:2em auto;padding:0 1em;line-height:1.7;color:#222}table{border-collapse:collapse;margin:1em 0;font-size:.92em}th,td{border:1px solid #ccc;padding:.35em .6em;vertical-align:top}th{background:#f3f3f3}pre{background:#f7f7f7;padding:.8em;overflow-x:auto}code{background:#f2f2f2;padding:0 .2em}blockquote{border-left:4px solid #ccc;margin:1em 0;padding:.2em 1em;color:#555}h2{border-bottom:2px solid #333;padding-bottom:.2em;margin-top:2em}</style></head><body>
+<h1>15 おりおんFBA実額への差し替え ― 1点あたりの納品コスト・初回の必要資金・許可待ちの保管料</h1>
+<p>T-20260929-001 ／ 2026-10-09 ／ 経理ハジメ</p>
+<p>きっかけ：主力の納品代行がおりおんFBAに確定（2026-10-09・CLAUDE.md §3.4）。損益モデルと判定式の納品コストは、これまで e-fba 基準の合算 49.5円/点（作業12円＋FC送料37.5円）だった。</p>
+<hr>
+<h2>0. 結論</h2>
+<ol>
+<li><strong>納品コスト（作業費＋FCまでの送料・税込・1点あたり）は、中央で 月30個 146円／月100個 85円／月300個 57円。</strong> 旧前提の49.5円が当たるのは月300個以上だけで、少量期は1.7〜3.0倍の過小だった。</li>
+<li><strong>いちばん効くのは「1箱に何点入れて送るか」。</strong> 1箱ごとに 1,136円（箱代528円＋FC送料608円）が掛かる。入荷を同じ週にそろえて1回の納品にまとめれば、月30個でも 71円（検品込み）まで下がる。</li>
+<li><strong>預かり金3万円は初回の必要資金に足す</strong>（契約終了時に全額返金＝費用ではない）。08 の運転資金は約410万→約413万円、自己資金150万円で回せる上限は月約310個→約300個になる。</li>
+<li><strong>許可待ちの保管超過は「1点＝6,050円×超過月数×按分率÷入荷点数」。</strong> 12点の入荷で1ヶ月超えると1点504円で、売価3,000円の16.8ptが消える。発注した日に許可申請を出すことが前提になる。</li>
+<li>判定式（<code>fba_cost.py</code>）は差し替え済み。候補648件の再判定では等級A→B 22件・B→C 7件、GOは0件のまま。</li>
+</ol>
+<hr>
+<h2>1. おりおんFBAの料金（公式料金表＋2026-10-07 書面回答）</h2>
+<table><thead><tr><th>費目</th><th>金額（税別）</th><th>掛かる単位</th><th>出典</th></tr></thead><tbody>
+<tr><td>ラベル貼付</td><td>11円</td><td>1点</td><td>公式料金表（01 §4-1）</td></tr>
+<tr><td>簡易検品</td><td>11円</td><td>1点（任意）</td><td>同上</td></tr>
+<tr><td>荷受</td><td>22円</td><td>1SKU</td><td>同上</td></tr>
+<tr><td>納品プラン作成</td><td>55円</td><td>1SKU</td><td>同上</td></tr>
+<tr><td>箱・梱包</td><td>370／480／590／700円</td><td>1箱（〜10／15／20／25kg）</td><td>同上</td></tr>
+<tr><td>OPP袋</td><td>45円</td><td>1点（袋入れが要る商品だけ）</td><td>同上</td></tr>
+<tr><td>月額・最低料金</td><td>0円</td><td>—</td><td>書面回答</td></tr>
+<tr><td>預かり金</td><td>30,000円</td><td>初回のみ・終了時に全額返金</td><td>書面回答</td></tr>
+<tr><td>保管</td><td>7営業日まで0円、超えると月5,500円</td><td>単位は未確認（§6）</td><td>書面回答</td></tr>
+<tr><td>FCまでの送料</td><td>ヤマトFBAパートナーキャリア 140サイズ 608円（税込）／160サイズ 762円</td><td>1箱・Amazonから請求</td><td>ヤマト公式（01 §4-2）</td></tr>
+</tbody></table>
+<p><strong>1点あたりの式（税込）</strong></p>
+<pre>1点 ＝ 12.1（ラベル）＋ 12.1（簡易検品）
+     ＋ 84.7 ÷ 1SKUの入荷点数（荷受＋プラン）
+     ＋ 1,136 ÷ 1箱の点数（箱代528＋FC送料608）</pre>
+<p>簡易検品は既定で入れた。卸からの直送で、社長も当社も現物を見ないため。外すと1点12.1円下がる。</p>
+<hr>
+<h2>2. 月30／100／300個の1点あたり（3シナリオ）</h2>
+<table><thead><tr><th>月の個数</th><th>楽観</th><th><strong>中央（推奨値）</strong></th><th>悲観</th><th>中央・まとめ納品</th><th>旧前提</th></tr></thead><tbody>
+<tr><td>30個</td><td>52円</td><td><strong>146円</strong></td><td>162円</td><td>71円</td><td>49.5円</td></tr>
+<tr><td>100個</td><td>37円</td><td><strong>85円</strong></td><td>162円</td><td>51円</td><td>49.5円</td></tr>
+<tr><td>300個</td><td>37円</td><td><strong>57円</strong></td><td>162円</td><td>50円</td><td>49.5円</td></tr>
+<tr><td>月の総額（中央）</td><td>—</td><td>30個 4,388円／100個 8,524円／300個 17,195円</td><td>—</td><td>—</td><td>—</td></tr>
+</tbody></table>
+<p><strong>シナリオの置き方（すべて仮定）</strong></p>
+<table><thead><tr><th>項目</th><th>楽観</th><th>中央</th><th>悲観</th></tr></thead><tbody>
+<tr><td>1SKUの入荷点数</td><td>20点</td><td>30個=10点（3SKU）／100個=20点（5SKU）／300個=30点（10SKU）</td><td>10点</td></tr>
+<tr><td>1回の納品の箱数</td><td>月の個数÷50点</td><td>30個=3箱／100個=5箱／300個=8箱（入荷がばらけて納品が分かれる）</td><td>1SKUごとに1箱</td></tr>
+<tr><td>箱の重量帯</td><td>〜10kg（370円）</td><td>〜15kg（480円）</td><td>〜15kg（480円）</td></tr>
+<tr><td>簡易検品</td><td>なし</td><td>あり</td><td>あり</td></tr>
+<tr><td>FC送料</td><td>140サイズ 608円</td><td>140サイズ 608円</td><td>160サイズ 762円</td></tr>
+</tbody></table>
+<p><strong>中央の内訳（1点・税込）</strong></p>
+<table><thead><tr><th>月の個数</th><th>ラベル</th><th>簡易検品</th><th>荷受＋プラン</th><th>箱代</th><th>FC送料</th><th>計</th></tr></thead><tbody>
+<tr><td>30個</td><td>12.1</td><td>12.1</td><td>8.5</td><td>52.8</td><td>60.8</td><td>146.3</td></tr>
+<tr><td>100個</td><td>12.1</td><td>12.1</td><td>4.2</td><td>26.4</td><td>30.4</td><td>85.2</td></tr>
+<tr><td>300個</td><td>12.1</td><td>12.1</td><td>2.8</td><td>14.1</td><td>16.2</td><td>57.3</td></tr>
+</tbody></table>
+<p><strong>読み方</strong></p>
+<ul>
+<li>少量期の費用の6〜8割は箱代とFC送料（1箱1,136円）。<strong>1箱の点数を増やすことが、単価を下げる唯一の手段。</strong></li>
+<li>「まとめ納品」は、卸への発注を週1回にそろえ、同じ週に届いた入荷をおりおんに1回の納品にまとめてもらう運用。無料保管7営業日の内側で待つだけなので追加費用は0円。月30個なら 146→71円/点、月額で約2,300円下がる。おりおんが応じるかは未確認（§6）。</li>
+<li>他社との比較（01 の公式値・月100個）：FBA代行センター140円、びーぷらす36円（月1,000個から）。おりおん中央85円は、まとめ納品なら51円。</li>
+</ul>
+<hr>
+<h2>3. 差し替えた箇所（洗い出しの結果）</h2>
+<table><thead><tr><th>#</th><th>場所</th><th>旧</th><th>新</th><th>状態</th></tr></thead><tbody>
+<tr><td>1</td><td><code>T-20260920-003/26_候補提案パイプライン/fba_cost.py</code>（現役の判定式）</td><td>外注25円＋梱包資材（段ボール250円÷箱の点数＋4.5円）・1箱30点</td><td><code>orion_prep_yen()</code>＝§1の式・梱包資材0円（箱代とラベルは作業費に含む）・1箱20点・1SKU10点（悲観は各7割）</td><td><strong>更新済み</strong>。<code>prep="legacy"</code> で旧版を再現できる</td></tr>
+<tr><td>2</td><td>同 <code>test_cost_v2.py</code>／<code>test_sets.py</code>／<code>test_units.py</code></td><td>小型63円ほか</td><td>小型95円ほか。旧値は legacy の検算として残した</td><td><strong>更新済み</strong>。7本すべて通過</td></tr>
+<tr><td>3</td><td><code>T-20260904-004/C1_cost_assumptions.json</code>（T-20260904-006 の「実測コストの正」）</td><td>作業12円・FC送料37.5円（e-fba）</td><td>作業59.1円・FC送料30.4円（計89.5円/点・1箱20点・1SKU10点）</td><td><strong>更新済み</strong>。旧値は <code>superseded</code> に残した</td></tr>
+<tr><td>4</td><td><code>T-20260831-006/pipeline/config.py</code>（NETSEA 旧パイプライン）</td><td><code>prep_service_yen=12.0</code>／<code>fba_inbound_yen=37.5</code></td><td>59.1／30.4 に揃える</td><td><strong>未変更</strong>。T-20260904-006（IT）で揃える。ここは小口の基本成約料110円も残っている（2026-09-12 に大口へ切替済みなので0円が正）</td></tr>
+<tr><td>5</td><td><code>T-20260521-005/code/calc/profit.py</code></td><td>呼び出し側が <code>inbound_shipping</code> を渡す方式で既定値なし</td><td>変更不要</td><td>—</td></tr>
+<tr><td>6</td><td><code>T-20260914-004/code/profit.py</code>（納品49.5円）</td><td>9/14時点の判定の記録</td><td>変更しない（過去の結果を再現するための記録）</td><td>—</td></tr>
+<tr><td>7</td><td>08 月1,000個の到達像</td><td>少量期は自宅受け・つなぎはFBA代行センター140円</td><td>冒頭に注記を追加（§5）</td><td><strong>注記済み</strong></td></tr>
+</tbody></table>
+<p><strong>判定式の変化（その他固定費・1点・消化3ヶ月・通常期）</strong></p>
+<table><thead><tr><th>サイズ区分</th><th>旧（10/04版・1箱30点）</th><th>新（おりおん・1箱20点）</th><th>差</th></tr></thead><tbody>
+<tr><td>小型</td><td>63円</td><td>95円</td><td>+32円</td></tr>
+<tr><td>標準1</td><td>75円</td><td>106円</td><td>+31円</td></tr>
+<tr><td>標準3</td><td>65円</td><td>97円</td><td>+31円</td></tr>
+<tr><td>標準6</td><td>187円</td><td>221円</td><td>+34円</td></tr>
+<tr><td>標準7</td><td>460円</td><td>556円</td><td>+96円</td></tr>
+<tr><td>標準8</td><td>739円</td><td>881円</td><td>+142円</td></tr>
+</tbody></table>
+<p>候補648件（Keepa 0トークンで再判定）：その他固定費の差の中央値 +142円（大型寄りの候補が多く、1箱に入る点数が少ないため）、利益率の差の中央値 −2.0pt。等級A 95→73件、B 91→106件、C 160→167件。総合判定は GO 0件のまま、UNKNOWN→NO-GO が2件。</p>
+<hr>
+<h2>4. 初回の必要資金</h2>
+<pre>初回の必要資金 ＝ 仕入れ代金 ＋ 卸→おりおんの送料 ＋ 預かり金 30,000円
+               ＋ おりおん作業費（初回12点の中央 903円）
+               ＋ FC送料（140サイズ 608円）＋ 大口の月額 5,390円</pre>
+<table><thead><tr><th>費目</th><th>金額（税込）</th><th>出ていく時期</th><th>戻るか</th></tr></thead><tbody>
+<tr><td>預かり金</td><td>30,000円</td><td>契約時（初回の入荷より前）</td><td>契約終了時に全額</td></tr>
+<tr><td>おりおん作業費（初回12点・中央）</td><td>903円</td><td>翌月15日（月末締め）</td><td>戻らない（費用）</td></tr>
+<tr><td>FC送料</td><td>608円</td><td>納品時。Amazon の請求（売上から差し引き、売上がなければカード）</td><td>戻らない（費用）</td></tr>
+<tr><td>大口の月額</td><td>5,390円</td><td>毎月</td><td>戻らない（費用）</td></tr>
+</tbody></table>
+<ul>
+<li>初回12点の作業費とFC送料の合計は中央で1,511円（1点126円）、楽観1,245円、悲観1,665円。01 §5 の「約1,400円」は検品なし・160サイズの値。</li>
+<li>預かり金は損益には入れない。資金繰りの表では「差入保証金」として、契約月に現金から引き、終了月に戻す。</li>
+<li>08 への影響：運転資金 約410万→約413万円、自己資金150万円で回せる上限 月約310個→約300個（3,000円・利益率20%の場合。推定）。借入300万円の結論は変わらない。</li>
+</ul>
+<hr>
+<h2>5. 出品許可待ちで保管が7営業日を超えた場合（ゲート品の採算に入れる式）</h2>
+<h3>5-1. 式</h3>
+<pre>1点あたりの保管超過 g ＝ 6,050円 × M × s ÷ Q
+
+  6,050円 … 5,500円（税別）× 1.1
+  M      … 課金される月数。日割りの有無が未確認なので、超えた月を1と数える（保守側）
+  s      … 按分率。5,500円がアカウント単位の定額で、同じ月に超過している入荷が k 件あるなら 1/k。
+            単位が分かるまでは 1（その入荷に全額を負わせる）
+  Q      … その入荷の点数</pre>
+<p>ゲート品の判定では、通常の手残りから g の期待値を引いてから等級を付ける。</p>
+<pre>期待値 E[g] ＝ 6,050 × s ÷ Q × （P(M=1)×1 ＋ P(M=2)×2 ＋ …）
+           ＋ P(不許可) ×（6,050 × M_不許可 × s ＋ 返送料・処分損）÷ Q
+ゲート品の手残り ＝ 通常の手残り − E[g]</pre>
+<p>実装：<code>fba_cost.gate_storage_yen_per_unit(Q, M, s)</code>。</p>
+<h3>5-2. 1点あたりの額（s=1）</h3>
+<table><thead><tr><th>入荷の点数 Q</th><th>1ヶ月超過</th><th>2ヶ月超過</th><th>売価3,000円に対する比（1ヶ月）</th></tr></thead><tbody>
+<tr><td>10点</td><td>605円</td><td>1,210円</td><td>20.2pt</td></tr>
+<tr><td>12点</td><td>504円</td><td>1,008円</td><td>16.8pt</td></tr>
+<tr><td>20点</td><td>303円</td><td>605円</td><td>10.1pt</td></tr>
+<tr><td>30点</td><td>202円</td><td>403円</td><td>6.7pt</td></tr>
+<tr><td>50点</td><td>121円</td><td>242円</td><td>4.0pt</td></tr>
+</tbody></table>
+<h3>5-3. 3シナリオ（12点の入荷・s=1）</h3>
+<table><thead><tr><th></th><th>楽観</th><th><strong>中央（推奨値）</strong></th><th>悲観</th></tr></thead><tbody>
+<tr><td>置き方（仮定）</td><td>到着前に許可が出る（M=0）</td><td>70%がM=0・25%がM=1・5%がM=2</td><td>M=2</td></tr>
+<tr><td>1点あたり</td><td>0円</td><td><strong>176円</strong></td><td>1,008円</td></tr>
+<tr><td>売価3,000円に対する比</td><td>0pt</td><td><strong>5.9pt</strong></td><td>33.6pt</td></tr>
+</tbody></table>
+<p>中央の確率は当社の実績ゼロ件で置いた仮定。最初の3件の申請で実績に置き換える。</p>
+<h3>5-4. 運用で効く順</h3>
+<ol>
+<li><strong>発注した日に申請する</strong>（CLAUDE.md §3.4 の段取りのとおり）。書類は卸サイトの会員ページから取れるので、荷物の到着を待たない。無料の窓は「到着から7営業日」で、おりおんの出荷作業に2〜3営業日掛かるため、許可は到着から4〜5営業日以内に出ている必要がある（起算日は未確認）。</li>
+<li><strong>ゲート品は最初の入荷を20点以上にする。</strong> 1ヶ月超えたときの損が12点の504円から303円に下がる。予算枠と回転の上限（6ヶ月）の範囲内で。</li>
+<li><strong>5,500円がアカウント定額なら、超過は月の固定費として扱う。</strong> 同じ月に超過が複数あっても6,050円で止まるので、ゲート品を複数抱える時期は s=1/k で按分してよい。</li>
+</ol>
+<hr>
+<h2>6. おりおんに確かめること（第三者連絡＝§4.1。契約後のチャットワークで社長経由）</h2>
+<table><thead><tr><th>#</th><th>確かめること</th><th>効く数字</th></tr></thead><tbody>
+<tr><td>1</td><td>保管5,500円の単位（アカウント定額か／棚・SKU・箱ごとか）、日割りの有無、7営業日の起算日</td><td>§5 の s・M</td></tr>
+<tr><td>2</td><td>同じ週に届いた入荷を1回の納品にまとめてもらえるか</td><td>§2 のまとめ納品（月30個で146→71円）</td></tr>
+<tr><td>3</td><td>箱代（370円〜）に段ボール代が含まれるか</td><td>含まなければ1箱100〜250円を足す（推定）</td></tr>
+<tr><td>4</td><td>同梱納品書を後日郵送する費用</td><td>不明。郵便の実費なら1通110円（仮定）</td></tr>
+<tr><td>5</td><td>簡易検品の中身（外箱の破損・数量の確認だけか）</td><td>外せるなら1点12.1円下がる</td></tr>
+</tbody></table>
+<hr>
+<h2>7. 確度</h2>
+<table><thead><tr><th>区分</th><th>中身</th></tr></thead><tbody>
+<tr><td>事実（公式・書面）</td><td>おりおんの料金表、書面回答の条件、ヤマトFBAパートナーキャリアの料金</td></tr>
+<tr><td>仮定</td><td>1SKUの入荷点数、1箱の点数・重量帯、納品がばらける程度、許可が出るまでの日数の確率、按分率</td></tr>
+<tr><td>未確認</td><td>§6 の5項目</td></tr>
+</tbody></table>
+<p>計算：<code>workspace/output/agent_output/T-20260929-001/15_orion_calc/</code>（calc.py／calc2.py、648件の再判定の新旧比較 regrade_legacy.csv／regrade_orion.csv）。</p>
+</body></html>

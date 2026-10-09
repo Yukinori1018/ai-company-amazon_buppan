@@ -129,7 +129,9 @@ big = profit.compute(30428, 15.0, 3573, 19350, 10, monthly_sold=60)    # 発注�
 check("発注額193,500円は FAIL", CP.economics_status(big, 60)[0], FAIL)
 check("  理由に残枠が出る", "80,000" in CP.economics_status(big, 60)[1], True)
 
-small = profit.compute(3000, 15.0, 430, 1500, 10, monthly_sold=60)     # 発注額 15,000円
+# 2026-10-09 おりおん実額で手残りが1円差で利益ゲートに掛かるようになったため売価を3,300円へ
+# （このテストの主題は予算。利益の判定に巻き込まない）
+small = profit.compute(3300, 15.0, 430, 1500, 10, monthly_sold=60)     # 発注額 15,000円
 check("発注額15,000円は FAIL でない", CP.economics_status(small, 60)[0] != FAIL, True)
 
 # 境界。上限ちょうどは通す（超えたら落とす）。

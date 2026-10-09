@@ -87,12 +87,26 @@ check("profit に OTHER_UNIT_COSTS_YEN は無い", hasattr(profit, "OTHER_UNIT_C
 check("set_family に DEFAULT_FBA_YEN=415 は無い", hasattr(set_family, "DEFAULT_FBA_YEN"), False)
 check("set_family に誤差幅 BAND_FIXED は無い", hasattr(set_family, "BAND_FIXED"), False)
 
-# ハジメの成果物33 表A と一致すること（1箱30個・消化3ヶ月・通常期）
-near("小型のその他固定費は63円（旧206円）", F.other_costs("小型", 3.0).total, 63, 1.0)
-near("標準1は75円", F.other_costs("標準1", 3.0).total, 75, 1.0)
-near("標準3は65円", F.other_costs("標準3", 3.0).total, 65, 1.0)
-near("標準7は460円（鍋。ここは旧206円より重い）", F.other_costs("標準7", 3.0).total, 460, 1.0)
-near("標準8は739円", F.other_costs("標準8", 3.0).total, 739, 1.0)
+# ハジメの成果物33 表A（2026-10-04・外注25円＋資材・1箱30個）は legacy で再現できること
+L = dict(prep="legacy", units_per_box=30)
+near("[legacy] 小型のその他固定費は63円（旧206円）", F.other_costs("小型", 3.0, **L).total, 63, 1.0)
+near("[legacy] 標準1は75円", F.other_costs("標準1", 3.0, **L).total, 75, 1.0)
+near("[legacy] 標準3は65円", F.other_costs("標準3", 3.0, **L).total, 65, 1.0)
+near("[legacy] 標準7は460円", F.other_costs("標準7", 3.0, **L).total, 460, 1.0)
+near("[legacy] 標準8は739円", F.other_costs("標準8", 3.0, **L).total, 739, 1.0)
+
+# 2026-10-09〜 おりおんFBA実額（T-20260929-001 成果物15）。1箱20個・1SKU10点・簡易検品あり
+near("おりおん作業費 1箱30個・1SKU10点・検品ありで50.3円", F.orion_prep_yen(30), 50.3, 0.1)
+near("おりおん作業費 検品なしは38.2円", F.orion_prep_yen(30, inspect=False), 38.2, 0.1)
+near("小型のその他固定費は95円（おりおん・1箱20個）", F.other_costs("小型", 3.0).total, 95, 1.0)
+near("標準1は106円", F.other_costs("標準1", 3.0).total, 106, 1.0)
+near("標準3は97円", F.other_costs("標準3", 3.0).total, 97, 1.0)
+near("標準7は556円（鍋）", F.other_costs("標準7", 3.0).total, 556, 1.0)
+near("標準8は881円", F.other_costs("標準8", 3.0).total, 881, 1.0)
+check("おりおんでは梱包資材は0円（箱代・ラベルは作業費に含む）",
+      F.other_costs("小型", 3.0).material, 0.0)
+near("許可待ちで1ヶ月超過・12点の入荷なら1点504円", F.gate_storage_yen_per_unit(12, 1), 504, 1.0)
+near("同月に超過入荷が3件あり定額按分なら168円", F.gate_storage_yen_per_unit(12, 1, 1/3), 168, 1.0)
 check("小型のほうが標準7より安い（体積比例が効いている）",
       F.other_costs("小型", 3.0).total < F.other_costs("標準7", 3.0).total, True)
 
@@ -116,7 +130,8 @@ check("12×8×4.0cm（厚み2cm超）は小型でない",
 check("寸法が欠けていれば None", F.tier_from_dimensions(-1, 60, 15, 30), None)
 
 # 卸178円のたわし。旧モデルは必要売価1,214円と言っていた
-near("卸178円の単品の損益分岐は約514円（旧1,214円）", set_family.required_sell(178, 1), 514, 5)
+# 2026-10-09 おりおん実額へ差し替えで 514 → 545円（外注25→59円・1箱30→20個）
+near("卸178円の単品の損益分岐は約545円（旧1,214円・10/04版514円）", set_family.required_sell(178, 1), 545, 5)
 
 
 # ── 3. カート保持者判定（本体の存在では落とさない）───────────────────────
@@ -222,7 +237,7 @@ check("新モデルでは同じ行が B（候補）になる", b.grade, "B")
 e = profit.compute(1500, 15.0, 288, 396, 10)
 check("compute がサイズ区分を逆引きする", e.size_tier, "小型")
 check("compute が等級を返す", e.grade in ("A", "B", "C", "UNKNOWN"), True)
-near("compute のその他固定費は区分別（206円ではない）", e.other_unit_costs, 63, 1.0)
+near("compute のその他固定費は区分別（206円ではない・おりおん実額95円）", e.other_unit_costs, 95, 1.0)
 
 
 # ── 5. セット組の向き（体積が理由・単価ではない）─────────────────────────

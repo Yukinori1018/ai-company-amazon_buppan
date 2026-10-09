@@ -17,6 +17,13 @@
 | 販売手数料率 | 8.4% を全商品 | ホーム&キッチン／文房具／DIY／家具は **15.4%** | 8.4%は服&ファッション小物の率。**ここだけは旧モデルが甘かった** |
 | 750円の崖 | 無かった | **売上合計750円以下は5%** | 売価751〜900円・1,001〜1,100円は値下げした方が手残りが増える「死に帯」 |
 
+2026-10-09 追記（ハジメ・T-20260929-001 成果物15）：納品代行をおりおんFBAの実額に差し替え
+-----------------------------------------------------------------------------------------
+外注 25円（相場の中央値）→ `orion_prep_yen()`（ラベル11＋簡易検品11＋(荷受22＋プラン55)÷1SKUの入荷点数
+＋箱代480÷1箱の点数、税別×1.1）。箱とラベルが代行料金に入るので梱包資材は0円。1箱の点数の既定は
+30→20（少量期の中央）。小型のその他固定費は 63→95円。648件の再判定で A→B 22件・B→C 7件、GO は0件のまま。
+`prep="legacy"`・`units_per_box=30` で 2026-10-04 版を再現できます。
+
 公式出典（2026-10-04 に原文取得・`agent_output/T-20260920-003/lowprice34/pricing.html`）
   FBA配送代行・保管料・販売手数料  https://sell.amazon.co.jp/pricing
   逐語「商品1点あたりの売上の合計が750円以下の場合は商品代金の5%」
@@ -79,12 +86,65 @@ STORAGE = {
 BOX_YEN = 608
 BOX_VOLUME_CM3 = 94_500
 FILL_RATE = 0.70              # 箱の実装率（仮定）。悲観ではこれを0.7倍する
-# 1箱に入れる個数の既定（仮定）。ハジメの成果物33 表A と同じ 30個。
+# 1箱に入れる個数の既定（仮定）。
+# 2026-10-09 に 30 → 20 へ下げました（ハジメ・T-20260929-001 成果物15）。
+# 30 は月300個規模の値で、少量期（月30〜100個）は入荷がばらけて1箱10〜20個しか入らない。
+# 中央値＝月100個の段（5SKU×20個を5箱）の 20個。
 # 体積から計算した満載数のほうが小さければ、そちら（物理的に入る数）が勝ちます。
-UNITS_PER_BOX = 30
-BOX_MATERIAL_YEN = 250        # 段ボール140サイズ1枚（推定・公式値なし）
-PER_UNIT_MATERIAL_YEN = 4.5   # OPP袋3円 + FNSKUラベル1.5円（推定・公式値なし）
-OUTSOURCE_YEN = 25            # 納品代行の検品/ラベル/梱包（月100点規模の中央値・税込）
+UNITS_PER_BOX = 20
+BOX_MATERIAL_YEN = 250        # 段ボール140サイズ1枚（推定・公式値なし）※legacy のみ
+PER_UNIT_MATERIAL_YEN = 4.5   # OPP袋3円 + FNSKUラベル1.5円（推定・公式値なし）※legacy のみ
+OUTSOURCE_YEN = 25            # 旧：納品代行の検品/ラベル/梱包の中央値（税込）※legacy のみ
+
+# ── 3b. 納品代行 = おりおんFBA（2026-10-09 主力確定・CLAUDE.md §3.4）──────────
+# 出典：おりおんFBA 公式料金表（T-20260929-001 成果物01 §4-1・2026-09-30 取得）と
+# 2026-10-07 の書面回答（1個から可・月額なし・預かり金3万円・無料保管7営業日）。
+# **金額は税別。計算では ×1.1 する。**
+# 箱代は「箱・梱包」の重量帯料金。段ボール代を含むかは公式に明記なし（推定：含む）。
+# FNSKUラベルの用紙もラベル11円に含むと置く（推定）。→ legacy の梱包資材は0円になる。
+PREP_DEFAULT = "orion"              # "legacy" で 2026-10-04 版（外注25円＋資材）を再現
+ORION_LABEL_YEN = 11                # 1点
+ORION_INSPECT_YEN = 11              # 簡易検品 1点（任意。直送で誰も現物を見ないので既定で入れる）
+ORION_RECEIVE_PER_SKU_YEN = 22      # 荷受 1SKU
+ORION_PLAN_PER_SKU_YEN = 55         # 納品プラン作成 1SKU
+ORION_BOX_YEN = {10: 370, 15: 480, 20: 590, 25: 700}   # 〜kg の帯 → 1箱
+ORION_BOX_BAND_KG = 15              # 既定の重量帯（仮定）
+ORION_BAG_YEN = 45                  # OPP袋（Amazon が袋入れを求める商品だけ）
+ORION_INSPECT_DEFAULT = True
+# 1SKUあたり1回の入荷で何点届くか（仮定）。出品許可の書類要件（10点以上）に合わせた中央値。
+UNITS_PER_SKU = 10
+ORION_FREE_STORAGE_BUSINESS_DAYS = 7
+ORION_OVERDUE_STORAGE_YEN_MONTH = 5_500   # 税別。7営業日を超えた月。単位（アカウント／棚／SKU）は未確認
+ORION_DEPOSIT_YEN = 30_000                # 初回預かり金。契約終了時に全額返金＝費用ではなく資金
+
+
+def orion_prep_yen(units_per_box: int, units_per_sku: int = UNITS_PER_SKU,
+                   inspect: bool = ORION_INSPECT_DEFAULT,
+                   box_band_kg: int = ORION_BOX_BAND_KG, bagged: bool = False) -> float:
+    """おりおんFBAの作業費（1点あたり・円・税込）。FC までの送料は含まない（`BOX_YEN`）。
+
+    1点 = (ラベル11 ＋ 検品11 ＋ 袋45? ＋ (荷受22＋プラン55)÷1SKUの入荷点数
+           ＋ 箱代÷1箱の点数) × 1.1
+    """
+    per_unit = ORION_LABEL_YEN + (ORION_INSPECT_YEN if inspect else 0) \
+        + (ORION_BAG_YEN if bagged else 0)
+    per_sku = (ORION_RECEIVE_PER_SKU_YEN + ORION_PLAN_PER_SKU_YEN) / max(1, int(units_per_sku))
+    per_box = ORION_BOX_YEN[box_band_kg] / max(1, int(units_per_box))
+    return (per_unit + per_sku + per_box) * 1.1
+
+
+def gate_storage_yen_per_unit(lot_units: int, overdue_months: float,
+                              share: float = 1.0) -> float:
+    """出品許可待ちで無料保管（7営業日）を超えたときの保管料（1点あたり・円・税込）。
+
+    = 5,500円 × 1.1 × 超過月数 × 按分率 ÷ その入荷の点数
+
+    - `overdue_months`：課金される月数。日割りの有無は未確認なので、始まった月を1と数える（保守側）
+    - `share`：同じ月に超過している在庫がほかにもあるときの按分率。5,500円が
+      アカウント単位の定額なら 1/k（k = その月の超過入荷数）。単位が未確認の間は 1.0（全額を負わせる）
+    """
+    return ORION_OVERDUE_STORAGE_YEN_MONTH * 1.1 * max(0.0, overdue_months) \
+        * max(0.0, share) / max(1, int(lot_units))
 
 # ── 4. 販売手数料（公式）──────────────────────────────────────────────────
 # 🔴 750円は**段階制ではなく閾値**です。「売上の合計が750円以下なら全額5%」。
@@ -272,11 +332,19 @@ def other_costs(tier: str, months_to_sell: float = 3.0, peak: bool = False,
                 apparel: bool = False, fill_rate: float = FILL_RATE,
                 volume_cm3: float | None = None,
                 units_per_box: int = UNITS_PER_BOX,
-                outsource: float = OUTSOURCE_YEN) -> OtherCosts:
+                outsource: float | None = None,
+                prep: str = PREP_DEFAULT,
+                units_per_sku: int = UNITS_PER_SKU,
+                inspect: bool = ORION_INSPECT_DEFAULT) -> OtherCosts:
     """保管料・FC納品送料・梱包資材・外注費（1個あたり・円）。
 
-    **納品送料（608円/箱）と段ボール代（250円/枚）は「1箱に入れる個数」で割ります。**
-    割る個数は `units_per_box`（既定30個・ハジメの成果物33 表Aと同じ仮定）と、
+    **外注費は `prep="orion"`（既定・2026-10-09〜）でおりおんFBAの実額**
+    （`orion_prep_yen()`：ラベル・検品・荷受/SKU・プラン/SKU・箱代）。箱代とラベルが
+    代行料金に入るので梱包資材は0円。`prep="legacy"` は 2026-10-04 版（外注25円＋資材）。
+    `outsource` に数値を渡すと外注費をその値で上書きします（資材は prep に従う）。
+
+    **納品送料（608円/箱）と箱代は「1箱に入れる個数」で割ります。**
+    割る個数は `units_per_box`（既定20個・2026-10-09 に30から変更）と、
     体積から計算した**物理的に入る個数**の**小さい方**です。
 
     社長の「固定費は量を増やせば薄まる」はここについて正しく、小型なら1箱110個入って
@@ -291,8 +359,15 @@ def other_costs(tier: str, months_to_sell: float = 3.0, peak: bool = False,
     storage = rate * vol / 1000.0 * (max(0.0, float(months_to_sell)) / 2.0)
     q = max(1, min(int(units_per_box), box_capacity(vol, fill_rate)))
     inbound = BOX_YEN / q
-    material = PER_UNIT_MATERIAL_YEN + BOX_MATERIAL_YEN / q
-    return OtherCosts(storage, inbound, material, float(outsource), vol, q)
+    if prep == "orion":
+        material = 0.0
+        out = orion_prep_yen(q, min(int(units_per_sku), 10**6), inspect)
+    else:
+        material = PER_UNIT_MATERIAL_YEN + BOX_MATERIAL_YEN / q
+        out = OUTSOURCE_YEN
+    if outsource is not None:
+        out = float(outsource)
+    return OtherCosts(storage, inbound, material, float(out), vol, q)
 
 
 # ── 必要売価 ─────────────────────────────────────────────────────────────
@@ -437,7 +512,8 @@ def _scenario(sell: float, unit_cost_incl: float, tier: str, *, worst: bool,
     t = tier_up(tier) if worst else tier
     oth = other_costs(t, months_to_sell * (2.0 if worst else 1.0), peak, apparel,
                       fill_rate=FILL_RATE * (0.7 if worst else 1.0),
-                      units_per_box=int(UNITS_PER_BOX * (0.7 if worst else 1.0))).total
+                      units_per_box=int(UNITS_PER_BOX * (0.7 if worst else 1.0)),
+                      units_per_sku=int(UNITS_PER_SKU * (0.7 if worst else 1.0))).total
     fee = referral_yen(sell, category, keepa_pct, worst=worst)
     fba = fba_fee_yen(t, sell)
     net = sell - fee - fba - unit_cost_incl - oth
