@@ -1,7 +1,7 @@
 ---
 ticket_id: T-20260904-006
 title: calc/profit.py の呼び出し側を実測コストモデルに揃える（販売手数料の消費税が未適用）
-status: todo
+status: doing
 assignee: it-engineer
 priority: medium
 created_at: 2026-09-04
@@ -9,7 +9,7 @@ updated_at: 2026-10-09
 requires_approval: false
 labels: [tech-debt, keepa, netsea]
 parent_ticket: T-20260904-004
-next_check_at: 2026-09-08
+next_check_at: 2026-10-10
 related_tickets: [T-20260904-004, T-20260831-006, T-20260521-005]
 ---
 
@@ -96,11 +96,17 @@ IT タカシが `calc/profit.py` に3費目を実装したが、**同モジュ�
 - `T-20260831-006/out/candidates.csv` は旧前提のまま（再生成は `netsea_scan.py --stage verify` だが未検証分で Keepa を叩くので、別途トークン計画と合わせて実施）
 - 本チケット本来の `referral_fee_tax_rate` 既定値の整合は未着手
 
+## 現在地
+
+- 状態：doing（担当 IT タカシ）。納品コスト3値のおりおん実額化は完了（commit 5747382b）
+- 次の手：`referral_fee_tax_rate` 既定値の整合（呼び出し側の洗い出し→意図判定→新旧比較を記録）、`candidates.csv` 再生成はトークン計画と合わせて
+
 ## ログ
 
 - 2026-09-04 IT タカシからの差し戻しを受けてカズヨが起票
 - 2026-10-09 ハジメ：納品コストの整合先をおりおん実額（作業59.1円＋送料30.4円・小口110円→0円）に更新。追記節を参照
 - 2026-10-09 タカシ：NETSEA 旧パイプライン config.py の3値を揃えた（1ファイル3値＋表示1件）。16,478件で利益プラス 2,480→2,892（1件+70円一律、うちおりおん化は−40円で黒字→赤字314件）。テスト106件通過。消費税の既定値は未着手
+- 2026-10-09 マリエ：todo→doing へ移動（納品コスト整合に着手済み・本来の論点＝販売手数料の消費税が未着手のため継続）。Notion 同期
 
 ## 成果物
 - workspace/output/deliverables/T-20260831-006/pipeline/config.py（コスト既定値の更新・変更履歴コメント）
