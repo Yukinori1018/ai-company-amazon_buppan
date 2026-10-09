@@ -101,10 +101,22 @@ def test_保管料は体積と月数から計算され純利益に反映され�
 
 def test_納品送料はFBA納品分と納品代行費とNETSEA送料の按分の合計():
     ev = evaluate.evaluate(_cand(ship_fee=800), _facts(), CFG)
-    # FBA納品37.5円 + 納品代行12円 + NETSEA送料800円 ÷ 10個 = 129.5円
+    # FBA納品30.4円 + 納品代行59.1円（おりおんFBA中央・2026-10-09）+ NETSEA送料800円 ÷ 10個
     # 旧値は「FBA納品100円 + 80円」で、**納品代行の作業費が1円も入っていなかった**。
     # 社長方針は物理作業の外注前提なので、これは費目の欠落だった（2026-09-04 修正）。
-    assert abs(ev.inbound_shipping - (37.5 + 12 + 80)) < 0.01
+    assert abs(ev.inbound_shipping - (30.4 + 59.1 + 80)) < 0.01
+
+
+def test_旧前提e_fbaと小口なら納品と成約料は旧値どおり():
+    """2026-10-09 の差し替えで数字が黙って動いていないことの検算。
+    旧前提（e-fba 12円＋37.5円・小口110円）を明示すれば旧値が出る。"""
+    legacy = config.ScanConfig(costs=config.CostAssumptions(**config.LEGACY_EFBA_KOGUCHI))
+    old = evaluate.evaluate(_cand(ship_fee=800), _facts(), legacy)
+    new = evaluate.evaluate(_cand(ship_fee=800), _facts(), CFG)
+    assert abs(old.inbound_shipping - (37.5 + 12 + 80)) < 0.01
+    assert old.closing_fee == 110
+    # 新旧の差は 1出品あたり +70円（成約料 +110 ／ おりおん化 −40）。売価・卸値に依らず一定。
+    assert abs((new.result.net_profit - old.result.net_profit) - 70.0) < 0.01
 
 
 def test_売れるたび乗る固定費が計上される():
@@ -114,8 +126,8 @@ def test_売れるたび乗る固定費が計上される():
     **売価に関係なく1点あたり必ず乗ります**。低単価品ほど効きます。
     """
     ev = evaluate.evaluate(_cand(), _facts(), CFG)
-    assert ev.closing_fee == 110                      # 小口プラン基本成約料(税込)
-    assert ev.inbound_shipping >= 12                  # 納品代行の作業費が入っている
+    assert ev.closing_fee == 0                        # 大口（2026-09-12 切替）。小口なら110
+    assert ev.inbound_shipping >= 59.1                # 納品代行の作業費が入っている
     assert ev.return_provision > 0                    # 返品引当（旧「雑費」の置換）
     # 販売手数料は税抜表示。請求は×1.1。
     bare = ev.result.amazon_price * ev.result.referral_rate

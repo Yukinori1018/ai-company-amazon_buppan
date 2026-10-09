@@ -322,6 +322,9 @@ def to_row(ev: Evaluation) -> dict:
             "ROI%": round(r.roi * 100, 1),
             "販売手数料(消費税込)": round(r.referral_fee),
             "FBA配送料": round(r.fba_fee),
+            # 大口プランの 0 は「未計算」ではなく実額 0。空欄にすると内訳の合計が合わなくなる
+            # （2026-10-09 に小口110→大口0 へ揃えたとき、テストが検出）。
+            "基本成約料": round(ev.closing_fee),
             "利益判定": r.verdict,
             "手数料内訳": (
                 f"販売{round(r.referral_fee)}({r.referral_rate*100:.1f}%・消費税込)"
