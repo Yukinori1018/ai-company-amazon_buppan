@@ -527,8 +527,23 @@ fi
 #       行動を要する短いものを前に、一覧性の長いものを後ろに置きます。
 # ⑤ は 2026-08-31 に追加。⑥ は 2026-09-02 に追加。掲出は ① → ⑤ → ⑥ → ③ → ④ → ②。
 # 番号は作成順、掲出順とは別です（③④② が既にそうなっています）。
+# ⑨（2026-10-10・予約タスク停止）は最前列＝additionalContext の先頭。
 # ⑧（2026-09-12）は ① の直後。⑤⑥⑧ はいずれも「異常な時だけ」出るため、平常日は1行も増えません。だから最前列に置けます。
-MESSAGE="${SYNC_MSG}${LEDGER_MSG}${MON_MSG}${MIRROR_MSG}${CATALOG_MSG}${INBOX_MSG}${LIST_MSG}${REMINDER_MSG}"
+# --- リマインダー⑨: 予約タスクの停止検知（2026-10-10 / T-20260920-003）-----------
+# 予約実行が許可画面で止まり、9/30 以降1件も完了していなかったのに誰も気づかなかった。
+# 異常時だけ 🔴 で出す。ログが無い環境（クラウド）では無音。判定は python 側。
+SCHED_MSG=""
+SCHED_CHECK="$REPO/.claude/hooks/scheduled_task_health.py"
+if [ -f "$SCHED_CHECK" ] && command -v python3 >/dev/null 2>&1; then
+  SCHED_OUT="$(python3 "$SCHED_CHECK" 2>/dev/null || true)"
+  if [ -n "$SCHED_OUT" ]; then
+    SCHED_MSG="${SCHED_OUT}
+
+"
+  fi
+fi
+
+MESSAGE="${SCHED_MSG}${SYNC_MSG}${LEDGER_MSG}${MON_MSG}${MIRROR_MSG}${CATALOG_MSG}${INBOX_MSG}${LIST_MSG}${REMINDER_MSG}"
 
 # JSON エスケープ（python が無い環境を考慮し、jq があれば使う）
 if command -v jq >/dev/null 2>&1; then
