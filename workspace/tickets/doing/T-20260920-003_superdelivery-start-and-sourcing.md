@@ -3905,3 +3905,28 @@ Lazada の根拠：手数料 約11〜12%（90日中は約5%）／**入金1週間
 - 14,091 行・過去1か月の多い順・上限なし。SD 検索 URL 列つき。
 - 妥協点: ①カート保持者は 11,216 行が「不明（本体在庫なし）」（キャッシュに BuyBox が無い）。SD でヒットした行だけ実画面で確認する運用。②価格は 12,8xx 行が「履歴なし→90日平均で代用・悲観=90日最安」（中央値ではない）。③セット数は Keepa PQ が 1〜24 で商品名と矛盾しないときだけ確定。それ以外（5,361行）は「要確認」とし、上限は「Amazon1個＝卸1点」で計算。
 - 再生成: `python3 sd_queue_build.py`（トークン0）。
+
+## ログ（2026-10-11 追記・タカシ・キーゾン再現の検算）
+- キーゾン「過去1/2/3ヶ月目の販売数」を Keepa ランク履歴から再現できるか検算。**式＝30日窓ごとにランクが直前観測より3%超改善した回数**で、25 ASIN×3か月の月MAE 0.08個・最大誤差1個（10/11組は27/27完全一致）
+- UNKNOWN 1,016件に適用：agent_output/T-20260920-003/ledger20261010/kz_estimate_20261011.csv（スクリプト kz_estimate.py・Keepa 未取得分は取得後に再実行でトークン0）
+
+## 2026-10-11 タカシ（IT）— 実売 UNKNOWN の解消と GO 判定の組み込み（途中・実行待ち）
+
+**現在地**：コード変更は入れた。**台帳への書き込み・GO 件数の確定・commit はまだ**（途中で Bash 実行がツール側の判定で止められた）。Keepa 取り直しは 450/484 まで済み・残り34件はトークン補充待ちで自動継続中。
+
+- 変更（26_候補提案パイプライン）
+  - `screen_checks.py`：①実画面「カートあり=Y・保持者名なし」をカートなし扱いしていたのを修正し、Keepa buyBoxSellerId で保持者名を補う（Amazon は FAIL・出品者名にブランド/メーカー名があれば「疑い」）②実画面「過去1か月◯点以上」を Keepa monthlySold なしでも #9 PASS ③`kz_estimate_*.csv` をキーゾン同等として読む（§3.3-16 改訂 9c673a11・人のキーゾン値が勝つ・観測少で0は UNKNOWN・注意書きは判定理由へ。機械値なので「確認者=カズヨ」行の凍結は解かない）④`season_check_*.csv`（人の季節判定）を合流
+  - `ledger_refresh.py`：取り直した ASIN は新データで再採点／**GO は出品可否を人が見た行だけ**（ゲート未確認でも GO になり得た穴を塞いだ）／別記 CSV `extra_go_YYYYMMDD.csv`（GO・GO・ゲート未確認・カートなし黒字）
+  - `hidden_cart.py`（新規）：カートが消えた棚の基準売価＝カートが立っていた最後の90日の BuyBox 中央値
+  - `keepa_unknown_fetch.py`（新規）：UNKNOWN 行の取り直し（stats=90&history=1&buybox=1）
+  - `test_cart_kz_20261011.py`（新規・未実行）
+- 証跡ファイル（agent_output/ledger20261010）：`season_check_20261011.csv`（蛍光灯2件 PASS・1年前価格約3,200円の注記）／`cart_check_20261011_d.csv`（B000FP3CC8=Amazon・B0D1XHYYNV=ハナリラ）／`cart_maker_flags_20261011.csv` に B0D1XHYYNV 確定を追記／`keizon_rank_calib_20261011.csv`
+- 不採用：ランク→月販の換算式（rank_velocity.py・未コミット）。キーゾン実数に対し2〜40倍の過大推定。キーゾン再現値（3%改善回数）の方が正しい
+- 判明：cart_check_c 188件で「過去1か月」表示は5件のみ（うち B000FP3CC8=本体・B0D1XHYYNV=本人）。188件は**出品可否の確認が0件**＝GO の律速はゲート確認
+
+**残りの実行手順（Bash が使える場で）**
+1. Keepa 取得完了を待つ（scratchpad の fetch.log が 484/484）
+2. `cd agent_output/T-20260920-003/ledger20261010 && python3 kz_estimate.py`
+3. 26_候補提案パイプラインで `python3 test_cart_kz_20261011.py && python3 test_screen_checks.py`
+4. `python3 ledger_refresh.py --dry-run` → summary.json の「別記」と extra_go_*.csv を確認 → `python3 ledger_refresh.py`
+5. before/after JSON で人の行（確認者=カズヨ・証跡なし）が無変更か照合 → commit

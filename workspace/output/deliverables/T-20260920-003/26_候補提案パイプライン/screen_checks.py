@@ -48,7 +48,8 @@ TARGET_MONTHS = 3      # 3か月を超えるのはロット・ゲート10点が�
 #: Keepa 生データ（buyBoxEligibleOfferCounts を読むため）。後ろほど新しい
 RAW_FILES = [WORK / "refetch20261004/raw.jsonl",
              WORK / "buylist20261009/resolve_raw.jsonl",
-             WORK / "buylist20261009/buybox_raw.jsonl"]
+             WORK / "buylist20261009/buybox_raw.jsonl",
+             OUT / "keepa_unknown_20261011.jsonl"]      # 2026-10-11 実売 UNKNOWN の取り直し
 
 
 @dataclass
@@ -59,6 +60,8 @@ class Cart:
     checked_at: str
     maker: str = ""        # "確定" / "疑い" / ""
     maker_note: str = ""
+    has_cart: bool | None = None   # 実画面で「カートあり=Y」。保持者名は未取得のことがある
+    holder_src: str = "人"         # "人"（実画面で読んだ）／"Keepa"（Y だが名前は Keepa で補った）
 
 
 @dataclass
@@ -74,9 +77,17 @@ class ScreenChecks:
     cart: dict[str, Cart]
     gate: dict[str, dict]
     keizon: dict[str, Keizon]
+    season: dict[str, dict] = field(default_factory=dict)   # 人が12か月ランクを見た季節判定
 
     def covers(self, asin: str) -> bool:
-        return asin in self.cart or asin in self.gate or asin in self.keizon
+        """人の確認の証跡があるか（凍結解除の判定に使う）。キーゾン再現値（機械）は数えない。"""
+        k = self.keizon.get(asin)
+        return (asin in self.cart or asin in self.gate or asin in self.season
+                or bool(k and not k.checked.startswith("Keepa")))
+
+    def has_any(self, asin: str) -> bool:
+        """人の確認 or キーゾン再現値のどれかがあるか（判定に合流させるかの判定）。"""
+        return self.covers(asin) or asin in self.keizon
 
 
 def _num(x) -> float | None:
@@ -94,10 +105,12 @@ def load_cart() -> dict[str, Cart]:
         for r in csv.DictReader(p.open(encoding="utf-8-sig")):
             a = r["ASIN"].strip()
             holder = (r.get("カート保持者(実画面)") or "").strip()
-            if (r.get("カートあり") or "").strip() == "N" and not holder:
+            yn = (r.get("カートあり") or "").strip().upper()
+            if yn == "N" and not holder:
                 holder = "カートなし"
             sold = (r.get("過去1か月(実画面)") or r.get("過去1か月(実画面・下限)") or "").strip()
-            c = Cart(holder, (r.get("カート価格") or "").strip(), sold, r.get("確認時刻", ""))
+            c = Cart(holder, (r.get("カート価格") or "").strip(), sold, r.get("確認時刻", ""),
+                     has_cart=(True if yn == "Y" else False if yn == "N" else None))
             if "疑い" in (r.get("注意") or ""):
                 c.maker, c.maker_note = "疑い", r["注意"]
             if a in flags:
@@ -138,6 +151,34 @@ def load_keizon(sheet) -> dict[str, Keizon]:
     return out
 
 
+def load_kz_estimate() -> dict[str, Keizon]:
+    """キーゾン再現値（kz_estimate_*.csv）。CLAUDE.md §3.3-16（9c673a11）でキーゾン実数と同等に扱う。
+    式＝30日窓ごとにランクが直前観測より3%超改善した回数（キーゾン実画面75点中69点が完全一致）。
+    人がキーゾン画面で見た値（シートのタブ）があればそちらが勝つ（load() で上書き）。"""
+    out = {}
+    for p in sorted(OUT.glob("kz_estimate_*.csv")):
+        for r in csv.DictReader(p.open(encoding="utf-8-sig")):
+            if (r.get("3か月平均") or "") == "":
+                continue
+            m = [r["推定m1"], r["推定m2"], r["推定m3"]]
+            note = (r.get("注意") or "").strip()
+            lab = f"{'/'.join(m)}（平均{r['3か月平均']}個）"
+            out[r["ASIN"].strip()] = Keizon(
+                lab, float(r["3か月平均"]), m,
+                "Keepa ランク改善3%超で再現（キーゾン同等・§3.3-16）" + (f"・注意：{note}" if note else ""))
+    return out
+
+
+def load_season() -> dict[str, dict]:
+    """ledger20261010/season_check_*.csv（人が Keepa の12か月ランクを目視した季節判定）。
+    列：ASIN, 季節の窓(PASS/FAIL/UNKNOWN), 根拠, 追記（判定理由に足す注意）, 確認時刻, 確認者"""
+    out = {}
+    for p in sorted(OUT.glob("season_check_*.csv")):
+        for r in csv.DictReader(p.open(encoding="utf-8-sig")):
+            out[r["ASIN"].strip()] = {k: (v or "").strip() for k, v in r.items()}
+    return out
+
+
 def load_legal() -> dict[str, tuple[str, str]]:
     """法務判定で販売を止める行（{ASIN: (区分, 判定理由に書く文)}）。"""
     out = {}
@@ -165,7 +206,9 @@ def doc_note(name: str) -> str:
 
 
 def load(sheet, gate_fallback: dict[str, dict]) -> ScreenChecks:
-    return ScreenChecks(load_cart(), load_gate(gate_fallback), load_keizon(sheet))
+    kz = load_kz_estimate()
+    kz.update(load_keizon(sheet))          # 人がキーゾン画面で見た値が勝つ
+    return ScreenChecks(load_cart(), load_gate(gate_fallback), kz, load_season())
 
 
 _OFFERS: dict[str, tuple[int, int, str]] | None = None
@@ -191,17 +234,60 @@ def offers(asin: str) -> tuple[int, int, str] | None:
     return _OFFERS.get(asin)
 
 
+AMAZON_JP = "AN1VRQENFRJN5"
+_STRIP = re.compile(r"株式会社|有限会社|合同会社|\(株\)|（株）|㈱|公式|オフィシャル|ストア|ショップ|"
+                    r"store|shop|official|online|japan|jp|[\s・\-_（）()【】\[\]　]", re.I)
+
+
+def _norm(x: str) -> str:
+    return _STRIP.sub("", (x or "").lower())
+
+
+def maker_suspect(seller: str, brand: str, maker: str) -> str:
+    """出品者名にブランド名・メーカー名が含まれていれば理由を返す（疑い止まり。確定は人）。"""
+    sn = _norm(seller)
+    for label, w in (("ブランド", brand), ("メーカー", maker)):
+        wn = _norm(w)
+        if len(wn) >= 2 and len(sn) >= 2 and (wn in sn or sn in wn):
+            return f"出品者名「{seller}」が{label}「{w}」と一致（Keepa 機械判定）"
+    return ""
+
+
+def supplement_holder(c: Cart, sid: str | None, name: str | None, brand: str = "",
+                      maker: str = "") -> Cart:
+    """実画面でカートあり（名前未取得）の行に、Keepa の buyBoxSellerId で保持者名を補う。"""
+    from dataclasses import replace
+    if c.holder or not c.has_cart or not sid or sid == "-1":
+        return c
+    if sid == AMAZON_JP:
+        return replace(c, holder="Amazon.co.jp（Keepa buyBoxSellerId）", holder_src="Keepa")
+    nm = name or sid
+    sus = "" if c.maker else maker_suspect(nm, brand, maker)
+    return replace(c, holder=f"{nm}（{sid}）", holder_src="Keepa",
+                   maker=c.maker or ("疑い" if sus else ""), maker_note=c.maker_note or sus)
+
+
 # ── 各項目 ────────────────────────────────────────────────────────────
 
 def cart_gate(c: Cart) -> tuple[str, str]:
     """(状態, 理由)。§3.3-1・§3.3-5。"""
     h = c.holder
     if "Amazon.co.jp" in h:
-        return "FAIL", f"カートは Amazon.co.jp（カズヨ実画面 {c.checked_at}）"
+        src = ("Keepa buyBoxSellerId・カートの有無はカズヨ実画面" if c.holder_src == "Keepa"
+               else "カズヨ実画面")
+        return "FAIL", f"カートは Amazon.co.jp（{src} {c.checked_at}）"
     if c.maker == "確定":
         return "FAIL", f"カートはメーカー/ブランド本人：{h}（{c.maker_note}）"
     if c.maker == "疑い":
         return "UNKNOWN", f"カート {h} はメーカー/ブランド本人の疑い（{c.maker_note}）"
+    if not h and c.has_cart:
+        return "UNKNOWN", (f"カートあり（カズヨ実画面 {c.checked_at}・{c.price}円）だが保持者名は未取得"
+                           "（Keepa にも buyBoxSellerId が無い）")
+    if c.holder_src == "Keepa" and c.maker != "確定":
+        if c.maker == "疑い":
+            return "UNKNOWN", f"カート {h} はメーカー/ブランド本人の疑い（{c.maker_note}）"
+        return "PASS", (f"カートは第三者 {h}（カートの有無と価格 {c.price}円はカズヨ実画面 "
+                        f"{c.checked_at}・保持者名は Keepa buyBoxSellerId）")
     if h in ("カートなし", "高値で非表示") or not h:
         return "UNKNOWN", (f"カートなし（{h or '表示なし'}・カズヨ実画面 {c.checked_at}）"
                            "＝誰もカートを持っていない。売価を相場に戻せば取れる可能性")
@@ -214,6 +300,8 @@ def sales(asin: str, s: dict, machine_st: str, sc: ScreenChecks) -> tuple[str, s
     if k:
         if k.avg is None:
             return "UNKNOWN", f"キーゾン表示なし（{k.checked}）＝この ASIN の実数が取れない", None
+        if k.avg <= 0 and "観測少" in k.checked:
+            return "UNKNOWN", f"キーゾン3か月 {k.label} だが観測が少なく0と区別できない（{k.checked}）", None
         if k.avg <= 0:
             return "FAIL", f"キーゾン3か月 {k.label}＝実質ゼロ（{k.checked}）", 0
         return "PASS", f"キーゾン3か月 {k.label}（ASIN 単位・{k.checked}）", k.avg
@@ -231,6 +319,11 @@ def sales(asin: str, s: dict, machine_st: str, sc: ScreenChecks) -> tuple[str, s
             return ("UNKNOWN", f"Keepa 月{ms}個と実画面 {c.sold_label} が2倍以上ずれる（キーゾン未確認）",
                     None)
         return "PASS", f"実画面 過去1か月 {c.sold_label}（Keepa {ms}個と一致）", min(float(ms), shown)
+    if not ms and shown and shown >= 50:
+        # 実画面の「過去1か月で◯点以上購入」は Amazon が出している ASIN 単位の実数（下限値）。
+        # 人が画面で見た実数なので §3.3-16 を満たす。Keepa の monthlySold は未反映なだけ。
+        return ("PASS", f"実画面 過去1か月 {c.sold_label}（Amazon 表示・下限値・カズヨ {c.checked_at}。"
+                        "Keepa monthlySold は未反映）", shown)
     return "UNKNOWN", "キーゾン未確認（月販表示なし＝月50個未満。ASIN 単位の実数が無い）", None
 
 
