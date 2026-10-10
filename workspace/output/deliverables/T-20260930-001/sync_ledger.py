@@ -107,7 +107,11 @@ CHECKED_COLS = LINKED_COLS + [CHECK_COL]
 # 2026-10-10（タカシ）：セラーセントラル lookupAsin の実測（62_出品可否_20261010.csv）を基準チェックの隣に。対象外の行は空欄
 LIST_COL = 'Amazon出品可否(10/10)'
 LIST_CSV = '62_出品可否_20261010.csv'
-COLS = CHECKED_COLS + [LIST_COL]
+LISTED_COLS = CHECKED_COLS + [LIST_COL]
+# 2026-10-10（タカシ）：社長承認「そのまま出品できる社から打診。基準は確保」。第1弾/第2弾/下書き済/対象外。ロジックは dashin_order.py
+import dashin_order as do
+DASHIN_CSV = '63_打診第1弾.csv'
+COLS = LISTED_COLS + [do.COL]
 
 OWNER_COLS = ['接触ステータス', '接触日', 'メモ']
 STATUS_OPTIONS = ["未接触", "送信済", "返信あり", "見積りあり", "成約", "お断り"]
@@ -135,6 +139,11 @@ NOTES = {
     '紐付け根拠URL': '上の判定の根拠にした公式サイト・公式通販・ブランド公式のページ（取得 2026-10-04）。',
     'Amazon出品可否(10/10)': ('セラーセントラルの商品検索（lookupAsin）で代表ASINを2026-10-10に実測（カズヨ）。出品できる／出品許可が必要（ブランド/カテゴリ）／出品不可。\n'
                             '空欄＝実測の対象外。許可が必要でも書類（請求書10点以上）で通る場合がある（§3.5 #1〜3）。'),
+    do.COL: ('打診の順番（タカシ 2026-10-10・dashin_order.py）。社長承認「そのまま出品できる社から打診を始める。ただし基準は確保」。\n'
+             '第1弾-NN＝接触候補・連絡先あり・基準チェックOK・出品できる・未送信・検算通過／第2弾-NN＝同条件で出品許可が必要／'
+             '下書き済＝打診メールを下書き・送信済み／対象外（理由）。NN は送信順（成約しやすさ順）を保った連番。\n'
+             '検算＝月販≥50・本体365日在庫切れ率≥90%・FBA≥2または(新品≥2かつFBA≥1)・ランク≤5万・売価≥2,200円・'
+             'カート保持者が本体/メーカー本人でなく実画面で確認済み・公式ページで紐付け確認済み（根拠URLあり）を1項目ずつ。'),
     'Amazon上のブランド表記': '代表ASINの Amazon 上のブランド欄（Keepa の brand。取得 2026-09-30〜10-04）。製造販売元と違うことがある。',
     'Amazon上のメーカー表記': '代表ASINの Amazon 上のメーカー欄（Keepa の manufacturer）。販売店名・旧社名・ブランド名が入ることがある。',
     C_ORDER: ('送信キューの順番（成約しやすさ順。儲かる順ではない）。\n'
@@ -365,6 +374,7 @@ def collect():
         a = r['代表ASIN(タカシ)']
         c = cand[0].get(a) or cand[1].get(r['メーカー名(タカシ)']) or {}
         r[CHECK_COL] = cc.check(r, c, profit.get(a, {}), kc.get(a))
+        r['_m'] = do.measure(r, c, profit.get(a, {}), kc.get(a))
     listing = {x['代表ASIN']: (x.get(LIST_COL) or '').strip() for x in read_csv(os.path.join(HERE, LIST_CSV))}
     for r in rows:
         r[LIST_COL] = listing.get(r['代表ASIN(タカシ)'], '')
@@ -395,6 +405,8 @@ def main():
     head = cur[0] if cur else []
     if head[:len(COLS)] == COLS:
         mode, cur_cols = '通常', COLS
+    elif head[:len(LISTED_COLS)] == LISTED_COLS and len([h for h in head if h]) == len(LISTED_COLS):
+        mode, cur_cols = '移行（52列→打診順1列追加・初回のみ）', LISTED_COLS
     elif head[:len(CHECKED_COLS)] == CHECKED_COLS and len([h for h in head if h]) == len(CHECKED_COLS):
         mode, cur_cols = '移行（51列→出品可否1列追加・初回のみ）', CHECKED_COLS
     elif head[:len(LINKED_COLS)] == LINKED_COLS and len([h for h in head if h]) == len(LINKED_COLS):
@@ -420,6 +432,8 @@ def main():
                 r[c] = old[c]
         if (old.get('代表商品（Amazon URL）') or '').startswith('=HYPERLINK'):
             r['代表商品（Amazon URL）'] = old['代表商品（Amazon URL）']
+    dres = do.assign(rows, LIST_COL, CHECK_COL)
+    n_exp = do.export(rows, os.path.join(HERE, DASHIN_CSV), CHECK_COL)
     missing = [k for k in keep if k not in {key_of(r) for r in rows}
                and any((keep[k].get(c) or '').strip() not in ('', '未接触') for c in OWNER_COLS)]
 
@@ -439,6 +453,12 @@ def main():
     import criteria_check as cc
     print('NG理由:', collections.Counter(t for r in rows for t in cc.reason_tags(r[CHECK_COL])).most_common())
     print('出品可否 接触候補:', dict(collections.Counter(re.sub(r'（.*', '', r[LIST_COL]) or '空欄' for r in q)))
+    dc2 = collections.Counter(re.sub(r'-\d+$', '', r[do.COL]) for r in rows)
+    print('打診順:', dict(sorted(dc2.items(), key=lambda x: -x[1])))
+    print('第1弾 連絡手段:', dict(collections.Counter(do.contact_means(r) for r in rows if r[do.COL].startswith('第1弾'))))
+    for name, lst, bad in dres['excluded']:
+        print(f'  検算で外した: {name}（{lst}）: {"・".join(bad)}')
+    print(f'{DASHIN_CSV}: {n_exp}行')
     if missing:
         print('注意: 入力から消えたが社長入力があった行（シートからは落ちます）:', missing)
     if dry:
