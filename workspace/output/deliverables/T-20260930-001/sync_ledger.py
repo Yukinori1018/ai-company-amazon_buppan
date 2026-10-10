@@ -103,7 +103,11 @@ LINK_COLS = ['紐付けの判定', '紐付け根拠URL', 'Amazon上のブラン�
 LINKED_COLS = PREV_COLS + LINK_COLS
 # 2026-10-10（タカシ）：入口基準への適合チェックを末尾に1列追加。判定ロジックは criteria_check.py
 CHECK_COL = '基準チェック'
-COLS = LINKED_COLS + [CHECK_COL]
+CHECKED_COLS = LINKED_COLS + [CHECK_COL]
+# 2026-10-10（タカシ）：セラーセントラル lookupAsin の実測（62_出品可否_20261010.csv）を基準チェックの隣に。対象外の行は空欄
+LIST_COL = 'Amazon出品可否(10/10)'
+LIST_CSV = '62_出品可否_20261010.csv'
+COLS = CHECKED_COLS + [LIST_COL]
 
 OWNER_COLS = ['接触ステータス', '接触日', 'メモ']
 STATUS_OPTIONS = ["未接触", "送信済", "返信あり", "見積りあり", "成約", "お断り"]
@@ -129,6 +133,8 @@ NOTES = {
                     '一致＝公式に同じ商品（商品名・容量・型番）あり／一致（表記ゆれ）＝Amazonのブランド欄が原料メーカー・ブランド名・海外製造元など（理由を併記）／'
                     '不一致＝別会社の商品／未確認＝公式に同商品のページなし。不一致・未確認は判定を「要確認」にして送信キューから外す。'),
     '紐付け根拠URL': '上の判定の根拠にした公式サイト・公式通販・ブランド公式のページ（取得 2026-10-04）。',
+    'Amazon出品可否(10/10)': ('セラーセントラルの商品検索（lookupAsin）で代表ASINを2026-10-10に実測（カズヨ）。出品できる／出品許可が必要（ブランド/カテゴリ）／出品不可。\n'
+                            '空欄＝実測の対象外。許可が必要でも書類（請求書10点以上）で通る場合がある（§3.5 #1〜3）。'),
     'Amazon上のブランド表記': '代表ASINの Amazon 上のブランド欄（Keepa の brand。取得 2026-09-30〜10-04）。製造販売元と違うことがある。',
     'Amazon上のメーカー表記': '代表ASINの Amazon 上のメーカー欄（Keepa の manufacturer）。販売店名・旧社名・ブランド名が入ることがある。',
     C_ORDER: ('送信キューの順番（成約しやすさ順。儲かる順ではない）。\n'
@@ -359,6 +365,9 @@ def collect():
         a = r['代表ASIN(タカシ)']
         c = cand[0].get(a) or cand[1].get(r['メーカー名(タカシ)']) or {}
         r[CHECK_COL] = cc.check(r, c, profit.get(a, {}), kc.get(a))
+    listing = {x['代表ASIN']: (x.get(LIST_COL) or '').strip() for x in read_csv(os.path.join(HERE, LIST_CSV))}
+    for r in rows:
+        r[LIST_COL] = listing.get(r['代表ASIN(タカシ)'], '')
     rest = sorted([r for r in rows if j_rank(r['判定']) > 1], key=lambda r: (j_rank(r['判定']),) + base(r))
     return queue + rest, used, profit
 
@@ -386,6 +395,8 @@ def main():
     head = cur[0] if cur else []
     if head[:len(COLS)] == COLS:
         mode, cur_cols = '通常', COLS
+    elif head[:len(CHECKED_COLS)] == CHECKED_COLS and len([h for h in head if h]) == len(CHECKED_COLS):
+        mode, cur_cols = '移行（51列→出品可否1列追加・初回のみ）', CHECKED_COLS
     elif head[:len(LINKED_COLS)] == LINKED_COLS and len([h for h in head if h]) == len(LINKED_COLS):
         mode, cur_cols = '移行（50列→基準チェック1列追加・初回のみ）', LINKED_COLS
     elif head[:len(PREV_COLS)] == PREV_COLS and len([h for h in head if h]) == len(PREV_COLS):
@@ -427,6 +438,7 @@ def main():
     print('基準チェック 全体:', dict(chk), '/ 接触候補:', dict(collections.Counter(r[CHECK_COL].split('：')[0] for r in q)))
     import criteria_check as cc
     print('NG理由:', collections.Counter(t for r in rows for t in cc.reason_tags(r[CHECK_COL])).most_common())
+    print('出品可否 接触候補:', dict(collections.Counter(re.sub(r'（.*', '', r[LIST_COL]) or '空欄' for r in q)))
     if missing:
         print('注意: 入力から消えたが社長入力があった行（シートからは落ちます）:', missing)
     if dry:
