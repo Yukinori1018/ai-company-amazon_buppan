@@ -438,6 +438,11 @@ def main():
         k = key_of(d)
         if k:
             keep[k] = d
+    # 縮小ガード（2026-10-11 事故：別フォルダから実行して入力0行のままシートを全消去した）。
+    # 入力が空、またはシートの現行行数の9割を下回るときは書かずに止める。意図した縮小は --allow-shrink
+    if not rows or (keep and len(rows) < len(keep) * 0.9 and '--allow-shrink' not in sys.argv):
+        sys.exit(f'中止: 入力 {len(rows)}行 < シート現行 {len(keep)}行の9割。入力CSVの場所（HERE={HERE}）を確認。'
+                 '意図した縮小なら --allow-shrink')
     for r in rows:
         old = keep.get(key_of(r))
         if not old:
