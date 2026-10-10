@@ -33,7 +33,9 @@
   掛からないよう、見出しの割合の数字は変数 HI / LO から組み立てている。中身は Amazon 側の
   公開価格から逆算した自社の上限であり、会員限定の取引条件ではない。
 
-実行：python3 sync_ledger.py [--dry-run]
+実行：python3 sync_ledger.py [--dry-run] [--through=batchL] [--unchecked-out=64_出品可否_未判定.csv]
+  --through       … 24_連絡先_batch*.csv をこのバッチ名まで（ファイル名順）読む。後ろは採取途中なので読まない
+  --unchecked-out … 出品可否が「未確認」の接触候補（＝ゲート一括確認の対象）を agent_output に書き出す
 """
 import csv, glob, math, os, re, sys, collections
 
@@ -111,6 +113,15 @@ LISTED_COLS = CHECKED_COLS + [LIST_COL]
 # 2026-10-10（タカシ）：社長承認「そのまま出品できる社から打診。基準は確保」。第1弾/第2弾/下書き済/対象外。ロジックは dashin_order.py
 import dashin_order as do
 DASHIN_CSV = '63_打診第1弾.csv'
+# 2026-10-10（タカシ）：出品可否が未実測の接触候補は空欄でなく「未確認」と書く（＝実測待ちと見て分かるように）。
+# 実測は scripts/sourcing_gate/gate_sweep_browser.md（ブラウザ）。結果は LIST_CSV に足して再同期する
+UNCHECKED = '未確認'
+UNCHECKED_COLS = ['送信順', '判定', '正式社名', 'ブランド', '代表ASIN', 'Amazon URL', '確認URL', '基準チェック', 'Amazon出品可否',
+                  'カート保持者', 'カート実画面確認', '紐付けの判定']
+
+
+def argval(name, default=''):
+    return next((a.split('=', 1)[1] for a in sys.argv if a.startswith(f'--{name}=')), default)
 COLS = LISTED_COLS + [do.COL]
 
 OWNER_COLS = ['接触ステータス', '接触日', 'メモ']
@@ -338,7 +349,9 @@ def collect():
     cand, profit = load_candidates(), load_profit()
     sources = [(os.path.join(HERE, '30_最終_50社.csv'), True),
                (os.path.join(HERE, '22_連絡先_印付き.csv'), False)]
-    sources += [(p, False) for p in sorted(glob.glob(os.path.join(HERE, '24_連絡先_*.csv')))]
+    last = argval('through')  # 例 batchL → 24_連絡先_batchL.csv まで
+    sources += [(p, False) for p in sorted(glob.glob(os.path.join(HERE, '24_連絡先_*.csv')))
+                if not last or os.path.basename(p) <= f'24_連絡先_{last}.csv']
     rows, seen, used = [], set(), []
     for path, existing in sources:
         n = 0
@@ -378,6 +391,8 @@ def collect():
     listing = {x['代表ASIN']: (x.get(LIST_COL) or '').strip() for x in read_csv(os.path.join(HERE, LIST_CSV))}
     for r in rows:
         r[LIST_COL] = listing.get(r['代表ASIN(タカシ)'], '')
+        if not r[LIST_COL] and j_rank(r['判定']) in (0, 1):
+            r[LIST_COL] = UNCHECKED  # 接触候補なのに未実測。対象外の行は従来どおり空欄
     rest = sorted([r for r in rows if j_rank(r['判定']) > 1], key=lambda r: (j_rank(r['判定']),) + base(r))
     return queue + rest, used, profit
 
@@ -459,6 +474,19 @@ def main():
     for name, lst, bad in dres['excluded']:
         print(f'  検算で外した: {name}（{lst}）: {"・".join(bad)}')
     print(f'{DASHIN_CSV}: {n_exp}行')
+    un = [r for r in rows if r[LIST_COL] == UNCHECKED]
+    out = argval('unchecked-out')
+    if out:
+        with open(os.path.join(HERE, out), 'w', encoding='utf-8-sig', newline='') as f:
+            w = csv.writer(f)
+            w.writerow(UNCHECKED_COLS)
+            for r in un:
+                a = r['代表ASIN(タカシ)']
+                w.writerow([r[C_ORDER], r['判定'], r['正式社名'], r['ブランド'], a, r['Amazon URL'],
+                            'https://sellercentral-japan.amazon.com/hz/approvalrequest/restrictions/approve'
+                            f'?asin={a}&itemcondition=New', r[CHECK_COL], UNCHECKED,
+                            r['_m']['カート保持者'], '済' if r['_m']['カート実画面確認'] else '未', r['_m']['紐付けの判定']])
+        print(f'{out}: {len(un)}行（出品可否 未確認の接触候補）')
     if missing:
         print('注意: 入力から消えたが社長入力があった行（シートからは落ちます）:', missing)
     if dry:

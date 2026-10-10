@@ -163,7 +163,7 @@ def classify(r: dict, list_col: str, check_col: str) -> tuple[str, list[str]]:
         return '対象外（基準NG）', []
     if chk != 'OK':
         return '対象外（基準未確認）', []
-    if not lst:
+    if not lst or lst.startswith('未確認'):  # 未確認＝sync_ledger が未実測の接触候補に入れる値
         return '対象外（出品可否 未実測）', []
     if (r.get('流通形態') or '').startswith(LIQUOR):
         return '対象外（酒類：販売免許なし）', []
