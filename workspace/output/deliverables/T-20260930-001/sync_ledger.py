@@ -100,7 +100,10 @@ OLD_COLS = BASE_COLS[:2] + [O_ORDER] + BASE_COLS[2:_i] + _OLD_PROFIT + BASE_COLS
 PREV_COLS = BASE_COLS[:2] + [C_ORDER, C_DIST] + BASE_COLS[2:_i] + PROFIT_COLS + BASE_COLS[_i:]
 # 2026-10-04 夜（サトル）：商品×社名の紐付け確認の4列を末尾に追加。直前の46列（PREV_COLS）からの移行を許す
 LINK_COLS = ['紐付けの判定', '紐付け根拠URL', 'Amazon上のブランド表記', 'Amazon上のメーカー表記']
-COLS = PREV_COLS + LINK_COLS
+LINKED_COLS = PREV_COLS + LINK_COLS
+# 2026-10-10（タカシ）：入口基準への適合チェックを末尾に1列追加。判定ロジックは criteria_check.py
+CHECK_COL = '基準チェック'
+COLS = LINKED_COLS + [CHECK_COL]
 
 OWNER_COLS = ['接触ステータス', '接触日', 'メモ']
 STATUS_OPTIONS = ["未接触", "送信済", "返信あり", "見積りあり", "成約", "お断り"]
@@ -119,6 +122,9 @@ JUDGE = ('【見積り判定表】メーカーから見積りが来たら、こ�
          f'見積り（着値・税込）が利益率{TE}%の上限以下なら、§3.3/§3.5 の地雷確認を通したうえで5〜10個テスト仕入れ。'
          '売れる量・儲かる額の予測はしない（テストの実績が唯一の正）。\n')
 NOTES = {
+    '基準チェック': ('リスト設計書§3-1/3-2・CLAUDE.md §3.3-5/§3.5 の入口基準に代表ASINが合うか（タカシ 2026-10-10・criteria_check.py）。\n'
+                 '月販≥50／本体365日在庫切れ率≥90%／FBA出品者≥1かつ新品出品≥2／売れ筋ランク≤5万／売価≥2,200円／カート保持者がメーカー本人でない。\n'
+                 'OK＝全部満たす／NG＝外れた基準と値／未確認＝データが無い項目。値の出典は実画面＞候補CSV＞Keepaキャッシュ（取得日は列ごとに異なる）。'),
     '紐付けの判定': ('代表ASINの商品が、この社の製造・販売品であることを公式ページで確かめた結果（サトル 2026-10-04）。\n'
                     '一致＝公式に同じ商品（商品名・容量・型番）あり／一致（表記ゆれ）＝Amazonのブランド欄が原料メーカー・ブランド名・海外製造元など（理由を併記）／'
                     '不一致＝別会社の商品／未確認＝公式に同商品のページなし。不一致・未確認は判定を「要確認」にして送信キューから外す。'),
@@ -347,6 +353,12 @@ def collect():
     queue = sorted([r for r in rows if j_rank(r['判定']) in (0, 1)], key=send_key)
     for i, r in enumerate(queue, 1):
         r[C_ORDER] = str(i)
+    import criteria_check as cc
+    kc = cc.load_keepa_cache()
+    for r in rows:
+        a = r['代表ASIN(タカシ)']
+        c = cand[0].get(a) or cand[1].get(r['メーカー名(タカシ)']) or {}
+        r[CHECK_COL] = cc.check(r, c, profit.get(a, {}), kc.get(a))
     rest = sorted([r for r in rows if j_rank(r['判定']) > 1], key=lambda r: (j_rank(r['判定']),) + base(r))
     return queue + rest, used, profit
 
@@ -374,6 +386,8 @@ def main():
     head = cur[0] if cur else []
     if head[:len(COLS)] == COLS:
         mode, cur_cols = '通常', COLS
+    elif head[:len(LINKED_COLS)] == LINKED_COLS and len([h for h in head if h]) == len(LINKED_COLS):
+        mode, cur_cols = '移行（50列→基準チェック1列追加・初回のみ）', LINKED_COLS
     elif head[:len(PREV_COLS)] == PREV_COLS and len([h for h in head if h]) == len(PREV_COLS):
         mode, cur_cols = '移行（46列→紐付け4列追加・初回のみ）', PREV_COLS
     elif head[:len(OLD_COLS)] == OLD_COLS and len([h for h in head if h]) == len(OLD_COLS):
@@ -408,6 +422,11 @@ def main():
     dc = collections.Counter(re.sub(r'（.*', '', r[C_DIST]) for r in rows)
     print('流通形態:', ' / '.join(f'{k} {v}' for k, v in dc.most_common()))
     print('送信順1-20:', '、'.join(r['正式社名'] or r['メーカー名(タカシ)'] for r in rows[:20]))
+    chk = collections.Counter(r[CHECK_COL].split('：')[0] for r in rows)
+    q = [r for r in rows if j_rank(r['判定']) in (0, 1)]
+    print('基準チェック 全体:', dict(chk), '/ 接触候補:', dict(collections.Counter(r[CHECK_COL].split('：')[0] for r in q)))
+    import criteria_check as cc
+    print('NG理由:', collections.Counter(t for r in rows for t in cc.reason_tags(r[CHECK_COL])).most_common())
     if missing:
         print('注意: 入力から消えたが社長入力があった行（シートからは落ちます）:', missing)
     if dry:
