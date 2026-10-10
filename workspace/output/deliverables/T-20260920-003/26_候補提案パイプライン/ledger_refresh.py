@@ -62,6 +62,12 @@ import score_20261004 as S     # noqa: E402
 import fba_cost                # noqa: E402
 sys.path.insert(0, str(REPO / "scripts/sourcing_gate"))
 import consistency as K        # noqa: E402
+import screen_checks as SC     # noqa: E402
+
+#: 人の実画面確認（カート・ゲート・キーゾン）。main() で読み込む。ここに載っている ASIN は
+#: 「確認者=カズヨ」でも凍結せず、毎回この証跡から人の値を合流させて引き直す。
+SCREEN = SC.ScreenChecks({}, {}, {})
+LEGAL = SC.load_legal()            # 法務判定で販売を止める行（GO にしない）
 
 WAIT_FULL: list[dict] = []     # 実画面確認待ち（NETSEA）の全列。autofill.py に渡す
 
@@ -104,6 +110,7 @@ ITEM = {
     "取引条件": "#4 仕入れ先の Amazon 出品可否",
     "Amazonカタログ": "#16 カタログJAN",
     "ゲート": "#1-2 出品許可",
+    "取り分": "#10 取り分と在庫月数",
 }
 HUMAN_ITEMS_BASE = ["#9 キーゾンで3か月の実数（型番ごと）",
                     "#5 カートの販売元を実画面で読む",
@@ -169,8 +176,18 @@ def reread_gates(s: dict) -> list[tuple[str, str, str, str]]:
 def fix_for(name: str, st: str, why: str, s: dict) -> tuple[str, bool]:
     """(こう変えれば, 変えようがないか)。"""
     e = s.get("econ")
+    if name == "カート保持者" and st == "FAIL" and "メーカー" in why:
+        return "変えようがない：メーカー/ブランド本人がカート（原価で負ける・§3.3-5）", True
     if name == "カート保持者" and st == "FAIL":
         return "変えようがない：Amazon 本体がカート（値下げしても取れない・§3.3-1）", True
+    if name == "カート保持者" and "疑い" in why:
+        return "出品者プロフィールの事業者名を見て、メーカーと別会社なら可", False
+    if name == "カート保持者" and "カートなし" in why:
+        return ("売価を相場（90日中央値）に戻せばカートを取れる可能性。出品一覧の最安の即納価格と"
+                "90日中央値を比べれば決まる"), False
+    if name == "取り分":
+        info = s.get("_share") or {}
+        return info.get("fix") or "人が確認すれば決まる", False
     if name == "カート保持者":
         return "実画面でカートの販売元を読めば決まる（カート不在なら出品者の内訳を見る）", False
     if name == "実売" and st == "FAIL":
@@ -246,8 +263,30 @@ def fix_profit(s: dict) -> str:
     return "／".join(parts)
 
 
+def apply_screen(s: dict, gates: list, gate: dict | None) -> bool:
+    """人の実画面確認を gates に合流させる。人の確認が1つでもあれば True。"""
+    a = s["asin"]
+    if not SCREEN.covers(a):
+        return False
+    c = SCREEN.cart.get(a)
+    if c:
+        st, why = SC.cart_gate(c)
+        gates[:] = [g for g in gates if g[0] != "カート保持者"] + [("カート保持者", st, why, "")]
+    sale_st = next((g[1] for g in gates if g[0] == "実売"), "UNKNOWN")
+    st, why, monthly = SC.sales(a, s, sale_st, SCREEN)
+    gates[:] = [g for g in gates if g[0] != "実売"] + [("実売", st, why, "")]
+    s["_sales_why"], s["_monthly"] = why, monthly
+    if st == "PASS" and monthly:
+        e = s.get("econ")
+        st2, why2, info = SC.share_gate(a, monthly, e.qty if e else None, s.get("min_lot"), False)
+        s["_share"] = info
+        gates.append(("取り分", st2, why2, ""))
+    return True
+
+
 def compose_netsea(s: dict, gate: dict | None) -> dict:
     gates = reread_gates(s)
+    screened = apply_screen(s, gates, gate)
     if gate:
         if gate["ゲート判定"] == "NG":
             gates.append(("ゲート", "FAIL", gate["根拠"], ""))
@@ -278,6 +317,25 @@ def compose_netsea(s: dict, gate: dict | None) -> dict:
         human.append("#1-2 ゲート（restrictions/approve）")
     human.append("#4 仕入れ先の Amazon 出品可否")
     waiting = False
+    if machine == "GO" and screened and SCREEN.cart.get(s["asin"]):
+        # 人がカートを見て、実売（キーゾン or 実画面の月販表示）と取り分まで通った行だけ GO
+        verdict, waiting = "GO", True
+        sh = s.get("_share") or {}
+        reason = ("GO：§3.5 の機械項目＋人の確認がすべて PASS。"
+                  f"#5 {next(g[2] for g in gates if g[0] == 'カート保持者')} ／ "
+                  f"#9 {s.get('_sales_why')} ／ #10 {next((g[2] for g in gates if g[0] == '取り分'), '')} ／ "
+                  f"#1-2 {(gate or {}).get('根拠', '')}（{(gate or {}).get('確認日', '')}） ／ "
+                  f"推奨初回 {sh.get('rec')}点（発注点数・粗利の列は採算計算時の点数）。"
+                  "発注直前に残す確認：#7 出品一覧の画面実数（いまは Keepa のカート対象数）・"
+                  "#4 卸の商品ページの注意事項・#17 卸の在庫と価格の取り直し・"
+                  "§3.5 21項目の記録（order-gate-guard）")
+        dn = SC.doc_note(s["row"].get("商品名") or "")
+        if dn:
+            reason += " ／ " + dn
+        if adj:
+            reason += " ／ 読み替え：" + " ／ ".join(adj)
+        return {"verdict": verdict, "reason": reason[:1800], "waiting": waiting,
+                "gates": gates, "screened": screened}
     if machine == "GO":
         verdict, waiting = "UNKNOWN", True
         head = "機械判定は通過・実画面確認待ち"
@@ -298,8 +356,10 @@ def compose_netsea(s: dict, gate: dict | None) -> dict:
                           + reason)
         if adj:
             reason += " ／ 読み替え：" + " ／ ".join(adj)
+    if screened:
+        reason = "（人の実画面確認を反映）" + reason
     return {"verdict": verdict, "reason": reason[:1800], "waiting": waiting,
-            "gates": gates}
+            "gates": gates, "screened": screened}
 
 
 def netsea_cells(s: dict, gate: dict | None, comp: dict) -> dict:
@@ -322,9 +382,50 @@ def netsea_cells(s: dict, gate: dict | None, comp: dict) -> dict:
         g[col] = val if val is not None else "未確認"
     g["判定"] = comp["verdict"]
     g["判定理由"] = comp["reason"]
+    lg = LEGAL.get(s["asin"])
+    if lg:
+        if g["判定"] == "GO":
+            g["判定"] = lg[0]
+        g["判定理由"] = (lg[1] + " ／ " + g["判定理由"])[:1800]
     g["確認方法"] = ("Keepa 取得済みデータで再採点（価格90日中央値・ランク12ヶ月・buybox）"
-                     f"{TODAY}" + ("＋セラセン restrictions/approve 10/09" if gate else ""))
+                     f"{TODAY}" + (f"＋セラセン restrictions/approve {gate.get('確認日', '')}"
+                                   if gate else ""))
     g["確認者"] = "タカシ（機械判定・実画面未確認）"
+    if comp.get("screened"):
+        g.update(screen_cells(s, gate))
+    return g
+
+
+def screen_cells(s: dict, gate: dict | None) -> dict:
+    """人の実画面確認を書く列（NETSEA・SD 共通）。"""
+    a, g, how, who = s["asin"], {}, [], []
+    c = SCREEN.cart.get(a)
+    if c:
+        g["カートの販売元"] = (f"{c.holder}（カズヨ実画面 {c.checked_at}" +
+                              (f"・{c.price}円" if c.price else "") +
+                              (f"・過去1か月 {c.sold_label}" if c.sold_label else "") + "）")
+        how.append(f"Chrome 実画面でカート保持者 {c.checked_at[:10]}")
+        who.append("カート")
+    if gate and gate.get("人"):
+        how.append(f"セラセン restrictions/approve {gate['確認日']}")
+        who.append("ゲート")
+    k = SCREEN.keizon.get(a)
+    if k:
+        g["キーゾン 平均月販"] = (f"{k.avg:g}" if k.avg is not None else k.label)
+        for i, col in enumerate(("キーゾン 過去1ヶ月", "キーゾン 過去2ヶ月", "キーゾン 過去3ヶ月")):
+            g[col] = k.months[i] if len(k.months) > i else k.label
+        how.append(f"キーゾン（ASIN 単位）{k.checked}")
+        who.append("キーゾン")
+    sh = s.get("_share") or {}
+    if sh.get("src"):
+        g["新品出品者数(画面実数)"] = (f"未確認（Keepa {sh['src']} カート対象：FBA {sh['fba']}／"
+                                    f"自己発送 {sh['fbm']}）")
+    if sh.get("months"):
+        g["売り切る月数"] = (f"{sh['months']:.1f}（推奨初回 {sh['rec']}点÷取り分 "
+                           f"{sh['share']:.1f}個/月）")
+    if how:
+        g["確認方法"] = "＋".join(how) + f"＋Keepa 取得済みデータで機械判定 {TODAY}"
+        g["確認者"] = f"カズヨ（実画面：{'・'.join(who)}）／タカシ（機械判定）"
     return g
 
 
@@ -527,9 +628,51 @@ def sd_rows(header: list[str]) -> tuple[list[list], list[dict]]:
     return out, waiting
 
 
+def sd_screen(cells: dict) -> dict:
+    """SD 行に人の実画面確認（カート・ゲート）を合流させる。卸価格待ちの判定は動かさない。"""
+    a = cells["ASIN"]
+    if not SCREEN.covers(a):
+        return cells
+    cells = dict(cells)
+    gate = SCREEN.gate.get(a)
+    pre, fail, never = [], False, ""
+    c = SCREEN.cart.get(a)
+    if c:
+        st, why = SC.cart_gate(c)
+        pre.append(f"#5 カートの販売元 {st}：{why}")
+        if st == "FAIL":
+            fail = True
+            never = ("変えようがない：メーカー/ブランド本人がカート（§3.3-5）" if "メーカー" in why
+                     else "変えようがない：Amazon 本体がカート（§3.3-1）")
+    if gate and gate.get("人"):
+        cells["ゲート種別"] = f"restrictions/approve（{gate['確認日']}）：{gate['根拠']}"
+        cells["ゲート可否"] = "可（新品）" if gate["ゲート判定"] == "OK" else "不可（新品の申請経路なし）"
+        pre.append(f"#1-2 出品許可 {'PASS' if gate['ゲート判定'] == 'OK' else 'FAIL'}：{gate['根拠']}")
+        if gate["ゲート判定"] != "OK":
+            fail, never = True, "変えようがない：新品の申請経路が無い（§3.3-25）"
+    k = SCREEN.keizon.get(a)
+    if k:
+        pre.append(f"#9 キーゾン {k.label}")
+    elif c and c.sold_label:
+        pre.append(f"#9 実画面 過去1か月 {c.sold_label}（キーゾン未確認）")
+    cells.update({x: y for x, y in screen_cells({"asin": a}, gate).items()})
+    head = "（人の実画面確認を反映）" + " ／ ".join(pre) + "。"
+    if fail:
+        cells["判定"] = "NO-GO"
+        cells["判定理由"] = (head + f"【こう変えれば】{never} ／ 機械判定："
+                            + cells["判定理由"])[:1800]
+    else:
+        cells["判定理由"] = (head + "残り：" + cells["判定理由"])[:1800]
+    return cells
+
+
 # ── 本体 ────────────────────────────────────────────────────────────────
 
 def is_human(row: dict) -> bool:
+    """凍結する人の行か。実画面確認の証跡ファイル（screen_checks）に載っている ASIN は
+    凍結せず、毎回その証跡から人の値を合流させて引き直す（2026-10-11）。"""
+    if SCREEN.covers(row.get("ASIN", "")):
+        return False
     return "カズヨ" in (row.get("確認者") or "")
 
 
@@ -543,7 +686,10 @@ def main(argv=None) -> int:
     from google.oauth2.service_account import Credentials
     gc = gspread.authorize(Credentials.from_service_account_file(
         str(CRED), scopes=["https://www.googleapis.com/auth/spreadsheets"]))
-    ws = gc.open_by_key(SHEET_ID).worksheet("判定台帳")
+    sh = gc.open_by_key(SHEET_ID)
+    ws = sh.worksheet("判定台帳")
+    global SCREEN
+    SCREEN = SC.load(sh, load_gate_checks())
     vals = ws.get_all_values()
     stamp = date.today().strftime("%Y%m%d") + "_" + os.environ.get("RUN_TAG", "run")
     (OUT / f"before_{stamp}.json").write_text(json.dumps(vals, ensure_ascii=False))
@@ -555,7 +701,7 @@ def main(argv=None) -> int:
     before = count(rows)
 
     scored = score_netsea()
-    gates = load_gate_checks()
+    gates = SCREEN.gate
     by_asin: dict[str, dict] = {}
     for s in scored:  # 同じ ASIN が2行あれば、判定の良い方（GO>UNKNOWN>NO-GO）を採る
         k = s["asin"]
@@ -607,12 +753,13 @@ def main(argv=None) -> int:
         if is_human(r):
             skipped_human += 1
             continue
-        r.update(dict(zip(header, ln)))
+        r.update(sd_screen(dict(zip(header, ln))))
         updated += 1
     human_sd = {r["ASIN"] for r in rows
                 if r["卸サイト"] == "スーパーデリバリー" and is_human(r)}
     sd_wait = [w for w in sd_wait if w["ASIN"] not in human_sd]
-    sd_lines = [ln for ln in sd_lines if ln[ia] not in have_sd]
+    sd_lines = [[sd_screen(dict(zip(header, ln)))[h] for h in header]
+                for ln in sd_lines if ln[ia] not in have_sd]
     waiting += sd_wait
 
     final = [[r[h] for h in header] for r in rows] + appended + sd_lines

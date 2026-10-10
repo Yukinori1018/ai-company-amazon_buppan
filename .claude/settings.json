@@ -1,4 +1,35 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash",
+      "Read",
+      "Write",
+      "Edit",
+      "Glob",
+      "Grep",
+      "Agent",
+      "WebFetch",
+      "WebSearch",
+      "mcp__scheduled-tasks__list_scheduled_tasks",
+      "mcp__scheduled-tasks__list_task_runs",
+      "mcp__claude-in-chrome__tabs_context_mcp",
+      "mcp__claude-in-chrome__tabs_create_mcp",
+      "mcp__claude-in-chrome__navigate",
+      "mcp__claude-in-chrome__get_page_text",
+      "mcp__claude-in-chrome__read_page",
+      "mcp__claude-in-chrome__find",
+      "mcp__claude-in-chrome__computer"
+    ],
+    "deny": [
+      "Bash(git push --force*)",
+      "Bash(git push -f*)",
+      "Bash(git reset --hard*)",
+      "Bash(rm -rf*)",
+      "mcp__b84f7bcc-0b3f-4526-83f8-092de916aae4__send_message",
+      "mcp__b84f7bcc-0b3f-4526-83f8-092de916aae4__reply",
+      "mcp__b84f7bcc-0b3f-4526-83f8-092de916aae4__forward"
+    ]
+  },
   "hooks": {
     "SessionStart": [
       {

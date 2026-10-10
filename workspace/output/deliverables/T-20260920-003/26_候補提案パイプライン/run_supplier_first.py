@@ -45,6 +45,8 @@ WORK = REPO / "workspace/output/agent_output/T-20260920-003/pipeline"
 TRIED = WORK / "tried_jans.json"       # 一度 Keepa に投げた JAN（二度払わないため）
 BUDGET = WORK / "daily_token_budget.json"   # 日ごとの消費（1日の上限を跨いだ実行でも守る）
 STOP = WORK / "STOP"                   # これがあれば起動しない（消し方は起動時に案内する）
+RR_STATE = WORK / "roundrobin_state.json"   # ラウンドロビンの現在位置（経路・出店者）
+PER_BRAND = 20                         # 1出店者20件で次へ（§3.3-34 の引き金。上限ではない）
 
 
 def spent_today(path: Path = BUDGET) -> tuple[str, int, dict]:
@@ -166,6 +168,53 @@ def plan(index: dict, tried: set[str]) -> list[tuple[int, str, dict]]:
     return sorted(rows, key=key)
 
 
+def brand_key(rec: dict) -> str:
+    """ラウンドロビンの単位。NETSEA の索引にはブランド欄が無いので**出店者（shop）**で代用する。"""
+    return str(rec.get("shop_id") or rec.get("supplier_name") or "?")
+
+
+def plan_roundrobin(index: dict, tried: set[str],
+                    per_brand: int = PER_BRAND) -> list[tuple[int, str, dict]]:
+    """`plan()` と同じ対象を、**同じ tier の中で出店者ごとに20件ずつ順番に**並べ直す。
+
+    🔴 これは「上限」ではなく「順番」です（CLAUDE.md §3.3-34）。
+    20件で次の出店者へ移り、一巡したら先頭の出店者に戻って続きを20件。**誰も打ち切らない。**
+    tier の優先（黒字が見込める順）は崩さない。崩すと楽な棚から先に見る利点が消えるため。
+    カテゴリーは JAN の段階では分からない（Keepa を引くまで不明）ので、ここでは回せない。
+    """
+    from collections import OrderedDict
+    base = plan(index, tried)
+    out: list[tuple[int, str, dict]] = []
+    by_tier: "OrderedDict[int, OrderedDict[str, list]]" = OrderedDict()
+    for row in base:                       # base は tier→余裕の順。その順を各キュー内に保つ
+        by_tier.setdefault(row[0], OrderedDict()).setdefault(brand_key(row[2]), []).append(row)
+    for _t, queues in by_tier.items():
+        qs = [list(q) for q in queues.values()]
+        while any(qs):
+            for q in qs:
+                out.extend(q[:per_brand])
+                del q[:per_brand]
+    return out
+
+
+def write_rr_state(rows_done: list[tuple[int, str, dict]], rest: int) -> None:
+    """どこまで進んだかを `roundrobin_state.json` に残す（翌晩の人が読める形で）。"""
+    from collections import Counter
+    st = json.loads(RR_STATE.read_text()) if RR_STATE.exists() else {}
+    if not rows_done:
+        return
+    t, jan, rec = rows_done[-1]
+    st.setdefault("routes", {})["NETSEA"] = {
+        "updated": time.strftime("%Y-%m-%d %H:%M"),
+        "position": {"tier": t, "brand(shop)": brand_key(rec), "last_jan": jan},
+        "this_run_jans": len(rows_done),
+        "this_run_brands": len({brand_key(r) for _t, _j, r in rows_done}),
+        "this_run_by_tier": dict(sorted(Counter(tt for tt, _j, _r in rows_done).items())),
+        "remaining_jans": rest,
+    }
+    RR_STATE.write_text(json.dumps(st, ensure_ascii=False, indent=1))
+
+
 # ── 残高を見てから投げる ──────────────────────────────────────────────────
 
 
@@ -184,6 +233,8 @@ def main() -> int:
     ap.add_argument("--floor", type=int, default=240, help="これ以下まで減らさない残高")
     ap.add_argument("--minutes", type=int, default=75, help="通算の上限（分）")
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--order", choices=("roundrobin", "tier"), default="roundrobin",
+                    help="roundrobin＝同じ tier の中で出店者20件ずつ順番に（既定・§3.3-34）")
     a = ap.parse_args()
 
     if STOP.exists():
@@ -206,7 +257,7 @@ def main() -> int:
 
     index = discover.load_index()["jans"]
     tried = set(json.loads(TRIED.read_text()) if TRIED.exists() else [])
-    todo = plan(index, tried)
+    todo = plan_roundrobin(index, tried) if a.order == "roundrobin" else plan(index, tried)
     from collections import Counter
     print(f"索引 {len(index):,}件 / 既投 {len(tried):,}件 → 今回の対象 {len(todo):,}件")
     print("  tier 内訳:", dict(sorted(Counter(t for t, _, _ in todo).items())))
@@ -219,6 +270,7 @@ def main() -> int:
     key = load_api_key()
     cache = discover.load_cache()
     spent_total, start = 0, time.time()
+    done_rows: list[tuple[int, str, dict]] = []
     i = 0
     while i < len(todo) and spent_total < a.total_tokens:
         if STOP.exists():
@@ -247,6 +299,7 @@ def main() -> int:
         for c in cands:
             cache.setdefault("candidates", {})[c.asin] = c.__dict__
         tried.update(jans)
+        done_rows.extend(chunk)
         discover.save_cache(cache)
         TRIED.write_text(json.dumps(sorted(tried)))
         if a.daily_tokens:
@@ -255,6 +308,7 @@ def main() -> int:
               f"{len(cache.get('candidates', {}))}件 ==", flush=True)
 
     rest = len(todo) - i
+    write_rr_state(done_rows, rest)
     print(f"\n完了: 消費 {spent_total} / 候補プール {len(cache.get('candidates', {}))}件 / "
           f"未投入の JAN 残り {rest:,}件")
     if a.daily_tokens:

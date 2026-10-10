@@ -120,6 +120,70 @@ UNCHECKED_COLS = ['送信順', '判定', '正式社名', 'ブランド', '代表
                   'カート保持者', 'カート実画面確認', '紐付けの判定']
 
 
+# 2026-10-11（タカシ）：カズヨの実画面確認（カート保持者 65_*／新品の出品可否 62b_*）を合流する。
+# 元の batch CSV は書き換えず、同期のたびにこの証跡ファイルから上書きする（人の値は毎回同じに戻る）
+CART_GLOB = '65_カート確認_*.csv'
+GATE_GLOB = '62b_出品可否_*.csv'
+MAKER_FLAGS_GLOB = os.path.join(HERE, '..', 'T-20260920-003', 'ledger20261010', 'cart_maker_flags_*.csv')
+
+
+def apply_screen_checks(rows):
+    """カート保持者・月販表示・判定（本体/本人カート）を実画面の値で上書き。件数を返す。"""
+    cart = {}
+    for p in sorted(glob.glob(os.path.join(HERE, CART_GLOB))):
+        for x in read_csv(p):
+            cart[x['ASIN'].strip()] = x
+    flags = {}
+    for p in sorted(glob.glob(MAKER_FLAGS_GLOB)):
+        for x in read_csv(p):
+            flags[x['ASIN'].strip()] = x['根拠']
+    n = collections.Counter()
+    for r in rows:
+        a = r['代表ASIN(タカシ)']
+        x = cart.get(a)
+        if not x:
+            continue
+        day = (x.get('確認時刻') or '')[5:10].replace('-', '/')
+        holder = (x.get('カート保持者(実画面)') or '').strip() or \
+            ('カートなし' if (x.get('カートあり') or '').strip() == 'N' else '')
+        r['カート保持者(実画面9/30)'] = f'{holder}（{day}実画面確認・カズヨ）'
+        sold = (x.get('過去1か月(実画面・下限)') or x.get('過去1か月(実画面)') or '').strip()
+        r['過去1ヶ月の販売数(実画面9/30)'] = (f'{sold}（実画面{day}）' if sold
+                                         else f'表示なし（月50個未満）／実画面{day}')
+        n['カート反映'] += 1
+        if not r['判定'].startswith(OK_STATUS):
+            continue
+        if 'Amazon.co.jp' in holder:
+            r['判定'] = f'除外：Amazon本体がカート（§3.3-1・実画面{day}）'
+            n['本体カートで除外'] += 1
+        elif a in flags or '疑い' in (x.get('注意') or ''):
+            why = flags.get(a) or x.get('注意')
+            r['判定'] = f'要確認：カートがメーカー/ブランド本人の疑い（{holder}・{why}）'
+            n['本人カート疑いで要確認'] += 1
+    return n
+
+
+def apply_gate_checks(listing):
+    """62b（restrictions/approve・§3.3-25 の正）を 10/10 の lookupAsin に重ねる。"""
+    n = collections.Counter()
+    for p in sorted(glob.glob(os.path.join(HERE, GATE_GLOB))):
+        for x in read_csv(p):
+            a, v = x['ASIN'].strip(), (x.get('新品の出品可否') or '').strip()
+            day = (x.get('確認時刻') or '')[5:10].replace('-', '/')
+            prev = listing.get(a, '')
+            if not v.upper().startswith('OK'):
+                listing[a] = f'出品不可（新品の申請経路なし・{day} restrictions/approve）'
+                n['出品不可'] += 1
+            elif prev.startswith('出品許可が必要'):
+                listing[a] = f'{prev}／{day} 新品の申請経路あり'      # 許可の要否は lookupAsin が正
+                n['出品許可が必要（申請経路あり）'] += 1
+            else:
+                listing[a] = (f'出品できる（新品・{day} restrictions/approve'
+                              + (f'。10/10 lookupAsin は {prev}' if prev else '') + '）')
+                n['出品できる'] += 1
+    return n
+
+
 def argval(name, default=''):
     return next((a.split('=', 1)[1] for a in sys.argv if a.startswith(f'--{name}=')), default)
 COLS = LISTED_COLS + [do.COL]
@@ -375,6 +439,8 @@ def collect():
         return int(m.group()) if m else 0
 
     # 送信順＝成約しやすさ（§3.5）。①流通形態 ②窓口 ③規模 ④新品出品者数 降順 ⑤該当ASIN数 降順
+    global SCREEN_N
+    SCREEN_N = apply_screen_checks(rows)
     send_key = lambda r: (j_rank(r['判定']), r['_dist'], r['_contact'], r['_scale'], -sellers(r), -asin_n(r),
                           r['優先度'] or 'Z', key_of(r))
     base = lambda r: (r['優先度'] or 'Z', -asin_n(r), key_of(r))
@@ -389,6 +455,8 @@ def collect():
         r[CHECK_COL] = cc.check(r, c, profit.get(a, {}), kc.get(a))
         r['_m'] = do.measure(r, c, profit.get(a, {}), kc.get(a))
     listing = {x['代表ASIN']: (x.get(LIST_COL) or '').strip() for x in read_csv(os.path.join(HERE, LIST_CSV))}
+    global GATE_N
+    GATE_N = apply_gate_checks(listing)
     for r in rows:
         r[LIST_COL] = listing.get(r['代表ASIN(タカシ)'], '')
         if not r[LIST_COL] and j_rank(r['判定']) in (0, 1):
@@ -479,6 +547,7 @@ def main():
     for name, lst, bad in dres['excluded']:
         print(f'  検算で外した: {name}（{lst}）: {"・".join(bad)}')
     print(f'{DASHIN_CSV}: {n_exp}行')
+    print('実画面の合流:', dict(SCREEN_N), dict(GATE_N))
     un = [r for r in rows if r[LIST_COL] == UNCHECKED]
     out = argval('unchecked-out')
     if out:
