@@ -546,11 +546,11 @@ def _c_sentinel_margin(row: dict, ctx: dict) -> Optional[Finding]:
 def _c_grade_rule(row: dict, ctx: dict) -> Optional[Finding]:
     """等級が A/B/C の規定どおりか（中央と悲観の数字から再判定して突き合わせる）。
 
-    規定（`fba_cost.grade()`）: A＝中央も悲観も「利益率20%以上 **または** 手残り400円以上」／
-    B＝中央は満たすが悲観で割れる／C＝中央で満たさない。
-    ⚠️ CLAUDE.md §3.5 の表には「利益率20%以上」しか書いておらず、**実装の OR 条件が落ちています**。
-       規定と実装の粒度ずれ（§3.3-22）なので、ここでは**実装＝社長指示（単価ではなく利益額で切る）**
-       に合わせ、文書の方を直してもらうよう報告します。
+    規定（CLAUDE.md §3.5 #18 ＝ `fba_cost.grade()`・2026-10-11 に両者を揃えた）:
+    A＝中央も悲観も「利益率20%以上 **または** 手残り400円以上」／
+    B＝中央で「利益率5%以上 **または** 手残り400円以上」かつ A でない／C＝中央でどちらも満たさない。
+    推定費目があると数字が A でも B に留まる（天井）。表からは推定費目が読めないので、
+    **数字が A で表が B の行は NG にしない**（安全側への格下げ）。逆向き（数字が B で表が A）は NG。
     """
     g = get(row, COLS.grade).strip()
     if g not in ("A", "B", "C") or F is None:
@@ -563,14 +563,16 @@ def _c_grade_rule(row: dict, ctx: dict) -> Optional[Finding]:
                        {"中央手残り": net, "中央利益率": mar,
                         "悲観手残り": wn, "悲観利益率": wm})
     tgt, floor = F.TARGET_MARGIN * 100, F.MIN_PROFIT_YEN
-    ok_mid = mar >= tgt or net >= floor
-    ok_bad = wm >= tgt or wn >= floor
-    exp = "C" if not ok_mid else ("A" if ok_bad else "B")
-    if exp == g:
+    low = getattr(F, "MIN_MARGIN_B", 0.05) * 100
+    ok_b = mar >= low or net >= floor
+    ok_a = (mar >= tgt or net >= floor) and (wm >= tgt or wn >= floor)
+    exp = "C" if not ok_b else ("A" if ok_a else "B")
+    if exp == g or (exp == "A" and g == "B"):
         return None
     return Finding("grade_rule", NG,
                    f"等級が合いません。中央 {net:,.0f}円/{mar:.1f}%・悲観 {wn:,.0f}円/{wm:.1f}% なら "
-                   f"**{exp}**（基準：利益率{tgt:g}%以上 または 手残り{floor:,}円以上）ですが、"
+                   f"**{exp}**（A：利益率{tgt:g}%以上 または {floor:,}円以上／B：中央で{low:g}%以上 "
+                   f"または {floor:,}円以上）ですが、"
                    f"表は {g} です。",
                    {"表の等級": g, "計算値": exp})
 

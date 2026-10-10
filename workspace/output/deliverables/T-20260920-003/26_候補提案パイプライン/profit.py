@@ -118,7 +118,8 @@ def compute(sell: float, fee_pct: float, fba_yen: float,
             size_tier: str | None = None,
             category: str | None = None,
             unit_decided: bool = True,
-            peak: bool = False, apparel: bool = False) -> Economics:
+            peak: bool = False, apparel: bool = False,
+            estimated: tuple[str, ...] = ()) -> Economics:
     """1 SKU ぶんの採算。すべて円・整数に丸めて返す（報告と同じ粒度）。
 
     2026-10-04 に変わったところ（成果物33 / 34）
@@ -160,7 +161,7 @@ def compute(sell: float, fee_pct: float, fba_yen: float,
 
     g = fba_cost.grade(sell_i, cost_i, tier, category=category, keepa_pct=fee_pct,
                        months_to_sell=months_for_storage, peak=peak, apparel=apparel,
-                       unit_decided=unit_decided)
+                       unit_decided=unit_decided, estimated=estimated)
 
     return Economics(
         sell=sell_i,

@@ -57,13 +57,17 @@ OUT = WORK / "score20261004"
 TODAY = (date.fromisoformat(os.environ["SCORE_TODAY"])
          if os.environ.get("SCORE_TODAY") else date.today())
 MAX_ORDER_TOTAL_YEN = 80_000        # 1 SKU の発注額の上限（残枠）
-# 実売の代理：ランクがこれ以内なら「売れている」とみなす。
-# 🔴 **300,000 は当社のプールを作ったときの基準そのものです**（memory
-# `project_research_criteria_v13`「ランク30万」）。2026-10-04 に私が 100,000 へ締めたら
-# **候補が0件**になりました。母数を 30万位で集めておいて 10万位で判定するのは、
-# 自分のコードが条件を壊している例です（CLAUDE.md §3.3-19）。
-# 緩めた/締めたときの件数は `--relax` で出ます。
-RANK_OK = 300_000
+# 実売の代理：売れ筋ランクは「死んでいないこと」の確認にしか使わない（CLAUDE.md §3.3-8）。
+#   RANK_PASS 以内 … PASS（根拠はランクだけ＝弱）
+#   RANK_PASS〜RANK_DEAD … UNKNOWN（キーゾンで人が実数を見る）
+#   RANK_DEAD より下 … FAIL（NO-GO）
+# 🔴 2026-10-11 に規定へ合わせて直した。旧実装は RANK_OK=300,000 で「30万位より下は FAIL」
+#    だったため、§3.3-8 で UNKNOWN の 30万〜50万位を落とし、10万〜30万位を PASS にしていた
+#    （§3.3-22 規定と実装の粒度ずれ）。10万〜30万位は FAIL ではなく UNKNOWN なので、
+#    2026-10-04 の「10万に締めたら候補0件」（§3.3-19）とは違い、人が見る列に残る。
+RANK_PASS = 100_000
+RANK_DEAD = 500_000
+RANK_OK = RANK_PASS     # 旧名（感度表の「いまここ」の印に使う）
 TOP_N = 30
 
 AMAZON_SELLER_IDS = {"AN1VRQENFRJN5"}   # Amazon.co.jp 本体
@@ -186,36 +190,39 @@ def velocity_of(product: dict, shared_ranks: dict[int, int] | None = None
     """
     s = product.get("stats") or {}
     cur = s.get("current") or []
-    rank = cur[3] if len(cur) > 3 and cur[3] and cur[3] > 0 else None
+    rank = cur[3] if len(cur) > 3 and isinstance(cur[3], int) and cur[3] > 0 else None
     ms = product.get("monthlySold")
-    ms = int(ms) if isinstance(ms, int) and ms > 0 else None
+    ms = int(ms) if isinstance(ms, int) and not isinstance(ms, bool) and ms > 0 else None
     if ms:
         return ("PASS", f"過去1ヶ月に {ms}個 売れています（Keepa monthlySold）。", ms, rank)
-    n_share = (shared_ranks or {}).get(rank or -1, 1)
-    if n_share > 1 and rank and rank > RANK_OK:
-        # 共有ランクでも、**その値そのものが遅い**なら family 全体が売れていません。
-        # 兄弟の誰かが売れていればランクは上がるので、605,794位 の共有ランクは
-        # 「この子が売れていないかもしれない」ではなく「**一族が売れていない**」。
-        return ("FAIL",
-                f"売れ筋ランク {rank:,}位 を他の {n_share - 1} ASIN と共有していますが、"
-                f"**その共有ランク自体が {RANK_OK:,}位より下**です。"
-                f"兄弟の誰かが売れていればランクは上がるので、**一族ごと売れていません。**",
-                None, rank)
+    if not rank:
+        return ("UNKNOWN", "販売数もランクも取れていません。", None, None)
+    n_share = (shared_ranks or {}).get(rank, 1)
+    if rank > RANK_DEAD:
+        if n_share > 1:
+            # 共有ランクでも、**その値そのものが遅い**なら family 全体が売れていません。
+            # 兄弟の誰かが売れていればランクは上がるので「一族が売れていない」。
+            return ("FAIL",
+                    f"売れ筋ランク {rank:,}位 を他の {n_share - 1} ASIN と共有していますが、"
+                    f"**その共有ランク自体が {RANK_DEAD:,}位より下**です。"
+                    f"兄弟の誰かが売れていればランクは上がるので、**一族ごと売れていません。**",
+                    None, rank)
+        return ("FAIL", f"販売数の表示がなく、売れ筋ランクも {rank:,}位（{RANK_DEAD:,}位より下）"
+                        f"です。**売れている根拠がありません**（§3.3-8）。", None, rank)
     if n_share > 1:
         return ("UNKNOWN",
                 f"売れ筋ランク {rank:,}位 を**他の {n_share - 1} ASIN と共有**しています"
                 f"＝バリエーションの family 共有ランクです。**この ASIN が売れている根拠に"
                 f"なりません**（兄弟の売上でもランクは付く）。販売数の表示も無いので、"
                 f"キーゾンで3か月の実数を人が見てください。", None, rank)
-    if rank and rank <= RANK_OK:
+    if rank <= RANK_PASS:
         return ("PASS", f"販売数の表示はありません（月50個未満）が、売れ筋ランク {rank:,}位 "
-                        f"＝ {RANK_OK:,}位以内で、他 ASIN と共有していません。"
+                        f"＝ {RANK_PASS:,}位以内で、他 ASIN と共有していません。"
                         f"**根拠はランクだけ（弱）**で、実数はキーゾンで人が見てください。",
                 None, rank)
-    if rank:
-        return ("FAIL", f"販売数の表示がなく、売れ筋ランクも {rank:,}位（{RANK_OK:,}位より下）"
-                        f"です。**売れている根拠がありません。**", None, rank)
-    return ("UNKNOWN", "販売数もランクも取れていません。", None, None)
+    return ("UNKNOWN", f"販売数の表示がなく、売れ筋ランク {rank:,}位＝{RANK_PASS:,}〜"
+                       f"{RANK_DEAD:,}位の間です（§3.3-8 の UNKNOWN）。"
+                       f"キーゾンで3か月の実数を人が見てください。", None, rank)
 
 
 def build(row: dict, cand: dict, product: dict, idx: dict, names: dict,
@@ -322,9 +329,14 @@ def build(row: dict, cand: dict, product: dict, idx: dict, names: dict,
         e = profit.compute(sell, fee_pct, fba_yen, unit_cost, qty,
                            monthly_sold=ms_for_qty, category=cat, unit_decided=True)
         # 悲観側の売価（90日の下位25%）を効かせて等級を引き直す。
+        est = []
+        if not (product.get("fbaFees") or {}).get("pickAndPackFee"):
+            est.append("FBA配送代行（Keepa 実測なし・候補表の値）")
+        if not ms:
+            est.append("保管月数（月販の表示なしで売り切り月数が実測でない）")
         gr = fba_cost.grade(sell, unit_cost, e.size_tier, category=cat, keepa_pct=fee_pct,
                             months_to_sell=e.months_to_sell or 3.0,
-                            unit_decided=True, sell_worst=sell_bad)
+                            unit_decided=True, sell_worst=sell_bad, estimated=tuple(est))
         e.grade, e.grade_reason = gr.grade, gr.reason
         e.worst_net_per_unit = gr.worst.get("手残り")
         e.worst_margin_pct = gr.worst.get("利益率(%)")

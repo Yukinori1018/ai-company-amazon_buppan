@@ -156,13 +156,8 @@ def reread_gates(s: dict) -> list[tuple[str, str, str, str]]:
     e = s.get("econ")
     for name, st, why in s["gates"]:
         note = ""
-        if name == "実売" and st == "FAIL" and s.get("rank") and s["rank"] <= 500_000:
-            st, note = "UNKNOWN", "§3.3-8 では10万〜50万位は UNKNOWN（実装は30万位より下で FAIL）"
-        if (name == "採算" and st == "FAIL" and e and e.grade == "C"
-                and (e.net_margin_pct or -99) >= 5.0):
-            st, note = "PASS", (f"§3.5 #18 では中央値で利益率5%以上は B（実装は20%未満を C）。"
-                                f"中央値 {e.net_margin_pct}%・手残り {yen(e.net_per_unit)}")
-            s["_grade_adj"] = "B（§3.5読み替え）"
+        # 2026-10-11：実売（§3.3-8）と採算 B（§3.5 #18）の読み替えは、ライブラリ本体
+        # （score_20261004.velocity_of / fba_cost.grade）を規定に合わせて直したので撤去した。
         if name == "採算" and st == "FAIL" and e and e.grade in ("A", "B") \
                 and e.order_total > S.MAX_ORDER_TOTAL_YEN:
             st, note = "PASS", (f"等級 {e.grade}。発注額 {yen(e.order_total)} が1SKU枠を超えるだけ"
@@ -414,14 +409,11 @@ def sd_rows(header: list[str]) -> tuple[list[list], list[dict]]:
         gr = None
         split_note = ""
         def _grade(nn):
-            g_ = fba_cost.grade(sell, num(mp["卸価格_税抜_1点"]) * 1.1 * nn, tier,
-                                keepa_pct=num(r["販売手数料率(%)"]),
-                                sell_worst=num(r["保守値(90日の下位25%)"]))
-            # §3.5 #18 の B（中央値5%以上）に読み替え
-            if g_.grade == "C" and g_.mid.get("利益率(%)", -99) >= 5.0:
-                g_.grade = "B"
-                g_.reason += "（§3.5 #18 の読み替えで B：中央値5%以上）"
-            return g_
+            # 売り切り月数は3か月の仮置き（SD 行は月販から月数を出していない）＝推定費目
+            return fba_cost.grade(sell, num(mp["卸価格_税抜_1点"]) * 1.1 * nn, tier,
+                                  keepa_pct=num(r["販売手数料率(%)"]),
+                                  sell_worst=num(r["保守値(90日の下位25%)"]),
+                                  estimated=("保管月数（3か月の仮置き）",))
         if mp and num(mp.get("卸価格_税抜_1点")) and sell and n and tier:
             if r.get("セット数の確度") in ("確定", "単独"):
                 gr = _grade(n)
@@ -599,9 +591,28 @@ def main(argv=None) -> int:
         if comp["waiting"]:
             waiting.append(wait_row(s, dict(zip(header, line)), "NETSEA"))
 
-    have_sd = {r["ASIN"] for r in rows if r["卸サイト"] == "スーパーデリバリー"}
+    # SD 行：既にある行も引き直す（人の行は触らない）。2026-10-11 まで既存の SD 行は
+    # 飛ばしていたため、卸価格や規定が変わっても台帳に反映されなかった。
     sd_lines, sd_wait = sd_rows(header)
-    sd_lines = [ln for ln in sd_lines if ln[header.index("ASIN")] not in have_sd]
+    ia = header.index("ASIN")
+    sd_by_asin = {ln[ia]: ln for ln in sd_lines}
+    have_sd = set()
+    for r in rows:
+        if r["卸サイト"] != "スーパーデリバリー":
+            continue
+        have_sd.add(r["ASIN"])
+        ln = sd_by_asin.get(r["ASIN"])
+        if not ln:
+            continue
+        if is_human(r):
+            skipped_human += 1
+            continue
+        r.update(dict(zip(header, ln)))
+        updated += 1
+    human_sd = {r["ASIN"] for r in rows
+                if r["卸サイト"] == "スーパーデリバリー" and is_human(r)}
+    sd_wait = [w for w in sd_wait if w["ASIN"] not in human_sd]
+    sd_lines = [ln for ln in sd_lines if ln[ia] not in have_sd]
     waiting += sd_wait
 
     final = [[r[h] for h in header] for r in rows] + appended + sd_lines
