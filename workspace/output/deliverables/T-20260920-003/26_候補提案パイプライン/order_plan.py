@@ -13,7 +13,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import date
+from fractions import Fraction
 from itertools import combinations
+import math
 
 BUDGET_YEN = 80_000
 SKU_PER_PLAN = 3
@@ -266,8 +268,13 @@ def _min_lot_in_amazon_units(r: dict, s: dict) -> int:
         lot = int(float(r.get("卸の最小ロット(点)") or 1))
     except (TypeError, ValueError):
         lot = 1
-    n = int(s.get("n_set") or 1) or 1
-    return max(1, -(-lot // n))
+    # セット数は分数のことがある（卸1点＝3袋セット・Amazon1個＝2袋 → 2/3。2026-10-11）。
+    # そのときは「卸の点数が整数になる Amazon の個数」まで切り上げる（2/3 なら Amazon 3個＝卸2点）。
+    n = Fraction(s.get("n_set") or 1).limit_denominator(24) or Fraction(1)
+    k = max(1, math.ceil(Fraction(lot) / n))
+    while (k * n).denominator != 1:
+        k += 1
+    return k
 
 
 def pick_from_row(s: dict) -> Pick | None:

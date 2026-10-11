@@ -57,7 +57,7 @@ def to_row(rank: int, s: dict) -> list:
         "カートの販売元": s.get("カート保持者"),
         "季節": (s["season"].verdict if s.get("season") else ""),
         "等級": s["等級"],
-        "Amazon側のセット数": (int(s["n_set"]) if s.get("n_set") else ""),
+        "Amazon側のセット数": SC.set_label(s.get("n_set")),
         "卸の1点あたり原価(税込)": r.get("卸の1点あたり原価(税込)"),
         "買う卸の口": r.get("買う卸の口"),
         "発注する卸の点数": r.get("発注する卸の点数"),

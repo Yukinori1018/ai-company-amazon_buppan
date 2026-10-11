@@ -96,7 +96,7 @@ def _structured(v) -> int | None:
 
 
 def resolve(title: str | None, package_quantity=None, number_of_items=None,
-            wholesale_title: str | None = None) -> SetCount:
+            wholesale_title: str | None = None, wholesale_lot: int | None = None) -> SetCount:
     """商品名 × packageQuantity（× numberOfItems）から倍率を決める。
 
     `numberOfItems` は**判定には使いません**（1 が既定値として入る実例があるため）。
@@ -105,7 +105,7 @@ def resolve(title: str | None, package_quantity=None, number_of_items=None,
     `wholesale_title` … 突き合わせる卸の商品名。「12個入」型の表記はこれと比べて初めて
     倍率になる（`set_count.parse_amazon_set_count` の docstring・2026-10-11）。
     """
-    title_n = set_count.parse_amazon_set_count(title, wholesale_title)
+    title_n = set_count.parse_amazon_set_count(title, wholesale_title, wholesale_lot)
     pq = _structured(package_quantity)
     noi = _structured(number_of_items)
 

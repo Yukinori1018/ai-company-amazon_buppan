@@ -28,9 +28,11 @@ import json
 import os
 import re
 import subprocess
+import unicodedata
 import sys
 from collections import Counter
 from datetime import date, datetime, timezone
+from fractions import Fraction
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -97,14 +99,35 @@ CATEGORY_ALIAS = {
 }
 
 
+_FRAC_RE = re.compile(r"^(\d+)\s*/\s*(\d+)$")
+
+
 def _num(s):
+    """数値セルを float に。**「2/3」のような分数も読む**（2026-10-11）。
+
+    #15 セット数（Amazon 1個＝卸◯点）は、卸自身が「60粒 x 3袋セット」のような束ね品を
+    1点で売っているとき分数になる（Amazon 2袋 ＝ 卸 2/3点）。旧版は分数を None にして
+    人の確認（確度 中）を捨て、UNKNOWN に落としていた。"""
     if s is None:
         return None
     s = str(s).replace(",", "").replace("%", "").replace("円", "").strip()
+    s = unicodedata.normalize("NFKC", s)
+    m = _FRAC_RE.match(s)
+    if m:
+        a, b = int(m.group(1)), int(m.group(2))
+        return a / b if b else None
     try:
         return float(s)
     except ValueError:
         return None
+
+
+def set_label(n) -> str:
+    """セット数を人が読める形に。整数は「2」、分数は「2/3」（float の 0.6667 を見せない）。"""
+    if not n:
+        return ""
+    f = Fraction(n).limit_denominator(24)
+    return str(f.numerator) if f.denominator == 1 else f"{f.numerator}/{f.denominator}"
 
 
 # ── 読み込み ─────────────────────────────────────────────────────────────
@@ -164,8 +187,8 @@ def _short(t: str, n: int = 140) -> str:
     return t if len(t) <= n else t[: n - 1] + "…"
 
 
-def set_count_of(row: dict, product: dict, wholesale_title: str | None = None
-                 ) -> tuple[float | None, str, str]:
+def set_count_of(row: dict, product: dict, wholesale_title: str | None = None,
+                 wholesale_lot: int | None = None) -> tuple[float | None, str, str]:
     """セット数（Amazon 1個 ＝ 卸の何点か）と確度。
 
     順番:
@@ -191,7 +214,7 @@ def set_count_of(row: dict, product: dict, wholesale_title: str | None = None
 
     import set_family as SF
     sc = SF.resolve(row.get("商品名"), product.get("packageQuantity"),
-                    product.get("numberOfItems"), wholesale_title)
+                    product.get("numberOfItems"), wholesale_title, wholesale_lot)
     src = "・".join(f"{k}={v}" for k, v in sc.sources.items()) or "情報源なし"
     if wholesale_title:
         src += "（卸の商品名と照合）"
@@ -336,7 +359,7 @@ def build(row: dict, cand: dict, product: dict, idx: dict, names: dict,
         g.append(("仕入れ", "UNKNOWN", "卸の在庫が索引で確認できません（SD 由来の行など）。"))
 
     # ── セット数（単位ずれは真偽）
-    n_set, conf, src = set_count_of(row, product, ni.get("title"))
+    n_set, conf, src = set_count_of(row, product, ni.get("title"), ni.get("min_lot_units"))
     # 確度が「確定/単独」でも**数が入っていなければ確定していません**（2026-10-04 に
     # 台帳の確度だけを見て None を int() に渡して落ちました）。両方そろって初めて確定。
     decided = conf in ("確定", "単独") and bool(n_set)
@@ -344,7 +367,7 @@ def build(row: dict, cand: dict, product: dict, idx: dict, names: dict,
         g.append(("セット数", "UNKNOWN",
                   f"Amazon の1個が卸の何点かが決まりません（{conf}）。{src}"))
     else:
-        g.append(("セット数", "PASS", f"Amazon 1個 ＝ 卸 {int(n_set)}点（{conf}・{src}）"))
+        g.append(("セット数", "PASS", f"Amazon 1個 ＝ 卸 {set_label(n_set)}点（{conf}・{src}）"))
 
     # ── 採算
     sell = lv.sell_for_profit
@@ -371,7 +394,7 @@ def build(row: dict, cand: dict, product: dict, idx: dict, names: dict,
         # 黙ってどちらかを採ると、辻褄だけ合って嘘が一段深くなる。
         if ledger_unit and abs(ledger_unit - unit_cost) > 1.5:
             unit_note = (f"台帳の Amazon1個あたり原価 {ledger_unit:,.0f}円 と、"
-                         f"卸の1点 {per_pt:,.0f}円 × セット数 {n_set:g} = {unit_cost:,.0f}円 が"
+                         f"卸の1点 {per_pt:,.0f}円 × セット数 {set_label(n_set)} = {unit_cost:,.0f}円 が"
                          f"食い違います。**単位ずれは「幅」ではなく「真偽」です。**")
             unit_cost = None
     elif ledger_unit:
@@ -776,7 +799,7 @@ def as_row(s: dict, full: bool = False) -> dict:
         "セラー数": r.get("セラー数"), "Amazon本体の有無": r.get("Amazon本体の有無"),
         "カートの販売元": s.get("カート保持者"),
         "売れ筋ランク": (f"{s['rank']:,}位" if s.get("rank") else "未取得"),
-        "Amazon側のセット数(Amazon1個=卸何点か)": (int(s["n_set"]) if s.get("n_set") else ""),
+        "Amazon側のセット数(Amazon1個=卸何点か)": set_label(s.get("n_set")),
         "セット数の確度": s.get("セット数の確度"),
         "季節(ランク12ヶ月履歴)": (s["season"].verdict if s.get("season") else ""),
         "卸の在庫": s.get("在庫"), "購入元の名前": r.get("購入元の名前"),

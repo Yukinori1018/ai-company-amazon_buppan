@@ -649,10 +649,8 @@ def parse_sd_gates(txt: str) -> list[tuple[str, str, str]]:
 
 
 def num(x):
-    try:
-        return float(str(x).replace(",", "").replace("円", ""))
-    except Exception:
-        return None
+    """数値セル → float。「2/3」の分数も読む（#15 セット数・2026-10-11）。本体は S._num。"""
+    return S._num(x)
 
 
 def sd_rows(header: list[str]) -> tuple[list[list], list[dict]]:
@@ -710,12 +708,12 @@ def sd_rows(header: list[str]) -> tuple[list[list], list[dict]]:
                 g1, gn = _grade(1), _grade(n)
                 if g1.grade == gn.grade == "C" or (g1.grade in ("A", "B") and gn.grade in ("A", "B")):
                     gr = gn
-                    gr.reason += (f"（セット数は未確定だが、1点でも{int(n)}点でも等級 "
+                    gr.reason += (f"（セット数は未確定だが、1点でも{S.set_label(n)}点でも等級 "
                                   f"{g1.grade}/{gn.grade} で結論は同じ）")
                 else:
                     split_note = (f"#15 セット数 UNKNOWN（{set_conf}）：SD 卸1点 "
                                   f"{mp['卸価格_税抜_1点']}円なら、Amazon1個＝卸1点で等級 {g1.grade}"
-                                  f"（{g1.mid.get('利益率(%)')}%）・{int(n)}点で等級 {gn.grade}"
+                                  f"（{g1.mid.get('利益率(%)')}%）・{S.set_label(n)}点で等級 {gn.grade}"
                                   f"（{gn.mid.get('利益率(%)')}%）。どちらかで結論が変わる")
         miss, fixes, never = [], [], []
         sold_out = bool(mp and "SOLD OUT" in (mp.get("在庫") or "").upper()
@@ -859,6 +857,35 @@ def sd_screen(cells: dict) -> dict:
 
 # ── 本体 ────────────────────────────────────────────────────────────────
 
+# 2026-10-07〜 NETSEA はランサムウェア被害で停止中（新規登録も停止）。NETSEA 経由の GO は
+# 「買える」ではなく「復旧すれば買える」。判定は GO のまま残し、判定理由の先頭に書く（カズヨ 10/11 指示）。
+# API は叩かない（このスクリプトは手元の索引だけを読む）。復旧したらこの定数を "" にする。
+NETSEA_DOWN_NOTE = "【NETSEA 復旧待ち】10/7〜ランサムウェア被害で停止中（新規登録も停止）。"
+#: 購入元の社名 → NETSEA を通さない直販窓口。社名の部分一致で引く
+DIRECT_WINDOWS = {"カネイシ": "卸売ドットコム", "国分": "国分ネット卸"}
+
+
+def supply_note(site: str, supplier: str) -> str:
+    """NETSEA 経由の行に付ける仕入れ経路の注記（NETSEA 以外・復旧後は空文字）。"""
+    if not (NETSEA_DOWN_NOTE and (site or "").startswith("NETSEA")):
+        return ""
+    note = NETSEA_DOWN_NOTE
+    for key, window in DIRECT_WINDOWS.items():
+        if key in (supplier or ""):
+            note += (f"購入元（{supplier}）は直販窓口（{window}）でも仕入れ可の見込み・会員登録待ち。")
+            break
+    return note
+
+
+def with_supply_note(reason: str, site: str, supplier: str) -> str:
+    """判定理由の先頭に注記を付ける。2回走らせても二重にならない（冪等）。"""
+    note = supply_note(site, supplier)
+    reason = reason or ""
+    if not note or reason.startswith(NETSEA_DOWN_NOTE):
+        return reason
+    return note + reason
+
+
 def is_human(row: dict) -> bool:
     """凍結する人の行か。実画面確認の証跡ファイル（screen_checks）に載っている ASIN は
     凍結せず、毎回その証跡から人の値を合流させて引き直す（2026-10-11）。"""
@@ -959,6 +986,14 @@ def main(argv=None) -> int:
     waiting += sd_wait
 
     final = [[r[h] for h in header] for r in rows] + appended + sd_lines
+    # NETSEA 経由の GO に「復旧待ち」を付ける（人の行は触らない）
+    i_site, i_sup = header.index("卸サイト"), header.index("購入元の名前")
+    i_v, i_why = header.index("判定"), header.index("判定理由")
+    for x in final:
+        if x[i_v] == "GO" and not is_human(dict(zip(header, x))):
+            x[i_why] = with_supply_note(x[i_why], x[i_site], x[i_sup])
+    for x in EXTRA["GO"]:
+        x["判定理由"] = with_supply_note(x.get("判定理由"), x.get("卸サイト"), x.get("購入元の名前"))
     after = count([dict(zip(header, x)) for x in final])
     summary = {"前": before, "後": after, "更新": updated, "人の行(据え置き)": skipped_human,
                "追記NETSEA": len(appended), "追記SD": len(sd_lines),
@@ -1001,19 +1036,26 @@ def main(argv=None) -> int:
         w = csv.DictWriter(f, fieldnames=go_cols, extrasaction="ignore")
         w.writeheader()
         w.writerows(EXTRA["GO"])
-    # NO-GO から外れて、残りがゲート（#1-2）とカート（#5）の未確認だけになった行
-    # ＝カズヨが実画面で見れば決まる行。毎回作り直す（0件でもファイルを書く）
+    # GO の手前で、残りがゲート（#1-2）とカート（#5）の未確認だけの行
+    # ＝カズヨが実画面で見れば決まる行。毎回作り直す（0件でもファイルを書く）。
+    # 2026-10-11：旧版は「前回 NO-GO だった行」だけを拾っていた。前回から UNKNOWN のまま
+    # ゲート・カート待ちで止まっている行が出てこなかったので、判定が GO でない行すべてに広げた。
+    # 「今回NO-GOから外れた」列で、新しく入ってきた行と前からの行を分ける
     ia, ij, ir = header.index("ASIN"), header.index("判定"), header.index("判定理由")
     queue = []
     for x in final:
-        if prev_verdict.get(x[ia]) != "NO-GO" or x[ij] == "NO-GO":
+        if x[ij] in ("GO", "NO-GO") or is_human(dict(zip(header, x))):
             continue
         items = set(re.findall(r"(#[\d-]+)[^：／]*? (?:FAIL|UNKNOWN)", x[ir]))
         if items and items <= {"#1-2", "#5"}:
-            queue.append(x[ia])
+            new_in = "Y" if prev_verdict.get(x[ia]) == "NO-GO" else ""
+            queue.append("\t".join([x[ia], "+".join(sorted(items)), new_in, x[i_site], x[i_sup],
+                                    supply_note(x[i_site], x[i_sup])]))
     (OUT / f"gate_cart_queue_{date.today().strftime('%Y%m%d')}.txt").write_text(
-        "# NO-GO から外れ、ゲート(#1-2)・カート(#5)の未確認だけで止まった ASIN"
-        f"（ledger_refresh {TODAY}）{len(queue)}件\n" + "".join(a + "\n" for a in queue))
+        "# GO の手前で、ゲート(#1-2)・カート(#5)の未確認だけで止まっている ASIN"
+        f"（ledger_refresh {TODAY}）{len(queue)}件\n"
+        "# ASIN\t未確認の項目\t今回NO-GOから外れた\t卸サイト\t購入元\t仕入れ経路の注記\n"
+        + "".join(q + "\n" for q in queue))
     summary["ゲート・カート待ち"] = len(queue)
     summary["新しくGO"] = sum(1 for x in EXTRA["GO"] if x.get("今回GOになった") == "Y")
     (OUT / "summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=1, default=str))
@@ -1059,7 +1101,7 @@ def record_extra(comp: dict, cells: dict, s: dict) -> None:
         "卸サイト": cells.get("卸サイト"),
         "出品可否": cells.get("ゲート可否"),
         "推奨初回点数": (s.get("_share") or {}).get("rec") or cells.get("発注点数"),
-        "セット数(Amazon1個=卸何点)": (int(s["n_set"]) if s.get("n_set") else "未確定"),
+        "セット数(Amazon1個=卸何点)": (S.set_label(s["n_set"]) if s.get("n_set") else "未確定"),
         "セット数の根拠": f"{s.get('セット数の確度') or ''}" + (
             "（人の確認）" if str(s.get("セット数の確度")) == "確定" and
             s["asin"] in S.human_set_checks() else ""),
