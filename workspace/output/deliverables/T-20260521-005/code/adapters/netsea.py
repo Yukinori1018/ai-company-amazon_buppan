@@ -481,8 +481,9 @@ class NetseaClient:
            違約金200万円＋代金の50%＋事業者名の公表（第27条3項（2026-09-12 訂正：旧記載27条4項は誤り））の対象です。
            メーカー発見リストへ合流させないこと（モジュール冒頭の用途制限を参照）。
 
-        本番では GET /suppliers をそのまま使う（id と社名）。本番に行けない／失敗時は
-        サンプル商品から supplier_id を抽出して擬似サプライヤー一覧を作る（デモが回る）。
+        本番では GET /suppliers をそのまま使う（id と社名）。トークン未設定／force_sample のときだけ
+        サンプル商品から擬似サプライヤー一覧を作る（デモ用）。**本番で失敗したら NetseaError**
+        （2026-10-11 まではサンプルを返しており、停止中に偽の「承認済み4社」が出ていた）。
 
         ⚠️ 2026-08-31 修正（T-20260831-006）:
            このメソッドは以前 **先頭100件しか返していませんでした**。
@@ -517,19 +518,21 @@ class NetseaClient:
                 self.last_error = f"NETSEA /suppliers 通信失敗: {e}"
                 if data:
                     break  # 途中まで取れているなら、それは正直な部分結果として返す
-                return self._sample_suppliers()
+                # 🔴 2026-10-11：本番で失敗したらサンプルで埋めずに投げる（§3.3-11）。
+                #    NETSEA 停止中にサンプルの ID 1000〜1003 が「承認済み4社」として返っていた。
+                raise NetseaError(self.last_error) from e
             if resp.status_code != 200:
                 self.last_error = self._explain_http_error(resp)
                 if data:
                     break
-                return self._sample_suppliers()
+                raise NetseaError(self.last_error)
             try:
                 payload = resp.json()
             except ValueError:
                 self.last_error = "NETSEA /suppliers が非JSONを返却"
                 if data:
                     break
-                return self._sample_suppliers()
+                raise NetseaError(self.last_error)
             page = payload.get("data", []) if isinstance(payload, dict) else (payload or [])
             data.extend(page)
             next_id = payload.get("next_supplier_id") if isinstance(payload, dict) else None
