@@ -105,6 +105,12 @@ CRED = Path.home() / ".config/claude-session-sheets/credentials.json"
 TICKET = "T-20260920-003"
 TODAY = date.today().isoformat()
 SD_MANUAL = SDB / "sd_price_manual_20261010.csv"
+#: 2026-10-11 22:30 カズヨが社長 Chrome で読んだ SD 卸価格（SD品番キー・段階価格つき）。
+#: SD_MANUAL（10/10・ASIN キー）より新しいので、同じ SD 品番ではこちらが勝つ
+SD_SCREEN = SDB / "sd_price_screen_20261011.csv"
+#: NETSEA 停止中（10/7〜）に、同じ購入元の SD 出展で買える ASIN の仕入れ経路を SD に切り替える。
+#: 卸価格は人の実画面（カズヨ）。値はこのファイルにだけあり、スクリプトは持たない（PUBLIC）
+SD_ROUTE = SDB / "sd_route_override_20261011.csv"
 
 #: score_20261004 のゲート名 → CLAUDE.md §3.5 の項目番号
 ITEM = {
@@ -187,8 +193,57 @@ def score_netsea() -> list[dict]:
                 s2["_fresh"] = f[1]
                 s = s2
             out.append(s)
-        return out
-    return old + new
+        return route_to_sd(out, idx, names, dict(rc2))
+    return route_to_sd(old + new, idx, names, dict(rc))
+
+
+def load_sd_route() -> dict[str, dict]:
+    if not SD_ROUTE.exists():
+        return {}
+    return {r["ASIN"].strip(): r for r in csv.DictReader(SD_ROUTE.open(encoding="utf-8-sig"))
+            if (r.get("ASIN") or "").strip() and S._num(r.get("卸価格_税抜_1点"))}
+
+
+def route_to_sd(scored: list[dict], idx: dict, names: dict, rc: dict) -> list[dict]:
+    """NETSEA 行のうち、SD で同じ購入元から買える ASIN を SD 経路で採点し直す（2026-10-11）。
+
+    - 原価は SD の卸1点（税抜・人の実画面）×1.1。NETSEA の卸値は使わない
+    - NETSEA の索引（在庫・URL）を引かないよう、その JAN を外した索引で build する
+    - #17 仕入れは SD 実画面の在庫で PASS／FAIL を付け直す（索引が無いので UNKNOWN になるため）
+    """
+    route = load_sd_route()
+    if not route:
+        return scored
+    out = []
+    for s in scored:
+        o = route.get(s["asin"])
+        if not (o and s.get("row") and s.get("product")):
+            out.append(s)
+            continue
+        row = dict(s["row"])
+        excl = S._num(o["卸価格_税抜_1点"])
+        row["卸の1点あたり原価(税込)"] = f"{excl * 1.1:.1f}"
+        row["Amazon1個あたり原価(税込)"] = ""
+        row["卸の最小ロット(点)"] = o.get("卸の最小ロット(点)") or "1"
+        row["購入先URL"] = o["購入先URL"]
+        jan = (row.get("JAN") or "").strip()
+        idx2 = {k: v for k, v in idx.items() if k != jan}   # URL は SD に替えたので索引に当たらない
+        s2 = S.build(row, s.get("_cand") or {}, s["product"], idx2, names,
+                     s.get("_idx_day") or "2026-10-01", None, rc)
+        for k in ("_src", "_cand", "_idx_day", "_fresh"):
+            if k in s:
+                s2[k] = s[k]
+        stock = o.get("在庫") or ""
+        sold_out = "SOLD OUT" in stock.upper() or stock.strip() in ("なし", "品切れ")
+        s2["gates"] = [g for g in s2["gates"] if g[0] != "仕入れ"] + [(
+            "仕入れ", "FAIL" if sold_out else "PASS",
+            f"SD（{o['購入先URL']}）で在庫{'なし' if sold_out else 'あり'}・卸1点 {excl:,.0f}円（税抜）"
+            f"（{o.get('確認者', '')} {o.get('確認時刻', '')}）。**発注直前に卸値を引き直してください。**")]
+        s2["在庫"] = "在庫なし" if sold_out else "在庫あり"
+        s2["channel"] = "スーパーデリバリー"
+        s2["_route"] = o
+        out.append(s2)
+    return out
 
 
 #: 2026-10-11：旧プールのうち 705行は refetch20261004/raw.jsonl に商品データが無く、
@@ -505,6 +560,12 @@ def _compose_netsea(s: dict, gate: dict | None) -> dict:
         dn = SC.doc_note(s["row"].get("商品名") or "")
         if dn:
             reason += " ／ " + dn
+        o = s.get("_route")
+        if o:
+            reason = (f"SD 経由で即発注可（購入元＝{s['row'].get('購入元の名前') or ''}・SD 取引中・"
+                      f"卸1点 {S._num(o['卸価格_税抜_1点']):,.0f}円税抜 {o.get('確認時刻', '')} 実画面）。"
+                      "PSE 書類（適合性確認・自主検査記録）を発注前にヤザワへ取り寄せ。"
+                      "SD の取引条件表で Amazon 出品可を発注前に確認（NETSEA 側は確認済み） ／ " + reason)
         if adj:
             reason += " ／ 読み替え：" + " ／ ".join(adj)
         return {"verdict": verdict, "reason": reason[:1800], "waiting": waiting,
@@ -566,6 +627,12 @@ def netsea_cells(s: dict, gate: dict | None, comp: dict) -> dict:
     g["確認者"] = "タカシ（機械判定・実画面未確認）"
     if comp.get("screened"):
         g.update(screen_cells(s, gate))
+    o = s.get("_route")
+    if o:
+        g["卸サイト"] = "スーパーデリバリー"
+        g["購入先URL"] = o["購入先URL"]
+        g["確認方法"] = (g["確認方法"] + f"＋SD 卸価格・在庫はカズヨが社長 Chrome で確認 {o.get('確認時刻', '')}"
+                         "（NETSEA 停止中のため SD 経路で採算）")
     return g
 
 
@@ -627,10 +694,39 @@ def netsea_new_row(s: dict, header: list[str], gate, comp) -> list:
 
 # ── SD 側 ────────────────────────────────────────────────────────────────
 
+def load_sd_screen() -> list[dict]:
+    """10/11 の実画面 SD 卸価格（SD品番キー）を SD_MANUAL と同じ形に直す。
+
+    「卸単価(税抜)x最小点数」は段階価格（例 単価x1/単価x10/単価x200）。採算は**最小の口の単価**
+    （最初の段＝一番高い単価）で計算する＝利益を多く見せない側。まとめ買いの段はメモに残す。
+    ASIN は sd_candidates_private.csv の SD品番（5053100S1 等）の前方一致で引く。
+    """
+    if not SD_SCREEN.exists():
+        return []
+    cands = list(csv.DictReader((SDB / "sd_candidates_private.csv").open(encoding="utf-8-sig")))
+    out = []
+    for r in csv.DictReader(SD_SCREEN.open(encoding="utf-8-sig")):
+        code = (r.get("SD品番") or "").strip()
+        tiers = [t.split("x") for t in (r.get("卸単価(税抜)x最小点数") or "").split("/") if "x" in t]
+        if not (code and tiers):
+            continue
+        first_price, first_lot = tiers[0]
+        asins = sorted({c["ASIN"] for c in cands
+                        if c.get("ASIN") and re.match(re.escape(code) + r"(S\d+)?$", c.get("SD品番", ""))})
+        for a in asins:
+            out.append({"ASIN": a, "SD品番": code, "購入先URL": r.get("購入先URL", ""),
+                        "卸価格_税抜_1点": first_price, "入数・最小ロット": f"{first_lot}点〜（段階 {r.get('卸単価(税抜)x最小点数')}）",
+                        "在庫": r.get("在庫", ""), "確認時刻": r.get("確認時刻", ""),
+                        "メモ": f"{r.get('確認者', '')}・採算は最小口の単価で計算（まとめ買いの段は使わない＝保守側）"})
+    return out
+
+
 def load_sd_manual() -> dict[str, dict]:
+    out: dict[str, list] = {}
+    for r in load_sd_screen():          # 新しい方を先に置く（同じ SD 品番では先勝ち）
+        out.setdefault(r["ASIN"], []).append(r)
     if not SD_MANUAL.exists():
-        return {}
-    out = {}
+        return out
     for r in csv.DictReader(SD_MANUAL.open(encoding="utf-8-sig")):
         a = (r.get("ASIN") or "").strip()
         if a:
@@ -930,8 +1026,9 @@ def main(argv=None) -> int:
 
     waiting = []
     updated = skipped_human = 0
+    routed = set(load_sd_route())
     for r in rows:
-        if r["卸サイト"] == "スーパーデリバリー":
+        if r["卸サイト"] == "スーパーデリバリー" and r["ASIN"] not in routed:
             continue
         s = by_asin.get(r["ASIN"])
         if not s:
@@ -967,7 +1064,7 @@ def main(argv=None) -> int:
     sd_by_asin = {ln[ia]: ln for ln in sd_lines}
     have_sd = set()
     for r in rows:
-        if r["卸サイト"] != "スーパーデリバリー":
+        if r["卸サイト"] != "スーパーデリバリー" or r["ASIN"] in routed:
             continue
         have_sd.add(r["ASIN"])
         ln = sd_by_asin.get(r["ASIN"])
@@ -982,7 +1079,7 @@ def main(argv=None) -> int:
                 if r["卸サイト"] == "スーパーデリバリー" and is_human(r)}
     sd_wait = [w for w in sd_wait if w["ASIN"] not in human_sd]
     sd_lines = [[sd_screen(dict(zip(header, ln)))[h] for h in header]
-                for ln in sd_lines if ln[ia] not in have_sd]
+                for ln in sd_lines if ln[ia] not in have_sd and ln[ia] not in have_netsea]
     waiting += sd_wait
 
     final = [[r[h] for h in header] for r in rows] + appended + sd_lines
@@ -999,7 +1096,8 @@ def main(argv=None) -> int:
                "追記NETSEA": len(appended), "追記SD": len(sd_lines),
                "実画面確認待ち": Counter(w["状態"] for w in waiting),
                "実画面確認待ち_経路": Counter(w["卸サイト"] for w in waiting),
-               "SD手入力卸価格": SD_MANUAL.exists()}
+               "SD手入力卸価格": SD_MANUAL.exists(), "SD実画面卸価格(10/11)": len(load_sd_screen()),
+               "SD経路へ切替": sorted(routed)}
     print(json.dumps(summary, ensure_ascii=False, indent=1, default=str))
     with (OUT / "waiting_list.csv").open("w", encoding="utf-8-sig", newline="") as f:
         w = csv.DictWriter(f, fieldnames=["状態", "ASIN", "商品名", "卸サイト", "購入元", "月販",

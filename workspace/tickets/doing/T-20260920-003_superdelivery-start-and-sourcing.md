@@ -4052,3 +4052,22 @@ NETSEA は 10/7 からランサムウェア被害で停止しており、新規�
 
 ## 完了報告（タカシ → カズヨ・#15 分数対応）
 分数と卸の束ね数は読めるようになったが、GO は増えなかった（2件のまま）。セット数が決まった87行のうち68行が赤字（C）で NO-GO に移った。GO を増やす次の一手は gate_cart_queue の6件のカート実画面確認（#5）。
+
+## 現在地（2026-10-11 深夜 タカシ・NETSEA 停止中の GO を SD 経路へ）
+GO 2件（FLR910T6EXL30=B00Q64QHII／FLR910T6EX-WW=B008FIN7NQ・購入元ヤザワ）を SD 経路（卸1点の価格はカズヨ実画面・値は agent_output の override CSV）で採算し直し、**GO のまま**（B 等級・利益率 11.2%・1個手残り 1,186円・推奨初回10点）。台帳の卸サイト列は「スーパーデリバリー」に切替、購入先URL は SD に。SD 実画面卸価格12件（ハリマ11・森川1）を合流し SD 行を確定。ヤザワ全 ASIN の SD 照会キュー 238行を出力。
+
+## ログ（2026-10-11 深夜 タカシ・SD 経路）
+- yazawa_sd_queue.py 新設 → agent_output/.../ledger20261010/yazawa_sd_queue_20261011.csv（238行・キーゾン相当3か月の多い順・B 等級に必要な卸1点上限つき 155行）
+- ledger_refresh.py：SD_SCREEN（sd_price_screen_20261011.csv）を SD 品番の前方一致で ASIN に展開し SD_MANUAL より優先。採算は段階価格の最小口の単価（保守側）
+- ledger_refresh.py：SD_ROUTE（sd_route_override_20261011.csv）に載る ASIN は、NETSEA 索引を外して SD 卸価格で build し直し、#17 を SD 実画面在庫で付け直す（route_to_sd）。GO 理由に「SD 経由で即発注可」「PSE 書類を発注前に取り寄せ」「SD 取引条件表で Amazon 可を確認」
+- dry-run → 旧コードの dry-run と突合（差 38行＝SD 行と FLR910 の2件＋90日窓の時刻ずれ4件のみ）→ 本実行 2018行書き込み。凍結の人の行 13行は据え置き
+- SD 行の結果：B06Y5JXM87／B01M7N47ZE／B01MQW5W80／B01MCR1XMK／B09TXK6FT6／B00XTVTUV2 が UNKNOWN→NO-GO（SD 卸価格で C 等級＝赤字）。B079R869VC も NO-GO。セット数未確定の10数行は UNKNOWN のまま（1点と表記点数で等級が割れる）
+- go_list_20261011.csv 更新（GO 2件・卸サイト=スーパーデリバリー）
+
+## 成果物（2026-10-11 深夜 タカシ・SD 経路）
+- workspace/output/deliverables/T-20260920-003/26_候補提案パイプライン/yazawa_sd_queue.py
+- workspace/output/deliverables/T-20260920-003/26_候補提案パイプライン/ledger_refresh.py（SD_SCREEN・SD_ROUTE 対応）
+- （agent_output・Git 除外）ledger20261010/yazawa_sd_queue_20261011.csv、go_list_20261011.csv、sd_buylist20261009/sd_route_override_20261011.csv
+
+## 完了報告（タカシ → カズヨ・SD 経路）
+FLR910 2件は SD 経由でも GO（B 等級・11.2%・手残り1,186円/個）。SD の卸値は NETSEA より高く、利益率は 24.8%→11.2% に下がる。発注前の残り：SD の取引条件表で Amazon 可／PSE 書類の取り寄せ／#7 出品一覧の実数。SD 実画面価格12件では新たな GO は出ず（7件が赤字で NO-GO 確定）。ヤザワ照会キューは上から引けば、B 上限と比べてその場で判定できる。
