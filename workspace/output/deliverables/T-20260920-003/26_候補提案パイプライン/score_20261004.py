@@ -225,6 +225,27 @@ def velocity_of(product: dict, shared_ranks: dict[int, int] | None = None
                        f"キーゾンで3か月の実数を人が見てください。", None, rank)
 
 
+_URL_IDX: dict[int, dict[str, dict]] = {}
+
+
+def index_by_url(idx: dict) -> dict[str, dict]:
+    """NETSEA 索引を「購入先URL → 索引の行」で引けるようにする。
+
+    2026-10-11：台帳の 10/10 拡張分（apply21 由来）は JAN と卸の1点単価が空で、
+    購入先URL だけが入っていた（382行）。JAN で索引を引けず、在庫も卸値も UNKNOWN に
+    なっていた。URL が索引の supplier_url と**完全一致**する行だけを同じ商品とみなす
+    （URL 末尾の数字を JAN と決め打ちしない＝末尾が商品コードの店がある）。"""
+    k = id(idx)
+    if k not in _URL_IDX:
+        m: dict[str, dict] = {}
+        for v in idx.values():
+            u = (v.get("supplier_url") or "").strip()
+            if u:
+                m[u] = v
+        _URL_IDX[k] = m
+    return _URL_IDX[k]
+
+
 def build(row: dict, cand: dict, product: dict, idx: dict, names: dict,
           idx_day: str, now: datetime | None = None,
           shared_ranks: dict | None = None) -> dict:
@@ -258,7 +279,7 @@ def build(row: dict, cand: dict, product: dict, idx: dict, names: dict,
     season = seasonality.from_product(product, now=now)
 
     # ── 仕入れ（在庫と鮮度）
-    ni = idx.get(row.get("JAN") or "") or {}
+    ni = idx.get(row.get("JAN") or "") or index_by_url(idx).get((row.get("購入先URL") or "").strip()) or {}
     stock = ni.get("stock")
     if stock == "品切れ":
         g.append(("仕入れ", "FAIL", "NETSEA の索引で**品切れ**です（買えません）。"))

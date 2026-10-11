@@ -77,6 +77,7 @@ EXTRA: dict[str, list[dict]] = {"GO": [], "GO・ゲート未確認": [], "カー
 SCREEN = SC.ScreenChecks({}, {}, {})
 LEGAL = SC.load_legal()            # 法務判定で販売を止める行（GO にしない）
 
+DIAG: list[dict] = []          # 行ごとの項目の状態（GO の手前で止まっている理由の集計用）
 WAIT_FULL: list[dict] = []     # 実画面確認待ち（NETSEA）の全列。autofill.py に渡す
 
 
@@ -173,8 +174,11 @@ def score_netsea() -> list[dict]:
             if len(cur) > 3 and cur[3] and cur[3] > 0:
                 rc2[cur[3]] += 1
         out = []
+        supp = load_supplement()
         for s in old + new:
             f = FRESH.get(s["asin"])
+            if not f and _no_product(s):
+                f = supp.get(s["asin"])
             if f and s.get("row"):
                 s2 = S.build(s["row"], s["_cand"], f[0], idx, names, s["_idx_day"], None, dict(rc2))
                 for k in ("_src", "_supplier_url", "_cand", "_idx_day"):
@@ -185,6 +189,35 @@ def score_netsea() -> list[dict]:
             out.append(s)
         return out
     return old + new
+
+
+#: 2026-10-11：旧プールのうち 705行は refetch20261004/raw.jsonl に商品データが無く、
+#: 「今日の値を取り直せていません」のまま一度も採点されていなかった。手元に既にある取得済み
+#: データ（トークン0）で埋める。**商品データが1つも無い行にだけ**使う（既にデータがある行を
+#: buybox なしの古いデータで上書きしない）。後ろほど新しい＝後勝ち。
+SUPP_RAW = [BUY / "resolve_raw.jsonl",                 # 2026-10-09 stats=90&history=1（buybox なし）
+            BUY / "buybox_raw.jsonl",                  # 2026-10-09 buybox=1
+            OUT / "keepa_kz_hist_20261011.jsonl"]      # 2026-10-11 キーゾン再現用 history=1
+
+
+def _no_product(s: dict) -> bool:
+    g = s.get("gates") or []
+    return bool(g) and g[0][0] == "取り直し"
+
+
+def load_supplement() -> dict[str, tuple[dict, int]]:
+    out: dict[str, tuple[dict, int]] = {}
+    for f in SUPP_RAW:
+        if not f.exists():
+            continue
+        for line in f.open():
+            try:
+                o = json.loads(line)
+            except Exception:
+                continue
+            if o.get("asin") and o.get("product"):
+                out[o["asin"]] = (o["product"], o.get("fetched") or 0)
+    return out
 
 
 def load_fresh() -> None:
@@ -427,6 +460,9 @@ def _compose_netsea(s: dict, gate: dict | None) -> dict:
             gates.append(("ゲート", "FAIL", gate["根拠"], ""))
         else:
             gates.append(("ゲート", "PASS", gate["根拠"], ""))
+    DIAG.append({"ASIN": s["asin"], "items": {n: st for n, st, *_ in gates},
+                 "gate": (gate or {}).get("ゲート判定", ""), "cart_human": s["asin"] in SCREEN.cart,
+                 "grade": getattr(s.get("econ"), "grade", "")})
     miss = [(n, st, w, nt) for n, st, w, nt in gates if st != "PASS"]
     lines_miss, fixes, never = [], [], []
     for n, st, w, nt in miss:
@@ -793,7 +829,12 @@ def sd_screen(cells: dict) -> dict:
             fail, never = True, "変えようがない：新品の申請経路が無い（§3.3-25）"
     k = SCREEN.keizon.get(a)
     if k:
-        pre.append(f"#9 キーゾン {k.label}")
+        # キーゾン（人の画面 or 再現値＝§3.3-16 で同等）で #9 を決める。機械の「ランク10万〜50万位
+        # で UNKNOWN」より優先（2026-10-11：SD 行だけキーゾンを表示するだけで判定に使っていなかった）
+        st9, why9, _ = SC.sales(a, {}, "UNKNOWN", SCREEN)
+        pre.append(f"#9 実売 {st9}：{why9}")
+        if st9 == "FAIL" and not fail:
+            fail, never = True, "変えようがない：3か月の販売が実質ゼロ（§3.3-16）。季節品なら12か月ランクで再判定"
     elif c and c.sold_label:
         pre.append(f"#9 実画面 過去1か月 {c.sold_label}（キーゾン未確認）")
     cells.update({x: y for x, y in screen_cells({"asin": a}, gate).items()})
@@ -868,7 +909,9 @@ def main(argv=None) -> int:
         if comp["waiting"]:
             waiting.append(wait_row(s, r, "NETSEA"))
 
-    have_netsea = {r["ASIN"] for r in rows if r["卸サイト"] != "スーパーデリバリー"}
+    # 2026-10-11：SD 行が既にある ASIN を「卸サイト=未確認」の NETSEA 行として二重に足していた
+    # （旧プールに SD 由来の候補が混ざったため・250行）。台帳に既にある ASIN は経路を問わず足さない
+    have_netsea = {r["ASIN"] for r in rows}
     appended = []
     for k, s in by_asin.items():
         if k in have_netsea:
@@ -933,6 +976,17 @@ def main(argv=None) -> int:
             w = csv.DictWriter(f, fieldnames=list(allx[0].keys()))
             w.writeheader()
             w.writerows(allx)
+    (OUT / f"diag_items_{date.today().strftime('%Y%m%d')}.json").write_text(
+        json.dumps(DIAG, ensure_ascii=False))
+    # GO 一覧（社長が発注を決める表・CLAUDE.md §3.2 の必須列を含む）。購入先URL は agent_output にだけ置く
+    go_cols = ["ASIN", "商品名", "卸サイト", "購入元の名前", "利益率(%)", "手残り(円)", "3か月販売数",
+               "取り分(個/月)", "カートの販売元", "出品可否", "推奨初回点数", "過去1ヶ月の販売数",
+               "セラー数", "Amazon本体の有無", "Amazon URL", "購入先URL", "等級", "判定理由"]
+    with (OUT / f"go_list_{date.today().strftime('%Y%m%d')}.csv").open(
+            "w", encoding="utf-8-sig", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=go_cols, extrasaction="ignore")
+        w.writeheader()
+        w.writerows(EXTRA["GO"])
     (OUT / "summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=1, default=str))
     if a.dry_run:
         (OUT / "after_dryrun.json").write_text(json.dumps([header] + final, ensure_ascii=False))
@@ -973,6 +1027,9 @@ def record_extra(comp: dict, cells: dict, s: dict) -> None:
         "等級": info.get("grade") or (e.grade if e else ""),
         "利益率(%)": info.get("margin") or cells.get("利益率(%)"),
         "手残り(円)": info.get("net") or cells.get("1個粗利(円)"),
+        "卸サイト": cells.get("卸サイト"),
+        "出品可否": cells.get("ゲート可否"),
+        "推奨初回点数": (s.get("_share") or {}).get("rec") or cells.get("発注点数"),
         "判定": cells.get("判定"), "判定理由": (cells.get("判定理由") or "")[:400],
     })
 

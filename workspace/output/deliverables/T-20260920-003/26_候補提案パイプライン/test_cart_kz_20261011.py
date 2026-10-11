@@ -48,7 +48,20 @@ def test_kz_estimate_is_keizon_equivalent_but_not_human():
     assert SC.sales("A", {}, "UNKNOWN", sc)[0] == "PASS"
     assert not sc.covers("A") and sc.has_any("A")          # 人の行の凍結は解かない
     low = SC.Keizon("0/0/0（平均0.0個）", 0.0, ["0", "0", "0"], "Keepa …・注意：観測少(3/2/4)")
-    assert SC.sales("B", {}, "UNKNOWN", SC.ScreenChecks({}, {}, {"B": low}))[0] == "UNKNOWN"
+    # 観測少でも0はキーゾン同等で FAIL（キーゾン自身も同じデータから0を出す・2026-10-11）
+    assert SC.sales("B", {}, "UNKNOWN", SC.ScreenChecks({}, {}, {"B": low}))[0] == "FAIL"
+
+
+def test_human_keizon_always_wins():
+    est = {"A": SC.Keizon("4/3/5（平均4.0個）", 4.0, ["4", "3", "5"], "Keepa 再現"),
+           "B": SC.Keizon("1/1/1（平均1.0個）", 1.0, ["1", "1", "1"], "Keepa 再現")}
+    human = {"A": SC.Keizon("表示なし", None, [], "カズヨ"),
+             "B": SC.Keizon("9/9/9", 9.0, ["9", "9", "9"], "カズヨ"),
+             "C": SC.Keizon("表示なし", None, [], "カズヨ")}
+    m = SC.merge_keizon(est, human)
+    assert m["A"].avg is None         # 人の「表示なし」も人の観測＝機械値で上書きしない
+    assert m["B"].avg == 9.0          # 人の数が勝つ
+    assert m["C"].avg is None         # 再現値が無ければ人の「表示なし」を残す
 
 
 if __name__ == "__main__":

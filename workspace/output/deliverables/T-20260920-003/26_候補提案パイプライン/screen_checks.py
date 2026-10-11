@@ -23,6 +23,7 @@
       カートなし・高値で非表示 → UNKNOWN（誰も持っていない＝相場に戻せば取れる可能性）／それ以外 PASS
   #1-2 ゲート：最新の確認日の結果を採る（ブランド申請の前後で変わる・§3.3-25）
   #9  実売：キーゾンがある ASIN はキーゾンだけで決める（兄弟の値は流用しない・§3.3-29）。
+      キーゾン再現値（kz_estimate）も同等に扱う。人のキーゾン画面の値（表示なし含む）が勝つ。
       無ければ、Keepa の monthlySold があり実画面の「過去1か月」表示と一致すれば PASS。
       それ以外は UNKNOWN「キーゾン未確認」
   #10 取り分＝月販 ÷（カート対象の FBA ＋ カート対象の自己発送 ＋ 1）。3個/月未満は FAIL。
@@ -49,6 +50,7 @@ TARGET_MONTHS = 3      # 3か月を超えるのはロット・ゲート10点が�
 RAW_FILES = [WORK / "refetch20261004/raw.jsonl",
              WORK / "buylist20261009/resolve_raw.jsonl",
              WORK / "buylist20261009/buybox_raw.jsonl",
+             OUT / "keepa_kz_hist_20261011.jsonl",      # 2026-10-11 キーゾン再現用の取得
              OUT / "keepa_unknown_20261011.jsonl"]      # 2026-10-11 実売 UNKNOWN の取り直し
 
 
@@ -205,9 +207,19 @@ def doc_note(name: str) -> str:
     return f"発注前にメーカーから {'／'.join(need)} を取り寄せ（Amazon の審査用・法務46）"
 
 
+def merge_keizon(est: dict[str, Keizon], human: dict[str, Keizon]) -> dict[str, Keizon]:
+    """人がキーゾン画面で見た値が常に勝つ（「表示なし」も人の観測なので残す）。
+
+    2026-10-11 に「人の表示なし → 再現値で埋める」を試したが、人の行（確認者=カズヨ）の
+    キーゾン列を機械値で上書きすることになるため撤回（秘書指示「人の行は上書きしない」）。
+    表示なしの行を再現値で解くなら、人がキーゾン画面を見直してタブを更新する。"""
+    out = dict(est)
+    out.update(human)
+    return out
+
+
 def load(sheet, gate_fallback: dict[str, dict]) -> ScreenChecks:
-    kz = load_kz_estimate()
-    kz.update(load_keizon(sheet))          # 人がキーゾン画面で見た値が勝つ
+    kz = merge_keizon(load_kz_estimate(), load_keizon(sheet))
     return ScreenChecks(load_cart(), load_gate(gate_fallback), kz, load_season())
 
 
@@ -300,8 +312,8 @@ def sales(asin: str, s: dict, machine_st: str, sc: ScreenChecks) -> tuple[str, s
     if k:
         if k.avg is None:
             return "UNKNOWN", f"キーゾン表示なし（{k.checked}）＝この ASIN の実数が取れない", None
-        if k.avg <= 0 and "観測少" in k.checked:
-            return "UNKNOWN", f"キーゾン3か月 {k.label} だが観測が少なく0と区別できない（{k.checked}）", None
+        # 観測少で0：キーゾン自身も同じ Keepa データから0を出す＝人が画面で見ても「3か月0個」で落とす。
+        # §3.3-16（9c673a11）で再現値はキーゾン実数と同等なので FAIL に揃える（注意は理由に残す）
         if k.avg <= 0:
             return "FAIL", f"キーゾン3か月 {k.label}＝実質ゼロ（{k.checked}）", 0
         return "PASS", f"キーゾン3か月 {k.label}（ASIN 単位・{k.checked}）", k.avg

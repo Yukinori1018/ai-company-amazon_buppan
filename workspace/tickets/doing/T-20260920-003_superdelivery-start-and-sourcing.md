@@ -3930,3 +3930,32 @@ Lazada の根拠：手数料 約11〜12%（90日中は約5%）／**入金1週間
 3. 26_候補提案パイプラインで `python3 test_cart_kz_20261011.py && python3 test_screen_checks.py`
 4. `python3 ledger_refresh.py --dry-run` → summary.json の「別記」と extra_go_*.csv を確認 → `python3 ledger_refresh.py`
 5. before/after JSON で人の行（確認者=カズヨ・証跡なし）が無変更か照合 → commit
+
+## 現在地（2026-10-11 サトル・48 卸経路の拡張）
+- イシュー：NETSEA・SD 以外で「個人事業主が今日登録でき、Amazon で売ってよく、ゲート申請に使える書類が出る」国内の仕入れ先はどこか
+- スコープ：既判定13先は差分確認のみ／未調査の約12先を追加。1先につき公式3ページで打ち切り、読めなければ「未調査（到達不能）」
+- 登録・申込みはしない（§4.1）
+
+## ログ（2026-10-11 21:30 タカシ・商品判定台帳の仕上げ＝社長承認「A で」の実行）
+- kz_estimate.py：1,016件 → Keepa 未取得だった150件を取り直して（450トークン・既契約内）**1,166件すべて**に3か月販売数を付与
+- 見つけて直したバグ4件（どれも GO を隠す側／台帳を汚す側）
+  1. **旧プール705行が一度も採点されていなかった**（refetch20261004 に商品データが無く「残トークン待ち」のまま）。手元の取得済みデータ（resolve_raw・buybox_raw・kz_hist）で555行を埋め、残り150行は Keepa で取得
+  2. **NETSEA 382行で JAN が空**＝索引を引けず卸値・在庫が UNKNOWN。購入先URL が索引の supplier_url と完全一致する行だけ同じ商品として結合（score_20261004.index_by_url）
+  3. **SD 行が「卸サイト=未確認」の NETSEA 行として二重に追記されかけた**（250行）。台帳に既にある ASIN は経路を問わず足さない
+  4. SD 行がキーゾン値を表示するだけで #9 に使っていなかった → SC.sales で判定。観測少の0は「キーゾン同等で0」として FAIL に揃えた
+- 人の行の照合（before/after_20261011_final_write.json）：確認者=カズヨ 150行のうち人の値（カート・ゲート・本体有無・キーゾン人画面値）の変更 0件／カズヨ表記の消失 0件／発注状況（社長入力欄）の変更 0件。変わったのは機械列（Amazon価格・未確認だったキーゾン列の再現値埋め・判定理由）だけ
+- 一度「人のキーゾン画面＝表示なし」を再現値で置き換える実装を入れたが、人の行の上書きになるので撤回（7行）
+
+## 成果物（2026-10-11 タカシ・台帳仕上げ）
+- workspace/output/deliverables/T-20260920-003/26_候補提案パイプライン/ledger_refresh.py（未採点行の補完・二重追記防止・SD #9・go_list／diag 出力）
+- workspace/output/deliverables/T-20260920-003/26_候補提案パイプライン/score_20261004.py（index_by_url）
+- workspace/output/deliverables/T-20260920-003/26_候補提案パイプライン/screen_checks.py（merge_keizon・観測少0の扱い）
+- workspace/output/deliverables/T-20260920-003/26_候補提案パイプライン/test_cart_kz_20261011.py（7件）
+- 証跡（agent_output・非公開）：ledger20261010/go_list_20261011.csv・diag_items_20261011.json・before/after_20261011_final_write.json・missing_keepa_20261011.json
+
+## 完了報告（タカシ → カズヨ・台帳仕上げ）
+- 判定 前→後：GO 2→2／NO-GO 1,000→1,791／UNKNOWN 1,016→225（NETSEA GO 2・NO-GO 1,673・UNKNOWN 57／SD NO-GO 88・UNKNOWN 163／未確認 34）
+- **GO は2件のまま。20件に届かない**。原因は判定の穴ではなく市場：NETSEA 1,758行 → 実売 PASS 699 → **取り分（月販÷(FBA＋自己発送＋1)≥3）PASS 54** → ほか全項目 PASS 2
+- GO の手前（UNKNOWN 225行）の律速：SD 卸価格未確認 146／ゲート未確認 162（SD 111・NETSEA 51）／実売 UNKNOWN 155（SD 129＝人のキーゾン「表示なし」含む）
+- SD の「ゲート可・カート第三者・実売 PASS で卸価格だけ待ち」は41行あるが、取り分を当てると3個/月以上は2行だけ
+- rank_velocity.py / test_rank_velocity.py は不採用だが、07:30 の自動同期（545caf84）で既にコミット済み。削除は §4.1 のため残置
