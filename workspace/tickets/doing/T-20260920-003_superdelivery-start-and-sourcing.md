@@ -4116,3 +4116,34 @@ FLR910 2件は SD 経由でも GO（B 等級・11.2%・手残り1,186円/個）�
 - 台帳の既存2,018行：終売 NO-GO 204行（うち台帳で GO 2・UNKNOWN 15＝FLR910 ほか）→ discontinued_flags_20261011.csv。再採点担当が合流
 - 妥協点：NETSEA の97%が未評価（トークン待ち）。DN ライティングの生産終了時期は公式で未確認（法令の期限で判定）。「一般照明用／特殊用途」の線引きは機械では決めていない
 - 残課題：未取得 JAN を夜間に流す常設化（`--tokens` `--wait`）は kz_entry_fetch と同じキーを取り合うので順番の判断が要る
+
+## 現在地（2026-10-11 23時 タカシ・カズヨ夜間実画面11件の合流＋レポート修正）
+- 判定台帳 2,018行（前後で行数不変）。**GO 1件（SD 1／NETSEA 0）**＝B00Q64QHII。ただし同 ASIN は終売フラグ NO-GO（discontinued_flags_20261011・§3.5#12）が未合流で、兄弟 B008FIN7NQ は出品が取り寄せ型1本だけと判明 → 発注候補としては弱い
+- 人が見れば決まる候補（実画面確認待ち）NETSEA 7件／SD 卸価格待ち 63件
+
+## ログ（2026-10-11 23時 タカシ・夜間実画面の合流）
+- 入力：agent_output/.../ledger20261010/kz_screen_20261011_night.csv（11 ASIN）。証跡ファイルに分けて置いた：cart_check_20261011_f.csv（カート2件）・gate_check_20261011_c.csv（ゲート3件）・offer_check_20261011.csv（出品一覧の画面実数2件・新設）。キーゾンは kz_screen_*.csv を screen_checks.load_keizon_screen() が直接読む（新設）
+- **キーゾン表が出なかった5件（B00Z9I3H08・B00Q64UWES・B00J3FMNJO・B017SK20A2・B078X35J1D）は未確認のまま**（0個と書かない）。台帳の値は 10/05 の人の観測「表示なし」のまま・判定 UNKNOWN
+- 台帳 前→後：NO-GO 1,822→1,820／UNKNOWN 196→197／GO 0→1（SD 1・NETSEA 0）。行数 2,018→2,018。シートを読み返して一致を確認
+- 🔴 **既存の不具合を修正**：cart_gate がカート欄「カートなし(一般的な価格より高いため非表示)」を完全一致で判定できず「第三者がカート」で PASS にしていた。B0C8HD3F37 が一度 GO に化けた（dry-run で発見・書き込み前に修正）。カートあり=N または欄に「カートなし／高値／非表示」を含めば UNKNOWN
+- 新規の検査：出品一覧の実画面で即納0・取り寄せ型だけの棚は #13 UNKNOWN（§3.5#13「取り寄せ型の価格しかない」）。B008FIN7NQ は GO→UNKNOWN（新品1本・9,130円・11/15-16着。1年前のカート価格は約3,200円）
+- 書類申請のゲート（ブランド出品許可）は最小ロット10点で取り分・在庫月数を計算（§3.5#3）
+- 画面で数えた出品一覧の内訳が Keepa の buyBoxEligibleOfferCounts より優先（§3.5#7）
+- B084S12JV9（和平フレイズ揚げ鍋）：NO-GO。#10 取り分 2.5（FAIL）に加え、台帳の採算は売価3,453円で手残り -566円・-16.4%＝C（#18 FAIL）。秘書メモの「採算B 16.6%」とは一致しない
+- B0C8HD3F37（オカトー トイレマット）：UNKNOWN。カートの観測が食い違う（22:05 記録＝カートなし・高値で非表示／夜間メモ＝カート店あり・行が読めず）
+- _sourcing_checks に40件記録（11 ASIN・by=kazuyo・出典は実画面URL）
+- 夜間レポート：write_report.py が手残り None（make_buy_list は net を常に None で渡す）で TypeError → yen() で「未取得」と書くよう修正。32_買う候補リストを再生成（候補0件＝DN 蛍光灯は 10/01 の系列除外でレポートから外れる）
+- 🔴 **PUBLIC 公開の手前で止めた**：再生成した 32_買う候補リストに、台帳の判定理由から卸の実額（「卸1点 ◯円以下なら B（いま ◯円）」）が490か所転記されていた。source-terms-guard は Write/Edit にしか効かずスクリプト出力は素通りする。write_report.mask_wholesale() で伏せてから書くよう修正し、伏せた版だけを commit（伏せる前の版は agent_output/pipeline/report_unmasked_20261011/）
+- テスト test_night_20261011.py を追加（23項目 OK）。既存テスト13本も OK
+- 確認時刻の注意：kz_screen の「確認時刻 04:xx」はファイル作成 22:55 と合わない。値はファイルのまま転記した
+
+## 成果物（2026-10-11 23時 タカシ）
+- workspace/output/deliverables/T-20260920-003/26_候補提案パイプライン/screen_checks.py（load_keizon_screen・load_offer_checks・backorder_only・cart_gate 修正）
+- workspace/output/deliverables/T-20260920-003/26_候補提案パイプライン/ledger_refresh.py（#13 取り寄せ・書類ゲート10点・画面実数の表示）
+- workspace/output/deliverables/T-20260920-003/26_候補提案パイプライン/write_report.py（yen）
+- workspace/output/deliverables/T-20260920-003/26_候補提案パイプライン/test_night_20261011.py
+- workspace/output/deliverables/T-20260920-003/32_買う候補リスト.md / .html（再生成）
+
+## 完了報告（タカシ → カズヨ・夜間実画面の合流）
+- 台帳 GO 1件（SD 1／NETSEA 0）＝B00Q64QHII。ただし終売フラグ未合流・兄弟が取り寄せ型のみ＝発注前に #7・#12 を要確認
+- B0C8HD3F37 と B084S12JV9 の残り項目は秘書宛の返信に一覧

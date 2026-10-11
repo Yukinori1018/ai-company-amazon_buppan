@@ -129,10 +129,14 @@ def load_gate(fallback: dict[str, dict]) -> dict[str, dict]:
             ok = r["新品の出品可否"].strip().upper().startswith("OK")
             out[r["ASIN"].strip()] = {
                 "ゲート判定": "OK" if ok else "NG",
-                "根拠": ("新品可（その他の商品なし）" if ok else r["新品の出品可否"]),
+                "根拠": (("新品可（その他の商品なし）"
+                          + ("・ブランド出品許可が必要＝書類申請（請求書10点）" if "書類" in r["新品の出品可否"] else ""))
+                         if ok else r["新品の出品可否"]),
                 "確認日": (r.get("確認時刻") or "")[:10],
                 "確認者": r.get("確認者") or "",
                 "人": True,
+                # 「OK(書類申請…)」＝新品の申請経路はあるがブランド出品許可が要る（請求書10点）
+                "書類": ok and "書類" in r["新品の出品可否"],
             }
     return out
 
@@ -207,6 +211,59 @@ def doc_note(name: str) -> str:
     return f"発注前にメーカーから {'／'.join(need)} を取り寄せ（Amazon の審査用・法務46）"
 
 
+def load_keizon_screen() -> dict[str, Keizon]:
+    """ledger20261010/kz_screen_*.csv（カズヨがキーゾンを実画面で見た3か月の実数・2026-10-11 夜〜）。
+
+    シートのタブ（KEIZON_TAB）と同じく人の観測。証跡をファイルに置く形に揃えた。
+    🔴 月の列が空の行（キーゾンの販売数表が出なかった）は**載せない**＝未確認のまま。
+       「表が出ない」は「0個」とも「表示なし」とも区別できないので、0 と書かない。
+    平均はキーゾン画面の「平均月間」の表示値をそのまま使う（3か月合計÷3 に直さない）。"""
+    out = {}
+    for p in sorted(OUT.glob("kz_screen_*.csv")):           # 名前順。後のファイルが勝つ
+        for r in csv.DictReader(p.open(encoding="utf-8-sig")):
+            m = [(r.get(c) or "").strip() for c in ("キーゾン過去1ヶ月目", "過去2ヶ月目", "過去3ヶ月目")]
+            avg = _num(r.get("平均月間"))
+            if not all(x != "" for x in m) or avg is None:
+                continue
+            out[r["ASIN"].strip()] = Keizon(
+                f"{'/'.join(m)}（平均{avg:g}個）", avg, m,
+                f"{(r.get('確認者') or '').strip()} {(r.get('確認時刻') or '').strip()}".strip())
+    return out
+
+
+def load_offer_checks() -> dict[str, tuple[int, int, str]]:
+    """ledger20261010/offer_check_*.csv（出品一覧の実画面で数えたカート対象の競合）。
+
+    列：ASIN, カート対象FBA, 即納の自己発送, 取り寄せ型, 内訳, 確認時刻, 確認者
+    §3.5 #10 の分母は「FBA ＋ 即納の自己発送 ＋ 1」。取り寄せ型は数えない。
+    ここに載った ASIN は Keepa の buyBoxEligibleOfferCounts より優先する（§3.5 #7＝画面実数が正）。"""
+    out = {}
+    for p in sorted(OUT.glob("offer_check_*.csv")):
+        for r in csv.DictReader(p.open(encoding="utf-8-sig")):
+            out[r["ASIN"].strip()] = (int(r["カート対象FBA"]), int(r["即納の自己発送"]),
+                                      f"実画面 {r.get('確認者', '').strip()} {r.get('確認時刻', '').strip()}"
+                                      f"・{r.get('内訳', '').strip()}")
+    return out
+
+
+def backorder_only(asin: str) -> str:
+    """出品一覧の実画面で、即納の出品（FBA・即納の自己発送）が0本で取り寄せ型しか無いなら理由を返す。
+
+    §3.5 #13「資格なし・取り寄せ型の価格しかない」＝落とす条件。Keepa の90日中央値は
+    その取り寄せ型の出品者が付けた値で、即納で売れる相場の根拠にならない（2026-10-11 夜 B008FIN7NQ）。"""
+    for p in sorted(OUT.glob("offer_check_*.csv"), reverse=True):
+        for r in csv.DictReader(p.open(encoding="utf-8-sig")):
+            if r["ASIN"].strip() != asin:
+                continue
+            if int(r["カート対象FBA"]) == 0 and int(r["即納の自己発送"]) == 0 \
+                    and int(r.get("取り寄せ型") or 0) > 0:
+                return (f"即納の出品が0本・取り寄せ型 {r['取り寄せ型']}本だけ（{r.get('内訳', '').strip()}・"
+                        f"{r.get('確認者', '').strip()} {r.get('確認時刻', '').strip()}）＝売価の根拠が"
+                        "取り寄せ型の出品者の値付けしかない")
+            return ""
+    return ""
+
+
 def merge_keizon(est: dict[str, Keizon], human: dict[str, Keizon]) -> dict[str, Keizon]:
     """人がキーゾン画面で見た値が常に勝つ（「表示なし」も人の観測なので残す）。
 
@@ -219,7 +276,7 @@ def merge_keizon(est: dict[str, Keizon], human: dict[str, Keizon]) -> dict[str, 
 
 
 def load(sheet, gate_fallback: dict[str, dict]) -> ScreenChecks:
-    kz = merge_keizon(load_kz_estimate(), load_keizon(sheet))
+    kz = merge_keizon(load_kz_estimate(), {**load_keizon(sheet), **load_keizon_screen()})
     return ScreenChecks(load_cart(), load_gate(gate_fallback), kz, load_season())
 
 
@@ -229,6 +286,9 @@ _OFFERS: dict[str, tuple[int, int, str]] | None = None
 def offers(asin: str) -> tuple[int, int, str] | None:
     """(カート対象 FBA 数, カート対象 自己発送数, 取得元)。Keepa buyBoxEligibleOfferCounts。"""
     global _OFFERS
+    human = load_offer_checks()
+    if asin in human:
+        return human[asin]
     if _OFFERS is None:
         _OFFERS = {}
         for f in RAW_FILES:
@@ -242,7 +302,7 @@ def offers(asin: str) -> tuple[int, int, str] | None:
                 p = o.get("product") or {}
                 bb = p.get("buyBoxEligibleOfferCounts")
                 if o.get("asin") and bb and len(bb) >= 2:
-                    _OFFERS[o["asin"]] = (max(bb[0], 0), max(bb[1], 0), f.parent.name)
+                    _OFFERS[o["asin"]] = (max(bb[0], 0), max(bb[1], 0), f"Keepa {f.parent.name}")
     return _OFFERS.get(asin)
 
 
@@ -300,7 +360,11 @@ def cart_gate(c: Cart) -> tuple[str, str]:
             return "UNKNOWN", f"カート {h} はメーカー/ブランド本人の疑い（{c.maker_note}）"
         return "PASS", (f"カートは第三者 {h}（カートの有無と価格 {c.price}円はカズヨ実画面 "
                         f"{c.checked_at}・保持者名は Keepa buyBoxSellerId）")
-    if h in ("カートなし", "高値で非表示") or not h:
+    # 🔴 2026-10-11 夜：保持者欄が「カートなし(一般的な価格より高いため非表示)」のように注記つきだと
+    #    完全一致に当たらず「第三者がカート」で PASS していた（B0C8HD3F37 が GO に化けた）。
+    #    カートあり=N か、欄が「カートなし」「高値」「非表示」を含めば UNKNOWN にする
+    if (c.has_cart is False or not h or h.startswith("カートなし")
+            or "高値" in h or "非表示" in h):
         return "UNKNOWN", (f"カートなし（{h or '表示なし'}・カズヨ実画面 {c.checked_at}）"
                            "＝誰もカートを持っていない。売価を相場に戻せば取れる可能性")
     return "PASS", f"カートは第三者 {h}（{c.price}円・カズヨ実画面 {c.checked_at}）"
@@ -347,15 +411,15 @@ def share_gate(asin: str, monthly: float, qty: int | None, min_lot: float | None
         return "UNKNOWN", "出品者の内訳が取れない（Keepa 生データなし）", {}
     fba, fbm, src = off
     share = monthly / (fba + fbm + 1)
-    info = {"fba": fba, "fbm": fbm, "share": share, "src": src}
-    brk = f"カート対象 FBA {fba}・自己発送 {fbm}（Keepa {src}）"
+    info = {"fba": fba, "fbm": fbm, "share": share, "src": src, "human": src.startswith("実画面")}
+    brk = f"カート対象 FBA {fba}・自己発送 {fbm}（{src}）"
     if share < MIN_SHARE:
         need = math.ceil(MIN_SHARE * (fba + fbm + 1))
         rivals_ok = int(monthly // MIN_SHARE) - 1        # 取り分3個を満たす競合数の上限
         fix = f"月販が {need}個以上になる月なら可（キーゾンで毎月の実数を見て再判定）"
         if rivals_ok >= 0 and rivals_ok < fba + fbm:
             fix += (f"／出品一覧の画面実数で、カート対象の競合が {rivals_ok}社以下なら可"
-                    f"（Keepa {src} では {fba + fbm}社）")
+                    f"（{src} では {fba + fbm}社）")
         elif rivals_ok < 0:
             fix += f"／月販 {monthly:g}個では競合ゼロでも3個に届かない"
         return ("FAIL", f"取り分 {share:.1f}個/月（基準3個）＝月販 {monthly:g}÷({fba}+{fbm}+1)。{brk}",

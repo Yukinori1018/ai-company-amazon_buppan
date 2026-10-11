@@ -18,6 +18,36 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import make_buy_list as M  # noqa: E402
 
 
+def yen(x) -> str:
+    """金額を「1,234円」で書く。値が無い（None・空）なら「未取得」と書く。
+
+    2026-10-11 03:44 の夜間走行で、手残りが None の GO 行（SD 経路で採算の列が空）に
+    `f"{r['net']:,}円"` を当てて TypeError で落ち、レポートが出なかった。0円と書くと嘘になるので
+    「未取得」と書く（データは正直に）。"""
+    if x is None or x == "":
+        return "未取得"
+    try:
+        return f"{int(round(float(x))):,}円"
+    except (TypeError, ValueError):
+        return "未取得"
+
+
+#: 🔴 このレポートは PUBLIC リポに置かれ、github-sync が30分ごとに push する。
+#: 台帳の `判定理由` には「卸1点 ◯円（税抜）以下なら B（いま ◯円）」のような
+#: 会員限定の卸の実額が入る（2026-10-11 夜、そのまま転記して490か所に出ているのを commit 前に発見）。
+#: source-terms-guard は Write/Edit にしか効かず、スクリプトの書き出しは素通りするので、ここで伏せる。
+_W_FIX = re.compile(r"卸(\d+)点\s*-?[\d,]+円（税抜）以下なら\s*([AB])"
+                    r"(?:・-?[\d,]+円以下なら\s*A?)?(?:（いま[^）|／\n]*）?)?")
+_W_AMOUNT = re.compile(r"(卸\d*点?|卸値|卸価格|卸単価)\s*-?[\d,]+円(?:（?税[抜込]）?)?")
+
+
+def mask_wholesale(text: str) -> str:
+    """卸の実額を伏せる（率・件数・Amazon 側の金額は残す）。値は台帳シートにだけある。"""
+    text = _W_FIX.sub(lambda m: f"卸{m.group(1)}点を今より下げれば {m.group(2)}（実額は非公開・台帳シート参照）",
+                      text)
+    return _W_AMOUNT.sub(lambda m: f"{m.group(1)}（実額は非公開・台帳シート参照）", text)
+
+
 def stage_a_tally() -> dict:
     log = (WORK / "stageA.log").read_text(encoding="utf-8")
     tot = {"hit": 0, "dead": 0, "nopr": 0, "kept": 0, "loss": 0, "thrown": 0}
@@ -291,7 +321,7 @@ def main() -> int:
                   f" … Amazon は{M.set_label(r)}／卸は{r['wholesale_mouth'] or '未確認'}の口を"
                   f"{r['wholesale_sets'] or '未算定'}口（＝{r['wholesale_points'] or '未算定'}点）"
                   f"／Amazon {r['qty']}個ぶん・{M.band(r['order_total'])}"
-                  f"・1個手残り {r['net']:,}円")
+                  f"・1個手残り {yen(r.get('net'))}")
             w("")
     else:
         w("候補が0件なので案を出せません。**無い候補で案を作ることはしません。**")
@@ -409,7 +439,7 @@ def main() -> int:
       f"1ppyXCnp2S_9Xwi3vJHGOT6iJCfsEqt88n30aqUFtX3I/edit")
 
     md = DELIV / "32_買う候補リスト.md"
-    md.write_text("\n".join(L) + "\n", encoding="utf-8")
+    md.write_text(mask_wholesale("\n".join(L)) + "\n", encoding="utf-8")
     subprocess.run([sys.executable, str(DELIV / "99_md2html.py"), str(md)], check=True)
     print(f"書きました: {md}")
     print(f"GO {len(go)} / UNKNOWN {len(unknown)} / NO-GO {len(nogo)} / 段B判定 {bn}")

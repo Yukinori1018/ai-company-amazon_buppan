@@ -126,6 +126,7 @@ ITEM = {
     "Amazonカタログ": "#16 カタログJAN",
     "ゲート": "#1-2 出品許可",
     "取り分": "#10 取り分と在庫月数",
+    "取り寄せ価格": "#13 販売価格（取り寄せ型の値付けしかない）",
 }
 HUMAN_ITEMS_BASE = ["#9 キーゾンで3か月の実数（型番ごと）",
                     "#5 カートの販売元を実画面で読む",
@@ -352,6 +353,9 @@ def fix_for(name: str, st: str, why: str, s: dict) -> tuple[str, bool]:
         return "キーゾンで3か月の実数を見れば決まる（月3個以上の取り分があれば可）", False
     if name == "価格の動き" and st == "FAIL":
         return "下落が止まり、90日の後半が前半比-5%以内に戻れば再判定で通る", False
+    if name == "取り寄せ価格":
+        return ("即納で売れる相場が無い。Keepa で即納の出品者がいた時期のカート価格（1年前など）を"
+                "売価にして採算を引き直し、黒字なら可"), False
     if name in ("価格の動き", "取り直し"):
         return "実画面で売価（カート価格）を確認すれば採算を計算できる", False
     if name == "仕入れ" and st == "FAIL":
@@ -435,13 +439,18 @@ def apply_screen(s: dict, gates: list, gate: dict | None) -> bool:
         gates[:] = [g for g in gates if g[0] != "季節の窓"] + [
             ("季節の窓", sea["季節の窓"], f"{sea['根拠']}（{sea['確認者']} {sea['確認時刻']}）", "")]
         s["_season_note"] = sea.get("追記") or ""
+    bo = SC.backorder_only(a)
+    if bo:
+        gates.append(("取り寄せ価格", "UNKNOWN", bo, ""))
     sale_st = next((g[1] for g in gates if g[0] == "実売"), "UNKNOWN")
     st, why, monthly = SC.sales(a, s, sale_st, SCREEN)
     gates[:] = [g for g in gates if g[0] != "実売"] + [("実売", st, why, "")]
     s["_sales_why"], s["_monthly"] = why, monthly
     if st == "PASS" and monthly:
         e = s.get("econ")
-        st2, why2, info = SC.share_gate(a, monthly, e.qty if e else None, s.get("min_lot"), False)
+        # 書類申請のゲート（ブランド出品許可）は請求書10点が要る＝最小ロット10点（§3.5 #3）
+        docs = bool(gate and gate.get("書類"))
+        st2, why2, info = SC.share_gate(a, monthly, e.qty if e else None, s.get("min_lot"), docs)
         s["_share"] = info
         gates.append(("取り分", st2, why2, ""))
     return True
@@ -661,8 +670,12 @@ def screen_cells(s: dict, gate: dict | None) -> dict:
             who.append("キーゾン")
     sh = s.get("_share") or {}
     if sh.get("src"):
-        g["新品出品者数(画面実数)"] = (f"未確認（Keepa {sh['src']} カート対象：FBA {sh['fba']}／"
-                                    f"自己発送 {sh['fbm']}）")
+        if sh.get("human"):
+            g["新品出品者数(画面実数)"] = (f"カート対象 FBA {sh['fba']}／即納の自己発送 {sh['fbm']}"
+                                        f"（{sh['src']}）")
+        else:
+            g["新品出品者数(画面実数)"] = (f"未確認（{sh['src']} カート対象：FBA {sh['fba']}／"
+                                        f"自己発送 {sh['fbm']}）")
     if sh.get("months"):
         g["売り切る月数"] = (f"{sh['months']:.1f}（推奨初回 {sh['rec']}点÷取り分 "
                            f"{sh['share']:.1f}個/月）")
