@@ -22,7 +22,7 @@ from keepa_unknown_fetch import get, key, wait_tokens   # noqa: E402  同じ取�
 
 OUT = Path("/Users/yukinori/Claude Code/ai-company-amazon_buppan/workspace/output/agent_output/T-20260920-003/kz_entry")
 COST = {"hist": 1, "full": 3}
-BATCH = 100
+BATCH = 30      # 他のジョブと Keepa を分け合うとき 100（300トークン）だと残高が貯まらず止まる
 
 
 def main(argv: list[str]) -> int:
