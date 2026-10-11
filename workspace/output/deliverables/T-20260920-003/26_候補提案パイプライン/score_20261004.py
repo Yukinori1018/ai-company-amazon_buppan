@@ -138,27 +138,72 @@ def category_of(product: dict) -> str | None:
     return CATEGORY_ALIAS.get(tree[0].get("name") or "")
 
 
-def set_count_of(row: dict, product: dict) -> tuple[float | None, str, str]:
+#: 人が #15（Amazon 1個＝卸の何点か）を目で確定した証跡。cart_check / gate_check と同じ
+#: 「証跡ファイル」方式で、採点のたびに毎回合流させる（2026-10-11 サトル 179行）。
+#: 列: ASIN, Amazon側の構成（型番×数量）, 卸側の1点の中身, Amazon1個＝卸◯点, 確度, 根拠（何を見たか）, 確認者
+SET_CHECK_DIR = WORK / "ledger20261010"
+HUMAN_SET_OK = ("高", "中")        # 「低」と「未確定」は使わない（UNKNOWN のまま理由を書く）
+_HUMAN_SET: dict[str, dict] | None = None
+
+
+def human_set_checks() -> dict[str, dict]:
+    """{ASIN: 証跡の行}。ファイル名順＝日付順で、後の確認が勝つ。"""
+    global _HUMAN_SET
+    if _HUMAN_SET is None:
+        _HUMAN_SET = {}
+        for p in sorted(SET_CHECK_DIR.glob("set_check_*.csv")):
+            for r in csv.DictReader(p.open(encoding="utf-8-sig")):
+                a = (r.get("ASIN") or "").strip()
+                if a:
+                    _HUMAN_SET[a] = r
+    return _HUMAN_SET
+
+
+def _short(t: str, n: int = 140) -> str:
+    t = re.sub(r"\s+", " ", t or "").strip()
+    return t if len(t) <= n else t[: n - 1] + "…"
+
+
+def set_count_of(row: dict, product: dict, wholesale_title: str | None = None
+                 ) -> tuple[float | None, str, str]:
     """セット数（Amazon 1個 ＝ 卸の何点か）と確度。
 
-    🔴 **`packageQuantity` を黙って信じません。**台帳の値（商品名から読んだ数）と
-    突き合わせて、**一致したら確度を上げ、食い違ったら UNKNOWN に落とします**
-    （CLAUDE.md §3.3-17「2つのデータ源をつなぐ口は単位を渡させる」）。
-    """
-    led = _num(row.get("Amazon側のセット数(Amazon1個=卸何点か)"))
-    conf = (row.get("セット数の確度") or "").strip()
-    pq = product.get("packageQuantity")
-    pq = int(pq) if isinstance(pq, int) and pq > 0 else None
+    順番:
+      1. **人の確認（set_check_*.csv）があればそれが勝つ。**確度 高・中だけを「確定」に使い、
+         低・未確定は UNKNOWN のまま「人が見たが決まらなかった」理由を書く
+      2. 無ければ商品名 × packageQuantity × **卸の商品名**で読み直す（`set_family.resolve`）
 
-    if led and pq:
-        if int(led) == pq:
-            return led, "確定", f"商品名と Keepa packageQuantity が一致（{pq}）"
-        return (None, "食い違い",
-                f"台帳 {int(led)} と Keepa packageQuantity {pq} が食い違います。"
-                f"**人が卸サイトと Amazon の両方の画面を見てください。**")
-    if led and conf in ("確定", "単独"):
-        return led, conf, row.get("セット数の情報源") or "商品名"
-    return (led, conf or "不明", row.get("セット数の情報源") or "")
+    🔴 2026-10-11：プール CSV の「Amazon側のセット数」は旧パーサが商品名の「12個入」「35枚組」を
+    そのまま倍率にした値で、人が確かめた34行中31行が誤りだった。**台帳の値はもう読まない**
+    （出どころはすべて機械＝商品名/packageQuantity なので、直したパーサで読み直せば足りる）。
+    """
+    h = human_set_checks().get(row.get("ASIN", ""))
+    if h:
+        n = _num(h.get("Amazon1個＝卸◯点"))
+        hc = (h.get("確度") or "").strip()
+        who = (h.get("確認者") or "人").strip()
+        why = _short(h.get("根拠（何を見たか）") or "")
+        if n and hc in HUMAN_SET_OK:
+            return n, "確定", f"人の確認（{who}・確度{hc}）：{why}"
+        return (None, "人の確認で未確定",
+                f"{who} が卸と Amazon を見たが確定できず（確度{hc or '—'}）：{why} "
+                f"【こう変えれば】卸サイトの画面で1点の中身（入り数）を見れば決まる")
+
+    import set_family as SF
+    sc = SF.resolve(row.get("商品名"), product.get("packageQuantity"),
+                    product.get("numberOfItems"), wholesale_title)
+    src = "・".join(f"{k}={v}" for k, v in sc.sources.items()) or "情報源なし"
+    if wholesale_title:
+        src += "（卸の商品名と照合）"
+    if sc.confidence == SF.CONFIRMED:
+        return sc.n, "確定", src
+    # 商品名だけで読めた n>1 は「×N」の束ね表記か、卸の商品名と突き合わせた多入りに限られる
+    # （set_count の EXPLICIT/PACK）。卸の商品名と照合できたときだけ単独で通す。
+    if sc.confidence == SF.SINGLE and sc.n and (sc.n == 1 or (
+            wholesale_title and "商品名" in sc.sources)):
+        return sc.n, "単独", src
+    return (None, {SF.CONFLICT: "食い違い"}.get(sc.confidence, "不明"),
+            f"{sc.reason} {src}")
 
 
 def cart_of(product: dict, names: dict) -> tuple[str, str, str]:
@@ -291,7 +336,7 @@ def build(row: dict, cand: dict, product: dict, idx: dict, names: dict,
         g.append(("仕入れ", "UNKNOWN", "卸の在庫が索引で確認できません（SD 由来の行など）。"))
 
     # ── セット数（単位ずれは真偽）
-    n_set, conf, src = set_count_of(row, product)
+    n_set, conf, src = set_count_of(row, product, ni.get("title"))
     # 確度が「確定/単独」でも**数が入っていなければ確定していません**（2026-10-04 に
     # 台帳の確度だけを見て None を int() に渡して落ちました）。両方そろって初めて確定。
     decided = conf in ("確定", "単独") and bool(n_set)
@@ -316,7 +361,9 @@ def build(row: dict, cand: dict, product: dict, idx: dict, names: dict,
     if not per_pt:
         per_pt_src = ""
     min_lot = _num(row.get("卸の最小ロット(点)")) or _num(ni.get("min_lot_units"))
-    ledger_unit = _num(row.get("Amazon1個あたり原価(税込)"))
+    # 台帳の Amazon1個あたり原価は旧セット数（2026-10-11 に誤りと判明）から作った値なので、
+    # セット数を読み直した今は検算に使わない。原価は「卸の1点 × セット数」だけから作る。
+    ledger_unit = None
     unit_cost, unit_note = None, ""
     if per_pt and n_set:
         unit_cost = per_pt * n_set

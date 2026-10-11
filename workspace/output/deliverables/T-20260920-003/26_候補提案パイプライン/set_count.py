@@ -51,26 +51,64 @@ NON_SET_WORDS = (
 #    候補が静かに UNKNOWN へ落ちていました（母数を削る型のバグ）。
 SETWORD_RE = re.compile(r"(セット|まとめ買い|詰め合わせ|詰合せ|アソート|ペア)", re.I)
 
-# 「セット」の語が無くても数えてよい助数詞（物理的な多入り）。
-# 「ウルフピー4袋」「ヒトデdeでんでん 2袋」は卸1袋に対して Amazon が4袋・2袋で売っている。
+# 「セット」の語が無くても数える助数詞（物理的な多入り）。**ただし中身の数かもしれない**ので、
+# 下の PACK と同じく卸の商品名と突き合わせて初めて倍率にする（2026-10-11 「20膳」は卸も20膳）。
 # 個/本/枚/点は**単体では数えない**（「3枚刃」「1本」のような仕様表記に当たるため）。
 STANDALONE_RE = re.compile(r"(\d+)\s*(?:袋|箱|缶|膳|双|客|脚)(?![\dA-Za-z])")
 
-# 個数つきの型。**すべて突き合わせ、食い違ったら None**（黙って片方を採らない）。
-PATTERNS = (
-    # 【2点セット】 / 2点セット / 2個セット / 2枚組 / 2色組み / 2P組
-    re.compile(rf"(\d+)\s*(?:{COUNTABLE})\s*(?:セット|組み?|入り?)"),
-    # ×2点セット / ×2個 / x2セット（寸法の「幅70×奥行32」に当てないため助数詞を必須にする）
-    re.compile(rf"[×xX]\s*(\d+)\s*(?:{COUNTABLE})(?:\s*(?:セット|組み?))?"),
-    # 2セット / 2パック / 2pack
-    re.compile(r"(\d+)\s*(?:セット|パック|pack)", re.I),
-    # セット2点 / 組2個 / セット数:4pcs
-    re.compile(rf"(?:セット|組)\s*数?\s*[:：]?\s*(\d+)\s*(?:{COUNTABLE})?"),
-    # 4pcs / 4pc
-    re.compile(r"(\d+)\s*pcs?\b", re.I),
+# ── 2種類の「N」を分ける（2026-10-11 サトル実測を受けて書き直し）────────────────
+#
+# 旧実装は「12個入」「35枚組」「8点デラックスセット」「ペアセット」の N を全部
+# 「Amazon の1個 ＝ 卸の N点」と読んでいた。サトルが179行を人の目で確かめたところ、
+# **台帳にセット数の値があって人が数を確定できた34行のうち31行が誤り**で、31行すべてが
+# 「商品名の数をそのまま倍率にした」ものだった（正解は1が29行）。卸も同じ「12個入」を1点で
+# 売っているので、原価を12倍に見ていた（§3.3-17）。
+#
+#   EXPLICIT … 売り手が単品を束ねた表記。「×2点セット」「×3個」「2セット」「3パック」
+#              → これは倍率として読む（B0DJNX12KZ の【2点セット】…×2点セット）
+#   PACK     … 1つの商品の中身の数とも、束ねた数とも読める表記。
+#              「12個入」「35枚組」「4点セット」「2個セット」「ペアセット」「20膳」「6食」「2P」
+#              → **卸の商品名と突き合わせないと決めない。**卸の商品名が無ければ None（UNKNOWN）
+
+_UNIT = rf"(?:{COUNTABLE}|袋|箱|缶|膳|双|客|脚)"
+_UNIT_NO_MAI = r"(?:点|個|本|袋|双|膳|脚|客|色|巻|束|足|P|p|pcs|pc|箱|缶)"
+
+# 「4L (4個)」「18枚入 (4個)」— 括弧書きの個数。**束ね表記のことも中身の言い直しのこともある**
+# （人の確認：「ティポス 除菌アルコール 4L (4個)」＝4、「2袋（4本）」＝1）。
+# 他に多入り表記が無ければ束ね、あれば卸と突き合わせる。
+PAREN_RE = re.compile(r"[\(（]\s*(\d+)\s*(?:個|本|点|袋|箱|缶|セット)\s*[\)）]")
+
+EXPLICIT_PATTERNS = (
+    # ×2点セット / ×2個 / x2セット（寸法の「幅70×奥行32」に当てないため助数詞かセットを必須にする）
+    # 「FX 8点」の X（型番の英字）に当てないため、x/X は英数字の直後を除く
+    # 「フェイスタオル×2枚」は**ギフト箱の中身**（2026-10-11 今治タオル3件・人の確認は1）なので
+    # 枚 は束ね表記に数えない（PACK 側で卸と突き合わせる）
+    re.compile(rf"(?:×|(?<![A-Za-z0-9])[xX])\s*(\d+)\s*(?:{_UNIT_NO_MAI}|セット|組)"),
+    # 2セット / 2パック / 2pack（数字の直後がセット＝「4点セット」は含まない）
+    re.compile(r"(?<![\d.])(\d+)\s*(?:セット|パック|pack)", re.I),
 )
 
-# 「ペアセット」「ペア組」は2点。
+# 「20g×12個」「50ml×6本」は**1つの商品の中身の規格**（20g の小袋が12個で1箱）。束ね表記ではない。
+# ただし後ろに「セット」「組」が付く「500ml ×2点セット」は束ね表記（ステンレスボトル2本）。
+# 2026-10-11 B01M1NNOEE（蒟蒻ゼリー 20gx12個）を12倍に読んでいた（人の確認は1）。
+# 「12mm×9m×24巻」のように寸法が連なる規格も1つの中身として扱う
+_MEAS = r"(?:g|kg|ml|mL|L|l|cc|cm|mm|m|M|粒|錠)"
+CONTENT_X_RE = re.compile(
+    rf"\d+(?:\.\d+)?\s*{_MEAS}(?:\s*[×xX]\s*\d+(?:\.\d+)?\s*{_MEAS})*\s*[×xX]\s*(\d+)(?!\d)"
+    rf"(?!\s*(?:{_UNIT})?\s*(?:セット|組))\s*(?:{_UNIT})?")
+
+PACK_PATTERNS = (
+    CONTENT_X_RE,
+    # 12個入 / 35枚組 / 4点セット / 2個セット / 2袋入
+    re.compile(rf"(\d+)\s*{_UNIT}\s*(?:セット|組み?|入り?)"),
+    # セット数:4pcs / 組数 4（「ギフトタオルセット 34X66cm」の 34 を拾わないよう「数」を必須にした）
+    re.compile(r"(?:セット|組)\s*数\s*[:：]?\s*(\d+)"),
+    # 4pcs / 4pc
+    re.compile(r"(\d+)\s*pcs?\b", re.I),
+    STANDALONE_RE,
+)
+
+# 「ペアセット」「ペア組」は2点。**卸もペアで1点のことがある**（小倉陶器ビアタンブラー）。
 PAIR_RE = re.compile(r"ペア\s*(?:セット|組み?)")
 
 # 「N〈単位〉入り」の〈単位〉が**内容量とも個数とも読める**もの。
@@ -78,69 +116,153 @@ PAIR_RE = re.compile(r"ペア\s*(?:セット|組み?)")
 # （卸268円/点 × 18 = 4,824円が正しい原価。1個手残りを +3,706円と報告したが実際は ▲778円）。
 #   「18食入り」＝カップ麺18個（＝卸18点）
 #   「90包入り」＝青汁1箱の中身（＝卸1点）
-# **同じ書き方で意味が逆になるので、機械では決められない。**だから 1 とも N とも決めずに
-# None（UNKNOWN）を返し、人に見せる。CLAUDE.md §3.3-7。
-AMBIGUOUS_RE = re.compile(r"(\d+)\s*(?:食|包|缶|杯|玉|丁|尾|房|株|輪|カット|パウチ)\s*入り?")
+# **同じ書き方で意味が逆になるので、機械では決められない。**CLAUDE.md §3.3-7。
+# 2026-10-11：旧式は `入り?`（「入」必須）で「120g、6食」を素通りして単品と読んでいた（人の確認は6）。
+AMBIGUOUS_RE = re.compile(r"(\d+)\s*(?:食|包|缶|杯|玉|丁|尾|房|株|輪|カット|パウチ)(?:\s*入り?)?")
 
 # 「2P」「4P」のようなパック表記。**卸の1点が1枚なのか1パックなのかは商品名から分からない。**
-# 2026-10-01: 「いいタオル バスタオル2P」を単品と読んでいた。
 AMBIGUOUS_PACK_RE = re.compile(r"(?<![A-Za-z0-9])(\d+)\s*[Pp](?![A-Za-z0-9])")
 
 # 現実的な上限。これを超える数は「600粒」型の誤読なので採らない。
 MAX_PLAUSIBLE = 60
 
 
-def parse_amazon_set_count(title: str | None) -> int | None:
-    """商品タイトルから「Amazon の1個 ＝ 卸の何点か」を読む。
-
-    戻り値:
-      1     … 単品（セットを示す語が無い）
-      N     … N点セット
-      None  … セットらしいが個数が読めない／読んだ数が食い違う → **UNKNOWN にすること**
-    """
-    if not title:
-        return None
+def _normalize(title: str) -> str:
     t = unicodedata.normalize("NFKC", str(title))
     for w in NON_SET_WORDS:
         t = t.replace(w, "")
+    return t
 
-    # **曖昧な表記を先に見る。**読めるふりをしないのが一番安全（下流は UNKNOWN になる）。
-    for pat in (AMBIGUOUS_RE, AMBIGUOUS_PACK_RE):
-        m = pat.search(t)
-        if m and 1 < int(m.group(1)) <= MAX_PLAUSIBLE:
-            return None
 
-    found: set[int] = set()
-    for pat in PATTERNS + (STANDALONE_RE,):
+def _numbers(t: str, patterns) -> set[int]:
+    out: set[int] = set()
+    for pat in patterns:
         for m in pat.finditer(t):
             n = int(m.group(1))
             if 1 <= n <= MAX_PLAUSIBLE:
-                found.add(n)
+                out.add(n)
+    return out
 
-    if not found and PAIR_RE.search(t):
-        return 2
 
-    if len(found) == 1:
-        return found.pop()
+def _pack_numbers(t: str) -> set[int]:
+    """中身の数とも束ねた数とも読める N（2以上）。"""
+    found = {n for n in _numbers(t, PACK_PATTERNS + (AMBIGUOUS_RE, AMBIGUOUS_PACK_RE)) if n > 1}
+    if PAIR_RE.search(t):
+        found.add(2)
+    return found
 
-    if len(found) > 1:
-        # 「【2点セット】…×2点セット」なら両方2で一致する。食い違うのは読み違えの疑い。
+
+def has_pack_expression(title: str | None) -> bool:
+    """商品名に「12個入」型の（卸と突き合わせないと決まらない）数があるか。"""
+    return bool(title) and bool(_pack_numbers(_normalize(title)))
+
+
+ONE_RE = re.compile(rf"(?<![\d.])1\s*{_UNIT}(?![\dA-Za-z])")
+
+
+def wholesale_count(wholesale_title: str | None) -> int | None:
+    """卸の商品名に書かれた「1点の中の数」。
+
+    「1袋」のように1と明記されていれば 1、「12個入」なら 12。
+    **数が書かれていなければ None**（＝分からない）。2026-10-11 の実測で、卸の商品名に数が無い
+    「タオルセット」「法善寺あられ みやびかぜ」は卸もギフト箱1点で、Amazon の「2枚組」「14袋入」を
+    倍率にすると誤りだった（22行中12行）。
+    """
+    if wholesale_title is None:
         return None
+    t = _normalize(wholesale_title)
+    ns = _numbers(t, EXPLICIT_PATTERNS + (PAREN_RE,)) | _pack_numbers(t)
+    if not ns:
+        return 1 if ONE_RE.search(t) else None
+    return ns.pop() if len(ns) == 1 else None
+
+
+def parse_amazon_set_count(title: str | None, wholesale_title: str | None = None) -> int | None:
+    """商品タイトルから「Amazon の1個 ＝ 卸の何点か」を読む。
+
+    `wholesale_title` … 突き合わせる卸の商品名（NETSEA の product_name 等）。
+    「12個入」型の表記は、**卸の商品名にも同じ数があれば 1**、卸に数が無ければ N、
+    卸の商品名が無ければ None（UNKNOWN）にする。
+
+    戻り値:
+      1     … 単品
+      N     … N点セット
+      None  … 決められない → **UNKNOWN にすること**（人が卸と Amazon の両方を見る）
+    """
+    if not title:
+        return None
+    t = _normalize(title)
+
+    # 中身の規格（20g×12個）を先に PACK として取り出し、束ね表記の検索から外す
+    t = CONTENT_X_RE.sub(lambda m: f" {m.group(1)}個入 ", t)
+    explicit = _numbers(t, EXPLICIT_PATTERNS)
+    # 「×2点セット」の「2点セット」部分が PACK にも当たるので、EXPLICIT の箇所を消してから数える
+    rest = t
+    for pat in EXPLICIT_PATTERNS:
+        rest = pat.sub(" ", rest)
+    paren = _numbers(rest, (PAREN_RE,))
+    rest = PAREN_RE.sub(" ", rest)
+    pack = _pack_numbers(rest)
+    if paren:
+        if len(paren) > 1 or explicit:
+            return None
+        q = next(iter(paren))
+        if not pack:
+            explicit = paren                # 「4L (4個)」＝束ね
+        else:
+            # 「18枚入 (4個)」＝18枚入を4箱 or 「2袋（4本）」＝中身の言い直し。卸と比べて決める
+            if len(pack) > 1:
+                return None
+            w = wholesale_count(wholesale_title)
+            p = next(iter(pack))
+            return q if w == p else None
+
+    if len(explicit) > 1:
+        return None                     # 「×2点…×3点」は読み違えの疑い
+    if explicit:
+        n = next(iter(explicit))
+        # 【2点セット】…×2点セット は同じ数。食い違う「N点セット」が残っていれば疑う。
+        set_like = _numbers(rest, (re.compile(rf"(\d+)\s*{_UNIT}\s*セット"),))
+        if set_like - {n}:
+            return None
+        # 卸の商品名があり、卸の側にも数が書かれていれば割る（卸も同じ束ねなら 1）。
+        # 卸に数が無い／商品名が無いときは、束ね表記の n をそのまま使う（B0DJNX12KZ の型）
+        w = wholesale_count(wholesale_title)
+        if w is None:
+            # 卸の商品名が「タオルセット」のようにセットを名乗っているのに数が無い＝卸も箱1点の疑い
+            if wholesale_title and SETWORD_RE.search(_normalize(wholesale_title)):
+                return None
+            return n
+        return n // w if n % w == 0 else None
+
+    if pack:
+        if len(pack) > 1:
+            return None
+        p = next(iter(pack))
+        w = wholesale_count(wholesale_title)
+        if w is None:
+            return None                 # 卸の商品名が無い／読めない → 人が見る
+        return p // w if p % w == 0 else None
 
     # 個数は読めなかった。セットを匂わせる語があるなら 1 と決め打たない。
     if SETWORD_RE.search(t):
         return None
+    # Amazon に数が無いのに卸の1点が「30枚入」なら、Amazon の1個が卸の何点かは分からない
+    # （2026-10-11 マスク：Amazon 商品名に数なし・卸は30枚入・人の確認は 3〜50）
+    if wholesale_title is not None and _pack_numbers(_normalize(wholesale_title)):
+        return None
     return 1
 
 
-def cost_multiplier(title: str | None) -> tuple[int | None, str]:
+def cost_multiplier(title: str | None, wholesale_title: str | None = None
+                    ) -> tuple[int | None, str]:
     """(原価の倍率, 人が読める理由) を返す。倍率が None なら UNKNOWN。"""
-    n = parse_amazon_set_count(title)
+    n = parse_amazon_set_count(title, wholesale_title)
     if n is None:
         return (None,
                 "商品名から「Amazon の1個 ＝ 卸の何点か」が確定できません"
-                "（『18食入り』型は中身の数とも個数とも読めます）。原価の倍率が決まらないので"
-                "**卸サイトと Amazon の両方を人が見てください。**")
+                "（『12個入』『18食入り』型は中身の数とも束ねた数とも読めます）。原価の倍率が"
+                "決まらないので**卸サイトと Amazon の両方を人が見てください。**")
     if n == 1:
         return (1, "単品（Amazon の1個 ＝ 卸の1点）。")
     return (n, f"Amazon の1個 ＝ 卸の{n}点（原価は卸単価の{n}倍）。")

@@ -683,6 +683,15 @@ def sd_rows(header: list[str]) -> tuple[list[list], list[dict]]:
                 break
         sell = num(r["販売価格(90日中央値)"])
         n = num(r["Amazon側のセット数(Amazon1個=卸何点か)"]) or None
+        set_conf = r.get("セット数の確度")
+        # 人の #15 確認（set_check_*.csv）が勝つ。高・中だけ使い、低・未確定は UNKNOWN（2026-10-11）
+        hs = S.human_set_checks().get(a)
+        if hs:
+            hn = num(hs.get("Amazon1個＝卸◯点"))
+            if hn and (hs.get("確度") or "").strip() in S.HUMAN_SET_OK:
+                n, set_conf = hn, "確定"
+            else:
+                set_conf = "人の確認で未確定"
         tier = r.get("サイズ区分") or None
         gr = None
         split_note = ""
@@ -693,7 +702,7 @@ def sd_rows(header: list[str]) -> tuple[list[list], list[dict]]:
                                   sell_worst=num(r["保守値(90日の下位25%)"]),
                                   estimated=("保管月数（3か月の仮置き）",))
         if mp and num(mp.get("卸価格_税抜_1点")) and sell and n and tier:
-            if r.get("セット数の確度") in ("確定", "単独"):
+            if set_conf in ("確定", "単独"):
                 gr = _grade(n)
             else:
                 # セット数が未確定でも、候補の全部（1点・表記の n 点）で同じ等級なら
@@ -704,7 +713,7 @@ def sd_rows(header: list[str]) -> tuple[list[list], list[dict]]:
                     gr.reason += (f"（セット数は未確定だが、1点でも{int(n)}点でも等級 "
                                   f"{g1.grade}/{gn.grade} で結論は同じ）")
                 else:
-                    split_note = (f"#15 セット数 UNKNOWN（{r.get('セット数の確度')}）：SD 卸1点 "
+                    split_note = (f"#15 セット数 UNKNOWN（{set_conf}）：SD 卸1点 "
                                   f"{mp['卸価格_税抜_1点']}円なら、Amazon1個＝卸1点で等級 {g1.grade}"
                                   f"（{g1.mid.get('利益率(%)')}%）・{int(n)}点で等級 {gn.grade}"
                                   f"（{gn.mid.get('利益率(%)')}%）。どちらかで結論が変わる")
@@ -881,6 +890,7 @@ def main(argv=None) -> int:
     def count(rs):
         return (dict(Counter(r["判定"] for r in rs)), dict(Counter(r["卸サイト"] for r in rs)))
     before = count(rows)
+    prev_verdict = {r["ASIN"]: r["判定"] for r in rows}   # 新しく GO／NO-GO から外れた行の検出用
 
     scored = score_netsea()
     gates = SCREEN.gate
@@ -979,14 +989,33 @@ def main(argv=None) -> int:
     (OUT / f"diag_items_{date.today().strftime('%Y%m%d')}.json").write_text(
         json.dumps(DIAG, ensure_ascii=False))
     # GO 一覧（社長が発注を決める表・CLAUDE.md §3.2 の必須列を含む）。購入先URL は agent_output にだけ置く
-    go_cols = ["ASIN", "商品名", "卸サイト", "購入元の名前", "利益率(%)", "手残り(円)", "3か月販売数",
+    go_cols = ["今回GOになった", "ASIN", "商品名", "卸サイト", "購入元の名前", "セット数(Amazon1個=卸何点)",
+               "セット数の根拠", "利益率(%)", "手残り(円)", "3か月販売数",
                "取り分(個/月)", "カートの販売元", "出品可否", "推奨初回点数", "過去1ヶ月の販売数",
                "セラー数", "Amazon本体の有無", "Amazon URL", "購入先URL", "等級", "判定理由"]
+    for x in EXTRA["GO"]:
+        x["今回GOになった"] = "Y" if prev_verdict.get(x["ASIN"]) != "GO" else ""
+    EXTRA["GO"].sort(key=lambda x: x["今回GOになった"] != "Y")
     with (OUT / f"go_list_{date.today().strftime('%Y%m%d')}.csv").open(
             "w", encoding="utf-8-sig", newline="") as f:
         w = csv.DictWriter(f, fieldnames=go_cols, extrasaction="ignore")
         w.writeheader()
         w.writerows(EXTRA["GO"])
+    # NO-GO から外れて、残りがゲート（#1-2）とカート（#5）の未確認だけになった行
+    # ＝カズヨが実画面で見れば決まる行。毎回作り直す（0件でもファイルを書く）
+    ia, ij, ir = header.index("ASIN"), header.index("判定"), header.index("判定理由")
+    queue = []
+    for x in final:
+        if prev_verdict.get(x[ia]) != "NO-GO" or x[ij] == "NO-GO":
+            continue
+        items = set(re.findall(r"(#[\d-]+)[^：／]*? (?:FAIL|UNKNOWN)", x[ir]))
+        if items and items <= {"#1-2", "#5"}:
+            queue.append(x[ia])
+    (OUT / f"gate_cart_queue_{date.today().strftime('%Y%m%d')}.txt").write_text(
+        "# NO-GO から外れ、ゲート(#1-2)・カート(#5)の未確認だけで止まった ASIN"
+        f"（ledger_refresh {TODAY}）{len(queue)}件\n" + "".join(a + "\n" for a in queue))
+    summary["ゲート・カート待ち"] = len(queue)
+    summary["新しくGO"] = sum(1 for x in EXTRA["GO"] if x.get("今回GOになった") == "Y")
     (OUT / "summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=1, default=str))
     if a.dry_run:
         (OUT / "after_dryrun.json").write_text(json.dumps([header] + final, ensure_ascii=False))
@@ -1030,6 +1059,10 @@ def record_extra(comp: dict, cells: dict, s: dict) -> None:
         "卸サイト": cells.get("卸サイト"),
         "出品可否": cells.get("ゲート可否"),
         "推奨初回点数": (s.get("_share") or {}).get("rec") or cells.get("発注点数"),
+        "セット数(Amazon1個=卸何点)": (int(s["n_set"]) if s.get("n_set") else "未確定"),
+        "セット数の根拠": f"{s.get('セット数の確度') or ''}" + (
+            "（人の確認）" if str(s.get("セット数の確度")) == "確定" and
+            s["asin"] in S.human_set_checks() else ""),
         "判定": cells.get("判定"), "判定理由": (cells.get("判定理由") or "")[:400],
     })
 

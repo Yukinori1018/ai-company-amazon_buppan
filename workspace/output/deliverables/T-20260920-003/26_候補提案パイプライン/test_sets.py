@@ -72,9 +72,17 @@ FAMILY = [
 
 
 print("1. JAN 1本からセット品 ASIN を全部拾う")
-members = sf.family_members(FAMILY)
+# 2026-10-11：「2個セット」（× の無い多入り表記）は卸の商品名と突き合わせて初めて倍率になる。
+# 卸（NETSEA）の1点は単品のあみたわしなので、渡せば 2 と読める。
+WHOLESALE = "旭化成 ズビズバ サラッシュ 立体タイプ 隅々まで洗えるあみたわし 1個"
+members = sf.family_members(FAMILY, wholesale_title=WHOLESALE)
 eq(len(members), 6, "6口すべてを Member にする（1件に絞らない）")
 eq([m.set_count.n for m in members], [200, 10, 3, 2, 1, 1], "大きい口から並べる")
+eq([m.set_count.n for m in sf.family_members(
+    FAMILY, wholesale_title="旭化成 ズビズバ サラッシュ 立体タイプ あみたわし")][-1], None,
+   "卸の商品名に数が無ければ『2個セット』は決めない（卸もセット1点のことがある・タオル3件）")
+eq([m.set_count.n for m in sf.family_members(FAMILY)][-1], None,
+   "卸の商品名が無ければ『2個セット』は決めない（12個入を12倍に読んだ 2026-10-11 の型）")
 eq(sf.extra_asins(FAMILY), ["B0GV1Y3C38", "B0VARIATION1"],
    "parentAsin と variations も同じレスポンスから拾える（追加トークン0）")
 
@@ -82,6 +90,9 @@ print("\n2. セット数は商品名 × packageQuantity の2本で決める")
 eq(sf.resolve("あみたわし × 10個セット", 10, -1).confidence, sf.CONFIRMED, "2本一致で確定")
 eq(sf.resolve("あみたわし × 10個セット", 10, -1).n, 10, "確定したら倍率を返す")
 c = sf.resolve("ズビズバ 2個セット", 1, 2)
+eq(c.confidence, sf.UNREADABLE, "多入り表記×pq=1 は決めない（pq=1 は既定値のことがある）")
+check(not c.is_decided(), "多入り表記×pq=1 は GO に進めない（辛ラーメン6食を1と読んだ型）")
+c = sf.resolve("ズビズバ ×2個セット", 1, 2)
 eq(c.confidence, sf.CONFLICT, "商品名2・pq1 は不一致")
 eq(c.n, 2, "不一致なら**大きい方**で計算する（原価を安く見積もらない）")
 check(not c.is_decided(), "不一致は GO に進めない（人が両方の画面を見る）")

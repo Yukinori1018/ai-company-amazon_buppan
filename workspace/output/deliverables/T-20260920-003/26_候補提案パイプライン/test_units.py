@@ -57,7 +57,9 @@ check("600粒 は内容量＝単品",
 
 # 読めるものは読む（過剰に UNKNOWN へ倒して母数を削らない）。
 check("2点セットは 2", set_count.parse_amazon_set_count("ステンレスボトル 500ml ×2点セット"), 2)
-check("4袋入は 4", set_count.parse_amazon_set_count("ウルフピー 4袋入"), 4)
+# 2026-10-11：「4袋入」は卸の1点が1袋なら4・4袋入りなら1。卸の商品名と突き合わせて決める。
+check("4袋入は卸が1袋なら 4", set_count.parse_amazon_set_count("ウルフピー 4袋入", "ウルフピー 1袋"), 4)
+check("4袋入は卸の商品名が無ければ読まない", set_count.parse_amazon_set_count("ウルフピー 4袋入"), None)
 check("ヘッドセットは単品", set_count.parse_amazon_set_count("エレコム ゲーミングヘッドセット"), 1)
 check("寸法を拾わない",
       set_count.parse_amazon_set_count("キャビネット 幅100×奥行32×高さ70cm"), 1)

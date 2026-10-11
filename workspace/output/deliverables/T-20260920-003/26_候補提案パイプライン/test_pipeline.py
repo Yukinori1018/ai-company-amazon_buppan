@@ -389,19 +389,32 @@ class TestSetCount(unittest.TestCase):
         self.assertEqual(set_count.parse_amazon_set_count(
             "不二貿易(Fujiboeki) シューズラック 4段 幅63cm ブラウン 木製 簡単組立"), 1)
 
+    # 2026-10-11 書き換え：「4pcs」「ペアセット」「35枚組」「4袋」は**中身の数**のことがある。
+    # サトルの人の確認では、小倉陶器ペアセット・サンカ35枚組とも卸も同じセットを1点で売っており
+    # 正解は 1 だった。卸の商品名と突き合わせて初めて倍率にする。
     def test_pcs_and_pair(self):
+        self.assertIsNone(set_count.parse_amazon_set_count(
+            "[C/D:37189] [セット数:4pcs] アニマルドアストッパー"))
         self.assertEqual(set_count.parse_amazon_set_count(
-            "[C/D:37189] [セット数:4pcs] アニマルドアストッパー"), 4)
+            "[C/D:37189] [セット数:4pcs] アニマルドアストッパー", "アニマルドアストッパー 1個"), 4)
+        # 卸の商品名に数が無ければ決めない（卸もセット1点のことがある）
+        self.assertIsNone(set_count.parse_amazon_set_count(
+            "[C/D:37189] [セット数:4pcs] アニマルドアストッパー", "アニマルドアストッパー"))
+        self.assertIsNone(set_count.parse_amazon_set_count(
+            "小倉陶器 ビアタンブラー 420ml ペアセット IE NOMI BEER"))
         self.assertEqual(set_count.parse_amazon_set_count(
-            "小倉陶器 ビアタンブラー 420ml ペアセット IE NOMI BEER"), 2)
+            "小倉陶器 ビアタンブラー 420ml ペアセット IE NOMI BEER",
+            "小倉陶器 IE NOMI BEER ビアタンブラー ペアセット"), 1)
 
     def test_large_multipacks(self):
-        self.assertEqual(set_count.parse_amazon_set_count(
-            "サンカ 芝の根止め レギュラー (幅16cm×高さ13.7cm) 【35枚組】 ブラック"), 35)
+        t = "サンカ 芝の根止め レギュラー (幅16cm×高さ13.7cm) 【35枚組】 ブラック"
+        self.assertIsNone(set_count.parse_amazon_set_count(t))
+        self.assertEqual(set_count.parse_amazon_set_count(t, "サンカ 芝の根止め レギュラー 35枚組"), 1)
 
     def test_standalone_bags_count(self):
-        self.assertEqual(set_count.parse_amazon_set_count(
-            "ウルフピー4袋[オオカミ尿100％] WOLFPEE 動物除け"), 4)
+        t = "ウルフピー4袋[オオカミ尿100％] WOLFPEE 動物除け"
+        self.assertIsNone(set_count.parse_amazon_set_count(t))
+        self.assertEqual(set_count.parse_amazon_set_count(t, "ウルフピー 1袋"), 4)
 
     def test_multiplier_none_makes_economics_unknown(self):
         """倍率が読めなければ GO にしない（採算は UNKNOWN）。"""

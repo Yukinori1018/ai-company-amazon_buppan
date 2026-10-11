@@ -266,7 +266,7 @@ def to_candidates(netsea: dict[str, dict], by_jan: dict[str, list[dict]],
         if not group:
             continue
         tally["jan"] += 1
-        members = set_family.family_members(group)
+        members = set_family.family_members(group, wholesale_title=w.get("title"))
         tally["set_members"] += max(0, len(members) - 1)
         unit_cost_1pt = profit.unit_cost_incl_tax(w["unit_price_excl"])
 

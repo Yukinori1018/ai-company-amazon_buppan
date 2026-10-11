@@ -95,13 +95,17 @@ def _structured(v) -> int | None:
     return n if 1 <= n <= MAX_STRUCTURED else None
 
 
-def resolve(title: str | None, package_quantity=None, number_of_items=None) -> SetCount:
+def resolve(title: str | None, package_quantity=None, number_of_items=None,
+            wholesale_title: str | None = None) -> SetCount:
     """商品名 × packageQuantity（× numberOfItems）から倍率を決める。
 
     `numberOfItems` は**判定には使いません**（1 が既定値として入る実例があるため）。
     記録だけ残して、人が見るときの材料にします。
+
+    `wholesale_title` … 突き合わせる卸の商品名。「12個入」型の表記はこれと比べて初めて
+    倍率になる（`set_count.parse_amazon_set_count` の docstring・2026-10-11）。
     """
-    title_n = set_count.parse_amazon_set_count(title)
+    title_n = set_count.parse_amazon_set_count(title, wholesale_title)
     pq = _structured(package_quantity)
     noi = _structured(number_of_items)
 
@@ -123,6 +127,15 @@ def resolve(title: str | None, package_quantity=None, number_of_items=None) -> S
                         f"商品名は{title_n}点・packageQuantity は{pq}点で食い違います。"
                         f"原価を安く見積もらないため大きい方（{n}点）で計算しますが、"
                         f"**人が卸サイトと Amazon の両方を見てください。**")
+
+    # 商品名に「12個入」型の数があって卸と突き合わせられなかった行は、packageQuantity
+    # 1本で決めない（pq=1 は既定値として入ることがあり、「6食」を単品と読む向きの誤り＝
+    # 原価を安く見る側になる。2026-10-11 サトル実測で辛ラーメン 6食が台帳1・人6）。
+    if title_n is None and pq == 1 and set_count.has_pack_expression(title):
+        return SetCount(None, UNREADABLE, sources,
+                        "商品名に「12個入」型の数があり、卸の1点が同じ中身かどうかが"
+                        "商品名からは決まりません（packageQuantity=1 は既定値のことがあるので使わない）。"
+                        "**卸サイトの1点の中身を人が見てください。**")
 
     only = title_n if title_n is not None else pq
     if only is not None:
@@ -160,7 +173,7 @@ class Member:
     review_count: int | None = None      # COUNT_REVIEWS（rating=1 が無いと -1）
 
 
-def family_members(products: list[dict]) -> list[Member]:
+def family_members(products: list[dict], wholesale_title: str | None = None) -> list[Member]:
     """Keepa の `code` 逆引きが返した商品群 → セット品ファミリ。
 
     **1件に絞りません。**`discover._pick_best()` は「ランクが付いていて一番上位のもの」を
@@ -190,7 +203,7 @@ def family_members(products: list[dict]) -> list[Member]:
             asin=p.get("asin") or "",
             title=(p.get("title") or "")[:160],
             set_count=resolve(p.get("title"), p.get("packageQuantity"),
-                              p.get("numberOfItems")),
+                              p.get("numberOfItems"), wholesale_title),
             sell=sell,
             rank_now=at(cur, 3),
             rank_avg90=at(avg, 3),
