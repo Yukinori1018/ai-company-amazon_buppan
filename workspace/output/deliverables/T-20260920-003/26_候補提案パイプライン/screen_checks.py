@@ -53,6 +53,8 @@ RAW_FILES = [WORK / "refetch20261004/raw.jsonl",
              OUT / "keepa_kz_hist_20261011.jsonl",      # 2026-10-11 キーゾン再現用の取得
              OUT / "keepa_unknown_20261011.jsonl",      # 2026-10-11 実売 UNKNOWN の取り直し
              WORK / "kz_entry/keepa_full.jsonl"]        # 2026-10-11 kz 入口（buybox=1）
+#: 2026-10-12 UNKNOWN の段階解消（unknown_stages.py）の取り直し。後ろほど新しい＝後勝ち
+RAW_FILES += sorted((WORK / "unknown_queue").glob("keepa_stage_*.jsonl"))
 
 
 @dataclass

@@ -49,6 +49,8 @@ from datetime import date
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
+#: §3.5 #18 実績枠の判定文字列（consistency.TRACK_RECORD と同じ。import 前に EXTRA で使うので直書き）
+K_TR = "GO（実績枠）"
 REPO = Path("/Users/yukinori/Claude Code/ai-company-amazon_buppan")
 WORK = REPO / "workspace/output/agent_output/T-20260920-003"
 BUY = WORK / "buylist20261009"
@@ -71,7 +73,7 @@ import discontinued as DISC    # noqa: E402
 FRESH_RAW = OUT / "keepa_unknown_20261011.jsonl"
 FRESH: dict[str, tuple[dict, int]] = {}      # {ASIN: (product, fetched_unix)}
 #: GO(テスト)／カートなし黒字の別記（社長判断の材料）。main() で CSV に書く
-EXTRA: dict[str, list[dict]] = {"GO": [], "GO・ゲート未確認": [], "カートなし黒字": []}
+EXTRA: dict[str, list[dict]] = {"GO": [], K_TR: [], "GO・ゲート未確認": [], "カートなし黒字": []}
 
 #: 人の実画面確認（カート・ゲート・キーゾン）。main() で読み込む。ここに載っている ASIN は
 #: 「確認者=カズヨ」でも凍結せず、毎回この証跡から人の値を合流させて引き直す。
@@ -116,6 +118,12 @@ SD_ROUTE = SDB / "sd_route_override_20261011.csv"
 #: 一覧で見たのは価格だけなので**在庫は未確認**（＝#17 仕入れは UNKNOWN）。
 #: 同じ ASIN が SD_ROUTE（10/11・在庫確認済み）にあれば、そちらを優先する。
 SD_ROUTE_EXTRA = sorted(SDB.glob("sd_route_override_2026101[2-9]*.csv"))
+#: 2026-10-12 サトル：問屋 国分ネット卸の非ログイン商品ページ（kokubu_lookup.py・法務判定50）で
+#: 読んだ値段。SD_ROUTE と同じ列＋「卸サイト」列。値はこのファイルにだけあり、スクリプトは持たない
+KOKUBU_ROUTE = sorted((WORK / "kokubu").glob("kokubu_route_override_*.csv"))
+#: 2026-10-12 サトル：仕入れ先起点（supplier_screen.py）で見つけた台帳外の ASIN。
+#: 列は ASIN・JAN・仕入れ先。商品データは supplier_screen のキャッシュ（トークン0）から読む
+FEEDS = sorted(OUT.glob("new_supplier_candidates_*.csv"))
 
 #: score_20261004 のゲート名 → CLAUDE.md §3.5 の項目番号
 ITEM = {
@@ -173,6 +181,7 @@ def score_netsea() -> list[dict]:
         s["_cand"], s["_idx_day"] = {"fba_yen": r.get("_fba_yen") or None}, "2026-10-01"
         new.append(s)
     new += score_kz_entry(idx, names, rc)
+    new += score_feeds(idx, names, rc)
     # 2026-10-11：実売 UNKNOWN 行は Keepa を取り直した（buybox=1 でカート保持者・history=1 で
     # ランク履歴）。取り直した ASIN は新しい商品データで採点し直す（同じ行・同じ卸データ）。
     load_fresh()
@@ -235,10 +244,51 @@ def score_kz_entry(idx: dict, names: dict, rc: Counter) -> list[dict]:
     return out
 
 
+def score_feeds(idx: dict, names: dict, rc: Counter) -> list[dict]:
+    """仕入れ先起点の台帳外 ASIN を、既存の行と同じ S.build で採点する（2026-10-12 サトル）。
+
+    卸値は NETSEA 索引（10/01）か、国分の実測（KOKUBU_ROUTE）。NETSEA 索引に無い国分の JAN は
+    国分の実測を索引の形にして足す。経路の切り替え（SD／国分）は route_to_sd が行う。"""
+    if not FEEDS:
+        return []
+    import kz_entry_candidates as KE
+    import supplier_screen as SS
+    want: dict[str, dict] = {}
+    for f in FEEDS:
+        for r in csv.DictReader(f.open(encoding="utf-8-sig")):
+            a = (r.get("ASIN") or "").strip()
+            if a:
+                want.setdefault(a, r)
+    latest, _ = SS.load_by_asin(set(want))
+    idx2 = dict(idx)
+    for o in load_sd_route().values():
+        j = (o.get("JAN") or "").strip()
+        if o.get("卸サイト") == "国分ネット卸" and j and j not in idx2:
+            idx2[j] = {"jan": j, "unit_price_excl": S._num(o["卸価格_税抜_1点"]),
+                       "min_lot_units": int(S._num(o.get("卸の最小ロット(点)")) or 1),
+                       "stock": o.get("在庫") or "", "title": o.get("卸の商品名") or "",
+                       "supplier_name": "問屋 国分ネット卸", "supplier_url": o.get("購入先URL") or ""}
+    out = []
+    for a, r in want.items():
+        c = latest.get(a)
+        if not c:
+            continue
+        row = KE.build_row(a, c.product, idx2, None, 1)
+        if not row:
+            continue
+        cand = {"fba_yen": row.get("_fba_yen") or None}
+        s = S.build(row, cand, c.product, idx2, names, KE.IDX_DAY, None, dict(rc))
+        s["_src"] = f"仕入れ先起点({r.get('仕入れ先') or ''})"
+        s["_supplier_url"] = row.get("_supplier_url")
+        s["_cand"], s["_idx_day"], s["_fresh"] = cand, KE.IDX_DAY, c.fetched
+        out.append(s)
+    return out
+
+
 def load_sd_route() -> dict[str, dict]:
     out: dict[str, dict] = {}
     # 古い順に読み、先に入った（在庫まで確認済みの）行を後のファイルで上書きしない
-    for f in [SD_ROUTE, *SD_ROUTE_EXTRA]:
+    for f in [SD_ROUTE, *SD_ROUTE_EXTRA, *KOKUBU_ROUTE]:
         if not f.exists():
             continue
         for r in csv.DictReader(f.open(encoding="utf-8-sig")):
@@ -283,12 +333,15 @@ def route_to_sd(scored: list[dict], idx: dict, names: dict, rc: dict) -> list[di
         in_stock = stock in ("あり", "在庫あり")
         st = "FAIL" if sold_out else ("PASS" if in_stock else "UNKNOWN")
         word = {"FAIL": "在庫なし", "PASS": "在庫あり", "UNKNOWN": "在庫は未確認（価格のみ確認）"}[st]
+        site = o.get("卸サイト") or "スーパーデリバリー"
+        memo = (o.get("メモ") or "").strip()
         s2["gates"] = [g for g in s2["gates"] if g[0] != "仕入れ"] + [(
             "仕入れ", st,
-            f"SD（{o['購入先URL']}）で{word}・卸1点 {excl:,.0f}円（税抜）"
-            f"（{o.get('確認者', '')} {o.get('確認時刻', '')}）。**発注直前に卸値を引き直してください。**")]
+            f"{'SD' if site == 'スーパーデリバリー' else site}（{o['購入先URL']}）で{word}・卸1点 {excl:,.0f}円（税抜）"
+            f"（{o.get('確認者', '')} {o.get('確認時刻', '')}）" + (f"。{memo}" if memo and site != "スーパーデリバリー" else "")
+            + "。**発注直前に卸値を引き直してください。**")]
         s2["在庫"] = {"FAIL": "在庫なし", "PASS": "在庫あり", "UNKNOWN": "未確認"}[st]
-        s2["channel"] = "スーパーデリバリー"
+        s2["channel"] = site
         s2["_route"] = o
         out.append(s2)
     return out
@@ -323,12 +376,27 @@ def load_supplement() -> dict[str, tuple[dict, int]]:
     return out
 
 
+#: 2026-10-12：UNKNOWN の段階解消（unknown_stages.py）が取り直した生データ。FRESH と同じ扱いで、
+#: 同じ ASIN は fetched が新しい方を使う
+STAGE_RAW = WORK / "unknown_queue"
+
+
 def load_fresh() -> None:
-    if FRESH or not FRESH_RAW.exists():
+    if FRESH:
         return
-    for line in FRESH_RAW.open():
-        o = json.loads(line)
-        FRESH[o["asin"]] = (o["product"], o["fetched"])
+    for f in [FRESH_RAW, *sorted(STAGE_RAW.glob("keepa_stage_*.jsonl"))]:
+        if not f.exists():
+            continue
+        for line in f.open():
+            try:
+                o = json.loads(line)
+            except Exception:
+                continue
+            if not (o.get("asin") and o.get("product")):
+                continue
+            t = o.get("fetched") or 0
+            if o["asin"] not in FRESH or t >= FRESH[o["asin"]][1]:
+                FRESH[o["asin"]] = (o["product"], t)
 
 
 def econ_at(s: dict, sell: float, sell_worst: float | None):
@@ -387,7 +455,23 @@ def fix_for(name: str, st: str, why: str, s: dict) -> tuple[str, bool]:
                 "90日中央値を比べれば決まる"), False
     if name == "取り分":
         info = s.get("_share") or {}
-        return info.get("fix") or "人が確認すれば決まる", False
+        fix = info.get("fix") or "人が確認すれば決まる"
+        sh = info.get("share")
+        if sh is not None and st == "FAIL":
+            if sh >= K.TRACK_MIN_SHARE:
+                floor = max(int(s.get("min_lot") or 1), 10 if s.get("_docs") else 1)
+                m = floor / sh
+                if m > K.TRACK_MAX_MONTHS:
+                    ok_lot = int(sh * K.TRACK_MAX_MONTHS)
+                    fix += (f"／取り分 {sh:.1f}個/月は実績枠の線（月{K.TRACK_MIN_SHARE:g}個以上）は満たすが、"
+                            f"最小ロット {floor}点で在庫 {m:.1f}か月（6か月超）。"
+                            f"{ok_lot}点以下で買える仕入れ先（小分けの卸）なら GO（実績枠）の候補")
+                else:
+                    fix += (f"／取り分 {sh:.1f}個/月は実績枠の線（月{K.TRACK_MIN_SHARE:g}個以上）は満たす"
+                            "＝中央値で手残り0円以上なら GO（実績枠・最小ロット1回）")
+            else:
+                fix += f"／実績枠でも月{K.TRACK_MIN_SHARE:g}個以上が要る（いま {sh:.1f}個）"
+        return fix, False
     if name == "カート保持者":
         return "実画面でカートの販売元を読めば決まる（カート不在なら出品者の内訳を見る）", False
     if name == "実売" and st == "FAIL":
@@ -443,6 +527,16 @@ def fix_profit(s: dict) -> str:
                 if miss else "FBA 手数料（サイズ区分）が決まれば計算できる")
     if e.grade not in ("A", "B", "C"):
         return "寸法が分かればサイズ区分が決まり計算できる（セラセンの商品登録画面で確認）"
+    tr_note = ""
+    if e.grade == "C":
+        mid = mid_net(e)
+        if mid is not None and mid >= K.TRACK_MIN_NET_YEN:
+            tr_note = (f"中央値の手残り {yen(mid)}＝実績枠の採算の線（0円以上）は満たす。"
+                       "ほかの地雷が全部 PASS・取り分 月1個以上なら GO（実績枠・最小ロット1回）")
+        elif mid is not None:
+            n_ = s.get("n_set") or 1
+            tr_note = (f"実績枠（手残り0円以上）まであと {yen(-mid)}"
+                       f"＝卸1点を {yen(-mid / n_ / 1.1)}（税抜）下げれば実績枠の採算は満たす")
     if e.cost_ratio_pct < S.MIN_PLAUSIBLE_COST_RATIO:
         return (f"卸率{e.cost_ratio_pct}%は低すぎる＝単位ずれか終売の疑い。"
                 f"卸と Amazon の画面で単位を確かめれば決まる")
@@ -471,7 +565,64 @@ def fix_profit(s: dict) -> str:
             pass
     if e.cliff_note:
         parts.append(clean(e.cliff_note, 70))
+    if tr_note:
+        parts.insert(0, tr_note)
     return "／".join(parts)
+
+
+def mid_net(e) -> int | None:
+    """等級を決めた中央シナリオの手残り。古い Economics（属性なし）なら None＝推測しない。"""
+    return getattr(e, "mid_net_per_unit", None) if e else None
+
+
+def track_record_frame(s: dict, gates: list, gate: dict | None) -> dict | None:
+    """§3.5 #18 実績枠に入るか（2026-10-12 社長方針「プラマイ0でも卸で実績を作る」）。
+
+    入る条件（CLAUDE.md §3.5 #18 実績枠 ①〜⑤）
+      - 採算：等級 C（取り分だけが足りない B も拾う）で、中央値の1個手残りが0円以上
+        ※ 損益計算書の手残り（net_per_unit）と等級の中央シナリオの両方が0円以上（保守側）
+      - 取り分：月1個以上（通常3個）。在庫月数は**最小ロット1回ぶん**で6か月以内
+      - それ以外の項目（地雷）は全部 PASS。人の確認（カート・ゲート）の要否は GO と同じ扱い
+    返り値：入るなら {"mid","worst","share","rec","months","why"}、入らなければ None。
+    """
+    e = s.get("econ")
+    if not e or e.grade not in ("B", "C"):
+        return None
+    st = {g[0]: g[1] for g in gates}
+    pf = st.get("採算")
+    if e.grade == "C" and pf != "FAIL":
+        return None   # 卸率の番兵（UNKNOWN）などは実績枠に入れない
+    others = {k: v for k, v in st.items() if k not in ("採算", "取り分")}
+    if not others or any(v != "PASS" for v in others.values()):
+        return None
+    mid = mid_net(e)
+    if mid is None or e.net_per_unit is None:
+        return None
+    mid_use = min(mid, e.net_per_unit)
+    if "取り分" not in st:
+        # 実売は PASS だが出品者の内訳が無く取り分が出ていない。採算は実績枠の線を満たすので
+        # 落とさず「実績枠の候補・取り分待ち」（UNKNOWN）にする＝出品一覧を見れば決まる
+        floor = max(int(s.get("min_lot") or 1), 10 if (gate and gate.get("書類")) else 1)
+        best = s.get("_monthly") or s.get("monthlySold")   # 競合ゼロでも取り分は月販まで
+        if best and floor / best > K.TRACK_MAX_MONTHS:
+            return None   # 競合ゼロでも最小ロットが6か月で捌けない＝取り分を見ても入らない
+        if mid_use >= K.TRACK_MIN_NET_YEN and e.grade == "C":
+            return {"pending": True, "mid": mid_use, "worst": e.worst_net_per_unit}
+        return None
+    if e.grade == "B" and st.get("取り分") == "PASS":
+        return None   # B で取り分も足りていれば通常の GO
+    info = s.get("_share") or {}
+    share = info.get("share")
+    if share is None:
+        return None
+    docs = bool(gate and gate.get("書類"))
+    floor = max(int(s.get("min_lot") or 1), 10 if docs else 1)
+    months = floor / share if share > 0 else None
+    ok_, why = K.track_record(e.grade, mid_use, share, months)
+    if not ok_:
+        return None
+    return {"mid": mid_use, "worst": e.worst_net_per_unit, "share": share, "rec": floor,
+            "months": months, "why": why}
 
 
 def apply_screen(s: dict, gates: list, gate: dict | None) -> bool:
@@ -520,8 +671,8 @@ def compose_netsea(s: dict, gate: dict | None) -> dict:
         comp["reason"] = comp["reason"][:1800 - len(mark) - 3] + " ／ " + mark
     tag, info = classify_extra(s, comp["gates"], gate)
     comp["extra"] = (tag, info)
-    if comp["verdict"] == "GO":
-        comp["extra"] = ("GO", info)
+    if comp["verdict"] in K.GO_VERDICTS:
+        comp["extra"] = (comp["verdict"], info)
         sn = s.get("_season_note")
         if sn:
             comp["reason"] = (comp["reason"] + " ／ " + sn)[:1800]
@@ -598,6 +749,7 @@ def end_gate(s: dict, gates: list) -> None:
 
 def _compose_netsea(s: dict, gate: dict | None) -> dict:
     gates = reread_gates(s)
+    s["_docs"] = bool(gate and gate.get("書類"))
     screened = apply_screen(s, gates, gate)
     end_gate(s, gates)
     if gate:
@@ -620,7 +772,25 @@ def _compose_netsea(s: dict, gate: dict | None) -> dict:
             continue  # 売価・セット数の側で「こう変えれば」を書いている（重複させない）
         f, nv = fix_for(n, st, w, s)
         (never if nv else fixes).append(f)
-    adj = [nt for n, st, w, nt in gates if st == "PASS" and nt]
+    tr = track_record_frame(s, gates, gate)
+    if tr and tr.get("pending"):
+        note = K.track_record_note(tr["mid"], tr["worst"])
+        gates = [(n, "UNKNOWN", f"実績枠の候補（{note}）。取り分が未計算＝出品一覧の内訳"
+                                f"（FBA・即納の自己発送）を見て月1個以上なら GO（実績枠）", "")
+                 if n == "採算" else (n, st, w, nt) for n, st, w, nt in gates]
+        miss = [(n, st, w, nt) for n, st, w, nt in gates if st != "PASS"]
+        lines_miss = [f"{ITEM.get(n, n)} {st}：{clean(w, 140)}" for n, st, w, nt in miss]
+        fixes = ["出品一覧（/gp/offer-listing/<ASIN>/?f_new=true）でカート対象の出品者数を数えれば取り分が決まる"]
+        never = []
+        tr = None
+    s["_tr"] = tr
+    if tr:
+        # 実績枠に入る行は、採算（C）と取り分（月1〜3個）を「実績枠で PASS」と読み替えて判定する
+        note = K.track_record_note(tr["mid"], tr["worst"])
+        gates = [(n, "PASS", w, note) if n in ("採算", "取り分") else (n, st, w, nt)
+                 for n, st, w, nt in gates]
+        miss = [(n, st, w, nt) for n, st, w, nt in gates if st != "PASS"]
+    adj = [nt for n, st, w, nt in gates if st == "PASS" and nt and not (tr and n in ("採算", "取り分"))]
     sts = [st for _, st, _, _ in gates]
     machine = "NO-GO" if "FAIL" in sts else ("UNKNOWN" if "UNKNOWN" in sts else "GO")
     if s.get("pinned"):
@@ -637,7 +807,7 @@ def _compose_netsea(s: dict, gate: dict | None) -> dict:
             and gate["ゲート判定"] == "OK":
         # 出品可否（restrictions/approve）を人が見ていない行は GO にしない（2026-10-11 追加）
         # 人がカートを見て、実売（キーゾン or 実画面の月販表示）と取り分まで通った行だけ GO
-        verdict, waiting = "GO", True
+        verdict, waiting = ("GO" if not tr else K.TRACK_RECORD), True
         sh = s.get("_share") or {}
         reason = ("GO：§3.5 の機械項目＋人の確認がすべて PASS。"
                   f"#5 {next(g[2] for g in gates if g[0] == 'カート保持者')} ／ "
@@ -650,6 +820,11 @@ def _compose_netsea(s: dict, gate: dict | None) -> dict:
         dn = SC.doc_note(s["row"].get("商品名") or "")
         if dn:
             reason += " ／ " + dn
+        if tr:
+            reason = (f"GO（実績枠）＝{K.track_record_note(tr['mid'], tr['worst'])}。"
+                      f"{tr['why']}。最小ロット {tr['rec']}点で1回だけ（卸で取引・販売実績を作り、"
+                      "メーカー直取引の打診材料にする枠・§3.5 #18）。通常の GO とは別に数える ／ "
+                      + reason.replace(f"推奨初回 {sh.get('rec')}点", f"推奨初回 {tr['rec']}点（実績枠＝最小ロット）"))
         o = s.get("_route")
         if o:
             reason = (f"SD 経由で即発注可（購入元＝{s['row'].get('購入元の名前') or ''}・SD 取引中・"
@@ -663,6 +838,9 @@ def _compose_netsea(s: dict, gate: dict | None) -> dict:
     if machine == "GO":
         verdict, waiting = "UNKNOWN", True
         head = "機械判定は通過・実画面確認待ち"
+        if tr:
+            head = (f"実績枠の候補（{K.track_record_note(tr['mid'], tr['worst'])}・{tr['why']}）。"
+                    "機械判定は通過・実画面確認待ち")
         reason = (f"{head}。" + (f"読み替え：{' ／ '.join(adj)}。" if adj else "")
                   + f"人が見る項目：{'・'.join(human)}")
     else:
@@ -708,7 +886,7 @@ def netsea_cells(s: dict, gate: dict | None, comp: dict) -> dict:
     g["判定理由"] = comp["reason"]
     lg = LEGAL.get(s["asin"])
     if lg:
-        if g["判定"] == "GO":
+        if g["判定"] in K.GO_VERDICTS:
             g["判定"] = lg[0]
         g["判定理由"] = (lg[1] + " ／ " + g["判定理由"])[:1800]
     g["確認方法"] = ("Keepa 取得済みデータで再採点（価格90日中央値・ランク12ヶ月・buybox）"
@@ -719,10 +897,16 @@ def netsea_cells(s: dict, gate: dict | None, comp: dict) -> dict:
         g.update(screen_cells(s, gate))
     o = s.get("_route")
     if o:
-        g["卸サイト"] = "スーパーデリバリー"
+        site = o.get("卸サイト") or "スーパーデリバリー"
+        g["卸サイト"] = site
         g["購入先URL"] = o["購入先URL"]
-        g["確認方法"] = (g["確認方法"] + f"＋SD 卸価格・在庫はカズヨが社長 Chrome で確認 {o.get('確認時刻', '')}"
-                         "（NETSEA 停止中のため SD 経路で採算）")
+        if site == "スーパーデリバリー":
+            g["確認方法"] = (g["確認方法"] + f"＋SD 卸価格・在庫はカズヨが社長 Chrome で確認 {o.get('確認時刻', '')}"
+                             "（NETSEA 停止中のため SD 経路で採算）")
+        else:
+            g["購入元の名前"] = o.get("仕入れ先") or g.get("購入元の名前") or "未確認"
+            g["確認方法"] = (g["確認方法"] + f"＋{site} の値段・在庫は{o.get('確認者', '')}が"
+                             f"非ログインの商品ページで確認 {o.get('確認時刻', '')}（法務判定50）")
     return g
 
 
@@ -932,12 +1116,19 @@ def sd_rows(header: list[str]) -> tuple[list[list], list[dict]]:
         sts = [st for nm_, st, _ in gates if not (nm_ == "採算" and gr)]
         if sold_out:
             sts.append("FAIL")
+        tr_sd = bool(gr and gr.grade == "C" and (gr.mid.get("手残り") is not None)
+                     and gr.mid["手残り"] >= K.TRACK_MIN_NET_YEN)
         if gr:
             if gr.grade == "C":
-                sts.append("FAIL")
+                # 実績枠（§3.5 #18）：中央値で手残り0円以上の C は落とさず、ほかが全部 PASS なら
+                # 「実績枠の候補・実画面確認待ち」に上げる（取り分は人が出品一覧で見る）
+                sts.append("TR" if tr_sd else "FAIL")
                 miss.append(f"#18 採算等級 C：{clean(gr.reason, 90)}")
                 cap = r.get("B等級に必要な卸値上限(1点・税抜)")
                 fixes.append(f"卸1点 {cap}円（税抜）以下なら B（いま {mp['卸価格_税抜_1点']}円）")
+                if tr_sd:
+                    fixes.insert(0, "中央値の手残り0円以上＝実績枠の採算は満たす。ほかの地雷が全部 PASS・"
+                                    "取り分 月1個以上なら GO（実績枠・最小ロット1回）")
             elif gr.grade == "UNKNOWN":
                 sts.append("UNKNOWN")
                 miss.append(f"#18 採算等級 UNKNOWN：{clean(gr.reason, 70)}")
@@ -954,6 +1145,8 @@ def sd_rows(header: list[str]) -> tuple[list[list], list[dict]]:
             miss.append("#17 SD 取引申請が必要（取引企業リストに無い）")
             fixes.append("SD で取引申請すれば卸価格が見えて発注できる")
         machine = "NO-GO" if "FAIL" in sts else ("UNKNOWN" if "UNKNOWN" in sts else "GO")
+        tr_note = (K.track_record_note(gr.mid["手残り"], gr.worst.get("手残り"))
+                   if tr_sd and machine == "GO" else "")
         human = [HUMAN_ITEMS_BASE[0]] if not num(re.sub(r"[^0-9]", "", r["過去1ヶ月の販売数"] or "")) \
             else []
         human += HUMAN_ITEMS_BASE[1:] + ["#1-2 ゲート（restrictions/approve）"]
@@ -962,6 +1155,9 @@ def sd_rows(header: list[str]) -> tuple[list[list], list[dict]]:
             verdict, wait = "UNKNOWN", True
             reason = (f"機械判定は通過・実画面確認待ち（SD 卸価格 {mp['確認時刻'] if mp else ''} 確認済み・"
                       f"等級 {gr.grade}）。人が見る項目：{'・'.join(human)}")
+            if tr_note:
+                reason = (f"実績枠の候補（{tr_note}）。" + reason
+                          + "・#10 取り分（月1個以上・最小ロット1回で在庫6か月以内）")
         else:
             verdict = machine
             reason = "未達：" + " ／ ".join(miss)
@@ -1005,7 +1201,9 @@ def sd_rows(header: list[str]) -> tuple[list[list], list[dict]]:
 def sd_screen(cells: dict) -> dict:
     """SD 行に人の実画面確認（カート・ゲート）を合流させる。卸価格待ちの判定は動かさない。"""
     a = cells["ASIN"]
-    if not SCREEN.covers(a):
+    # 2026-10-12：キーゾン再現値（機械・§3.3-16 で実数同等）だけの SD 行にも #9 を合流させる
+    # （以前は人の確認がある行だけ。SD 行の #9「販売数もランクも取れていません」が解けなかった）
+    if not SCREEN.has_any(a):
         return cells
     cells = dict(cells)
     gate = SCREEN.gate.get(a)
@@ -1035,7 +1233,8 @@ def sd_screen(cells: dict) -> dict:
     elif c and c.sold_label:
         pre.append(f"#9 実画面 過去1か月 {c.sold_label}（キーゾン未確認）")
     cells.update({x: y for x, y in screen_cells({"asin": a}, gate).items()})
-    head = "（人の実画面確認を反映）" + " ／ ".join(pre) + "。"
+    label = "（人の実画面確認を反映）" if SCREEN.covers(a) else "（キーゾン再現値を反映）"
+    head = label + " ／ ".join(pre) + "。"
     if fail:
         cells["判定"] = "NO-GO"
         cells["判定理由"] = (head + f"【こう変えれば】{never} ／ 機械判定："
@@ -1193,9 +1392,9 @@ def main(argv=None) -> int:
     i_site, i_sup = header.index("卸サイト"), header.index("購入元の名前")
     i_v, i_why = header.index("判定"), header.index("判定理由")
     for x in final:
-        if x[i_v] == "GO" and not is_human(dict(zip(header, x))):
+        if x[i_v] in K.GO_VERDICTS and not is_human(dict(zip(header, x))):
             x[i_why] = with_supply_note(x[i_why], x[i_site], x[i_sup])
-    for x in EXTRA["GO"]:
+    for x in EXTRA["GO"] + EXTRA[K_TR]:
         x["判定理由"] = with_supply_note(x.get("判定理由"), x.get("卸サイト"), x.get("購入元の名前"))
     after = count([dict(zip(header, x)) for x in final])
     summary = {"前": before, "後": after, "更新": updated, "人の行(据え置き)": skipped_human,
@@ -1241,6 +1440,15 @@ def main(argv=None) -> int:
         w = csv.DictWriter(f, fieldnames=go_cols, extrasaction="ignore")
         w.writeheader()
         w.writerows(EXTRA["GO"])
+    # GO（実績枠）一覧（通常 GO と別ファイル・同じ必須列＋中央値/悲観値の手残り）
+    for x in EXTRA[K_TR]:
+        x["今回GOになった"] = "Y" if prev_verdict.get(x["ASIN"]) != K_TR else ""
+    with (OUT / f"track_record_list_{date.today().strftime('%Y%m%d')}.csv").open(
+            "w", encoding="utf-8-sig", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=go_cols[:8] + ["中央値の手残り(円)", "悲観値の手残り(円)"]
+                           + go_cols[8:], extrasaction="ignore")
+        w.writeheader()
+        w.writerows(EXTRA[K_TR])
     # GO の手前で、残りがゲート（#1-2）とカート（#5）の未確認だけの行
     # ＝カズヨが実画面で見れば決まる行。毎回作り直す（0件でもファイルを書く）。
     # 2026-10-11：旧版は「前回 NO-GO だった行」だけを拾っていた。前回から UNKNOWN のまま
@@ -1249,7 +1457,7 @@ def main(argv=None) -> int:
     ia, ij, ir = header.index("ASIN"), header.index("判定"), header.index("判定理由")
     queue = []
     for x in final:
-        if x[ij] in ("GO", "NO-GO") or is_human(dict(zip(header, x))):
+        if x[ij] in (*K.GO_VERDICTS, "NO-GO") or is_human(dict(zip(header, x))):
             continue
         items = set(re.findall(r"(#[\d-]+)[^：／]*? (?:FAIL|UNKNOWN)", x[ir]))
         if items and items <= {"#1-2", "#5"}:
@@ -1279,8 +1487,8 @@ def main(argv=None) -> int:
 
 def record_extra(comp: dict, cells: dict, s: dict) -> None:
     tag, info = comp.get("extra") or ("", {})
-    if cells.get("判定") == "GO":
-        tag = "GO"
+    if cells.get("判定") in K.GO_VERDICTS:
+        tag = cells["判定"]
     if not tag:
         return
     e = s.get("econ")
@@ -1305,7 +1513,10 @@ def record_extra(comp: dict, cells: dict, s: dict) -> None:
         "手残り(円)": info.get("net") or cells.get("1個粗利(円)"),
         "卸サイト": cells.get("卸サイト"),
         "出品可否": cells.get("ゲート可否"),
-        "推奨初回点数": (s.get("_share") or {}).get("rec") or cells.get("発注点数"),
+        "推奨初回点数": ((s.get("_tr") or {}).get("rec") or (s.get("_share") or {}).get("rec")
+                    or cells.get("発注点数")),
+        "中央値の手残り(円)": (s.get("_tr") or {}).get("mid", ""),
+        "悲観値の手残り(円)": ((s.get("_tr") or {}).get("worst", "") if s.get("_tr") else ""),
         "セット数(Amazon1個=卸何点)": (S.set_label(s["n_set"]) if s.get("n_set") else "未確定"),
         "セット数の根拠": f"{s.get('セット数の確度') or ''}" + (
             "（人の確認）" if str(s.get("セット数の確度")) == "確定" and

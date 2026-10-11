@@ -577,6 +577,82 @@ def _c_grade_rule(row: dict, ctx: dict) -> Optional[Finding]:
                    {"表の等級": g, "計算値": exp})
 
 
+# ── 実績枠（§3.5 #18・2026-10-12 社長方針）───────────────────────────────
+#: 社長「卸サイトで実績を増やしてからメーカー直取引へ進みたい。利益がそんなに取れなくても
+#: プラマイ0ぐらいでも取引を進めたい」。**通常の GO とは別に数える**ため判定の文字列を分ける。
+TRACK_RECORD = "GO（実績枠）"
+#: 判定列で「仕入れてよい」を意味する値（通常 GO と実績枠）。数えるときは必ず分けて数える
+GO_VERDICTS = ("GO", TRACK_RECORD)
+#: 実績枠の採算の線：中央値で1個手残り **0円以上**（プラマイ0まで）。仮置き（§3.1）
+TRACK_MIN_NET_YEN = 0
+#: 実績枠の取り分の下限（個/月）。通常は3個（screen_checks.MIN_SHARE）。仮置き（§3.1）
+TRACK_MIN_SHARE = 1.0
+#: 実績枠の在庫月数の上限（最小ロット1回ぶん）。§3.5 #10 の6ヶ月と同じ
+TRACK_MAX_MONTHS = 6.0
+
+
+def track_record(grade: str, mid_net: Optional[float], share: Optional[float],
+                 months: Optional[float]) -> tuple[bool, str]:
+    """実績枠に入れるか（採算と取り分だけを見る。地雷の PASS は呼び出し側で確かめる）。
+
+    入れる：等級 C（または取り分だけが足りない B）で、中央値の1個手残りが0円以上、
+            取り分が月1個以上、最小ロット1回の在庫月数が6ヶ月以内。
+    返り値：(入るか, 入らない理由 or 入る根拠の短文)。**数字が欠けていたら入れない**（推測で埋めない）。
+    """
+    if grade not in ("B", "C"):
+        return False, f"等級 {grade or '未確定'}（実績枠は C か、取り分だけ足りない B）"
+    if mid_net is None:
+        return False, "中央値の手残りが無い"
+    if mid_net < TRACK_MIN_NET_YEN:
+        return False, f"中央値の手残り {mid_net:,.0f}円（0円未満＝赤字）"
+    if share is None:
+        return False, "取り分が出ていない（実売・出品者の内訳が未確定）"
+    if share < TRACK_MIN_SHARE:
+        return False, f"取り分 {share:.1f}個/月（実績枠でも月{TRACK_MIN_SHARE:g}個以上）"
+    if months is None or months > TRACK_MAX_MONTHS:
+        return False, (f"最小ロットの在庫 {months:.1f}か月（上限{TRACK_MAX_MONTHS:g}か月）"
+                       if months is not None else "在庫月数が出ていない")
+    return True, (f"中央値 手残り {mid_net:,.0f}円・取り分 {share:.1f}個/月・"
+                  f"最小ロットで在庫 {months:.1f}か月")
+
+
+def track_record_note(mid_net: float, worst_net: Optional[float]) -> str:
+    """判定理由に書く1句。悲観値が赤字なら赤字額を書く（§3.5 #18 実績枠 ⑤）。"""
+    if worst_net is None:
+        w = "悲観値 未計算"
+    elif worst_net < 0:
+        w = f"悲観値 {worst_net:,.0f}円（赤字 {-worst_net:,.0f}円）"
+    else:
+        w = f"悲観値 {worst_net:,.0f}円"
+    return f"実績枠：中央値 手残り{mid_net:,.0f}円／{w}"
+
+
+def _c_track_record(row: dict, ctx: dict) -> Optional[Finding]:
+    """判定が「GO（実績枠）」の行が、実績枠の採算の線（中央値で手残り0円以上）を満たしているか。
+    等級 A/B の行を実績枠にしているのは数え方の誤り（通常 GO に数えるべき）なので WARN。"""
+    if get(row, COLS.verdict).strip() != TRACK_RECORD:
+        return None
+    net = ctx["net"]
+    if net is None:
+        return Finding("track_record", NG, "判定が実績枠なのに中央値の1個手残りが空欄です。")
+    if net < TRACK_MIN_NET_YEN:
+        return Finding("track_record", NG,
+                       f"判定が実績枠なのに中央値の1個手残りが {net:,.0f}円（0円未満）です。",
+                       {"1個手残り": net})
+    if get(row, COLS.grade).strip() == "A":
+        return Finding("track_record", WARN, "等級 A の行は通常の GO に数えます（実績枠ではない）。")
+    return None
+
+
+def count_verdicts(rows: Iterable[dict]) -> dict[str, int]:
+    """判定列の件数。**GO と GO（実績枠）を分けて数える**（社長方針）。"""
+    out: dict[str, int] = {}
+    for r in rows:
+        v = get(r, COLS.verdict).strip() or "(空)"
+        out[v] = out.get(v, 0) + 1
+    return out
+
+
 # ── 日付 ──────────────────────────────────────────────────────────────────
 _MD_RE = re.compile(r"^(\d{1,2})\s*[/月-]\s*(\d{1,2})")
 _YM_RE = re.compile(r"^(\d{4})\s*[-/年]\s*(\d{1,2})")
@@ -703,6 +779,7 @@ CHECKS: tuple[Callable[[dict, dict], Optional[Finding]], ...] = (
     _c_sentinel_cost_ratio,
     _c_sentinel_margin,
     _c_grade_rule,
+    _c_track_record,
     _c_death_band,
     _c_timeline,
     _c_timeline_stale,
@@ -896,6 +973,7 @@ def summarize(results: Iterable[RowResult], rows: Optional[list[dict]] = None) -
         "WARNのみ": sum(1 for r in results if not r.blocking and r.of(WARN)),
         "問題なし": sum(1 for r in results if not r.findings),
         "検査別": by_check,
+        "判定別": count_verdicts(rows) if rows is not None else {},
     }
 
 
@@ -909,6 +987,9 @@ def _print_summary(s: dict) -> None:
           f"（うち番兵のみ {s['うち番兵のみ']}行）")
     print(f"  WARN のみ               {s['WARNのみ']}行")
     print(f"  問題なし                {s['問題なし']}行")
+    if s.get("判定別"):
+        print("  判定別（GO と GO（実績枠）は別に数える）: "
+              + " ／ ".join(f"{k} {v}" for k, v in sorted(s["判定別"].items())))
     print("  検査別:")
     for k, v in sorted(s["検査別"].items(), key=lambda x: -sum(x[1].values())):
         bits = " ".join(f"{sev}={n}" for sev, n in v.items() if n)

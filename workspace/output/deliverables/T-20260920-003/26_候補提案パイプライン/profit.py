@@ -66,6 +66,8 @@ class Economics:
     worst_net_per_unit: int | None = None                # 悲観シナリオの手残り
     worst_margin_pct: float | None = None                # 悲観シナリオの利益率
     cliff_note: str = ""                                 # 750円 / 1,000円 の崖の助言
+    #: 等級（fba_cost.grade）の中央シナリオの手残り。等級を決めた数字そのもの（§3.5 #18 実績枠の判定に使う）
+    mid_net_per_unit: int | None = None
 
     def as_dict(self) -> dict:
         return self.__dict__.copy()
@@ -185,4 +187,5 @@ def compute(sell: float, fee_pct: float, fba_yen: float,
         worst_net_per_unit=g.worst.get("手残り"),
         worst_margin_pct=g.worst.get("利益率(%)"),
         cliff_note=g.cliff,
+        mid_net_per_unit=g.mid.get("手残り"),
     )

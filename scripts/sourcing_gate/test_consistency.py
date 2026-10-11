@@ -477,6 +477,29 @@ ok(all(it.get("decidable") in ("machine", "partial", "human") for it in sp),
 ok(all(len(it.get("decidable_why", "")) > 10 for it in sp),
    "全項目に仕分けの根拠が1行ある")
 
+print("\n== 実績枠（§3.5 #18・2026-10-12）==")
+tr = K.track_record
+ok(tr("C", 0, 1.0, 6.0)[0], "手残り0円・取り分1個・在庫6か月ちょうどは入る（境界）")
+ok(tr("C", 120, 2.5, 4.0)[0], "C・手残り120円・取り分2.5個は入る")
+ok(not tr("C", -1, 3.0, 2.0)[0], "中央値で1円でも赤字なら入らない")
+ok(not tr("C", 50, 0.9, 2.0)[0], "取り分 月1個未満は入らない")
+ok(not tr("C", 50, 2.0, 6.5)[0], "最小ロットで在庫6か月超は入らない")
+ok(not tr("A", 500, 5.0, 2.0)[0], "等級 A は実績枠に入れない（通常 GO）")
+ok(tr("B", 300, 1.5, 4.0)[0], "取り分だけ足りない B は実績枠で拾う")
+ok(not tr("C", None, 2.0, 2.0)[0], "中央値の手残りが無ければ入れない（推測しない）")
+ok(not tr("C", 10, None, None)[0], "取り分が無ければ入れない（縮退入力）")
+ok("赤字 80円" in K.track_record_note(30, -80), "悲観値が赤字なら赤字額を書く")
+ok("赤字" not in K.track_record_note(30, 5), "悲観値が黒字なら赤字と書かない")
+res = K.check_row(good_row(**{"判定": K.TRACK_RECORD, "1個手残り": "-10"}), today=TODAY, base_date=BASE)
+ok("track_record" in checks(res) and res.blocking, "実績枠なのに中央値が赤字の行は NG")
+res = K.check_row(good_row(**{"判定": K.TRACK_RECORD}), today=TODAY, base_date=BASE)
+ok(any(f.check == "track_record" and f.severity == K.WARN for f in res.findings),
+   "等級 A を実績枠にしている行は WARN（通常 GO に数える）")
+res = K.check_row(good_row(), today=TODAY, base_date=BASE)
+ok("track_record" not in checks(res), "通常 GO の行では鳴らない")
+cv = K.count_verdicts([{"判定": "GO"}, {"判定": K.TRACK_RECORD}, {"判定": K.TRACK_RECORD}])
+ok(cv.get("GO") == 1 and cv.get(K.TRACK_RECORD) == 2, "GO と GO（実績枠）を分けて数える")
+
 print(f"\n{'=' * 60}")
 print(f"{_n - len(_fails)}/{_n} 件 通過" + (f"  失敗: {_fails}" if _fails else "  （全件通過）"))
 sys.exit(1 if _fails else 0)

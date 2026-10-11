@@ -172,7 +172,10 @@ def daily_samples(points: list[tuple[datetime, int]], days: int,
     """
     if not points:
         return []
-    now = now or datetime.now(timezone.utc)
+    # 2026-10-12：既定の「いま」は**今日の0時（UTC）**に揃える。秒単位の現在時刻だと、同じ日に
+    # 2回走らせても90日窓の端が動き、境界に値替えがある棚の中央値が漂った（B002BN428K：115円↔136円・
+    # §3.3-17「2回目で0行」に反する）。日をまたげば窓が動くのは正しい（価格は日々変わる）
+    now = now or datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
     pts = sorted(points, key=lambda p: p[0])
     end = pts[-1][0] + timedelta(days=MAX_CARRY_DAYS)
     out: list[int] = []

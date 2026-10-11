@@ -431,6 +431,7 @@ def build(row: dict, cand: dict, product: dict, idx: dict, names: dict,
         e.grade, e.grade_reason = gr.grade, gr.reason
         e.worst_net_per_unit = gr.worst.get("手残り")
         e.worst_margin_pct = gr.worst.get("利益率(%)")
+        e.mid_net_per_unit = gr.mid.get("手残り")
 
         if e.cost_ratio_pct < MIN_PLAUSIBLE_COST_RATIO:
             g.append(("採算", "UNKNOWN",
