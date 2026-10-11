@@ -76,6 +76,9 @@ class PriceLevel:
     current: int | None = None      # 現在値（Keepa の最終観測）
     median90: int | None = None     # 🔴 採算の基準
     median180: int | None = None
+    #: 1年中央値（§3.5 #18 実績枠 ⑥「価格が平常か」の物差し）と、その1年で価格が付いていた日数
+    median365: int | None = None
+    days_covered365: int = 0
     p25_90: int | None = None       # 🔴 悲観シナリオの売価
     p75_90: int | None = None
     spread: float | None = None     # (p75 − p25) ÷ 中央値。大きいほど読めない
@@ -235,7 +238,7 @@ def from_product(product: dict, screen_price: int | None = None,
         pts = parse_series(csvs, idx)
         d90, d180 = daily_samples(pts, 90, now), daily_samples(pts, 180, now)
         if d90:
-            cand.append((name, d90, d180))
+            cand.append((name, d90, d180, daily_samples(pts, 365, now)))
     if not cand:
         return PriceLevel(screen_price=screen_price, verdict="判定不能",
                           note="価格履歴がありません（Keepa に BuyBox も新品最安も無い）。")
@@ -245,7 +248,7 @@ def from_product(product: dict, screen_price: int | None = None,
     # 2026-10-04、B004PXZAFI で BuyBox 3,400円 と 新品最安 5,897円 が食い違いました。
     # 高いほうを採ると赤字を黒字と報告するので、**迷ったら安いほう**にします。
     best = min(cand, key=lambda c: _pct(c[1], 0.5) or 10**9)
-    source, d90, d180 = best
+    source, d90, d180, d365 = best
     if len(cand) == 2:
         other = [c for c in cand if c[0] != source][0]
         source = f"{source}（{other[0]} は {_pct(other[1], 0.5):,}円・安い側を採用）"
@@ -257,7 +260,8 @@ def from_product(product: dict, screen_price: int | None = None,
 
     lv = PriceLevel(source=source, current=cur, median90=med90, median180=med180,
                     p25_90=p25, p75_90=p75, spread=spread, slope_pct_per_30d=slope,
-                    days_covered=len(d90), screen_price=screen_price)
+                    days_covered=len(d90), screen_price=screen_price,
+                    median365=_pct(d365, 0.5), days_covered365=len(d365))
 
     # ── 判定（落とす・残す）。順番に意味があります。
     if len(d90) < MIN_DAYS_COVERED:

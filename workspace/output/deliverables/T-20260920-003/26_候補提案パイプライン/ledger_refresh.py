@@ -575,6 +575,17 @@ def mid_net(e) -> int | None:
     return getattr(e, "mid_net_per_unit", None) if e else None
 
 
+def price_is_normal(s: dict) -> tuple[bool, str]:
+    """実績枠 ⑥。現在価格は人の実画面のカート価格 → 実画面売価 → Keepa の最終観測の順。"""
+    lv = s.get("price")
+    if not lv:
+        return False, "価格履歴が無い＝平常か判断できない"
+    c = SCREEN.cart.get(s["asin"])
+    cur = (SC._num(c.price) if c and c.price else None) or lv.screen_price or lv.current
+    return K.price_normal(cur, lv.median90, getattr(lv, "median365", None),
+                          getattr(lv, "days_covered365", 0))
+
+
 def track_record_frame(s: dict, gates: list, gate: dict | None) -> dict | None:
     """§3.5 #18 実績枠に入るか（2026-10-12 社長方針「プラマイ0でも卸で実績を作る」）。
 
@@ -599,6 +610,13 @@ def track_record_frame(s: dict, gates: list, gate: dict | None) -> dict | None:
     if mid is None or e.net_per_unit is None:
         return None
     mid_use = min(mid, e.net_per_unit)
+    # ⑥ 価格が平常か（2026-10-12 追加）。品薄の一時高値で黒字に見える棚はテストではなく賭け
+    pn_ok, pn_why = price_is_normal(s)
+
+    def blocked() -> None:
+        # ①〜⑤ は満たすのに ⑥ だけで外れた行にだけ、理由を判定理由へ書く（他で落ちる行に書かない）
+        s["_tr_block"] = f"実績枠 ⑥ に該当しない：{pn_why}"
+        return None
     if "取り分" not in st:
         # 実売は PASS だが出品者の内訳が無く取り分が出ていない。採算は実績枠の線を満たすので
         # 落とさず「実績枠の候補・取り分待ち」（UNKNOWN）にする＝出品一覧を見れば決まる
@@ -607,6 +625,8 @@ def track_record_frame(s: dict, gates: list, gate: dict | None) -> dict | None:
         if best and floor / best > K.TRACK_MAX_MONTHS:
             return None   # 競合ゼロでも最小ロットが6か月で捌けない＝取り分を見ても入らない
         if mid_use >= K.TRACK_MIN_NET_YEN and e.grade == "C":
+            if not pn_ok:
+                return blocked()
             return {"pending": True, "mid": mid_use, "worst": e.worst_net_per_unit}
         return None
     if e.grade == "B" and st.get("取り分") == "PASS":
@@ -621,8 +641,10 @@ def track_record_frame(s: dict, gates: list, gate: dict | None) -> dict | None:
     ok_, why = K.track_record(e.grade, mid_use, share, months)
     if not ok_:
         return None
+    if not pn_ok:
+        return blocked()
     return {"mid": mid_use, "worst": e.worst_net_per_unit, "share": share, "rec": floor,
-            "months": months, "why": why}
+            "months": months, "why": why + "・" + pn_why}
 
 
 def apply_screen(s: dict, gates: list, gate: dict | None) -> bool:
@@ -846,6 +868,9 @@ def _compose_netsea(s: dict, gate: dict | None) -> dict:
     else:
         verdict = machine
         reason = "未達：" + " ／ ".join(lines_miss)
+        if s.get("_tr_block"):
+            lines_miss.append(s["_tr_block"])
+            reason += " ／ " + s["_tr_block"]
         if never:
             reason += " ／【こう変えれば】" + never[0]
         else:
@@ -1157,7 +1182,8 @@ def sd_rows(header: list[str]) -> tuple[list[list], list[dict]]:
                       f"等級 {gr.grade}）。人が見る項目：{'・'.join(human)}")
             if tr_note:
                 reason = (f"実績枠の候補（{tr_note}）。" + reason
-                          + "・#10 取り分（月1個以上・最小ロット1回で在庫6か月以内）")
+                          + "・#10 取り分（月1個以上・最小ロット1回で在庫6か月以内）"
+                          + "・⑥ 1年の価格（現在価格と90日中央値が1年中央値の1.3倍以内か＝品薄の一時高値でないか）")
         else:
             verdict = machine
             reason = "未達：" + " ／ ".join(miss)

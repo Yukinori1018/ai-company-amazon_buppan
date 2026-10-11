@@ -616,6 +616,32 @@ def track_record(grade: str, mid_net: Optional[float], share: Optional[float],
                   f"最小ロットで在庫 {months:.1f}か月")
 
 
+#: 実績枠 ⑥ 価格が平常か：現在価格と90日中央値がどちらも1年中央値のこの倍率以内（CLAUDE.md §3.5 #18）
+TRACK_MAX_PRICE_RATIO = 1.3
+#: 1年中央値を信じるのに要る「価格が付いていた日数」。足りなければ平常か判断できない＝入れない
+TRACK_MIN_DAYS_365 = 180
+
+
+def price_normal(current: Optional[float], median90: Optional[float],
+                 median365: Optional[float], days365: int = 0) -> tuple[bool, str]:
+    """実績枠 ⑥：品薄の一時高値ではないか（社長「蛍光灯は事業のテストではなくギャンブル」2026-10-12）。
+    現在価格と90日中央値がどちらも1年中央値の1.3倍以内なら平常。1年の履歴が足りなければ入れない。"""
+    if not median365 or days365 < TRACK_MIN_DAYS_365:
+        return False, (f"1年の価格履歴が足りない（価格が付いていた日 {days365}日・{TRACK_MIN_DAYS_365}日未満）"
+                       "＝平常の値か判断できない")
+    bad = []
+    for label, v in (("現在価格", current), ("90日中央値", median90)):
+        if v is None:
+            return False, f"{label}が無い＝平常か判断できない"
+        if v > median365 * TRACK_MAX_PRICE_RATIO:
+            bad.append(f"{label} {v:,.0f}円＝1年中央値 {median365:,.0f}円の{v / median365:.2f}倍")
+    if bad:
+        return False, ("品薄の一時高値（" + "・".join(bad) + f"・上限{TRACK_MAX_PRICE_RATIO:g}倍）。"
+                       "値が戻れば赤字＝実績枠はテストであって値動きに賭けない")
+    return True, (f"価格は平常（現在 {current:,.0f}円・90日中央値 {median90:,.0f}円・"
+                  f"1年中央値 {median365:,.0f}円）")
+
+
 def track_record_note(mid_net: float, worst_net: Optional[float]) -> str:
     """判定理由に書く1句。悲観値が赤字なら赤字額を書く（§3.5 #18 実績枠 ⑤）。"""
     if worst_net is None:

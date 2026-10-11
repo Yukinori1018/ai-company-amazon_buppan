@@ -490,6 +490,13 @@ ok(not tr("C", None, 2.0, 2.0)[0], "中央値の手残りが無ければ入れ�
 ok(not tr("C", 10, None, None)[0], "取り分が無ければ入れない（縮退入力）")
 ok("赤字 80円" in K.track_record_note(30, -80), "悲観値が赤字なら赤字額を書く")
 ok("赤字" not in K.track_record_note(30, 5), "悲観値が黒字なら赤字と書かない")
+pn = K.price_normal
+ok(not pn(9130, 9130, 3500, 365)[0], "⑥ 品薄の一時高値（今9,130円・1年中央値3,500円）は入れない")
+ok(not pn(3500, 4800, 3500, 365)[0], "⑥ 90日中央値だけ1.3倍超でも入れない")
+ok(pn(4550, 4550, 3500, 365)[0], "⑥ ちょうど1.3倍は平常（境界）")
+ok(pn(3000, 3200, 3500, 300)[0], "⑥ 1年より安い・同程度は平常")
+ok(not pn(3000, 3000, 3000, 100)[0], "⑥ 1年の履歴が180日未満なら入れない（判断できない）")
+ok(not pn(None, 3000, 3000, 365)[0], "⑥ 現在価格が無ければ入れない")
 res = K.check_row(good_row(**{"判定": K.TRACK_RECORD, "1個手残り": "-10"}), today=TODAY, base_date=BASE)
 ok("track_record" in checks(res) and res.blocking, "実績枠なのに中央値が赤字の行は NG")
 res = K.check_row(good_row(**{"判定": K.TRACK_RECORD}), today=TODAY, base_date=BASE)
