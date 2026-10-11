@@ -171,12 +171,21 @@ def apply_gate_checks(listing):
             a, v = x['ASIN'].strip(), (x.get('新品の出品可否') or '').strip()
             day = (x.get('確認時刻') or '')[5:10].replace('-', '/')
             prev = listing.get(a, '')
+            # 2026-10-11 夜（タカシ）：62b_未判定 から「出品許可の要否」列が付いた。
+            # restrictions/approve の OK は「新品の申請経路がある」だけで、許可不要とは限らない。
+            # 要否が「要」の行は lookupAsin が空でも「出品できる」にせず、第2弾の扱いにする。
+            # 要否列が無い旧ファイル（62b_JKL）は従来どおり（要否は lookupAsin が正）。
+            need = (x.get('出品許可の要否') or '').strip()
             if not v.upper().startswith('OK'):
                 listing[a] = f'出品不可（新品の申請経路なし・{day} restrictions/approve）'
                 n['出品不可'] += 1
             elif prev.startswith('出品許可が必要'):
                 listing[a] = f'{prev}／{day} 新品の申請経路あり'      # 許可の要否は lookupAsin が正
                 n['出品許可が必要（申請経路あり）'] += 1
+            elif need.startswith('要'):
+                listing[a] = (f'出品許可が必要（ブランド/カテゴリ）／新品の申請経路あり（{day} restrictions/approve'
+                              + (f'。10/10 lookupAsin は {prev}' if prev else '') + '）')
+                n['出品許可が必要（申請経路あり・要否列）'] += 1
             else:
                 listing[a] = (f'出品できる（新品・{day} restrictions/approve'
                               + (f'。10/10 lookupAsin は {prev}' if prev else '') + '）')
