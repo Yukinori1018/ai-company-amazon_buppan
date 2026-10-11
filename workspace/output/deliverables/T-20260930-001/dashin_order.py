@@ -6,6 +6,7 @@
   下書き済 … 打診メールの下書きを作成済み・送信済みの社（DRAFTED）。出品可否に関係なく
   第1弾-NN … 接触候補 ＆ 連絡先あり ＆ 基準チェック=OK ＆ 出品可否=出品できる ＆ 未送信 ＆ 下の検算を全部通過
   第2弾-NN … 同条件で 出品可否=出品許可が必要
+  保留（秘書判断：理由） … 第1弾/第2弾の条件は通ったが、秘書が後回しにした社（70_秘書判断_*.csv）
   対象外（理由） … それ以外。理由は最初に当たったもの1つ
   NN は送信順（成約しやすさ順・sync_ledger.py の send_key）を保った連番
 
@@ -61,6 +62,44 @@ def _load_live_asins() -> set[str]:
 
 
 LIVE = _load_live_asins()
+
+
+# 2026-10-12（タカシ）：秘書の判断を上書きファイルで持つ（元の batch CSV・シートの原文は書き換えない）
+# 70_秘書判断_*.csv：代表ASIN,正式社名,判定,理由,判断者,日付。判定は3値
+#   除外   … 判定列を「除外：理由」に書き換える（送信キューから外れる）
+#   後回し … 判定は接触候補のまま。第1弾/第2弾に入る行を「保留（秘書判断：理由）」にする
+#   残す   … 区分は変えない。備考に注記だけ足す
+# どれも備考に「秘書判断（日付・判断者）：…」を追記する。後のファイルが勝つ
+DECISION_GLOB = '70_秘書判断_*.csv'
+
+
+def load_decisions() -> dict[str, dict]:
+    import glob
+    out: dict[str, dict] = {}
+    for p in sorted(glob.glob(os.path.join(WORK, DECISION_GLOB))):
+        for x in csv.DictReader(open(p, encoding='utf-8-sig')):
+            out[x['代表ASIN'].strip()] = {k: (v or '').strip() for k, v in x.items()}
+    return out
+
+
+DECISIONS = load_decisions()
+
+
+def apply_decisions(rows: list[dict]) -> dict:
+    """判定列（除外）と備考を秘書判断で上書きする。sync_ledger の送信順の並べ替えより前に呼ぶ。"""
+    from collections import Counter
+    n = Counter()
+    for r in rows:
+        d = DECISIONS.get(r.get('代表ASIN(タカシ)', ''))
+        if not d:
+            continue
+        note = f'秘書判断（{d["日付"][5:].replace("-", "/")}・{d["判断者"]}）：{d["判定"]}：{d["理由"]}'
+        if note not in (r.get('備考') or ''):
+            r['備考'] = '／'.join(s for s in [r.get('備考') or '', note] if s)
+        if d['判定'] == '除外':
+            r['判定'] = f'除外：{d["理由"]}'
+        n[d['判定']] += 1
+    return dict(n)
 
 
 def contact_means(r: dict) -> str:
@@ -193,6 +232,9 @@ def classify(r: dict, list_col: str, check_col: str) -> tuple[str, list[str]]:
     bad = verify(r['_m'], j)
     if bad:
         return '対象外（検算NG：' + '・'.join(bad) + '）', bad
+    d = DECISIONS.get(r.get('代表ASIN(タカシ)', ''))
+    if d and d['判定'] == '後回し' and lst.startswith(('出品できる', '出品許可が必要')):
+        return f'保留（秘書判断：{d["理由"]}）', []
     if lst.startswith('出品できる'):
         return '第1弾', []
     if lst.startswith('出品許可が必要'):

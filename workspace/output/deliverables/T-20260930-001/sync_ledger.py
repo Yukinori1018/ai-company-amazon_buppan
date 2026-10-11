@@ -11,6 +11,7 @@
         65_カート確認_*.csv（カート保持者）／62b_出品可否_*.csv（新品の出品可否）／
         67_紐付け確認_*.csv（紐付け4列・サトルの再確認）／68_宛先差し替え_*.csv（窓口列・旧値は備考へ）
         24_連絡先_recheck*_*.csv（要確認の再確認・代表ASINで元の行と差し替え。--recheck=タグ で読む範囲を指定）
+        70_秘書判断_*.csv（秘書の除外/後回し/残す。dashin_order.py が読む）
   採算：40_採算列.csv（経理ハジメ・40_profit_cols.py の出力・キー＝代表ASIN）
         式は 41_採算列の計算式.md
 
@@ -256,7 +257,12 @@ def load_rechecks():
     """{代表ASIN: 再確認の行}（後のファイルが勝つ）と、読んだファイル名の一覧を返す。"""
     tags = [t for t in argval('recheck').split(',') if t]
     m, files = {}, []
-    for p in sorted(glob.glob(os.path.join(HERE, RECHECK_GLOB))):
+    # 並びは（日付, タグ）。ファイル名の素の順だと「recheck2_」が「recheck_」より前に来て、
+    # 後の再確認（recheck2）が古い再確認（recheck）に負けていた（2026-10-12 タカシ）
+    def order(p):
+        stem = os.path.basename(p)[len('24_連絡先_'):-len('.csv')].split('_')
+        return (stem[-1], stem[0])
+    for p in sorted(glob.glob(os.path.join(HERE, RECHECK_GLOB)), key=order):
         tag = os.path.basename(p)[len('24_連絡先_'):].split('_')[0]
         if tags and tag not in tags:
             continue
@@ -584,6 +590,8 @@ def collect():
     global LINK_N, CONTACT_N
     LINK_N = apply_link_checks(rows)
     CONTACT_N = apply_contact_overrides(rows)
+    global DECISION_N
+    DECISION_N = do.apply_decisions(rows)  # 70_秘書判断_*（除外は送信キューから外れるので並べ替えより前）
     send_key = lambda r: (j_rank(r['判定']), r['_dist'], r['_contact'], r['_scale'], -sellers(r), -asin_n(r),
                           r['優先度'] or 'Z', key_of(r))
     base = lambda r: (r['優先度'] or 'Z', -asin_n(r), key_of(r))
@@ -693,6 +701,7 @@ def main():
     print('実画面の合流:', dict(SCREEN_N), dict(GATE_N))
     print('紐付け再確認の合流:', dict(LINK_N), '/ 宛先差し替え:', CONTACT_N, '社')
     print('要確認の再確認（24_連絡先_recheck*）:', RECHECK_N)
+    print('秘書判断（70_秘書判断_*）:', DECISION_N)
     lk = collections.Counter((r['_m']['紐付けの判定'], r['_m']['紐付けの判定(原文)'].split('：')[0] != r['_m']['紐付けの判定'])
                              for r in q)
     print('紐付け（接触候補・正規化後, 原文と違うか）:', dict(lk))
