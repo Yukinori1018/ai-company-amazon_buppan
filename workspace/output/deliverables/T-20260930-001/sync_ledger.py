@@ -10,6 +10,7 @@
   上書き（元の batch CSV は書き換えない・同期のたびに証跡から上書き）：
         65_カート確認_*.csv（カート保持者）／62b_出品可否_*.csv（新品の出品可否）／
         67_紐付け確認_*.csv（紐付け4列・サトルの再確認）／68_宛先差し替え_*.csv（窓口列・旧値は備考へ）
+        24_連絡先_recheck*_*.csv（要確認の再確認・代表ASINで元の行と差し替え。--recheck=タグ で読む範囲を指定）
   採算：40_採算列.csv（経理ハジメ・40_profit_cols.py の出力・キー＝代表ASIN）
         式は 41_採算列の計算式.md
 
@@ -36,7 +37,7 @@
   掛からないよう、見出しの割合の数字は変数 HI / LO から組み立てている。中身は Amazon 側の
   公開価格から逆算した自社の上限であり、会員限定の取引条件ではない。
 
-実行：python3 sync_ledger.py [--dry-run] [--through=batchL] [--unchecked-out=64_出品可否_未判定.csv]
+実行：python3 sync_ledger.py [--dry-run] [--through=batchL] [--recheck=recheck] [--unchecked-out=64_出品可否_未判定.csv]
   --through       … 24_連絡先_batch*.csv をこのバッチ名まで（ファイル名順）読む。後ろは採取途中なので読まない
   --unchecked-out … 出品可否が「未確認」の接触候補（＝ゲート一括確認の対象）を agent_output に書き出す
 """
@@ -219,6 +220,66 @@ def apply_contact_overrides(rows):
             if note not in r['備考']:
                 r['備考'] = '／'.join(s for s in [r['備考'], note] if s)
             r['_contact'] = contact_rank(r)  # 窓口が変われば送信順も変わる
+            n += 1
+    return n
+
+
+# 2026-10-12（タカシ）：サトルの要確認の再確認（24_連絡先_recheck*_*.csv）。元の batch CSV は書き換えず、
+# 代表ASINが一致する元の行を、同期のたびにこの再確認の行で差し替える（並び順は元の行の位置のまま）。
+# 読むファイルは --recheck=recheck,recheck2 のようにタグ（「24_連絡先_」の次から「_」まで）で指定。
+# 省略時は全部読む。採取中のファイルがあるときは、完成したタグだけを指定して実行すること。
+RECHECK_GLOB = '24_連絡先_recheck*_*.csv'
+
+# 再確認の行に重ねる秘書の判断（2026-10-12 カズヨ）。キー＝代表ASIN。値は文字列の上書き／備考への追記
+SCALE_NOTE = '規模の論点あり（{}）→秘書判断で接触候補のまま（10/12）'
+RC_DECISIONS = {
+    # N1369：上場会社の子会社の可能性は備考に残し、接触候補として扱う。社名は括弧書きを外す（担当Y 3082 と同社）
+    'B06XNNKRDT': {'正式社名': '株式会社ユイット・ラボラトリーズ', '判定': '接触候補',
+                   '備考+': SCALE_NOTE.format('上場会社アクシージアの子会社の可能性・従業員76名・資本金1億円')},
+    'B0DPT5XPHL': {'備考+': SCALE_NOTE.format('gBiz 従業員156名・資本金1,100万円')},
+    'B017VHNW18': {'備考+': SCALE_NOTE.format('売上75.76億円・資本金5,000万円')},
+    'B0754DJ9F5': {'備考+': SCALE_NOTE.format('gBiz 従業員918名・卸売業')},
+    'B0CZ33NN61': {'備考+': SCALE_NOTE.format('2015年に上場のパス株式会社が51%取得・現在の資本関係は未確認')},
+    'B091F68K9F': {'備考+': SCALE_NOTE.format('2022年に上場企業が買収の検索要約・公式で未確認')},
+}
+# 重複と判明した行の情報を、残す側の行（代表ASIN）へ寄せる。寄せられた側の行は判定「重複：…」のまま
+RC_MERGES = [
+    # (残す側, 項目, 追記する文)
+    ('B01M1KWWDN', 'ブランド', 'NUDY AURA（B005LFHF5C・同社の別ブランド／10/12 再確認）'),   # J957 → B190
+    ('B004SF2NIU', 'ブランド', 'LABEAST ラビースト（B074PQMW8V・同社の別ブランド／10/12 再確認）'),  # P1590 → F593
+    ('B005LKCVQU', '備考', 'サーレS（B00600O3PM）の販売元 株式会社ティー・ビー・ケーは登記所在地が同番地'
+                          '（目黒区鷹番2-10-7）＝同グループの販売会社と推測（確度高・10/12 再確認でこの行へ寄せた）'),  # J919 → 22_72
+]
+
+
+def load_rechecks():
+    """{代表ASIN: 再確認の行}（後のファイルが勝つ）と、読んだファイル名の一覧を返す。"""
+    tags = [t for t in argval('recheck').split(',') if t]
+    m, files = {}, []
+    for p in sorted(glob.glob(os.path.join(HERE, RECHECK_GLOB))):
+        tag = os.path.basename(p)[len('24_連絡先_'):].split('_')[0]
+        if tags and tag not in tags:
+            continue
+        files.append(os.path.basename(p))
+        for x in read_csv(p):
+            x = dict(x)
+            d = RC_DECISIONS.get(x['代表ASIN(タカシ)'].strip(), {})
+            for c, v in d.items():
+                if c.endswith('+'):
+                    if v not in x.get(c[:-1], ''):
+                        x[c[:-1]] = '／'.join(s for s in [x.get(c[:-1], ''), v] if s)
+                else:
+                    x[c] = v
+            m[x['代表ASIN(タカシ)'].strip()] = x
+    return m, files
+
+
+def apply_rc_merges(rows):
+    n = 0
+    for a, col, text in RC_MERGES:
+        r = next((r for r in rows if r['代表ASIN(タカシ)'] == a), None)
+        if r and text not in r[col]:
+            r[col] = '／'.join(s for s in [r[col], text] if s)
             n += 1
     return n
 
@@ -484,11 +545,19 @@ def collect():
                (os.path.join(HERE, '22_連絡先_印付き.csv'), False)]
     last = argval('through')  # 例 batchL → 24_連絡先_batchL.csv まで
     sources += [(p, False) for p in sorted(glob.glob(os.path.join(HERE, '24_連絡先_*.csv')))
-                if not last or os.path.basename(p) <= f'24_連絡先_{last}.csv']
+                if '_recheck' not in os.path.basename(p)  # 再確認は下で元の行と差し替える（単独の入力にしない）
+                and (not last or os.path.basename(p) <= f'24_連絡先_{last}.csv')]
+    global RECHECK_N
+    rc, rc_files = load_rechecks()
+    rc_hit = set()
     rows, seen, used = [], set(), []
     for path, existing in sources:
         n = 0
         for src in read_csv(path):
+            a = (src.get('代表ASIN(タカシ)') or src.get('代表ASIN') or '').strip()
+            if not existing and a in rc and a not in rc_hit:
+                src = rc[a]
+                rc_hit.add(a)
             r = to_row(src, existing, cand, profit)
             k = key_of(r)
             if not k or k in seen:
@@ -508,6 +577,8 @@ def collect():
         return int(m.group()) if m else 0
 
     # 送信順＝成約しやすさ（§3.5）。①流通形態 ②窓口 ③規模 ④新品出品者数 降順 ⑤該当ASIN数 降順
+    RECHECK_N = {'files': rc_files, '差し替え': len(rc_hit), '元の行が無い': sorted(set(rc) - rc_hit),
+                 '寄せ': apply_rc_merges(rows)}
     global SCREEN_N
     SCREEN_N = apply_screen_checks(rows)
     global LINK_N, CONTACT_N
@@ -621,6 +692,7 @@ def main():
     print(f'{DASHIN_CSV}: {n_exp}行')
     print('実画面の合流:', dict(SCREEN_N), dict(GATE_N))
     print('紐付け再確認の合流:', dict(LINK_N), '/ 宛先差し替え:', CONTACT_N, '社')
+    print('要確認の再確認（24_連絡先_recheck*）:', RECHECK_N)
     lk = collections.Counter((r['_m']['紐付けの判定'], r['_m']['紐付けの判定(原文)'].split('：')[0] != r['_m']['紐付けの判定'])
                              for r in q)
     print('紐付け（接触候補・正規化後, 原文と違うか）:', dict(lk))
