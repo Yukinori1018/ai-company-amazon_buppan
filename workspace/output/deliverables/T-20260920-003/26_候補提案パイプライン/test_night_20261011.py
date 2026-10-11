@@ -79,6 +79,8 @@ with tempfile.TemporaryDirectory() as d:
     check("月販10・即納3 は取り分2.5で FAIL（緩めない）", st == "FAIL" and abs(info["share"] - 2.5) < 1e-9)
     st, why, info = SC.share_gate("B2", 12, None, None, True)
     check("月販12・即納3 は取り分3.0で PASS・書類ゲートで最小10点", st == "PASS" and info["floor"] == 10)
+    st, why, info = SC.share_gate("B2", 16, 6, 6, True)
+    check("採算の点数6・書類ゲートなら推奨は10点（2026-10-12 不二貿易）", st == "PASS" and info["rec"] == 10)
 SC.OUT = orig
 
 print("NG:", NG or "なし")

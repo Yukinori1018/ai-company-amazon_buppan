@@ -4,6 +4,8 @@
 2026-10-11 タカシ（T-20260920-003）。
   python3 kz_entry_candidates.py queue   # 足切り（kz 平均≥6・本体カートでない）→ queue_full.json
   python3 kz_entry_candidates.py build   # full 取得済みの ASIN を採点 → new_kz_candidates_20261011.csv
+  python3 kz_entry_candidates.py estimate  # 台帳に未登録の行の kz を証跡ファイル（kz_estimate_*_kzentry.csv）に書く
+                                           # → ledger_refresh が screen_checks 経由で実売に合流させる（2026-10-12）
 
 入口の条件（monthlySold は問わない）
   1. NETSEA 索引（pipeline/netsea_jan_index.json）に JAN が当たる
@@ -318,5 +320,43 @@ def build() -> int:
     return 0
 
 
+def estimate() -> int:
+    """new_kz_candidates の ASIN の kz を、screen_checks.load_kz_estimate が読む形で書き出す。
+
+    ledger_refresh は実売を screen_checks.sales（キーゾン→再現値→monthlySold）で決めるので、
+    kz 入口の行もここに置けば、既存の行と同じ規則（§3.3-16：再現値＝キーゾン実数と同等・
+    バリエーション子は family 合計と注記）で判定される。Keepa は叩かない（keepa_full.jsonl）。"""
+    full = load_jsonl(KZ / "keepa_full.jsonl")
+    src = LED / "new_kz_candidates_20261011.csv"
+    asins = [r["ASIN"] for r in csv.DictReader(src.open(encoding="utf-8-sig"))]
+    out = LED / "kz_estimate_20261011_kzentry.csv"
+    cols = ["ASIN", "推定m1", "推定m2", "推定m3", "3か月平均", "式", "一致度", "観測回数m1/m2/m3", "注意"]
+    n = 0
+    with out.open("w", encoding="utf-8-sig", newline="") as f:
+        w = csv.DictWriter(f, cols)
+        w.writeheader()
+        for a in asins:
+            if a not in full:
+                continue
+            p, fetched = full[a]
+            k = kz_of(p, fetched)
+            if not k:
+                continue
+            m, obs = k
+            note = []
+            if p.get("parentAsin"):
+                note.append("バリエーション子＝family合計")
+            if max(m) > 13:
+                note.append("月13個超は未検算・過小の可能性")
+            w.writerow({"ASIN": a, "推定m1": m[0], "推定m2": m[1], "推定m3": m[2],
+                        "3か月平均": round(sum(m) / 3, 1),
+                        "式": "30日窓ごとにランクが直前観測より3%超改善した回数",
+                        "一致度": "キーゾン25ASIN×3か月で完全一致69/75・最大誤差1個（§3.3-16）",
+                        "観測回数m1/m2/m3": "/".join(map(str, obs)), "注意": "・".join(note)})
+            n += 1
+    print(f"{out.name}：{n}件")
+    return 0
+
+
 if __name__ == "__main__":
-    raise SystemExit({"queue": queue, "build": build}[sys.argv[1]]())
+    raise SystemExit({"queue": queue, "build": build, "estimate": estimate}[sys.argv[1]]())

@@ -166,6 +166,7 @@ def score_netsea() -> list[dict]:
         s["_supplier_url"] = r.get("_supplier_url")
         s["_cand"], s["_idx_day"] = {"fba_yen": r.get("_fba_yen") or None}, "2026-10-01"
         new.append(s)
+    new += score_kz_entry(idx, names, rc)
     # 2026-10-11：実売 UNKNOWN 行は Keepa を取り直した（buybox=1 でカート保持者・history=1 で
     # ランク履歴）。取り直した ASIN は新しい商品データで採点し直す（同じ行・同じ卸データ）。
     load_fresh()
@@ -196,6 +197,36 @@ def score_netsea() -> list[dict]:
             out.append(s)
         return route_to_sd(out, idx, names, dict(rc2))
     return route_to_sd(old + new, idx, names, dict(rc))
+
+
+#: 2026-10-12：kz 入口（monthlySold を問わず Keepa 再現の3か月販売数で選んだ Amazon 起点）の
+#: 台帳に未登録の行。採点は既存の行と同じ S.build、実売は kz_estimate_*_kzentry.csv
+#: （kz_entry_candidates.py estimate）を screen_checks が読んで決める。Keepa は叩かない。
+KZ_NEW = OUT / "new_kz_candidates_20261011.csv"
+KZ_FULL = WORK / "kz_entry/keepa_full.jsonl"
+
+
+def score_kz_entry(idx: dict, names: dict, rc: Counter) -> list[dict]:
+    if not (KZ_NEW.exists() and KZ_FULL.exists()):
+        return []
+    import kz_entry_candidates as KE
+    full = KE.load_jsonl(KZ_FULL)
+    out = []
+    for r in csv.DictReader(KZ_NEW.open(encoding="utf-8-sig")):
+        a = r["ASIN"].strip()
+        if a not in full:
+            continue
+        p, fetched = full[a]
+        row = KE.build_row(a, p, idx, None, 1)
+        if not row:
+            continue
+        cand = {"fba_yen": row.get("_fba_yen") or None}
+        s = S.build(row, cand, p, idx, names, KE.IDX_DAY, None, dict(rc))
+        s["_src"] = "kz入口(10/11)"
+        s["_supplier_url"] = row.get("_supplier_url")
+        s["_cand"], s["_idx_day"], s["_fresh"] = cand, KE.IDX_DAY, fetched
+        out.append(s)
+    return out
 
 
 def load_sd_route() -> dict[str, dict]:

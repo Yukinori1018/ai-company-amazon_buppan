@@ -51,7 +51,8 @@ RAW_FILES = [WORK / "refetch20261004/raw.jsonl",
              WORK / "buylist20261009/resolve_raw.jsonl",
              WORK / "buylist20261009/buybox_raw.jsonl",
              OUT / "keepa_kz_hist_20261011.jsonl",      # 2026-10-11 キーゾン再現用の取得
-             OUT / "keepa_unknown_20261011.jsonl"]      # 2026-10-11 実売 UNKNOWN の取り直し
+             OUT / "keepa_unknown_20261011.jsonl",      # 2026-10-11 実売 UNKNOWN の取り直し
+             WORK / "kz_entry/keepa_full.jsonl"]        # 2026-10-11 kz 入口（buybox=1）
 
 
 @dataclass
@@ -425,7 +426,9 @@ def share_gate(asin: str, monthly: float, qty: int | None, min_lot: float | None
         return ("FAIL", f"取り分 {share:.1f}個/月（基準3個）＝月販 {monthly:g}÷({fba}+{fbm}+1)。{brk}",
                 {**info, "fix": fix})
     floor = max(int(min_lot or 1), 10 if gated_needs_10 else 1)
-    rec = qty or floor
+    # 2026-10-12：採算の点数（qty）が書類申請の10点や最小ロットより少ないと、そのまま推奨に
+    # なっていた（不二貿易 B0C5WXSTKF：卸ロット6点・ブランド申請で10点要るのに推奨6点）。下限を当てる
+    rec = max(qty or floor, floor)
     if rec / share > TARGET_MONTHS:
         rec = max(floor, math.floor(share * TARGET_MONTHS))
     months = rec / share
