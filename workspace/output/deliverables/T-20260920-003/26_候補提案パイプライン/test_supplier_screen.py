@@ -10,6 +10,7 @@ import json
 import sys
 import tempfile
 import unittest
+from datetime import date
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -51,7 +52,10 @@ class TestLampRule(unittest.TestCase):
         }
         for t, kind in cases.items():
             self.assertEqual(D.lamp_kind(t), kind, t)
-            self.assertEqual(D.check(None, t).verdict, D.NO_GO, t)
+            d = D.check(None, t)
+            # 2026-10-12：印だけでは落とさない。3条件が未確認なら UNKNOWN
+            self.assertEqual(d.verdict, D.UNKNOWN, t)
+            self.assertTrue(d.marked, t)
 
     def test_not_lamp(self):
         for t in ("LED蛍光灯 40W形 直管 昼白色", "蛍光灯カバー 40形", "蛍光ペン 5色セット",
@@ -71,16 +75,67 @@ class TestLampRule(unittest.TestCase):
         self.assertIn("2028-01-01", d.label())
 
     def test_wholesale_title_also_counts(self):
-        self.assertEqual(D.check(None, "エースラインランプ", "FLR910T6EX-W 蛍光灯").verdict, D.NO_GO)
+        self.assertTrue(D.check(None, "エースラインランプ", "FLR910T6EX-W 蛍光灯").marked)
 
 
 class TestSupplierWords(unittest.TestCase):
     def test_supplier_says_discontinued(self):
         d = D.check(None, "エステー オンパックス", "【エステー】オンパックス", "メーカー廃番・取扱終了と記載")
-        self.assertEqual(d.verdict, D.NO_GO)
+        self.assertTrue(d.marked)
+        self.assertEqual(d.verdict, D.UNKNOWN)          # 3条件が未確認
+        # 卸の廃番は終了日が無い＝仮置き3か月で売り切れるか
+        ok = D.NowOnly(True, 2.0, D.UP_OR_FLAT, date(2026, 10, 12))
+        self.assertEqual(D.check(None, "オンパックス", "", "廃番", now_only=ok).verdict, D.PASS)
+        slow = D.NowOnly(True, 4.0, D.UP_OR_FLAT, date(2026, 10, 12))
+        self.assertEqual(D.check(None, "オンパックス", "", "廃番", now_only=slow).verdict, D.NO_GO)
 
     def test_amazon_title_word_is_only_a_sign(self):
         self.assertEqual(D.check(None, "【在庫限り】ふきん 3枚").verdict, D.UNKNOWN)
+
+
+class TestNowOnly(unittest.TestCase):
+    """2026-10-12 社長方針「今だけ、儲かるなら、廃止が決まっているものも仕入れて良い」。"""
+
+    T = "DNライティング エースライン スリム蛍光灯 FLR910T6EX-WW"   # 直管形＝2028-01-01
+
+    def test_all_three_pass_keeps_mark(self):
+        ctx = D.NowOnly(True, 1.6, D.UP_OR_FLAT, date(2026, 10, 12))
+        d = D.check(None, self.T, now_only=ctx)
+        self.assertEqual(d.verdict, D.PASS)
+        self.assertTrue(d.marked)
+        self.assertIn("終売・今だけ可", d.label())        # 印は判定理由に残す
+        self.assertIn("2028-01-01", d.label())
+
+    def test_each_condition_fails(self):
+        today = date(2026, 10, 12)
+        for ctx in (D.NowOnly(False, 1.6, D.UP_OR_FLAT, today),       # (a) 在庫なし
+                    D.NowOnly(True, 20.0, D.UP_OR_FLAT, today),       # (b) 期限まで約14.6か月を超える
+                    D.NowOnly(True, 1.6, D.DOWN, today)):             # (c) 値崩れ
+            self.assertEqual(D.check(None, self.T, now_only=ctx).verdict, D.NO_GO, ctx)
+
+    def test_unknown_when_not_checked(self):
+        ctx = D.NowOnly(None, 1.6, D.UP_OR_FLAT, date(2026, 10, 12))
+        self.assertEqual(D.check(None, self.T, now_only=ctx).verdict, D.UNKNOWN)
+
+    def test_after_end_date_uses_short_window(self):
+        # 電球形は 2026-01-01 に製造終了済み → 仮置き3か月
+        t = "東芝 ネオボールZ 電球形蛍光ランプ EFA10EL"
+        self.assertEqual(D.check(None, t, now_only=D.NowOnly(True, 2.5, D.UP_OR_FLAT,
+                                                               date(2026, 10, 12))).verdict, D.PASS)
+        self.assertEqual(D.check(None, t, now_only=D.NowOnly(True, 3.5, D.UP_OR_FLAT,
+                                                               date(2026, 10, 12))).verdict, D.NO_GO)
+
+    def test_now_only_from_gates(self):
+        c = D.now_only_from("PASS", 1.0, "使える")
+        self.assertEqual((c.in_stock, c.price_trend), (True, D.UP_OR_FLAT))
+        c = D.now_only_from("UNKNOWN", None, "下落トレンド")
+        self.assertEqual((c.in_stock, c.price_trend), (None, D.DOWN))
+        self.assertIsNone(D.now_only_from("PASS", 1.0, "振れ幅が大きい").price_trend)
+
+    def test_unmarked_is_untouched(self):
+        d = D.check(None, "ふきん 3枚", now_only=D.NowOnly(False, 99, D.DOWN))
+        self.assertEqual(d.verdict, D.PASS)
+        self.assertFalse(d.marked)
 
 
 class TestSigns(unittest.TestCase):

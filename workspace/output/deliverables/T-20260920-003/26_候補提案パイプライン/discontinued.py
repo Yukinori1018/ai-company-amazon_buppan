@@ -13,21 +13,32 @@
 
 2段構え
 -------
-① **分類ルール**（`RULES`）… 法令で製造・輸入の終了が決まっている品目。根拠 URL を辞書に持つ。
-   当たったら `NO-GO`（仕入れが続かない＝リピートできない。§3.5 #12）。
-   ただし根拠が公的資料で確かめられていないルールは `UNKNOWN` に留める（`confirmed=False`）。
+① **終売の印**（`RULES` ＋ 卸の「廃番」記載）… 法令で製造・輸入の終了が決まっている品目
+   （根拠 URL を辞書に持つ）と、仕入れ先自身が廃番と書いている商品。**印を付けるだけで自動では落とさない。**
 ② **兆候**（`signs()`）… Keepa の履歴から「終売の匂い」を拾う。当たっても `UNKNOWN`
    （人がメーカー公式の製品DBで確認する）。**兆候だけでは落とさない。**
 
+🔴 2026-10-12 社長方針（CLAUDE.md §3.5 #12）：「**今だけ、儲かるなら、廃止が決まっているものも仕入れて良い**」。
+   ①の印が付いた商品は、次の3条件（`NowOnly`）で判定する。
+     (a) 仕入れ先に在庫がある
+     (b) 廃止期限（製造終了日）・在庫切れまでに売り切れる＝在庫月数 ≦ 期限までの月数
+         （期限が過ぎている／期限が無い卸の廃番は `AFTER_END_MONTHS`＝3か月の仮置き）
+     (c) 価格が上昇〜横ばい（下落トレンドでない）
+   3つとも満たせば PASS（印は判定理由に残す）、1つでも満たさなければ NO-GO、確かめていなければ UNKNOWN。
+   2026-10-11 までは①に当たれば一律 NO-GO だった（理由＝リピート不可）。
+
 ⚠️ 法令の「製造・輸出入禁止」は**販売の禁止ではありません**（環境省「蛍光ランプの使用・販売・
-購入は禁止されません」）。ここで NO-GO にする理由は違法だからではなく、**供給が止まる＝
-テスト仕入れの後のリピートが成立しない**からです（§3.5 #12 の「終売・廃番」）。
+購入は禁止されません」）。終売品のリスクは違法性ではなく、**供給が止まる＝リピートできない**ことと
+**在庫が売れ残ったまま市場が縮む**こと。後者を (b)(c) で見る。
 
 使い方
 ------
     from discontinued import check
     d = check(product, amazon_title, wholesale_title="", wholesale_note="", now_unix=fetched)
+    d = check(..., now_only=NowOnly(in_stock=True, months_to_sell=1.6, price_trend=UP_OR_FLAT,
+                                    today=date(2026, 10, 12)))
     d.verdict   # "NO-GO" / "UNKNOWN" / "PASS"
+    d.marked    # 終売の印（法令品目・卸の廃番）。PASS でも True のことがある
     d.label()   # 台帳の判定理由に入れる1行
 """
 
@@ -36,6 +47,7 @@ from __future__ import annotations
 import re
 import unicodedata
 from dataclasses import dataclass, field
+from datetime import date
 from statistics import median
 
 NO_GO = "NO-GO"
@@ -142,10 +154,6 @@ class RuleHit:
     detail: str = ""
     ends: str = ""
 
-    @property
-    def verdict(self) -> str:
-        return NO_GO if self.rule.confirmed else UNKNOWN
-
     def text(self) -> str:
         src = f" 根拠 {self.rule.source_url}" if self.rule.source_url else ""
         return (f"{self.rule.label}{('・' + self.detail) if self.detail else ''}"
@@ -167,6 +175,80 @@ def classify(*titles: str | None) -> RuleHit | None:
             if r.pattern.search(nt) and not (r.key == "incandescent" and _LED.search(nt)):
                 return RuleHit(r)
     return None
+
+
+# ── 「今だけ」判定（2026-10-12 社長方針・§3.5 #12） ───────────────────────
+
+UP_OR_FLAT = "上昇〜横ばい"
+DOWN = "下落"
+#: 製造終了日を過ぎた品目／期限の無い卸の廃番は、在庫がいつ尽きるか分からない。
+#: 3か月で売り切れる量だけを通す（仮置き・§3.1。実績で直す）。
+AFTER_END_MONTHS = 3.0
+_ISO = re.compile(r"\d{4}-\d{2}-\d{2}")
+
+
+@dataclass(frozen=True)
+class NowOnly:
+    """「今だけ」判定の材料。None は未確認（＝UNKNOWN になる）。"""
+
+    in_stock: bool | None = None           # (a) 仕入れ先に在庫
+    months_to_sell: float | None = None    # (b) 在庫月数（推奨初回点数 ÷ 取り分）
+    price_trend: str | None = None         # (c) UP_OR_FLAT / DOWN / None
+    today: date | None = None
+
+
+def end_date(ends: str | None) -> date | None:
+    """「2028-01-01（ハロりん酸塩系は2027-01-01）」の先頭の日付＝その種類の主たる終了日。"""
+    m = _ISO.search(ends or "")
+    return date.fromisoformat(m.group(0)) if m else None
+
+
+def now_only_verdict(ctx: NowOnly | None, ends: str | None) -> tuple[str, str]:
+    """(PASS/NO-GO/UNKNOWN, 理由)。3条件を全部満たせば PASS。"""
+    ctx = ctx or NowOnly()
+    today = ctx.today or date.today()
+    d = end_date(ends)
+    if d and d > today:
+        limit = round((d - today).days / 30.4, 1)
+        lim_txt = f"製造終了 {d.isoformat()} まで {limit}か月"
+    else:
+        limit = AFTER_END_MONTHS
+        lim_txt = (f"製造終了 {d.isoformat()} を過ぎている" if d else "終了日の記載なし") \
+            + f"ため {AFTER_END_MONTHS:g}か月（仮置き）"
+    fails, unknowns, oks = [], [], []
+    if ctx.in_stock is None:
+        unknowns.append("(a)仕入れ先の在庫 未確認")
+    elif ctx.in_stock:
+        oks.append("(a)仕入れ先に在庫あり")
+    else:
+        fails.append("(a)仕入れ先に在庫なし")
+    if ctx.months_to_sell is None:
+        unknowns.append(f"(b)在庫月数 未確認（上限 {lim_txt}）")
+    elif ctx.months_to_sell <= limit:
+        oks.append(f"(b)在庫 {ctx.months_to_sell:.1f}か月 ≦ {lim_txt}")
+    else:
+        fails.append(f"(b)在庫 {ctx.months_to_sell:.1f}か月 ＞ {lim_txt}")
+    if ctx.price_trend is None:
+        unknowns.append("(c)価格の傾き 未確認")
+    elif ctx.price_trend == DOWN:
+        fails.append("(c)価格が下落トレンド（値崩れ）")
+    else:
+        oks.append(f"(c)価格は{ctx.price_trend}")
+    verdict = NO_GO if fails else (UNKNOWN if unknowns else PASS)
+    head = {PASS: "今だけ仕入れ可", NO_GO: "今だけ仕入れ不可", UNKNOWN: "今だけ仕入れ 判定待ち"}[verdict]
+    return verdict, f"{head}：" + "・".join(fails + unknowns + oks)
+
+
+def now_only_from(stock_status: str | None, months_to_sell: float | None,
+                  price_verdict: str | None, today: date | None = None) -> NowOnly:
+    """パイプラインのゲート表から NowOnly を作る（台帳・仕入れ先ふるいの共通口）。
+
+    stock_status  … 「仕入れ」ゲートの PASS / FAIL / UNKNOWN
+    price_verdict … price_history.PriceLevel.verdict（下落トレンド→下落・使える/高値→上昇〜横ばい・他→未確認）
+    """
+    stock = {"PASS": True, "FAIL": False}.get(stock_status or "")
+    trend = {"下落トレンド": DOWN, "使える": UP_OR_FLAT, "高値": UP_OR_FLAT}.get(price_verdict or "")
+    return NowOnly(stock, months_to_sell, trend, today)
 
 
 # ── 商品名・卸の注記に書かれた終売の語 ────────────────────────────────────
@@ -263,11 +345,15 @@ class Discontinued:
     verdict: str                       # NO-GO / UNKNOWN / PASS
     rule: RuleHit | None = None
     reasons: list[str] = field(default_factory=list)
+    marked: bool = False               # 終売の印（法令品目・卸の廃番）。PASS でも残す
 
     def label(self) -> str:
-        if self.verdict == PASS:
+        if self.verdict == PASS and not self.marked:
             return "終売の印なし（分類ルール・兆候とも該当なし。メーカー公式は未確認）"
-        head = "🔴終売" if self.verdict == NO_GO else "終売疑い"
+        if self.marked:
+            head = {PASS: "終売・今だけ可", NO_GO: "🔴終売・今だけ不可"}.get(self.verdict, "終売・判定待ち")
+        else:
+            head = "🔴終売" if self.verdict == NO_GO else "終売疑い"
         return f"【{head}】" + " ／ ".join(self.reasons)
 
 
@@ -279,11 +365,13 @@ LISTING_LEVEL = ("no_new_offer", "rank_gone", "rank_stale")
 
 def check(product: dict | None, amazon_title: str | None, wholesale_title: str | None = "",
           wholesale_note: str | None = "", now_unix: int | None = None,
-          family_alive: bool = False) -> Discontinued:
+          family_alive: bool = False, now_only: NowOnly | None = None) -> Discontinued:
     """§3.5 #12 の機械の前段。NO-GO / UNKNOWN / PASS を返す。
 
     `family_alive` … 同じ JAN にぶら下がる別の ASIN が直近60日にランクを持っている
     （＝商品そのものは売れている）。True なら出品単位の兆候（LISTING_LEVEL）を終売の根拠にしない。
+    `now_only` … 終売の印が付いたときの「今だけ」3条件の材料。渡さなければ UNKNOWN（未確認）。
+    **終売の印だけでは NO-GO にしない**（2026-10-12 社長方針）。
     """
     reasons: list[str] = []
     verdict = PASS
@@ -291,12 +379,17 @@ def check(product: dict | None, amazon_title: str | None, wholesale_title: str |
     hit = classify(amazon_title, wholesale_title)
     if hit:
         reasons.append("分類ルール：" + hit.text())
-        verdict = hit.verdict
 
     sup = SUPPLIER_END_RE.search(_norm(f"{wholesale_title or ''} {wholesale_note or ''}"))
     if sup:
         reasons.append(f"仕入れ先の記載に「{sup.group(0)}」（卸自身が終わりを書いている＝リピート不可）")
-        verdict = NO_GO
+
+    marked = bool(hit or sup)
+    if marked:
+        # 法令品目は製造終了日まで、卸の廃番は終了日なし（＝仮置きの月数）で売り切れるかを見る
+        ends = (hit.ends or hit.rule.ends) if (hit and not sup) else None
+        verdict, why = now_only_verdict(now_only, ends)
+        reasons.append(why)
 
     sg = signs(product or {}, now_unix)
     if family_alive:
@@ -316,4 +409,4 @@ def check(product: dict | None, amazon_title: str | None, wholesale_title: str |
             verdict = UNKNOWN
     elif sg:
         reasons.append("弱い兆候（単独では落とさない）：" + sg[0].text)
-    return Discontinued(verdict, hit, reasons)
+    return Discontinued(verdict, hit, reasons, marked)

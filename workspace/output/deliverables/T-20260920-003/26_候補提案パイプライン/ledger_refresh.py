@@ -65,6 +65,7 @@ import consistency as K        # noqa: E402
 import screen_checks as SC     # noqa: E402
 import hidden_cart as HC       # noqa: E402
 import profit                  # noqa: E402
+import discontinued as DISC    # noqa: E402
 
 #: 2026-10-11 実売 UNKNOWN 行を Keepa で取り直した生データ（stats=90&history=1&buybox=1）
 FRESH_RAW = OUT / "keepa_unknown_20261011.jsonl"
@@ -111,6 +112,10 @@ SD_SCREEN = SDB / "sd_price_screen_20261011.csv"
 #: NETSEA 停止中（10/7〜）に、同じ購入元の SD 出展で買える ASIN の仕入れ経路を SD に切り替える。
 #: 卸価格は人の実画面（カズヨ）。値はこのファイルにだけあり、スクリプトは持たない（PUBLIC）
 SD_ROUTE = SDB / "sd_route_override_20261011.csv"
+#: 2026-10-12：ヤザワ（DNライティング）の SD 一覧価格（カズヨ実画面・120型番）を型番で突き合わせた分。
+#: 一覧で見たのは価格だけなので**在庫は未確認**（＝#17 仕入れは UNKNOWN）。
+#: 同じ ASIN が SD_ROUTE（10/11・在庫確認済み）にあれば、そちらを優先する。
+SD_ROUTE_EXTRA = sorted(SDB.glob("sd_route_override_2026101[2-9]*.csv"))
 
 #: score_20261004 のゲート名 → CLAUDE.md §3.5 の項目番号
 ITEM = {
@@ -127,6 +132,7 @@ ITEM = {
     "ゲート": "#1-2 出品許可",
     "取り分": "#10 取り分と在庫月数",
     "取り寄せ価格": "#13 販売価格（取り寄せ型の値付けしかない）",
+    "終売": "#12 終売（今だけ3条件）",
 }
 HUMAN_ITEMS_BASE = ["#9 キーゾンで3か月の実数（型番ごと）",
                     "#5 カートの販売元を実画面で読む",
@@ -230,10 +236,16 @@ def score_kz_entry(idx: dict, names: dict, rc: Counter) -> list[dict]:
 
 
 def load_sd_route() -> dict[str, dict]:
-    if not SD_ROUTE.exists():
-        return {}
-    return {r["ASIN"].strip(): r for r in csv.DictReader(SD_ROUTE.open(encoding="utf-8-sig"))
-            if (r.get("ASIN") or "").strip() and S._num(r.get("卸価格_税抜_1点"))}
+    out: dict[str, dict] = {}
+    # 古い順に読み、先に入った（在庫まで確認済みの）行を後のファイルで上書きしない
+    for f in [SD_ROUTE, *SD_ROUTE_EXTRA]:
+        if not f.exists():
+            continue
+        for r in csv.DictReader(f.open(encoding="utf-8-sig")):
+            a = (r.get("ASIN") or "").strip()
+            if a and a not in out and S._num(r.get("卸価格_税抜_1点")):
+                out[a] = r
+    return out
 
 
 def route_to_sd(scored: list[dict], idx: dict, names: dict, rc: dict) -> list[dict]:
@@ -265,13 +277,17 @@ def route_to_sd(scored: list[dict], idx: dict, names: dict, rc: dict) -> list[di
         for k in ("_src", "_cand", "_idx_day", "_fresh"):
             if k in s:
                 s2[k] = s[k]
-        stock = o.get("在庫") or ""
-        sold_out = "SOLD OUT" in stock.upper() or stock.strip() in ("なし", "品切れ")
+        stock = (o.get("在庫") or "").strip()
+        sold_out = "SOLD OUT" in stock.upper() or stock in ("なし", "品切れ")
+        # 2026-10-12：在庫を見ていない行（一覧で価格だけ見た）を「在庫あり」にしない
+        in_stock = stock in ("あり", "在庫あり")
+        st = "FAIL" if sold_out else ("PASS" if in_stock else "UNKNOWN")
+        word = {"FAIL": "在庫なし", "PASS": "在庫あり", "UNKNOWN": "在庫は未確認（価格のみ確認）"}[st]
         s2["gates"] = [g for g in s2["gates"] if g[0] != "仕入れ"] + [(
-            "仕入れ", "FAIL" if sold_out else "PASS",
-            f"SD（{o['購入先URL']}）で在庫{'なし' if sold_out else 'あり'}・卸1点 {excl:,.0f}円（税抜）"
+            "仕入れ", st,
+            f"SD（{o['購入先URL']}）で{word}・卸1点 {excl:,.0f}円（税抜）"
             f"（{o.get('確認者', '')} {o.get('確認時刻', '')}）。**発注直前に卸値を引き直してください。**")]
-        s2["在庫"] = "在庫なし" if sold_out else "在庫あり"
+        s2["在庫"] = {"FAIL": "在庫なし", "PASS": "在庫あり", "UNKNOWN": "未確認"}[st]
         s2["channel"] = "スーパーデリバリー"
         s2["_route"] = o
         out.append(s2)
@@ -401,6 +417,14 @@ def fix_for(name: str, st: str, why: str, s: dict) -> tuple[str, bool]:
         return f"今季は間に合わない。{pk}の2〜3か月前に発注すれば窓に入る", False
     if name == "採算":
         return fix_profit(s), False
+    if name == "終売":
+        if "(a)" in why and "在庫なし" in why:
+            return "終売品：仕入れ先に在庫が戻るか、同じ型番の在庫がある別の卸を探せば可", False
+        if "(b)" in why and "＞" in why:
+            return "終売品：初回点数を減らし、製造終了までに売り切れる量にすれば可", False
+        if "下落" in why:
+            return "終売品：値崩れが止まり価格が横ばいに戻れば再判定で通る", False
+        return "終売品：卸の在庫・在庫月数（取り分）・価格の傾きが決まれば今だけ仕入れ可か決まる", False
     return "人が確認すれば決まる", False
 
 
@@ -489,6 +513,11 @@ def apply_screen(s: dict, gates: list, gate: dict | None) -> bool:
 
 def compose_netsea(s: dict, gate: dict | None) -> dict:
     comp = _compose_netsea(s, gate)
+    # 終売の印は PASS（今だけ可）でも判定理由に残す（§3.5 #12・2026-10-12）
+    mark = next((g[2] for g in comp["gates"] if g[0] == "終売" and g[1] == "PASS"), "")
+    if mark:
+        mark = mark[:400]
+        comp["reason"] = comp["reason"][:1800 - len(mark) - 3] + " ／ " + mark
     tag, info = classify_extra(s, comp["gates"], gate)
     comp["extra"] = (tag, info)
     if comp["verdict"] == "GO":
@@ -547,9 +576,30 @@ def classify_extra(s: dict, gates: list, gate: dict | None) -> tuple[str, dict]:
     return "", {}
 
 
+def end_gate(s: dict, gates: list) -> None:
+    """§3.5 #12 終売（2026-10-12 社長方針「今だけ、儲かるなら廃止決定品も仕入れて良い」）。
+
+    法令品目・卸の廃番に印を付け、(a)仕入れ先の在庫 (b)在庫月数 ≦ 製造終了まで (c)価格が上昇〜横ばい
+    の3条件で判定する。印の無い行にはゲートを足さない。Keepa の兆候（signs）はここでは見ない
+    （台帳では product の鮮度がまちまちで、兆候は supplier_screen 側で見ている）。
+    """
+    r = s.get("row") or {}
+    e = s.get("econ")
+    lv = s.get("price")
+    months = (s.get("_share") or {}).get("months") or (e.months_to_sell if e else None)
+    stock = next((g[1] for g in gates if g[0] == "仕入れ"), None)
+    ctx = DISC.now_only_from(stock, months, lv.verdict if lv else None, date.fromisoformat(TODAY))
+    d = DISC.check(None, r.get("商品名"), "", "", None, now_only=ctx)
+    if not d.marked:
+        return
+    st = {DISC.NO_GO: "FAIL", DISC.PASS: "PASS"}.get(d.verdict, "UNKNOWN")
+    gates[:] = [g for g in gates if g[0] != "終売"] + [("終売", st, d.label(), "")]
+
+
 def _compose_netsea(s: dict, gate: dict | None) -> dict:
     gates = reread_gates(s)
     screened = apply_screen(s, gates, gate)
+    end_gate(s, gates)
     if gate:
         if gate["ゲート判定"] == "NG":
             gates.append(("ゲート", "FAIL", gate["根拠"], ""))
@@ -1029,9 +1079,15 @@ def with_supply_note(reason: str, site: str, supplier: str) -> str:
 def is_human(row: dict) -> bool:
     """凍結する人の行か。実画面確認の証跡ファイル（screen_checks）に載っている ASIN は
     凍結せず、毎回その証跡から人の値を合流させて引き直す（2026-10-11）。"""
+    who = row.get("確認者") or ""
+    # 2026-10-12：秘書が台帳で直接下した最終判断（確認者にタカシ＝機械の名が無い行。例
+    # 「カズヨ（社長方針で終売品を許容・…）」）は、証跡ファイルに載っていても凍結する。
+    # 機械の合流で作る確認者は必ず「／タカシ（…）」を含むので区別できる（§3.3-16）。
+    if "カズヨ" in who and "タカシ" not in who:
+        return True
     if SCREEN.covers(row.get("ASIN", "")):
         return False
-    return "カズヨ" in (row.get("確認者") or "")
+    return "カズヨ" in who
 
 
 def main(argv=None) -> int:
@@ -1070,6 +1126,7 @@ def main(argv=None) -> int:
 
     waiting = []
     updated = skipped_human = 0
+    kept_no_data: list[str] = []
     routed = set(load_sd_route())
     for r in rows:
         if r["卸サイト"] == "スーパーデリバリー" and r["ASIN"] not in routed:
@@ -1079,6 +1136,11 @@ def main(argv=None) -> int:
             continue
         if is_human(r):
             skipped_human += 1
+            continue
+        if _no_product(s) and r.get("判定") == "GO":
+            # 2026-10-12：別ルート（candidate_pipeline 等）が自前の Keepa データで GO にした行を、
+            # 手元にデータが無いだけで UNKNOWN に落とさない（B0BP7M69YH）。データなしは判定の根拠にならない
+            kept_no_data.append(r["ASIN"])
             continue
         comp = consistency_gate(s, compose_netsea(s, gates.get(r["ASIN"])))
         r.update(netsea_cells(s, gates.get(r["ASIN"]), comp))
@@ -1137,6 +1199,7 @@ def main(argv=None) -> int:
         x["判定理由"] = with_supply_note(x.get("判定理由"), x.get("卸サイト"), x.get("購入元の名前"))
     after = count([dict(zip(header, x)) for x in final])
     summary = {"前": before, "後": after, "更新": updated, "人の行(据え置き)": skipped_human,
+               "データなしで GO 据え置き": kept_no_data,
                "追記NETSEA": len(appended), "追記SD": len(sd_lines),
                "実画面確認待ち": Counter(w["状態"] for w in waiting),
                "実画面確認待ち_経路": Counter(w["卸サイト"] for w in waiting),

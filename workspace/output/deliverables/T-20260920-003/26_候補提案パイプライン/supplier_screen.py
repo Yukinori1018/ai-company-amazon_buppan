@@ -17,7 +17,7 @@
 | 実売（キーゾン相当） | Keepa ランク履歴で「30日ごとに直前より3%超改善した回数」（キーゾン実画面25ASIN×3か月で一致を確認済み） | #9 |
 | 取り分 | 3か月平均 ÷（カート対象の FBA＋自己発送＋1）。3個/月未満は落とす | #10 |
 | メーカー本人のカート | カート保持者の表示名がブランド名・メーカー名と一致したら疑い（UNKNOWN） | #5 |
-| 終売フラグ | `discontinued.py`（法令で製造終了の品目は NO-GO・兆候は UNKNOWN） | #12 |
+| 終売フラグ | `discontinued.py`（法令品目・卸の廃番は印＋「今だけ」3条件で判定・兆候は UNKNOWN。2026-10-12） | #12 |
 
 入口の流れ
 ----------
@@ -532,10 +532,15 @@ def score_asin(asin: str, inp: dict, store: KeepaStore, names: dict, rank_counts
         g.append(("メーカー本人", mk_st, mk_why))
 
     # 終売（§3.5 #12）
+    # 2026-10-12：終売の印だけでは落とさない。「今だけ」3条件（在庫・在庫月数・価格の傾き）で判定
+    stock_st = next((x[1] for x in g if x[0] == "仕入れ"), None)
+    lv = s.get("price")
+    ctx = DISC.now_only_from(stock_st, months if months else (e.months_to_sell if e else None),
+                             lv.verdict if lv else None, S.TODAY)
     d = DISC.check(p, p.get("title"), inp.get("卸の商品名"), inp.get("備考"), fetched,
-                   family_alive=family_alive)
-    if d.verdict != DISC.PASS:
-        g.append(("終売", "FAIL" if d.verdict == DISC.NO_GO else "UNKNOWN", d.label()))
+                   family_alive=family_alive, now_only=ctx)
+    if d.verdict != DISC.PASS or d.marked:
+        g.append(("終売", {DISC.NO_GO: "FAIL", DISC.PASS: "PASS"}.get(d.verdict, "UNKNOWN"), d.label()))
     s["gates"] = g
     s["disc"] = d
 
@@ -851,8 +856,10 @@ def ledger_flags(out: Path, log=print) -> dict:
             "根拠URL": d.rule.rule.source_url if d.rule else "",
             "理由": " ／ ".join(d.reasons),
             "Keepa の取得日": _day(c.fetched) if c else "キャッシュなし（兆候は見ていない）",
-            "推奨": ("台帳の判定を NO-GO に（§3.5 #12 終売。後継品＝LED の同じ仕入れ先を探す）"
-                   if d.verdict == DISC.NO_GO else "人がメーカー公式の製品DBで現行品か確認（UNKNOWN）"),
+            "推奨": ("「今だけ」3条件を満たさない（§3.5 #12・2026-10-12 方針）。後継品＝LED の同じ仕入れ先を探す"
+                   if d.verdict == DISC.NO_GO else
+                   ("終売の印あり：仕入れ先の在庫・在庫月数・価格の傾きを確かめれば今だけ仕入れ可（§3.5 #12）"
+                    if d.marked else "人がメーカー公式の製品DBで現行品か確認（UNKNOWN）")),
         })
     out_rows.sort(key=lambda x: (x["終売フラグ"] != DISC.NO_GO, x["購入元の名前"], x["商品名"]))
     cols = ["ASIN", "商品名", "購入元の名前", "台帳の判定", "終売フラグ", "根拠の種類", "品目",
