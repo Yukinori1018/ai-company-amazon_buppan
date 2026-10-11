@@ -1,0 +1,72 @@
+<!doctype html><html lang='ja'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>51 仕入れ先の状態確認 — 毎日の手順</title><style>body{font-family:-apple-system,'Hiragino Sans','Noto Sans JP',sans-serif;max-width:1150px;margin:2em auto;padding:0 1em;line-height:1.65;color:#222;font-size:14.5px}table{border-collapse:collapse;margin:.8em 0;font-size:.92em}th,td{border:1px solid #bbb;padding:.35em .6em;vertical-align:top}th{background:#eef2f8}tr:nth-child(even) td{background:#fafafa}h1{font-size:1.5em;border-bottom:2px solid #444}h2{font-size:1.25em;border-left:5px solid #25b;padding-left:8px;margin-top:1.8em}h3{font-size:1.05em;margin-top:1.4em}blockquote{border-left:4px solid #ccc;margin:.8em 0;padding:.2em 1em;color:#444}code{background:#f3f3f3;padding:1px 4px;border-radius:3px}hr{border:0;border-top:1px solid #ccc;margin:1.6em 0}</style></head><body>
+<h1>51 仕入れ先の状態確認 — 毎日の手順</h1>
+<p>T-20260920-003 ／ サトル（リサーチャー）／ 2026-10-11 作成</p>
+<p>対になる台帳：49（公開用の要約）／<code>agent_output/T-20260920-003/supplier_master_20261011.csv</code>（本体）</p>
+<p>登録・申請・問い合わせはこの手順に含めない（§4.1）。見て、記録するだけ。</p>
+<p><strong>この手順で社長が仕入れられるもの</strong>：承認・復旧・審査が通った日のうちに、その仕入れ先の台帳行（SD カネイシ157行・ニッパン50行、NETSEA 1,733行など）を採点に戻せる。</p>
+<hr>
+<h2>1. 毎日見る5項目</h2>
+<table><thead><tr><th>#</th><th>見たいこと</th><th>判定に使うもの（主）</th><th>補助のシグナル</th><th>自動化できるか</th><th>1日の負荷</th></tr></thead><tbody>
+<tr><td>1</td><td><strong>NETSEA が復旧したか</strong></td><td><code>https://www.netsea.jp/</code> の HTTP ステータス。<strong>200 で復旧の候補、503 で停止中</strong></td><td>告知の「第N報」の番号と更新日時（10/11 時点は第4報・19時）／SynaBiz のお知らせ <code>https://synabiz.co.jp/news/</code></td><td><strong>できる</strong>（非ログインの公開ページ。夜間タスクで1日1回）</td><td>1〜2リクエスト</td></tr>
+<tr><td>2</td><td><strong>SD の申請が承認されたか</strong>（カネイシ・ニッパン・ブライ・志成・コモライフ・クレエ・創健社・健康フーズ）</td><td>ログインした状態で各社の商品一覧を開き、「申請中」が値段の表示に変わったか</td><td>SD 内「メッセージ」に出展企業から「お取引について」が届く（9/20 の申請時の記録で1〜3営業日）</td><td><strong>人が見る</strong>（社長の Chrome。ログイン後の画面は自動取得しない）</td><td>8社×1ページ。レーンB の1日50の内</td></tr>
+<tr><td>3</td><td><strong>卸売ドットコムの審査が通ったか</strong></td><td>審査結果のメール</td><td>ログインして値段が表示されるか</td><td>メールは半自動（下の §2）</td><td>0〜1</td></tr>
+<tr><td>4</td><td><strong>卸問屋.com の審査が通ったか</strong></td><td>審査結果のメール</td><td>同上</td><td>同上</td><td>0〜1</td></tr>
+<tr><td>5</td><td><strong>国分ネット卸で値段と JAN が見えるか</strong>（登録完了済み。1回だけ）</td><td>ログイン後の商品ページ</td><td>—</td><td>人が見る</td><td>1回で終わり</td></tr>
+</tbody></table>
+<p>事実：</p>
+<ul>
+<li style='margin-left:0.0em'>NETSEA の 503 ページには障害告知の本文が入っている（2026-10-11 取得・28,639バイト）。<strong>本文を読めば原因・新規登録停止・注文の扱いまで分かる</strong>ので、ステータスだけでなく「第N報」も記録する</li>
+<li style='margin-left:0.0em'>卸売ドットコムの審査は FAQ で7営業日以内。10/11 の登録なら、10/12（スポーツの日）を除いて <strong>10/21（水）が目安</strong>（登録日は秘書の依頼文から推定）</li>
+<li style='margin-left:0.0em'>SD の承認は、9/20 の一括申請のときは一覧の表示が「申請中」に変わるのに約10分、出展企業からの返事は1〜3営業日だった</li>
+</ul>
+<p>未確認（初回の受信で埋める）：</p>
+<ul>
+<li style='margin-left:0.0em'>SD の承認・卸売ドットコム・卸問屋.com の審査結果メールの<strong>差出人と件名</strong>。届いたら Gmail のフィルタ条件として §2 に書き足す</li>
+<li style='margin-left:0.0em'>各サイトの登録に使ったメールアドレス（satoyselect か 1018 か）。<strong>satoyselect は Gmail コネクタでは読めず、ブラウザでは読める</strong>（<code>reference_business_accounts</code>）</li>
+</ul>
+<hr>
+<h2>2. 手順（夜間タスクと朝の人手に分ける）</h2>
+<h3>夜間タスクでやる（無人・公開ページだけ）</h3>
+<ol>
+<li style='margin-left:0.0em'>NETSEA のトップを1回取得する</li>
+</ol>
+<p>   ```</p>
+<p>   curl -s -o netsea.html -w "%{http_code}\n" https://www.netsea.jp/</p>
+<p>   ```</p>
+<ul>
+<li style='margin-left:1.7999999999999998em'>503：本文から「第N報」と更新日時を抜き出し、前日と比べる。変化があれば朝の報告に1行</li>
+<li style='margin-left:1.7999999999999998em'>200：<strong>復旧の候補</strong>。API の疎通はこの時点では打たない（朝に人が確認してから）</li>
+<li style='margin-left:1.7999999999999998em'>再試行はしない。1日1回で足りる</li>
+<li style='margin-left:0.0em'>SynaBiz のお知らせを1回取得し、NETSEA の見出しが増えたかを見る</li>
+<li style='margin-left:0.0em'>結果を <code>agent_output/T-20260920-003/supplier_master/status_&lt;YYYYMMDD&gt;.json</code> に書く（ステータス・第N報・取得時刻）</li>
+</ul>
+<h3>朝、秘書が社長の Chrome でやる（人が在席）</h3>
+<ol>
+<li style='margin-left:0.0em'>Gmail（1018 はコネクタ、satoyselect はブラウザ）で前日以降の SD・卸売ドットコム・卸問屋.com からのメールを見る</li>
+<li style='margin-left:0.0em'>SD にログインした状態で、申請中の8社の商品一覧を1社1ページずつ開き、値段が出たかを見る。<strong>間隔3秒以上・1社1回</strong></li>
+<li style='margin-left:0.0em'>変化があった社だけ、<code>supplier_master_20261011.csv</code> の「取引状態」「卸価格が見えるか」と確認日を書き換える</li>
+<li style='margin-left:0.0em'>承認が出た社は、その日のうちに次へ回す：</li>
+<li style='margin-left:1.7999999999999998em'>SD：値段を <code>sd_price_manual_20261010.csv</code> に足し、<code>ledger_refresh.py</code> を再実行（タカシの手順）</li>
+<li style='margin-left:1.7999999999999998em'>NETSEA 復旧：GO 2件（ヤザワ）と UNKNOWN 35行の卸の画面を見直す。§3.3-11 に従い、<strong>当たるはずの JAN で API の疎通を確かめてから</strong>「0件」を信じる</li>
+<li style='margin-left:1.7999999999999998em'>卸売ドットコム：台帳のカネイシ286行を JAN で引けるか、まず数件で試す</li>
+</ol>
+<hr>
+<h2>3. 止める条件と再開の条件（§3.3-31「止めた」には再開を書く）</h2>
+<table><thead><tr><th>状況</th><th>どうするか</th><th>再開</th></tr></thead><tbody>
+<tr><td>SD が 429 を返した</td><td>その日の SD 確認を打ち切る</td><td>翌日、間隔を倍にして再開（3→6→12秒）</td></tr>
+<tr><td>NETSEA が 200 だが API がエラー</td><td>API を叩き続けない。エラーの code と message を記録</td><td>翌日もう一度1回</td></tr>
+<tr><td>審査のメールが7営業日を過ぎても来ない</td><td>ログインを1回試して状態を見る</td><td>結果を秘書に報告。問い合わせは §4.1 なので秘書経由で社長判断</td></tr>
+</tbody></table>
+<p>🔴 してはいけないこと：通信の指紋を偽装する手段を使う（§3.3-14）。SD・直販サイトのログイン後の画面を無人で取得する。審査や承認の催促を自分から送る（§3.3-15・§4.1）。</p>
+<hr>
+<h2>4. どの実践者の型か（§3.3-27）</h2>
+<p>新しい型ではない。<strong>卸の取引申請は「申請→1〜3営業日で承認メール→承認先から仕入れ」</strong>が SD 公式の案内どおりの流れで、それを毎日1回の確認に置き直しただけ。NETSEA の告知を毎日見る手順は、運営が告知ページで「定期的にご確認ください」と案内している（第4報）。</p>
+<h2>出典</h2>
+<table><thead><tr><th>資料</th><th>URL・所在</th><th>取得日</th></tr></thead><tbody>
+<tr><td>NETSEA サイト障害発生に関するお知らせ 第1〜4報</td><td>https://www.netsea.jp/</td><td>2026-10-11 22:45</td></tr>
+<tr><td>SynaBiz お知らせ</td><td>https://synabiz.co.jp/news/</td><td>2026-10-11（48 で取得）</td></tr>
+<tr><td>卸売ドットコム よくあるご質問（審査7営業日以内）</td><td>https://oroshi-uri.com/page/faq</td><td>2026-10-11（48 で取得）</td></tr>
+<tr><td>SD 一括申請の挙動（10分で反映・1〜3営業日で連絡）</td><td>チケット T-20260920-003「2026-09-20 卸価格の申請」</td><td>2026-09-20</td></tr>
+<tr><td>SD の自動取得の線</td><td>成果物 29・30（法務判定）・CLAUDE.md §3.3-14/18</td><td>2026-09-30</td></tr>
+</tbody></table>
+</body></html>
