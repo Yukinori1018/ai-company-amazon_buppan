@@ -4089,3 +4089,30 @@ FLR910 2件は SD 経由でも GO（B 等級・11.2%・手残り1,186円/個）�
 
 ## 完了報告（サトル → カズヨ・49/51）
 完了しました。確認をお願いします。値段が見えて Amazon 可が確定しているのはハリマ1社（36行）。GO 2件を SD のヤザワで買う前に、ヤザワの SD 取引条件ページを1回読む必要があります（社内に記録なし）。創健社・健康フーズは申請記録と出展 ID がチケットに無いので、秘書側で追記してください。経路は NETSEA 85.9%（§3.3-31 の80%超）で、その経路が停止中です。論点 A〜C（ヤザワ付け替え・カネイシの窓口・NETSEA 依存の下限）はタケシへ。
+
+## 現在地（2026-10-11 深夜 タカシ・部品2 自動ふるい）
+- `supplier_screen.py`（自動ふるい）と `discontinued.py`（終売フラグ）を作り、SD（ハリマ・森川 12品）と NETSEA 索引（67,667 JAN）で初回稼働。台帳には書いていない（合流は再採点担当）。
+- NETSEA は Keepa キャッシュに当たる 2,063 JAN（3%）だけ評価済み。残り 67,549 JAN は待ち行列（約11.5万トークン＝キー独占で約4日）。
+
+## ログ（2026-10-11 深夜 タカシ・部品2）
+- 入力の標準形と変換口（supplier_inputs.py：sd-screen / netsea）を作成。SD は実画面価格の**最小ロットの段**を採用（保守側）。「品切れあり」は「一部品切れ」として在庫ありに畳まない
+- supplier_screen.py：JAN→Keepa（手元キャッシュ9本・約4千 ASIN を先に引く）→足りない JAN だけ code 逆引き→セット ASIN 全部→score_20261004.build＋キーゾン相当の実売・取り分・メーカー本人・終売。候補だけ buybox 取り直し
+- discontinued.py：環境省ページ（https://www.env.go.jp/chemi/tmms/lamp.html）で蛍光ランプの種類別終了日を確認して辞書化。LED 蛍光灯・蛍光ペン・カバー等は当てない
+- 初回実走で「終売疑い」がセット出品の死骸16件で埋まった → **同じ JAN の別 ASIN が売れていれば出品単位の停止は終売の兆候にしない**よう直した
+- 実走中に2点修正：①平均が3個/月未満なら出品者数を見なくても取り分 FAIL ②family 合計（上限）で取り分<3 なら FAIL ③人が実画面で NO-GO にした行（SCREEN_CHECKED_NO_GO）を上書きしない
+- Keepa 消費 174トークン（code 逆引き 93 JAN＝159・buybox 5件＝15）。kz_entry_fetch.py（別タカシ）が同じキーで待機中だったので最小限に留めた
+- テスト23本 OK（test_cost_v2・test_pipeline も OK）。commit 済み（push なし）
+
+## 成果物（2026-10-11 深夜 タカシ・部品2）
+- workspace/output/deliverables/T-20260920-003/26_候補提案パイプライン/supplier_screen.py
+- workspace/output/deliverables/T-20260920-003/26_候補提案パイプライン/discontinued.py
+- workspace/output/deliverables/T-20260920-003/26_候補提案パイプライン/supplier_inputs.py
+- workspace/output/deliverables/T-20260920-003/26_候補提案パイプライン/test_supplier_screen.py
+- workspace/output/deliverables/T-20260920-003/26_候補提案パイプライン/README.md（§自動ふるい）
+- （卸値入り・agent_output）supplier_screen/screen_{sd,netsea}_20261011.csv・candidates_netsea_20261011.csv・summary_*.json／ledger20261010/discontinued_flags_20261011.csv
+
+## 完了報告（タカシ → カズヨ・部品2）
+- 初回稼働：SD 12品→37 ASIN→候補0（採算C 13・実売17）。NETSEA 2,063 JAN→2,790 ASIN→**人が見る価値のある候補 8件（うち台帳に無い新規6件・全部B等級）**。終売で NO-GO 216件（ほぼ DN ライティング等の蛍光灯）
+- 台帳の既存2,018行：終売 NO-GO 204行（うち台帳で GO 2・UNKNOWN 15＝FLR910 ほか）→ discontinued_flags_20261011.csv。再採点担当が合流
+- 妥協点：NETSEA の97%が未評価（トークン待ち）。DN ライティングの生産終了時期は公式で未確認（法令の期限で判定）。「一般照明用／特殊用途」の線引きは機械では決めていない
+- 残課題：未取得 JAN を夜間に流す常設化（`--tokens` `--wait`）は kz_entry_fetch と同じキーを取り合うので順番の判断が要る
