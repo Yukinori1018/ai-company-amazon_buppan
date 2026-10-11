@@ -18,7 +18,8 @@
   カート保持者が本体・メーカー本人でない、かつ実画面で確認済み
                                   … カート保持者列に「確認」の記載、または 30_verify_cart.tsv（9/30 実画面）
                                      ／61_checked_asins.json（10/5 実画面）に ASIN がある
-  公式ページで商品と社名の紐付け確認済み … 紐付けの判定が「一致」で始まり、根拠URLがある
+  公式ページで商品と社名の紐付け確認済み … 紐付けの判定を link_verdict() で4値に正規化して「一致」で始まり、根拠URLがある
+                                     （「ブランド単位：…」「表記ゆれ：…」の自由記述も読む。シートの原文は書き換えない）
 
 ※ このファイルは PUBLIC リポに入る。値（連絡先・売価）はシートと agent_output の CSV にだけ出す。
 """
@@ -76,6 +77,27 @@ def contact_means(r: dict) -> str:
     return 'なし'
 
 
+LINK_VALUES = ('一致', '一致（ブランド単位）', '一致（表記ゆれ）', '未確認')
+
+
+def link_verdict(raw: str) -> str:
+    """紐付けの判定の自由記述を4値に正規化する（2026-10-11 タカシ）。
+
+    10/04 の確認（09_）は「一致／一致（表記ゆれ）／一致（ブランド単位）／未確認」の4値だったが、
+    その後のバッチで「ブランド単位：…」「表記ゆれ：…」と「一致」を付けずに書いた行があり、
+    検算の startswith('一致') で取りこぼしていた。ブランド単位は 10/04 からの既定どおり確認済みに数える。
+    「〜で確認済み」（他行への参照）は参照先を辿っていないので未確認のまま（甘く読まない）。
+    """
+    s = (raw or '').strip()
+    if s.startswith(('一致（ブランド単位）', '一致(ブランド単位)', 'ブランド単位')):
+        return '一致（ブランド単位）'
+    if s.startswith(('一致（表記ゆれ）', '一致(表記ゆれ)', '表記ゆれ')):
+        return '一致（表記ゆれ）'
+    if s.startswith(('一致', '製造元として一致', '社名一致')):
+        return '一致'
+    return '未確認'
+
+
 def measure(r: dict, cand: dict, profit: dict, kp: dict | None) -> dict:
     """検算に使う値と出典を1行ぶん取り出す（判定はしない）。"""
     from criteria_check import _keepa
@@ -112,7 +134,8 @@ def measure(r: dict, cand: dict, profit: dict, kp: dict | None) -> dict:
     m['カート保持者'] = cart
     m['カート実画面確認'] = (('確認' in cart and not cart.startswith('未調査'))
                        or r.get('代表ASIN(タカシ)', '') in LIVE)
-    m['紐付けの判定'] = r.get('紐付けの判定') or ''
+    m['紐付けの判定(原文)'] = r.get('紐付けの判定') or ''
+    m['紐付けの判定'] = link_verdict(m['紐付けの判定(原文)'])
     m['紐付け根拠URL'] = r.get('紐付け根拠URL') or ''
     return m
 
@@ -195,7 +218,7 @@ def assign(rows: list[dict], list_col: str, check_col: str) -> dict:
 
 EXPORT_COLS = ['打診順', '送信順', '正式社名', 'ブランド', '代表ASIN', 'Amazon URL', '連絡手段', 'メールアドレス',
                '電話番号', '問い合わせフォームURL', '流通形態', '月販', '月販の出典', '本体在庫切れ率365(%)', 'FBA数', '新品数',
-               '売れ筋ランク', '売価(円)', 'カート保持者', 'カート実画面確認', '紐付けの判定', '紐付け根拠URL', '基準チェック']
+               '売れ筋ランク', '売価(円)', 'カート保持者', 'カート実画面確認', '紐付けの判定', '紐付けの判定(原文)', '紐付け根拠URL', '基準チェック']
 
 
 def export(rows: list[dict], path: str, check_col: str, prefix: str = '第1弾-') -> int:
@@ -213,7 +236,7 @@ def export(rows: list[dict], path: str, check_col: str, prefix: str = '第1弾-'
                     '月販': m['月販'], '月販の出典': m['月販の出典'], '本体在庫切れ率365(%)': m['本体在庫切れ率365'],
                     'FBA数': m['FBA数'], '新品数': m['新品数'], '売れ筋ランク': m['ランク'], '売価(円)': m['売価'],
                     'カート保持者': m['カート保持者'], 'カート実画面確認': '済' if m['カート実画面確認'] else '未',
-                    '紐付けの判定': m['紐付けの判定'], '紐付け根拠URL': m['紐付け根拠URL'],
+                    '紐付けの判定': m['紐付けの判定'], '紐付けの判定(原文)': m['紐付けの判定(原文)'], '紐付け根拠URL': m['紐付け根拠URL'],
                     '基準チェック': r.get(check_col, '')})
     with open(path, 'w', encoding='utf-8-sig', newline='') as f:
         w = csv.DictWriter(f, fieldnames=EXPORT_COLS)

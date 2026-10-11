@@ -7,6 +7,9 @@
   3. 24_連絡先_*.csv          … 今後増える分（glob・ファイル名順）
   補助：10_メーカー候補_完全版.csv → 10_メーカー候補_完全版_v1.csv の順で
         代表商品名・印・Keepa値・値崩れの兆候・ブランドストアを引き当て（キー＝代表ASIN）
+  上書き（元の batch CSV は書き換えない・同期のたびに証跡から上書き）：
+        65_カート確認_*.csv（カート保持者）／62b_出品可否_*.csv（新品の出品可否）／
+        67_紐付け確認_*.csv（紐付け4列・サトルの再確認）／68_宛先差し替え_*.csv（窓口列・旧値は備考へ）
   採算：40_採算列.csv（経理ハジメ・40_profit_cols.py の出力・キー＝代表ASIN）
         式は 41_採算列の計算式.md
 
@@ -160,6 +163,63 @@ def apply_screen_checks(rows):
             why = flags.get(a) or x.get('注意')
             r['判定'] = f'要確認：カートがメーカー/ブランド本人の疑い（{holder}・{why}）'
             n['本人カート疑いで要確認'] += 1
+    return n
+
+
+# 2026-10-11 深夜（タカシ）：サトルの紐付けの再確認（67_*）と、ヒデアキの宛先差し替え（68_*）を合流する。
+# どちらも元の batch CSV は書き換えず、同期のたびに証跡ファイルから上書きする（65_/62b_ と同じ型）
+LINK_GLOB = '67_紐付け確認_*.csv'
+CONTACT_GLOB = '68_宛先差し替え_*.csv'
+CONTACT_FIELDS = ['メールアドレス', '問い合わせフォームURL', '電話番号', '窓口の種類']
+
+
+def apply_link_checks(rows):
+    """67_紐付け確認_*（キー＝代表ASIN）で紐付け4列を上書き。後のファイルが勝つ。件数を返す。"""
+    link = {}
+    for p in sorted(glob.glob(os.path.join(HERE, LINK_GLOB))):
+        for x in read_csv(p):
+            link[x['ASIN'].strip()] = x
+    n = collections.Counter()
+    for r in rows:
+        x = link.get(r['代表ASIN(タカシ)'])
+        if not x:
+            continue
+        v, why = (x.get('紐付けの判定') or '').strip(), (x.get('判定の理由') or '').strip()
+        day = (x.get('確認時刻') or '')[5:10].replace('-', '/')
+        # 「一致」は既存行と同じ素の値。それ以外は理由を併記（NOTES の約束どおり）
+        r['紐付けの判定'] = v if v == '一致' else f'{v}：{why}（{day}再確認・サトル）'
+        r['紐付け根拠URL'] = (x.get('紐付け根拠URL') or '').strip()
+        for c in ('Amazon上のブランド表記', 'Amazon上のメーカー表記'):
+            if (x.get(c) or '').strip():
+                r[c] = x[c].strip()
+        n[v] += 1
+    return n
+
+
+def apply_contact_overrides(rows):
+    """68_宛先差し替え_*（キー＝代表ASIN）で窓口列を差し替える。旧値は備考へ退避（消さない）。"""
+    n = 0
+    for p in sorted(glob.glob(os.path.join(HERE, CONTACT_GLOB))):
+        for x in read_csv(p):
+            r = next((r for r in rows if r['代表ASIN(タカシ)'] == x['代表ASIN'].strip()), None)
+            if not r:
+                continue
+            old = []
+            for c in CONTACT_FIELDS:
+                if c not in x:
+                    continue
+                new = (x.get(c) or '').strip()
+                if new != r[c]:
+                    if r[c]:
+                        old.append(f'{c}={r[c]}')
+                    r[c] = new
+            note = f'宛先差し替え（{x.get("差し替え日", "")}・{x.get("理由", "").strip()}）'
+            if old:
+                note += '。旧：' + '／'.join(old)
+            if note not in r['備考']:
+                r['備考'] = '／'.join(s for s in [r['備考'], note] if s)
+            r['_contact'] = contact_rank(r)  # 窓口が変われば送信順も変わる
+            n += 1
     return n
 
 
@@ -450,6 +510,9 @@ def collect():
     # 送信順＝成約しやすさ（§3.5）。①流通形態 ②窓口 ③規模 ④新品出品者数 降順 ⑤該当ASIN数 降順
     global SCREEN_N
     SCREEN_N = apply_screen_checks(rows)
+    global LINK_N, CONTACT_N
+    LINK_N = apply_link_checks(rows)
+    CONTACT_N = apply_contact_overrides(rows)
     send_key = lambda r: (j_rank(r['判定']), r['_dist'], r['_contact'], r['_scale'], -sellers(r), -asin_n(r),
                           r['優先度'] or 'Z', key_of(r))
     base = lambda r: (r['優先度'] or 'Z', -asin_n(r), key_of(r))
@@ -557,6 +620,10 @@ def main():
         print(f'  検算で外した: {name}（{lst}）: {"・".join(bad)}')
     print(f'{DASHIN_CSV}: {n_exp}行')
     print('実画面の合流:', dict(SCREEN_N), dict(GATE_N))
+    print('紐付け再確認の合流:', dict(LINK_N), '/ 宛先差し替え:', CONTACT_N, '社')
+    lk = collections.Counter((r['_m']['紐付けの判定'], r['_m']['紐付けの判定(原文)'].split('：')[0] != r['_m']['紐付けの判定'])
+                             for r in q)
+    print('紐付け（接触候補・正規化後, 原文と違うか）:', dict(lk))
     un = [r for r in rows if r[LIST_COL] == UNCHECKED]
     out = argval('unchecked-out')
     if out:
