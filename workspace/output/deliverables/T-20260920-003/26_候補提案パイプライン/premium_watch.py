@@ -606,7 +606,7 @@ def judge(rows: list[dict]) -> dict:
     return {
         "①母数(原価が判っている)": len(priced), "①黒字": len(win),
         "①過半か": (len(win) * 2 > len(priced)) if priced else None,
-        "②最大損(悲観)": worst[0] if worst else None, "②最大損のASIN": worst[1]["ASIN"] if worst else "",
+        "②最大損(悲観)": int(worst[0]) if worst else None, "②最大損のASIN": worst[1]["ASIN"] if worst else "",
         "②1万円以内か": (worst[0] >= -MAX_LOSS_PER_LOT) if worst else None,
         "②悲観で1万円超の損の件数": sum(1 for v, _ in pess if v < -MAX_LOSS_PER_LOT),
         "公正価格の恐れ(Amazon外の価格が入っている行のうち)": f"{sum(1 for r in rows if r.get('公正価格の恐れ'))}/{sum(1 for r in rows if r.get('Amazon外最安'))}",
@@ -628,7 +628,7 @@ def weekly(today: date) -> Path:
          f"- 監視対象 {len(rows)}件（うち原価が判っている {j['①母数(原価が判っている)']}件）・判定日 {WATCH_END.isoformat()}",
          "- 発注はしていない。監視開始日に最小ロットを買ったとみなした**紙の上の取引**",
          "- 式：販売開始＝開始＋21日／1日の販売＝kz再現 m1÷(カート対象FBA＋自己発送＋1)÷30・本体カートの日は0／"
-         "入金＝fba_cost の費用一式（手数料・FBA・保管・納品・おりおん）／悲観＝売価が1年中央値に戻る", "",
+         "入金＝fba_cost の費用一式（手数料・FBA・保管・納品・おりおん）／悲観＝売価が1年中央値に戻る・悲観2＝Amazon外最安まで戻る（手入力の行だけ）", "",
          "## 判定の3指標（秘書が 2026-12-07 に使う）", "",
          "| # | 指標 | 値 | 線 |", "|---|---|---|---|",
          f"| ① | 評価込みで黒字の ASIN | {pct(j['①黒字'], j['①母数(原価が判っている)'])} | 過半 |",
