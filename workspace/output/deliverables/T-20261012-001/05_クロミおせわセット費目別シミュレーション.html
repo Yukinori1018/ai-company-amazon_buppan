@@ -1,0 +1,108 @@
+<!doctype html><html lang="ja"><meta charset="utf-8"><title>05 クロミ おせわセット 費目別シミュレーション</title><style>body{font-family:-apple-system,"Hiragino Sans",sans-serif;max-width:1100px;margin:auto;padding:20px;line-height:1.6}table{border-collapse:collapse;margin:10px 0;font-size:13px}td,th{border:1px solid #ccc;padding:4px 8px}th{background:#f3f3f3}td:nth-child(n+2){text-align:right}.ctl{margin:8px 0}.note{font-size:12px;color:#555}</style><body><h1>05 クロミ おせわセット 費目別シミュレーション（おりおん経由で FBA）</h1>
+<li>チケット：T-20261012-001／作成：経理 ハジメ／2026-10-12</li>
+<li>対象：<a href="https://www.amazon.co.jp/dp/B0FPXCLG84">B0FPXCLG84</a> サンリオ ぬいぐるみおせわセット（ベビー）クロミ 199281</li>
+<li>条件：SD から<b>おりおんFBA</b>へ直送 → おりおんが検品・ラベル貼り・箱詰め → FBA 倉庫へ納品（CLAUDE.md §3.4）。初回は20点（ゲート品）</li>
+<li>使った型：FBA 手数料の三層（販売＋配送代行＋保管）に外注費と送料を積む当社の原価モデル v2（成果物 T-20260920-003/33）と、おりおん実額（T-20260929-001/15）。等級は §3.5 #18</li>
+<li>計算：<code>agent_output/T-20261012-001/05/calc05.py</code>（Keepa トークン0・保存データのみ）</li>
+<h2>結論</h2>
+<p><b>SD の卸率67%では、どの売価でも1個あたり赤字です（等級 C・実績枠にも入らない）。20点を仕入れると、全部売れても損失で終わり、現金の谷から戻りません。</b></p>
+<li>1個の利益率：4,300円で ▲8.3%／4,209円で ▲10.5%／4,096円で ▲13.2%</li>
+<li>黒字に必要な卸率は58.2%以下、B は54.0%以下。売価で取り返すなら4,706円以上（本体の4,669円より上）</li>
+<li>マサル 02 の「B は卸率54.8%以下」とほぼ一致します（差0.8pt は、私が FC 納品の箱数を3箱で数え、返品引当を原価連動にしたため）</li>
+<li>卸の送料が0円になっても C のままです。出品許可待ちでおりおんの保管が1か月出ると、1個あたりさらに303円悪化します（感度表）</li>
+<h2>図：4,300円の値札を、費目ごとに切り分ける</h2>
+<div class="ctl">売価：<select id="p"><option>4300</option><option>4209</option><option>4096</option></select>
+　卸率（上代比）：<input type="range" id="r" min="40" max="70" step="1" value="67"> <b id="rl">67%</b></div>
+<svg id="tag" viewBox="0 0 1000 220" width="100%"></svg>
+<p class="note">上の段＝お客様が払う値札（売価）。下の段＝そこから出ていくお金。<span style="color:#c62828">赤い部分が値札からはみ出していれば赤字</span>、緑の部分が手残り。卸率のつまみで、どこから黒字になるかが分かります（58%で手残り0・54%で B）。</p>
+<script>
+const F={"4300": {"ref": 492, "fba": 472, "st": 79, "other": 242}, "4209": {"ref": 482, "fba": 472, "st": 79, "other": 242}, "4096": {"ref": 469, "fba": 472, "st": 79, "other": 242}};
+function draw(){const P=+document.getElementById('p').value, r=+document.getElementById('r').value/100; document.getElementById('rl').textContent=Math.round(r*100)+'%';
+const f=F[P]; const REF=4950; /* Amazon の参考価格（税込・公開） */ const cost=REF*r; const ret=0.025*(472+Math.round(f.ref*0.1)+0.5*(cost+f.other-7));
+const parts=[['販売手数料',f.ref,'#8e7cc3'],['FBA配送代行',f.fba,'#6fa8dc'],['保管',f.st,'#76a5af'],['卸（税込）',cost,'#f6b26b'],['送料・おりおん・振込',f.other,'#ffd966'],['返品引当',ret,'#b7b7b7']];
+const tot=parts.reduce((a,b)=>a+b[1],0); const hand=P-tot; const max=Math.max(P,tot)*1.05; const sc=940/max; let h='';
+h+=`<rect x="30" y="20" width="${P*sc}" height="50" fill="#fff3e0" stroke="#e69138" rx="8"/><circle cx="45" cy="45" r="7" fill="#fff" stroke="#e69138"/><text x="${30+P*sc/2}" y="52" text-anchor="middle" font-size="18">値札 ${P.toLocaleString()}円</text>`;
+let x=30; parts.forEach(p=>{const w=p[1]*sc; h+=`<rect x="${x}" y="100" width="${w}" height="50" fill="${p[2]}"/>`; if(w>50) h+=`<text x="${x+w/2}" y="122" font-size="11" text-anchor="middle">${p[0]}</text><text x="${x+w/2}" y="140" font-size="11" text-anchor="middle">${Math.round(p[1]/P*100)}%</text>`; x+=w;});
+if(hand>=0){h+=`<rect x="${x}" y="100" width="${hand*sc}" height="50" fill="#93c47d"/><text x="${x+hand*sc/2}" y="130" font-size="12" text-anchor="middle">手残り</text>`;}
+else{h+=`<rect x="${30+P*sc}" y="95" width="${-hand*sc}" height="60" fill="none" stroke="#c62828" stroke-width="3"/><line x1="${30+P*sc}" x2="${30+P*sc}" y1="15" y2="170" stroke="#c62828" stroke-dasharray="4"/>`;}
+h+=`<text x="30" y="195" font-size="16" fill="${hand<0?'#c62828':'#2e7d32'}">1個あたり ${hand<0?'赤字':'手残り'}：売価の ${(hand/P*100).toFixed(1)}%</text>`;
+document.getElementById('tag').innerHTML=h;}
+document.querySelectorAll('select,input').forEach(e=>e.addEventListener('input',draw)); draw();
+</script>
+<h2>1. 1個あたりの全費目（売価3列）</h2>
+<p>卸率は 02 と同じ意味です。公開版では仕入れの円の実額を書かず、売価に対する率で書きます。</p>
+<table>
+<tr><th>費目</th><th>4,300円（いまのカート）</th><th>4,209円（90日中央値）</th><th>4,096円（90日下位25%）</th><th>根拠・区分</th></tr>
+<tr><td>① 売上（税込・お客様の支払額）</td><td>4,300</td><td>4,209</td><td>4,096</td><td>Amazon の表示価格。3列＝いまのカート／時間加重90日中央値／下位25%（Keepa 2026-10-12）</td></tr>
+<tr><td>② 販売手数料（税込）</td><td>▲492</td><td>▲482</td><td>▲469</td><td>おもちゃ 10.4%（税抜）×1.1＝11.44%。売上750円超なので5%の崖は無関係（§3.3-23）。公式</td></tr>
+<tr><td>③ FBA配送代行手数料（税込）</td><td>▲472</td><td>▲472</td><td>▲472</td><td>標準7（三辺合計80cm以下・5kg以下）。実寸30.0×24.1×10.9cm＝三辺65cm・450g（Keepa）。価格1,000円超の列。Keepa の pickAndPackFee＝472円と一致。公式</td></tr>
+<tr><td>④ 在庫保管手数料（税込）</td><td>▲79</td><td>▲79</td><td>▲79</td><td>10〜12月料金 10.087円/1,000cm³/月 × 7.88千cm³ × 1.0か月。<b>仮定：入庫から2か月で売り切る＝平均在庫は半分＝計上1か月</b>。1月以降に残ると料率は5.676円に下がる</td></tr>
+<tr><td><b>⑤ Amazon からの入金（①−②−③−④）</b></td><td><b>3,257</b></td><td><b>3,176</b></td><td><b>3,076</b></td><td>1個売れるごとに Amazon から入る額</td></tr>
+<tr><td>⑥ 仕入れ本体</td><td>売価の70.1%</td><td>売価の71.6%</td><td>売価の73.6%</td><td>SD 実画面で確認した卸率67%。実測</td></tr>
+<tr><td>⑦ 仕入れにかかる消費税（10%）</td><td>売価の7.0%</td><td>売価の7.2%</td><td>売価の7.4%</td><td>免税事業者なので仕入税額控除なし＝原価に入る</td></tr>
+<tr><td>⑧ 卸→おりおんの送料（按分）</td><td>▲55</td><td>▲55</td><td>▲55</td><td><b>推定</b>：1回1,100円÷20点（マサル 02 の置き値）。出展企業の送料条件は未確認。無料になる場合は下の感度表</td></tr>
+<tr><td>⑨ おりおん作業費（按分）</td><td>▲89</td><td>▲89</td><td>▲89</td><td>公式料金表（税抜）×1.1：ラベル11＋簡易検品11（1点）／荷受22＋納品プラン55（1SKU）／箱・梱包370円×3箱（〜10kg帯・1箱約4.5kg＝<b>推定</b>）。20点で1,790円</td></tr>
+<tr><td>⑩ おりおん→FBA倉庫の納品送料（按分）</td><td>▲91</td><td>▲91</td><td>▲91</td><td>ヤマト140サイズ 608円/箱 × 3箱 ÷ 20点（FBAパートナーキャリア・当社モデル値＝<b>推定</b>）。140サイズの箱に物理的に8個しか入らないので3箱（8＋8＋4）</td></tr>
+<tr><td>⑪ おりおんの保管（7営業日超）</td><td>0</td><td>0</td><td>0</td><td><b>仮定：7営業日以内に出品許可が下りて全量 FBA へ送る＝0円</b>。超えた場合は月6,050円÷20点＝303円/点（下の感度表）</td></tr>
+<tr><td>⑫ 返品・破損の引当</td><td>▲57</td><td>▲57</td><td>▲57</td><td><b>推定</b>：返品率2.5%×〔FBA 472円＋返金手数料49円＋再販不可50%×（原価＋⑧〜⑩）〕</td></tr>
+<tr><td>⑬ 振込の費用（按分）</td><td>▲7</td><td>▲7</td><td>▲7</td><td><b>推定</b>：おりおんへの振込1回145円÷20点。Amazon からの入金・仕入れ先へのカード払いは手数料0円（仮定）</td></tr>
+<tr><td><b>⑭ 1個あたりの総原価（⑥〜⑬）</b></td><td><b>売価の84.1%</b></td><td><b>売価の85.9%</b></td><td><b>売価の88.3%</b></td><td></td></tr>
+<tr><td><b>利益率（⑮÷①）</b></td><td><b>▲8.3%</b></td><td><b>▲10.5%</b></td><td><b>▲13.2%</b></td><td></td></tr>
+<tr><td><b>等級（§3.5 #18）</b></td><td><b>C</b></td><td><b>C</b></td><td><b>C</b></td><td>中央値4,209円で手残りが0円未満＝実績枠にも入らない。推定費目があるので、条件を満たしても最高 B</td></tr></table>
+<p><b>この表に入れていないもの</b></p>
+<li>大口出品の月額 4,900円（税抜）：SKU ごとではなく月の固定費。すでに払っているので、この1品を足しても増えない（月商の判定には入れる）</li>
+<li>低在庫レベル手数料：在庫日数が短い高回転品に1点ごとにかかる制度。<b>免除条件が未確認</b>。20点がすぐ売れると対象になりうる</li>
+<li>長期保管・廃棄の手数料：中央シナリオでは11月中に売り切るので0円。売れ残って廃棄する場合は別途</li>
+<li>所得税・住民税：利益が出た場合の話で、この案は赤字</li>
+<h3>感度：条件を1つだけ変えると</h3>
+<table>
+<tr><th>条件を1つだけ変えたとき</th><th>4,300円</th><th>4,209円</th><th>4,096円</th><th>等級</th></tr>
+<tr><td>基準（上の表）</td><td>▲8.3%</td><td>▲10.5%</td><td>▲13.2%</td><td>C</td></tr>
+<tr><td>卸の送料0円（入会特典クーポン／送料無料条件に届く）</td><td>▲7.1%</td><td>▲9.2%</td><td>▲11.8%</td><td>C</td></tr>
+<tr><td>出品許可待ちでおりおん保管が1か月超過（＋303円/点）</td><td>▲15.4%</td><td>▲17.7%</td><td>▲20.6%</td><td>C</td></tr>
+<tr><td>Amazon が袋入れを求めた（OPP袋 45円×1.1/点）</td><td>▲9.5%</td><td>▲11.7%</td><td>▲14.4%</td><td>C</td></tr></table>
+<h2>2. 20点仕入れたときの総額と現金の動き</h2>
+<p>円の総額表は卸の実額が逆算できるため社内メモに置きました。公開版では率だけ書きます。</p>
+<table>
+<tr><th>項目</th><th>4,300円</th><th>4,209円</th><th>4,096円</th></tr>
+<tr><td>Amazon からの入金（売上に対する割合）</td><td>73.6%</td><td>73.3%</td><td>72.9%</td></tr>
+<tr><td>20点の損益（売上に対する割合）</td><td>▲8.4%</td><td>▲10.5%</td><td>▲13.2%</td></tr>
+<tr><td>おりおん初回預かり金</td><td>30,000円（別枠・契約終了時に全額返金）</td><td>同</td><td>同</td></tr>
+<tr><td>現金の谷から戻る時期</td><td>戻らない</td><td>戻らない</td><td>戻らない</td></tr></table>
+<h2>3. どこまで下がれば黒字・B・A になるか</h2>
+<h3>3-1. 卸単価を動かす（売価・ほかの費目は固定）</h3>
+<table>
+<tr><th>目標</th><th>判定に使う売価</th><th>卸率の上限</th><th>いまの卸率との差</th></tr>
+<tr><td>4,300円で黒字（手残り0円）</td><td>4,300円</td><td>59.8%</td><td>▲7.2pt</td></tr>
+<tr><td>実績枠（中央値で手残り0円以上）</td><td>4,209円</td><td>58.2%</td><td>▲8.8pt</td></tr>
+<tr><td>悲観でも黒字</td><td>4,096円</td><td>56.2%</td><td>▲10.8pt</td></tr>
+<tr><td><b>B</b>（中央値で利益率5%以上 または 手残り400円以上）</td><td>4,209円</td><td>54.0%</td><td>▲13.0pt</td></tr>
+<tr><td><b>A</b>（中央値でも悲観値でも 利益率20% または 手残り400円以上）</td><td>4,209円と4,096円</td><td>48.2%</td><td>▲18.8pt</td></tr>
+<tr><td>KPI の利益率20%</td><td>4,209円</td><td>41.4%</td><td>▲25.6pt</td></tr></table>
+<li>A の上限は「悲観値4,096円で手残り400円」で決まります（利益率20%より400円の方が先に満たせるため）。ただし推定費目があるので、条件を満たしても判定は最高 B です</li>
+<li>卸率が下がると返品引当（原価連動）も少し下がるので、1円下がるごとに手残りは1.1円強増えます</li>
+<h3>3-2. 売価を動かす（卸率67%で固定）</h3>
+<table>
+<tr><th>目標</th><th>必要な売価（卸率67%・ほかは上の表のまま）</th><th>いまのカート4,300円との差</th><th>参考</th></tr>
+<tr><td>黒字（手残り0円）</td><td>4,706円</td><td>+406円</td><td>本体の出品価格4,669円より上。昨年12月のカート相場（4,700円前後）でようやくゼロ</td></tr>
+<tr><td>B（利益率5%）</td><td>4,989円</td><td>+689円</td><td>昨年1月のカート4,950円でも届かない</td></tr>
+<tr><td>手残り400円</td><td>5,159円</td><td>+859円</td><td>昨年1月のカート4,950円も超える</td></tr>
+<tr><td>利益率20%</td><td>6,081円</td><td>+1,781円</td><td>昨年1月のカートの1.23倍</td></tr></table>
+<h2>4. 判断</h2>
+<li><b>卸率67%のまま発注する案は出しません。</b>20点・全数販売でも損失が出て、回収できない取引です</li>
+<li>打てる手は2つです。①出展企業に数量での値引きを打診して卸率54%以下（B）／58%以下（実績枠）を取れるか聞く（第三者連絡＝§4.1・秘書経由）。②SD 以外（メーカー直・別の卸）で同じ JAN を探す</li>
+<li>売価で取り返す案（4,706円以上で売る）は、本体が4,669円で出品している限り成り立ちません。昨年の年末相場4,700円前後に戻っても手残りはほぼ0円です</li>
+<h2>5. 推定・仮定の一覧（実測と分けて）</h2>
+<table>
+<tr><th>項目</th><th>区分</th><th>出所</th></tr>
+<tr><td>卸率67%・1セット1点・在庫あり</td><td>実測</td><td>SD 実画面（2026-10-12・社長と秘書が確認）</td></tr>
+<tr><td>売価3列・寸法・重量・手数料率</td><td>実測</td><td>Keepa 2026-10-12 取得（マサル 02）</td></tr>
+<tr><td>FBA 配送代行472円・保管料の単価・販売手数料率</td><td>公式</td><td>sell.amazon.co.jp/pricing（2026-10-04 原文取得）</td></tr>
+<tr><td>おりおんの単価（ラベル・検品・荷受・プラン・箱）</td><td>公式</td><td>おりおん料金表（T-20260929-001 01）＋書面回答</td></tr>
+<tr><td>箱の重量帯（〜10kg）・1箱8個</td><td>推定</td><td>箱の内寸60×45×35cm に実寸で並べた計算</td></tr>
+<tr><td>FC 納品送料 608円/箱</td><td>推定</td><td>当社モデル値。実額は納品プラン作成画面でしか出ない</td></tr>
+<tr><td>卸の送料1,100円/回</td><td>推定</td><td>マサル 02 の置き値。出展企業の条件は未確認</td></tr>
+<tr><td>保管の計上1か月</td><td>仮定</td><td>入庫から2か月で売り切る</td></tr>
+<tr><td>返品率2.5%・再販不可50%</td><td>推定</td><td>当社に実績なし</td></tr>
+<tr><td>振込の費用145円/回</td><td>推定</td><td>銀行による</td></tr>
+<tr><td>出品許可が7営業日以内</td><td>仮定</td><td>超えたら感度表の行</td></tr></table></body></html>
