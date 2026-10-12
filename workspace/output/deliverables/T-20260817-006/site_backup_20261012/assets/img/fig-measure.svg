@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 400" width="700" height="400" role="img" aria-label="調理台の作業スペースの横幅と奥行きを測る位置を示した図">
+  <style>
+    .ttl{font-family:-apple-system,'Hiragino Kaku Gothic ProN',sans-serif;font-size:15px;font-weight:700;fill:#1B2A4A}
+    .sub{font-family:-apple-system,'Hiragino Kaku Gothic ProN',sans-serif;font-size:12.5px;fill:#5b6470}
+    .lbl{font-family:-apple-system,'Hiragino Kaku Gothic ProN',sans-serif;font-size:14px;font-weight:700;fill:#1B2A4A}
+    .dim{font-family:-apple-system,'Hiragino Kaku Gothic ProN',sans-serif;font-size:13px;font-weight:700;fill:#a5812f}
+    .dimline{stroke:#C9A24B;stroke-width:1.8;fill:none}
+    .ext{stroke:#C9A24B;stroke-width:1;stroke-dasharray:3 3;fill:none}
+  </style>
+  <rect width="700" height="400" fill="#ffffff"/>
+
+  <text x="40" y="30" class="ttl">測るのは、この2か所</text>
+  <text x="40" y="54" class="sub">シンクとコンロの間にある作業スペース。まな板はこれより小さいものを選びます。</text>
+
+  <!-- 天板 -->
+  <rect x="40" y="118" width="560" height="190" rx="6" fill="#f7f9fb" stroke="#c2ccd8" stroke-width="2"/>
+
+  <!-- シンク -->
+  <rect x="56" y="140" width="140" height="146" rx="8" fill="#e4eaf0" stroke="#a9b6c4" stroke-width="2"/>
+  <circle cx="126" cy="205" r="11" fill="none" stroke="#a9b6c4" stroke-width="2"/>
+  <text x="126" y="330" text-anchor="middle" class="sub">シンク</text>
+
+  <!-- コンロ -->
+  <rect x="432" y="140" width="152" height="146" rx="8" fill="#e4eaf0" stroke="#a9b6c4" stroke-width="2"/>
+  <circle cx="472" cy="182" r="17" fill="none" stroke="#a9b6c4" stroke-width="2"/>
+  <circle cx="544" cy="182" r="17" fill="none" stroke="#a9b6c4" stroke-width="2"/>
+  <circle cx="508" cy="240" r="14" fill="none" stroke="#a9b6c4" stroke-width="2"/>
+  <text x="508" y="330" text-anchor="middle" class="sub">コンロ</text>
+
+  <!-- 作業スペース -->
+  <rect x="214" y="140" width="200" height="146" rx="6" fill="#faf3e2" stroke="#C9A24B" stroke-width="2.5" stroke-dasharray="7 5"/>
+  <text x="330" y="200" text-anchor="middle" class="lbl">作業スペース</text>
+  <text x="330" y="224" text-anchor="middle" class="sub">ここにまな板を置く</text>
+
+  <!-- ① 横幅：天板の外（上）に寸法線 -->
+  <path class="ext" d="M214 136 V90"/>
+  <path class="ext" d="M414 136 V90"/>
+  <path class="dimline" d="M214 96 H414 M214 90 V102 M414 90 V102"/>
+  <text x="314" y="82" text-anchor="middle" class="dim">① 横幅</text>
+
+  <!-- ② 奥行き：作業スペースの内側に縦の寸法線 -->
+  <path class="dimline" d="M256 148 V278 M250 148 H262 M250 278 H262"/>
+  <text transform="translate(240,213) rotate(-90)" text-anchor="middle" class="dim">② 奥行き</text>
+
+  <!-- 目安 -->
+  <rect x="40" y="344" width="560" height="44" rx="6" fill="#faf3e2" stroke="#e6d5ab" stroke-width="1.5"/>
+  <text x="58" y="366" class="sub"><tspan font-weight="700" fill="#1B2A4A">目安：</tspan>まな板は「奥行き −5cm」ほど。</text>
+  <text x="58" y="382" class="sub">はみ出すと使えず、小さすぎると切った具材の置き場に困ります。</text>
+</svg>

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240" font-family="'Helvetica Neue',Arial,sans-serif">
+  <circle cx="120" cy="120" r="120" fill="#1B2A4A"/>
+  <g transform="translate(120,120)">
+    <circle r="92" fill="none" stroke="#C9A24B" stroke-width="2.5"/>
+    <path d="M-36 4 L-10 32 L43 -34" fill="none" stroke="#C9A24B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="0" y="66" text-anchor="middle" font-size="14" letter-spacing="5.5" fill="#ffffff" font-weight="600">SELECT</text>
+  </g>
+</svg>

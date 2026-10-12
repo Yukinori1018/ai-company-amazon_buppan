@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 320" width="640" height="320" role="img" aria-label="4種類の詰め替えボトルのイラスト">
+  <defs>
+    <linearGradient id="bg2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f7f9fb"/><stop offset="1" stop-color="#eef2f7"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="320" fill="url(#bg2)"/>
+
+  <!-- プッシュ式 -->
+  <g transform="translate(70,66)">
+    <rect x="6" y="46" width="86" height="130" rx="12" fill="#ffffff" stroke="#b9c4d0" stroke-width="2"/>
+    <rect x="34" y="26" width="30" height="22" rx="5" fill="#e7edf3" stroke="#b9c4d0" stroke-width="2"/>
+    <path d="M49 26 V10 M49 14 H74 L68 24" fill="none" stroke="#b9c4d0" stroke-width="2" stroke-linecap="round"/>
+    <path d="M22 96 H76" stroke="#e3e9ef" stroke-width="2"/>
+    <text x="49" y="206" text-anchor="middle" font-family="-apple-system,'Hiragino Kaku Gothic ProN',sans-serif" font-size="15" font-weight="700" fill="#1B2A4A">プッシュ式</text>
+  </g>
+
+  <!-- 泡ポンプ -->
+  <g transform="translate(206,66)">
+    <rect x="6" y="46" width="86" height="130" rx="12" fill="#eef6fb" stroke="#a9c4d6" stroke-width="2"/>
+    <rect x="30" y="24" width="38" height="24" rx="6" fill="#dcebf4" stroke="#a9c4d6" stroke-width="2"/>
+    <path d="M49 24 V12" stroke="#a9c4d6" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="42" cy="6" r="4" fill="none" stroke="#a9c4d6" stroke-width="1.6"/>
+    <circle cx="55" cy="8" r="3" fill="none" stroke="#a9c4d6" stroke-width="1.6"/>
+    <text x="49" y="206" text-anchor="middle" font-family="-apple-system,'Hiragino Kaku Gothic ProN',sans-serif" font-size="15" font-weight="700" fill="#1B2A4A">泡ポンプ</text>
+  </g>
+
+  <!-- スプレー -->
+  <g transform="translate(342,66)">
+    <rect x="6" y="52" width="86" height="124" rx="10" fill="#ffffff" stroke="#b9c4d0" stroke-width="2"/>
+    <path d="M36 52 V34 H62 V52" fill="none" stroke="#b9c4d0" stroke-width="2"/>
+    <path d="M36 34 L18 26 L18 40 Z" fill="#e7edf3" stroke="#b9c4d0" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M10 22 L2 18 M10 30 L1 30 M10 38 L2 42" stroke="#C9A24B" stroke-width="1.8" stroke-linecap="round"/>
+    <text x="49" y="206" text-anchor="middle" font-family="-apple-system,'Hiragino Kaku Gothic ProN',sans-serif" font-size="15" font-weight="700" fill="#1B2A4A">スプレー</text>
+  </g>
+
+  <!-- 詰め替え袋 -->
+  <g transform="translate(478,66)">
+    <path d="M14 34 H84 L92 176 H6 Z" fill="#f3eee2" stroke="#c8b795" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M32 34 V22 H66 V34" fill="none" stroke="#c8b795" stroke-width="2"/>
+    <path d="M22 74 H76 M22 96 H62" stroke="#e0d6c0" stroke-width="2"/>
+    <text x="49" y="206" text-anchor="middle" font-family="-apple-system,'Hiragino Kaku Gothic ProN',sans-serif" font-size="15" font-weight="700" fill="#1B2A4A">詰め替え袋</text>
+  </g>
+</svg>
