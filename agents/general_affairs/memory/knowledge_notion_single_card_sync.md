@@ -10,3 +10,8 @@
 - owner-tasks.md は最上段に「更新N」節を足し、**任意の確認は 🔴 ではなく ℹ️ 枠**に置く。他チケットの 🔴 状態は未確認なら「下の更新N-1のまま（未確認）」と明記し、勝手に書き換えない。最終更新行は先頭追記＋「／前: 」でぶら下げ。
 - 2,700行超の owner-tasks.md は Read が上限超えで失敗する。grep -n で行番号を取り、Python で行挿入する。
 - リポ外成果物（第三者著作物）はカタログ行の追記対象外（カタログは deliverables/ のミラー）。
+
+## 2026-10-12 T-20261012-001（doing で新規起票・単発同期）
+- 手順：data_source 内で TicketID 検索 → 無し → create-pages（Status=doing・Assignee=accounting・ParentTicket=T-20260920-003・本文に結果要約＋「成果物（なし — 作業中）」）。page id 3f7b0a40-44fa-8161-b3cb-de91099ada53
+- Labels（sourcing/superdelivery/sanrio/bundle/recheck）は未定義の選択肢を含む可能性があるため今回は未設定。必要なら選択肢追加後に付与（knowledge_notion_label_option_must_be_added_first.md）
+- owner-tasks.md：社長依存タスクなし（requires_approval=false・担当=経理）で変更不要を確認
