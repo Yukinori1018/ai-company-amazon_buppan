@@ -4310,3 +4310,20 @@ FLR910 2件は SD 経由でも GO（B 等級・11.2%・手残り1,186円/個）�
 - 経路別（後）：NETSEA 3,938（87.4%）／SD 330（7.3%）／国分 201（4.5%）／未確認 34。NETSEA が上がったのは、SD 出展企業の行の値段の出所が NETSEA 索引だから（SD の卸値を読めば SD 経路に切り替わる）
 - 妥協点：Keepa 逆引きは 937/15,772 JAN まで（共有キーの補充が律速）。背景で継続中。森川産業は JAN の出所が無く未着手
 - 引き継ぎ：タカシへ — supplier_screen.ledger_asins() が after_dryrun.json も読むので、dry-run で足した行を「既存」と誤る（supplier_feed_build 側は除外済み）
+
+## ログ（2026-10-12 タカシ・ログイン延命）
+- 10:10 着手。社長指示「ログインが切れないような工夫を」。スコープ：入れる＝専用ウィンドウの定期再読込・切れ検知 ALERT・macOS 通知・launchd 常駐／入れない＝ログイン入力の自動化・Cookie/パスワードの読み書き・Chrome 設定の変更・スリープ設定の変更
+- 各サイトのログイン画面を非ログインで実測（保持チェック欄の有無・切れたときの飛び先）。卸売ドットコムだけ「ログイン状態を保存」あり、SD・国分は無し、卸問屋.com は「パスワードを保存」のみ
+- 10:21 setup 実行。延命ウィンドウ作成。初回でセラセンの出品案内ページを OK と誤判定→パターンに `/amazonsell` を追加して再確認
+- 10:23 launchd 登録（600秒・RunAtLoad）。kickstart で launchd 文脈から reload まで通ることを確認（runs=2・last exit 0・TCC プロンプトなし）
+- 現在の状態：OK＝amazon.co.jp・Gmail／🔴切れ＝セラセン・SD（＋審査中の卸売ドットコム・卸問屋.com）／国分＝延命のみ（判定不可）／NETSEA＝障害中
+
+## 成果物（2026-10-12 タカシ・ログイン延命）
+- workspace/output/deliverables/T-20260920-003/login_keepalive/README.md（サイト別の原因・対策・社長が1回やること）
+- workspace/output/deliverables/T-20260920-003/login_keepalive/login_keepalive.py・sites.json・keepalive_window.html・test_login_keepalive.py・com.aicompany.amazon-buppan.login-keepalive.plist
+- .claude/scripts/login-keepalive.sh
+
+## 完了報告（タカシ → カズヨ・2026-10-12 ログイン延命）
+稼働中。社長の Chrome に「ログイン延命ウィンドウ」を作り、launchd が10分ごとにサイト別の間隔で再読込する。切れたら agent_output/T-20260920-003/login_watch/ALERT_<サイト>.txt と Mac 通知。秘書は朝に同フォルダの STATUS.md を見る。
+妥協点：国分は切れを検知できない（延命のみ）。スリープ中は止まる。延命で本当に切れなくなるかは ALERT の「最後に OK」で数日実測してから間隔を直す。
+社長の一手：延命ウィンドウでセラセン（確認コード不要にチェック）と SD にログイン、Chrome の起動時設定と Cookie 削除設定の確認、スリープ設定の判断（README の表）。

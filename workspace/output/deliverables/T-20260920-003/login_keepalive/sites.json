@@ -1,0 +1,161 @@
+{
+  "_README": "ログイン延命の対象サイト。値はすべて仮置き（CLAUDE.md §3.1）。ALERT の『最後に OK だった時刻』からセッションの実際の寿命が分かるので、それを見て every_min を直す。パスワード・Cookie はここに書かない。",
+  "sites": [
+    {
+      "id": "sellercentral",
+      "name": "Amazon セラーセントラル",
+      "enabled": true,
+      "url": "https://sellercentral-japan.amazon.com/home",
+      "host": "sellercentral-japan.amazon.com",
+      "every_min": 20,
+      "hours": [
+        0,
+        24
+      ],
+      "logout_url_re": "(/ap/(signin|mfa|cvf)|/ax/claim|/signin|/amazonsell)",
+      "note": "サインインは openid.pape.max_auth_age=0 付き＝切れたら必ずパスワードから。延命だけが効く手。 非ログインの Chrome では /home が出品案内ページ（/amazonsell/business）へ飛ぶ（2026-10-12 実測）。"
+    },
+    {
+      "id": "amazon_jp",
+      "name": "amazon.co.jp（購入側・キーゾン用）",
+      "enabled": true,
+      "url": "https://www.amazon.co.jp/gp/css/homepage.html",
+      "host": "www.amazon.co.jp",
+      "every_min": 30,
+      "hours": [
+        0,
+        24
+      ],
+      "logout_url_re": "(/ap/(signin|mfa|cvf)|/ax/claim)",
+      "note": "アカウントサービスは非ログインだとサインインへ飛ぶ。"
+    },
+    {
+      "id": "gmail_satoyselect",
+      "name": "Gmail（satoyselect）",
+      "enabled": true,
+      "url": "https://mail.google.com/mail/u/1/",
+      "host": "mail.google.com",
+      "every_min": 180,
+      "hours": [
+        0,
+        24
+      ],
+      "logout_url_re": "^accounts\\.google\\.com/",
+      "expect_in_title": "satoyselect",
+      "note": "Gmail は自分で定期更新するので再読込は3時間ごとで足りる。u/1 の並びがずれたら『別アカウント』で知らせる。"
+    },
+    {
+      "id": "superdelivery",
+      "name": "スーパーデリバリー",
+      "enabled": true,
+      "url": "https://www.superdelivery.com/i/r/msgbox/",
+      "host": "www.superdelivery.com",
+      "every_min": 60,
+      "hours": [
+        7,
+        24
+      ],
+      "logout_url_re": "/p/do/clickMemberLogin",
+      "note": "429 の前歴あり（CLAUDE.md §3.3-18）。1時間に1回・7〜24時＝1日17回まで。ログイン保持のチェック欄は無い。"
+    },
+    {
+      "id": "kokubu",
+      "name": "問屋 国分ネット卸",
+      "enabled": true,
+      "url": "https://netton.kokubu.jp/shop/customer/menu.aspx",
+      "host": "netton.kokubu.jp",
+      "every_min": 15,
+      "hours": [
+        0,
+        24
+      ],
+      "logout_url_re": "/shop/contents1/login\\.aspx",
+      "note": "ASP.NET（既定のセッション寿命20分）。🔴非ログインでも同じ URL のままログイン欄を出すため、URL では切れを検知できない。延命のみ。",
+      "detectable": false
+    },
+    {
+      "id": "oroshi_uri",
+      "name": "卸売ドットコム",
+      "enabled": true,
+      "url": "https://oroshi-uri.com/mypage.php",
+      "host": "oroshi-uri.com",
+      "every_min": 30,
+      "hours": [
+        0,
+        24
+      ],
+      "logout_url_re": "/login\\.php",
+      "note": "ログイン画面に『ログイン状態を保存』のチェック欄あり。審査中は入れないので ALERT が出続けても正常。"
+    },
+    {
+      "id": "orosidonya",
+      "name": "卸問屋.com",
+      "enabled": true,
+      "url": "https://www.orosidonya.com/users/MyPage.asp",
+      "host": "www.orosidonya.com",
+      "every_min": 15,
+      "hours": [
+        0,
+        24
+      ],
+      "logout_url_re": "(/users/sessionMessage\\.asp|/users/index\\.asp)",
+      "note": "クラシック ASP（既定のセッション寿命20分）。切れると sessionMessage.asp へ飛ぶ。チェック欄は『パスワードを保存する』で、ログイン保持ではない。審査中。"
+    },
+    {
+      "id": "netsea",
+      "name": "NETSEA",
+      "enabled": true,
+      "url": "https://www.netsea.jp/mypage",
+      "host": "www.netsea.jp",
+      "every_min": 60,
+      "hours": [
+        0,
+        24
+      ],
+      "logout_url_re": "/login",
+      "note": "2026-10-12 時点で 503（障害中）。障害中は『エラー』として記録し、間隔を自動で広げる。復旧後に URL と判定を実画面で確かめる（未検証）。"
+    },
+    {
+      "id": "shopee",
+      "name": "Shopee セラーセンター",
+      "enabled": false,
+      "url": "https://seller.shopee.tw/",
+      "host": "seller.shopee.tw",
+      "every_min": 30,
+      "hours": [
+        0,
+        24
+      ],
+      "logout_url_re": "/account/signin",
+      "note": "未開設。開設したら URL を実画面で確かめて enabled を true に。"
+    },
+    {
+      "id": "lazada",
+      "name": "Lazada セラーセンター",
+      "enabled": false,
+      "url": "https://sellercenter.lazada.sg/",
+      "host": "sellercenter.lazada.sg",
+      "every_min": 30,
+      "hours": [
+        0,
+        24
+      ],
+      "logout_url_re": "/apps/seller/login",
+      "note": "未開設。同上。"
+    },
+    {
+      "id": "payoneer",
+      "name": "Payoneer",
+      "enabled": false,
+      "url": "https://myaccount.payoneer.com/ma/",
+      "host": "myaccount.payoneer.com",
+      "every_min": 10,
+      "hours": [
+        0,
+        24
+      ],
+      "logout_url_re": "^login\\.payoneer\\.com/",
+      "note": "未開設。金融サービスは短時間で強制ログアウトする設計が普通なので、延命は効かない前提で『切れた通知』だけ使う想定。"
+    }
+  ]
+}

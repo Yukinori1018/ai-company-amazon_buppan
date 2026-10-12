@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>ログイン延命ウィンドウ（閉じない）</title>
+<style>
+  body { font-family: -apple-system, "Hiragino Sans", sans-serif; background: #fffbe6; color: #222; margin: 40px; line-height: 1.8; }
+  h1 { font-size: 22px; }
+  code { background: #eee; padding: 1px 4px; }
+</style>
+</head>
+<body>
+<h1>このウィンドウはログイン延命用です。閉じないでください。</h1>
+<p>右のタブ（セラーセントラル・Gmail・スーパーデリバリーなど）を、裏で定期的に読み込み直してログインが切れないようにしています（T-20260920-003）。</p>
+<ul>
+  <li>このウィンドウでは作業しないでください。読み込み直しで入力中の内容が消えます。作業はいつものウィンドウで。</li>
+  <li>しまっておきたいときは最小化（黄色いボタン）で大丈夫です。</li>
+  <li>あるタブがログイン画面になっていたら、そのタブでログインし直してください（「ログイン状態を保持」に必ずチェック）。</li>
+  <li>止めたいとき：<code>.claude/scripts/login-keepalive.sh stop</code>（秘書に「延命を止めて」と言えば止めます）。</li>
+</ul>
+</body>
+</html>

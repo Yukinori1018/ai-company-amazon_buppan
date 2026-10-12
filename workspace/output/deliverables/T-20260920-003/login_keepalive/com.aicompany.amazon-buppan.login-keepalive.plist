@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  ログイン延命（T-20260920-003）。~/Library/LaunchAgents/ に置く実体と同じもの。
+  10分ごとに起き、期限の来たサイトのタブだけを読み込み直す（間隔は sites.json）。
+  スリープ中は動かない（復帰時に1回まとめて走る）。Mac 再起動・再ログイン後も RunAtLoad で戻る。
+  停止: launchctl bootout gui/$(id -u)/com.aicompany.amazon-buppan.login-keepalive
+  一時停止: .claude/scripts/login-keepalive.sh stop
+-->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.aicompany.amazon-buppan.login-keepalive</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>/Users/yukinori/Claude Code/ai-company-amazon_buppan/.claude/scripts/login-keepalive.sh</string>
+    </array>
+    <key>StartInterval</key>
+    <integer>600</integer>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>WorkingDirectory</key>
+    <string>/Users/yukinori/Claude Code/ai-company-amazon_buppan</string>
+    <key>StandardOutPath</key>
+    <string>/Users/yukinori/Claude Code/ai-company-amazon_buppan/workspace/output/agent_output/T-20260920-003/login_watch/launchd.out.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/yukinori/Claude Code/ai-company-amazon_buppan/workspace/output/agent_output/T-20260920-003/login_watch/launchd.err.log</string>
+    <key>ProcessType</key>
+    <string>Background</string>
+</dict>
+</plist>
