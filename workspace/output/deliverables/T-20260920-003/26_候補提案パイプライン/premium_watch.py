@@ -426,22 +426,22 @@ def fetch_today(asins: list[str], today: date) -> dict:
     if not todo:
         return res
     k = _keepa_key()
-    for i in range(0, len(todo), KEEPA_BATCH):
-        chunk = todo[i:i + KEEPA_BATCH]
-        need = len(chunk) * KEEPA_COST_PER_ASIN
-        waited = 0
-        while True:
-            left = _get(f"https://api.keepa.com/token?key={k}").get("tokensLeft", 0)
-            if left >= need:
-                break
+    # 共有キー（他の夜間作業も使う）なので、残高ぶんだけ小分けに取る。100件ぶんの残高を待たない
+    # （2026-10-12 初回：残高が 193〜211 から増えず、300 を20分待って0件で止まった）
+    waited = 0
+    while todo:
+        left = _get(f"https://api.keepa.com/token?key={k}").get("tokensLeft", 0)
+        n = min(KEEPA_BATCH, len(todo), max(0, left) // KEEPA_COST_PER_ASIN)
+        if n < min(10, len(todo)):
             if waited >= KEEPA_MAX_WAIT_SEC:
-                res["未取得"] = todo[i:]
-                print(f"  Keepa トークン {left} < {need}。{waited}秒待っても足りないので止める"
-                      f"（残り {len(todo) - i}件は次回）", flush=True)
+                res["未取得"] = todo
+                print(f"  Keepa トークン {left}。{waited}秒待っても足りないので止める（残り {len(todo)}件は次回）",
+                      flush=True)
                 return res
-            s = min(300, max(20, int((need - left) / 20 * 60) + 5))
-            time.sleep(s)
-            waited += s
+            time.sleep(60)
+            waited += 60
+            continue
+        chunk, todo = todo[:n], todo[n:]
         url = (f"https://api.keepa.com/product?key={k}&domain=5&asin={','.join(chunk)}"
                f"&stats=90&history=1&buybox=1&days=400")
         d = _get(url)
@@ -451,7 +451,7 @@ def fetch_today(asins: list[str], today: date) -> dict:
                 f.write(json.dumps({"asin": p.get("asin"), "fetched": now, "product": p},
                                    ensure_ascii=False) + "\n")
         res["今回取得"] += len(d.get("products") or [])
-        print(f"  Keepa {i + len(chunk)}/{len(todo)}・消費 {d.get('tokensConsumed')}・残 {d.get('tokensLeft')}",
+        print(f"  Keepa +{len(chunk)}（残り {len(todo)}件）・消費 {d.get('tokensConsumed')}・残高 {d.get('tokensLeft')}",
               flush=True)
     return res
 
@@ -530,6 +530,9 @@ def simulate(w: dict, obs: list[dict], today: date, off: dict | None = None) -> 
             row["公正価格の恐れ"] = "恐れあり" if lp / offp > FAIR_PRICE_RATIO else ""
     sh = share(last) if last else None
     row["取り分(個/月)"] = round(sh, 2) if sh is not None else ""
+    if not obs:
+        row["注意"] = "観測なし（Keepa 未取得）＝損益は計算しない"
+        return row
     if not cost:
         notes.append("原価未確認＝損益は計算しない（監視だけ）")
         row["注意"] = "・".join(notes)
@@ -564,8 +567,6 @@ def simulate(w: dict, obs: list[dict], today: date, off: dict | None = None) -> 
         notes.append(f"公正価格ポリシーでカートを失う恐れ（Amazon {int(lp):,}円＝Amazon外最安 {int(offp):,}円 の {lp / offp:.2f}倍）")
     if today < sale:
         notes.append(f"販売開始前（{sale.isoformat()}〜）")
-    if not obs:
-        notes.append("観測なし")
     if last.get("カートは本体") == "1":
         notes.append("最新はカートが Amazon 本体＝売れない日")
     if sh is None and obs:
@@ -678,7 +679,7 @@ def main(argv=None) -> int:
         if a.cmd == "list":
             return 0
         if not a.no_fetch:
-            r = fetch_today([w["ASIN"] for w in wl], today)
+            r = fetch_today(sorted([w["ASIN"] for w in wl], key=lambda x: x not in FIXED), today)
             print("Keepa:", json.dumps({k: (len(v) if isinstance(v, list) else v) for k, v in r.items()},
                                         ensure_ascii=False))
         n = update_history(today)

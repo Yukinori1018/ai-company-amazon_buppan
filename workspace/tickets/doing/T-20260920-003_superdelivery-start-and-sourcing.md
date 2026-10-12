@@ -4248,3 +4248,21 @@ FLR910 2件は SD 経由でも GO（B 等級・11.2%・手残り1,186円/個）�
 
 ## 完了報告（サトル → カズヨ・2026-10-12・プレ値調査）
 実践者5人は全員が小売仕入れで、卸から仕入れる型は0件。撤退ラインを数字で書いた人もいない。FLR910 は終売品ではなく受注生産中（DN は2027年12月まで生産）で、Amazon 外の最安値は6,065円。Amazon の9,130円は Amazon の棚だけの高値と読むのが自然（推論・確度は中）。日本の Amazon の公正価格ポリシー本文はログインが必要で未確認。やるかどうかはタケシの領分。完了しました。確認をお願いします。
+- 秘書の追加指示：実績枠 ⑥「価格が平常（現在価格と90日中央値が1年中央値の1.3倍以内）」を判定に追加（1年の価格日数180日未満は判断不能＝入れない）
+- 2巡目（09:10）：②を40件（共有トークンがサトルの下限200に張り付いたためバッチを縮小）・③4件。② で26件の #13 が解け、18件が UNKNOWN→NO-GO
+- 2回目の引き直しとシートの差分 0セル（§3.3-17）
+
+## 現在地（2026-10-12 タカシ）
+- 台帳：GO 3／GO（実績枠）1／NO-GO 1,923／UNKNOWN 311（作業前は GO 3／NO-GO 1,832／UNKNOWN 403。GO 5→3 はカズヨが FLR 2行を手で直した分）
+- UNKNOWN の段：①16件 ②205件が機械待ち（next_stage=s2_price）／④実画面 43件・⑤人手 23件はファイル出力済み
+
+## 成果物（2026-10-12 タカシ）
+- workspace/output/deliverables/T-20260920-003/26_候補提案パイプライン/unknown_stages.py（新規）
+- workspace/output/deliverables/T-20260920-003/26_候補提案パイプライン/ledger_refresh.py・price_history.py・profit.py・score_20261004.py・screen_checks.py
+- scripts/sourcing_gate/consistency.py・test_consistency.py
+- （agent_output・非公開）unknown_queue/state.json・needs_browser_20261012.txt・needs_human_20261012.txt・keepa_stage_20261012.jsonl／ledger20261010/track_record_list_20261012.csv・kz_estimate_stages.csv
+
+## 完了報告（タカシ → カズヨ・2026-10-12 実績枠と UNKNOWN の段階解消）
+実績枠（①〜⑥）と UNKNOWN の段階解消を実装し、台帳を書き戻した。GO（実績枠）は1件（オリヒロ アミノボディ粒・NETSEA 復旧待ち）。UNKNOWN は 403→311。②価格の段が205件残り、夜間タスクが続きから回す。取り分だけ足りない B を実績枠に入れたのはタカシの判断なので、確認が要る。
+- 秘書の実画面確認44件（browser_result_20261012.tsv）を cart_check_20261012_z_browser.csv／cart_maker_flags_20261012_z_browser.csv に変換して合流（#5・#6 補助）。B087MBZPKT（Amazon.co.jp）・B0BYHVSPLD・B0FLJZ2M2G（メーカー本人）は NO-GO。B0D3Q8NDDH は「アマゾン直販 在庫あり」を判定理由の先頭に明記。台帳：GO 1／GO（実績枠）1／NO-GO 1,930／UNKNOWN 306。2回目の差分 0
+- 残：hidden_high の SD 行（カネイシ DHC 等）は SD 卸値が未承認で採算が出ないため、【カートなし黒字】の判定（NETSEA 行のみ・採算が要る）に乗らず UNKNOWN（#5 カートなし）のまま。卸値が入れば同じ型で判定できる
