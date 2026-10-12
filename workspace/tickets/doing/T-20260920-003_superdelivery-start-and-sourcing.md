@@ -4327,3 +4327,10 @@ FLR910 2件は SD 経由でも GO（B 等級・11.2%・手残り1,186円/個）�
 稼働中。社長の Chrome に「ログイン延命ウィンドウ」を作り、launchd が10分ごとにサイト別の間隔で再読込する。切れたら agent_output/T-20260920-003/login_watch/ALERT_<サイト>.txt と Mac 通知。秘書は朝に同フォルダの STATUS.md を見る。
 妥協点：国分は切れを検知できない（延命のみ）。スリープ中は止まる。延命で本当に切れなくなるかは ALERT の「最後に OK」で数日実測してから間隔を直す。
 社長の一手：延命ウィンドウでセラセン（確認コード不要にチェック）と SD にログイン、Chrome の起動時設定と Cookie 削除設定の確認、スリープ設定の判断（README の表）。
+- 社長指摘（想定の卸値の放置）対応：台帳に列「卸値の出どころ」を追加し全4,504行を記入（NETSEA実額 3,774／国分実額 201／SD実画面 89／未確認 440）。想定・未確認の行は GO にしない（#17）→ B0BP7M69YH（GO・購入先URLが NETSEA 索引に無い）を UNKNOWN へ。台帳：GO 0／GO（実績枠）1／UNKNOWN 684／NO-GO 3,819。2回目の差分 0
+- 台帳外 SD 候補：unknown_queue/off_ledger_sd_20261012.csv に 14,055 ASIN（うち sd_lookup_queue_big 13,984・想定卸値つき＝sanrio8 8件）。ASIN 未特定 10 JAN は off_ledger_sd_noasin_20261012.csv
+- 突合スクリプト sd_offledger.py match を用意（秘書の sd_catalog_<企業ID>_20261012.json → sd_route_override_<日付>_cat<企業ID>.csv／曖昧は sd_catalog_candidates_<企業ID>_<日付>.csv）。台帳外の ASIN も ledger_refresh が採点する
+- 秘書の SD 企業内検索の卸値（sd_price_read_20261012.csv・184 JAN）を sd_route_override_20261012_read.csv（193 ASIN・列「JAN照合」）で合流。JAN 照合済みは アカシア 4953980404619・ディフューザー 0280664/0280671 の3 ASIN だけで、残りは「SD実画面(JAN未照合)」＝GO・実績枠の根拠にしない。シューズラック 4953980899804 は SD 該当なし扱いで除外
+- 実績枠の線（中央値で手残り0円以上の C）を満たし、FAIL がなく UNKNOWN が残るだけの行は NO-GO にせず UNKNOWN「実績枠の候補」に残すよう変更（38行）
+- 台帳：GO 0／GO（実績枠）1／UNKNOWN 722／NO-GO 3,782（4,505行）。2回目の差分 0
+- B0H99N9BH6（アカシアプレート2点）＝UNKNOWN（実績枠の候補）：中央値の手残り11円・悲観 -109円。残る UNKNOWN は #13-14（90日で価格が付いた日が14日）と #17（SD 在庫が未確認）
