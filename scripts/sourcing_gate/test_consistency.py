@@ -508,6 +508,7 @@ ok(K.wholesale_source_ok("SD実画面(2026-10-11)") and K.wholesale_source_ok("N
    "SD実画面・NETSEA実額は実額")
 ok(not K.wholesale_source_ok("想定（卸率55%）") and not K.wholesale_source_ok("未確認")
    and not K.wholesale_source_ok(""), "想定・未確認・空欄は実額でない")
+ok(not K.wholesale_source_ok("SD実画面(JAN未照合)(2026-10-12)"), "SD の JAN 未照合の卸値は実額でない")
 res = K.check_row(good_row(**{"卸値の出どころ": "想定（卸率55%）"}), today=TODAY, base_date=BASE)
 ok("wholesale_source" in checks(res) and res.blocking, "GO なのに卸値が想定なら NG")
 res = K.check_row(good_row(**{"卸値の出どころ": "SD実画面(2026-10-11)"}), today=TODAY, base_date=BASE)

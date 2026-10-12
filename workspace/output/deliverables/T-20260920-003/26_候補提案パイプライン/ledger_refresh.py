@@ -869,6 +869,23 @@ def _compose_netsea(s: dict, gate: dict | None) -> dict:
         fixes = ["出品一覧（/gp/offer-listing/<ASIN>/?f_new=true）でカート対象の出品者数を数えれば取り分が決まる"]
         never = []
         tr = None
+    if not tr and not s.get("_tr_block"):
+        # 実績枠の採算の線（中央値で手残り0円以上の C）を満たし、ほかに FAIL が無く UNKNOWN が残るだけの
+        # 行は、NO-GO（採算 C）で落とさず UNKNOWN「実績枠の候補」に残す（UNKNOWN が解ければ実績枠に入りうる）
+        e_ = s.get("econ")
+        mid_ = min(mid_net(e_), e_.net_per_unit) if (e_ and mid_net(e_) is not None) else None
+        fails = {n for n, st, *_ in gates if st == "FAIL"}
+        sh_ = (s.get("_share") or {}).get("share")
+        share_ok = "取り分" not in fails or (sh_ is not None and sh_ >= K.TRACK_MIN_SHARE)
+        if (e_ and e_.grade == "C" and mid_ is not None and mid_ >= K.TRACK_MIN_NET_YEN
+                and fails and fails <= {"採算", "取り分"} and share_ok
+                and any(st == "UNKNOWN" for _, st, *_ in gates)):
+            note = K.track_record_note(mid_, e_.worst_net_per_unit)
+            gates = [(n, "UNKNOWN", f"実績枠の候補（{note}）。残りの UNKNOWN が解ければ実績枠に入りうる", "")
+                     if n in ("採算", "取り分") and st == "FAIL" else (n, st, w, nt)
+                     for n, st, w, nt in gates]
+            miss = [(n, st, w, nt) for n, st, w, nt in gates if st != "PASS"]
+            lines_miss = [f"{ITEM.get(n, n)} {st}：{clean(w, 140)}" for n, st, w, nt in miss]
     s["_tr"] = tr
     if tr:
         # 実績枠に入る行は、採算（C）と取り分（月1〜3個）を「実績枠で PASS」と読み替えて判定する
@@ -960,7 +977,13 @@ WSRC = "卸値の出どころ"
 def route_src(o: dict) -> str:
     """経路上書きファイルの1行 → 出どころ。国分はサトルの非ログイン商品ページ実測（法務判定50）。"""
     day = (o.get("確認時刻") or "")[:10]
-    return f"国分実額({day})" if o.get("卸サイト") == "国分ネット卸" else f"SD実画面({day})"
+    if o.get("卸サイト") == "国分ネット卸":
+        return f"国分実額({day})"
+    # 2026-10-12：SD の企業内検索は JAN が無いと別商品を返すことがある（シューズラック B005LIEBEC が
+    # SD の別商品＝2段を拾っていた）。JAN を照合していない卸値は GO・実績枠の根拠にしない
+    if (o.get("JAN照合") or "済").strip() != "済":
+        return f"SD実画面(JAN未照合)({day})"
+    return f"SD実画面({day})"
 
 
 def wholesale_src_of(s: dict) -> str:

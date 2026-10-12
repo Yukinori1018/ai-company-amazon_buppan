@@ -678,7 +678,9 @@ WHOLESALE_SRC_OK = ("SD実画面", "NETSEA実額", "国分実額")
 
 def wholesale_source_ok(src: str) -> bool:
     """卸値が実額（人の実画面 or 卸の API・索引の実額）か。想定・未確認・空欄は False。"""
-    return (src or "").strip().startswith(WHOLESALE_SRC_OK)
+    s = (src or "").strip()
+    # SD の企業内検索で読んだが JAN を照合していない値は実額扱いしない（別商品を拾うことがある）
+    return s.startswith(WHOLESALE_SRC_OK) and "JAN未照合" not in s
 
 
 def _c_wholesale_source(row: dict, ctx: dict) -> Optional[Finding]:
