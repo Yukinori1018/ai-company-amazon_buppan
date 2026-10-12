@@ -1284,6 +1284,11 @@ def sd_screen(cells: dict) -> dict:
 NETSEA_DOWN_NOTE = "【NETSEA 復旧待ち】10/7〜ランサムウェア被害で停止中（新規登録も停止）。"
 #: 購入元の社名 → NETSEA を通さない直販窓口。社名の部分一致で引く
 DIRECT_WINDOWS = {"カネイシ": "卸売ドットコム", "国分": "国分ネット卸"}
+#: 2026-10-12 サトル：直販窓口の登録状態（仕入れ先台帳 49・2026-10-11）。無い社は「会員登録待ち」
+WINDOW_STATUS = {"国分": "会員登録済み（10/11）"}
+#: 2026-10-12 サトル：同じ会社が SD に出展し、取引中で卸値が見える社（仕入れ先台帳 49）。
+#: SD の卸値を人が読めば（sd_queue_<日付>.csv → sd_route_override_*.csv）SD 経路に切り替わる
+SD_SAME_COMPANY = ("ハリマ", "ヤザワ", "不二貿易")
 
 
 def supply_note(site: str, supplier: str) -> str:
@@ -1293,7 +1298,13 @@ def supply_note(site: str, supplier: str) -> str:
     note = NETSEA_DOWN_NOTE
     for key, window in DIRECT_WINDOWS.items():
         if key in (supplier or ""):
-            note += (f"購入元（{supplier}）は直販窓口（{window}）でも仕入れ可の見込み・会員登録待ち。")
+            note += (f"購入元（{supplier}）は直販窓口（{window}）でも仕入れ可の見込み・"
+                     f"{WINDOW_STATUS.get(key, '会員登録待ち')}。")
+            break
+    for key in SD_SAME_COMPANY:
+        if key in (supplier or ""):
+            note += ("同じ会社がスーパーデリバリーに出展・取引中（卸値が見える）＝SD の卸値を実画面で読めば"
+                     "SD 経路に切り替わる（sd_queue）。")
             break
     return note
 

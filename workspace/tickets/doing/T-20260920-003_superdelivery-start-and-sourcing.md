@@ -4287,3 +4287,26 @@ FLR910 2件は SD 経由でも GO（B 等級・11.2%・手残り1,186円/個）�
 
 ## 完了報告（タカシ → カズヨ・2026-10-12 プレミアム監視）
 監視319件で稼働。初日の判定3指標は「評価込み黒字 13/164（8%）・悲観の最大損 −72,050円（110件が1万円超の損）・履歴遡りで4週以上高値 70/201（35%）」。FLR910 2件は悲観で −48,160円／−25,210円（Amazon外最安基準）。初日の評価込みは「全在庫を平常価格で売った場合」なので悲観と同じ値。販売が始まる11/2以降に差が出る。8週間後（12/07）に weekly を見て判定する。
+
+## ログ（2026-10-12 サトル・NETSEA 以外の経路拡張）
+- 08:17 着手。NETSEA 索引から SD 出展3社（ハリマ・ヤザワ・不二貿易）＋国分の 15,772 JAN を入力に、supplier_screen.py で Keepa 逆引き開始（ヤザワは1 JAN あたりの ASIN が多いので後ろに回す・ラウンドロビン20件）
+- 08:21〜09:47 国分ネット卸を非ログインで照会（kokubu_lookup.py＝法務判定50 §5 実装）。498件・10秒間隔・停止トリガ0回。有り32件（国分索引の既知 JAN 35件中29件／Amazon 売れ筋のブランド当て389件中3件）
+- 国分の32 JAN→201 ASIN を国分の値段（送料按分込み）で判定：GO 0
+- ledger_refresh.py に score_feeds（仕入れ先起点の台帳外 ASIN を同じ採点で追記）と国分の経路切り替えを追加。dry-run で既存行の判定変化2件のみを確認してから本書き込み（RUN_TAG=satoru_supplier_write）
+- 台帳 2,238→4,504行（+2,266）。新規の判定 GO 0／GO（実績枠）0／UNKNOWN 377／NO-GO 1,889。新規の UNKNOWN は unknown_stages のキューに自動で載る（plan：①17・②575・③4・④408・⑤235）
+- SD の卸値キュー 206 ASIN／184 JAN を出した（sd_queue_20261012.csv）
+- 🔴 Keepa 共有キーの補充待ちで逆引きは 937/15,772 JAN（10時時点）。背景で継続中。続きの手順は agent_output/T-20260920-003/supply_expand20261012/明日の続き.md
+
+## 成果物（2026-10-12 サトル）
+- workspace/output/deliverables/T-20260920-003/53_NETSEA以外の経路拡張_20261012.md / .html
+- workspace/output/deliverables/T-20260920-003/26_候補提案パイプライン/kokubu_lookup.py（新規）
+- workspace/output/deliverables/T-20260920-003/26_候補提案パイプライン/supplier_feed_build.py（新規）
+- workspace/output/deliverables/T-20260920-003/26_候補提案パイプライン/ledger_refresh.py（score_feeds・国分の経路・SD 同一会社の注記）
+- （agent_output・非公開）sd_buylist20261009/sd_queue_20261012.csv／kokubu/lookup.jsonl・kokubu_route_override_20261012.csv・queue_next_jans.txt／ledger20261010/new_supplier_candidates_20261012.csv・kz_estimate_20261012_supplier.csv
+
+## 完了報告（サトル → カズヨ・2026-10-12）
+完了しました。確認をお願いします（チケットは doing のまま）。
+- 結論：台帳 2,238→4,504行。新しく足した 2,266行に GO・GO（実績枠）は0件。国分は値段が Amazon 売価に近く GO 0。SD 3社は卸値を読めば動く 206 ASIN を Chrome キューにした
+- 経路別（後）：NETSEA 3,938（87.4%）／SD 330（7.3%）／国分 201（4.5%）／未確認 34。NETSEA が上がったのは、SD 出展企業の行の値段の出所が NETSEA 索引だから（SD の卸値を読めば SD 経路に切り替わる）
+- 妥協点：Keepa 逆引きは 937/15,772 JAN まで（共有キーの補充が律速）。背景で継続中。森川産業は JAN の出所が無く未着手
+- 引き継ぎ：タカシへ — supplier_screen.ledger_asins() が after_dryrun.json も読むので、dry-run で足した行を「既存」と誤る（supplier_feed_build 側は除外済み）

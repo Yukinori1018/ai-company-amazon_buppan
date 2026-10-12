@@ -135,8 +135,9 @@ def kokubu_route(screen: Path) -> Path:
 
 
 def ledger_asins() -> set[str]:
-    snaps = sorted(list(LED.glob("after_*.json")) + list(LED.glob("before_*.json")),
-                   key=lambda p: p.stat().st_mtime)
+    # after_dryrun.json は書いていない台帳なので使わない（使うと dry-run で足した行を「既存」と誤る）
+    snaps = sorted([p for p in list(LED.glob("after_*.json")) + list(LED.glob("before_*.json"))
+                    if p.name != "after_dryrun.json"], key=lambda p: p.stat().st_mtime)
     rows = json.loads(snaps[-1].read_text())
     i = rows[0].index("ASIN")
     return {r[i] for r in rows[1:] if len(r) > i}
@@ -164,7 +165,7 @@ def feed(screens: list[Path]) -> Path:
 
 
 #: 卸値が決まれば判定が動く（＝価格以外では落ちていない）とみなす落ちた理由
-PRICE_ONLY = ("採算", "仕入れ", "")
+PRICE_ONLY = {"採算", "仕入れ", "取り分", "在庫月数"}
 
 
 def sd_queue(screens: list[Path]) -> Path:
@@ -180,10 +181,21 @@ def sd_queue(screens: list[Path]) -> Path:
             sup = r.get("購入元の名前") or ""
             if sup not in SD_DEALERS:
                 continue
-            ff = (r.get("落ちた理由") or "").split("（")[0]
-            if ff not in PRICE_ONLY:
+            fails = set(re.findall(r"\[([^:\]]+):FAIL\]", r.get("判定理由") or ""))
+            if not fails <= PRICE_ONLY:      # 価格以外の FAIL が1つでもあれば卸値を見ても動かない
                 continue
+            if fails & {"取り分", "在庫月数"}:  # 実績枠（§3.5 #18）は取り分 月1個以上で足りる
+                try:
+                    if float(r.get("取り分(個/月)") or 0) < 1:
+                        continue
+                except ValueError:
+                    continue
             rows.append(r)
+    # SD の卸値を既に人が読んだ ASIN（sd_route_override_*.csv）はキューに入れない
+    priced = set()
+    for f in sorted(SDB.glob("sd_route_override_*.csv")):
+        priced |= {(x.get("ASIN") or "").strip() for x in csv.DictReader(f.open(encoding="utf-8-sig"))}
+    rows = [r for r in rows if r["ASIN"] not in priced]
     asins = {r["ASIN"] for r in rows}
     latest, _ = SS.load_by_asin(asins)
     out = []
@@ -207,6 +219,8 @@ def sd_queue(screens: list[Path]) -> Path:
                 to_pt = lambda x: round(x / 1.1 / n) if x and x > 0 else "成立しない"  # noqa: E731
                 cap = {"実績枠の卸1点上限(税抜)": to_pt(zero), "B等級の卸1点上限(税抜)": to_pt(b),
                        "A等級の卸1点上限(税抜)": to_pt(min(a_mid, a_bad)), "売価90日中央値": sell}
+        if cap and cap["実績枠の卸1点上限(税抜)"] == "成立しない":
+            continue                         # 原価0円でも手残りが出ない棚は見ても無駄
         dealer, did = SD_DEALERS[r["購入元の名前"]]
         out.append({
             "ASIN": r["ASIN"], "JAN": r.get("JAN"), "商品名": r.get("商品名"),
@@ -230,7 +244,9 @@ def sd_queue(screens: list[Path]) -> Path:
     for i, x in enumerate(out, 1):
         x["順位"] = i
     dst = SDB / f"sd_queue_{STAMP}.csv"
-    cols = ["順位"] + [k for k in (out[0].keys() if out else []) if k != "順位"]
+    cols = ["順位"]
+    for x in out:
+        cols += [k for k in x if k not in cols]
     with dst.open("w", encoding="utf-8-sig", newline="") as f:
         w = csv.DictWriter(f, cols or ["順位"])
         w.writeheader()
