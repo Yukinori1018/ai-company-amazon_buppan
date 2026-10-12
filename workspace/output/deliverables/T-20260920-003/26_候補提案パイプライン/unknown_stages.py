@@ -423,7 +423,19 @@ def cmd_run(a) -> int:
     i0 = order.index(st.get("next_stage", order[0]))
     stopped = ""
     touched: dict[str, set[str]] = {}
-    for rot in range(a.rotations):
+    # s0：台帳の外の SD 候補で、秘書が SD 実画面の卸値を sd_route_override に入れたのに Keepa の
+    # 商品データが無い ASIN（ledger_refresh が off_ledger_needs_keepa.txt に書く）を先に取る
+    off = QDIR / "off_ledger_needs_keepa.txt"
+    if off.exists() and not a.no_fetch:
+        need0 = [x.strip() for x in off.read_text().split() if x.strip()]
+        need0 = [x for x in need0 if x not in prods][: a.batch]
+        if need0:
+            got0, stop0 = fetch(need0, a.reserve)
+            run_log["rotations"].append({"stage": "s0_offledger", "batch": len(need0),
+                                         "fetched": got0, "stop": stop0})
+            if stop0:
+                stopped = stop0
+    for rot in range(0 if stopped else a.rotations):
         for j in range(len(order)):
             stage = order[(i0 + j) % len(order)]
             todo = pending(stage, q.get(stage, []), st)[: a.batch]

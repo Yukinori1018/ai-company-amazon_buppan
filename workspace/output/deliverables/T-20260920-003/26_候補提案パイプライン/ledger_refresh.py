@@ -210,8 +210,66 @@ def score_netsea() -> list[dict]:
                 s2["_fresh"] = f[1]
                 s = s2
             out.append(s)
-        return route_to_sd(out, idx, names, dict(rc2))
-    return route_to_sd(old + new, idx, names, dict(rc))
+        return route_to_sd(out + score_off_ledger(out, idx, names, dict(rc2)), idx, names, dict(rc2))
+    base = old + new
+    return route_to_sd(base + score_off_ledger(base, idx, names, dict(rc)), idx, names, dict(rc))
+
+
+#: 台帳の外の SD 候補で、秘書が SD 実画面で卸値を読んで sd_route_override に入れた ASIN のうち、
+#: 採点プールに無いもの。Keepa の商品データが無ければ取り直し待ちとして書き出す（unknown_stages s0）
+OFF_NEEDS = WORK / "unknown_queue" / "off_ledger_needs_keepa.txt"
+
+
+def score_off_ledger(scored: list[dict], idx: dict, names: dict, rc: dict) -> list[dict]:
+    """sd_route_override にあるのに採点プールに無い ASIN を、手元の Keepa データで採点する。
+    卸値は route_to_sd が SD 実画面の値で差し替える（ここでは仮の行を作るだけ）。"""
+    have = {x["asin"] for x in scored}
+    route = load_sd_route()
+    todo = [a for a in route if a not in have]
+    if not todo:
+        if OFF_NEEDS.exists():
+            OFF_NEEDS.write_text("")
+        return []
+    prods: dict[str, tuple[dict, int]] = dict(load_supplement())
+    for f in [KZ_FULL, *sorted(STAGE_RAW.glob("keepa_stage_*.jsonl"))]:
+        if f.exists():
+            for line in f.open():
+                try:
+                    o = json.loads(line)
+                except Exception:
+                    continue
+                if o.get("asin") and o.get("product"):
+                    t = o.get("fetched") or 0
+                    if o["asin"] not in prods or t >= prods[o["asin"]][1]:
+                        prods[o["asin"]] = (o["product"], t)
+    prods.update({k: v for k, v in FRESH.items() if k not in prods or v[1] >= prods[k][1]})
+    # 台帳外の古いプールが持っている取得済みデータ（取得時刻が無いので最後の手段＝無い ASIN にだけ使う）
+    for f in (WORK / "sd_lookup_keepa_raw_20261011.json", WORK / "sanrio8/raw.json"):
+        if f.exists():
+            d = json.loads(f.read_text())
+            for p in (d.values() if isinstance(d, dict) else d):
+                if p.get("asin") and p["asin"] not in prods:
+                    prods[p["asin"]] = (p, int((p.get("lastUpdate") or 0) + 21564000) * 60)
+    out, missing = [], []
+    for a in todo:
+        o = route[a]
+        pf = prods.get(a)
+        if not pf:
+            missing.append(a)
+            continue
+        p, fetched = pf
+        row = {"ASIN": a, "商品名": p.get("title") or o.get("商品名") or "", "ブランド": p.get("brand") or "",
+               "AmazonURL": f"https://www.amazon.co.jp/dp/{a}", "JAN": (o.get("JAN") or "").strip(),
+               "卸の1点あたり原価(税込)": "", "購入先URL": o.get("購入先URL") or "",
+               "購入元の名前": o.get("購入元の名前") or o.get("SD出展企業") or "", "ゲート種別": "未確認"}
+        cand = {"fba_yen": (p.get("fbaFees") or {}).get("pickAndPackFee")}
+        s2 = S.build(row, cand, p, idx, names, "2026-10-01", None, rc)
+        s2.update({"_src": "台帳外SD(off_ledger)", "_cand": cand, "_idx_day": "2026-10-01",
+                   "_fresh": fetched})
+        out.append(s2)
+    OFF_NEEDS.parent.mkdir(parents=True, exist_ok=True)
+    OFF_NEEDS.write_text("".join(f"{a}\n" for a in missing))
+    return out
 
 
 #: 2026-10-12：kz 入口（monthlySold を問わず Keepa 再現の3か月販売数で選んだ Amazon 起点）の
@@ -895,6 +953,41 @@ def _compose_netsea(s: dict, gate: dict | None) -> dict:
             "gates": gates, "screened": screened}
 
 
+#: 台帳の列「卸値の出どころ」（2026-10-12 社長指摘：SD で卸値が見えているのに想定のまま放置されていた）
+WSRC = "卸値の出どころ"
+
+
+def route_src(o: dict) -> str:
+    """経路上書きファイルの1行 → 出どころ。国分はサトルの非ログイン商品ページ実測（法務判定50）。"""
+    day = (o.get("確認時刻") or "")[:10]
+    return f"国分実額({day})" if o.get("卸サイト") == "国分ネット卸" else f"SD実画面({day})"
+
+
+def wholesale_src_of(s: dict) -> str:
+    """採点に使った卸値の出どころ。SD の人の実画面＞NETSEA の実額（API/索引）＞未確認。"""
+    o = s.get("_route")
+    if o:
+        return route_src(o)
+    if not s.get("per_pt"):
+        return "未確認"
+    src = s.get("per_pt_src") or ""
+    if src.startswith("索引") or src == "台帳":
+        # 台帳＝旧プール（NETSEA Buyer API で取った卸1点）・索引＝NETSEA 索引。どちらも NETSEA の実額
+        return f"NETSEA実額({s.get('_idx_day') or '2026-10-01'})"
+    return "未確認"
+
+
+def apply_wholesale_rule(cells: dict) -> dict:
+    """卸値の出どころが想定・未確認の行は GO・GO（実績枠）にしない（#17 UNKNOWN）。"""
+    if cells.get("判定") in K.GO_VERDICTS and not K.wholesale_source_ok(cells.get(WSRC, "")):
+        cells = dict(cells)
+        cells["判定"] = "UNKNOWN"
+        cells["判定理由"] = (f"#17 卸値の出どころ UNKNOWN：{cells.get(WSRC) or '空欄'}＝卸値が実額でない。"
+                          "【こう変えれば】卸サイトの実画面で卸値を読めば決まる ／ "
+                          + (cells.get("判定理由") or ""))[:1800]
+    return cells
+
+
 def netsea_cells(s: dict, gate: dict | None, comp: dict) -> dict:
     e, lv, r = s.get("econ"), s.get("price"), s["row"]
     has = bool(e and e.grade in ("A", "B", "C"))
@@ -915,6 +1008,7 @@ def netsea_cells(s: dict, gate: dict | None, comp: dict) -> dict:
         g[col] = val if val is not None else "未確認"
     g["判定"] = comp["verdict"]
     g["判定理由"] = comp["reason"]
+    g[WSRC] = wholesale_src_of(s)
     lg = LEGAL.get(s["asin"])
     if lg:
         if g["判定"] in K.GO_VERDICTS:
@@ -1219,6 +1313,7 @@ def sd_rows(header: list[str]) -> tuple[list[list], list[dict]]:
             "確認者": "タカシ（機械判定・実画面未確認）"
                       + ("／カズヨ（SD 卸価格のみ実画面）" if mp else ""),
             "発注状況": "未発注",
+            WSRC: (f"SD実画面({(mp.get('確認時刻') or '')[:10]})" if mp else "未確認"),
         })
         out.append([cells[h] for h in header])
         if wait or reason.startswith("Amazon側の機械判定は通過"):
@@ -1350,6 +1445,8 @@ def main(argv=None) -> int:
     stamp = date.today().strftime("%Y%m%d") + "_" + os.environ.get("RUN_TAG", "run")
     (OUT / f"before_{stamp}.json").write_text(json.dumps(vals, ensure_ascii=False))
     header, body = vals[0], vals[1:]
+    if WSRC not in header:          # 2026-10-12 列を末尾に1本足す（既存の列は動かさない）
+        header = header + [WSRC]
     rows = [dict(zip(header, r + [""] * (len(header) - len(r)))) for r in body]
 
     def count(rs):
@@ -1379,13 +1476,14 @@ def main(argv=None) -> int:
         if is_human(r):
             skipped_human += 1
             continue
-        if _no_product(s) and r.get("判定") == "GO":
+        if _no_product(s) and (r.get("判定") in K.GO_VERDICTS
+                                   or (r.get("判定理由") or "").startswith("#17 卸値の出どころ")):
             # 2026-10-12：別ルート（candidate_pipeline 等）が自前の Keepa データで GO にした行を、
             # 手元にデータが無いだけで UNKNOWN に落とさない（B0BP7M69YH）。データなしは判定の根拠にならない
             kept_no_data.append(r["ASIN"])
             continue
         comp = consistency_gate(s, compose_netsea(s, gates.get(r["ASIN"])))
-        r.update(netsea_cells(s, gates.get(r["ASIN"]), comp))
+        r.update(apply_wholesale_rule({**r, **netsea_cells(s, gates.get(r["ASIN"]), comp)}))
         record_extra(comp, r, s)
         updated += 1
         if comp["waiting"]:
@@ -1421,7 +1519,7 @@ def main(argv=None) -> int:
         if is_human(r):
             skipped_human += 1
             continue
-        r.update(sd_screen(dict(zip(header, ln))))
+        r.update(apply_wholesale_rule(sd_screen(dict(zip(header, ln)))))
         updated += 1
     human_sd = {r["ASIN"] for r in rows
                 if r["卸サイト"] == "スーパーデリバリー" and is_human(r)}
@@ -1430,6 +1528,31 @@ def main(argv=None) -> int:
                 for ln in sd_lines if ln[ia] not in have_sd and ln[ia] not in have_netsea]
     waiting += sd_wait
 
+    # 卸値の出どころが空の行（人の凍結行・今回採点しなかった行）を、手元の証跡から埋める。
+    # 人の行は判定を触らない（値の列を1本足すだけ）
+    sd_seen = {a_: (m[0].get("確認時刻") or "")[:10] for a_, m in load_sd_manual().items() if m}
+    route = load_sd_route()
+    idx_urls = {(v.get("supplier_url") or "").strip() for v in json.loads(
+        (WORK / "pipeline/netsea_jan_index.json").read_text())["jans"].values()} - {""}
+    for r in rows:
+        if r.get(WSRC):
+            continue
+        a_ = r["ASIN"]
+        if a_ in route:
+            r[WSRC] = route_src(route[a_])
+        elif a_ in by_asin:
+            r[WSRC] = wholesale_src_of(by_asin[a_])
+        elif r["卸サイト"] == "スーパーデリバリー" and a_ in sd_seen:
+            r[WSRC] = f"SD実画面({sd_seen[a_]})"
+        elif (r.get("購入先URL") or "").strip() in idx_urls:
+            r[WSRC] = "NETSEA実額(2026-10-01)"     # 購入先URL が NETSEA 索引の商品ページと完全一致
+        else:
+            r[WSRC] = "未確認"
+    for r in rows:
+        if not is_human(r):
+            r.update(apply_wholesale_rule(r))
+    appended = [[apply_wholesale_rule(dict(zip(header, x)))[h] for h in header] for x in appended]
+    sd_lines = [[apply_wholesale_rule(dict(zip(header, x)))[h] for h in header] for x in sd_lines]
     final = [[r[h] for h in header] for r in rows] + appended + sd_lines
     # NETSEA 経由の GO に「復旧待ち」を付ける（人の行は触らない）
     i_site, i_sup = header.index("卸サイト"), header.index("購入元の名前")
@@ -1522,6 +1645,9 @@ def main(argv=None) -> int:
     need = len(final) + 1 - ws.row_count
     if need > 0:
         ws.add_rows(need + 10)
+    if len(header) > ws.col_count:
+        ws.add_cols(len(header) - ws.col_count)
+    ws.update(range_name="A1", values=[header], value_input_option="RAW")
     ws.update(range_name="A2", values=final, value_input_option="USER_ENTERED")
     (OUT / f"after_{stamp}.json").write_text(json.dumps([header] + final, ensure_ascii=False))
     print(f"書き込み {len(final)}行")
@@ -1532,6 +1658,9 @@ def record_extra(comp: dict, cells: dict, s: dict) -> None:
     tag, info = comp.get("extra") or ("", {})
     if cells.get("判定") in K.GO_VERDICTS:
         tag = cells["判定"]
+    if tag in K.GO_VERDICTS and (cells.get("判定") not in K.GO_VERDICTS
+                                 or not K.wholesale_source_ok(cells.get(WSRC, ""))):
+        return   # 卸値が実額でない行は GO 一覧に載せない（apply_wholesale_rule と同じ線）
     if not tag:
         return
     e = s.get("econ")

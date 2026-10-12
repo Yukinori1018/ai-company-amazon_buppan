@@ -98,6 +98,8 @@ class COLS:
     # 非公開（agent_output にしか置かない）側の列
     wholesale_unit = "卸の1点あたり原価(税込)"
     wholesale_lot = "卸の最小ロット(点)"
+    #: 卸値の出どころ（2026-10-12 社長指摘「SD で卸値が見えているのに想定のまま放置」）
+    wholesale_src = "卸値の出どころ"
     # このモジュールが足す列
     result = "整合性検査"
     detail = "整合性検査の詳細"
@@ -670,6 +672,30 @@ def _c_track_record(row: dict, ctx: dict) -> Optional[Finding]:
     return None
 
 
+#: 実額と認める卸値の出どころ（前方一致）。「想定」「未確認」は GO にしない（2026-10-12）
+WHOLESALE_SRC_OK = ("SD実画面", "NETSEA実額", "国分実額")
+
+
+def wholesale_source_ok(src: str) -> bool:
+    """卸値が実額（人の実画面 or 卸の API・索引の実額）か。想定・未確認・空欄は False。"""
+    return (src or "").strip().startswith(WHOLESALE_SRC_OK)
+
+
+def _c_wholesale_source(row: dict, ctx: dict) -> Optional[Finding]:
+    """GO・GO（実績枠）の行の卸値が実額か。列が無い表（旧 CSV）は対象外（§約束4）。"""
+    if get(row, COLS.verdict).strip() not in GO_VERDICTS:
+        return None
+    if not any((k or "").lstrip("\ufeff") == COLS.wholesale_src for k in row):
+        return None
+    src = get(row, COLS.wholesale_src)
+    if wholesale_source_ok(src):
+        return None
+    return Finding("wholesale_source", NG,
+                   f"判定が GO なのに卸値の出どころが「{src or '空欄'}」です。想定・未確認の卸値で "
+                   f"GO にしません（#17）。卸サイトの実画面で卸値を読んでください。",
+                   {"卸値の出どころ": src})
+
+
 def count_verdicts(rows: Iterable[dict]) -> dict[str, int]:
     """判定列の件数。**GO と GO（実績枠）を分けて数える**（社長方針）。"""
     out: dict[str, int] = {}
@@ -806,6 +832,7 @@ CHECKS: tuple[Callable[[dict, dict], Optional[Finding]], ...] = (
     _c_sentinel_margin,
     _c_grade_rule,
     _c_track_record,
+    _c_wholesale_source,
     _c_death_band,
     _c_timeline,
     _c_timeline_stale,
