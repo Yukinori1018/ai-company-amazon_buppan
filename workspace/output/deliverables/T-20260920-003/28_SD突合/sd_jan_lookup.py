@@ -18,9 +18,21 @@ Amazon 側で生存を確認した ASIN の JAN を投げると、SD 側の商�
 
 🔴 間隔160秒でも1日30件なら80分。**上限に当たっても諦めない。**
 
+🔴 **JAN で0件＝SD に無い、ではない**（2026-10-12 追加・T-20261012-001）
+    サンリオ おせわセット クロミ（JAN 4550624199285）は JAN で0件だったが、SD の1ページに
+    キティ／シナモロール／クロミを S1〜S3 の内訳にした1ページで出ていた（内訳にメーカー品番
+    199281 はあるが JAN は無い）。だから `--queue-csv` で商品名・ブランドを渡すと、
+    **JAN → メーカー品番 → 商品名の主要語** の3段で引く（`sd_query_plan.py`）。
+    * 段を進めるたびに1リクエスト＝**回数枠を1つ使う**（枠・間隔・在席の縛りは同じ）
+    * ②③で当たった行は `needs_page_check: true`。**商品ページの内訳の品番を人が見るまで候補扱い**
+    * 3段とも0件でも `verdict` は「SD に無い」とは書かない
+    * `--jan-file`（JAN だけ）で渡した行は商品名が無いので①だけ。`verdict` に「品番・名前は未照会」と残す
+
 使い方:
     python3 sd_jan_lookup.py --jan-file jans.txt --out out.jsonl --attended
     python3 sd_jan_lookup.py --jan 4903779138287 --attended
+    python3 sd_jan_lookup.py --queue-csv queue.csv --out out.jsonl --attended   # 3段で引く
+        （queue.csv は列 JAN・商品名・ブランド、任意で メーカー品番。sd_lookup_list.py の出力をそのまま渡せる）
 
 終了コード:
     0 正常 / 1 引数か在席の不備 / 2 Cloudflare / 4 停止中（SUSPENDED）
@@ -42,6 +54,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from _fetch import Blocked, Failed, RateLimited, fetch               # noqa: E402
 from _budget import (LANE_A, Budget, BudgetExceeded, DayCutOff,      # noqa: E402
                      NotAttended, Suspended)
+import sd_query_plan                                                  # noqa: E402
 
 ITEM_RE = re.compile(
     r'<div class="itembox-parts.*?(?=<div class="itembox-parts|<div class="dvs-loading|\Z)', re.S)
@@ -80,9 +93,12 @@ def parse_hits(page_html: str) -> list[dict]:
     return hits
 
 
-def search_url(jan: str) -> str:
-    """問い合わせ先。`*` 宛の robots.txt の Disallow 対象外（2026-09-30 実測）。"""
-    return f"{BASE}/p/do/psl/?word={jan}"
+def search_url(word: str) -> str:
+    """問い合わせ先。`*` 宛の robots.txt の Disallow 対象外（2026-09-30 実測）。
+
+    JAN でも品番でも名前でも同じ口。日本語・空白は URL エンコードする。
+    """
+    return sd_query_plan.search_url(word)
 
 
 def lookup(jan: str, fetcher=None) -> dict:
@@ -90,6 +106,44 @@ def lookup(jan: str, fetcher=None) -> dict:
     page = (fetcher or fetch)(search_url(jan))
     hits = parse_hits(page)
     return {"jan": jan, "hit_count": len(hits), "hits": hits}
+
+
+def lookup_tiered(jan: str, title: str = "", brand: str = "", model: str = "",
+                  fetcher=None, take=lambda: None) -> dict:
+    """JAN → メーカー品番 → 商品名の主要語 の順に、**当たった段で止める**。
+
+    `take` は1リクエストごとに呼ぶ（回数枠の消費。上限なら BudgetExceeded が飛ぶ）。
+    429・上限は**呼び出し側へそのまま投げる**（途中の段の結果は捨てる＝0件に化けさせない）。
+    """
+    tried: list[dict] = []
+    for tier, word in sd_query_plan.plan(jan, title, brand, model):
+        take()
+        hits = parse_hits((fetcher or fetch)(search_url(word)))
+        tried.append({"tier": tier, "word": word, "hit_count": len(hits)})
+        if hits:
+            return {"jan": jan, "hit_count": len(hits), "hits": hits, "matched_by": tier,
+                    "needs_page_check": tier != "jan", "queries": tried,
+                    "verdict": ("JAN で一致" if tier == "jan" else
+                                f"{'品番' if tier == 'partno' else '名前'}で候補あり（JAN 未確認。"
+                                "商品ページの内訳の品番を見て確定する）")}
+    has_more = bool(title or model)
+    return {"jan": jan, "hit_count": 0, "hits": [], "matched_by": None,
+            "needs_page_check": False, "queries": tried,
+            "verdict": ("3段とも0件（SD に無いとは限らない：表記揺れ・出展企業の非公開ページ）"
+                        if has_more else "JAN で0件・品番と名前は未照会（SD に無いとは言えない）")}
+
+
+def read_queue_csv(path: str) -> list[dict]:
+    """列 JAN・商品名・ブランド（任意で メーカー品番）の CSV を読む。1セルに複数 JAN なら分ける。"""
+    import csv
+    rows: list[dict] = []
+    for r in csv.DictReader(open(path, encoding="utf-8-sig")):
+        for j in re.split(r"[;／/\s,]+", r.get("JAN", "") or ""):
+            j = re.sub(r"\D", "", j)
+            if 8 <= len(j) <= 13:
+                rows.append({"jan": j, "title": r.get("商品名", ""), "brand": r.get("ブランド", ""),
+                             "model": r.get("メーカー品番", "")})
+    return rows
 
 
 def read_jans(args) -> list[str]:
@@ -110,6 +164,7 @@ def main(argv: list[str] | None = None, sleep=time.sleep) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--jan")
     ap.add_argument("--jan-file", help="1行1JAN のテキスト。# で始まる行は無視")
+    ap.add_argument("--queue-csv", help="列 JAN・商品名・ブランド の CSV。JAN→品番→名前の3段で引く")
     ap.add_argument("--out", help="JSONL の出力先。既にある JAN はスキップ（再開できる）")
     ap.add_argument("--attended", action="store_true",
                     help="人が在席していることを明示する。**付けないと動かない**（法務判定・成果物29 §5）")
@@ -132,7 +187,11 @@ def main(argv: list[str] | None = None, sleep=time.sleep) -> int:
         return 5
     print(budget.describe(), flush=True)
 
-    jans = read_jans(args)
+    meta: dict[str, dict] = {}
+    if args.queue_csv:
+        for r in read_queue_csv(args.queue_csv):
+            meta.setdefault(r["jan"], r)
+    jans = list(dict.fromkeys(read_jans(args) + list(meta)))
     if not jans:
         print("JAN がありません", file=sys.stderr)
         return 1
@@ -158,8 +217,9 @@ def main(argv: list[str] | None = None, sleep=time.sleep) -> int:
     try:
         for n, jan in enumerate(todo, 1):
             try:
-                budget.take()
-                res = lookup(jan)
+                m = meta.get(jan, {})
+                res = lookup_tiered(jan, m.get("title", ""), m.get("brand", ""),
+                                    m.get("model", ""), take=budget.take)
             except BudgetExceeded as exc:
                 print(f"■ {exc}", flush=True)
                 n -= 1
@@ -187,6 +247,7 @@ def main(argv: list[str] | None = None, sleep=time.sleep) -> int:
             else:
                 print(line)
             print(f"  {n}/{len(todo)} {jan}: {res['hit_count']}件"
+                  f"（{res.get('matched_by') or '一致なし'}・{len(res.get('queries', []))}回）"
                   f"（本日の残り {budget.remaining}）", flush=True)
     finally:
         if sink:

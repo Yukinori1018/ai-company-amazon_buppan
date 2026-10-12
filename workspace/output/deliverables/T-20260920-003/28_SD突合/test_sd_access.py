@@ -460,6 +460,64 @@ def test_lookup_clean_run() -> None:
         ok(used["used"] == 2, "回数カウンタが2件ぶん増えている")
 
 
+def test_tiered_lookup_partno() -> None:
+    section("🔴 JAN で0件でも止めず、品番 → 名前で引き直す（T-20261012-001）")
+    import sd_query_plan as qp
+    title = "サンリオ(SANRIO) ぬいぐるみおせわセット（ベビー） クロミ 対象年齢3才以上 199281"
+    steps = qp.plan("4550624199285", title, "サンリオ(SANRIO)")
+    ok(steps[0] == ("jan", "4550624199285"), "1段目は JAN")
+    ok(("partno", "199281") in steps, "2段目に商品名のメーカー品番 199281 が入る")
+    ok(any(t == "name" and "おせわセット" in w for t, w in steps), "3段目に名前（種類）が入る")
+    ok(qp.part_numbers("スケーター 水筒 470ml 22cm 子供用") == [], "容量・寸法は品番にしない")
+    ok("069816" in qp.part_numbers("カミオジャパン ウサハナ ボールペン0.5mm 069816"),
+       "JAN の中に埋まった品番も捨てない")
+    with tempfile.TemporaryDirectory() as d:
+        out = os.path.join(d, "out.jsonl")
+        q = os.path.join(d, "q.csv")
+        open(q, "w", encoding="utf-8").write(
+            "JAN,商品名,ブランド\n4550624199285," + title + ",サンリオ(SANRIO)\n")
+        seen: list[str] = []
+
+        def fake_fetch(url, **kw):
+            seen.append(url)
+            if url.endswith("word=199281"):
+                return ('<div class="itembox-parts"><div class="item-name">'
+                        '<a href="/p/r/pd_p/7654321/">おせわセット</a></div>registBtn/1</div>')
+            return "<html>0件</html>"
+
+        real = sd_jan_lookup.fetch
+        sd_jan_lookup.fetch = fake_fetch
+        try:
+            rc = sd_jan_lookup.main(["--queue-csv", q, "--out", out, "--attended",
+                                     "--state-dir", d], sleep=lambda s: None)
+        finally:
+            sd_jan_lookup.fetch = real
+        res = json.loads(open(out, encoding="utf-8").read().strip())
+        ok(rc == 0 and len(seen) == 2, "JAN（0件）→ 品番（当たり）の2回で止まる")
+        ok(res["matched_by"] == "partno" and res["needs_page_check"] is True,
+           "品番で当たった行は JAN 未確認として印が付く")
+        ok(res["hits"][0]["product_code"] == "7654321", "当たった商品コードが残る")
+        used = json.load(open(os.path.join(d, f"{LANE_A.label}_budget_"
+                                          f"{_budget.datetime.date.today().isoformat()}.json"),
+                              encoding="utf-8"))
+        ok(used["used"] == 2, "段を進めた回数ぶん枠を消費する（縛りは同じ）")
+
+    with tempfile.TemporaryDirectory() as d:
+        out = os.path.join(d, "out.jsonl")
+        janfile = os.path.join(d, "jans.txt")
+        open(janfile, "w").write("4901234567894\n")
+        real = sd_jan_lookup.fetch
+        sd_jan_lookup.fetch = lambda url, **kw: "<html>0件</html>"
+        try:
+            sd_jan_lookup.main(["--jan-file", janfile, "--out", out, "--attended",
+                                "--state-dir", d], sleep=lambda s: None)
+        finally:
+            sd_jan_lookup.fetch = real
+        res = json.loads(open(out, encoding="utf-8").read().strip())
+        ok("SD に無い" not in res["verdict"].replace("SD に無いとは言えない", ""),
+           "JAN だけで0件の行に「SD に無い」と書かない")
+
+
 def main() -> int:
     print("SD への取得の縛りを検査します（ネットワークには一切つなぎません）")
     for fn in (test_suspension_released, test_lane_constants, test_attended_required,
@@ -469,7 +527,7 @@ def main() -> int:
                test_restart_restores_state, test_handwritten_state_cannot_loosen,
                test_no_loosening_arguments, test_no_full_scan_path,
                test_no_fingerprint_spoofing, test_lookup_stops_on_rate_limit,
-               test_lookup_clean_run):
+               test_lookup_clean_run, test_tiered_lookup_partno):
         fn()
     print(f"\n{COUNT - len(FAILS)}/{COUNT} 通過")
     for f in FAILS:
