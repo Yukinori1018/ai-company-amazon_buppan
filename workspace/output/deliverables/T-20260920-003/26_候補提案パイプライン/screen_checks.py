@@ -67,6 +67,8 @@ class Cart:
     maker_note: str = ""
     has_cart: bool | None = None   # 実画面で「カートあり=Y」。保持者名は未取得のことがある
     holder_src: str = "人"         # "人"（実画面で読んだ）／"Keepa"（Y だが名前は Keepa で補った）
+    #: キーゾンの「アマゾン直販」（§3.5 #6 補助・2026-10-12）。単独では落とさないが判定理由に書く
+    amazon_direct: str = ""
 
 
 @dataclass
@@ -115,7 +117,8 @@ def load_cart() -> dict[str, Cart]:
                 holder = "カートなし"
             sold = (r.get("過去1か月(実画面)") or r.get("過去1か月(実画面・下限)") or "").strip()
             c = Cart(holder, (r.get("カート価格") or "").strip(), sold, r.get("確認時刻", ""),
-                     has_cart=(True if yn == "Y" else False if yn == "N" else None))
+                     has_cart=(True if yn == "Y" else False if yn == "N" else None),
+                     amazon_direct=(r.get("アマゾン直販(キーゾン)") or "").strip())
             if "疑い" in (r.get("注意") or ""):
                 c.maker, c.maker_note = "疑い", r["注意"]
             if a in flags:
@@ -345,7 +348,15 @@ def supplement_holder(c: Cart, sid: str | None, name: str | None, brand: str = "
 # ── 各項目 ────────────────────────────────────────────────────────────
 
 def cart_gate(c: Cart) -> tuple[str, str]:
-    """(状態, 理由)。§3.3-1・§3.3-5。"""
+    """(状態, 理由)。§3.3-1・§3.3-5。キーゾンのアマゾン直販（#6 補助）が在庫ありなら理由に足す。"""
+    st, why = _cart_gate(c)
+    if c.amazon_direct and "在庫あり" in c.amazon_direct:
+        why += ("。🔴 #6 キーゾンのアマゾン直販が在庫あり（Amazon 本体が出品中＝カートを取り返される"
+                "おそれ。§3.5 #6 は補助情報で単独では落とさない）")
+    return st, why
+
+
+def _cart_gate(c: Cart) -> tuple[str, str]:
     h = c.holder
     if "Amazon.co.jp" in h:
         src = ("Keepa buyBoxSellerId・カートの有無はカズヨ実画面" if c.holder_src == "Keepa"

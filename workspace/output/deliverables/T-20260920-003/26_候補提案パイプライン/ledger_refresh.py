@@ -691,6 +691,12 @@ def compose_netsea(s: dict, gate: dict | None) -> dict:
     if mark:
         mark = mark[:400]
         comp["reason"] = comp["reason"][:1800 - len(mark) - 3] + " ／ " + mark
+    c = SCREEN.cart.get(s["asin"])
+    if c and "在庫あり" in (c.amazon_direct or "") and "アマゾン直販が在庫あり" not in comp["reason"]:
+        # §3.5 #6（補助）：キーゾンのアマゾン直販が在庫あり＝本体が出品中。単独では落とさないが必ず書く
+        comp["reason"] = ("🔴 #6 キーゾンのアマゾン直販が在庫あり（カズヨ実画面 "
+                          f"{c.checked_at}）＝Amazon 本体が出品中でカートを取り返されるおそれ ／ "
+                          + comp["reason"])[:1800]
     tag, info = classify_extra(s, comp["gates"], gate)
     comp["extra"] = (tag, info)
     if comp["verdict"] in K.GO_VERDICTS:
