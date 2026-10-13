@@ -4334,3 +4334,15 @@ FLR910 2件は SD 経由でも GO（B 等級・11.2%・手残り1,186円/個）�
 - 実績枠の線（中央値で手残り0円以上の C）を満たし、FAIL がなく UNKNOWN が残るだけの行は NO-GO にせず UNKNOWN「実績枠の候補」に残すよう変更（38行）
 - 台帳：GO 0／GO（実績枠）1／UNKNOWN 722／NO-GO 3,782（4,505行）。2回目の差分 0
 - B0H99N9BH6（アカシアプレート2点）＝UNKNOWN（実績枠の候補）：中央値の手残り11円・悲観 -109円。残る UNKNOWN は #13-14（90日で価格が付いた日が14日）と #17（SD 在庫が未確認）
+
+## ログ（2026-10-13 夜間定期タスク・カズヨ／14:29 に遅延起動）
+- **GO 0件（NETSEA 0／SD 0）＋GO（実績枠）1件（NETSEA・オリヒロ アミノボディ粒＝NETSEA 障害で復旧待ち）**。nightly の機械判定で GO 3件が出たが、3件とも #17 卸値の出どころ「未確認」で UNKNOWN に戻った（B077YSRZSX・B0D2R7NTQD・B01N74X8DR）。【こう変えれば】NETSEA の実画面で卸値を読めば決まる（NETSEA 復旧待ち）
+- 🔴 構成比：台帳 4,715行のうち NETSEA 3,962（84.0%）／SD 517（11.0%）／国分 201（4.3%）／未確認 34。**NETSEA が80%超**。候補（NO-GO 以外 1,629行）でも NETSEA 83.6%／SD 10.4%／国分 5.8%。ブランド最大は不二貿易 11.4%（候補内）。カテゴリーは台帳に列が無く未集計
+- 台帳 4,505 → 4,715行（+210：nightly 段B）。判定 前 NO-GO 3,849／UNKNOWN 655／実績枠 1 → 後 NO-GO 3,086／UNKNOWN 1,628／実績枠 1
+- 🔴 異常：unknown_stages 2回目（18:00）の書き戻しで **NO-GO 862行が「#13 今日の値を取り直せていません」の UNKNOWN に変わり、元の FAIL 理由が消えた**。dry-run でも再現。14:31 の1回目では起きず nightly.sh の後に発生。原因候補は nightly が上書きする pipeline/buy_list_private.csv・discovered.json を score_20261004.load_all() が旧プールの入力に使っていること。誤 GO は出ていない。詳細は agent_output/T-20260920-003/pipeline/nightly_stop_note_20261013.md
+- Keepa：premium_watch 328件（今日の観測328・①黒字 26/266 ②悲観の最大損 −128,160円〔B083L6XTK9〕・1万円超の損159件 ③4週高値 0/0〔監視28日未満〕・参考 履歴遡り 116/327）／unknown_stages は2回とも残高不足で0件（②価格 残り1,483件）／nightly.sh 14:34〜18:00 段B 約1,709
+- UNKNOWN 655→1,628（上の異常が主因）。段別の残り：①64 ②1,483 ③3 ④実画面45 ⑤人手83。今回解けた件数 0。needs_browser_20261013.txt 48行・needs_human_20261013.txt 85行
+- consistency check（10/9 の648行）：🔴前回の NG 印が残る行 4行／今回 NG 252行（other_costs 固定費の再計算不一致＝all.csv が旧モデル）・grade_rule 16行。autofill：PASS 2,540／FAIL 202／UNKNOWN 10,866（648 ASIN）
+- SD：照会0回（在席時のみ）。SD 起点の Keepa 逆引き（rr3 未取得 9,477 JAN・yazawa 4,384 JAN）と台帳合流は今回未着手＝次回の先頭
+- ラウンドロビン：NETSEA tier2・shop 880827・last_jan 4902205373803（今回 3,300 JAN・25店・残り 27,851）
+- 次回：①862行の異常の原因（タカシ）②rr3/yazawa の台帳合流（Keepa 0）③unknown_stages s2 の続き ④SD は在席時に laneA/B
