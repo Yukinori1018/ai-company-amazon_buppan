@@ -137,7 +137,7 @@ def kokubu_route(screen: Path) -> Path:
 def ledger_asins() -> set[str]:
     # after_dryrun.json は書いていない台帳なので使わない（使うと dry-run で足した行を「既存」と誤る）
     snaps = sorted([p for p in list(LED.glob("after_*.json")) + list(LED.glob("before_*.json"))
-                    if p.name != "after_dryrun.json"], key=lambda p: p.stat().st_mtime)
+                    if not (p.name.startswith("after_") and "dry" in p.stem)], key=lambda p: p.stat().st_mtime)
     rows = json.loads(snaps[-1].read_text())
     i = rows[0].index("ASIN")
     return {r[i] for r in rows[1:] if len(r) > i}

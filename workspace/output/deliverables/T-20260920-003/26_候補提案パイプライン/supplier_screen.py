@@ -662,9 +662,19 @@ AUX = ["JAN", "機械の区分", "等級", "取り分(個/月)", "Amazon側の�
 # ── 台帳の ASIN（重複の印だけ。台帳には触らない）────────────────────────
 
 
+def ledger_snapshots() -> list[Path]:
+    """台帳の実際の状態を写したスナップショット（古い順）。
+
+    before_* はシートから読んだ値、after_* は書き込んだ値。**dry-run の after（after_dryrun.json・
+    after_*_dry.json）はシートに書いていない**ので除く（2026-10-14 修正。サトル引き継ぎの既知バグ：
+    dry-run で足す予定だった行を「台帳にある」と数え、重複の印が狂っていた）。"""
+    snaps = [p for p in LEDGER_SNAP_DIR.glob("after_*.json") if "dry" not in p.stem]
+    snaps += list(LEDGER_SNAP_DIR.glob("before_*.json"))
+    return sorted(snaps, key=lambda p: p.stat().st_mtime)
+
+
 def ledger_asins() -> set[str]:
-    snaps = sorted(list(LEDGER_SNAP_DIR.glob("after_*.json")) + list(LEDGER_SNAP_DIR.glob("before_*.json")),
-                   key=lambda p: p.stat().st_mtime)
+    snaps = ledger_snapshots()
     if not snaps:
         return set()
     rows = json.loads(snaps[-1].read_text())
@@ -825,8 +835,7 @@ def load_by_asin(asins: set[str], sources: list[Path] | None = None) -> tuple[di
 
 def ledger_flags(out: Path, log=print) -> dict:
     """台帳の最新スナップショットの全行に discontinued.check を当て、印の付いた行を CSV に出す。"""
-    snaps = sorted(list(LEDGER_SNAP_DIR.glob("after_*.json")) + list(LEDGER_SNAP_DIR.glob("before_*.json")),
-                   key=lambda p: p.stat().st_mtime)
+    snaps = ledger_snapshots()
     rows = json.loads(snaps[-1].read_text())
     head = rows[0]
     recs = [dict(zip(head, r)) for r in rows[1:]]

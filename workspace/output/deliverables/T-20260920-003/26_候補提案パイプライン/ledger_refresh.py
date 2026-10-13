@@ -419,6 +419,59 @@ def _no_product(s: dict) -> bool:
     return bool(g) and g[0][0] == "取り直し"
 
 
+#: 「商品データが無い」ことを示す判定理由の文言（score_20261004.build の取り直しゲート）
+NO_DATA_TEXT = "今日の値を取り直せていません"
+_VRANK = {"GO": 0, "UNKNOWN": 1, "NO-GO": 2}
+
+
+def better(new: dict, old: dict | None) -> bool:
+    """同じ ASIN が採点プールに2行あるとき、new を採るか。
+
+    判定の良い方（GO>UNKNOWN>NO-GO）を採るが、**商品データが無い行（取り直し）は
+    データのある行に必ず負ける**。2026-10-13 18:00、データなしの UNKNOWN が NO-GO に勝って
+    台帳の判定理由を消した（データなしは判定の根拠にならない）。"""
+    if old is None:
+        return True
+    if _no_product(new) != _no_product(old):
+        return not _no_product(new)
+    return _VRANK.get(new["判定"], 3) < _VRANK.get(old["判定"], 3)
+
+
+def keep_when_no_data(row: dict, s: dict) -> bool:
+    """手元に商品データが無い採点で、台帳の既存行を上書きしないか。
+
+    既存行がデータに基づく判定（理由に「取り直せていません」が無い）なら据え置く。
+    2026-10-12 は GO 行だけ守っていたが、NO-GO の理由（在庫月数・季節など）も同じく根拠であり、
+    「データが無い」で消してよいものではない（2026-10-14）。"""
+    if not _no_product(s):
+        return False
+    if row.get("判定") in K.GO_VERDICTS or (row.get("判定理由") or "").startswith("#17 卸値の出どころ"):
+        return True
+    return bool(row.get("判定")) and NO_DATA_TEXT not in (row.get("判定理由") or "")
+
+
+def restore_no_data_rows(rows: list[dict], snap_path: Path, header: list[str]) -> list[str]:
+    """一度だけの修復：取り直しで上書きされた行を、上書き前のスナップショットから戻す。
+
+    対象＝人の行でなく、今の理由が「取り直せていません」で、スナップショットでは
+    データに基づく判定だった行。値は列名で合わせる（列が増えていても動く）。"""
+    snap = json.loads(snap_path.read_text())
+    sh = snap[0]
+    old = {r[sh.index("ASIN")]: dict(zip(sh, r + [""] * (len(sh) - len(r)))) for r in snap[1:] if r}
+    done = []
+    for r in rows:
+        if is_human(r) or NO_DATA_TEXT not in (r.get("判定理由") or ""):
+            continue
+        o = old.get(r["ASIN"])
+        if not o or NO_DATA_TEXT in (o.get("判定理由") or "") or not o.get("判定"):
+            continue
+        for h in header:
+            if h in o:
+                r[h] = o[h]
+        done.append(r["ASIN"])
+    return done
+
+
 def load_supplement() -> dict[str, tuple[dict, int]]:
     out: dict[str, tuple[dict, int]] = {}
     for f in SUPP_RAW:
@@ -1453,6 +1506,8 @@ def is_human(row: dict) -> bool:
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--restore-from", type=Path, default=None,
+                    help="取り直しで上書きされた行を、このスナップショット（before_*.json）から戻す（一度だけの修復）")
     a = ap.parse_args(argv)
     OUT.mkdir(parents=True, exist_ok=True)
 
@@ -1476,15 +1531,15 @@ def main(argv=None) -> int:
         return (dict(Counter(r["判定"] for r in rs)), dict(Counter(r["卸サイト"] for r in rs)))
     before = count(rows)
     prev_verdict = {r["ASIN"]: r["判定"] for r in rows}   # 新しく GO／NO-GO から外れた行の検出用
+    # SCREEN を読んだ後でないと is_human が正しく働かないので、ここで復元する
+    restored = restore_no_data_rows(rows, a.restore_from, header) if a.restore_from else []
 
     scored = score_netsea()
     gates = SCREEN.gate
     by_asin: dict[str, dict] = {}
-    for s in scored:  # 同じ ASIN が2行あれば、判定の良い方（GO>UNKNOWN>NO-GO）を採る
-        k = s["asin"]
-        rank = {"GO": 0, "UNKNOWN": 1, "NO-GO": 2}.get(s["判定"], 3)
-        if k not in by_asin or rank < {"GO": 0, "UNKNOWN": 1, "NO-GO": 2}.get(by_asin[k]["判定"], 3):
-            by_asin[k] = s
+    for s in scored:  # 同じ ASIN が2行あれば判定の良い方。ただしデータなしは必ず負ける（better）
+        if better(s, by_asin.get(s["asin"])):
+            by_asin[s["asin"]] = s
 
     waiting = []
     updated = skipped_human = 0
@@ -1499,10 +1554,10 @@ def main(argv=None) -> int:
         if is_human(r):
             skipped_human += 1
             continue
-        if _no_product(s) and (r.get("判定") in K.GO_VERDICTS
-                                   or (r.get("判定理由") or "").startswith("#17 卸値の出どころ")):
+        if keep_when_no_data(r, s):
             # 2026-10-12：別ルート（candidate_pipeline 等）が自前の Keepa データで GO にした行を、
             # 手元にデータが無いだけで UNKNOWN に落とさない（B0BP7M69YH）。データなしは判定の根拠にならない
+            # 2026-10-14：GO だけでなく NO-GO・UNKNOWN の既存判定も同じく据え置く
             kept_no_data.append(r["ASIN"])
             continue
         comp = consistency_gate(s, compose_netsea(s, gates.get(r["ASIN"])))
@@ -1587,7 +1642,10 @@ def main(argv=None) -> int:
         x["判定理由"] = with_supply_note(x.get("判定理由"), x.get("卸サイト"), x.get("購入元の名前"))
     after = count([dict(zip(header, x)) for x in final])
     summary = {"前": before, "後": after, "更新": updated, "人の行(据え置き)": skipped_human,
-               "データなしで GO 据え置き": kept_no_data,
+               "データなしで据え置き": len(kept_no_data),
+               "データなしで GO 据え置き": [x for x in kept_no_data if x in prev_verdict
+                                         and prev_verdict[x] in K.GO_VERDICTS],
+               "取り直しから復元": len(restored),
                "追記NETSEA": len(appended), "追記SD": len(sd_lines),
                "実画面確認待ち": Counter(w["状態"] for w in waiting),
                "実画面確認待ち_経路": Counter(w["卸サイト"] for w in waiting),

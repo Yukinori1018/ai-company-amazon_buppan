@@ -46,7 +46,14 @@ import seasonality                    # noqa: E402
 
 REPO = Path("/Users/yukinori/Claude Code/ai-company-amazon_buppan")
 WORK = REPO / "workspace/output/agent_output/T-20260920-003"
-POOL = WORK / "pipeline/buy_list_private.csv"
+# 🔴 2026-10-14 タカシ：旧プール（10/04・648行）は**凍結コピー**から読む。
+#    以前は pipeline/buy_list_private.csv を読んでいたが、このファイルは nightly.sh の
+#    write_report.py が毎晩「判定台帳の全行ダンプ」で上書きする（10/13 18:00 に 4,716行）。
+#    行は増えるのに商品データ（RAW＝refetch20261004/raw.jsonl・648件）は増えないので、
+#    増えた行が全部「取り直し」UNKNOWN になり、ledger_refresh が台帳の NO-GO 764行と
+#    stage B の210行の判定理由を消した（対照実験：入力をこのコピーに替えるだけで 14:31 と完全一致）。
+#    行集合と商品データの供給元は同じ時点のものを対で持つこと。
+POOL = WORK / "score20261004/old_pool_20261004.csv"   # = pipeline/buy_list_private.before_20261010.csv
 DISCOVERED = WORK / "pipeline/discovered.json"
 NETSEA_IDX = WORK / "pipeline/netsea_jan_index.json"
 SELLER_NAMES = WORK / "pipeline/seller_names.json"
