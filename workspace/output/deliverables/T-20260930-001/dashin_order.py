@@ -144,7 +144,8 @@ def measure(r: dict, cand: dict, profit: dict, kp: dict | None) -> dict:
     m: dict = {}
 
     shown = r.get('過去1ヶ月の販売数(実画面9/30)') or ''
-    if shown and '表示なし' not in shown and _int(shown) is not None:
+    # 2026-10-13：「未調査（batchZ3の範囲外）」のバッチ名の数字を月販と読まない（criteria_check._shown_int と同じ）
+    if shown and '表示なし' not in shown and not shown.startswith(('未調査', '未確認')) and _int(shown) is not None:
         m['月販'], m['月販の出典'] = _int(shown), ('Keepa' if 'Keepa' in shown else '実画面')
     elif _int(cand.get('過去1ヶ月の販売数(代表)')) is not None:
         m['月販'], m['月販の出典'] = _int(cand.get('過去1ヶ月の販売数(代表)')), '候補CSV(Keepa)'

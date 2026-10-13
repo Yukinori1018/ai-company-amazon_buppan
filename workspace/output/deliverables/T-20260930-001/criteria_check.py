@@ -52,6 +52,16 @@ def _int(s) -> int | None:
     return int(m.group().replace(',', '')) if m else None
 
 
+def _shown_int(s) -> int | None:
+    """実画面の列の数値。「未調査（batchZ3の範囲外）」「未確認」は値なし（None）。
+    2026-10-13 タカシ：batchZ1〜Z3 の「未調査（batchZ3の範囲外）」から _int が 3 を拾い、
+    月販3・新品3 と誤読して接触候補3社を基準NGにしていた（バッチ名に数字が入ったのは Z1 から）。"""
+    s = str(s or '').strip()
+    if not s or s.startswith(('未調査', '未確認')):
+        return None
+    return _int(s)
+
+
 def _keepa(p: dict) -> dict:
     """Keepa の負値（-1=データなし・-2=未取得）は None に揃える。"""
     st = (p or {}).get('stats') or {}
@@ -74,7 +84,7 @@ def check(r: dict, cand: dict, profit: dict, kp: dict | None) -> str:
     if '表示なし' in shown and '実画面未確認' not in shown:
         ng.append('月販表示なし')
     else:
-        v = _int(shown) if shown and '表示なし' not in shown else None
+        v = _shown_int(shown) if shown and '表示なし' not in shown else None
         if v is None:
             v = _int(cand.get('過去1ヶ月の販売数(代表)')) or k['sold']
         if v is None:
@@ -99,7 +109,7 @@ def check(r: dict, cand: dict, profit: dict, kp: dict | None) -> str:
     fba = _int(cand.get('代表のFBA数'))
     fba = fba if fba is not None else k['fba']
     new_s = r.get('新品出品数(実画面)') or ''
-    new = _int(new_s) if new_s and '未確認' != new_s else None
+    new = _shown_int(new_s)
     if new is None:
         new = _int(cand.get('代表の新品オファー数'))
     if new is None:
