@@ -22,7 +22,9 @@
       "mcp__claude-in-chrome__tabs_close_mcp",
       "mcp__claude-in-chrome__browser_batch",
       "Monitor",
-      "ToolSearch"
+      "ToolSearch",
+      "mcp__b84f7bcc-0b3f-4526-83f8-092de916aae4__search_threads",
+      "mcp__b84f7bcc-0b3f-4526-83f8-092de916aae4__get_thread"
     ],
     "deny": [
       "Bash(git push --force*)",
