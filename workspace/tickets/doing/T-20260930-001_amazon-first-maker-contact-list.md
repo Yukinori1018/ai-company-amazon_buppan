@@ -1176,3 +1176,16 @@ Amazonで売れている商品を起点に、取引できる国内中小メー�
 - 重複の再照合（xdup Z4〜Z6）：Z5 2832＝Z4 2757、Z6 2904＝Z4 2735、Z6 2930＝Z5 2856。いずれも除外行で第1弾に影響なし（CSV は未修正）
 - 層4の歩留まり：Z4〜Z6 の約290行で接触候補7（2.4%）。残りキュー 2,973〜3,189位（層4 124行・層5 93行）
 - 相手への連絡なし。シート以外の外部送信なし
+
+## ログ（ヒデアキ 2026-10-13 21:25・会社概要PDFのロゴ画像切れ修正）
+- 原因：配布用 `profile.html` の `<img src="assets/logo-mark.svg">`（2か所）が、存在しない `会社概要_配布用/assets/` を参照していた。テンプレ `site/profile.html` も同じ参照のため、再生成のたびに再発する構造だった
+- 対処：ロゴ SVG（公開用/site の assets と同一バイト）を base64 の data URI にして `src` だけ差し替え。`<img>` と CSS はそのまま（ロゴの表示サイズ 42px／印刷 36px は既存 CSS が効く）。テンプレ側も同じ修正をして commit 4f4025fa
+- PDF は fill.py の make_pdf と同じ Headless Chrome で再生成。2ページ・本文テキストは旧版と pdftotext で完全一致
+- 旧 PDF・旧 HTML は `agent_output/T-20260930-001/70_work/backup_会社概要_配布用_20261013/` に退避
+
+## 成果物（ヒデアキ 2026-10-13 会社概要PDFロゴ修正）
+- workspace/output/deliverables/T-20260817-006/会社概要_配布用/Satoy-Select_会社概要.pdf（.gitignore 対象・未 commit）
+- workspace/output/deliverables/T-20260817-006/site/profile.html（テンプレ・commit 4f4025fa）
+
+## 完了報告（ヒデアキ 2026-10-13 会社概要PDFロゴ修正）
+ロゴは1・2ページとも描画されることを画像で確認済み（`backup_会社概要_配布用_20261013/png_after/`）。本文・ページ数は不変。妥協点なし。残り：配布用 HTML の favicon 参照（9行目）も同じ切れ方だが PDF には出ないため未修正。完了しました。確認お願いします。
