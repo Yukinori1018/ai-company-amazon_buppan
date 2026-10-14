@@ -20,6 +20,10 @@ import candidate_pipeline as pipe   # noqa: E402
 import ledger_sheet                 # noqa: E402
 import maker_direct as md           # noqa: E402
 import profit                       # noqa: E402
+import fba_cost                     # noqa: E402
+
+# 2026-10-14：この検査の固定値は 2026-10-09 版の原価（送料0・返品0・繁忙期なし）。新3費目は test_cost_20261014.py
+fba_cost.freeze_pre_20261014()
 import set_count                    # noqa: E402
 from verdict import GO, NO_GO, UNKNOWN  # noqa: E402
 

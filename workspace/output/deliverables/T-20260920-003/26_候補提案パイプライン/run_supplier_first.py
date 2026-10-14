@@ -38,6 +38,7 @@ sys.path.insert(0, str(PIPE))
 sys.path.insert(0, str(GUARD))
 
 import discover                       # noqa: E402
+import entry_order as EO              # noqa: E402
 import set_family                    # noqa: E402
 from keepa_client import load_api_key  # noqa: E402
 
@@ -134,7 +135,9 @@ def tier(rec: dict) -> int | None:
     lot = int(rec.get("min_lot_units") or 1)
     lot_cap = min(240, 24 * max(1, n_min or 1))
     if lot > lot_cap:
-        return None
+        # 2026-10-14：捨てずに最後へ回す（§3.3-34：足切りではなく順番）。この時点で
+        # 実効卸率の見込み55%以下の未投入 JAN 1,701件がここで捨てられていた
+        return 6
 
     if n_min == 1:
         return 0                            # 単品でも黒字が見込める（いちばん楽）
@@ -159,12 +162,16 @@ def plan(index: dict, tried: set[str]) -> list[tuple[int, str, dict]]:
         if t is None:
             continue
         rows.append((t, jan, rec))
-    # 同じ tier の中は「上代/卸値の倍率が大きい順」（＝余裕が大きい順）。
+    # 2026-10-14：いちばん外側は「実効卸率の見込み」（entry_order。55%以下が先・定価なし・55%超）。
+    # 🔴 足切りではなく順番（§3.3-34）。55%超も後ろに全部残る。
+    # 同じグループの中は tier → 「上代/卸値の倍率が大きい順」（＝余裕が大きい順）。
     def key(row):
         t, _jan, rec = row
         rp = rec.get("reference_price") or 0
         w = rec.get("unit_price_excl") or 1
-        return (t, -(rp / w))
+        g = EO.group_of(EO.effective_rate(w, rp))
+        lot = int(rec.get("min_lot_units") or 1) if t == 6 else 0   # ロット超過は小さいロットから
+        return (g, t, lot, -(rp / w))
     return sorted(rows, key=key)
 
 
@@ -185,9 +192,11 @@ def plan_roundrobin(index: dict, tried: set[str],
     from collections import OrderedDict
     base = plan(index, tried)
     out: list[tuple[int, str, dict]] = []
-    by_tier: "OrderedDict[int, OrderedDict[str, list]]" = OrderedDict()
-    for row in base:                       # base は tier→余裕の順。その順を各キュー内に保つ
-        by_tier.setdefault(row[0], OrderedDict()).setdefault(brand_key(row[2]), []).append(row)
+    by_tier: "OrderedDict[tuple, OrderedDict[str, list]]" = OrderedDict()
+    for row in base:                       # base は 見込み→tier→余裕の順。その順を各キュー内に保つ
+        g = EO.group_of(EO.effective_rate(row[2].get("unit_price_excl"),
+                                          row[2].get("reference_price")))
+        by_tier.setdefault((g, row[0]), OrderedDict()).setdefault(brand_key(row[2]), []).append(row)
     for _t, queues in by_tier.items():
         qs = [list(q) for q in queues.values()]
         while any(qs):
@@ -261,6 +270,9 @@ def main() -> int:
     from collections import Counter
     print(f"索引 {len(index):,}件 / 既投 {len(tried):,}件 → 今回の対象 {len(todo):,}件")
     print("  tier 内訳:", dict(sorted(Counter(t for t, _, _ in todo).items())))
+    print("  入口の順番（実効卸率の見込み・捨てない）:", dict(Counter(
+        EO.label(EO.effective_rate(r.get("unit_price_excl"), r.get("reference_price")))
+        for _t, _j, r in todo)))
     if a.dry_run or not todo:
         for t, jan, rec in todo[:15]:
             print(f"  t{t} {jan} 卸{rec['unit_price_excl']} 上代{rec.get('reference_price')} "

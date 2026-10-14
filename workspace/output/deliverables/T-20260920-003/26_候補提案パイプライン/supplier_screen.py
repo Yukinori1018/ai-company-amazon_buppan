@@ -71,6 +71,7 @@ sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(HERE.parent / "24_カート保持者ガード"))
 
 import discontinued as DISC           # noqa: E402
+import entry_order as EO              # noqa: E402
 import price_history as PH            # noqa: E402
 import schedule as SC                 # noqa: E402
 import score_20261004 as S            # noqa: E402
@@ -685,6 +686,24 @@ def ledger_asins() -> set[str]:
 # ── 実行 ─────────────────────────────────────────────────────────────────
 
 
+def amazon_median_of(store: "KeepaStore", jan: str) -> int | None:
+    """キャッシュにある単品 ASIN の90日中央値（税込）。無ければ None（entry_order が0.86で置く）。
+
+    並べ替えにしか使わない。セット品（packageQuantity>1）は1点あたりが読めないので使わない。"""
+    vals = []
+    for a in store.by_jan.get(jan, ()):
+        c = store.latest.get(a)
+        if not c or (c.product.get("packageQuantity") or 1) > 1:
+            continue
+        try:
+            v = PH.from_product(c.product).sell_for_profit
+        except Exception:          # 並べ替えの材料が読めないだけ。判定には影響しない
+            v = None
+        if v:
+            vals.append(v)
+    return sorted(vals)[len(vals) // 2] if vals else None
+
+
 def roundrobin(items: list[dict], key: str = "仕入れ先", per: int = PER_SUPPLIER) -> list[dict]:
     """仕入れ先ごとに per 件ずつ交互に並べる（§3.3-34：上限ではなく順番）。"""
     groups: dict[str, list[dict]] = defaultdict(list)
@@ -712,7 +731,18 @@ def run(input_csv: Path, label: str, tokens: int, floor: int, wait: bool,
         todo_raw = [r for r in rows if r["JAN"] not in store.complete]
         fresh = [r for r in todo_raw if r["JAN"] not in store.by_jan]
         partial = [r for r in todo_raw if r["JAN"] in store.by_jan]
-        order = [r["JAN"] for r in roundrobin(fresh) + roundrobin(partial)]
+        # 2026-10-14：実効卸率の見込み（entry_order）で 55%以下 → 定価なし → 55%超 の順。
+        # 🔴 順番であって足切りではない（§3.3-34）。各グループの中は今までどおり社ごとの順番
+        def rate(r):
+            return EO.effective_rate(r["卸単価(税抜)"], r.get("上代(税抜)"),
+                                     amazon_median_of(store, r["JAN"]))
+        order = []
+        for g in (EO.GROUP_FIRST, EO.GROUP_UNKNOWN, EO.GROUP_LATER):
+            pick = lambda rs: sorted([r for r in rs if EO.group_of(rate(r)) == g],
+                                     key=lambda r: EO.sort_key(rate(r)))
+            order += [r["JAN"] for r in roundrobin(pick(fresh)) + roundrobin(pick(partial))]
+        log("  入口の順番（実効卸率の見込み・捨てない）: "
+            + json.dumps(dict(Counter(EO.label(rate(r)) for r in todo_raw)), ensure_ascii=False))
         order = list(dict.fromkeys(order))
         log(f"code 逆引きの待ち行列 {len(order):,} JAN（予算 {tokens}・下限 {floor}）")
         store.resolve_jans(order, tokens, floor, wait)

@@ -22,6 +22,9 @@ sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(HERE.parents[4] / "scripts/sourcing_gate"))
 
 import fba_cost as F                 # noqa: E402
+
+# 2026-10-14：この検査の固定値は 2026-10-09 版の原価（送料0・返品0・繁忙期なし）。新3費目は test_cost_20261014.py
+F.freeze_pre_20261014()
 import score_20261004 as S           # noqa: E402
 
 FAILS: list[str] = []

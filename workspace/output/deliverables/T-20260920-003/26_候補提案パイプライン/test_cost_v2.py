@@ -24,6 +24,9 @@ sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(HERE.parent / "24_カート保持者ガード"))
 
 import fba_cost as F                       # noqa: E402
+
+# 2026-10-14：この検査の固定値は 2026-10-09 版の原価（送料0・返品0・繁忙期なし）。新3費目は test_cost_20261014.py
+F.freeze_pre_20261014()
 import profit                              # noqa: E402
 import set_family                          # noqa: E402
 import verdict as V                        # noqa: E402

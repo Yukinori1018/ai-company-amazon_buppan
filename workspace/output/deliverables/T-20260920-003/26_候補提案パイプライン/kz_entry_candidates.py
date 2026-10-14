@@ -294,7 +294,7 @@ def build() -> int:
             "ゲート可否": gate[0] if gate else "未確認",
             "購入元の名前": row["購入元の名前"] or "未確認", "卸サイト": "NETSEA",
             "購入先URL": row["_supplier_url"] or "未確認",
-            "卸率(売価比)": e.cost_ratio_pct, "発注点数": e.qty, "発注額(円・税込)": e.order_total,
+            "卸率(売価比)": f"{e.cost_ratio_pct}%",  # 数値で書くと %書式のセルで100倍に見える（2026-10-14） "発注点数": e.qty, "発注額(円・税込)": e.order_total,
             "1個粗利(円)": e.net_per_unit, "利益率(%)": e.net_margin_pct,
             "売り切る月数": row["売り切る月数"], "半値処分時の損失(円)": e.half_disposal_loss,
             "判定": verdict, "判定理由": f"【等級 {grade}】" + reason[:1700],

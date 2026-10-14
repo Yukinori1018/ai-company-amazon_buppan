@@ -50,7 +50,7 @@ class Economics:
     fba_yen: int                   # FBA 配送代行手数料（円）
     gross_per_unit: int            # 1個粗利（成果物22・23 と同じ定義。保管/納品/梱包を含まない）
     margin_pct: float              # 利益率（売価比）
-    other_unit_costs: int          # 保管料+納品送料+梱包資材+外注（**サイズ区分別**）
+    other_unit_costs: int          # 保管料+納品送料+梱包資材+外注+卸→代行の送料+返品引当（**サイズ区分別**）
     net_per_unit: int              # 1個あたりの手残り（gross - other_unit_costs）
     net_margin_pct: float          # 手残りの率
     qty: int                       # 発注点数
@@ -68,6 +68,8 @@ class Economics:
     cliff_note: str = ""                                 # 750円 / 1,000円 の崖の助言
     #: 等級（fba_cost.grade）の中央シナリオの手残り。等級を決めた数字そのもの（§3.5 #18 実績枠の判定に使う）
     mid_net_per_unit: int | None = None
+    #: 2026-10-14：返品引当（other_unit_costs の内数・推定費目）
+    return_reserve: int = 0
 
     def as_dict(self) -> dict:
         return self.__dict__.copy()
@@ -120,8 +122,9 @@ def compute(sell: float, fee_pct: float, fba_yen: float,
             size_tier: str | None = None,
             category: str | None = None,
             unit_decided: bool = True,
-            peak: bool = False, apparel: bool = False,
-            estimated: tuple[str, ...] = ()) -> Economics:
+            peak: bool | None = None, apparel: bool = False,
+            estimated: tuple[str, ...] = (),
+            supplier_freight: float | None = None) -> Economics:
     """1 SKU ぶんの採算。すべて円・整数に丸めて返す（報告と同じ粒度）。
 
     2026-10-04 に変わったところ（成果物33 / 34）
@@ -132,6 +135,12 @@ def compute(sell: float, fee_pct: float, fba_yen: float,
     2. **販売手数料は750円の崖を効かせる**（売上の合計が750円以下なら一律5%・最低30円税抜）。
        `fee_pct`（Keepa の丸めた率）は公式の段へ**切り上げ**て使います。
     3. **誤差幅（売価7%＋200円）は撤去**し、`grade`（A/B/C/UNKNOWN）に置き換えました。
+
+    2026-10-14（T-20261014-001 ハジメ §6）
+    -------------------------------------
+    その他固定費に **卸→代行の送料（仮置き40円/点）・返品引当（返品率2.5%）・10〜12月の保管単価**
+    が入りました。前2つは推定費目なので等級は最高 B。卸値に送料を按分済みの経路（国分）は
+    `supplier_freight=0` を渡してください。
     """
     sell_i = int(round(sell))
     cost_i = int(round(unit_cost_incl))
@@ -156,14 +165,17 @@ def compute(sell: float, fee_pct: float, fba_yen: float,
 
     # 消化月数は保管料の計上月数（＝消化月数÷2）に効く。読めなければ3ヶ月を置く。
     months_for_storage = months if months else 3.0
-    oc = (fba_cost.other_costs(tier, months_for_storage, peak, apparel)
+    oc = (fba_cost.other_costs(tier, months_for_storage, peak, apparel,
+                               supplier_freight=supplier_freight)
           if tier else None)
-    other = int(round(oc.total)) if oc else 0
+    ret = (fba_cost.return_reserve_yen(fee_i, fba_i, cost_i, oc.total) if oc else 0.0)
+    other = int(round(oc.total + ret)) if oc else 0
     net = gross - other
 
     g = fba_cost.grade(sell_i, cost_i, tier, category=category, keepa_pct=fee_pct,
                        months_to_sell=months_for_storage, peak=peak, apparel=apparel,
-                       unit_decided=unit_decided, estimated=estimated)
+                       unit_decided=unit_decided, estimated=estimated,
+                       supplier_freight=supplier_freight)
 
     return Economics(
         sell=sell_i,
@@ -181,11 +193,12 @@ def compute(sell: float, fee_pct: float, fba_yen: float,
         half_disposal_loss=half_loss,
         cost_ratio_pct=round(cost_i / sell_i * 100, 1) if sell_i else 0.0,
         size_tier=tier,
-        other_breakdown=(oc.as_dict() if oc else {}),
+        other_breakdown=({**oc.as_dict(), "返品引当": round(ret, 1)} if oc else {}),
         grade=g.grade,
         grade_reason=g.reason,
         worst_net_per_unit=g.worst.get("手残り"),
         worst_margin_pct=g.worst.get("利益率(%)"),
         cliff_note=g.cliff,
         mid_net_per_unit=g.mid.get("手残り"),
+        return_reserve=int(round(ret)),
     )

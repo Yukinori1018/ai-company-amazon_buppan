@@ -420,8 +420,18 @@ def _c_other_costs(row: dict, ctx: dict) -> Optional[Finding]:
     if not tier or oth is None or F is None or tier not in F.FBA:
         return None
     months = ctx["months"] if ctx["months"] is not None else 3.0
-    exp = F.other_costs(tier, months).total
-    if abs(oth - exp) <= 1.5:
+    # 2026-10-14：その他固定費に「卸→代行の送料（仮置き。国分は卸値に按分済みで0）」と
+    # 「返品引当」が入った。返品引当は販売手数料・FBA・原価から決まるので、取れれば足して比べる。
+    cands = []
+    for fr in (None, 0.0):
+        oc = F.other_costs(tier, months, supplier_freight=fr).total
+        ret = 0.0
+        if hasattr(F, "return_reserve_yen") and None not in (ctx.get("referral"), ctx.get("fba"),
+                                                               ctx.get("cost")):
+            ret = F.return_reserve_yen(ctx["referral"], ctx["fba"], ctx["cost"], oc)
+        cands.append(oc + ret)
+    exp = cands[0]
+    if any(abs(oth - c) <= 1.5 for c in cands):
         return None
     return Finding("other_costs", NG,
                    f"その他固定費が合いません。区分 {tier}・消化 {months:g}ヶ月 で再計算すると "

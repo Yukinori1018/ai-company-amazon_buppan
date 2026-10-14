@@ -21,6 +21,10 @@ sys.path.insert(0, str(HERE))
 
 import set_family as sf          # noqa: E402
 import trading_terms as tt       # noqa: E402
+import fba_cost                  # noqa: E402
+
+# 2026-10-14：損益分岐の固定値は 2026-10-09 版の原価（送料0・返品0・繁忙期なし）。新3費目は test_cost_20261014.py
+fba_cost.freeze_pre_20261014()
 
 ok = fail = 0
 

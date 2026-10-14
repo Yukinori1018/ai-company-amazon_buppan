@@ -22,6 +22,9 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import consistency as K  # noqa: E402
 
+# 2026-10-14：この検査の固定値は 2026-10-09 版の原価（送料0・返品0・繁忙期なし）。新3費目は test_cost_20261014.py
+K.F.freeze_pre_20261014()
+
 TODAY = date(2026, 10, 9)
 BASE = date(2026, 10, 4)
 

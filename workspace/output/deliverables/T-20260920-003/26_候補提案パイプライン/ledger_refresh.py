@@ -520,14 +520,17 @@ def econ_at(s: dict, sell: float, sell_worst: float | None):
     if not fba_yen:
         return None
     unit = per_pt * n
+    freight = 0.0 if S.freight_in_cost(s.get("row") or {}) else None   # 国分は卸値に按分済み
     e = profit.compute(sell, p.get("referralFeePercentage"), fba_yen, unit, 10,
-                       monthly_sold=None, category=s.get("category"), unit_decided=True)
+                       monthly_sold=None, category=s.get("category"), unit_decided=True,
+                       supplier_freight=freight)
     est = ["保管月数（売り切り月数が実測でない）"]
     if not (p.get("fbaFees") or {}).get("pickAndPackFee"):
         est.append("FBA配送代行（Keepa 実測なし）")
     gr = fba_cost.grade(sell, unit, e.size_tier, category=s.get("category"),
                         keepa_pct=p.get("referralFeePercentage"), months_to_sell=3.0,
-                        unit_decided=True, sell_worst=sell_worst, estimated=tuple(est))
+                        unit_decided=True, sell_worst=sell_worst, estimated=tuple(est),
+                        supplier_freight=freight)
     return e, gr
 
 
@@ -1064,6 +1067,39 @@ def apply_wholesale_rule(cells: dict) -> dict:
     return cells
 
 
+RATIO_COL = "卸率(売価比)"
+
+
+def ratio_cell(v) -> str | None:
+    """卸率（%の数値）→ シートに書く文字列 "58.2%"。
+
+    2026-10-14（T-20261014-001）：数値 58.2 を USER_ENTERED で書くと、%書式のセルでは
+    「5820.00%」と表示されていた（99行→この日の台帳で352行）。"58.2%" の文字列で書けば
+    シートは 0.582 として持ち、どの書式のセルでも 58.2% と表示される。"""
+    if v is None or v == "":
+        return None
+    return f"{round(float(v), 1)}%"
+
+
+def ratio_from_sheet(formatted: str, raw) -> str:
+    """シートから読んだ卸率のセルを正しい "x.x%" に直す（表示ずれの修復・冪等）。
+
+    - 表示に % が無い数値（例 "71"）… 値そのものが % の数（71%）
+    - 表示に % がある … シートの生値が 0.582 なら 58.2%（正しい行）。生値が 10 より大きければ
+      % の数をそのまま書いた**表示ずれ**（58.2 → 5820%）なので、生値を % の数として読む。
+      境界を 10（表示1000%）に置くのは、単位ずれ疑いの行に本当に 624.8% があるため
+      （2026-10-14 B0CGZPDLQJ。境界5では2回目に 6.2% へ壊した）。卸率10%未満の表示ずれは
+      番兵（卸率が低すぎる行は UNKNOWN）に当たる帯で、取り違えても判定は動かない
+    - 文字（「未確認」「算出不能…」・説明つき）はそのまま
+    """
+    f = (formatted or "").strip()
+    if not isinstance(raw, (int, float)) or isinstance(raw, bool):
+        return formatted
+    if not f.endswith("%"):
+        return ratio_cell(raw)
+    return ratio_cell(raw if raw > 10 else raw * 100)
+
+
 def netsea_cells(s: dict, gate: dict | None, comp: dict) -> dict:
     e, lv, r = s.get("econ"), s.get("price"), s["row"]
     has = bool(e and e.grade in ("A", "B", "C"))
@@ -1074,7 +1110,7 @@ def netsea_cells(s: dict, gate: dict | None, comp: dict) -> dict:
     if gate:
         g["ゲート種別"] = f"restrictions/approve（{gate['確認日']}）：{gate['根拠']}"
         g["ゲート可否"] = "可（新品）" if gate["ゲート判定"] == "OK" else "不可（新品の申請経路なし）"
-    for col, val in (("卸率(売価比)", e.cost_ratio_pct if has else None),
+    for col, val in (("卸率(売価比)", ratio_cell(e.cost_ratio_pct) if has else None),
                      ("発注点数", e.qty if has else None),
                      ("発注額(円・税込)", e.order_total if has else None),
                      ("1個粗利(円)", e.net_per_unit if has else None),
@@ -1380,7 +1416,7 @@ def sd_rows(header: list[str]) -> tuple[list[list], list[dict]]:
             "ゲート種別": r.get("ゲート種別") or "未確認",
             "購入元の名前": r["購入元の名前"], "卸サイト": "スーパーデリバリー",
             "購入先URL": (mp or {}).get("購入先URL") or r.get("購入先URL") or "未確認",
-            "卸率(売価比)": (round(gr.mid["原価"] / sell * 100, 1) if has else "未確認"),
+            "卸率(売価比)": (ratio_cell(gr.mid["原価"] / sell * 100) if has else "未確認"),
             "1個粗利(円)": (gr.mid["手残り"] if has else "未確認"),
             "利益率(%)": (gr.mid["利益率(%)"] if has else "未確認"),
             "判定": verdict, "判定理由": reason[:1800],
@@ -1523,6 +1559,23 @@ def main(argv=None) -> int:
     stamp = date.today().strftime("%Y%m%d") + "_" + os.environ.get("RUN_TAG", "run")
     (OUT / f"before_{stamp}.json").write_text(json.dumps(vals, ensure_ascii=False))
     header, body = vals[0], vals[1:]
+    # 卸率の表示ずれ（58.2% が 5820.00%）を直すため、その列だけ生値でも読む（2026-10-14）
+    ratio_fixed = 0
+    if RATIO_COL in header:
+        from gspread.utils import rowcol_to_a1
+        ci = header.index(RATIO_COL) + 1
+        a1 = rowcol_to_a1(2, ci)[:-1]
+        raw_col = ws.get(f"{a1}2:{a1}{len(vals)}", value_render_option="UNFORMATTED_VALUE")
+        ri = ci - 1
+        for k, line in enumerate(body):
+            raw = raw_col[k][0] if k < len(raw_col) and raw_col[k] else None
+            if ri < len(line):
+                fixed = ratio_from_sheet(line[ri], raw)
+                if fixed != line[ri]:
+                    a_, b_ = S._num(fixed), S._num(line[ri])
+                    if a_ is None or b_ is None or abs(a_ - b_) > 0.05:
+                        ratio_fixed += 1      # 値が変わった行だけ数える（"71"→"71.0%" は数えない）
+                    line[ri] = fixed
     if WSRC not in header:          # 2026-10-12 列を末尾に1本足す（既存の列は動かさない）
         header = header + [WSRC]
     rows = [dict(zip(header, r + [""] * (len(header) - len(r)))) for r in body]
@@ -1650,7 +1703,8 @@ def main(argv=None) -> int:
                "実画面確認待ち": Counter(w["状態"] for w in waiting),
                "実画面確認待ち_経路": Counter(w["卸サイト"] for w in waiting),
                "SD手入力卸価格": SD_MANUAL.exists(), "SD実画面卸価格(10/11)": len(load_sd_screen()),
-               "SD経路へ切替": sorted(routed)}
+               "SD経路へ切替": sorted(routed),
+               "卸率の表示を直した行（読み込み時）": ratio_fixed}
     print(json.dumps(summary, ensure_ascii=False, indent=1, default=str))
     with (OUT / "waiting_list.csv").open("w", encoding="utf-8-sig", newline="") as f:
         w = csv.DictWriter(f, fieldnames=["状態", "ASIN", "商品名", "卸サイト", "購入元", "月販",

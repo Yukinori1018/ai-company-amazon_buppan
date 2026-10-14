@@ -33,7 +33,10 @@
 
 from __future__ import annotations
 
+import math
+import os
 from dataclasses import dataclass, field
+from datetime import date
 
 TAX = 1.1
 
@@ -145,6 +148,64 @@ def gate_storage_yen_per_unit(lot_units: int, overdue_months: float,
     """
     return ORION_OVERDUE_STORAGE_YEN_MONTH * 1.1 * max(0.0, overdue_months) \
         * max(0.0, share) / max(1, int(lot_units))
+
+# ── 3c. 2026-10-14 追加（T-20261014-001 ハジメ成果物01 §6）：判定が甘かった3費目 ──────
+# ハジメの比較で「パイプラインは小型1点あたり約50円甘い」と出た。その差の中身を入れる。
+#
+# ① 卸→代行（おりおん）の送料。NETSEA・SD はこれまで0円だった（国分だけ卸値に按分済み）。
+#    **仮置き 40円/点**（1回の注文 800円 ÷ 1箱20点・ハジメ中央シナリオ）。実額は卸ごとに違うので
+#    設定値として外に出す：環境変数 `FBA_SUPPLIER_FREIGHT_YEN` で上書きできる。
+#    卸値にすでに送料を按分している経路（国分ネット卸）は呼び出し側が `supplier_freight=0` を渡す。
+SUPPLIER_FREIGHT_YEN = float(os.environ.get("FBA_SUPPLIER_FREIGHT_YEN", "40"))
+# ② 返品の引当。返品率 2.5%（仮定）。返品1件で失うもの＝FBA配送代行（戻らない）＋返金手数料
+#    （販売手数料の10%・上限500円）＋再販できない半分の「原価＋代行・送料」。
+RETURN_RATE = 0.025
+RETURN_UNSELLABLE_SHARE = 0.5
+REFUND_ADMIN_RATE = 0.10
+REFUND_ADMIN_CAP_YEN = 500
+# ③ 10〜12月の保管単価（公式・`STORAGE` の True 側）。売り切る期間のうち10〜12月に当たる月の
+#    割合で、通常単価と繁忙期単価を加重平均する（`peak=None` のとき・期間は今月から）。
+PEAK_MONTHS = (10, 11, 12)
+#: テスト用。None なら今日の日付で繁忙期の割合を決める
+TODAY_OVERRIDE: date | None = None
+
+
+def freeze_pre_20261014() -> None:
+    """テスト用：2026-10-09 版の数字（送料0・返品0・繁忙期なし）に戻す。
+
+    既存テストの固定値（小型95円など）はこの条件の値。10-14 の3費目は
+    `test_cost_20261014.py` で別に検査する。"""
+    global SUPPLIER_FREIGHT_YEN, RETURN_RATE, TODAY_OVERRIDE
+    SUPPLIER_FREIGHT_YEN, RETURN_RATE, TODAY_OVERRIDE = 0.0, 0.0, date(2026, 7, 1)
+
+
+def est_freight_label() -> str:
+    return f"卸→代行の送料（{SUPPLIER_FREIGHT_YEN:g}円/点の仮置き）"
+
+
+EST_RETURN = f"返品引当（返品率{RETURN_RATE * 100:g}%の仮置き）"
+
+
+def peak_share(months_to_sell: float, start_month: int | None = None) -> float:
+    """売り切る期間（今月から `months_to_sell` か月）のうち、10〜12月に当たる月の割合（0〜1）。"""
+    m0 = start_month or (TODAY_OVERRIDE or date.today()).month
+    n = max(1, math.ceil(max(0.0, float(months_to_sell)) - 1e-9))
+    ms = [((m0 - 1 + i) % 12) + 1 for i in range(n)]
+    return sum(1 for m in ms if m in PEAK_MONTHS) / n
+
+
+def return_reserve_yen(referral_yen_: float, fba_yen_: float, unit_cost_incl: float,
+                       other_total: float, rate: float | None = None) -> float:
+    """返品の引当（1個あたり・円・税込）。**推定費目**（返品率は仮置き）。
+
+    = 返品率 × ( FBA配送代行 ＋ 返金手数料(販売手数料の10%・上限500円)
+                 ＋ 再販不可の割合 × (原価 ＋ その他固定費) )
+    """
+    rate = RETURN_RATE if rate is None else rate
+    admin = min(REFUND_ADMIN_CAP_YEN, REFUND_ADMIN_RATE * float(referral_yen_))
+    return max(0.0, rate) * (float(fba_yen_) + admin
+                             + RETURN_UNSELLABLE_SHARE * (float(unit_cost_incl) + float(other_total)))
+
 
 # ── 4. 販売手数料（公式）──────────────────────────────────────────────────
 # 🔴 750円は**段階制ではなく閾値**です。「売上の合計が750円以下なら全額5%」。
@@ -305,21 +366,27 @@ class OtherCosts:
     outsource: float
     volume_cm3: float
     units_per_box: int
+    freight: float = 0.0          # 卸→代行の送料（2026-10-14〜・既定は仮置き40円/点）
 
     @property
     def total(self) -> float:
-        return self.storage + self.inbound + self.material + self.outsource
+        return self.storage + self.inbound + self.material + self.outsource + self.freight
 
     def as_dict(self) -> dict:
         return {"保管": round(self.storage, 1), "納品送料": round(self.inbound, 1),
                 "梱包資材": round(self.material, 1), "外注": round(self.outsource, 1),
+                "卸→代行の送料": round(self.freight, 1),
                 "合計": round(self.total, 1), "1箱の入り数": self.units_per_box}
 
 
-def _storage_rate(tier: str, peak: bool, apparel: bool) -> float:
-    if apparel:
-        return STORAGE[("服", peak)]
-    return STORAGE[("大型" if tier.startswith("大型") else "標準", peak)]
+def _storage_rate(tier: str, peak: bool | None, apparel: bool,
+                  months_to_sell: float = 3.0) -> float:
+    """保管単価。`peak=None`（既定・2026-10-14〜）は売り切る期間の10〜12月の割合で加重平均。"""
+    key = "服" if apparel else ("大型" if tier.startswith("大型") else "標準")
+    if peak is None:
+        sh = peak_share(months_to_sell)
+        return STORAGE[(key, False)] * (1 - sh) + STORAGE[(key, True)] * sh
+    return STORAGE[(key, bool(peak))]
 
 
 def box_capacity(volume_cm3: float, fill_rate: float = FILL_RATE) -> int:
@@ -328,15 +395,20 @@ def box_capacity(volume_cm3: float, fill_rate: float = FILL_RATE) -> int:
     return max(1, int(usable // max(1.0, float(volume_cm3))))
 
 
-def other_costs(tier: str, months_to_sell: float = 3.0, peak: bool = False,
+def other_costs(tier: str, months_to_sell: float = 3.0, peak: bool | None = None,
                 apparel: bool = False, fill_rate: float = FILL_RATE,
                 volume_cm3: float | None = None,
                 units_per_box: int = UNITS_PER_BOX,
                 outsource: float | None = None,
                 prep: str = PREP_DEFAULT,
                 units_per_sku: int = UNITS_PER_SKU,
-                inspect: bool = ORION_INSPECT_DEFAULT) -> OtherCosts:
-    """保管料・FC納品送料・梱包資材・外注費（1個あたり・円）。
+                inspect: bool = ORION_INSPECT_DEFAULT,
+                supplier_freight: float | None = None) -> OtherCosts:
+    """保管料・FC納品送料・梱包資材・外注費・卸→代行の送料（1個あたり・円）。
+
+    2026-10-14：`peak=None`（既定）で10〜12月の保管単価を期間の割合で効かせる。
+    `supplier_freight=None` で仮置き `SUPPLIER_FREIGHT_YEN`（40円/点）を足す。卸値に送料が
+    按分済みの経路は 0 を渡す。旧版を再現するなら `peak=False, supplier_freight=0`。
 
     **外注費は `prep="orion"`（既定・2026-10-09〜）でおりおんFBAの実額**
     （`orion_prep_yen()`：ラベル・検品・荷受/SKU・プラン/SKU・箱代）。箱代とラベルが
@@ -355,7 +427,7 @@ def other_costs(tier: str, months_to_sell: float = 3.0, peak: bool = False,
     線形に売り切る前提で **計上月数 = 消化月数 ÷ 2** を使います。
     """
     vol = float(volume_cm3 if volume_cm3 else VOL[tier])
-    rate = _storage_rate(tier, peak, apparel)
+    rate = _storage_rate(tier, peak, apparel, months_to_sell)
     storage = rate * vol / 1000.0 * (max(0.0, float(months_to_sell)) / 2.0)
     q = max(1, min(int(units_per_box), box_capacity(vol, fill_rate)))
     inbound = BOX_YEN / q
@@ -367,7 +439,8 @@ def other_costs(tier: str, months_to_sell: float = 3.0, peak: bool = False,
         out = OUTSOURCE_YEN
     if outsource is not None:
         out = float(outsource)
-    return OtherCosts(storage, inbound, material, float(out), vol, q)
+    fr = SUPPLIER_FREIGHT_YEN if supplier_freight is None else float(supplier_freight)
+    return OtherCosts(storage, inbound, material, float(out), vol, q, max(0.0, fr))
 
 
 # ── 必要売価 ─────────────────────────────────────────────────────────────
@@ -375,8 +448,9 @@ def other_costs(tier: str, months_to_sell: float = 3.0, peak: bool = False,
 
 def required_sell(unit_cost_incl: float, tier: str, margin: float = 0.0,
                   category: str | None = None, keepa_pct: float | None = None,
-                  months_to_sell: float = 3.0, peak: bool = False,
-                  apparel: bool = False, worst: bool = False, **kw) -> float | None:
+                  months_to_sell: float = 3.0, peak: bool | None = None,
+                  apparel: bool = False, worst: bool = False,
+                  return_rate: float | None = None, **kw) -> float | None:
     """**「この原価なら、いくらで売れている棚でないと駄目か」。**
 
     `margin=0` で損益分岐、`0.20` で利益率20%。原価は **Amazon 1個あたりの税込原価**
@@ -388,6 +462,7 @@ def required_sell(unit_cost_incl: float, tier: str, margin: float = 0.0,
     oth = other_costs(tier, months_to_sell, peak, apparel, **kw).total
     cost = float(unit_cost_incl)
     fixed = oth + cost
+    r = max(0.0, RETURN_RATE if return_rate is None else return_rate)
     cands: list[float] = []
 
     def feasible(p: float, low_fba: bool, pct: float) -> bool:
@@ -403,15 +478,19 @@ def required_sell(unit_cost_incl: float, tier: str, margin: float = 0.0,
         for pct in sorted({5.0, referral_pct(1200, category, keepa_pct, worst),
                            referral_pct(2000, category, keepa_pct, worst),
                            referral_pct(5000, category, keepa_pct, worst)}):
+            # 返品引当（2026-10-14）：r×(FBA ＋ 再販不可×(原価＋その他)) は定額、
+            # 返金手数料 r×10%×販売手数料 は売価に比例（上限500円は低単価では効かないので無視）
+            ret_fixed = r * (fba + RETURN_UNSELLABLE_SHARE * fixed)
             # 枝① 料率が効く帯（売価 × 率 ≥ 最低手数料30円）
-            denom = 1.0 - pct * TAX / 100.0 - margin
+            denom = 1.0 - pct * TAX / 100.0 * (1 + r * REFUND_ADMIN_RATE) - margin
             if denom > 0:
-                p = (fba + fixed) / denom
+                p = (fba + fixed + ret_fixed) / denom
                 if p * pct / 100.0 >= MIN_REFERRAL_YEN_EXCL and feasible(p, low_fba, pct):
                     cands.append(p)
             # 枝② 最低販売手数料30円（税抜）が効く帯。手数料が定額なので割り算が変わる
             if 1.0 - margin > 0:
-                p = (fba + fixed + MIN_REFERRAL_YEN_EXCL * TAX) / (1.0 - margin)
+                p = (fba + fixed + ret_fixed
+                     + MIN_REFERRAL_YEN_EXCL * TAX * (1 + r * REFUND_ADMIN_RATE)) / (1.0 - margin)
                 if p * pct / 100.0 < MIN_REFERRAL_YEN_EXCL and feasible(p, low_fba, pct):
                     cands.append(p)
     return min(cands) if cands else None
@@ -428,7 +507,7 @@ DEAD_BANDS: tuple[tuple[int, int, int], ...] = (
 
 def cliff_advice(sell: float, unit_cost_incl: float, tier: str,
                  category: str | None = None, keepa_pct: float | None = None,
-                 months_to_sell: float = 3.0, peak: bool = False,
+                 months_to_sell: float = 3.0, peak: bool | None = None,
                  apparel: bool = False, **kw) -> str:
     """売価が死に帯にあるなら「◯円に下げると手残りが増える」を1行で返す。無ければ空文字。
 
@@ -440,10 +519,11 @@ def cliff_advice(sell: float, unit_cost_incl: float, tier: str,
     oth = other_costs(tier, months_to_sell, peak, apparel, **kw).total
     for lo, hi, target in DEAD_BANDS:
         if lo <= sell <= hi:
-            now = (sell - referral_yen(sell, category, keepa_pct)
-                   - fba_fee_yen(tier, sell) - unit_cost_incl - oth)
-            down = (target - referral_yen(target, category, keepa_pct)
-                    - fba_fee_yen(tier, target) - unit_cost_incl - oth)
+            def _net(p: float) -> float:
+                fee, fba = referral_yen(p, category, keepa_pct), fba_fee_yen(tier, p)
+                return (p - fee - fba - unit_cost_incl - oth
+                        - return_reserve_yen(fee, fba, unit_cost_incl, oth))
+            now, down = _net(sell), _net(target)
             if down > now:
                 why = ("販売手数料が5%→15.4%に飛ぶ帯" if target == REFERRAL_CLIFF_YEN
                        else "FBA配送代行の『1,000円以下』の列から外れる帯")
@@ -510,7 +590,8 @@ class Grade:
 
 def _scenario(sell: float, unit_cost_incl: float, tier: str, *, worst: bool,
               category: str | None, keepa_pct: float | None,
-              months_to_sell: float, peak: bool, apparel: bool) -> dict:
+              months_to_sell: float, peak: bool | None, apparel: bool,
+              supplier_freight: float | None = None) -> dict:
     """1シナリオぶんの手残り。悲観はハジメの定義（成果物33 §6.2）に合わせます。
 
     悲観の当て方: サイズ区分を**1段上**／料率を**カテゴリー最高段**／保管月数を**2倍**／
@@ -520,25 +601,34 @@ def _scenario(sell: float, unit_cost_incl: float, tier: str, *, worst: bool,
     **ここで勝手に割り引きません。**呼び出し側が履歴から出した値を渡します。
     """
     t = tier_up(tier) if worst else tier
+    fr = SUPPLIER_FREIGHT_YEN if supplier_freight is None else float(supplier_freight)
     oth = other_costs(t, months_to_sell * (2.0 if worst else 1.0), peak, apparel,
                       fill_rate=FILL_RATE * (0.7 if worst else 1.0),
                       units_per_box=int(UNITS_PER_BOX * (0.7 if worst else 1.0)),
-                      units_per_sku=int(UNITS_PER_SKU * (0.7 if worst else 1.0))).total
+                      units_per_sku=int(UNITS_PER_SKU * (0.7 if worst else 1.0)),
+                      # 悲観は送料も箱7割で割る（1回の注文の送料は同じで点数が減る）
+                      supplier_freight=fr / (0.7 if worst else 1.0)).total
     fee = referral_yen(sell, category, keepa_pct, worst=worst)
     fba = fba_fee_yen(t, sell)
+    # 返品の引当（2026-10-14）。悲観は返品率2倍
+    ret = return_reserve_yen(fee, fba, unit_cost_incl, oth,
+                             RETURN_RATE * (2.0 if worst else 1.0))
+    oth += ret
     net = sell - fee - fba - unit_cost_incl - oth
     return {"サイズ区分": t, "売価": int(sell), "販売手数料": fee, "FBA配送代行": fba,
             "原価": int(round(unit_cost_incl)), "その他固定費": int(round(oth)),
+            "うち返品引当": int(round(ret)),
             "手残り": int(round(net)),
             "利益率(%)": round(net / sell * 100, 1) if sell else 0.0}
 
 
 def grade(sell: float | None, unit_cost_incl: float | None, tier: str | None,
           *, category: str | None = None, keepa_pct: float | None = None,
-          months_to_sell: float = 3.0, peak: bool = False, apparel: bool = False,
+          months_to_sell: float = 3.0, peak: bool | None = None, apparel: bool = False,
           unit_decided: bool = True, note: str = "",
           sell_worst: float | None = None,
-          estimated: tuple[str, ...] | list[str] = ()) -> Grade:
+          estimated: tuple[str, ...] | list[str] = (),
+          supplier_freight: float | None = None) -> Grade:
     """A / B / C / UNKNOWN を返す。**UNKNOWN を GO に畳みません。**
 
     `sell`        … 中央ケースの売価（**90日中央値**。現在価格ではない）
@@ -546,6 +636,9 @@ def grade(sell: float | None, unit_cost_incl: float | None, tier: str | None,
 
     `estimated`   … 推定で置いた費目の名前（例：「保管月数（月販非表示で3か月を仮置き）」）。
                     1つでもあれば**最高 B**（§3.5 #18「推定費目ありで A」は落とす条件）
+                    2026-10-14〜：返品引当（返品率の仮置き）と、`supplier_freight` を渡さない
+                    ときの卸→代行の送料（40円/点の仮置き）は**自動で推定費目に入る**
+    `supplier_freight` … 卸→代行の送料の実額（1点・円）。卸値に按分済みなら 0
 
     切り方（CLAUDE.md §3.5 #18。2026-10-11 に規定へ合わせて直した）
       A … 中央でも悲観でも〔利益率20%以上 **または** 手残り MIN_PROFIT_YEN 以上〕
@@ -571,11 +664,12 @@ def grade(sell: float | None, unit_cost_incl: float | None, tier: str | None,
 
     kw = dict(category=category, keepa_pct=keepa_pct,
               months_to_sell=months_to_sell, peak=peak, apparel=apparel)
-    mid = _scenario(sell, unit_cost_incl, tier, worst=False, **kw)
+    mid = _scenario(sell, unit_cost_incl, tier, worst=False,
+                    supplier_freight=supplier_freight, **kw)
     # 悲観は**売価も下げる**（90日の下位25%）。費目だけ悲観にしても売価が中央のままだと、
     # 「価格が下がったときに赤字になる棚」を A に通してしまいます（2026-10-04 の差し戻し）。
     bad = _scenario(sell_worst if sell_worst else sell, unit_cost_incl, tier,
-                    worst=True, **kw)
+                    worst=True, supplier_freight=supplier_freight, **kw)
     adv = cliff_advice(sell, unit_cost_incl, tier, category=category,
                        keepa_pct=keepa_pct, months_to_sell=months_to_sell,
                        peak=peak, apparel=apparel)
@@ -591,8 +685,14 @@ def grade(sell: float | None, unit_cost_incl: float | None, tier: str | None,
                 or sc["手残り"] >= MIN_PROFIT_YEN)
 
     est = [x for x in (estimated or ()) if x]
+    # 2026-10-14：仮置きの費目は自動で推定費目に入れる（§3.5 #18「推定費目があれば最高 B」）
+    if supplier_freight is None and SUPPLIER_FREIGHT_YEN > 0:
+        est.append(est_freight_label())
+    if RETURN_RATE > 0:
+        est.append(EST_RETURN)
     if not ok_b(mid):
-        need = required_sell(unit_cost_incl, tier, MIN_MARGIN_B, **kw) or 0
+        need = required_sell(unit_cost_incl, tier, MIN_MARGIN_B,
+                             supplier_freight=supplier_freight, **kw) or 0
         g, why = GRADE_C, (
             f"中央値（売価 {mid['売価']:,}円）で手残り {mid['手残り']:,}円・"
             f"{mid['利益率(%)']}% です。利益率{MIN_MARGIN_B * 100:g}%にも手残り "

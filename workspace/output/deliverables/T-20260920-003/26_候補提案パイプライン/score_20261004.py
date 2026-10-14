@@ -321,6 +321,17 @@ def index_by_url(idx: dict) -> dict[str, dict]:
     return _URL_IDX[k]
 
 
+#: 卸値に「卸→代行の送料」を按分済みの卸サイト（購入先URL のドメイン）。2026-10-14
+FREIGHT_IN_COST_HOSTS = ("kokubu.jp",)
+
+
+def freight_in_cost(row: dict, ni: dict | None = None) -> bool:
+    """卸1点の値段に送料が按分済みか（国分ネット卸）。二重計上を避けるため。"""
+    url = " ".join([(row or {}).get("購入先URL") or "", ((ni or {}).get("supplier_url") or "")])
+    name = ((ni or {}).get("supplier_name") or "")
+    return any(h in url for h in FREIGHT_IN_COST_HOSTS) or "国分" in name
+
+
 def build(row: dict, cand: dict, product: dict, idx: dict, names: dict,
           idx_day: str, now: datetime | None = None,
           shared_ranks: dict | None = None) -> dict:
@@ -424,8 +435,12 @@ def build(row: dict, cand: dict, product: dict, idx: dict, names: dict,
     else:
         months = _num(row.get("売り切る月数"))
         ms_for_qty = ms or (int(round(qty / months)) if months else None)
+        # 2026-10-14：卸→代行の送料。国分は卸1点に送料を按分済み（supplier_feed_build）なので0、
+        # それ以外は fba_cost の仮置き（40円/点・推定費目）
+        freight = 0.0 if freight_in_cost(row, ni) else None
         e = profit.compute(sell, fee_pct, fba_yen, unit_cost, qty,
-                           monthly_sold=ms_for_qty, category=cat, unit_decided=True)
+                           monthly_sold=ms_for_qty, category=cat, unit_decided=True,
+                           supplier_freight=freight)
         # 悲観側の売価（90日の下位25%）を効かせて等級を引き直す。
         est = []
         if not (product.get("fbaFees") or {}).get("pickAndPackFee"):
@@ -434,7 +449,8 @@ def build(row: dict, cand: dict, product: dict, idx: dict, names: dict,
             est.append("保管月数（月販の表示なしで売り切り月数が実測でない）")
         gr = fba_cost.grade(sell, unit_cost, e.size_tier, category=cat, keepa_pct=fee_pct,
                             months_to_sell=e.months_to_sell or 3.0,
-                            unit_decided=True, sell_worst=sell_bad, estimated=tuple(est))
+                            unit_decided=True, sell_worst=sell_bad, estimated=tuple(est),
+                            supplier_freight=freight)
         e.grade, e.grade_reason = gr.grade, gr.reason
         e.worst_net_per_unit = gr.worst.get("手残り")
         e.worst_margin_pct = gr.worst.get("利益率(%)")
