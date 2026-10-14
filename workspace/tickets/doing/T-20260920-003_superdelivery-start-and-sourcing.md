@@ -4402,3 +4402,13 @@ FLR910 2件は SD 経由でも GO（B 等級・11.2%・手残り1,186円/個）�
 - カズヨ指摘：セラセンの「切れ」も SD と同じ型の誤判定。実画面で確認：`/home` は**ログイン中でも** `/amazonsell/business` へ飛ぶ（本文に店舗名 Satoy Select あり）。昼の報告で「同じ Chrome でも飛ぶ＝本当に切れ」と書いたのは、飛び先だけ見て中身を見なかった誤り
 - 判定ページを出品許可の確認ページ `/hz/approvalrequest/restrictions/approve?asin=B01BW9TAKS&itemcondition=New` に変更（ログイン中に開いてタイトル「申請に必要な要件」・本文に Satoy Select を確認してから切替）。タイトルが違えば切れ（`ok_title_re`）。`/amazonsell` は logout_url_re から外した
 - テスト PASS。check 実行で セラセン＝**OK**（12:15）、ALERT_sellercentral は resolved/ へ。残る ALERT は卸売ドットコム・卸問屋.com（審査中なら正常）のみ。社長の一手は現時点で無し
+
+## ログ（2026-10-15 夜間定期タスク・カズヨ）
+- **GO 0件／GO（実績枠）1件（NETSEA）**。UNKNOWN **1,535→544**（991行が NO-GO 確定・GO への転化0）。台帳 10,626行（行の追加なし）
+- 🔴 構成比：台帳の卸サイト NETSEA 9,852（**92.7%**）／SD 538（5.1%）／国分 201（1.9%）＝80%超。UNKNOWN 側は NETSEA 435（80.0%）／SD 102（18.8%）。ブランド最大は旭光 8.1%
+- 6b：③季節→①実売→②価格を Keepa の回復に合わせて繰り返し回した（02:00〜05:45）。**機械で回せる段は①②③とも残0**。残り＝④実画面 85／⑤人手 103（needs_browser_20261015.txt／needs_human_20261015.txt）
+- **GO の一歩手前（残る理由が1つ）111行**：#13 価格 79（取り寄せ型・凍結行など機械で取れないもの）・#18 11・#5 カート 8・#17 卸値 4・#9 4 ほか。経路 NETSEA 88／SD 23。一覧 agent_output/.../unknown_queue/one_step_20261015.tsv。#17 の4行は needs_human の先頭に回した
+- 整合性（score20261004/all.csv 648行）：前回 NG の印が残る行 **4行**（採算欄は空）・今回 NG 252行（other_costs 252・grade_rule 16）。autofill：PASS 2,540／FAIL 202／UNKNOWN 10,866（PASS は「人が実画面で見る価値がある」の意味）
+- プレミアム監視 348件（今回追加20）・今日の観測 295件（未取得53＝トークン切れ・翌晩）。判定①黒字 26/266 ②悲観の最大損 −139,920円（B083L6XTK9）・悲観で1万円超の損 161件 ③4週高値 0/0（監視28日未満。履歴遡り参考 114/327）
+- NETSEA 起点（nightly.sh）は今夜は回さず（Keepa を 6b に全量回した）。位置は tier2・shop 880827 のまま。SD への照会0回（在席時のみ）
+- 明日の続き：①朝の在席時に needs_human 先頭の #17 4行（NETSEA 卸値）と one_step の #5 8行（カート）を実画面で ②needs_browser 85件 ③UNKNOWN が減り切ったので、次の晩は Keepa を nightly.sh（NETSEA 新規）と SD 由来の逆引きに回してよい。ただし NETSEA 92.7% の偏りを広げないよう SD・国分の最低件数を先に
