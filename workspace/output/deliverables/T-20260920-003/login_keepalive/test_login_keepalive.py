@@ -22,7 +22,18 @@ def test_logout_urls_are_detected_for_every_enabled_site():
 
 def test_logged_in_pages_are_ok():
     assert lk.classify(SITES["sellercentral"], "https://sellercentral-japan.amazon.com/home", "Seller Central") == "ok"
-    assert lk.classify(SITES["superdelivery"], "https://www.superdelivery.com/i/r/msgbox/", "メッセージ") == "ok"
+    sd_ok = "https://www.superdelivery.com/p/do/memberManage/purchase/orderHistory/list"
+    assert lk.classify(SITES["superdelivery"], sd_ok, "購入履歴｜卸・仕入れサイト【スーパーデリバリー】") == "ok"
+
+
+def test_sd_title_guard():
+    # 2026-10-14：旧 URL /i/r/msgbox はログイン中でも login へ飛び、10/12〜14 の「切れ」は誤判定だった。
+    # 購入履歴ページでタイトルを見る。読み込み途中（タイトル＝URL）では判定しない。
+    sd = SITES["superdelivery"]
+    url = "https://www.superdelivery.com/p/do/memberManage/purchase/orderHistory/list"
+    assert lk.classify(sd, url, "事業者専用の卸・仕入れサイト【スーパーデリバリー】") == "logged_out"
+    assert lk.classify(sd, url, url) == "ok"
+    assert "msgbox" not in sd.url
 
 
 def test_gmail_wrong_account_and_ok():
@@ -34,7 +45,7 @@ def test_gmail_wrong_account_and_ok():
 
 def test_error_and_backoff():
     sd = SITES["superdelivery"]
-    assert lk.classify(sd, "https://www.superdelivery.com/i/r/msgbox/", "429 Too Many Requests") == "error"
+    assert lk.classify(sd, "https://www.superdelivery.com/p/do/memberManage/purchase/orderHistory/list", "429 Too Many Requests") == "error"
     assert lk.classify(SITES["gmail_satoyselect"], "https://mail.google.com/mail/u/1/", "受信トレイ (503) - satoyselect@gmail.com - Gmail") == "ok"  # 未読数で誤報しない
     b = 1
     for _ in range(10):

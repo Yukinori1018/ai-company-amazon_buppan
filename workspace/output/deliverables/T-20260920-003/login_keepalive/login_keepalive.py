@@ -52,6 +52,7 @@ ERROR_TITLE_RE = re.compile(
     r"アクセスが集中|メンテナンス|サイト障害|ただいま大変混み合って)", re.I)
 MAX_BACKOFF = 8          # エラーが続いたら間隔を最大8倍まで広げる（§3.3-18 の安全側）
 LOAD_TIMEOUT_S = 40
+MAX_RECREATE = 5     # 閉じられた延命ウィンドウを自動で作り直す回数の上限（1日）。SD の1日30回を守るため
 
 
 # ---------------------------------------------------------------- 純ロジック（テスト対象）
@@ -68,6 +69,7 @@ class Site:
     expect_in_title: str | None = None
     enabled: bool = True
     detectable: bool = True   # False＝URL でもタイトルでも切れが分からない（延命だけする）
+    ok_title_re: str | None = None  # ログイン中のページだけが持つタイトル。無ければ「切れ」（URL で分からないサイト用）
 
 
 def load_sites(path: Path = SITES_JSON) -> list[Site]:
@@ -76,7 +78,8 @@ def load_sites(path: Path = SITES_JSON) -> list[Site]:
                  every_min=int(s["every_min"]), hours=tuple(s.get("hours", [0, 24])),
                  logout_url_re=s["logout_url_re"], expect_in_title=s.get("expect_in_title"),
                  enabled=bool(s.get("enabled", True)),
-                 detectable=bool(s.get("detectable", True)))
+                 detectable=bool(s.get("detectable", True)),
+                 ok_title_re=s.get("ok_title_re"))
             for s in raw]
 
 
@@ -118,6 +121,9 @@ def classify(site: Site, url: str, title: str) -> str:
         return "error"
     if not hp.startswith(site.host):
         return "off_site"
+    if (site.ok_title_re and title and not title.startswith("http")   # 読み込み途中は URL がタイトルになる
+            and not re.search(site.ok_title_re, title)):
+        return "logged_out"
     if site.expect_in_title and "@" in (title or "") and site.expect_in_title not in title:
         return "wrong_account"
     if not site.detectable:
@@ -168,15 +174,24 @@ end run''', MARKER_NAME)
     return int(out) if out else None
 
 
-def create_marker_window() -> int:
+def create_marker_window(minimized: bool = False) -> int:
+    """延命ウィンドウを作る。minimized=True なら作った直後に Dock へしまう（自動で作り直すとき用）。
+    Chrome を前面に出す activate はしない。"""
     out = _osa('''on run argv
   tell application "Google Chrome"
     set w to make new window
     set URL of active tab of w to (item 1 of argv)
+    if (item 2 of argv) is "1" then set minimized of w to true
     return (id of w) as text
   end tell
-end run''', MARKER_FILE.as_uri())
+end run''', MARKER_FILE.as_uri(), "1" if minimized else "0")
     return int(out)
+
+
+def minimize_window(win: int) -> None:
+    _osa('''on run argv
+  tell application "Google Chrome" to set minimized of window id ((item 1 of argv) as integer) to true
+end run''', str(win))
 
 
 def list_tabs(win: int) -> list[dict]:
@@ -298,6 +313,9 @@ def write_status(sites: list[Site], st: dict) -> None:
         x = st["sites"].get(s.id, {})
         lines.append(f"| {s.name} | {LABEL.get(x.get('status'), '未確認')} | {x.get('checked_at', '-')} | "
                      f"{x.get('last_ok', '-')} | {s.every_min * x.get('backoff', 1)}分 |")
+    rc = st.get("recreated", {}).get(datetime.now().strftime("%Y-%m-%d"), 0)
+    if rc:
+        lines += ["", f"延命ウィンドウを今日 {rc} 回自動で作り直しました（閉じられていたため・最小化して Dock にあります）"]
     alerts = sorted(p.name for p in WATCH.glob("ALERT_*.txt"))
     lines += ["", "ALERT: " + (", ".join(alerts) if alerts else "なし")]
     STATUS_MD.write_text("\n".join(lines) + "\n", encoding="utf-8")
@@ -308,7 +326,6 @@ def write_status(sites: list[Site], st: dict) -> None:
 TODO = {
     "logged_out": "延命ウィンドウのそのタブでログインし直す（『ログイン状態を保持』にチェック）",
     "wrong_account": "Gmail の u/1 が satoyselect でない。アカウントの並びを確認",
-    "window": "延命ウィンドウが閉じられた。秘書に『延命ウィンドウを作り直して』と言う（setup）",
     "automation": "システム設定 > プライバシーとセキュリティ > オートメーション で Google Chrome を許可",
 }
 LABEL = {"ok": "OK", "logged_out": "🔴切れている", "wrong_account": "🔴別アカウント", "error": "相手側エラー（間隔を広げ中）",
@@ -338,17 +355,27 @@ def run(force_all: bool = False, allow_create: bool = False) -> int:
     clear_alert("automation")
 
     if win is None:
-        # 社長が自分で閉じた場合に、10分ごとに出し直して邪魔をしない。
-        # 作り直すのは setup のときと、Chrome が再起動した（pid が変わった）ときだけ。
-        pid = chrome_pid()
-        if allow_create or st.get("created_for_pid") != pid:
-            win = create_marker_window()
-            st["created_for_pid"] = pid
-            log({"event": "window_created"})
-        else:
-            raise_alert("window", "延命ウィンドウ", "延命ウィンドウが見つからない", TODO["window"], None)
+        # 2026-10-14 変更：閉じられたら次の回で自動で作り直す（10/12 10:54 に閉じられ、2日間延命が止まっていた）。
+        # 邪魔にならないよう、setup 以外では作った直後に最小化する（Chrome を前面にも出さない）。
+        # 作り直しは状態に数えて残す。1日に何度も作り直していたら、社長が閉じたがっているサイン＝STATUS.md に出る。
+        # 作り直すと全タブを開き直す＝SD にも1回アクセスが増える。§3.3-18（SD は1日30回まで）を守るため、
+        # 自動の作り直しは1日 MAX_RECREATE 回まで。超えたら ALERT を出して止まる（社長が閉じ続けている＝意思表示）。
+        today = now.strftime("%Y-%m-%d")
+        rc = st.get("recreated", {})
+        if not allow_create and rc.get(today, 0) >= MAX_RECREATE:
+            raise_alert("window", "延命ウィンドウ", f"今日 {MAX_RECREATE} 回作り直したが、また閉じられた",
+                        "延命ウィンドウは最小化でよいので閉じないでほしい。再開は秘書に『延命ウィンドウを作り直して』（setup）", None)
             save_state(st)
+            write_status(sites, st)
             return 0
+        win = create_marker_window(minimized=not allow_create)
+        auto_created = not allow_create
+        st["created_for_pid"] = chrome_pid()
+        st["recreated"] = {today: rc.get(today, 0) + (0 if allow_create else 1)}
+        log({"event": "window_created", "minimized": not allow_create})
+        time.sleep(2)
+    else:
+        auto_created = False
     clear_alert("window")
 
     tabs = list_tabs(win)
@@ -391,6 +418,12 @@ def run(force_all: bool = False, allow_create: bool = False) -> int:
             raise_alert(s.id, s.name, JP[status], TODO[status], x.get("last_ok"))
         # error / off_site は ALERT にしない（相手の障害・社長の操作）。STATUS.md には出る
 
+    if auto_created:
+        # 新しいタブを足すと Chrome は最小化を解いてしまうので、最後にもう一度しまう
+        try:
+            minimize_window(win)
+        except RuntimeError:
+            pass
     save_state(st)
     write_status(sites, st)
     return 0

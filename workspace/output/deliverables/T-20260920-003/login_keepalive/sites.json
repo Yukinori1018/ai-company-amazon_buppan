@@ -48,7 +48,7 @@
       "id": "superdelivery",
       "name": "スーパーデリバリー",
       "enabled": true,
-      "url": "https://www.superdelivery.com/i/r/msgbox/",
+      "url": "https://www.superdelivery.com/p/do/memberManage/purchase/orderHistory/list",
       "host": "www.superdelivery.com",
       "every_min": 60,
       "hours": [
@@ -56,7 +56,8 @@
         24
       ],
       "logout_url_re": "/p/do/clickMemberLogin",
-      "note": "429 の前歴あり（CLAUDE.md §3.3-18）。1時間に1回・7〜24時＝1日17回まで。ログイン保持のチェック欄は無い。"
+      "note": "429 の前歴あり（CLAUDE.md §3.3-18）。1時間に1回・7〜24時＝1日17回まで。ログイン保持のチェック欄は無い。🔴2026-10-14 修正：旧 URL /i/r/msgbox はログイン中でも直接開くと必ず clickMemberLogin へ飛ぶ（実画面で確認）＝10/12〜14 の『切れている』は誤判定だった。購入履歴はログイン中なら同じ URL のまま開く。タイトルに『購入履歴』が無ければ切れと判定（ok_title_re）。",
+      "ok_title_re": "購入履歴"
     },
     {
       "id": "kokubu",
