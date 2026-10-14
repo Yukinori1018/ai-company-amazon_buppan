@@ -15,3 +15,9 @@
 - 手順：data_source 内で TicketID 検索 → 無し → create-pages（Status=doing・Assignee=accounting・ParentTicket=T-20260920-003・本文に結果要約＋「成果物（なし — 作業中）」）。page id 3f7b0a40-44fa-8161-b3cb-de91099ada53
 - Labels（sourcing/superdelivery/sanrio/bundle/recheck）は未定義の選択肢を含む可能性があるため今回は未設定。必要なら選択肢追加後に付与（knowledge_notion_label_option_must_be_added_first.md）
 - owner-tasks.md：社長依存タスクなし（requires_approval=false・担当=経理）で変更不要を確認
+
+## 2026-10-14 T-20261014-001（新規 doing・accounting）＋ T-20260920-003（ログ追記のみ）
+- 新規：data_source 内で TicketID 検索 → 該当なし → create-pages（ParentTicket=T-20260920-003・本文に結果要約＋「成果物（なし — 作業中）」）。page id 3f9b0a40-44fa-8187-b355-cd283699d25d。Labels は未設定（選択肢未確認）
+- 既存の長寿チケットへのログ反映は、UpdatedAt だけ update_properties ＋ 本文末尾へ insert_content（日付見出し）。本文全置換はしない
+- 依頼時の git status では T-20260920-003 が M でも、同期時点で別担当（タカシ）が既にコミット済みのことがある。commit 前に `git status --short` を取り直し、コミット対象を実態に合わせる
+- owner-tasks.md：社長タスクの増減なし。ただしセラセンのログイン切れ（10/14 11:56）は既存の⑦（おりおんへの権限付与＝社長ログインが前提）に包含されるため新規行は足さない
