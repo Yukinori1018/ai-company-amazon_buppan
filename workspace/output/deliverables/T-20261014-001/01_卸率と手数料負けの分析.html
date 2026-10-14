@@ -1,0 +1,183 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><title>卸率と手数料負けの分析 T-20261014-001</title><style>body{font-family:-apple-system,"Hiragino Sans",sans-serif;max-width:1000px;margin:24px auto;padding:0 16px;line-height:1.7;color:#222}
+table{border-collapse:collapse;margin:10px 0;font-size:14px}th,td{border:1px solid #ccc;padding:4px 8px}th{background:#f0f0f0}
+blockquote{border-left:4px solid #ccc;margin:8px 0;padding:4px 12px;color:#555}code{background:#f4f4f4;padding:1px 4px}
+.fig{border:2px solid #3d5a80;border-radius:10px;padding:12px 16px;margin:20px 0;background:#fbfaf6}
+.ctl{display:grid;grid-template-columns:1fr 1fr;gap:6px 20px}.ctl label{display:block;font-size:14px}.ctl input{width:100%}
+.out{font-size:15px;margin-top:6px}.red{color:#d00}.green{color:#2a9d8f}.note{font-size:13px;color:#555}</style></head><body><h1>卸率62〜67%で Amazon に出すと手数料負けするか（T-20261014-001）</h1>
+<p>作成：2026-10-14 経理ハジメ ／ 使った型：成果物34（サトル）の「750円の崖」「1個の利益額400円」、中村本の「メーカー直は2回目以降に卸率を交渉する」</p>
+<blockquote>用語：<strong>定価</strong>＝メーカー希望小売価格（卸サイトの「上代」・税抜）。<strong>定価比卸率</strong>＝卸1点（税抜）÷定価。<strong>実効卸率</strong>＝卸1点（税抜）÷ Amazon 売価（税抜）。台帳の「卸率(売価比)」と同じ定義です。</blockquote>
+<h2>結論</h2>
+<ol><li><strong>社長の仮説は当たり。しかも低単価に限りません。</strong> 販売手数料15.4%のカテゴリー（ホーム&amp;キッチン・文房具など）では、定価比67%で仕入れた商品は、Amazon で定価どおり売れても小型で売価2,900円未満は赤字。Amazon の実売が定価の86%（台帳の中央値）なら、<strong>売価1万円でも赤字</strong>です。</li><li><strong>原因は「売価に比例して引かれる費用」です。</strong> 仕入れ67%と販売手数料17%（15.4%×消費税）で売価の84%が先に消え、残り16%で FBA 配送代行（222〜430円）と代行・送料・保管（約150円）を払います。さらに Amazon の実売は定価より中央値で14%安く、<strong>定価比67%は実効卸率78%</strong>になります。</li><li><strong>台帳でも同じでした。</strong> 採算を計算できた4,290行のうち黒字は16.7%。実効卸率75%を超える2,102行では黒字が0〜1.5%です。</li><li><strong>黒字にできる条件</strong>は次のどちらかです。①卸サイトなら実効卸率55%以下・売価2,000〜5,000円・小型〜標準3に絞る。②メーカー直で定価比45%以下（利益率20%を狙うなら40%以下）を取る。セット組みでは定価比67%は救えません。</li></ol>
+<hr>
+
+<section class="fig">
+<h2>動かして確かめる：売価1個のお札を、誰がどれだけ持っていくか</h2>
+<p class="note">お札の幅が Amazon の売価です。左から順に費用が切り取られ、右端に残った緑が手残りです。足りないときは、お札の右からはみ出した<b class="red">赤</b>が「自分の財布から出ていくお金」です。</p>
+<div class="ctl">
+<label>Amazon 売価 <b id="vP"></b><input id="P" type="range" min="300" max="10000" step="50" value="3000"></label>
+<label>定価比卸率 <b id="vJ"></b><input id="J" type="range" min="20" max="80" step="1" value="67"></label>
+<label>Amazon 実売 ÷ 定価 <b id="vA"></b><input id="A" type="range" min="50" max="130" step="1" value="86"></label>
+<label>サイズ <select id="T"><option>小型</option><option>標準1</option><option selected>標準3</option><option>標準6</option><option>標準8</option></select></label>
+<label>販売手数料率（750円超） <select id="R"><option value="15.4" selected>15.4%（ホーム&amp;キッチン・文房具など）</option><option value="10.4">10.4%（おもちゃ・スポーツ）</option><option value="8.4">8.4%（家電・PC周辺）</option></select></label>
+</div>
+<svg id="bill" viewBox="0 0 1000 230" width="100%"></svg>
+<div id="out" class="out"></div>
+<p class="note">中央シナリオの仮定（保管3か月・1箱20点・卸→代行の送料40円/点・返品2.5%）で計算しています。750円と1,000円をまたぐと、手数料と FBA の列が切り替わります。</p>
+</section>
+<script>
+const TAX=1.1;
+const FBA={"小型":[288,222],"標準1":[318,252],"標準3":[415,358],"標準6":[430,391],"標準8":[532,466]};
+const VOL={"小型":600,"標準1":1980,"標準3":840,"標準6":7280,"標準8":32912};
+function costs(P,t,rate){
+  const pct=P<=750?5:rate; const ref=Math.max(P*pct/100,30)*TAX;
+  const fba=P<=1000?FBA[t][1]:FBA[t][0]; const vol=VOL[t];
+  const q=Math.max(1,Math.min(20,Math.floor(94500*0.7/vol)));
+  const storage=6.78*vol/1000*1.5;
+  const orion=(11+11+77/20+480/q)*TAX; const fc=608/q; const ship=40*20/q; const bank=7.25;
+  const retFixed=0.025*(fba+Math.min(500,0.1*ref)+0.5*(orion+fc+ship));
+  return {ref,fba,storage,orion,fc,ship,bank,retFixed,pct};
+}
+const $=id=>document.getElementById(id);
+const yen=v=>Math.round(v).toLocaleString()+'円';
+function draw(){
+  const P=+$('P').value, J=+$('J').value/100, A=+$('A').value/100, t=$('T').value, rate=+$('R').value;
+  $('vP').textContent=P.toLocaleString()+'円'; $('vJ').textContent=Math.round(J*100)+'%'; $('vA').textContent=(A*100).toFixed(0)+'%';
+  const c=costs(P,t,rate); const eff=J/A; const cost=eff*P; const retW=0.0125*cost;
+  const parts=[["販売手数料",c.ref,"#e07a5f"],["FBA配送代行",c.fba,"#f2a541"],["代行・FC送料・卸送料",c.orion+c.fc+c.ship,"#81b29a"],["保管・返品・振込",c.storage+c.bank+c.retFixed+retW,"#a5a58d"],["仕入れ",cost,"#3d5a80"]];
+  const total=parts.reduce((s,p)=>s+p[1],0); const hand=P-total;
+  const W=1000, scale=Math.min(700/P, 700/Math.max(total,1)); let x=40; let svg='';
+  const billW=P*scale;
+  svg+=`<rect x="40" y="40" width="${billW}" height="120" rx="10" fill="#f4ecd8" stroke="#8a7a5a" stroke-width="2"/>`;
+  svg+=`<text x="${40+billW/2}" y="30" text-anchor="middle" font-size="16" fill="#333">売価 ${yen(P)} のお札</text>`;
+  for(const [n,v,col] of parts){ const w=v*scale; if(w<=0) continue;
+    const over = x+w>40+billW;
+    svg+=`<rect x="${x}" y="52" width="${w}" height="96" fill="${col}" opacity="0.9"/>`;
+    if(w>46) svg+=`<text x="${x+w/2}" y="96" text-anchor="middle" font-size="12" fill="#fff">${n}</text><text x="${x+w/2}" y="114" text-anchor="middle" font-size="12" fill="#fff">${yen(v)}</text>`;
+    x+=w; }
+  if(hand>=0){ const w=hand*scale; svg+=`<rect x="${x}" y="52" width="${w}" height="96" fill="#2a9d8f"/>`; if(w>40) svg+=`<text x="${x+w/2}" y="104" text-anchor="middle" font-size="13" fill="#fff">手残り</text>`; }
+  else { const s=40+billW; svg+=`<rect x="${s}" y="44" width="${x-s}" height="112" fill="none" stroke="#d00" stroke-width="3" stroke-dasharray="6 4"/><text x="${(s+x)/2}" y="180" text-anchor="middle" font-size="14" fill="#d00">はみ出し＝赤字 ${yen(-hand)}</text>`; }
+  $('bill').innerHTML=svg;
+  const m=hand/P*100; const B=(m>=5||hand>=400), Aok=(m>=20||hand>=400);
+  // 手残り0になる実効卸率
+  const fixed=c.ref+c.fba+c.storage+c.orion+c.fc+c.ship+c.bank+c.retFixed;
+  const be=(P-fixed)/(1.0125)/P*100;
+  $('out').innerHTML=`<b>実効卸率 ${(eff*100).toFixed(1)}%</b>（定価比 ${Math.round(J*100)}% ÷ ${(A).toFixed(2)}）／ 手残り <b class="${hand<0?'red':'green'}">${hand<0?'▲':''}${yen(Math.abs(hand))}</b>（${m.toFixed(1)}%）／ 判定：${hand<0?'<b class="red">赤字</b>':Aok?'A の線（20%か400円）を越える':B?'B の線（5%か400円）':'黒字だが C（5%未満）'}<br>この売価・サイズで手残り0になる実効卸率の上限：<b>${be.toFixed(1)}%</b>（定価比に直すと ${(be*A).toFixed(1)}%）`;
+}
+for(const id of ['P','J','A','T','R']) $(id).addEventListener('input',draw);
+draw();
+</script>
+
+<h2>1. 1個の売上の行き先（例：売価3,000円・小型・料率15.4%・定価比67%）</h2>
+<table><thead><tr><th>行き先</th><th>Amazon 実売＝定価の86%（中央値）</th><th>Amazon 実売＝定価どおり</th></tr></thead><tbody>
+<tr><td>販売手数料（15.4%×1.1）</td><td>508円</td><td>508円</td></tr>
+<tr><td>FBA 配送代行（小型・1,000円超）</td><td>288円</td><td>288円</td></tr>
+<tr><td>おりおん作業（ラベル・検品・荷受・プラン・箱代）</td><td>55円</td><td>55円</td></tr>
+<tr><td>FC 納品送料（1箱20点で按分）</td><td>30円</td><td>30円</td></tr>
+<tr><td>卸→おりおんの送料（仮定）</td><td>40円</td><td>40円</td></tr>
+<tr><td>保管（3か月で売り切る）</td><td>6円</td><td>6円</td></tr>
+<tr><td>返品引当（返品率2.5%と仮定）・銀行振込の費用</td><td>46円</td><td>42円</td></tr>
+<tr><td><strong>仕入れ（消費税は原価に含む）</strong></td><td><strong>2,337円（売価の77.9%）</strong></td><td><strong>2,010円（売価の67.0%）</strong></td></tr>
+<tr><td><strong>手残り</strong></td><td><strong>▲311円（▲10.4%）</strong></td><td><strong>＋20円（0.7%）</strong></td></tr>
+</tbody></table>
+<p>仕入れ以外の費用は合計約970円（売価の約32%）。このうち販売手数料が508円で過半を占めます。</p>
+<h2>2. 損益分岐表：卸率の上限（実効卸率・中央シナリオ・料率15.4%）</h2>
+<p>セルは「手残り0円 ／ B等級の線（利益率5%か手残り400円）／ 利益率20%」を満たす<strong>実効卸率の上限</strong>です。「不可」は卸率0%でも届かないことを示します。</p>
+<table><thead><tr><th>Amazon 売価</th><th>小型（厚さ2cm以下）</th><th>標準3（三辺30cm）</th><th>標準6（三辺60cm）</th><th>標準8（三辺100cm）</th></tr></thead><tbody>
+<tr><td>500円</td><td>19.6 ／ 14.7 ／ 不可</td><td>不可</td><td>不可</td><td>不可</td></tr>
+<tr><td>750円</td><td>44.9 ／ 40.0 ／ 25.1</td><td>26.2 ／ 21.3 ／ 6.5</td><td>不可</td><td>不可</td></tr>
+<tr><td>1,000円</td><td>45.7 ／ 40.7 ／ 25.9</td><td>31.7 ／ 26.7 ／ 11.9</td><td>10.0 ／ 5.1 ／ 不可</td><td>不可</td></tr>
+<tr><td>1,500円</td><td>53.3 ／ 48.4 ／ 33.6</td><td>44.6 ／ 39.7 ／ 24.8</td><td>31.4 ／ 26.4 ／ 11.6</td><td>不可</td></tr>
+<tr><td>2,000円</td><td>60.5 ／ 55.6 ／ 40.7</td><td>53.9 ／ 49.0 ／ 34.2</td><td>44.0 ／ 39.1 ／ 24.3</td><td>不可</td></tr>
+<tr><td>3,000円</td><td>67.7 ／ 62.7 ／ 47.9</td><td>63.3 ／ 58.4 ／ 43.5</td><td>56.7 ／ 51.7 ／ 36.9</td><td>19.6 ／ 14.6 ／ 不可</td></tr>
+<tr><td>5,000円</td><td>73.4 ／ 68.5 ／ 53.6</td><td>70.8 ／ 65.8 ／ 51.0</td><td>66.8 ／ 61.9 ／ 47.1</td><td>44.5 ／ 39.6 ／ 24.8</td></tr>
+<tr><td>10,000円</td><td>77.7 ／ 73.7 ／ 57.9</td><td>76.4 ／ 72.4 ／ 56.6</td><td>74.4 ／ 70.5 ／ 54.6</td><td>63.3 ／ 59.3 ／ 43.5</td></tr>
+</tbody></table>
+<p>読み方：</p>
+<ul><li>実効卸率78%（定価比67%・Amazon 実売が定価の86%）が手残り0の線を越えるのは、どのサイズでも<strong>売価1万円を超えてから</strong>です。</li><li>750円と1,000円の上限はほぼ同じです（小型で44.9%と45.7%）。750円を超えると販売手数料が5%から15.4%に上がるため、売価を上げた分が相殺されます。<strong>751〜1,100円の死に帯</strong>（§3.3-23）がこの表でも確認できます。</li><li>料率が10.4%のカテゴリー（おもちゃ・スポーツ）は上限が<strong>+5.4ポイント</strong>、8.4%（家電・PC周辺）は<strong>+7.6ポイント</strong>上がります。</li></ul>
+<h3>3シナリオ（手残り0の実効卸率の上限）</h3>
+<table><thead><tr><th></th><th>小型 2,000円</th><th>小型 3,000円</th><th>標準3 2,000円</th><th>標準3 3,000円</th></tr></thead><tbody>
+<tr><td>楽観</td><td>72.2%</td><td>78.2%</td><td>65.7%</td><td>73.9%</td></tr>
+<tr><td><strong>中央（推奨値）</strong></td><td><strong>60.5%</strong></td><td><strong>67.7%</strong></td><td><strong>53.9%</strong></td><td><strong>63.3%</strong></td></tr>
+<tr><td>悲観</td><td>52.5%</td><td>62.0%</td><td>29.7%</td><td>46.8%</td></tr>
+</tbody></table>
+<p>楽観：料率8.4%・保管月数2か月（計上1か月）・1箱30点・卸→代行の送料0円・返品1%。中央：料率15.4%・保管は年平均単価で3か月・1箱20点・送料40円/点・返品2.5%。悲観：サイズ区分を1段上・10〜12月の保管単価で6か月・1箱14点・1SKU10点・返品5%。</p>
+<h3>定価比62%・67%で仕入れたとき、黒字になる最低売価（中央・小型）</h3>
+<table><thead><tr><th>料率</th><th>定価比</th><th>Amazon 実売＝定価</th><th>Amazon 実売＝定価の86%</th></tr></thead><tbody>
+<tr><td>15.4%</td><td>62%</td><td>2,200円（B線は2,900円）</td><td>4,350円（B線は8,350円）</td></tr>
+<tr><td>15.4%</td><td>67%</td><td>2,900円（B線は4,300円）</td><td>10,550円（B線は20,200円）</td></tr>
+<tr><td>10.4%</td><td>67%</td><td>2,150円（B線は2,800円）</td><td>4,550円（B線は8,700円）</td></tr>
+<tr><td>8.4%</td><td>67%</td><td>1,950円（B線は2,450円）</td><td>3,700円（B線は6,350円）</td></tr>
+</tbody></table>
+<p>標準3はこの金額のおよそ1.3倍が必要です。</p>
+<h2>3. 定価と Amazon 売価のずれ（台帳の実データ）</h2>
+<p><strong>母集団A：NETSEA の商品索引のうち定価が登録された26,762件（2026-10-01 取得）</strong></p>
+<ul><li>定価比卸率の分布：10%点45%／25%点52.5%／<strong>中央値65%</strong>／75%点75%／90%点85%</li><li>62〜67%の帯に入るのは12.3%。<strong>50%以下は23.3%</strong>（約6,200件）</li></ul>
+<p><strong>母集団B：Amazon 突合済みで定価があり、セット数が確定した1,119 ASIN（NETSEA の JAN で突合）</strong></p>
+<ul><li>Amazon 実売（90日中央値・1点あたり税抜）÷定価：10%点0.50／25%点0.64／<strong>中央値0.86</strong>／75%点1.03／90%点1.44</li><li><strong>73%の商品は定価より安く売られています</strong>。定価の8割未満が41%です。</li><li>定価比67%で仕入れた場合の実効卸率：25%点65%／<strong>中央値78%</strong>／75%点104%。62%なら中央値72%です。</li></ul>
+<p><strong>母集団C：商品判定台帳のうち実効卸率が入っている4,290行（経路別）</strong></p>
+<table><thead><tr><th>経路</th><th>行数</th><th>25%点</th><th>中央値</th><th>75%点</th></tr></thead><tbody>
+<tr><td>NETSEA</td><td>4,028</td><td>54.8%</td><td>74.0%</td><td>90.6%</td></tr>
+<tr><td>スーパーデリバリー</td><td>192</td><td>58.9%</td><td>80.9%</td><td>87.8%</td></tr>
+<tr><td>国分ネット卸</td><td>64</td><td>108.6%</td><td>138.1%</td><td>159.4%</td></tr>
+</tbody></table>
+<ul><li>スーパーデリバリーの中央値81%は、「定価比67〜70% ÷ 0.86」で説明できる水準です（推定。台帳に SD の定価列がないため、定価比を直接は測れていません）。</li><li>国分は食品が中心で、送料（1ケースぶんの按分）を卸に含めています。Amazon の食品は定価よりかなり安く売られているため、実効卸率が100%を超えます。</li></ul>
+<h2>4. 台帳での検証（社長の仮説はどこまで当たるか）</h2>
+<p><strong>母集団：商品判定台帳10,626行（2026-10-14 06:38 時点）。うち NO-GO 9,071行</strong></p>
+<ul><li>NO-GO のうち <strong>#18 採算の FAIL を含む行は3,684（40.6%）</strong>、<strong>採算だけで落ちた行は2,493（27.5%）</strong></li><li>項目別の記録9,509行のうち採算の判定がついた3,902行で、<strong>FAIL は91.4%</strong></li></ul>
+<p><strong>実効卸率の帯別の黒字率（採算を計算できた4,290行）</strong></p>
+<table><thead><tr><th>実効卸率</th><th>行数</th><th>黒字（手残り0以上）</th><th>利益率5%以上</th><th>利益率の中央値</th></tr></thead><tbody>
+<tr><td>30%以下</td><td>160</td><td>69.4%</td><td>56.2%</td><td>+9.9%</td></tr>
+<tr><td>30〜45%</td><td>455</td><td>42.2%</td><td>31.9%</td><td>▲2.9%</td></tr>
+<tr><td>45〜55%</td><td>435</td><td>34.7%</td><td>27.6%</td><td>▲9.0%</td></tr>
+<tr><td>55〜62%</td><td>365</td><td>34.0%</td><td>22.5%</td><td>▲8.7%</td></tr>
+<tr><td><strong>62〜67%</strong></td><td><strong>292</strong></td><td><strong>23.3%</strong></td><td><strong>16.4%</strong></td><td><strong>▲18.4%</strong></td></tr>
+<tr><td>67〜75%</td><td>481</td><td>11.2%</td><td>6.7%</td><td>▲27.0%</td></tr>
+<tr><td>75〜90%</td><td>972</td><td>1.5%</td><td>0.4%</td><td>▲30.6%</td></tr>
+<tr><td>90%超</td><td>1,130</td><td>0%</td><td>0%</td><td>▲43〜74%</td></tr>
+</tbody></table>
+<p><strong>売価帯別の黒字率（同じ4,290行）</strong>：750円以下7.9%（736行）／751〜1,000円19.3%／1,001〜1,500円19.5%／1,501〜2,000円14.5%／2,001〜3,000円16.0%／3,001〜5,000円14.8%／5,001〜1万円20.5%／1万円超29.1%</p>
+<p><strong>判定：当たりです。</strong> 採算を計算できた4,290行のうち83%が赤字です。低単価（750円以下）は黒字7.9%で最も不利ですが、中価格帯も黒字は15〜20%にとどまります。<strong>決め手は価格帯ではなく実効卸率で、75%を超えると価格帯に関係なく黒字は1.5%以下</strong>になります。</p>
+<p>補足として、採算を通過した337行も、実売（170行）・取り分（73行）・季節（56行）で落ちています。<strong>卸で安く買える商品は、Amazon でも売れていないことが多い</strong>という傾向があります。</p>
+<h2>5. ではどうすれば可（§3.1-6）</h2>
+<h3>5-1. 卸サイトを使い続けるなら狙う帯</h3>
+<table><thead><tr><th>条件</th><th>線</th><th>根拠</th></tr></thead><tbody>
+<tr><td>サイズ</td><td>小型・標準1・標準3まで</td><td>標準6は売価3,000円でも上限56.7%。それより安いと急に下がる</td></tr>
+<tr><td>売価</td><td>2,000〜5,000円</td><td>固定費の割合が売価の25〜45%に下がる。750円以下は実効卸率40%以下の商品だけ</td></tr>
+<tr><td>実効卸率</td><td><strong>55%以下</strong>（B等級）、45%以下（利益率20%）</td><td>小型2,000円のB線が55.6%、20%線が40.7%</td></tr>
+<tr><td>カテゴリー</td><td>料率8.4%・10.4%を優先</td><td>上限が+5.4〜7.6ポイント上がる</td></tr>
+<tr><td>入口フィルタ</td><td>Keepa に回す前に「定価比卸率 ÷（Amazon 90日中央値 ÷ 定価税込）≦ 55%」</td><td>0トークンで足切りできる。母集団Aでは定価比50%以下が約6,200件</td></tr>
+</tbody></table>
+<h3>5-2. セット組みが効く条件</h3>
+<p>単品の売価が低く、固定費（FBA 配送代行・代行費・箱）を個数で割れるときにだけ効きます（中央・料率15.4%）。</p>
+<table><thead><tr><th>単品</th><th>1個</th><th>2個組</th><th>3個組</th><th>5個組</th><th>10個組</th></tr></thead><tbody>
+<tr><td>小型・単品500円</td><td>19.6%</td><td>29.1%</td><td>43.4%</td><td>56.5%</td><td>66.8%</td></tr>
+<tr><td>小型・単品750円</td><td>44.9%</td><td>43.4%</td><td>56.3%</td><td>65.0%</td><td>—</td></tr>
+<tr><td>標準3・単品1,000円</td><td>31.7%</td><td>53.1%</td><td>60.7%</td><td>69.2%</td><td>68.7%</td></tr>
+</tbody></table>
+<p>（セル＝手残り0の実効卸率の上限。セット価格＝単品×個数と仮定。セット後のサイズ区分は体積からの目安）</p>
+<ul><li>単品750円の小型は、2個組にすると販売手数料が5%から15.4%に上がるため、<strong>かえって悪くなります</strong>（44.9%→43.4%）。3個組以上で上限が上がります。</li><li><strong>10個組でも上限は約67〜69%です。実効卸率78%（定価比67%）には届かないので、セット組みでは解決しません。</strong></li></ul>
+<h3>5-3. メーカー直で目標にする卸率</h3>
+<table><thead><tr><th>定価比卸率</th><th>実効卸率</th><th>小型 2,000円</th><th>小型 3,000円</th><th>小型 5,000円</th><th>標準3 3,000円</th></tr></thead><tbody>
+<tr><td>40%</td><td>46.5%</td><td>14.2%</td><td><strong>21.4%</strong></td><td>27.2%</td><td>17.0%</td></tr>
+<tr><td><strong>45%</strong></td><td>52.3%</td><td>8.3%</td><td>15.5%</td><td>21.3%</td><td>11.1%</td></tr>
+<tr><td>50%</td><td>58.1%</td><td>2.4%</td><td>9.6%</td><td>15.4%</td><td>5.2%</td></tr>
+<tr><td>55%</td><td>64.0%</td><td>▲3.5%</td><td>3.8%</td><td>9.6%</td><td>▲0.7%</td></tr>
+</tbody></table>
+<p>（セル＝利益率。中央・料率15.4%・Amazon 実売は定価の86%）</p>
+<ul><li><strong>目標は定価比45%以下</strong>です。会社 KPI の利益率20%を狙うなら40%以下が必要です。</li><li>初回は定価比50〜55%でも、売価3,000円以上の小型なら B 等級（いちばん少ない数で1回だけ試す）として取引実績を作れます。2回目以降に45%以下を交渉します。</li><li>交渉材料：「Amazon では定価の86%前後で売られ、手数料と FBA で売価の約3割が差し引かれます」と、数字で説明できます。</li></ul>
+<h3>5-4. 費用側で下げられるもの（影響の大きい順）</h3>
+<p>固定費（大口出品の月額）は1個あたりの採算には影響しないので、ここでは変動費だけを並べます。</p>
+<ol><li><strong>販売手数料</strong>：カテゴリーの選び方で最大7.6ポイント変わります（最大の変動費）</li><li><strong>FBA 配送代行</strong>：サイズ区分。厚さ2cm以下の小型と標準3では1個127〜136円違います</li><li><strong>卸→代行の送料</strong>：1回の注文額を送料がかからない金額以上にまとめれば、40円/点が0円になります</li><li><strong>おりおんの箱代・FC 納品送料</strong>：週1回のまとめ納品（§3.4）で、1箱の点数を増やすと下がります</li></ol>
+<hr>
+<h2>6. 判定パイプラインとのずれ（IT・秘書向け）</h2>
+<p><code>fba_cost.py</code>（<code>consistency.py</code> も同じものを使用）と今回の中央モデルを比べました。</p>
+<table><thead><tr><th>費目</th><th>パイプライン</th><th>今回</th><th>小型1点あたりの差</th></tr></thead><tbody>
+<tr><td>卸→おりおんの送料</td><td>NETSEA・SD は0円（国分だけ按分）</td><td>40円/点（仮定）</td><td><strong>パイプラインが40円甘い</strong></td></tr>
+<tr><td>返品引当・銀行振込の費用</td><td>入っていない</td><td>14円/点（推定）</td><td>14円甘い</td></tr>
+<tr><td>10〜12月の保管単価</td><td>反映していない（<code>peak=False</code> 固定）</td><td>年平均</td><td>小型は1円、標準6は33円甘い</td></tr>
+<tr><td>箱代</td><td>15kg 帯</td><td>15kg 帯（同じ。小物は10kg 帯が実態）</td><td>実態より5円辛い</td></tr>
+<tr><td>1SKUの入荷点数</td><td>10点</td><td>20点（§3.4）</td><td>4円辛い</td></tr>
+</tbody></table>
+<ul><li>差し引きで、<strong>パイプラインは小型1点あたり約50円甘い</strong>です。したがって、GO が0件なのは判定が厳しすぎるからではありません。</li><li>台帳の「卸率(売価比)」列に<strong>表示のずれが99行</strong>あります（例：58.2%が「5820.00%」と書かれている）。今回の集計では100で割って補正しました。IT に修正を依頼してください。</li></ul>
+<h2>前提と確度</h2>
+<ul><li><strong>実測（公式）</strong>：販売手数料率・750円の崖・FBA 配送代行17区分・保管単価（いずれも2026-10-04取得の公式料金表）、おりおんFBA の料金（§3.4）</li><li><strong>実測（社内データ）</strong>：NETSEA 索引（2026-10-01）、画面判定 CSV（10/11〜10/14）、商品判定台帳（10/14 06:38）</li><li><strong>仮定</strong>：卸→代行の送料40円/点、返品率2.5%（再販できないもの50%）、銀行振込の費用1点7円、保管3か月で売り切り、1箱20点、サイズ区分ごとの代表体積（<code>fba_cost.VOL</code>）、セット価格は単品×個数</li><li><strong>未確認</strong>：SD の定価比卸率の分布（台帳に定価がない）、カテゴリー別の構成比（料率15.4%を代表値にした）</li><li>計算スクリプトと個別データは <code>agent_output/T-20261014-001/</code>（非公開）にあります</li></ul></body></html>
