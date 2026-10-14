@@ -104,5 +104,13 @@ xs = [None, 0.9, 0.4, 0.55, 0.56]
 check("並べると 55%以下 → 定価なし → 55%超、件数は減らない",
       sorted(xs, key=EO.sort_key), [0.4, 0.55, None, 0.56, 0.9])
 
+# ── 実績枠：B 等級で取り分だけ月1〜3個（2026-10-14 秘書判断 A・§3.5 #18）──────
+sys.path.insert(0, str(HERE.parents[3] / "scripts/sourcing_gate"))
+import consistency as K   # noqa: E402
+check("B・取り分2個/月・中央値+100円 → 実績枠", K.track_record("B", 100, 2.0, 0.5)[0], True)
+check("B・取り分3個/月 → 通常 GO（実績枠ではない）", K.track_record("B", 100, 3.0, 0.4)[0], False)
+check("B でも取り分0.8個/月は入らない", K.track_record("B", 100, 0.8, 1.3)[0], False)
+check("C・中央値▲1円は入らない", K.track_record("C", -1, 2.0, 0.5)[0], False)
+
 print(f"\n{'全部 ok' if not FAILS else f'NG {len(FAILS)}件: {FAILS}'}")
 sys.exit(1 if FAILS else 0)

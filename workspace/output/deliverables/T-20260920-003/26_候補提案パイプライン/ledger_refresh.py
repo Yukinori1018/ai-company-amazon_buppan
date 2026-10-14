@@ -80,6 +80,23 @@ EXTRA: dict[str, list[dict]] = {"GO": [], K_TR: [], "GO・ゲート未確認": [
 SCREEN = SC.ScreenChecks({}, {}, {})
 LEGAL = SC.load_legal()            # 法務判定で販売を止める行（GO にしない）
 
+
+def load_price_checks() -> dict[str, dict]:
+    """人が実画面で見た実勢価格で NO-GO にする行（2026-10-14〜・#13）。
+
+    `ledger20261010/price_checks_*.csv`（ASIN・実勢価格・根拠・確認者・確認時刻）。
+    Keepa の90日中央値より実際のカート・次点が安く、採算の前提が崩れている行を止める。"""
+    out = {}
+    for p in sorted(OUT.glob("price_checks_*.csv")):
+        for r in csv.DictReader(p.open(encoding="utf-8-sig")):
+            a = (r.get("ASIN") or "").strip()
+            if a:
+                out[a] = r
+    return out
+
+
+PRICE_CHECKS = load_price_checks()
+
 DIAG: list[dict] = []          # 行ごとの項目の状態（GO の手前で止まっている理由の集計用）
 WAIT_FULL: list[dict] = []     # 実画面確認待ち（NETSEA）の全列。autofill.py に渡す
 
@@ -141,6 +158,7 @@ ITEM = {
     "取り分": "#10 取り分と在庫月数",
     "取り寄せ価格": "#13 販売価格（取り寄せ型の値付けしかない）",
     "終売": "#12 終売（今だけ3条件）",
+    "実勢価格": "#13 実勢価格",
 }
 HUMAN_ITEMS_BASE = ["#9 キーゾンで3か月の実数（型番ごと）",
                     "#5 カートの販売元を実画面で読む",
@@ -558,6 +576,9 @@ def reread_gates(s: dict) -> list[tuple[str, str, str, str]]:
 def fix_for(name: str, st: str, why: str, s: dict) -> tuple[str, bool]:
     """(こう変えれば, 変えようがないか)。"""
     e = s.get("econ")
+    if name == "実勢価格":
+        return ("実勢価格（カートと次点の即納価格）が採算の線に戻れば再判定。"
+                "ふるさと納税など相場外の出品が消えるかを定点で見る"), False
     if name == "カート保持者" and st == "FAIL" and "メーカー" in why:
         return "変えようがない：メーカー/ブランド本人がカート（原価で負ける・§3.3-5）", True
     if name == "カート保持者" and st == "FAIL":
@@ -899,6 +920,11 @@ def _compose_netsea(s: dict, gate: dict | None) -> dict:
             gates.append(("ゲート", "FAIL", gate["根拠"], ""))
         else:
             gates.append(("ゲート", "PASS", gate["根拠"], ""))
+    pc = PRICE_CHECKS.get(s["asin"])
+    if pc:
+        # 2026-10-14：人の実画面で実勢価格が採算の前提（90日中央値）より安い行は NO-GO（#13）
+        gates.append(("実勢価格", "FAIL",
+                      f"{pc.get('根拠', '')}（{pc.get('確認者', '')} {pc.get('確認時刻', '')}）", ""))
     DIAG.append({"ASIN": s["asin"], "items": {n: st for n, st, *_ in gates},
                  "gate": (gate or {}).get("ゲート判定", ""), "cart_human": s["asin"] in SCREEN.cart,
                  "grade": getattr(s.get("econ"), "grade", "")})
@@ -933,7 +959,11 @@ def _compose_netsea(s: dict, gate: dict | None) -> dict:
         fails = {n for n, st, *_ in gates if st == "FAIL"}
         sh_ = (s.get("_share") or {}).get("share")
         share_ok = "取り分" not in fails or (sh_ is not None and sh_ >= K.TRACK_MIN_SHARE)
-        if (e_ and e_.grade == "C" and mid_ is not None and mid_ >= K.TRACK_MIN_NET_YEN
+        # 2026-10-14 秘書判断 A（§3.5 #18）：B 等級で #10 の取り分だけが月1〜3個のため落ちた行も
+        # 実績枠の候補にする（C だけ残して B を落とす逆転を解消）
+        b_share_only = bool(e_ and e_.grade == "B" and fails == {"取り分"})
+        if (e_ and (e_.grade == "C" or b_share_only) and mid_ is not None
+                and mid_ >= K.TRACK_MIN_NET_YEN
                 and fails and fails <= {"採算", "取り分"} and share_ok
                 and any(st == "UNKNOWN" for _, st, *_ in gates)):
             note = K.track_record_note(mid_, e_.worst_net_per_unit)
