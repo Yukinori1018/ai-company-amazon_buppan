@@ -5,15 +5,16 @@
       "id": "sellercentral",
       "name": "Amazon セラーセントラル",
       "enabled": true,
-      "url": "https://sellercentral-japan.amazon.com/home",
+      "url": "https://sellercentral-japan.amazon.com/hz/approvalrequest/restrictions/approve?asin=B01BW9TAKS&itemcondition=New",
       "host": "sellercentral-japan.amazon.com",
       "every_min": 20,
       "hours": [
         0,
         24
       ],
-      "logout_url_re": "(/ap/(signin|mfa|cvf)|/ax/claim|/signin|/amazonsell)",
-      "note": "サインインは openid.pape.max_auth_age=0 付き＝切れたら必ずパスワードから。延命だけが効く手。 非ログインの Chrome では /home が出品案内ページ（/amazonsell/business）へ飛ぶ（2026-10-12 実測）。"
+      "logout_url_re": "(/ap/(signin|mfa|cvf)|/ax/claim|/signin)",
+      "note": "サインインは openid.pape.max_auth_age=0 付き＝切れたら必ずパスワードから。延命だけが効く手。🔴2026-10-14 修正：旧 URL /home は**ログイン中でも** /amazonsell/business（出品案内）へ飛ぶ（本文に店舗名 Satoy Select ありを実画面で確認）＝10/12〜14 の『切れ』は誤判定。出品許可の確認ページ（§3.3-25 の URL）はログイン中ならタイトル『申請に必要な要件』で開く。タイトルが違えば切れ（ok_title_re）。AppleScript ではタイトルしか読まないので本文の店舗名は見ない。非ログイン時の飛び先は未確認（/ap/signin の想定。違ってもタイトルで切れになる）。",
+      "ok_title_re": "申請に必要な要件"
     },
     {
       "id": "amazon_jp",

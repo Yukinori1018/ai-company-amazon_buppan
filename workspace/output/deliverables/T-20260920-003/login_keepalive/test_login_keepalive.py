@@ -21,7 +21,7 @@ def test_logout_urls_are_detected_for_every_enabled_site():
 
 
 def test_logged_in_pages_are_ok():
-    assert lk.classify(SITES["sellercentral"], "https://sellercentral-japan.amazon.com/home", "Seller Central") == "ok"
+    assert lk.classify(SITES["sellercentral"], SITES["sellercentral"].url, "申請に必要な要件") == "ok"
     sd_ok = "https://www.superdelivery.com/p/do/memberManage/purchase/orderHistory/list"
     assert lk.classify(SITES["superdelivery"], sd_ok, "購入履歴｜卸・仕入れサイト【スーパーデリバリー】") == "ok"
 
@@ -76,9 +76,17 @@ def test_sd_daily_reloads_within_legal_line():
 
 
 
-def test_sellercentral_landing_page_means_logged_out():
-    # 非ログインの Chrome で /home を開くと出品案内に飛ぶ（2026-10-12 実測）
-    assert lk.classify(SITES["sellercentral"], "https://sellercentral-japan.amazon.com/amazonsell/business", "Amazonの新しい出品サービス") == "logged_out"
+def test_sellercentral_uses_approval_page_and_title():
+    # 2026-10-14：/home はログイン中でも /amazonsell/business へ飛ぶ＝10/12〜14 の「切れ」は誤判定だった。
+    # 出品許可の確認ページをログイン中に開くとタイトル「申請に必要な要件」（実画面で確認）。
+    sc = SITES["sellercentral"]
+    url = "https://sellercentral-japan.amazon.com/hz/approvalrequest/restrictions/approve?asin=B01BW9TAKS&itemcondition=New"
+    assert "/home" not in sc.url and "approvalrequest" in sc.url
+    assert lk.classify(sc, url, "申請に必要な要件") == "ok"
+    assert lk.classify(sc, url, url) == "ok"  # 読み込み途中
+    # /amazonsell はログイン中でも出るので URL では「切れ」にしない（タイトルが違えば切れ）
+    assert lk.classify(sc, "https://sellercentral-japan.amazon.com/amazonsell/business", "Amazonの新しい出品サービス") == "logged_out"
+    assert not __import__("re").search(sc.logout_url_re, "sellercentral-japan.amazon.com/amazonsell/business")
 
 
 def test_outage_title_is_error_not_ok():
