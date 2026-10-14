@@ -20,3 +20,9 @@
 ## 判定の前→後（台帳 10,626行・ledger_refresh）
 - 後述の数字はチケット T-20261014-001 のログが正
 - 規定のねじれを発見（未修正）：B で取り分1〜3個は #10 FAIL→NO-GO、C で中央値0円以上なら実績枠候補（UNKNOWN）。費用を厳しくしたら NO-GO→UNKNOWN が7件出た。`consistency.track_record` の docstring は「取り分だけ足りない B」も実績枠に入れる想定
+
+## 追記（同日・秘書判断 A）
+- 実績枠に「B で取り分だけ月1〜3個」を追加（`consistency.TRACK_B_SHARE_CEIL=3`）。ledger_refresh 側は「実績枠の候補」判定の `grade == "C"` 条件が漏れていた所を直した
+- SD の手読み卸値は `sd_route_override_<日付>_read.csv`（列＝ASIN,JAN,SD品番,購入先URL,卸価格_税抜_1点,卸の最小ロット(点),在庫,確認時刻,確認者,メモ,卸サイト,仕入れ先,JAN照合）で合流。**先に読み込んだファイルが勝つ**（同じ ASIN は古い override が優先）
+- 人の実勢価格で NO-GO にするのは `ledger20261010/price_checks_*.csv`（ASIN,実勢価格,根拠,確認者,確認時刻）。#13 実勢価格 の FAIL ゲートになる
+- 卸率の読み込み修正の境界は生値10（表示1000%）。境界5では本当の624.8%・856.1%を壊した

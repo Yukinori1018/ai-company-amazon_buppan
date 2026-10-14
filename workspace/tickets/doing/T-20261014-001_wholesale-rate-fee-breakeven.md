@@ -43,6 +43,13 @@ related_tickets:
   - B07XCVFL6R（SD 卸値・10/14 読み取り）：通常卸値で中央値 57→▲51円、初回割引でも 78→▲30円＝赤字になり実績枠から外れる（台帳は NETSEA 経路で NO-GO）
   - B01BW9TAKS（SD 卸値）：中央値 174→109円・悲観 64→▲22円。B のまま＝実績枠の採算線（中央値0円以上）は満たす。取り分1.3個/月なので実績枠の候補のまま（台帳は NETSEA 経路で UNKNOWN）
   - 発見（未修正・秘書判断）：B で取り分1〜3個は #10 FAIL で NO-GO、C で中央値0円以上だと実績枠候補で UNKNOWN になる。費用を厳しくしたら NO-GO→UNKNOWN が7件出たのはこのねじれ。`consistency.track_record` は「取り分だけ足りない B」も実績枠に入れる想定
+- 2026-10-14 タカシ（秘書判断 A を反映）
+  - 実績枠：`consistency.track_record` と `ledger_refresh` を §3.5 #18 の追記（B 等級で #10 の取り分だけが月1〜3個のため落ちた行も入れる）に合わせた。B で取り分が月3個以上なら通常の GO
+  - 10/14 SD で読んだ卸値 20 ASIN を `agent_output/.../sd_buylist20261009/sd_route_override_20261014_read.csv` として経路に合流（通常価格・在庫は未確認・JAN 照合済み）。SD 経路の台帳行 518→538
+  - B07XCVFL6R：実画面のカート465円（ふるさと納税の出品）・次点600円 → NO-GO・理由「#13 実勢価格」。人の実勢価格の証跡 `ledger20261010/price_checks_*.csv` を ledger_refresh が読む仕組みを追加
+  - 台帳：前 GO 0／実績枠 1／UNKNOWN 1,534／NO-GO 9,091 → 後 GO 0／実績枠 1／UNKNOWN 1,535／NO-GO 9,090。dry-run→書き込み→2回目 dry-run 差分0
+  - 実績枠の候補（UNKNOWN が残る行）33→34：増 B00Q64TJ3S・B00J3FMHZO（SD 経路・B で取り分だけ不足＝A の効果）、減 B0D3LJN9S1（SD で SOLD OUT）
+  - GO（実績枠）は B001CNHI8G の1件（NETSEA・中央値402円／悲観85円。NETSEA は停止中）
 
 ## 現在地
 
