@@ -135,7 +135,13 @@ MAKER_FLAGS_GLOB = os.path.join(HERE, '..', 'T-20260920-003', 'ledger20261010', 
 def apply_screen_checks(rows):
     """カート保持者・月販表示・判定（本体/本人カート）を実画面の値で上書き。件数を返す。"""
     cart = {}
-    for p in sorted(glob.glob(os.path.join(HERE, CART_GLOB))):
+    # 2026-10-16（タカシ）：並びは（日付, ファイル名）＝新しい確認が勝つ。ファイル名の素の順だと
+    # 「65_カート確認_月販読み直し_20261016」（月 U+6708）が「…_未判定_20261011」（未 U+672A）より前に来て、
+    # 10/16 の読み直し40件が 10/11 の古い値に負けていた。日付順にしても他の ASIN の勝者は変わらない（検算済み）
+    def order(p):
+        m = re.search(r'_(\d{8})\.csv$', p)
+        return (m.group(1) if m else '', os.path.basename(p))
+    for p in sorted(glob.glob(os.path.join(HERE, CART_GLOB)), key=order):
         for x in read_csv(p):
             cart[x['ASIN'].strip()] = x
     flags = {}
