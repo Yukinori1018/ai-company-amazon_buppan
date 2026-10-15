@@ -1654,8 +1654,8 @@ Amazonで売れている商品を起点に、取引できる国内中小メー�
 - 公開版は leak.py＋特商法の全販売業者名で照合。3541 はキューのメーカー欄・ブランド欄が販売店名（時計部品店）だったので RETAIL で伏せた
 
 ## 成果物（サトル 2026-10-16 担当ZC・キュー3490〜3589位）
-- workspace/output/deliverables/T-20260930-001/10_連絡先_batchZC_公開版.csv（100行・売価・カート保持セラー列なし、販売店名は伏せ字）
-- workspace/output/deliverables/T-20260930-001/67_紐付け確認_ZC_20261016.csv（接触候補13社）
+- workspace/output/deliverables/T-20260930-001/10_連絡先_batchZC_公開版.csv（100行・commit 6c3bc8ae・売価・カート保持セラー列なし、販売店名は伏せ字）
+- workspace/output/deliverables/T-20260930-001/67_紐付け確認_ZC_20261016.csv（接触候補13社・commit 6c3bc8ae）
 - （全列版・Git管理外）workspace/output/agent_output/T-20260930-001/24_連絡先_batchZC.csv・67_紐付け確認_ZC_20261016.csv・64_出品可否_未判定_ZC.csv／道具 batchZC/（recs.py・build.py・jan.py ほか）／カート保持店の名義・seller ID・特商法の抜粋・検索35回の記録は batchZC/sources_private.md
 
 ## 完了報告（サトル 担当ZC）
