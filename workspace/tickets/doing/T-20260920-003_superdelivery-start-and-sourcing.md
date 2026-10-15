@@ -4424,3 +4424,11 @@ FLR910 2件は SD 経由でも GO（B 等級・11.2%・手残り1,186円/個）�
 - load_sd_route：JAN 照合済みの値がファイル順に関係なく未照合より勝つ。出どころ表記は「SD実画面(JAN照合済み)(日付)」
 - 95 ASIN の結果：NO-GO 94／UNKNOWN 1。中央値で手残り0円以上は2件（B0FF9HRRYD オニポテ＝UNKNOWN〔卸率14.1%の番兵・在庫未確認・取り分1.7〕／B00SB66PKY なめらかかと48本＝NO-GO〔キーゾン0〕）。Keepa データが無い10 ASIN は off_ledger_needs_keepa.txt → unknown_stages s0 で取得待ち
 - 台帳（10,626行）：GO 0／GO（実績枠）1／UNKNOWN 510／NO-GO 10,115。2回目の差分 0
+
+## ログ（2026-10-15 22:40・タカシ・カズヨ実画面 85件の書き戻し）
+- 2026-10-15 カズヨ実画面（browser_results_20261015.tsv・85 ASIN：#1-2 ゲート／#5 カート／#7 内訳）を新設の `browser_results_import.py` で証跡ファイル（ledger20261010/gate_check_20261015_browser.csv・cart_check_20261015_browser.csv）と確認記録（_sourcing_checks/<ASIN>.json の gate_type・listing_button・buybox_seller・new_offer_count）に変換し、ledger_refresh で台帳へ合流（証跡方式＝機械が人の値を上書きしない）
+- 85件のうち16件は 10/14 の POOL 凍結で採点プールから外れた「孤児行」で、引き直されず人の確認が効かなかった → `score_screened_orphans()` を追加（人の証跡がある ASIN だけ、生きたプールの行＋手元の Keepa データで再採点。Keepa 0トークン）
+- カート欄「ハナリラ」＝ブランド「ハナリラ」（B0GJR86F8W）は機械でメーカー本人の疑い → #5 UNKNOWN。両方 PASS は 23 → 22件
+- 台帳（10,626行）：GO 0→1／GO（実績枠）1→2／UNKNOWN 510→498／NO-GO 10,115→10,125。2回目の dry-run 差分 0。書き込み前の全値は before_20261015_browser1015.json
+- 新しく GO：B0DYNG386S（ブライト エレキブラシ・NETSEA ウェルフェア）／新しく実績枠：B00Y1U9KKG（パナソニック EEスイッチ・NETSEA ヤザワ＝SD にも出展）。どちらも NETSEA 停止中で卸値は 10/01 の実額のまま＝発注直前に #17 の取り直しが要る
+- 「#17 だけ残った」UNKNOWN 行は 0件（#17 が残る SD 行は全部 #10 などと併発）。#7 の FBA／自己発送の内訳は TSV に無いので offer_check は作らず、#10 の分母は Keepa のまま
