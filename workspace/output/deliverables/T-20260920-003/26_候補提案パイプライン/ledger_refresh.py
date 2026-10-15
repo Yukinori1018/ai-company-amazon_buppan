@@ -369,7 +369,12 @@ def load_sd_route() -> dict[str, dict]:
             continue
         for r in csv.DictReader(f.open(encoding="utf-8-sig")):
             a = (r.get("ASIN") or "").strip()
-            if a and a not in out and S._num(r.get("卸価格_税抜_1点")):
+            if not (a and S._num(r.get("卸価格_税抜_1点"))):
+                continue
+            # 2026-10-15：JAN 照合済みの値は、先に入った JAN 未照合の値より勝つ（ファイルの順に関係なく）
+            prev = out.get(a)
+            if prev is None or ((prev.get("JAN照合") or "済").strip() != "済"
+                                and (r.get("JAN照合") or "済").strip() == "済"):
                 out[a] = r
     return out
 
@@ -1069,6 +1074,8 @@ def route_src(o: dict) -> str:
     # SD の別商品＝2段を拾っていた）。JAN を照合していない卸値は GO・実績枠の根拠にしない
     if (o.get("JAN照合") or "済").strip() != "済":
         return f"SD実画面(JAN未照合)({day})"
+    if (o.get("JAN照合") or "").strip() == "済":
+        return f"SD実画面(JAN照合済み)({day})"
     return f"SD実画面({day})"
 
 
