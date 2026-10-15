@@ -4432,3 +4432,10 @@ FLR910 2件は SD 経由でも GO（B 等級・11.2%・手残り1,186円/個）�
 - 台帳（10,626行）：GO 0→1／GO（実績枠）1→2／UNKNOWN 510→498／NO-GO 10,115→10,125。2回目の dry-run 差分 0。書き込み前の全値は before_20261015_browser1015.json
 - 新しく GO：B0DYNG386S（ブライト エレキブラシ・NETSEA ウェルフェア）／新しく実績枠：B00Y1U9KKG（パナソニック EEスイッチ・NETSEA ヤザワ＝SD にも出展）。どちらも NETSEA 停止中で卸値は 10/01 の実額のまま＝発注直前に #17 の取り直しが要る
 - 「#17 だけ残った」UNKNOWN 行は 0件（#17 が残る SD 行は全部 #10 などと併発）。#7 の FBA／自己発送の内訳は TSV に無いので offer_check は作らず、#10 の分母は Keepa のまま
+
+## ログ（2026-10-15 23:30・タカシ・秘書判断4点の反映）
+- B0DYNG386S：出品一覧に「【公式】Brighte Online」（FBA）＝ブランド公式が出品 → 証跡 ip_check_20261015_browser.csv（新設：§3.5 #8 を人の確認で合流）＋確認記録 ip_complaint_signs=FAIL。GO → **NO-GO（#8 FAIL）**
+- B00Y1U9KKG：出品一覧の内訳（FBA 4／自己発送 2／本体なし）を offer_check_20261015_browser.csv へ。取り分 2.1→**1.8個/月**・最小ロット10点で在庫5.5か月 → **GO（実績枠）を維持**（実績枠の条件＝月1個以上）
+- 孤児行の全量を採点に戻した（score_screened_orphans の範囲を台帳の全 ASIN に拡大・Keepa 0）。手元に商品データが無い行は据え置き（判定日が 10/13・10/14 のまま 435行が残る＝Keepa の取り直し待ち）
+- GO 一覧の「セラー数」「Amazon本体の有無」は人の #7（offer_check → cart_check の出品一覧件数・本体の有無）を Keepa より優先
+- 台帳（10,626行）：GO 1→**0**／GO（実績枠）2→**2**（B00Y1U9KKG・B001CNHI8G）／UNKNOWN 498→**415**／NO-GO 10,125→**10,209**。2回目の dry-run 差分 0。退避 before_20261015_orphans1015.json

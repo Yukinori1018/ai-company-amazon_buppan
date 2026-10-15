@@ -47,7 +47,8 @@ sys.path.insert(0, str(REPO / "scripts/sourcing_gate"))
 import gate  # noqa: E402
 
 CART_COLS = ["ASIN", "カートあり", "カート保持者(実画面)", "カート価格", "過去1か月(実画面・下限)",
-             "確認時刻", "確認者", "注意", "アマゾン直販(キーゾン)"]
+             "確認時刻", "確認者", "注意", "アマゾン直販(キーゾン)",
+             "新品出品者数(出品一覧)", "Amazon本体(出品一覧)"]
 GATE_COLS = ["ASIN", "新品の出品可否", "判定方法", "確認時刻", "確認者"]
 GATE_URL = ("https://sellercentral-japan.amazon.com/hz/approvalrequest/restrictions/approve"
             "?asin={a}&itemcondition=New")
@@ -107,7 +108,9 @@ def build(rows: list[dict], checked_at: str, by: str, src_name: str):
             warn.append((a, sus))
         carts.append({"ASIN": a, "カートあり": yn, "カート保持者(実画面)": holder, "カート価格": "",
                       "過去1か月(実画面・下限)": "", "確認時刻": checked_at,
-                      "確認者": f"{by}(Chrome実画面)", "注意": note, "アマゾン直販(キーゾン)": ""})
+                      "確認者": f"{by}(Chrome実画面)", "注意": note, "アマゾン直販(キーゾン)": "",
+                      "新品出品者数(出品一覧)": off.get("n", ""),
+                      "Amazon本体(出品一覧)": {"本体なし": "なし", "本体あり": "あり"}.get(off.get("amazon"), "")})
         recs[a] = (g_kind, yn, holder, off, sus)
     return carts, gates, recs, warn
 

@@ -159,6 +159,7 @@ ITEM = {
     "取り寄せ価格": "#13 販売価格（取り寄せ型の値付けしかない）",
     "終売": "#12 終売（今だけ3条件）",
     "実勢価格": "#13 実勢価格",
+    "知財": "#8 知財申立てのサイン",
 }
 HUMAN_ITEMS_BASE = ["#9 キーゾンで3か月の実数（型番ごと）",
                     "#5 カートの販売元を実画面で読む",
@@ -237,21 +238,24 @@ def score_netsea() -> list[dict]:
 
 #: 2026-10-14 まで採点プールだった「生きている」buy_list_private（毎晩 台帳ダンプで上書きされる）
 LIVE_POOL = WORK / "pipeline/buy_list_private.csv"
+#: 台帳にある ASIN（main() がシートを読んだ後に入れる）。採点プール外の孤児行を拾うのに使う
+LEDGER_ASINS: set[str] = set()
 
 
 def score_screened_orphans(scored: list[dict], idx: dict, names: dict, rc: dict) -> list[dict]:
-    """人の実画面確認がある（SCREEN.covers）のに、どの採点プールにも居ない ASIN を採点に戻す。
+    """台帳にある（または人の実画面確認がある）のに、どの採点プールにも居ない ASIN を採点に戻す。
 
     なぜ要るか（2026-10-15 タカシ）：10/14 に POOL を 648行の凍結コピーに戻したため、10/13 の
     生きたプール（台帳ダンプ）でしか採点されていなかった行が「孤児」になり、以後 ledger_refresh が
     一度も引き直さない。そこへカズヨがゲート・カートを実画面で見ても判定に効かない
     （10/15 の browser_results 85件のうち16件。B07G4HFP3N はゲート FAIL なのに UNKNOWN のまま）。
 
-    範囲は**人の証跡がある ASIN だけ**に絞る（孤児の全量＝約850行を戻すのは別判断）。
+    範囲：当初（10/15 22時）は人の証跡がある ASIN だけ。秘書判断で同日 23時に**台帳の孤児行の全量**に広げた
+    （判定日 10/13・10/14 のまま止まっていた約850行）。
     行は生きたプールの同じ ASIN の行、商品データは手元の取得済み（FRESH・取り直し・補完）だけ。
     データが無ければ採点しない＝既存行は据え置き（keep_when_no_data と同じ考え方）。Keepa は叩かない。"""
     have = {x["asin"] for x in scored}
-    todo = {a for a in (set(SCREEN.cart) | set(SCREEN.gate)) if a not in have and SCREEN.covers(a)}
+    todo = ({a for a in (set(SCREEN.cart) | set(SCREEN.gate)) if SCREEN.covers(a)} | LEDGER_ASINS) - have
     if not todo or not LIVE_POOL.exists():
         return []
     rows = {}
@@ -281,7 +285,7 @@ def score_screened_orphans(scored: list[dict], idx: dict, names: dict, rc: dict)
             continue
         cand = cands.get(a) or {}
         s = S.build(row, cand, pf[0], idx, names, idx_day, None, dict(rc))
-        s.update({"_src": "人の確認ありの孤児行(10/13 生きたプール)", "_cand": cand,
+        s.update({"_src": "孤児行(10/13 生きたプール)", "_cand": cand,
                   "_idx_day": idx_day, "_fresh": pf[1]})
         out.append(s)
     return out
@@ -678,6 +682,11 @@ def fix_for(name: str, st: str, why: str, s: dict) -> tuple[str, bool]:
         return "キーゾンで3か月の実数を見れば決まる（月3個以上の取り分があれば可）", False
     if name == "価格の動き" and st == "FAIL":
         return "下落が止まり、90日の後半が前半比-5%以内に戻れば再判定で通る", False
+    if name == "知財" and st == "FAIL":
+        return ("変えようがない：ブランド公式・正規店が出品している棚は、知財申立てや販売者限定化で"
+                "排除される側に回る（§3.3-5）。メーカー直取引で販売許可を得れば別"), True
+    if name == "知財":
+        return "出品一覧と Keepa の出品者数グラフで公式・正規店の有無を見れば決まる", False
     if name == "取り寄せ価格":
         return ("即納で売れる相場が無い。Keepa で即納の出品者がいた時期のカート価格（1年前など）を"
                 "売価にして採算を引き直し、黒字なら可"), False
@@ -856,6 +865,10 @@ def apply_screen(s: dict, gates: list, gate: dict | None) -> bool:
     if c:
         st, why = SC.cart_gate(c)
         gates[:] = [g for g in gates if g[0] != "カート保持者"] + [("カート保持者", st, why, "")]
+    ip = SCREEN.ip.get(a)
+    if ip:
+        gates[:] = [g for g in gates if g[0] != "知財"] + [
+            ("知財", ip["知財のサイン"], f"{ip['根拠']}（{ip['確認者']} {ip['確認時刻']}）", "")]
     sea = SCREEN.season.get(a)
     if sea:
         gates[:] = [g for g in gates if g[0] != "季節の窓"] + [
@@ -1262,13 +1275,19 @@ def screen_cells(s: dict, gate: dict | None) -> dict:
             how.append(f"キーゾン（ASIN 単位）{k.checked}")
             who.append("キーゾン")
     sh = s.get("_share") or {}
-    if sh.get("src"):
-        if sh.get("human"):
-            g["新品出品者数(画面実数)"] = (f"カート対象 FBA {sh['fba']}／即納の自己発送 {sh['fbm']}"
-                                        f"（{sh['src']}）")
-        else:
-            g["新品出品者数(画面実数)"] = (f"未確認（{sh['src']} カート対象：FBA {sh['fba']}／"
-                                        f"自己発送 {sh['fbm']}）")
+    # §3.5 #7：人が出品一覧で数えた値を Keepa より優先する（2026-10-15 GO 一覧の「セラー数」「本体」）
+    if c and c.amazon_on_listing:
+        g["Amazon本体の有無"] = f"{c.amazon_on_listing}（出品一覧・カズヨ実画面 {c.checked_at}）"
+    if sh.get("src") and sh.get("human"):
+        g["新品出品者数(画面実数)"] = (f"カート対象 FBA {sh['fba']}／即納の自己発送 {sh['fbm']}"
+                                    f"（{sh['src']}）")
+    elif c and c.offers_new is not None:
+        g["新品出品者数(画面実数)"] = (f"新品{c.offers_new}件（出品一覧・カズヨ実画面 {c.checked_at}）"
+                                    + (f"。カート対象の内訳は Keepa：FBA {sh['fba']}／自己発送 {sh['fbm']}"
+                                       if sh.get("src") else ""))
+    elif sh.get("src"):
+        g["新品出品者数(画面実数)"] = (f"未確認（{sh['src']} カート対象：FBA {sh['fba']}／"
+                                    f"自己発送 {sh['fbm']}）")
     if sh.get("months"):
         g["売り切る月数"] = (f"{sh['months']:.1f}（推奨初回 {sh['rec']}点÷取り分 "
                            f"{sh['share']:.1f}個/月）")
@@ -1650,6 +1669,7 @@ def main(argv=None) -> int:
     stamp = date.today().strftime("%Y%m%d") + "_" + os.environ.get("RUN_TAG", "run")
     (OUT / f"before_{stamp}.json").write_text(json.dumps(vals, ensure_ascii=False))
     header, body = vals[0], vals[1:]
+    LEDGER_ASINS.update(x[header.index("ASIN")] for x in body if x)
     # 卸率の表示ずれ（58.2% が 5820.00%）を直すため、その列だけ生値でも読む（2026-10-14）
     ratio_fixed = 0
     if RATIO_COL in header:

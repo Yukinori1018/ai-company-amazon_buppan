@@ -69,6 +69,9 @@ class Cart:
     holder_src: str = "人"         # "人"（実画面で読んだ）／"Keepa"（Y だが名前は Keepa で補った）
     #: キーゾンの「アマゾン直販」（§3.5 #6 補助・2026-10-12）。単独では落とさないが判定理由に書く
     amazon_direct: str = ""
+    #: 出品一覧の実画面（§3.5 #7・2026-10-15）。新品の件数と本体の有無（browser_results の #7）
+    offers_new: int | None = None
+    amazon_on_listing: str = ""     # "なし" / "あり" / ""（未確認）
 
 
 @dataclass
@@ -85,11 +88,12 @@ class ScreenChecks:
     gate: dict[str, dict]
     keizon: dict[str, Keizon]
     season: dict[str, dict] = field(default_factory=dict)   # 人が12か月ランクを見た季節判定
+    ip: dict[str, dict] = field(default_factory=dict)       # 人が見た §3.5 #8 知財のサイン
 
     def covers(self, asin: str) -> bool:
         """人の確認の証跡があるか（凍結解除の判定に使う）。キーゾン再現値（機械）は数えない。"""
         k = self.keizon.get(asin)
-        return (asin in self.cart or asin in self.gate or asin in self.season
+        return (asin in self.cart or asin in self.gate or asin in self.season or asin in self.ip
                 or bool(k and not k.checked.startswith("Keepa")))
 
     def has_any(self, asin: str) -> bool:
@@ -119,6 +123,9 @@ def load_cart() -> dict[str, Cart]:
             c = Cart(holder, (r.get("カート価格") or "").strip(), sold, r.get("確認時刻", ""),
                      has_cart=(True if yn == "Y" else False if yn == "N" else None),
                      amazon_direct=(r.get("アマゾン直販(キーゾン)") or "").strip())
+            n_new = (r.get("新品出品者数(出品一覧)") or "").strip()
+            c.offers_new = int(n_new) if n_new.isdigit() else None
+            c.amazon_on_listing = (r.get("Amazon本体(出品一覧)") or "").strip()
             if "疑い" in (r.get("注意") or ""):
                 c.maker, c.maker_note = "疑い", r["注意"]
             if a in flags:
@@ -270,6 +277,18 @@ def backorder_only(asin: str) -> str:
     return ""
 
 
+def load_ip_checks() -> dict[str, dict]:
+    """ledger20261010/ip_check_*.csv（§3.5 #8 知財申立てのサインを人が実画面で見た結果・2026-10-15〜）。
+
+    列：ASIN, 知財のサイン(PASS/FAIL/UNKNOWN), 根拠, 確認時刻, 確認者。名前順＝日付順・後勝ち。
+    例：出品一覧に「【公式】<ブランド>」が出品している＝ブランド公式が売っている棚（§3.3-5）＝FAIL"""
+    out = {}
+    for p in sorted(OUT.glob("ip_check_*.csv")):
+        for r in csv.DictReader(p.open(encoding="utf-8-sig")):
+            out[r["ASIN"].strip()] = {k: (v or "").strip() for k, v in r.items()}
+    return out
+
+
 def merge_keizon(est: dict[str, Keizon], human: dict[str, Keizon]) -> dict[str, Keizon]:
     """人がキーゾン画面で見た値が常に勝つ（「表示なし」も人の観測なので残す）。
 
@@ -283,7 +302,7 @@ def merge_keizon(est: dict[str, Keizon], human: dict[str, Keizon]) -> dict[str, 
 
 def load(sheet, gate_fallback: dict[str, dict]) -> ScreenChecks:
     kz = merge_keizon(load_kz_estimate(), {**load_keizon(sheet), **load_keizon_screen()})
-    return ScreenChecks(load_cart(), load_gate(gate_fallback), kz, load_season())
+    return ScreenChecks(load_cart(), load_gate(gate_fallback), kz, load_season(), load_ip_checks())
 
 
 _OFFERS: dict[str, tuple[int, int, str]] | None = None
