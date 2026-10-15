@@ -152,9 +152,12 @@ def apply_screen_checks(rows):
         holder = (x.get('カート保持者(実画面)') or '').strip() or \
             ('カートなし' if (x.get('カートあり') or '').strip() == 'N' else '')
         r['カート保持者(実画面9/30)'] = f'{holder}（{day}実画面確認・カズヨ）'
-        sold = (x.get('過去1か月(実画面・下限)') or x.get('過去1か月(実画面)') or '').strip()
-        r['過去1ヶ月の販売数(実画面9/30)'] = (f'{sold}（実画面{day}）' if sold
-                                         else f'表示なし（月50個未満）／実画面{day}')
+        # 2026-10-15（タカシ）：月販の列が無い証跡（65_RC4＝出品可否とカートだけ見た）は月販を書き換えない。
+        # 列が無いのを「表示なし（月50個未満）」と読むと、見ていない値を事実として書くことになる
+        if '過去1か月(実画面・下限)' in x or '過去1か月(実画面)' in x:
+            sold = (x.get('過去1か月(実画面・下限)') or x.get('過去1か月(実画面)') or '').strip()
+            r['過去1ヶ月の販売数(実画面9/30)'] = (f'{sold}（実画面{day}）' if sold
+                                             else f'表示なし（月50個未満）／実画面{day}')
         n['カート反映'] += 1
         if not r['判定'].startswith(OK_STATUS):
             continue
@@ -638,6 +641,20 @@ def gspread_utils():
     return gspread.utils
 
 
+def owner_cell(col, v):
+    """社長入力列の値を文字列に戻す。2026-10-15（タカシ）：書き込みは USER_ENTERED なので、送信反映で入った
+    接触日「2026-10-15」は次の読み込み（FORMULA）で日付シリアル 46310（int）になり、.strip() で落ちた。
+    日付シリアルは ISO 日付に戻す（同じ値を書き戻すだけ＝表示は変わらない）。"""
+    if v is None:
+        return ''
+    if isinstance(v, (int, float)) and not isinstance(v, bool):
+        if col == '接触日' and 20000 < v < 80000:
+            import datetime
+            return (datetime.date(1899, 12, 30) + datetime.timedelta(days=int(v))).isoformat()
+        return str(int(v)) if float(v).is_integer() else str(v)
+    return str(v)
+
+
 def main():
     dry = '--dry-run' in sys.argv
     rows, used, profit = collect()
@@ -680,14 +697,15 @@ def main():
         if not old:
             continue
         for c in OWNER_COLS:
-            if (old.get(c) or '').strip():
-                r[c] = old[c]
+            v = owner_cell(c, old.get(c))
+            if v.strip():
+                r[c] = v
         if (old.get('代表商品（Amazon URL）') or '').startswith('=HYPERLINK'):
             r['代表商品（Amazon URL）'] = old['代表商品（Amazon URL）']
     dres = do.assign(rows, LIST_COL, CHECK_COL)
     n_exp = do.export(rows, os.path.join(HERE, DASHIN_CSV), CHECK_COL)
     missing = [k for k in keep if k not in {key_of(r) for r in rows}
-               and any((keep[k].get(c) or '').strip() not in ('', '未接触') for c in OWNER_COLS)]
+               and any(owner_cell(c, keep[k].get(c)).strip() not in ('', '未接触') for c in OWNER_COLS)]
 
     n = len(rows)
     counts = collections.Counter(r['判定'] for r in rows)
