@@ -55,6 +55,32 @@ def test_no_note_at_50_percent_or_more():
     assert cc.kake_note(cc.need_kake(profit(2000, 1000))) == ''
 
 
+def _with_kz(est: dict):
+    cc._KZ = {'BTEST00001': est}
+
+
+HIDDEN = dict(ROW, **{'過去1ヶ月の販売数(実画面9/30)': '表示なし（月50個未満）／実画面10/16', '代表ASIN(タカシ)': 'BTEST00001'})
+
+
+def test_kz_estimate_below_50_stays_ng_with_note():
+    # 実画面で表示なし・推定 直近30日14個 → NG のまま。推定値と限界を〔〕で添え、集計タグは「月販表示なし」のまま
+    _with_kz({'m': [14, 13, 13], 'obs': [73, 73, 64], 'family': True, 'badge': (50, '08/29'), 'day': '10/16'})
+    s = cc.check(HIDDEN, CAND, profit(2000, 1000), KP)
+    assert s.startswith('NG：月販表示なし〔キーゾン式推定（直近30日 14個 3か月 14/13/13')
+    assert 'family' in s and '月13個超は過小' in s and '50+' in s
+    assert cc.reason_tags(s) == ['月販表示なし']
+
+
+def test_kz_estimate_50_or_more_passes():
+    _with_kz({'m': [60, 40, 30], 'obs': [90, 90, 90], 'family': False, 'badge': None, 'day': '10/16'})
+    assert cc.check(HIDDEN, CAND, profit(2000, 1000), KP) == 'OK'
+
+
+def test_no_kz_history_keeps_old_behavior():
+    cc._KZ = {}
+    assert cc.check(HIDDEN, CAND, profit(2000, 1000), KP) == 'NG：月販表示なし'
+
+
 if __name__ == '__main__':
     for name, fn in list(globals().items()):
         if name.startswith('test_'):

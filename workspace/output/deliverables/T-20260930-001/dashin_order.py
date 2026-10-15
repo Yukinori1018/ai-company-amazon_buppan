@@ -168,6 +168,12 @@ def measure(r: dict, cand: dict, profit: dict, kp: dict | None) -> dict:
         m['月販'], m['月販の出典'] = k['sold'], 'Keepaキャッシュ'
     else:
         m['月販'], m['月販の出典'] = (0, '実画面で表示なし') if '表示なし' in shown else (None, '')
+    # 2026-10-16：実画面で表示なしの行はキーゾン式推定（直近30日）を月販に使う（criteria_check と同じ線）
+    if '表示なし' in shown and '実画面未確認' not in shown:
+        from criteria_check import kz_estimate
+        e = kz_estimate(r.get('代表ASIN(タカシ)') or (kp or {}).get('asin') or '')
+        if e and not e.get('none'):
+            m['月販'], m['月販の出典'] = e['m'][0], 'キーゾン式推定(実画面は表示なし)'
 
     oos = _int(cand.get('本体365日在庫切れ率(代表)'))
     m['本体在庫切れ率365'] = oos if oos is not None else k['oos']

@@ -5,7 +5,9 @@ deliverables/T-20260930-001/01_リスト設計_Amazon起点メーカー連絡先
 CLAUDE.md §3.3-5・§3.5 の入口基準を満たすかを判定し、「基準チェック」列の文字列を返す。
 
 基準（カズヨ指示 10/10）
-  1 月販 ≥ 50（Amazon 表示）          … 実画面 → 候補CSV → Keepa キャッシュ の順に採る
+  1 月販 ≥ 50（Amazon 表示）          … 実画面 → 候補CSV → Keepa キャッシュ の順に採る。
+       実画面で「表示なし」の行は、キーゾン式推定（kz_hist.py・CLAUDE.md §3.3-16）の直近30日が 50 以上なら通す。
+       50 未満なら NG のまま推定値と限界（family 共有・月13個超は過小）を〔〕に書く（2026-10-16 追加）
   2 Amazon 本体なし（365日在庫切れ率 ≥ 90%）… 実画面で「あり」なら NG
   3 FBA出品者 ≥ 1 かつ 新品出品 ≥ 2（入口(a)を含む）
   4 大カテゴリーの売れ筋ランク ≤ 5万     … Keepa キャッシュ stats.current[3]
@@ -25,6 +27,10 @@ import gzip
 import json
 import os
 import re
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
+import kz_hist  # noqa: E402
 
 # 実体は deliverables/（PUBLIC・コードのみ）。Keepa キャッシュは agent_output/（gitignore）にある
 REPO = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../../..'))
@@ -53,6 +59,20 @@ def load_keepa_cache() -> dict[str, dict]:
             if p and p.get('asin'):
                 idx[p['asin']] = p
     return idx
+
+
+_KZ: dict[str, dict] | None = None
+
+
+def kz_estimate(asin: str) -> dict | None:
+    """キーゾン式推定（kz_hist.py）。手元の raw/kzhist_*.json.gz だけを読む（取得はしない）。"""
+    global _KZ
+    if _KZ is None:
+        try:
+            _KZ = kz_hist.load()
+        except Exception:
+            _KZ = {}
+    return _KZ.get(asin)
 
 
 def _int(s) -> int | None:
@@ -113,7 +133,14 @@ def check(r: dict, cand: dict, profit: dict, kp: dict | None) -> str:
     # 1 月販
     shown = r.get('過去1ヶ月の販売数(実画面9/30)') or ''
     if '表示なし' in shown and '実画面未確認' not in shown:
-        ng.append('月販表示なし')
+        # 2026-10-16（タカシ）：実画面で表示なしの行に、キーゾン式推定（kz_hist.py・§3.3-16）を後ろから足す。
+        # 推定の直近30日が 50 以上なら通す。50 未満なら NG のまま、推定値と限界を〔〕に添える（事実として書く）
+        e = kz_estimate(r.get('代表ASIN(タカシ)') or (kp or {}).get('asin') or '')
+        note = f'〔{kz_hist.text(e)}〕' if e else ''
+        if e and not e.get('none') and e['m'][0] >= MIN_SOLD:
+            pass
+        else:
+            ng.append('月販表示なし' + note)
     else:
         v = _shown_int(shown) if shown and '表示なし' not in shown else None
         if v is None:
@@ -187,7 +214,7 @@ def reason_tags(s: str) -> list[str]:
     """集計用：'NG：月販30<50・ランク7.2万位>5万' → ['月販', 'ランク']"""
     if not s.startswith('NG：'):
         return []
-    body = re.sub(r'（未確認：.*', '', s[3:])
+    body = re.sub(r'〔[^〕]*〕', '', re.sub(r'（未確認：.*', '', s[3:]))
     out = []
     for t in body.split('・'):
         if '必要な掛け' in t:  # 「5%に必要な掛け32%<40%」は先頭が数字なので下の正規表現では語が残らない
