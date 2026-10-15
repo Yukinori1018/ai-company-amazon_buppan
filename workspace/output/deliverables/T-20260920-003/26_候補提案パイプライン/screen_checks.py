@@ -381,7 +381,9 @@ def _cart_gate(c: Cart) -> tuple[str, str]:
             or "高値" in h or "非表示" in h):
         return "UNKNOWN", (f"カートなし（{h or '表示なし'}・カズヨ実画面 {c.checked_at}）"
                            "＝誰もカートを持っていない。売価を相場に戻せば取れる可能性")
-    return "PASS", f"カートは第三者 {h}（{c.price}円・カズヨ実画面 {c.checked_at}）"
+    # 2026-10-15：価格を読まずに保持者だけ見た確認（browser_results）では「（円・」と出ていた
+    price = f"{c.price}円・" if c.price else ""
+    return "PASS", f"カートは第三者 {h}（{price}カズヨ実画面 {c.checked_at}）"
 
 
 def sales(asin: str, s: dict, machine_st: str, sc: ScreenChecks) -> tuple[str, str, float | None]:

@@ -228,9 +228,63 @@ def score_netsea() -> list[dict]:
                 s2["_fresh"] = f[1]
                 s = s2
             out.append(s)
+        out += score_screened_orphans(out, idx, names, dict(rc2))
         return route_to_sd(out + score_off_ledger(out, idx, names, dict(rc2)), idx, names, dict(rc2))
     base = old + new
+    base += score_screened_orphans(base, idx, names, dict(rc))
     return route_to_sd(base + score_off_ledger(base, idx, names, dict(rc)), idx, names, dict(rc))
+
+
+#: 2026-10-14 まで採点プールだった「生きている」buy_list_private（毎晩 台帳ダンプで上書きされる）
+LIVE_POOL = WORK / "pipeline/buy_list_private.csv"
+
+
+def score_screened_orphans(scored: list[dict], idx: dict, names: dict, rc: dict) -> list[dict]:
+    """人の実画面確認がある（SCREEN.covers）のに、どの採点プールにも居ない ASIN を採点に戻す。
+
+    なぜ要るか（2026-10-15 タカシ）：10/14 に POOL を 648行の凍結コピーに戻したため、10/13 の
+    生きたプール（台帳ダンプ）でしか採点されていなかった行が「孤児」になり、以後 ledger_refresh が
+    一度も引き直さない。そこへカズヨがゲート・カートを実画面で見ても判定に効かない
+    （10/15 の browser_results 85件のうち16件。B07G4HFP3N はゲート FAIL なのに UNKNOWN のまま）。
+
+    範囲は**人の証跡がある ASIN だけ**に絞る（孤児の全量＝約850行を戻すのは別判断）。
+    行は生きたプールの同じ ASIN の行、商品データは手元の取得済み（FRESH・取り直し・補完）だけ。
+    データが無ければ採点しない＝既存行は据え置き（keep_when_no_data と同じ考え方）。Keepa は叩かない。"""
+    have = {x["asin"] for x in scored}
+    todo = {a for a in (set(SCREEN.cart) | set(SCREEN.gate)) if a not in have and SCREEN.covers(a)}
+    if not todo or not LIVE_POOL.exists():
+        return []
+    rows = {}
+    for r in csv.DictReader(LIVE_POOL.open(encoding="utf-8-sig")):
+        a = (r.get("ASIN") or "").strip()
+        if a in todo and a not in rows:
+            rows[a] = r
+    if not rows:
+        return []
+    load_fresh()
+    prods: dict[str, tuple[dict, int]] = dict(load_supplement())
+    prods.update({k: v for k, v in FRESH.items() if k not in prods or v[1] >= prods[k][1]})
+    if KZ_FULL.exists():
+        for line in KZ_FULL.open():
+            try:
+                o = json.loads(line)
+            except Exception:
+                continue
+            if o.get("asin") and o.get("product") and o["asin"] not in prods:
+                prods[o["asin"]] = (o["product"], o.get("fetched") or 0)
+    cands = json.loads(S.DISCOVERED.read_text())["candidates"]
+    idx_day = S.load_all()[5]
+    out = []
+    for a, row in rows.items():
+        pf = prods.get(a)
+        if not pf:
+            continue
+        cand = cands.get(a) or {}
+        s = S.build(row, cand, pf[0], idx, names, idx_day, None, dict(rc))
+        s.update({"_src": "人の確認ありの孤児行(10/13 生きたプール)", "_cand": cand,
+                  "_idx_day": idx_day, "_fresh": pf[1]})
+        out.append(s)
+    return out
 
 
 #: 台帳の外の SD 候補で、秘書が SD 実画面で卸値を読んで sd_route_override に入れた ASIN のうち、
