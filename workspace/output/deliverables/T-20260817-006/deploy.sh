@@ -78,4 +78,4 @@ wrangler whoami </dev/null 2>&1 | grep -q "not authenticated" && {
 
 echo
 echo " Cloudflare Pages へ公開します（プロジェクト: $PROJECT）…"
-wrangler pages deploy "$PUB" --project-name "$PROJECT"
+wrangler pages deploy "$PUB" --project-name "$PROJECT" --branch main --commit-dirty=true  # 作業ブランチ名だとプレビュー扱いになり本番に出ない（2026-10-15）
