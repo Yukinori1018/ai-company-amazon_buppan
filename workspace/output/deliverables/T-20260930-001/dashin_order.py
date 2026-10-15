@@ -15,7 +15,8 @@
   本体365日在庫切れ率 ≥ 90%       … 候補CSV → Keepa outOfStockPercentage365。実画面で本体ありなら NG
   FBA ≥ 2 または（新品 ≥ 2 かつ FBA ≥ 1）
   売れ筋ランク ≤ 5万              … Keepa stats.current[3]
-  売価 ≥ 2,200円                  … 40_採算列の平時売価 → 代表の売価
+  利益率5%に必要な掛け ≥ 40%      … 40_採算列の上限卸値(5%)÷平時売価（criteria_check.need_kake）
+                                     2026-10-16 までは「売価 ≥ 2,200円」（カズヨ判断A・§3.3-27／§3.5）
   カート保持者が本体・メーカー本人でない、かつ実画面で確認済み
                                   … カート保持者列に「確認」の記載、または 30_verify_cart.tsv（9/30 実画面）
                                      ／61_checked_asins.json（10/5 実画面）に ASIN がある
@@ -41,7 +42,7 @@ DRAFTED = ['ナチュラルウェーブ株式会社', '株式会社ユニマッ�
            '株式会社feel.', '素数株式会社', '株式会社諏訪田製作所', 'リードバディ株式会社']
 LIQUOR = '酒類'  # 流通形態がこれで始まる社は販売免許が無いので打診しない
 
-MIN_SOLD, MIN_OOS, MAX_RANK, MIN_PRICE = 50, 90, 50_000, 2_200
+MIN_SOLD, MIN_OOS, MAX_RANK = 50, 90, 50_000  # 売価の下限 MIN_PRICE=2,200 は 2026-10-16 に廃止
 
 
 def _int(s) -> int | None:
@@ -153,7 +154,7 @@ def link_verdict(raw: str) -> str:
 
 def measure(r: dict, cand: dict, profit: dict, kp: dict | None) -> dict:
     """検算に使う値と出典を1行ぶん取り出す（判定はしない）。"""
-    from criteria_check import _keepa
+    from criteria_check import _keepa, need_kake
     k = _keepa(kp or {})
     m: dict = {}
 
@@ -175,6 +176,8 @@ def measure(r: dict, cand: dict, profit: dict, kp: dict | None) -> dict:
 
     fba = _int(cand.get('代表のFBA数'))
     m['FBA数'] = fba if fba is not None else k['fba']
+    if m['FBA数'] is None and r.get('_cart_fba'):  # 実画面でカート保持者の出荷が FBA＝下限1（2026-10-16）
+        m['FBA数'] = 1
     new_s = r.get('新品出品数(実画面)') or ''
     new = _int(new_s) if new_s and not new_s.startswith(('未確認', '未調査')) else None
     if new is None:
@@ -183,6 +186,7 @@ def measure(r: dict, cand: dict, profit: dict, kp: dict | None) -> dict:
 
     m['ランク'] = k['rank']
     m['売価'] = _int(profit.get('平時売価(円・税込)')) or _int(r.get('代表の売価')) or _int(cand.get('代表の売価'))
+    m['必要掛け'] = need_kake(profit)  # 利益率5%に必要な掛け（0〜1）。計算できなければ None
 
     cart = r.get('カート保持者(実画面9/30)') or ''
     m['カート保持者'] = cart
@@ -208,8 +212,11 @@ def verify(m: dict, judge: str) -> list[str]:
         bad.append(f'FBA{fba}・新品{new}')
     if m['ランク'] is None or m['ランク'] > MAX_RANK:
         bad.append(f'ランク{m["ランク"]}>5万')
-    if m['売価'] is None or m['売価'] < MIN_PRICE:
-        bad.append(f'売価{m["売価"]}<2,200')
+    from criteria_check import kake_ng
+    if m['必要掛け'] is None:
+        bad.append('採算未計算')
+    elif kake_ng(m['必要掛け']):
+        bad.append(kake_ng(m['必要掛け']))
     cart = m['カート保持者']
     if 'Amazon.co.jp' in cart or judge.startswith('除外') or '本人' in judge:
         bad.append('カートが本体/メーカー本人')
@@ -275,7 +282,7 @@ def assign(rows: list[dict], list_col: str, check_col: str) -> dict:
 
 EXPORT_COLS = ['打診順', '送信順', '正式社名', 'ブランド', '代表ASIN', 'Amazon URL', '連絡手段', 'メールアドレス',
                '電話番号', '問い合わせフォームURL', '流通形態', '月販', '月販の出典', '本体在庫切れ率365(%)', 'FBA数', '新品数',
-               '売れ筋ランク', '売価(円)', 'カート保持者', 'カート実画面確認', '紐付けの判定', '紐付けの判定(原文)', '紐付け根拠URL', '基準チェック']
+               '売れ筋ランク', '売価(円)', '5%に必要な掛け(%)', 'カート保持者', 'カート実画面確認', '紐付けの判定', '紐付けの判定(原文)', '紐付け根拠URL', '基準チェック']
 
 
 def export(rows: list[dict], path: str, check_col: str, prefix: str = '第1弾-') -> int:
@@ -292,6 +299,7 @@ def export(rows: list[dict], path: str, check_col: str, prefix: str = '第1弾-'
                     '問い合わせフォームURL': r.get('問い合わせフォームURL', ''), '流通形態': r.get('流通形態', ''),
                     '月販': m['月販'], '月販の出典': m['月販の出典'], '本体在庫切れ率365(%)': m['本体在庫切れ率365'],
                     'FBA数': m['FBA数'], '新品数': m['新品数'], '売れ筋ランク': m['ランク'], '売価(円)': m['売価'],
+                    '5%に必要な掛け(%)': '' if m['必要掛け'] is None else round(m['必要掛け'] * 100),
                     'カート保持者': m['カート保持者'], 'カート実画面確認': '済' if m['カート実画面確認'] else '未',
                     '紐付けの判定': m['紐付けの判定'], '紐付けの判定(原文)': m['紐付けの判定(原文)'], '紐付け根拠URL': m['紐付け根拠URL'],
                     '基準チェック': r.get(check_col, '')})

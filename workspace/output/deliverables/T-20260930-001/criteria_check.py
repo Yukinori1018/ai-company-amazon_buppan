@@ -9,7 +9,11 @@ CLAUDE.md §3.3-5・§3.5 の入口基準を満たすかを判定し、「基準
   2 Amazon 本体なし（365日在庫切れ率 ≥ 90%）… 実画面で「あり」なら NG
   3 FBA出品者 ≥ 1 かつ 新品出品 ≥ 2（入口(a)を含む）
   4 大カテゴリーの売れ筋ランク ≤ 5万     … Keepa キャッシュ stats.current[3]
-  5 売価 ≥ 2,200円                     … 40_採算列の平時売価 → 候補CSVの代表の売価
+  5 利益率5%に必要な掛け ≥ 40%          … 40_採算列の「利益率5%の上限卸値」÷「平時売価」
+       2026-10-16 変更（カズヨ判断A・タカシ実装）：前の値は「売価 ≥ 2,200円」。単価の下限は当社が置いた定数で、
+       CLAUDE.md §3.3-27（実践者は単価の下限を置かず利益で切る）・§3.5 メーカー直の初期方針（見積り利益率5%以上で
+       テスト仕入れ）と食い違い、入口(b)（売価1,500〜2,199円）の接触候補を全員落としていた。
+       40% は仮置き（§3.1）。メーカー直の一般的な5〜6掛けで5%が届く線。40〜50%は採算メモに「掛け交渉次第」
   6 カート保持者がメーカー本人でない      … 判定「除外：メーカー本人」→NG、「本人の疑い」→未確認
 
 出力：'OK' ／ 'NG：理由・理由' ／ '未確認：項目'（NG が1つでもあれば NG を優先し、未確認は括弧で併記）
@@ -26,7 +30,11 @@ import re
 REPO = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../../..'))
 RAW = os.path.join(REPO, 'workspace/output/agent_output/T-20260930-001/raw')
 
-MIN_SOLD, MIN_OOS, MAX_RANK, MIN_PRICE = 50, 90, 50_000, 2_200
+MIN_SOLD, MIN_OOS, MAX_RANK = 50, 90, 50_000
+# 基準5：利益率5%を取るのに必要な掛け（＝利益率5%の上限卸値 ÷ 平時売価）の下限。仮置き（§3.1）。
+# 2026-10-16 までは MIN_PRICE = 2_200（売価の下限）だった。
+MIN_KAKE, NEGOTIATE_KAKE = 0.40, 0.50
+COL_UP5, COL_PRICE = '利益率5%の上限卸値(円・税込)', '平時売価(円・税込)'
 
 
 def load_keepa_cache() -> dict[str, dict]:
@@ -75,6 +83,29 @@ def _keepa(p: dict) -> dict:
             'new': pos(st.get('totalOfferCount'))}
 
 
+def need_kake(profit: dict) -> float | None:
+    """利益率5%を取るのに必要な掛け（0.45＝4.5掛けまでなら5%が残る）。計算できなければ None。
+    上限卸値が0以下（タダで仕入れても5%に届かない）は 0.0 を返す＝必ず NG になる。"""
+    up5, price = _int((profit or {}).get(COL_UP5)), _int((profit or {}).get(COL_PRICE))
+    if up5 is None or not price or price <= 0:
+        return None
+    return max(up5, 0) / price
+
+
+def kake_ng(k: float | None) -> str | None:
+    """基準5の NG 理由（OK なら None）。k が None のときは呼ばない（未確認扱い）。"""
+    if k is not None and k < MIN_KAKE:
+        return f'5%に必要な掛け{k * 100:.0f}%<{MIN_KAKE * 100:.0f}%'
+    return None
+
+
+def kake_note(k: float | None) -> str:
+    """40〜50% は通すが、掛けの交渉が要ることを採算メモに残す。"""
+    if k is not None and MIN_KAKE <= k < NEGOTIATE_KAKE:
+        return f'掛け交渉次第（利益率5%に必要な掛け{k * 100:.0f}%）'
+    return ''
+
+
 def check(r: dict, cand: dict, profit: dict, kp: dict | None) -> str:
     k = _keepa(kp or {})
     ng, unk = [], []
@@ -108,6 +139,8 @@ def check(r: dict, cand: dict, profit: dict, kp: dict | None) -> str:
     # 3 FBA ≥1 かつ 新品 ≥2（実画面の新品数があれば優先）
     fba = _int(cand.get('代表のFBA数'))
     fba = fba if fba is not None else k['fba']
+    if fba is None and r.get('_cart_fba'):  # 実画面でカート保持者の出荷が FBA（sync_ledger.apply_screen_checks）
+        fba = 1
     new_s = r.get('新品出品数(実画面)') or ''
     new = _shown_int(new_s)
     if new is None:
@@ -129,12 +162,12 @@ def check(r: dict, cand: dict, profit: dict, kp: dict | None) -> str:
     elif k['rank'] > MAX_RANK:
         ng.append(f'ランク{k["rank"] / 10000:.1f}万位>5万')
 
-    # 5 売価
-    price = _int(profit.get('平時売価(円・税込)')) or _int(r.get('代表の売価')) or _int(cand.get('代表の売価'))
-    if price is None:
-        unk.append('売価')
-    elif price < MIN_PRICE:
-        ng.append(f'売価{price:,}円<2,200')
+    # 5 利益率5%に必要な掛け ≥ 40%（2026-10-16 までは「売価 ≥ 2,200円」）
+    k5 = need_kake(profit)
+    if k5 is None:
+        unk.append('採算')
+    elif kake_ng(k5):
+        ng.append(kake_ng(k5))
 
     # 6 カート保持者
     j = r.get('判定') or ''
@@ -157,5 +190,8 @@ def reason_tags(s: str) -> list[str]:
     body = re.sub(r'（未確認：.*', '', s[3:])
     out = []
     for t in body.split('・'):
+        if '必要な掛け' in t:  # 「5%に必要な掛け32%<40%」は先頭が数字なので下の正規表現では語が残らない
+            out.append('必要な掛け')
+            continue
         out.append(re.sub(r'[\d,.%<>万位円]+.*$', '', t) or t)
     return out
