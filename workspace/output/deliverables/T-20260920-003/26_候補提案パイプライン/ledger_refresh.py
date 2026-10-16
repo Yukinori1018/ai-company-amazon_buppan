@@ -1533,7 +1533,7 @@ def sd_rows(header: list[str]) -> tuple[list[list], list[dict]]:
             "確認方法": ("SD 商品ページ（非ログイン・9/30〜10/09）＋取引条件表＋Keepa（JAN 逆引き）"
                          + ("＋卸価格はカズヨが社長 Chrome で確認" if mp else "")),
             "確認者": "タカシ（機械判定・実画面未確認）"
-                      + ("／カズヨ（SD 卸価格のみ実画面）" if mp else ""),
+                      + (SD_PRICE_ONLY_NOTE if mp else ""),
             "発注状況": "未発注",
             WSRC: (f"SD実画面({(mp.get('確認時刻') or '')[:10]})" if mp else "未確認"),
         })
@@ -1635,10 +1635,17 @@ def with_supply_note(reason: str, site: str, supplier: str) -> str:
     return note + reason
 
 
+SD_PRICE_ONLY_NOTE = "／カズヨ（SD 卸価格のみ実画面）"   # 機械が付ける注記（is_human は凍結しない）
+
+
 def is_human(row: dict) -> bool:
     """凍結する人の行か。実画面確認の証跡ファイル（screen_checks）に載っている ASIN は
     凍結せず、毎回その証跡から人の値を合流させて引き直す（2026-10-11）。"""
     who = row.get("確認者") or ""
+    # 2026-10-17（秘書判断 A）：「／カズヨ（SD 卸価格のみ実画面）」は sd_rows が**機械で付ける**注記。
+    # 人が見たのは卸値だけで判定は機械なので、凍結の根拠にしない（10/11 から26行が一度も引き直されず、
+    # 人のセット数確認 B00H2E0JLW も効かなかった）。卸値の人の値は load_sd_manual 経由で引き続き勝つ
+    who = who.replace(SD_PRICE_ONLY_NOTE, "")
     # 2026-10-12：秘書が台帳で直接下した最終判断（確認者にタカシ＝機械の名が無い行。例
     # 「カズヨ（社長方針で終売品を許容・…）」）は、証跡ファイルに載っていても凍結する。
     # 機械の合流で作る確認者は必ず「／タカシ（…）」を含むので区別できる（§3.3-16）。

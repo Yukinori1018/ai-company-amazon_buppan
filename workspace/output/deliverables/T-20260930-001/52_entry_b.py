@@ -46,6 +46,12 @@ ORDER = keepa_io.RAW / "order_wideB.json"
 STATUS = WORK / "entry_b_status.json"
 TAG = "wideB"
 PRICE_MIN_B, PRICE_MAX_B = 1_500, 2_199
+# 入口ごとに差し替える値（53_entry_c.py がここを上書きして同じ処理を使い回す）
+LABEL = "入口(b) 売価1,500〜2,199"
+KNOWN_ORDERS = ("order.json", "order_wideA.json", "order_seller.json")  # この一覧にある ASIN は取り直さない
+OLD_POOLS: list[tuple[str, str]] = []  # B.load_products() に足す旧プール（order ファイル, product タグ）
+OUT_CAND, OUT_DROP, BAK_TAG = "11c_追加候補_入口b.csv", "12d_入口b_落とした行.csv", "entryb"
+RESERVE = 0  # 他のジョブ用に残す token（取得の前に 必要量＋RESERVE を待つ）
 
 
 def _mod(name: str, path: Path):
@@ -72,7 +78,7 @@ def can_spend(need: int, until: datetime | None) -> bool:
     if until is None:
         return True
     left = keepa_io.tokens_left()
-    wait_min = max(0, need - left) / 20
+    wait_min = max(0, need + RESERVE - left) / 20
     return datetime.now() + timedelta(minutes=wait_min + 1) < until
 
 
@@ -85,15 +91,15 @@ def status(**kw) -> None:
 # ---------------------------------------------------------------- list / fetch
 def cmd_list() -> None:
     known: set[str] = set()
-    for fn in ("order.json", "order_wideA.json", "order_seller.json"):
+    for fn in KNOWN_ORDERS:
         p = keepa_io.RAW / fn
         if p.exists():
             known |= set(json.loads(p.read_text()))
-    got = E["_list"](SEL_B, "wideB")          # 月販の降順（10,000件超なら昇順も足す）
+    got = E["_list"](SEL_B, TAG)          # 月販の降順（10,000件超なら昇順も足す）
     new = [a for a in got if a not in known]
     ORDER.write_text(json.dumps(new))
     status(一覧=len(got), 新規ASIN=len(new), 既取得と重複=len(got) - len(new))
-    print(f"入口(b) 一覧 {len(got)} / 既取得と重複 {len(got) - len(new)} / 新規 {len(new)} ASIN", flush=True)
+    print(f"{LABEL} 一覧 {len(got)} / 既取得と重複 {len(got) - len(new)} / 新規 {len(new)} ASIN", flush=True)
 
 
 def cmd_fetch(until: datetime | None) -> int:
@@ -104,6 +110,8 @@ def cmd_fetch(until: datetime | None) -> int:
         if not cached and not can_spend(len(order[i:i + 100]) + 5, until):
             print(f"締め切り {until:%H:%M} までに次の100件を取れないので止める（{i}/{len(order)}）", flush=True)
             break
+        if not cached and RESERVE:
+            keepa_io.wait_for(len(order[i:i + 100]) + 5 + RESERVE, log=lambda s: print(s, flush=True))
         keepa_io.products(order[: i + 100], TAG, log=lambda s: print(s, flush=True))
         n = min(i + 100, len(order))
     status(product取得済み=n, product未取得=len(order) - n)
@@ -141,7 +149,7 @@ def cmd_build(until: datetime | None, dry: bool) -> None:
     S = _mod("s36", HERE / "36_size_additions.py")
     order = json.loads(ORDER.read_text())
     ps = keepa_io.products(order, TAG, offline=True)
-    funnel = [("入口(b) 新規 ASIN（Finder 一覧−既取得）", len(order)), ("product 取得済み", len(ps))]
+    funnel = [(f"{LABEL} 新規 ASIN（Finder 一覧−既取得）", len(order)), ("product 取得済み", len(ps))]
 
     # 1) product 再判定。30_build.POST の売価だけを帯の下限に替える（他の条件は同じ関数）
     post = [(lbl, ok) for lbl, ok in B.POST if not lbl.startswith("6 ")]
@@ -153,7 +161,10 @@ def cmd_build(until: datetime | None, dry: bool) -> None:
         funnel.append((lbl, len(alive)))
 
     # 2) メーカーに集約。旧プール（基本・入口(a)・セラー）に同じ社がいれば判定済みなので落とす
-    old_keys = {R.maker_key(p)[0] for p in B.load_products()}
+    old = B.load_products()
+    for fn, tg in OLD_POOLS:
+        old += keepa_io.products(json.loads((keepa_io.RAW / fn).read_text()), tg, offline=True)
+    old_keys = {R.maker_key(p)[0] for p in old}
     groups: dict[str, list] = defaultdict(list)
     for p, f in alive:
         k, name = R.maker_key(p)
@@ -173,7 +184,7 @@ def cmd_build(until: datetime | None, dry: bool) -> None:
         if k in old_keys:
             rep = max(it, key=lambda x: x[1]["ms"] or 0)
             dropped.append(({"メーカー名": rep[2], "代表ASIN": rep[1]["asin"], "該当ASIN数": len(it)},
-                            "旧プール（基本・入口(a)・セラー）と同社＝判定済み"))
+                            "旧プール（基本・入口(a)・セラー" + ("・入口(b)" if OLD_POOLS else "") + "）と同社＝判定済み"))
     cl = classify_all(fresh)
     sus = sorted({n for c in cl if c[5] in R.RESCUABLE for n in [c[4], (c[2].get("brand") or "").strip()] if n})
     if sus:
@@ -189,7 +200,7 @@ def cmd_build(until: datetime | None, dry: bool) -> None:
              "カテゴリ": R.ROOT_NAMES.get(rep_f["root"], str(rep_f["root"])),
              "印": "・".join(sorted({R.MARK_ROOTS[f["root"]] for _, f, _ in items if f["root"] in R.MARK_ROOTS})),
              "カート保持セラー(代表)": "", "要確認": "", "除外理由": excl, "判定の根拠": why, "救済の根拠": rescue,
-             "大手": "", "規模": "", "法人番号(gBiz)": "", "入口": "入口(b) 売価1,500〜2,199"}
+             "大手": "", "規模": "", "法人番号(gBiz)": "", "入口": LABEL}
         rows.append(r)
         if excl:
             dropped.append((r, f"一次除外：{excl}"))
@@ -231,6 +242,8 @@ def cmd_build(until: datetime | None, dry: bool) -> None:
     for i in range(0, len(need), 100):
         if dry or not can_spend(len(need[i:i + 100]) * 3 + 5, until):
             break
+        if RESERVE:
+            keepa_io.wait_for(len(need[i:i + 100]) * 3 + 5 + RESERVE, log=lambda s: print(s, flush=True))
         have.update(keepa_io.products_buybox(need[i:i + 100], log=lambda s: print(s, flush=True)))
     sids = {a: ((have.get(a) or {}).get("stats") or {}).get("buyBoxSellerId") for a in reps if a in have}
     names = keepa_io.sellers([s for s in sids.values() if s], offline=dry or not can_spend(len(sids) + 5, until))
@@ -312,15 +325,15 @@ def cmd_build(until: datetime | None, dry: bool) -> None:
     cols = ["優先度", "メーカー名", "ブランド", "代表ASIN", "代表商品名", "Amazon URL", "該当ASIN数", "過去1ヶ月の販売数(代表)",
             "代表の売価", "代表のFBA数", "代表の新品オファー数", "カテゴリ", "印", "カート保持セラー(代表)", "要確認",
             "除外理由", "判定の根拠", "救済の根拠", "大手", "規模", "法人番号(gBiz)", "入口"]
-    with (WORK / "11c_追加候補_入口b.csv").open("w", encoding="utf-8-sig", newline="") as fh:
+    with (WORK / OUT_CAND).open("w", encoding="utf-8-sig", newline="") as fh:
         w = csv.DictWriter(fh, fieldnames=cols, extrasaction="ignore"); w.writeheader(); w.writerows(rows)
-    with (WORK / "12d_入口b_落とした行.csv").open("w", encoding="utf-8-sig", newline="") as fh:
+    with (WORK / OUT_DROP).open("w", encoding="utf-8-sig", newline="") as fh:
         w = csv.writer(fh)
         w.writerow(["落とした理由", "メーカー名", "代表ASIN", "該当ASIN数", "要確認"])
         for r, wy in dropped:
             w.writerow([wy, r.get("メーカー名"), r.get("代表ASIN"), r.get("該当ASIN数"), r.get("要確認", "")])
     if new:
-        bak = qpath.with_name(qpath.name + f".bak_entryb_{datetime.now():%Y%m%d_%H%M}")
+        bak = qpath.with_name(qpath.name + f".bak_{BAK_TAG}_{datetime.now():%Y%m%d_%H%M}")
         shutil.copy(qpath, bak)
         qcols = list(queue[0].keys())
         with qpath.open("w", encoding="utf-8-sig", newline="") as fh:
@@ -329,7 +342,7 @@ def cmd_build(until: datetime | None, dry: bool) -> None:
     status(build=summ)
 
 
-if __name__ == "__main__":
+def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("cmd", choices=["list", "fetch", "build"])
     ap.add_argument("--until", help="HH:MM。これを過ぎる取得はしない（夜間タスクと Keepa を分け合うため）")
@@ -342,3 +355,7 @@ if __name__ == "__main__":
         cmd_fetch(u)
     else:
         cmd_build(u, a.dry_run)
+
+
+if __name__ == "__main__":
+    main()
