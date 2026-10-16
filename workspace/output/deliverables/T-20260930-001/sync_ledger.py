@@ -494,14 +494,38 @@ def load_candidates():
     return by_asin, by_name
 
 
+# 2026-10-17 08:40（タカシ）：11d_追加候補_入口c.csv は 53_entry_c.py build のたびに作り直され、
+# 前回の一覧にあった ASIN が消えることがある（07:44 の build で ARTISAN B0B38FBNRV・オクト B06XRP3FS5 が消え、
+# 第2弾だった ARTISAN が「未確認：FBA数」に落ちた）。一度読んだ値はこの控えに残し、11*_ に無ければ控えで埋める。
+# 控えは追記のみ（値の上書き・削除はしない）。11*_ の今の値があればそちらが勝つ。
+FBA_KEEP = '11z_代表のFBA数_控え.csv'
+FBA_KEEP_COLS = ['代表ASIN', '代表のFBA数', '出典', '記録日']
+
+
 def load_entry_fba():
-    """{代表ASIN: 代表のFBA数}。入口(a)(b)(c) の追加候補（11_／11c_／11d_）から。前のファイルが勝つ。"""
-    m = {}
+    """{代表ASIN: 代表のFBA数}。入口(a)(b)(c) の追加候補（11_／11c_／11d_）から。前のファイルが勝つ。
+    11*_ に無い ASIN は控え（11z_）から。dry-run 以外では、新しく見た ASIN を控えに追記する。"""
+    m, src = {}, {}
     for p in sorted(glob.glob(os.path.join(HERE, '11*_追加候補*.csv'))):
         for r in read_csv(p):
             v = (r.get('代表のFBA数') or '').strip()
-            if v:
-                m.setdefault((r.get('代表ASIN') or '').strip(), v)
+            a = (r.get('代表ASIN') or '').strip()
+            if v and a and a not in m:
+                m[a], src[a] = v, os.path.basename(p)
+    keep_path = os.path.join(HERE, FBA_KEEP)
+    kept = {r['代表ASIN']: r for r in read_csv(keep_path) if r.get('代表ASIN')} if os.path.exists(keep_path) else {}
+    for a, r in kept.items():
+        m.setdefault(a, r['代表のFBA数'])
+    add = [a for a in m if a not in kept and a in src]
+    if add and '--dry-run' not in sys.argv:
+        new = not os.path.exists(keep_path)
+        with open(keep_path, 'a', encoding='utf-8-sig' if new else 'utf-8', newline='') as f:
+            w = csv.DictWriter(f, fieldnames=FBA_KEEP_COLS)
+            if new:
+                w.writeheader()
+            today = __import__('datetime').date.today().isoformat()
+            for a in add:
+                w.writerow({'代表ASIN': a, '代表のFBA数': m[a], '出典': src[a], '記録日': today})
     return m
 
 
