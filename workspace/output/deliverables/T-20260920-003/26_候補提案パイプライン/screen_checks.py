@@ -396,6 +396,11 @@ def _cart_gate(c: Cart) -> tuple[str, str]:
     # 🔴 2026-10-11 夜：保持者欄が「カートなし(一般的な価格より高いため非表示)」のように注記つきだと
     #    完全一致に当たらず「第三者がカート」で PASS していた（B0C8HD3F37 が GO に化けた）。
     #    カートあり=N か、欄が「カートなし」「高値」「非表示」を含めば UNKNOWN にする
+    # 2026-10-17：商品ページ自体が 404（カタログ削除の疑い）。売り場が無いので「相場に戻せば取れる」
+    #    とは書かない。セラセンで出品できても詳細ページが無ければ売れない＝UNKNOWN（落とす判断は人）
+    if "404" in h:
+        return "UNKNOWN", (f"Amazon 商品ページが404（{h}・カズヨ実画面 {c.checked_at}）＝売り場が無い。"
+                           "詳細ページが復活していれば再確認、無ければこの ASIN は諦める")
     if (c.has_cart is False or not h or h.startswith("カートなし")
             or "高値" in h or "非表示" in h):
         return "UNKNOWN", (f"カートなし（{h or '表示なし'}・カズヨ実画面 {c.checked_at}）"

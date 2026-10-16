@@ -44,6 +44,18 @@ def t_doc():
     assert SC.doc_note("バスタオル") == ""
 
 
-for f in (t_cart, t_sales, t_share, t_doc):
+def t_browser_import_20261017():
+    import browser_results_import as BI
+    st, why = SC.cart_gate(Cart("商品ページ404（カタログ削除の疑い）", "", "", "x", has_cart=False))
+    assert st == "UNKNOWN" and "404" in why and "相場に戻せば" not in why
+    assert BI.parse_cart("UNKNOWN（商品ページ404＝カタログ削除）") == ("N", "商品ページ404（カタログ削除の疑い）")
+    assert BI.parse_cart_price("アサイー 200g×5個セット カート4,870円") == "4870"
+    assert BI.parse_cart_price("カート3,078円・過去1か月50点以上") == "3078"
+    assert BI.parse_cart_price("出品にメーカー直販もあり") == ""
+    assert BI.parse_sold_label("カート3,078円・過去1か月50点以上") == "50+"
+    assert BI.parse_sold_label("カート646円") == ""
+
+
+for f in (t_cart, t_sales, t_share, t_doc, t_browser_import_20261017):
     f()
 print("ok")

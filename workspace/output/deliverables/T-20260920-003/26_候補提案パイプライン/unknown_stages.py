@@ -478,6 +478,10 @@ def cmd_run(a) -> int:
             still = any(i.startswith(key) for i in aft[1])
             if had and not still:
                 resolved[s] += 1
+    # 2026-10-17：取り直し段で「価格が無い」と分かった ASIN は、引き直しの**前**に集めている。
+    #    引き直し後に #9/#10 などの FAIL で NO-GO になった行まで実画面に回していた
+    #    （10/17 は #13 の26件中23件が既に NO-GO＝人の確認が判定を動かさない）。UNKNOWN の行だけ回す
+    to_browser = [x for x in to_browser if after.get(x, ("",))[0] == "UNKNOWN"]
     pb, ph = write_human_files(q2, to_browser)
     run_log.update({"stop": stopped, "queues_before": q_before, "queues_after": counts(q2),
                     "resolved_items": dict(resolved), "unknown_left_to": dict(left_unknown),

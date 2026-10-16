@@ -71,6 +71,17 @@ check("「(1g×150粒)×3」は束ね", set_count.parse_amazon_set_count("ZOO �
 check("8点デラックスセットは卸の名前が無ければ決めない",
       set_count.parse_amazon_set_count("H2OスチームFX 8点デラックスセット (レッド)"), None)
 
+# 2026-10-17：1を超える分数（卸1点＝2本組・Amazon1個＝3本 → 3/2）。B0817SB56S で初めて出た形
+import order_plan  # noqa: E402
+check("分数「3/2」を読む（1を超える分数）", S._num("3/2"), 1.5)
+check("全角「３／２」も読む", S._num("３／２"), 1.5)
+check("1.5 の表示は 3/2", S.set_label(1.5), "3/2")
+check("3/2 の最小ロット：卸1点ロットなら Amazon 2個（＝卸3点・整数になるまで切り上げ）",
+      order_plan._min_lot_in_amazon_units({"卸の最小ロット(点)": "1"}, {"n_set": 1.5}), 2)
+check("3/2 の最小ロット：卸4点ロットなら Amazon 4個（＝卸6点）",
+      order_plan._min_lot_in_amazon_units({"卸の最小ロット(点)": "4"}, {"n_set": 1.5}), 4)
+check("0/2 は数として使わない", bool(S._num("0/2")), False)
+
 ev = sorted((W / "ledger20261010").glob("set_check_*.csv"))
 pool_p = W / "pipeline/buy_list_private.csv"
 idx_p = W / "pipeline/netsea_jan_index.json"

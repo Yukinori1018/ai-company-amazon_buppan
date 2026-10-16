@@ -22,7 +22,9 @@
 やらないこと
   - #7 の FBA／即納の自己発送／取り寄せの内訳は TSV に無いので offer_check は作らない
     （推測で埋めない。#10 の分母は Keepa の buyBoxEligibleOfferCounts のまま）
-  - カート価格・過去1か月表示も TSV に無いので空欄のまま
+  - 過去1か月表示は商品名列に「過去1か月50点以上」とあれば "50+" で入れる（無ければ空欄）
+  - カート価格は2026-10-17から商品名列の末尾「カート◯円」を読む（無ければ空欄。推測で埋めない）
+  - #5 が「UNKNOWN（商品ページ404…）」の行はカートなし扱い＋保持者欄に404を残す（cart_gate が理由を書く）
 
 使い方
   python3 browser_results_import.py <browser_results.tsv> --tag 20261015_browser \
@@ -76,7 +78,28 @@ def parse_cart(s: str) -> tuple[str, str]:
         return "Y", "Amazon.co.jp"
     if s.startswith("UNKNOWN") and "カートなし" in s:
         return "N", "カートなし"
+    # 2026-10-17：Amazon 商品ページが 404（カタログ削除の疑い）。売り場が無いのでカートなし扱い
+    if s.startswith("UNKNOWN") and "404" in s:
+        return "N", "商品ページ404（カタログ削除の疑い）"
     raise ValueError(f"カート欄が読めない: {s!r}")
+
+
+_CART_PRICE_RE = re.compile(r"カート\s*([\d,]+)\s*円")
+
+
+def parse_cart_price(s: str) -> str:
+    """商品名列の「カート4,870円」→ "4870"。無ければ ""（2026-10-17 カズヨ形式）。"""
+    m = _CART_PRICE_RE.search(s or "")
+    return m.group(1).replace(",", "") if m else ""
+
+
+_SOLD_RE = re.compile(r"過去1か月\s*(\d+)\s*点以上")
+
+
+def parse_sold_label(s: str) -> str:
+    """商品名列の「過去1か月50点以上」→ "50+"（cart_check の既存表記）。無ければ ""。"""
+    m = _SOLD_RE.search(s or "")
+    return f"{m.group(1)}+" if m else ""
 
 
 def parse_offers(s: str) -> dict:
@@ -106,8 +129,10 @@ def build(rows: list[dict], checked_at: str, by: str, src_name: str):
         if sus:
             note += f"。メーカー本人の疑い：{sus}"
             warn.append((a, sus))
-        carts.append({"ASIN": a, "カートあり": yn, "カート保持者(実画面)": holder, "カート価格": "",
-                      "過去1か月(実画面・下限)": "", "確認時刻": checked_at,
+        price = parse_cart_price(r.get("商品名") or "") if yn == "Y" else ""
+        carts.append({"ASIN": a, "カートあり": yn, "カート保持者(実画面)": holder, "カート価格": price,
+                      "過去1か月(実画面・下限)": parse_sold_label(r.get("商品名") or ""),
+                      "確認時刻": checked_at,
                       "確認者": f"{by}(Chrome実画面)", "注意": note, "アマゾン直販(キーゾン)": "",
                       "新品出品者数(出品一覧)": off.get("n", ""),
                       "Amazon本体(出品一覧)": {"本体なし": "なし", "本体あり": "あり"}.get(off.get("amazon"), "")})
@@ -126,7 +151,9 @@ def write_records(recs: dict, day: str, by_id: str) -> int:
         lb = {"open": ("新品で出品できる（restrictions/approve）", "PASS"),
               "docs": ("申請で開く（restrictions/approve）", "PASS"),
               "closed": ("申請できない（「その他の商品」が受け付けていません）", "FAIL")}[g_kind]
-        if yn == "N":
+        if yn == "N" and "404" in holder:
+            bb = (holder, "UNKNOWN")
+        elif yn == "N":
             bb = ("カートなし（おすすめ出品が出ていない）", "UNKNOWN")
         elif "Amazon.co.jp" in holder:
             bb = ("Amazon.co.jp", "FAIL")
