@@ -55,7 +55,11 @@ main() {
   # 走査対象: 今回の commit で **新規に** index へ入るファイル（追加・コピー）
   # NUL 区切りは $(...) では失われる（bash が NUL を捨てる）ため一時ファイルを経由する。
   local list
-  list="$(mktemp -t precommit-wholesale)" || return 1
+  # `mktemp -t 接頭辞` は BSD(macOS) 専用の書き方。GNU(Linux) は末尾に X が3つ以上無いと
+  # 「too few X's in template」で失敗し、fail-open なので**検査ごと素通り**していた
+  # （クラウドのセッションではこのゲートが一度も効いていなかった。2026-10-16 / T-20261016-002）。
+  # テンプレートを明示すれば両方で同じに動く。
+  list="$(mktemp "${TMPDIR:-/tmp}/precommit-wholesale.XXXXXX")" || return 1
   git diff --cached --name-only --diff-filter=AC -z >"$list" 2>/dev/null || { rm -f "$list"; return 1; }
   if [ ! -s "$list" ]; then rm -f "$list"; return 0; fi
 

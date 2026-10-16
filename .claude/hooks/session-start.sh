@@ -140,7 +140,7 @@ if [ -d "$INBOX_DIR" ]; then
     OLDEST_DATE=""
     while IFS= read -r f; do
       [ -n "$f" ] || continue
-      d="$(stat -f '%Sm' -t '%Y-%m-%d' "$f" 2>/dev/null || stat -c '%y' "$f" 2>/dev/null | cut -d' ' -f1)"
+      d="$(stat -c '%y' "$f" 2>/dev/null | cut -d' ' -f1 | grep . || stat -f '%Sm' -t '%Y-%m-%d' "$f" 2>/dev/null)"
       [ -n "$d" ] || continue
       if [ -z "$OLDEST_DATE" ] || [[ "$d" < "$OLDEST_DATE" ]]; then
         OLDEST_DATE="$d"
@@ -212,7 +212,7 @@ $(sed -n '5,10p' "$LB_V14/ALERT.md" 2>/dev/null | sed 's/^/  /')
   # 心拍の古さ（分）。ファイルが無ければ「不明」。
   LB_BEAT="不明"
   if [ -f "$LB_V14/heartbeat.json" ]; then
-    LB_M="$(stat -f %m "$LB_V14/heartbeat.json" 2>/dev/null || echo 0)"
+    LB_M="$(stat -c %Y "$LB_V14/heartbeat.json" 2>/dev/null || stat -f %m "$LB_V14/heartbeat.json" 2>/dev/null || echo 0)"
     [ "$LB_M" -gt 0 ] && LB_BEAT="$(( ( $(date +%s) - LB_M ) / 60 ))分前"
   fi
 
@@ -286,27 +286,10 @@ elif command -v python3 >/dev/null 2>&1 && [ -f "$MON_LOGIC" ]; then
   if [ -n "$MON_STATE" ]; then
     # 警告文の組み立ては python 側に寄せる（bash で JSON を切り貼りしない）。
     # 何も問題が無ければ空文字を返す＝平常日は1行も出ない。
-    MON_BODY="$(printf '%s' "$MON_STATE" | python3 -c "
-import json,sys
-try:
-    s = json.load(sys.stdin)
-except Exception:
-    sys.exit(0)
-if not s.get('log_exists', True):
-    sys.exit(0)
-missing = s.get('missing') or []
-today_pending = (not s.get('today_done')) and (not s.get('before_deadline'))
-if not missing and not today_pending:
-    sys.exit(0)   # 平常。無風時は完全に静か
-out = []
-if missing:
-    out.append(f\"**実行されなかった日が {len(missing)} 日あります: {', '.join(missing)}**\")
-if today_pending:
-    out.append(f\"**今日（{s['today']}）の巡回がまだです**（12:00 予定を過ぎています）。\")
-last = s.get('last_ok')
-out.append(f\"最後に巡回できたのは {last} です。\" if last else \"**一度も巡回できていません。**\")
-print('\n'.join(out))
-" 2>/dev/null || true)"
+    # 警告文の組み立ては python 側（amazon_check_log.py hook）に寄せる。
+    # 何も問題が無ければ空文字を返す＝平常日は1行も出ない。
+    # 2026-10-16: 40日ぶんの日付を羅列して読めなくなったので区間表記に。クラウド巡回の状況も併記。
+    MON_BODY="$(python3 "$MON_LOGIC" hook 2>/dev/null || true)"
 
     if [ -n "$MON_BODY" ]; then
       # 番犬（launchd）の生存も一緒に出す。検知する側が死ぬと、静かに元に戻るため。
@@ -324,6 +307,29 @@ Amazon の通知・申し立てステータス・サポート返信を見落と�
 
 ${MON_HOWTO}"
     fi
+  fi
+fi
+
+# --- リマインダー⑦: Mac の自動同期（github-sync）停止検知（2026-10-16 / T-20261016-002）---
+#
+# 背景: 2026-09-06 19:05 の自動同期を最後に、Mac からのコミットが40日間ゼロでした。
+#       その間 Amazon 日次チェックも止まっていたのに、**誰も気づきませんでした**。
+#       Mac 側の番犬は Mac が止まれば一緒に止まります（検知器が監視対象と運命を共有していた）。
+#       Git の履歴は Mac の外（クラウドのセッション・スケジュールタスク）からも見えるので、
+#       ここを「Mac が生きているか」の判定材料にします。判定は sync_liveness.sh に1本化。
+#       平常時（24時間以内に自動同期あり）は1行も出ません。
+SYNC_LIVE_MSG=""
+if [ -f "$REPO/.claude/scripts/sync_liveness.sh" ]; then
+  SYNC_LIVE_BODY="$(bash "$REPO/.claude/scripts/sync_liveness.sh" 2>/dev/null || true)"
+  if [ -n "$SYNC_LIVE_BODY" ]; then
+    SYNC_LIVE_MSG="
+
+【SessionStart リマインダー⑦：Mac の自動同期が止まっています】
+${SYNC_LIVE_BODY}
+Mac の launchd（github-sync・Amazon 番犬）と Mac 上の Claude スケジュールタスク（Amazon 日次巡回）がまとめて止まっている可能性があります。
+- 社長の Mac で: Claude アプリが起動しているか／Mac がスリープ・ログアウトしていないか
+- Mac のターミナルで: \`tail -20 workspace/.sync/github-sync.log\`（ERROR / STOP / HOLD の行が原因を示します）
+- 手順書: workspace/output/deliverables/T-20261016-002/01_日次チェック停止の原因と対策_20261016.md"
   fi
 fi
 
@@ -355,18 +361,21 @@ MIRROR_LIVE_ROOT="$HOME/.claude"                               # 実体＝正（
 
 # BSD(macOS) / GNU 両対応。取れなくても絶対に落とさない（フックがセッション開始を妨げないこと）。
 mirror_mtime_human() {
+  # GNU を先に試す。GNU の `stat -f` は「ファイルシステム情報」を返して成功してしまうため、
+  # BSD を先にすると Linux（クラウド）で df のような出力が混入する（2026-10-16 修正）。
+  # 逆に BSD の stat は -c を知らないので確実に失敗し、次の行へ落ちる。
+  stat -c '%y' "$1" 2>/dev/null | cut -c1-16 | grep . && return 0
   stat -f '%Sm' -t '%Y-%m-%d %H:%M' "$1" 2>/dev/null && return 0
-  stat -c '%y' "$1" 2>/dev/null | cut -c1-16 && return 0
   echo '不明'
 }
 mirror_mtime_epoch() {
-  stat -f '%m' "$1" 2>/dev/null && return 0
   stat -c '%Y' "$1" 2>/dev/null && return 0
+  stat -f '%m' "$1" 2>/dev/null && return 0
   echo 0
 }
 mirror_size() {
-  stat -f '%z' "$1" 2>/dev/null && return 0
   stat -c '%s' "$1" 2>/dev/null && return 0
+  stat -f '%z' "$1" 2>/dev/null && return 0
   echo '?'
 }
 # 秒差 → 「2日3時間5分」。0分未満は「1分未満」。
@@ -475,10 +484,11 @@ fi
 #       ② は社長への問いかけリストであり、②が長い日ほど ③ が埋没するという逆相関がある。
 #       件数が増えるほど埋もれる配置は、放置を検知する仕組みとして自己矛盾しています。
 #       行動を要する短いものを前に、一覧性の長いものを後ろに置きます。
-# ⑤ は 2026-08-31 に追加。⑥ は 2026-09-02 に追加。掲出は ① → ⑤ → ⑥ → ③ → ④ → ②。
+# ⑤ は 2026-08-31 に追加。⑥ は 2026-09-02 に追加。⑦ は 2026-10-16 に追加。
+# 掲出は ① → ⑦ → ⑤ → ⑥ → ③ → ④ → ②（⑦ は⑤の原因側なので前に置く）。
 # 番号は作成順、掲出順とは別です（③④② が既にそうなっています）。
 # ⑤⑥ はいずれも「異常な時だけ」出るため、平常日は1行も増えません。だから最前列に置けます。
-MESSAGE="${SYNC_MSG}${MON_MSG}${MIRROR_MSG}${INBOX_MSG}${LIST_MSG}${REMINDER_MSG}"
+MESSAGE="${SYNC_MSG}${SYNC_LIVE_MSG}${MON_MSG}${MIRROR_MSG}${INBOX_MSG}${LIST_MSG}${REMINDER_MSG}"
 
 # JSON エスケープ（python が無い環境を考慮し、jq があれば使う）
 if command -v jq >/dev/null 2>&1; then

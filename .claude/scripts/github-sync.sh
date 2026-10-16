@@ -5,14 +5,20 @@
 # 設計方針（CLAUDE.md §4.1「不可逆な操作は社長承認必須」に準拠）
 #   - やること   : git add -A → commit → fetch → ff-only pull → push（カレントブランチのみ）
 #   - やらないこと: force push / branch 削除 / reset --hard / rebase / main への自動マージ
-#   - 分岐(diverge)を検知したら **何もせずログに残して終了**。人間が解決する。
+#   - 分岐(diverge)を検知したら、作業ツリーがきれいな時に限り **通常の merge を1回だけ試す**。
+#     競合したら `git merge --abort` で元に戻し、ログと通知を残して終了（人間が解決する）。
+#     （2026-10-16 / T-20261016-002 で追加。クラウドのセッションも main に push するようになり、
+#       旧実装の「分岐したら何もしない」では Mac 側の同期が永久に止まるため。merge は履歴を
+#       消さない操作で、競合時は abort で完全に元へ戻るので §4.1 の不可逆操作には当たらない）
+#   - ERROR / STOP は macOS の通知センターにも出す（6時間に1回まで）。ログファイルは誰も読まない。
 #
 # 起動: launchd `com.aicompany.amazon-buppan.github-sync`（30分間隔）
 # ログ: workspace/.sync/github-sync.log（1MB でローテート・Git 非追跡）
 #
 set -uo pipefail
 
-REPO="/Users/yukinori/Claude Code/ai-company-amazon_buppan"
+# スクリプト自身の位置からリポジトリを求める（Mac の絶対パス決め打ちを廃止 / 2026-10-16）
+REPO="$(cd "$(dirname "$0")/../.." && pwd)"
 LOG_DIR="$REPO/workspace/.sync"
 LOG="$LOG_DIR/github-sync.log"
 LOCK="$LOG_DIR/.lock"
@@ -25,8 +31,22 @@ export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 mkdir -p "$LOG_DIR"
 log() { printf '%s | %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$*" >>"$LOG"; }
 
+# 失敗を人の目に届ける。2026-09-06 以降の40日停止は、原因が何であれ
+# 「workspace/.sync/github-sync.log（Git 非追跡）にしか書かれていなかった」ので誰も気づけなかった。
+# 30分ごとに鳴ると無視されるので、6時間に1回までに絞る。
+alert() {
+  log "$*"
+  command -v osascript >/dev/null 2>&1 || return 0
+  local stamp="$LOG_DIR/.last-alert"
+  if [ -f "$stamp" ] && [ -z "$(find "$stamp" -mmin +360 2>/dev/null)" ]; then
+    return 0
+  fi
+  touch "$stamp"
+  osascript -e "display notification \"$* — workspace/.sync/github-sync.log を確認\" with title \"GitHub 自動同期が失敗しています\"" >/dev/null 2>&1 || true
+}
+
 # --- ログローテート -----------------------------------------------------------
-if [ -f "$LOG" ] && [ "$(stat -f%z "$LOG" 2>/dev/null || echo 0)" -gt "$MAX_LOG_BYTES" ]; then
+if [ -f "$LOG" ] && [ "$(stat -c%s "$LOG" 2>/dev/null || stat -f%z "$LOG" 2>/dev/null || echo 0)" -gt "$MAX_LOG_BYTES" ]; then
   mv -f "$LOG" "$LOG.1"
 fi
 
@@ -71,7 +91,8 @@ if [ -n "$(git status --porcelain)" ]; then
   while IFS= read -r -d '' entry; do
     path="${entry:3}"
     [ -f "$path" ] || continue
-    m="$(stat -f %m "$path" 2>/dev/null)" || continue
+    # GNU を先に（GNU の stat -f はファイルシステム情報を返して成功してしまう）
+    m="$(stat -c %Y "$path" 2>/dev/null || stat -f %m "$path" 2>/dev/null)" || continue
     [ "$m" -gt "$newest" ] && newest="$m"
   done < <(git status --porcelain -z)
 
@@ -91,7 +112,7 @@ Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>" 2>>"$LOG"; then
         log "COMMIT ${count}ファイルを自動コミット"
         DID_SOMETHING=1
       else
-        log "ERROR コミットに失敗しました"
+        alert "ERROR コミットに失敗しました（pre-commit ゲートの検知の可能性。直前のログ行を参照）"
       fi
     fi
   fi
@@ -111,8 +132,21 @@ if git rev-parse --verify -q "origin/$BRANCH" >/dev/null; then
   ahead="${2:-0}"
 
   if [ "$behind" -gt 0 ] && [ "$ahead" -gt 0 ]; then
-    log "STOP  分岐を検知（origin が +$behind / ローカルが +$ahead）— force push は行いません。手動でマージしてください"
-    exit 0
+    # 作業ツリーに未コミットの変更がある時は merge しない（巻き込み・中断時の復旧が難しくなる）
+    if [ -n "$(git status --porcelain --untracked-files=no)" ]; then
+      alert "STOP  分岐を検知（origin +$behind / ローカル +$ahead）。未コミットの変更があるため merge を見送り"
+      exit 0
+    fi
+    if git merge --no-edit -m "chore(auto-sync): origin/$BRANCH を取り込み（Mac とクラウドの分岐を解消）" "origin/$BRANCH" >>"$LOG" 2>&1; then
+      log "MERGE 分岐を merge で解消（origin +$behind / ローカル +$ahead）"
+      DID_SOMETHING=1
+      ahead="$(git rev-list --count "origin/$BRANCH..HEAD")"
+      behind=0
+    else
+      git merge --abort >>"$LOG" 2>&1 || true
+      alert "STOP  分岐を merge しようとしたが競合。元に戻しました（force push はしません）。手動で解決してください"
+      exit 0
+    fi
   fi
 
   if [ "$behind" -gt 0 ]; then
@@ -135,7 +169,7 @@ if [ "$ahead" -gt 0 ]; then
     log "PUSH  $BRANCH → origin（${ahead}コミット）"
     DID_SOMETHING=1
   else
-    log "ERROR push に失敗しました（force は行いません）"
+    alert "ERROR push に失敗しました（force は行いません。100MB超のファイルや認証切れを疑う）"
   fi
 fi
 

@@ -16,6 +16,16 @@ CLI:
   python3 amazon_check_log.py status            人が読む1行サマリ
   python3 amazon_check_log.py status --json     機械が読む JSON
   python3 amazon_check_log.py fill              欠測日に「未実行」行を挿入する（過去日のみ）
+  python3 amazon_check_log.py hook              SessionStart 用の警告本文（平常時は空）
+
+2026-10-16 追記（T-20261016-002）:
+  - **ログは2本**になりました。書き手ごとに1ファイルにして、Mac とクラウドが同じ行を
+    同時に書き換えて git が分岐（＝github-sync が永久停止）するのを避けるためです。
+      amazon-daily-check.md        … Mac の巡回（セラーセントラル画面＋Gmail）。従来どおり
+      amazon-daily-check-cloud.md  … クラウドの巡回（Gmail 通知のみ。画面は見られない）
+    「欠測」は従来どおり **Mac の巡回（フル）** で数えます。クラウドは代替ではなく保険です。
+  - 「今日」は **日本時間** で数えます。クラウドのコンテナは UTC なので、素の date.today()
+    だと 0:00〜9:00 JST の間、前日扱いになり誤判定します。
 """
 
 from __future__ import annotations
@@ -26,6 +36,9 @@ import json
 import re
 import sys
 from pathlib import Path
+from zoneinfo import ZoneInfo
+
+JST = ZoneInfo("Asia/Tokyo")
 
 HEADING = re.compile(r"^## (\d{4}-\d{2}-\d{2})")
 
@@ -40,6 +53,36 @@ def repo_root() -> Path:
 
 def default_log_path() -> Path:
     return repo_root() / "workspace" / "monitoring" / "amazon-daily-check.md"
+
+
+def cloud_log_path() -> Path:
+    """クラウド巡回（Gmail のみ）の記録。書き手を分けるため別ファイル。"""
+    return repo_root() / "workspace" / "monitoring" / "amazon-daily-check-cloud.md"
+
+
+def now_jst() -> dt.datetime:
+    """巡回は日本時間 12:00 予定。判定は常に日本時間で行う（コンテナは UTC のことがある）。"""
+    return dt.datetime.now(JST)
+
+
+def summarize_dates(dates: list[str]) -> str:
+    """['2026-09-07', '2026-09-08', ...] を '2026-09-07〜2026-10-15' のような区間表記に縮める。
+
+    40日ぶん日付を並べると警告が読まれなくなる（2026-10-16 の実例）ので、連続は畳む。
+    """
+    if not dates:
+        return "なし"
+    ds = sorted(dt.date.fromisoformat(d) for d in dates)
+    spans: list[tuple[dt.date, dt.date]] = []
+    start = prev = ds[0]
+    for d in ds[1:]:
+        if d == prev + dt.timedelta(days=1):
+            prev = d
+            continue
+        spans.append((start, prev))
+        start = prev = d
+    spans.append((start, prev))
+    return ", ".join(a.isoformat() if a == b else f"{a.isoformat()}〜{b.isoformat()}" for a, b in spans)
 
 
 class Entry:
@@ -164,9 +207,47 @@ def fill(path: Path, today: dt.date, now: dt.time) -> list[str]:
     return targets
 
 
+def cloud_summary(today: dt.date, now: dt.time) -> dict:
+    """クラウド巡回ログの要約。ファイルが無ければ log_exists=False。"""
+    path = cloud_log_path()
+    if not path.exists():
+        return {"log_exists": False}
+    return status(path.read_text(encoding="utf-8"), today, now)
+
+
+def hook_body(main_st: dict, cloud_st: dict) -> str:
+    """SessionStart リマインダー⑤の本文。**平常時は空文字**（無風時は1行も出さない）。"""
+    missing = main_st.get("missing") or []
+    today_pending = (not main_st.get("today_done")) and (not main_st.get("before_deadline"))
+    # クラウド巡回そのものが止まった時も鳴らす（保険が黙って死ぬのが一番まずい）。
+    # クラウドは 11:56 頃に走るので、今日ぶんの判定は Mac と同じ 12:00 境界でよい。
+    cloud_missing = (cloud_st.get("missing") or []) if cloud_st.get("log_exists") else []
+    cloud_pending = bool(cloud_st.get("log_exists")) and (not cloud_st.get("today_done")) \
+        and (not cloud_st.get("before_deadline"))
+    if not missing and not today_pending and not cloud_missing and not cloud_pending:
+        return ""
+    out = []
+    if cloud_missing or cloud_pending:
+        out.append(f"**クラウド巡回（スケジュールタスク）も止まっています**: 欠測 {summarize_dates(cloud_missing)}"
+                   + ("／今日ぶん未" if cloud_pending else ""))
+    if missing:
+        out.append(f"**Mac での巡回（セラーセントラル画面）が実行されなかった日が {len(missing)} 日あります: "
+                   f"{summarize_dates(missing)}**")
+    if today_pending:
+        out.append(f"**今日（{main_st['today']}）の Mac 巡回がまだです**（12:00 予定を過ぎています）。")
+    last = main_st.get("last_ok")
+    out.append(f"Mac で最後に巡回できたのは {last} です。" if last else "**Mac では一度も巡回できていません。**")
+    if cloud_st.get("log_exists"):
+        c_last = cloud_st.get("last_ok")
+        c_today = "済" if cloud_st.get("today_done") else "未"
+        out.append(f"クラウド巡回（Gmail 通知のみ・画面は見ていない）: 最終 {c_last or 'なし'} / 今日={c_today}"
+                   "（workspace/monitoring/amazon-daily-check-cloud.md）")
+    return "\n".join(out)
+
+
 def main(argv: list[str]) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("command", choices=["status", "fill"])
+    ap.add_argument("command", choices=["status", "fill", "hook"])
     ap.add_argument("--json", action="store_true")
     ap.add_argument("--log", default=None, help="ログのパス（既定: workspace/monitoring/...）")
     ap.add_argument("--today", default=None, help="テスト用に今日の日付を上書き（YYYY-MM-DD）")
@@ -174,8 +255,9 @@ def main(argv: list[str]) -> int:
     args = ap.parse_args(argv)
 
     path = Path(args.log) if args.log else default_log_path()
-    today = dt.date.fromisoformat(args.today) if args.today else dt.date.today()
-    now = dt.time.fromisoformat(args.now) if args.now else dt.datetime.now().time()
+    jst = now_jst()
+    today = dt.date.fromisoformat(args.today) if args.today else jst.date()
+    now = dt.time.fromisoformat(args.now) if args.now else jst.time()
 
     if not path.exists():
         out = {"log_exists": False, "path": str(path)}
@@ -191,13 +273,25 @@ def main(argv: list[str]) -> int:
         return 0
 
     st = status(path.read_text(encoding="utf-8"), today, now)
+    cloud = cloud_summary(today, now) if not args.log else {"log_exists": False}
+    if args.command == "hook":
+        print(hook_body(st, cloud))
+        return 0
     if args.json:
+        st["cloud"] = cloud
         print(json.dumps(st, ensure_ascii=False))
     else:
         print(
-            f"最後に実行できた日={st['last_ok']} / 今日は{'済' if st['today_done'] else '未'} / "
-            f"欠測{len(st['missing'])}日: {', '.join(st['missing']) or 'なし'}"
+            f"[Mac巡回] 最後に実行できた日={st['last_ok']} / 今日は{'済' if st['today_done'] else '未'} / "
+            f"欠測{len(st['missing'])}日: {summarize_dates(st['missing'])}"
         )
+        if cloud.get("log_exists"):
+            print(
+                f"[クラウド巡回・Gmailのみ] 最終={cloud['last_ok']} / 今日は{'済' if cloud['today_done'] else '未'} / "
+                f"開始以降の欠測{len(cloud['missing'])}日: {summarize_dates(cloud['missing'])}"
+            )
+        else:
+            print("[クラウド巡回・Gmailのみ] ログなし")
     return 0
 
 
