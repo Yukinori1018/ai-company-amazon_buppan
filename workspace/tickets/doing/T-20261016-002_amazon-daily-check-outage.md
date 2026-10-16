@@ -1,8 +1,8 @@
 ---
 ticket_id: T-20261016-002
 title: Amazon 日次チェックが 9/6 以降停止 → 原因究明・改善・継続運用の確認
-status: doing
-assignee: it_engineer
+status: waiting
+assignee: owner
 priority: high
 created_at: 2026-10-16
 updated_at: 2026-10-16
@@ -47,3 +47,4 @@ related_tickets: [T-20260826-004]
 - 妥協点：クラウド巡回は Gmail（satoyukinori1018）のみ。画面・satoyselect は毎回「未確認」
 - 引き継ぎ：①社長判断＝統合 A 案（Mac で main に戻す・推奨）②カナダ店を立て直すか閉じるか ③クラウドの T-20261016-001 は Mac 側の進行（更新98〜99・問い合わせフォーム⑰）と重複の恐れあり、秘書で突合を
 
+- 2026-10-16 カズヨ：ブランチ統合（Mac 作業ブランチ → main）をクラウドから試行 → 共有ブランチ変更として権限判定で拒否（タカシ・カズヨとも）。迂回せず停止。統合は Mac 側で実施する（成果物01 §6 の手順）か、社長が権限ルールを許可してから再実行。waiting へ。
