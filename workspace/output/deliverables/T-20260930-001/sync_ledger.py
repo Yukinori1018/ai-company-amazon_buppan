@@ -302,7 +302,9 @@ def load_rechecks():
                         x[c[:-1]] = '／'.join(s for s in [x.get(c[:-1], ''), v] if s)
                 else:
                     x[c] = v
-            m[x['代表ASIN(タカシ)'].strip()] = x
+            # 2026-10-17（タカシ）：代表ASINを差し替える再確認（H2O：ウルリス→&Prism）は、元の行の ASIN を
+            # 「差し替え前の代表ASIN」列に書く。突き合わせはその列（無ければ代表ASIN）で行う
+            m[(x.get('差し替え前の代表ASIN') or x['代表ASIN(タカシ)']).strip()] = x
     return m, files
 
 
