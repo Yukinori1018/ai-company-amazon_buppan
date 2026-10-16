@@ -4512,3 +4512,11 @@ FLR910 2件は SD 経由でも GO（B 等級・11.2%・手残り1,186円/個）�
 - プレミアム監視 371件（追加7）・観測371（未取得0）。①黒字 26/280 ②悲観の最大損 −139,920円（B083L6XTK9）・1万円超の損 163件 ③4週高値 0/0（監視28日未満。履歴遡り参考 126/370）
 - NETSEA 起点（nightly.sh）は今夜も回さず（Keepa はメーカー窓口の入口(c) に回した＝社長「一番重要なリスト」）。position は tier2・shop 880827 のまま。SD への照会0回（在席時のみ・§3.3-14）
 - 明日の続き：①browser_results_20261017b.tsv の取り込み ②one_step #9 実売18行（キーゾン実画面）③在席時に SD 実画面で SD 由来 one_step 17行の卸値・在庫 ④NETSEA 復旧の確認（実績枠4件・#17 5行）
+
+## ログ（2026-10-17 朝・タカシ・キーゾン実数15件＋B0CDFGHXC1 の書き戻し）
+- 入力：カズヨ `ledger20261010/kz_screen_20261017_night.csv`（one_step #9 の15 ASIN・キーゾン iframe・06:48。B00Z9I3H08・B017SK20A2・B078X35J1D はキーゾンが出ず未入力）／`unknown_queue/browser_results_20261017b.tsv`（B0CDFGHXC1）→ browser_results_import --tag 20261017b_browser --checked-at "2026-10-17 03:15"
+- 追加修正：SD 行で人のキーゾンが #9 PASS にしても、後ろに足す機械の理由に「未達：#9 実売 UNKNOWN」と「キーゾンで3か月の実数を見れば決まる」が残っていた → `ledger_refresh.drop_settled_sales()` で消す（test_now_only に3件・NG なし）。判定は動かず理由文だけ14行
+- 手順：dry-run 2回（証跡のみ／理由文の修正込み）→ 本番 RUN_TAG=kz1017（退避 before_20261017_kz1017.json）→ 2回目 dry-run が本番・事前 dry-run と完全一致。対象外の変化は B09HRK4L4C の季節の文言（ピーク月に10月が加わった）1行のみ・判定は NO-GO のまま
+- 判定件数（前→後）：GO 0→0／GO（実績枠）4→4／UNKNOWN 335→328／NO-GO 10,471→10,478。新しい GO・実績枠は0
+- 16行の行き先：UNKNOWN→NO-GO 7（#9 キーゾン3か月が実質ゼロ：B007JTDXMM 0/1/0・B007M844KK 0/1/0・B00SB64HZO 0/1/0・B07CWFRK69 0/0/1・B08NC9M2GN 0/0/1・B09JST5TN6 1/0/1・B0FMXFVG53 1/1/0）／UNKNOWN のまま 9（#9 は PASS：B0CGHV2SZ2 9/9/10・B088YV2PST 5/7/4・B0C28FPW2G 4/5/4・B0CGHS8SDT 4/3/3・B07CVSX2QJ 4/5/0・B007M85W42 2/1/2・B01FTVLGIE 1/0/2・B0F6SQ6VY5 1/3/0 の8行は「#17 SD 取引申請が必要（カネイシ／ニッパン）」だけが残る。B0CDFGHXC1 はカートなし・新品0件で #5 UNKNOWN）
+- one_step 32→**19**（#17 5・#13-14 5・#9 3〔キーゾン未確認の3件〕・#11 3・#5 2・#15 1。経路 NETSEA 13／SD 4／未確認 2）。抜けた15行はすべて上の16行。入った2行（B007M85HHE #11・B07CVT4GJJ #13-14）。注意：SD の「#17 取引申請が必要」は 10/16 の数え方では項目に数えないので、上の8行は one_step に入っていない（実質は「カネイシ・ニッパンに SD で取引申請すれば一歩手前」）
