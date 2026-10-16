@@ -1589,8 +1589,27 @@ def sd_screen(cells: dict) -> dict:
         cells["判定理由"] = (head + f"【こう変えれば】{never} ／ 機械判定："
                             + cells["判定理由"])[:1800]
     else:
-        cells["判定理由"] = (head + "残り：" + cells["判定理由"])[:1800]
+        rest = cells["判定理由"]
+        if k and st9 == "PASS":
+            rest = drop_settled_sales(rest)
+        cells["判定理由"] = (head + "残り：" + rest)[:1800]
     return cells
+
+
+#: 機械の #9 UNKNOWN の文と、その「こう変えれば」。人のキーゾン（再現値含む）で #9 が PASS したら消す
+_SALES_UNKNOWN_SEG = re.compile(r"#9 実売 UNKNOWN：.*?(?: ／ |$)")
+_SALES_FIX_SEG = re.compile(r"キーゾンで3か月の実数を見れば決まる.*?(?: ／ |$)")
+
+
+def drop_settled_sales(reason: str) -> str:
+    """SD 行の機械の判定理由から、キーゾンで解けた #9 UNKNOWN とその「こう変えれば」を取り除く（2026-10-17）。
+
+    sd_screen は機械の理由を「残り：」として後ろに足すので、キーゾンで #9 PASS になっても
+    「未達：#9 実売 UNKNOWN」が残り、一歩手前の集計で #9 待ちに数えられていた（B0CGHV2SZ2 ほか）。
+    文の区切りは「 ／ 」。消した後に区切りが末尾に残れば落とす。"""
+    out = _SALES_FIX_SEG.sub("", _SALES_UNKNOWN_SEG.sub("", reason))
+    out = re.sub(r"(?: ／ |【こう変えれば】|未達：)+$", "", out.rstrip())
+    return out
 
 
 # ── 本体 ────────────────────────────────────────────────────────────────
