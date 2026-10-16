@@ -34,7 +34,7 @@ related_tickets: [T-20260826-004]
 - 2026-10-16 タカシ着手。当初「Mac 丸ごと停止」と診断し対策 commit（755738b）→ 全ブランチ取得で誤診と判明。Mac は別ブランチで毎日稼働していた。診断を訂正し検知を作り直し（279f70d）
 - 2026-10-16 Gmail（satoyukinori1018）で 9/6 以降の出品者向けメール14通を確認し、クラウド巡回ログに記録。カナダ 9/15 deactivated・売上金保留、日本 9/9 再開・10/4 出品
 - 2026-10-16 Mac ブランチの main 統合を試験（競合2件・解決案作成）。共有 main への大規模 merge は権限判定で停止したため実行せず、社長判断へ
-- 2026-10-16 スケジュールタスク：新規セッション方式は Gmail・push とも不可で削除。専用セッション session_011fNsTLzjLYwSKi2gQKdxPy ＋ trig_019sxvGpTBJH4i9pcuWTcsEo（persistent）に切替、手動実行で確認
+- 2026-10-16 スケジュールタスク：新規セッション方式は Gmail・push とも不可で削除。専用セッション session_011fNsTLzjLYwSKi2gQKdxPy ＋ trig_019sxvGpTBJH4i9pcuWTcsEo（persistent）に切替。専用セッションは Gmail 可・push 可（接続確認済み）。ただし fire_trigger の手動実行は専用セッションに届かず、他セッションからの依頼は正しく拒否されたため、**記録の追記は初回の定時実行（10/16 11:56 JST）が最初の本番**。12:05 以降に `git log origin/main --grep='クラウド・Gmail'` で確認すること
 
 ## 成果物
 - workspace/output/deliverables/T-20261016-002/01_日次チェック停止の原因と対策_20261016.md
