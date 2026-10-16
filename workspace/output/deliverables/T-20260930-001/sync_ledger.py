@@ -494,6 +494,17 @@ def load_candidates():
     return by_asin, by_name
 
 
+def load_entry_fba():
+    """{代表ASIN: 代表のFBA数}。入口(a)(b)(c) の追加候補（11_／11c_／11d_）から。前のファイルが勝つ。"""
+    m = {}
+    for p in sorted(glob.glob(os.path.join(HERE, '11*_追加候補*.csv'))):
+        for r in read_csv(p):
+            v = (r.get('代表のFBA数') or '').strip()
+            if v:
+                m.setdefault((r.get('代表ASIN') or '').strip(), v)
+    return m
+
+
 def load_profit():
     return {r['代表ASIN']: r for r in read_csv(os.path.join(HERE, '40_採算列.csv')) if r.get('代表ASIN')}
 
@@ -629,9 +640,17 @@ def collect():
         r[C_ORDER] = str(i)
     import criteria_check as cc
     kc = cc.load_keepa_cache()
+    fba_extra = load_entry_fba()
     for r in rows:
         a = r['代表ASIN(タカシ)']
         c = cand[0].get(a) or cand[1].get(r['メーカー名(タカシ)']) or {}
+        # 2026-10-17（タカシ）：入口(c)（カート自己発送）は「カートが FBA なら FBA≥1」の下限が使えず、
+        # Keepa キャッシュの offerCountFBA も -2（offers 未取得）で「未確認：FBA数」になっていた（ZH/ZI で31社）。
+        # 事実は 11*_追加候補_*.csv の「代表のFBA数」（Finder 条件 offerCountFBA≥1 で取った一覧の値）にある。
+        # 候補CSVにも Keepa にも値が無い行だけ埋める（既に値がある行の判定は変えない）
+        if not (c.get('代表のFBA数') or '').strip() and a in fba_extra \
+                and cc._keepa(kc.get(a))['fba'] is None:
+            c = {**c, '代表のFBA数': fba_extra[a]}
         r[CHECK_COL] = cc.check(r, c, profit.get(a, {}), kc.get(a))
         # 2026-10-16：基準5を「売価≥2,200円」→「利益率5%に必要な掛け≥40%」へ。40〜50%は通すが採算メモに残す
         note = cc.kake_note(cc.need_kake(profit.get(a, {})))
