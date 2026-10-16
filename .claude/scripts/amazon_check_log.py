@@ -33,7 +33,9 @@ from __future__ import annotations
 import argparse
 import datetime as dt
 import json
+import os
 import re
+import subprocess
 import sys
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -44,6 +46,9 @@ HEADING = re.compile(r"^## (\d{4}-\d{2}-\d{2})")
 
 # 「この日は動かなかった」と判定する印。本文の先頭付近に出る。
 NOT_RUN_MARK = "未実行"
+
+# SessionStart で警告する欠測の範囲（日）。これより古い欠測は status には出すが、警告はしない。
+RECENT_DAYS = 7
 
 
 def repo_root() -> Path:
@@ -207,6 +212,34 @@ def fill(path: Path, today: dt.date, now: dt.time) -> list[str]:
     return targets
 
 
+def read_mac_log(ref: str | None, path: Path) -> tuple[str | None, str]:
+    """Mac 版ログの本文と、どこから読んだかの説明を返す。
+
+    ref=None   … 作業ツリーのファイル（従来どおり）
+    ref="auto" … 最新の自動同期が載っているブランチ（sync_liveness.sh --branch）から読む。
+                 Mac が main 以外のブランチに居ると、main のファイルは古いまま止まって見える
+                 （2026-10-16 に実際そうなって「40日停止」と誤認した）。main ならファイルを読む。
+    それ以外   … そのブランチ名（origin/<ref>）から読む。
+    """
+    if ref == "auto":
+        env = dict(os.environ, SYNC_LIVENESS_NOFETCH=os.environ.get("SYNC_LIVENESS_NOFETCH", "1"))
+        try:
+            ref = subprocess.run(
+                ["bash", str(repo_root() / ".claude" / "scripts" / "sync_liveness.sh"), "--branch"],
+                capture_output=True, text=True, timeout=30, env=env,
+            ).stdout.strip() or None
+        except Exception:
+            ref = None
+        if ref in (None, "main", "不明"):
+            ref = None
+    if ref is None:
+        return (path.read_text(encoding="utf-8") if path.exists() else None), str(path)
+    rel = path.resolve().relative_to(repo_root()).as_posix()
+    r = subprocess.run(["git", "-C", str(repo_root()), "show", f"origin/{ref}:{rel}"],
+                       capture_output=True, text=True)
+    return (r.stdout if r.returncode == 0 else None), f"origin/{ref}:{rel}"
+
+
 def cloud_summary(today: dt.date, now: dt.time) -> dict:
     """クラウド巡回ログの要約。ファイルが無ければ log_exists=False。"""
     path = cloud_log_path()
@@ -217,7 +250,12 @@ def cloud_summary(today: dt.date, now: dt.time) -> dict:
 
 def hook_body(main_st: dict, cloud_st: dict) -> str:
     """SessionStart リマインダー⑤の本文。**平常時は空文字**（無風時は1行も出さない）。"""
-    missing = main_st.get("missing") or []
+    # 鳴らすのは「直近7日」の欠測だけ。過去の欠測は取り返せない（Amazon の画面は今しか見せない）ので、
+    # 永遠に警告し続けると、いずれ誰も読まなくなる（2026-10-16 に31日ぶんが並んで実際そうなった）。
+    all_missing = main_st.get("missing") or []
+    recent_from = (dt.date.fromisoformat(main_st["today"]) - dt.timedelta(days=RECENT_DAYS)).isoformat()
+    missing = [d for d in all_missing if d >= recent_from]
+    older_n = len(all_missing) - len(missing)
     today_pending = (not main_st.get("today_done")) and (not main_st.get("before_deadline"))
     # クラウド巡回そのものが止まった時も鳴らす（保険が黙って死ぬのが一番まずい）。
     # クラウドは 11:56 頃に走るので、今日ぶんの判定は Mac と同じ 12:00 境界でよい。
@@ -231,8 +269,8 @@ def hook_body(main_st: dict, cloud_st: dict) -> str:
         out.append(f"**クラウド巡回（スケジュールタスク）も止まっています**: 欠測 {summarize_dates(cloud_missing)}"
                    + ("／今日ぶん未" if cloud_pending else ""))
     if missing:
-        out.append(f"**Mac での巡回（セラーセントラル画面）が実行されなかった日が {len(missing)} 日あります: "
-                   f"{summarize_dates(missing)}**")
+        out.append(f"**直近{RECENT_DAYS}日で Mac での巡回（セラーセントラル画面）が実行されなかった日: "
+                   f"{summarize_dates(missing)}**" + (f"（それより前の欠測 {older_n} 日は記録済み）" if older_n else ""))
     if today_pending:
         out.append(f"**今日（{main_st['today']}）の Mac 巡回がまだです**（12:00 予定を過ぎています）。")
     last = main_st.get("last_ok")
@@ -252,6 +290,8 @@ def main(argv: list[str]) -> int:
     ap.add_argument("--log", default=None, help="ログのパス（既定: workspace/monitoring/...）")
     ap.add_argument("--today", default=None, help="テスト用に今日の日付を上書き（YYYY-MM-DD）")
     ap.add_argument("--now", default=None, help="テスト用に現在時刻を上書き（HH:MM）")
+    ap.add_argument("--ref", default=None,
+                    help="Mac 版ログを git のブランチから読む（auto=最新の自動同期が載っているブランチ）。status/hook 用")
     args = ap.parse_args(argv)
 
     path = Path(args.log) if args.log else default_log_path()
@@ -259,9 +299,13 @@ def main(argv: list[str]) -> int:
     today = dt.date.fromisoformat(args.today) if args.today else jst.date()
     now = dt.time.fromisoformat(args.now) if args.now else jst.time()
 
-    if not path.exists():
-        out = {"log_exists": False, "path": str(path)}
-        print(json.dumps(out, ensure_ascii=False) if args.json else f"ログがありません: {path}")
+    if args.ref and args.command != "fill":
+        text, source = read_mac_log(args.ref, path)
+    else:
+        text, source = (path.read_text(encoding="utf-8") if path.exists() else None), str(path)
+    if text is None:
+        out = {"log_exists": False, "path": source}
+        print(json.dumps(out, ensure_ascii=False) if args.json else f"ログがありません: {source}")
         return 0
 
     if args.command == "fill":
@@ -272,7 +316,8 @@ def main(argv: list[str]) -> int:
             print("挿入した欠測日: " + (", ".join(added) if added else "なし"))
         return 0
 
-    st = status(path.read_text(encoding="utf-8"), today, now)
+    st = status(text, today, now)
+    st["source"] = source
     cloud = cloud_summary(today, now) if not args.log else {"log_exists": False}
     if args.command == "hook":
         print(hook_body(st, cloud))
@@ -281,6 +326,7 @@ def main(argv: list[str]) -> int:
         st["cloud"] = cloud
         print(json.dumps(st, ensure_ascii=False))
     else:
+        print(f"（Mac 版ログの読み元: {source}）")
         print(
             f"[Mac巡回] 最後に実行できた日={st['last_ok']} / 今日は{'済' if st['today_done'] else '未'} / "
             f"欠測{len(st['missing'])}日: {summarize_dates(st['missing'])}"

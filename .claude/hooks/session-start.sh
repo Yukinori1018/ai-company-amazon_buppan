@@ -289,11 +289,17 @@ elif command -v python3 >/dev/null 2>&1 && [ -f "$MON_LOGIC" ]; then
     # 警告文の組み立ては python 側（amazon_check_log.py hook）に寄せる。
     # 何も問題が無ければ空文字を返す＝平常日は1行も出ない。
     # 2026-10-16: 40日ぶんの日付を羅列して読めなくなったので区間表記に。クラウド巡回の状況も併記。
-    MON_BODY="$(python3 "$MON_LOGIC" hook 2>/dev/null || true)"
+    # --ref auto: Mac が main 以外のブランチに居る時は、そのブランチのログを読む（⑩ 参照）
+    MON_BODY="$(SYNC_LIVENESS_NOFETCH=1 python3 "$MON_LOGIC" hook --ref auto 2>/dev/null || true)"
 
     if [ -n "$MON_BODY" ]; then
       # 番犬（launchd）の生存も一緒に出す。検知する側が死ぬと、静かに元に戻るため。
       MON_BEAT="$(cat "$REPO/workspace/monitoring/watchdog-last-run.txt" 2>/dev/null || echo '記録なし（番犬が一度も走っていない可能性）')"
+      # Mac が main 以外のブランチに居るなら、番犬の心拍もそちらが本物（⑩ 参照）
+      MON_BR="$(SYNC_LIVENESS_NOFETCH=1 bash "$REPO/.claude/scripts/sync_liveness.sh" --branch 2>/dev/null || true)"
+      if [ -n "$MON_BR" ] && [ "$MON_BR" != "main" ] && [ "$MON_BR" != "不明" ]; then
+        MON_BEAT="$(git -C "$REPO" show "origin/${MON_BR}:workspace/monitoring/watchdog-last-run.txt" 2>/dev/null || echo "$MON_BEAT")（${MON_BR} より）"
+      fi
 
       MON_MSG="
 
@@ -310,26 +316,25 @@ ${MON_HOWTO}"
   fi
 fi
 
-# --- リマインダー⑦: Mac の自動同期（github-sync）停止検知（2026-10-16 / T-20261016-002）---
+# --- リマインダー⑩: Mac の自動同期の停止・ブランチ逸脱の検知（2026-10-16 / T-20261016-002）---
 #
-# 背景: 2026-09-06 19:05 の自動同期を最後に、Mac からのコミットが40日間ゼロでした。
-#       その間 Amazon 日次チェックも止まっていたのに、**誰も気づきませんでした**。
-#       Mac 側の番犬は Mac が止まれば一緒に止まります（検知器が監視対象と運命を共有していた）。
-#       Git の履歴は Mac の外（クラウドのセッション・スケジュールタスク）からも見えるので、
-#       ここを「Mac が生きているか」の判定材料にします。判定は sync_liveness.sh に1本化。
-#       平常時（24時間以内に自動同期あり）は1行も出ません。
+# 背景: クラウドから main を見ると 9/6 を最後に Mac のコミットが40日間ゼロに見えました。
+#       実際は Mac は毎日動いていて、リポジトリが `claude/nighttime-work-checkin-iTWEa` に居続けたため
+#       github-sync（カレントブランチのみ同期）が全部そのブランチへ push していました。
+#       main を見るクラウドのセッションは40日前の状態から作業し、「日次チェックが40日止まった」と誤認しました。
+#       判定は sync_liveness.sh に1本化（全ブランチを最大15秒 fetch してから見る）。平常時は1行も出ません。
+#       番号は Mac 側ブランチで ⑦〜⑨ が使われているため ⑩（統合時に衝突しないように）。
 SYNC_LIVE_MSG=""
 if [ -f "$REPO/.claude/scripts/sync_liveness.sh" ]; then
   SYNC_LIVE_BODY="$(bash "$REPO/.claude/scripts/sync_liveness.sh" 2>/dev/null || true)"
   if [ -n "$SYNC_LIVE_BODY" ]; then
     SYNC_LIVE_MSG="
 
-【SessionStart リマインダー⑦：Mac の自動同期が止まっています】
+【SessionStart リマインダー⑩：Mac の作業が main に届いていません】
 ${SYNC_LIVE_BODY}
-Mac の launchd（github-sync・Amazon 番犬）と Mac 上の Claude スケジュールタスク（Amazon 日次巡回）がまとめて止まっている可能性があります。
-- 社長の Mac で: Claude アプリが起動しているか／Mac がスリープ・ログアウトしていないか
-- Mac のターミナルで: \`tail -20 workspace/.sync/github-sync.log\`（ERROR / STOP / HOLD の行が原因を示します）
-- 手順書: workspace/output/deliverables/T-20261016-002/01_日次チェック停止の原因と対策_20261016.md"
+このまま main だけを見て作業すると、Mac 側の最新状態（チケット・社長タスク・監視ログ）と食い違います。
+- 先に読む: \`git log origin/<上のブランチ> -5\` と、必要なファイルは \`git show origin/<ブランチ>:<パス>\`
+- 直し方（社長の Mac で1回）: workspace/output/deliverables/T-20261016-002/01_日次チェック停止の原因と対策_20261016.md §6"
   fi
 fi
 
@@ -484,8 +489,8 @@ fi
 #       ② は社長への問いかけリストであり、②が長い日ほど ③ が埋没するという逆相関がある。
 #       件数が増えるほど埋もれる配置は、放置を検知する仕組みとして自己矛盾しています。
 #       行動を要する短いものを前に、一覧性の長いものを後ろに置きます。
-# ⑤ は 2026-08-31 に追加。⑥ は 2026-09-02 に追加。⑦ は 2026-10-16 に追加。
-# 掲出は ① → ⑦ → ⑤ → ⑥ → ③ → ④ → ②（⑦ は⑤の原因側なので前に置く）。
+# ⑤ は 2026-08-31 に追加。⑥ は 2026-09-02 に追加。⑩ は 2026-10-16 に追加。
+# 掲出は ① → ⑩ → ⑤ → ⑥ → ③ → ④ → ②（⑩ は⑤の原因側なので前に置く）。
 # 番号は作成順、掲出順とは別です（③④② が既にそうなっています）。
 # ⑤⑥ はいずれも「異常な時だけ」出るため、平常日は1行も増えません。だから最前列に置けます。
 MESSAGE="${SYNC_MSG}${SYNC_LIVE_MSG}${MON_MSG}${MIRROR_MSG}${INBOX_MSG}${LIST_MSG}${REMINDER_MSG}"

@@ -32,8 +32,12 @@ Amazon の重要通知（カナダ店の無効化など）を誰も見ていま�
 
    ```
    bash .claude/scripts/sync_liveness.sh --status
-   python3 .claude/scripts/amazon_check_log.py status
+   python3 .claude/scripts/amazon_check_log.py status --ref auto
    ```
+
+   `--ref auto` は「Mac の自動同期が今載っているブランチ」から Mac 版ログを読みます。Mac が main 以外のブランチに
+   居ると、main の `amazon-daily-check.md` は古いまま止まって見えます（2026-10-16 にそれで「40日停止」と誤認した）。
+   **Mac 版の最終実行日は必ずこの出力から書く。** main のファイルを直接読んで書かない。
 
 4. **`workspace/monitoring/amazon-daily-check-cloud.md` の「---」の直下に1件追記する**（新しい順）。見出しは `## YYYY-MM-DD（クラウド・Gmailのみ）`（日本時間の日付）。
    - 表で：Gmail の結果／セラーセントラル画面＝**未確認**／satoyselect＝**未確認**／Mac の自動同期の状態

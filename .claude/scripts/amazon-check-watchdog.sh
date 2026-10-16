@@ -51,8 +51,14 @@ case "${1:-run}" in
     exit 0
     ;;
   --status)
-    python3 "$LOGIC" status
-    echo "番犬（Mac の launchd）の最終実行: $(cat "$HEARTBEAT" 2>/dev/null || echo '記録なし')"
+    # --ref auto: Mac が main 以外のブランチに居ても、Mac の本物のログを読む（T-20261016-002）
+    python3 "$LOGIC" status --ref auto
+    BR="$(SYNC_LIVENESS_NOFETCH=1 bash "$REPO/.claude/scripts/sync_liveness.sh" --branch 2>/dev/null || true)"
+    if [ -n "$BR" ] && [ "$BR" != "main" ] && [ "$BR" != "不明" ]; then
+      echo "番犬（Mac の launchd）の最終実行: $(git -C "$REPO" show "origin/$BR:workspace/monitoring/watchdog-last-run.txt" 2>/dev/null || echo '記録なし')（$BR より）"
+    else
+      echo "番犬（Mac の launchd）の最終実行: $(cat "$HEARTBEAT" 2>/dev/null || echo '記録なし')"
+    fi
     echo "Mac の自動同期: $(bash "$REPO/.claude/scripts/sync_liveness.sh" --status 2>/dev/null || echo '判定不能')"
     exit 0
     ;;
