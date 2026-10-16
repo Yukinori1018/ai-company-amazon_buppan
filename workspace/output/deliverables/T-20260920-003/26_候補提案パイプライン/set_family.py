@@ -138,6 +138,16 @@ def resolve(title: str | None, package_quantity=None, number_of_items=None,
                         "**卸サイトの1点の中身を人が見てください。**")
 
     only = title_n if title_n is not None else pq
+    # 🔴 2026-10-16：商品名に数が無く（=1 と読んだ）packageQuantity も無い行で、
+    # numberOfItems が 2 以上なら「1点」と決めない。B0FF9HRRYD（オニポテスナック 40g）は
+    # 商品名だけ見て 1 にしたが、実画面は「袋あたり￥296」の5袋セット（numberOfItems=5）で、
+    # 原価を1/5に見て利益率36.8%（実際は -24.4%）と出ていた。numberOfItems=1 は既定値の
+    # ことがあるので使わないが、2 以上は既定値ではない。原価を安く見る向きの誤りなので UNKNOWN に倒す。
+    if only == 1 and pq is None and noi is not None and noi > 1:
+        return SetCount(None, UNREADABLE, sources,
+                        f"商品名からは1点と読めますが、numberOfItems={noi} です"
+                        "（例：40g の商品名で実物は5袋セット）。1点と決めると原価を安く見るので"
+                        "**Amazon の画面で「1袋あたり」「◯袋セット」を人が見てください。**")
     if only is not None:
         where = "商品名" if title_n is not None else "packageQuantity"
         return SetCount(only, SINGLE, sources,

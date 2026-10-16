@@ -113,6 +113,10 @@ c = sf.resolve("カップ麺 110g、18食入り", 18, -1)
 eq(c.n, 18, "pq が 18 なら『18食入り』の曖昧さが解ける")
 eq(c.confidence, sf.SINGLE, "商品名側は曖昧で読めないので情報源は1本")
 check(not c.is_decided(), "n>1 の単独は GO にしない（10/01 の ▲778円/個 の型）")
+c = sf.resolve("あじげん オニポテスナック うすしお味 40g", -1, 5)
+eq(c.n, None, "商品名で1点でも numberOfItems=5 なら1と決めない（B0FF9HRRYD 5袋セット・2026-10-16）")
+check(not c.is_decided(), "numberOfItems>=2 と食い違う単品は UNKNOWN")
+eq(sf.resolve("あみたわし", -1, 1).n, 1, "numberOfItems=1 は既定値なので従来どおり単品")
 eq(sf.resolve("×200個セット", 200, -1).n, 200,
    "pq は 1000 まで受ける（商品名側の上限60で大口を切り落とさない）")
 eq(sf.resolve("あみたわし", 99999, -1).confidence, sf.SINGLE,
