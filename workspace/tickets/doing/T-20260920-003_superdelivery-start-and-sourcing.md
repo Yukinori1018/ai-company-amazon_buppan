@@ -4520,3 +4520,17 @@ FLR910 2件は SD 経由でも GO（B 等級・11.2%・手残り1,186円/個）�
 - 判定件数（前→後）：GO 0→0／GO（実績枠）4→4／UNKNOWN 335→328／NO-GO 10,471→10,478。新しい GO・実績枠は0
 - 16行の行き先：UNKNOWN→NO-GO 7（#9 キーゾン3か月が実質ゼロ：B007JTDXMM 0/1/0・B007M844KK 0/1/0・B00SB64HZO 0/1/0・B07CWFRK69 0/0/1・B08NC9M2GN 0/0/1・B09JST5TN6 1/0/1・B0FMXFVG53 1/1/0）／UNKNOWN のまま 9（#9 は PASS：B0CGHV2SZ2 9/9/10・B088YV2PST 5/7/4・B0C28FPW2G 4/5/4・B0CGHS8SDT 4/3/3・B07CVSX2QJ 4/5/0・B007M85W42 2/1/2・B01FTVLGIE 1/0/2・B0F6SQ6VY5 1/3/0 の8行は「#17 SD 取引申請が必要（カネイシ／ニッパン）」だけが残る。B0CDFGHXC1 はカートなし・新品0件で #5 UNKNOWN）
 - one_step 32→**19**（#17 5・#13-14 5・#9 3〔キーゾン未確認の3件〕・#11 3・#5 2・#15 1。経路 NETSEA 13／SD 4／未確認 2）。抜けた15行はすべて上の16行。入った2行（B007M85HHE #11・B07CVT4GJJ #13-14）。注意：SD の「#17 取引申請が必要」は 10/16 の数え方では項目に数えないので、上の8行は one_step に入っていない（実質は「カネイシ・ニッパンに SD で取引申請すれば一歩手前」）
+
+## ログ（2026-10-18 夜間・タカシ・実画面59件の書き戻し＋#10 を新品件数で決める修正）
+- 入力：カズヨ `unknown_queue/browser_results_20261018.tsv`（59行・確認 2026-10-18 02:20）→ browser_results_import --tag 20261018_browser（ゲート open8／docs49／closed2・カート Y21／N38・メーカー疑い B0GJR86F8W ハナリラ）。証跡 `cart_check_20261018_browser.csv`・`gate_check_20261018_browser.csv`・_sourcing_checks 59件。Amazon 上のスーパー（成城石井など）だけの行はカートなし（N）のまま、Amazon フレッシュは保持者 Amazon.co.jp（本体 FAIL）で入っている
+- 🔴 見つけた穴：#7 の「新品n件」を取っても #10 取り分が動いていなかった（share_gate は Keepa の内訳か offer_check の FBA／自己発送の内訳しか見ない）。59件中35件が「出品者の内訳が取れない（Keepa 生データなし）」で止まっていた → `screen_checks.share_gate(new_offers=)` を追加。下限＝月販÷(n+1)（n件全部を競合とみなす）・上限＝月販÷1。下限で PASS→PASS／競合ゼロでも基準3個未満→FAIL（実績枠の線＝月1個は下限で決まるときだけ）／それ以外は UNKNOWN。台帳の列には「カート対象 FBA n」と書かず「新品n件」のまま。test_screen_checks に6件追加（ok）・test_night・test_now_only も NG なし
+- 手順：基準 dry-run（after_20261018_pre_br1018_dry.json）→ 取り込み → dry-run（TSV 外の変化0）→ 本番 RUN_TAG=br1018（退避 before_20261018_br1018.json）→ #10 修正 → dry-run（TSV 外の変化は人の証跡が前からある4行だけ）→ 本番 RUN_TAG=share1018（退避 before_20261018_share1018.json）→ 2回目 dry-run。**どちらの本番も事前 dry-run・2回目 dry-run とバイト一致**
+- 判定件数（前 → 取り込み後 → #10 修正後）：GO 0→0→0／GO（実績枠）4→4→4／UNKNOWN 331→323→**299**／NO-GO 10,475→10,483→**10,507**。**新しい GO・実績枠は0**
+- 59行の行き先：UNKNOWN→NO-GO 30／UNKNOWN のまま 29
+  - 取り込みだけで NO-GO 8：Amazon 本体がカート 6（Amazon フレッシュ5：B00BBVVBRI・B074PVW7HV・B0DGF4YVYZ・B0DGF54LZ1・B00YE2LXVU／Amazon.co.jp：B0C5X32L5W）・新品の申請経路なし 1（B072XJ4PM3。B00YE2LXVU も該当）・#12 終売で今だけ不可 1（B008FIPORI 蛍光灯）
+  - #10 修正で NO-GO 22：月販0.3〜2.7個（キーゾン再現値）で、競合ゼロでも取り分3個に届かない。ほかに前から人の証跡があった2行（B0H99J1VR4・B0765RXJC7）も同じ理由で NO-GO（合計 UNKNOWN→NO-GO 32）
+  - 残る29行（NETSEA 16／SD 13）の未達：#5 18・#13-14 15・#10 14・#17 11・#12 9・#9 4・#11 1。項目1つだけ5行（#9 3・#5 2）、2つ 10行
+- #9 キーゾンが出ない3件（B00Z9I3H08・B017SK20A2・B078X35J1D）は再現式でも埋まらない：Keepa の3か月の売れ筋ランク観測が0回（10/4・10/11 取得とも）＝キーゾンが表を出さないのと同じ理由。0個とは書けないので未確認のまま。B00Z9I3H08（第三者 暮らしのデパート・本体あり）と B078X35J1D（第三者 ポニーショップ）はカート PASS
+- **one_step 20行**（#17 5・#13-14 5・#9 3・#11 3・#5 3・#15 1。経路 NETSEA 13／SD 5／未確認 2）→ `unknown_queue/one_step_20261018.tsv`。前後で同じ顔ぶれ（取り込みで B06XSVSDNB が #10 で一度入り、#10 修正で NO-GO に抜けた）。10/17 の19行との差1行は数え方の修正：判定理由が「（人の実画面確認を反映）#5 …」で始まる行（B0CDFGHXC1）を拾えていなかった
+- 構成比：UNKNOWN 299＝NETSEA 250（83.6%）／SD 45（15.1%）／未確認 4。実績枠4件は全部 NETSEA（10/7〜相手側障害中）
+- コード（screen_checks.py・ledger_refresh.py・test_screen_checks.py）は 03:14 の自動同期で commit 済み。SD・NETSEA へのアクセス0。Keepa は ledger_refresh の通常動作のみ
