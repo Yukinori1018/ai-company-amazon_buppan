@@ -235,9 +235,13 @@ def verify(m: dict, judge: str) -> list[str]:
 
 def classify(r: dict, list_col: str, check_col: str) -> tuple[str, list[str]]:
     """（区分, 検算で外れた項目）。区分は '第1弾'/'第2弾'/'下書き済'/'対象外（理由）'。"""
+    st = (r.get('接触ステータス') or '').strip()
+    # お断りは下書き済（DRAFTED の固定リスト）より先に見る。返事が来た社を「下書き済」に戻さない
+    # （2026-10-18 ナチュラルウェーブ・第一酵母がお断りでも「下書き済」のままだった）
+    if st == 'お断り':
+        return '対象外（接触済：お断り）', []
     if (r.get('正式社名') or '') in DRAFTED:
         return '下書き済', []
-    st = (r.get('接触ステータス') or '').strip()
     if st and st != '未接触':
         return f'対象外（接触済：{st}）', []
     j = r.get('判定') or ''
