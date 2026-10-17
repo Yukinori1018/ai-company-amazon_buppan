@@ -602,7 +602,8 @@ TRACK_MIN_SHARE = 1.0
 #: 実績枠の在庫月数の上限（最小ロット1回ぶん）。§3.5 #10 の6ヶ月と同じ
 TRACK_MAX_MONTHS = 6.0
 #: 通常の取り分の下限（個/月・§3.5 #10。screen_checks.MIN_SHARE と同じ）。
-#: B 等級はこれ未満（＝取り分だけで落ちた）のときだけ実績枠に入る（2026-10-14 秘書判断 A）
+#: A・B 等級はこれ未満（＝取り分だけで落ちた）のときだけ実績枠に入る（2026-10-14 秘書判断 A で B、
+#: 2026-10-18 秘書判断で A も。B が残り A が落ちる逆転の解消）
 TRACK_B_SHARE_CEIL = 3.0
 
 
@@ -610,14 +611,14 @@ def track_record(grade: str, mid_net: Optional[float], share: Optional[float],
                  months: Optional[float]) -> tuple[bool, str]:
     """実績枠に入れるか（採算と取り分だけを見る。地雷の PASS は呼び出し側で確かめる）。
 
-    入れる：等級 C で中央値の1個手残りが0円以上、**または B 等級で #10 の取り分だけが
+    入れる：等級 C で中央値の1個手残りが0円以上、**または A・B 等級で #10 の取り分だけが
             月1〜3個のため落ちた行**（CLAUDE.md §3.5 #18・2026-10-14 秘書判断：薄利の C が残り
-            厚い B が落ちる逆転を解消）。どちらも取り分が月1個以上、最小ロット1回の在庫月数が
-            6ヶ月以内。B で取り分が月3個以上なら通常の GO（実績枠ではない）。
+            厚い B が落ちる逆転を解消／2026-10-18 秘書判断：同じ理由で A も）。どちらも取り分が月1個以上、最小ロット1回の在庫月数が
+            6ヶ月以内。A・B で取り分が月3個以上なら通常の GO（実績枠ではない）。
     返り値：(入るか, 入らない理由 or 入る根拠の短文)。**数字が欠けていたら入れない**（推測で埋めない）。
     """
-    if grade not in ("B", "C"):
-        return False, f"等級 {grade or '未確定'}（実績枠は C か、取り分だけ足りない B）"
+    if grade not in ("A", "B", "C"):
+        return False, f"等級 {grade or '未確定'}（実績枠は C か、取り分だけ足りない A・B）"
     if mid_net is None:
         return False, "中央値の手残りが無い"
     if mid_net < TRACK_MIN_NET_YEN:
@@ -626,8 +627,8 @@ def track_record(grade: str, mid_net: Optional[float], share: Optional[float],
         return False, "取り分が出ていない（実売・出品者の内訳が未確定）"
     if share < TRACK_MIN_SHARE:
         return False, f"取り分 {share:.1f}個/月（実績枠でも月{TRACK_MIN_SHARE:g}個以上）"
-    if grade == "B" and share >= TRACK_B_SHARE_CEIL:
-        return False, f"等級 B・取り分 {share:.1f}個/月＝通常の GO（実績枠ではない）"
+    if grade in ("A", "B") and share >= TRACK_B_SHARE_CEIL:
+        return False, f"等級 {grade}・取り分 {share:.1f}個/月＝通常の GO（実績枠ではない）"
     if months is None or months > TRACK_MAX_MONTHS:
         return False, (f"最小ロットの在庫 {months:.1f}か月（上限{TRACK_MAX_MONTHS:g}か月）"
                        if months is not None else "在庫月数が出ていない")

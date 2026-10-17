@@ -4534,3 +4534,9 @@ FLR910 2件は SD 経由でも GO（B 等級・11.2%・手残り1,186円/個）�
 - **one_step 20行**（#17 5・#13-14 5・#9 3・#11 3・#5 3・#15 1。経路 NETSEA 13／SD 5／未確認 2）→ `unknown_queue/one_step_20261018.tsv`。前後で同じ顔ぶれ（取り込みで B06XSVSDNB が #10 で一度入り、#10 修正で NO-GO に抜けた）。10/17 の19行との差1行は数え方の修正：判定理由が「（人の実画面確認を反映）#5 …」で始まる行（B0CDFGHXC1）を拾えていなかった
 - 構成比：UNKNOWN 299＝NETSEA 250（83.6%）／SD 45（15.1%）／未確認 4。実績枠4件は全部 NETSEA（10/7〜相手側障害中）
 - コード（screen_checks.py・ledger_refresh.py・test_screen_checks.py）は 03:14 の自動同期で commit 済み。SD・NETSEA へのアクセス0。Keepa は ledger_refresh の通常動作のみ
+
+## ログ（2026-10-18 夜間・タカシ・秘書判断：A 等級も実績枠の候補に）
+- 逆転の解消：「#10 の取り分だけが月1〜3個で落ちる行」は B 等級なら実績枠の候補・A 等級なら NO-GO だった → A も B と同じ扱いに。直した所＝`scripts/sourcing_gate/consistency.track_record`（A を受け付ける・A/B で取り分3個以上は通常 GO）／`ledger_refresh` の実績枠判定（等級の入口・取り分 PASS なら通常 GO・b_share_only）。test_cost_20261014 に A のテスト2件（取り分2個→実績枠／3個→通常 GO）。test_cost・test_screen_checks・test_night・test_now_only・test_rules すべて NG なし
+- 台帳への影響：**0件**（dry-run が本番 after_20261018_share1018.json とバイト一致。A 等級で #10 だけ FAIL の行が台帳に0行）→ 指示どおり本番は回さず、コードとテストだけ
+- 判定件数（前→後）：GO 0→0／GO（実績枠）4→4／UNKNOWN 299→299／NO-GO 10,507→10,507
+- CLAUDE.md §3.5 #18 の文言（「A・B 等級で」）は秘書が直す（タカシは触っていない）

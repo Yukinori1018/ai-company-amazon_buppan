@@ -111,6 +111,9 @@ check("B・取り分2個/月・中央値+100円 → 実績枠", K.track_record("
 check("B・取り分3個/月 → 通常 GO（実績枠ではない）", K.track_record("B", 100, 3.0, 0.4)[0], False)
 check("B でも取り分0.8個/月は入らない", K.track_record("B", 100, 0.8, 1.3)[0], False)
 check("C・中央値▲1円は入らない", K.track_record("C", -1, 2.0, 0.5)[0], False)
+# 2026-10-18 秘書判断：A 等級も取り分だけ月1〜3個なら実績枠（B が残り A が落ちる逆転の解消）
+check("A・取り分2個/月・中央値+500円 → 実績枠", K.track_record("A", 500, 2.0, 0.5)[0], True)
+check("A・取り分3個/月 → 通常 GO（実績枠ではない）", K.track_record("A", 500, 3.0, 0.4)[0], False)
 
 print(f"\n{'全部 ok' if not FAILS else f'NG {len(FAILS)}件: {FAILS}'}")
 sys.exit(1 if FAILS else 0)

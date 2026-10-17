@@ -793,14 +793,14 @@ def track_record_frame(s: dict, gates: list, gate: dict | None) -> dict | None:
     """§3.5 #18 実績枠に入るか（2026-10-12 社長方針「プラマイ0でも卸で実績を作る」）。
 
     入る条件（CLAUDE.md §3.5 #18 実績枠 ①〜⑤）
-      - 採算：等級 C（取り分だけが足りない B も拾う）で、中央値の1個手残りが0円以上
+      - 採算：等級 C（取り分だけが足りない A・B も拾う）で、中央値の1個手残りが0円以上
         ※ 損益計算書の手残り（net_per_unit）と等級の中央シナリオの両方が0円以上（保守側）
       - 取り分：月1個以上（通常3個）。在庫月数は**最小ロット1回ぶん**で6か月以内
       - それ以外の項目（地雷）は全部 PASS。人の確認（カート・ゲート）の要否は GO と同じ扱い
     返り値：入るなら {"mid","worst","share","rec","months","why"}、入らなければ None。
     """
     e = s.get("econ")
-    if not e or e.grade not in ("B", "C"):
+    if not e or e.grade not in ("A", "B", "C"):   # A は 2026-10-18 秘書判断（取り分だけ足りない A）
         return None
     st = {g[0]: g[1] for g in gates}
     pf = st.get("採算")
@@ -832,8 +832,8 @@ def track_record_frame(s: dict, gates: list, gate: dict | None) -> dict | None:
                 return blocked()
             return {"pending": True, "mid": mid_use, "worst": e.worst_net_per_unit}
         return None
-    if e.grade == "B" and st.get("取り分") == "PASS":
-        return None   # B で取り分も足りていれば通常の GO
+    if e.grade in ("A", "B") and st.get("取り分") == "PASS":
+        return None   # A・B で取り分も足りていれば通常の GO
     info = s.get("_share") or {}
     share = info.get("share")
     if share is None:
@@ -1035,7 +1035,8 @@ def _compose_netsea(s: dict, gate: dict | None) -> dict:
         share_ok = "取り分" not in fails or (sh_ is not None and sh_ >= K.TRACK_MIN_SHARE)
         # 2026-10-14 秘書判断 A（§3.5 #18）：B 等級で #10 の取り分だけが月1〜3個のため落ちた行も
         # 実績枠の候補にする（C だけ残して B を落とす逆転を解消）
-        b_share_only = bool(e_ and e_.grade == "B" and fails == {"取り分"})
+        # 2026-10-18 秘書判断：A 等級も同じ（B が残り A が落ちる逆転の解消）
+        b_share_only = bool(e_ and e_.grade in ("A", "B") and fails == {"取り分"})
         if (e_ and (e_.grade == "C" or b_share_only) and mid_ is not None
                 and mid_ >= K.TRACK_MIN_NET_YEN
                 and fails and fails <= {"採算", "取り分"} and share_ok
