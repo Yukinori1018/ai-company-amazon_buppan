@@ -36,6 +36,16 @@ def t_share():
     st, _, i = SC.share_gate("A3", 4, 30, 30, False)       # 最小ロット30点＝7.5か月
     assert st == "FAIL"
     assert SC.share_gate("NONE", 10, 10, 1, False)[0] == "UNKNOWN"
+    # 2026-10-18：内訳なし・実画面の新品件数だけ → 全件を競合とした下限。PASS は PASS、FAIL は UNKNOWN
+    st, why, i = SC.share_gate("NONE", 10, 10, 1, False, new_offers=1)   # 10÷2=5
+    assert st == "PASS" and "下限" in why and i["share"] == 5
+    st, why, _ = SC.share_gate("NONE", 6, 10, 1, False, new_offers=3)    # 6÷4=1.5 → 下限で FAIL
+    assert st == "UNKNOWN" and "取り寄せ型を除いた" in why
+    assert SC.share_gate("NONE", 0.7, 10, 1, False, new_offers=1)[0] == "FAIL"  # 競合ゼロでも月0.7個
+    st, _, i = SC.share_gate("NONE", 2, 10, 1, False, new_offers=1)   # 下限1.0＝実績枠の線は確定
+    assert st == "FAIL" and i["share"] == 1
+    assert SC.share_gate("NONE", 2, 10, 1, False, new_offers=2)[0] == "UNKNOWN"  # 下限0.67・上限2
+    assert SC.share_gate("A1", 11, 10, 1, False, new_offers=9)[0] == "PASS"  # 内訳がある行は内訳が勝つ
 
 
 def t_doc():

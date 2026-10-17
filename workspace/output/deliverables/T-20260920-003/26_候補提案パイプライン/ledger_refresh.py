@@ -885,7 +885,9 @@ def apply_screen(s: dict, gates: list, gate: dict | None) -> bool:
         e = s.get("econ")
         # 書類申請のゲート（ブランド出品許可）は請求書10点が要る＝最小ロット10点（§3.5 #3）
         docs = bool(gate and gate.get("書類"))
-        st2, why2, info = SC.share_gate(a, monthly, e.qty if e else None, s.get("min_lot"), docs)
+        cc = SCREEN.cart.get(a)
+        st2, why2, info = SC.share_gate(a, monthly, e.qty if e else None, s.get("min_lot"), docs,
+                                        new_offers=cc.offers_new if cc else None)
         s["_share"] = info
         gates.append(("取り分", st2, why2, ""))
     return True
@@ -1284,7 +1286,7 @@ def screen_cells(s: dict, gate: dict | None) -> dict:
     elif c and c.offers_new is not None:
         g["新品出品者数(画面実数)"] = (f"新品{c.offers_new}件（出品一覧・カズヨ実画面 {c.checked_at}）"
                                     + (f"。カート対象の内訳は Keepa：FBA {sh['fba']}／自己発送 {sh['fbm']}"
-                                       if sh.get("src") else ""))
+                                       if sh.get("src") and not sh.get("bound") else ""))
     elif sh.get("src"):
         g["新品出品者数(画面実数)"] = (f"未確認（{sh['src']} カート対象：FBA {sh['fba']}／"
                                     f"自己発送 {sh['fbm']}）")

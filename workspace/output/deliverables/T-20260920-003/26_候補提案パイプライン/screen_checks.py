@@ -43,6 +43,7 @@ WORK = REPO / "workspace/output/agent_output/T-20260920-003"
 OUT = WORK / "ledger20261010"
 KEIZON_TAB = "実売とゲート_20261005"
 MIN_SHARE = 3          # §3.5 #10 取り分の下限（個/月）
+TRACK_MIN_SHARE = 1.0  # 実績枠の取り分の下限（scripts/sourcing_gate/consistency.py と同じ値）
 MAX_MONTHS = 6         # §3.5 #10 在庫月数の上限
 TARGET_MONTHS = 3      # 3か月を超えるのはロット・ゲート10点が理由のときだけ
 
@@ -444,12 +445,36 @@ def sales(asin: str, s: dict, machine_st: str, sc: ScreenChecks) -> tuple[str, s
 
 
 def share_gate(asin: str, monthly: float, qty: int | None, min_lot: float | None,
-               gated_needs_10: bool) -> tuple[str, str, dict]:
-    """§3.5 #10。(状態, 理由, 付帯情報)。"""
+               gated_needs_10: bool, new_offers: int | None = None) -> tuple[str, str, dict]:
+    """§3.5 #10。(状態, 理由, 付帯情報)。
+
+    new_offers：出品一覧の実画面で数えた新品の件数（browser_results の #7「新品n件」）。
+    FBA／自己発送の内訳が無く Keepa の生データも無いときだけ使う。n件を全部カート対象の
+    競合として数える＝取り分の下限。下限で PASS なら本当も PASS。下限で FAIL のときは
+    取り寄せ型・本体を除けば通るかもしれないので UNKNOWN に倒す（2026-10-18・35行がこれで止まっていた）。"""
     off = offers(asin)
+    if not off and new_offers is not None:
+        src = f"実画面 出品一覧 新品{new_offers}件（FBA/自己発送の内訳なし＝全件を競合として数えた下限）"
+        st, why, info = _share_core(monthly, qty, min_lot, gated_needs_10, new_offers, 0, src)
+        info.update(human=False, bound=True)   # 内訳は人が数えていない（台帳の列に FBA n と書かない）
+        why = why.replace(f"カート対象 FBA {new_offers}・自己発送 0（", "（")
+        # 競合ゼロ（上限＝月販÷1）でも基準3個に届かない＝通常の #10 は内訳を数えても FAIL。
+        # 実績枠（月1個以上）は info["share"]（下限）で見られるので、下限で決まるときだけ FAIL にする
+        if st == "FAIL" and monthly < MIN_SHARE and (
+                monthly < TRACK_MIN_SHARE or info.get("share", 0) >= TRACK_MIN_SHARE):
+            return "FAIL", why + f"。競合ゼロでも月{monthly:g}個＝基準3個に届かない", info
+        if st == "FAIL":
+            return ("UNKNOWN", why + "。下限での FAIL なので、出品一覧で取り寄せ型を除いた内訳を数えれば決まる",
+                    info)
+        return st, why, info
     if not off:
         return "UNKNOWN", "出品者の内訳が取れない（Keepa 生データなし）", {}
     fba, fbm, src = off
+    return _share_core(monthly, qty, min_lot, gated_needs_10, fba, fbm, src)
+
+
+def _share_core(monthly: float, qty: int | None, min_lot: float | None, gated_needs_10: bool,
+                fba: int, fbm: int, src: str) -> tuple[str, str, dict]:
     share = monthly / (fba + fbm + 1)
     info = {"fba": fba, "fbm": fbm, "share": share, "src": src, "human": src.startswith("実画面")}
     brk = f"カート対象 FBA {fba}・自己発送 {fbm}（{src}）"
