@@ -184,7 +184,7 @@ def cmd_build(until: datetime | None, dry: bool) -> None:
         if k in old_keys:
             rep = max(it, key=lambda x: x[1]["ms"] or 0)
             dropped.append(({"メーカー名": rep[2], "代表ASIN": rep[1]["asin"], "該当ASIN数": len(it)},
-                            "旧プール（基本・入口(a)・セラー" + ("・入口(b)" if OLD_POOLS else "") + "）と同社＝判定済み"))
+                            "旧プール（基本・入口(a)・セラー" + "".join(f"・{tg}" for _, tg in OLD_POOLS) + "）と同社＝判定済み"))
     cl = classify_all(fresh)
     sus = sorted({n for c in cl if c[5] in R.RESCUABLE for n in [c[4], (c[2].get("brand") or "").strip()] if n})
     if sus:
@@ -335,9 +335,12 @@ def cmd_build(until: datetime | None, dry: bool) -> None:
     if new:
         bak = qpath.with_name(qpath.name + f".bak_{BAK_TAG}_{datetime.now():%Y%m%d_%H%M}")
         shutil.copy(qpath, bak)
+        # 2026-10-18：追記のみ（"a" モード）。並行のサトルが既存範囲を読んでいるので、既存行は1バイトも書き換えない
         qcols = list(queue[0].keys())
-        with qpath.open("w", encoding="utf-8-sig", newline="") as fh:
-            w = csv.DictWriter(fh, fieldnames=qcols); w.writeheader(); w.writerows(queue + new)
+        if not qpath.read_bytes().endswith(b"\n"):
+            raise RuntimeError(f"{qpath.name} の末尾が改行でない。追記すると最終行が壊れるので止める")
+        with qpath.open("a", encoding="utf-8", newline="") as fh:
+            w = csv.DictWriter(fh, fieldnames=qcols); w.writerows(new)
         print(f"書き込み: {qpath.name}（{len(queue)}→{len(queue) + len(new)}行）退避 {bak.name}")
     status(build=summ)
 
