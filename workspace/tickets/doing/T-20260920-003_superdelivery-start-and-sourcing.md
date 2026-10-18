@@ -4557,3 +4557,20 @@ FLR910 2件は SD 経由でも GO（B 等級・11.2%・手残り1,186円/個）�
 - 商品判定台帳：GO 0／GO（実績枠）4／UNKNOWN 299／NO-GO 10,507。「機械判定のみ」の GO は0行。実績枠4行の販売元と新品出品一覧を実画面で取り直し（4行とも第三者がカート・本体なし。B0D2R7NTQD は販売元 ad friend が HEXAR のブランド元かは未確認）→ シートの確認方法に追記
 - SD 送料無料クーポン（10/17）は発注なしで失効（SD からの注文メールなし）。Paid 書類提出（期限10/20）は satoyselect に提出完了メールなし＝未提出とみる
 - satoyselect の新着メーカー返信（10/15〜16）はすべて T-20260930-001 に記録済み。新しい返信なし
+
+## ログ（2026-10-19 夜間・タカシ・実画面32件の書き戻し）
+- 入力：カズヨ `unknown_queue/browser_results_20261019.tsv`（32行・商品ページ＋aodAjax 02:16〜02:19／ゲート restrictions/approve?itemcondition=New 02:20〜02:22）→ browser_results_import --tag 20261019_browser --checked-at "2026-10-19 02:19"（ゲート open4／docs28／closed0・カート Y12／N20・メーカー疑い B0GJR86F8W ハナリラ）。証跡 `cart_check_20261019_browser.csv`・`gate_check_20261019_browser.csv`・_sourcing_checks 32件
+- カズヨ注記の扱い：
+  1. B073JKXV4N・B0765RXJC7 の404 → import の既存処理でカートなし＋保持者欄「商品ページ404」。B073JKXV4N は UNKNOWN のまま（#5・#13-14・#15）、B0765RXJC7 は前から NO-GO（#10 月販0.7個）のまま
+  2. B0F329R75P・B06XH9CZF6（Amazon 上のスーパー LIFE だけ）→ カートなし（N）。cart_check の注意欄に理由を追記。B06XH9CZF6 の「過去1か月50点以上」は LIFE の売上を含むので、**第三者の実売の根拠にしないよう過去1か月欄を空欄にした**
+  3. B0GJR86F8W：maker_suspect で拾われた（＝UNKNOWN 疑い止まり）。カズヨが実画面でブランド本人と確認したので `cart_maker_flags_20261019_human.csv` に「確定」で追加（同ブランドの B0D1XHYYNV は 10/11 に確定済み）→ #5 FAIL で **UNKNOWN→NO-GO**
+  4. 🔴 B0GX6FNCK2：台帳のセット数は Keepa の商品名「【3点セット】」から3と読んでいた。Amazon 実画面は「【2点セット】」＝**食い違い**。数字は直さず `set_check_20261019_amazonpage.csv` に「未確定」で置き、**#15 UNKNOWN（人の確認で未確定）**。カート1,050円は入ったが採算は「計算しません（売価／原価／セット数）」のまま（§3.3-17）。決め手＝商品画像・「商品の個数」欄
+  5. #9 キーゾン未確認4件（B078X35J1D・B00Z9I3H08・B017SK20A2・B00J3FMNJO）は過去1か月表示なし＝月50個未満というだけ。#9 は未確認のまま（機械で上書きしていない）
+  6. B018V4FW86 のカート保持者 ミーニャ→POPOandCO.（第三者）を注意欄に記録。判定は UNKNOWN のまま（#10・#11）
+- 手順：基準 dry-run（after_20261019_pre_br1019_dry.json＝今夜 02:05 の stages 本番と判定値一致）→ 取り込み → dry-run（TSV 外の変化0）→ メーカー確定を追加して dry-run（変化は B0GJR86F8W 1行だけ）→ 本番 RUN_TAG=br1019（退避 before_20261019_br1019.json）→ 2回目 dry-run。**本番は事前 dry-run・2回目 dry-run とバイト一致**
+- 判定件数（前→後）：GO 0→0／GO（実績枠）4→4／UNKNOWN 297→**296**／NO-GO 10,507→**10,508**。**新しい GO・実績枠は0**
+- 32行の行き先：UNKNOWN のまま 30（NETSEA 17／SD 13）・NO-GO 2（B0GJR86F8W 新規・B0765RXJC7 前から）。残る30行の未達：#5 19・#13-14 17・#10 14・#17 11・#12 9・#9 4・#15 2・#11 1。項目1つだけ5行（#9 3・#5 2）
+- **one_step 20行**（#17 5・#13-14 5・#9 3・#11 3・#5 3・#15 1。経路 NETSEA 13／SD 5／未確認 2）→ `unknown_queue/one_step_20261019.tsv`。10/18 と同じ顔ぶれ（数え方は 10/18 の台帳で 20行一致を先に確認）
+- unknown_stages plan：UNKNOWN 296・①#9 1／②#13-14 33／③#11 4／④実画面 30／⑤人手 37。次の段 s2_price
+- 構成比：UNKNOWN 296＝NETSEA 247（83.4%）／SD 45（15.2%）／未確認 4（1.4%）
+- コード変更なし（証跡ファイルだけ・agent_output）。SD・NETSEA へのアクセス0。Keepa は ledger_refresh の通常動作のみ

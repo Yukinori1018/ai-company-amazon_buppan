@@ -52,6 +52,10 @@ KNOWN_ORDERS = ("order.json", "order_wideA.json", "order_seller.json")  # この
 OLD_POOLS: list[tuple[str, str]] = []  # B.load_products() に足す旧プール（order ファイル, product タグ）
 OUT_CAND, OUT_DROP, BAK_TAG = "11c_追加候補_入口b.csv", "12d_入口b_落とした行.csv", "entryb"
 RESERVE = 0  # 他のジョブ用に残す token（取得の前に 必要量＋RESERVE を待つ）
+# 2026-10-19 入口(e) 用のフック。None のときは入口(b)(c)(d) と同じ動き（既存の結果は変わらない）
+RANK_RANGE: tuple[int, int] | None = None  # 大カテゴリーランクの帯（lo, hi）。product 再判定「4 …」を差し替える
+BIG_VERIFY = None  # f(p, items) -> str。大手判定（層5・一次除外の大手）の裏付けが取れないとき理由を返す → 層3 に回す
+LAYER_NOTE = None  # f(row) -> str。層の印のあとに足す注記（例：売価が死に帯）。冪等の判定は ENTRY_MARK の部分一致なので壊れない
 
 
 def _mod(name: str, path: Path):
@@ -153,6 +157,11 @@ def cmd_build(until: datetime | None, dry: bool) -> None:
 
     # 1) product 再判定。30_build.POST の売価だけを帯の下限に替える（他の条件は同じ関数）
     post = [(lbl, ok) for lbl, ok in B.POST if not lbl.startswith("6 ")]
+    if RANK_RANGE:
+        lo, hi = RANK_RANGE
+        post = [(f"4 大カテゴリーランク {lo:,}〜{hi:,}（再判定）",
+                 lambda f: f["rank"] is not None and lo <= f["rank"] <= hi) if lbl.startswith("4 ") else (lbl, ok)
+                for lbl, ok in post]
     post.insert(4, (f"6 売価（カート価格・無ければ新品最安）≥ {PRICE_MIN_B:,}円",
                     lambda f: f["price"] is not None and f["price"] >= PRICE_MIN_B))
     alive = [(p, B.facts(p)) for p in ps]
@@ -176,6 +185,10 @@ def cmd_build(until: datetime | None, dry: bool) -> None:
         for k, items in gs:
             rep_p, rep_f, name = max(items, key=lambda x: ((x[1]["ms"] or 0), -(x[1]["rank"] or 10**9)))
             excl, why, rescue = R.classify(rep_p, [x[0] for x in items])
+            if excl.startswith("大手") and BIG_VERIFY:
+                doubt = BIG_VERIFY(rep_p, [x[0] for x in items])
+                if doubt:  # ブランド欄だけで大手にした疑い → 除外せず層3へ（tier() でも同じ判定をする）
+                    excl, rescue = "", f"大手判定を保留：{doubt}"
             out.append((k, items, rep_p, rep_f, name, excl, why, rescue))
         return out
 
@@ -192,7 +205,7 @@ def cmd_build(until: datetime | None, dry: bool) -> None:
         _gbiz_exact(sus)
         cl = classify_all(fresh)
     for k, items, rep_p, rep_f, name, excl, why, rescue in cl:
-        r = {"_p": rep_p, "_key": k, "優先度": "" if excl else "B", "メーカー名": name,
+        r = {"_p": rep_p, "_items": [x[0] for x in items], "_key": k, "優先度": "" if excl else "B", "メーカー名": name,
              "ブランド": " / ".join(dict.fromkeys((p.get("brand") or "").strip() for p, _, _ in items if p.get("brand")))[:60],
              "代表ASIN": rep_f["asin"], "代表商品名": rep_f["title"], "Amazon URL": f"https://www.amazon.co.jp/dp/{rep_f['asin']}",
              "該当ASIN数": len(items), "過去1ヶ月の販売数(代表)": rep_f["ms"], "代表の売価": rep_f["price"],
@@ -281,7 +294,12 @@ def cmd_build(until: datetime | None, dry: bool) -> None:
 
     def tier(r) -> int:
         if r["大手"] or r["_上場"].startswith("大手（上場）"):
-            return 5
+            doubt = BIG_VERIFY(r["_p"], r["_items"]) if BIG_VERIFY else ""
+            if not doubt:
+                return 5
+            prev = r["要確認"]  # 本人カート疑いが重なれば層4（大手でないなら本来そこに入る）
+            r["要確認"] = "要確認：大手判定を保留（" + doubt + "）" + (" / " + prev if prev else "")
+            return 4 if prev else 3
         if r["要確認"]:
             return 4
         if r["規模"].startswith("中小"):
@@ -295,7 +313,7 @@ def cmd_build(until: datetime | None, dry: bool) -> None:
     ready.sort(key=lambda r: (r["_tier"], -num(r["該当ASIN数"]), -num(r["過去1ヶ月の販売数(代表)"])))
     new = []
     for i, r in enumerate(ready, last + 1):
-        new.append({"順位": str(i), "層": TIER_NAMES[r["_tier"]] + ENTRY_MARK, "メーカー名": r["メーカー名"],
+        new.append({"順位": str(i), "層": TIER_NAMES[r["_tier"]] + ENTRY_MARK + (LAYER_NOTE(r) if LAYER_NOTE else ""), "メーカー名": r["メーカー名"],
                     "ブランド": r["ブランド"], "代表ASIN": r["代表ASIN"], "AmazonURL": r["Amazon URL"],
                     "該当ASIN数": r["該当ASIN数"], "月販": r["過去1ヶ月の販売数(代表)"], "売価": r["代表の売価"],
                     "印": r["印"], "要確認": r["要確認"], "規模": r["規模"], "カート保持セラー": r["カート保持セラー(代表)"],
