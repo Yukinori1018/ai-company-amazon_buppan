@@ -147,7 +147,7 @@ def _gbiz_exact(names: list[str]) -> None:
     R.GBIZ_EXACT.update(res)
 
 
-def cmd_build(until: datetime | None, dry: bool) -> None:
+def cmd_build(until: datetime | None, dry: bool, prefetch: bool = False) -> None:
     B = _mod("b30", HERE / "30_build.py")
     Q = _mod("q51", HERE / "51_extend_queue.py")
     S = _mod("s36", HERE / "36_size_additions.py")
@@ -260,6 +260,11 @@ def cmd_build(until: datetime | None, dry: bool) -> None:
         have.update(keepa_io.products_buybox(need[i:i + 100], log=lambda s: print(s, flush=True)))
     sids = {a: ((have.get(a) or {}).get("stats") or {}).get("buyBoxSellerId") for a in reps if a in have}
     names = keepa_io.sellers([s for s in sids.values() if s], offline=dry or not can_spend(len(sids) + 5, until))
+    if prefetch:  # 2026-10-19：カート保持者だけ先に取る。build を区切って回すと層の並びが実行ごとに割れるので、書き込みは全部そろってから
+        miss = [a for a in reps if a not in have]
+        print(f"prefetch: カート保持者 {len(reps) - len(miss)}/{len(reps)} 社 取得済み", flush=True)
+        status(prefetch_カート保持者=f"{len(reps) - len(miss)}/{len(reps)}")
+        return
     for r in cand:
         if r["代表ASIN"] not in have:
             r["要確認"] = "カート保持者 未取得"
@@ -368,6 +373,7 @@ def main() -> None:
     ap.add_argument("cmd", choices=["list", "fetch", "build"])
     ap.add_argument("--until", help="HH:MM。これを過ぎる取得はしない（夜間タスクと Keepa を分け合うため）")
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--prefetch", action="store_true", help="build の前段だけ（カート保持者の取得）。キューは書かない")
     a = ap.parse_args()
     u = deadline(a.until)
     if a.cmd == "list":
@@ -375,7 +381,7 @@ def main() -> None:
     elif a.cmd == "fetch":
         cmd_fetch(u)
     else:
-        cmd_build(u, a.dry_run)
+        cmd_build(u, a.dry_run, a.prefetch)
 
 
 if __name__ == "__main__":
