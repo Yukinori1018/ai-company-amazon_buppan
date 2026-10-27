@@ -9,7 +9,8 @@
   そこで、このリポに関係する会話のときだけ、リポのフックを呼び出して効かせる。
 
 他のプロジェクトに影響しない仕組み（3重の門）
-  1. 会話の記録（transcript_path）が「フォルダなし」の置き場（scratch-workspaces）のときだけ動く。
+  1. 会話の記録（transcript_path）か作業フォルダ（cwd）が「フォルダなし」の置き場（scratch-workspaces）、
+     または作業フォルダがホームそのもの・空のときだけ動く。
      どこかのフォルダを開いて始めた会話（このリポ・他の事業リポ）では即終了。
      → このリポで始めた会話は、リポの .claude/settings.json のフックが動くので二重にならない。
   2. さらに、この会話が Amazon 物販の話だと分かったときだけ動く：
@@ -49,6 +50,22 @@ FIRST = (
 EVERY = "【物販の会話】社長に見える文字は日本語で。専門作業は Agent で担当に振る（CLAUDE.md §A2）。"
 
 
+def folderless(data):
+    """フォルダを開かずに始まった会話か。
+
+    実際のアプリ（2026-10-27 実測）は、記録も作業フォルダも scratch-workspaces の下になる。
+    記録の場所だけで判定すると、記録の場所が渡らない・別の場所のとき（秘書の検算：
+    transcript_path=/dev/null・cwd=$HOME）に物販の会話でも黙る。そこで作業フォルダも見る。
+    作業フォルダがホームそのもの・空のときも、どのプロジェクトのルールも読まれていないので対象にする。
+    どこかのフォルダ（このリポ・他の事業リポ）を開いた会話は、ここで落ちる。
+    """
+    tp = str(data.get("transcript_path") or "")
+    cwd = str(data.get("cwd") or "").rstrip("/")
+    if "scratch-workspaces" in tp or "scratch-workspaces" in cwd:
+        return True
+    return cwd in ("", os.path.expanduser("~").rstrip("/"))
+
+
 def state_path(session):
     tmp = os.environ.get("TMPDIR") or "/tmp"
     return os.path.join(tmp, f"claude-buppan-bridge-{session}.json")
@@ -85,7 +102,7 @@ def main():
     except Exception:
         return 0
     # 門1：フォルダなしの会話だけ
-    if "scratch-workspaces" not in str(data.get("transcript_path") or ""):
+    if not folderless(data):
         return 0
     if data.get("agent_id"):
         return 0

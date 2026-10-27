@@ -74,6 +74,19 @@ done
 has "作業8手で抱え込み検知が出る" "委譲チェック（作業中）"
 call "$B" "{\"hook_event_name\":\"UserPromptSubmit\",\"session_id\":\"s5\",\"transcript_path\":\"$SCR\",\"cwd\":\"/Users/yukinori/Claude Code/ai-company-amazon_buppan/workspace\",\"prompt\":\"続けて、お願いします。ここから先の段取りを考えて\"}"
 has "作業フォルダがリポの中なら、語が無くても物販の会話とみなす" "あなたは秘書カズヨです"
+echo "== 橋渡し：秘書の検算の3ケース（cwd=\$HOME・transcript_path=/dev/null） =="
+K="kazuyo-check-$$"
+call "$B" "{\"hook_event_name\":\"UserPromptSubmit\",\"session_id\":\"$K\",\"transcript_path\":\"/dev/null\",\"cwd\":\"$HOME\",\"prompt\":\"Amazonの仕入れの件、NETSEAの商品の採算を見て\"}"
+has "記録の場所が無くても、ホームで始めた物販の会話なら初回の差し込みが出る" "あなたは秘書カズヨです"
+call "$B" "{\"hook_event_name\":\"PreToolUse\",\"session_id\":\"$K\",\"transcript_path\":\"/dev/null\",\"cwd\":\"$HOME\",\"tool_name\":\"AskUserQuestion\",\"tool_input\":{\"questions\":[{\"question\":\"Which supplier should we check first?\",\"header\":\"Supplier\",\"options\":[{\"label\":\"Check NETSEA first\",\"description\":\"Start with the wholesale site\"},{\"label\":\"Check the maker\",\"description\":\"Contact the maker directly\"}]}]}}"
+has "同じ会話の英語の AskUserQuestion は止まる" '"permissionDecision": "deny"'
+call "$B" "{\"hook_event_name\":\"UserPromptSubmit\",\"session_id\":\"$K-2\",\"transcript_path\":\"/dev/null\",\"cwd\":\"$HOME\",\"prompt\":\"今日の夕飯のレシピを教えて\"}"
+none "ホームで始めた物販と関係ない会話では動かない"
+call "$B" "{\"hook_event_name\":\"UserPromptSubmit\",\"session_id\":\"$K-3\",\"transcript_path\":\"/dev/null\",\"cwd\":\"/Users/yukinori/Library/Application Support/Claude/scratch-workspaces/a/b/scratch-2026-10-27-x\",\"prompt\":\"Amazonの仕入れの件\"}"
+has "記録の場所が渡らなくても、作業フォルダが scratch-workspaces なら動く（実アプリの cwd の形）" "あなたは秘書カズヨです"
+call "$B" "{\"hook_event_name\":\"UserPromptSubmit\",\"session_id\":\"$K-4\",\"transcript_path\":\"/dev/null\",\"cwd\":\"/Users/yukinori/Claude Code/ai-company-tokyo_tour_inbound\",\"prompt\":\"Amazonの仕入れの件\"}"
+none "記録の場所が無くても、他の事業リポで始めた会話では動かない"
+
 call "$B" 'broken'
 none "壊れた入力でも exit 0・無音"
 
