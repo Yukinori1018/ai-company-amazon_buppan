@@ -61,10 +61,10 @@ CLAUDE.md を見直して新しく作る。ほかの改善箇所も直す（2026
 ## 成果物
 - workspace/output/deliverables/T-20261027-001/README.md
 - workspace/output/deliverables/T-20261027-001/01_CLAUDE_新版.md（.html）
-- workspace/output/deliverables/T-20261027-001/detail/01_仕入れの記録.md
-- workspace/output/deliverables/T-20261027-001/detail/02_進め方と確かめ方の記録.md
-- workspace/output/deliverables/T-20261027-001/detail/03_会社と運用の記録.md
-- workspace/output/deliverables/T-20261027-001/02_新旧対応表.md（.html）
+- docs/rules/sourcing.md（旧 deliverables/T-20261027-001/detail/01_仕入れの記録.md）
+- docs/rules/practice.md（旧 detail/02_進め方と確かめ方の記録.md）
+- docs/rules/operations.md（旧 detail/03_会社と運用の記録.md）
+- docs/rules/numbering.md（旧 02_新旧対応表.md）・workspace/output/deliverables/T-20261027-001/02_新旧対応表.html
 - workspace/output/deliverables/T-20261027-001/03_旧番号の参照元一覧.md
 - workspace/output/deliverables/T-20261027-001/04_未解決の論点.md（.html）
 - workspace/output/deliverables/T-20261027-001/05_ユーザー全体設定の案.md（.html）
