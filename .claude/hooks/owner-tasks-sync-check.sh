@@ -6,7 +6,7 @@
 # 「社長タスクまとめ」（ローカル + Notion まとめカード）の更新を促す。
 #
 # 設計:
-# - 社長のタスク＝waiting/ のチケット（CLAUDE.md §6「waiting＝社長の番」）
+# - 社長のタスク＝waiting/ のチケット（CLAUDE.md §A4：waiting は「社長の番」）
 # - 次のどちらかなら未同期とみなしてブロックする（1ターンにつき1回だけ）
 #     (a) waiting/ のチケットが owner-tasks.md より新しく更新されている
 #     (b) waiting/ にあるのに owner-tasks.md に ticket_id が1度も出てこない（＝新しく社長の番になった）

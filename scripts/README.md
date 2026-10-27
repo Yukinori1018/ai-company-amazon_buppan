@@ -204,4 +204,4 @@ python3 scripts/check_source_cards.py --list   # 検出ファイルを OK/NG つ
 - 手動版手順（フォールバック）: [../docs/subsidiary-onboarding.md](../docs/subsidiary-onboarding.md)
 - Notion DB スキーマ仕様: [../docs/notion-board-schema.md](../docs/notion-board-schema.md)
 - Notion セットアップ詳細: [../docs/notion-setup-guide.md](../docs/notion-setup-guide.md)
-- プレースホルダー一覧: [../CLAUDE.md](../CLAUDE.md) §7
+- プレースホルダー一覧（旧 CLAUDE.md §7 の原文）: [../docs/rules/operations.md](../docs/rules/operations.md)

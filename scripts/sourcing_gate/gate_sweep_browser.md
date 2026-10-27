@@ -53,7 +53,7 @@ await window.__gc(["ASIN1","ASIN2"]);
 NG＝B08432J49S・B0CVX7YCKS・B0D9J6WR46・B0D9J7S94S・B0FVL8QST6（発注済の鍋）。
 結果は `workspace/output/agent_output/T-20260920-003/buylist20261009/gate_check_20261009.csv`。
 
-## 申請画面まで読む（2026-10-20 追加・CLAUDE.md §3.3-41）
+## 申請画面まで読む（2026-10-20 追加・CLAUDE.md §F8）
 
 社長指示「仕入れリストに入れた時点で出品申請をしてほしい」。上の判定（OK/NG）だけでは、
 **書類が要るのか・何点要るのか**が分からない（台帳の「可（新品）」は「申請経路がある」だけ）。

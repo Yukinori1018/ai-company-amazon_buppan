@@ -5,7 +5,7 @@
   - 金額はすべて**架空の合成値**。PUBLIC リポなので実際の卸の取引条件は1つも書かない。
   - 検査ごとに「崩れている行で鳴る」「正しい行で鳴らない」の両方を見る。
     片方だけだと、常に鳴る検査・絶対鳴らない検査が緑のまま通る。
-  - §3.3-20「縮退した入力をテストする」：全項目が同じ値／空／1行だけ／セット数不明。
+  - §F5「縮退した入力をテストする」：全項目が同じ値／空／1行だけ／セット数不明。
 """
 from __future__ import annotations
 
@@ -110,7 +110,7 @@ r = run(good_row(**{"発注点数(Amazon何個)": "2", "発注額(円・税込)"
         wholesale={"卸の1点あたり原価(税込)": "5000", "卸の最小ロット(点)": "10"})
 ok("min_lot" in checks(r), "Amazon 2個 × セット1 = 卸2点 で最小発注数10点に届かないのを捕まえる")
 
-print("\n== 750円の崖（§3.3-23）==")
+print("\n== 750円の崖（§F6）==")
 # 売価700円・小型 → 手数料は一律5%＝35円 → 税込39円
 r = run(good_row(**{"販売価格(90日中央値)": "700", "現在価格": "700", "サイズ区分": "小型",
                     "販売手数料": "39", "FBA配送代行": K.F and str(K.F.fba_fee_yen("小型", 700)),
@@ -170,7 +170,7 @@ ok("other_costs" in checks(run(good_row(**{"その他固定費": "206"}))),
 ok("fba_fee" in checks(run(good_row(**{"サイズ区分": "特大99"}))),
    "公式の区分表に無いサイズ区分は番兵で UNKNOWN にする")
 
-print("\n== 採算をどの売価で計算したか（§3.3-28）==")
+print("\n== 採算をどの売価で計算したか（§F6）==")
 # ① 生成側が基準売価を渡していない（旧い表）: 90日中央値で検算する
 r = run(good_row(**{"採算の基準売価": "", "基準売価の出どころ": "", "現在価格": "12000",
                     "1個手残り": "4374", "利益率(%)": "43.7", "手残り合計": "43740"}))
@@ -201,7 +201,7 @@ r = run(good_row(**{
 ok(not {"price_basis", "net_per_unit", "margin_pct", "referral_cliff"} & checks(r),
    f"🔴 実画面の価格で計算した行を誤検知しない（出たもの: {checks(r)}）")
 
-print("\n== 番兵（§3.3-17）==")
+print("\n== 番兵（§F6）==")
 r = run(good_row(**{"Amazon1個あたり原価(税込)": "500", "1個手残り": "6874",
                     "利益率(%)": "68.7", "発注額(円・税込)": "5000",
                     "手残り合計": "68740"}))
@@ -268,7 +268,7 @@ r = run(good_row(**{"発注日": "12/28", "着荷の見込み": "01/05",
                     "売り切り目標月": "2027-04"}), )
 ok("timeline" not in checks(r), "12/28 → 01/05 をまたぐ鎖を逆順と誤判定しない")
 
-print("\n== 縮退した入力（§3.3-20）==")
+print("\n== 縮退した入力（§F5）==")
 empty = {k: "" for k in good_row()}
 empty["ASIN"] = "B000000002"
 r = run(empty)
@@ -293,7 +293,7 @@ ok(K.num("3ヶ月") == 3.0, "「3ヶ月」は読む")
 ok(K.num("21,930") == 21930.0 and K.num("68.3%") == 68.3, "カンマと % を読む")
 ok(K.num("") is None and K.num(None) is None, "空欄は 0 ではなく None")
 
-print("\n== CSV まるごと：是正は2回目で0行（§3.3-17）==")
+print("\n== CSV まるごと：是正は2回目で0行（§F6）==")
 with tempfile.TemporaryDirectory() as td:
     td = Path(td)
     cols = list(good_row())
@@ -424,7 +424,7 @@ with tempfile.TemporaryDirectory() as td:
                    capture_output=True, text=True, env=env)
     rec = json.loads((td / "checks" / "B000000004.json").read_text(encoding="utf-8"))
     ok(rec["items"]["buybox_seller"]["result"] == "FAIL",
-       "カート保持者が Amazon 本体なら機械で FAIL（§3.3-1）")
+       "カート保持者が Amazon 本体なら機械で FAIL（§F4）")
 
 print("\n== 発注ゲートが整合性検査 NG で止まる ==")
 with tempfile.TemporaryDirectory() as td:
@@ -480,7 +480,7 @@ ok(all(it.get("decidable") in ("machine", "partial", "human") for it in sp),
 ok(all(len(it.get("decidable_why", "")) > 10 for it in sp),
    "全項目に仕分けの根拠が1行ある")
 
-print("\n== 実績枠（§3.5 #18・2026-10-12）==")
+print("\n== 実績枠（§F3・2026-10-12）==")
 tr = K.track_record
 ok(tr("C", 0, 1.0, 6.0)[0], "手残り0円・取り分1個・在庫6か月ちょうどは入る（境界）")
 ok(tr("C", 120, 2.5, 4.0)[0], "C・手残り120円・取り分2.5個は入る")

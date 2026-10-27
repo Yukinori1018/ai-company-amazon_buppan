@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """候補 CSV の整合性検査（妥当性チェック）— 当社の数字がどれだけ信用できるかを機械で測る。
 
-背景（CLAUDE.md §3.3-17 / §3.3-21 / §3.3-28）
+背景（CLAUDE.md §F6 / §D5）
   当社は「単位ずれで赤字を黒字と報告」を3回、「原価の57%が架空」を1回やっています。
   どれも**人が表を読めば気づけたはずの算術の崩れ**でした。人の注意力は当てにならないので、
   **不変条件を機械で検査**します。
 
-このモジュールの約束（§3.3-17 をそのままコードにしたもの）
+このモジュールの約束（§F6 をそのままコードにしたもの）
   1. **崩れていたら数字を黙って直さない。**「NG」と書いて**採算欄を空にする**。
      どちらが正しいか分からないまま辻褄だけ合わせると、嘘が一段深いところに潜ります。
   2. **判定できない項目は UNKNOWN と理由を書く。空欄で埋めない。**
@@ -25,7 +25,7 @@
     python3 scripts/sourcing_gate/consistency.py fix <candidates.csv> \\
         --out <fixed.csv> --report <report.json>
 
-    # 2回目が0行であることを確かめる（§3.3-17「是正スクリプトは2回目で0行になるまで未完成」）
+    # 2回目が0行であることを確かめる（§F6「是正スクリプトは2回目で0行になるまで未完成」）
     python3 scripts/sourcing_gate/consistency.py fix <fixed.csv> --out <again.csv>
 
 列の名前は `COLS` に集めています。CSV の列名が変わったらここだけ直せば動きます。
@@ -115,7 +115,7 @@ PROFIT_COLS = (
 #: 等級・判定は空にせず UNKNOWN にする（空は「未処理」と読まれるため）。
 UNKNOWN = "UNKNOWN"
 
-# ── 許容差と番兵の線（すべて仮置き。根拠を横に書く＝§3.1）──────────────────
+# ── 許容差と番兵の線（すべて仮置き。根拠を横に書く＝§A6）──────────────────
 YEN_TOL = 1.0        # 円の丸め差。これを超えたら式が違う
 PCT_TOL = 0.15       # % の丸め差（小数1桁表示 ＝ ±0.05 ＋ 余裕）
 STEP_TOL = 0.15      # 販売手数料の段に当てるときの許容
@@ -125,13 +125,13 @@ STEP_TOL = 0.15      # 販売手数料の段に当てるときの許容
 #: どちらも「安すぎる原価」が共通のサイン。
 #: ★ 15.0 は `score_20261004.MIN_PLAUSIBLE_COST_RATIO` と**同じ値**。
 #:   最初 10.0 で書いたが、生成側に既にある線と二重定義になっていた（別々の線を持つと、
-#:   生成側が落とした行を検査側が通すことが起きる）。**既にある会社の線に揃える**（§3.1）。
+#:   生成側が落とした行を検査側が通すことが起きる）。**既にある会社の線に揃える**（§A6）。
 COST_RATIO_FLOOR_PCT = 15.0
 #: 番兵②：利益率が異常に高い行。上の2件（64.7% / 75.5%）を確実に拾う線として 60%。
 MARGIN_CEIL_PCT = 60.0
-#: 回転の上限（§3.3「回転上限6ヶ月は既定」）。発注日→売り切り目標月末。
+#: 回転の上限（§F2 #10・#21「回転上限6ヶ月は既定」）。発注日→売り切り目標月末。
 MAX_SELL_THROUGH_DAYS = 183
-#: 死に帯（§3.3-23）。750円→751円で手数料が5%→15.4%、1,000円→1,001円で FBA が66円上がる。
+#: 死に帯（§F6）。750円→751円で手数料が5%→15.4%、1,000円→1,001円で FBA が66円上がる。
 DEATH_BANDS = ((751, 900), (1001, 1100))
 
 
@@ -223,7 +223,7 @@ class RowResult:
 def _c_order_amount(row: dict, ctx: dict) -> Optional[Finding]:
     """発注額 ≒ Amazon1個あたり原価(税込) × 発注点数(Amazon何個)。
 
-    §3.3-17 の不変条件そのもの。2026-09-30・10-01 に同じ単位ずれを2回出している。
+    §F6 の不変条件そのもの。2026-09-30・10-01 に同じ単位ずれを2回出している。
     """
     cost, qty, amt = ctx["cost"], ctx["qty"], ctx["amount"]
     if None in (cost, qty, amt):
@@ -259,7 +259,7 @@ def _c_unit_cost_from_wholesale(row: dict, ctx: dict) -> Optional[Finding]:
 def _c_min_lot(row: dict, ctx: dict) -> Optional[Finding]:
     """発注点数(Amazon何個) × セット数 が、卸の最小ロット(点) を満たしているか。
 
-    「Amazon 何個」と「卸 何点」を分けて検算する（§3.3-17）。
+    「Amazon 何個」と「卸 何点」を分けて検算する（§F6）。
     """
     qty, n, lot = ctx["qty"], ctx["set_count"], ctx["wholesale_lot"]
     if None in (qty, n, lot) or lot <= 0:
@@ -325,7 +325,7 @@ def _c_margin(row: dict, ctx: dict) -> Optional[Finding]:
 
 
 def _c_referral_cliff(row: dict, ctx: dict) -> Optional[Finding]:
-    """販売手数料が **750円の崖**（§3.3-23）を正しく踏んでいるか。
+    """販売手数料が **750円の崖**（§F6）を正しく踏んでいるか。
 
     - 売上の合計が750円以下 → **一律5%**（段階制ではない）・最低30円（税抜）
     - 750円超 → 公式に存在する段（5.0 を除く 8.4 / 10.4 / 12.4 / 15.4 / 45.4）のどれか
@@ -376,7 +376,7 @@ def _c_referral_cliff(row: dict, ctx: dict) -> Optional[Finding]:
 
 
 def _c_death_band(row: dict, ctx: dict) -> Optional[Finding]:
-    """死に帯（§3.3-23）。751〜900円と1,001〜1,100円は値下げした方が手残りが増える。"""
+    """死に帯（§F6）。751〜900円と1,001〜1,100円は値下げした方が手残りが増える。"""
     sell = ctx["sell"]
     if sell is None:
         return None
@@ -439,12 +439,12 @@ def _c_other_costs(row: dict, ctx: dict) -> Optional[Finding]:
                    {"区分": tier, "消化月数": months, "計算値": round(exp, 1), "表の額": oth})
 
 
-#: 採算の基準として認める売価の出どころ。**現在価格は認めない**（§3.3-28）。
+#: 採算の基準として認める売価の出どころ。**現在価格は認めない**（§F6）。
 ALLOWED_BASIS = ("90日中央値", "180日中央値", "実画面")
 
 
 def _c_price_basis(row: dict, ctx: dict) -> Optional[Finding]:
-    """採算を**どの売価で計算したか**を検査する（§3.3-28）。
+    """採算を**どの売価で計算したか**を検査する（§F6）。
 
     認めるのは「90日中央値」「180日中央値」「人が実画面で見た価格」。
     **現在価格で計算していたら NG**（スナップショットで判定するのが誤り）。
@@ -465,7 +465,7 @@ def _c_price_basis(row: dict, ctx: dict) -> Optional[Finding]:
             return Finding("price_basis", NG,
                            f"採算の基準売価の出どころが「{src}」です。認めるのは "
                            f"{' / '.join(ALLOWED_BASIS)} だけで、**現在価格では判定しません**"
-                           f"（§3.3-28）。", {"出どころ": src, "基準売価": basis})
+                           f"（§F6）。", {"出どころ": src, "基準売価": basis})
         if abs(implied - basis) > YEN_TOL:
             return Finding("price_basis", NG,
                            f"採算の基準売価は {basis:,.0f}円 と書いてありますが、"
@@ -478,14 +478,14 @@ def _c_price_basis(row: dict, ctx: dict) -> Optional[Finding]:
         return Finding("price_basis", NG,
                        f"90日中央値も基準売価も空欄なのに採算が計算されています"
                        f"（手残りから逆算した売価 {implied:,.0f}円）。"
-                       f"採算の基準は90日中央値です（§3.3-28）。",
+                       f"採算の基準は90日中央値です（§F6）。",
                        {"逆算した売価": implied})
     if now is None or abs(now - median90) <= YEN_TOL:
         return None
     if abs(implied - now) <= YEN_TOL and abs(implied - median90) > YEN_TOL:
         return Finding("price_basis", NG,
                        f"採算が**現在価格 {now:,.0f}円**で計算されています。"
-                       f"基準は90日中央値 {median90:,.0f}円 です（§3.3-28）。",
+                       f"基準は90日中央値 {median90:,.0f}円 です（§F6）。",
                        {"90日中央値": median90, "現在価格": now, "逆算した売価": implied})
     return None
 
@@ -493,7 +493,7 @@ def _c_price_basis(row: dict, ctx: dict) -> Optional[Finding]:
 def _c_set_count_decided(row: dict, ctx: dict) -> Optional[Finding]:
     """セット数が確定していないのに採算が計算されていないか。
 
-    §3.3-17「確定していない行は金額を膨らませず**計算しない（UNKNOWN）**」。
+    §F6「確定していない行は金額を膨らませず**計算しない（UNKNOWN）**」。
     """
     conf = get(row, COLS.set_conf).strip()
     if not conf or conf in ("確定", "単独"):
@@ -528,7 +528,7 @@ def _c_grade_unknown_with_numbers(row: dict, ctx: dict) -> Optional[Finding]:
 
 
 def _c_sentinel_cost_ratio(row: dict, ctx: dict) -> Optional[Finding]:
-    """番兵①：原価が売価に対して異常に安い行は UNKNOWN（§3.3-17）。"""
+    """番兵①：原価が売価に対して異常に安い行は UNKNOWN（§F6）。"""
     cost, sell = ctx["cost"], ctx["sell"]
     if None in (cost, sell) or sell <= 0:
         return None
@@ -544,7 +544,7 @@ def _c_sentinel_cost_ratio(row: dict, ctx: dict) -> Optional[Finding]:
 
 
 def _c_sentinel_margin(row: dict, ctx: dict) -> Optional[Finding]:
-    """番兵②：利益率が異常に高い行は UNKNOWN（§3.3-17 / 終売バイアス）。"""
+    """番兵②：利益率が異常に高い行は UNKNOWN（§F6 / 終売バイアス）。"""
     mar = ctx["margin"]
     if mar is None or mar < MARGIN_CEIL_PCT:
         return None
@@ -558,7 +558,7 @@ def _c_sentinel_margin(row: dict, ctx: dict) -> Optional[Finding]:
 def _c_grade_rule(row: dict, ctx: dict) -> Optional[Finding]:
     """等級が A/B/C の規定どおりか（中央と悲観の数字から再判定して突き合わせる）。
 
-    規定（CLAUDE.md §3.5 #18 ＝ `fba_cost.grade()`・2026-10-11 に両者を揃えた）:
+    規定（CLAUDE.md §F3 ＝ `fba_cost.grade()`・2026-10-11 に両者を揃えた）:
     A＝中央も悲観も「利益率20%以上 **または** 手残り400円以上」／
     B＝中央で「利益率5%以上 **または** 手残り400円以上」かつ A でない／C＝中央でどちらも満たさない。
     推定費目があると数字が A でも B に留まる（天井）。表からは推定費目が読めないので、
@@ -589,19 +589,19 @@ def _c_grade_rule(row: dict, ctx: dict) -> Optional[Finding]:
                    {"表の等級": g, "計算値": exp})
 
 
-# ── 実績枠（§3.5 #18・2026-10-12 社長方針）───────────────────────────────
+# ── 実績枠（§F3・2026-10-12 社長方針）───────────────────────────────
 #: 社長「卸サイトで実績を増やしてからメーカー直取引へ進みたい。利益がそんなに取れなくても
 #: プラマイ0ぐらいでも取引を進めたい」。**通常の GO とは別に数える**ため判定の文字列を分ける。
 TRACK_RECORD = "GO（実績枠）"
 #: 判定列で「仕入れてよい」を意味する値（通常 GO と実績枠）。数えるときは必ず分けて数える
 GO_VERDICTS = ("GO", TRACK_RECORD)
-#: 実績枠の採算の線：中央値で1個手残り **0円以上**（プラマイ0まで）。仮置き（§3.1）
+#: 実績枠の採算の線：中央値で1個手残り **0円以上**（プラマイ0まで）。仮置き（§A6）
 TRACK_MIN_NET_YEN = 0
-#: 実績枠の取り分の下限（個/月）。通常は3個（screen_checks.MIN_SHARE）。仮置き（§3.1）
+#: 実績枠の取り分の下限（個/月）。通常は3個（screen_checks.MIN_SHARE）。仮置き（§A6）
 TRACK_MIN_SHARE = 1.0
-#: 実績枠の在庫月数の上限（最小ロット1回ぶん）。§3.5 #10 の6ヶ月と同じ
+#: 実績枠の在庫月数の上限（最小ロット1回ぶん）。§F2 #10 の6ヶ月と同じ
 TRACK_MAX_MONTHS = 6.0
-#: 通常の取り分の下限（個/月・§3.5 #10。screen_checks.MIN_SHARE と同じ）。
+#: 通常の取り分の下限（個/月・§F2 #10。screen_checks.MIN_SHARE と同じ）。
 #: A・B 等級はこれ未満（＝取り分だけで落ちた）のときだけ実績枠に入る（2026-10-14 秘書判断 A で B、
 #: 2026-10-18 秘書判断で A も。B が残り A が落ちる逆転の解消）
 TRACK_B_SHARE_CEIL = 3.0
@@ -612,7 +612,7 @@ def track_record(grade: str, mid_net: Optional[float], share: Optional[float],
     """実績枠に入れるか（採算と取り分だけを見る。地雷の PASS は呼び出し側で確かめる）。
 
     入れる：等級 C で中央値の1個手残りが0円以上、**または A・B 等級で #10 の取り分だけが
-            月1〜3個のため落ちた行**（CLAUDE.md §3.5 #18・2026-10-14 秘書判断：薄利の C が残り
+            月1〜3個のため落ちた行**（CLAUDE.md §F3・2026-10-14 秘書判断：薄利の C が残り
             厚い B が落ちる逆転を解消／2026-10-18 秘書判断：同じ理由で A も）。どちらも取り分が月1個以上、最小ロット1回の在庫月数が
             6ヶ月以内。A・B で取り分が月3個以上なら通常の GO（実績枠ではない）。
     返り値：(入るか, 入らない理由 or 入る根拠の短文)。**数字が欠けていたら入れない**（推測で埋めない）。
@@ -636,7 +636,7 @@ def track_record(grade: str, mid_net: Optional[float], share: Optional[float],
                   f"最小ロットで在庫 {months:.1f}か月")
 
 
-#: 実績枠 ⑥ 価格が平常か：現在価格と90日中央値がどちらも1年中央値のこの倍率以内（CLAUDE.md §3.5 #18）
+#: 実績枠 ⑥ 価格が平常か：現在価格と90日中央値がどちらも1年中央値のこの倍率以内（CLAUDE.md §F3）
 TRACK_MAX_PRICE_RATIO = 1.3
 #: 1年中央値を信じるのに要る「価格が付いていた日数」。足りなければ平常か判断できない＝入れない
 TRACK_MIN_DAYS_365 = 180
@@ -663,7 +663,7 @@ def price_normal(current: Optional[float], median90: Optional[float],
 
 
 def track_record_note(mid_net: float, worst_net: Optional[float]) -> str:
-    """判定理由に書く1句。悲観値が赤字なら赤字額を書く（§3.5 #18 実績枠 ⑤）。"""
+    """判定理由に書く1句。悲観値が赤字なら赤字額を書く（§F3 実績枠 ⑤）。"""
     if worst_net is None:
         w = "悲観値 未計算"
     elif worst_net < 0:
@@ -816,10 +816,10 @@ def _c_timeline(row: dict, ctx: dict) -> Optional[Finding]:
 
 
 def _c_timeline_stale(row: dict, ctx: dict) -> Optional[Finding]:
-    """発注日が過去なら、その予定表はもう使えない（§3.3-26「判定データは4日で陳腐化」）。
+    """発注日が過去なら、その予定表はもう使えない（§F5「判定データは4日で陳腐化」）。
 
     ⚠️ これは **WARN** です。NG にして採算欄を空にすると、表が1日古くなるだけで
-    648行ぜんぶの数字が消えます。§3.3-17 の「空にする」は**算術が崩れている行**への処置で、
+    648行ぜんぶの数字が消えます。§F6 の「空にする」は**算術が崩れている行**への処置で、
     「正しいが古い」行への処置ではありません。鮮度は発注ゲート側（`checklist_spec.json` の
     `max_age_days`）が ASIN ごとに見ているので、ここで二重に執行しません。
     """
@@ -942,7 +942,7 @@ def _parse_detail(s: str) -> dict[str, str]:
 
 
 def remediate(row: dict, res: RowResult) -> list[str]:
-    """§3.3-17 の是正：NG・番兵の行は**採算欄を空にし**、等級と判定を UNKNOWN にする。
+    """§F6 の是正：NG・番兵の行は**採算欄を空にし**、等級と判定を UNKNOWN にする。
 
     数字を黙って直さない（どちらが正しいか分からないため）。捨てた値は呼び出し側が
     レポートに残す。変更した列名のリストを返す（空なら何も触っていない＝収束）。
@@ -1122,7 +1122,7 @@ def cmd_fix(a) -> int:
             json.dumps({"入力": str(src), "集計": s, "行": report},
                        ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
         print(f"レポート（捨てた数字の原本つき）: {a.report}")
-    print("\n※ 2回目の実行で「書き換えた行: 0行」になることを必ず確かめてください（§3.3-17）。")
+    print("\n※ 2回目の実行で「書き換えた行: 0行」になることを必ず確かめてください（§F6）。")
     return 0
 
 
@@ -1131,7 +1131,7 @@ def _day(s: str) -> date:
 
 
 def main(argv=None) -> int:
-    ap = argparse.ArgumentParser(description="候補CSVの整合性検査（CLAUDE.md §3.3-17）")
+    ap = argparse.ArgumentParser(description="候補CSVの整合性検査（CLAUDE.md §F6）")
     sub = ap.add_subparsers(dest="cmd", required=True)
     for name, fn in (("check", cmd_check), ("fix", cmd_fix)):
         p = sub.add_parser(name)

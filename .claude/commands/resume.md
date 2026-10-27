@@ -11,7 +11,7 @@
 ### Step 1: 必読ファイル一括読み込み（並列）
 
 - `workspace/handover.md` — 引き継ぎノート全文
-- `CLAUDE.md` §1〜§5 — 事業ミッション・組織・鉄則・承認ルール・ルーティング
+- `CLAUDE.md` §A〜§B — 事業ミッション・組織・鉄則・承認ルール・ルーティング
 - `workspace/tickets/doing/` 配下の全 `.md` — 進行中チケット
 - `workspace/tickets/waiting/` 配下の全 `.md` — 社長レビュー待ち
 - `workspace/tickets/todo/` 配下の全 `.md` の **frontmatter のみ**（タイトル＋次に何をするか）

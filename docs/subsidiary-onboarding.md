@@ -287,7 +287,7 @@ open ~/Documents/"AI Company Outputs"/<事業名>
 
 `open` コマンドで Finder が開くので、サイドバーにドラッグしてブックマーク化しておくと毎回のアクセスが楽。
 
-> なぜリポ外か：worktree のサイクル（作成 → 作業 → マージ → 削除）に左右されず、全 worktree から同じ場所で最終物が見えるため。詳細は CLAUDE.md §6。
+> なぜリポ外か：worktree のサイクル（作成 → 作業 → マージ → 削除）に左右されず、全 worktree から同じ場所で最終物が見えるため。詳細は CLAUDE.md §I4。
 
 ---
 
@@ -309,7 +309,7 @@ claude
 
 **期待:** **カズヨ** が名乗り、です・ます調＋簡潔で自己紹介。
 
-> もし「Claude Code です」と返ってきたら CLAUDE.md §0.1 が読み込まれていない。リポの CLAUDE.md を確認。
+> もし「Claude Code です」と返ってきたら CLAUDE.md §A1 が読み込まれていない。リポの CLAUDE.md を確認。
 
 ### 7.3 Test 2: チケット起票＋Notion 同期
 
@@ -358,7 +358,7 @@ claude
 | `Database not found` / `object_not_found` | Database ID の桁数（32文字）と URL クエリパラメータ混入を確認。Step 5.4 の診断 |
 | Notion カード作成は成功するが Status が空欄 | Notion 側 Status プロパティの値が `todo/doing/waiting/done`（小文字）で完全一致しているか |
 | ファイル作ったはずなのに Finder で見えない | worktree（`<repo>/.claude/worktrees/<name>/`）の中にある可能性。`git worktree list` で確認 |
-| 秘書が「Claude Code です」と名乗る | CLAUDE.md §0.1 が抜けている／プレースホルダー未置換でセッション初期化失敗。手動で「あなたはこのリポの秘書カズヨです」と指示 |
+| 秘書が「Claude Code です」と名乗る | CLAUDE.md §A1 が抜けている／プレースホルダー未置換でセッション初期化失敗。手動で「あなたはこのリポの秘書カズヨです」と指示 |
 | Integration がない／コネクト追加できない | my-integrations で Internal Integration を作成。Public/OAuth 型は別仕様 |
 | gh auth で失敗 | `gh auth status` で確認、必要なら `gh auth login`（HTTPS → ブラウザ認証） |
 
@@ -371,7 +371,7 @@ claude
 ### リポ側
 - [ ] GitHub Template から子会社リポを作成
 - [ ] ローカルに clone 済み
-- [ ] CLAUDE.md §1 のプレースホルダー全埋め
+- [ ] CLAUDE.md §B1 のプレースホルダー全埋め
 - [ ] `grep "{{ " CLAUDE.md` の結果が §7 と §3 の説明文のみ
 - [ ] `.mcp.json` 作成、`OPENAPI_MCP_HEADERS` 形式で記述、`NOTION_DATABASE_ID` 埋め込み
 - [ ] Step 5.4 の自己診断スクリプトが両方 SUCCESS

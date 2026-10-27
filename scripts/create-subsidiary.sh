@@ -498,7 +498,7 @@ step_print_checklist() {
        c. 「そのチケットを doing に進めてください」
           → ファイルが doing/ に移動し、Notion 側のカラムも更新
        d. 「外部にメール送信したい」と頼む
-          → §4.1 該当として waiting/ に出し承認を求めればOK
+          → §A3 該当として waiting/ に出し承認を求めればOK
 
   4) Notion カンバン URL:
        ${NOTION_DATABASE_URL:-(dry-run のため未取得)}

@@ -11,7 +11,7 @@
 以下を統合して `workspace/handover.md` を上書き更新します。
 
 1. **社長プロファイル** — `~/.claude/projects/-Users-yukinori-Claude-Code-ai-company-amazon-buppan/memory/` 配下のメモリー（HTML 出力ルール、副業初心者、2軸戦略 等）を要約してノートに反映。**機密情報は載せない**（トークン・API キー・個人特定情報）。
-2. **事業の現状** — CLAUDE.md §1 から事業名・ミッション・KPI を読む。
+2. **事業の現状** — CLAUDE.md §B1 から事業名・ミッション・KPI を読む。
 3. **チケット状況** — `workspace/tickets/<status>/T-*.md` を全スキャンし、ID / タイトル / Status / 一言サマリーを表にする。
 4. **進行中の論点** — `doing/` と `waiting/` のチケットから、社長返答待ち事項を抽出して箇条書きに。
 5. **環境メモ** — Notion DB ID 等の再現に必要な情報を残す（**APIキーは絶対に書かない**、保管場所のパスのみ記載）。

@@ -2,7 +2,7 @@
 #
 # github-sync.sh — ローカル ⇄ GitHub の定期自動同期（T-20260817-007 / 親 T-20260531-001）
 #
-# 設計方針（CLAUDE.md §4.1「不可逆な操作は社長承認必須」に準拠）
+# 設計方針（CLAUDE.md §A3：不可逆な削除・force push 等は社長の承認が必須、に準拠）
 #   - やること   : git add -A → commit → fetch → ff-only pull → push（カレントブランチのみ）
 #   - やらないこと: force push / branch 削除 / reset --hard / rebase / main への自動マージ
 #   - 分岐(diverge)を検知したら **何もせずログに残して終了**。人間が解決する。

@@ -24,7 +24,7 @@ python3 scripts/catalog/build_catalog.py --html     # 旧 HTML 版も出す（�
 
 - **社長の入口は Google スプレッドシートです**（2026-09-09 社長指示）。
   HTML 版カタログ（`00_成果物カタログ.html`）は入口ではなくなりました。
-  既定では再生成しませんが、**ファイルは削除せず残置**しています（§4.1 不可逆な削除）。
+  既定では再生成しませんが、**ファイルは削除せず残置**しています（§A3 不可逆な削除）。
   内容は 2026-09-09 時点のまま古くなります。必要なら `--html` で更新してください。
 - 既存の 内容（要約）/ 暫定結果 / 備考 / 種別 / 担当 は、リポジトリ相対パスをキーに
   **必ず引き継ぎます**。新規行の要約は `要記入`。
@@ -112,7 +112,7 @@ launchctl bootout gui/$(id -u)/com.aicompany.catalog-server
 launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.aicompany.catalog-server.plist
 ```
 
-完全に撤去するときは bootout のあと plist を削除します（削除は §4.1 なので社長承認のうえで）。
+完全に撤去するときは bootout のあと plist を削除します（削除は §A3 なので社長承認のうえで）。
 
 **注意: 手で `nohup python3 serve_deliverables.py &` を起動しないこと。**
 ポート 17325 を先に取られると launchd 側が `Address already in use` で起動できず、

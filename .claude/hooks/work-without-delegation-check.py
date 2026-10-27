@@ -17,7 +17,7 @@
   - 数えない（秘書が自分でやってよい4つ）: チケット・owner-tasks・handover・Notion の操作、
     読むだけの Bash（cat/ls/grep/git log 等＝1手の事実確認）、Read/Grep、Agent 自体
 
-閾値（CLAUDE.md §3.1 の変数。実績で直す）
+閾値（CLAUDE.md §A6 の変数。実績で直す）
   NUDGE_AFTER = 8（環境変数 DELEGATION_NUDGE_AFTER で上書き可）
   決め方: セッション履歴の1ターンごとの作業手数（agent_output/T-20261027-001/delegation_turns.py）。
     10/01〜18（振っていた期間・本リポ・対話402ターン）で振らなかったターンのうち発火 43/295（15%）
@@ -132,12 +132,12 @@ def main():
         if st["count"] >= st.get("next", NUDGE_AFTER):
             st["next"] = st["count"] + NUDGE_AFTER
             cands = guess(st["ev"])
-            cand = "、".join(f"{l} → subagent_type: {s}" for l, s in cands) or "（作業の中身から特定できず。§5 の表で決める）"
+            cand = "、".join(f"{l} → subagent_type: {s}" for l, s in cands) or "（作業の中身から特定できず。§A2 の表で決める）"
             msg = (
                 f"【委譲チェック（作業中）】このターンで担当に振らずに作業が {st['count']} 手続いています"
                 f"（Bash・Edit・Write・ブラウザ。チケット・owner-tasks・Notion・読むだけのコマンドは数えていません）。\n"
                 f"担当候補: {cand}\n"
-                "続ける前に「この作業は〔担当〕です（理由）」と1行で宣言し、Agent ツールで**実発注**してください（CLAUDE.md §5）。"
+                "続ける前に「この作業は〔担当〕です（理由）」と1行で宣言し、Agent ツールで**実発注**してください（CLAUDE.md §A2）。"
                 "ブラウザで画面を見ること自体は秘書の仕事ですが、途中で出てきた調査・計算・台帳整備・文章作りは担当に振ります。\n"
                 "秘書が自分でやってよいのは、社長との対話・統合と品質確認・チケット操作・1手の事実確認だけです。"
                 "それに当たると判断したなら、理由を一言書いて続けて構いません。"

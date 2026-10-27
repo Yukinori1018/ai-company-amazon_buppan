@@ -107,7 +107,7 @@ except Exception:
 # --- メッセージ組み立て（1〜3行） ---
 if GENERIC:
     print(
-        "【委譲チェック】この依頼の担当は誰ですか？ 手を動かす前に「この作業は〔担当〕です（理由）」を1行で宣言してください（CLAUDE.md §5 着手前の可視化）。\n"
+        "【委譲チェック】この依頼の担当は誰ですか？ 手を動かす前に「この作業は〔担当〕です（理由）」を1行で宣言してください（CLAUDE.md §A2 着手前の可視化）。\n"
         "専門領域なら Agent ツールで実発注する（subagent_type: researcher / planner / simulator / accounting / legal / general-affairs / content-creator / it-engineer）。"
         "カズヨが自分で受けてよいのは「横断的な統合・司令塔業務・社長への報告」だけです。"
     )
@@ -115,7 +115,7 @@ else:
     cand = "、".join(f"{label} → subagent_type: {sub}" for label, sub in hits)
     print(
         f"【委譲チェック】担当候補を検知しました: {cand}\n"
-        "手を動かす前に「この作業は〔担当〕です（理由）」を1行で宣言し、Agent ツールで**実発注**してください（宣言だけで自分で書き始めるのが抱え込みです / CLAUDE.md §5）。\n"
+        "手を動かす前に「この作業は〔担当〕です（理由）」を1行で宣言し、Agent ツールで**実発注**してください（宣言だけで自分で書き始めるのが抱え込みです / CLAUDE.md §A2）。\n"
         "違う担当だと判断したなら、その理由を一言添えれば構いません。"
     )
 PY

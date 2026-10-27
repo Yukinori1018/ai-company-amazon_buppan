@@ -35,7 +35,7 @@ build_catalog.py — 成果物カタログを deliverables/ の実体から機�
     workspace/output/deliverables/T-20260601-001/deliverables-catalog.csv  … マスター（唯一の正）
 
     HTML 版（00_成果物カタログ.html）は 2026-09-09 の社長指示で**既定の生成対象から外した**。
-    運用は従来どおりスプレッドシート。既存ファイルは削除せず残置してある（§4.1 不可逆な削除）。
+    運用は従来どおりスプレッドシート。既存ファイルは削除せず残置してある（§A3 不可逆な削除）。
     `--html` を付けたときだけ再生成する。
 
 Google スプレッドシートへの反映は `sync_catalog_to_sheet.py` が別途行う。
@@ -102,7 +102,7 @@ EXCLUDE_DIR_NAMES = {
     ".git", ".pytest_cache", "__pycache__", "node_modules", ".ipynb_checkpoints",
     "raw", "raw_offers", "state", "out", ".venv", "venv",
 }
-# 本人特定情報（住所・電話）を含むため CLAUDE.md §6 で Git 除外しているフォルダ。
+# 本人特定情報（住所・電話）を含むため CLAUDE.md §I4 で Git 除外しているフォルダ。
 # カタログ（PUBLIC リポに載る CSV）にはファイル名も出さない。
 EXCLUDE_DIR_PATHS = {
     os.path.join(DELIVERABLES, "T-20260817-006", "公開用"),

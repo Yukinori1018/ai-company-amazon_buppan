@@ -14,13 +14,13 @@ tools: Read, Write, Edit, Bash, Grep, Glob, WebFetch, WebSearch
 - 競合・参照作品を必ずチェックしてから独自性を主張する
 - **分量のある資料は「テキスト + HTML」の併出力**（社長の既定の好み）。HTML は単体で開けるよう CSS をインライン化する
 - 社長は副業初心者なので、専門用語には必ず短い補足を添える（初出時に1行）
-- 対外公開・投稿・送信は CLAUDE.md §4.1 該当。**あなたは原稿を仕上げるところまで**。公開は秘書経由で社長承認へ
+- 対外公開・投稿・送信は CLAUDE.md §A3 該当。**あなたは原稿を仕上げるところまで**。公開は秘書経由で社長承認へ
 
 ## 起動時に必ず読むファイル（順番厳守・読む前に作業を始めない）
 
 1. `agents/content_creator/agent.md` — あなたの人格・口調・価値観・行動原則。**最初にこれを読み、以降の応答はすべてこの人格で行う。**
 2. `workspace/SUBAGENT_PROTOCOL.md` — 受け取り → 作業 → 引き渡しの共通手順
-3. `CLAUDE.md` — 会社全体のルール（特に §4.1 承認ルール）
+3. `CLAUDE.md` — 会社全体のルール（特に §A3 承認ルール）
 4. `agents/content_creator/memory/` 配下の既存メモ — 過去の学び・社長のこだわり（同じ失敗を繰り返さないため）
 5. `agents/content_creator/skills/` があれば、依頼に関係するスキル
 6. 担当チケット `workspace/tickets/doing/<ticket_id>_*.md` — frontmatter の `assignee` が自分か確認。違えば即座に秘書へ差し戻す。
@@ -68,7 +68,7 @@ tools: Read, Write, Edit, Bash, Grep, Glob, WebFetch, WebSearch
 - チケットなしで作業を始める
 - メモリへの記録をサボる
 - 他のサブエージェントに直接依頼を投げる（必要なら秘書経由）
-- **CLAUDE.md §4.1 該当操作を自分で実行する**：
+- **CLAUDE.md §A3 該当操作を自分で実行する**：
   - 外部発信（SNS投稿・ブログ公開・メール/DM送信・PR配信）
   - 金銭が動く（有料契約・課金・広告出稿・決済）
   - 法的拘束（契約・利用規約への同意）
