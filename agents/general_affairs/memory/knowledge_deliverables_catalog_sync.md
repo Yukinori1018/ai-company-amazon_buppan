@@ -321,3 +321,8 @@ python3 -c "raw=open('<CSV>','rb').read(); print('CRLF',raw.count(b'\r\n'),'lone
 - マスターCSVは**一部の行だけ CRLF**（13行）。Python で `open()` 既定（newline=None）で読んで書き戻すと CRLF→LF に化け、無関係な行が diff に出る。さらに csv.writer で全行を書き直すと引用符の付き方が変わり、同様に無関係行が動く。
 - 正しい手順：**`open(p, newline="")` で生テキストのまま読む → 変更行だけ文字列置換 → 新規行だけ csv.writer で末尾に足す → `newline=""` で書く**。`git diff --stat` で「変更行数＝意図した行数」を確かめてから同期する（今回は +13/−3 ＝新規10行＋README・08×2の状態更新）。
 - 別チケットの staged ファイル（T-20260930-001 batchE）が index にあったので、commit は `git commit -- <自分のパス>` でパス指定し、他人の staged を巻き込まない。
+
+## 2026-10-27 追記：成果物を deliverables の外へ移設したときの直し方（T-20261027-001）
+- docs/rules/ へ git mv された4本（detail/01〜03・02_新旧対応表.md）の行は、**行を消さずに**パス・GitHubリンクを新しい置き場へ書き換え、タイトルに「（〜へ移設）」、備考に移設日を残した。ローカルリンク列は空にした（localhost:17325 は deliverables しか配信しないため。docs/ 行の前例＝T-20260821-009 と同じ）
+- GitHubリンクのブランチは、ファイルが実在するブランチ（今回は claude/nighttime-work-checkin-iTWEa）にした。同チケットの既存行は research/gift-set-strategy を指していたが、そちらに docs/rules は無い
+- 🔴 **CSV 全体を csv.writer で書き直すと、触っていない行の引用符が変わって無関係な差分が出る**（今回13行の巻き添えが出て巻き戻した）。対象行だけを csv で読み書きし、他の行は文字列のまま残す
