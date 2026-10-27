@@ -42,7 +42,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/session-start.sh"
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/session-start.sh"
           }
         ]
       }
@@ -53,7 +53,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/ticket-notion-sync-reminder.sh"
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/ticket-notion-sync-reminder.sh"
           }
         ]
       },
@@ -62,7 +62,16 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/done-open-items-check.sh"
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/done-open-items-check.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash|Edit|Write|MultiEdit|NotebookEdit|Agent|Task|mcp__claude-in-chrome__.*|mcp__Claude_Browser__.*|mcp__computer-use__.*|mcp__Control_Chrome__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/work-without-delegation-check.py"
           }
         ]
       }
@@ -72,7 +81,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/owner-tasks-sync-check.sh"
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/owner-tasks-sync-check.sh"
           }
         ]
       }
@@ -82,11 +91,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/delegation-check.sh"
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/delegation-check.sh"
           },
           {
             "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/inbox-intake-check.sh"
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/inbox-intake-check.sh"
           }
         ]
       }
@@ -97,15 +106,15 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/asset-claim-guard.py"
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/asset-claim-guard.py"
           },
           {
             "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/source-terms-guard.py"
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/source-terms-guard.py"
           },
           {
             "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/order-gate-guard.py"
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/order-gate-guard.py"
           }
         ]
       }

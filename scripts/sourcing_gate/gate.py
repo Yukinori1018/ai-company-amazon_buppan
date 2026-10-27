@@ -45,8 +45,21 @@ ASIN_RE = re.compile(r"^[A-Z0-9]{10}$")
 MARKER_RE = re.compile(r"<!--\s*order-asins\s*:(.*?)-->", re.S)
 # 「まだ決まっていない」を表す語。表の行・値に残っていたら発注させない。
 UNRESOLVED_RE = re.compile(r"要確認|未確認|UNKNOWN|不明", re.I)
-# パスでの発注案判定に使う語（「発注案」「発注」は「発注」で両方拾える）
-PATH_WORDS = ("発注", "order_proposal")
+# パスでの発注案判定に使う「名前の型」。
+# ★ 2026-10-27（T-20261027-001）まで「発注」の2文字を含むだけで発注案とみなしていた。
+#   ところが当社では「サブエージェントへの発注」の意味でも「発注」を使うので、
+#   `01_発注減少の原因分析.md`（秘書の委譲が減った原因の報告書）や `75_次の窓口集め発注文.md`
+#   まで発注案扱いになり、納品できなかった。
+#   そこで「発注」の後ろに「何を発注するか」を表す語が続く形だけを発注案の名前とする。
+#   旧ルールで実在した発注案（35_発注案・36_初回発注案_確定版・22_発注する3SKU・
+#   01_発注セットの組み方…）はすべてこの型に当たる。加えて旧ルールが拾えなかった
+#   言い換え（仕入れ案・購入案・purchase_order）も拾う＝ゲートは弱めていない。
+#   本文に <!-- order-asins: --> マーカーがあれば名前に関係なく発注案（従来どおり）。
+ORDER_NAME_RE = re.compile(
+    r"発注(?:案|書|表|リスト|一覧|候補|セット|する|予定|明細|数量)"
+    r"|仕入れ?(?:案|リスト確定)|購入案"
+    r"|order[_-]?proposal|purchase[_-]?order",
+    re.I)
 DOC_EXT = (".md", ".html", ".htm", ".csv", ".tsv", ".txt")
 
 
@@ -232,9 +245,9 @@ def is_doc(path: str) -> bool:
 
 
 def path_says_order(path: str) -> bool:
-    """workspace/output/ 配下で、パスに「発注」「order_proposal」を含む文書。"""
+    """workspace/output/ 配下で、パス（フォルダ名・ファイル名）が発注案の名前の型に当たる文書。"""
     p = rel_path(path)
-    return p.startswith("workspace/output/") and any(w in p for w in PATH_WORDS)
+    return p.startswith("workspace/output/") and bool(ORDER_NAME_RE.search(p))
 
 
 def is_order_proposal(path: str, text: str) -> bool:

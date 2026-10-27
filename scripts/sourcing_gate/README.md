@@ -36,8 +36,11 @@ python3 scripts/sourcing_gate/check_record.py verify B01DBGGW8S B008FIPMP2  # �
 
 ## 発注案の書き方
 
-発注案（`workspace/output/` 配下でパスに「発注」「order_proposal」を含む .md/.html/.csv/.tsv/.txt、
+発注案（`workspace/output/` 配下でパスが**発注案の名前の型**に当たる .md/.html/.csv/.tsv/.txt、
 または下のマーカーを含む文書）の先頭に、**発注する ASIN を全部**書く。
+
+名前の型（`gate.ORDER_NAME_RE`）：`発注案` `発注書` `発注表` `発注リスト` `発注一覧` `発注候補` `発注セット` `発注する` `発注予定` `発注明細` `発注数量` `仕入れ案` `購入案` `order_proposal` `purchase_order`。
+「発注」の2文字だけでは発注案とみなさない（2026-10-27・T-20261027-001。当社は「サブエージェントへの発注」の意味でも使うため、`発注減少の原因分析` `窓口集め発注文` が誤って止まっていた）。**発注案を書くときは、この型の名前を付けるか、マーカーを書く。**
 
 ```
 <!-- order-asins: B01DBGGW8S, B008FIPMP2 -->

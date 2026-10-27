@@ -287,15 +287,8 @@ def cmd_build(until: datetime | None, dry: bool, prefetch: bool = False) -> None
         client.flush()
     exact, cores = Q.ld.listed(str(Q.XLSX))
 
-    def listed_mark(r) -> str:  # 51_extend_queue.main の listed_mark と同じ
-        ks = [Q.nm.match_key(x) for x in (r["メーカー名"], *r["ブランド"].split(" / ")) if x]
-        hit = next((exact[x] for x in ks if x in exact), "")
-        if hit:
-            short = min(len(x) for x in ks if x in exact) <= 4
-            return f"大手（上場）：{hit}" + ("（社名が短い・同名別会社の可能性）" if short else "")
-        mk = ks[0] if ks else ""
-        par = next((tag for core, tag in cores if mk.startswith(core) and len(mk) > len(core) and Q.ld._boundary_ok(mk, core)), "")
-        return f"大手（上場子会社の疑い）：親 {par}" if par else ""
+    def listed_mark(r) -> str:  # 2026-10-21：37_listed_dedup.listed_mark に一本化（同名別会社の取り違え対策）
+        return Q.ld.listed_mark(r["メーカー名"], r["ブランド"].split(" / "), exact, cores, big=r["大手"], size=r["規模"])
 
     def tier(r) -> int:
         if r["大手"] or r["_上場"].startswith("大手（上場）"):

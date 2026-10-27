@@ -45,7 +45,7 @@ code{background:#f3f3f3;padding:1px 4px;border-radius:3px;font-size:0.92em}pre{b
 <h2>5. 出力</h2>
 <h3>5-1. 今すぐ仕入れ候補</h3>
 <p>全条件（利益率≥12%・回転≤2.5ヶ月・取り分≥6・既知ゲートなし・終売の兆候なし・在庫あり・入数確定）を通る同一品は <strong>0件</strong>。次点を金額なしで挙げる（明細は <code>out/t2_matched.csv</code>）。</p>
-<table><thead><tr><th>次点</th><th>確認</th><th>落ちた条件</th><th>打ち手</th></tr></thead><tbody><tr><td>旭電機化成（車脱出用ハンマー）</td><td>同一品</td><td>NETSEA 欠品中・終売の兆候3つ</td><td>再入荷を待たない。メーカー打診の候補へ回す</td></tr><tr><td>HIRO（UVチェッカー）</td><td>同型・ブランド違い</td><td>最小ロット48で回転2.9ヶ月。Amazon 側は別ブランド名義</td><td>HIRO 名義の ASIN が別にあるか確認。無ければ新規出品になる（相乗りではない）</td></tr><tr><td>iClever（ワイヤレスマウス MD360）</td><td>要確認</td><td>利益率10.1%（12%に届かない）</td><td>NETSEA 側が iClever 品か確認</td></tr><tr><td>ファースト・アロー（木刀）</td><td>同一品</td><td>利益率10.9%・30本単位で回転3.0ヶ月</td><td>見送り</td></tr></tbody></table>
+<table><thead><tr><th>次点</th><th>確認</th><th>落ちた条件</th><th>打ち手</th></tr></thead><tbody><tr><td>旭電機化成（車脱出用ハンマー）</td><td>同一品</td><td>NETSEA 欠品中・終売の兆候3つ</td><td>再入荷を待たない。メーカー打診の候補へ回す</td></tr><tr><td>HIRO（UVチェッカー）</td><td>同型・ブランド違い</td><td>最小ロット〔非公開・NETSEA規約15条〕で回転2.9ヶ月。Amazon 側は別ブランド名義</td><td>HIRO 名義の ASIN が別にあるか確認。無ければ新規出品になる（相乗りではない）</td></tr><tr><td>iClever（ワイヤレスマウス MD360）</td><td>要確認</td><td>利益率10.1%（12%に届かない）</td><td>NETSEA 側が iClever 品か確認</td></tr><tr><td>ファースト・アロー（木刀）</td><td>同一品</td><td>利益率10.9%・30本単位で回転3.0ヶ月</td><td>見送り</td></tr></tbody></table>
 <h3>5-2. 卸別の件数（照合36行）</h3>
 <p>照合できた36行は NETSEA の20社に散った。同一品15件は8社で、最多は KAEI の3件（全件赤字）。全条件を通る社は無いので、1社で複数商品を組める社も無い。</p>
 <h3>5-3. マサルに渡す数字: 12ヶ月で卸から立つ商品数</h3>

@@ -112,15 +112,8 @@ def main() -> None:
         else:
             keep.append(r)
 
-    def listed_mark(r) -> str:
-        ks = [nm.match_key(x) for x in (r["メーカー名"], *r["ブランド"].split(" / ")) if x]
-        hit = next((exact[x] for x in ks if x in exact), "")
-        if hit:
-            short = min(len(x) for x in ks if x in exact) <= 4
-            return f"大手（上場）：{hit}" + ("（社名が短い・同名別会社の可能性）" if short else "")
-        mk = ks[0] if ks else ""
-        par = next((tag for core, tag in cores if mk.startswith(core) and len(mk) > len(core) and ld._boundary_ok(mk, core)), "")
-        return f"大手（上場子会社の疑い）：親 {par}" if par else ""
+    def listed_mark(r) -> str:  # 2026-10-21：37_listed_dedup.listed_mark に一本化（同名別会社の取り違え対策）
+        return ld.listed_mark(r["メーカー名"], r["ブランド"].split(" / "), exact, cores, big=r["大手"], size=r["規模"])
 
     num = lambda x: float(x) if x not in ("", None) else 0
     for r in keep:

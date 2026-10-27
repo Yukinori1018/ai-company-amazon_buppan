@@ -49,9 +49,14 @@ SUFFIX = ("ホールディングス", "ホールディング", "グループ本�
 def listed(xlsx: str) -> tuple[dict[str, str], list[tuple[str, str]]]:
     d = pd.read_excel(xlsx)
     d = d[d["市場・商品区分"].astype(str).str.contains("内国株式")]
+    return index_from([(str(r["銘柄名"]), f"{r['銘柄名']}（{str(r['市場・商品区分']).replace('（内国株式）', '')}・{r['コード']}）")
+                       for _, r in d.iterrows()])
+
+
+def index_from(pairs: list[tuple[str, str]]) -> tuple[dict[str, str], list[tuple[str, str]]]:
+    """(銘柄名, 表示タグ) の一覧から (完全一致の索引, 親の核の一覧) を作る。テストでは xlsx なしでここを直接呼ぶ。"""
     exact, cores = {}, []
-    for _, r in d.iterrows():
-        name = str(r["銘柄名"]); tag = f"{name}（{str(r['市場・商品区分']).replace('（内国株式）', '')}・{r['コード']}）"
+    for name, tag in pairs:
         k = nm.match_key(name)
         exact[k] = tag
         core = k
@@ -64,6 +69,57 @@ def listed(xlsx: str) -> tuple[dict[str, str], list[tuple[str, str]]]:
     return exact, cores
 
 
+SHORT = 4  # 照合キーがこの文字数以下の完全一致は、同名別会社がありうる（トミタ 8147 ≠ 燕市のトミタ）
+SHORT_LATIN = 6  # 英字だけのキーは短い語が多義（sanei＝SANEI 6230 ≠ 三永貿易のブランド「SE(Sanei)」）
+
+
+def _short(k: str) -> bool:
+    return len(k) <= (SHORT_LATIN if re.fullmatch(r"[a-z0-9]+", k) else SHORT)
+
+
+def _keys(name: str) -> list[str]:
+    """和英併記を割ってから照合キーにする。「ロゴス(LOGOS)」を1語にすると「ロゴス＋logos」が親「ロゴス」の前方一致に当たる。"""
+    out = []
+    for a in nm.split_aliases(name or ""):
+        k = nm.match_key(a)
+        if k and k not in out:
+            out.append(k)
+    return out
+
+
+def listed_mark(maker: str, brands: list[str], exact: dict, cores: list, big: str = "", size: str = "") -> str:
+    """キューの「上場」列の文言。**「大手（上場）」で始まる＝層5 に入れてよい**（呼び出し側はこの前方一致で層を決める）。
+
+    2026-10-21 の修正（サトル指摘・同名別会社の取り違え2件）：
+      トミタ … 照合キー3文字で東証のトミタ（8147）に完全一致 → 層5。実は燕市の6名の会社。
+      ロゴス(LOGOS) … 「ロゴスlogos」が親「ロゴス」（ロゴスホールディングス＝北海道の住宅会社）の前方一致 → 子会社の疑い。
+    直し方：社名の一致を確かめてから大手に使う。
+      1. 和英併記は割ってから照合する（_keys）
+      2. 照合キーが SHORT 文字以下の完全一致は、別の根拠（gBiz の大手判定 or 既知の大手リスト＝big）があるときだけ大手にする。
+         根拠がなければ「上場銘柄と同名…未確認」と書いて層5 に入れない（入口(e) の big_verify と同じく層3 で人が公式を見る）
+    「gBiz で中小なら別会社」は採らない：グロース上場には法定中小の会社がある（ビタブリッドジャパン 542A 等・2026-10-21 実データ）。
+    big：gBiz（L1/L2）か既知リストの大手の印。size：規模の文言（36_size_additions.label）。"""
+    ks = []
+    for x in (maker, *brands):
+        ks += [k for k in _keys(x) if k not in ks]
+    hits = [(k, exact[k]) for k in ks if k in exact]
+    if hits:
+        k, tag = max(hits, key=lambda x: len(x[0]))
+        if _short(k) and not big:
+            return f"上場銘柄と同名（{tag}）・社名が短く同一社か未確認"
+        return f"大手（上場）：{tag}"
+    mks = _keys(maker) or (ks[:1])
+    for mk in mks:
+        # 社名が親の核そのもの（イートアンド ＝ イートアンドHD − ホールディングス）は事業子会社の型。ただし核が短いと
+        # 同名別会社（ロゴス ≠ ロゴスHD）なので、核が SHORT より長いときだけ
+        par = next((tag for core, tag in cores
+                    if (mk.startswith(core) and len(mk) > len(core) and _boundary_ok(mk, core))
+                    or (mk == core and len(core) > SHORT)), "")
+        if par:
+            return f"大手（上場子会社の疑い）：親 {par}"
+    return ""
+
+
 def main(xlsx: str) -> None:
     exact, cores = listed(xlsx)
     q = WORK / "12_窓口集めキュー.csv"
@@ -72,15 +128,9 @@ def main(xlsx: str) -> None:
         shutil.copy(q, v1)
     rows = list(csv.DictReader(v1.open(encoding="utf-8-sig")))
     for r in rows:
-        keys = [nm.match_key(x) for x in (r["メーカー名"], *r["ブランド"].split(" / ")) if x]
-        hit = next((exact[k] for k in keys if k in exact), "")
-        if hit:
-            short = min(len(k) for k in keys if k in exact) <= 4
-            r["上場"] = f"大手（上場）：{hit}" + ("（社名が短い・同名別会社の可能性）" if short else "")
-            continue
-        mk = keys[0] if keys else ""
-        par = next((tag for core, tag in cores if mk.startswith(core) and len(mk) > len(core) and _boundary_ok(mk, core)), "")
-        r["上場"] = f"大手（上場子会社の疑い）：親 {par}" if par else ""
+        sz = r.get("規模", "")
+        r["上場"] = listed_mark(r["メーカー名"], r["ブランド"].split(" / "), exact, cores,
+                              big="大手" if sz.startswith("大手") else "", size=sz)
     groups = defaultdict(list)
     for r in rows:
         groups[nm.match_key(r["メーカー名"]) or r["メーカー名"]].append(r)

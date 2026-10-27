@@ -4,7 +4,7 @@
     python3 test_supply.py
 
 HTML の断片は 2026-09-30 に実ページから取った形をそのまま縮めたものです
-（SD品番 13681795 / ブライエンタープライズ）。**作り話の HTML でテストしても意味がない**ので、
+（SD品番 99999999 / ブライエンタープライズ）。**作り話の HTML でテストしても意味がない**ので、
 構造は実物に合わせてあります。
 """
 
@@ -41,7 +41,7 @@ PRODUCT_HTML = """
 <tr><th>画像転載</th><td class="co-tac"> △<br>（購入した商品のみ転載可） </td></tr>
 <tr><th>ネット販売</th><td class="co-tac"> ○ </td></tr>
 </table>
-<span class="co-pc-only">SD品番：13681795</span>
+<span class="co-pc-only">SD品番：99999999</span>
 <tr class="ts-tr02">
   <td class="co-align-center border-rt border-b co-pc-only">S1</td>
   <td class="border-rt border-b td-set-detail"><div>くまのプーさん 珪藻土マット ナチュラルハッピー
@@ -51,7 +51,7 @@ PRODUCT_HTML = """
   <td class="border-rt maker-product-price"><div class="float-left">メーカー希望小売価格（税抜）</div>
     <div class="float-right">&yen;1,000 / 1点<br /><span>1セット (2点)</span></div></td>
   <td class="stock-info co-align-center border-t"><span>卸価格は</span>会員のみ公開</td>
-  <td class="tr-last co-ts-only"><table><tr><td><span>SD品番：13681795S1</span>
+  <td class="tr-last co-ts-only"><table><tr><td><span>SD品番：99999999S1</span>
     <span> / メーカー品番：mrs-2215051000</span></td></tr></table></td>
 </tr>
 <tr class="ts-tr02">
@@ -62,7 +62,7 @@ PRODUCT_HTML = """
   <td class="maker-product-price"><div>メーカー希望小売価格（税抜）</div>
     <div>&yen;1,000 / 1点<br /><span>1セット (3点)</span></div></td>
   <td class="stock-info">SOLD OUT <span>卸価格は</span>会員のみ公開</td>
-  <td><table><tr><td><span>SD品番：13681795S2</span>
+  <td><table><tr><td><span>SD品番：99999999S2</span>
     <span> / メーカー品番：mrs-2215051000</span></td></tr></table></td>
 </tr>
 """
@@ -77,18 +77,18 @@ SEARCH_HTML = """
 <a href="/p/do/dpsl/205398/">ブライエンタープライズ（すべてのジャンル）</a>
 <a href="/p/do/dpsl/57703/">ネオウィング ライフスタイル事業部（1号店）</a>
 1 ～ 2社 （全2社）
-<a href="/p/r/pd_p/13681795/">x</a><a href="/p/r/pd_p/13681817/">y</a>
-<a href="/p/r/pd_p/13681795/">dup</a>
+<a href="/p/r/pd_p/99999999/">x</a><a href="/p/r/pd_p/13681817/">y</a>
+<a href="/p/r/pd_p/99999999/">dup</a>
 """
 
 EMPTY_HTML = "<p>ご指定の検索条件に該当する商品は ございませんでした。</p>"
 
 
 def test_parse_product():
-    rows = sd.parse_product(PRODUCT_HTML, "https://example/p/r/pd_p/13681795/")
+    rows = sd.parse_product(PRODUCT_HTML, "https://example/p/r/pd_p/99999999/")
     ok(len(rows) == 2, "規格2行になる（S1/S2）")
     a, b = rows
-    ok(a.sd_code == "13681795S1", "SD品番（枝番つき）")
+    ok(a.sd_code == "99999999S1", "SD品番（枝番つき）")
     ok(a.jan == "4992272443363", "JAN を読む")
     ok(a.maker_code == "mrs-2215051000", "メーカー品番を読む")
     ok(a.units_per_set == 2 and b.units_per_set == 3, "入り数は口ごとに違う")
@@ -133,7 +133,7 @@ def test_parse_search():
     ok(total == 2, "「全2社」を社数として読む")
     ok(len(sups) == 2, "企業は重複とジャンルリンクを除いて2社")
     ok(sups[0].name == "ブライエンタープライズ", "企業名")
-    ok(pids == ["13681795", "13681817"], "商品IDは重複を畳んで順番を保つ")
+    ok(pids == ["99999999", "13681817"], "商品IDは重複を畳んで順番を保つ")
     sups, pids, total = sd.parse_search(EMPTY_HTML)
     ok((sups, pids, total) == ([], [], 0), "0件ページは (0,0,0)")
 
@@ -205,7 +205,7 @@ def test_report_stop_exit_code():
 def test_find_by_identity_confirms_by_jan():
     """検索が当たっても、**JAN が違えば一致にしない**。"""
     pages = {sd.search_url("mrs-2215051000"): SEARCH_HTML,
-             sd.product_url("13681795"): PRODUCT_HTML,
+             sd.product_url("99999999"): PRODUCT_HTML,
              sd.product_url("13681817"): PRODUCT_HTML}
     calls = []
 
@@ -244,13 +244,13 @@ def test_merge_wholesale():
     rows = sd.parse_product(PRODUCT_HTML)
     # 🔴 2026-10-01 から `価格の単位` が必須です（同じ JAN に「1点」「×10点」の口が並び、
     #    画面の建て付けが口ごとに違うため）。単位が無い行は取り込みません。
-    sd.merge_wholesale(rows, {"13681795S1": {"卸価格": 620, "価格の単位": "1点あたり",
+    sd.merge_wholesale(rows, {"99999999S1": {"卸価格": 620, "価格の単位": "1点あたり",
                                              "在庫": "在庫あり"},
-                              "13681795S2": {"承認状態": "卸価格未承認"}})
+                              "99999999S2": {"承認状態": "卸価格未承認"}})
     ok(rows[0].wholesale_price_excl == 620, "人が見た卸価格が入る")
     ok(rows[0].approval == "承認済み", "金額が入れば承認済み")
     no_basis = sd.parse_product(PRODUCT_HTML)
-    sd.merge_wholesale(no_basis, {"13681795S1": {"卸価格": 620}})
+    sd.merge_wholesale(no_basis, {"99999999S1": {"卸価格": 620}})
     ok(no_basis[0].wholesale_price_excl is None,
        "`価格の単位` が無い行は卸価格を取り込まない（推測しない）")
     ok(any("価格の単位" in n for n in no_basis[0].notes), "取り込まなかった理由を残す")
@@ -274,8 +274,8 @@ def test_approval_requests_does_not_apply():
     ok("実売のある棚" in with_asin[0]["申請したい理由"], "突合できた企業は理由が変わる")
     ok(len(reqs[0]["JAN例"]) == 1, "同じ JAN を JAN例に2回入れない")
     # 承認済みの行は申請対象にしない
-    sd.merge_wholesale(rows, {"13681795S1": {"卸価格": 620, "価格の単位": "1点あたり"},
-                              "13681795S2": {"卸価格": 600, "価格の単位": "1点あたり"}})
+    sd.merge_wholesale(rows, {"99999999S1": {"卸価格": 620, "価格の単位": "1点あたり"},
+                              "99999999S2": {"卸価格": 600, "価格の単位": "1点あたり"}})
     ok(sd.approval_requests(rows) == [], "承認済みだけなら申請対象は0件")
 
 

@@ -34,7 +34,7 @@ TICKET = "T-20260920-003"
 # **この台帳ダンプにはサイズ区分が無いので、1個手残りはここで計算しません。**
 # 区分別の手残り・A/B/C 等級が要るときは `regrade.py` / `write_buy_list_v2.py` を使ってください
 # （Keepa 0トークンで引き直せます）。
-BUDGET_LEFT = 80_000            # テスト予算10万 − 消化19,756 ≒ 8万円
+BUDGET_LEFT = 80_000            # テスト予算10万 − 消化〔非公開・SD規約17条〕 ≒ 8万円
 C = {name: i for i, name in enumerate(ledger_sheet.COLUMNS)}
 
 

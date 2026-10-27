@@ -435,34 +435,59 @@ def cmd_run(a) -> int:
                                          "fetched": got0, "stop": stop0})
             if stop0:
                 stopped = stop0
-    for rot in range(0 if stopped else a.rotations):
-        for j in range(len(order)):
-            stage = order[(i0 + j) % len(order)]
-            todo = pending(stage, q.get(stage, []), st)[: a.batch]
-            rec = run_stage(stage, todo, prods, a.reserve, a.no_fetch)
-            rec["remaining_after"] = max(0, len(pending(stage, q.get(stage, []), st)) - len(todo))
-            if rec["stop"]:
-                stopped = rec["stop"]
-                st["next_stage"] = stage           # 次回はこの段のこのバッチから
-                run_log["rotations"].append(rec)
+    # 2026-10-25 タカシ：引き直し（refresh_ledger）で**新しく UNKNOWN になった行**を同じ回で続けて回す。
+    #   旧実装は「引き直し前の台帳」でキューを作り、段→引き直しを1回で終えていた。引き直しで判定が
+    #   UNKNOWN に落ちた行（例：取得済みデータが古くなり90日窓に価格が残らなくなった行）は次の回まで
+    #   手つかずで、run を2回続けると2回目だけが動いた（10/24：1回目 UNKNOWN 295→300、2回目 300→295。
+    #   B0CLJ8GS2Z・B00XTYOM12・B01NBDCW2T・B09JFKH3WS・B01N0H1A76）。§3.3-17「2回目で0行」に反する。
+    #   いまは「機械にかけられる行が残らなくなるまで」段→引き直しを繰り返す。回数の上限は置かない
+    #   （§3.3-34）。止まるのは、処理した ASIN が REVISIT_DAYS の間 pending から外れるため
+    #   （同じ ASIN を同じ日に2度回さない）か、トークン不足で stop したとき。
+    summ_first: dict | None = None
+    passes = 0
+    seen: set[tuple[str, str]] = set()     # これまでの pass でキューに入っていた (段, ASIN)
+    while True:
+        passes += 1
+        for rot in range(0 if stopped else a.rotations):
+            for j in range(len(order)):
+                stage = order[(i0 + j) % len(order)]
+                todo = pending(stage, q.get(stage, []), st)[: a.batch]
+                rec = run_stage(stage, todo, prods, a.reserve, a.no_fetch)
+                rec["remaining_after"] = max(0, len(pending(stage, q.get(stage, []), st)) - len(todo))
+                rec["pass"] = passes
+                if rec["stop"]:
+                    stopped = rec["stop"]
+                    st["next_stage"] = stage           # 次回はこの段のこのバッチから
+                    run_log["rotations"].append(rec)
+                    break
+                for x in todo:
+                    st["done"].setdefault(stage, {})[x["ASIN"]] = today()
+                    touched.setdefault(x["ASIN"], set()).add(stage)
+                to_browser += rec.get("to_browser", [])
+                run_log["rotations"].append({k: v for k, v in rec.items() if k != "to_browser"}
+                                            | {"to_browser": len(rec.get("to_browser", []))})
+                st["next_stage"] = order[(i0 + j + 1) % len(order)]
+            if stopped:
                 break
-            for x in todo:
-                st["done"].setdefault(stage, {})[x["ASIN"]] = today()
-                touched.setdefault(x["ASIN"], set()).add(stage)
-            to_browser += rec.get("to_browser", [])
-            run_log["rotations"].append({k: v for k, v in rec.items() if k != "to_browser"}
-                                        | {"to_browser": len(rec.get("to_browser", []))})
-            st["next_stage"] = order[(i0 + j + 1) % len(order)]
-        if stopped:
+        save_state(st)
+        summ = refresh_ledger(write=not a.no_write)
+        summ_first = summ_first or summ
+        if a.no_write:
+            h, *body = json.loads((LEDGER / "after_dryrun.json").read_text())
+            rows2 = [dict(zip(h, r)) for r in body]
+        else:
+            _, rows2 = read_sheet()
+        q2 = build_queues(rows2)
+        # 続けるのは「引き直しで**新しく**機械の段に入った行」だけ。もともとキューにあってバッチから
+        # 溢れた行は従来どおり次の回（バッチ＝1回分の量の意味を変えない）
+        seen |= {(s, x["ASIN"]) for s in MACHINE_STAGES for x in q.get(s, [])}
+        new_q = {s: [x for x in pending(s, q2.get(s, []), st) if (s, x["ASIN"]) not in seen]
+                 for s in MACHINE_STAGES}
+        if stopped or not any(new_q.values()):
             break
-    save_state(st)
-    summ = refresh_ledger(write=not a.no_write)
-    if a.no_write:
-        h, *body = json.loads((LEDGER / "after_dryrun.json").read_text())
-        rows2 = [dict(zip(h, r)) for r in body]
-    else:
-        _, rows2 = read_sheet()
-    q2 = build_queues(rows2)
+        q = new_q
+        i0 = order.index(st["next_stage"])
+    run_log["passes"] = passes
     after = {r["ASIN"]: (r["判定"], outstanding(r.get("判定理由") or "")) for r in rows2}
     resolved = Counter()
     left_unknown = Counter()
@@ -485,7 +510,8 @@ def cmd_run(a) -> int:
     pb, ph = write_human_files(q2, to_browser)
     run_log.update({"stop": stopped, "queues_before": q_before, "queues_after": counts(q2),
                     "resolved_items": dict(resolved), "unknown_left_to": dict(left_unknown),
-                    "verdicts_before": summ.get("前", [{}])[0], "verdicts_after": summ.get("後", [{}])[0],
+                    "verdicts_before": summ_first.get("前", [{}])[0],
+                    "verdicts_after": summ.get("後", [{}])[0],
                     "needs_browser": str(pb), "needs_human": str(ph),
                     "next_stage": st["next_stage"], "wrote_sheet": not a.no_write})
     st["history"].append(run_log)

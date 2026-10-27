@@ -41,7 +41,10 @@ if tool in ("Write", "Edit", "MultiEdit", "NotebookEdit"):
 elif tool == "Bash":
     cmd = ti.get("command", "") or ""
     # チケットを物理的に動かす/消す操作のみ対象（参照系 ls/cat/sed 等は除外）
-    if "workspace/tickets/" in cmd and re.search(r'\b(mv|cp|rm|git\s+mv|git\s+rm)\b', cmd):
+    # 2026-10-27（T-20261027-001）：mv/cp/rm が「コマンドとして」チケットを引数に取るときだけ。
+    #   旧判定は文字列のどこかに "cp" と "workspace/tickets/" があれば鳴り、
+    #   ヒアドキュメントやテスト文の中の語でも同期を促していた。
+    if re.search(r'(?:^|[;&|(]\s*|\n\s*)(?:sudo\s+)?(?:git\s+)?(?:mv|cp|rm)\s+[^;&|\n]*workspace/tickets/', cmd):
         paths.append(cmd)
         mutating = True
 

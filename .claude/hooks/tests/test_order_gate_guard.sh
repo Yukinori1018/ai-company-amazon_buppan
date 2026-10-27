@@ -67,6 +67,9 @@ payload_write "$T/.claude/hooks/x.md" "<!-- order-asins: B0TEST0001 -->" >"$T/p.
 payload_write "$T/scripts/sourcing_gate/README.md" "例: <!-- order-asins: B0XXXXXXXX -->" >"$T/p.json"; expect "ゲートの README は対象外" 0
 payload_write "$T/workspace/tickets/doing/T-99999999-001_発注.md" "発注の段取りを決める" >"$T/p.json"; expect "チケット（パスに発注・マーカーなし）は対象外" 0
 printf '{"tool_name":"Read","tool_input":{"file_path":"%s"}}' "$P" >"$T/p.json"; expect "Read は対象外" 0
+# 2026-10-27（T-20261027-001）：「発注」を委譲の意味で使う文書は発注案ではない
+payload_write "$D/01_発注減少の原因分析.md" "秘書のサブエージェント発注が減った原因。ゲートは要確認。" >"$T/p.json"; expect "委譲の「発注」を含む報告書（マーカーなし）は対象外" 0
+payload_write "$D/75_次の窓口集め発注文.md" "サトルへの発注文" >"$T/p.json"; expect "サブエージェントへの発注文は対象外" 0
 echo 'not json' >"$T/p.json"; expect "壊れた入力でも落ちない" 0
 
 echo "== マーカー =="
@@ -77,6 +80,9 @@ payload_write "$P" "# 発注案
 payload_write "$D/03_まとめ.md" "<!-- order-asins: B0TEST0009 -->
 本文" >"$T/p.json"; expect "パスに発注が無くてもマーカーがあれば対象（未確認でブロック）" 2 "B0TEST0009"
 payload_write "$P" "<!-- order-asins:  -->" >"$T/p.json"; expect "マーカーが空ならブロック" 2 "1つもありません"
+for nm in "36_初回発注案_確定版.md" "22_発注する3SKU.md" "01_発注セットの組み方と案の比較.md" "07_仕入れ案.md" "08_購入案.html" "order_proposal.csv" "09_発注リスト.md"; do
+  payload_write "$D/$nm" "本文だけ" >"$T/p.json"; expect "名前の型に当たる「$nm」はマーカー無しでブロック" 2 "order-asins"
+done
 payload_write "/x/.claude/worktrees/wt1/workspace/output/deliverables/T-1/01_発注案.md" "本文だけ" >"$T/p.json"
 expect "worktree の発注案も対象（.claude/ を含む絶対パスでも素通りしない）" 2 "order-asins"
 

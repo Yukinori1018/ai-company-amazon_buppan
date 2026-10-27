@@ -1,1 +1,2 @@
 - [時刻つき期限は予約通知を併設](knowledge_timed_deadline_needs_scheduled_reminder.md) — next_check_at はセッション開始時しか効かない。9/10期限のリマインドが1日遅れた（2026-09-11）
+- [おりおんへの Chatwork 連絡はカズヨが送る](owner-delegates-orion-chatwork.md) — 社長の包括承認（2026-10-23）。費用・契約の変更は従来どおり確認

@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CLAUDE.md 新旧対応表（第2版）</title>
+<meta name="robots" content="noindex, nofollow">
+<style>
+:root{
+  color-scheme: light dark;
+  --bg:#ffffff; --surface:#f5f7f9; --surface2:#eceff3;
+  --text:#1b1f24; --muted:#525b66; --faint:#6c7681;
+  --border:#d5dae1; --border-strong:#b8c0ca;
+  --accent:#1c5b86; --accent-bg:#eef5fa;
+  --warn:#8a4b00; --warn-bg:#fdf1df; --warn-border:#dd9a3c;
+  --alert:#7d2b2b; --alert-bg:#fbeeee; --alert-border:#d08b8b;
+  --ok:#1b6144; --ok-bg:#eaf4ef; --ok-border:#8ab9a3;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#15181c; --surface:#1d2126; --surface2:#252a31;
+    --text:#e4e8ec; --muted:#aab4bf; --faint:#949eaa;
+    --border:#333a43; --border-strong:#48515c;
+    --accent:#79b4dc; --accent-bg:#1a2a36;
+    --warn:#f0b866; --warn-bg:#332616; --warn-border:#7a5a2a;
+    --alert:#e79a9a; --alert-bg:#331e1e; --alert-border:#6e4040;
+    --ok:#84cfa9; --ok-bg:#17281f; --ok-border:#3c6450;
+  }
+}
+*{box-sizing:border-box;}
+html{ -webkit-text-size-adjust:100%; }
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic Medium","Yu Gothic",
+              "Noto Sans JP","Meiryo",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:16px; line-height:1.85;
+  font-feature-settings:"palt" 1;
+  text-align:left;
+}
+.wrap{max-width:900px; margin:0 auto; padding:32px 20px 96px;}
+
+/* ---------- header ---------- */
+.kicker{
+  font-size:12px; letter-spacing:.14em; color:var(--faint);
+  margin:0 0 10px; font-variant-numeric:tabular-nums;
+}
+h1{
+  font-size:27px; line-height:1.5; margin:0 0 20px;
+  letter-spacing:.01em; font-weight:700; text-wrap:balance;
+}
+.lead{
+  margin:0; color:var(--muted); font-size:15px; line-height:1.8;
+  border-left:3px solid var(--border-strong); padding:2px 0 2px 14px;
+}
+
+/* ---------- kpi カード ---------- */
+.kpis{display:flex; flex-wrap:wrap; gap:10px; margin:1.1em 0 1.2em;}
+.kpi{
+  flex:1 1 150px; min-width:150px;
+  border:1px solid var(--border-strong); border-radius:10px;
+  background:var(--bg); padding:12px 14px 13px;
+}
+.kpi-l{margin:0; font-size:13px; line-height:1.5; color:var(--muted); letter-spacing:.02em;}
+.kpi-v{
+  margin:.1em 0 0; font-size:32px; line-height:1.25; font-weight:700;
+  letter-spacing:-.01em; font-variant-numeric:tabular-nums;
+}
+@media (max-width:520px){
+  .kpi{flex:1 1 100%;}
+  .kpi-v{font-size:27px;}
+}
+
+/* ---------- toc ---------- */
+.toc{
+  margin:30px 0 8px; padding:18px 22px 20px;
+  background:var(--surface); border:1px solid var(--border); border-radius:10px;
+}
+.toc-h{
+  margin:0 0 10px; font-size:13px; font-weight:700;
+  letter-spacing:.1em; color:var(--muted);
+}
+.toc ul.toc-list{margin:0; padding:0; list-style:none;}
+.toc li{margin:.26em 0; line-height:1.65;}
+.toc li.toc-lv1{margin:.85em 0 .3em; font-weight:700;}
+.toc li.toc-lv1:first-child{margin-top:0;}
+.toc li.toc-lv2{padding-left:1.1em;}
+.toc li.toc-lv3{padding-left:2.5em; font-size:14.5px; color:var(--muted); margin:.16em 0;}
+.toc li.toc-lv3::before{content:"–"; color:var(--faint); margin-right:.45em;}
+.toc a{color:var(--accent); text-decoration:none; border-bottom:1px solid transparent;}
+.toc a:hover{border-bottom-color:currentColor;}
+
+/* ---------- part ---------- */
+h1.part{
+  font-size:24px; line-height:1.5; font-weight:700; letter-spacing:.02em;
+  margin:64px 0 8px; padding:14px 0 0; border-top:4px solid var(--text);
+  scroll-margin-top:16px;
+}
+
+/* ---------- sections ---------- */
+.sec{margin:0;}
+.sec>*:last-child{margin-bottom:0;}
+h2{
+  font-size:21px; line-height:1.5; margin:46px 0 16px; padding-bottom:9px;
+  border-bottom:2px solid var(--border-strong); font-weight:700;
+  scroll-margin-top:16px;
+}
+h3{
+  font-size:17px; line-height:1.6; margin:32px 0 12px; font-weight:700;
+  color:var(--text); scroll-margin-top:16px;
+}
+h3::before{content:""; display:inline-block; width:4px; height:1em;
+  background:var(--accent); margin-right:9px; vertical-align:-.13em; border-radius:2px;}
+p{margin:0 0 1.1em;}
+ul,ol{margin:0 0 1.2em; padding-left:1.6em;}
+li{margin:.4em 0;}
+li>ul{margin:.45em 0 .2em;}
+blockquote{
+  margin:0 0 1.2em; padding:14px 18px;
+  background:var(--surface); border-left:4px solid var(--accent); border-radius:0 8px 8px 0;
+}
+blockquote p{margin:0;}
+hr.rule{
+  border:0; border-top:1px solid var(--border);
+  margin:40px 0 0; opacity:.55;
+}
+hr.rule:has(+ .sec-box),hr.rule:has(+ h1.part){display:none;}
+
+/* ---------- tables ---------- */
+.tw{
+  overflow-x:auto; -webkit-overflow-scrolling:touch;
+  margin:0 0 1.4em; border:1px solid var(--border); border-radius:9px;
+  background:
+    linear-gradient(to right, var(--bg) 30%, rgba(0,0,0,0)) left / 28px 100% no-repeat local,
+    linear-gradient(to left,  var(--bg) 30%, rgba(0,0,0,0)) right / 28px 100% no-repeat local,
+    radial-gradient(farthest-side at 0 50%, rgba(90,110,130,.28), rgba(0,0,0,0)) left / 12px 100% no-repeat scroll,
+    radial-gradient(farthest-side at 100% 50%, rgba(90,110,130,.28), rgba(0,0,0,0)) right / 12px 100% no-repeat scroll;
+}
+.tw:focus{outline:2px solid var(--accent); outline-offset:2px;}
+table{border-collapse:collapse; width:100%; font-size:14.5px; line-height:1.72;}
+thead th{
+  background:var(--surface2); text-align:left; font-weight:700;
+  padding:11px 14px; border-bottom:2px solid var(--border-strong);
+  white-space:nowrap; vertical-align:bottom;
+}
+tbody td{padding:11px 14px; border-bottom:1px solid var(--border); vertical-align:top;
+  overflow-wrap:anywhere;}
+tbody tr:last-child td{border-bottom:0;}
+tbody tr:nth-child(even){background:color-mix(in srgb, var(--surface) 55%, transparent);}
+tbody td:first-child{font-weight:600;}
+thead th:first-child,tbody td:first-child{min-width:7.5em;}
+thead th:last-child,tbody td:last-child{white-space:normal;}
+
+/* ---------- inline markers ---------- */
+.ref{
+  font-size:.75em; color:var(--faint); margin-left:.15em;
+  white-space:nowrap; font-variant-numeric:tabular-nums;
+  letter-spacing:.01em; vertical-align:.06em;
+}
+/* [#n] は出典表に行がある時だけリンクになる。見た目は span と同じにして
+   本文の印象を変えない（追加したのは移動手段だけで、文字は足していない） */
+a.ref{text-decoration:none;}
+a.ref:hover,a.ref:focus{color:var(--accent); text-decoration:underline;}
+.chk{
+  display:inline-block; font-size:.75em; line-height:1.5;
+  padding:0 .5em; margin:0 .12em; border-radius:4px;
+  background:var(--warn-bg); color:var(--warn);
+  border:1px solid var(--warn-border); font-weight:700;
+  white-space:nowrap; vertical-align:.09em;
+}
+
+/* ---------- inline emphasis ---------- */
+strong{font-weight:700; color:var(--text);}
+td strong,th strong{font-weight:700;}
+pre.codeblock{white-space:pre-wrap; word-break:break-all; background:rgba(127,127,127,.10); border:1px solid rgba(127,127,127,.35); border-radius:6px; padding:14px 16px; line-height:1.7; font-size:14px; overflow-x:auto;}
+pre.codeblock code{background:none; border:0; padding:0; font-size:inherit;}
+code{
+  font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+  font-size:.9em; padding:.05em .35em; border-radius:4px;
+  background:var(--surface2); border:1px solid var(--border);
+}
+code .chk{font-family:inherit;}
+
+/* ---------- 表セル内の語ハイライト ---------- */
+.pill{
+  display:inline-block; padding:0 .45em; border-radius:4px;
+  font-weight:700; white-space:nowrap;
+}
+.pill-danger{background:var(--alert); color:#fff; border:1px solid var(--alert);}
+.pill-warn{background:var(--warn-bg); color:var(--warn); border:1px solid var(--warn-border);}
+.pill-ok{background:var(--ok-bg); color:var(--ok); border:1px solid var(--ok-border);}
+.pill-info{background:var(--accent-bg); color:var(--accent); border:1px solid var(--accent);}
+/* muted は「検証していない」を表す。塗らず・破線で、済んだものと視覚的に別系統にする */
+.pill-muted{background:transparent; color:var(--faint);
+  border:1px dashed var(--border-strong); font-weight:600;}
+tbody tr.row-danger td:first-child{box-shadow:inset 4px 0 0 var(--alert);}
+tbody tr.row-danger td{background:color-mix(in srgb, var(--alert-bg) 70%, transparent);}
+
+/* ---------- 出典一覧（--reftable） ---------- */
+table.reftable:has(colgroup){table-layout:fixed; min-width:600px;}
+/* --colwidths で列幅を固定した表。狭い画面の溢れは .tw の横スクロールが受ける */
+table.fixedcols{table-layout:fixed; min-width:620px;}
+/* 狭い画面で列が1〜2文字幅に潰れるのを防ぐ。溢れは .tw の横スクロールが受ける */
+table.reftable td:first-child{
+  min-width:2.6em; width:2.6em; text-align:right; white-space:nowrap;
+  font-variant-numeric:tabular-nums; color:var(--muted);
+}
+table.reftable th:first-child{min-width:2.6em; width:2.6em; text-align:right;}
+tbody tr[id]{scroll-margin-top:14px;}
+tbody tr[id]:target td{background:var(--accent-bg);}
+tbody tr[id]:target td:first-child{box-shadow:inset 4px 0 0 var(--accent); color:var(--accent);}
+
+/* ---------- emphasised sections ---------- */
+.sec-box{
+  margin:28px 0 0; padding:6px 26px 20px;
+  border:1px solid var(--border-strong); border-radius:10px;
+}
+.sec-box h2{margin-top:26px;}
+.sec-box .tw{background-color:var(--bg);}
+.sec-conclusion{background:var(--accent-bg); border-left:6px solid var(--accent);}
+.sec-conclusion h2{border-bottom-color:var(--accent);}
+.sec-alert{background:var(--alert-bg); border-color:var(--alert-border);
+  border-left:6px solid var(--alert);}
+.sec-alert h2{border-bottom-color:var(--alert-border);}
+.sec-danger{background:var(--alert-bg); border:2px solid var(--alert);
+  border-left:10px solid var(--alert);}
+.sec-danger h2{border-bottom-color:var(--alert);}
+.sec-warn{background:var(--warn-bg); border-color:var(--warn-border);
+  border-left:6px solid var(--warn-border);}
+.sec-warn h2{border-bottom-color:var(--warn-border);}
+.sec-checklist{background:var(--surface); border:2px solid var(--border-strong);
+  border-left:10px solid var(--accent);}
+.sec-checklist h2{border-bottom-color:var(--accent);}
+/* チェックリストは印刷して手元で使う。番号は原稿どおり残し、記入欄だけ CSS で足す */
+.sec-checklist ol{list-style:decimal; padding-left:1.9em;}
+.sec-checklist ol>li{margin:.7em 0; padding-left:2.1em; position:relative;}
+.sec-checklist ol>li::before{
+  content:""; position:absolute; left:0; top:.25em;
+  width:1.15em; height:1.15em; border:1.5px solid var(--border-strong);
+  border-radius:3px; background:var(--bg);
+}
+
+/* ---------- toc: 囲み枠の節は目次でも色を付ける ---------- */
+.toc a.toc-danger,.toc a.toc-alert{color:var(--alert); font-weight:700;}
+.toc a.toc-warn{color:var(--warn); font-weight:700;}
+.toc a.toc-checklist{color:var(--accent); font-weight:700;}
+
+/* ---------- footer / nav ---------- */
+.prov{
+  margin:56px 0 0; padding-top:16px; border-top:1px solid var(--border);
+  font-size:12.5px; line-height:1.8; color:var(--faint); word-break:break-all;
+}
+.top{
+  position:fixed; right:18px; bottom:18px; z-index:5;
+  display:block; width:42px; height:42px; line-height:40px; text-align:center;
+  border-radius:50%; text-decoration:none; font-size:17px;
+  background:var(--surface); color:var(--muted);
+  border:1px solid var(--border-strong);
+  box-shadow:0 2px 8px rgba(0,0,0,.14);
+}
+.top:hover{color:var(--accent); border-color:var(--accent);}
+
+/* ---------- narrow screens ---------- */
+@media (max-width:640px){
+  body{font-size:15.5px;}
+  .wrap{padding:22px 14px 88px;}
+  h1{font-size:22px;}
+  h1.part{font-size:20px; margin-top:46px;}
+  h2{font-size:19px;}
+  h3{font-size:16.5px;}
+  .toc{padding:14px 16px 16px;}
+  .sec-box{padding:4px 14px 14px;}
+  table{font-size:14px;}
+  thead th,tbody td{padding:9px 11px;}
+}
+
+/* ---------- print ---------- */
+@media print{
+  :root{
+    --bg:#fff; --surface:#fff; --surface2:#fff; --text:#000; --muted:#333; --faint:#555;
+    --border:#999; --border-strong:#555; --accent:#000; --accent-bg:#fff;
+    --warn:#000; --warn-bg:#fff; --warn-border:#000;
+    --alert:#000; --alert-bg:#fff; --alert-border:#000;
+  }
+  body{background:#fff; color:#000; font-size:10.5pt; line-height:1.7;}
+  .wrap{max-width:none; padding:0;}
+  a{color:#000; text-decoration:none;}
+  .top{display:none;}
+  .tw{overflow:visible; background:none; border:1px solid #999;}
+  table{font-size:9pt;}
+  thead th{background:#fff; border-bottom:1.5pt solid #000;}
+  tbody tr:nth-child(even){background:#fff;}
+  .sec-box{background:#fff; border:1.5pt solid #000;}
+  .sec-danger{border:2.5pt solid #000; border-left:2.5pt solid #000;}
+  .chk{background:#fff; color:#000; border:1pt solid #000;}
+  pre.codeblock{background:#fff; border:1px solid #999; break-inside:avoid;}
+  code{background:#fff; border:1px solid #999;}
+  .pill{background:#fff!important; color:#000!important; border:1.2pt solid #000!important;}
+  /* 未検証は印刷でも「済んだもの」と別に見えなければ意味がない。
+     モノクロでは色が消えるので、破線と濃度で差を残す */
+  .pill-muted{border:1pt dashed #666!important; color:#555!important; font-weight:400!important;}
+  /* 長いURLは印刷で紙幅を超える。折り返しを許可して溢れを止める */
+  .tw{overflow:hidden;}
+  table{table-layout:auto; width:100%;}
+  tbody td{overflow-wrap:anywhere; word-break:break-word;}
+  thead th{white-space:normal;}
+  table.reftable{font-size:7.6pt; line-height:1.5;}
+  table.reftable thead th,table.reftable tbody td{padding:5px 6px;}
+  tbody tr[id]:target td{background:#fff;}
+  tbody tr.row-danger td{background:#fff;}
+  tbody tr.row-danger td:first-child{box-shadow:inset 3pt 0 0 #000;}
+  /* チェックリストは1枚で手元に置けるよう独立ページにする */
+  .sec-checklist{break-before:page; page-break-before:always;
+    border:1.5pt solid #000; border-left:1.5pt solid #000;}
+  .sec-checklist ol>li::before{border:1.2pt solid #000;}
+  .ref{color:#555; opacity:1;}
+  blockquote{background:#fff; border-left:3pt solid #000;}
+  h1.part{break-before:page; page-break-before:always; border-top:2.5pt solid #000;
+    font-size:15pt; margin-top:0;}
+  h1.part,h2,h3{break-after:avoid; page-break-after:avoid;}
+  .tw,blockquote,tr{break-inside:avoid; page-break-inside:avoid;}
+  .toc{border:1px solid #999; background:#fff;}
+  .kpi{border:1pt solid #000; background:#fff; break-inside:avoid;}
+  .kpi-v{font-size:16pt;}
+}
+</style>
+</head>
+<body id="top">
+<div class="wrap">
+<p class="kicker">T-20261027-001</p>
+<h1>新旧対応表（T-20261027-001・第2版）</h1>
+<p class="lead">旧 CLAUDE.md の各規則が新版のどこへ行ったか。差し替え後は <code>docs/rules/numbering.md</code> に置く。第2版は、監査（20）と仮想実行（21）を受けた改訂を反映した。</p>
+<nav class="toc" aria-label="目次"><p class="toc-h">目次</p><ul class="toc-list"><li class="toc-lv2"><a href="#s1">大きさ</a></li><li class="toc-lv2"><a href="#s2">新しい番号の決め方</a></li><li class="toc-lv2"><a href="#s3">新版の構成</a></li><li class="toc-lv2"><a href="#s4">旧→新の対応</a></li><li class="toc-lv2"><a href="#s5">新版で足したもの・変えたもの</a></li><li class="toc-lv2"><a href="#s6">法務判定により伏せた箇所</a></li></ul></nav>
+<section id="s1" class="sec">
+<h2>大きさ</h2>
+<div class="tw" tabindex="0"><table><thead><tr><th></th><th>行数</th><th>サイズ</th></tr></thead><tbody><tr><td>旧 CLAUDE.md</td><td>754</td><td>108KB（110,957バイト）</td></tr><tr><td>新 CLAUDE.md（01_CLAUDE_新版.md）</td><td>360</td><td>48KB（49,219バイト）</td></tr><tr><td>うち毎ターン守る範囲（§A1〜§A7）</td><td>101行目まで</td><td>—</td></tr><tr><td>詳細 01_仕入れの記録.md</td><td>350</td><td>42KB</td></tr><tr><td>詳細 02_進め方と確かめ方の記録.md</td><td>335</td><td>37KB</td></tr><tr><td>詳細 03_会社と運用の記録.md</td><td>521</td><td>41KB</td></tr></tbody></table></div>
+<ul><li>新版は旧版より行数で52%、サイズで56%少ない（第1版は435行・52KB）。</li><li>詳細ファイル3本は旧版の原文を並べ直したもの。原文の文言は変えていない。後の規則で更新された10か所には「&gt; 更新：」の注記を足した。旧版の空でない行は、文字列のまま3本のどれかにちょうど1回ずつ入っている（<code>build_detail.py</code> で機械検査・注記行は除外）。</li><li>🔴 の付いた規則・注記（旧版40行・41か所）は、すべて新版に命令形で残した。新版の 🔴 は29か所（同じ規則の繰り返しを1つにまとめたため旧より少ない）。</li><li>Claude Code の公式ドキュメントは CLAUDE.md を200行未満にするよう勧めている。新版はまだ長い。理由は 04 の1。</li></ul>
+</section>
+<section id="s2" class="sec">
+<h2>新しい番号の決め方</h2>
+<ul><li>節は §A〜§J の記号にした。旧番号（§4.1 など）と同じ形の番号を別の中身に使い回すと、古い文書の「§4.1」が黙って別の規則を指してしまうため。</li><li>新版の見出しと各規則の末尾に「（旧§4.1）」「（旧3.3-18）」の形で旧番号を残した。参照元の書き換えが終われば消してよい。</li><li>旧 §3.1 の「守ること1〜6」は §A6 の1〜6、旧 §3.5 の #1〜21 は §F2 の #1〜21 と、番号を変えていない。</li></ul>
+</section>
+<section id="s3" class="sec">
+<h2>新版の構成</h2>
+<div class="tw" tabindex="0"><table><thead><tr><th>節</th><th>中身</th><th>読む時</th></tr></thead><tbody><tr><td>§A</td><td>役割・振り分け・承認・チケット（waiting の定義）・計画承認・目的と条件・作業→節の早見表（§A7）</td><td>毎ターン</td></tr><tr><td>§B</td><td>ミッション・KPI・意思決定の流れ</td><td>目的・組織を確かめるとき</td></tr><tr><td>§C</td><td>進め方の原則（止めない・上限を置かない・否定する等）</td><td>止める・絞る・仕組みを作る前</td></tr><tr><td>§D</td><td>確かめ方と報告</td><td>数字・原因・完了を報告する前</td></tr><tr><td>§E</td><td>外部とのやりとり（ブラウザ・メール・相手サイト）</td><td>ブラウザ操作・メール・卸サイトに触る前</td></tr><tr><td>§F</td><td>仕入れ判定（必須列・21項目・等級・カート・実売・採算・経路・ゲート）</td><td>§A7 で当たった節を、その作業の前に</td></tr><tr><td>§G</td><td>メーカー直取引（要点。全文は詳細01）</td><td>打診・リスト作り・テスト仕入れの前</td></tr><tr><td>§H</td><td>FBA 納品（要点。条件の表は詳細01）</td><td>発送指示・納品の前</td></tr><tr><td>§I</td><td>運用（セッション開始・チケット・同期・成果物・担当の定常業務）</td><td>該当の操作のとき</td></tr><tr><td>§J</td><td>参照</td><td>—</td></tr></tbody></table></div>
+</section>
+<section id="s4" class="sec">
+<h2>旧→新の対応</h2>
+<p>扱いの意味：移設＝中身を変えずに移した／縮約＝要点だけ本体に残し、残りは詳細ファイルへ／統合＝同じ規則が複数あったので1か所にした／整合＝旧版の中で食い違っていたので、後から決まった方に揃えた／訂正＝事実と違っていたので直した／削除＝本番リポで不要になった（原文は詳細03に保存）。</p>
+<div class="tw" tabindex="0"><table><thead><tr><th>旧</th><th>中身</th><th>新版</th><th>詳細ファイル</th><th>扱い</th><th>メモ</th></tr></thead><tbody><tr><td>§0</td><td>このファイルについて</td><td>冒頭・§A1</td><td>03 会社と運用</td><td>移設</td><td></td></tr><tr><td>§0.1</td><td>秘書カズヨの役割・handover・SessionStart フック</td><td>§A1・§I1</td><td>03 会社と運用</td><td>移設</td><td></td></tr><tr><td>§1</td><td>ミッション・KPI</td><td>§B1</td><td>03 会社と運用</td><td>移設・訂正</td><td>「子会社化時に埋めて」の注記を削除（本番リポのため）</td></tr><tr><td>§2</td><td>組織図・意思決定パイプライン</td><td>§A2（担当表）・§B2</td><td>03 会社と運用</td><td>統合</td><td>組織表は §A2 の振り分け表に一本化</td></tr><tr><td>§3</td><td>鉄則（見出し）</td><td>§A〜§E</td><td>03 会社と運用</td><td>分解</td><td></td></tr><tr><td>鉄則1</td><td>窓口の一元化</td><td>§A1</td><td>03 会社と運用</td><td>移設</td><td></td></tr><tr><td>鉄則2</td><td>チケット駆動</td><td>§A4</td><td>03 会社と運用</td><td>移設</td><td></td></tr><tr><td>鉄則3</td><td>成果物は1箇所に集約</td><td>§A4・§I4</td><td>03 会社と運用</td><td>移設</td><td></td></tr><tr><td>鉄則4</td><td>メモリへの記録義務</td><td>§A4</td><td>03 会社と運用</td><td>移設</td><td></td></tr><tr><td>鉄則5</td><td>不明点は止まって聞く</td><td>§A5</td><td>03 会社と運用</td><td>統合・上書き</td><td>§4.3・§4.5（後から決まった方）と矛盾していたため、「止まってよいのは §A3 と前提崩れだけ」に統一</td></tr><tr><td>鉄則6</td><td>プレースホルダーは保持</td><td>（削除）</td><td>03 会社と運用</td><td><span class="pill pill-muted">削除</span></td><td>このリポは親テンプレではなく本番（memory project_repo_role.md）。原文は詳細03の末尾に保存</td></tr><tr><td>鉄則7</td><td>チケット ID 言及時の読み合わせ</td><td>§I2</td><td>03 会社と運用</td><td>移設</td><td></td></tr><tr><td>鉄則8</td><td>社長タスクまとめの即時同期</td><td>§I3</td><td>03 会社と運用</td><td><span class="pill pill-warn">訂正</span></td><td>Notion「社長タスクまとめ」カードは実在しない（404）。owner-tasks.md と waiting 列に訂正</td></tr><tr><td>鉄則9</td><td>ブラウザ操作は秘書</td><td>§E1</td><td>02 進め方</td><td>統合</td><td>§4.4 と同じ内容を1か所に</td></tr><tr><td>鉄則10</td><td>目的は固定、条件は変数</td><td>§A6</td><td>03 会社と運用</td><td>統合</td><td>§3.1 と同じ内容を1か所に</td></tr><tr><td>鉄則11</td><td>方針化の指示は CLAUDE.md に</td><td>§C9</td><td>02 進め方</td><td>移設</td><td></td></tr><tr><td>鉄則12</td><td>図は現物の形に</td><td>§D12</td><td>02 進め方</td><td>移設</td><td></td></tr><tr><td>鉄則13</td><td>宛先のないメールは下書きにしない</td><td>§E2</td><td>02 進め方</td><td>移設</td><td></td></tr><tr><td>§3.1</td><td>目的は固定、条件は変数（守ること1〜6）</td><td>§A6</td><td>03 会社と運用</td><td>移設</td><td>守ること1〜6 の番号は §A6 の1〜6 と同じ順</td></tr><tr><td>§3.2</td><td>提案表の必須6列・判定台帳</td><td>§F1</td><td>01 仕入れ</td><td>移設</td><td></td></tr><tr><td>§3.3（冒頭の表 #1〜3）</td><td>発注前のカート保持者3点確認</td><td>§F4</td><td>01 仕入れ</td><td>移設・訂正</td><td>表#2「本体の在庫率が高い棚は発注しない」は、後の 3.3-22 と §3.5 #6（補助情報）に合わせて「補助情報・単独では落とさない」に統一</td></tr><tr><td>§3.3-1</td><td>1要素・1数値で本体なしと結論しない</td><td>§F4</td><td>01 仕入れ</td><td>移設</td><td></td></tr><tr><td>§3.3-2</td><td>社長の Chrome で実画面</td><td>§F4</td><td>01 仕入れ</td><td>移設</td><td></td></tr><tr><td>§3.3-3</td><td>報告の1行目にカート保持者</td><td>§F4</td><td>01 仕入れ</td><td>移設</td><td></td></tr><tr><td>§3.3-4</td><td>必須6列は確認結果を載せる欄</td><td>§F1</td><td>01 仕入れ</td><td>移設</td><td></td></tr><tr><td>§3.3-5</td><td>メーカー・ブランド公式のカートも避ける</td><td>§F4</td><td>01 仕入れ</td><td>移設</td><td></td></tr><tr><td>§3.3-6</td><td>仕入れの実在を確かめる</td><td>§F7</td><td>01 仕入れ</td><td>移設</td><td></td></tr><tr><td>§3.3-7</td><td>卸と Amazon の1個を揃える</td><td>§F6</td><td>01 仕入れ</td><td>移設</td><td></td></tr><tr><td>§3.3-8</td><td>積極条件（実売）を必ず1本</td><td>§F5</td><td>01 仕入れ</td><td>移設</td><td></td></tr><tr><td>§3.3-9</td><td>探す向きは両方</td><td>§F7</td><td>01 仕入れ</td><td>移設</td><td></td></tr><tr><td>§3.3-10</td><td>原因を語る前に確かめる・母集団</td><td>§D1・§D2</td><td>02 進め方</td><td>移設</td><td></td></tr><tr><td>§3.3-11</td><td>0件の前に検算</td><td>§D4</td><td>02 進め方</td><td>移設</td><td></td></tr><tr><td>§3.3-12</td><td>仕入れ先が Amazon 出品を許すか</td><td>§F7・§F2 #4</td><td>01 仕入れ</td><td>移設</td><td></td></tr><tr><td>§3.3-13</td><td>順序を入れ替えるまで原因を確定しない</td><td>§D3</td><td>02 進め方</td><td>移設</td><td></td></tr><tr><td>§3.3-14</td><td>自動取得の土台・偽装不可</td><td>§E4</td><td>02 進め方</td><td>移設</td><td></td></tr><tr><td>§3.3-15</td><td>自分から申告しない</td><td>§E3</td><td>02 進め方</td><td>移設</td><td></td></tr><tr><td>§3.3-16</td><td>実売は人が見る価値／キーゾン＝Keepa 式</td><td>§F5</td><td>01 仕入れ</td><td>移設・整合</td><td>10-11 更新（Keepa 式＝キーゾン）を正とした。実売は Keepa 式で確定し、人が画面で見るのはカート・ゲート・セット構成。旧い文は詳細01に「&gt; 更新：」注記つきで残す</td></tr><tr><td>§3.3-17</td><td>列名に単位・不変条件・番兵</td><td>§F6</td><td>01 仕入れ</td><td>移設</td><td></td></tr><tr><td>§3.3-18</td><td>停止は手段・SD の線</td><td>§C1・§E4</td><td>02 進め方</td><td>移設</td><td></td></tr><tr><td>§3.3-19</td><td>自分の定数とフィルタを疑う</td><td>§D7・§F6</td><td>02 進め方</td><td>移設</td><td></td></tr><tr><td>§3.3-20</td><td>カレンダー・12ヶ月履歴・季節</td><td>§F5</td><td>01 仕入れ</td><td>移設・整合</td><td>季節の判定月（11〜1月を残す）は 2026-10 時点の線と明記し、「販売開始後にピークが来るか」で一般化</td></tr><tr><td>§3.3-21</td><td>0件なら落ちた理由を集計</td><td>§D5</td><td>02 進め方</td><td>移設</td><td></td></tr><tr><td>§3.3-22</td><td>規定と実装の粒度</td><td>§D6・§F4</td><td>02 進め方</td><td>移設</td><td></td></tr><tr><td>§3.3-23</td><td>750円の崖・死に帯</td><td>§F6</td><td>01 仕入れ</td><td>移設</td><td></td></tr><tr><td>§3.3-24</td><td>誤差幅を原価に足さない・等級</td><td>§F6・§F3</td><td>01 仕入れ</td><td>移設・整合</td><td>旧24の等級定義（利益率のみ）は §3.5 の等級（利益率または利益額）に統合</td></tr><tr><td>§3.3-25</td><td>ゲート確認の URL</td><td>§F8・§F2 #1〜2</td><td>01 仕入れ</td><td>移設・整合</td><td>§3.5 #1〜2 の取り方を旧手順（productsearch）からこの URL に更新</td></tr><tr><td>§3.3-26</td><td>いつ買っていつ売るか</td><td>§F5</td><td>01 仕入れ</td><td>移設</td><td></td></tr><tr><td>§3.3-27</td><td>先人の型・単価の下限で切らない</td><td>§C7・§F3</td><td>02 進め方</td><td>移設</td><td></td></tr><tr><td>§3.3-28</td><td>採算は価格履歴で</td><td>§F6</td><td>01 仕入れ</td><td>移設</td><td></td></tr><tr><td>§3.3-29</td><td>テストと本番で手順を変えない</td><td>§C8</td><td>02 進め方</td><td>移設</td><td></td></tr><tr><td>§3.3-30</td><td>ナレッジは照合される形に・発注ゲート</td><td>§C9・§F2</td><td>02 進め方</td><td>移設</td><td></td></tr><tr><td>§3.3-31</td><td>経路別の件数と割合・80%</td><td>§F7・§C1・§D1</td><td>01 仕入れ</td><td>移設</td><td></td></tr><tr><td>§3.3-32</td><td>止まらない仕組み</td><td>§C2</td><td>02 進め方</td><td>移設・整合</td><td>「夜間タスクで回す」を「登録した。動いているかは実行記録と毎朝の健全性検査で確かめてから書く」に直した</td></tr><tr><td>§3.3-33</td><td>偏りは下限で直す</td><td>§C4</td><td>02 進め方</td><td>移設</td><td></td></tr><tr><td>§3.3-34</td><td>調査に上限を置かない</td><td>§C3</td><td>02 進め方</td><td>移設</td><td></td></tr><tr><td>§3.3-35</td><td>送信できた≠できた</td><td>§D8・§F8</td><td>02 進め方</td><td>移設</td><td></td></tr><tr><td>§3.3-36</td><td>仕組みは動くまで未完了・リストの数え方</td><td>§D9・§G</td><td>02 進め方</td><td>移設</td><td></td></tr><tr><td>§3.3-37</td><td>リスト＝シート</td><td>§D11</td><td>02 進め方</td><td>移設</td><td></td></tr><tr><td>§3.3-38</td><td>成果物は目的で測る</td><td>§D10</td><td>02 進め方</td><td>移設・整合</td><td>0件のときの入口の例（メーカー連絡先台帳の代表商品から JAN で逆引き）を戻した</td></tr><tr><td>§3.3-39</td><td>社長の方針でも否定する</td><td>§C5・§G</td><td>02 進め方</td><td>移設</td><td></td></tr><tr><td>§3.3-40</td><td>在席時に回さない</td><td>§C6</td><td>02 進め方</td><td>移設</td><td></td></tr><tr><td>§3.3-41</td><td>出品申請は仕入れリストに入れた時点で</td><td>§F8</td><td>01 仕入れ</td><td>移設・整合</td><td>§3.5 #3 の「10点未満」を「申請画面の必要点数」に更新</td></tr><tr><td>§3.5 #1</td><td>仕入れ前チェック #1</td><td>§F2 #1</td><td>01 仕入れ</td><td>移設・整合</td><td>取り方を 3.3-25 の URL に更新</td></tr><tr><td>§3.5 #2</td><td>仕入れ前チェック #2</td><td>§F2 #2</td><td>01 仕入れ</td><td>移設・整合</td><td>同上</td></tr><tr><td>§3.5 #3</td><td>仕入れ前チェック #3</td><td>§F2 #3</td><td>01 仕入れ</td><td>移設・整合</td><td>「10点未満」→申請画面の必要点数（3.3-41）</td></tr><tr><td>§3.5 #4</td><td>仕入れ前チェック #4</td><td>§F2 #4</td><td>01 仕入れ</td><td>移設</td><td></td></tr><tr><td>§3.5 #5</td><td>仕入れ前チェック #5</td><td>§F2 #5</td><td>01 仕入れ</td><td>移設</td><td></td></tr><tr><td>§3.5 #6</td><td>仕入れ前チェック #6</td><td>§F2 #6</td><td>01 仕入れ</td><td>移設</td><td></td></tr><tr><td>§3.5 #7</td><td>仕入れ前チェック #7</td><td>§F2 #7</td><td>01 仕入れ</td><td>移設</td><td></td></tr><tr><td>§3.5 #8</td><td>仕入れ前チェック #8</td><td>§F2 #8</td><td>01 仕入れ</td><td>移設</td><td></td></tr><tr><td>§3.5 #9</td><td>仕入れ前チェック #9</td><td>§F2 #9</td><td>01 仕入れ</td><td>移設・整合</td><td>取り方に Keepa 式を併記（3.3-16 更新）</td></tr><tr><td>§3.5 #10</td><td>仕入れ前チェック #10</td><td>§F2 #10</td><td>01 仕入れ</td><td>移設・整合</td><td>「ゲート10点以外」→「ゲートの必要点数以外」、実績枠の月1個を併記</td></tr><tr><td>§3.5 #11</td><td>仕入れ前チェック #11</td><td>§F2 #11</td><td>01 仕入れ</td><td>移設</td><td></td></tr><tr><td>§3.5 #12</td><td>仕入れ前チェック #12</td><td>§F2 #12</td><td>01 仕入れ</td><td>移設・整合</td><td>終売の例外は社長の「今だけ」（2026-10-12）を残し、期限は未定・定期棚卸しで見直す、と明記。値上がり狙いの終売品は実績枠に入れない</td></tr><tr><td>§3.5 #13</td><td>仕入れ前チェック #13</td><td>§F2 #13</td><td>01 仕入れ</td><td>移設</td><td></td></tr><tr><td>§3.5 #14</td><td>仕入れ前チェック #14</td><td>§F2 #14</td><td>01 仕入れ</td><td>移設</td><td></td></tr><tr><td>§3.5 #15</td><td>仕入れ前チェック #15</td><td>§F2 #15</td><td>01 仕入れ</td><td>移設</td><td></td></tr><tr><td>§3.5 #16</td><td>仕入れ前チェック #16</td><td>§F2 #16</td><td>01 仕入れ</td><td>移設</td><td></td></tr><tr><td>§3.5 #17</td><td>仕入れ前チェック #17</td><td>§F2 #17</td><td>01 仕入れ</td><td>移設</td><td></td></tr><tr><td>§3.5 #18</td><td>仕入れ前チェック #18</td><td>§F2 #18</td><td>01 仕入れ</td><td>移設</td><td></td></tr><tr><td>§3.5 #19</td><td>仕入れ前チェック #19</td><td>§F2 #19</td><td>01 仕入れ</td><td>移設</td><td></td></tr><tr><td>§3.5 #20</td><td>仕入れ前チェック #20</td><td>§F2 #20</td><td>01 仕入れ</td><td>移設</td><td></td></tr><tr><td>§3.5 #21</td><td>仕入れ前チェック #21</td><td>§F2 #21</td><td>01 仕入れ</td><td>移設</td><td></td></tr><tr><td>§3.5（等級）</td><td>採算等級 A/B/C・実績枠・推定費目は最高B</td><td>§F3</td><td>01 仕入れ</td><td>移設</td><td>実績枠の目的（卸での実績づくり・値動きに賭けない）を1行戻した</td></tr><tr><td>§3.4</td><td>FBA 納品は代行へ直送（おりおん）</td><td>§H（要点3行）</td><td>01 仕入れ</td><td>移設・縮約</td><td>条件の表（料金・保管・次点・移行先）は詳細01 §H に</td></tr><tr><td>§3.5（メーカー直）</td><td>メーカー直取引の初期方針</td><td>§G（要点5行）</td><td>01 仕入れ</td><td>移設・縮約</td><td>3.5 が2つあった。2つ目をこちらに。2回目以降・資金のリピート上限・撤退ライン・構えは詳細01 §G に</td></tr><tr><td>§4</td><td>承認ルール（見出し）</td><td>§A3・§A5・§E1</td><td>03 会社と運用</td><td>分解</td><td></td></tr><tr><td>§4.1</td><td>社長承認が必須の操作</td><td>§A3</td><td>03 会社と運用</td><td>移設</td><td></td></tr><tr><td>§4.2</td><td>秘書判断で自動進行してよいもの</td><td>§A5</td><td>03 会社と運用</td><td>統合</td><td></td></tr><tr><td>§4.3</td><td>迷ったら軽く動いてから聞く</td><td>§A5・§A4</td><td>03 会社と運用</td><td>統合・整合</td><td>waiting に置くものを §A4 の4つに一本化（§4.5 と食い違っていた）</td></tr><tr><td>§4.4</td><td>ブラウザ操作の分担</td><td>§E1</td><td>02 進め方</td><td>統合</td><td></td></tr><tr><td>§4.5</td><td>計画承認→一気通貫→成果物で報告</td><td>§A5</td><td>03 会社と運用</td><td>移設</td><td></td></tr><tr><td>§5</td><td>依頼ルーティング</td><td>§A2</td><td>03 会社と運用</td><td>移設・追記</td><td>5つ目の例外（ブラウザ操作は秘書、途中の調査・台帳・文面・計算は振る）、「画面の数字は秘書・計算は経理」、「振るのに許可は要らない」（旧L582）、種類が一覧に無いときの general-purpose を追記。Agent の種類名を併記</td></tr><tr><td>§5.1</td><td>自律運用とルーティン</td><td>§I5（1行）</td><td>03 会社と運用</td><td>移設・縮約</td><td>表は agents/secretary/skills/routines.md と詳細03 に</td></tr><tr><td>§6</td><td>ワークフローの基本</td><td>§A4・§I2〜§I5</td><td>03 会社と運用</td><td>分解・縮約</td><td>inbox・カタログの手順は担当の skills と詳細03 に</td></tr><tr><td>§7</td><td>子会社化テンプレのプレースホルダー一覧</td><td>（削除）</td><td>03 会社と運用</td><td><span class="pill pill-muted">削除</span></td><td>本番リポで不要。原文は詳細03の末尾に保存。Notion の接続設定は docs/notion-setup-guide.md にある</td></tr><tr><td>§8</td><td>参照</td><td>§J・§I6</td><td>03 会社と運用</td><td>移設・訂正</td><td>「notion-setup-guide.md は整備予定」→実在するので直リンク</td></tr></tbody></table></div>
+</section>
+<section id="s5" class="sec">
+<h2>新版で足したもの・変えたもの</h2>
+<div class="tw" tabindex="0"><table><thead><tr><th>新版</th><th>中身</th><th>出どころ</th></tr></thead><tbody><tr><td>§A2 の5</td><td>ブラウザ操作は秘書。途中で出た調査・台帳整備・文面作り・計算は担当に振る（社長の指摘で数字を直すときも）</td><td>監査 高-1・仮想実行 シナリオ1。秘書が採用を判断</td></tr><tr><td>§A2</td><td>画面から数字を写すのは秘書、計算・採算は経理に振る</td><td>T-20261026-002 の対策案C</td></tr><tr><td>§A2</td><td>振るのに社長の許可は要らない</td><td>旧§5（旧L582）の戻し。監査 低-1</td></tr><tr><td>§A2</td><td>Agent の種類が一覧に無いときは general-purpose に agent.md を読ませて振る</td><td>仮想実行 シナリオ7。秘書が採用を判断</td></tr><tr><td>§A2</td><td>Agent の種類名を併記</td><td><code>.claude/agents/</code> の定義名</td></tr><tr><td>§A3</td><td>「質問するな」「やり切れ」は承認ではない。最終クリックは最後にまとめて頼む</td><td>旧3.3-39 の一文を §A3 に移した。仮想実行 シナリオ6</td></tr><tr><td>§A4</td><td>waiting に置くものを4つに定義し、ここだけに書く</td><td>監査 中-1（§4.3・§4.5・§6 の食い違いの解消）</td></tr><tr><td>§A7</td><td>作業→読む節の早見表</td><td>仮想実行 対策2・監査 中-3</td></tr><tr><td>§F 冒頭・詳細3本</td><td>「詳細ファイルを全部読む」をやめ、「早見表の節を作業の前に読む・詳細は迷ったときに引く」に</td><td>監査 中-2・仮想実行 シナリオ3</td></tr><tr><td>§F2 #12</td><td>終売の例外に社長の「今だけ」を戻し、期限は未定・定期棚卸しで見直すと明記</td><td>監査 高-2（第1版で期限を落としていた）</td></tr><tr><td>§F3</td><td>実績枠の目的（卸での実績づくり・値動きに賭けない）</td><td>旧§3.5 等級の戻し。監査 中-4</td></tr><tr><td>§F5</td><td>実売は Keepa 式で確定。人が画面で見るのはカート・ゲート・セット構成</td><td>旧3.3-16 の 10-11 更新を正とした。監査 中-5</td></tr><tr><td>§C2</td><td>夜間タスクは「登録した。動いているかは実行記録で確かめる」</td><td>仮想実行 シナリオ4</td></tr><tr><td>冒頭・各節</td><td>「読む時」の1行</td><td>本チケットの要件2</td></tr></tbody></table></div>
+</section>
+<section id="s6" class="sec">
+<h2>法務判定により伏せた箇所</h2>
+<p>詳細ファイルは原文のまま、が前提だが、次の2か所は例外。根拠は <code>30_法務判定_公開済み実額.md</code>（会員限定の取引条件の実額。SD 会員規約第17条1項・NETSEA 規約第15条1項）。元の値は <code>agent_output/T-20261027-001/redacted_values/</code>（Git の対象外）にある。照合スクリプトは、伏せた後の文字列で一致を取る。</p>
+<div class="tw" tabindex="0"><table><thead><tr><th>旧</th><th>詳細ファイル</th><th>伏せたもの</th><th>書き方</th></tr></thead><tbody><tr><td>旧3.3-25（旧 CLAUDE.md 248行）</td><td>01 §F8</td><td>2026-09-30 に発注した鍋12点の仕入額</td><td>「12点（実額は社内記録）」</td></tr><tr><td>旧3.3-20（旧 CLAUDE.md 223行）</td><td>01 §F5</td><td>ナガクラ ミニトマト栽培キットの卸単価</td><td>「卸（実額は社内記録）」</td></tr></tbody></table></div>
+<ul><li>新版の本文（01）・02・03・04・05・README と HTML には、伏せた値の一覧（redacted_values の全151種）に当たる実額は無かった（一般的な数字の一致を除き、目で確かめた）。</li><li>利益率の誤報の例（33.3%・75.5%・64.7%）は社内の計算値で、卸値の実額ではないので残した。</li></ul>
+<p>上の表以外に新しい規則は足していない。memory にだけある社長の指摘（採算には納品代行費を別の行で入れる、文章がくどい）は、今回も CLAUDE.md に上げていない（04 の6）。</p>
+</section>
+<p class="prov">HTML版。内容の唯一の正は 02_新旧対応表.md です。</p>
+</div>
+<a class="top" href="#top" aria-label="先頭へ戻る">&#8593;</a>
+</body>
+</html>

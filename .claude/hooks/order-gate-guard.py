@@ -7,7 +7,8 @@
       9/30 には実際に、本体がカートを持ち申請経路も閉じた鍋を12点発注している。
       文章のルールは発注案を作る瞬間に照合されないので、機械で止める。
 
-対象: 発注案ファイル（workspace/output/ 配下でパスに「発注」「order_proposal」を含む文書、
+対象: 発注案ファイル（workspace/output/ 配下でパスが発注案の名前の型〔発注案・発注書・発注リスト・
+      発注する・仕入れ案・購入案・order_proposal 等。gate.ORDER_NAME_RE〕に当たる文書、
       または本文に `<!-- order-asins: ... -->` マーカーがある文書。.md/.html/.csv/.tsv/.txt）。
       それ以外は素通り。
 止める条件:
@@ -54,7 +55,10 @@ def looks_like_order(fp: str) -> bool:
     """gate が読めないとき用の最小判定（fail-closed の範囲を絞るため）。"""
     p = fp.replace("\\", "/")
     p = re.sub(r"^.*/\.claude/worktrees/[^/]+/", "", p)
-    return ("workspace/output/" in p and ("発注" in p or "order_proposal" in p)
+    # gate.ORDER_NAME_RE と同じ型（gate が読めないときの控え。直すときは両方直す）
+    name_re = (r"発注(?:案|書|表|リスト|一覧|候補|セット|する|予定|明細|数量)"
+               r"|仕入れ?(?:案|リスト確定)|購入案|order[_-]?proposal|purchase[_-]?order")
+    return ("workspace/output/" in p and re.search(name_re, p, re.I) is not None
             and p.lower().endswith((".md", ".html", ".htm", ".csv", ".tsv", ".txt")))
 
 

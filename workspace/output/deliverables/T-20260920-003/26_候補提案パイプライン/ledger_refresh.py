@@ -620,6 +620,55 @@ def load_gate_checks() -> dict[str, dict]:
     return {r["ASIN"]: r for r in csv.DictReader(p.open(encoding="utf-8-sig"))}
 
 
+#: 出品申請画面の読み取り結果（CLAUDE.md §3.3-41）。日付つきフォルダが増えていく
+APPLY_PROBE_GLOB = "apply_probe_*/results.tsv"
+
+
+def load_apply_probe() -> dict[str, dict]:
+    """{ASIN: {"可否", "種別", "日付"}}。申請画面を読んだ結果（results.tsv：ASIN／区分／文言）。
+
+    フォルダ名の日付順に読み、後のフォルダが勝つ。観測日は文言の「申請画面 YYYY-MM-DD」、
+    無ければフォルダ名の日付。
+    """
+    out: dict[str, dict] = {}
+    for p in sorted(WORK.glob(APPLY_PROBE_GLOB)):
+        m = re.search(r"(\d{4})(\d{2})(\d{2})", p.parent.name)
+        folder_day = f"{m[1]}-{m[2]}-{m[3]}" if m else ""
+        for row in csv.reader(p.open(encoding="utf-8"), delimiter="\t"):
+            if len(row) < 3 or not row[0].strip():
+                continue
+            d = re.search(r"\d{4}-\d{2}-\d{2}", row[2])
+            out[row[0].strip()] = {"可否": row[1].strip(), "種別": row[2].strip(),
+                                   "日付": d.group() if d else folder_day}
+    return out
+
+
+def latest_gate_cells(asin: str, probe: dict[str, dict]) -> tuple[str, str] | None:
+    """(ゲート種別, ゲート可否) を、観測日の新しい方から決める。どちらも無ければ None（触らない）。
+
+    取り方の優先順位（2026-10-21 タカシ。55行が「可（新品）／未確認」に戻った事故の修正）
+      1. 観測日が新しい方を勝たせる。申請画面（apply_probe_*）と restrictions/approve
+         （gate_check_*.csv・10/09 の fallback）を同じ土俵で日付比較する
+      2. 同じ日なら申請画面が勝つ。申請画面は restrictions/approve の一段先（書類の点数 N・
+         即時承認・申請不可）まで読んでいるので情報が多い
+      3. restrictions/approve の方が新しい（例：「不可」をあとで取り直して「可」になった）ときは
+         restrictions/approve の文言で書く。この場合は書類の点数は分からない
+      4. ただし restrictions/approve が新しくても、結論の向き（開いている／不可）が申請画面と
+         同じなら申請画面を残す。夜間の取り直し（gate_check_<日付>_browser.csv）は毎晩日付が
+         新しくなるので、これが無いと「要書類30点」が翌晩に「可（新品）」へ戻る（2026-10-21 br1021）
+    判定・判定理由はここでは変えない（ゲート列の表示だけ）。
+    """
+    pr, gt = probe.get(asin), SCREEN.gate.get(asin)
+    if pr and (not gt or pr["日付"] >= (gt.get("確認日") or "")):
+        return pr["種別"], pr["可否"]
+    if pr and gt and pr["可否"].startswith("不可") == (gt["ゲート判定"] != "OK"):
+        return pr["種別"], pr["可否"]
+    if gt:
+        return (f"restrictions/approve（{gt['確認日']}）：{gt['根拠']}",
+                "可（新品）" if gt["ゲート判定"] == "OK" else "不可（新品の申請経路なし）")
+    return None
+
+
 def reread_gates(s: dict) -> list[tuple[str, str, str, str]]:
     """(ゲート, 状態, 理由, 読み替えの注記)。§3.3-8 / §3.5 #18 に合わせて読み替える。"""
     out = []
@@ -1825,6 +1874,21 @@ def main(argv=None) -> int:
     appended = [[apply_wholesale_rule(dict(zip(header, x)))[h] for h in header] for x in appended]
     sd_lines = [[apply_wholesale_rule(dict(zip(header, x)))[h] for h in header] for x in sd_lines]
     final = [[r[h] for h in header] for r in rows] + appended + sd_lines
+    # ゲート列は最後に、観測日の新しい方（申請画面 or restrictions/approve）で書き直す。
+    # 2026-10-21：netsea_cells／sd_screen は restrictions/approve しか知らず、SD 行は sd_rows が
+    # 行ごと作り直すので「未確認」に戻っていた（申請画面の結果55行を上書き）。人の行も含め全行に当てる
+    probe = load_apply_probe()
+    i_gk, i_go = header.index("ゲート種別"), header.index("ゲート可否")
+    gate_fixed = 0
+    for x in final:
+        g = latest_gate_cells(x[header.index("ASIN")], probe)
+        if g and (x[i_gk], x[i_go]) != g:
+            x[i_gk], x[i_go] = g
+            gate_fixed += 1
+    for x in EXTRA["GO"] + EXTRA[K_TR]:
+        g = latest_gate_cells(x.get("ASIN", ""), probe)
+        if g:
+            x["出品可否"] = g[1]
     # NETSEA 経由の GO に「復旧待ち」を付ける（人の行は触らない）
     i_site, i_sup = header.index("卸サイト"), header.index("購入元の名前")
     i_v, i_why = header.index("判定"), header.index("判定理由")
@@ -1844,7 +1908,8 @@ def main(argv=None) -> int:
                "実画面確認待ち_経路": Counter(w["卸サイト"] for w in waiting),
                "SD手入力卸価格": SD_MANUAL.exists(), "SD実画面卸価格(10/11)": len(load_sd_screen()),
                "SD経路へ切替": sorted(routed),
-               "卸率の表示を直した行（読み込み時）": ratio_fixed}
+               "卸率の表示を直した行（読み込み時）": ratio_fixed,
+               "ゲート列を申請画面／新しい観測で書き直した行": gate_fixed}
     print(json.dumps(summary, ensure_ascii=False, indent=1, default=str))
     with (OUT / "waiting_list.csv").open("w", encoding="utf-8-sig", newline="") as f:
         w = csv.DictWriter(f, fieldnames=["状態", "ASIN", "商品名", "卸サイト", "購入元", "月販",

@@ -214,6 +214,11 @@ $(sed -n '5,10p' "$LB_V14/ALERT.md" 2>/dev/null | sed 's/^/  /')
   if [ -f "$LB_V14/heartbeat.json" ]; then
     LB_M="$(stat -f %m "$LB_V14/heartbeat.json" 2>/dev/null || echo 0)"
     [ "$LB_M" -gt 0 ] && LB_BEAT="$(( ( $(date +%s) - LB_M ) / 60 ))分前"
+    # 2026-10-27：latest.json の「状態=稼働中」は最後のロールアップ時点の値。心拍が3時間以上
+    # 途絶えていれば止まっているので、そう書く（10/27 時点で心拍は56日前なのに「稼働中」と出ていた）
+    if [ "$LB_M" -gt 0 ] && [ $(( $(date +%s) - LB_M )) -gt 10800 ]; then
+      LB_BEAT="${LB_BEAT}（⚠ 3時間以上心拍なし＝**止まっています**。下の「状態」は最後に動いたときの値）"
+    fi
   fi
 
   LB_LINE="（まだロールアップがありません）"
@@ -294,7 +299,15 @@ except Exception:
     sys.exit(0)
 if not s.get('log_exists', True):
     sys.exit(0)
-missing = s.get('missing') or []
+# 2026-10-27（T-20261027-001）：直近14日の欠測だけを鳴らす。過去の欠測は埋められないので、
+# 全期間を数えると一度欠けた日がある限り毎セッション鳴り続け、警告が読まれなくなる
+# （10/27 時点で最終成功 10/26 なのに「31日欠測」と出ていた）。
+import datetime as _dt
+try:
+    _cut = (_dt.date.fromisoformat(s['today']) - _dt.timedelta(days=14)).isoformat()
+except Exception:
+    _cut = ''
+missing = [m for m in (s.get('missing') or []) if m >= _cut]
 today_pending = (not s.get('today_done')) and (not s.get('before_deadline'))
 if not missing and not today_pending:
     sys.exit(0)   # 平常。無風時は完全に静か
