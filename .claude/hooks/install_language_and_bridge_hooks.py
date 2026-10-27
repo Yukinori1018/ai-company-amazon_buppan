@@ -32,6 +32,7 @@ OWNER_FACING = "AskUserQuestion|SendUserFile|mcp__ccd_turn__.*|mcp__ccd_session_
 WORK = ("Bash|Edit|Write|MultiEdit|NotebookEdit|Agent|Task|mcp__claude-in-chrome__.*|"
         "mcp__Claude_Browser__.*|mcp__computer-use__.*|mcp__Control_Chrome__.*")
 
+WRITE = "Write|Edit|MultiEdit"
 GUARD_PROJECT = '"$CLAUDE_PROJECT_DIR"/.claude/hooks/japanese-only-guard.py'
 BRIDGE_USER = f"'{REPO}/.claude/hooks/global-buppan-bridge.py'"
 
@@ -39,6 +40,9 @@ PLAN = {
     "project": [("PreToolUse", OWNER_FACING, GUARD_PROJECT), ("Stop", None, GUARD_PROJECT)],
     "user": [("UserPromptSubmit", None, BRIDGE_USER),
              ("PreToolUse", OWNER_FACING, BRIDGE_USER),
+             # 2026-10-27 夜追加：書き込み前のガード（会員限定条件・資産台帳・発注ゲート）を
+             # 「道具でリポへ移った会話」にも効かせる。未登録なら --apply で足す（要承認）。
+             ("PreToolUse", WRITE, BRIDGE_USER),
              ("PostToolUse", WORK, BRIDGE_USER),
              ("Stop", None, BRIDGE_USER)],
 }
@@ -46,7 +50,9 @@ PLAN = {
 
 def add(settings, event, matcher, command):
     groups = settings.setdefault("hooks", {}).setdefault(event, [])
-    if any(h.get("command") == command for g in groups for h in g.get("hooks", [])):
+    # 同じ matcher・同じ command が既にあれば足さない（matcher 違いは別の登録として足す）
+    if any(g.get("matcher") == matcher and h.get("command") == command
+           for g in groups for h in g.get("hooks", [])):
         return False
     g = {"hooks": [{"type": "command", "command": command}]}
     if matcher:
