@@ -128,7 +128,7 @@
    "id": "actual_sales",
    "no": 9,
    "name": "実売（ASIN単位）",
-   "how": "型番ごとにキーゾンの3ヶ月販売数を見る（Keepa 式で可＝§F5。実装は workspace/output/agent_output/T-20260920-003/ledger20261010/kz_estimate.py・Git 対象外）。代表1件で済ませない（§C8）。Keepa monthlySold と並べて value に書く。バリエーションの子は family 合計の値・月13個超の高回転品は過小に出ることを判定理由に書く",
+   "how": "型番ごとにキーゾンの3ヶ月販売数を見る（Keepa 式で可＝§F5。実装は scripts/sourcing_gate/kz_estimate.py）。代表1件で済ませない（§C8）。Keepa monthlySold と並べて value に書く。バリエーションの子は family 合計の値・月13個超の高回転品は過小に出ることを判定理由に書く",
    "fail_if": "3ヶ月で実質ゼロ（§F5）／キーゾンと monthlySold が2倍以上食い違うのに定点観測（上位3〜4出品者の在庫の差分）をしていない＝UNKNOWN",
    "max_age_days": 3,
    "why_age": "市場で動く事実。§F5「判定データは4日で陳腐化」の実測から3日（v1 と同じ）",
@@ -136,7 +136,7 @@
    "stage": "発注前",
    "origin": "既存・条件変更",
    "decidable": "human",
-   "decidable_why": "§F5 で、実売は Keepa 式（キーゾン3ヶ月販売数の再現）で確定してよいと決まっている。ただし autofill は Keepa 式を計算しないので、kz_estimate.py の出力かキーゾンの実数を人が value に書く。"
+   "decidable_why": "§F5 で、実売は Keepa 式（キーゾン3ヶ月販売数の再現）で確定してよいと決まっている。ただし autofill は Keepa 式を計算しないので、scripts/sourcing_gate/kz_estimate.py の出力かキーゾンの実数を人が value に書く。"
   },
   {
    "id": "my_share",

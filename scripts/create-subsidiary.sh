@@ -54,6 +54,7 @@ PRODUCTS=""
 CUSTOMERS=""
 VISIBILITY="--private"
 DRY_RUN=0
+REPLACE_ONLY=""   # 指定時は Step C だけをそのディレクトリに実行（検証・やり直し用）
 
 # ---------------------------------------------------------------------------
 # ユーティリティ
@@ -90,6 +91,9 @@ OPTIONS:
   --private                  リポジトリを private で作成（デフォルト）
   --public                   リポジトリを public で作成
   --dry-run                  副作用を伴う処理を実行せず、計画のみ表示
+  --replace-only <dir>       Step C（プレースホルダー置換）だけを <dir> に実行する。
+                             GitHub・Notion・設定ファイルには触れない。動作確認や
+                             置換のやり直しに使う（--repo は不要）
   -h, --help                 このヘルプ
 
 引数を省略した項目は対話的に入力を求められます。
@@ -129,6 +133,7 @@ parse_args() {
       --private)        VISIBILITY="--private"; shift ;;
       --public)         VISIBILITY="--public"; shift ;;
       --dry-run)        DRY_RUN=1; shift ;;
+      --replace-only)   REPLACE_ONLY="$2"; shift 2 ;;
       -h|--help)        usage; exit 0 ;;
       *) die "Unknown option: $1 (--help でヘルプ表示)" ;;
     esac
@@ -168,7 +173,7 @@ collect_inputs() {
 # ---------------------------------------------------------------------------
 preflight() {
   log "前提チェック..."
-  for cmd in gh jq curl git sed; do
+  for cmd in gh jq curl git sed python3; do
     command -v "$cmd" >/dev/null 2>&1 \
       || die "$cmd が見つかりません。インストールしてください（gh と jq は brew install gh jq）"
   done
@@ -292,51 +297,33 @@ step_clone() {
 # ---------------------------------------------------------------------------
 # Step C: プレースホルダー置換
 # ---------------------------------------------------------------------------
-# macOS sed の特殊文字エスケープ（区切り文字 | を使うので | と & と \ を逃がす）
-sed_escape() {
-  printf '%s' "$1" | sed -e 's/[\\|&]/\\&/g'
-}
-
+# 置換の定義は docs/rules/subsidiary-placeholders.md（表と CLAUDE.md §B1 のひな形）。
+# 実体は scripts/subsidiary_placeholders.py。CLAUDE.md 本文に {{ }} を置かない方針
+# （2026-10-27 T-20261027-001）なので、「このリポに今書かれている値」を置き換える。
+# 引数 $1 = 対象ディレクトリ（省略時は clone 先）
 step_replace_placeholders() {
   log "Step C: プレースホルダー置換"
-  local dest="${CLONE_PARENT}/${REPO_NAME}"
+  local dest="${1:-${CLONE_PARENT}/${REPO_NAME}}"
+  local args=(
+    "$dest"
+    --business-name "$BUSINESS_NAME"
+    --mission       "$MISSION"
+    --kpi           "$KPI"
+    --products      "$PRODUCTS"
+    --customers     "$CUSTOMERS"
+  )
 
   if [ "$DRY_RUN" -eq 1 ]; then
-    printf '\033[1;35m[DRY]\033[0m find %s -type f \\( -name "*.md" -o -name "*.json*" \\) で対象列挙し、以下を置換:\n' "$dest"
-    printf '         {{ 事業名 }}            -> %s\n' "$BUSINESS_NAME"
-    printf '         {{ ミッション }}        -> %s\n' "$MISSION"
-    printf '         {{ 最重要KPI }}         -> %s\n' "$KPI"
-    printf '         {{ 主力商品/サービス }} -> %s\n' "$PRODUCTS"
-    printf '         {{ 想定顧客 }}          -> %s\n' "$CUSTOMERS"
-    printf '         ※ {{ チケットタイトル }} は runtime のため置換しない\n'
+    printf '\033[1;35m[DRY]\033[0m python3 scripts/subsidiary_placeholders.py %s（docs/rules/subsidiary-placeholders.md の表で置換）\n' "$dest"
+    printf '         事業名            -> %s（全文置換）\n' "$BUSINESS_NAME"
+    printf '         ミッション/KPI/主力商品/想定顧客 -> CLAUDE.md §B1 を書き直し\n'
     printf '         ※ {{ NOTION_API_KEY }} / {{ NOTION_DATABASE_ID }} は Step E で\n'
     ok "Step C 完了 (dry-run)"
     return
   fi
 
-  local b m k p c
-  b="$(sed_escape "$BUSINESS_NAME")"
-  m="$(sed_escape "$MISSION")"
-  k="$(sed_escape "$KPI")"
-  p="$(sed_escape "$PRODUCTS")"
-  c="$(sed_escape "$CUSTOMERS")"
-
-  # 対象ファイル列挙（.git と docs/reference は除外）
-  # NUL 区切りで読み、ファイル名の特殊文字に安全
-  find "$dest" -type f \( -name "*.md" -o -name "*.json" -o -name "*.json.example" \) \
-       -not -path "*/.git/*" \
-       -not -path "*/docs/reference/*" \
-       -print0 \
-  | while IFS= read -r -d '' f; do
-      sed -i '' \
-        -e "s|{{ 事業名 }}|${b}|g" \
-        -e "s|{{ ミッション }}|${m}|g" \
-        -e "s|{{ 最重要KPI }}|${k}|g" \
-        -e "s|{{ 主力商品/サービス }}|${p}|g" \
-        -e "s|{{ 想定顧客 }}|${c}|g" \
-        "$f"
-    done
-
+  python3 "${SCRIPT_DIR}/subsidiary_placeholders.py" "${args[@]}" \
+    || die "Step C の置換か検査に失敗しました（上の [NG] / [ERR] を参照）"
   ok "Step C 完了"
 }
 
@@ -518,6 +505,15 @@ EOF
 # ---------------------------------------------------------------------------
 main() {
   parse_args "$@"
+
+  if [ -n "$REPLACE_ONLY" ]; then
+    [ -d "$REPLACE_ONLY" ] || die "ディレクトリがありません: $REPLACE_ONLY"
+    REPO_NAME="(replace-only)"
+    collect_inputs
+    step_replace_placeholders "$REPLACE_ONLY"
+    exit 0
+  fi
+
   preflight
   load_config
   collect_inputs

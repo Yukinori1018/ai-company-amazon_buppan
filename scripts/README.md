@@ -12,7 +12,7 @@ ai-company-template 用の運用スクリプト置き場。
 |------|:----:|------|
 | GitHub リポジトリ作成（テンプレ複製） | ✓ | `gh repo create --template` |
 | ローカルへ clone（`~/Claude Code/<repo>`） | ✓ | 既存ディレクトリがあれば中断 |
-| プレースホルダー一括置換 | ✓ | `*.md` / `*.json*`（`docs/reference/`, `.git/` 除外） |
+| プレースホルダー一括置換 | ✓ | 定義は `docs/rules/subsidiary-placeholders.md`。`*.md` / `*.json*`（`docs/reference/`, `.git/` 除外）＋ CLAUDE.md §B1 |
 | Notion カンバン DB 作成 | ✓ | `docs/notion-board-schema.md` 準拠 |
 | `.mcp.json` 生成 + token/db-id 埋め込み | ✓ | gitignore 対象なので push されない |
 | `~/Documents/AI Company Outputs/<事業名>/` 作成 | ✓ | |
@@ -118,7 +118,7 @@ GITHUB_OWNER=                                # 空なら gh から自動取得
 |------|------|
 | A | `gh repo create $OWNER/$REPO --template Yukinori1018/ai-company-template --private` |
 | B | `~/Claude Code/$REPO/` に clone |
-| C | `find . -type f \( -name "*.md" -o -name "*.json*" \)`（`.git`, `docs/reference` 除外）で対象を列挙し、`{{ 事業名 }}` `{{ ミッション }}` `{{ 最重要KPI }}` `{{ 主力商品/サービス }}` `{{ 想定顧客 }}` を `sed -i ''` で置換。`{{ チケットタイトル }}` は runtime プレースホルダーなのでスキップ。`{{ NOTION_API_KEY }}` `{{ NOTION_DATABASE_ID }}` は Step E でやるのでスキップ |
+| C | `scripts/subsidiary_placeholders.py` が `docs/rules/subsidiary-placeholders.md` の表を読み、旧事業名を `*.md` / `*.json*` で全文置換（`.git`, `docs/reference` 除外）し、CLAUDE.md `### §B1` をひな形で書き直す。最後に置き残しを検査し、残れば止まる。`{{ NOTION_API_KEY }}` `{{ NOTION_DATABASE_ID }}` は Step E。`--replace-only <dir>` で Step C だけを実行できる（動作確認・やり直し用） |
 | D | `POST https://api.notion.com/v1/databases` に `scripts/notion-db-schema.json` の properties を送って DB 作成。レスポンスから `id` を抽出 |
 | E | `.mcp.json.example` を `.mcp.json` にコピーし、Notion token / DB ID を埋め込み（`chmod 600`） |
 | F | `~/Documents/AI Company Outputs/<事業名>/` を `mkdir -p` |
@@ -204,4 +204,4 @@ python3 scripts/check_source_cards.py --list   # 検出ファイルを OK/NG つ
 - 手動版手順（フォールバック）: [../docs/subsidiary-onboarding.md](../docs/subsidiary-onboarding.md)
 - Notion DB スキーマ仕様: [../docs/notion-board-schema.md](../docs/notion-board-schema.md)
 - Notion セットアップ詳細: [../docs/notion-setup-guide.md](../docs/notion-setup-guide.md)
-- プレースホルダー一覧（旧 CLAUDE.md §7 の原文）: [../docs/rules/operations.md](../docs/rules/operations.md)
+- プレースホルダー一覧（Step C が読む定義）: [../docs/rules/subsidiary-placeholders.md](../docs/rules/subsidiary-placeholders.md)（旧 CLAUDE.md §7 の原文は [../docs/rules/operations.md](../docs/rules/operations.md) 末尾）

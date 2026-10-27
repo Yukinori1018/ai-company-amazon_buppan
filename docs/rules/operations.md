@@ -493,6 +493,8 @@ todo → doing → waiting → done
 
 ### 旧§7 プレースホルダー一覧（旧 CLAUDE.md 718〜743行）
 
+> 2026-10-27：子会社化で使う一覧は [subsidiary-placeholders.md](subsidiary-placeholders.md) に移した（`create-subsidiary.sh` はそちらを読む）。下は当時の原文。
+
 #### 7. プレースホルダー一覧（子会社化チェックリスト）
 
 このテンプレートから子会社リポジトリを作る際、以下を埋めます。
