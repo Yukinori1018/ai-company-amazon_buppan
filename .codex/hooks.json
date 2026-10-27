@@ -1,0 +1,103 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "'/Users/yukinori/Claude Code/ai-company-amazon_buppan/.codex/hooks/asset-claim-guard.py'"
+          },
+          {
+            "type": "command",
+            "command": "'/Users/yukinori/Claude Code/ai-company-amazon_buppan/.codex/hooks/source-terms-guard.py'"
+          },
+          {
+            "type": "command",
+            "command": "'/Users/yukinori/Claude Code/ai-company-amazon_buppan/.codex/hooks/order-gate-guard.py'"
+          }
+        ]
+      },
+      {
+        "matcher": "AskUserQuestion|SendUserFile|mcp__ccd_turn__.*|mcp__ccd_session__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "'/Users/yukinori/Claude Code/ai-company-amazon_buppan/.codex/hooks/japanese-only-guard.py'"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit|NotebookEdit|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "'/Users/yukinori/Claude Code/ai-company-amazon_buppan/.codex/hooks/ticket-notion-sync-reminder.sh'"
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "'/Users/yukinori/Claude Code/ai-company-amazon_buppan/.codex/hooks/done-open-items-check.sh'"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash|Edit|Write|MultiEdit|NotebookEdit|Agent|Task|mcp__claude-in-chrome__.*|mcp__Claude_Browser__.*|mcp__computer-use__.*|mcp__Control_Chrome__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "'/Users/yukinori/Claude Code/ai-company-amazon_buppan/.codex/hooks/work-without-delegation-check.py'"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "'/Users/yukinori/Claude Code/ai-company-amazon_buppan/.codex/hooks/session-start.sh'"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "'/Users/yukinori/Claude Code/ai-company-amazon_buppan/.codex/hooks/delegation-check.sh'"
+          },
+          {
+            "type": "command",
+            "command": "'/Users/yukinori/Claude Code/ai-company-amazon_buppan/.codex/hooks/inbox-intake-check.sh'"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "'/Users/yukinori/Claude Code/ai-company-amazon_buppan/.codex/hooks/owner-tasks-sync-check.sh'"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "'/Users/yukinori/Claude Code/ai-company-amazon_buppan/.codex/hooks/japanese-only-guard.py'"
+          }
+        ]
+      }
+    ]
+  }
+}
