@@ -84,6 +84,14 @@
             "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/owner-tasks-sync-check.sh"
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/japanese-only-guard.py"
+          }
+        ]
       }
     ],
     "UserPromptSubmit": [
@@ -115,6 +123,15 @@
           {
             "type": "command",
             "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/order-gate-guard.py"
+          }
+        ]
+      },
+      {
+        "matcher": "AskUserQuestion|SendUserFile|mcp__ccd_turn__.*|mcp__ccd_session__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/japanese-only-guard.py"
           }
         ]
       }
