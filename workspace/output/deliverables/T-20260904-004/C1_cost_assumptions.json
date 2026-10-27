@@ -196,7 +196,7 @@
       "confidence": "実測",
       "range": null,
       "source": "workspace/output/deliverables/T-20260904-004/_tariffs_cache.json（ITタカシ取得・1社ぶん。社名/IDはPUBLICリポのため非掲載）",
-      "note": "送料の実額は /items の ship_fee ではなく /tariffs にある。当該社は gradual_border_price=20000・price2=0＝20,000円以上で送料無料、未満は770円（一部1,650円）。apply_type=higher（複数社注文時は高い方が適用）。【サンプル1社のみ】無料ラインはサプライヤーごとに異なる。全社分布はITタカシの取得完了待ち"
+      "note": "送料の実額は /items の ship_fee ではなく /tariffs にある。当該社は gradual_border_price=〔非公開・NETSEA規約15条〕・price2=〔非公開・NETSEA規約15条〕＝〔非公開・NETSEA規約15条〕以上で送料無料、未満は〔非公開・NETSEA規約15条〕（一部〔非公開・NETSEA規約15条〕）。apply_type=higher（複数社注文時は高い方が適用）。【サンプル1社のみ】無料ラインはサプライヤーごとに異なる。全社分布はITタカシの取得完了待ち"
     },
     {
       "id": "netsea_first_order_free_shipping",
